@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS9cu-0007bt-9U
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS9cv-0007cp-DO
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dS9cr-0004Wg-4B
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dS9cu-0004aD-ES
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 18:15:29 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon,  3 Jul 2017 17:14:46 -0500
-Message-Id: <20170703221456.30817-6-eblake@redhat.com>
+Date: Mon,  3 Jul 2017 17:14:47 -0500
+Message-Id: <20170703221456.30817-7-eblake@redhat.com>
 In-Reply-To: <20170703221456.30817-1-eblake@redhat.com>
 References: <20170703221456.30817-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/15] qcow2: Switch is_zero_sectors() to
+Subject: [Qemu-devel] [PATCH v2 06/15] block: Switch bdrv_make_zero() to
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,89 +21,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert another internal
-function (no semantic change), and rename it to is_zero() in the
-process.
+easier to reason about than sector-based.  Change the internal
+loop iteration of zeroing a device to track by bytes instead of
+sectors (although we are still guaranteed that we iterate by steps
+that are sector-aligned).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: rename function, rebase to upstream changes
+v2: rebase to earlier changes
 ---
- block/qcow2.c | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+ block/io.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index d75f248..9754193 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2905,21 +2905,28 @@ finish:
- }
-
-
--static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
--                            uint32_t count)
-+static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
+diff --git a/block/io.c b/block/io.c
+index 2377f3a..b3ba9af 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -669,38 +669,38 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+  */
+ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
  {
-     int nr;
-     int64_t res;
-+    int64_t start;
+-    int64_t target_sectors, ret, nb_sectors, sector_num = 0;
++    int64_t target_size, ret, bytes, offset = 0;
+     BlockDriverState *bs = child->bs;
+-    int n;
++    int n; /* sectors */
 
--    if (start + count > bs->total_sectors) {
--        count = bs->total_sectors - start;
-+    /* Widen to sector boundaries, then clamp to image length, before
-+     * checking status of underlying sectors */
-+    start = QEMU_ALIGN_DOWN(offset, BDRV_SECTOR_SIZE);
-+    bytes = QEMU_ALIGN_UP(offset + bytes, BDRV_SECTOR_SIZE) - start;
-+
-+    if (start + bytes > bs->total_sectors * BDRV_SECTOR_SIZE) {
-+        bytes = bs->total_sectors * BDRV_SECTOR_SIZE - start;
+-    target_sectors = bdrv_nb_sectors(bs);
+-    if (target_sectors < 0) {
+-        return target_sectors;
++    target_size = bdrv_getlength(bs);
++    if (target_size < 0) {
++        return target_size;
      }
 
--    if (!count) {
-+    if (!bytes) {
-         return true;
+     for (;;) {
+-        nb_sectors = MIN(target_sectors - sector_num, BDRV_REQUEST_MAX_SECTORS);
+-        if (nb_sectors <= 0) {
++        bytes = MIN(target_size - offset, BDRV_REQUEST_MAX_BYTES);
++        if (bytes <= 0) {
+             return 0;
+         }
+-        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, NULL);
++        ret = bdrv_get_block_status(bs, offset >> BDRV_SECTOR_BITS,
++                                    bytes >> BDRV_SECTOR_BITS, &n, NULL);
+         if (ret < 0) {
+-            error_report("error getting block status at sector %" PRId64 ": %s",
+-                         sector_num, strerror(-ret));
++            error_report("error getting block status at offset %" PRId64 ": %s",
++                         offset, strerror(-ret));
+             return ret;
+         }
+         if (ret & BDRV_BLOCK_ZERO) {
+-            sector_num += n;
++            offset += n * BDRV_SECTOR_BITS;
+             continue;
+         }
+-        ret = bdrv_pwrite_zeroes(child, sector_num << BDRV_SECTOR_BITS,
+-                                 n << BDRV_SECTOR_BITS, flags);
++        ret = bdrv_pwrite_zeroes(child, offset, n * BDRV_SECTOR_SIZE, flags);
+         if (ret < 0) {
+-            error_report("error writing zeroes at sector %" PRId64 ": %s",
+-                         sector_num, strerror(-ret));
++            error_report("error writing zeroes at offset %" PRId64 ": %s",
++                         offset, strerror(-ret));
+             return ret;
+         }
+-        sector_num += n;
++        offset += n * BDRV_SECTOR_SIZE;
      }
--    res = bdrv_get_block_status_above(bs, NULL, start, count, &nr, NULL);
--    return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == count;
-+    res = bdrv_get_block_status_above(bs, NULL, start >> BDRV_SECTOR_BITS,
-+                                      bytes >> BDRV_SECTOR_BITS, &nr, NULL);
-+    return res >= 0 && (res & BDRV_BLOCK_ZERO) &&
-+        nr * BDRV_SECTOR_SIZE == bytes;
  }
 
- static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-@@ -2937,24 +2944,21 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     }
-
-     if (head || tail) {
--        int64_t cl_start = (offset - head) >> BDRV_SECTOR_BITS;
-         uint64_t off;
-         unsigned int nr;
-
-         assert(head + bytes <= s->cluster_size);
-
-         /* check whether remainder of cluster already reads as zero */
--        if (!(is_zero_sectors(bs, cl_start,
--                              DIV_ROUND_UP(head, BDRV_SECTOR_SIZE)) &&
--              is_zero_sectors(bs, (offset + bytes) >> BDRV_SECTOR_BITS,
--                              DIV_ROUND_UP(-tail & (s->cluster_size - 1),
--                                           BDRV_SECTOR_SIZE)))) {
-+        if (!(is_zero(bs, offset - head, head) &&
-+              is_zero(bs, offset + bytes,
-+                      tail ? s->cluster_size - tail : 0))) {
-             return -ENOTSUP;
-         }
-
-         qemu_co_mutex_lock(&s->lock);
-         /* We can have new write after previous check */
--        offset = cl_start << BDRV_SECTOR_BITS;
-+        offset = QEMU_ALIGN_DOWN(offset, s->cluster_size);
-         bytes = s->cluster_size;
-         nr = s->cluster_size;
-         ret = qcow2_get_cluster_offset(bs, offset, &nr, &off);
 -- 
 2.9.4
