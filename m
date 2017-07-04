@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQmF-0007uO-4u
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:34:16 -0400
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQuP-0002vQ-6u
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:42:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQmB-0004BX-TE
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:34:15 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:3675)
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQuM-00009x-10
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:42:41 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:15762
+	helo=SMTP.EU.CITRIX.COM)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQmB-0004Aq-EW
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:34:11 -0400
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQuL-000069-FU
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:42:37 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 4 Jul 2017 16:42:21 +0000
+Message-ID: <449552367f194ec5bc0a0ac5f0646fb0@AMSPEX02CL01.citrite.net>
 References: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
 	<1499183267-28623-4-git-send-email-igor.druzhinin@citrix.com>
 	<5e854d8a0df0401eba375f959ee5de8c@AMSPEX02CL01.citrite.net>
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Message-ID: <7833d6fb-b930-6890-b679-afc1ad8cde9e@citrix.com>
-Date: Tue, 4 Jul 2017 17:34:04 +0100
-MIME-Version: 1.0
-In-Reply-To: <5e854d8a0df0401eba375f959ee5de8c@AMSPEX02CL01.citrite.net>
-Content-Type: text/plain; charset="utf-8"
+	<7833d6fb-b930-6890-b679-afc1ad8cde9e@citrix.com>
+In-Reply-To: <7833d6fb-b930-6890-b679-afc1ad8cde9e@citrix.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH v2 3/4] xen/mapcache: introduce
  xen_replace_cache_entry()
 List-Id: <qemu-devel.nongnu.org>
@@ -33,296 +35,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Igor Druzhinin <igor.druzhinin@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "sstabellini@kernel.org" <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-On 04/07/17 17:27, Paul Durrant wrote:
->> -----Original Message-----
->> From: Igor Druzhinin
->> Sent: 04 July 2017 16:48
->> To: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
->> Cc: Igor Druzhinin <igor.druzhinin@citrix.com>; sstabellini@kernel.org;
->> Anthony Perard <anthony.perard@citrix.com>; Paul Durrant
->> <Paul.Durrant@citrix.com>; pbonzini@redhat.com
->> Subject: [PATCH v2 3/4] xen/mapcache: introduce
->> xen_replace_cache_entry()
->>
->> This new call is trying to update a requested map cache entry
->> according to the changes in the physmap. The call is searching
->> for the entry, unmaps it and maps again at the same place using
->> a new guest address. If the mapping is dummy this call will
->> make it real.
->>
->> This function makes use of a new xenforeignmemory_map2() call
->> with an extended interface that was recently introduced in
->> libxenforeignmemory [1].
-> 
-> I don't understand how the compat layer works here. If xenforeignmemory_map2() is not available then you can't control the placement in virtual address space.
-> 
-
-If it's not 4.10 or newer xenforeignmemory_map2() doesn't exist and is
-going to be defined as xenforeignmemory_map(). At the same time
-XEN_COMPAT_PHYSMAP is defined and the entry replace function (which
-relies on xenforeignmemory_map2 functionality) is never going to be called.
-
-If you mean that I should incorporate this into the description I can do it.
-
-Igor
-
->   Paul
-> 
->>
->> [1] https://www.mail-archive.com/xen-devel@lists.xen.org/msg113007.html
->>
->> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
->> ---
->>  configure                     | 18 ++++++++++
->>  hw/i386/xen/xen-mapcache.c    | 79
->> ++++++++++++++++++++++++++++++++++++++-----
->>  include/hw/xen/xen_common.h   |  7 ++++
->>  include/sysemu/xen-mapcache.h | 11 +++++-
->>  4 files changed, 106 insertions(+), 9 deletions(-)
->>
->> diff --git a/configure b/configure
->> index c571ad1..ad6156b 100755
->> --- a/configure
->> +++ b/configure
->> @@ -2021,6 +2021,24 @@ EOF
->>      # Xen unstable
->>      elif
->>          cat > $TMPC <<EOF &&
->> +#undef XC_WANT_COMPAT_MAP_FOREIGN_API
->> +#include <xenforeignmemory.h>
->> +int main(void) {
->> +  xenforeignmemory_handle *xfmem;
->> +
->> +  xfmem = xenforeignmemory_open(0, 0);
->> +  xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
->> +
->> +  return 0;
->> +}
->> +EOF
->> +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
->> +      then
->> +      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
->> +      xen_ctrl_version=41000
->> +      xen=yes
->> +    elif
->> +        cat > $TMPC <<EOF &&
->>  #undef XC_WANT_COMPAT_DEVICEMODEL_API
->>  #define __XEN_TOOLS__
->>  #include <xendevicemodel.h>
->> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
->> index cd4e746..a988be7 100644
->> --- a/hw/i386/xen/xen-mapcache.c
->> +++ b/hw/i386/xen/xen-mapcache.c
->> @@ -151,6 +151,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f,
->> void *opaque)
->>  }
->>
->>  static void xen_remap_bucket(MapCacheEntry *entry,
->> +                             void *vaddr,
->>                               hwaddr size,
->>                               hwaddr address_index,
->>                               bool dummy)
->> @@ -167,7 +168,9 @@ static void xen_remap_bucket(MapCacheEntry
->> *entry,
->>      err = g_malloc0(nb_pfn * sizeof (int));
->>
->>      if (entry->vaddr_base != NULL) {
->> -        ram_block_notify_remove(entry->vaddr_base, entry->size);
->> +        if (entry->vaddr_base != vaddr) {
->> +            ram_block_notify_remove(entry->vaddr_base, entry->size);
->> +        }
->>          if (munmap(entry->vaddr_base, entry->size) != 0) {
->>              perror("unmap fails");
->>              exit(-1);
->> @@ -181,11 +184,11 @@ static void xen_remap_bucket(MapCacheEntry
->> *entry,
->>      }
->>
->>      if (!dummy) {
->> -        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
->> -                                           PROT_READ|PROT_WRITE,
->> +        vaddr_base = xenforeignmemory_map2(xen_fmem, xen_domid,
->> vaddr,
->> +                                           PROT_READ|PROT_WRITE, 0,
->>                                             nb_pfn, pfns, err);
->>          if (vaddr_base == NULL) {
->> -            perror("xenforeignmemory_map");
->> +            perror("xenforeignmemory_map2");
->>              exit(-1);
->>          }
->>          entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
->> @@ -194,7 +197,7 @@ static void xen_remap_bucket(MapCacheEntry
->> *entry,
->>           * We create dummy mappings where we are unable to create a foreign
->>           * mapping immediately due to certain circumstances (i.e. on resume
->> now)
->>           */
->> -        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
->> +        vaddr_base = mmap(vaddr, size, PROT_READ|PROT_WRITE,
->>                            MAP_ANON|MAP_SHARED, -1, 0);
->>          if (vaddr_base == NULL) {
->>              perror("mmap");
->> @@ -203,13 +206,16 @@ static void xen_remap_bucket(MapCacheEntry
->> *entry,
->>          entry->flags |= XEN_MAPCACHE_ENTRY_DUMMY;
->>      }
->>
->> +    if (entry->vaddr_base == NULL || entry->vaddr_base != vaddr) {
->> +        ram_block_notify_add(vaddr_base, size);
->> +    }
->> +
->>      entry->vaddr_base = vaddr_base;
->>      entry->paddr_index = address_index;
->>      entry->size = size;
->>      entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long)
->> *
->>              BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
->>
->> -    ram_block_notify_add(entry->vaddr_base, entry->size);
->>      bitmap_zero(entry->valid_mapping, nb_pfn);
->>      for (i = 0; i < nb_pfn; i++) {
->>          if (!err[i]) {
->> @@ -282,14 +288,14 @@ tryagain:
->>      if (!entry) {
->>          entry = g_malloc0(sizeof (MapCacheEntry));
->>          pentry->next = entry;
->> -        xen_remap_bucket(entry, cache_size, address_index, dummy);
->> +        xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
->>      } else if (!entry->lock) {
->>          if (!entry->vaddr_base || entry->paddr_index != address_index ||
->>                  entry->size != cache_size ||
->>                  !test_bits(address_offset >> XC_PAGE_SHIFT,
->>                      test_bit_size >> XC_PAGE_SHIFT,
->>                      entry->valid_mapping)) {
->> -            xen_remap_bucket(entry, cache_size, address_index, dummy);
->> +            xen_remap_bucket(entry, NULL, cache_size, address_index,
->> dummy);
->>          }
->>      }
->>
->> @@ -486,3 +492,60 @@ void xen_invalidate_map_cache(void)
->>
->>      mapcache_unlock();
->>  }
->> +
->> +static uint8_t *xen_replace_cache_entry_unlocked(hwaddr
->> old_phys_addr,
->> +                                                 hwaddr new_phys_addr,
->> +                                                 hwaddr size)
->> +{
->> +    MapCacheEntry *entry;
->> +    hwaddr address_index;
->> +    hwaddr address_offset;
->> +    hwaddr cache_size = size;
->> +    hwaddr test_bit_size;
->> +
->> +    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
->> +    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
->> +
->> +    assert(size);
->> +    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
->> +    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
->> +    if (test_bit_size % XC_PAGE_SIZE) {
->> +        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
->> +    }
->> +    cache_size = size + address_offset;
->> +    if (cache_size % MCACHE_BUCKET_SIZE) {
->> +        cache_size += MCACHE_BUCKET_SIZE - (cache_size %
->> MCACHE_BUCKET_SIZE);
->> +    }
->> +
->> +    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
->> +    while (entry && !(entry->paddr_index == address_index && entry->size
->> == cache_size)) {
->> +        entry = entry->next;
->> +    }
->> +    if (!entry) {
->> +        DPRINTF("Trying to update an entry for %lx that is not in the
->> mapcache!\n", phys_addr);
->> +        return NULL;
->> +    }
->> +
->> +    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
->> +    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
->> +
->> +    xen_remap_bucket(entry, entry->vaddr_base, cache_size,
->> address_index, false);
->> +    if(!test_bits(address_offset >> XC_PAGE_SHIFT,
->> +                test_bit_size >> XC_PAGE_SHIFT,
->> +                entry->valid_mapping)) {
->> +        DPRINTF("Unable to update an entry for %lx in the mapcache!\n",
->> phys_addr);
->> +        return NULL;
->> +    }
->> +
->> +    return entry->vaddr_base + address_offset;
->> +}
->> +
->> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr, hwaddr
->> new_phys_addr, hwaddr size)
->> +{
->> +    uint8_t *p;
->> +
->> +    mapcache_lock();
->> +    p = xen_replace_cache_entry_unlocked(old_phys_addr,
->> new_phys_addr, size);
->> +    mapcache_unlock();
->> +    return p;
->> +}
->> diff --git a/include/hw/xen/xen_common.h
->> b/include/hw/xen/xen_common.h
->> index e00ddd7..70a5cad 100644
->> --- a/include/hw/xen/xen_common.h
->> +++ b/include/hw/xen/xen_common.h
->> @@ -78,6 +78,13 @@ static inline void
->> *xenforeignmemory_map(xc_interface *h, uint32_t dom,
->>
->>  extern xenforeignmemory_handle *xen_fmem;
->>
->> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
->> +
->> +#define xenforeignmemory_map2(h, d, a, p, f, ps, ar, e) \
->> +    xenforeignmemory_map(h, d, p, ps, ar, e)
->> +
->> +#endif
->> +
->>  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
->>
->>  typedef xc_interface xendevicemodel_handle;
->> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-
->> mapcache.h
->> index 01daaad..b38962c 100644
->> --- a/include/sysemu/xen-mapcache.h
->> +++ b/include/sysemu/xen-mapcache.h
->> @@ -21,7 +21,9 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr
->> size,
->>  ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
->>  void xen_invalidate_map_cache_entry(uint8_t *buffer);
->>  void xen_invalidate_map_cache(void);
->> -
->> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
->> +                                 hwaddr new_phys_addr,
->> +                                 hwaddr size);
->>  #else
->>
->>  static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
->> @@ -50,6 +52,13 @@ static inline void xen_invalidate_map_cache(void)
->>  {
->>  }
->>
->> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
->> +                                 hwaddr new_phys_addr,
->> +                                 hwaddr size)
->> +{
->> +    abort();
->> +}
->> +
->>  #endif
->>
->>  #endif /* XEN_MAPCACHE_H */
->> --
->> 2.7.4
-> 
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBJZ29yIERydXpoaW5pbg0KPiBT
+ZW50OiAwNCBKdWx5IDIwMTcgMTc6MzQNCj4gVG86IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50
+QGNpdHJpeC5jb20+OyB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7DQo+IHFlbXUtZGV2
+ZWxAbm9uZ251Lm9yZw0KPiBDYzogc3N0YWJlbGxpbmlAa2VybmVsLm9yZzsgQW50aG9ueSBQZXJh
+cmQgPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+Ow0KPiBwYm9uemluaUByZWRoYXQuY29tDQo+
+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMy80XSB4ZW4vbWFwY2FjaGU6IGludHJvZHVjZQ0KPiB4
+ZW5fcmVwbGFjZV9jYWNoZV9lbnRyeSgpDQo+IA0KPiBPbiAwNC8wNy8xNyAxNzoyNywgUGF1bCBE
+dXJyYW50IHdyb3RlOg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9t
+OiBJZ29yIERydXpoaW5pbg0KPiA+PiBTZW50OiAwNCBKdWx5IDIwMTcgMTY6NDgNCj4gPj4gVG86
+IHhlbi1kZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+
+ID4+IENjOiBJZ29yIERydXpoaW5pbiA8aWdvci5kcnV6aGluaW5AY2l0cml4LmNvbT47IHNzdGFi
+ZWxsaW5pQGtlcm5lbC5vcmc7DQo+ID4+IEFudGhvbnkgUGVyYXJkIDxhbnRob255LnBlcmFyZEBj
+aXRyaXguY29tPjsgUGF1bCBEdXJyYW50DQo+ID4+IDxQYXVsLkR1cnJhbnRAY2l0cml4LmNvbT47
+IHBib256aW5pQHJlZGhhdC5jb20NCj4gPj4gU3ViamVjdDogW1BBVENIIHYyIDMvNF0geGVuL21h
+cGNhY2hlOiBpbnRyb2R1Y2UNCj4gPj4geGVuX3JlcGxhY2VfY2FjaGVfZW50cnkoKQ0KPiA+Pg0K
+PiA+PiBUaGlzIG5ldyBjYWxsIGlzIHRyeWluZyB0byB1cGRhdGUgYSByZXF1ZXN0ZWQgbWFwIGNh
+Y2hlIGVudHJ5DQo+ID4+IGFjY29yZGluZyB0byB0aGUgY2hhbmdlcyBpbiB0aGUgcGh5c21hcC4g
+VGhlIGNhbGwgaXMgc2VhcmNoaW5nDQo+ID4+IGZvciB0aGUgZW50cnksIHVubWFwcyBpdCBhbmQg
+bWFwcyBhZ2FpbiBhdCB0aGUgc2FtZSBwbGFjZSB1c2luZw0KPiA+PiBhIG5ldyBndWVzdCBhZGRy
+ZXNzLiBJZiB0aGUgbWFwcGluZyBpcyBkdW1teSB0aGlzIGNhbGwgd2lsbA0KPiA+PiBtYWtlIGl0
+IHJlYWwuDQo+ID4+DQo+ID4+IFRoaXMgZnVuY3Rpb24gbWFrZXMgdXNlIG9mIGEgbmV3IHhlbmZv
+cmVpZ25tZW1vcnlfbWFwMigpIGNhbGwNCj4gPj4gd2l0aCBhbiBleHRlbmRlZCBpbnRlcmZhY2Ug
+dGhhdCB3YXMgcmVjZW50bHkgaW50cm9kdWNlZCBpbg0KPiA+PiBsaWJ4ZW5mb3JlaWdubWVtb3J5
+IFsxXS4NCj4gPg0KPiA+IEkgZG9uJ3QgdW5kZXJzdGFuZCBob3cgdGhlIGNvbXBhdCBsYXllciB3
+b3JrcyBoZXJlLiBJZg0KPiB4ZW5mb3JlaWdubWVtb3J5X21hcDIoKSBpcyBub3QgYXZhaWxhYmxl
+IHRoZW4geW91IGNhbid0IGNvbnRyb2wgdGhlDQo+IHBsYWNlbWVudCBpbiB2aXJ0dWFsIGFkZHJl
+c3Mgc3BhY2UuDQo+ID4NCj4gDQo+IElmIGl0J3Mgbm90IDQuMTAgb3IgbmV3ZXIgeGVuZm9yZWln
+bm1lbW9yeV9tYXAyKCkgZG9lc24ndCBleGlzdCBhbmQgaXMNCj4gZ29pbmcgdG8gYmUgZGVmaW5l
+ZCBhcyB4ZW5mb3JlaWdubWVtb3J5X21hcCgpLiBBdCB0aGUgc2FtZSB0aW1lDQo+IFhFTl9DT01Q
+QVRfUEhZU01BUCBpcyBkZWZpbmVkIGFuZCB0aGUgZW50cnkgcmVwbGFjZSBmdW5jdGlvbiAod2hp
+Y2gNCj4gcmVsaWVzIG9uIHhlbmZvcmVpZ25tZW1vcnlfbWFwMiBmdW5jdGlvbmFsaXR5KSBpcyBu
+ZXZlciBnb2luZyB0byBiZSBjYWxsZWQuDQo+IA0KPiBJZiB5b3UgbWVhbiB0aGF0IEkgc2hvdWxk
+IGluY29ycG9yYXRlIHRoaXMgaW50byB0aGUgZGVzY3JpcHRpb24gSSBjYW4gZG8gaXQuDQoNCkFG
+QUlDVCBYRU5fQ09NUEFUX1BIWVNNQVAgaXMgbm90IGludHJvZHVjZWQgdW50aWwgcGF0Y2ggIzQg
+dGhvdWdoLg0KDQpUaGUgcHJvYmxlbSByZWFsbHkgY29tZXMgZG93biB0byBkZWZpbmluZyB4ZW5m
+b3JlaWdubWVtb3J5X21hcDIoKSBpbiB0ZXJtcyBvZiB4ZW5mb3JlaWdubWVtb3J5X21hcCgpLiBJ
+dCBiYXNpY2FsbHkgY2FuJ3QgYmUgc2FmZWx5IGRvbmUuIENvdWxkIHlvdSBkZWZpbmUgeGVuZm9y
+ZWlnbm1lbW9yeV9tYXAyKCkgYXMgYWJvcnQoKSBpbiB0aGUgY29tcGF0IGNhc2UgaW5zdGVhZD8g
+DQoNCiAgUGF1bA0KDQo+IA0KPiBJZ29yDQo+IA0KPiA+ICAgUGF1bA0KPiA+DQo+ID4+DQo+ID4+
+IFsxXSBodHRwczovL3d3dy5tYWlsLWFyY2hpdmUuY29tL3hlbi0NCj4gZGV2ZWxAbGlzdHMueGVu
+Lm9yZy9tc2cxMTMwMDcuaHRtbA0KPiA+Pg0KPiA+PiBTaWduZWQtb2ZmLWJ5OiBJZ29yIERydXpo
+aW5pbiA8aWdvci5kcnV6aGluaW5AY2l0cml4LmNvbT4NCj4gPj4gLS0tDQo+ID4+ICBjb25maWd1
+cmUgICAgICAgICAgICAgICAgICAgICB8IDE4ICsrKysrKysrKysNCj4gPj4gIGh3L2kzODYveGVu
+L3hlbi1tYXBjYWNoZS5jICAgIHwgNzkNCj4gPj4gKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKystLS0tLQ0KPiA+PiAgaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5oICAgfCAg
+NyArKysrDQo+ID4+ICBpbmNsdWRlL3N5c2VtdS94ZW4tbWFwY2FjaGUuaCB8IDExICsrKysrLQ0K
+PiA+PiAgNCBmaWxlcyBjaGFuZ2VkLCAxMDYgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkN
+Cj4gPj4NCj4gPj4gZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZSBiL2NvbmZpZ3VyZQ0KPiA+PiBpbmRl
+eCBjNTcxYWQxLi5hZDYxNTZiIDEwMDc1NQ0KPiA+PiAtLS0gYS9jb25maWd1cmUNCj4gPj4gKysr
+IGIvY29uZmlndXJlDQo+ID4+IEBAIC0yMDIxLDYgKzIwMjEsMjQgQEAgRU9GDQo+ID4+ICAgICAg
+IyBYZW4gdW5zdGFibGUNCj4gPj4gICAgICBlbGlmDQo+ID4+ICAgICAgICAgIGNhdCA+ICRUTVBD
+IDw8RU9GICYmDQo+ID4+ICsjdW5kZWYgWENfV0FOVF9DT01QQVRfTUFQX0ZPUkVJR05fQVBJDQo+
+ID4+ICsjaW5jbHVkZSA8eGVuZm9yZWlnbm1lbW9yeS5oPg0KPiA+PiAraW50IG1haW4odm9pZCkg
+ew0KPiA+PiArICB4ZW5mb3JlaWdubWVtb3J5X2hhbmRsZSAqeGZtZW07DQo+ID4+ICsNCj4gPj4g
+KyAgeGZtZW0gPSB4ZW5mb3JlaWdubWVtb3J5X29wZW4oMCwgMCk7DQo+ID4+ICsgIHhlbmZvcmVp
+Z25tZW1vcnlfbWFwMih4Zm1lbSwgMCwgMCwgMCwgMCwgMCwgMCwgMCk7DQo+ID4+ICsNCj4gPj4g
+KyAgcmV0dXJuIDA7DQo+ID4+ICt9DQo+ID4+ICtFT0YNCj4gPj4gKyAgICAgICAgY29tcGlsZV9w
+cm9nICIiICIkeGVuX2xpYnMgLWx4ZW5kZXZpY2Vtb2RlbCAkeGVuX3N0YWJsZV9saWJzIg0KPiA+
+PiArICAgICAgdGhlbg0KPiA+PiArICAgICAgeGVuX3N0YWJsZV9saWJzPSItbHhlbmRldmljZW1v
+ZGVsICR4ZW5fc3RhYmxlX2xpYnMiDQo+ID4+ICsgICAgICB4ZW5fY3RybF92ZXJzaW9uPTQxMDAw
+DQo+ID4+ICsgICAgICB4ZW49eWVzDQo+ID4+ICsgICAgZWxpZg0KPiA+PiArICAgICAgICBjYXQg
+PiAkVE1QQyA8PEVPRiAmJg0KPiA+PiAgI3VuZGVmIFhDX1dBTlRfQ09NUEFUX0RFVklDRU1PREVM
+X0FQSQ0KPiA+PiAgI2RlZmluZSBfX1hFTl9UT09MU19fDQo+ID4+ICAjaW5jbHVkZSA8eGVuZGV2
+aWNlbW9kZWwuaD4NCj4gPj4gZGlmZiAtLWdpdCBhL2h3L2kzODYveGVuL3hlbi1tYXBjYWNoZS5j
+IGIvaHcvaTM4Ni94ZW4veGVuLW1hcGNhY2hlLmMNCj4gPj4gaW5kZXggY2Q0ZTc0Ni4uYTk4OGJl
+NyAxMDA2NDQNCj4gPj4gLS0tIGEvaHcvaTM4Ni94ZW4veGVuLW1hcGNhY2hlLmMNCj4gPj4gKysr
+IGIvaHcvaTM4Ni94ZW4veGVuLW1hcGNhY2hlLmMNCj4gPj4gQEAgLTE1MSw2ICsxNTEsNyBAQCB2
+b2lkDQo+IHhlbl9tYXBfY2FjaGVfaW5pdChwaHlzX29mZnNldF90b19nYWRkcl90IGYsDQo+ID4+
+IHZvaWQgKm9wYXF1ZSkNCj4gPj4gIH0NCj4gPj4NCj4gPj4gIHN0YXRpYyB2b2lkIHhlbl9yZW1h
+cF9idWNrZXQoTWFwQ2FjaGVFbnRyeSAqZW50cnksDQo+ID4+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHZvaWQgKnZhZGRyLA0KPiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBod2FkZHIgc2l6ZSwNCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaHdhZGRy
+IGFkZHJlc3NfaW5kZXgsDQo+ID4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wg
+ZHVtbXkpDQo+ID4+IEBAIC0xNjcsNyArMTY4LDkgQEAgc3RhdGljIHZvaWQgeGVuX3JlbWFwX2J1
+Y2tldChNYXBDYWNoZUVudHJ5DQo+ID4+ICplbnRyeSwNCj4gPj4gICAgICBlcnIgPSBnX21hbGxv
+YzAobmJfcGZuICogc2l6ZW9mIChpbnQpKTsNCj4gPj4NCj4gPj4gICAgICBpZiAoZW50cnktPnZh
+ZGRyX2Jhc2UgIT0gTlVMTCkgew0KPiA+PiAtICAgICAgICByYW1fYmxvY2tfbm90aWZ5X3JlbW92
+ZShlbnRyeS0+dmFkZHJfYmFzZSwgZW50cnktPnNpemUpOw0KPiA+PiArICAgICAgICBpZiAoZW50
+cnktPnZhZGRyX2Jhc2UgIT0gdmFkZHIpIHsNCj4gPj4gKyAgICAgICAgICAgIHJhbV9ibG9ja19u
+b3RpZnlfcmVtb3ZlKGVudHJ5LT52YWRkcl9iYXNlLCBlbnRyeS0+c2l6ZSk7DQo+ID4+ICsgICAg
+ICAgIH0NCj4gPj4gICAgICAgICAgaWYgKG11bm1hcChlbnRyeS0+dmFkZHJfYmFzZSwgZW50cnkt
+PnNpemUpICE9IDApIHsNCj4gPj4gICAgICAgICAgICAgIHBlcnJvcigidW5tYXAgZmFpbHMiKTsN
+Cj4gPj4gICAgICAgICAgICAgIGV4aXQoLTEpOw0KPiA+PiBAQCAtMTgxLDExICsxODQsMTEgQEAg
+c3RhdGljIHZvaWQgeGVuX3JlbWFwX2J1Y2tldChNYXBDYWNoZUVudHJ5DQo+ID4+ICplbnRyeSwN
+Cj4gPj4gICAgICB9DQo+ID4+DQo+ID4+ICAgICAgaWYgKCFkdW1teSkgew0KPiA+PiAtICAgICAg
+ICB2YWRkcl9iYXNlID0geGVuZm9yZWlnbm1lbW9yeV9tYXAoeGVuX2ZtZW0sIHhlbl9kb21pZCwN
+Cj4gPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQUk9UX1JF
+QUR8UFJPVF9XUklURSwNCj4gPj4gKyAgICAgICAgdmFkZHJfYmFzZSA9IHhlbmZvcmVpZ25tZW1v
+cnlfbWFwMih4ZW5fZm1lbSwgeGVuX2RvbWlkLA0KPiA+PiB2YWRkciwNCj4gPj4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQUk9UX1JFQUR8UFJPVF9XUklURSwg
+MCwNCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYl9w
+Zm4sIHBmbnMsIGVycik7DQo+ID4+ICAgICAgICAgIGlmICh2YWRkcl9iYXNlID09IE5VTEwpIHsN
+Cj4gPj4gLSAgICAgICAgICAgIHBlcnJvcigieGVuZm9yZWlnbm1lbW9yeV9tYXAiKTsNCj4gPj4g
+KyAgICAgICAgICAgIHBlcnJvcigieGVuZm9yZWlnbm1lbW9yeV9tYXAyIik7DQo+ID4+ICAgICAg
+ICAgICAgICBleGl0KC0xKTsNCj4gPj4gICAgICAgICAgfQ0KPiA+PiAgICAgICAgICBlbnRyeS0+
+ZmxhZ3MgJj0gfihYRU5fTUFQQ0FDSEVfRU5UUllfRFVNTVkpOw0KPiA+PiBAQCAtMTk0LDcgKzE5
+Nyw3IEBAIHN0YXRpYyB2b2lkIHhlbl9yZW1hcF9idWNrZXQoTWFwQ2FjaGVFbnRyeQ0KPiA+PiAq
+ZW50cnksDQo+ID4+ICAgICAgICAgICAqIFdlIGNyZWF0ZSBkdW1teSBtYXBwaW5ncyB3aGVyZSB3
+ZSBhcmUgdW5hYmxlIHRvIGNyZWF0ZSBhDQo+IGZvcmVpZ24NCj4gPj4gICAgICAgICAgICogbWFw
+cGluZyBpbW1lZGlhdGVseSBkdWUgdG8gY2VydGFpbiBjaXJjdW1zdGFuY2VzIChpLmUuIG9uIHJl
+c3VtZQ0KPiA+PiBub3cpDQo+ID4+ICAgICAgICAgICAqLw0KPiA+PiAtICAgICAgICB2YWRkcl9i
+YXNlID0gbW1hcChOVUxMLCBzaXplLCBQUk9UX1JFQUR8UFJPVF9XUklURSwNCj4gPj4gKyAgICAg
+ICAgdmFkZHJfYmFzZSA9IG1tYXAodmFkZHIsIHNpemUsIFBST1RfUkVBRHxQUk9UX1dSSVRFLA0K
+PiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICBNQVBfQU5PTnxNQVBfU0hBUkVELCAtMSwg
+MCk7DQo+ID4+ICAgICAgICAgIGlmICh2YWRkcl9iYXNlID09IE5VTEwpIHsNCj4gPj4gICAgICAg
+ICAgICAgIHBlcnJvcigibW1hcCIpOw0KPiA+PiBAQCAtMjAzLDEzICsyMDYsMTYgQEAgc3RhdGlj
+IHZvaWQgeGVuX3JlbWFwX2J1Y2tldChNYXBDYWNoZUVudHJ5DQo+ID4+ICplbnRyeSwNCj4gPj4g
+ICAgICAgICAgZW50cnktPmZsYWdzIHw9IFhFTl9NQVBDQUNIRV9FTlRSWV9EVU1NWTsNCj4gPj4g
+ICAgICB9DQo+ID4+DQo+ID4+ICsgICAgaWYgKGVudHJ5LT52YWRkcl9iYXNlID09IE5VTEwgfHwg
+ZW50cnktPnZhZGRyX2Jhc2UgIT0gdmFkZHIpIHsNCj4gPj4gKyAgICAgICAgcmFtX2Jsb2NrX25v
+dGlmeV9hZGQodmFkZHJfYmFzZSwgc2l6ZSk7DQo+ID4+ICsgICAgfQ0KPiA+PiArDQo+ID4+ICAg
+ICAgZW50cnktPnZhZGRyX2Jhc2UgPSB2YWRkcl9iYXNlOw0KPiA+PiAgICAgIGVudHJ5LT5wYWRk
+cl9pbmRleCA9IGFkZHJlc3NfaW5kZXg7DQo+ID4+ICAgICAgZW50cnktPnNpemUgPSBzaXplOw0K
+PiA+PiAgICAgIGVudHJ5LT52YWxpZF9tYXBwaW5nID0gKHVuc2lnbmVkIGxvbmcgKikgZ19tYWxs
+b2MwKHNpemVvZih1bnNpZ25lZA0KPiBsb25nKQ0KPiA+PiAqDQo+ID4+ICAgICAgICAgICAgICBC
+SVRTX1RPX0xPTkdTKHNpemUgPj4gWENfUEFHRV9TSElGVCkpOw0KPiA+Pg0KPiA+PiAtICAgIHJh
+bV9ibG9ja19ub3RpZnlfYWRkKGVudHJ5LT52YWRkcl9iYXNlLCBlbnRyeS0+c2l6ZSk7DQo+ID4+
+ICAgICAgYml0bWFwX3plcm8oZW50cnktPnZhbGlkX21hcHBpbmcsIG5iX3Bmbik7DQo+ID4+ICAg
+ICAgZm9yIChpID0gMDsgaSA8IG5iX3BmbjsgaSsrKSB7DQo+ID4+ICAgICAgICAgIGlmICghZXJy
+W2ldKSB7DQo+ID4+IEBAIC0yODIsMTQgKzI4OCwxNCBAQCB0cnlhZ2FpbjoNCj4gPj4gICAgICBp
+ZiAoIWVudHJ5KSB7DQo+ID4+ICAgICAgICAgIGVudHJ5ID0gZ19tYWxsb2MwKHNpemVvZiAoTWFw
+Q2FjaGVFbnRyeSkpOw0KPiA+PiAgICAgICAgICBwZW50cnktPm5leHQgPSBlbnRyeTsNCj4gPj4g
+LSAgICAgICAgeGVuX3JlbWFwX2J1Y2tldChlbnRyeSwgY2FjaGVfc2l6ZSwgYWRkcmVzc19pbmRl
+eCwgZHVtbXkpOw0KPiA+PiArICAgICAgICB4ZW5fcmVtYXBfYnVja2V0KGVudHJ5LCBOVUxMLCBj
+YWNoZV9zaXplLCBhZGRyZXNzX2luZGV4LA0KPiBkdW1teSk7DQo+ID4+ICAgICAgfSBlbHNlIGlm
+ICghZW50cnktPmxvY2spIHsNCj4gPj4gICAgICAgICAgaWYgKCFlbnRyeS0+dmFkZHJfYmFzZSB8
+fCBlbnRyeS0+cGFkZHJfaW5kZXggIT0gYWRkcmVzc19pbmRleCB8fA0KPiA+PiAgICAgICAgICAg
+ICAgICAgIGVudHJ5LT5zaXplICE9IGNhY2hlX3NpemUgfHwNCj4gPj4gICAgICAgICAgICAgICAg
+ICAhdGVzdF9iaXRzKGFkZHJlc3Nfb2Zmc2V0ID4+IFhDX1BBR0VfU0hJRlQsDQo+ID4+ICAgICAg
+ICAgICAgICAgICAgICAgIHRlc3RfYml0X3NpemUgPj4gWENfUEFHRV9TSElGVCwNCj4gPj4gICAg
+ICAgICAgICAgICAgICAgICAgZW50cnktPnZhbGlkX21hcHBpbmcpKSB7DQo+ID4+IC0gICAgICAg
+ICAgICB4ZW5fcmVtYXBfYnVja2V0KGVudHJ5LCBjYWNoZV9zaXplLCBhZGRyZXNzX2luZGV4LCBk
+dW1teSk7DQo+ID4+ICsgICAgICAgICAgICB4ZW5fcmVtYXBfYnVja2V0KGVudHJ5LCBOVUxMLCBj
+YWNoZV9zaXplLCBhZGRyZXNzX2luZGV4LA0KPiA+PiBkdW1teSk7DQo+ID4+ICAgICAgICAgIH0N
+Cj4gPj4gICAgICB9DQo+ID4+DQo+ID4+IEBAIC00ODYsMyArNDkyLDYwIEBAIHZvaWQgeGVuX2lu
+dmFsaWRhdGVfbWFwX2NhY2hlKHZvaWQpDQo+ID4+DQo+ID4+ICAgICAgbWFwY2FjaGVfdW5sb2Nr
+KCk7DQo+ID4+ICB9DQo+ID4+ICsNCj4gPj4gK3N0YXRpYyB1aW50OF90ICp4ZW5fcmVwbGFjZV9j
+YWNoZV9lbnRyeV91bmxvY2tlZChod2FkZHINCj4gPj4gb2xkX3BoeXNfYWRkciwNCj4gPj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBod2FkZHIgbmV3
+X3BoeXNfYWRkciwNCj4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBod2FkZHIgc2l6ZSkNCj4gPj4gK3sNCj4gPj4gKyAgICBNYXBDYWNoZUVudHJ5
+ICplbnRyeTsNCj4gPj4gKyAgICBod2FkZHIgYWRkcmVzc19pbmRleDsNCj4gPj4gKyAgICBod2Fk
+ZHIgYWRkcmVzc19vZmZzZXQ7DQo+ID4+ICsgICAgaHdhZGRyIGNhY2hlX3NpemUgPSBzaXplOw0K
+PiA+PiArICAgIGh3YWRkciB0ZXN0X2JpdF9zaXplOw0KPiA+PiArDQo+ID4+ICsgICAgYWRkcmVz
+c19pbmRleCAgPSBvbGRfcGh5c19hZGRyID4+IE1DQUNIRV9CVUNLRVRfU0hJRlQ7DQo+ID4+ICsg
+ICAgYWRkcmVzc19vZmZzZXQgPSBvbGRfcGh5c19hZGRyICYgKE1DQUNIRV9CVUNLRVRfU0laRSAt
+IDEpOw0KPiA+PiArDQo+ID4+ICsgICAgYXNzZXJ0KHNpemUpOw0KPiA+PiArICAgIC8qIHRlc3Rf
+Yml0X3NpemUgaXMgYWx3YXlzIGEgbXVsdGlwbGUgb2YgWENfUEFHRV9TSVpFICovDQo+ID4+ICsg
+ICAgdGVzdF9iaXRfc2l6ZSA9IHNpemUgKyAob2xkX3BoeXNfYWRkciAmIChYQ19QQUdFX1NJWkUg
+LSAxKSk7DQo+ID4+ICsgICAgaWYgKHRlc3RfYml0X3NpemUgJSBYQ19QQUdFX1NJWkUpIHsNCj4g
+Pj4gKyAgICAgICAgdGVzdF9iaXRfc2l6ZSArPSBYQ19QQUdFX1NJWkUgLSAodGVzdF9iaXRfc2l6
+ZSAlIFhDX1BBR0VfU0laRSk7DQo+ID4+ICsgICAgfQ0KPiA+PiArICAgIGNhY2hlX3NpemUgPSBz
+aXplICsgYWRkcmVzc19vZmZzZXQ7DQo+ID4+ICsgICAgaWYgKGNhY2hlX3NpemUgJSBNQ0FDSEVf
+QlVDS0VUX1NJWkUpIHsNCj4gPj4gKyAgICAgICAgY2FjaGVfc2l6ZSArPSBNQ0FDSEVfQlVDS0VU
+X1NJWkUgLSAoY2FjaGVfc2l6ZSAlDQo+ID4+IE1DQUNIRV9CVUNLRVRfU0laRSk7DQo+ID4+ICsg
+ICAgfQ0KPiA+PiArDQo+ID4+ICsgICAgZW50cnkgPSAmbWFwY2FjaGUtPmVudHJ5W2FkZHJlc3Nf
+aW5kZXggJSBtYXBjYWNoZS0+bnJfYnVja2V0c107DQo+ID4+ICsgICAgd2hpbGUgKGVudHJ5ICYm
+ICEoZW50cnktPnBhZGRyX2luZGV4ID09IGFkZHJlc3NfaW5kZXggJiYgZW50cnktDQo+ID5zaXpl
+DQo+ID4+ID09IGNhY2hlX3NpemUpKSB7DQo+ID4+ICsgICAgICAgIGVudHJ5ID0gZW50cnktPm5l
+eHQ7DQo+ID4+ICsgICAgfQ0KPiA+PiArICAgIGlmICghZW50cnkpIHsNCj4gPj4gKyAgICAgICAg
+RFBSSU5URigiVHJ5aW5nIHRvIHVwZGF0ZSBhbiBlbnRyeSBmb3IgJWx4IHRoYXQgaXMgbm90IGlu
+IHRoZQ0KPiA+PiBtYXBjYWNoZSFcbiIsIHBoeXNfYWRkcik7DQo+ID4+ICsgICAgICAgIHJldHVy
+biBOVUxMOw0KPiA+PiArICAgIH0NCj4gPj4gKw0KPiA+PiArICAgIGFkZHJlc3NfaW5kZXggID0g
+bmV3X3BoeXNfYWRkciA+PiBNQ0FDSEVfQlVDS0VUX1NISUZUOw0KPiA+PiArICAgIGFkZHJlc3Nf
+b2Zmc2V0ID0gbmV3X3BoeXNfYWRkciAmIChNQ0FDSEVfQlVDS0VUX1NJWkUgLSAxKTsNCj4gPj4g
+Kw0KPiA+PiArICAgIHhlbl9yZW1hcF9idWNrZXQoZW50cnksIGVudHJ5LT52YWRkcl9iYXNlLCBj
+YWNoZV9zaXplLA0KPiA+PiBhZGRyZXNzX2luZGV4LCBmYWxzZSk7DQo+ID4+ICsgICAgaWYoIXRl
+c3RfYml0cyhhZGRyZXNzX29mZnNldCA+PiBYQ19QQUdFX1NISUZULA0KPiA+PiArICAgICAgICAg
+ICAgICAgIHRlc3RfYml0X3NpemUgPj4gWENfUEFHRV9TSElGVCwNCj4gPj4gKyAgICAgICAgICAg
+ICAgICBlbnRyeS0+dmFsaWRfbWFwcGluZykpIHsNCj4gPj4gKyAgICAgICAgRFBSSU5URigiVW5h
+YmxlIHRvIHVwZGF0ZSBhbiBlbnRyeSBmb3IgJWx4IGluIHRoZSBtYXBjYWNoZSFcbiIsDQo+ID4+
+IHBoeXNfYWRkcik7DQo+ID4+ICsgICAgICAgIHJldHVybiBOVUxMOw0KPiA+PiArICAgIH0NCj4g
+Pj4gKw0KPiA+PiArICAgIHJldHVybiBlbnRyeS0+dmFkZHJfYmFzZSArIGFkZHJlc3Nfb2Zmc2V0
+Ow0KPiA+PiArfQ0KPiA+PiArDQo+ID4+ICt1aW50OF90ICp4ZW5fcmVwbGFjZV9jYWNoZV9lbnRy
+eShod2FkZHIgb2xkX3BoeXNfYWRkciwgaHdhZGRyDQo+ID4+IG5ld19waHlzX2FkZHIsIGh3YWRk
+ciBzaXplKQ0KPiA+PiArew0KPiA+PiArICAgIHVpbnQ4X3QgKnA7DQo+ID4+ICsNCj4gPj4gKyAg
+ICBtYXBjYWNoZV9sb2NrKCk7DQo+ID4+ICsgICAgcCA9IHhlbl9yZXBsYWNlX2NhY2hlX2VudHJ5
+X3VubG9ja2VkKG9sZF9waHlzX2FkZHIsDQo+ID4+IG5ld19waHlzX2FkZHIsIHNpemUpOw0KPiA+
+PiArICAgIG1hcGNhY2hlX3VubG9jaygpOw0KPiA+PiArICAgIHJldHVybiBwOw0KPiA+PiArfQ0K
+PiA+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody94ZW4veGVuX2NvbW1vbi5oDQo+ID4+IGIvaW5j
+bHVkZS9ody94ZW4veGVuX2NvbW1vbi5oDQo+ID4+IGluZGV4IGUwMGRkZDcuLjcwYTVjYWQgMTAw
+NjQ0DQo+ID4+IC0tLSBhL2luY2x1ZGUvaHcveGVuL3hlbl9jb21tb24uaA0KPiA+PiArKysgYi9p
+bmNsdWRlL2h3L3hlbi94ZW5fY29tbW9uLmgNCj4gPj4gQEAgLTc4LDYgKzc4LDEzIEBAIHN0YXRp
+YyBpbmxpbmUgdm9pZA0KPiA+PiAqeGVuZm9yZWlnbm1lbW9yeV9tYXAoeGNfaW50ZXJmYWNlICpo
+LCB1aW50MzJfdCBkb20sDQo+ID4+DQo+ID4+ICBleHRlcm4geGVuZm9yZWlnbm1lbW9yeV9oYW5k
+bGUgKnhlbl9mbWVtOw0KPiA+Pg0KPiA+PiArI2lmIENPTkZJR19YRU5fQ1RSTF9JTlRFUkZBQ0Vf
+VkVSU0lPTiA8IDQxMDAwDQo+ID4+ICsNCj4gPj4gKyNkZWZpbmUgeGVuZm9yZWlnbm1lbW9yeV9t
+YXAyKGgsIGQsIGEsIHAsIGYsIHBzLCBhciwgZSkgXA0KPiA+PiArICAgIHhlbmZvcmVpZ25tZW1v
+cnlfbWFwKGgsIGQsIHAsIHBzLCBhciwgZSkNCj4gPj4gKw0KPiA+PiArI2VuZGlmDQo+ID4+ICsN
+Cj4gPj4gICNpZiBDT05GSUdfWEVOX0NUUkxfSU5URVJGQUNFX1ZFUlNJT04gPCA0MDkwMA0KPiA+
+Pg0KPiA+PiAgdHlwZWRlZiB4Y19pbnRlcmZhY2UgeGVuZGV2aWNlbW9kZWxfaGFuZGxlOw0KPiA+
+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9zeXNlbXUveGVuLW1hcGNhY2hlLmggYi9pbmNsdWRlL3N5
+c2VtdS94ZW4tDQo+ID4+IG1hcGNhY2hlLmgNCj4gPj4gaW5kZXggMDFkYWFhZC4uYjM4OTYyYyAx
+MDA2NDQNCj4gPj4gLS0tIGEvaW5jbHVkZS9zeXNlbXUveGVuLW1hcGNhY2hlLmgNCj4gPj4gKysr
+IGIvaW5jbHVkZS9zeXNlbXUveGVuLW1hcGNhY2hlLmgNCj4gPj4gQEAgLTIxLDcgKzIxLDkgQEAg
+dWludDhfdCAqeGVuX21hcF9jYWNoZShod2FkZHIgcGh5c19hZGRyLA0KPiBod2FkZHINCj4gPj4g
+c2l6ZSwNCj4gPj4gIHJhbV9hZGRyX3QgeGVuX3JhbV9hZGRyX2Zyb21fbWFwY2FjaGUodm9pZCAq
+cHRyKTsNCj4gPj4gIHZvaWQgeGVuX2ludmFsaWRhdGVfbWFwX2NhY2hlX2VudHJ5KHVpbnQ4X3Qg
+KmJ1ZmZlcik7DQo+ID4+ICB2b2lkIHhlbl9pbnZhbGlkYXRlX21hcF9jYWNoZSh2b2lkKTsNCj4g
+Pj4gLQ0KPiA+PiArdWludDhfdCAqeGVuX3JlcGxhY2VfY2FjaGVfZW50cnkoaHdhZGRyIG9sZF9w
+aHlzX2FkZHIsDQo+ID4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBod2FkZHIg
+bmV3X3BoeXNfYWRkciwNCj4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGh3
+YWRkciBzaXplKTsNCj4gPj4gICNlbHNlDQo+ID4+DQo+ID4+ICBzdGF0aWMgaW5saW5lIHZvaWQg
+eGVuX21hcF9jYWNoZV9pbml0KHBoeXNfb2Zmc2V0X3RvX2dhZGRyX3QgZiwNCj4gPj4gQEAgLTUw
+LDYgKzUyLDEzIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCB4ZW5faW52YWxpZGF0ZV9tYXBfY2FjaGUo
+dm9pZCkNCj4gPj4gIHsNCj4gPj4gIH0NCj4gPj4NCj4gPj4gK3VpbnQ4X3QgKnhlbl9yZXBsYWNl
+X2NhY2hlX2VudHJ5KGh3YWRkciBvbGRfcGh5c19hZGRyLA0KPiA+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgaHdhZGRyIG5ld19waHlzX2FkZHIsDQo+ID4+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBod2FkZHIgc2l6ZSkNCj4gPj4gK3sNCj4gPj4gKyAgICBh
+Ym9ydCgpOw0KPiA+PiArfQ0KPiA+PiArDQo+ID4+ICAjZW5kaWYNCj4gPj4NCj4gPj4gICNlbmRp
+ZiAvKiBYRU5fTUFQQ0FDSEVfSCAqLw0KPiA+PiAtLQ0KPiA+PiAyLjcuNA0KPiA+DQo=
