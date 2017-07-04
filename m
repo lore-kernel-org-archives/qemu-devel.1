@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dSNPz-0002TU-C6
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:04 -0400
+	(envelope-from <thuth@redhat.com>) id 1dSNQX-0002ja-VS
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dSNPy-0002t2-Gz
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:03 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:32881)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dSNPy-0002sh-9G
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:02 -0400
-Received: by mail-wm0-x231.google.com with SMTP id z75so44567274wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 05:59:01 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dSNQT-00034O-6F
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46272)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dSNQS-00033s-UB
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:33 -0400
+References: <20170704111404.28569-1-berrange@redhat.com>
+	<20170704111404.28569-3-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e4f5548d-0da3-ea64-1ffc-fa887b51c947@redhat.com>
+Date: Tue, 4 Jul 2017 14:59:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
-References: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Jul 2017 13:58:40 +0100
-Message-ID: <CAFEAcA-DC9-2NBLGEwJtXcpY490P=qpudOau0o=6LMT=Tn3tHg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 00/17] Xilinx queue
+In-Reply-To: <20170704111404.28569-3-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs: document deprecated features
+ in appendix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, alistai@xilinx.com, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 4 July 2017 at 10:54, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> The following changes since commit fd479c60f5766f7fb247ad146b9e3c33d03d2055:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170603' into staging (2017-07-03 09:54:32 +0100)
->
-> are available in the git repository at:
->
->   git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next.for-upstream
->
-> for you to fetch changes up to 31cf950ea2a010c33e5384aaba91f01dc27c1599:
->
->   xilinx-dp: Add support for the yuy2 video format (2017-07-04 09:22:20 +0200)
->
-> ----------------------------------------------------------------
-> edgar/xilinx-next.for-upstream
->
-> ----------------------------------------------------------------
-> Edgar E. Iglesias (16):
->       target-microblaze: Correct bit shift for the PVR0 version field
->       target-microblaze: Don't hard code 0xb as initial MB version
->       target-microblaze: Add CPU versions 9.4, 9.5 and 9.6
->       target-microblaze: Introduce a use-barrel property
->       target-microblaze: Introduce a use-div property
->       target-microblaze: Introduce a use-hw-mul property
->       target-microblaze: Introduce a use-msr-instr property
->       target-microblaze: Introduce a use-pcmp-instr property
->       target-microblaze: dec_barrel: Use bool instead of unsigned int
->       target-microblaze: dec_barrel: Use extract32
->       target-microblaze: dec_barrel: Add braces around if-statements
->       target-microblaze: dec_barrel: Plug TCG temp leak
->       target-microblaze: dec_barrel: Add BSEFI
->       target-microblaze: dec_barrel: Add BSIFI
->       target-microblaze: Add CPU version 10.0
->       xilinx-dp: Add support for the yuy2 video format
->
-> Stefan Weil (1):
->       disas/microblaze: Add missing 'const' attributes
+On 04.07.2017 13:14, Daniel P. Berrange wrote:
+> The deprecation of features in QEMU is totally adhoc currently,
+> with no way for the user to get a list of what is deprecated
+> in each release. This adds an appendix to the doc that records
+> when each deprecation was made and provides text explaining
+> what to use instead, if anything.
+>=20
+> Since there has been no formal policy around removal of deprecated
+> features in the past, any deprecations prior to 2.10.0 are to be
+> treated as if they had been made at the 2.10.0 release. Thus the
+> earliest that existing deprecations will be deleted is the start
+> of the 2.12.0 cycle.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-doc.texi | 167 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 167 insertions(+)
+>=20
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 27781e4..ba5170c 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -39,6 +39,7 @@
+>  * QEMU User space emulator::
+>  * Implementation notes::
+>  * Support lifetime::
+> +* Deprecated features::
+>  * License::
+>  * Index::
+>  @end menu
+> @@ -3054,6 +3055,172 @@ support machine types from many previous versio=
+ns.
+[...]
+> +@subsection -monitor default=3Don (since 2.4.0)
+> +
+> +The ``default'' option to the ``-monitor'' argument is
+> +now ignored. When multiple monitors were enabled, it
+> +indicated which monitor would receive log messages
+> +from the audio subsystem.
 
+The audio subsystem was just the last user. There were other subsystems
+using it before, see e.g. commit 027a79c373954920d5 or commit
+02d16089802234f.
 
-Applied, thanks.
+[...]
+> +@subsection -net vlan (since 2.9.0)
+> +
+> +The ``-net van=3DNN'' argument is partially replaced with the
+> +new ``-netdev'' argument. The remaining use cases will no
+> +longer be directly supported in QEMU
 
--- PMM
+Add a period after the last sentence?
+
+> +@subsection -drive if=3Dscsi (since 2.9.0)
+> +
+> +The ``-drive if=3Dscsi'' argument is replaced by the the
+> +``-device BUS-TYPE'' argument combined with ``-drive if=3Dnone''.
+> +
+> +@subsection -net dump (since 2.10.0)
+> +
+> +The ``--net dump'' argument is now a synonym for setting the
+> +``-object filter-dump'' argument instead.
+
+Technically, it's not a synonym, but a replacement ;-)
+("-net dump" uses the "vlan" concept, while "-object filter-dump" works
+with "-netdev" instead)
+
+> +@subsection -hdachs (since 2.10.0)
+> +
+> +The ``-hdachs'' argument is now a synonym for setting
+> +the ``cyls'', ``heads'', ``secs'', and ``trans'' properties
+> +on the ``ide-hd'' device using the ``-device'' argument.
+> +The new syntax allows different settings to be provided
+> +per disk.
+> +
+> +@subsection -usbdevice (since 2.10.0)
+> +
+> +The ``-usbdevice DEV'' argument is now a synonym for setting
+> +the ``-device usb-DEV'' argument instead. The deprecated syntax
+> +would automatically enable USB support on the machine type.
+> +If using the new syntax, USB support must be explicitly
+> +enabled via the ``-machine usb=3Don'' argument.
+> +
+> +@section qemu-img command line arguments
+> +
+> +@subsection convert -s (since 2.0.0)
+> +
+> +The ``convert -s snapshot_id_or_name'' argument is obsoleted
+> +by the ``convert -l snapshot_param'' argument instead.
+> +
+> +@section System emulator human monitor commands
+> +
+> +@subsection usb_add (since 2.10.0)
+> +
+> +The ``usb_add'' command is replaced by the ``device_add'' command.
+> +
+> +@subsection usb_del (since 2.10.0)
+> +
+> +The ``usb_del'' command is replaced by the ``device_del'' command.
+> +
+> +@section System emulator devices
+> +
+> +@subsection ivshmem (since 2.6.0)
+> +
+> +The ``ivshmem'' device type is replaced by either the ``ivshmem-plain'=
+'
+> +or ``ivshmem-doorbell`` device types.
+> +
+> +@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
+> +
+> +The ``spapr-pci-vfio-host-bridge'' device type is replaced by
+> +the ``spapr-pci-host-bridge'' device type.
+> +
+>  @node License
+>  @appendix License
+
+ Thomas
