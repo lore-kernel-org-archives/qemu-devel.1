@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dSJdp-0004kl-95
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:06 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dSJea-00058v-Iu
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dSJdm-0005P6-77
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:05 -0400
-References: <20170703131455.25424-1-lvivier@redhat.com>
-	<20170703131455.25424-2-lvivier@redhat.com>
-	<b11aa61c-ff73-3568-f924-e10828c0e92c@redhat.com>
-	<20170704105146.6ef17b9f@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <4f7f7d4d-4d07-9595-8fdf-e44360ea9870@redhat.com>
-Date: Tue, 4 Jul 2017 10:56:56 +0200
+	(envelope-from <longpeng2@huawei.com>) id 1dSJeX-0005bN-Oe
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:52 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3960)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1dSJeW-0005aD-TC
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:49 -0400
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Tue, 4 Jul 2017 16:56:52 +0800
+Message-ID: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170704105146.6ef17b9f@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC v3 1/2] target/ppc/cpu-models: set
- POWER9_v1.0 as POWER9 DD1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 00/18] crypto: add afalg-backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +24,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Suraj Singh <sursingh@redhat.com>, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>
+To: berrange@redhat.com
+Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-On 04/07/2017 10:51, Greg Kurz wrote:
-> On Tue, 4 Jul 2017 09:42:33 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> On 03.07.2017 15:14, Laurent Vivier wrote:
->>> CPU_POWERPC_POWER9_DD1 is 0x004E0100, so this is the POWER9 v1.0.
->>>
->>> When we run qemu on a POWER9 DD1 host, we must use either
->>> "-cpu host" or "-cpu POWER9", but in the latter case it fails with
->>>
->>>     Unable to find sPAPR CPU Core definition
->>>
->>> because POWER9 DD1 doesn't appear in the list of known CPUs.
->>>
->>> This patch fixes this by defining POWER9_v1.0 with POWER9 DD1
->>> PVR instead of CPU_POWERPC_POWER9_BASE. It also adds POWER_v2.0
->>> with POWER9 DD2 PVR to avoid to trigger kernel POWER9 DD1 workaround
->>> in TCG mode.
->>>
->>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>> ---
->>>  hw/ppc/spapr_cpu_core.c | 5 ++++-
->>>  target/ppc/cpu-models.c | 6 ++++--
->>>  target/ppc/cpu-models.h | 1 +
->>>  3 files changed, 9 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
->>> index 9fb896b..00918a5 100644
->>> --- a/hw/ppc/spapr_cpu_core.c
->>> +++ b/hw/ppc/spapr_cpu_core.c
->>> @@ -249,8 +249,11 @@ static const char *spapr_core_models[] = {
->>>      /* POWER8NVL */
->>>      "POWER8NVL_v1.0",
->>>  
->>> -    /* POWER9 */
->>> +    /* POWER9 DD1 */
->>>      "POWER9_v1.0",
->>> +
->>> +    /* POWER9 DD2 */
->>> +    "POWER9_v2.0",  
->>
->> In case you re-spin, what about a more compact listing:
->>
->>     /* POWER9 */
->>     "POWER9_v1.0",
->>     "POWER9_v2.0",
->>
->> ?
->>
-> 
-> I second that but anyway:
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> 
->> Anyway, patch looks good to me, so:
->>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+The AF_ALG socket family is the userspace interface for linux
+crypto API, users can use it to access hardware accelerators.
 
-I agree, but as I was focused on the problem with "-cpu POWER9" I forgot
-to update the first patch.
+This patchset adds a afalg-backend for qemu crypto subsystem. Currently
+when performs encrypt/decrypt, we'll try afalg-backend first and will
+back to libiary-backend if it failed.
 
-Thanks,
-Laurent
+In the next step, It would support a command parameter to specifies
+which backends prefer to and some other improvements.
+
+I measured the performance about the afalg-backend impls, I tested
+how many data could be encrypted in 5 seconds.
+
+NOTE: If we use specific hardware crypto cards, I think afalg-backend
+      would even faster.
+
+test-environment: Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
+
+*sha256*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 93.03                       185.87
+1024                146.32                      201.78
+2048                213.32                      210.93
+4096                275.48                      215.26
+8192                321.77                      217.49
+16384               349.60                      219.26
+32768               363.59                      219.73
+65536               375.79                      219.99
+
+*hmac(sha256)*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 71.26                       165.55
+1024                117.43                      189.15
+2048                180.96                      203.24
+4096                247.60                      211.38
+8192                301.99                      215.65
+16384               340.79                      218.22
+32768               365.51                      219.49
+65536               377.92                      220.24
+
+*cbc(aes128)*
+chunk_size(bytes)   MB/sec(afalg:cbc-aes-aesni)  MB/sec(nettle)
+512                 371.76                       188.41
+1024                559.86                       189.64
+2048                768.66                       192.11
+4096                939.15                       192.40
+8192                1029.48                      192.49
+16384               1072.79                      190.52
+32768               1109.38                      190.41
+65536               1102.38                      190.40
+
+---
+Changes since v3:
+    - add "Reviewed-by: Daniel P. Berrange <berrange@redhat.com>" in
+      commit messages of PATCH 1/2/3/4/5/7/8/9/10/11.
+    - PATCH 12: use strlen() instead of qemu_strnlen() in qcrypto_afalg_build_saddr(). [Daniel]
+    - PATCH 12: rather than indenting the entire method, just return immediately
+                if afalg=NULL. [Daniel]
+    - PATCH 13: use g_strdup_printf() instead of g_new0+snprintf() and remove
+                redundant bounds check in qcrypto_afalg_cipher_format_name(). [Daniel]
+    - PATCH 13: s/except_niv/expect_niv  s/origin_contorllen/origin_controllen. [Daniel]
+    - PATCH 13: use '%zu' to print 'size_t' in qcrypto_afalg_cipher_setiv(). [Daniel]
+    - PATCH 13: remove qcrypto_cipher_using_afalg_drv(). [Daniel]
+    - PATCH 13: refactor the qcrypto_cipher_new() as Daniel's suggestion. [Daniel]
+    - PATCH 13: correct the ->cmsg initialization int qcrypto_afalg_cipher_ctx_new() to
+                avoid different behaviour in test_cipher_null_iv(). [Daniel]
+    - PATCH 14: use g_strdup_printf() instead of g_new0+snprintf() and remove
+                edundant bounds check in qcrypto_afalg_hash_format_name(). [Daniel]
+    - PATCH 14: s/except_len/expect_len. [Daniel]
+    - PATCH 14: free 'errp' if afalg_driver.hash_bytesv() failed. [Daniel]
+    - PATCH 14: maybe some afalg errors should be treated as fatal, but we
+                have no idea yet, so add a "TODO" comment.
+    - PATCH 15: refactor the qcrypto_hmac_new() as Daniel's suggestion. [Daniel]
+
+Changes since v2:
+    - init sockaddr_alg object when it's defined. [Gonglei]
+    - fix some superfluous initialization. [Gonglei]
+    - s/opeartion/operation/g in crypto/afalgpriv.h. [Gonglei]
+    - check 'niv' in qcrypto_afalg_cipher_setiv. [Gonglei]
+
+Changes since v1:
+    - use "make check-speed" to testing the performance. [Daniel]
+    - put private definations into crypto/***priv.h. [Daniel]
+    - remove afalg socket from qapi-schema, put them into crypto/. [Daniel]
+    - some Error report change. [Daniel]
+    - s/QCryptoAfalg/QCryptoAFAlg. [Daniel]
+    - use snprintf with bounds checking instead of sprintf. [Daniel]
+    - use "qcrypto_afalg_" prefix and "qcrypto_nettle(gcrypt,glib,builtin)_" prefix. [Daniel]
+    - add testing results in cover-letter. [Gonglei]
+
+---
+Longpeng(Mike) (18):
+  crypto: cipher: introduce context free function
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for gcrypt-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for nettle-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for builtin-backend
+  crypto: cipher: add cipher driver framework
+  crypto: hash: add hash driver framework
+  crypto: hmac: move crypto/hmac.h into include/crypto/
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for gcrypt-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for nettle-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for glib-backend
+  crypto: hmac: add hmac driver framework
+  crypto: introduce some common functions for af_alg backend
+  crypto: cipher: add afalg-backend cipher support
+  crypto: hash: add afalg-backend hash support
+  crypto: hmac: add af_alg hmac support
+  tests: crypto: add cipher speed benchmark support
+  tests: crypto: add hash speed benchmark support
+  tests: crypto: add hmac speed benchmark support
+
+ configure                       |  22 ++++
+ crypto/Makefile.objs            |   3 +
+ crypto/afalg.c                  | 118 +++++++++++++++++++++
+ crypto/afalgpriv.h              |  65 ++++++++++++
+ crypto/cipher-afalg.c           | 223 ++++++++++++++++++++++++++++++++++++++++
+ crypto/cipher-builtin.c         | 125 +++++++++++-----------
+ crypto/cipher-gcrypt.c          | 105 ++++++++++---------
+ crypto/cipher-nettle.c          |  84 ++++++++-------
+ crypto/cipher.c                 |  80 ++++++++++++++
+ crypto/cipherpriv.h             |  56 ++++++++++
+ crypto/hash-afalg.c             | 217 ++++++++++++++++++++++++++++++++++++++
+ crypto/hash-gcrypt.c            |  19 ++--
+ crypto/hash-glib.c              |  19 ++--
+ crypto/hash-nettle.c            |  19 ++--
+ crypto/hash.c                   |  30 ++++++
+ crypto/hashpriv.h               |  39 +++++++
+ crypto/hmac-gcrypt.c            |  42 ++++----
+ crypto/hmac-glib.c              |  63 ++++++------
+ crypto/hmac-nettle.c            |  42 ++++----
+ crypto/hmac.c                   |  58 +++++++++++
+ crypto/hmac.h                   | 166 ------------------------------
+ crypto/hmacpriv.h               |  48 +++++++++
+ include/crypto/cipher.h         |   1 +
+ include/crypto/hmac.h           | 167 ++++++++++++++++++++++++++++++
+ tests/Makefile.include          |  13 ++-
+ tests/benchmark-crypto-cipher.c |  88 ++++++++++++++++
+ tests/benchmark-crypto-hash.c   |  67 ++++++++++++
+ tests/benchmark-crypto-hmac.c   |  94 +++++++++++++++++
+ 28 files changed, 1662 insertions(+), 411 deletions(-)
+ create mode 100644 crypto/afalg.c
+ create mode 100644 crypto/afalgpriv.h
+ create mode 100644 crypto/cipher-afalg.c
+ create mode 100644 crypto/cipherpriv.h
+ create mode 100644 crypto/hash-afalg.c
+ create mode 100644 crypto/hashpriv.h
+ delete mode 100644 crypto/hmac.h
+ create mode 100644 crypto/hmacpriv.h
+ create mode 100644 include/crypto/hmac.h
+ create mode 100644 tests/benchmark-crypto-cipher.c
+ create mode 100644 tests/benchmark-crypto-hash.c
+ create mode 100644 tests/benchmark-crypto-hmac.c
+
+-- 
+1.8.3.1
