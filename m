@@ -1,41 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dSLuU-0006oX-LI
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:22:27 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSLxw-0002lH-BW
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dSLuP-0007GO-Mw
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:22:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41064
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSLxs-00011P-88
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:26:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57484)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1dSLuP-0007FV-GD
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:22:21 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dSLxr-00010j-Ut
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:25:56 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v64BJLXG134304
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 07:22:20 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg6bgract-1
+	v64BODqf104003
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 07:25:53 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg78nn53h-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:22:20 -0400
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:25:53 -0400
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Tue, 4 Jul 2017 12:22:18 +0100
-References: <1499082529-16970-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-	<650c9114-67bf-1f5b-7155-7bb1c7813b21@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Tue, 4 Jul 2017 13:22:16 +0200
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 4 Jul 2017 12:25:50 +0100
+References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
+	<20170606165510.33057-2-pasic@linux.vnet.ibm.com>
+	<20170607095127.GB2099@work-vm>
+	<8c0f9dac-ceef-fe88-8147-3cf043f7e109@linux.vnet.ibm.com>
+	<f8f8bc90-56df-9885-83cd-2283e38c5462@linux.vnet.ibm.com>
+	<00b260fd-14f6-d716-daab-7d0172be1c07@redhat.com>
+	<2791f136-d531-464c-8c44-7006ff7a658f@linux.vnet.ibm.com>
+	<c28ab7f2-4541-4657-0387-b988e8040e3f@redhat.com>
+	<7fdfeb7c-050b-1cf4-e22a-fa242da99ad9@linux.vnet.ibm.com>
+	<87d19hk4q1.fsf@dusky.pond.sub.org>
+	<a6f580f0-ed90-4860-231e-84612a14202f@linux.vnet.ibm.com>
+	<87van8aej0.fsf@dusky.pond.sub.org>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 4 Jul 2017 13:25:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <650c9114-67bf-1f5b-7155-7bb1c7813b21@redhat.com>
+In-Reply-To: <87van8aej0.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <9df99982-111b-01f4-e1e5-ec375a4cf4e0@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] s390: return unavailable features via
- query-cpu-definitions
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <dae51f0a-121d-1394-64c0-bbf32ae0e1db@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] vmstate: error hint for failed
+ equal checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,76 +53,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com
-
-On 04.07.2017 11:35, David Hildenbrand wrote:
->> +
->>  static void create_cpu_model_list(ObjectClass *klass, void *opaque)
->>  {
->> -    CpuDefinitionInfoList **cpu_list =3D opaque;
->> +    struct CpuDefinitionInfoListData *cpu_list_data =3D opaque;
->> +    CpuDefinitionInfoList **cpu_list =3D &cpu_list_data->list;
->>      CpuDefinitionInfoList *entry;
->>      CpuDefinitionInfo *info;
->>      char *name =3D g_strdup(object_class_get_name(klass));
->> @@ -300,7 +331,19 @@ static void create_cpu_model_list(ObjectClass *kl=
-ass, void *opaque)
->>      info->migration_safe =3D scc->is_migration_safe;
->>      info->q_static =3D scc->is_static;
->>      info->q_typename =3D g_strdup(object_class_get_name(klass));
->> -
->=20
-> Wonder if we should add the following:
->=20
-> /* the host model can never be used under TCG */
-> if (scc->kvm_required && !kvm_enabled())) {
->     info->has_unavailable_features =3D true;
->     list_add_feat("type", &info->unavailable_features);
-> } else if (cpu_list_data->model ...
->=20
->> +    /* check for unavailable features */
->> +    if (cpu_list_data->model) {
->> +        Object *obj;
->> +        S390CPU *sc;
->> +        obj =3D object_new(object_class_get_name(klass));
->> +        sc =3D S390_CPU(obj);
->=20
-> So we can drop the check here (if we have a host/max_model definition
-> under KVM, then all models have sc->model set). But the current code
-> should also work (it simply will not indicate runability information fo=
-r
-> the "host" model under TCG, as sc->model will be NULL).
-Hmm ... that made me think that we could remove the check here and make
-check_unavailable_features interpret a NULL model as not
-usable/incompatible (a bit more robust in the unlikely event of a memory
-allocation failure). Thoughts?
-> >> +        if (sc->model) {
->> +            info->has_unavailable_features =3D true;
->> +            check_unavailable_features(cpu_list_data->model, sc->mode=
-l,
->> +                                       &info->unavailable_features);
->> +        }
->> +        object_unref(obj);
->> +    }
->> =20
-> Looks good to me and produced the expected result under TCG.
->=20
-> Feel free to add my
->=20
-> Reviewed-by: David Hildenbrand <david@redhat.com>
->=20
-> with or without the modification.
->=20
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Cornelia Huck <cohuck@kernel.org>
 
 
---=20
 
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
-   Viktor Mihajlovski
+On 07/04/2017 08:42 AM, Markus Armbruster wrote:
+> Halil Pasic <pasic@linux.vnet.ibm.com> writes:
+> 
+>> On 07/03/2017 03:52 PM, Markus Armbruster wrote:
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> writes:
+>>>
+>>>> On 06/30/2017 04:54 PM, Eric Blake wrote:
+>>>>> On 06/30/2017 09:41 AM, Halil Pasic wrote:
+[..]
+>>> If we have errors that can't be adequately explained in a single error
+>>> message, we may need a way to add more explanation.  error_append_hint()
+>>> isn't.
+>>>
+>>
+>> Was not aware. Using hint in this very situation was suggested by Connie,
+>> and I assumed she is long enough with the project to know...
+>>
+>> In fact looking at  include/qapi/error.h:
+>> """
+>> /*
+>>  * Error reporting system loosely patterned after Glib's GError.
+>>  *
+>>  * Create an error:
+>>  *     error_setg(&err, "situation normal, all fouled up");
+>>  *
+>>  * Create an error and add additional explanation:
+>>  *     error_setg(&err, "invalid quark");
+>>  *     error_append_hint(&err, "Valid quarks are up, down, strange, "
+>>  *                       "charm, top, bottom.\n");
+>>  *
+>>  * Do *not* contract this to
+>>  *     error_setg(&err, "invalid quark\n"
+>>  *                "Valid quarks are up, down, strange, charm, top, bottom.");
+>> """
+>>
+>> my understanding was and is still the exact opposite of what you say:
+>> error_append_hint is for adding more explanation.
+>>
+>> Furthermore 
+>> """
+>> /*
+>>  * Append a printf-style human-readable explanation to an existing error.
+>>  * @errp may be NULL, but not &error_fatal or &error_abort.
+>>  * Trivially the case if you call it only after error_setg() or
+>>  * error_propagate().
+>>  * May be called multiple times.  The resulting hint should end with a
+>>  * newline.
+>>  */
+>> void error_append_hint(Error **errp, const char *fmt, ...)
+>> """
+>>
+>> Assuming that error_append_hint() isn't for adding more explanation,
+>> IMHO the doc does not adequately explain what it is for.
+> 
+> You're right, it doesn't.
+> 
+>> I have also failed to find any hint in qapi/error.h which is AFAIU
+>> documenting the error api about this human-readable explanation
+>> appended to an existing error by error_append_hint() is to be discarded
+>> if the error is reported in QMP context.
+>>
+>> Am I reading the api doc incorrectly, or did the documentation and
+>> de-facto api diverge (behavior)?
+> 
+> I added documentation after I inherited this subsystem, in response to
+> recurring questions on proper use of the interface.  I failed to fully
+> capture the hint feature's intent.  I'll post a patch.
+> 
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+Hey, IMHO error.h is one of the better documented corners of the QEMU
+code base. If you like put me on cc for this promised patch.
+
+>>>>>>> If something absolutely must be reported, then it is not a hint, and
+>>>>>>> shouldn't be using the hint mechanism.
+>>>
+>>> Exactly.
+>>>
+>>
+>> Perfectly fine with me provided the apidoc tells me clearly what the hint is
+>> for, and what it is not for.
+>>
+>>>>>> I find it hard to formulate criteria for 'must be reported'. I'm afraid
+>>>>>> this is backwards logic: since the hint may not be reported everything
+>>>>>> that needs to be reported is not a hint. This is a valid approach of
+>>>>>> course, but then I think some modifications to the comments in error.h
+>>>>>> would not hurt. And maybe something with verbose would be more
+>>>>>> expressive name.
+>>>>>>
+>>>>>> I hope all this makes some sense and ain't pure waste of time...
+>>>>>
+>>>>> No, it never hurts to question whether the design is optimal, and it's
+>>>>> better to question first to know whether it is even worth patching
+>>>>> things to behave differently, rather than spending time patching it only
+>>>>> to have a maintainer clarify that the patch can't be accepted because of
+>>>>> some design constraint.  So I still hope Markus will chime in.
+>>>>>
+>>>>
+>>>> For this patch I went with Dave's proposal so I have no acute interest
+>>>> in changing this.
+>>>>
+>>>> Conceptually, for me it really boils down to the question: Is it reasonable
+>>>> to assume that we are interested in what went wrong (error message)?
+>>>>
+>>>> If yes, we are good as is. If no, we should not drop hint in QMP context.
+>>>>
+>>>> Thanks for your time. I think we provided Markus with enough input to
+>>>> make his call :).
+>>>
+>>> I had a quick peek at the patch that triggered this discussion.  What
+>>> problem are you trying to solve?  According to your cover letter, it's
+>>> "to specify a hint for the case a vmstate equal assertion".  How is
+>>> nicer assertion failures related to QMP?  Am I confused?
+>>
+>>
+>> The problem is solved by d2164ad ("vmstate: error hint for failed equal
+>> checks", 2017-06-23).
+> 
+> The way the commit uses error_report() and error_printf() looks good to
+> me.
+> 
+
+I'm glad to hear that. My confidence ain't very high because my understand
+of the infrastructure is shallow (especially the interface between
+libvirt/management software and qemu and end user). Because of that
+I may have relied on the api-doc more that the more knowledgeable colleagues.
+
+>> The assertions ain't assertions in sense of the C programming
+>> language. Maybe calling these 'checks' instead of 'assertions' in the
+>> cover letter (like in the subject) would have been better. If one of
+>> these 'assertions' fail qemu is supposed to abort the initiated load
+>> (migration), state the reason, and terminate normally. In this sense these
+>> 'assertions' are similar to the assertions in our unit tests (those fail
+>> a test, and similarly to these do not terminate the program).
+>>
+>> The problem I was trying to solve is that the message generated by these
+>> checks looked something like "5 != 4" which is OK if the check is never
+>> supposed to fail, but not satisfactory for something we have to live
+>> with.
+>>
+>> Sorry for the confusion.
+> 
+> No problem :)
+> 
+
+I'm glad all resolves positively.
+
+Thanks,
+Halil
