@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSKDE-0000hu-FF
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:33:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dSKDH-0000pi-O5
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSKDA-0006Jx-KS
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:33:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53826)
+	(envelope-from <pbonzini@redhat.com>) id 1dSKDG-0006S0-QX
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:33:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSKDA-0006Ik-Ek
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:33:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 47A7F3B721
-	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 09:33:35 +0000 (UTC)
-Date: Tue, 4 Jul 2017 10:33:31 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170704093331.GE3135@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170704092704.8754-1-pbonzini@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSKDG-0006Qg-KC
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:33:42 -0400
+References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
+	<1499099693-22903-5-git-send-email-pbonzini@redhat.com>
+	<1cfd6e25-727e-2b11-b662-4a2b7dbaed05@twiddle.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4e0fdd72-2168-cda5-fe01-e8e5379e0b8c@redhat.com>
+Date: Tue, 4 Jul 2017 11:33:38 +0200
 MIME-Version: 1.0
+In-Reply-To: <1cfd6e25-727e-2b11-b662-4a2b7dbaed05@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170704092704.8754-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: should not use signal except
- for SIG_DFL or SIG_IGN
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/22] vl: convert -tb-size to qemu_strtoul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-On Tue, Jul 04, 2017 at 11:27:04AM +0200, Paolo Bonzini wrote:
-> Using signal to establish a signal handler is not portable; on
-> SysV systems, the signal handler would be reset to SIG_DFL after
-> delivery, while BSD preserves the signal handler.  Daniel Berrange
-> reported that (to complicate matters further) the signal system call
-> has SysV behavior, but glibc signal() actually calls the sigaction
-> system call to provide BSD behavior.
+
+
+On 03/07/2017 21:46, Richard Henderson wrote:
+> On 07/03/2017 09:34 AM, Paolo Bonzini wrote:
+>> -extern int tcg_tb_size;
+>> +extern unsigned long tcg_tb_size;
 > 
-> However, using signal() to set a signal's disposition to SIG_DFL
-> or SIG_IGN is portable and is a relatively common occurrence in
-> QEMU source code, so allow that.
+> size_t would be more natural.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/checkpatch.pl | 4 ++++
->  1 file changed, 4 insertions(+)
+> I don't think we support any hosts for which sizeof(size_t) !=
+> sizeof(unsigned long), but perhaps
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+There's Win64...  Another place where to do the range check
+could be tcg_exec_init.  That's where the actual bug lies.
 
-We currently only have 1 violation of this rule, and that
-is in the TCG test suite, so pretty harmless.
+The previous code's error handling was even worse, since strtol's output
+was completely unchecked.  tcg_exec_init can be fixed later.
 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 45027b9281..73efc927a9 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -2473,6 +2473,10 @@ sub process {
->  		if ($line =~ /\b(strto[^kd].*?)\s*\(/) {
->  			ERROR("consider using qemu_$1 in preference to $1\n" . $herecurr);
->  		}
-> +# recommend sigaction over signal for portability, when establishing a handler
-> +		if ($line =~ /\bsignal\s*\(/ && !($line =~ /SIG_(?:IGN|DFL)/)) {
-> +			ERROR("use sigaction to establish signal handlers; signal is not portable\n" . $herecurr);
-> +		}
->  # check for module_init(), use category-specific init macros explicitly please
->  		if ($line =~ /^module_init\s*\(/) {
->  			ERROR("please use block_init(), type_init() etc. instead of module_init()\n" . $herecurr);
-> -- 
-> 2.13.0
+Paolo
+
+>     unsigned lomg tmp;
+>     if (qemu_strtoul(optarg, NULL, 0, &tmp) < 0
+>             || tmp != (size_t)tmp) {
+>       error_report("Invalid argument to -tb-size");
+>       exit(1);
+>     }
+>     tcg_tb_size = tmp;
 > 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> where I'd expect the extra comparison to be optimized away.
+> 
+> But I'm not overly concerned either way, so
+> 
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> 
+> 
+> r~
