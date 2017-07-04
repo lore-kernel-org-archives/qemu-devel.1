@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56635)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQ3k-0006oe-Ee
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:17 -0400
+	id 1dSQ3o-0006rE-8C
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQ3j-00080z-GV
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:16 -0400
+	id 1dSQ3m-00082C-Oy
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:20 -0400
 Received: from smtp.eu.citrix.com ([185.25.65.24]:24123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQ3j-00080X-6j
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:15 -0400
+	id 1dSQ3m-00080X-Af
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:18 -0400
 From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Date: Tue, 4 Jul 2017 16:47:45 +0100
-Message-ID: <1499183267-28623-3-git-send-email-igor.druzhinin@citrix.com>
+Date: Tue, 4 Jul 2017 16:47:46 +0100
+Message-ID: <1499183267-28623-4-git-send-email-igor.druzhinin@citrix.com>
 In-Reply-To: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
 References: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/4] xen/mapcache: add an ability to create
- dummy mappings
+Subject: [Qemu-devel] [PATCH v2 3/4] xen/mapcache: introduce
+ xen_replace_cache_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +32,244 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 Cc: Igor Druzhinin <igor.druzhinin@citrix.com>, sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
 
-Dummys are simple anonymous mappings that are placed instead
-of regular foreign mappings in certain situations when we need
-to postpone the actual mapping but still have to give a
-memory region to QEMU to play with.
+This new call is trying to update a requested map cache entry
+according to the changes in the physmap. The call is searching
+for the entry, unmaps it and maps again at the same place using
+a new guest address. If the mapping is dummy this call will
+make it real.
 
-This is planned to be used for restore on Xen.
+This function makes use of a new xenforeignmemory_map2() call
+with an extended interface that was recently introduced in
+libxenforeignmemory [1].
+
+[1] https://www.mail-archive.com/xen-devel@lists.xen.org/msg113007.html
 
 Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
 ---
- hw/i386/xen/xen-mapcache.c | 40 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 32 insertions(+), 8 deletions(-)
+ configure                     | 18 ++++++++++
+ hw/i386/xen/xen-mapcache.c    | 79 ++++++++++++++++++++++++++++++++++++++-----
+ include/hw/xen/xen_common.h   |  7 ++++
+ include/sysemu/xen-mapcache.h | 11 +++++-
+ 4 files changed, 106 insertions(+), 9 deletions(-)
 
+diff --git a/configure b/configure
+index c571ad1..ad6156b 100755
+--- a/configure
++++ b/configure
+@@ -2021,6 +2021,24 @@ EOF
+     # Xen unstable
+     elif
+         cat > $TMPC <<EOF &&
++#undef XC_WANT_COMPAT_MAP_FOREIGN_API
++#include <xenforeignmemory.h>
++int main(void) {
++  xenforeignmemory_handle *xfmem;
++
++  xfmem = xenforeignmemory_open(0, 0);
++  xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
++
++  return 0;
++}
++EOF
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
++      then
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
++      xen_ctrl_version=41000
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+ #define __XEN_TOOLS__
+ #include <xendevicemodel.h>
 diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-index e60156c..cd4e746 100644
+index cd4e746..a988be7 100644
 --- a/hw/i386/xen/xen-mapcache.c
 +++ b/hw/i386/xen/xen-mapcache.c
-@@ -53,6 +53,8 @@ typedef struct MapCacheEntry {
-     uint8_t *vaddr_base;
-     unsigned long *valid_mapping;
-     uint8_t lock;
-+#define XEN_MAPCACHE_ENTRY_DUMMY (1 << 0)
-+    uint8_t flags;
-     hwaddr size;
-     struct MapCacheEntry *next;
- } MapCacheEntry;
-@@ -150,7 +152,8 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
+@@ -151,6 +151,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
+ }
  
  static void xen_remap_bucket(MapCacheEntry *entry,
++                             void *vaddr,
                               hwaddr size,
--                             hwaddr address_index)
-+                             hwaddr address_index,
-+                             bool dummy)
- {
-     uint8_t *vaddr_base;
-     xen_pfn_t *pfns;
-@@ -177,11 +180,27 @@ static void xen_remap_bucket(MapCacheEntry *entry,
-         pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
+                              hwaddr address_index,
+                              bool dummy)
+@@ -167,7 +168,9 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+     err = g_malloc0(nb_pfn * sizeof (int));
+ 
+     if (entry->vaddr_base != NULL) {
+-        ram_block_notify_remove(entry->vaddr_base, entry->size);
++        if (entry->vaddr_base != vaddr) {
++            ram_block_notify_remove(entry->vaddr_base, entry->size);
++        }
+         if (munmap(entry->vaddr_base, entry->size) != 0) {
+             perror("unmap fails");
+             exit(-1);
+@@ -181,11 +184,11 @@ static void xen_remap_bucket(MapCacheEntry *entry,
      }
  
--    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
--                                      nb_pfn, pfns, err);
--    if (vaddr_base == NULL) {
--        perror("xenforeignmemory_map");
--        exit(-1);
-+    if (!dummy) {
-+        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
-+                                           PROT_READ|PROT_WRITE,
-+                                           nb_pfn, pfns, err);
-+        if (vaddr_base == NULL) {
-+            perror("xenforeignmemory_map");
-+            exit(-1);
-+        }
-+        entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
-+    } else {
-+        /*
-+         * We create dummy mappings where we are unable to create a foreign
-+         * mapping immediately due to certain circumstances (i.e. on resume now)
-+         */
-+        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
-+                          MAP_ANON|MAP_SHARED, -1, 0);
-+        if (vaddr_base == NULL) {
-+            perror("mmap");
-+            exit(-1);
-+        }
-+        entry->flags |= XEN_MAPCACHE_ENTRY_DUMMY;
+     if (!dummy) {
+-        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
+-                                           PROT_READ|PROT_WRITE,
++        vaddr_base = xenforeignmemory_map2(xen_fmem, xen_domid, vaddr,
++                                           PROT_READ|PROT_WRITE, 0,
+                                            nb_pfn, pfns, err);
+         if (vaddr_base == NULL) {
+-            perror("xenforeignmemory_map");
++            perror("xenforeignmemory_map2");
+             exit(-1);
+         }
+         entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
+@@ -194,7 +197,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+          * We create dummy mappings where we are unable to create a foreign
+          * mapping immediately due to certain circumstances (i.e. on resume now)
+          */
+-        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
++        vaddr_base = mmap(vaddr, size, PROT_READ|PROT_WRITE,
+                           MAP_ANON|MAP_SHARED, -1, 0);
+         if (vaddr_base == NULL) {
+             perror("mmap");
+@@ -203,13 +206,16 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+         entry->flags |= XEN_MAPCACHE_ENTRY_DUMMY;
      }
  
++    if (entry->vaddr_base == NULL || entry->vaddr_base != vaddr) {
++        ram_block_notify_add(vaddr_base, size);
++    }
++
      entry->vaddr_base = vaddr_base;
-@@ -211,6 +230,7 @@ static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
-     hwaddr cache_size = size;
-     hwaddr test_bit_size;
-     bool translated = false;
-+    bool dummy = false;
+     entry->paddr_index = address_index;
+     entry->size = size;
+     entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
+             BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
  
- tryagain:
-     address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
-@@ -262,14 +282,14 @@ tryagain:
+-    ram_block_notify_add(entry->vaddr_base, entry->size);
+     bitmap_zero(entry->valid_mapping, nb_pfn);
+     for (i = 0; i < nb_pfn; i++) {
+         if (!err[i]) {
+@@ -282,14 +288,14 @@ tryagain:
      if (!entry) {
          entry = g_malloc0(sizeof (MapCacheEntry));
          pentry->next = entry;
--        xen_remap_bucket(entry, cache_size, address_index);
-+        xen_remap_bucket(entry, cache_size, address_index, dummy);
+-        xen_remap_bucket(entry, cache_size, address_index, dummy);
++        xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
      } else if (!entry->lock) {
          if (!entry->vaddr_base || entry->paddr_index != address_index ||
                  entry->size != cache_size ||
                  !test_bits(address_offset >> XC_PAGE_SHIFT,
                      test_bit_size >> XC_PAGE_SHIFT,
                      entry->valid_mapping)) {
--            xen_remap_bucket(entry, cache_size, address_index);
-+            xen_remap_bucket(entry, cache_size, address_index, dummy);
+-            xen_remap_bucket(entry, cache_size, address_index, dummy);
++            xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
          }
      }
  
-@@ -282,6 +302,10 @@ tryagain:
-             translated = true;
-             goto tryagain;
-         }
-+        if (!dummy && runstate_check(RUN_STATE_INMIGRATE)) {
-+            dummy = true;
-+            goto tryagain;
-+        }
-         trace_xen_map_cache_return(NULL);
-         return NULL;
-     }
+@@ -486,3 +492,60 @@ void xen_invalidate_map_cache(void)
+ 
+     mapcache_unlock();
+ }
++
++static uint8_t *xen_replace_cache_entry_unlocked(hwaddr old_phys_addr,
++                                                 hwaddr new_phys_addr,
++                                                 hwaddr size)
++{
++    MapCacheEntry *entry;
++    hwaddr address_index;
++    hwaddr address_offset;
++    hwaddr cache_size = size;
++    hwaddr test_bit_size;
++
++    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
++    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
++
++    assert(size);
++    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
++    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
++    if (test_bit_size % XC_PAGE_SIZE) {
++        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
++    }
++    cache_size = size + address_offset;
++    if (cache_size % MCACHE_BUCKET_SIZE) {
++        cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
++    }
++
++    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
++    while (entry && !(entry->paddr_index == address_index && entry->size == cache_size)) {
++        entry = entry->next;
++    }
++    if (!entry) {
++        DPRINTF("Trying to update an entry for %lx that is not in the mapcache!\n", phys_addr);
++        return NULL;
++    }
++
++    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
++    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
++
++    xen_remap_bucket(entry, entry->vaddr_base, cache_size, address_index, false);
++    if(!test_bits(address_offset >> XC_PAGE_SHIFT,
++                test_bit_size >> XC_PAGE_SHIFT,
++                entry->valid_mapping)) {
++        DPRINTF("Unable to update an entry for %lx in the mapcache!\n", phys_addr);
++        return NULL;
++    }
++
++    return entry->vaddr_base + address_offset;
++}
++
++uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr, hwaddr new_phys_addr, hwaddr size)
++{
++    uint8_t *p;
++
++    mapcache_lock();
++    p = xen_replace_cache_entry_unlocked(old_phys_addr, new_phys_addr, size);
++    mapcache_unlock();
++    return p;
++}
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index e00ddd7..70a5cad 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -78,6 +78,13 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+ 
+ extern xenforeignmemory_handle *xen_fmem;
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
++
++#define xenforeignmemory_map2(h, d, a, p, f, ps, ar, e) \
++    xenforeignmemory_map(h, d, p, ps, ar, e)
++
++#endif
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+ 
+ typedef xc_interface xendevicemodel_handle;
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index 01daaad..b38962c 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -21,7 +21,9 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+ ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
+ void xen_invalidate_map_cache_entry(uint8_t *buffer);
+ void xen_invalidate_map_cache(void);
+-
++uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
++                                 hwaddr new_phys_addr,
++                                 hwaddr size);
+ #else
+ 
+ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+@@ -50,6 +52,13 @@ static inline void xen_invalidate_map_cache(void)
+ {
+ }
+ 
++uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
++                                 hwaddr new_phys_addr,
++                                 hwaddr size)
++{
++    abort();
++}
++
+ #endif
+ 
+ #endif /* XEN_MAPCACHE_H */
 -- 
 2.7.4
