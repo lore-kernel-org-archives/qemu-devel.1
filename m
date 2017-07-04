@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dSP7h-0008Db-QD
+	(envelope-from <alex.bennee@linaro.org>) id 1dSP7h-0008Dg-TS
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dSP7d-000147-TL
+	(envelope-from <alex.bennee@linaro.org>) id 1dSP7d-00013x-S0
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:48:17 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35174)
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35571)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dSP7d-00012M-Jx
+	id 1dSP7d-00013I-KF
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:48:13 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id w126so198099858wme.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:48:11 -0700 (PDT)
+Received: by mail-wr0-x231.google.com with SMTP id k67so249660520wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:48:13 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  4 Jul 2017 15:48:48 +0100
-Message-Id: <20170704144859.17644-1-alex.bennee@linaro.org>
+Date: Tue,  4 Jul 2017 15:48:51 +0100
+Message-Id: <20170704144859.17644-4-alex.bennee@linaro.org>
+In-Reply-To: <20170704144859.17644-1-alex.bennee@linaro.org>
+References: <20170704144859.17644-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH 00/11] Misc fixes,
- documentation and patterns
+Subject: [Qemu-devel] [RISU PATCH 03/11] README: document --static builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +32,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi Peter,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ README | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-A bit of a mixed set of patches here for you to pick from as you
-will. The first 2 are additional tracing fixes including a fix for
-segfaulting when generating a trace.
-
-The next two are documentation patches as requested.
-
-Then two minor tweaks, one to risu.el and a indent failure of risugen.
-
-While I've been working through the half-precision stuff I've been
-finding the --pattern approach a bit inflexible as you basically end
-up eyeballing the risu file to build up the regexs. I've added a
-little syntactic suger to the risu file to enable grouping. This makes
-slicing a subset a lot easier, e.g.:
-
-  ./risugen --group AdvSIMDAcrossVector --not-pattern ".*_RES" aarch64.risu
-
-You can specify multiple groups in the risu file as the matching is
-string based, e.g.:
-
-  @Integer,Logic,Immediate
-
-And then:
-
-  ./risugen --group Logic aarch64.risu foo.bin
-
-What do you think?
-
-Alex Bennée (11):
-  risu: make match status take tracing into account
-  reginfo.c: always return 1 on OP_TESTEND
-  README: document --static builds
-  README: document record/replay support
-  risu.el: derive from text-mode
-  risugen: fix bad indent
-  risugen: support @GroupName in risu files
-  aarch64.risu: document naming conventions
-  aarch64.risu: remove duplicate AdvSIMD Scalar 3 same block
-  aarch64.risu: remove duplicate AdvSIMD scalar 2 reg misc block
-  aarch64.risu: update AdvancedSIMD across lanes
-
- README         |  40 ++++++++--
- aarch64.risu   | 241 ++++++++++++++++++++++++---------------------------------
- reginfo.c      |  19 +++--
- risu.c         |   4 +-
- risu.el        |   2 +-
- risu.h         |   2 +-
- risugen        |  17 +++-
- risugen_arm.pm |   7 ++
- 8 files changed, 175 insertions(+), 157 deletions(-)
-
+diff --git a/README b/README
+index 858a349..e0bf5c5 100644
+--- a/README
++++ b/README
+@@ -17,7 +17,7 @@ test blobs (which can be run anywhere), and a Linux executable
+ 'risu' which runs on the target architecture (ie ARM). To
+ build the executable part:
+ 
+-    [VAR=VALUE] ... ./configure
++    [VAR=VALUE] ... ./configure [--static]
+     make
+ 
+ where [VAR=VALUE] ... allows you to specify any options.
+@@ -25,6 +25,10 @@ Most useful is
+  CROSS_PREFIX= which specifies the cross compiler prefix; you'll
+    need this if you're not building on the target system
+    (Example: CROSS_PREFIX=arm-linux-gnueabihf- )
++
++Passing --static will build a statically linked binary which is useful
++if you don't want to mess around with chroot's to run the binary.
++
+ For other possibilities run 'configure --help'.
+ 
+ Building into a separate build tree from the source code is supported:
+@@ -86,8 +90,14 @@ as simple as:
+ 
+ However since you actually need to run it under qemu or similar
+ you probably need an ARM chroot to run it in, and to do something
+-like
+- sudo chroot /srv/chroot/arm-mav /risu --host ipaddr vqshlimm.out
++like:
++
++  sudo chroot /srv/chroot/arm-mav /risu --host ipaddr vqshlimm.out
++
++If you built the binary statically you can simply run:
++
++  /path/to/qemu ./risu --host ipaddr vqshlimm.out
++
+ 
+ When the apprentice connects to the master, they will both start
+ running the binary and checking results with each other. When the
 -- 
 2.13.0
