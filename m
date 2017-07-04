@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dSPkt-0003yJ-3v
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:28:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dSPlA-0004Jk-V7
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:29:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dSPks-0007RE-AW
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:28:47 -0400
-Date: Tue, 4 Jul 2017 17:28:33 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dSPlA-0007YD-5O
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:29:04 -0400
+Date: Tue, 4 Jul 2017 17:28:54 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170704152833.GL4253@noname.str.redhat.com>
+Message-ID: <20170704152854.GM4253@noname.str.redhat.com>
 References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-4-eblake@redhat.com>
+	<20170627192458.15519-6-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170627192458.15519-4-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 03/20] stream: Switch stream_populate()
+In-Reply-To: <20170627192458.15519-6-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 05/20] commit: Switch commit_populate()
  to byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
