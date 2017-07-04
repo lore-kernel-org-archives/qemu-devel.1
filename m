@@ -1,14 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dSMpU-0003hS-3w
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:21:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1dSMpk-00045V-Po
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dSMpP-0002i8-95
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:21:20 -0400
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue,  4 Jul 2017 20:21:06 +0800
-Message-Id: <1499170866-9068-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio-scsi: finalize IOMMU support
+	(envelope-from <thuth@redhat.com>) id 1dSMpi-0002pN-3D
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:21:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dSMph-0002pF-Sp
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:21:34 -0400
+References: <20170704111404.28569-1-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f22d82b6-cd4b-b71c-179e-2f590ddb19b8@redhat.com>
+Date: Tue, 4 Jul 2017 14:21:28 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170704111404.28569-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] Document deprecated features &
+ support lifecycle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,38 +28,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-After converting to use DMA api for virtio devices, we should use
-dma_as instead of address_space_memory. Otherwise it won't work if
-IOMMU is enabled.
+On 04.07.2017 13:14, Daniel P. Berrange wrote:
+[...]
+>  - Not listing the '-6' and '-e' args to qemu-img create. Those
+>    were never deprecations, because the functionality was
+>    immediately turned into a fatal error.
+How did you come to that conclusion? As far as I can see, the -6 option
+has been added by commit ec36ba14748e140dda2 and that was part of QEMU
+v0.10. The deprecation was done in commit eec77d9e712bd415 and that was
+part of QEMU v0.14.
 
-Fixes: commit 8607f5c3072c ("virtio: convert to use DMA api")
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/scsi/virtio-scsi.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index f46f06d..d076fe7 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -43,12 +43,13 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
- 
- void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
- {
-+    VirtIODevice *vdev = VIRTIO_DEVICE(s);
-     const size_t zero_skip =
-         offsetof(VirtIOSCSIReq, resp_iov) + sizeof(req->resp_iov);
- 
-     req->vq = vq;
-     req->dev = s;
--    qemu_sglist_init(&req->qsgl, DEVICE(s), 8, &address_space_memory);
-+    qemu_sglist_init(&req->qsgl, DEVICE(s), 8, vdev->dma_as);
-     qemu_iovec_init(&req->resp_iov, 1);
-     memset((uint8_t *)req + zero_skip, 0, sizeof(*req) - zero_skip);
- }
--- 
-2.7.4
+ Thomas
