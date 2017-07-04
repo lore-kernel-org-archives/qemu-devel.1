@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSOFh-0001Q2-7P
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:52:30 -0400
+	(envelope-from <berrange@redhat.com>) id 1dSOGO-0001rb-GM
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSOFd-00030u-8t
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:52:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49852)
+	(envelope-from <berrange@redhat.com>) id 1dSOGK-0003Ls-HA
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:53:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37224)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSOFc-0002zu-Vu
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:52:25 -0400
-Date: Tue, 4 Jul 2017 14:52:17 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSOGK-0003LR-7H
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:53:08 -0400
+Date: Tue, 4 Jul 2017 14:53:01 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170704135217.GA9211@redhat.com>
+Message-ID: <20170704135301.GB9211@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170704111404.28569-1-berrange@redhat.com>
-	<20170704111404.28569-2-berrange@redhat.com>
-	<33d0a009-766f-6c06-5968-d55ad19a0c27@redhat.com>
+	<20170704111404.28569-3-berrange@redhat.com>
+	<e4f5548d-0da3-ea64-1ffc-fa887b51c947@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <33d0a009-766f-6c06-5968-d55ad19a0c27@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] docs: document support lifetime for
- features
+In-Reply-To: <e4f5548d-0da3-ea64-1ffc-fa887b51c947@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs: document deprecated features
+ in appendix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,97 +33,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jul 04, 2017 at 02:43:29PM +0200, Thomas Huth wrote:
+On Tue, Jul 04, 2017 at 02:59:27PM +0200, Thomas Huth wrote:
 > On 04.07.2017 13:14, Daniel P. Berrange wrote:
-> > There is currently no explicit guidance on the duration of support
-> > for features such as versioned machine types, which have a finite
-> > useful lifespan. Thus apps / users cannot predict how much time
-> > they might be able to use a feature for, before it is removed (if
-> > ever).
+> > The deprecation of features in QEMU is totally adhoc currently,
+> > with no way for the user to get a list of what is deprecated
+> > in each release. This adds an appendix to the doc that records
+> > when each deprecation was made and provides text explaining
+> > what to use instead, if anything.
 > > 
-> > This adds a new appendix that lists items which have finite lifecycles,
-> > such as machine types. For items which are generally expected to be
-> > supported indefinitely, it sets out the policy around deprecation
-> > and removal, should it be needed.
-> 
-> Great, thanks for tackling this!
-> 
+> > Since there has been no formal policy around removal of deprecated
+> > features in the past, any deprecations prior to 2.10.0 are to be
+> > treated as if they had been made at the 2.10.0 release. Thus the
+> > earliest that existing deprecations will be deleted is the start
+> > of the 2.12.0 cycle.
+> > 
 > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > > ---
-> >  qemu-doc.texi | 37 +++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 37 insertions(+)
+> >  qemu-doc.texi | 167 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 167 insertions(+)
 > > 
 > > diff --git a/qemu-doc.texi b/qemu-doc.texi
-> > index 21079fd..27781e4 100644
+> > index 27781e4..ba5170c 100644
 > > --- a/qemu-doc.texi
 > > +++ b/qemu-doc.texi
-> > @@ -38,6 +38,7 @@
-> >  * QEMU Guest Agent::
+> > @@ -39,6 +39,7 @@
 > >  * QEMU User space emulator::
 > >  * Implementation notes::
-> > +* Support lifetime::
+> >  * Support lifetime::
+> > +* Deprecated features::
 > >  * License::
 > >  * Index::
 > >  @end menu
-> > @@ -3017,6 +3018,42 @@ Run the emulation in single step mode.
-> >  
-> >  @include qemu-tech.texi
-> >  
-> > +@node Support lifetime
-> > +@appendix Support lifetime
+> > @@ -3054,6 +3055,172 @@ support machine types from many previous versions.
+> [...]
+> > +@subsection -monitor default=on (since 2.4.0)
 > > +
-> > +In general features are intended to be supported indefinitely once
-> > +introduced into QEMU.
-> > +
-> > +In the event that a feature needs to be removed, it will be listed
-> > +in the ``Deprecated features'' appendix of this document. The feature
-> > +will remain functional for 2 major releases prior to actual removal.
+> > +The ``default'' option to the ``-monitor'' argument is
+> > +now ignored. When multiple monitors were enabled, it
+> > +indicated which monitor would receive log messages
+> > +from the audio subsystem.
 > 
-> Maybe say "at least for two major releases" instead? Sometimes we might
-> forget to remove it in time, or we might decide to keep it alive a
-> little bit longer in case it was once an important feature...
+> The audio subsystem was just the last user. There were other subsystems
+> using it before, see e.g. commit 027a79c373954920d5 or commit
+> 02d16089802234f.
 
-FWIW, I explicitly avoided saying "at least" when I wrote this. I
-want to make deletion of deprecated features a clearly defined process
-where we don't have to re-open the debate of whether its ok to now
-delete it. 
+Ah, right, I'll clarify it.
 
-
-> > +Deprecated features may also generate warnings on the console when
-> > +QEMU starts up, or if activated via a monitor command, however,
-> > +this is not a mandatory requirement.
+> [...]
+> > +@subsection -net vlan (since 2.9.0)
 > > +
-> > +Certain features have an inherently finite lifetime, and thus
-> > +will be removed on a fixed schedule, without following the normal
-> > +deprecation process. Such features are listed in the sections
-> > +that follow.
-> > +
-> > +@node Machine types
-> > +@section Machine types
-> > +
-> > +For architectures which aim to support live migration compatibility
-> > +across releases, each release will introduce a new versioned machine
-> > +type. For example, the 2.8.0 release introduced machine types
-> > +``pc-i440fx-2.8'' and ``pc-q35-2.8' 'for the x86_64/i686 architectures.
+> > +The ``-net van=NN'' argument is partially replaced with the
+> > +new ``-netdev'' argument. The remaining use cases will no
+> > +longer be directly supported in QEMU
 > 
-> Space at wrong location --------------^
+> Add a period after the last sentence?
 
-Opps.
+Yes
 
 > 
-> > +To allow live migration of a guest running on a 2.8.0 release to a
-> > +2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-> > +``pc-q35-2.8''.  To allow users live migrating VMs to skip multiple
-> > +intermediate releases when upgrading, new releases of QEMU will
-> > +support machine types from many previous versions.
+> > +@subsection -drive if=scsi (since 2.9.0)
 > > +
-> > +The supported lifetime for versioned machine types is 12 releases,
+> > +The ``-drive if=scsi'' argument is replaced by the the
+> > +``-device BUS-TYPE'' argument combined with ``-drive if=none''.
+> > +
+> > +@subsection -net dump (since 2.10.0)
+> > +
+> > +The ``--net dump'' argument is now a synonym for setting the
+> > +``-object filter-dump'' argument instead.
 > 
-> Maybe rather "The minimum supported lifetime ..." ? In case we decide to
-> support it longer for any reasons...
+> Technically, it's not a synonym, but a replacement ;-)
+> ("-net dump" uses the "vlan" concept, while "-object filter-dump" works
+> with "-netdev" instead)
 
-Same point as above - I feel its important to set a clear fixed timeframe
-to avoid re-opening debate each time we come to delete something.
+Oh, right, I misunderstood that
+
 
 Regards,
 Daniel
