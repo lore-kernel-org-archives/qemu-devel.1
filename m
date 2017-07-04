@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLl0-0006bu-GW
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:39 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLl4-0006f1-2e
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkv-0001qm-Mb
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:38 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36363)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLl3-0001tI-3j
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:41 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35526)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSLkv-0001qD-G5
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:33 -0400
-Received: by mail-wm0-x243.google.com with SMTP id y5so25528667wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:33 -0700 (PDT)
+	id 1dSLl2-0001st-Sz
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:41 -0400
+Received: by mail-wm0-x244.google.com with SMTP id u23so25603576wma.2
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:40 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  4 Jul 2017 13:12:01 +0200
-Message-Id: <1499166735-39360-9-git-send-email-pbonzini@redhat.com>
+Date: Tue,  4 Jul 2017 13:12:02 +0200
+Message-Id: <1499166735-39360-10-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
 References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/22] tcg: make tcg_allowed global
+Subject: [Qemu-devel] [PATCH 09/22] monitor: disable "info jit" and "info
+ opcount" if !TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +31,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-From: Yang Zhong <yang.zhong@intel.com>
-
-Change the tcg_enabled() and make sure user build still enable tcg
-even x86 softmmu disable tcg.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/tcg/cpu-exec-common.c | 2 ++
- accel/tcg/tcg-all.c         | 1 -
- accel/tcg/translate-all.c   | 6 +-----
- include/qemu-common.h       | 7 ++++++-
- 4 files changed, 9 insertions(+), 7 deletions(-)
+ accel/tcg/translate-all.c | 5 +++++
+ hmp-commands-info.hx      | 4 ++++
+ monitor.c                 | 2 ++
+ 3 files changed, 11 insertions(+)
 
-diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
-index e81da27..5b4ae54 100644
---- a/accel/tcg/cpu-exec-common.c
-+++ b/accel/tcg/cpu-exec-common.c
-@@ -23,6 +23,8 @@
- #include "exec/exec-all.h"
- #include "exec/memory-internal.h"
- 
-+bool tcg_allowed;
-+
- /* exit the current TB, but without causing any exception to be raised */
- void cpu_loop_exit_noexc(CPUState *cpu)
- {
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index c1ccad3..56dbb56 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -33,7 +33,6 @@
- #include "qemu/main-loop.h"
- 
- unsigned long tcg_tb_size;
--static bool tcg_allowed = true;
- 
- #ifndef CONFIG_USER_ONLY
- /* mask must never be zero, except for A20 change call */
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8428fce..4c1d8c9 100644
+index 4c1d8c9..093207a 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -784,6 +784,7 @@ static void tb_htable_init(void)
-    size. */
- void tcg_exec_init(unsigned long tb_size)
- {
-+    tcg_allowed = true;
-     cpu_gen_init();
-     page_init();
-     tb_htable_init();
-@@ -795,11 +796,6 @@ void tcg_exec_init(unsigned long tb_size)
- #endif
- }
+@@ -1851,6 +1851,11 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
  
--bool tcg_enabled(void)
--{
--    return tcg_ctx.code_gen_buffer != NULL;
--}
--
- /*
-  * Allocate a new translation block. Flush the translation buffer if
-  * too many translation blocks or too much generated code.
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 387ef52..b5adbfa 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -76,8 +76,13 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
-     sendto(sockfd, buf, len, flags, destaddr, addrlen)
- #endif
+     tb_lock();
  
-+extern bool tcg_allowed;
- void tcg_exec_init(unsigned long tb_size);
--bool tcg_enabled(void);
-+#ifdef CONFIG_TCG
-+#define tcg_enabled() (tcg_allowed)
-+#else
-+#define tcg_enabled() 0
++    if (!tcg_enabled()) {
++        cpu_fprintf(f, "TCG not enabled\n");
++        return;
++    }
++
+     target_code_size = 0;
+     max_target_code_size = 0;
+     cross_page = 0;
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index ba98e58..07500ef 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -261,6 +261,7 @@ STEXI
+ Show memory tree.
+ ETEXI
+ 
++#if defined(CONFIG_TCG)
+     {
+         .name       = "jit",
+         .args_type  = "",
+@@ -268,6 +269,7 @@ ETEXI
+         .help       = "show dynamic compiler info",
+         .cmd        = hmp_info_jit,
+     },
 +#endif
  
- void cpu_exec_init_all(void);
- void cpu_exec_step_atomic(CPUState *cpu);
+ STEXI
+ @item info jit
+@@ -275,6 +277,7 @@ STEXI
+ Show dynamic compiler info.
+ ETEXI
+ 
++#if defined(CONFIG_TCG)
+     {
+         .name       = "opcount",
+         .args_type  = "",
+@@ -282,6 +285,7 @@ ETEXI
+         .help       = "show dynamic compiler opcode counters",
+         .cmd        = hmp_info_opcount,
+     },
++#endif
+ 
+ STEXI
+ @item info opcount
+diff --git a/monitor.c b/monitor.c
+index 4031876..d8ac20f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1098,6 +1098,7 @@ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+     }
+ }
+ 
++#ifdef CONFIG_TCG
+ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+ {
+     if (!tcg_enabled()) {
+@@ -1113,6 +1114,7 @@ static void hmp_info_opcount(Monitor *mon, const QDict *qdict)
+ {
+     dump_opcount_info((FILE *)mon, monitor_fprintf);
+ }
++#endif
+ 
+ static void hmp_info_history(Monitor *mon, const QDict *qdict)
+ {
 -- 
 1.8.3.1
