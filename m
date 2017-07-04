@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSNZp-0006WT-SP
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:09:14 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dSNdc-0007NT-T8
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSNZl-0006uE-6x
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:09:13 -0400
-References: <20170704110126.26806-1-lvivier@redhat.com>
-	<20170704110126.26806-3-lvivier@redhat.com>
-	<20170704131500.3ef448c8@bahia.lan>
-	<20170704114151.GG2180@umbus.fritz.box>
-	<20170704150239.2e4adb64@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6e5799ff-e6f6-ed88-8079-489658427033@redhat.com>
-Date: Tue, 4 Jul 2017 15:08:54 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dSNdY-0008W6-T4
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:13:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dSNdY-0008Tw-M9
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:13:04 -0400
+Date: Tue, 4 Jul 2017 15:12:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170704151255.03c69ee0@nial.brq.redhat.com>
+In-Reply-To: <20170703193026-mutt-send-email-mst@kernel.org>
+References: <1498773362-18675-1-git-send-email-zuban32s@gmail.com>
+	<20170630020622-mutt-send-email-mst@kernel.org>
+	<ec616cb6-f693-76c5-5732-ec6ee7840d9c@redhat.com>
+	<20170703142711.0a1db036@nial.brq.redhat.com>
+	<20170703193026-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170704150239.2e4adb64@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="tcUWWmbc8nMVebDnT5NLjooV0DDKj2F0L"
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] target/ppc: move POWER9 DD1
- workaround to init_proc_POWER9()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 0/6] q35: add acpi pci hotplug support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Laurent Vivier <lvivier@redhat.com>, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Singh <sursingh@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>, Andrea Bolognani <abologna@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: ehabkost@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, pbonzini@redhat.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tcUWWmbc8nMVebDnT5NLjooV0DDKj2F0L
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Mon, 3 Jul 2017 19:34:07 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-On 04.07.2017 15:02, Greg Kurz wrote:
-> On Tue, 4 Jul 2017 21:41:51 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
->> On Tue, Jul 04, 2017 at 01:15:00PM +0200, Greg Kurz wrote:
->>> On Tue,  4 Jul 2017 13:01:26 +0200
->>> Laurent Vivier <lvivier@redhat.com> wrote:
->>>  =20
->>>> Commit 5f3066d ("target/ppc: Allow workarounds for POWER9 DD1")
->>>> disables compatibility mode for POWER9 DD1 to allow to
->>>> boot on POWER9 DD1 host with KVM.
->>>>
->>>> As the workaround has been added in kvmppc_host_cpu_class_init(),
->>>> it applies only on CPU created with "-cpu host".
->>>> As we want to be able to use also "-cpu POWER9" on a POWER9 DD1
->>>> host, this patch moves the workaround from kvmppc_host_cpu_class_ini=
-t()
->>>> to init_proc_POWER9().
->>>>  =20
->>>
->>> As with ppc_cpu_initfn() in your previous version, init_proc_POWER9()=
- is
->>> called for every CPU instance.. ie, all CPU will adjust the @pcr_supp=
-orted
->>> class attribute... =20
->>
->> Ah.. yeah.. I didn't notice that before.  That's definitely not right.=
+> On Mon, Jul 03, 2017 at 02:27:11PM +0200, Igor Mammedov wrote:
+> > On Fri, 30 Jun 2017 10:25:05 +0300
+> > Marcel Apfelbaum <marcel@redhat.com> wrote:
+> > 
+> > [...]  
+> > > 
+> > > So for the modern systems not supporting PCI ACPI hotplug
+> > > we don't need pci-bridges anyway, but for the older ones
+> > > the ACPI code of the pci-bridge will be loaded into the
+> > > ACPI namespace only if a pci-bridge is actually hot-plugged.  
+> > 
+> > just note that the set of 'older' guest OSes is limited to
+> > one that do not support SHPC (i.e. to EOLed WinXP & co)
+> > as for linux and more modern Windows SHPC hotplug should
+> > just work without our ACPI hack (which taxes low memory
+> > to keep acpi tables for bridges).
+> > 
+> > So I'm in favor of Michael's suggestion to leave ACPI PCI
+> > only in PC machine for old WinXP guests and to keep Q35
+> > clean, where linux or newer Windows guests could just
+> > use standard SHPC.
+> > 
+> > [...]  
+> 
+> I didn't realize windows actually supports SHPC for PCI.
+> 
+> Do they correctly set _OSC Arg3, bit offset 1?
+> 	SHPC Native Hot Plug control
+> 	The OS sets this bit to 1 to request control over PCI/PCI-X Standard Hot-Plug Controller
+> 	(SHPC) hot plug. If the OS successfully receives control of this feature, it must track and
+> 	update the status of hot plug slots and handle hot plug events as described in the SHPC
+> 	Specification.
+> I was under impression they only set bit 0.
 
+Alexander,
 
-It's a hack for DD1 which will likely be removed soon again anyway (as
-soon as the DD1 hardware is not in use anymore), so I think it's ok for
-such a temporary solution?
+wrt windows it might be worth to keep in mind
+  https://msdn.microsoft.com/en-us/library/windows/hardware/dn631753(v=vs.85).aspx
 
->>> What about moving the workaround to ppc_POWER9_cpu_family_class_init(=
-)
->>> instead ? This would just require to expose mfpvr() in some header.  =
+as for QEMU,
+one should remove masking SHPC support in QEMU ACPI part
+ build_q35_osc_method()
 
->>
->> Yeah, as someone else pointed out using the host PVR is also
->> definitely not right (unless you're in a function specifically
->> connected to the host cpu class).
->>
->=20
-> I agree but the root issue is that we accept to pass -cpu POWER9 instea=
-d of
-> -cpu host with -enable-kvm. And the host cpu class isn't involved in th=
-is
-> case.
-
-Allowing -cpu POWERx with -enable-kvm was likely a bad idea, but we've
-agree with libvirt that we support this, so we can't revert this feature
-so easily without changing libvirt first.
-
- Thomas
-
-
---tcUWWmbc8nMVebDnT5NLjooV0DDKj2F0L
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZW5NwAAoJEC7Z13T+cC21PfYP/iL0mxRKWAkdNRB5qpZinZSo
-CRk4gmjr0Y/jnm67BZXoWIuuS5MUqJmc/0NhoFWYtewhddz61NHgQ1PgcXaME0Os
-noAWKgUWNNSu3V2cSMZJlBtOe4dU8HSMv4I3CBGp/fdfEcsfdlQNr7gL+RvvszGz
-BiF+7Tcard40qnA5aj7eSk7HhUz7PryQ1sCMU9Hdj4OAvc7GtSNd9C2AnMJGce4w
-rWlRukzYGsyjAhY7HFUgYXRQ425aiAeRsTAdP4Ctj5GIjBEUsqtSgTk5v/isOJ+a
-F0BmZOZb0At9y2U7pFIku1nBa6bL9OC3jcX/8pUq+z4InJA98xbhBYr/U3t+jays
-2221cT18ZM1LhPMpkd4en4lPljNtpXYkZiXghZJcb4USNIVMDp6DbwWM2d6um6bq
-tgPYpxvWx+CdC3TitdVUsX+hIUnpjnyxVkQWNc72gzsXLKztsChehd2hJozZEHH1
-ev7VUvd+7u05PlzYkGBoOMj07Tal49ejh5b+WNeK9SB8hDd8Eu69yDgjjuz9mlAs
-mareuUgyEsC6HrjHpTpofrKPj1zGaED8T+YKDKlduFLq0VdIw74uaq5L9Nl+OZWE
-MFSNAUyuLNIvCu3rhpm6pmGdBpVjYZH2gR+9AXhpoVvBUTVIDQlZBIy/QALBxtm3
-4Bi+ogwba5IqEow8Xiah
-=H0/B
------END PGP SIGNATURE-----
-
---tcUWWmbc8nMVebDnT5NLjooV0DDKj2F0L--
+hw switch to SHPC method happens for bridges in shpc_init() see qbus_set_hotplug_handler()
