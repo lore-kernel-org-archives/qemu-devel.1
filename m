@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dSWPX-0000L4-Cn
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:35:12 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dSWSR-0001Py-68
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dSWPW-0003L7-HH
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:35:11 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35047)
+	(envelope-from <rth7680@gmail.com>) id 1dSWSN-0004Rt-4r
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:38:11 -0400
+Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:36481)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dSWPW-0003KD-8r
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:35:10 -0400
-Received: by mail-wm0-x233.google.com with SMTP id w126so206335802wme.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 15:35:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSWSM-0004Rg-TV
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:38:07 -0400
+Received: by mail-pf0-x22b.google.com with SMTP id q86so120155512pfl.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 15:38:06 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170608184944.19406-1-mrolnik@gmail.com>
+	<CAK4993hiFSozkL-5B0gud-nPVFqcvP2mgBR1Rk1vQSmhts3fGQ@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <7103e7ca-1504-58b0-1f32-aabba7f45792@twiddle.net>
+Date: Tue, 4 Jul 2017 12:38:01 -1000
 MIME-Version: 1.0
-In-Reply-To: <ee87713c-82f1-5a3f-2c42-41833e2ea932@twiddle.net>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865316837.17063.1608754834009945976.stgit@frigg.lan>
-	<528c921e-d04c-f064-08f8-2c6a0b3f23f1@twiddle.net>
-	<8760f8av0c.fsf@frigg.lan>
-	<CAFEAcA8VPgejz7oUKMR7965BjyU3t+DA8Vq7GatUUhTC0j9XRg@mail.gmail.com>
-	<ee87713c-82f1-5a3f-2c42-41833e2ea932@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Jul 2017 23:34:48 +0100
-Message-ID: <CAFEAcA8RJcGJU-r+mhTVQaGgdKk5=JR8EXVV6HHfwptFQOHpWw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 04/29] target: [tcg] Add generic
- translation framework
+In-Reply-To: <CAK4993hiFSozkL-5B0gud-nPVFqcvP2mgBR1Rk1vQSmhts3fGQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v19 00/13] QEMU AVR 8 bit cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Michael Rolnik <mrolnik@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Anichang <anichang@protonmail.ch>
 
-On 4 July 2017 at 23:31, Richard Henderson <rth@twiddle.net> wrote:
-> On 07/04/2017 09:14 AM, Peter Maydell wrote:
->> I kind of like not having CPUState* in DisasContext, because
->> it enforces the rule that you can't read from fields of
->> it inside the target translate.c code without jumping through
->> a hoop (ie copying the info from CPUState->foo to
->> DisasContext->foo). That then acts as a useful flag in code
->> review (or when writing the code) to confirm that foo really
->> is constant for the life of the simulation (or to recommend
->> using a TB flag instead).
->
->
-> I don't see how the spelling "cpu" vs "dc->cpu" really affects that.
+On 06/21/2017 09:15 PM, Michael Rolnik wrote:
+> Hi all,
+> 
+> are there any action items for me?
 
-If you put it in dc->cpu then everywhere that gets the dc gets
-the cpu, unavoidably (which is why I'm suggesting it would
-be nicer not to do that). If you don't put it in dc then you
-can structure your translate code so that pretty much all of
-it gets the dc but not the cpu. target/arm/translate-a64.c
-does this, for instance.
+What kind of testing are you doing for this?
 
-thanks
--- PMM
+I just briefly browsed through the code again and happened to see that ROR has 
+a critical typo.  Considering that ROR must be used for multi-byte shifts, I'm 
+wondering how you wouldn't have found this via even cursory testing.
+
+> +int avr_translate_ROR(CPUAVRState *env, DisasContext *ctx, uint32_t opcode)
+> +{
+> +    TCGv Rd = cpu_r[ROR_Rd(opcode)];
+> +    TCGv t0 = tcg_temp_new_i32();
+> +
+> +    tcg_gen_shli_tl(t0, cpu_Cf, 7);
+> +    tcg_gen_andi_tl(cpu_Cf, Rd, 0);
+
+
+r~
