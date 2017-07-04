@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dSCrO-0001TK-00
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:42:39 -0400
+	(envelope-from <peterx@redhat.com>) id 1dSCsP-0002WQ-OE
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:43:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dSCrK-0001w1-QX
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:42:38 -0400
-Received: from mga09.intel.com ([134.134.136.24]:38270)
+	(envelope-from <peterx@redhat.com>) id 1dSCsM-0002uu-JM
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:43:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60250)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dSCrK-0001sO-Er
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:42:34 -0400
-Message-ID: <595AF319.6000708@intel.com>
-Date: Tue, 04 Jul 2017 09:44:57 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dSCsM-0002t3-AA
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:43:38 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4D00275748
+	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 01:43:36 +0000 (UTC)
+Date: Tue, 4 Jul 2017 09:43:36 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170704014336.GB32003@pxdev.xzpeter.org>
+References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
+	<1499049848-18012-3-git-send-email-peterx@redhat.com>
+	<20170703145903.GL12152@localhost.localdomain>
 MIME-Version: 1.0
-References: <1499111049-13721-1-git-send-email-mst@redhat.com>
-	<1499111049-13721-2-git-send-email-mst@redhat.com>
-In-Reply-To: <1499111049-13721-2-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 01/21] virtio-net: enable configurable tx
- queue size
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170703145903.GL12152@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/4] vl: move global property,
+ migrate init earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +36,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, jan.scheurich@ericsson.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 07/04/2017 03:44 AM, Michael S. Tsirkin wrote:
-> From: Wei Wang <wei.w.wang@intel.com>
->
-> This patch enables the virtio-net tx queue size to be configurable
-> between 256 (the default queue size) and 1024 by the user when the
-> vhost-user backend is used.
->
-> Currently, the maximum tx queue size for other backends is 512 due
-> to the following limitations:
-> - QEMU backend: the QEMU backend implementation in some cases may
-> send 1024+1 iovs to writev.
-> - Vhost_net backend: there are possibilities that the guest sends
-> a vring_desc of memory which crosses a MemoryRegion thereby
-> generating more than 1024 iovs after translation from guest-physical
-> address in the backend.
->
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->   include/hw/virtio/virtio-net.h |  1 +
->   hw/net/virtio-net.c            | 32 ++++++++++++++++++++++++++++++--
->   2 files changed, 31 insertions(+), 2 deletions(-)
->
-> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-> index 602b486..b81b6a4 100644
-> --- a/include/hw/virtio/virtio-net.h
-> +++ b/include/hw/virtio/virtio-net.h
-> @@ -36,6 +36,7 @@ typedef struct virtio_net_conf
->       int32_t txburst;
->       char *tx;
->       uint16_t rx_queue_size;
-> +    uint16_t tx_queue_size;
->       uint16_t mtu;
->   } virtio_net_conf;
->   
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 91eddaf..a1fc0db 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -34,8 +34,11 @@
->   
->   /* previously fixed value */
->   #define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 256
-> +#define VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE 256
-> +
->   /* for now, only allow larger queues; with virtio-1, guest can downsize */
->   #define VIRTIO_NET_RX_QUEUE_MIN_SIZE VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE
-> +#define VIRTIO_NET_TX_QUEUE_MIN_SIZE VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE
->   
->   /*
->    * Calculate the number of bytes up to and including the given 'field' of
-> @@ -1508,15 +1511,18 @@ static void virtio_net_add_queue(VirtIONet *n, int index)
->   
->       n->vqs[index].rx_vq = virtio_add_queue(vdev, n->net_conf.rx_queue_size,
->                                              virtio_net_handle_rx);
-> +
->       if (n->net_conf.tx && !strcmp(n->net_conf.tx, "timer")) {
->           n->vqs[index].tx_vq =
-> -            virtio_add_queue(vdev, 256, virtio_net_handle_tx_timer);
-> +            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
-> +                             virtio_net_handle_tx_timer);
->           n->vqs[index].tx_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
->                                                 virtio_net_tx_timer,
->                                                 &n->vqs[index]);
->       } else {
->           n->vqs[index].tx_vq =
-> -            virtio_add_queue(vdev, 256, virtio_net_handle_tx_bh);
-> +            virtio_add_queue(vdev, n->net_conf.tx_queue_size,
-> +                             virtio_net_handle_tx_bh);
->           n->vqs[index].tx_bh = qemu_bh_new(virtio_net_tx_bh, &n->vqs[index]);
->       }
->   
-> @@ -1927,6 +1933,17 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->           return;
->       }
->   
-> +    if (n->net_conf.tx_queue_size < VIRTIO_NET_TX_QUEUE_MIN_SIZE ||
-> +        n->net_conf.tx_queue_size > VIRTQUEUE_MAX_SIZE ||
-> +        !is_power_of_2(n->net_conf.tx_queue_size)) {
-> +        error_setg(errp, "Invalid tx_queue_size (= %" PRIu16 "), "
-> +                   "must be a power of 2 between %d and %d",
-> +                   n->net_conf.tx_queue_size, VIRTIO_NET_TX_QUEUE_MIN_SIZE,
-> +                   VIRTQUEUE_MAX_SIZE);
-> +        virtio_cleanup(vdev);
-> +        return;
-> +    }
-> +
->       n->max_queues = MAX(n->nic_conf.peers.queues, 1);
->       if (n->max_queues * 2 + 1 > VIRTIO_QUEUE_MAX) {
->           error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
-> @@ -1947,6 +1964,15 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->           error_report("Defaulting to \"bh\"");
->       }
->   
-> +    /*
-> +     * Currently, backends other than vhost-user don't support 1024 queue
-> +     * size.
-> +     */
-> +    if (n->net_conf.tx_queue_size == VIRTQUEUE_MAX_SIZE &&
-> +        n->nic_conf.peers.ncs[0]->info->type != NET_CLIENT_DRIVER_VHOST_USER) {
-> +        n->net_conf.tx_queue_size = VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE;
-> +    }
-> +
->       for (i = 0; i < n->max_queues; i++) {
->           virtio_net_add_queue(n, i);
->       }
-> @@ -2106,6 +2132,8 @@ static Property virtio_net_properties[] = {
->       DEFINE_PROP_STRING("tx", VirtIONet, net_conf.tx),
->       DEFINE_PROP_UINT16("rx_queue_size", VirtIONet, net_conf.rx_queue_size,
->                          VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE),
-> +    DEFINE_PROP_UINT16("tx_queue_size", VirtIONet, net_conf.tx_queue_size,
-> +                       VIRTIO_NET_TX_QUEUE_DEFAULT_SIZE),
->       DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
->       DEFINE_PROP_BOOL("x-mtu-bypass-backend", VirtIONet, mtu_bypass_backend,
->                        true),
+On Mon, Jul 03, 2017 at 11:59:03AM -0300, Eduardo Habkost wrote:
+> On Mon, Jul 03, 2017 at 10:44:06AM +0800, Peter Xu wrote:
+> > Currently drive_init_func() may call migrate_get_current() while the
+> > migrate object is still not ready yet at that time. Move the migratio=
+n
+> > object init earlier, along with the global properties, right after
+> > acceleration init.
+> >=20
+> > This fixes a breakage for iotest 055, which caused an assertion failu=
+re.
+> >=20
+> > Reported-by: Max Reitz <mreitz@redhat.com>
+> > Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > Fixes: 3df663 ("migration: move only_migratable to MigrationState")
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  vl.c | 24 ++++++++++++------------
+> >  1 file changed, 12 insertions(+), 12 deletions(-)
+> >=20
+> > diff --git a/vl.c b/vl.c
+> > index 0c497a3..2ae4313 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -4414,6 +4414,18 @@ int main(int argc, char **argv, char **envp)
+> > =20
+> >      configure_accelerator(current_machine);
+> > =20
+> > +    /*
+> > +     * Register all the global properties, including accel propertie=
+s,
+> > +     * machine properties, and user-specified ones.
+> > +     */
+> > +    register_global_properties(current_machine);
+> > +
+> > +    /*
+> > +     * Migration object can only be created after global properties
+> > +     * are applied correctly.
+> > +     */
+> > +    migration_object_init();
+> > +
+>=20
+> So, things that might introduce bugs here are:
+> 1) Unexpected qdev_prop_register_global() calls between this place and
+>    the original register_global_properties() call (that would now happe=
+n
+>    in a different order).
+> 2) register_global_properties() seeing a different global property list
+>    because it is being called earlier.
+>    2.1) AccelClass::global_props is statically defined and will be the
+>         same here. Not a problem.
+>    2.2) MachineClass::compat_props: same as above.
+>    2.3) user-provided global properties: we need to ensure all
+>         properties in the "global" QemuOpts section are already
+>         available at this point.
+>=20
+>=20
+> To ensure (1) is not a problem, we need to check all calls for
+> qdev_prop_register_global().  The callers are:
+>=20
+> * configure_rtc()
+>   - Called very early, when parsing command-line options.  Not a proble=
+m.[1]
+> * global_init_func()
+>   * Called by user_register_global_props()
+>     * Called by register_global_properties().
+>       - That's the code we're moving.  Not a problem.
+> * QEMU_OPTION_rtc_td_hack case in main()
+>   - Called very early, when parsing command-line options.  Not a proble=
+m.[1]
+> * QEMU_OPTION_no_kvm_pit_reinjection case in main()
+>   - Called very early, when parsing command-line options.  Not a proble=
+m.[1]
+> * register_compat_prop()
+>   * Called by machine_register_compat_props()
+>     * Called by register_global_properties().
+>       - That's the code we're moving.  Not a problem.
+>   * Called by machine_register_compat_for_subclass()
+>     * Called by machine_register_compat_props() (see above)
+>   * Called by register_compat_props_array()
+>     * Called by accel_register_compat_props()
+>       * Called by register_global_properties().
+>         - That's the code we're moving.  Not a problem.
+> * qdev_prop_register_global_list()
+>   - Used only by unit test code.
+> * cpu_common_parse_features()
+>   - Used when initializing CPUs, which is done much later, when
+>     machine_run_board_init() is called (or when -device is handled by
+>     device_init_func()).  Not a problem.[2]
+> * x86_cpu_parse_featurestr()
+>   - Same as above.
+>=20
+>=20
+> To ensure (2.3) is not a problem, we need to look for references to
+> qemu_find_opts("global") or qemu_global_opts.  They are:
+>=20
+> * user_register_global_props()
+>   - This is the code we're moving.  Not a problem.
+> * default_driver_check() call at main()
+>   - This happens earlier, before the code we're moving.  Not a problem.
+> * qemu_global_option()
+>   - Called very early, when parsing command-line options.  Not a proble=
+m.
+>=20
+>=20
+> So the code reordering looks OK.
+>=20
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Btw, users also expect the support of configuring the tx queue size could
-be added to libvirt soon.
+I really appreciate for such an in-depth review on this patch.
 
-Best,
-Wei
+>=20
+>=20
+> Notes about things we need to fix in the future:
+>=20
+> [1] I think they should be replaced by qemu_global_option() calls, thou=
+gh.
+> [2] This is a fragile portion of the global property code and should be
+>     eventually moved to the command-line parsing section of main().
+
+Agree on both.
+
+Thanks again!
+
+--=20
+Peter Xu
