@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSOUu-00088k-0g
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:13 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dSOWX-0001gs-Bf
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSOUq-0003Xt-Kx
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50983
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dSOUq-0003XT-Es
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:08 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v64E4WVq019474
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 10:08:07 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg6bh367w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 10:08:07 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 4 Jul 2017 15:08:04 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue,  4 Jul 2017 16:07:52 +0200
-Message-Id: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 0/7] s390x/kvm: pending patches
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dSOWR-0004aA-49
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:09:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:65508)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dSOWQ-0004YP-TN
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:09:47 -0400
+References: <20170628190047.26159-1-dgilbert@redhat.com>
+	<20170628190047.26159-30-dgilbert@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <09cc072b-68c1-5212-c9ad-8cb0cf64a892@redhat.com>
+Date: Tue, 4 Jul 2017 16:09:33 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170628190047.26159-30-dgilbert@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 29/29] vhost-user: Claim support for postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-This is what I have queued for s390x.
 
-Cornelia Huck (1):
-  s390x/MAINTAINERS: Update my email address
 
-Dong Jia Shi (1):
-  s390x/3270: fix instruction interception handler
+On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Tell QEMU we understand the protocol features needed for postcopy.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>   contrib/libvhost-user/libvhost-user.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> index c1716d1a62..1c46aecfb3 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -797,7 +797,8 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vmsg)
+>   static bool
+>   vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+>   {
+> -    uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
+> +    uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
+> +                        1ULL << VHOST_USER_PROTOCOL_F_POSTCOPY;
 
-Halil Pasic (3):
-  s390x: vmstatify config migration for virtio-ccw
-  s390x: fix error propagation in kvm-flic's realize
-  s390x: fix realize inheritance for kvm-flic
+Maybe advertising VHOST_USER_PROTOCOL_F_POSTCOPY could be done only
+if userfaultfd syscall is supported?
 
-QingFeng Hao (1):
-  virtio-scsi-ccw: use ioeventfd even when KVM is disabled
-
-Viktor Mihajlovski (1):
-  s390x: return unavailable features via query-cpu-definitions
-
- MAINTAINERS                  |   8 +-
- hw/intc/s390_flic.c          |  32 +++-
- hw/intc/s390_flic_kvm.c      |  31 +++-
- hw/s390x/3270-ccw.c          |   1 +
- hw/s390x/ccw-device.c        |  10 ++
- hw/s390x/ccw-device.h        |   4 +
- hw/s390x/css.c               | 378 +++++++++++++++++++++++++------------------
- hw/s390x/virtio-ccw.c        | 160 +++++++++---------
- include/hw/s390x/css.h       |  12 +-
- include/hw/s390x/s390_flic.h |   5 +
- target/s390x/cpu.h           |   6 +-
- target/s390x/cpu_models.c    |  62 ++++++-
- 12 files changed, 456 insertions(+), 253 deletions(-)
-
--- 
-2.7.4
+>   
+>       if (dev->iface->get_protocol_features) {
+>           features |= dev->iface->get_protocol_features(dev);
+> 
