@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLlP-0006zf-0t
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:13:04 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLlP-0006zk-1Z
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:13:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLlL-000229-4k
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLlK-00021z-PY
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:13:02 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34439)
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33367)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSLlK-00021X-Ua
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:59 -0400
-Received: by mail-wr0-x242.google.com with SMTP id k67so46853801wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:58 -0700 (PDT)
+	id 1dSLlK-00021B-Co
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:58 -0400
+Received: by mail-wm0-x244.google.com with SMTP id j85so25562283wmj.0
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:57 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  4 Jul 2017 13:12:13 +0200
-Message-Id: <1499166735-39360-21-git-send-email-pbonzini@redhat.com>
+Date: Tue,  4 Jul 2017 13:12:12 +0200
+Message-Id: <1499166735-39360-20-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
 References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 20/22] target/i386: add the tcg_enabled() in
- target/i386/
+Subject: [Qemu-devel] [PATCH 19/22] target/i386: move TLB refill function
+ out of helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +31,721 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-From: Yang Zhong <yang.zhong@intel.com>
+This function calls tlb_set_page_with_attrs, which is not available
+when TCG is disabled.  Move it to excp_helper.c.
 
-Add the tcg_enabled() where the x86 target needs to disable
-TCG-specific code.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-	v2: do not touch bpt_helper.c, adjust caller in machine.c [Richard]
+ target/i386/excp_helper.c | 343 +++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/helper.c      | 344 +---------------------------------------------
+ 2 files changed, 344 insertions(+), 343 deletions(-)
 
- target/i386/cpu.c     |  4 +++-
- target/i386/cpu.h     |  8 +++++++-
- target/i386/helper.c  |  2 +-
- target/i386/machine.c | 10 +++++-----
- 4 files changed, 16 insertions(+), 8 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 642519a..c571772 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4040,8 +4040,10 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->class_by_name = x86_cpu_class_by_name;
-     cc->parse_features = x86_cpu_parse_featurestr;
-     cc->has_work = x86_cpu_has_work;
-+#ifdef CONFIG_TCG
-     cc->do_interrupt = x86_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
-+#endif
-     cc->dump_state = x86_cpu_dump_state;
-     cc->get_crash_info = x86_cpu_get_crash_info;
-     cc->set_pc = x86_cpu_set_pc;
-@@ -4070,7 +4072,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-     cc->gdb_core_xml_file = "i386-32bit.xml";
-     cc->gdb_num_core_regs = 41;
- #endif
--#ifndef CONFIG_USER_ONLY
-+#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
-     cc->debug_excp_handler = breakpoint_handler;
- #endif
-     cc->cpu_exec_enter = x86_cpu_exec_enter;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 66a363f..cef7dbe 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -52,7 +52,9 @@
- 
- #include "exec/cpu-defs.h"
- 
-+#ifdef CONFIG_TCG
- #include "fpu/softfloat.h"
-+#endif
- 
- #define R_EAX 0
- #define R_ECX 1
-@@ -1597,7 +1599,11 @@ uint32_t cpu_cc_compute_all(CPUX86State *env1, int op);
- 
- static inline uint32_t cpu_compute_eflags(CPUX86State *env)
+diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
+index b769772..cef4449 100644
+--- a/target/i386/excp_helper.c
++++ b/target/i386/excp_helper.c
+@@ -136,3 +136,346 @@ void raise_exception_ra(CPUX86State *env, int exception_index, uintptr_t retaddr
  {
--    return env->eflags | cpu_cc_compute_all(env, CC_OP) | (env->df & DF_MASK);
-+    uint32_t eflags = env->eflags;
-+    if (tcg_enabled()) {
-+        eflags |= cpu_cc_compute_all(env, CC_OP) | (env->df & DF_MASK);
-+    }
-+    return eflags;
+     raise_interrupt2(env, exception_index, 0, 0, 0, retaddr);
  }
- 
- /* NOTE: the translator must set DisasContext.cc_op to CC_OP_EFLAGS
++
++#if defined(CONFIG_USER_ONLY)
++int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
++                             int is_write, int mmu_idx)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++
++    /* user mode only emulation */
++    is_write &= 1;
++    env->cr[2] = addr;
++    env->error_code = (is_write << PG_ERROR_W_BIT);
++    env->error_code |= PG_ERROR_U_MASK;
++    cs->exception_index = EXCP0E_PAGE;
++    env->exception_is_int = 0;
++    env->exception_next_eip = -1;
++    return 1;
++}
++
++#else
++
++/* return value:
++ * -1 = cannot handle fault
++ * 0  = nothing more to do
++ * 1  = generate PF fault
++ */
++int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
++                             int is_write1, int mmu_idx)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++    uint64_t ptep, pte;
++    int32_t a20_mask;
++    target_ulong pde_addr, pte_addr;
++    int error_code = 0;
++    int is_dirty, prot, page_size, is_write, is_user;
++    hwaddr paddr;
++    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
++    uint32_t page_offset;
++    target_ulong vaddr;
++
++    is_user = mmu_idx == MMU_USER_IDX;
++#if defined(DEBUG_MMU)
++    printf("MMU fault: addr=%" VADDR_PRIx " w=%d u=%d eip=" TARGET_FMT_lx "\n",
++           addr, is_write1, is_user, env->eip);
++#endif
++    is_write = is_write1 & 1;
++
++    a20_mask = x86_get_a20_mask(env);
++    if (!(env->cr[0] & CR0_PG_MASK)) {
++        pte = addr;
++#ifdef TARGET_X86_64
++        if (!(env->hflags & HF_LMA_MASK)) {
++            /* Without long mode we can only address 32bits in real mode */
++            pte = (uint32_t)pte;
++        }
++#endif
++        prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++        page_size = 4096;
++        goto do_mapping;
++    }
++
++    if (!(env->efer & MSR_EFER_NXE)) {
++        rsvd_mask |= PG_NX_MASK;
++    }
++
++    if (env->cr[4] & CR4_PAE_MASK) {
++        uint64_t pde, pdpe;
++        target_ulong pdpe_addr;
++
++#ifdef TARGET_X86_64
++        if (env->hflags & HF_LMA_MASK) {
++            bool la57 = env->cr[4] & CR4_LA57_MASK;
++            uint64_t pml5e_addr, pml5e;
++            uint64_t pml4e_addr, pml4e;
++            int32_t sext;
++
++            /* test virtual address sign extension */
++            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
++            if (sext != 0 && sext != -1) {
++                env->error_code = 0;
++                cs->exception_index = EXCP0D_GPF;
++                return 1;
++            }
++
++            if (la57) {
++                pml5e_addr = ((env->cr[3] & ~0xfff) +
++                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
++                pml5e = x86_ldq_phys(cs, pml5e_addr);
++                if (!(pml5e & PG_PRESENT_MASK)) {
++                    goto do_fault;
++                }
++                if (pml5e & (rsvd_mask | PG_PSE_MASK)) {
++                    goto do_fault_rsvd;
++                }
++                if (!(pml5e & PG_ACCESSED_MASK)) {
++                    pml5e |= PG_ACCESSED_MASK;
++                    x86_stl_phys_notdirty(cs, pml5e_addr, pml5e);
++                }
++                ptep = pml5e ^ PG_NX_MASK;
++            } else {
++                pml5e = env->cr[3];
++                ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
++            }
++
++            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
++                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
++            pml4e = x86_ldq_phys(cs, pml4e_addr);
++            if (!(pml4e & PG_PRESENT_MASK)) {
++                goto do_fault;
++            }
++            if (pml4e & (rsvd_mask | PG_PSE_MASK)) {
++                goto do_fault_rsvd;
++            }
++            if (!(pml4e & PG_ACCESSED_MASK)) {
++                pml4e |= PG_ACCESSED_MASK;
++                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
++            }
++            ptep &= pml4e ^ PG_NX_MASK;
++            pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
++                a20_mask;
++            pdpe = x86_ldq_phys(cs, pdpe_addr);
++            if (!(pdpe & PG_PRESENT_MASK)) {
++                goto do_fault;
++            }
++            if (pdpe & rsvd_mask) {
++                goto do_fault_rsvd;
++            }
++            ptep &= pdpe ^ PG_NX_MASK;
++            if (!(pdpe & PG_ACCESSED_MASK)) {
++                pdpe |= PG_ACCESSED_MASK;
++                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
++            }
++            if (pdpe & PG_PSE_MASK) {
++                /* 1 GB page */
++                page_size = 1024 * 1024 * 1024;
++                pte_addr = pdpe_addr;
++                pte = pdpe;
++                goto do_check_protect;
++            }
++        } else
++#endif
++        {
++            /* XXX: load them when cr3 is loaded ? */
++            pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
++                a20_mask;
++            pdpe = x86_ldq_phys(cs, pdpe_addr);
++            if (!(pdpe & PG_PRESENT_MASK)) {
++                goto do_fault;
++            }
++            rsvd_mask |= PG_HI_USER_MASK;
++            if (pdpe & (rsvd_mask | PG_NX_MASK)) {
++                goto do_fault_rsvd;
++            }
++            ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
++        }
++
++        pde_addr = ((pdpe & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
++            a20_mask;
++        pde = x86_ldq_phys(cs, pde_addr);
++        if (!(pde & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        if (pde & rsvd_mask) {
++            goto do_fault_rsvd;
++        }
++        ptep &= pde ^ PG_NX_MASK;
++        if (pde & PG_PSE_MASK) {
++            /* 2 MB page */
++            page_size = 2048 * 1024;
++            pte_addr = pde_addr;
++            pte = pde;
++            goto do_check_protect;
++        }
++        /* 4 KB page */
++        if (!(pde & PG_ACCESSED_MASK)) {
++            pde |= PG_ACCESSED_MASK;
++            x86_stl_phys_notdirty(cs, pde_addr, pde);
++        }
++        pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
++            a20_mask;
++        pte = x86_ldq_phys(cs, pte_addr);
++        if (!(pte & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        if (pte & rsvd_mask) {
++            goto do_fault_rsvd;
++        }
++        /* combine pde and pte nx, user and rw protections */
++        ptep &= pte ^ PG_NX_MASK;
++        page_size = 4096;
++    } else {
++        uint32_t pde;
++
++        /* page directory entry */
++        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) &
++            a20_mask;
++        pde = x86_ldl_phys(cs, pde_addr);
++        if (!(pde & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        ptep = pde | PG_NX_MASK;
++
++        /* if PSE bit is set, then we use a 4MB page */
++        if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
++            page_size = 4096 * 1024;
++            pte_addr = pde_addr;
++
++            /* Bits 20-13 provide bits 39-32 of the address, bit 21 is reserved.
++             * Leave bits 20-13 in place for setting accessed/dirty bits below.
++             */
++            pte = pde | ((pde & 0x1fe000LL) << (32 - 13));
++            rsvd_mask = 0x200000;
++            goto do_check_protect_pse36;
++        }
++
++        if (!(pde & PG_ACCESSED_MASK)) {
++            pde |= PG_ACCESSED_MASK;
++            x86_stl_phys_notdirty(cs, pde_addr, pde);
++        }
++
++        /* page directory entry */
++        pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) &
++            a20_mask;
++        pte = x86_ldl_phys(cs, pte_addr);
++        if (!(pte & PG_PRESENT_MASK)) {
++            goto do_fault;
++        }
++        /* combine pde and pte user and rw protections */
++        ptep &= pte | PG_NX_MASK;
++        page_size = 4096;
++        rsvd_mask = 0;
++    }
++
++do_check_protect:
++    rsvd_mask |= (page_size - 1) & PG_ADDRESS_MASK & ~PG_PSE_PAT_MASK;
++do_check_protect_pse36:
++    if (pte & rsvd_mask) {
++        goto do_fault_rsvd;
++    }
++    ptep ^= PG_NX_MASK;
++
++    /* can the page can be put in the TLB?  prot will tell us */
++    if (is_user && !(ptep & PG_USER_MASK)) {
++        goto do_fault_protect;
++    }
++
++    prot = 0;
++    if (mmu_idx != MMU_KSMAP_IDX || !(ptep & PG_USER_MASK)) {
++        prot |= PAGE_READ;
++        if ((ptep & PG_RW_MASK) || (!is_user && !(env->cr[0] & CR0_WP_MASK))) {
++            prot |= PAGE_WRITE;
++        }
++    }
++    if (!(ptep & PG_NX_MASK) &&
++        (mmu_idx == MMU_USER_IDX ||
++         !((env->cr[4] & CR4_SMEP_MASK) && (ptep & PG_USER_MASK)))) {
++        prot |= PAGE_EXEC;
++    }
++    if ((env->cr[4] & CR4_PKE_MASK) && (env->hflags & HF_LMA_MASK) &&
++        (ptep & PG_USER_MASK) && env->pkru) {
++        uint32_t pk = (pte & PG_PKRU_MASK) >> PG_PKRU_BIT;
++        uint32_t pkru_ad = (env->pkru >> pk * 2) & 1;
++        uint32_t pkru_wd = (env->pkru >> pk * 2) & 2;
++        uint32_t pkru_prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++
++        if (pkru_ad) {
++            pkru_prot &= ~(PAGE_READ | PAGE_WRITE);
++        } else if (pkru_wd && (is_user || env->cr[0] & CR0_WP_MASK)) {
++            pkru_prot &= ~PAGE_WRITE;
++        }
++
++        prot &= pkru_prot;
++        if ((pkru_prot & (1 << is_write1)) == 0) {
++            assert(is_write1 != 2);
++            error_code |= PG_ERROR_PK_MASK;
++            goto do_fault_protect;
++        }
++    }
++
++    if ((prot & (1 << is_write1)) == 0) {
++        goto do_fault_protect;
++    }
++
++    /* yes, it can! */
++    is_dirty = is_write && !(pte & PG_DIRTY_MASK);
++    if (!(pte & PG_ACCESSED_MASK) || is_dirty) {
++        pte |= PG_ACCESSED_MASK;
++        if (is_dirty) {
++            pte |= PG_DIRTY_MASK;
++        }
++        x86_stl_phys_notdirty(cs, pte_addr, pte);
++    }
++
++    if (!(pte & PG_DIRTY_MASK)) {
++        /* only set write access if already dirty... otherwise wait
++           for dirty access */
++        assert(!is_write);
++        prot &= ~PAGE_WRITE;
++    }
++
++ do_mapping:
++    pte = pte & a20_mask;
++
++    /* align to page_size */
++    pte &= PG_ADDRESS_MASK & ~(page_size - 1);
++
++    /* Even if 4MB pages, we map only one 4KB page in the cache to
++       avoid filling it too fast */
++    vaddr = addr & TARGET_PAGE_MASK;
++    page_offset = vaddr & (page_size - 1);
++    paddr = pte + page_offset;
++
++    assert(prot & (1 << is_write1));
++    tlb_set_page_with_attrs(cs, vaddr, paddr, cpu_get_mem_attrs(env),
++                            prot, mmu_idx, page_size);
++    return 0;
++ do_fault_rsvd:
++    error_code |= PG_ERROR_RSVD_MASK;
++ do_fault_protect:
++    error_code |= PG_ERROR_P_MASK;
++ do_fault:
++    error_code |= (is_write << PG_ERROR_W_BIT);
++    if (is_user)
++        error_code |= PG_ERROR_U_MASK;
++    if (is_write1 == 2 &&
++        (((env->efer & MSR_EFER_NXE) &&
++          (env->cr[4] & CR4_PAE_MASK)) ||
++         (env->cr[4] & CR4_SMEP_MASK)))
++        error_code |= PG_ERROR_I_D_MASK;
++    if (env->intercept_exceptions & (1 << EXCP0E_PAGE)) {
++        /* cr2 is not modified in case of exceptions */
++        x86_stq_phys(cs,
++                 env->vm_vmcb + offsetof(struct vmcb, control.exit_info_2),
++                 addr);
++    } else {
++        env->cr[2] = addr;
++    }
++    env->error_code = error_code;
++    cs->exception_index = EXCP0E_PAGE;
++    return 1;
++}
++#endif
 diff --git a/target/i386/helper.c b/target/i386/helper.c
-index bcf9b22..f63eb3d 100644
+index 4d584b5..bcf9b22 100644
 --- a/target/i386/helper.c
 +++ b/target/i386/helper.c
-@@ -990,7 +990,7 @@ void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
-         env->tpr_access_type = access;
+@@ -722,349 +722,7 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+     cpu_sync_bndcs_hflags(env);
+ }
  
-         cpu_interrupt(cs, CPU_INTERRUPT_TPR);
--    } else {
-+    } else if (tcg_enabled()) {
-         cpu_restore_state(cs, cs->mem_io_pc);
- 
-         apic_handle_tpr_access_report(cpu->apic_state, env->eip, access);
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index e0417fe..eab3372 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -281,16 +281,16 @@ static int cpu_post_load(void *opaque, int version_id)
-         env->fptags[i] = (env->fptag_vmstate >> i) & 1;
-     }
-     if (tcg_enabled()) {
-+        target_ulong dr7;
-         update_fp_status(env);
-         update_mxcsr_status(env);
+-#if defined(CONFIG_USER_ONLY)
+-
+-int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+-                             int is_write, int mmu_idx)
+-{
+-    X86CPU *cpu = X86_CPU(cs);
+-    CPUX86State *env = &cpu->env;
+-
+-    /* user mode only emulation */
+-    is_write &= 1;
+-    env->cr[2] = addr;
+-    env->error_code = (is_write << PG_ERROR_W_BIT);
+-    env->error_code |= PG_ERROR_U_MASK;
+-    cs->exception_index = EXCP0E_PAGE;
+-    env->exception_is_int = 0;
+-    env->exception_next_eip = -1;
+-    return 1;
+-}
+-
+-#else
+-
+-/* return value:
+- * -1 = cannot handle fault
+- * 0  = nothing more to do
+- * 1  = generate PF fault
+- */
+-int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+-                             int is_write1, int mmu_idx)
+-{
+-    X86CPU *cpu = X86_CPU(cs);
+-    CPUX86State *env = &cpu->env;
+-    uint64_t ptep, pte;
+-    int32_t a20_mask;
+-    target_ulong pde_addr, pte_addr;
+-    int error_code = 0;
+-    int is_dirty, prot, page_size, is_write, is_user;
+-    hwaddr paddr;
+-    uint64_t rsvd_mask = PG_HI_RSVD_MASK;
+-    uint32_t page_offset;
+-    target_ulong vaddr;
+-
+-    is_user = mmu_idx == MMU_USER_IDX;
+-#if defined(DEBUG_MMU)
+-    printf("MMU fault: addr=%" VADDR_PRIx " w=%d u=%d eip=" TARGET_FMT_lx "\n",
+-           addr, is_write1, is_user, env->eip);
+-#endif
+-    is_write = is_write1 & 1;
+-
+-    a20_mask = x86_get_a20_mask(env);
+-    if (!(env->cr[0] & CR0_PG_MASK)) {
+-        pte = addr;
+-#ifdef TARGET_X86_64
+-        if (!(env->hflags & HF_LMA_MASK)) {
+-            /* Without long mode we can only address 32bits in real mode */
+-            pte = (uint32_t)pte;
+-        }
+-#endif
+-        prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+-        page_size = 4096;
+-        goto do_mapping;
 -    }
- 
--    cpu_breakpoint_remove_all(cs, BP_CPU);
--    cpu_watchpoint_remove_all(cs, BP_CPU);
--    {
-+        cpu_breakpoint_remove_all(cs, BP_CPU);
-+        cpu_watchpoint_remove_all(cs, BP_CPU);
-+
-         /* Indicate all breakpoints disabled, as they are, then
-            let the helper re-enable them.  */
--        target_ulong dr7 = env->dr[7];
-+        dr7 = env->dr[7];
-         env->dr[7] = dr7 & ~(DR7_GLOBAL_BP_MASK | DR7_LOCAL_BP_MASK);
-         cpu_x86_update_dr7(env, dr7);
-     }
+-
+-    if (!(env->efer & MSR_EFER_NXE)) {
+-        rsvd_mask |= PG_NX_MASK;
+-    }
+-
+-    if (env->cr[4] & CR4_PAE_MASK) {
+-        uint64_t pde, pdpe;
+-        target_ulong pdpe_addr;
+-
+-#ifdef TARGET_X86_64
+-        if (env->hflags & HF_LMA_MASK) {
+-            bool la57 = env->cr[4] & CR4_LA57_MASK;
+-            uint64_t pml5e_addr, pml5e;
+-            uint64_t pml4e_addr, pml4e;
+-            int32_t sext;
+-
+-            /* test virtual address sign extension */
+-            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
+-            if (sext != 0 && sext != -1) {
+-                env->error_code = 0;
+-                cs->exception_index = EXCP0D_GPF;
+-                return 1;
+-            }
+-
+-            if (la57) {
+-                pml5e_addr = ((env->cr[3] & ~0xfff) +
+-                        (((addr >> 48) & 0x1ff) << 3)) & a20_mask;
+-                pml5e = x86_ldq_phys(cs, pml5e_addr);
+-                if (!(pml5e & PG_PRESENT_MASK)) {
+-                    goto do_fault;
+-                }
+-                if (pml5e & (rsvd_mask | PG_PSE_MASK)) {
+-                    goto do_fault_rsvd;
+-                }
+-                if (!(pml5e & PG_ACCESSED_MASK)) {
+-                    pml5e |= PG_ACCESSED_MASK;
+-                    x86_stl_phys_notdirty(cs, pml5e_addr, pml5e);
+-                }
+-                ptep = pml5e ^ PG_NX_MASK;
+-            } else {
+-                pml5e = env->cr[3];
+-                ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
+-            }
+-
+-            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
+-                    (((addr >> 39) & 0x1ff) << 3)) & a20_mask;
+-            pml4e = x86_ldq_phys(cs, pml4e_addr);
+-            if (!(pml4e & PG_PRESENT_MASK)) {
+-                goto do_fault;
+-            }
+-            if (pml4e & (rsvd_mask | PG_PSE_MASK)) {
+-                goto do_fault_rsvd;
+-            }
+-            if (!(pml4e & PG_ACCESSED_MASK)) {
+-                pml4e |= PG_ACCESSED_MASK;
+-                x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
+-            }
+-            ptep &= pml4e ^ PG_NX_MASK;
+-            pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+-                a20_mask;
+-            pdpe = x86_ldq_phys(cs, pdpe_addr);
+-            if (!(pdpe & PG_PRESENT_MASK)) {
+-                goto do_fault;
+-            }
+-            if (pdpe & rsvd_mask) {
+-                goto do_fault_rsvd;
+-            }
+-            ptep &= pdpe ^ PG_NX_MASK;
+-            if (!(pdpe & PG_ACCESSED_MASK)) {
+-                pdpe |= PG_ACCESSED_MASK;
+-                x86_stl_phys_notdirty(cs, pdpe_addr, pdpe);
+-            }
+-            if (pdpe & PG_PSE_MASK) {
+-                /* 1 GB page */
+-                page_size = 1024 * 1024 * 1024;
+-                pte_addr = pdpe_addr;
+-                pte = pdpe;
+-                goto do_check_protect;
+-            }
+-        } else
+-#endif
+-        {
+-            /* XXX: load them when cr3 is loaded ? */
+-            pdpe_addr = ((env->cr[3] & ~0x1f) + ((addr >> 27) & 0x18)) &
+-                a20_mask;
+-            pdpe = x86_ldq_phys(cs, pdpe_addr);
+-            if (!(pdpe & PG_PRESENT_MASK)) {
+-                goto do_fault;
+-            }
+-            rsvd_mask |= PG_HI_USER_MASK;
+-            if (pdpe & (rsvd_mask | PG_NX_MASK)) {
+-                goto do_fault_rsvd;
+-            }
+-            ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
+-        }
+-
+-        pde_addr = ((pdpe & PG_ADDRESS_MASK) + (((addr >> 21) & 0x1ff) << 3)) &
+-            a20_mask;
+-        pde = x86_ldq_phys(cs, pde_addr);
+-        if (!(pde & PG_PRESENT_MASK)) {
+-            goto do_fault;
+-        }
+-        if (pde & rsvd_mask) {
+-            goto do_fault_rsvd;
+-        }
+-        ptep &= pde ^ PG_NX_MASK;
+-        if (pde & PG_PSE_MASK) {
+-            /* 2 MB page */
+-            page_size = 2048 * 1024;
+-            pte_addr = pde_addr;
+-            pte = pde;
+-            goto do_check_protect;
+-        }
+-        /* 4 KB page */
+-        if (!(pde & PG_ACCESSED_MASK)) {
+-            pde |= PG_ACCESSED_MASK;
+-            x86_stl_phys_notdirty(cs, pde_addr, pde);
+-        }
+-        pte_addr = ((pde & PG_ADDRESS_MASK) + (((addr >> 12) & 0x1ff) << 3)) &
+-            a20_mask;
+-        pte = x86_ldq_phys(cs, pte_addr);
+-        if (!(pte & PG_PRESENT_MASK)) {
+-            goto do_fault;
+-        }
+-        if (pte & rsvd_mask) {
+-            goto do_fault_rsvd;
+-        }
+-        /* combine pde and pte nx, user and rw protections */
+-        ptep &= pte ^ PG_NX_MASK;
+-        page_size = 4096;
+-    } else {
+-        uint32_t pde;
+-
+-        /* page directory entry */
+-        pde_addr = ((env->cr[3] & ~0xfff) + ((addr >> 20) & 0xffc)) &
+-            a20_mask;
+-        pde = x86_ldl_phys(cs, pde_addr);
+-        if (!(pde & PG_PRESENT_MASK)) {
+-            goto do_fault;
+-        }
+-        ptep = pde | PG_NX_MASK;
+-
+-        /* if PSE bit is set, then we use a 4MB page */
+-        if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
+-            page_size = 4096 * 1024;
+-            pte_addr = pde_addr;
+-
+-            /* Bits 20-13 provide bits 39-32 of the address, bit 21 is reserved.
+-             * Leave bits 20-13 in place for setting accessed/dirty bits below.
+-             */
+-            pte = pde | ((pde & 0x1fe000LL) << (32 - 13));
+-            rsvd_mask = 0x200000;
+-            goto do_check_protect_pse36;
+-        }
+-
+-        if (!(pde & PG_ACCESSED_MASK)) {
+-            pde |= PG_ACCESSED_MASK;
+-            x86_stl_phys_notdirty(cs, pde_addr, pde);
+-        }
+-
+-        /* page directory entry */
+-        pte_addr = ((pde & ~0xfff) + ((addr >> 10) & 0xffc)) &
+-            a20_mask;
+-        pte = x86_ldl_phys(cs, pte_addr);
+-        if (!(pte & PG_PRESENT_MASK)) {
+-            goto do_fault;
+-        }
+-        /* combine pde and pte user and rw protections */
+-        ptep &= pte | PG_NX_MASK;
+-        page_size = 4096;
+-        rsvd_mask = 0;
+-    }
+-
+-do_check_protect:
+-    rsvd_mask |= (page_size - 1) & PG_ADDRESS_MASK & ~PG_PSE_PAT_MASK;
+-do_check_protect_pse36:
+-    if (pte & rsvd_mask) {
+-        goto do_fault_rsvd;
+-    }
+-    ptep ^= PG_NX_MASK;
+-
+-    /* can the page can be put in the TLB?  prot will tell us */
+-    if (is_user && !(ptep & PG_USER_MASK)) {
+-        goto do_fault_protect;
+-    }
+-
+-    prot = 0;
+-    if (mmu_idx != MMU_KSMAP_IDX || !(ptep & PG_USER_MASK)) {
+-        prot |= PAGE_READ;
+-        if ((ptep & PG_RW_MASK) || (!is_user && !(env->cr[0] & CR0_WP_MASK))) {
+-            prot |= PAGE_WRITE;
+-        }
+-    }
+-    if (!(ptep & PG_NX_MASK) &&
+-        (mmu_idx == MMU_USER_IDX ||
+-         !((env->cr[4] & CR4_SMEP_MASK) && (ptep & PG_USER_MASK)))) {
+-        prot |= PAGE_EXEC;
+-    }
+-    if ((env->cr[4] & CR4_PKE_MASK) && (env->hflags & HF_LMA_MASK) &&
+-        (ptep & PG_USER_MASK) && env->pkru) {
+-        uint32_t pk = (pte & PG_PKRU_MASK) >> PG_PKRU_BIT;
+-        uint32_t pkru_ad = (env->pkru >> pk * 2) & 1;
+-        uint32_t pkru_wd = (env->pkru >> pk * 2) & 2;
+-        uint32_t pkru_prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+-
+-        if (pkru_ad) {
+-            pkru_prot &= ~(PAGE_READ | PAGE_WRITE);
+-        } else if (pkru_wd && (is_user || env->cr[0] & CR0_WP_MASK)) {
+-            pkru_prot &= ~PAGE_WRITE;
+-        }
+-
+-        prot &= pkru_prot;
+-        if ((pkru_prot & (1 << is_write1)) == 0) {
+-            assert(is_write1 != 2);
+-            error_code |= PG_ERROR_PK_MASK;
+-            goto do_fault_protect;
+-        }
+-    }
+-
+-    if ((prot & (1 << is_write1)) == 0) {
+-        goto do_fault_protect;
+-    }
+-
+-    /* yes, it can! */
+-    is_dirty = is_write && !(pte & PG_DIRTY_MASK);
+-    if (!(pte & PG_ACCESSED_MASK) || is_dirty) {
+-        pte |= PG_ACCESSED_MASK;
+-        if (is_dirty) {
+-            pte |= PG_DIRTY_MASK;
+-        }
+-        x86_stl_phys_notdirty(cs, pte_addr, pte);
+-    }
+-
+-    if (!(pte & PG_DIRTY_MASK)) {
+-        /* only set write access if already dirty... otherwise wait
+-           for dirty access */
+-        assert(!is_write);
+-        prot &= ~PAGE_WRITE;
+-    }
+-
+- do_mapping:
+-    pte = pte & a20_mask;
+-
+-    /* align to page_size */
+-    pte &= PG_ADDRESS_MASK & ~(page_size - 1);
+-
+-    /* Even if 4MB pages, we map only one 4KB page in the cache to
+-       avoid filling it too fast */
+-    vaddr = addr & TARGET_PAGE_MASK;
+-    page_offset = vaddr & (page_size - 1);
+-    paddr = pte + page_offset;
+-
+-    assert(prot & (1 << is_write1));
+-    tlb_set_page_with_attrs(cs, vaddr, paddr, cpu_get_mem_attrs(env),
+-                            prot, mmu_idx, page_size);
+-    return 0;
+- do_fault_rsvd:
+-    error_code |= PG_ERROR_RSVD_MASK;
+- do_fault_protect:
+-    error_code |= PG_ERROR_P_MASK;
+- do_fault:
+-    error_code |= (is_write << PG_ERROR_W_BIT);
+-    if (is_user)
+-        error_code |= PG_ERROR_U_MASK;
+-    if (is_write1 == 2 &&
+-        (((env->efer & MSR_EFER_NXE) &&
+-          (env->cr[4] & CR4_PAE_MASK)) ||
+-         (env->cr[4] & CR4_SMEP_MASK)))
+-        error_code |= PG_ERROR_I_D_MASK;
+-    if (env->intercept_exceptions & (1 << EXCP0E_PAGE)) {
+-        /* cr2 is not modified in case of exceptions */
+-        x86_stq_phys(cs,
+-                 env->vm_vmcb + offsetof(struct vmcb, control.exit_info_2),
+-                 addr);
+-    } else {
+-        env->cr[2] = addr;
+-    }
+-    env->error_code = error_code;
+-    cs->exception_index = EXCP0E_PAGE;
+-    return 1;
+-}
+-
++#if !defined(CONFIG_USER_ONLY)
+ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ {
+     X86CPU *cpu = X86_CPU(cs);
 -- 
 1.8.3.1
