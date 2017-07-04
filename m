@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKXo-00022K-Od
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:54:57 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKXo-00022I-OS
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKXm-0000Vi-Li
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKXm-0000Vu-OD
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:54:56 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35773)
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34397)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dSKXm-0000Uy-DU
+	id 1dSKXm-0000Te-Hv
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:54:54 -0400
-Received: by mail-lf0-x243.google.com with SMTP id z78so4904185lff.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 02:54:54 -0700 (PDT)
+Received: by mail-lf0-x242.google.com with SMTP id g21so17212172lfk.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 02:54:52 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  4 Jul 2017 11:54:33 +0200
-Message-Id: <1499162088-1562-3-git-send-email-edgar.iglesias@gmail.com>
+Date: Tue,  4 Jul 2017 11:54:32 +0200
+Message-Id: <1499162088-1562-2-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 02/17] target-microblaze: Correct bit shift
- for the PVR0 version field
+Subject: [Qemu-devel] [PULL v1 01/17] disas/microblaze: Add missing 'const'
+ attributes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +30,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: Stefan Weil <sw@weilnetz.de>
 
-Correct bit shift for the PVR0 version field.
+Making the opcode list 'const' saves memory.
+Some function arguments and local variables needed 'const', too.
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Add also 'static' to two local functions.
+
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+[EI: Removed old prototypes to fix the build]
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/cpu.c | 2 +-
- target/microblaze/cpu.h | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ disas/microblaze.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 3d58869..af70faa 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -182,7 +182,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         (cpu->cfg.use_fpu ? PVR0_USE_FPU_MASK : 0) |
-                         (cpu->cfg.use_mmu ? PVR0_USE_MMU_MASK : 0) |
-                         (cpu->cfg.endi ? PVR0_ENDI_MASK : 0) |
--                        (version_code << 16) |
-+                        (version_code << PVR0_VERSION_SHIFT) |
-                         (cpu->cfg.pvr == C_PVR_FULL ? PVR0_PVR_FULL_MASK : 0);
+diff --git a/disas/microblaze.c b/disas/microblaze.c
+index 7795a0b..598ecbc 100644
+--- a/disas/microblaze.c
++++ b/disas/microblaze.c
+@@ -272,7 +272,7 @@ enum microblaze_instr_type {
  
-     env->pvr.regs[2] |= (cpu->cfg.use_fpu ? PVR2_USE_FPU_MASK : 0) |
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index bf6963b..68c33e8 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -129,6 +129,8 @@ typedef struct CPUMBState CPUMBState;
- #define PVR0_USER1_MASK                 0x000000FF
- #define PVR0_SPROT_MASK                 0x00000001
+ #define MAX_OPCODES 280
  
-+#define PVR0_VERSION_SHIFT              8
-+
- /* User 2 PVR mask */
- #define PVR1_USER2_MASK                 0xFFFFFFFF
+-static struct op_code_struct {
++static const struct op_code_struct {
+   const char *name;
+   short inst_type; /* registers and immediate values involved */
+   short inst_offset_type; /* immediate vals offset from PC? (= 1 for branches) */
+@@ -596,10 +596,6 @@ static char * get_field_imm15 (long instr);
+ #if 0
+ static char * get_field_unsigned_imm (long instr);
+ #endif
+-char * get_field_special (long instr, struct op_code_struct * op);
+-unsigned long read_insn_microblaze (bfd_vma memaddr, 
+-		      struct disassemble_info *info,
+-		      struct op_code_struct **opr);
  
+ static char *
+ get_field (long instr, long mask, unsigned short low)
+@@ -664,8 +660,8 @@ get_field_unsigned_imm (long instr)
+   }
+ */
+ 
+-char *
+-get_field_special (long instr, struct op_code_struct * op)
++static char *
++get_field_special(long instr, const struct op_code_struct *op)
+ {
+    char tmpstr[25];
+    char spr[6];
+@@ -729,14 +725,14 @@ get_field_special (long instr, struct op_code_struct * op)
+    return(strdup(tmpstr));
+ }
+ 
+-unsigned long
++static unsigned long
+ read_insn_microblaze (bfd_vma memaddr, 
+ 		      struct disassemble_info *info,
+-		      struct op_code_struct **opr)
++		      const struct op_code_struct **opr)
+ {
+   unsigned char       ibytes[4];
+   int                 status;
+-  struct op_code_struct * op;
++  const struct op_code_struct *op;
+   unsigned long inst;
+ 
+   status = info->read_memory_func (memaddr, ibytes, 4, info);
+@@ -772,7 +768,7 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+   fprintf_function    fprintf_func = info->fprintf_func;
+   void *              stream = info->stream;
+   unsigned long       inst, prev_inst;
+-  struct op_code_struct * op, *pop;
++  const struct op_code_struct *op, *pop;
+   int                 immval = 0;
+   bfd_boolean         immfound = FALSE;
+   static bfd_vma prev_insn_addr = -1; /*init the prev insn addr */
 -- 
 2.7.4
