@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSHYD-0003Mc-EE
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:43:10 -0400
+	(envelope-from <famz@redhat.com>) id 1dSHZ0-0003nH-7H
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:43:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSHY8-0002Dc-EL
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:43:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54676)
+	(envelope-from <famz@redhat.com>) id 1dSHYw-0002u2-Rb
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:43:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSHY8-0002Ba-4v
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:43:04 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170606165510.33057-1-pasic@linux.vnet.ibm.com>
-	<20170606165510.33057-2-pasic@linux.vnet.ibm.com>
-	<20170607095127.GB2099@work-vm>
-	<8c0f9dac-ceef-fe88-8147-3cf043f7e109@linux.vnet.ibm.com>
-	<f8f8bc90-56df-9885-83cd-2283e38c5462@linux.vnet.ibm.com>
-	<00b260fd-14f6-d716-daab-7d0172be1c07@redhat.com>
-	<2791f136-d531-464c-8c44-7006ff7a658f@linux.vnet.ibm.com>
-	<c28ab7f2-4541-4657-0387-b988e8040e3f@redhat.com>
-	<7fdfeb7c-050b-1cf4-e22a-fa242da99ad9@linux.vnet.ibm.com>
-	<87d19hk4q1.fsf@dusky.pond.sub.org>
-	<a6f580f0-ed90-4860-231e-84612a14202f@linux.vnet.ibm.com>
-Date: Tue, 04 Jul 2017 08:42:59 +0200
-In-Reply-To: <a6f580f0-ed90-4860-231e-84612a14202f@linux.vnet.ibm.com> (Halil
-	Pasic's message of "Mon, 3 Jul 2017 18:21:29 +0200")
-Message-ID: <87van8aej0.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] vmstate: error hint for failed
- equal checks
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dSHYw-0002sl-Hl
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:43:54 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 65588C0587DE
+	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 06:43:53 +0000 (UTC)
+From: Fam Zheng <famz@redhat.com>
+Date: Tue,  4 Jul 2017 14:43:28 +0800
+Message-Id: <20170704064347.7022-2-famz@redhat.com>
+In-Reply-To: <20170704064347.7022-1-famz@redhat.com>
+References: <20170704064347.7022-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/20] qom: enforce readonly nature of
+ link's check callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,192 +30,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Cornelia Huck <cohuck@kernel.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Halil Pasic <pasic@linux.vnet.ibm.com> writes:
+From: Igor Mammedov <imammedo@redhat.com>
 
-> On 07/03/2017 03:52 PM, Markus Armbruster wrote:
->> Halil Pasic <pasic@linux.vnet.ibm.com> writes:
->> 
->>> On 06/30/2017 04:54 PM, Eric Blake wrote:
->>>> On 06/30/2017 09:41 AM, Halil Pasic wrote:
->>>>>>> 'This' basically boils down to the question and
->>>>>>> 'Why aren't hints reported in QMP context?'
->>>>>>
->>>>>> QMP is supposed to be machine-parseable.  Hints are supposed to be
->>>>>> human-readable. If you have a machine managing the monitor, the hint
->>>>>> adds nothing but bandwidth consumption, because machine should not be
->>>>>> parsing the human portion of the error message in the first place (as it
->>>>>> is, libvirt already just logs the human-readable portion of a message,
->>>>>> and bases its actions solely on the machine-stable portions of an error
->>>>>> reply: namely, whether an error was sent at all, and occasionally, what
->>>>>> error class was used for that error - there's no guarantee a human will
->>>>>> be reading the log, though).
-[...]
->>>>> From prior experiences I'm more used to think about error messages as
->>>>> something meant for human consumption, and expressing things expected to
->>>>> be relevant for some kind of client code in a different way (optimized
->>>>> for machine consumption).
->>>>>
->>>>> If however the error message ain't part of the machine relevant portion,
->>>>> then the same argument applies as to the 'hint', and I don't see the
->>>>> reason for handling hints differently. Do you agree with my
->>>>> argumentation?
->>>>
->>>> Indeed, it may not hurt to start passing the hints over the wire (errors
->>>> would then consume more bandwidth, but errors are not the hot path).
->>>> And I'm not necessarily opposed to that change, so much as trying to
->>>> document why it is not currently the case.  At the same time, I probably
->>>> won't be the one writing a path to populate the hint information into
->>>> the QMP error, as I don't have any reason to use the hint when
->>>> controlling libvirt (except maybe for logging, but there, the hint is
->>>> not going to help the end user, because it's not the end-user's fault
->>>> that libvirt used the API wrong to get a hint in the first place).
->>>
->>> For me both human readable things make sense only for error reporting
->>> (effectively logging). Error.msg should IMHO be different, than Error.hint.
->>> The existence of an error should be indicated by the Error object.
->> 
->> Consider this one from qemu-option.c:
->> 
->>         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, name,
->>                    "a non-negative number below 2^64");
->>         error_append_hint(errp, "Optional suffix k, M, G, T, P or E means"
->>                           " kilo-, mega-, giga-, tera-, peta-\n"
->>                           "and exabytes, respectively.\n");
->> 
->> The hint is helpful for a human command line or HMP user.  It's actively
->> misleading in QMP.
->
-> I agree.
->
->> Totally fine, it's how the "hint" feature is meant
->> to be used.
->> 
->
-> Was not aware.
->
->> If we have errors that can't be adequately explained in a single error
->> message, we may need a way to add more explanation.  error_append_hint()
->> isn't.
->> 
->
-> Was not aware. Using hint in this very situation was suggested by Connie,
-> and I assumed she is long enough with the project to know...
->
-> In fact looking at  include/qapi/error.h:
-> """
-> /*
->  * Error reporting system loosely patterned after Glib's GError.
->  *
->  * Create an error:
->  *     error_setg(&err, "situation normal, all fouled up");
->  *
->  * Create an error and add additional explanation:
->  *     error_setg(&err, "invalid quark");
->  *     error_append_hint(&err, "Valid quarks are up, down, strange, "
->  *                       "charm, top, bottom.\n");
->  *
->  * Do *not* contract this to
->  *     error_setg(&err, "invalid quark\n"
->  *                "Valid quarks are up, down, strange, charm, top, bottom.");
-> """
->
-> my understanding was and is still the exact opposite of what you say:
-> error_append_hint is for adding more explanation.
->
-> Furthermore 
-> """
-> /*
->  * Append a printf-style human-readable explanation to an existing error.
->  * @errp may be NULL, but not &error_fatal or &error_abort.
->  * Trivially the case if you call it only after error_setg() or
->  * error_propagate().
->  * May be called multiple times.  The resulting hint should end with a
->  * newline.
->  */
-> void error_append_hint(Error **errp, const char *fmt, ...)
-> """
->
-> Assuming that error_append_hint() isn't for adding more explanation,
-> IMHO the doc does not adequately explain what it is for.
+link's check callback is supposed to verify/permit setting it,
+however currently nothing restricts it from misusing it
+and modifying target object from within.
+Make sure that readonly semantics are checked by compiler
+to prevent callback's misuse.
 
-You're right, it doesn't.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ hw/core/qdev-properties.c    | 3 ++-
+ hw/display/xlnx_dp.c         | 2 +-
+ hw/ipmi/ipmi.c               | 2 +-
+ hw/mem/pc-dimm.c             | 2 +-
+ hw/misc/ivshmem.c            | 2 +-
+ hw/virtio/virtio-crypto.c    | 2 +-
+ include/hw/qdev-properties.h | 3 ++-
+ include/qom/object.h         | 6 +++---
+ qom/object.c                 | 8 ++++----
+ 9 files changed, 16 insertions(+), 14 deletions(-)
 
-> I have also failed to find any hint in qapi/error.h which is AFAIU
-> documenting the error api about this human-readable explanation
-> appended to an existing error by error_append_hint() is to be discarded
-> if the error is reported in QMP context.
->
-> Am I reading the api doc incorrectly, or did the documentation and
-> de-facto api diverge (behavior)?
-
-I added documentation after I inherited this subsystem, in response to
-recurring questions on proper use of the interface.  I failed to fully
-capture the hint feature's intent.  I'll post a patch.
-
->>>>>> If something absolutely must be reported, then it is not a hint, and
->>>>>> shouldn't be using the hint mechanism.
->> 
->> Exactly.
->> 
->
-> Perfectly fine with me provided the apidoc tells me clearly what the hint is
-> for, and what it is not for.
->
->>>>> I find it hard to formulate criteria for 'must be reported'. I'm afraid
->>>>> this is backwards logic: since the hint may not be reported everything
->>>>> that needs to be reported is not a hint. This is a valid approach of
->>>>> course, but then I think some modifications to the comments in error.h
->>>>> would not hurt. And maybe something with verbose would be more
->>>>> expressive name.
->>>>>
->>>>> I hope all this makes some sense and ain't pure waste of time...
->>>>
->>>> No, it never hurts to question whether the design is optimal, and it's
->>>> better to question first to know whether it is even worth patching
->>>> things to behave differently, rather than spending time patching it only
->>>> to have a maintainer clarify that the patch can't be accepted because of
->>>> some design constraint.  So I still hope Markus will chime in.
->>>>
->>>
->>> For this patch I went with Dave's proposal so I have no acute interest
->>> in changing this.
->>>
->>> Conceptually, for me it really boils down to the question: Is it reasonable
->>> to assume that we are interested in what went wrong (error message)?
->>>
->>> If yes, we are good as is. If no, we should not drop hint in QMP context.
->>>
->>> Thanks for your time. I think we provided Markus with enough input to
->>> make his call :).
->> 
->> I had a quick peek at the patch that triggered this discussion.  What
->> problem are you trying to solve?  According to your cover letter, it's
->> "to specify a hint for the case a vmstate equal assertion".  How is
->> nicer assertion failures related to QMP?  Am I confused?
->
->
-> The problem is solved by d2164ad ("vmstate: error hint for failed equal
-> checks", 2017-06-23).
-
-The way the commit uses error_report() and error_printf() looks good to
-me.
-
-> The assertions ain't assertions in sense of the C programming
-> language. Maybe calling these 'checks' instead of 'assertions' in the
-> cover letter (like in the subject) would have been better. If one of
-> these 'assertions' fail qemu is supposed to abort the initiated load
-> (migration), state the reason, and terminate normally. In this sense these
-> 'assertions' are similar to the assertions in our unit tests (those fail
-> a test, and similarly to these do not terminate the program).
->
-> The problem I was trying to solve is that the message generated by these
-> checks looked something like "5 != 4" which is OK if the check is never
-> supposed to fail, but not satisfactory for something we have to live
-> with.
->
-> Sorry for the confusion.
-
-No problem :)
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index f11d578..113ce7d 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+     }
+ }
+ 
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index f7b7b80..e99bba4 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
+     s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
+ }
+ 
+-static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
++static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
+                               Error **errp)
+ {
+     XlnxDPState *s = XLNX_DP(obj);
+diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
+index afafe14..b27babd 100644
+--- a/hw/ipmi/ipmi.c
++++ b/hw/ipmi/ipmi.c
+@@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
+     .class_init = ipmi_interface_class_init,
+ };
+ 
+-static void isa_ipmi_bmc_check(Object *obj, const char *name,
++static void isa_ipmi_bmc_check(const Object *obj, const char *name,
+                                Object *val, Error **errp)
+ {
+     IPMIBmc *bmc = IPMI_BMC(val);
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index b72258e..5e23495 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -367,7 +367,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+     visit_type_uint64(v, name, &value, errp);
+ }
+ 
+-static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
++static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     Error *local_err = NULL;
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 2f0819d..97beaf6 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -1009,7 +1009,7 @@ static const TypeInfo ivshmem_common_info = {
+     .class_init    = ivshmem_common_class_init,
+ };
+ 
+-static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
++static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
+                                          Object *val, Error **errp)
+ {
+     if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+index 0353eb6..2590893 100644
+--- a/hw/virtio/virtio-crypto.c
++++ b/hw/virtio/virtio-crypto.c
+@@ -889,7 +889,7 @@ static void virtio_crypto_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static void
+-virtio_crypto_check_cryptodev_is_used(Object *obj, const char *name,
++virtio_crypto_check_cryptodev_is_used(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     if (cryptodev_backend_is_used(CRYPTODEV_BACKEND(val))) {
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 0604c33..9edded2 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -272,7 +272,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+  * This function should be used as the check() argument to
+  * object_property_add_link().
+  */
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp);
+ 
+ #endif
+diff --git a/include/qom/object.h b/include/qom/object.h
+index abaeb8c..1b82899 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -764,7 +764,7 @@ ObjectClass *object_get_class(Object *obj);
+  *
+  * Returns: The QOM typename of @obj.
+  */
+-const char *object_get_typename(Object *obj);
++const char *object_get_typename(const Object *obj);
+ 
+ /**
+  * type_register_static:
+@@ -1319,7 +1319,7 @@ typedef enum {
+  * callback function.  It allows the link property to be set and never returns
+  * an error.
+  */
+-void object_property_allow_set_link(Object *, const char *,
++void object_property_allow_set_link(const Object *, const char *,
+                                     Object *, Error **);
+ 
+ /**
+@@ -1352,7 +1352,7 @@ void object_property_allow_set_link(Object *, const char *,
+  */
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *obj, const char *name,
++                              void (*check)(const Object *obj, const char *name,
+                                             Object *val, Error **errp),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp);
+diff --git a/qom/object.c b/qom/object.c
+index 5f6fdfa..dfdbd50 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -740,7 +740,7 @@ out:
+     return ret;
+ }
+ 
+-const char *object_get_typename(Object *obj)
++const char *object_get_typename(const Object *obj)
+ {
+     return obj->class->type->name;
+ }
+@@ -1428,7 +1428,7 @@ out:
+     g_free(type);
+ }
+ 
+-void object_property_allow_set_link(Object *obj, const char *name,
++void object_property_allow_set_link(const Object *obj, const char *name,
+                                     Object *val, Error **errp)
+ {
+     /* Allow the link to be set, always */
+@@ -1436,7 +1436,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
+ 
+ typedef struct {
+     Object **child;
+-    void (*check)(Object *, const char *, Object *, Error **);
++    void (*check)(const Object *, const char *, Object *, Error **);
+     ObjectPropertyLinkFlags flags;
+ } LinkProperty;
+ 
+@@ -1552,7 +1552,7 @@ static void object_release_link_property(Object *obj, const char *name,
+ 
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *, const char *,
++                              void (*check)(const Object *, const char *,
+                                             Object *, Error **),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp)
+-- 
+2.9.4
