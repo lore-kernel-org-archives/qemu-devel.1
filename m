@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dSPnh-0006c1-Ev
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:42 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dSPnh-0006c5-F8
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dSPnf-0000ci-1X
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dSPne-0000cC-A5
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:41 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36486)
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36498)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dSPne-0000c5-OU
+	id 1dSPne-0000bW-0R
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:38 -0400
-Received: by mail-wm0-x244.google.com with SMTP id y5so27017319wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 08:31:38 -0700 (PDT)
+Received: by mail-wr0-x244.google.com with SMTP id 77so47624289wrb.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 08:31:37 -0700 (PDT)
 From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Tue,  4 Jul 2017 11:31:00 -0400
-Message-Id: <1499182263-19139-4-git-send-email-pradeep.jagadeesh@huawei.com>
+Date: Tue,  4 Jul 2017 11:30:59 -0400
+Message-Id: <1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
 In-Reply-To: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
 References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v7 3/6] throttle: move out function to reuse
- the code
+Subject: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,174 +27,215 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-This patch move out the throttle code to util/throttle.c to maximize
-the reusability of the code.The same code is also used by fsdev.
+This patch enables qmp interfaces for the fsdev
+devices. This provides two interfaces one 
+for querying info of all the fsdev devices. The second one
+to set the IO limits for the required fsdev device.
 
 Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- blockdev.c                      | 53 +++---------------------------------
- include/qemu/throttle-options.h |  3 +++
- util/throttle.c                 | 59 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 65 insertions(+), 50 deletions(-)
+ qapi/block-core.json | 76 ++-------------------------------------------
+ qapi/iothrottle.json | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+), 73 deletions(-)
+ create mode 100644 qapi/iothrottle.json
 
-diff --git a/blockdev.c b/blockdev.c
-index a95ea41..8090798 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2579,6 +2579,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
-     BlockDriverState *bs;
-     BlockBackend *blk;
-     AioContext *aio_context;
-+    IOThrottle *iothrottle;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index f85c223..9320974 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -6,6 +6,7 @@
  
-     blk = qmp_get_blk(arg->has_device ? arg->device : NULL,
-                       arg->has_id ? arg->id : NULL,
-@@ -2596,56 +2597,8 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
-         goto out;
-     }
+ # QAPI common definitions
+ { 'include': 'common.json' }
++{ 'include': 'iothrottle.json' }
  
--    throttle_config_init(&cfg);
--    cfg.buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
--    cfg.buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
--    cfg.buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
--
--    cfg.buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
--    cfg.buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
--    cfg.buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
--
--    if (arg->has_bps_max) {
--        cfg.buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
--    }
--    if (arg->has_bps_rd_max) {
--        cfg.buckets[THROTTLE_BPS_READ].max = arg->bps_rd_max;
--    }
--    if (arg->has_bps_wr_max) {
--        cfg.buckets[THROTTLE_BPS_WRITE].max = arg->bps_wr_max;
--    }
--    if (arg->has_iops_max) {
--        cfg.buckets[THROTTLE_OPS_TOTAL].max = arg->iops_max;
--    }
--    if (arg->has_iops_rd_max) {
--        cfg.buckets[THROTTLE_OPS_READ].max = arg->iops_rd_max;
--    }
--    if (arg->has_iops_wr_max) {
--        cfg.buckets[THROTTLE_OPS_WRITE].max = arg->iops_wr_max;
--    }
--
--    if (arg->has_bps_max_length) {
--        cfg.buckets[THROTTLE_BPS_TOTAL].burst_length = arg->bps_max_length;
--    }
--    if (arg->has_bps_rd_max_length) {
--        cfg.buckets[THROTTLE_BPS_READ].burst_length = arg->bps_rd_max_length;
--    }
--    if (arg->has_bps_wr_max_length) {
--        cfg.buckets[THROTTLE_BPS_WRITE].burst_length = arg->bps_wr_max_length;
--    }
--    if (arg->has_iops_max_length) {
--        cfg.buckets[THROTTLE_OPS_TOTAL].burst_length = arg->iops_max_length;
--    }
--    if (arg->has_iops_rd_max_length) {
--        cfg.buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
--    }
--    if (arg->has_iops_wr_max_length) {
--        cfg.buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
--    }
--
--    if (arg->has_iops_size) {
--        cfg.op_size = arg->iops_size;
--    }
-+    iothrottle = qapi_BlockIOThrottle_base(arg);
-+    throttle_set_io_limits(&cfg, iothrottle);
+ ##
+ # @SnapshotInfo:
+@@ -1761,84 +1762,13 @@
+ #
+ # @device: Block device name (deprecated, use @id instead)
+ #
+-# @id: The name or QOM path of the guest device (since: 2.8)
+-#
+-# @bps: total throughput limit in bytes per second
+-#
+-# @bps_rd: read throughput limit in bytes per second
+-#
+-# @bps_wr: write throughput limit in bytes per second
+-#
+-# @iops: total I/O operations per second
+-#
+-# @iops_rd: read I/O operations per second
+-#
+-# @iops_wr: write I/O operations per second
+-#
+-# @bps_max: total throughput limit during bursts,
+-#                     in bytes (Since 1.7)
+-#
+-# @bps_rd_max: read throughput limit during bursts,
+-#                        in bytes (Since 1.7)
+-#
+-# @bps_wr_max: write throughput limit during bursts,
+-#                        in bytes (Since 1.7)
+-#
+-# @iops_max: total I/O operations per second during bursts,
+-#                      in bytes (Since 1.7)
+-#
+-# @iops_rd_max: read I/O operations per second during bursts,
+-#                         in bytes (Since 1.7)
+-#
+-# @iops_wr_max: write I/O operations per second during bursts,
+-#                         in bytes (Since 1.7)
+-#
+-# @bps_max_length: maximum length of the @bps_max burst
+-#                            period, in seconds. It must only
+-#                            be set if @bps_max is set as well.
+-#                            Defaults to 1. (Since 2.6)
+-#
+-# @bps_rd_max_length: maximum length of the @bps_rd_max
+-#                               burst period, in seconds. It must only
+-#                               be set if @bps_rd_max is set as well.
+-#                               Defaults to 1. (Since 2.6)
+-#
+-# @bps_wr_max_length: maximum length of the @bps_wr_max
+-#                               burst period, in seconds. It must only
+-#                               be set if @bps_wr_max is set as well.
+-#                               Defaults to 1. (Since 2.6)
+-#
+-# @iops_max_length: maximum length of the @iops burst
+-#                             period, in seconds. It must only
+-#                             be set if @iops_max is set as well.
+-#                             Defaults to 1. (Since 2.6)
+-#
+-# @iops_rd_max_length: maximum length of the @iops_rd_max
+-#                                burst period, in seconds. It must only
+-#                                be set if @iops_rd_max is set as well.
+-#                                Defaults to 1. (Since 2.6)
+-#
+-# @iops_wr_max_length: maximum length of the @iops_wr_max
+-#                                burst period, in seconds. It must only
+-#                                be set if @iops_wr_max is set as well.
+-#                                Defaults to 1. (Since 2.6)
+-#
+-# @iops_size: an I/O size in bytes (Since 1.7)
+-#
+ # @group: throttle group name (Since 2.4)
+ #
+ # Since: 1.1
+ ##
+ { 'struct': 'BlockIOThrottle',
+-  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+-            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+-            '*bps_max': 'int', '*bps_rd_max': 'int',
+-            '*bps_wr_max': 'int', '*iops_max': 'int',
+-            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+-            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+-            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+-            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+-            '*iops_size': 'int', '*group': 'str' } }
++  'base': 'IOThrottle',
++  'data': { '*device': 'str', '*group': 'str' } }
  
-     if (!throttle_is_valid(&cfg, errp)) {
-         goto out;
-diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
-index f63d38c..a9deb8e 100644
---- a/include/qemu/throttle-options.h
-+++ b/include/qemu/throttle-options.h
-@@ -11,6 +11,7 @@
- #define THROTTLE_OPTIONS_H
- 
- #include "typedefs.h"
-+#include "qapi-types.h"
- 
- #define THROTTLE_OPTS \
-           { \
-@@ -93,4 +94,6 @@
- 
- void throttle_parse_options(ThrottleConfig *, QemuOpts *);
- 
-+void throttle_set_io_limits(ThrottleConfig *, IOThrottle *);
+ ##
+ # @block-stream:
+diff --git a/qapi/iothrottle.json b/qapi/iothrottle.json
+new file mode 100644
+index 0000000..0f067c3
+--- /dev/null
++++ b/qapi/iothrottle.json
+@@ -0,0 +1,88 @@
++# -*- Mode: Python -*-
 +
- #endif
-diff --git a/util/throttle.c b/util/throttle.c
-index a751126..2cf9ec5 100644
---- a/util/throttle.c
-+++ b/util/throttle.c
-@@ -565,3 +565,62 @@ void throttle_parse_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
-     throttle_cfg->op_size =
-         qemu_opt_get_number(opts, "throttling.iops-size", 0);
- }
++##
++# == QAPI IOThrottle definitions
++##
 +
-+/* set the throttle limits
-+ *
-+ * @arg: iothrottle limits
-+ * @cfg: throttle configuration
-+ */
-+void throttle_set_io_limits(ThrottleConfig *cfg, IOThrottle *arg)
-+{
-+    throttle_config_init(cfg);
-+    cfg->buckets[THROTTLE_BPS_TOTAL].avg = arg->bps;
-+    cfg->buckets[THROTTLE_BPS_READ].avg  = arg->bps_rd;
-+    cfg->buckets[THROTTLE_BPS_WRITE].avg = arg->bps_wr;
-+
-+    cfg->buckets[THROTTLE_OPS_TOTAL].avg = arg->iops;
-+    cfg->buckets[THROTTLE_OPS_READ].avg  = arg->iops_rd;
-+    cfg->buckets[THROTTLE_OPS_WRITE].avg = arg->iops_wr;
-+
-+    if (arg->has_bps_max) {
-+        cfg->buckets[THROTTLE_BPS_TOTAL].max = arg->bps_max;
-+    }
-+    if (arg->has_bps_rd_max) {
-+        cfg->buckets[THROTTLE_BPS_READ].max = arg->bps_rd_max;
-+    }
-+    if (arg->has_bps_wr_max) {
-+        cfg->buckets[THROTTLE_BPS_WRITE].max = arg->bps_wr_max;
-+    }
-+    if (arg->has_iops_max) {
-+        cfg->buckets[THROTTLE_OPS_TOTAL].max = arg->iops_max;
-+    }
-+    if (arg->has_iops_rd_max) {
-+        cfg->buckets[THROTTLE_OPS_READ].max = arg->iops_rd_max;
-+    }
-+    if (arg->has_iops_wr_max) {
-+        cfg->buckets[THROTTLE_OPS_WRITE].max = arg->iops_wr_max;
-+    }
-+
-+    if (arg->has_bps_max_length) {
-+        cfg->buckets[THROTTLE_BPS_TOTAL].burst_length = arg->bps_max_length;
-+    }
-+    if (arg->has_bps_rd_max_length) {
-+        cfg->buckets[THROTTLE_BPS_READ].burst_length = arg->bps_rd_max_length;
-+    }
-+    if (arg->has_bps_wr_max_length) {
-+        cfg->buckets[THROTTLE_BPS_WRITE].burst_length = arg->bps_wr_max_length;
-+    }
-+    if (arg->has_iops_max_length) {
-+        cfg->buckets[THROTTLE_OPS_TOTAL].burst_length = arg->iops_max_length;
-+    }
-+    if (arg->has_iops_rd_max_length) {
-+        cfg->buckets[THROTTLE_OPS_READ].burst_length = arg->iops_rd_max_length;
-+    }
-+    if (arg->has_iops_wr_max_length) {
-+        cfg->buckets[THROTTLE_OPS_WRITE].burst_length = arg->iops_wr_max_length;
-+    }
-+
-+    if (arg->has_iops_size) {
-+        cfg->op_size = arg->iops_size;
-+    }
-+}
++##
++# @IOThrottle:
++#
++# A set of parameters describing IO throttling
++#
++# @id: The name or QOM path of the guest device (since: 2.8)
++#
++# @bps: total throughput limit in bytes per second
++#
++# @bps_rd: read throughput limit in bytes per second
++#
++# @bps_wr: write throughput limit in bytes per second
++#
++# @iops: total I/O operations per second
++#
++# @iops_rd: read I/O operations per second
++#
++# @iops_wr: write I/O operations per second
++#
++# @bps_max: total throughput limit during bursts,
++#                     in bytes (Since 1.7)
++#
++# @bps_rd_max: read throughput limit during bursts,
++#                        in bytes (Since 1.7)
++#
++# @bps_wr_max: write throughput limit during bursts,
++#                        in bytes (Since 1.7)
++#
++# @iops_max: total I/O operations per second during bursts,
++#                      in bytes (Since 1.7)
++#
++# @iops_rd_max: read I/O operations per second during bursts,
++#                         in bytes (Since 1.7)
++#
++# @iops_wr_max: write I/O operations per second during bursts,
++#                         in bytes (Since 1.7)
++#
++# @bps_max_length: maximum length of the @bps_max burst
++#                            period, in seconds. It must only
++#                            be set if @bps_max is set as well.
++#                            Defaults to 1. (Since 2.6)
++#
++# @bps_rd_max_length: maximum length of the @bps_rd_max
++#                               burst period, in seconds. It must only
++#                               be set if @bps_rd_max is set as well.
++#                               Defaults to 1. (Since 2.6)
++#
++# @bps_wr_max_length: maximum length of the @bps_wr_max
++#                               burst period, in seconds. It must only
++#                               be set if @bps_wr_max is set as well.
++#                               Defaults to 1. (Since 2.6)
++#
++# @iops_max_length: maximum length of the @iops burst
++#                             period, in seconds. It must only
++#                             be set if @iops_max is set as well.
++#                             Defaults to 1. (Since 2.6)
++#
++# @iops_rd_max_length: maximum length of the @iops_rd_max
++#                                burst period, in seconds. It must only
++#                                be set if @iops_rd_max is set as well.
++#                                Defaults to 1. (Since 2.6)
++#
++# @iops_wr_max_length: maximum length of the @iops_wr_max
++#                                burst period, in seconds. It must only
++#                                be set if @iops_wr_max is set as well.
++#                                Defaults to 1. (Since 2.6)
++#
++# @iops_size: an I/O size in bytes (Since 1.7)
++#
++#
++# Since: 2.10
++##
++{ 'struct': 'IOThrottle',
++  'data': { '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
++            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
++            '*bps_max': 'int', '*bps_rd_max': 'int',
++            '*bps_wr_max': 'int', '*iops_max': 'int',
++            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
++            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
++            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
++            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
++            '*iops_size': 'int' } }
 -- 
 1.8.3.1
