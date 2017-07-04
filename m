@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dSLtb-00065d-ME
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:21:32 -0400
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dSLuU-0006oX-LI
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dSLtW-0006b7-MA
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:21:31 -0400
-References: <20170704110126.26806-1-lvivier@redhat.com>
-	<20170704110126.26806-3-lvivier@redhat.com>
-	<20170704131500.3ef448c8@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <2045ad91-17ad-3c69-9084-0d4ca2390690@redhat.com>
-Date: Tue, 4 Jul 2017 13:21:19 +0200
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dSLuP-0007GO-Mw
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:22:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41064
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1dSLuP-0007FV-GD
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:22:21 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v64BJLXG134304
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 07:22:20 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg6bgract-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:22:20 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Tue, 4 Jul 2017 12:22:18 +0100
+References: <1499082529-16970-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+	<650c9114-67bf-1f5b-7155-7bb1c7813b21@redhat.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Tue, 4 Jul 2017 13:22:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170704131500.3ef448c8@bahia.lan>
+In-Reply-To: <650c9114-67bf-1f5b-7155-7bb1c7813b21@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] target/ppc: move POWER9 DD1
- workaround to init_proc_POWER9()
+Content-Language: en-GB
+Message-Id: <9df99982-111b-01f4-e1e5-ec375a4cf4e0@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] s390: return unavailable features via
+ query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +44,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Suraj Singh <sursingh@redhat.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com
 
-On 04/07/2017 13:15, Greg Kurz wrote:
-> On Tue,  4 Jul 2017 13:01:26 +0200
-> Laurent Vivier <lvivier@redhat.com> wrote:
-> 
->> Commit 5f3066d ("target/ppc: Allow workarounds for POWER9 DD1")
->> disables compatibility mode for POWER9 DD1 to allow to
->> boot on POWER9 DD1 host with KVM.
->>
->> As the workaround has been added in kvmppc_host_cpu_class_init(),
->> it applies only on CPU created with "-cpu host".
->> As we want to be able to use also "-cpu POWER9" on a POWER9 DD1
->> host, this patch moves the workaround from kvmppc_host_cpu_class_init()
->> to init_proc_POWER9().
->>
-> 
-> As with ppc_cpu_initfn() in your previous version, init_proc_POWER9() is
-> called for every CPU instance.. ie, all CPU will adjust the @pcr_supported
-> class attribute...
-> 
-> What about moving the workaround to ppc_POWER9_cpu_family_class_init()
-> instead ? This would just require to expose mfpvr() in some header.
+On 04.07.2017 11:35, David Hildenbrand wrote:
+>> +
+>>  static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+>>  {
+>> -    CpuDefinitionInfoList **cpu_list =3D opaque;
+>> +    struct CpuDefinitionInfoListData *cpu_list_data =3D opaque;
+>> +    CpuDefinitionInfoList **cpu_list =3D &cpu_list_data->list;
+>>      CpuDefinitionInfoList *entry;
+>>      CpuDefinitionInfo *info;
+>>      char *name =3D g_strdup(object_class_get_name(klass));
+>> @@ -300,7 +331,19 @@ static void create_cpu_model_list(ObjectClass *kl=
+ass, void *opaque)
+>>      info->migration_safe =3D scc->is_migration_safe;
+>>      info->q_static =3D scc->is_static;
+>>      info->q_typename =3D g_strdup(object_class_get_name(klass));
+>> -
+>=20
+> Wonder if we should add the following:
+>=20
+> /* the host model can never be used under TCG */
+> if (scc->kvm_required && !kvm_enabled())) {
+>     info->has_unavailable_features =3D true;
+>     list_add_feat("type", &info->unavailable_features);
+> } else if (cpu_list_data->model ...
+>=20
+>> +    /* check for unavailable features */
+>> +    if (cpu_list_data->model) {
+>> +        Object *obj;
+>> +        S390CPU *sc;
+>> +        obj =3D object_new(object_class_get_name(klass));
+>> +        sc =3D S390_CPU(obj);
+>=20
+> So we can drop the check here (if we have a host/max_model definition
+> under KVM, then all models have sc->model set). But the current code
+> should also work (it simply will not indicate runability information fo=
+r
+> the "host" model under TCG, as sc->model will be NULL).
+Hmm ... that made me think that we could remove the check here and make
+check_unavailable_features interpret a NULL model as not
+usable/incompatible (a bit more robust in the unlikely event of a memory
+allocation failure). Thoughts?
+> >> +        if (sc->model) {
+>> +            info->has_unavailable_features =3D true;
+>> +            check_unavailable_features(cpu_list_data->model, sc->mode=
+l,
+>> +                                       &info->unavailable_features);
+>> +        }
+>> +        object_unref(obj);
+>> +    }
+>> =20
+> Looks good to me and produced the expected result under TCG.
+>=20
+> Feel free to add my
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
+> with or without the modification.
+>=20
 
-I think I have already tried something like that, and I'm not sure the
-PVR is already set at this level of the initialization. But I'm going to
-try your patch.
 
-Thanks,
-Laurent
+--=20
+
+Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
+   Viktor Mihajlovski
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
+Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
