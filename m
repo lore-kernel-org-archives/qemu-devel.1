@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSQcb-0005QT-8p
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:24:18 -0400
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQgM-0006Aq-LG
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSQcX-0007dC-7a
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:24:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSQcW-0007cp-UA
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:24:13 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1498727785.git.maozy.fnst@cn.fujitsu.com>
-	<943a835da22f8e4edc549d0c1b85da5b12e65ed4.1498727785.git.maozy.fnst@cn.fujitsu.com>
-Date: Tue, 04 Jul 2017 18:24:09 +0200
-In-Reply-To: <943a835da22f8e4edc549d0c1b85da5b12e65ed4.1498727785.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Thu, 29 Jun 2017 17:43:02 +0800")
-Message-ID: <87o9t0jhli.fsf@dusky.pond.sub.org>
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQgJ-0000vH-ES
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:28:10 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:48363)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQgI-0000uK-Vl
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:28:07 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 4 Jul 2017 16:27:25 +0000
+Message-ID: <5e854d8a0df0401eba375f959ee5de8c@AMSPEX02CL01.citrite.net>
+References: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
+	<1499183267-28623-4-git-send-email-igor.druzhinin@citrix.com>
+In-Reply-To: <1499183267-28623-4-git-send-email-igor.druzhinin@citrix.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 4/4] net/socket: Improve -net socket
- error reporting
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] xen/mapcache: introduce
+ xen_replace_cache_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,346 +32,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com
+To: Igor Druzhinin <igor.druzhinin@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "sstabellini@kernel.org" <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+> -----Original Message-----
+> From: Igor Druzhinin
+> Sent: 04 July 2017 16:48
+> To: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
+> Cc: Igor Druzhinin <igor.druzhinin@citrix.com>; sstabellini@kernel.org;
+> Anthony Perard <anthony.perard@citrix.com>; Paul Durrant
+> <Paul.Durrant@citrix.com>; pbonzini@redhat.com
+> Subject: [PATCH v2 3/4] xen/mapcache: introduce
+> xen_replace_cache_entry()
+>=20
+> This new call is trying to update a requested map cache entry
+> according to the changes in the physmap. The call is searching
+> for the entry, unmaps it and maps again at the same place using
+> a new guest address. If the mapping is dummy this call will
+> make it real.
+>=20
+> This function makes use of a new xenforeignmemory_map2() call
+> with an extended interface that was recently introduced in
+> libxenforeignmemory [1].
 
-> When -net socket fails, it first reports a specific error, then
-> a generic one, like this:
->
->     $ qemu-system-x86_64 -net socket,
->     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
->
-> Convert net_socket_*_init() to Error to get rid of the superfluous second
-> error message. After the patch, the effect like this:
->
->     $ qemu-system-x86_64 -net socket,
->     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->
-> At the same time, add many explicit error handling message when it fails.
->
-> Cc: jasowang@redhat.com
-> Cc: armbru@redhat.com
-> Cc: berrange@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+I don't understand how the compat layer works here. If xenforeignmemory_map=
+2() is not available then you can't control the placement in virtual addres=
+s space.
+
+  Paul
+
+>=20
+> [1] https://www.mail-archive.com/xen-devel@lists.xen.org/msg113007.html
+>=20
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
 > ---
->  net/socket.c | 94 +++++++++++++++++++++++++++++-------------------------------
->  1 file changed, 45 insertions(+), 49 deletions(-)
->
-> diff --git a/net/socket.c b/net/socket.c
-> index bd80b3c..a891c3a 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -494,22 +494,21 @@ static void net_socket_accept(void *opaque)
->  static int net_socket_listen_init(NetClientState *peer,
->                                    const char *model,
->                                    const char *name,
-> -                                  const char *host_str)
-> +                                  const char *host_str,
-> +                                  Error **errp)
->  {
->      NetClientState *nc;
->      NetSocketState *s;
->      struct sockaddr_in saddr;
->      int fd, ret;
-> -    Error *err = NULL;
->  
-> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
-> -        error_report_err(err);
-> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->          return -1;
->      }
->  
->      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->      if (fd < 0) {
-> -        perror("socket");
-> +        error_setg_errno(errp, errno, "failed to create stream socket");
->          return -1;
->      }
->      qemu_set_nonblock(fd);
-> @@ -518,13 +517,14 @@ static int net_socket_listen_init(NetClientState *peer,
->  
->      ret = bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
->      if (ret < 0) {
-> -        perror("bind");
-> +        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
-> +                         inet_ntoa(saddr.sin_addr));
-
-Comment on the same error message in PATCH 2 applies.
-
->          closesocket(fd);
->          return -1;
->      }
->      ret = listen(fd, 0);
->      if (ret < 0) {
-> -        perror("listen");
-> +        error_setg_errno(errp, errno, "listen socket failed");
-
-Suggest "can't listen on socket".
-
->          closesocket(fd);
->          return -1;
->      }
-> @@ -543,21 +543,20 @@ static int net_socket_listen_init(NetClientState *peer,
->  static int net_socket_connect_init(NetClientState *peer,
->                                     const char *model,
->                                     const char *name,
-> -                                   const char *host_str)
-> +                                   const char *host_str,
-> +                                   Error **errp)
->  {
->      NetSocketState *s;
->      int fd, connected, ret;
->      struct sockaddr_in saddr;
-> -    Error *err = NULL;
->  
-> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
-> -        error_report_err(err);
-> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->          return -1;
->      }
->  
->      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->      if (fd < 0) {
-> -        perror("socket");
-> +        error_setg_errno(errp, errno, "failed to create stream socket");
->          return -1;
->      }
->      qemu_set_nonblock(fd);
-> @@ -573,7 +572,7 @@ static int net_socket_connect_init(NetClientState *peer,
->                         errno == EINVAL) {
->                  break;
->              } else {
-> -                perror("connect");
-> +                error_setg_errno(errp, errno, "connection failed");
-
-Suggest "can't connect socket".
-
->                  closesocket(fd);
->                  return -1;
->              }
-> @@ -582,9 +581,8 @@ static int net_socket_connect_init(NetClientState *peer,
->              break;
->          }
->      }
-> -    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
-> +    s = net_socket_fd_init(peer, model, name, fd, connected, errp);
->      if (!s) {
-> -        error_report_err(err);
->          return -1;
->      }
->      snprintf(s->nc.info_str, sizeof(s->nc.info_str),
-> @@ -597,36 +595,36 @@ static int net_socket_mcast_init(NetClientState *peer,
->                                   const char *model,
->                                   const char *name,
->                                   const char *host_str,
-> -                                 const char *localaddr_str)
-> +                                 const char *localaddr_str,
-> +                                 Error **errp)
->  {
->      NetSocketState *s;
->      int fd;
->      struct sockaddr_in saddr;
->      struct in_addr localaddr, *param_localaddr;
-> -    Error *err = NULL;
->  
-> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
-> -        error_report_err(err);
-> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->          return -1;
->      }
->  
->      if (localaddr_str != NULL) {
-> -        if (inet_aton(localaddr_str, &localaddr) == 0)
-> +        if (inet_aton(localaddr_str, &localaddr) == 0) {
-> +            error_setg(errp, "localaddr '%s' is not a valid IPv4 address",
-> +                       localaddr_str);
->              return -1;
+>  configure                     | 18 ++++++++++
+>  hw/i386/xen/xen-mapcache.c    | 79
+> ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/xen/xen_common.h   |  7 ++++
+>  include/sysemu/xen-mapcache.h | 11 +++++-
+>  4 files changed, 106 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index c571ad1..ad6156b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2021,6 +2021,24 @@ EOF
+>      # Xen unstable
+>      elif
+>          cat > $TMPC <<EOF &&
+> +#undef XC_WANT_COMPAT_MAP_FOREIGN_API
+> +#include <xenforeignmemory.h>
+> +int main(void) {
+> +  xenforeignmemory_handle *xfmem;
+> +
+> +  xfmem =3D xenforeignmemory_open(0, 0);
+> +  xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
+> +
+> +  return 0;
+> +}
+> +EOF
+> +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
+> +      then
+> +      xen_stable_libs=3D"-lxendevicemodel $xen_stable_libs"
+> +      xen_ctrl_version=3D41000
+> +      xen=3Dyes
+> +    elif
+> +        cat > $TMPC <<EOF &&
+>  #undef XC_WANT_COMPAT_DEVICEMODEL_API
+>  #define __XEN_TOOLS__
+>  #include <xendevicemodel.h>
+> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+> index cd4e746..a988be7 100644
+> --- a/hw/i386/xen/xen-mapcache.c
+> +++ b/hw/i386/xen/xen-mapcache.c
+> @@ -151,6 +151,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f,
+> void *opaque)
+>  }
+>=20
+>  static void xen_remap_bucket(MapCacheEntry *entry,
+> +                             void *vaddr,
+>                               hwaddr size,
+>                               hwaddr address_index,
+>                               bool dummy)
+> @@ -167,7 +168,9 @@ static void xen_remap_bucket(MapCacheEntry
+> *entry,
+>      err =3D g_malloc0(nb_pfn * sizeof (int));
+>=20
+>      if (entry->vaddr_base !=3D NULL) {
+> -        ram_block_notify_remove(entry->vaddr_base, entry->size);
+> +        if (entry->vaddr_base !=3D vaddr) {
+> +            ram_block_notify_remove(entry->vaddr_base, entry->size);
 > +        }
->          param_localaddr = &localaddr;
->      } else {
->          param_localaddr = NULL;
+>          if (munmap(entry->vaddr_base, entry->size) !=3D 0) {
+>              perror("unmap fails");
+>              exit(-1);
+> @@ -181,11 +184,11 @@ static void xen_remap_bucket(MapCacheEntry
+> *entry,
 >      }
->  
-> -    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-> +    fd = net_socket_mcast_create(&saddr, param_localaddr, errp);
->      if (fd < 0) {
-> -        error_report_err(err);
->          return -1;
+>=20
+>      if (!dummy) {
+> -        vaddr_base =3D xenforeignmemory_map(xen_fmem, xen_domid,
+> -                                           PROT_READ|PROT_WRITE,
+> +        vaddr_base =3D xenforeignmemory_map2(xen_fmem, xen_domid,
+> vaddr,
+> +                                           PROT_READ|PROT_WRITE, 0,
+>                                             nb_pfn, pfns, err);
+>          if (vaddr_base =3D=3D NULL) {
+> -            perror("xenforeignmemory_map");
+> +            perror("xenforeignmemory_map2");
+>              exit(-1);
+>          }
+>          entry->flags &=3D ~(XEN_MAPCACHE_ENTRY_DUMMY);
+> @@ -194,7 +197,7 @@ static void xen_remap_bucket(MapCacheEntry
+> *entry,
+>           * We create dummy mappings where we are unable to create a fore=
+ign
+>           * mapping immediately due to certain circumstances (i.e. on res=
+ume
+> now)
+>           */
+> -        vaddr_base =3D mmap(NULL, size, PROT_READ|PROT_WRITE,
+> +        vaddr_base =3D mmap(vaddr, size, PROT_READ|PROT_WRITE,
+>                            MAP_ANON|MAP_SHARED, -1, 0);
+>          if (vaddr_base =3D=3D NULL) {
+>              perror("mmap");
+> @@ -203,13 +206,16 @@ static void xen_remap_bucket(MapCacheEntry
+> *entry,
+>          entry->flags |=3D XEN_MAPCACHE_ENTRY_DUMMY;
 >      }
->  
-> -    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-> +    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
->      if (!s) {
-> -        error_report_err(err);
->          return -1;
+>=20
+> +    if (entry->vaddr_base =3D=3D NULL || entry->vaddr_base !=3D vaddr) {
+> +        ram_block_notify_add(vaddr_base, size);
+> +    }
+> +
+>      entry->vaddr_base =3D vaddr_base;
+>      entry->paddr_index =3D address_index;
+>      entry->size =3D size;
+>      entry->valid_mapping =3D (unsigned long *) g_malloc0(sizeof(unsigned=
+ long)
+> *
+>              BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
+>=20
+> -    ram_block_notify_add(entry->vaddr_base, entry->size);
+>      bitmap_zero(entry->valid_mapping, nb_pfn);
+>      for (i =3D 0; i < nb_pfn; i++) {
+>          if (!err[i]) {
+> @@ -282,14 +288,14 @@ tryagain:
+>      if (!entry) {
+>          entry =3D g_malloc0(sizeof (MapCacheEntry));
+>          pentry->next =3D entry;
+> -        xen_remap_bucket(entry, cache_size, address_index, dummy);
+> +        xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
+>      } else if (!entry->lock) {
+>          if (!entry->vaddr_base || entry->paddr_index !=3D address_index =
+||
+>                  entry->size !=3D cache_size ||
+>                  !test_bits(address_offset >> XC_PAGE_SHIFT,
+>                      test_bit_size >> XC_PAGE_SHIFT,
+>                      entry->valid_mapping)) {
+> -            xen_remap_bucket(entry, cache_size, address_index, dummy);
+> +            xen_remap_bucket(entry, NULL, cache_size, address_index,
+> dummy);
+>          }
 >      }
->  
-> @@ -643,45 +641,45 @@ static int net_socket_udp_init(NetClientState *peer,
->                                   const char *model,
->                                   const char *name,
->                                   const char *rhost,
-> -                                 const char *lhost)
-> +                                 const char *lhost,
-> +                                 Error **errp)
+>=20
+> @@ -486,3 +492,60 @@ void xen_invalidate_map_cache(void)
+>=20
+>      mapcache_unlock();
+>  }
+> +
+> +static uint8_t *xen_replace_cache_entry_unlocked(hwaddr
+> old_phys_addr,
+> +                                                 hwaddr new_phys_addr,
+> +                                                 hwaddr size)
+> +{
+> +    MapCacheEntry *entry;
+> +    hwaddr address_index;
+> +    hwaddr address_offset;
+> +    hwaddr cache_size =3D size;
+> +    hwaddr test_bit_size;
+> +
+> +    address_index  =3D old_phys_addr >> MCACHE_BUCKET_SHIFT;
+> +    address_offset =3D old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
+> +
+> +    assert(size);
+> +    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
+> +    test_bit_size =3D size + (old_phys_addr & (XC_PAGE_SIZE - 1));
+> +    if (test_bit_size % XC_PAGE_SIZE) {
+> +        test_bit_size +=3D XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE)=
+;
+> +    }
+> +    cache_size =3D size + address_offset;
+> +    if (cache_size % MCACHE_BUCKET_SIZE) {
+> +        cache_size +=3D MCACHE_BUCKET_SIZE - (cache_size %
+> MCACHE_BUCKET_SIZE);
+> +    }
+> +
+> +    entry =3D &mapcache->entry[address_index % mapcache->nr_buckets];
+> +    while (entry && !(entry->paddr_index =3D=3D address_index && entry->=
+size
+> =3D=3D cache_size)) {
+> +        entry =3D entry->next;
+> +    }
+> +    if (!entry) {
+> +        DPRINTF("Trying to update an entry for %lx that is not in the
+> mapcache!\n", phys_addr);
+> +        return NULL;
+> +    }
+> +
+> +    address_index  =3D new_phys_addr >> MCACHE_BUCKET_SHIFT;
+> +    address_offset =3D new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
+> +
+> +    xen_remap_bucket(entry, entry->vaddr_base, cache_size,
+> address_index, false);
+> +    if(!test_bits(address_offset >> XC_PAGE_SHIFT,
+> +                test_bit_size >> XC_PAGE_SHIFT,
+> +                entry->valid_mapping)) {
+> +        DPRINTF("Unable to update an entry for %lx in the mapcache!\n",
+> phys_addr);
+> +        return NULL;
+> +    }
+> +
+> +    return entry->vaddr_base + address_offset;
+> +}
+> +
+> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr, hwaddr
+> new_phys_addr, hwaddr size)
+> +{
+> +    uint8_t *p;
+> +
+> +    mapcache_lock();
+> +    p =3D xen_replace_cache_entry_unlocked(old_phys_addr,
+> new_phys_addr, size);
+> +    mapcache_unlock();
+> +    return p;
+> +}
+> diff --git a/include/hw/xen/xen_common.h
+> b/include/hw/xen/xen_common.h
+> index e00ddd7..70a5cad 100644
+> --- a/include/hw/xen/xen_common.h
+> +++ b/include/hw/xen/xen_common.h
+> @@ -78,6 +78,13 @@ static inline void
+> *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+>=20
+>  extern xenforeignmemory_handle *xen_fmem;
+>=20
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+> +
+> +#define xenforeignmemory_map2(h, d, a, p, f, ps, ar, e) \
+> +    xenforeignmemory_map(h, d, p, ps, ar, e)
+> +
+> +#endif
+> +
+>  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+>=20
+>  typedef xc_interface xendevicemodel_handle;
+> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-
+> mapcache.h
+> index 01daaad..b38962c 100644
+> --- a/include/sysemu/xen-mapcache.h
+> +++ b/include/sysemu/xen-mapcache.h
+> @@ -21,7 +21,9 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr
+> size,
+>  ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
+>  void xen_invalidate_map_cache_entry(uint8_t *buffer);
+>  void xen_invalidate_map_cache(void);
+> -
+> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+> +                                 hwaddr new_phys_addr,
+> +                                 hwaddr size);
+>  #else
+>=20
+>  static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+> @@ -50,6 +52,13 @@ static inline void xen_invalidate_map_cache(void)
 >  {
->      NetSocketState *s;
->      int fd, ret;
->      struct sockaddr_in laddr, raddr;
-> -    Error *err = NULL;
->  
-> -    if (parse_host_port(&laddr, lhost, &err) < 0) {
-> -        error_report_err(err);
-> +    if (parse_host_port(&laddr, lhost, errp) < 0) {
->          return -1;
->      }
->  
-> -    if (parse_host_port(&raddr, rhost, &err) < 0) {
-> -        error_report_err(err);
-> +    if (parse_host_port(&raddr, rhost, errp) < 0) {
->          return -1;
->      }
->  
->      fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
->      if (fd < 0) {
-> -        perror("socket(PF_INET, SOCK_DGRAM)");
-> +        error_setg_errno(errp, errno, "failed to create datagram socket");
-
-Comment on the same error message in PATCH 2 applies.
-
->          return -1;
->      }
->  
->      ret = socket_set_fast_reuse(fd);
->      if (ret < 0) {
-> +        error_setg_errno(errp, errno, "set the socket 'SO_REUSEADDR'"
-> +                         " attribute failed");
-
-Comment on the same error message in PATCH 2 applies.
-
->          closesocket(fd);
->          return -1;
->      }
->      ret = bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
->      if (ret < 0) {
-> -        perror("bind");
-> +        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
-> +                         inet_ntoa(laddr.sin_addr));
-
-Likewise.
-
->          closesocket(fd);
->          return -1;
->      }
->      qemu_set_nonblock(fd);
->  
-> -    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-> +    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
->      if (!s) {
-> -        error_report_err(err);
->          return -1;
->      }
->  
-> @@ -696,8 +694,6 @@ static int net_socket_udp_init(NetClientState *peer,
->  int net_init_socket(const Netdev *netdev, const char *name,
->                      NetClientState *peer, Error **errp)
->  {
-> -    /* FIXME error_setg(errp, ...) on failure */
-> -    Error *err = NULL;
->      const NetdevSocketOptions *sock;
->  
->      assert(netdev->type == NET_CLIENT_DRIVER_SOCKET);
-> @@ -705,22 +701,21 @@ int net_init_socket(const Netdev *netdev, const char *name,
->  
->      if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
->          sock->has_udp != 1) {
-> -        error_report("exactly one of fd=, listen=, connect=, mcast= or udp="
-> -                     " is required");
-> +        error_setg(errp, "exactly one of fd=, listen=, connect=, mcast= or udp="
-> +                   " is required");
->          return -1;
->      }
->  
->      if (sock->has_localaddr && !sock->has_mcast && !sock->has_udp) {
-> -        error_report("localaddr= is only valid with mcast= or udp=");
-> +        error_setg(errp, "localaddr= is only valid with mcast= or udp=");
->          return -1;
->      }
->  
->      if (sock->has_fd) {
->          int fd;
->  
-> -        fd = monitor_fd_param(cur_mon, sock->fd, &err);
-> +        fd = monitor_fd_param(cur_mon, sock->fd, errp);
->          if (fd == -1) {
-> -            error_report_err(err);
->              return -1;
->          }
->          qemu_set_nonblock(fd);
-> @@ -731,15 +726,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
->      }
->  
->      if (sock->has_listen) {
-> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
-> +        if (net_socket_listen_init(peer, "socket", name,
-> +            sock->listen, errp) == -1) {
-
-Please avoid breaking the line in the middle of an operator's operand
-when you could just as well break it at the operator, like this:
-
-           if (net_socket_listen_init(peer, "socket", name, sock->listen, errp)
-               == -1) {
-
-Since you're touching this line anyway, I suggest to replace == -1 by
-the more idiomatic < 0.
-
->              return -1;
->          }
->          return 0;
->      }
->  
->      if (sock->has_connect) {
-> -        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
-> -            -1) {
-> +        if (net_socket_connect_init(peer, "socket", name,
-> +            sock->connect, errp) == -1) {
-
-Likewise.
-
->              return -1;
->          }
->          return 0;
-> @@ -748,8 +744,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
->      if (sock->has_mcast) {
->          /* if sock->localaddr is missing, it has been initialized to "all bits
->           * zero" */
-> -        if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
-> -            sock->localaddr) == -1) {
-> +        if (net_socket_mcast_init(peer, "socket", name,
-> +            sock->mcast, sock->localaddr, errp) == -1) {
-
-Likewise.
-
->              return -1;
->          }
->          return 0;
-> @@ -757,11 +753,11 @@ int net_init_socket(const Netdev *netdev, const char *name,
->  
->      assert(sock->has_udp);
->      if (!sock->has_localaddr) {
-> -        error_report("localaddr= is mandatory with udp=");
-> +        error_setg(errp, "localaddr= is mandatory with udp=");
->          return -1;
->      }
-> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
-> -        -1) {
-> +    if (net_socket_udp_init(peer, "socket", name,
-> +        sock->udp, sock->localaddr, errp) == -1) {
-
-Likewise.
-
->          return -1;
->      }
->      return 0;
+>  }
+>=20
+> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+> +                                 hwaddr new_phys_addr,
+> +                                 hwaddr size)
+> +{
+> +    abort();
+> +}
+> +
+>  #endif
+>=20
+>  #endif /* XEN_MAPCACHE_H */
+> --
+> 2.7.4
