@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dSOhf-0003RP-QA
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:21:24 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dSOl2-00062t-5l
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dSOhe-0003Ic-WD
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:21:23 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:35658)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dSOhe-0003HF-OB
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:21:22 -0400
-Received: by mail-lf0-x242.google.com with SMTP id z78so5749873lff.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:21:21 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dSOkw-0005B9-NJ
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:24:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dSOkw-0005Ai-GJ
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:24:46 -0400
+Date: Tue, 4 Jul 2017 16:24:41 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170704162441.0f68b2c0@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499177279-131407-3-git-send-email-borntraeger@de.ibm.com>
+References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
+	<1499177279-131407-3-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-References: <1499207612-3560-1-git-send-email-peng.hao2@zte.com.cn>
-In-Reply-To: <1499207612-3560-1-git-send-email-peng.hao2@zte.com.cn>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 04 Jul 2017 14:21:08 +0000
-Message-ID: <CAJ+F1C+sWiCpSSqPdkiU0iBmdjofuv6m1FAgwPBJJUu9BJcUEA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix a memory leak
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/7] s390x/3270: fix instruction
+ interception handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peng Hao <peng.hao2@zte.com.cn>, mst@redhat.com
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-Hi
+On Tue,  4 Jul 2017 16:07:54 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-On Tue, Jul 4, 2017 at 4:16 PM Peng Hao <peng.hao2@zte.com.cn> wrote:
+> From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> 
+> Commit bab482d7405f ("s390x/css: ccw translation infrastructure")
+> introduced instruction interception handler for different types of
+> subchannels. For emulated 3270 devices, we should assign the virtual
+> subchannel handler to them during device realization process, or 3270
+> will not work.
+> 
+> Fixes: bab482d7405f ("s390x/css: ccw translation infrastructure")
+> 
+> Reviewed-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/s390x/3270-ccw.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/s390x/3270-ccw.c b/hw/s390x/3270-ccw.c
+> index 6e6eee4..1554aa2 100644
+> --- a/hw/s390x/3270-ccw.c
+> +++ b/hw/s390x/3270-ccw.c
+> @@ -126,6 +126,7 @@ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
+>      sch->id.cu_type = EMULATED_CCW_3270_CU_TYPE;
+>      css_sch_build_virtual_schib(sch, (uint8_t)chpid,
+>                                  EMULATED_CCW_3270_CHPID_TYPE);
+> +    sch->do_subchannel_work = do_subchannel_work_virtual;
+>      sch->ccw_cb = emulated_ccw_3270_cb;
+>  
+>      ck->init(dev, &err);
 
-> vhost exists a call for g_file_get_contents, but not call g_free.
->
-> Signed-off-by: Peng Hao<peng.hao2@zte.com.cn>
->
-
- Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
----
->  hw/virtio/vhost-backend.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> index 4e31de1..2c481d6 100644
-> --- a/hw/virtio/vhost-backend.c
-> +++ b/hw/virtio/vhost-backend.c
-> @@ -52,11 +52,13 @@ static int vhost_kernel_memslots_limit(struct
-> vhost_dev *dev)
->                              &s, NULL, NULL)) {
->          uint64_t val =3D g_ascii_strtoull(s, NULL, 10);
->          if (!((val =3D=3D G_MAXUINT64 || !val) && errno)) {
-> +            g_free(s);
->              return val;
->          }
->          error_report("ignoring invalid max_mem_regions value in vhost
-> module:"
->                       " %s", s);
->      }
-> +    g_free(s);
->      return limit;
->  }
->
-> --
-> 1.8.3.1
->
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
