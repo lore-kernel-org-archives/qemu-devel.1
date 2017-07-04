@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJea-00058s-Ig
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:53 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dSJec-0005B6-1x
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJeX-0005bB-Hz
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:52 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3956)
+	(envelope-from <longpeng2@huawei.com>) id 1dSJeZ-0005cA-AT
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:54 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJeW-0005a8-UT
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:49 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dSJeY-0005an-O7
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:51 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 4 Jul 2017 16:56:53 +0800
-Message-ID: <1499158630-75260-2-git-send-email-longpeng2@huawei.com>
+Date: Tue, 4 Jul 2017 16:57:00 +0800
+Message-ID: <1499158630-75260-9-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 01/18] crypto: cipher: introduce context
- free function
+Subject: [Qemu-devel] [PATCH v4 08/18] crypto: hmac: introduce
+ qcrypto_hmac_ctx_new for gcrypt-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +29,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Refactors the qcrypto_cipher_free(), splits it into two parts. One
-is gcrypt/nettle__cipher_free_ctx() to free the special context.
+1) Fix a handle-leak problem in qcrypto_hmac_new(), didn't free
+   ctx->handle if gcry_mac_setkey fails.
 
-This makes code more clear, what's more, it would be used by the
-later patch.
+2) Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
+   gcrypt-backend impls.
 
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/cipher-gcrypt.c | 31 ++++++++++++++++++-------------
- crypto/cipher-nettle.c | 18 ++++++++++++++----
- 2 files changed, 32 insertions(+), 17 deletions(-)
+ crypto/hmac-gcrypt.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
-index 6487eca..0ecffa2 100644
---- a/crypto/cipher-gcrypt.c
-+++ b/crypto/cipher-gcrypt.c
-@@ -64,6 +64,22 @@ struct QCryptoCipherGcrypt {
-     uint8_t *iv;
- };
+diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
+index 21189e6..372ad7f 100644
+--- a/crypto/hmac-gcrypt.c
++++ b/crypto/hmac-gcrypt.c
+@@ -42,11 +42,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
+     return false;
+ }
  
-+static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
-+                                   QCryptoCipherMode mode)
-+{
-+    if (!ctx) {
-+        return;
-+    }
-+
-+    gcry_cipher_close(ctx->handle);
-+    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-+        gcry_cipher_close(ctx->tweakhandle);
-+    }
-+    g_free(ctx->iv);
-+    g_free(ctx);
-+}
-+
-+
- QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-                                   QCryptoCipherMode mode,
-                                   const uint8_t *key, size_t nkey,
-@@ -228,11 +244,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-     return cipher;
+-QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+-                              const uint8_t *key, size_t nkey,
+-                              Error **errp)
++static QCryptoHmacGcrypt *
++qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
++                     const uint8_t *key, size_t nkey,
++                     Error **errp)
+ {
+-    QCryptoHmac *hmac;
+     QCryptoHmacGcrypt *ctx;
+     gcry_error_t err;
  
-  error:
--    gcry_cipher_close(ctx->handle);
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
--        gcry_cipher_close(ctx->tweakhandle);
--    }
--    g_free(ctx);
-+    gcrypt_cipher_free_ctx(ctx, mode);
-     g_free(cipher);
+@@ -56,9 +56,6 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+         return NULL;
+     }
+ 
+-    hmac = g_new0(QCryptoHmac, 1);
+-    hmac->alg = alg;
+-
+     ctx = g_new0(QCryptoHmacGcrypt, 1);
+ 
+     err = gcry_mac_open(&ctx->handle, qcrypto_hmac_alg_map[alg],
+@@ -73,15 +70,14 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+     if (err != 0) {
+         error_setg(errp, "Cannot set key: %s",
+                    gcry_strerror(err));
++        gcry_mac_close(ctx->handle);
+         goto error;
+     }
+ 
+-    hmac->opaque = ctx;
+-    return hmac;
++    return ctx;
+ 
+ error:
+     g_free(ctx);
+-    g_free(hmac);
      return NULL;
  }
-@@ -240,17 +252,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
  
- void qcrypto_cipher_free(QCryptoCipher *cipher)
- {
--    QCryptoCipherGcrypt *ctx;
-     if (!cipher) {
-         return;
-     }
--    ctx = cipher->opaque;
--    gcry_cipher_close(ctx->handle);
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
--        gcry_cipher_close(ctx->tweakhandle);
--    }
--    g_free(ctx->iv);
--    g_free(ctx);
-+    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
-     g_free(cipher);
+@@ -150,3 +146,22 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+ 
+     return 0;
  }
- 
-diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
-index dfc9030..e04e3a1 100644
---- a/crypto/cipher-nettle.c
-+++ b/crypto/cipher-nettle.c
-@@ -249,6 +249,19 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
- }
- 
- 
-+static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
++
++QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
++                              const uint8_t *key, size_t nkey,
++                              Error **errp)
 +{
++    QCryptoHmac *hmac;
++    QCryptoHmacGcrypt *ctx;
++
++    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
 +    if (!ctx) {
-+        return;
++        return NULL;
 +    }
 +
-+    g_free(ctx->iv);
-+    g_free(ctx->ctx);
-+    g_free(ctx->ctx_tweak);
-+    g_free(ctx);
++    hmac = g_new0(QCryptoHmac, 1);
++    hmac->alg = alg;
++    hmac->opaque = ctx;
++
++    return hmac;
 +}
-+
-+
- QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-                                   QCryptoCipherMode mode,
-                                   const uint8_t *key, size_t nkey,
-@@ -440,10 +453,7 @@ void qcrypto_cipher_free(QCryptoCipher *cipher)
-     }
- 
-     ctx = cipher->opaque;
--    g_free(ctx->iv);
--    g_free(ctx->ctx);
--    g_free(ctx->ctx_tweak);
--    g_free(ctx);
-+    nettle_cipher_free_ctx(ctx);
-     g_free(cipher);
- }
- 
 -- 
 1.8.3.1
