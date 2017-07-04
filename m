@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSOUt-00088j-W9
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:13 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dSOUw-00089q-GV
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSOUp-0003XI-Ti
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53349)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dSOUq-0003Xg-B8
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dSOUp-0003Wi-Jh
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:07 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1dSOUq-0003X1-1w
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:08:08 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v64E4VgZ134827
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 10:08:06 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg8uv0vv4-1
+	v64E4WQo111361
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 10:08:07 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg9h65kgx-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 10:08:05 -0400
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 10:08:06 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 4 Jul 2017 15:08:03 +0100
+	Tue, 4 Jul 2017 15:08:04 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue,  4 Jul 2017 16:07:55 +0200
+Date: Tue,  4 Jul 2017 16:07:58 +0200
 In-Reply-To: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
 References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1499177279-131407-4-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 3/7] s390x: fix error propagation in kvm-flic's
- realize
+Message-Id: <1499177279-131407-7-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 6/7] s390x: return unavailable features via
+ query-cpu-definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,74 +39,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
->From the moment it was introduced by commit a2875e6f98 ("s390x/kvm:
-implement floating-interrupt controller device", 2013-07-16) the kvm-flic
-is not making realize fail properly in case it's impossible to create the
-KVM device which basically serves as a backend and is absolutely
-essential for having an operational kvm-flic.
+The response for query-cpu-definitions didn't include the
+unavailable-features field, which is used by libvirt to figure
+out whether a certain cpu model is usable on the host.
 
-Let's fix this by making sure we do proper error propagation in realize.
+The unavailable features are now computed by obtaining the host CPU
+model and comparing it against the known CPU models. The comparison
+takes into account the generation, the GA level and the feature
+bitmaps. In the case of a CPU generation/GA level mismatch
+a feature called "type" is reported to be missing.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Fixes: a2875e6f98 "s390x/kvm: implement floating-interrupt controller device"
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+As a result, the output of virsh domcapabilities would change
+from something like
+ ...
+     <mode name='custom' supported='yes'>
+      <model usable='unknown'>z10EC-base</model>
+      <model usable='unknown'>z9EC-base</model>
+      <model usable='unknown'>z196.2-base</model>
+      <model usable='unknown'>z900-base</model>
+      <model usable='unknown'>z990</model>
+ ...
+to
+ ...
+     <mode name='custom' supported='yes'>
+      <model usable='yes'>z10EC-base</model>
+      <model usable='yes'>z9EC-base</model>
+      <model usable='no'>z196.2-base</model>
+      <model usable='yes'>z900-base</model>
+      <model usable='yes'>z990</model>
+ ...
+
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Message-Id: <1499082529-16970-1-git-send-email-mihajlov@linux.vnet.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/intc/s390_flic_kvm.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ target/s390x/cpu_models.c | 62 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 57 insertions(+), 5 deletions(-)
 
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index b4c61d8..bea3997 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -15,6 +15,7 @@
- #include "cpu.h"
- #include <sys/ioctl.h>
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "sysemu/kvm.h"
- #include "hw/s390x/s390_flic.h"
-@@ -397,18 +398,22 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     struct kvm_create_device cd = {0};
-     struct kvm_device_attr test_attr = {0};
-     int ret;
-+    Error *errp_local = NULL;
- 
-     flic_state->fd = -1;
-     if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
-+        error_setg_errno(&errp_local, errno, "KVM is missing capability"
-+                         " KVM_CAP_DEVICE_CTRL");
-         trace_flic_no_device_api(errno);
--        return;
-+        goto fail;
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 63903c2..7cb55dc 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -283,10 +283,41 @@ void s390_cpu_list(FILE *f, fprintf_function print)
      }
- 
-     cd.type = KVM_DEV_TYPE_FLIC;
-     ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
-     if (ret < 0) {
--        trace_flic_create_device(errno);
--        return;
-+        error_setg_errno(&errp_local, errno, "Creating the KVM device failed");
-+        trace_flic_no_device_api(errno);
-+        goto fail;
-     }
-     flic_state->fd = cd.fd;
- 
-@@ -417,6 +422,9 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     flic_state->clear_io_supported = !ioctl(flic_state->fd,
-                                             KVM_HAS_DEVICE_ATTR, test_attr);
- 
-+    return;
-+fail:
-+    error_propagate(errp, errp_local);
  }
  
- static void kvm_s390_flic_reset(DeviceState *dev)
++static S390CPUModel *get_max_cpu_model(Error **errp);
++
+ #ifndef CONFIG_USER_ONLY
++static void list_add_feat(const char *name, void *opaque);
++
++static void check_unavailable_features(const S390CPUModel *max_model,
++                                       const S390CPUModel *model,
++                                       strList **unavailable)
++{
++    S390FeatBitmap missing;
++
++    /* check general model compatibility */
++    if (max_model->def->gen < model->def->gen ||
++        (max_model->def->gen == model->def->gen &&
++         max_model->def->ec_ga < model->def->ec_ga)) {
++        list_add_feat("type", unavailable);
++    }
++
++    /* detect missing features if any to properly report them */
++    bitmap_andnot(missing, model->features, max_model->features,
++                  S390_FEAT_MAX);
++    if (!bitmap_empty(missing, S390_FEAT_MAX)) {
++        s390_feat_bitmap_to_ascii(missing, unavailable, list_add_feat);
++    }
++}
++
++struct CpuDefinitionInfoListData {
++    CpuDefinitionInfoList *list;
++    S390CPUModel *model;
++};
++
+ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+ {
+-    CpuDefinitionInfoList **cpu_list = opaque;
++    struct CpuDefinitionInfoListData *cpu_list_data = opaque;
++    CpuDefinitionInfoList **cpu_list = &cpu_list_data->list;
+     CpuDefinitionInfoList *entry;
+     CpuDefinitionInfo *info;
+     char *name = g_strdup(object_class_get_name(klass));
+@@ -300,7 +331,19 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+     info->migration_safe = scc->is_migration_safe;
+     info->q_static = scc->is_static;
+     info->q_typename = g_strdup(object_class_get_name(klass));
+-
++    /* check for unavailable features */
++    if (cpu_list_data->model) {
++        Object *obj;
++        S390CPU *sc;
++        obj = object_new(object_class_get_name(klass));
++        sc = S390_CPU(obj);
++        if (sc->model) {
++            info->has_unavailable_features = true;
++            check_unavailable_features(cpu_list_data->model, sc->model,
++                                       &info->unavailable_features);
++        }
++        object_unref(obj);
++    }
+ 
+     entry = g_malloc0(sizeof(*entry));
+     entry->value = info;
+@@ -310,11 +353,20 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
+ 
+ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
+ {
+-    CpuDefinitionInfoList *list = NULL;
++    struct CpuDefinitionInfoListData list_data = {
++        .list = NULL,
++    };
+ 
+-    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false, &list);
++    list_data.model = get_max_cpu_model(errp);
++    if (*errp) {
++        error_free(*errp);
++        *errp = NULL;
++    }
+ 
+-    return list;
++    object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false,
++                         &list_data);
++
++    return list_data.list;
+ }
+ 
+ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
 -- 
 2.7.4
