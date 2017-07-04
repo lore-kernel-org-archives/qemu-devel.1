@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dSCsP-0002WQ-OE
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:43:42 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSD7h-0006M5-Jv
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dSCsM-0002uu-JM
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:43:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dSCsM-0002t3-AA
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:43:38 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4D00275748
-	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 01:43:36 +0000 (UTC)
-Date: Tue, 4 Jul 2017 09:43:36 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170704014336.GB32003@pxdev.xzpeter.org>
-References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
-	<1499049848-18012-3-git-send-email-peterx@redhat.com>
-	<20170703145903.GL12152@localhost.localdomain>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSD7d-00021d-4V
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:59:29 -0400
+Received: from [59.151.112.132] (port=20105 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSD7c-0001uj-5k
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 21:59:25 -0400
+References: <cover.1498542538.git.maozy.fnst@cn.fujitsu.com>
+	<20170703204129-mutt-send-email-mst@kernel.org>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <17fca3fb-817e-78ec-2723-25cf442229c0@cn.fujitsu.com>
+Date: Tue, 4 Jul 2017 09:58:55 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170703145903.GL12152@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] vl: move global property,
- migrate init earlier
+In-Reply-To: <20170703204129-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/9] Convert to realize and cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,131 +27,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com, dmitry@daynix.com, jasowang@redhat.com, kraxel@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
-On Mon, Jul 03, 2017 at 11:59:03AM -0300, Eduardo Habkost wrote:
-> On Mon, Jul 03, 2017 at 10:44:06AM +0800, Peter Xu wrote:
-> > Currently drive_init_func() may call migrate_get_current() while the
-> > migrate object is still not ready yet at that time. Move the migratio=
-n
-> > object init earlier, along with the global properties, right after
-> > acceleration init.
-> >=20
-> > This fixes a breakage for iotest 055, which caused an assertion failu=
-re.
-> >=20
-> > Reported-by: Max Reitz <mreitz@redhat.com>
-> > Reported-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > Fixes: 3df663 ("migration: move only_migratable to MigrationState")
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  vl.c | 24 ++++++++++++------------
-> >  1 file changed, 12 insertions(+), 12 deletions(-)
-> >=20
-> > diff --git a/vl.c b/vl.c
-> > index 0c497a3..2ae4313 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -4414,6 +4414,18 @@ int main(int argc, char **argv, char **envp)
-> > =20
-> >      configure_accelerator(current_machine);
-> > =20
-> > +    /*
-> > +     * Register all the global properties, including accel propertie=
-s,
-> > +     * machine properties, and user-specified ones.
-> > +     */
-> > +    register_global_properties(current_machine);
-> > +
-> > +    /*
-> > +     * Migration object can only be created after global properties
-> > +     * are applied correctly.
-> > +     */
-> > +    migration_object_init();
-> > +
->=20
-> So, things that might introduce bugs here are:
-> 1) Unexpected qdev_prop_register_global() calls between this place and
->    the original register_global_properties() call (that would now happe=
-n
->    in a different order).
-> 2) register_global_properties() seeing a different global property list
->    because it is being called earlier.
->    2.1) AccelClass::global_props is statically defined and will be the
->         same here. Not a problem.
->    2.2) MachineClass::compat_props: same as above.
->    2.3) user-provided global properties: we need to ensure all
->         properties in the "global" QemuOpts section are already
->         available at this point.
->=20
->=20
-> To ensure (1) is not a problem, we need to check all calls for
-> qdev_prop_register_global().  The callers are:
->=20
-> * configure_rtc()
->   - Called very early, when parsing command-line options.  Not a proble=
-m.[1]
-> * global_init_func()
->   * Called by user_register_global_props()
->     * Called by register_global_properties().
->       - That's the code we're moving.  Not a problem.
-> * QEMU_OPTION_rtc_td_hack case in main()
->   - Called very early, when parsing command-line options.  Not a proble=
-m.[1]
-> * QEMU_OPTION_no_kvm_pit_reinjection case in main()
->   - Called very early, when parsing command-line options.  Not a proble=
-m.[1]
-> * register_compat_prop()
->   * Called by machine_register_compat_props()
->     * Called by register_global_properties().
->       - That's the code we're moving.  Not a problem.
->   * Called by machine_register_compat_for_subclass()
->     * Called by machine_register_compat_props() (see above)
->   * Called by register_compat_props_array()
->     * Called by accel_register_compat_props()
->       * Called by register_global_properties().
->         - That's the code we're moving.  Not a problem.
-> * qdev_prop_register_global_list()
->   - Used only by unit test code.
-> * cpu_common_parse_features()
->   - Used when initializing CPUs, which is done much later, when
->     machine_run_board_init() is called (or when -device is handled by
->     device_init_func()).  Not a problem.[2]
-> * x86_cpu_parse_featurestr()
->   - Same as above.
->=20
->=20
-> To ensure (2.3) is not a problem, we need to look for references to
-> qemu_find_opts("global") or qemu_global_opts.  They are:
->=20
-> * user_register_global_props()
->   - This is the code we're moving.  Not a problem.
-> * default_driver_check() call at main()
->   - This happens earlier, before the code we're moving.  Not a problem.
-> * qemu_global_option()
->   - Called very early, when parsing command-line options.  Not a proble=
-m.
->=20
->=20
-> So the code reordering looks OK.
->=20
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Hi, Michael
 
-I really appreciate for such an in-depth review on this patch.
+On 07/04/2017 01:41 AM, Michael S. Tsirkin wrote:
+> On Tue, Jun 27, 2017 at 02:16:46PM +0800, Mao Zhongyi wrote:
+>> This series mainly implements the conversions of pci-bridge devices
+>> i82801b11, io3130_upstream/downstream and so on to realize(). Naturally
+>> part of error messages need to be converted to Error, then propagate
+>> to its callers via the argument errp, bonus clean related minor flaw
+>> up. In short, the former patches are prerequisites for latter ones.
+>
+>
+> Applied, thanks!
+>
+> Please remember to Cc maintainers on all patches, this was
+> missing on patch 3.
 
->=20
->=20
-> Notes about things we need to fix in the future:
->=20
-> [1] I think they should be replaced by qemu_global_option() calls, thou=
-gh.
-> [2] This is a fragile portion of the global property code and should be
->     eventually moved to the command-line parsing section of main().
+Thank you for your reminding. I remember.
 
-Agree on both.
+Thanks,
+Mao
 
-Thanks again!
 
---=20
-Peter Xu
+>> v7:
+>> * patch7: -drop the !local_err assert is really not appropriate,
+>>            now revert it.    [Marcel Apfelbaum]
+>>
+>> v6:
+>> * patch3: -rename the subject.
+>> * patch6: -simplify the commit message.
+>>           -use error_append_hint replace original error_setg rather
+>>            than remove it directly. [Marcel Apfelbaum]
+>>           -report the error message from local_err. [Marcel Apfelbaum]
+>> v5:
+>> * patch5: replace pci_add_capability2() with pci_add_capability(), because
+>>           it's confusing to have a function named pci_add_capability2() if
+>>           pci_add_capability() doesn't exist anymore. [Eduardo Habkost]
+>> * patch8: a new patch that fix the return type of verify_irqchip_kernel().
+>> * patch9: a new patch that use the errp directly instead of the local_err to
+>>           propagate the error messages.
+>>
+>> v4:
+>> * patch4: changed from patch 5 in v3. use a elegant way to check
+>>           the error, like
+>>
+>>           function(...);
+>>           if (function succeeded) {
+>>              /* non-error code path here */
+>>              foo = bar;
+>>           }
+>>
+>>           or
+>>
+>>           function(...);
+>>           if (function succeeded) {
+>>               /* non-error code path here */
+>>               foo = bar;
+>>           } else {
+>>               /* error path here */
+>>               return ret;
+>>           }
+>>
+>>           for readability, instead of this:
+>>
+>>           function(...)
+>>           if (function failed) {
+>>               return ...;  /* or: "goto out" */
+>>           }
+>>
+>>           /* non-error code path here */
+>>           foo = bar;             [Eduardo Habkost]
+>>
+>>           meanwhile, split previous patch4 out. [Michael S. Tsirkin]
+>> * patch5: a new patch that replace pci_add_capability() with
+>>           pci_add_capability2(). [Eduardo Habkost]
+>>
+>> v3:
+>> * patch2: explain the specified means of the return value, also
+>>           improve the commit message. [Marcel Apfelbaum]
+>> * patch3: simplify the subject and commit message, fix another
+>>           wrong assert. [Marcel Apfelbaum]
+>> * patch4: adjust the subject.
+>> * patch5: fix a wrong optimization for errp. [Eduardo Habkost]
+>> * patch7: a new patch that converts shpc_init() to Error in order
+>>           to propagate the error better.
+>> v2:
+>> * patch1: subject and commit message was rewrited by markus.
+>> * patch2: comment was added to pci_add_capability2().
+>> * patch3: a new patch that fix the wrong return value judgment condition.
+>> * patch4: a new patch that fix code style problems.
+>> * patch5: add an errp argument for pci_add_capability to pass
+>>           error for its callers.
+>> * patch6: convert part of pci-bridge device to realize.
+>>
+>> v1:
+>> * patch1: fix unreasonable return value check
+>>
+>> Cc: mst@redhat.com
+>> Cc: marcel@redhat.com
+>> Cc: armbru@redhat.com
+>> Cc: dmitry@daynix.com
+>> Cc: jasowang@redhat.com
+>> Cc: kraxel@redhat.com
+>> Cc: alex.williamson@redhat.com
+>> Cc: pbonzini@redhat.com
+>> Cc: rth@twiddle.net
+>> Cc: ehabkost@redhat.com
+>>
+>> Mao Zhongyi (9):
+>>   pci: Clean up error checking in pci_add_capability()
+>>   pci: Add comment for pci_add_capability2()
+>>   pci: Fix the wrong assertion.
+>>   pci: Make errp the last parameter of pci_add_capability()
+>>   pci: Replace pci_add_capability2() with pci_add_capability()
+>>   pci: Convert to realize
+>>   pci: Convert shpc_init() to Error
+>>   i386/kvm/pci-assign: Fix return type of verify_irqchip_kernel()
+>>   i386/kvm/pci-assign: Use errp directly rather than local_err
+>>
+>>  hw/i386/amd_iommu.c                | 24 ++++++++++++-----
+>>  hw/i386/kvm/pci-assign.c           | 54 ++++++++++++++------------------------
+>>  hw/ide/ich.c                       |  2 +-
+>>  hw/net/e1000e.c                    | 30 ++++++++++++---------
+>>  hw/net/eepro100.c                  | 18 ++++++++++---
+>>  hw/pci-bridge/i82801b11.c          | 12 ++++-----
+>>  hw/pci-bridge/pci_bridge_dev.c     | 14 +++++-----
+>>  hw/pci-bridge/pcie_root_port.c     | 18 ++++++-------
+>>  hw/pci-bridge/xio3130_downstream.c | 20 +++++++-------
+>>  hw/pci-bridge/xio3130_upstream.c   | 20 +++++++-------
+>>  hw/pci/msi.c                       |  2 +-
+>>  hw/pci/msix.c                      |  2 +-
+>>  hw/pci/pci.c                       | 24 +++--------------
+>>  hw/pci/pci_bridge.c                |  8 ++++--
+>>  hw/pci/pcie.c                      | 28 +++++++++++++++-----
+>>  hw/pci/shpc.c                      | 10 ++++---
+>>  hw/pci/slotid_cap.c                | 12 ++++++---
+>>  hw/usb/hcd-xhci.c                  |  2 +-
+>>  hw/vfio/pci.c                      | 15 ++++++-----
+>>  hw/virtio/virtio-pci.c             | 12 ++++++---
+>>  include/hw/pci/pci.h               |  2 --
+>>  include/hw/pci/pci_bridge.h        |  3 ++-
+>>  include/hw/pci/pcie.h              |  3 ++-
+>>  include/hw/pci/shpc.h              |  3 ++-
+>>  include/hw/pci/slotid_cap.h        |  3 ++-
+>>  25 files changed, 183 insertions(+), 158 deletions(-)
+>>
+>> --
+>> 2.9.4
+>>
+>>
+>
+>
+>
