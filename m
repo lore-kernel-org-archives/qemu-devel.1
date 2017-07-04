@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKY7-0002OY-37
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dSKaY-0004b1-Hh
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKY6-0000il-B3
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:15 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:36805)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dSKY6-0000iS-37
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:14 -0400
-Received: by mail-lf0-x244.google.com with SMTP id f28so17186841lfi.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 02:55:13 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  4 Jul 2017 11:54:48 +0200
-Message-Id: <1499162088-1562-18-git-send-email-edgar.iglesias@gmail.com>
-In-Reply-To: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
-References: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 17/17] xilinx-dp: Add support for the yuy2
- video format
+	(envelope-from <kwolf@redhat.com>) id 1dSKaX-0001ld-Pa
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:57:46 -0400
+Date: Tue, 4 Jul 2017 11:57:35 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170704095735.GC4253@noname.str.redhat.com>
+References: <20170704084059.6278-1-el13635@mail.ntua.gr>
+	<20170704084059.6278-4-el13635@mail.ntua.gr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170704084059.6278-4-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] block: Remove bdrv_truncate
+ callback in blkdebug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +24,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Am 04.07.2017 um 10:40 hat Manos Pitsidianakis geschrieben:
+> Now that bdrv_truncate is passed to bs->file by default, remove the
+> callback from block/blkdebug.c
+> 
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-Add support for the yuy2 video format.
+We'll need to set .is_filter = true for blkdebug now. I haven't yet
+looked into the existing implications that this has, but intuitively
+this should be okay.
 
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Acked-by: Sai Pavan Boddu <saipava@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- hw/display/xlnx_dp.c | 3 +++
- 1 file changed, 3 insertions(+)
+When you do so, please explain in the commit message the implications
+that this has.
 
-diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
-index f7b7b80..a77d7db 100644
---- a/hw/display/xlnx_dp.c
-+++ b/hw/display/xlnx_dp.c
-@@ -624,6 +624,9 @@ static void xlnx_dp_change_graphic_fmt(XlnxDPState *s)
-     case 0:
-         s->v_plane.format = PIXMAN_x8b8g8r8;
-         break;
-+    case DP_NL_VID_Y0_CB_Y1_CR:
-+        s->v_plane.format = PIXMAN_yuy2;
-+        break;
-     case DP_NL_VID_RGBA8880:
-         s->v_plane.format = PIXMAN_x8b8g8r8;
-         break;
--- 
-2.7.4
+Kevin
