@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSPBI-0003Hp-IJ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:52:04 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dSPD6-00052p-RU
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSPBE-0003Pf-7K
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:52:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35539)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dSPBD-0003P5-Sg
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:51:56 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v64EnLBa074710
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 10:51:52 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg9h683ct-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 10:51:51 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 4 Jul 2017 15:51:49 +0100
-References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-	<1499177279-131407-5-git-send-email-borntraeger@de.ibm.com>
-	<20170704163730.491517ac@dhcp-192-215.str.redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 4 Jul 2017 16:51:41 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dSPD3-0004em-0E
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:53:52 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dSPD2-0004eI-Mn
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:53:48 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id 77so250356011wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:53:48 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue,  4 Jul 2017 15:48:59 +0100
+Message-Id: <20170704144859.17644-12-alex.bennee@linaro.org>
+In-Reply-To: <20170704144859.17644-1-alex.bennee@linaro.org>
+References: <20170704144859.17644-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170704163730.491517ac@dhcp-192-215.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <930cb5d9-83d1-50e7-39a7-f7eea67ef1af@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/7] s390x: fix realize inheritance for
- kvm-flic
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RISU PATCH 11/11] aarch64.risu: update AdvancedSIMD
+ across lanes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,127 +30,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+ - sorted alphabetically
+ - aligned the instructions patterns
+ - adding half-precision F[MAX|MIN][NMV|V]
+ - add @AdvSIMDAcrossVector group
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ aarch64.risu | 90 +++++++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 49 insertions(+), 41 deletions(-)
 
-On 07/04/2017 04:37 PM, Cornelia Huck wrote:
-> On Tue,  4 Jul 2017 16:07:56 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: Halil Pasic <pasic@linux.vnet.ibm.com>
->>
->> Commit f6f4ce4211 ("s390x: add property adapter_routes_max_batch",
->> 2016-12-09) introduces a common realize (intended to be common for all
->> the subclasses) for flic, but fails to make sure the kvm-flic which had
->> it's own is actually calling this common realize.
-> 
-> s/it's/its/
-> 
-
-Valid. Sorry.
-
->>
->> This omission fortunately does not result in a grave problem. The common
->> realize was only supposed to catch a possible programming mistake by
->> validating a value of a property set via the compat machine macros. Since
->> there was no programming mistake we don't need this fixed for stable.
->>
->> Let's fix this problem by making sure kvm flic honors the realize of its
->> parent class.
->>
->> Let us also improve on the error message we would hypothetically emit
->> when the validation fails.
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> Fixes: f6f4ce4211 ("s390x: add property adapter_routes_max_batch")
->> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  hw/intc/s390_flic.c     |  4 ++--
->>  hw/intc/s390_flic_kvm.c | 17 +++++++++++++++++
->>  2 files changed, 19 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
->> index a99a350..837158b 100644
->> --- a/hw/intc/s390_flic.c
->> +++ b/hw/intc/s390_flic.c
->> @@ -101,8 +101,8 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
->>      uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
->>  
->>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
->> -        error_setg(errp, "flic adapter_routes_max_batch too big"
->> -                   "%d (%d allowed)", max_batch, ADAPTER_ROUTES_MAX_GSI);
->> +        error_setg(errp, "flic property adapter_routes_max_batch too big"
->> +                   " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
-> 
-> Unrelated message change?
-> 
-
-I've mentioned it in the commit message. It was also introduced by the
-patch I'm fixing. But yes strictly it's two different problems.
-
-
->>      }
->>  }
->>  
->> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
->> index bea3997..535d99d 100644
->> --- a/hw/intc/s390_flic_kvm.c
->> +++ b/hw/intc/s390_flic_kvm.c
->> @@ -392,6 +392,17 @@ static const VMStateDescription kvm_s390_flic_vmstate = {
->>      }
->>  };
->>  
->> +typedef struct KVMS390FLICStateClass {
->> +    S390FLICStateClass parent_class;
->> +    DeviceRealize parent_realize;
->> +} KVMS390FLICStateClass;
->> +
->> +#define KVM_S390_FLIC_GET_CLASS(obj) \
->> +    OBJECT_GET_CLASS(KVMS390FLICStateClass, (obj), TYPE_KVM_S390_FLIC)
->> +
->> +#define KVM_S390_FLIC_CLASS(klass) \
->> +    OBJECT_CLASS_CHECK(KVMS390FLICStateClass, (klass), TYPE_KVM_S390_FLIC)
->> +
->>  static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
->>  {
->>      KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
->> @@ -400,6 +411,10 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
->>      int ret;
->>      Error *errp_local = NULL;
->>  
->> +    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &errp_local);
-> 
-> I usually prefer to introduce a local variable for that, but don't care
-> too much.
-> 
->> +    if (errp_local) {
->> +        goto fail;
->> +    }
->>      flic_state->fd = -1;
->>      if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
->>          error_setg_errno(&errp_local, errno, "KVM is missing capability"
->> @@ -454,6 +469,7 @@ static void kvm_s390_flic_class_init(ObjectClass *oc, void *data)
->>      DeviceClass *dc = DEVICE_CLASS(oc);
->>      S390FLICStateClass *fsc = S390_FLIC_COMMON_CLASS(oc);
->>  
->> +    KVM_S390_FLIC_CLASS(oc)->parent_realize = dc->realize;
-> 
-> dito
-> 
->>      dc->realize = kvm_s390_flic_realize;
->>      dc->vmsd = &kvm_s390_flic_vmstate;
->>      dc->reset = kvm_s390_flic_reset;
->> @@ -468,6 +484,7 @@ static const TypeInfo kvm_s390_flic_info = {
->>      .name          = TYPE_KVM_S390_FLIC,
->>      .parent        = TYPE_S390_FLIC_COMMON,
->>      .instance_size = sizeof(KVMS390FLICState),
->> +    .class_size    = sizeof(KVMS390FLICStateClass),
->>      .class_init    = kvm_s390_flic_class_init,
->>  };
->>  
-> 
-> 
+diff --git a/aarch64.risu b/aarch64.risu
+index 5450cd3..215882e 100644
+--- a/aarch64.risu
++++ b/aarch64.risu
+@@ -1955,50 +1955,58 @@ ZIP2 A64_V 0 Q:1 001110 size:2 0 rm:5 0 111 10 rn:5 rd:5 \
+ # ReservedValue: break the !($size == 3 && $Q == 0) constraint
+ ZIP2_RES A64_V 0 0 001110 11 0 rm:5 0 111 10 rn:5 rd:5
+ 
+-# C3.6.4 AdvSIMD across lanes
++# C4-286 AdvSIMD across vector lanes
+ # 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16  12 11 10 9  5 4  0
+ #  0  Q  U  0  1  1  1  0  size  1  1  0  0  0 opcode  1  0  Rn   Rd
++@AdvSIMDAcrossVector
++
++ADDV         A64_V 0 Q:1 0 01110 s:2 11000 11011 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++ADDV_RES     A64_V 0  0  0 01110  10 11000 11011 10 rn:5 rd:5
++
++FMAXNMV      A64_V 0  1  1 01110  00 11000 01100 10 rn:5 rd:5
++FMAXV        A64_V 0  1  1 01110  00 11000 01111 10 rn:5 rd:5
++FMINNMV      A64_V 0  1  1 01110  10 11000 01100 10 rn:5 rd:5
++FMINV        A64_V 0  1  1 01110  10 11000 01111 10 rn:5 rd:5
++
++# ARMv8.2 Half-precision variants
++FMAXNMV_FP16 A64_V 0 q:1 0 01110  00 11000 01100 10 rn:5 rd:5
++FMAXV_FP16   A64_V 0 q:1 0 01110  00 11000 01111 10 rn:5 rd:5
++FMINNMV_FP16 A64_V 0 q:1 0 01110  10 11000 01100 10 rn:5 rd:5
++FMINV_FP16   A64_V 0 q:1 0 01110  10 11000 01111 10 rn:5 rd:5
++
++SADDLV       A64_V 0 Q:1 0 01110 s:2 11000 00011 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++SADDLV_RES   A64_V 0   0 0 01110  10 11000 00011 10 rn:5 rd:5
++
++SMAXV        A64_V 0 Q:1 0 01110 s:2 11000 01010 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++SMAXV_RES    A64_V 0   0 0 01110  10 11000 01010 10 rn:5 rd:5
++
++SMINV        A64_V 0 Q:1 0 01110 s:2 11000 11010 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++SMINV_RES    A64_V 0   0 0 01110  10 11000 11010 10 rn:5 rd:5
++
++UADDLV       A64_V 0 Q:1 1 01110 s:2 11000 00011 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++UADDLV_RES   A64_V 0   0 1 01110  10 11000 00011 10 rn:5 rd:5
++
++UMAXV        A64_V 0 Q:1 1 01110 s:2 11000 01010 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++UMAXV_RES    A64_V 0   0 1 01110  10 11000 01010 10 rn:5 rd:5
++
++UMINV        A64_V 0 Q:1 1 01110 s:2 11000 11010 10 rn:5 rd:5 \
++!constraints { $s < 2 || ($s == 2 && $Q == 1); }
++# ReservedValue: break the constraint (s==2) => (Q=1)
++UMINV_RES    A64_V 0   0 1 01110  10 11000 11010 10 rn:5 rd:5
+ 
+-SADDLV A64_V 0 Q:1 0 01110 size:2 11000 00011 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-SADDLV_RES A64_V 0 0 0 01110 10 11000 00011 10 rn:5 rd:5
+-
+-SMAXV A64_V 0 Q:1 0 01110 size:2 11000 01010 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-SMAXV_RES A64_V 0 0 0 01110 10 11000 01010 10 rn:5 rd:5
+-
+-SMINV A64_V 0 Q:1 0 01110 size:2 11000 11010 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-SMINV_RES A64_V 0 0 0 01110 10 11000 11010 10 rn:5 rd:5
+-
+-ADDV A64_V 0 Q:1 0 01110 size:2 11000 11011 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-ADDV_RES A64_V 0 0 0 01110 10 11000 11011 10 rn:5 rd:5
+-
+-UADDLV A64_V 0 Q:1 1 01110 size:2 11000 00011 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-UADDLV_RES A64_V 0 0 1 01110 10 11000 00011 10 rn:5 rd:5
+-
+-UMAXV A64_V 0 Q:1 1 01110 size:2 11000 01010 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-UMAXV_RES A64_V 0 0 1 01110 10 11000 01010 10 rn:5 rd:5
+-
+-UMINV A64_V 0 Q:1 1 01110 size:2 11000 11010 10 rn:5 rd:5 \
+-!constraints { $size < 2 || ($size == 2 && $Q == 1); }
+-# ReservedValue: break the constraint (size==2) => (Q=1)
+-UMINV_RES A64_V 0 0 1 01110 10 11000 11010 10 rn:5 rd:5
+-
+-FMAXNMV A64_V 0 1 1 01110 00 11000 01100 10 rn:5 rd:5
+-FMAXV A64_V 0 1 1 01110 00 11000 01111 10 rn:5 rd:5
+-
+-FMINNMV A64_V 0 1 1 01110 10 11000 01100 10 rn:5 rd:5
+-FMINV A64_V 0 1 1 01110 10 11000 01111 10 rn:5 rd:5
++@
+ 
+ # C3.6.5 AdvSIMD copy
+ # 31 30 29 28 27 26 25 24 23 22 21 20    16 15 14    11 10 9  5 4  0
+-- 
+2.13.0
