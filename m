@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dSOsB-0001KJ-LY
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:32:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dSOxQ-0003Ya-US
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:37:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dSOs9-00018W-Mh
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:32:15 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35301)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dSOs9-00016O-9Z
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:32:13 -0400
-Received: by mail-lf0-x241.google.com with SMTP id z78so5778660lff.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:32:13 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dSOxM-00031D-3P
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:37:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dSOxL-00030h-Pu
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:37:36 -0400
+Date: Tue, 4 Jul 2017 16:37:30 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170704163730.491517ac@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499177279-131407-5-git-send-email-borntraeger@de.ibm.com>
+References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
+	<1499177279-131407-5-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-References: <1499186732-32417-1-git-send-email-lu.zhipeng@zte.com.cn>
-In-Reply-To: <1499186732-32417-1-git-send-email-lu.zhipeng@zte.com.cn>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 04 Jul 2017 14:32:01 +0000
-Message-ID: <CAJ+F1CJ3bsqGYe4wNW4oxdObukAcRUo0sPn9T8FDLC8s0OfesQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RESEND v6] qga: Add support network
- interface statistics in guest-network-get-interfaces command
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/7] s390x: fix realize inheritance for
+ kvm-flic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,214 +28,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Hi
+On Tue,  4 Jul 2017 16:07:56 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-On Tue, Jul 4, 2017 at 10:51 AM ZhiPeng Lu <lu.zhipeng@zte.com.cn> wrote:
+> From: Halil Pasic <pasic@linux.vnet.ibm.com>
+> 
+> Commit f6f4ce4211 ("s390x: add property adapter_routes_max_batch",
+> 2016-12-09) introduces a common realize (intended to be common for all
+> the subclasses) for flic, but fails to make sure the kvm-flic which had
+> it's own is actually calling this common realize.
 
-> we can get the network interface statistics inside a virtual machine by
-> guest-network-get-interfaces command. it is very useful for us to monitor
-> and analyze network traffic.
->
->
-It's nicer if you give v1->v2->..->v6 change summary at each revision
+s/it's/its/
 
-
-> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+> 
+> This omission fortunately does not result in a grave problem. The common
+> realize was only supposed to catch a possible programming mistake by
+> validating a value of a property set via the compat machine macros. Since
+> there was no programming mistake we don't need this fixed for stable.
+> 
+> Let's fix this problem by making sure kvm flic honors the realize of its
+> parent class.
+> 
+> Let us also improve on the error message we would hypothetically emit
+> when the validation fails.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Fixes: f6f4ce4211 ("s390x: add property adapter_routes_max_batch")
+> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  qga/commands-posix.c | 80
-> +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  qga/qapi-schema.json | 38 ++++++++++++++++++++++++-
->  2 files changed, 116 insertions(+), 2 deletions(-)
->
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 915df9e..233b024 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -1638,6 +1638,73 @@ guest_find_interface(GuestNetworkInterfaceList
-> *head,
->      return head;
->  }
->
-> +
-> +static int str_trim_off(const char *s, int off, int lmt)
-> +{
-> +    for (; off < lmt; ++off) {
-> +        if (!isspace(s[off])) {
-> +            break;
-> +        }
-> +    }
-> +    return off;
-> +}
-> +
-> +static int guest_get_network_stats(const char *name,
-> +                       GuestNetworkInterfaceStat *stats)
-> +{
-> +    int name_len;
-> +    char const *devinfo =3D "/proc/net/dev";
-> +    FILE *fp;
-> +    char *line =3D NULL, *colon;
-> +    size_t n;
-> +    fp =3D fopen(devinfo, "r");
-> +    if (!fp) {
-> +        return -1;
-> +    }
-> +    name_len =3D strlen(name);
-> +    while (getline(&line, &n, fp) !=3D -1) {
-> +        long long dummy;
-> +        long long rx_bytes;
-> +        long long rx_packets;
-> +        long long rx_errs;
-> +        long long rx_dropped;
-> +        long long tx_bytes;
-> +        long long tx_packets;
-> +        long long tx_errs;
-> +        long long tx_dropped;
->
+>  hw/intc/s390_flic.c     |  4 ++--
+>  hw/intc/s390_flic_kvm.c | 17 +++++++++++++++++
+>  2 files changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> index a99a350..837158b 100644
+> --- a/hw/intc/s390_flic.c
+> +++ b/hw/intc/s390_flic.c
+> @@ -101,8 +101,8 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
+>      uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
+>  
+>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
+> -        error_setg(errp, "flic adapter_routes_max_batch too big"
+> -                   "%d (%d allowed)", max_batch, ADAPTER_ROUTES_MAX_GSI);
+> +        error_setg(errp, "flic property adapter_routes_max_batch too big"
+> +                   " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
 
- Why have local variables, and not pass stats->filed directly?
+Unrelated message change?
 
-+        int trim_off;
-> +        colon =3D strchr(line, ':');
-> +        if (!colon) {
-> +            continue;
-> +        }
-> +        trim_off =3D str_trim_off(line, 0, strlen(line));
->
-
-Couldn't you  call g_strchomp() ?
-
-
-> +        if (colon - name_len - trim_off =3D=3D line &&
-> +           strncmp(line + trim_off, name, colon - line - trim_off) =3D=
-=3D 0) {
-> +            if (sscanf(colon + 1,
-> +                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld
-> %lld %lld %lld %lld %lld",
-> +                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
-> +                  &dummy, &dummy, &dummy, &dummy,
-> +                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
-> +                  &dummy, &dummy, &dummy, &dummy) !=3D 16) {
-> +                continue;
-> +            }
-> +            stats->rx_bytes =3D rx_bytes;
-> +            stats->rx_packets =3D rx_packets;
-> +            stats->rx_errs =3D rx_errs;
-> +            stats->rx_dropped =3D rx_dropped;
-> +            stats->tx_bytes =3D tx_bytes;
-> +            stats->tx_packets =3D tx_packets;
-> +            stats->tx_errs =3D tx_errs;
-> +            stats->tx_dropped =3D tx_dropped;
-> +            fclose(fp);
-> +            return 0;
-> +        }
-> +    }
-> +    fclose(fp);
-> +    g_debug("/proc/net/dev: Interface not found");
-> +    return -1;
-> +}
-> +
->  /*
->   * Build information about guest interfaces
->   */
-> @@ -1654,6 +1721,7 @@ GuestNetworkInterfaceList
-> *qmp_guest_network_get_interfaces(Error **errp)
->      for (ifa =3D ifap; ifa; ifa =3D ifa->ifa_next) {
->          GuestNetworkInterfaceList *info;
->          GuestIpAddressList **address_list =3D NULL, *address_item =3D NU=
-LL;
-> +        GuestNetworkInterfaceStat  *interface_stat =3D NULL;
->          char addr4[INET_ADDRSTRLEN];
->          char addr6[INET6_ADDRSTRLEN];
->          int sock;
-> @@ -1773,7 +1841,17 @@ GuestNetworkInterfaceList
-> *qmp_guest_network_get_interfaces(Error **errp)
->
->          info->value->has_ip_addresses =3D true;
->
-> -
-> +        if (!info->value->has_statistics) {
-> +            interface_stat =3D g_malloc0(sizeof(*interface_stat));
-> +            if (guest_get_network_stats(info->value->name,
-> +                interface_stat) =3D=3D -1) {
-> +                info->value->has_statistics =3D false;
-> +                g_free(interface_stat);
-> +            } else {
-> +                info->value->statistics =3D interface_stat;
-> +                info->value->has_statistics =3D true;
-> +            }
-> +        }
 >      }
->
->      freeifaddrs(ifap);
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index a02dbf2..948219b 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -635,6 +635,38 @@
->             'prefix': 'int'} }
->
->  ##
-> +# @GuestNetworkInterfaceStat:
-> +#
-> +# @rx-bytes: total bytes received
-> +#
-> +# @rx-packets: total packets received
-> +#
-> +# @rx-errs: bad packets received
-> +#
-> +# @rx-dropped: receiver dropped packets
-> +#
-> +# @tx-bytes: total bytes transmitted
-> +#
-> +# @tx-packets: total packets transmitted
-> +#
-> +# @tx-errs: packet transmit problems
-> +#
-> +# @tx-dropped: dropped packets transmitted
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestNetworkInterfaceStat',
-> +  'data': {'rx-bytes': 'uint64',
-> +            'rx-packets': 'uint64',
-> +            'rx-errs': 'uint64',
-> +            'rx-dropped': 'uint64',
-> +            'tx-bytes': 'uint64',
-> +            'tx-packets': 'uint64',
-> +            'tx-errs': 'uint64',
-> +            'tx-dropped': 'uint64'
-> +           } }
+>  }
+>  
+> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+> index bea3997..535d99d 100644
+> --- a/hw/intc/s390_flic_kvm.c
+> +++ b/hw/intc/s390_flic_kvm.c
+> @@ -392,6 +392,17 @@ static const VMStateDescription kvm_s390_flic_vmstate = {
+>      }
+>  };
+>  
+> +typedef struct KVMS390FLICStateClass {
+> +    S390FLICStateClass parent_class;
+> +    DeviceRealize parent_realize;
+> +} KVMS390FLICStateClass;
 > +
-> +##
->  # @GuestNetworkInterface:
->  #
->  # @name: The name of interface for which info are being delivered
-> @@ -643,12 +675,16 @@
->  #
->  # @ip-addresses: List of addresses assigned to @name
->  #
-> +# @statistics: various statistic counters related to @name
-> +# (since 2.10)
-> +#
->  # Since: 1.1
->  ##
->  { 'struct': 'GuestNetworkInterface',
->    'data': {'name': 'str',
->             '*hardware-address': 'str',
-> -           '*ip-addresses': ['GuestIpAddress'] } }
-> +           '*ip-addresses': ['GuestIpAddress'],
-> +           '*statistics': 'GuestNetworkInterfaceStat' } }
->
->  ##
->  # @guest-network-get-interfaces:
-> --
-> 1.8.3.1
->
+> +#define KVM_S390_FLIC_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(KVMS390FLICStateClass, (obj), TYPE_KVM_S390_FLIC)
+> +
+> +#define KVM_S390_FLIC_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(KVMS390FLICStateClass, (klass), TYPE_KVM_S390_FLIC)
+> +
+>  static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>  {
+>      KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
+> @@ -400,6 +411,10 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>      int ret;
+>      Error *errp_local = NULL;
+>  
+> +    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &errp_local);
 
-looks good to me otherwise,
+I usually prefer to introduce a local variable for that, but don't care
+too much.
 
---=20
-Marc-Andr=C3=A9 Lureau
+> +    if (errp_local) {
+> +        goto fail;
+> +    }
+>      flic_state->fd = -1;
+>      if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
+>          error_setg_errno(&errp_local, errno, "KVM is missing capability"
+> @@ -454,6 +469,7 @@ static void kvm_s390_flic_class_init(ObjectClass *oc, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(oc);
+>      S390FLICStateClass *fsc = S390_FLIC_COMMON_CLASS(oc);
+>  
+> +    KVM_S390_FLIC_CLASS(oc)->parent_realize = dc->realize;
+
+dito
+
+>      dc->realize = kvm_s390_flic_realize;
+>      dc->vmsd = &kvm_s390_flic_vmstate;
+>      dc->reset = kvm_s390_flic_reset;
+> @@ -468,6 +484,7 @@ static const TypeInfo kvm_s390_flic_info = {
+>      .name          = TYPE_KVM_S390_FLIC,
+>      .parent        = TYPE_S390_FLIC_COMMON,
+>      .instance_size = sizeof(KVMS390FLICState),
+> +    .class_size    = sizeof(KVMS390FLICStateClass),
+>      .class_init    = kvm_s390_flic_class_init,
+>  };
+>  
