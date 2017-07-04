@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVvM-0006up-Ra
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:04:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVvb-0007EB-Ln
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVvL-000877-Bv
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:04:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45164)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dSVvL-00086p-2m
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:03:59 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVva-0008D4-IB
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:04:15 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  5 Jul 2017 00:03:12 +0200
-Message-Id: <20170704220346.29244-2-marcandre.lureau@redhat.com>
+Date: Wed,  5 Jul 2017 00:03:13 +0200
+Message-Id: <20170704220346.29244-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20170704220346.29244-1-marcandre.lureau@redhat.com>
 References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 01/35] WIP: coroutine: annotate coroutine with
- clang thread safety attributes
+Subject: [Qemu-devel] [PATCH 02/35] WIP: coroutine: manually tag the
+ fast-paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,142 +24,178 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Alberto Garcia <berto@igalia.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
 
-It is possible to use clang -Wthread-safety to do some basic coroutine
-checks:
-http://lists.llvm.org/pipermail/cfe-dev/2017-June/054372.html
-https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
-
-This will basically check that you don't call accidentally a coroutine
-function from a non-coroutine, as this may crash at run time if the
-coroutine function yields.
-
-I had to modify clang to support annotations on typedef and function
-pointers, and check some function assignments/arguments. The end
-result is quire far from ready for upstream review, but could serve as
-basis for more checks or work. (https://github.com/elmarco/clang
-qemu-ta branch)
+Some functions are both regular and coroutine. They may call coroutine
+functions in some cases, if it is known to be running in a coroutine.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qemu/coroutine.h     | 31 ++++++++++++++++++++++++++++++-
- util/coroutine-sigaltstack.c |  2 ++
- util/coroutine-ucontext.c    |  2 ++
- util/coroutine-win32.c       |  2 ++
- util/qemu-coroutine.c        |  2 ++
- 5 files changed, 38 insertions(+), 1 deletion(-)
+ block.c                 |  2 ++
+ block/block-backend.c   |  2 ++
+ block/io.c              | 16 +++++++++++++++-
+ block/sheepdog.c        |  2 ++
+ block/throttle-groups.c | 10 ++++++++--
+ migration/rdma.c        |  2 ++
+ 6 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index a4509bd977..35ff394f51 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -28,6 +28,34 @@
-  * These functions are re-entrant and may be used outside the global mut=
-ex.
-  */
+diff --git a/block.c b/block.c
+index 694396281b..b08c006da4 100644
+--- a/block.c
++++ b/block.c
+@@ -443,7 +443,9 @@ int bdrv_create(BlockDriver *drv, const char* filenam=
+e,
 =20
-+/* clang thread-safety attributes, used for static analysis of the CFG *=
-/
-+#if defined(__clang__) && (!defined(SWIG))
-+#define THREAD_ANNOTATION_ATTRIBUTE__(x)   __attribute__((x))
-+#else
-+#define THREAD_ANNOTATION_ATTRIBUTE__(x)
-+#endif
-+
-+#define TAA_ROLE                                        \
-+    THREAD_ANNOTATION_ATTRIBUTE__(capability("role"))
-+
-+#define TAA_REQUIRES(...)                                               =
-\
-+    THREAD_ANNOTATION_ATTRIBUTE__(requires_capability(__VA_ARGS__))
-+
-+#define TAA_ACQUIRE(R)                                          \
-+    THREAD_ANNOTATION_ATTRIBUTE__(acquire_capability(R))
-+
-+#define TAA_RELEASE(R)                                          \
-+    THREAD_ANNOTATION_ATTRIBUTE__(release_capability(R))
-+
-+#define TAA_NO_ANALYSYS                                         \
-+    THREAD_ANNOTATION_ATTRIBUTE__(no_thread_safety_analysis)
-+
-+typedef int TAA_ROLE coroutine_role;
-+extern coroutine_role _coroutine_fn;
-+
-+static inline void co_role_acquire(coroutine_role R) TAA_ACQUIRE(R) TAA_=
-NO_ANALYSYS {}
-+static inline void co_role_release(coroutine_role R) TAA_RELEASE(R) TAA_=
-NO_ANALYSYS {}
-+
- /**
-  * Mark a function that executes in coroutine context
-  *
-@@ -42,7 +70,8 @@
-  *       ....
-  *   }
-  */
--#define coroutine_fn
-+
-+#define coroutine_fn TAA_REQUIRES(_coroutine_fn)
-=20
- typedef struct Coroutine Coroutine;
-=20
-diff --git a/util/coroutine-sigaltstack.c b/util/coroutine-sigaltstack.c
-index f6fc49a0e5..05d1a378d1 100644
---- a/util/coroutine-sigaltstack.c
-+++ b/util/coroutine-sigaltstack.c
-@@ -98,7 +98,9 @@ static void coroutine_bootstrap(CoroutineSigAltStack *s=
-elf, Coroutine *co)
-     }
-=20
-     while (true) {
+     if (qemu_in_coroutine()) {
+         /* Fast-path if already in coroutine context */
 +        co_role_acquire(_coroutine_fn);
-         co->entry(co->entry_arg);
+         bdrv_create_co_entry(&cco);
 +        co_role_release(_coroutine_fn);
-         qemu_coroutine_switch(co, co->caller, COROUTINE_TERMINATE);
-     }
- }
-diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
-index 6621f3f692..010fbaedf1 100644
---- a/util/coroutine-ucontext.c
-+++ b/util/coroutine-ucontext.c
-@@ -76,7 +76,9 @@ static void coroutine_trampoline(int i0, int i1)
-     }
+     } else {
+         co =3D qemu_coroutine_create(bdrv_create_co_entry, &cco);
+         qemu_coroutine_enter(co);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0df3457a09..56fc0a4d1e 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1072,7 +1072,9 @@ static int blk_prw(BlockBackend *blk, int64_t offse=
+t, uint8_t *buf,
 =20
-     while (true) {
+     if (qemu_in_coroutine()) {
+         /* Fast-path if already in coroutine context */
 +        co_role_acquire(_coroutine_fn);
-         co->entry(co->entry_arg);
+         co_entry(&rwco);
 +        co_role_release(_coroutine_fn);
-         qemu_coroutine_switch(co, co->caller, COROUTINE_TERMINATE);
-     }
- }
-diff --git a/util/coroutine-win32.c b/util/coroutine-win32.c
-index de6bd4fd3e..75a3bed543 100644
---- a/util/coroutine-win32.c
-+++ b/util/coroutine-win32.c
-@@ -64,7 +64,9 @@ static void CALLBACK coroutine_trampoline(void *co_)
-     Coroutine *co =3D co_;
-=20
-     while (true) {
+     } else {
+         Coroutine *co =3D qemu_coroutine_create(co_entry, &rwco);
+         bdrv_coroutine_enter(blk_bs(blk), co);
+diff --git a/block/io.c b/block/io.c
+index 2de7c77983..14b88c8609 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -229,7 +229,9 @@ static void coroutine_fn bdrv_co_yield_to_drain(Block=
+DriverState *bs)
+ void bdrv_drained_begin(BlockDriverState *bs)
+ {
+     if (qemu_in_coroutine()) {
 +        co_role_acquire(_coroutine_fn);
-         co->entry(co->entry_arg);
+         bdrv_co_yield_to_drain(bs);
 +        co_role_release(_coroutine_fn);
-         qemu_coroutine_switch(co, co->caller, COROUTINE_TERMINATE);
+         return;
      }
- }
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index d6095c1d5a..efa0f20e69 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -25,6 +25,8 @@ enum {
-     POOL_BATCH_SIZE =3D 64,
- };
 =20
-+coroutine_role _coroutine_fn;
+@@ -616,7 +618,9 @@ static int bdrv_prwv_co(BdrvChild *child, int64_t off=
+set,
+=20
+     if (qemu_in_coroutine()) {
+         /* Fast-path if already in coroutine context */
++        co_role_acquire(_coroutine_fn);
+         bdrv_rw_co_entry(&rwco);
++        co_role_release(_coroutine_fn);
+     } else {
+         co =3D qemu_coroutine_create(bdrv_rw_co_entry, &rwco);
+         bdrv_coroutine_enter(child->bs, co);
+@@ -1901,7 +1905,9 @@ int64_t bdrv_get_block_status_above(BlockDriverStat=
+e *bs,
+=20
+     if (qemu_in_coroutine()) {
+         /* Fast-path if already in coroutine context */
++        co_role_acquire(_coroutine_fn);
+         bdrv_get_block_status_above_co_entry(&data);
++        co_role_release(_coroutine_fn);
+     } else {
+         co =3D qemu_coroutine_create(bdrv_get_block_status_above_co_entr=
+y,
+                                    &data);
+@@ -2027,7 +2033,11 @@ bdrv_rw_vmstate(BlockDriverState *bs, QEMUIOVector=
+ *qiov, int64_t pos,
+                 bool is_read)
+ {
+     if (qemu_in_coroutine()) {
+-        return bdrv_co_rw_vmstate(bs, qiov, pos, is_read);
++        int ret;
++        co_role_acquire(_coroutine_fn);
++        ret =3D bdrv_co_rw_vmstate(bs, qiov, pos, is_read);
++        co_role_release(_coroutine_fn);
++        return ret;
+     } else {
+         BdrvVmstateCo data =3D {
+             .bs         =3D bs,
+@@ -2259,7 +2269,9 @@ int bdrv_flush(BlockDriverState *bs)
+=20
+     if (qemu_in_coroutine()) {
+         /* Fast-path if already in coroutine context */
++        co_role_acquire(_coroutine_fn);
+         bdrv_flush_co_entry(&flush_co);
++        co_role_release(_coroutine_fn);
+     } else {
+         co =3D qemu_coroutine_create(bdrv_flush_co_entry, &flush_co);
+         bdrv_coroutine_enter(bs, co);
+@@ -2406,7 +2418,9 @@ int bdrv_pdiscard(BlockDriverState *bs, int64_t off=
+set, int bytes)
+=20
+     if (qemu_in_coroutine()) {
+         /* Fast-path if already in coroutine context */
++        co_role_acquire(_coroutine_fn);
+         bdrv_pdiscard_co_entry(&rwco);
++        co_role_release(_coroutine_fn);
+     } else {
+         co =3D qemu_coroutine_create(bdrv_pdiscard_co_entry, &rwco);
+         bdrv_coroutine_enter(bs, co);
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 08d7b11e9d..83bc43dde4 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -726,7 +726,9 @@ static int do_req(int sockfd, BlockDriverState *bs, S=
+heepdogReq *hdr,
+     };
+=20
+     if (qemu_in_coroutine()) {
++        co_role_acquire(_coroutine_fn);
+         do_co_req(&srco);
++        co_role_release(_coroutine_fn);
+     } else {
+         co =3D qemu_coroutine_create(do_co_req, &srco);
+         if (bs) {
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index da2b490c38..8778f78965 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -304,9 +304,15 @@ static void schedule_next_request(BlockBackend *blk,=
+ bool is_write)
+=20
+     /* If it doesn't have to wait, queue it for immediate execution */
+     if (!must_wait) {
++        bool handled =3D false;
 +
- /** Free list to speed up creation */
- static QSLIST_HEAD(, Coroutine) release_pool =3D QSLIST_HEAD_INITIALIZER=
-(pool);
- static unsigned int release_pool_size;
++        if (qemu_in_coroutine()) {
++            co_role_acquire(_coroutine_fn);
++            handled =3D throttle_group_co_restart_queue(blk, is_write);
++            co_role_release(_coroutine_fn);
++        }
+         /* Give preference to requests from the current blk */
+-        if (qemu_in_coroutine() &&
+-            throttle_group_co_restart_queue(blk, is_write)) {
++        if (handled) {
+             token =3D blk;
+         } else {
+             ThrottleTimers *tt =3D &blk_get_public(token)->throttle_time=
+rs;
+diff --git a/migration/rdma.c b/migration/rdma.c
+index c6bc607a03..8c00d4d74c 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1518,7 +1518,9 @@ static int qemu_rdma_block_for_wrid(RDMAContext *rd=
+ma, int wrid_requested,
+          * so don't yield unless we know we're running inside of a corou=
+tine.
+          */
+         if (rdma->migration_started_on_destination) {
++            co_role_acquire(_coroutine_fn);
+             yield_until_fd_readable(rdma->comp_channel->fd);
++            co_role_release(_coroutine_fn);
+         }
+=20
+         if (ibv_get_cq_event(rdma->comp_channel, &cq, &cq_ctx)) {
 --=20
 2.13.1.395.gf7b71de06
