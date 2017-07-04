@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQ3r-0006sn-Ht
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:26 -0400
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQKs-0008Dn-Un
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQ3q-00083S-7Q
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:23 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:24123)
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQKo-0005Fi-QT
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:05:58 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:20268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=3512ce2cb=igor.druzhinin@citrix.com>)
-	id 1dSQ3p-00080X-Ne
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:48:22 -0400
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Date: Tue, 4 Jul 2017 16:47:47 +0100
-Message-ID: <1499183267-28623-5-git-send-email-igor.druzhinin@citrix.com>
-In-Reply-To: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
+	(envelope-from <prvs=351b3ad51=Paul.Durrant@citrix.com>)
+	id 1dSQKo-00054A-EG
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 12:05:54 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 4 Jul 2017 16:05:50 +0000
+Message-ID: <4b1c13c385fd4427a112b92bd6ec203e@AMSPEX02CL01.citrite.net>
 References: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
+	<1499183267-28623-2-git-send-email-igor.druzhinin@citrix.com>
+In-Reply-To: <1499183267-28623-2-git-send-email-igor.druzhinin@citrix.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 4/4] xen: don't use xenstore to save/restore
- physmap anymore
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] xen: move physmap saving into a
+ separate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,135 +32,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Igor Druzhinin <igor.druzhinin@citrix.com>, sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
+To: Igor Druzhinin <igor.druzhinin@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "sstabellini@kernel.org" <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 
-If we have a system with xenforeignmemory_map2() implemented
-we don't need to save/restore physmap on suspend/restore
-anymore. In case we resume a VM without physmap - try to
-recreate the physmap during memory region restore phase and
-remap map cache entries accordingly. The old code is left
-for compatibility reasons.
 
-Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
----
- hw/i386/xen/xen-hvm.c       | 48 ++++++++++++++++++++++++++++++++++-----------
- include/hw/xen/xen_common.h |  1 +
- 2 files changed, 38 insertions(+), 11 deletions(-)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index d259cf7..d24ca47 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -289,6 +289,7 @@ static XenPhysmap *get_physmapping(XenIOState *state,
-     return NULL;
- }
- 
-+#ifdef XEN_COMPAT_PHYSMAP
- static hwaddr xen_phys_offset_to_gaddr(hwaddr start_addr,
-                                                    ram_addr_t size, void *opaque)
- {
-@@ -334,6 +335,12 @@ static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
-     }
-     return 0;
- }
-+#else
-+static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
-+{
-+    return 0;
-+}
-+#endif
- 
- static int xen_add_to_physmap(XenIOState *state,
-                               hwaddr start_addr,
-@@ -368,6 +375,26 @@ go_physmap:
-     DPRINTF("mapping vram to %"HWADDR_PRIx" - %"HWADDR_PRIx"\n",
-             start_addr, start_addr + size);
- 
-+    mr_name = memory_region_name(mr);
-+
-+    physmap = g_malloc(sizeof (XenPhysmap));
-+
-+    physmap->start_addr = start_addr;
-+    physmap->size = size;
-+    physmap->name = mr_name;
-+    physmap->phys_offset = phys_offset;
-+
-+    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
-+
-+    if (runstate_check(RUN_STATE_INMIGRATE)) {
-+        /* Now when we have a physmap entry we can replace a dummy mapping with
-+         * a real one of guest foreign memory. */
-+        uint8_t *p = xen_replace_cache_entry(phys_offset, start_addr, size);
-+        assert(p && p == memory_region_get_ram_ptr(mr));
-+
-+        return 0;
-+    }
-+
-     pfn = phys_offset >> TARGET_PAGE_BITS;
-     start_gpfn = start_addr >> TARGET_PAGE_BITS;
-     for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
-@@ -382,17 +409,6 @@ go_physmap:
-         }
-     }
- 
--    mr_name = memory_region_name(mr);
--
--    physmap = g_malloc(sizeof (XenPhysmap));
--
--    physmap->start_addr = start_addr;
--    physmap->size = size;
--    physmap->name = mr_name;
--    physmap->phys_offset = phys_offset;
--
--    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
--
-     xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
-                                    start_addr >> TARGET_PAGE_BITS,
-                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
-@@ -1158,6 +1174,7 @@ static void xen_exit_notifier(Notifier *n, void *data)
-     xs_daemon_close(state->xenstore);
- }
- 
-+#ifdef XEN_COMPAT_PHYSMAP
- static void xen_read_physmap(XenIOState *state)
- {
-     XenPhysmap *physmap = NULL;
-@@ -1205,6 +1222,11 @@ static void xen_read_physmap(XenIOState *state)
-     }
-     free(entries);
- }
-+#else
-+static void xen_read_physmap(XenIOState *state)
-+{
-+}
-+#endif
- 
- static void xen_wakeup_notifier(Notifier *notifier, void *data)
- {
-@@ -1331,7 +1353,11 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-     state->bufioreq_local_port = rc;
- 
-     /* Init RAM management */
-+#ifdef XEN_COMPAT_PHYSMAP
-     xen_map_cache_init(xen_phys_offset_to_gaddr, state);
-+#else
-+    xen_map_cache_init(NULL, state);
-+#endif
-     xen_ram_init(pcms, ram_size, ram_memory);
- 
-     qemu_add_vm_change_state_handler(xen_hvm_change_state_handler, state);
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 70a5cad..c04c5c9 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -80,6 +80,7 @@ extern xenforeignmemory_handle *xen_fmem;
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
- 
-+#define XEN_COMPAT_PHYSMAP
- #define xenforeignmemory_map2(h, d, a, p, f, ps, ar, e) \
-     xenforeignmemory_map(h, d, p, ps, ar, e)
- 
--- 
-2.7.4
+> -----Original Message-----
+> From: Igor Druzhinin
+> Sent: 04 July 2017 16:48
+> To: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
+> Cc: Igor Druzhinin <igor.druzhinin@citrix.com>; sstabellini@kernel.org;
+> Anthony Perard <anthony.perard@citrix.com>; Paul Durrant
+> <Paul.Durrant@citrix.com>; pbonzini@redhat.com
+> Subject: [PATCH v2 1/4] xen: move physmap saving into a separate function
+>=20
+> Non-functional change.
+>=20
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+
+> ---
+>  hw/i386/xen/xen-hvm.c | 57 ++++++++++++++++++++++++++++------------
+> -----------
+>  1 file changed, 31 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+> index cffa7e2..d259cf7 100644
+> --- a/hw/i386/xen/xen-hvm.c
+> +++ b/hw/i386/xen/xen-hvm.c
+> @@ -305,6 +305,36 @@ static hwaddr xen_phys_offset_to_gaddr(hwaddr
+> start_addr,
+>      return start_addr;
+>  }
+>=20
+> +static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
+> +{
+> +    char path[80], value[17];
+> +
+> +    snprintf(path, sizeof(path),
+> +            "/local/domain/0/device-
+> model/%d/physmap/%"PRIx64"/start_addr",
+> +            xen_domid, (uint64_t)physmap->phys_offset);
+> +    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap-
+> >start_addr);
+> +    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> +        return -1;
+> +    }
+> +    snprintf(path, sizeof(path),
+> +            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
+> +            xen_domid, (uint64_t)physmap->phys_offset);
+> +    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->size);
+> +    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> +        return -1;
+> +    }
+> +    if (physmap->name) {
+> +        snprintf(path, sizeof(path),
+> +                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name"=
+,
+> +                xen_domid, (uint64_t)physmap->phys_offset);
+> +        if (!xs_write(state->xenstore, 0, path,
+> +                      physmap->name, strlen(physmap->name))) {
+> +            return -1;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+>  static int xen_add_to_physmap(XenIOState *state,
+>                                hwaddr start_addr,
+>                                ram_addr_t size,
+> @@ -316,7 +346,6 @@ static int xen_add_to_physmap(XenIOState *state,
+>      XenPhysmap *physmap =3D NULL;
+>      hwaddr pfn, start_gpfn;
+>      hwaddr phys_offset =3D memory_region_get_ram_addr(mr);
+> -    char path[80], value[17];
+>      const char *mr_name;
+>=20
+>      if (get_physmapping(state, start_addr, size)) {
+> @@ -368,31 +397,7 @@ go_physmap:
+>                                     start_addr >> TARGET_PAGE_BITS,
+>                                     (start_addr + size - 1) >> TARGET_PAG=
+E_BITS,
+>                                     XEN_DOMCTL_MEM_CACHEATTR_WB);
+> -
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-
+> model/%d/physmap/%"PRIx64"/start_addr",
+> -            xen_domid, (uint64_t)phys_offset);
+> -    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
+> -    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> -        return -1;
+> -    }
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
+> -            xen_domid, (uint64_t)phys_offset);
+> -    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
+> -    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> -        return -1;
+> -    }
+> -    if (mr_name) {
+> -        snprintf(path, sizeof(path),
+> -                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name"=
+,
+> -                xen_domid, (uint64_t)phys_offset);
+> -        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name)=
+)) {
+> -            return -1;
+> -        }
+> -    }
+> -
+> -    return 0;
+> +    return xen_save_physmap(state, physmap);
+>  }
+>=20
+>  static int xen_remove_from_physmap(XenIOState *state,
+> --
+> 2.7.4
