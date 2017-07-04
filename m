@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSMvl-00071V-NQ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:27:50 -0400
+	(envelope-from <berrange@redhat.com>) id 1dSMyC-0008CT-TX
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSMvh-0006O3-QT
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:27:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSMvh-0006Ng-K9
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:27:45 -0400
-Date: Tue, 4 Jul 2017 13:27:38 +0100
+	(envelope-from <berrange@redhat.com>) id 1dSMyC-0007UV-5v
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:30:20 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170704122738.GM3135@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170704111404.28569-1-berrange@redhat.com>
-	<f22d82b6-cd4b-b71c-179e-2f590ddb19b8@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f22d82b6-cd4b-b71c-179e-2f590ddb19b8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] Document deprecated features &
- support lifecycle
+Date: Tue,  4 Jul 2017 13:30:09 +0100
+Message-Id: <20170704123009.4456-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] qemu-img: drop -e and -6 options from the
+ 'create' & 'convert' commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +18,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Tue, Jul 04, 2017 at 02:21:28PM +0200, Thomas Huth wrote:
-> On 04.07.2017 13:14, Daniel P. Berrange wrote:
-> [...]
-> >  - Not listing the '-6' and '-e' args to qemu-img create. Those
-> >    were never deprecations, because the functionality was
-> >    immediately turned into a fatal error.
-> How did you come to that conclusion? As far as I can see, the -6 option
-> has been added by commit ec36ba14748e140dda2 and that was part of QEMU
-> v0.10. The deprecation was done in commit eec77d9e712bd415 and that was
-> part of QEMU v0.14.
+The '-e' and '-6' options to the 'create' & 'convert' commands were
+"deprecated" in favour of the more generic '-o' option many years ago:
 
-A 'deprecation' message implies that the functionality continues to
-work, but the user gets a warning that its going away. In this case
-the user gets a warning, and the functionality is unusable - qemu-img
-just exits immediately. This isn't deprecation in any normal sense,
-it is just immediate feature removal with an message telling you it
-has already been deleted :-(
+  commit eec77d9e712bd4157a4e1c0b5a9249d168add738
+  Author: Jes Sorensen <Jes.Sorensen@redhat.com>
+  Date:   Tue Dec 7 17:44:34 2010 +0100
 
-Regards,
-Daniel
+    qemu-img: Deprecate obsolete -6 and -e options
+
+Except this was never actually a deprecation, which would imply giving
+the user a warning while the functionality continues to work for a
+number of releases before eventual removal. Instead the options were
+immediately turned into an error + exit. Given that the functionality
+is already broken, there's no point in keeping these psuedo-deprecation
+messages around any longer.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-img.c | 20 ++------------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index 91ad6be..c5f00db 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -464,7 +464,7 @@ static int img_create(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
++        c = getopt_long(argc, argv, ":F:b:f:ho:q",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -488,14 +488,6 @@ static int img_create(int argc, char **argv)
+         case 'f':
+             fmt = optarg;
+             break;
+-        case 'e':
+-            error_report("option -e is deprecated, please use \'-o "
+-                  "encryption\' instead!");
+-            goto fail;
+-        case '6':
+-            error_report("option -6 is deprecated, please use \'-o "
+-                  "compat6\' instead!");
+-            goto fail;
+         case 'o':
+             if (!is_valid_option_list(optarg)) {
+                 error_report("Invalid option list: %s", optarg);
+@@ -1985,7 +1977,7 @@ static int img_convert(int argc, char **argv)
+             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:WU",
++        c = getopt_long(argc, argv, ":hf:O:B:co:s:l:S:pt:T:qnm:WU",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -2012,14 +2004,6 @@ static int img_convert(int argc, char **argv)
+         case 'c':
+             s.compressed = true;
+             break;
+-        case 'e':
+-            error_report("option -e is deprecated, please use \'-o "
+-                  "encryption\' instead!");
+-            goto fail_getopt;
+-        case '6':
+-            error_report("option -6 is deprecated, please use \'-o "
+-                  "compat6\' instead!");
+-            goto fail_getopt;
+         case 'o':
+             if (!is_valid_option_list(optarg)) {
+                 error_report("Invalid option list: %s", optarg);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.9.4
