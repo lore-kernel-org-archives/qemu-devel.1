@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVy7-00011j-2u
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:06:52 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVyD-00018i-9i
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVy6-0001Lk-1m
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:06:51 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dSVyA-0001SY-Pa
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:06:57 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  5 Jul 2017 00:03:40 +0200
-Message-Id: <20170704220346.29244-30-marcandre.lureau@redhat.com>
+Date: Wed,  5 Jul 2017 00:03:41 +0200
+Message-Id: <20170704220346.29244-31-marcandre.lureau@redhat.com>
 In-Reply-To: <20170704220346.29244-1-marcandre.lureau@redhat.com>
 References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 29/35] block: mark coroutine_fn
+Subject: [Qemu-devel] [PATCH 30/35] block-backend: mark coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +23,166 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- block/blkdebug.c  | 15 ++++++++++-----
- block/blkverify.c |  3 ++-
- block/io.c        |  9 ++++++---
- 3 files changed, 18 insertions(+), 9 deletions(-)
+ include/sysemu/block-backend.h |  4 ++--
+ block/block-backend.c          | 36 ++++++++++++++++++++++++------------
+ 2 files changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index a1b24b9b0d..d55e2e69c8 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -483,7 +483,8 @@ out:
-     return ret;
- }
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
+d.h
+index 1e05281fff..2f967037af 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -165,8 +165,8 @@ int blk_co_ioctl(BlockBackend *blk, unsigned long int=
+ req, void *buf);
+ int blk_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
+ BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsigned long int req, void=
+ *buf,
+                           BlockCompletionFunc *cb, void *opaque);
+-int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes);
+-int blk_co_flush(BlockBackend *blk);
++int coroutine_fn blk_co_pdiscard(BlockBackend *blk, int64_t offset, int =
+bytes);
++int coroutine_fn blk_co_flush(BlockBackend *blk);
+ int blk_flush(BlockBackend *blk);
+ int blk_commit_all(void);
+ void blk_drain(BlockBackend *blk);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 56fc0a4d1e..a48aa4f900 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1032,7 +1032,8 @@ typedef struct BlkRwCo {
+     BdrvRequestFlags flags;
+ } BlkRwCo;
 =20
--static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t by=
-tes)
-+static int coroutine_fn
-+rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
- {
-     BDRVBlkdebugState *s =3D bs->opaque;
-     BlkdebugRule *rule =3D NULL;
-@@ -563,7 +564,8 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t of=
-fset, uint64_t bytes,
-     return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
- }
-=20
--static int blkdebug_co_flush(BlockDriverState *bs)
-+static int coroutine_fn
-+blkdebug_co_flush(BlockDriverState *bs)
- {
-     int err =3D rule_check(bs, 0, 0);
-=20
-@@ -656,7 +658,8 @@ static void blkdebug_close(BlockDriverState *bs)
-     g_free(s->config_file);
- }
-=20
--static void suspend_request(BlockDriverState *bs, BlkdebugRule *rule)
+-static void blk_read_entry(void *opaque)
 +static void coroutine_fn
-+suspend_request(BlockDriverState *bs, BlkdebugRule *rule)
++blk_read_entry(void *opaque)
  {
-     BDRVBlkdebugState *s =3D bs->opaque;
-     BlkdebugSuspendedReq r;
-@@ -681,7 +684,8 @@ static void suspend_request(BlockDriverState *bs, Blk=
-debugRule *rule)
-     g_free(r.tag);
+     BlkRwCo *rwco =3D opaque;
+=20
+@@ -1040,7 +1041,8 @@ static void blk_read_entry(void *opaque)
+                               rwco->qiov, rwco->flags);
  }
 =20
--static bool process_rule(BlockDriverState *bs, struct BlkdebugRule *rule=
-,
-+static bool coroutine_fn
-+process_rule(BlockDriverState *bs, struct BlkdebugRule *rule,
-     bool injected)
- {
-     BDRVBlkdebugState *s =3D bs->opaque;
-@@ -712,7 +716,8 @@ static bool process_rule(BlockDriverState *bs, struct=
- BlkdebugRule *rule,
-     return injected;
- }
-=20
--static void blkdebug_debug_event(BlockDriverState *bs, BlkdebugEvent eve=
-nt)
+-static void blk_write_entry(void *opaque)
 +static void coroutine_fn
-+blkdebug_debug_event(BlockDriverState *bs, BlkdebugEvent event)
++blk_write_entry(void *opaque)
  {
-     BDRVBlkdebugState *s =3D bs->opaque;
-     struct BlkdebugRule *rule, *next;
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 06369f9eac..d0c946173a 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -255,7 +255,8 @@ blkverify_co_pwritev(BlockDriverState *bs, uint64_t o=
-ffset, uint64_t bytes,
-     return blkverify_co_prwv(bs, &r, offset, bytes, qiov, qiov, flags, t=
-rue);
+     BlkRwCo *rwco =3D opaque;
+=20
+@@ -1195,7 +1197,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, =
+int64_t offset, int bytes,
+     return &acb->common;
  }
 =20
--static int blkverify_co_flush(BlockDriverState *bs)
-+static int coroutine_fn
-+blkverify_co_flush(BlockDriverState *bs)
- {
-     BDRVBlkverifyState *s =3D bs->opaque;
-=20
-diff --git a/block/io.c b/block/io.c
-index 14b88c8609..a53a86df3e 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -366,7 +366,8 @@ void bdrv_drain_all(void)
-  *
-  * This function should be called when a tracked request is completing.
-  */
--static void tracked_request_end(BdrvTrackedRequest *req)
+-static void blk_aio_read_entry(void *opaque)
 +static void coroutine_fn
-+tracked_request_end(BdrvTrackedRequest *req)
++blk_aio_read_entry(void *opaque)
  {
-     if (req->serialising) {
-         atomic_dec(&req->bs->serialising_in_flight);
-@@ -381,7 +382,8 @@ static void tracked_request_end(BdrvTrackedRequest *r=
-eq)
- /**
-  * Add an active request to the tracked requests list
-  */
--static void tracked_request_begin(BdrvTrackedRequest *req,
-+static void coroutine_fn
-+tracked_request_begin(BdrvTrackedRequest *req,
-                                   BlockDriverState *bs,
-                                   int64_t offset,
-                                   unsigned int bytes,
-@@ -2430,7 +2432,8 @@ int bdrv_pdiscard(BlockDriverState *bs, int64_t off=
-set, int bytes)
-     return rwco.ret;
+     BlkAioEmAIOCB *acb =3D opaque;
+     BlkRwCo *rwco =3D &acb->rwco;
+@@ -1206,7 +1209,8 @@ static void blk_aio_read_entry(void *opaque)
+     blk_aio_complete(acb);
  }
 =20
--int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf)
+-static void blk_aio_write_entry(void *opaque)
++static void coroutine_fn
++blk_aio_write_entry(void *opaque)
+ {
+     BlkAioEmAIOCB *acb =3D opaque;
+     BlkRwCo *rwco =3D &acb->rwco;
+@@ -1288,7 +1292,8 @@ BlockAIOCB *blk_aio_pwritev(BlockBackend *blk, int6=
+4_t offset,
+                         blk_aio_write_entry, flags, cb, opaque);
+ }
+=20
+-static void blk_aio_flush_entry(void *opaque)
++static void coroutine_fn
++blk_aio_flush_entry(void *opaque)
+ {
+     BlkAioEmAIOCB *acb =3D opaque;
+     BlkRwCo *rwco =3D &acb->rwco;
+@@ -1303,7 +1308,8 @@ BlockAIOCB *blk_aio_flush(BlockBackend *blk,
+     return blk_aio_prwv(blk, 0, 0, NULL, blk_aio_flush_entry, 0, cb, opa=
+que);
+ }
+=20
+-static void blk_aio_pdiscard_entry(void *opaque)
++static void coroutine_fn
++blk_aio_pdiscard_entry(void *opaque)
+ {
+     BlkAioEmAIOCB *acb =3D opaque;
+     BlkRwCo *rwco =3D &acb->rwco;
+@@ -1339,7 +1345,8 @@ int blk_co_ioctl(BlockBackend *blk, unsigned long i=
+nt req, void *buf)
+     return bdrv_co_ioctl(blk_bs(blk), req, buf);
+ }
+=20
+-static void blk_ioctl_entry(void *opaque)
++static void coroutine_fn
++blk_ioctl_entry(void *opaque)
+ {
+     BlkRwCo *rwco =3D opaque;
+     rwco->ret =3D blk_co_ioctl(rwco->blk, rwco->offset,
+@@ -1351,7 +1358,8 @@ int blk_ioctl(BlockBackend *blk, unsigned long int =
+req, void *buf)
+     return blk_prw(blk, req, buf, 0, blk_ioctl_entry, 0);
+ }
+=20
+-static void blk_aio_ioctl_entry(void *opaque)
++static void coroutine_fn
++blk_aio_ioctl_entry(void *opaque)
+ {
+     BlkAioEmAIOCB *acb =3D opaque;
+     BlkRwCo *rwco =3D &acb->rwco;
+@@ -1376,7 +1384,8 @@ BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsign=
+ed long int req, void *buf,
+     return blk_aio_prwv(blk, req, 0, &qiov, blk_aio_ioctl_entry, 0, cb, =
+opaque);
+ }
+=20
+-int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
 +int coroutine_fn
-+bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf)
++blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
  {
-     BlockDriver *drv =3D bs->drv;
-     CoroutineIOCompletion co =3D {
+     int ret =3D blk_check_byte_request(blk, offset, bytes);
+     if (ret < 0) {
+@@ -1386,7 +1395,8 @@ int blk_co_pdiscard(BlockBackend *blk, int64_t offs=
+et, int bytes)
+     return bdrv_co_pdiscard(blk_bs(blk), offset, bytes);
+ }
+=20
+-int blk_co_flush(BlockBackend *blk)
++int coroutine_fn
++blk_co_flush(BlockBackend *blk)
+ {
+     if (!blk_is_available(blk)) {
+         return -ENOMEDIUM;
+@@ -1395,7 +1405,8 @@ int blk_co_flush(BlockBackend *blk)
+     return bdrv_co_flush(blk_bs(blk));
+ }
+=20
+-static void blk_flush_entry(void *opaque)
++static void coroutine_fn
++blk_flush_entry(void *opaque)
+ {
+     BlkRwCo *rwco =3D opaque;
+     rwco->ret =3D blk_co_flush(rwco->blk);
+@@ -1785,7 +1796,8 @@ int blk_truncate(BlockBackend *blk, int64_t offset,=
+ Error **errp)
+     return bdrv_truncate(blk->root, offset, errp);
+ }
+=20
+-static void blk_pdiscard_entry(void *opaque)
++static void coroutine_fn
++blk_pdiscard_entry(void *opaque)
+ {
+     BlkRwCo *rwco =3D opaque;
+     rwco->ret =3D blk_co_pdiscard(rwco->blk, rwco->offset, rwco->qiov->s=
+ize);
 --=20
 2.13.1.395.gf7b71de06
