@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSLla-0007A6-6o
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:13:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1dSLmd-00087H-00
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:14:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSLlV-00027s-7N
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:13:14 -0400
-References: <20170703131455.25424-1-lvivier@redhat.com>
-	<20170703131455.25424-3-lvivier@redhat.com>
-	<fe1a3b5f-2811-3776-b777-4ae025bf74a1@redhat.com>
-	<20170704092701.GD2180@umbus.fritz.box>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aa80a641-897b-0408-71d5-55b0d1add29c@redhat.com>
-Date: Tue, 4 Jul 2017 13:13:00 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170704092701.GD2180@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="AX1crM6B7JFIeTAmUnEwetCuP96cBthpr"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC v3 2/2] target/ppc: move POWER9
- DD1 workaround to ppc_cpu_initfn
+	(envelope-from <berrange@redhat.com>) id 1dSLmb-0002fp-Li
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:14:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSLmb-0002f8-F1
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:14:17 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  4 Jul 2017 12:14:02 +0100
+Message-Id: <20170704111404.28569-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] Document deprecated features & support
+ lifecycle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +22,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Laurent Vivier <lvivier@redhat.com>, Suraj Singh <sursingh@redhat.com>, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AX1crM6B7JFIeTAmUnEwetCuP96cBthpr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This is a followup to
 
-On 04.07.2017 11:27, David Gibson wrote:
-> On Tue, Jul 04, 2017 at 10:17:18AM +0200, Thomas Huth wrote:
->> On 03.07.2017 15:14, Laurent Vivier wrote:
->>> Commit 5f3066d ("target/ppc: Allow workarounds for POWER9 DD1")
->>> disables compatibility mode for POWER9 DD1 to allow to
->>> boot on POWER9 DD1 host with KVM.
->>>
->>> As the workaround has been added in kvmppc_host_cpu_class_init(),
->>> it applies only on CPU created with "-cpu host".
->>> As we want to be able to use also "-cpu POWER9" on a POWER9 DD1
->>> host, this patch moves the workaround from kvmppc_host_cpu_class_init=
-()
->>> to ppc_cpu_initfn().
->>
->> Would it be feasible to move it to init_proc_POWER9() instead? I think=
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02390.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01286.html
 
->> that would be a better location for the POWER9 workaround ... not sure=
+The goal is to clarify to users & app developers what they can expect
+from QEMU in terms of feature lifecycle & any deprecation policy should
+it be neccessary to remove features.
 
->> whether it can be done there, though.
->=20
-> That would be neater if it works.  I've applied the patch as is for
-> now, but if that does work, a follow up to move the workaround would
-> be nice.
+The list of features marked as deprecated was determined by looking at
+the QEMU source for the word "deprecated'. It was then compared with
+the doc Thomas put up at http://wiki.qemu.org/Features/LegacyRemoval
 
-Seems like it works ... Could you use the patches from v4 instead?
+Key differences with the wiki page that Thomas wrote up vs patch 2
+in this series
 
- Thomas
+ - Deprecated features are given a fixed lifespan of 2 releases,
+   rather than listing deletion at a future "major" v3.0.0 release. 
+   This ensures that applications like libvirt have a predictable 
+   fixed amount of time to react to deprecations.
 
+ - Only lists features which are currently officially deprecated,
+   no list of possible future candidates. The wiki page is probably
+   a good place to maintain a list of future possible deprecations.
+   To turn them into actual deprecations, a patch to the QEMU doc
+   can then be posted & reviewed in the normal manner.
 
+ - Not listing the '-6' and '-e' args to qemu-img create. Those
+   were never deprecations, because the functionality was
+   immediately turned into a fatal error. I sent a patch to
+   just delete them straight away, as they've been unconditionlly
+   broken for 7 years now which is enough :-) 
 
+    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00616.html
 
---AX1crM6B7JFIeTAmUnEwetCuP96cBthpr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Changed in v3:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
+ - Rename appendix to "Deprecated features" (Markus)
+ - List all currently deprecated features
+ - Document that deprecated features will be removed after
+   2 releases of being deprecated
+ - Clarify that clock for removing historically deprecated
+   features starts with the forthcoming release.
 
-iQIcBAEBAgAGBQJZW3hBAAoJEC7Z13T+cC21y3YP/iGOMNOA09vWhhQGSo125KFv
-MRWsFoaJFkx8zy8tjepVfLhgpfzT9lV701L7kRIls3xtNygoqN6EUcfayfDXSV/M
-y/yecXGtZik+xX8nl3MpZ9jCtmZahGJrBs0ybB2eCTxQLHKqMIHfwILPsj5nIodj
-D1QHd3G6IgrUkmSlvIonoI50hZYEgqIdQWAjS3gJuWKmzYVp7mjbxbvwy2Nuz4aL
-BC8tfCqaHDxCZGfWKW1Bwdz2tGUyY5g6vz2K06Ic3OcH0qohfAWLUwTJzoiyrh7X
-gWGOnt1WwJli9HSyvK+Zu7Yp0K5FThxGdek0nosfIUr9w7GAYg16hHcW7NFBnBLx
-eUfe2SZRw36ifGcU0WZ5trd84R69tgzEP7nvV2AH80ndrit3LoR73hKPgSnq7u2V
-CHV+dUvyRO8+KBrWiI8Z6hqvPjijdgjvTLrDi9Alh4R1DPAYENV+b/RPrgGEWZYJ
-2Y8WDpKT69XJL66kMnUI/Hv/xGIJGV2/97aMCZIlpaWcjfuE/q6/xKwG07YaJaGM
-jZcWdKhIR5zgMJeaKFGYGnHEw0Of/R70Nl+o2eBWv/UNPXN6zZ567OpHkzEnjA+A
-sZBhYLdVaVrmQ8t46wd+KecFkJ3mGDFAKH+/MqMDIB/Exb8aE0Q5gdgQvDqJQ/5l
-4CItwElj0KID0Wplke3w
-=PIMI
------END PGP SIGNATURE-----
+Changed in v2:
 
---AX1crM6B7JFIeTAmUnEwetCuP96cBthpr--
+ - Split into 2 patches so we can consider each suggested addition
+   independantly.
+
+Daniel P. Berrange (2):
+  docs: document support lifetime for features
+  docs: document deprecated features in appendix
+
+ qemu-doc.texi | 204 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 204 insertions(+)
+
+-- 
+2.9.4
