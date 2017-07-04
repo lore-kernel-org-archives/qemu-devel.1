@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkr-0006TO-4M
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:30 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkp-0006Rc-D1
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkq-0001nL-4A
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:29 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35915)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkl-0001kw-TI
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:27 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35903)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSLkp-0001mf-TM
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:28 -0400
-Received: by mail-wr0-x243.google.com with SMTP id 77so46957120wrb.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:27 -0700 (PDT)
+	id 1dSLkl-0001kb-Mu
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:23 -0400
+Received: by mail-wr0-x241.google.com with SMTP id 77so46956705wrb.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:23 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  4 Jul 2017 13:11:57 +0200
-Message-Id: <1499166735-39360-5-git-send-email-pbonzini@redhat.com>
+Date: Tue,  4 Jul 2017 13:11:54 +0200
+Message-Id: <1499166735-39360-2-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
 References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/22] vl: convert -tb-size to qemu_strtoul
+Subject: [Qemu-devel] [PATCH 01/22] configure: factor out list of supported
+ Xen/KVM/HAX targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +31,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
+This will be useful when the functions are called, early in the configure
+process, to filter out targets that do not support hardware acceleration.
+
 Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/tcg/tcg-all.c    | 2 +-
- include/sysemu/accel.h | 2 +-
- vl.c                   | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ configure | 90 ++++++++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 55 insertions(+), 35 deletions(-)
 
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index dba9931..e327d90 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -28,7 +28,7 @@
- #include "sysemu/sysemu.h"
- #include "qom/object.h"
+diff --git a/configure b/configure
+index c571ad1..0f14e79 100755
+--- a/configure
++++ b/configure
+@@ -163,6 +163,50 @@ have_backend () {
+     echo "$trace_backends" | grep "$1" >/dev/null
+ }
  
--int tcg_tb_size;
-+unsigned long tcg_tb_size;
- static bool tcg_allowed = true;
- 
- static int tcg_init(MachineState *ms)
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index ecc5c84..5a632ce 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -63,7 +63,7 @@ typedef struct AccelClass {
- #define ACCEL_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(AccelClass, (obj), TYPE_ACCEL)
- 
--extern int tcg_tb_size;
-+extern unsigned long tcg_tb_size;
- 
- void configure_accelerator(MachineState *ms);
- /* Register accelerator specific global properties */
-diff --git a/vl.c b/vl.c
-index 36ff3f4..ea8ef5f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3933,9 +3933,9 @@ int main(int argc, char **argv, char **envp)
-                 configure_rtc(opts);
-                 break;
-             case QEMU_OPTION_tb_size:
--                tcg_tb_size = strtol(optarg, NULL, 0);
--                if (tcg_tb_size < 0) {
--                    tcg_tb_size = 0;
-+                if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
-+                    error_report("Invalid argument to -tb-size");
-+                    exit(1);
-                 }
-                 break;
-             case QEMU_OPTION_icount:
++glob() {
++    eval test -z '"${1#'"$2"'}"'
++}
++
++supported_hax_target() {
++    test "$hax" = "yes" || return 1
++    glob "$1" "*-softmmu" || return 1
++    case "${1%-softmmu}" in
++        i386|x86_64)
++            return 0
++        ;;
++    esac
++    return 1
++}
++
++supported_kvm_target() {
++    test "$kvm" = "yes" || return 1
++    glob "$1" "*-softmmu" || return 1
++    case "${1%-softmmu}:$cpu" in
++        arm:arm | aarch64:aarch64 | \
++        i386:i386 | i386:x86_64 | i386:x32 | \
++        x86_64:i386 | x86_64:x86_64 | x86_64:x32 | \
++        mips:mips | mipsel:mips | \
++        ppc:ppc | ppcemb:ppc | ppc64:ppc | \
++        ppc:ppc64 | ppcemb:ppc64 | ppc64:ppc64 | \
++        s390x:s390x)
++            return 0
++        ;;
++    esac
++    return 1
++}
++
++supported_xen_target() {
++    test "$xen" = "yes" || return 1
++    glob "$1" "*-softmmu" || return 1
++    case "${1%-softmmu}:$cpu" in
++        arm:arm | aarch64:aarch64 | \
++        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
++            return 0
++        ;;
++    esac
++    return 1
++}
++
+ # default parameters
+ source_path=$(dirname "$0")
+ cpu=""
+@@ -6178,46 +6222,22 @@ echo "TARGET_ABI_DIR=$TARGET_ABI_DIR" >> $config_target_mak
+ if [ "$HOST_VARIANT_DIR" != "" ]; then
+     echo "HOST_VARIANT_DIR=$HOST_VARIANT_DIR" >> $config_target_mak
+ fi
+-case "$target_name" in
+-  i386|x86_64)
+-    if test "$xen" = "yes" -a "$target_softmmu" = "yes" ; then
+-      echo "CONFIG_XEN=y" >> $config_target_mak
+-      if test "$xen_pci_passthrough" = yes; then
++
++if supported_xen_target $target; then
++    echo "CONFIG_XEN=y" >> $config_target_mak
++    if test "$xen_pci_passthrough" = yes; then
+         echo "CONFIG_XEN_PCI_PASSTHROUGH=y" >> "$config_target_mak"
+-      fi
+     fi
+-    ;;
+-  *)
+-esac
+-case "$target_name" in
+-  aarch64|arm|i386|x86_64|ppcemb|ppc|ppc64|s390x|mipsel|mips)
+-    # Make sure the target and host cpus are compatible
+-    if test "$kvm" = "yes" -a "$target_softmmu" = "yes" -a \
+-      \( "$target_name" = "$cpu" -o \
+-      \( "$target_name" = "ppcemb" -a "$cpu" = "ppc" \) -o \
+-      \( "$target_name" = "ppc64"  -a "$cpu" = "ppc" \) -o \
+-      \( "$target_name" = "ppc"    -a "$cpu" = "ppc64" \) -o \
+-      \( "$target_name" = "ppcemb" -a "$cpu" = "ppc64" \) -o \
+-      \( "$target_name" = "mipsel" -a "$cpu" = "mips" \) -o \
+-      \( "$target_name" = "x86_64" -a "$cpu" = "i386"   \) -o \
+-      \( "$target_name" = "i386"   -a "$cpu" = "x86_64" \) -o \
+-      \( "$target_name" = "x86_64" -a "$cpu" = "x32"   \) -o \
+-      \( "$target_name" = "i386"   -a "$cpu" = "x32" \) \) ; then
+-      echo "CONFIG_KVM=y" >> $config_target_mak
+-      if test "$vhost_net" = "yes" ; then
++fi
++if supported_kvm_target $target; then
++    echo "CONFIG_KVM=y" >> $config_target_mak
++    if test "$vhost_net" = "yes" ; then
+         echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+         echo "CONFIG_VHOST_NET_TEST_$target_name=y" >> $config_host_mak
+-      fi
+     fi
+-esac
+-if test "$hax" = "yes" ; then
+-  if test "$target_softmmu" = "yes" ; then
+-    case "$target_name" in
+-    i386|x86_64)
+-      echo "CONFIG_HAX=y" >> $config_target_mak
+-    ;;
+-    esac
+-  fi
++fi
++if supported_hax_target $target; then
++    echo "CONFIG_HAX=y" >> $config_target_mak
+ fi
+ if test "$target_bigendian" = "yes" ; then
+   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
 -- 
 1.8.3.1
