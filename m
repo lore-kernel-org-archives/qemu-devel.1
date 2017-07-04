@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJeg-0005E9-1P
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:59 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005gN-LR
+	(envelope-from <longpeng2@huawei.com>) id 1dSJef-0005Db-Dx
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:58 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4020)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1dSJed-0005fu-SA
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:57 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4016)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005em-1O
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:56 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dSJed-0005dG-1e
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:55 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 4 Jul 2017 16:57:04 +0800
-Message-ID: <1499158630-75260-13-git-send-email-longpeng2@huawei.com>
+Date: Tue, 4 Jul 2017 16:57:05 +0800
+Message-ID: <1499158630-75260-14-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 12/18] crypto: introduce some common
- functions for af_alg backend
+Subject: [Qemu-devel] [PATCH v4 13/18] crypto: cipher: add afalg-backend
+ cipher support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +29,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-The AF_ALG socket family is the userspace interface for linux
-crypto API, this patch adds af_alg family support and some common
-functions for af_alg backend. It'll be used by afalg-backend crypto
-latter.
+Adds afalg-backend cipher support: introduces some private APIs
+firstly, and then intergrates them into qcrypto_cipher_afalg_driver.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- configure            |  22 ++++++++++
- crypto/Makefile.objs |   1 +
- crypto/afalg.c       | 118 +++++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/afalgpriv.h   |  55 ++++++++++++++++++++++++
- 4 files changed, 196 insertions(+)
- create mode 100644 crypto/afalg.c
- create mode 100644 crypto/afalgpriv.h
+ crypto/Makefile.objs  |   1 +
+ crypto/afalgpriv.h    |   9 ++
+ crypto/cipher-afalg.c | 223 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/cipher.c       |  23 +++++-
+ crypto/cipherpriv.h   |  16 ++++
+ 5 files changed, 268 insertions(+), 4 deletions(-)
+ create mode 100644 crypto/cipher-afalg.c
 
-diff --git a/configure b/configure
-index c571ad1..0b3e6c1 100755
---- a/configure
-+++ b/configure
-@@ -4744,6 +4744,24 @@ if compile_prog "" "" ; then
-     have_af_vsock=yes
- fi
- 
-+##########################################
-+# check for usable AF_ALG environment
-+hava_af_alg=no
-+cat > $TMPC << EOF
-+#include <errno.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <linux/if_alg.h>
-+int main(void) {
-+    int sock;
-+    sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
-+    return sock;
-+}
-+EOF
-+if compile_prog "" "" ; then
-+    have_af_alg=yes
-+fi
-+
- #################################################
- # Sparc implicitly links with --relax, which is
- # incompatible with -r, so --no-relax should be
-@@ -5855,6 +5873,10 @@ if test "$have_af_vsock" = "yes" ; then
-   echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
- fi
- 
-+if test "$have_af_alg" = "yes" ; then
-+  echo "CONFIG_AF_ALG=y" >> $config_host_mak
-+fi
-+
- if test "$have_sysmacros" = "yes" ; then
-   echo "CONFIG_SYSMACROS=y" >> $config_host_mak
- fi
 diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 1f749f2..2be5a3a 100644
+index 2be5a3a..d2e8fa8 100644
 --- a/crypto/Makefile.objs
 +++ b/crypto/Makefile.objs
-@@ -10,6 +10,7 @@ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib
- crypto-obj-y += aes.o
+@@ -11,6 +11,7 @@ crypto-obj-y += aes.o
  crypto-obj-y += desrfb.o
  crypto-obj-y += cipher.o
-+crypto-obj-$(CONFIG_AF_ALG) += afalg.o
+ crypto-obj-$(CONFIG_AF_ALG) += afalg.o
++crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
  crypto-obj-y += tlscreds.o
  crypto-obj-y += tlscredsanon.o
  crypto-obj-y += tlscredsx509.o
-diff --git a/crypto/afalg.c b/crypto/afalg.c
+diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
+index d21160c..a4a7b97 100644
+--- a/crypto/afalgpriv.h
++++ b/crypto/afalgpriv.h
+@@ -19,6 +19,15 @@
+ #define SALG_TYPE_LEN_MAX 14
+ #define SALG_NAME_LEN_MAX 64
+ 
++#ifndef SOL_ALG
++#define SOL_ALG 279
++#endif
++
++#define AFALG_TYPE_CIPHER "skcipher"
++
++#define ALG_OPTYPE_LEN 4
++#define ALG_MSGIV_LEN(len) (sizeof(struct af_alg_iv) + (len))
++
+ typedef struct QCryptoAFAlg QCryptoAFAlg;
+ 
+ struct QCryptoAFAlg {
+diff --git a/crypto/cipher-afalg.c b/crypto/cipher-afalg.c
 new file mode 100644
-index 0000000..337d8a8
+index 0000000..c5d1d5d
 --- /dev/null
-+++ b/crypto/afalg.c
-@@ -0,0 +1,118 @@
++++ b/crypto/cipher-afalg.c
+@@ -0,0 +1,223 @@
 +/*
-+ * QEMU Crypto af_alg support
++ * QEMU Crypto af_alg-backend cipher support
 + *
 + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 + *
@@ -115,171 +93,289 @@ index 0000000..337d8a8
 + * top-level directory.
 + */
 +#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
 +#include "qemu/sockets.h"
++#include "qemu-common.h"
 +#include "qapi/error.h"
-+#include "afalgpriv.h"
++#include "crypto/cipher.h"
++#include "cipherpriv.h"
 +
-+static bool
-+qcrypto_afalg_build_saddr(const char *type, const char *name,
-+                          struct sockaddr_alg *salg, Error **errp)
++
++static char *
++qcrypto_afalg_cipher_format_name(QCryptoCipherAlgorithm alg,
++                                 QCryptoCipherMode mode,
++                                 Error **errp)
 +{
-+    salg->salg_family = AF_ALG;
++    char *name;
++    const char *alg_name;
++    const char *mode_name;
 +
-+    if (strnlen(type, SALG_TYPE_LEN_MAX) >= SALG_TYPE_LEN_MAX) {
-+        error_setg(errp, "Afalg type(%s) is larger than %d bytes",
-+                   type, SALG_TYPE_LEN_MAX);
-+        return false;
++    switch (alg) {
++    case QCRYPTO_CIPHER_ALG_AES_128:
++    case QCRYPTO_CIPHER_ALG_AES_192:
++    case QCRYPTO_CIPHER_ALG_AES_256:
++        alg_name = "aes";
++        break;
++    case QCRYPTO_CIPHER_ALG_CAST5_128:
++        alg_name = "cast5";
++        break;
++    case QCRYPTO_CIPHER_ALG_SERPENT_128:
++    case QCRYPTO_CIPHER_ALG_SERPENT_192:
++    case QCRYPTO_CIPHER_ALG_SERPENT_256:
++        alg_name = "serpent";
++        break;
++    case QCRYPTO_CIPHER_ALG_TWOFISH_128:
++    case QCRYPTO_CIPHER_ALG_TWOFISH_192:
++    case QCRYPTO_CIPHER_ALG_TWOFISH_256:
++        alg_name = "twofish";
++        break;
++
++    default:
++        error_setg(errp, "Unsupported cipher algorithm %d", alg);
++        return NULL;
 +    }
 +
-+    if (strnlen(name, SALG_NAME_LEN_MAX) >= SALG_NAME_LEN_MAX) {
-+        error_setg(errp, "Afalg name(%s) is larger than %d bytes",
-+                   name, SALG_NAME_LEN_MAX);
-+        return false;
++    mode_name = QCryptoCipherMode_lookup[mode];
++    name = g_strdup_printf("%s(%s)", mode_name, alg_name);
++
++    return name;
++}
++
++QCryptoAFAlg *
++qcrypto_afalg_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                             QCryptoCipherMode mode,
++                             const uint8_t *key,
++                             size_t nkey, Error **errp)
++{
++    QCryptoAFAlg *afalg;
++    size_t expect_niv;
++    char *name;
++
++    name = qcrypto_afalg_cipher_format_name(alg, mode, errp);
++    if (!name) {
++        return NULL;
 +    }
 +
-+    pstrcpy((char *)salg->salg_type, SALG_TYPE_LEN_MAX, type);
-+    pstrcpy((char *)salg->salg_name, SALG_NAME_LEN_MAX, name);
++    afalg = qcrypto_afalg_comm_alloc(AFALG_TYPE_CIPHER, name, errp);
++    if (!afalg) {
++        g_free(name);
++        return NULL;
++    }
++    afalg->name = name;
 +
-+    return true;
++    /* setkey */
++    if (qemu_setsockopt(afalg->tfmfd, SOL_ALG, ALG_SET_KEY, key,
++                        nkey) != 0) {
++        error_setg_errno(errp, errno, "Set key failed");
++        qcrypto_afalg_comm_free(afalg);
++        return NULL;
++    }
++
++    /* prepare msg header */
++    afalg->msg = g_new0(struct msghdr, 1);
++    afalg->msg->msg_controllen += CMSG_SPACE(ALG_OPTYPE_LEN);
++    expect_niv = qcrypto_cipher_get_iv_len(alg, mode);
++    if (expect_niv) {
++        afalg->msg->msg_controllen += CMSG_SPACE(ALG_MSGIV_LEN(expect_niv));
++    }
++    afalg->msg->msg_control = g_new0(uint8_t, afalg->msg->msg_controllen);
++
++    /* We use 1st msghdr for crypto-info and 2nd msghdr for IV-info */
++    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
++    afalg->cmsg->cmsg_type = ALG_SET_OP;
++    afalg->cmsg->cmsg_len = CMSG_SPACE(ALG_OPTYPE_LEN);
++    if (expect_niv) {
++        afalg->cmsg = CMSG_NXTHDR(afalg->msg, afalg->cmsg);
++        afalg->cmsg->cmsg_type = ALG_SET_IV;
++        afalg->cmsg->cmsg_len = CMSG_SPACE(ALG_MSGIV_LEN(expect_niv));
++    }
++    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
++
++    return afalg;
 +}
 +
 +static int
-+qcrypto_afalg_socket_bind(const char *type, const char *name,
-+                          Error **errp)
++qcrypto_afalg_cipher_setiv(QCryptoCipher *cipher,
++                           const uint8_t *iv,
++                           size_t niv, Error **errp)
 +{
-+    int sbind;
-+    struct sockaddr_alg salg = {0};
++    struct af_alg_iv *alg_iv;
++    size_t expect_niv;
++    QCryptoAFAlg *afalg = cipher->opaque;
 +
-+    if (!qcrypto_afalg_build_saddr(type, name, &salg, errp)) {
++    expect_niv = qcrypto_cipher_get_iv_len(cipher->alg, cipher->mode);
++    if (niv != expect_niv) {
++        error_setg(errp, "Set IV len(%zu) not match expected(%zu)",
++                   niv, expect_niv);
 +        return -1;
 +    }
 +
-+    sbind = qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
-+    if (sbind < 0) {
-+        error_setg_errno(errp, errno, "Failed to create socket");
-+        return -1;
-+    }
++    /* move ->cmsg to next msghdr, for IV-info */
++    afalg->cmsg = CMSG_NXTHDR(afalg->msg, afalg->cmsg);
 +
-+    if (bind(sbind, (const struct sockaddr *)&salg, sizeof(salg)) != 0) {
-+        error_setg_errno(errp, errno, "Failed to bind socket");
-+        closesocket(sbind);
-+        return -1;
-+    }
++    /* build setiv msg */
++    afalg->cmsg->cmsg_level = SOL_ALG;
++    alg_iv = (struct af_alg_iv *)CMSG_DATA(afalg->cmsg);
++    alg_iv->ivlen = niv;
++    memcpy(alg_iv->iv, iv, niv);
 +
-+    return sbind;
++    return 0;
 +}
 +
-+QCryptoAFAlg *
-+qcrypto_afalg_comm_alloc(const char *type, const char *name,
-+                         Error **errp)
++static int
++qcrypto_afalg_cipher_op(QCryptoAFAlg *afalg,
++                        const void *in, void *out,
++                        size_t len, bool do_encrypt,
++                        Error **errp)
 +{
-+    QCryptoAFAlg *afalg;
++    uint32_t *type = NULL;
++    struct iovec iov;
++    size_t ret, done = 0;
++    uint32_t origin_controllen;
 +
-+    afalg = g_new0(QCryptoAFAlg, 1);
-+    /* initilize crypto API socket */
-+    afalg->opfd = -1;
-+    afalg->tfmfd = qcrypto_afalg_socket_bind(type, name, errp);
-+    if (afalg->tfmfd == -1) {
-+        goto error;
++    origin_controllen = afalg->msg->msg_controllen;
++    /* movev ->cmsg to first header, for crypto-info */
++    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
++
++    /* build encrypt msg */
++    afalg->cmsg->cmsg_level = SOL_ALG;
++    afalg->msg->msg_iov = &iov;
++    afalg->msg->msg_iovlen = 1;
++    type = (uint32_t *)CMSG_DATA(afalg->cmsg);
++    if (do_encrypt) {
++        *type = ALG_OP_ENCRYPT;
++    } else {
++        *type = ALG_OP_DECRYPT;
 +    }
 +
-+    afalg->opfd = qemu_accept(afalg->tfmfd, NULL, 0);
-+    if (afalg->opfd == -1) {
-+        error_setg_errno(errp, errno, "Failed to accept socket");
-+        goto error;
-+    }
++    do {
++        iov.iov_base = (void *)in + done;
++        iov.iov_len = len - done;
 +
-+    return afalg;
++        /* send info to AF_ALG core */
++        ret = sendmsg(afalg->opfd, afalg->msg, 0);
++        if (ret == -1) {
++            error_setg_errno(errp, errno, "Send data to AF_ALG core failed");
++            return -1;
++        }
 +
-+error:
-+    qcrypto_afalg_comm_free(afalg);
-+    return NULL;
++        /* encrypto && get result */
++        if (ret != read(afalg->opfd, out, ret)) {
++            error_setg_errno(errp, errno, "Get result from AF_ALG core failed");
++            return -1;
++        }
++
++        /* do not update IV for following chunks */
++        afalg->msg->msg_controllen = 0;
++        done += ret;
++    } while (done < len);
++
++    afalg->msg->msg_controllen = origin_controllen;
++
++    return 0;
 +}
 +
-+void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
++static int
++qcrypto_afalg_cipher_encrypt(QCryptoCipher *cipher,
++                             const void *in, void *out,
++                             size_t len, Error **errp)
 +{
-+    if (!afalg) {
-+        return;
-+    }
-+
-+    if (afalg->msg) {
-+        g_free(afalg->msg->msg_control);
-+        g_free(afalg->msg);
-+    }
-+
-+    g_free(afalg->name);
-+
-+    if (afalg->tfmfd != -1) {
-+        closesocket(afalg->tfmfd);
-+    }
-+
-+    if (afalg->opfd != -1) {
-+        closesocket(afalg->opfd);
-+    }
-+
-+    g_free(afalg);
++    return qcrypto_afalg_cipher_op(cipher->opaque, in, out,
++                                   len, true, errp);
 +}
-diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
-new file mode 100644
-index 0000000..d21160c
---- /dev/null
-+++ b/crypto/afalgpriv.h
-@@ -0,0 +1,55 @@
-+/*
-+ * QEMU Crypto af_alg support
-+ *
-+ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
 +
-+#ifndef QCRYPTO_AFALGPRIV_H
-+#define QCRYPTO_AFALGPRIV_H
++static int
++qcrypto_afalg_cipher_decrypt(QCryptoCipher *cipher,
++                             const void *in, void *out,
++                             size_t len, Error **errp)
++{
++    return qcrypto_afalg_cipher_op(cipher->opaque, in, out,
++                                   len, false, errp);
++}
 +
-+#include <linux/if_alg.h>
++static void qcrypto_afalg_comm_ctx_free(QCryptoCipher *cipher)
++{
++    qcrypto_afalg_comm_free(cipher->opaque);
++}
 +
-+#define SALG_TYPE_LEN_MAX 14
-+#define SALG_NAME_LEN_MAX 64
-+
-+typedef struct QCryptoAFAlg QCryptoAFAlg;
-+
-+struct QCryptoAFAlg {
-+    int tfmfd;
-+    int opfd;
-+    char *name;
-+    struct msghdr *msg;
-+    struct cmsghdr *cmsg;
++struct QCryptoCipherDriver qcrypto_cipher_afalg_driver = {
++    .cipher_encrypt = qcrypto_afalg_cipher_encrypt,
++    .cipher_decrypt = qcrypto_afalg_cipher_decrypt,
++    .cipher_setiv = qcrypto_afalg_cipher_setiv,
++    .cipher_free = qcrypto_afalg_comm_ctx_free,
 +};
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index 0a3d2e5..a487270 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -163,18 +163,33 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   Error **errp)
+ {
+     QCryptoCipher *cipher;
+-    void *ctx;
++    void *ctx = NULL;
++    Error *err2 = NULL;
++    QCryptoCipherDriver *drv;
 +
-+/**
-+ * qcrypto_afalg_comm_alloc:
-+ * @type: the type of crypto operation
-+ * @name: the name of crypto operation
-+ *
-+ * Allocate a QCryptoAFAlg object and bind itself to
-+ * a AF_ALG socket.
-+ *
-+ * Returns:
-+ *  a new QCryptoAFAlg object, or NULL in error.
-+ */
-+QCryptoAFAlg *
-+qcrypto_afalg_comm_alloc(const char *type, const char *name,
-+                         Error **errp);
++#ifdef CONFIG_AF_ALG
++    ctx = qcrypto_afalg_cipher_ctx_new(alg, mode, key, nkey, &err2);
++    if (ctx) {
++        drv = &qcrypto_cipher_afalg_driver;
++    }
++#endif
+ 
+-    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+     if (!ctx) {
+-        return NULL;
++        ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
++        if (!ctx) {
++            error_free(err2);
++            return NULL;
++        }
 +
-+/**
-+ * afalg_comm_free:
-+ * @afalg: the QCryptoAFAlg object
-+ *
-+ * Free the @afalg.
-+ */
-+void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg);
++        drv = &qcrypto_cipher_lib_driver;
++        error_free(err2);
+     }
+ 
+     cipher = g_new0(QCryptoCipher, 1);
+     cipher->alg = alg;
+     cipher->mode = mode;
+     cipher->opaque = ctx;
+-    cipher->driver = (void *)&qcrypto_cipher_lib_driver;
++    cipher->driver = (void *)drv;
+ 
+     return cipher;
+ }
+diff --git a/crypto/cipherpriv.h b/crypto/cipherpriv.h
+index 4af5e85..77da4c2 100644
+--- a/crypto/cipherpriv.h
++++ b/crypto/cipherpriv.h
+@@ -15,6 +15,8 @@
+ #ifndef QCRYPTO_CIPHERPRIV_H
+ #define QCRYPTO_CIPHERPRIV_H
+ 
++#include "qapi-types.h"
++
+ typedef struct QCryptoCipherDriver QCryptoCipherDriver;
+ 
+ struct QCryptoCipherDriver {
+@@ -37,4 +39,18 @@ struct QCryptoCipherDriver {
+     void (*cipher_free)(QCryptoCipher *cipher);
+ };
+ 
++#ifdef CONFIG_AF_ALG
++
++#include "afalgpriv.h"
++
++extern QCryptoAFAlg *
++qcrypto_afalg_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                             QCryptoCipherMode mode,
++                             const uint8_t *key,
++                             size_t nkey, Error **errp);
++
++extern struct QCryptoCipherDriver qcrypto_cipher_afalg_driver;
 +
 +#endif
++
+ #endif
 -- 
 1.8.3.1
