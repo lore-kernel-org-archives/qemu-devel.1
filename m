@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKXz-0002CZ-GK
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:08 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKY2-0002GT-0I
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKXy-0000bk-Ns
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:07 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35787)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dSKY1-0000ft-AO
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:10 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36802)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dSKXy-0000bA-FW
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:06 -0400
-Received: by mail-lf0-x244.google.com with SMTP id z78so4904847lff.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 02:55:06 -0700 (PDT)
+	id 1dSKY1-0000eL-2p
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:55:09 -0400
+Received: by mail-lf0-x243.google.com with SMTP id f28so17186596lfi.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 02:55:08 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue,  4 Jul 2017 11:54:42 +0200
-Message-Id: <1499162088-1562-12-git-send-email-edgar.iglesias@gmail.com>
+Date: Tue,  4 Jul 2017 11:54:44 +0200
+Message-Id: <1499162088-1562-14-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1499162088-1562-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 11/17] target-microblaze: dec_barrel: Use
- extract32
+Subject: [Qemu-devel] [PULL v1 13/17] target-microblaze: dec_barrel: Plug
+ TCG temp leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +32,25 @@ Cc: alistai@xilinx.com, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use extract32 instead of opencoding the shifting and masking.
-No functional change.
+Plug TCG temp leak.
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/microblaze/translate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 4136a8e..e959de7 100644
+index 504ed88..6ee4885 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -670,8 +670,8 @@ static void dec_barrel(DisasContext *dc)
-         return;
+@@ -690,6 +690,7 @@ static void dec_barrel(DisasContext *dc)
+             tcg_gen_shr_tl(cpu_R[dc->rd], cpu_R[dc->ra], t0);
+         }
      }
++    tcg_temp_free(t0);
+ }
  
--    s = dc->imm & (1 << 10);
--    t = dc->imm & (1 << 9);
-+    s = extract32(dc->imm, 10, 1);
-+    t = extract32(dc->imm, 9, 1);
- 
-     LOG_DIS("bs%s%s r%d r%d r%d\n",
-             s ? "l" : "r", t ? "a" : "l", dc->rd, dc->ra, dc->rb);
+ static void dec_bit(DisasContext *dc)
 -- 
 2.7.4
