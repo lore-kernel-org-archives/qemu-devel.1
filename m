@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dSWSR-0001Py-68
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:38:11 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dSX4n-0002NB-MV
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 19:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dSWSN-0004Rt-4r
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:38:11 -0400
-Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:36481)
+	(envelope-from <rth7680@gmail.com>) id 1dSX4j-0003sX-LB
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 19:17:49 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:32800)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSWSM-0004Rg-TV
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 18:38:07 -0400
-Received: by mail-pf0-x22b.google.com with SMTP id q86so120155512pfl.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 15:38:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSX4j-0003sQ-ER
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 19:17:45 -0400
+Received: by mail-pg0-x243.google.com with SMTP id u62so28893349pgb.0
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 16:17:45 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170608184944.19406-1-mrolnik@gmail.com>
-	<CAK4993hiFSozkL-5B0gud-nPVFqcvP2mgBR1Rk1vQSmhts3fGQ@mail.gmail.com>
+References: <149903601307.6257.7341525830619997074.malonedeb@gac.canonical.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <7103e7ca-1504-58b0-1f32-aabba7f45792@twiddle.net>
-Date: Tue, 4 Jul 2017 12:38:01 -1000
+Message-ID: <4f8ac443-60c4-b833-9fb9-b399137c0e96@twiddle.net>
+Date: Tue, 4 Jul 2017 13:17:38 -1000
 MIME-Version: 1.0
-In-Reply-To: <CAK4993hiFSozkL-5B0gud-nPVFqcvP2mgBR1Rk1vQSmhts3fGQ@mail.gmail.com>
+In-Reply-To: <149903601307.6257.7341525830619997074.malonedeb@gac.canonical.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v19 00/13] QEMU AVR 8 bit cores
+Subject: Re: [Qemu-devel] [Bug 1701971] [NEW] multithreading not working
+ right under qemu user mode for sh4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Rolnik <mrolnik@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Anichang <anichang@protonmail.ch>
+To: Bug 1701971 <1701971@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-On 06/21/2017 09:15 PM, Michael Rolnik wrote:
-> Hi all,
-> 
-> are there any action items for me?
+On 07/02/2017 12:53 PM, Bruno Haible wrote:
+> In a multithreaded program running under qemu-sh4 (version 2.9.0),
+> thread termination and/or pthread_join is not working right.
 
-What kind of testing are you doing for this?
+QEMU does not support the roll-back atomic sequences used by linux on most 
+uniprocessor SH.
 
-I just briefly browsed through the code again and happened to see that ROR has 
-a critical typo.  Considering that ROR must be used for multi-byte shifts, I'm 
-wondering how you wouldn't have found this via even cursory testing.
-
-> +int avr_translate_ROR(CPUAVRState *env, DisasContext *ctx, uint32_t opcode)
-> +{
-> +    TCGv Rd = cpu_r[ROR_Rd(opcode)];
-> +    TCGv t0 = tcg_temp_new_i32();
-> +
-> +    tcg_gen_shli_tl(t0, cpu_Cf, 7);
-> +    tcg_gen_andi_tl(cpu_Cf, Rd, 0);
+Nor do we support the ll/sc form used by SH4A, although fixing that should be 
+trivial.
 
 
 r~
