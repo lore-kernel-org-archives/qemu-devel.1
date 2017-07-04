@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJeg-0005E7-0M
+	(envelope-from <longpeng2@huawei.com>) id 1dSJeg-0005E9-1P
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005gS-MR
+	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005gN-LR
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:58 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4019)
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4020)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005eh-1U
+	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005em-1O
 	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:56 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 4 Jul 2017 16:57:08 +0800
-Message-ID: <1499158630-75260-17-git-send-email-longpeng2@huawei.com>
+Date: Tue, 4 Jul 2017 16:57:04 +0800
+Message-ID: <1499158630-75260-13-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 16/18] tests: crypto: add cipher speed
- benchmark support
+Subject: [Qemu-devel] [PATCH v4 12/18] crypto: introduce some common
+ functions for af_alg backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +29,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Now we have two qcrypto backends, libiary-backend and afalg-backend,
-but which one is faster? This patch add a cipher speed benchmark, it
-helps us to measure the performance by using "make check-speed" or
-using "./tests/benchmark-crypto-cipher" directly.
+The AF_ALG socket family is the userspace interface for linux
+crypto API, this patch adds af_alg family support and some common
+functions for af_alg backend. It'll be used by afalg-backend crypto
+latter.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- tests/Makefile.include          |  9 ++++-
- tests/benchmark-crypto-cipher.c | 88 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+), 2 deletions(-)
- create mode 100644 tests/benchmark-crypto-cipher.c
+ configure            |  22 ++++++++++
+ crypto/Makefile.objs |   1 +
+ crypto/afalg.c       | 118 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/afalgpriv.h   |  55 ++++++++++++++++++++++++
+ 4 files changed, 196 insertions(+)
+ create mode 100644 crypto/afalg.c
+ create mode 100644 crypto/afalgpriv.h
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ae889ca..7bf7277 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
- check-unit-y += tests/test-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
-+check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlssession$(EXESUF)
-@@ -531,6 +532,7 @@ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
- test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
- 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
- 	$(test-qom-obj-y)
-+benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
- test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
- test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
- test-block-obj-y = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
-@@ -634,6 +636,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
- tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
-+tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
+diff --git a/configure b/configure
+index c571ad1..0b3e6c1 100755
+--- a/configure
++++ b/configure
+@@ -4744,6 +4744,24 @@ if compile_prog "" "" ; then
+     have_af_vsock=yes
+ fi
  
-@@ -801,6 +804,7 @@ check-help:
- 	@echo " make check-qtest-TARGET   Run qtest tests for given target"
- 	@echo " make check-qtest          Run qtest tests"
- 	@echo " make check-unit           Run qobject tests"
-+	@echo " make check-speed          Run qobject speed tests"
- 	@echo " make check-qapi-schema    Run QAPI schema tests"
- 	@echo " make check-block          Run block tests"
- 	@echo " make check-report.html    Generates an HTML test report"
-@@ -831,8 +835,8 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
- 	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
- 	done,)
++##########################################
++# check for usable AF_ALG environment
++hava_af_alg=no
++cat > $TMPC << EOF
++#include <errno.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <linux/if_alg.h>
++int main(void) {
++    int sock;
++    sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
++    return sock;
++}
++EOF
++if compile_prog "" "" ; then
++    have_af_alg=yes
++fi
++
+ #################################################
+ # Sparc implicitly links with --relax, which is
+ # incompatible with -r, so --no-relax should be
+@@ -5855,6 +5873,10 @@ if test "$have_af_vsock" = "yes" ; then
+   echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
+ fi
  
--.PHONY: $(patsubst %, check-%, $(check-unit-y))
--$(patsubst %, check-%, $(check-unit-y)): check-%: %
-+.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
-+$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
- 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command, \
- 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
-@@ -891,6 +895,7 @@ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
- check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
- check-unit: $(patsubst %,check-%, $(check-unit-y))
-+check-speed: $(patsubst %,check-%, $(check-speed-y))
- check-block: $(patsubst %,check-%, $(check-block-y))
- check: check-qapi-schema check-unit check-qtest
- check-clean:
-diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-cipher.c
++if test "$have_af_alg" = "yes" ; then
++  echo "CONFIG_AF_ALG=y" >> $config_host_mak
++fi
++
+ if test "$have_sysmacros" = "yes" ; then
+   echo "CONFIG_SYSMACROS=y" >> $config_host_mak
+ fi
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index 1f749f2..2be5a3a 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -10,6 +10,7 @@ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib
+ crypto-obj-y += aes.o
+ crypto-obj-y += desrfb.o
+ crypto-obj-y += cipher.o
++crypto-obj-$(CONFIG_AF_ALG) += afalg.o
+ crypto-obj-y += tlscreds.o
+ crypto-obj-y += tlscredsanon.o
+ crypto-obj-y += tlscredsx509.o
+diff --git a/crypto/afalg.c b/crypto/afalg.c
 new file mode 100644
-index 0000000..c6a4092
+index 0000000..337d8a8
 --- /dev/null
-+++ b/tests/benchmark-crypto-cipher.c
-@@ -0,0 +1,88 @@
++++ b/crypto/afalg.c
+@@ -0,0 +1,118 @@
 +/*
-+ * QEMU Crypto cipher speed benchmark
++ * QEMU Crypto af_alg support
 + *
 + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 + *
@@ -115,80 +115,171 @@ index 0000000..c6a4092
 + * top-level directory.
 + */
 +#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/cipher.h"
++#include "qemu/cutils.h"
++#include "qemu/sockets.h"
++#include "qapi/error.h"
++#include "afalgpriv.h"
 +
-+static void test_cipher_speed(const void *opaque)
++static bool
++qcrypto_afalg_build_saddr(const char *type, const char *name,
++                          struct sockaddr_alg *salg, Error **errp)
 +{
-+    QCryptoCipher *cipher;
-+    Error *err = NULL;
-+    double total = 0.0;
-+    size_t chunk_size = (size_t)opaque;
-+    uint8_t *key = NULL, *iv = NULL;
-+    uint8_t *plaintext = NULL, *ciphertext = NULL;
-+    size_t nkey = qcrypto_cipher_get_key_len(QCRYPTO_CIPHER_ALG_AES_128);
-+    size_t niv = qcrypto_cipher_get_iv_len(QCRYPTO_CIPHER_ALG_AES_128,
-+                                           QCRYPTO_CIPHER_MODE_CBC);
++    salg->salg_family = AF_ALG;
 +
-+    key = g_new0(uint8_t, nkey);
-+    memset(key, g_test_rand_int(), nkey);
-+
-+    iv = g_new0(uint8_t, niv);
-+    memset(iv, g_test_rand_int(), niv);
-+
-+    ciphertext = g_new0(uint8_t, chunk_size);
-+
-+    plaintext = g_new0(uint8_t, chunk_size);
-+    memset(plaintext, g_test_rand_int(), chunk_size);
-+
-+    cipher = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_128,
-+                                QCRYPTO_CIPHER_MODE_CBC,
-+                                key, nkey, &err);
-+    g_assert(cipher != NULL);
-+
-+    g_assert(qcrypto_cipher_setiv(cipher,
-+                                  iv, niv,
-+                                  &err) == 0);
-+
-+    g_test_timer_start();
-+    do {
-+        g_assert(qcrypto_cipher_encrypt(cipher,
-+                                        plaintext,
-+                                        ciphertext,
-+                                        chunk_size,
-+                                        &err) == 0);
-+        total += chunk_size;
-+    } while (g_test_timer_elapsed() < 5.0);
-+
-+    total /= 1024 * 1024; /* to MB */
-+
-+    g_print("cbc(aes128): ");
-+    g_print("Testing chunk_size %ld bytes ", chunk_size);
-+    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
-+    g_print("%.2f MB/sec\n", total / g_test_timer_last());
-+
-+    qcrypto_cipher_free(cipher);
-+    g_free(plaintext);
-+    g_free(ciphertext);
-+    g_free(iv);
-+    g_free(key);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    size_t i;
-+    char name[64];
-+
-+    g_test_init(&argc, &argv, NULL);
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    for (i = 512; i <= (64 * 1204); i *= 2) {
-+        memset(name, 0 , sizeof(name));
-+        snprintf(name, sizeof(name), "/crypto/cipher/speed-%lu", i);
-+        g_test_add_data_func(name, (void *)i, test_cipher_speed);
++    if (strnlen(type, SALG_TYPE_LEN_MAX) >= SALG_TYPE_LEN_MAX) {
++        error_setg(errp, "Afalg type(%s) is larger than %d bytes",
++                   type, SALG_TYPE_LEN_MAX);
++        return false;
 +    }
 +
-+    return g_test_run();
++    if (strnlen(name, SALG_NAME_LEN_MAX) >= SALG_NAME_LEN_MAX) {
++        error_setg(errp, "Afalg name(%s) is larger than %d bytes",
++                   name, SALG_NAME_LEN_MAX);
++        return false;
++    }
++
++    pstrcpy((char *)salg->salg_type, SALG_TYPE_LEN_MAX, type);
++    pstrcpy((char *)salg->salg_name, SALG_NAME_LEN_MAX, name);
++
++    return true;
 +}
++
++static int
++qcrypto_afalg_socket_bind(const char *type, const char *name,
++                          Error **errp)
++{
++    int sbind;
++    struct sockaddr_alg salg = {0};
++
++    if (!qcrypto_afalg_build_saddr(type, name, &salg, errp)) {
++        return -1;
++    }
++
++    sbind = qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
++    if (sbind < 0) {
++        error_setg_errno(errp, errno, "Failed to create socket");
++        return -1;
++    }
++
++    if (bind(sbind, (const struct sockaddr *)&salg, sizeof(salg)) != 0) {
++        error_setg_errno(errp, errno, "Failed to bind socket");
++        closesocket(sbind);
++        return -1;
++    }
++
++    return sbind;
++}
++
++QCryptoAFAlg *
++qcrypto_afalg_comm_alloc(const char *type, const char *name,
++                         Error **errp)
++{
++    QCryptoAFAlg *afalg;
++
++    afalg = g_new0(QCryptoAFAlg, 1);
++    /* initilize crypto API socket */
++    afalg->opfd = -1;
++    afalg->tfmfd = qcrypto_afalg_socket_bind(type, name, errp);
++    if (afalg->tfmfd == -1) {
++        goto error;
++    }
++
++    afalg->opfd = qemu_accept(afalg->tfmfd, NULL, 0);
++    if (afalg->opfd == -1) {
++        error_setg_errno(errp, errno, "Failed to accept socket");
++        goto error;
++    }
++
++    return afalg;
++
++error:
++    qcrypto_afalg_comm_free(afalg);
++    return NULL;
++}
++
++void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
++{
++    if (!afalg) {
++        return;
++    }
++
++    if (afalg->msg) {
++        g_free(afalg->msg->msg_control);
++        g_free(afalg->msg);
++    }
++
++    g_free(afalg->name);
++
++    if (afalg->tfmfd != -1) {
++        closesocket(afalg->tfmfd);
++    }
++
++    if (afalg->opfd != -1) {
++        closesocket(afalg->opfd);
++    }
++
++    g_free(afalg);
++}
+diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
+new file mode 100644
+index 0000000..d21160c
+--- /dev/null
++++ b/crypto/afalgpriv.h
+@@ -0,0 +1,55 @@
++/*
++ * QEMU Crypto af_alg support
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#ifndef QCRYPTO_AFALGPRIV_H
++#define QCRYPTO_AFALGPRIV_H
++
++#include <linux/if_alg.h>
++
++#define SALG_TYPE_LEN_MAX 14
++#define SALG_NAME_LEN_MAX 64
++
++typedef struct QCryptoAFAlg QCryptoAFAlg;
++
++struct QCryptoAFAlg {
++    int tfmfd;
++    int opfd;
++    char *name;
++    struct msghdr *msg;
++    struct cmsghdr *cmsg;
++};
++
++/**
++ * qcrypto_afalg_comm_alloc:
++ * @type: the type of crypto operation
++ * @name: the name of crypto operation
++ *
++ * Allocate a QCryptoAFAlg object and bind itself to
++ * a AF_ALG socket.
++ *
++ * Returns:
++ *  a new QCryptoAFAlg object, or NULL in error.
++ */
++QCryptoAFAlg *
++qcrypto_afalg_comm_alloc(const char *type, const char *name,
++                         Error **errp);
++
++/**
++ * afalg_comm_free:
++ * @afalg: the QCryptoAFAlg object
++ *
++ * Free the @afalg.
++ */
++void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg);
++
++#endif
 -- 
 1.8.3.1
