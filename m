@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhj-0003ju-5e
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:53:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1dSHiA-00049U-Be
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:53:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhh-00076f-IR
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:59 -0400
-Received: from [59.151.112.132] (port=28283 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhg-0006vy-SX
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:57 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Tue, 4 Jul 2017 14:53:55 +0800
-Message-ID: <1499151236-14671-12-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1499151236-14671-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1499151236-14671-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <armbru@redhat.com>) id 1dSHi9-0007Ue-71
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:53:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSHi8-0007Tv-Ug
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:53:25 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1498761179.git.alistair.francis@xilinx.com>
+	<0b14290d85eceaa145e0333c26826b14304e23e4.1498761179.git.alistair.francis@xilinx.com>
+	<20170630085426.GA23259@redhat.com>
+	<87ziclipgm.fsf@dusky.pond.sub.org> <20170703141537.GB955@redhat.com>
+Date: Tue, 04 Jul 2017 08:53:21 +0200
+In-Reply-To: <20170703141537.GB955@redhat.com> (Daniel P. Berrange's message
+	of "Mon, 3 Jul 2017 15:15:37 +0100")
+Message-ID: <87r2xwae1q.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V7 11/12] net/filter-rewriter.c: Make
- filter-rewriter support vnet_hdr_len
+Subject: Re: [Qemu-devel] [RFC v2 2/3] qemu-error: Implement a more generic
+ error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,120 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: alistair23@gmail.com, philippe@mathieu-daude.net, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
 
-We add the vnet_hdr_support option for filter-rewriter, default is disabled.
-If you use virtio-net-pci or other driver needs vnet_hdr, please enable it.
-You can use it for example:
--object filter-rewriter,id=rew0,netdev=hn0,queue=all,vnet_hdr_support
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-We get the vnet_hdr_len from NetClientState that make us
-parse net packet correctly.
+> On Mon, Jul 03, 2017 at 04:07:21PM +0200, Markus Armbruster wrote:
+>> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>> 
+>> > On Thu, Jun 29, 2017 at 12:42:38PM -0700, Alistair Francis wrote:
+>> >> This patch removes the exisinting error_vreport() function and replaces it
+>> >> with a more generic vreport() function that takes an enum describing the
+>> >> information to be reported.
+>> 
+>> Why remove error_vreport()?
+>> 
+>> >> As part of this change a report() function is added as well with the
+>> >> same capability.
+>> >> 
+>> >> To maintain full compatibility the original error_report() function is
+>> >> maintained and no changes to the way errors are printed have been made.
+>> >> 
+>> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> >> ---
+>> >> 
+>> >>  hw/virtio/virtio.c          |  2 +-
+>> >>  include/qemu/error-report.h | 10 +++++++++-
+>> >>  scripts/checkpatch.pl       |  3 ++-
+>> >>  util/qemu-error.c           | 33 ++++++++++++++++++++++++++++++---
+>> >>  4 files changed, 42 insertions(+), 6 deletions(-)
+>> >> 
+>> >> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>> >> index 464947f76d..bd3d26abb7 100644
+>> >> --- a/hw/virtio/virtio.c
+>> >> +++ b/hw/virtio/virtio.c
+>> >> @@ -2448,7 +2448,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+>> >>      va_list ap;
+>> >>  
+>> >>      va_start(ap, fmt);
+>> >> -    error_vreport(fmt, ap);
+>> >> +    vreport(ERROR, fmt, ap);
+>> >>      va_end(ap);
+>> >>  
+>> >>      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+>> >> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+>> >> index 3001865896..39b554c3b9 100644
+>> >> --- a/include/qemu/error-report.h
+>> >> +++ b/include/qemu/error-report.h
+>> >> @@ -21,6 +21,12 @@ typedef struct Location {
+>> >>      struct Location *prev;
+>> >>  } Location;
+>> >>  
+>> >> +typedef enum {
+>> >> +    ERROR,
+>> >> +    WARN,
+>> >> +    INFO,
+>> >> +} report_types;
+>> >
+>> > Woah, those are faaar to generic names to be used. There is way too much
+>> > chance of those clashing with definitions from headers we pull in - particularly
+>> > windows which pollutes its system headers with loads of generic names.
+>> >
+>> > I'd suggest  QMSG_ERROR, QMSG_WARN, QMSG_INFO
+>> >
+>> >> +
+>> >>  Location *loc_push_restore(Location *loc);
+>> >>  Location *loc_push_none(Location *loc);
+>> >>  Location *loc_pop(Location *loc);
+>> >> @@ -30,12 +36,14 @@ void loc_set_none(void);
+>> >>  void loc_set_cmdline(char **argv, int idx, int cnt);
+>> >>  void loc_set_file(const char *fname, int lno);
+>> >>  
+>> >> +void vreport(report_types type, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+>> >> +void report(report_types type, const char *fmt, ...)  GCC_FMT_ATTR(2, 3);
+>> >
+>> > Those names are too generic too IMHO.  I'd suggest  qmsg_report, qmsg_vreport
+>> >
+>> > As mentioned in the previous review, there should be wrappers which
+>> > call these with suitable enum to make usage less verbose. eg
+>> >
+>> >   qmsg_info(fmt, ....)  should call qmsg_report(QMSG_INFO, fmt, ...)
+>> >   qmsg_vinfo(fmt, ....)  should call qmsg_vreport(QMSG_INFO, fmt, ...)
+>> >
+>> > likewise, for other message levels
+>> 
+>> We then have qmsg_warning() for warnings, and error_report() for errors.
+>> Ugh!
+>> 
+>> If I had known back then what I know now, I wouldn't have used the
+>> error_ prefix.
+>> 
+>> Naming things is hard.
+>> 
+>> Ideas anyone?
+>
+> I guess implicit in my suggestion would be to switch to qmsg_error()
+> over some (long) period of time, but that would be a massive amount
+> of churn that would harm backporting.
+>
+> So perhaps, just have error_report warning_report, info_report, and
+> accept that the naming convention is slightly reversed from "normality"
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/filter-rewriter.c | 37 ++++++++++++++++++++++++++++++++++++-
- qemu-options.hx       |  4 ++--
- 2 files changed, 38 insertions(+), 3 deletions(-)
+That's not half bad.
 
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index 63256c7..55a6cf5 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -17,6 +17,7 @@
- #include "qemu-common.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
-+#include "qemu/error-report.h"
- #include "qapi-visit.h"
- #include "qom/object.h"
- #include "qemu/main-loop.h"
-@@ -33,6 +34,7 @@ typedef struct RewriterState {
-     NetQueue *incoming_queue;
-     /* hashtable to save connection */
-     GHashTable *connection_track_table;
-+    bool vnet_hdr;
- } RewriterState;
- 
- static void filter_rewriter_flush(NetFilterState *nf)
-@@ -155,10 +157,16 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-     ConnectionKey key;
-     Packet *pkt;
-     ssize_t size = iov_size(iov, iovcnt);
-+    ssize_t vnet_hdr_len = 0;
-     char *buf = g_malloc0(size);
- 
-     iov_to_buf(iov, iovcnt, 0, buf, size);
--    pkt = packet_new(buf, size, 0);
-+
-+    if (s->vnet_hdr) {
-+        vnet_hdr_len = nf->netdev->vnet_hdr_len;
-+    }
-+
-+    pkt = packet_new(buf, size, vnet_hdr_len);
-     g_free(buf);
- 
-     /*
-@@ -237,6 +245,32 @@ static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
-     s->incoming_queue = qemu_new_net_queue(qemu_netfilter_pass_to_next, nf);
- }
- 
-+static bool filter_rewriter_get_vnet_hdr(Object *obj, Error **errp)
-+{
-+    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+
-+    return s->vnet_hdr;
-+}
-+
-+static void filter_rewriter_set_vnet_hdr(Object *obj,
-+                                         bool value,
-+                                         Error **errp)
-+{
-+    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+
-+    s->vnet_hdr = value;
-+}
-+
-+static void filter_rewriter_init(Object *obj)
-+{
-+    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+
-+    s->vnet_hdr = false;
-+    object_property_add_bool(obj, "vnet_hdr_support",
-+                             filter_rewriter_get_vnet_hdr,
-+                             filter_rewriter_set_vnet_hdr, NULL);
-+}
-+
- static void colo_rewriter_class_init(ObjectClass *oc, void *data)
- {
-     NetFilterClass *nfc = NETFILTER_CLASS(oc);
-@@ -250,6 +284,7 @@ static const TypeInfo colo_rewriter_info = {
-     .name = TYPE_FILTER_REWRITER,
-     .parent = TYPE_NETFILTER,
-     .class_init = colo_rewriter_class_init,
-+    .instance_init = filter_rewriter_init,
-     .instance_size = sizeof(RewriterState),
- };
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1107896..96b6377 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4251,12 +4251,12 @@ Create a filter-redirector we need to differ outdev id from indev id, id can not
- be the same. we can just use indev or outdev, but at least one of indev or outdev
- need to be specified.
- 
--@item -object filter-rewriter,id=@var{id},netdev=@var{netdevid}[,queue=@var{all|rx|tx}]
-+@item -object filter-rewriter,id=@var{id},netdev=@var{netdevid},queue=@var{all|rx|tx},[vnet_hdr_support]
- 
- Filter-rewriter is a part of COLO project.It will rewrite tcp packet to
- secondary from primary to keep secondary tcp connection,and rewrite
- tcp packet to primary from secondary make tcp packet can be handled by
--client.
-+client.if it has the vnet_hdr_support flag, we can parse packet with vnet header.
- 
- usage:
- colo secondary:
--- 
-2.7.4
+The matching enum would be
+
+    typedef enum {
+        REPORT_TYPE_ERROR,
+        REPORT_TYPE_WARNING,
+        REPORT_TYPE_INFO,
+    } report_type;
+
+Note the typedef name is *singular*.  Compare
+
+    report_type rtype;
+
+to
+
+    report_types rtype;
+
+@rtype is *one* report type, not multiple.
+
+Let's stick report_type, report() and vreport() into qemu-error.c
+(static linkage) until we have a genuine need for them elsewhere.
