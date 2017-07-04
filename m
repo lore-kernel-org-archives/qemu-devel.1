@@ -1,43 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSPS0-00066e-AD
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:09:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dSPhQ-0002YR-Tw
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSPRx-0004iB-0T
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:09:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38470
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dSPRw-0004hv-QL
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:09:12 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v64F98SA051955
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 11:09:11 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bg9tpfdt2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 11:09:11 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 4 Jul 2017 16:08:55 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-	<1499177279-131407-4-git-send-email-borntraeger@de.ibm.com>
-	<20170704163103.4d6670a9@dhcp-192-215.str.redhat.com>
-	<3200e2c0-8ffe-2f6d-b7a8-049352851c96@linux.vnet.ibm.com>
-Date: Tue, 4 Jul 2017 17:08:52 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1dSPhM-0005NO-Qn
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:25:12 -0400
+References: <1497863771-24929-1-git-send-email-thuth@redhat.com>
+	<20170704144600.GH4253@noname.str.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <72652c2b-f7a5-d662-b648-78450d2f3c5b@redhat.com>
+Date: Tue, 4 Jul 2017 17:25:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <3200e2c0-8ffe-2f6d-b7a8-049352851c96@linux.vnet.ibm.com>
+In-Reply-To: <20170704144600.GH4253@noname.str.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <87aeaca3-5261-91c9-506b-eded3dededb4@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/7] s390x: fix error propagation in
- kvm-flic's realize
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Add missing "@c man end"
+ statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,67 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: Kevin Wolf <kwolf@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
 
 
 
-On 07/04/2017 04:46 PM, Halil Pasic wrote:
-> 
-> 
-> On 07/04/2017 04:31 PM, Cornelia Huck wrote:
->> On Tue,  4 Jul 2017 16:07:55 +0200
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 04/07/2017 16:46, Kevin Wolf wrote:
+> Am 19.06.2017 um 11:16 hat Thomas Huth geschrieben:
+>> Since commit 3f2ce724f1f1 ("Move the qemu-ga description into a
+>> separate chapter"), the qemu.1 man page looks pretty much screwed
+>> up, e.g. the title was "qemu-ga - QEMU Guest Agent" instead of
+>> "qemu-doc - QEMU Emulator User Documentation". However, that movement
+>> of the gemu-ga chapter is not the real problem, it just triggered
+>> another bug in the qemu-doc.texi: There are some parts in the file
+>> which introduce a "@c man begin OPTIONS" section, but never close
+>> it again with "@c man end". After adding the proper end tags here,
+>> the title of the man page is right again and the previously wrongly
+>> tagged sections now also show up correctly in the man page, too.
 >>
->>> From: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>
->>> From the moment it was introduced by commit a2875e6f98 ("s390x/kvm:
->>> implement floating-interrupt controller device", 2013-07-16) the kvm-flic
->>> is not making realize fail properly in case it's impossible to create the
->>> KVM device which basically serves as a backend and is absolutely
->>> essential for having an operational kvm-flic.
->>>
->>> Let's fix this by making sure we do proper error propagation in realize.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> Fixes: a2875e6f98 "s390x/kvm: implement floating-interrupt controller device"
->>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->>> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  hw/intc/s390_flic_kvm.c | 14 +++++++++++---
->>>  1 file changed, 11 insertions(+), 3 deletions(-)
->>>
->>
->> (...)
->>
->>>      cd.type = KVM_DEV_TYPE_FLIC;
->>>      ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
->>>      if (ret < 0) {
->>> -        trace_flic_create_device(errno);
->>> -        return;
->>> +        error_setg_errno(&errp_local, errno, "Creating the KVM device failed");
->>> +        trace_flic_no_device_api(errno);
->>
->> Err... this should still be trace_flic_create_device(), no?
+>> Reported-by: Kevin Wolf <kwolf@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > 
-> I'm afraid you are right! Probably a copy paste error :/
-> 
+> Michael, do you want to take this through qemu-trivial?
 
-Do you think the traces are still appropriate once we have
-proper error propagation?
+FWIW, I'm sending it out tomorrow.  Already tested the pull request, but
+I'd like Richard to take another look at the final version of the
+TCG-disabling patches and not rush them out.
 
-I did not feel comfortable removing them but thinking again,
-than might be the thing to do.
-
-@Christian:
-I think we should really fix this the one way or the other.
-Can you tell me what is the proper procedure?
-
->>
->>> +        goto fail;
->>>      }
->>>      flic_state->fd = cd.fd;
->>
-> 
-> 
+Paolo
