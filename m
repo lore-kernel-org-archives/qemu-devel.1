@@ -1,49 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSIZN-0002oI-22
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:48:26 -0400
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSIex-00062z-82
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSIZK-0006D2-07
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:48:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41385
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSIet-0003rq-QF
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:54:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40534
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dSIZJ-0006Al-Og
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:48:21 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v647i1u1142363
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 03:48:20 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bfk9xe1mv-1
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1dSIet-0003pK-GR
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:54:07 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v647s26p063316
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 03:54:05 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg6bgaf6a-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 03:48:19 -0400
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 03:54:05 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 4 Jul 2017 01:48:18 -0600
-References: <75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
-	<20170424143516.GD2075@work-vm>
-	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
-	<20170424191202.GQ2362@work-vm>
-	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
-	<20170426110144.GF2098@work-vm>
-	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
-	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
-	<20170630163139.GC2437@work-vm>
-	<20170703192353-mutt-send-email-mst@kernel.org>
-	<20170703190728.GE2206@work-vm>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 4 Jul 2017 09:48:11 +0200
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Tue, 4 Jul 2017 03:54:04 -0400
+References: <20170703085107.16547-1-haoqf@linux.vnet.ibm.com>
+	<20170703085107.16547-2-haoqf@linux.vnet.ibm.com>
+	<fee6eaa0-8132-b3ce-bb3e-0a716eb72064@de.ibm.com>
+	<abf0af9b-a5fd-392f-6d12-2fd066589553@linux.vnet.ibm.com>
+	<b999b689-92b7-bb01-ccca-fa29ad4a5a30@de.ibm.com>
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Date: Tue, 4 Jul 2017 15:53:55 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170703190728.GE2206@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <55708cff-cdda-9b1d-2106-1c6d2774f890@de.ibm.com>
-Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
+In-Reply-To: <b999b689-92b7-bb01-ccca-fa29ad4a5a30@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <43d37cd5-a2c0-2a90-5bdd-4fd8bd618257@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-scsi-ccw: use ioeventfd even
+ when KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,69 +46,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com, Martin Schwidefsky <schwidefsky@de.ibm.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, zyimin@linux.vnet.ibm.com, famz@redhat.com, peterx@redhat.com, stefanha@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-On 07/03/2017 09:07 PM, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
->> On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:
->>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>> On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
->>>>
->>>>>> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
->>>>>> then try changing ram_handle_compressed to always do the memset.
->>>>>
->>>>> FWIW, changing ram_handle_compressed to always memset makes the problem go away.
->>>>
->>>> It is still running fine now with the "always memset change"
->>>
->>> Did we ever nail down a fix for this; as I remember Andrea said
->>> we shouldn't need to do that memset, but we came to the conclusion
->>> it was something specific to how s390 protection keys worked.
->>>
->>> Dave
+
+
+=E5=9C=A8 2017/7/4 15:06, Christian Borntraeger =E5=86=99=E9=81=93:
+> On 07/04/2017 05:41 AM, QingFeng Hao wrote:
 >>
->> No we didn't. Let's merge that for now, with a comment that
->> we don't really understand what's going on?
-> 
-> Hmm no, I don't really want to change the !s390 behaviour, especially
-> since it causes allocation that we otherwise avoid and Andrea's
-> reply tothe original post pointed out it's not necessary.
+>> =E5=9C=A8 2017/7/3 18:20, Christian Borntraeger =E5=86=99=E9=81=93:
+>>> On 07/03/2017 10:51 AM, QingFeng Hao wrote:
+>>>> This patch is based on a similar patch from Stefan Hajnoczi -
+>>>> commit c324fd0a39c (" virtio-pci: use ioeventfd even when KVM is dis=
+abled)
+>>>>
+>>>> Do not check kvm_eventfds_enabled() when KVM is disabled since it
+>>>> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d646=
+2a6f
+>>>> ("memory: emulate ioeventfd") it has been possible to use ioeventfds=
+ in
+>>>> qtest or TCG mode.
+>>>>
+>>>> This patch makes -device virtio-scsi-ccw,iothread=3Diothread0 work e=
+ven
+>>>> when KVM is disabled.
+>>>>
+>>>> I have tested that virtio-scsi-ccw works under tcg both with and wit=
+hout
+>>>> iothread.
+>>>>
+>>>> This patch fixes qemu-iotests 068, which was accidentally merged ear=
+ly
+>>>> despite the dependency on ioeventfd.
+>>>>
+>>>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+>>>> ---
+>>>>    hw/s390x/virtio-ccw.c | 2 +-
+>>>>    target/s390x/kvm.c    | 3 +++
+>>>>    2 files changed, 4 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+>>>> index 90d37cb9ff..35896eb007 100644
+>>>> --- a/hw/s390x/virtio-ccw.c
+>>>> +++ b/hw/s390x/virtio-ccw.c
+>>>> @@ -711,7 +711,7 @@ static void virtio_ccw_device_realize(VirtioCcwD=
+evice *dev, Error **errp)
+>>>>            sch->cssid, sch->ssid, sch->schid, sch->devno,
+>>>>            ccw_dev->devno.valid ? "user-configured" : "auto-configur=
+ed");
+>>>>
+>>>> -    if (!kvm_eventfds_enabled()) {
+>>>> +    if (kvm_enabled() && !kvm_eventfds_enabled()) {
+>>>>            dev->flags &=3D ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
+>>>>        }
+>>>>
+>>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>>>> index a3d00196f4..c37f9c3b9e 100644
+>>>> --- a/target/s390x/kvm.c
+>>>> +++ b/target/s390x/kvm.c
+>>>> @@ -2220,6 +2220,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotif=
+ier *notifier, uint32_t sch,
+>>>>            .addr =3D sch,
+>>>>            .len =3D 8,
+>>>>        };
+>>>> +    if (!kvm_enabled()) {
+>>>> +        return 0;
+>>>> +    }
+>>> thinking more about it. wouldnt it be better to do something like thi=
+s instead
+>>>
+>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>> index 058ddad..cc47831 100644
+>>> --- a/target/s390x/cpu.h
+>>> +++ b/target/s390x/cpu.h
+>>> @@ -1240,7 +1240,11 @@ static inline int s390_assign_subch_ioeventfd(=
+EventNotifier *notifier,
+>>>                                                  uint32_t sch_id, int=
+ vq,
+>>>                                                  bool assign)
+>>>    {
+>>> -    return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, ass=
+ign);
+>>> +    if (kvm_enabled()) {
+>>> +        return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq,=
+ assign);
+>>> +    } else {
+>>> +        return 0;
+>>> +    }
+>>>    }
+>> Thanks. It makes sense. I'll change it.
+>>>    static inline void s390_crypto_reset(void)
+>>>
+>>>
+>>> FWIW, it seems that we (s390) do not have a functional equivalent fun=
+ction as commit
+>>> 8c56c1a592b5092d91da8d8943c17777d6462a6f ("memory: emulate ioeventfd"=
+) , so we will
+>>> not use the iothreads.
+>> Ok, but might s390 have skipped the iothread arguments and passed the =
+test, so we could
+>> still keep this test case?
+> Yes, lets just fix the test case. We can implement emulated ioeventfds =
+later.
+Fine, thanks!
+>
 
-
-Since storage keys are per physical page we must not have shared pages.
-Therefore in s390_enable_skey we already do a break_ksm (via ksm_madvise),
-in other words we already allocate pages on the keyless->keyed switch.
-
-So why not do the same for zero pages - instead of invalidating the page
-table entry, lets just do a proper COW.
-
-Something like this maybe (Andrea, Martin any better way to do that?)
-
-
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 4fb3d3c..11475c7 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2149,13 +2149,18 @@ EXPORT_SYMBOL_GPL(s390_enable_sie);
- static int __s390_enable_skey(pte_t *pte, unsigned long addr,
-                              unsigned long next, struct mm_walk *walk)
- {
-+       struct page *page;
-        /*
--        * Remove all zero page mappings,
-+        * Remove all zero page mappings with a COW
-         * after establishing a policy to forbid zero page mappings
-         * following faults for that page will get fresh anonymous pages
-         */
--       if (is_zero_pfn(pte_pfn(*pte)))
--               ptep_xchg_direct(walk->mm, addr, pte, __pte(_PAGE_INVALID));
-+       if (is_zero_pfn(pte_pfn(*pte))) {
-+               if (get_user_pages(addr, 1, FOLL_WRITE, &page, NULL) == 1)
-+                       put_page(page);
-+               else
-+                       return -ENOMEM;
-+       }
-        /* Clear storage key */
-        ptep_zap_key(walk->mm, addr, pte);
-        return 0;
+--=20
+Regards
+QingFeng Hao
