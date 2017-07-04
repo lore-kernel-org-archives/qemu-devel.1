@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dSUjy-0002Sy-9N
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 16:48:11 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dSV8p-0001Km-LT
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dSUjv-0006y4-4b
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 16:48:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dSUju-0006xO-SJ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 16:48:07 -0400
-References: <1498759215-25382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <596e2782-cf4f-952a-4d0a-6bf51a8a9e48@redhat.com>
-Date: Tue, 4 Jul 2017 22:47:59 +0200
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dSV8l-00065r-2b
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:13:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33418
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dSV8k-00065L-SF
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:13:46 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v64L96MD146759
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 17:13:42 -0400
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bg9tptqs0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 17:13:42 -0400
+Received: from localhost
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 4 Jul 2017 18:13:40 -0300
+References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 4 Jul 2017 18:13:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <1498759215-25382-1-git-send-email-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170621091848.28256-1-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] specs: Describe the TPM support in QEMU
+Content-Language: en-US
+Message-Id: <f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
+ VI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,159 +43,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: javierm@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com
+Cc: lvivier@redhat.com, sursingh@redhat.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
 
-On 06/29/17 20:00, Stefan Berger wrote:
-> This patch adds a description of the current TPM support in QEMU
-> to the specs.
-> 
-> Several public specs are referenced via their landing page on the
-> trustedcomputinggroup.org website.
-> 
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> ---
->  docs/specs/tpm.txt | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 98 insertions(+)
->  create mode 100644 docs/specs/tpm.txt
-> 
-> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> new file mode 100644
-> index 0000000..6472989
-> --- /dev/null
-> +++ b/docs/specs/tpm.txt
-> @@ -0,0 +1,98 @@
-> +
-> +QEMU TPM Device
-> +===============
-> +
-> += Guest-side Hardware Interface =
-> +
-> +The QEMU TPM emulation implements a TPM TIS hardware interface following
-> +the Trusted Computing Group's specification "TCG PC Client Specific TPM
-> +Interface Specification (TIS)", Specifcation Version 1.3, 21 March 2013.
-> +This specification, or a later version of it, can be accessed from the
-> +following URL:
-> +
-> +https://trustedcomputinggroup.org/pc-client-work-group-pc-client-specific-tpm-interface-specification-tis/
-> +
-> +The TIS interface makes a memory mapped IO region in the area 0xfed40000 -
-> +0xfed44fff available to the guest operating system.
-> +
-> +
-> +QEMU files related to TPM TIS interfaceL
+I just tested this patch set on top of current ppc-for-2.10 branch 
+(which contains
+the patches from part V). It applied cleanly but required a couple of 
+trivial
+fixes to build probably because it was made on top of an older code base.
 
-... OK, Eric mentioned the typo already
+The trivial migration test worked fine. The libvirt scenario (attaching 
+a device on
+target before migration, try to unplug after migration) isn't working as 
+expected
+but we have a different result with this series. Instead of silently 
+failing to unplug
+with error messages on dmesg, the hot unplug works on QEMU level:
 
-> + - hw/tpm/tpm_tis.c
-> + - hw/tpm/tpm_tis.h
-> +
-> +
-> += ACPI Interface =
-> +
-> +The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT and passes
-> +it into the guest through the fw_cfg device. The device description contains
-> +the base address of the TIS interface 0xfed40000 and the size of the MMIO area
-> +(0x5000). In case a TPM2 is used by QEMU, a TPM2 ACPI table is also provided.
-> +The device is described to be used in polling mode rather than interrupt mode
-> +primarily because no unused IRQ could be found.
-> +
-> +To support measurement logs to be written by the firmware, e.g. SeaBIOS, a TCPA
-> +table is implemented. This table provides a 64kb buffer where the firmware can
-> +write its log into. For TPM 2 only a more recent version of the TPM2 table
-> +provides support for measurements logs and a TCPA table does not need to be
-> +created.
-> +
-> +The TCPA and TPM2 ACPI tables follow the Trusted Computing Group specification
-> +"TCG ACPI Specification" Family "1.2" and "2.0", Level 00 Revision 00.37. This
-> +specification, or a later version of it, can be accessed from the following
-> +URL:
-> +
-> +https://trustedcomputinggroup.org/tcg-acpi-specification/
-> +
-> +
-> +QEMU files related to TPM ACPI tables:
-> + - hw/i386/acpi-build.c
-> + - include/hw/acpi/tpm.h
-> +
-> +
-> += TPM backend devices =
-> +
-> +The TPM implementation is split into two parts, frontend and backend. 
+(qemu) device_del core1
+(qemu)
+(qemu) info cpus
+* CPU #0: nip=0xc0000000000a3e0c thread_id=86162
+(qemu) info hotpluggable-cpus
+Hotpluggable CPUs:
+   type: "host-spapr-cpu-core"
+   vcpus_count: "1"
+   CPUInstance Properties:
+     core-id: "3"
+   type: "host-spapr-cpu-core"
+   vcpus_count: "1"
+   CPUInstance Properties:
+     core-id: "2"
+   type: "host-spapr-cpu-core"
+   vcpus_count: "1"
+   CPUInstance Properties:
+     core-id: "1"
+   type: "host-spapr-cpu-core"
+   vcpus_count: "1"
+   qom_path: "/machine/unattached/device[0]"
+   CPUInstance Properties:
+     core-id: "0"
+(qemu)
 
-git-am complains that this line adds a whitespace error (trailing space,
-namely).
 
-> +The frontend part is the hardware interface, such as the TPM TIS interface
-> +described earlier, and the other part is the TPM backend interface. The
-> +backend interfaces implement the interaction with a TPM device,
-> +which may be a physical or an emulated device. The split between the front-
-> +and backend devices allows a frontend to be connected with any available
-> +backend. This enables the TIS interface to be used with the passthrough
-> +backend or the swtpm backend.
+However, any operation on the guest afterwards (tried with lscpu and 
+dmesg) seems
+to hung the guest. This is what I got when trying to do a dmesg after the
+hot unplug:
 
-In the previous (RFC-like) version, you wrote "(future) swtpm" -- I
-think that would be more precise. When QEMU gets swtpm support, we can
-update this language (because we should update the filename list(s) as
-well). What do you think?
+danielhb@ubuntu1704:~$
+danielhb@ubuntu1704:~$
+danielhb@ubuntu1704:~$ dmesg | tail -n 5
+^C
 
-> +
-> +
-> +QEMU file related to TPM backends:
+[  362.749693] INFO: task kworker/u8:1:30 blocked for more than 120 seconds.
+[  362.749819]       Not tainted 4.10.0-26-generic #30-Ubuntu
+[  362.749892] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" 
+disables this message.
+[  362.750224] INFO: task kworker/0:3:1887 blocked for more than 120 
+seconds.
+[  362.750320]       Not tainted 4.10.0-26-generic #30-Ubuntu
+[  362.750394] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" 
+disables this message.
+[  483.568842] INFO: task kworker/u8:1:30 blocked for more than 120 seconds.
+[  483.568997]       Not tainted 4.10.0-26-generic #30-Ubuntu
+[  483.569067] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" 
+disables this message.
+[  483.569364] INFO: task kworker/0:3:1887 blocked for more than 120 
+seconds.
+(...)
 
-s/file/files/
 
-> + - backends/tpm.c
-> + - include/sysemu/tpm_backend.h
-> + - include/sysemu/tpm_backend_int.h
+I am not sure if it was intended for this scenario to work with this 
+patch set already. Figured
+it can serve as a FYI for the next series.
 
-Is this generic backend code? Because for the passthrough backend, you
-provide a separate file list below (which is great, but then we should
-qualify *this* list as "generic" or some such).
 
-> +
-> +
-> +== The QEMU TPM passthrough device ==
-> +
-> +In case QEMU is run on Linux as the host operating system it is possible to
-> +make the hardware TPM device available to a single QEMU guest. In this case the
-> +user must make sure that no other program is using the device, e.g., /dev/tpm0,
-> +before trying to start QEMU with it.
-> +
-> +The passthrough driver uses the host's TPM device for sending TPM commands
-> +and receiving responses from. Besides that it accesses the TPM device's sysfs
-> +entry for support of command cancellation. Since none of the state of a hardware
-> +TPM can be migrated between hosts, virtual machine migration is disabled when
-> +the TPM passthrough driver is used.
-> +
-> +Since the host's TPM device will already be initialize by the host's firmware,
+Given that hotplug/unplug without migration still works and on the 
+assumption that
+we'll look more into this libvirt scenario in the next spins, +1.
 
-s/initialize/initialized/
 
-... ah, also pointed out by Eric.
+Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 
-> +certain commands, e.g. TPM_Startup(), sent by the virtual firmware for device
-> +initialization, will fail. In this case the firmware should simply not use the
-> +TPM.
-> +
-> +Sharing the device with the host is generally not a recommended usage scenario
-> +for a TPM device. The primary reason for this is that two operating systems can
-> +then access the device's single set of resources, such as platform configuration
-> +registers (PCRs). Applications or kernel security subsystems, such as the
-> +Linux Integrity Measurement Architecture (IMA), are not expecting to share PCRs.
-> +
-> +
-> +QEMU files related to TPM passthrough device:
-> + - hw/tpm/tpm_passthrough.c
-> + - hw/tpm/tpm_util.c
-> + - hw/tpm/tpm_util.h
-> 
 
-This looks very helpful, thank you, and mostly done (as far as I'm
-concerned).
 
-Again, if you were willing to add command line options as examples, that
-would be great, but if not, I'm fine (and thankful) that way as well.
-
-Thanks!
-Laszlo
+On 06/21/2017 06:18 AM, David Gibson wrote:
+> This sixth set of DRC cleanup patches (to be applied on top of the
+> patches from part V) is a complete rework of DRC state management.  We
+> stop tracking some unnecessary things, and change the basic state
+> representation to a simpler and more robust model.
+>
+> Most of the patches in this set "break" migration from earlier git
+> snapshots, but not from any released qemu version.  The previous
+> migration stream format had multiple problems, so better to fix them
+> now, before 2.10 is out.
+>
+> David Gibson (5):
+>    spapr: Remove 'awaiting_allocation' DRC flag
+>    spapr: Refactor spapr_drc_detach()
+>    spapr: Cleanups relating to DRC awaiting_release field
+>    spapr: Consolidate DRC state variables
+>    spapr: Remove sPAPRConfigureConnectorState sub-structure
+>
+>   hw/ppc/spapr.c             |   9 +-
+>   hw/ppc/spapr_drc.c         | 321 +++++++++++++++++++++------------------------
+>   hw/ppc/spapr_pci.c         |  13 +-
+>   hw/ppc/trace-events        |   3 +-
+>   include/hw/ppc/spapr_drc.h |  53 +++++---
+>   5 files changed, 187 insertions(+), 212 deletions(-)
+>
