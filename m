@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSKGh-0003T9-DB
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:37:16 -0400
+	(envelope-from <rjones@redhat.com>) id 1dSKHt-0004Ra-Kp
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSKGd-0000aj-Ic
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:37:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38774)
+	(envelope-from <rjones@redhat.com>) id 1dSKHs-00017n-QI
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:38:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSKGd-0000aZ-Bs
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:37:11 -0400
-Date: Tue, 4 Jul 2017 10:37:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170704093705.GF3135@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-	<1499099693-22903-5-git-send-email-pbonzini@redhat.com>
-	<1cfd6e25-727e-2b11-b662-4a2b7dbaed05@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1cfd6e25-727e-2b11-b662-4a2b7dbaed05@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 04/22] vl: convert -tb-size to qemu_strtoul
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1dSKHs-000179-Jz
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:38:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7588BC058EC7
+	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 09:38:26 +0000 (UTC)
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue,  4 Jul 2017 10:38:15 +0100
+Message-Id: <20170704093815.28285-1-rjones@redhat.com>
+Subject: [Qemu-devel] [PATCH] checkpatch: Error if signal(2) is used
+ non-portably.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, anthony.xu@intel.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-On Mon, Jul 03, 2017 at 12:46:06PM -0700, Richard Henderson wrote:
-> On 07/03/2017 09:34 AM, Paolo Bonzini wrote:
-> > -extern int tcg_tb_size;
-> > +extern unsigned long tcg_tb_size;
-> 
-> size_t would be more natural.
-> 
-> I don't think we support any hosts for which sizeof(size_t) !=
-> sizeof(unsigned long), but perhaps
-> 
-> 	unsigned lomg tmp;
-> 	if (qemu_strtoul(optarg, NULL, 0, &tmp) < 0
->             || tmp != (size_t)tmp) {
-> 	  error_report("Invalid argument to -tb-size");
-> 	  exit(1);
-> 	}
-> 	tcg_tb_size = tmp;
-> 
-> where I'd expect the extra comparison to be optimized away.
+The only portable use for signal(2) is setting a signal to SIG_IGN or
+SIG_DFL.  Everything else is a portability minefield.  This change
+adds such a check to checkpatch.  It gives an error like this:
 
-If we wanted to use size_t, then I'd suggest we added a qemu_strtoXXX
-variant that directly returned a size_t, and did suitabled bounds
-checking
+  ERROR: Use sigaction instead of signal, except when setting the handler to SIG_IGN or SIG_DFL
+  #39: FILE: qemu-nbd.c:585:
+  +    signal(SIGPIPE, foobar);
 
-> But I'm not overly concerned either way, so
+  total: 1 errors, 0 warnings, 10 lines checked
 
-Agreed, doesn't need fixing now
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ scripts/checkpatch.pl | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-
-Regards,
-Daniel
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 45027b9281..76a2a87b25 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2593,6 +2593,15 @@ sub process {
+ 			$line =~ /\b(?:$non_exit_glib_asserts)\(/) {
+ 			ERROR("Use g_assert or g_assert_not_reached\n". $herecurr);
+ 		}
++
++# signal(2) can only portably be used for SIG_IGN or SIG_DFL.  For
++# everything else, sigaction should be used instead.
++                if ($line =~ /\bsignal\([^,]+, ([^,\)]+)/ &&
++                    $1 !~ /^SIG_(IGN|DFL)$/) {
++                    ERROR("Use sigaction instead of signal, ".
++                          "except when setting the handler to ".
++                          "SIG_IGN or SIG_DFL\n" . $herecurr);
++                }
+ 	}
+ 
+ 	# If we have no input at all, then there is nothing to report on
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.2
