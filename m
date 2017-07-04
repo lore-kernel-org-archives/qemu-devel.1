@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSNQX-0002ja-VS
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:39 -0400
+	(envelope-from <groug@kaod.org>) id 1dSNTt-0003or-WF
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSNQT-00034O-6F
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46272)
+	(envelope-from <groug@kaod.org>) id 1dSNTp-0004Ix-Ot
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:03:06 -0400
+Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:59033)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dSNQS-00033s-UB
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:59:33 -0400
-References: <20170704111404.28569-1-berrange@redhat.com>
-	<20170704111404.28569-3-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e4f5548d-0da3-ea64-1ffc-fa887b51c947@redhat.com>
-Date: Tue, 4 Jul 2017 14:59:27 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dSNTp-0004Dm-B6
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 09:03:01 -0400
+Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 010A675AC0
+	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 15:02:50 +0200 (CEST)
+Date: Tue, 4 Jul 2017 15:02:39 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170704150239.2e4adb64@bahia.lan>
+In-Reply-To: <20170704114151.GG2180@umbus.fritz.box>
+References: <20170704110126.26806-1-lvivier@redhat.com>
+	<20170704110126.26806-3-lvivier@redhat.com>
+	<20170704131500.3ef448c8@bahia.lan>
+	<20170704114151.GG2180@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170704111404.28569-3-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] docs: document deprecated features
- in appendix
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/6uFI2IaikgjSKSSkaqY6dIh";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] target/ppc: move POWER9 DD1
+ workaround to init_proc_POWER9()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +34,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Suraj Singh <sursingh@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>
 
-On 04.07.2017 13:14, Daniel P. Berrange wrote:
-> The deprecation of features in QEMU is totally adhoc currently,
-> with no way for the user to get a list of what is deprecated
-> in each release. This adds an appendix to the doc that records
-> when each deprecation was made and provides text explaining
-> what to use instead, if anything.
+--Sig_/6uFI2IaikgjSKSSkaqY6dIh
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, 4 Jul 2017 21:41:51 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Tue, Jul 04, 2017 at 01:15:00PM +0200, Greg Kurz wrote:
+> > On Tue,  4 Jul 2017 13:01:26 +0200
+> > Laurent Vivier <lvivier@redhat.com> wrote:
+> >  =20
+> > > Commit 5f3066d ("target/ppc: Allow workarounds for POWER9 DD1")
+> > > disables compatibility mode for POWER9 DD1 to allow to
+> > > boot on POWER9 DD1 host with KVM.
+> > >=20
+> > > As the workaround has been added in kvmppc_host_cpu_class_init(),
+> > > it applies only on CPU created with "-cpu host".
+> > > As we want to be able to use also "-cpu POWER9" on a POWER9 DD1
+> > > host, this patch moves the workaround from kvmppc_host_cpu_class_init=
+()
+> > > to init_proc_POWER9().
+> > >  =20
+> >=20
+> > As with ppc_cpu_initfn() in your previous version, init_proc_POWER9() is
+> > called for every CPU instance.. ie, all CPU will adjust the @pcr_suppor=
+ted
+> > class attribute... =20
 >=20
-> Since there has been no formal policy around removal of deprecated
-> features in the past, any deprecations prior to 2.10.0 are to be
-> treated as if they had been made at the 2.10.0 release. Thus the
-> earliest that existing deprecations will be deleted is the start
-> of the 2.12.0 cycle.
+> Ah.. yeah.. I didn't notice that before.  That's definitely not right.
 >=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-doc.texi | 167 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 167 insertions(+)
+> > What about moving the workaround to ppc_POWER9_cpu_family_class_init()
+> > instead ? This would just require to expose mfpvr() in some header. =20
 >=20
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 27781e4..ba5170c 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -39,6 +39,7 @@
->  * QEMU User space emulator::
->  * Implementation notes::
->  * Support lifetime::
-> +* Deprecated features::
->  * License::
->  * Index::
->  @end menu
-> @@ -3054,6 +3055,172 @@ support machine types from many previous versio=
-ns.
-[...]
-> +@subsection -monitor default=3Don (since 2.4.0)
-> +
-> +The ``default'' option to the ``-monitor'' argument is
-> +now ignored. When multiple monitors were enabled, it
-> +indicated which monitor would receive log messages
-> +from the audio subsystem.
+> Yeah, as someone else pointed out using the host PVR is also
+> definitely not right (unless you're in a function specifically
+> connected to the host cpu class).
+>=20
 
-The audio subsystem was just the last user. There were other subsystems
-using it before, see e.g. commit 027a79c373954920d5 or commit
-02d16089802234f.
+I agree but the root issue is that we accept to pass -cpu POWER9 instead of
+-cpu host with -enable-kvm. And the host cpu class isn't involved in this
+case.
 
-[...]
-> +@subsection -net vlan (since 2.9.0)
-> +
-> +The ``-net van=3DNN'' argument is partially replaced with the
-> +new ``-netdev'' argument. The remaining use cases will no
-> +longer be directly supported in QEMU
+> >=20
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -8913,8 +8913,10 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *da=
+ta)
+> >      dc->props =3D powerpc_servercpu_properties;
+> >      pcc->pvr_match =3D ppc_pvr_match_power9;
+> >      pcc->pcr_mask =3D PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2=
+_07;
+> > -    pcc->pcr_supported =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COM=
+PAT_2_06 |
+> > -                         PCR_COMPAT_2_05;
+> > +    if (!kvm_enabled() || (mfpvr() & 0xffffff00) !=3D CPU_POWERPC_POWE=
+R9_DD1) {
+> > +        pcc->pcr_supported =3D PCR_COMPAT_3_00 | PCR_COMPAT_2_07 |
+> > +                             PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+> > +    }
+> >      pcc->init_proc =3D init_proc_POWER9;
+> >      pcc->check_pow =3D check_pow_nocheck;
+> >      cc->has_work =3D cpu_has_work_POWER9;
+> >  =20
+> > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> > > ---
+> > >  target/ppc/kvm.c            | 11 -----------
+> > >  target/ppc/translate_init.c | 15 ++++++++++++++-
+> > >  2 files changed, 14 insertions(+), 12 deletions(-)
+> > >=20
+> > > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > > index f2f7c53..9d76817 100644
+> > > --- a/target/ppc/kvm.c
+> > > +++ b/target/ppc/kvm.c
+> > > @@ -2381,17 +2381,6 @@ static void kvmppc_host_cpu_class_init(ObjectC=
+lass *oc, void *data)
+> > > =20
+> > >  #if defined(TARGET_PPC64)
+> > >      pcc->radix_page_info =3D kvm_get_radix_page_info();
+> > > -
+> > > -    if ((pcc->pvr & 0xffffff00) =3D=3D CPU_POWERPC_POWER9_DD1) {
+> > > -        /*
+> > > -         * POWER9 DD1 has some bugs which make it not really ISA 3.00
+> > > -         * compliant.  More importantly, advertising ISA 3.00
+> > > -         * architected mode may prevent guests from activating
+> > > -         * necessary DD1 workarounds.
+> > > -         */
+> > > -        pcc->pcr_supported &=3D ~(PCR_COMPAT_3_00 | PCR_COMPAT_2_07
+> > > -                                | PCR_COMPAT_2_06 | PCR_COMPAT_2_05);
+> > > -    }
+> > >  #endif /* defined(TARGET_PPC64) */
+> > >  }
+> > > =20
+> > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > > index 783bf98..a41fe66 100644
+> > > --- a/target/ppc/translate_init.c
+> > > +++ b/target/ppc/translate_init.c
+> > > @@ -8811,6 +8811,8 @@ static struct ppc_radix_page_info POWER9_radix_=
+page_info =3D {
+> > > =20
+> > >  static void init_proc_POWER9(CPUPPCState *env)
+> > >  {
+> > > +    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
+> > > +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> > >      /* Common Registers */
+> > >      init_proc_book3s_common(env);
+> > >      gen_spr_book3s_207_dbg(env);
+> > > @@ -8848,7 +8850,18 @@ static void init_proc_POWER9(CPUPPCState *env)
+> > > =20
+> > >      /* Allocate hardware IRQ controller */
+> > >      init_excp_POWER8(env);
+> > > -    ppcPOWER7_irq_init(ppc_env_get_cpu(env));
+> > > +    ppcPOWER7_irq_init(cpu);
+> > > +
+> > > +    if ((pcc->pvr & 0xffffff00) =3D=3D CPU_POWERPC_POWER9_DD1) {
+> > > +        /*
+> > > +         * POWER9 DD1 has some bugs which make it not really ISA 3.00
+> > > +         * compliant.  More importantly, advertising ISA 3.00
+> > > +         * architected mode may prevent guests from activating
+> > > +         * necessary DD1 workarounds.
+> > > +         */
+> > > +        pcc->pcr_supported &=3D ~(PCR_COMPAT_3_00 | PCR_COMPAT_2_07
+> > > +                                | PCR_COMPAT_2_06 | PCR_COMPAT_2_05);
+> > > +    }
+> > >  }
+> > > =20
+> > >  static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)=
+ =20
+> >  =20
+>=20
+>=20
+>=20
 
-Add a period after the last sentence?
 
-> +@subsection -drive if=3Dscsi (since 2.9.0)
-> +
-> +The ``-drive if=3Dscsi'' argument is replaced by the the
-> +``-device BUS-TYPE'' argument combined with ``-drive if=3Dnone''.
-> +
-> +@subsection -net dump (since 2.10.0)
-> +
-> +The ``--net dump'' argument is now a synonym for setting the
-> +``-object filter-dump'' argument instead.
+--Sig_/6uFI2IaikgjSKSSkaqY6dIh
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Technically, it's not a synonym, but a replacement ;-)
-("-net dump" uses the "vlan" concept, while "-object filter-dump" works
-with "-netdev" instead)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-> +@subsection -hdachs (since 2.10.0)
-> +
-> +The ``-hdachs'' argument is now a synonym for setting
-> +the ``cyls'', ``heads'', ``secs'', and ``trans'' properties
-> +on the ``ide-hd'' device using the ``-device'' argument.
-> +The new syntax allows different settings to be provided
-> +per disk.
-> +
-> +@subsection -usbdevice (since 2.10.0)
-> +
-> +The ``-usbdevice DEV'' argument is now a synonym for setting
-> +the ``-device usb-DEV'' argument instead. The deprecated syntax
-> +would automatically enable USB support on the machine type.
-> +If using the new syntax, USB support must be explicitly
-> +enabled via the ``-machine usb=3Don'' argument.
-> +
-> +@section qemu-img command line arguments
-> +
-> +@subsection convert -s (since 2.0.0)
-> +
-> +The ``convert -s snapshot_id_or_name'' argument is obsoleted
-> +by the ``convert -l snapshot_param'' argument instead.
-> +
-> +@section System emulator human monitor commands
-> +
-> +@subsection usb_add (since 2.10.0)
-> +
-> +The ``usb_add'' command is replaced by the ``device_add'' command.
-> +
-> +@subsection usb_del (since 2.10.0)
-> +
-> +The ``usb_del'' command is replaced by the ``device_del'' command.
-> +
-> +@section System emulator devices
-> +
-> +@subsection ivshmem (since 2.6.0)
-> +
-> +The ``ivshmem'' device type is replaced by either the ``ivshmem-plain'=
-'
-> +or ``ivshmem-doorbell`` device types.
-> +
-> +@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
-> +
-> +The ``spapr-pci-vfio-host-bridge'' device type is replaced by
-> +the ``spapr-pci-host-bridge'' device type.
-> +
->  @node License
->  @appendix License
+iEYEARECAAYFAllbke8ACgkQAvw66wEB28IAUgCfX7iQGxPoEBBMoU+kVB+25uKE
+pJIAn3+jC2G1EE9pd128NpWrl2JyaA7g
+=DHMG
+-----END PGP SIGNATURE-----
 
- Thomas
+--Sig_/6uFI2IaikgjSKSSkaqY6dIh--
