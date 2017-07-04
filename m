@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dSP0B-0004ze-2r
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:40:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dSP5f-0006uL-6x
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dSP0A-0004og-8J
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:40:31 -0400
-Date: Tue, 4 Jul 2017 16:40:21 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dSP5b-00009G-DD
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:46:11 -0400
+Date: Tue, 4 Jul 2017 16:46:00 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170704144021.GG4253@noname.str.redhat.com>
-References: <1494585229-9119-1-git-send-email-thuth@redhat.com>
+Message-ID: <20170704144600.GH4253@noname.str.redhat.com>
+References: <1497863771-24929-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1494585229-9119-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] blockdev: Print a warning for legacy
- drive options that belong to -device
+In-Reply-To: <1497863771-24929-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Add missing "@c man end"
+ statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,23 +23,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-Am 12.05.2017 um 12:33 hat Thomas Huth geschrieben:
-> We likely do not want to carry these legacy -drive options along forever.
-> Let's emit a deprecation warning for the -drive options that have a
-> replacement with the -device option, so that the (hopefully few) remaining
-> users are aware of this and can adapt their scripts / behaviour accordingly.
+Am 19.06.2017 um 11:16 hat Thomas Huth geschrieben:
+> Since commit 3f2ce724f1f1 ("Move the qemu-ga description into a
+> separate chapter"), the qemu.1 man page looks pretty much screwed
+> up, e.g. the title was "qemu-ga - QEMU Guest Agent" instead of
+> "qemu-doc - QEMU Emulator User Documentation". However, that movement
+> of the gemu-ga chapter is not the real problem, it just triggered
+> another bug in the qemu-doc.texi: There are some parts in the file
+> which introduce a "@c man begin OPTIONS" section, but never close
+> it again with "@c man end". After adding the proper end tags here,
+> the title of the man page is right again and the previously wrongly
+> tagged sections now also show up correctly in the man page, too.
 > 
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2:
->  - Check for !qtest_enabled() since tests/hd-geo-test still uses these
->  - Added "addr" to the list, too
->  - Also mark the options as deprecated in the documentation
 
-Thanks, added the missing deprecation note for 'serial' in the
-documentation and applied to the block branch.
+Michael, do you want to take this through qemu-trivial?
 
 Kevin
