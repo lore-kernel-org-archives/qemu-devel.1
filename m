@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSJBv-00028W-Mq
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:28:16 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dSJEC-0003gb-RL
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dSJBr-0000pM-O7
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:28:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSJBr-0000oX-EJ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:28:11 -0400
-Date: Tue, 4 Jul 2017 09:28:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170704082805.GA3135@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
-	<1499099693-22903-2-git-send-email-pbonzini@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dSJE8-0002s2-Ic
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:30:36 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:48051)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dSJE8-0002pK-0f
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:30:32 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Tue,  4 Jul 2017 10:30:13 +0200
+Message-Id: <149915701334.6295.1724301929524364123.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1499099693-22903-2-git-send-email-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/22] configure: factor out list of
- supported Xen/KVM/HAX targets
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 0/6] trace: [tcg] Optimize per-vCPU tracing
+ states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +25,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Jul 03, 2017 at 06:34:32PM +0200, Paolo Bonzini wrote:
-> This will be useful when the functions are called, early in the configure
-> process, to filter out targets that do not support hardware acceleration.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  configure | 90 ++++++++++++++++++++++++++++++++++++++-------------------------
->  1 file changed, 55 insertions(+), 35 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index c571ad1..0f14e79 100755
-> --- a/configure
-> +++ b/configure
-> @@ -163,6 +163,50 @@ have_backend () {
->      echo "$trace_backends" | grep "$1" >/dev/null
->  }
->  
-> +glob() {
-> +    eval test -z '"${1#'"$2"'}"'
-> +}
-> +
-> +supported_hax_target() {
-> +    test "$hax" = "yes" || return 1
-> +    glob "$1" "*-softmmu" || return 1
-> +    case "${1%-softmmu}" in
-> +        i386|x86_64)
-> +            return 0
-> +        ;;
-> +    esac
-> +    return 1
-> +}
-> +
-> +supported_kvm_target() {
-> +    test "$kvm" = "yes" || return 1
-> +    glob "$1" "*-softmmu" || return 1
-> +    case "${1%-softmmu}:$cpu" in
-> +        arm:arm | aarch64:aarch64 | \
-> +        i386:i386 | i386:x86_64 | i386:x32 | \
-> +        x86_64:i386 | x86_64:x86_64 | x86_64:x32 | \
-
-IIUC, 'x86_64:i386' is claiming that you can run x86_64
-KVM guests on an i386 host. I thought that was impossible,
-only 32-on-64 being allowed not 64-on-32.
+Optimizes tracing of events with the 'tcg' and 'vcpu' properties (e.g., m=
+emory
+accesses), making it feasible to statically enable them by default on all=
+ QEMU
+builds. Last patch shows that overheads are completely eliminated in vari=
+ous
+types of benchmarks for linux-user and softmmu (overheads where up to 2x
+before).
 
 
-> +        mips:mips | mipsel:mips | \
-> +        ppc:ppc | ppcemb:ppc | ppc64:ppc | \
-> +        ppc:ppc64 | ppcemb:ppc64 | ppc64:ppc64 | \
+Right now, events with the 'tcg' property always generate TCG code to tra=
+ce that
+event at guest code execution time, where the event's dynamic state is ch=
+ecked.
 
-Same question here with ppc64:ppc suggesting you can
-run 64-bit guest with KVM on a 32-bit host ?
+This series adds a performance optimization where TCG code for events wit=
+h the
+'tcg' and 'vcpu' properties is not generated if the event is dynamically
+disabled. This optimization raises two issues:
 
-> +        s390x:s390x)
-> +            return 0
-> +        ;;
-> +    esac
-> +    return 1
-> +}
-> +
-> +supported_xen_target() {
-> +    test "$xen" = "yes" || return 1
-> +    glob "$1" "*-softmmu" || return 1
-> +    case "${1%-softmmu}:$cpu" in
-> +        arm:arm | aarch64:aarch64 | \
-> +        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
+* An event can be dynamically disabled/enabled after the corresponding TC=
+G code
+  has been generated (i.e., a new TB with the corresponding code should b=
+e
+  used).
 
-This again is claiming support for 64-bit guests with Xen on a
-32-bit host, which AFAIK is impossible.
+* Each vCPU can have a different dynamic state for the same event (i.e., =
+tracing
+  the memory accesses of only one process pinned to a vCPU).
 
-> +            return 0
-> +        ;;
-> +    esac
-> +    return 1
-> +}
+To handle both issues, this series integrates the dynamic tracing event s=
+tate
+into the TB hashing function, so that vCPUs tracing different events will=
+ use
+separate TBs. Note that only events with the 'vcpu' property are used for
+hashing (as stored in the bitmap of #CPUState::trace_dstate).
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+This makes dynamic event state changes on vCPUs very efficient, since the=
+y can
+use TBs produced by other vCPUs while on the same event state combination=
+ (or
+produced by the same vCPU, earlier).
+
+Discarded alternatives:
+
+* Emitting TCG code to check if an event needs tracing, where we should s=
+till
+  move the tracing call code to either a cold path (making tracing perfor=
+mance
+  worse), or leave it inlined (making non-tracing performance worse).
+
+* Eliding TCG code only when *zero* vCPUs are tracing an event, since ena=
+bling
+  it on a single vCPU will impact the performance of all other vCPUs that=
+ are
+  not tracing that event.
+
+Signed-off-by: Llu=C3=ADs Vilanova <address@hidden>
+---
+
+Changes in v11
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 931892e8a6.
+* Drop patch for flushing per-CPU virtual TB cache.
+* Fix typo in comments.
+* Change documentation format in TranslationBlock.
+
+
+Changes in v10
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Replace lingering trace_get_vcpu_event_count() with
+  CPU_TRACE_DSTATE_MAX_EVENTS [Emilio G. Cota].
+* Add performance results for dbt-bench [Emilio G. Cota].
+
+
+Changes in v9
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 931892e8a6.
+* Undo renaming of tb->trace_vcpu_dstate to the shorter tb->trace_ds.
+* Add measurements to commit enabling all guest events.
+
+
+Changes in v8
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+[Emilio G. Cota]
+
+* Ported to current dev tree.
+
+* Allocate cpu->trace_dstate statically. This
+  * allows us to drop the event_count inline patch.
+  * simplifies and improves the performance of accessing cpu->trace_dstat=
+e:
+    we just need to dereference, instead of going through bitmap_copy and
+    an intermediate unsigned long.
+
+* If we try to register more CPU events than the max we support (there's =
+a
+  constant for it), drop the event and tell the user with error_report. B=
+ut
+  really this is a bug, since we control what CPU events are traceable. S=
+hould
+  we abort() as well?
+
+* Added rth's R-b tag
+
+* Addressed my own comments:
+  * rename tb->trace_vcpu_dstate to the shorter tb->trace_ds
+  * use uint32_t for tb->trace_ds instead of a typedef
+  * add BUILD_BUG_ON check to make sure tb->trace_ds is big enough
+  * fix xxhash
+
+* Do not add trace_dstate to tb_htable_lookup, since we can grab it from
+  cpu->trace_dstate.
+
+This patchset applies cleanly on top of rth's tcg-next (a01792e1e).
+
+
+Changes in v7
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Fix delayed dstate changes (now uses async_run_on_cpu() as suggested by=
+ Paolo
+  Bonzini).
+
+* Note to Richard: patch 4 has been adapted to the new patch 3 async call=
+back,
+  but is essentially the same.
+
+
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Check hashing size error with QEMU_BUILD_BUG_ON [Richard Henderson].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Move define into "qemu-common.h" to allow compilation of tests.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Incorporate trace_dstate into the TB hashing function instead of using
+  multiple physical TB caches [suggested by Richard Henderson].
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+* Do not use reserved symbol prefixes ("__") [Stefan Hajnoczi].
+* Refactor trace_get_vcpu_event_count() to be inlinable.
+* Optimize cpu_tb_cache_set_requested() (hottest path).
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Fix bitmap copy in cpu_tb_cache_set_apply().
+* Split generated code re-alignment into a separate patch [Daniel P. Berr=
+ange].
+
+Llu=C3=ADs Vilanova (6):
+      trace: Allocate cpu->trace_dstate in place
+      trace: [tcg] Delay changes to dynamic state when translating
+      exec: [tcg] Use different TBs according to the vCPU's dynamic traci=
+ng state
+      trace: [tcg] Do not generate TCG code to trace dynamically-disabled=
+ events
+      trace: [tcg,trivial] Re-align generated code
+      trace: [trivial] Statically enable all guest events
+
+
+ accel/tcg/cpu-exec.c                     |    8 ++++++--
+ accel/tcg/translate-all.c                |   11 +++++++++--
+ include/exec/exec-all.h                  |    3 +++
+ include/exec/tb-hash-xx.h                |    7 +++++--
+ include/exec/tb-hash.h                   |    5 +++--
+ include/qom/cpu.h                        |   12 ++++++------
+ qom/cpu.c                                |    8 --------
+ scripts/tracetool/__init__.py            |    3 ++-
+ scripts/tracetool/backend/dtrace.py      |    4 ++--
+ scripts/tracetool/backend/ftrace.py      |   20 ++++++++++----------
+ scripts/tracetool/backend/log.py         |   19 ++++++++++---------
+ scripts/tracetool/backend/simple.py      |    4 ++--
+ scripts/tracetool/backend/syslog.py      |    6 +++---
+ scripts/tracetool/backend/ust.py         |    4 ++--
+ scripts/tracetool/format/h.py            |   26 +++++++++++++++++++-----=
+--
+ scripts/tracetool/format/tcg_h.py        |   21 +++++++++++++++++----
+ scripts/tracetool/format/tcg_helper_c.py |    5 +++--
+ tcg/tcg-runtime.c                        |    3 ++-
+ tests/qht-bench.c                        |    2 +-
+ trace-events                             |    6 +++---
+ trace/control-target.c                   |   21 ++++++++++++++++++---
+ trace/control.c                          |    9 ++++++++-
+ trace/control.h                          |    3 +++
+ 23 files changed, 137 insertions(+), 73 deletions(-)
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Emilio G. Cota <cota@braap.org>
