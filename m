@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dSHZN-0004A3-OJ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:44:22 -0400
+	(envelope-from <famz@redhat.com>) id 1dSHZP-0004Bn-SC
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dSHZM-00037L-PY
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:44:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60582)
+	(envelope-from <famz@redhat.com>) id 1dSHZO-00038P-Ue
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:44:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dSHZM-00036t-IS
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:44:20 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dSHZO-00037z-OU
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:44:22 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81D2961E48
-	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 06:44:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A43ADC04B924
+	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 06:44:21 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  4 Jul 2017 14:43:40 +0800
-Message-Id: <20170704064347.7022-14-famz@redhat.com>
+Date: Tue,  4 Jul 2017 14:43:41 +0800
+Message-Id: <20170704064347.7022-15-famz@redhat.com>
 In-Reply-To: <20170704064347.7022-1-famz@redhat.com>
 References: <20170704064347.7022-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 13/20] armv7m: Convert armv7m.memory to
- DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PATCH v3 14/20] gicv3: Convert to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +34,72 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- hw/arm/armv7m.c         | 10 +++-------
- include/hw/arm/armv7m.h |  2 +-
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ hw/intc/arm_gicv3_its_kvm.c            | 18 ++++++------------
+ include/hw/intc/arm_gicv3_its_common.h |  3 ++-
+ 2 files changed, 8 insertions(+), 13 deletions(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 3a13d82..3b0ada0 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -132,12 +132,6 @@ static void armv7m_instance_init(Object *obj)
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index 1f8991b..5520c28 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -120,17 +120,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+     qemu_add_vm_change_state_handler(vm_change_state_handler, s);
+ }
  
-     /* Can't init the cpu here, we don't yet know which model to use */
- 
--    object_property_add_link(obj, "memory",
--                             TYPE_MEMORY_REGION,
--                             (Object **)&s->board_memory,
--                             qdev_prop_allow_set_link_before_realize,
+-static void kvm_arm_its_init(Object *obj)
+-{
+-    GICv3ITSState *s = KVM_ARM_ITS(obj);
+-
+-    object_property_add_link(obj, "parent-gicv3",
+-                             "kvm-arm-gicv3", (Object **)&s->gicv3,
+-                             object_property_allow_set_link,
 -                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
 -                             &error_abort);
-     memory_region_init(&s->container, obj, "armv7m-container", UINT64_MAX);
+-}
+-
+ /**
+  * kvm_arm_its_pre_save - handles the saving of ITS registers.
+  * ITS tables are flushed into guest RAM separately and earlier,
+@@ -205,12 +194,18 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+                       GITS_CTLR, &s->ctlr, true, &error_abort);
+ }
  
-     object_initialize(&s->nvic, sizeof(s->nvic), "armv7m_nvic");
-@@ -167,7 +161,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-         return;
-     }
++static Property kvm_arm_its_props[] = {
++    DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3"),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     GICv3ITSCommonClass *icc = ARM_GICV3_ITS_COMMON_CLASS(klass);
  
--    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
-+    memory_region_add_subregion_overlap(&s->container, 0,
-+                                        MEMORY_REGION(s->board_memory), -1);
- 
-     cpustr = g_strsplit(s->cpu_model, ",", 2);
- 
-@@ -248,6 +243,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
- 
- static Property armv7m_properties[] = {
-     DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
-+    DEFINE_PROP_LINK("memory", ARMv7MState, board_memory, TYPE_MEMORY_REGION),
-     DEFINE_PROP_END_OF_LIST(),
+     dc->realize = kvm_arm_its_realize;
++    dc->props   = kvm_arm_its_props;
+     icc->send_msi = kvm_its_send_msi;
+     icc->pre_save = kvm_arm_its_pre_save;
+     icc->post_load = kvm_arm_its_post_load;
+@@ -220,7 +215,6 @@ static const TypeInfo kvm_arm_its_info = {
+     .name = TYPE_KVM_ARM_ITS,
+     .parent = TYPE_ARM_GICV3_ITS_COMMON,
+     .instance_size = sizeof(GICv3ITSState),
+-    .instance_init = kvm_arm_its_init,
+     .class_init = kvm_arm_its_class_init,
  };
  
-diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-index 1b4ce5b..1640199 100644
---- a/include/hw/arm/armv7m.h
-+++ b/include/hw/arm/armv7m.h
-@@ -58,7 +58,7 @@ typedef struct ARMv7MState {
-     /* Properties */
-     char *cpu_model;
-     /* MemoryRegion the board provides to us (with its devices, RAM, etc) */
--    MemoryRegion *board_memory;
-+    Object *board_memory;
- } ARMv7MState;
+diff --git a/include/hw/intc/arm_gicv3_its_common.h b/include/hw/intc/arm_gicv3_its_common.h
+index fd1fe64..29ec114 100644
+--- a/include/hw/intc/arm_gicv3_its_common.h
++++ b/include/hw/intc/arm_gicv3_its_common.h
+@@ -42,7 +42,8 @@ struct GICv3ITSState {
+     MemoryRegion iomem_its_cntrl;
+     MemoryRegion iomem_its_translation;
  
- #endif
+-    GICv3State *gicv3;
++    /* GICv3State pointer to be filled by link property */
++    Object *gicv3;
+ 
+     int dev_fd; /* kvm device fd if backed by kvm vgic support */
+     uint64_t gits_translater_gpa;
 -- 
 2.9.4
