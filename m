@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dSLaC-0000lU-5v
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:01:32 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dSLaH-0000lo-TX
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dSLa9-0004AD-5M
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:01:28 -0400
-Received: from mga03.intel.com ([134.134.136.65]:43148)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dSLa8-00049A-S3
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:01:25 -0400
-Message-ID: <595B7617.4060203@intel.com>
-Date: Tue, 04 Jul 2017 19:03:51 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1498617479-5809-1-git-send-email-wei.w.wang@intel.com>
-	<20170703220017-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170703220017-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4] virtio-net: enable
- configurable tx queue size
+	(envelope-from <lvivier@redhat.com>) id 1dSLaE-0004IE-Tf
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:01:34 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Tue,  4 Jul 2017 13:01:24 +0200
+Message-Id: <20170704110126.26806-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/2] target/ppc/cpu-models: set POWER9_v1.0
+ as POWER9 DD1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +18,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Suraj Singh <sursingh@redhat.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
 
-On 07/04/2017 03:18 AM, Michael S. Tsirkin wrote:
-> On Wed, Jun 28, 2017 at 10:37:59AM +0800, Wei Wang wrote:
->> This patch enables the virtio-net tx queue size to be configurable
->> between 256 (the default queue size) and 1024 by the user when the
->> vhost-user backend is used.
->>
->> Currently, the maximum tx queue size for other backends is 512 due
->> to the following limitations:
->> - QEMU backend: the QEMU backend implementation in some cases may
->> send 1024+1 iovs to writev.
->> - Vhost_net backend: there are possibilities that the guest sends
->> a vring_desc of memory which crosses a MemoryRegion thereby
->> generating more than 1024 iovs after translation from guest-physical
->> address in the backend.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> I was going to apply this, but run into a host of issues:
->
-> This segfaults:
-> $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-net,tx_queue_size=1024
-> Segmentation fault (core dumped)
->
-> I tried to tweak this code a bit to avoid the crash, and I run into a further issue:
-> $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-net,tx_queue_size=1024
-> Bad ram offset aa49002
-> Aborted (core dumped)
->
-> the second issue is especially concerning.
->
+This patch series allows to use "-cpu POWER9" with a POWER9
+DD1 host and KVM HV. With TCG, "-cpu POWER9" selects
+POWER9_v2.0 (POWER9 DD2).
 
-AFAIK, all the virtio-net backends require "-netdev". I'm wondering if there
-is any case that virtio-net can work without a "-netdev" created in QEMU?
+David, I send this series based on master, if you need a version
+based on your ppc-for-2.10 branch let me know.
 
-If not, would it be better if we just stop the device creation at the 
-beginning of
-virtio_net_device_realize() if "-netdev" is not given (i.e. 
-!n->nic_conf.peers.ncs[0])?
+v4:
+  update POWER9 comments
+  move workaround to init_proc_POWER9()
 
-Best,
-Wei
+v3:
+  add the patch to move POWER9 DD1 workaround to
+  the generic part (not only for "-cpu host").
+
+v2:
+  add POWER9_v2.0
+  sent as RFC as "-cpu POWER9" breaks the kernel
+
+Laurent Vivier (2):
+  target/ppc/cpu-models: set POWER9_v1.0 as POWER9 DD1
+  target/ppc: move POWER9 DD1 workaround to init_proc_POWER9()
+
+ hw/ppc/spapr_cpu_core.c     |  1 +
+ target/ppc/cpu-models.c     |  6 ++++--
+ target/ppc/cpu-models.h     |  1 +
+ target/ppc/kvm.c            | 11 -----------
+ target/ppc/translate_init.c | 15 ++++++++++++++-
+ 5 files changed, 20 insertions(+), 14 deletions(-)
+
+-- 
+2.9.4
