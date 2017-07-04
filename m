@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dSJM5-00019w-4F
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:38:46 -0400
+	(envelope-from <famz@redhat.com>) id 1dSJNf-0002KI-4M
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dSJM1-00027h-6w
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:38:45 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:46385)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dSJM0-00026s-Qf
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:38:41 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Tue,  4 Jul 2017 10:38:26 +0200
-Message-Id: <149915750615.6295.3713699402253529487.stgit@frigg.lan>
-In-Reply-To: <149915701334.6295.1724301929524364123.stgit@frigg.lan>
-References: <149915701334.6295.1724301929524364123.stgit@frigg.lan>
+	(envelope-from <famz@redhat.com>) id 1dSJNa-0003fm-52
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:40:19 -0400
+Date: Tue, 4 Jul 2017 16:40:06 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170704084006.GI10298@lemon.lan>
+References: <20170703221456.30817-1-eblake@redhat.com>
+	<20170703221456.30817-9-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 2/6] trace: [tcg] Delay changes to dynamic
- state when translating
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170703221456.30817-9-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 08/15] block: Convert
+ bdrv_get_block_status() to bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
 
-This keeps consistency across all decisions taken during translation
-when the dynamic state of a vCPU is changed in the middle of translating
-some guest code.
+On Mon, 07/03 17:14, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  In the common case, allocation is unlikely to ever use
+> values that are not naturally sector-aligned, but it is possible
+> that byte-based values will let us be more precise about allocation
+> at the end of an unaligned file that can do byte-based access.
+> 
+> Changing the name of the function from bdrv_get_block_status() to
+> bdrv_block_status() ensures that the compiler enforces that all
+> callers are updated.  For now, the io.c layer still assert()s that
+> all callers are sector-aligned, but that can be relaxed when a later
+> patch implements byte-based block status in the drivers.
+> 
+> Note that we have an inherent limitation in the BDRV_BLOCK_* return
+> values: BDRV_BLOCK_OFFSET_VALID can only return the start of a
+> sector, even if we later relax the interface to query for the status
+> starting at an intermediate byte; document the obvious interpretation
+> that valid offsets are always sector-relative.
+> 
+> Therefore, for the most part this patch is just the addition of scaling
+> at the callers followed by inverse scaling at bdrv_block_status().  But
+> some code, particularly bdrv_is_allocated(), gets a lot simpler because
+> it no longer has to mess with sectors.
+> 
+> For ease of review, bdrv_get_block_status_above() will be tackled
+> separately.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
----
- include/qom/cpu.h      |    3 +++
- trace/control-target.c |   20 +++++++++++++++++---
- 2 files changed, 20 insertions(+), 3 deletions(-)
-
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 31529adf2a..0f507e6f71 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -303,6 +303,8 @@ struct qemu_work_item;
-  * @kvm_fd: vCPU file descriptor for KVM.
-  * @work_mutex: Lock to prevent multiple access to queued_work_*.
-  * @queued_work_first: First asynchronous work pending.
-+ * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all =
-changes
-+ *                        to @trace_dstate).
-  * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask=
-).
-  *
-  * State of one CPU core or thread.
-@@ -375,6 +377,7 @@ struct CPUState {
-     struct kvm_run *kvm_run;
-=20
-     /* Used for events with 'vcpu' and *without* the 'disabled' properti=
-es */
-+    DECLARE_BITMAP(trace_dstate_delayed, CPU_TRACE_DSTATE_MAX_EVENTS);
-     DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
-=20
-     /* TODO Move common fields from CPUArchState here. */
-diff --git a/trace/control-target.c b/trace/control-target.c
-index 6266e6380d..d30fa5df75 100644
---- a/trace/control-target.c
-+++ b/trace/control-target.c
-@@ -1,7 +1,7 @@
- /*
-  * Interface for configuring and controlling the state of tracing events.
-  *
-- * Copyright (C) 2014-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ * Copyright (C) 2014-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  * See the COPYING file in the top-level directory.
-@@ -57,6 +57,13 @@ void trace_event_set_state_dynamic(TraceEvent *ev, boo=
-l state)
-     }
- }
-=20
-+static void trace_event_synchronize_vcpu_state_dynamic(
-+    CPUState *vcpu, run_on_cpu_data ignored)
-+{
-+    bitmap_copy(vcpu->trace_dstate, vcpu->trace_dstate_delayed,
-+                CPU_TRACE_DSTATE_MAX_EVENTS);
-+}
-+
- void trace_event_set_vcpu_state_dynamic(CPUState *vcpu,
-                                         TraceEvent *ev, bool state)
- {
-@@ -69,13 +76,20 @@ void trace_event_set_vcpu_state_dynamic(CPUState *vcp=
-u,
-     if (state_pre !=3D state) {
-         if (state) {
-             trace_events_enabled_count++;
--            set_bit(vcpu_id, vcpu->trace_dstate);
-+            set_bit(vcpu_id, vcpu->trace_dstate_delayed);
-             (*ev->dstate)++;
-         } else {
-             trace_events_enabled_count--;
--            clear_bit(vcpu_id, vcpu->trace_dstate);
-+            clear_bit(vcpu_id, vcpu->trace_dstate_delayed);
-             (*ev->dstate)--;
-         }
-+        /*
-+         * Delay changes until next TB; we want all TBs to be built from=
- a
-+         * single set of dstate values to ensure consistency of generate=
-d
-+         * tracing code.
-+         */
-+        async_run_on_cpu(vcpu, trace_event_synchronize_vcpu_state_dynami=
-c,
-+                         RUN_ON_CPU_NULL);
-     }
- }
-=20
+Reviewed-by: Fam Zheng <famz@redhat.com>
