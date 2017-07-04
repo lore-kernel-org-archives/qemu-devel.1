@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSPhQ-0002YR-Tw
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:25:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dSPkL-0003LV-Kl
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:28:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSPhM-0005NO-Qn
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:25:12 -0400
-References: <1497863771-24929-1-git-send-email-thuth@redhat.com>
-	<20170704144600.GH4253@noname.str.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <72652c2b-f7a5-d662-b648-78450d2f3c5b@redhat.com>
-Date: Tue, 4 Jul 2017 17:25:04 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dSPkK-0007J0-PJ
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:28:13 -0400
+Date: Tue, 4 Jul 2017 17:28:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170704152800.GJ4253@noname.str.redhat.com>
+References: <20170627192458.15519-1-eblake@redhat.com>
+	<20170627192458.15519-2-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170704144600.GH4253@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Add missing "@c man end"
- statements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170627192458.15519-2-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 01/20] blockjob: Track job ratelimits
+ via bytes, not sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +24,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-
-
-On 04/07/2017 16:46, Kevin Wolf wrote:
-> Am 19.06.2017 um 11:16 hat Thomas Huth geschrieben:
->> Since commit 3f2ce724f1f1 ("Move the qemu-ga description into a
->> separate chapter"), the qemu.1 man page looks pretty much screwed
->> up, e.g. the title was "qemu-ga - QEMU Guest Agent" instead of
->> "qemu-doc - QEMU Emulator User Documentation". However, that movement
->> of the gemu-ga chapter is not the real problem, it just triggered
->> another bug in the qemu-doc.texi: There are some parts in the file
->> which introduce a "@c man begin OPTIONS" section, but never close
->> it again with "@c man end". After adding the proper end tags here,
->> the title of the man page is right again and the previously wrongly
->> tagged sections now also show up correctly in the man page, too.
->>
->> Reported-by: Kevin Wolf <kwolf@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Am 27.06.2017 um 21:24 hat Eric Blake geschrieben:
+> The user interface specifies job rate limits in bytes/second.
+> It's pointless to have our internal representation track things
+> in sectors/second, particularly since we want to move away from
+> sector-based interfaces.
 > 
-> Michael, do you want to take this through qemu-trivial?
+> Fix up a doc typo found while verifying that the ratelimit
+> code handles the scaling difference.
+> 
+> Repetition of expressions like 'n * BDRV_SECTOR_SIZE' will be
+> cleaned up later when functions are converted to iterate over
+> images by bytes rather than by sectors.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
-FWIW, I'm sending it out tomorrow.  Already tested the pull request, but
-I'd like Richard to take another look at the final version of the
-TCG-disabling patches and not rush them out.
-
-Paolo
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
