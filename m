@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSN2j-0001J2-Qs
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:35:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1dSN8k-0003pY-15
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSN2g-0000fm-05
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:35:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55942)
+	(envelope-from <berrange@redhat.com>) id 1dSN8h-0003Xd-0M
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:41:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39962)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dSN2f-0000fU-QA
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:34:57 -0400
-References: <20170704111404.28569-1-berrange@redhat.com>
-	<f22d82b6-cd4b-b71c-179e-2f590ddb19b8@redhat.com>
-	<20170704122738.GM3135@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <687a9a9a-5419-a7fe-3d14-6e71f2f4a735@redhat.com>
-Date: Tue, 4 Jul 2017 14:34:52 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSN8g-0003WC-QV
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 08:41:10 -0400
+Date: Tue, 4 Jul 2017 13:41:04 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170704124104.GN3135@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
+	<1499166735-39360-3-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170704122738.GM3135@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] Document deprecated features &
- support lifecycle
+Content-Disposition: inline
+In-Reply-To: <1499166735-39360-3-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/22] configure: early test for supported
+ targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-On 04.07.2017 14:27, Daniel P. Berrange wrote:
-> On Tue, Jul 04, 2017 at 02:21:28PM +0200, Thomas Huth wrote:
->> On 04.07.2017 13:14, Daniel P. Berrange wrote:
->> [...]
->>>  - Not listing the '-6' and '-e' args to qemu-img create. Those
->>>    were never deprecations, because the functionality was
->>>    immediately turned into a fatal error.
->> How did you come to that conclusion? As far as I can see, the -6 option
->> has been added by commit ec36ba14748e140dda2 and that was part of QEMU
->> v0.10. The deprecation was done in commit eec77d9e712bd415 and that was
->> part of QEMU v0.14.
+On Tue, Jul 04, 2017 at 01:11:55PM +0200, Paolo Bonzini wrote:
+> Check for unsupported targets in target_list, and print an
+> error early in the configuration process.
 > 
-> A 'deprecation' message implies that the functionality continues to
-> work, but the user gets a warning that its going away. In this case
-> the user gets a warning, and the functionality is unusable - qemu-img
-> just exits immediately. This isn't deprecation in any normal sense,
-> it is just immediate feature removal with an message telling you it
-> has already been deleted :-(
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> 	v2: place ;; on a separate line [Daniel]
+> 
+>  configure | 70 +++++++++++++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 48 insertions(+), 22 deletions(-)
 
-Ah, right, of course ... I somehow read your original sentence that the
-functionality would have been added in one release cycle and also
-removed again in the same cycle, that's why I was confused, but it makes
-sense now. So yes, should be fine to remove this code immediately now.
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
- Thomas
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
