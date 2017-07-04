@@ -1,34 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dSIXE-0001aG-9g
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:46:13 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dSIZN-0002oI-22
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dSIXB-0003fC-7M
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:46:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36053)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dSIZK-0006D2-07
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:48:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41385
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dSIXB-0003e8-11
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:46:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dSIX8-0004rv-No
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:46:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A74922E8193
-	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 07:46:06 +0000 (UTC)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dSIZJ-0006Al-Og
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:48:21 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v647i1u1142363
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 03:48:20 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bfk9xe1mv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 03:48:19 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 4 Jul 2017 01:48:18 -0600
+References: <75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
+	<20170424143516.GD2075@work-vm>
+	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
+	<20170424191202.GQ2362@work-vm>
+	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
+	<20170426110144.GF2098@work-vm>
+	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
+	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
+	<20170630163139.GC2437@work-vm>
+	<20170703192353-mutt-send-email-mst@kernel.org>
+	<20170703190728.GE2206@work-vm>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 4 Jul 2017 09:48:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Jul 2017 07:26:20 -0000
-From: Thomas Huth <1377095@bugs.launchpad.net>
-Reply-To: Bug 1377095 <1377095@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141003105035.5331.35277.malonedeb@wampee.canonical.com>
-Message-Id: <149915318027.26657.3065864377321362708.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1377095] Re: KVM guest VM does not reattach a
- throughpassed USB printer from Host after switching printer off and on
+In-Reply-To: <20170703190728.GE2206@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+Message-Id: <55708cff-cdda-9b1d-2106-1c6d2774f890@de.ibm.com>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,69 +52,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com, Martin Schwidefsky <schwidefsky@de.ibm.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-I guess switching the printer off and on again is like attaching a new
-USB device to your host (so it only shows up in the host, of course, and
-not in the guest). Have you already tried to do a new "device_add usb-
-host,..." in the QEMU monitor to attach it to the guest again while the
-VM is running?
+On 07/03/2017 09:07 PM, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+>> On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:
+>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>>>> On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
+>>>>
+>>>>>> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
+>>>>>> then try changing ram_handle_compressed to always do the memset.
+>>>>>
+>>>>> FWIW, changing ram_handle_compressed to always memset makes the problem go away.
+>>>>
+>>>> It is still running fine now with the "always memset change"
+>>>
+>>> Did we ever nail down a fix for this; as I remember Andrea said
+>>> we shouldn't need to do that memset, but we came to the conclusion
+>>> it was something specific to how s390 protection keys worked.
+>>>
+>>> Dave
+>>
+>> No we didn't. Let's merge that for now, with a comment that
+>> we don't really understand what's going on?
+> 
+> Hmm no, I don't really want to change the !s390 behaviour, especially
+> since it causes allocation that we otherwise avoid and Andrea's
+> reply tothe original post pointed out it's not necessary.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1377095
+Since storage keys are per physical page we must not have shared pages.
+Therefore in s390_enable_skey we already do a break_ksm (via ksm_madvise),
+in other words we already allocate pages on the keyless->keyed switch.
 
-Title:
-  KVM guest VM does not reattach a throughpassed USB printer from Host
-  after switching printer off and on
+So why not do the same for zero pages - instead of invalidating the page
+table entry, lets just do a proper COW.
 
-Status in QEMU:
-  New
+Something like this maybe (Andrea, Martin any better way to do that?)
 
-Bug description:
-  =
 
-  Host OS: Gentoo, all packages built 2014-10-01
-
-  qemu version 2.1.0-r1
-
-  Linux kernel 3.14.14   x86_64 Intel(R) Core(TM) i3-3220T CPU @ 2.80GHz
-  GenuineIntel GNU/Linux
-
-  =
-
-  Guest VM: Debian 7 (Wheezy) Linux 3.2.0 686
-
-  =
-
-  Start command:
-  /usr/bin/qemu-system-i386 -enable-kvm -name wheezy -k de -serial null -pa=
-rallel null -hda /var/kvm/wheezy.kvm-img -daemonize -net nic,macaddr=3D02:0=
-0:00:00:01:31 -net tap,ifname=3Dtap3,script=3Dno,downscript=3Dno -m 512 -pi=
-dfile /var/run/kvm/wheezy.pid -usb -usbdevice tablet -runas myuser -vnc 127=
-.0.0.1:3 -usbdevice host:04e8:3242
-
-  Problem:
-  USB printer pass-through from KVM host to guest vm only works if I start =
-the qemu kvm when the USB printer (vendor/product ID 04e8:3242) is switched=
- on and therefore shown in lsusb on the host. Then it is available in the s=
-tarted VM.
-
-  But when I switch the usb printer attached to the host off, it
-  disappears in lsusb both on the host and the VM (as expected) but when
-  I switch the USB printer on again, it is shown on the host and also on
-  the QEMU Monitor (Crtl Alt Shift 2 -> info usbhost), but in the VM
-  lsusb does not show it again- so USB pass-through / hot plugging does
-  not work. It worked with a previous Version of qemu (1.0 or
-  something).
-
-  That is very annoying, because every time I want to print something, I ne=
-ed to shutdown the VM, start the printer, and then start the VM (which runs=
- cups as printer server).
-  But after printing, I do not want the printer to keep running, so I switc=
-h it off.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1377095/+subscriptions
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index 4fb3d3c..11475c7 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -2149,13 +2149,18 @@ EXPORT_SYMBOL_GPL(s390_enable_sie);
+ static int __s390_enable_skey(pte_t *pte, unsigned long addr,
+                              unsigned long next, struct mm_walk *walk)
+ {
++       struct page *page;
+        /*
+-        * Remove all zero page mappings,
++        * Remove all zero page mappings with a COW
+         * after establishing a policy to forbid zero page mappings
+         * following faults for that page will get fresh anonymous pages
+         */
+-       if (is_zero_pfn(pte_pfn(*pte)))
+-               ptep_xchg_direct(walk->mm, addr, pte, __pte(_PAGE_INVALID));
++       if (is_zero_pfn(pte_pfn(*pte))) {
++               if (get_user_pages(addr, 1, FOLL_WRITE, &page, NULL) == 1)
++                       put_page(page);
++               else
++                       return -ENOMEM;
++       }
+        /* Clear storage key */
+        ptep_zap_key(walk->mm, addr, pte);
+        return 0;
