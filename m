@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJea-00058t-Ii
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:57 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dSJee-0005DA-Ub
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJeX-0005bT-Ow
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:52 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3958)
+	(envelope-from <longpeng2@huawei.com>) id 1dSJed-0005fp-Rq
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:57 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4017)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dSJeW-0005aB-UR
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:49 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dSJed-0005dJ-8V
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:57:55 -0400
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 4 Jul 2017 16:56:56 +0800
-Message-ID: <1499158630-75260-5-git-send-email-longpeng2@huawei.com>
+Date: Tue, 4 Jul 2017 16:57:10 +0800
+Message-ID: <1499158630-75260-19-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 04/18] crypto: cipher: introduce
- qcrypto_cipher_ctx_new for builtin-backend
+Subject: [Qemu-devel] [PATCH v4 18/18] tests: crypto: add hmac speed
+ benchmark support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,196 +29,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
-builtin-backend impls.
+This patch add a hmac speed benchmark, it helps us to
+measure the performance by using "make check-speed" or
+using "./tests/benchmark-crypto-hmac" directly.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/cipher-builtin.c | 101 ++++++++++++++++++++++++++----------------------
- 1 file changed, 55 insertions(+), 46 deletions(-)
+ tests/Makefile.include        |  2 +
+ tests/benchmark-crypto-hmac.c | 94 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 96 insertions(+)
+ create mode 100644 tests/benchmark-crypto-hmac.c
 
-diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
-index b4bc2b9..4ecd15e 100644
---- a/crypto/cipher-builtin.c
-+++ b/crypto/cipher-builtin.c
-@@ -235,23 +235,24 @@ static int qcrypto_cipher_setiv_aes(QCryptoCipher *cipher,
- 
- 
- 
--static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
--                                   const uint8_t *key, size_t nkey,
--                                   Error **errp)
-+static QCryptoCipherBuiltin *
-+qcrypto_cipher_init_aes(QCryptoCipherMode mode,
-+                        const uint8_t *key, size_t nkey,
-+                        Error **errp)
- {
-     QCryptoCipherBuiltin *ctxt;
- 
--    if (cipher->mode != QCRYPTO_CIPHER_MODE_CBC &&
--        cipher->mode != QCRYPTO_CIPHER_MODE_ECB &&
--        cipher->mode != QCRYPTO_CIPHER_MODE_XTS) {
-+    if (mode != QCRYPTO_CIPHER_MODE_CBC &&
-+        mode != QCRYPTO_CIPHER_MODE_ECB &&
-+        mode != QCRYPTO_CIPHER_MODE_XTS) {
-         error_setg(errp, "Unsupported cipher mode %s",
--                   QCryptoCipherMode_lookup[cipher->mode]);
--        return -1;
-+                   QCryptoCipherMode_lookup[mode]);
-+        return NULL;
-     }
- 
-     ctxt = g_new0(QCryptoCipherBuiltin, 1);
- 
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
-+    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-         if (AES_set_encrypt_key(key, nkey * 4, &ctxt->state.aes.key.enc) != 0) {
-             error_setg(errp, "Failed to set encryption key");
-             goto error;
-@@ -291,13 +292,11 @@ static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
-     ctxt->encrypt = qcrypto_cipher_encrypt_aes;
-     ctxt->decrypt = qcrypto_cipher_decrypt_aes;
- 
--    cipher->opaque = ctxt;
--
--    return 0;
-+    return ctxt;
- 
-  error:
-     g_free(ctxt);
--    return -1;
-+    return NULL;
- }
- 
- 
-@@ -370,16 +369,17 @@ static int qcrypto_cipher_setiv_des_rfb(QCryptoCipher *cipher,
- }
- 
- 
--static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
--                                       const uint8_t *key, size_t nkey,
--                                       Error **errp)
-+static QCryptoCipherBuiltin *
-+qcrypto_cipher_init_des_rfb(QCryptoCipherMode mode,
-+                            const uint8_t *key, size_t nkey,
-+                            Error **errp)
- {
-     QCryptoCipherBuiltin *ctxt;
- 
--    if (cipher->mode != QCRYPTO_CIPHER_MODE_ECB) {
-+    if (mode != QCRYPTO_CIPHER_MODE_ECB) {
-         error_setg(errp, "Unsupported cipher mode %s",
--                   QCryptoCipherMode_lookup[cipher->mode]);
--        return -1;
-+                   QCryptoCipherMode_lookup[mode]);
-+        return NULL;
-     }
- 
-     ctxt = g_new0(QCryptoCipherBuiltin, 1);
-@@ -394,9 +394,7 @@ static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
-     ctxt->encrypt = qcrypto_cipher_encrypt_des_rfb;
-     ctxt->decrypt = qcrypto_cipher_decrypt_des_rfb;
- 
--    cipher->opaque = ctxt;
--
--    return 0;
-+    return ctxt;
- }
- 
- 
-@@ -426,12 +424,13 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
- }
- 
- 
--QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
--                                  QCryptoCipherMode mode,
--                                  const uint8_t *key, size_t nkey,
--                                  Error **errp)
-+static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
-+                                                    QCryptoCipherMode mode,
-+                                                    const uint8_t *key,
-+                                                    size_t nkey,
-+                                                    Error **errp)
- {
--    QCryptoCipher *cipher;
-+    QCryptoCipherBuiltin *ctxt;
- 
-     switch (mode) {
-     case QCRYPTO_CIPHER_MODE_ECB:
-@@ -444,39 +443,27 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         return NULL;
-     }
- 
--    cipher = g_new0(QCryptoCipher, 1);
--    cipher->alg = alg;
--    cipher->mode = mode;
--
-     if (!qcrypto_cipher_validate_key_length(alg, mode, nkey, errp)) {
--        goto error;
-+        return NULL;
-     }
- 
--    switch (cipher->alg) {
-+    switch (alg) {
-     case QCRYPTO_CIPHER_ALG_DES_RFB:
--        if (qcrypto_cipher_init_des_rfb(cipher, key, nkey, errp) < 0) {
--            goto error;
--        }
-+        ctxt = qcrypto_cipher_init_des_rfb(mode, key, nkey, errp);
-         break;
-     case QCRYPTO_CIPHER_ALG_AES_128:
-     case QCRYPTO_CIPHER_ALG_AES_192:
-     case QCRYPTO_CIPHER_ALG_AES_256:
--        if (qcrypto_cipher_init_aes(cipher, key, nkey, errp) < 0) {
--            goto error;
--        }
-+        ctxt = qcrypto_cipher_init_aes(mode, key, nkey, errp);
-         break;
-     default:
-         error_setg(errp,
-                    "Unsupported cipher algorithm %s",
--                   QCryptoCipherAlgorithm_lookup[cipher->alg]);
--        goto error;
-+                   QCryptoCipherAlgorithm_lookup[alg]);
-+        return NULL;
-     }
- 
--    return cipher;
--
-- error:
--    g_free(cipher);
--    return NULL;
-+    return ctxt;
- }
- 
- void qcrypto_cipher_free(QCryptoCipher *cipher)
-@@ -537,3 +524,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
- 
-     return ctxt->setiv(cipher, iv, niv, errp);
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index e83eb6b..258bcbc 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
+ check-unit-y += tests/test-crypto-hash$(EXESUF)
+ check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
+ check-unit-y += tests/test-crypto-hmac$(EXESUF)
++check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
+ check-unit-y += tests/test-crypto-cipher$(EXESUF)
+ check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
+ check-unit-y += tests/test-crypto-secret$(EXESUF)
+@@ -637,6 +638,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+ tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+ tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
+ tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
++tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
+ tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
+ tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+ tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
+diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
+new file mode 100644
+index 0000000..05b02a5
+--- /dev/null
++++ b/tests/benchmark-crypto-hmac.c
+@@ -0,0 +1,94 @@
++/*
++ * QEMU Crypto hmac speed benchmark
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "crypto/init.h"
++#include "crypto/hmac.h"
 +
++#define KEY "monkey monkey monkey monkey"
 +
-+QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-+                                  QCryptoCipherMode mode,
-+                                  const uint8_t *key, size_t nkey,
-+                                  Error **errp)
++static void test_hmac_speed(const void *opaque)
 +{
-+    QCryptoCipher *cipher;
-+    QCryptoCipherBuiltin *ctxt;
++    size_t chunk_size = (size_t)opaque;
++    QCryptoHmac *hmac = NULL;
++    uint8_t *in = NULL, *out = NULL;
++    size_t out_len = 0;
++    double total = 0.0;
++    struct iovec iov;
++    Error *err = NULL;
++    int ret;
 +
-+    ctxt = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
-+    if (!ctxt) {
-+        return NULL;
++    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
++        return;
 +    }
 +
-+    cipher = g_new0(QCryptoCipher, 1);
-+    cipher->alg = alg;
-+    cipher->mode = mode;
-+    cipher->opaque = ctxt;
++    hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
++                            strlen(KEY), &err);
++    g_assert(err == NULL);
++    g_assert(hmac != NULL);
 +
-+    return cipher;
++    in = g_new0(uint8_t, chunk_size);
++    memset(in, g_test_rand_int(), chunk_size);
++
++    iov.iov_base = (char *)in;
++    iov.iov_len = chunk_size;
++
++    g_test_timer_start();
++    do {
++        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
++        g_assert(ret == 0);
++        g_assert(err == NULL);
++
++#if !defined(CONFIG_NETTLE) && !defined(CONFIG_GCRYPT)
++        /*
++         * qcrypto_hmac_bytesv() uses g_checksum_get_digest() to get the
++         * digest. Once this function has been called, the #GChecksum is
++         * closed and can no longer be updated with g_checksum_update().
++         * So...we must free glib-backend hmac object and renew one here.
++         */
++        qcrypto_hmac_free(hmac);
++        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
++                                strlen(KEY), &err);
++        g_assert(err == NULL);
++        g_assert(hmac != NULL);
++#endif
++        total += chunk_size;
++    } while (g_test_timer_elapsed() < 5.0);
++
++    total /= 1024 * 1024; /* to MB */
++
++    g_print("hmac(sha256): ");
++    g_print("Testing chunk_size %ld bytes ", chunk_size);
++    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
++    g_print("%.2f MB/sec\n", total / g_test_timer_last());
++
++    qcrypto_hmac_free(hmac);
++    g_free(out);
++    g_free(in);
++}
++
++int main(int argc, char **argv)
++{
++    size_t i;
++    char name[64];
++
++    g_test_init(&argc, &argv, NULL);
++    g_assert(qcrypto_init(NULL) == 0);
++
++    for (i = 512; i <= (64 * 1204); i *= 2) {
++        memset(name, 0 , sizeof(name));
++        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
++        g_test_add_data_func(name, (void *)i, test_hmac_speed);
++    }
++
++    return g_test_run();
 +}
 -- 
 1.8.3.1
