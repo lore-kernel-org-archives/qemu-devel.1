@@ -1,40 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSKsT-00010r-PR
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 06:16:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1dSLAJ-0007BP-1z
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 06:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSKsO-00021Y-Si
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 06:16:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60406
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dSKsO-00021I-MD
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 06:16:12 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v64AE2qY119930
-	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 06:16:11 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg6bgkhwh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 06:16:11 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 4 Jul 2017 06:16:10 -0400
-References: <20170704092215.13742-1-cohuck@redhat.com>
-	<20170704092215.13742-2-cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 4 Jul 2017 12:16:05 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170704092215.13742-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <5b2264d5-eaa3-df0b-4a4c-95cf8fdd9f78@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] Update my email address
+	(envelope-from <berrange@redhat.com>) id 1dSLAI-00044x-AD
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 06:34:43 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  4 Jul 2017 11:34:27 +0100
+Message-Id: <20170704103427.22791-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-img: delete the -e and -6 options from
+ the 'create' command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,57 +18,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 07/04/2017 11:22 AM, Cornelia Huck wrote:
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+The '-e' and '-6' options to the 'create' command were "deprecated"
+in favour of the more generic '-o' option many years ago:
 
-Thanks applied to my s390-next tree.
+  commit eec77d9e712bd4157a4e1c0b5a9249d168add738
+  Author: Jes Sorensen <Jes.Sorensen@redhat.com>
+  Date:   Tue Dec 7 17:44:34 2010 +0100
 
+    qemu-img: Deprecate obsolete -6 and -e options
 
-> ---
->  MAINTAINERS | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7df088259b..afc2b8b328 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -299,7 +299,7 @@ F: target/ppc/kvm.c
-> 
->  S390
->  M: Christian Borntraeger <borntraeger@de.ibm.com>
-> -M: Cornelia Huck <cornelia.huck@de.ibm.com>
-> +M: Cornelia Huck <cohuck@redhat.com>
->  M: Alexander Graf <agraf@suse.de>
->  S: Maintained
->  F: target/s390x/kvm.c
-> @@ -778,7 +778,7 @@ F: include/hw/sparc/grlib.h
->  S390 Machines
->  -------------
->  S390 Virtio-ccw
-> -M: Cornelia Huck <cornelia.huck@de.ibm.com>
-> +M: Cornelia Huck <cohuck@redhat.com>
->  M: Christian Borntraeger <borntraeger@de.ibm.com>
->  M: Alexander Graf <agraf@suse.de>
->  S: Supported
-> @@ -1006,7 +1006,7 @@ F: hw/vfio/*
->  F: include/hw/vfio/
-> 
->  vfio-ccw
-> -M: Cornelia Huck <cornelia.huck@de.ibm.com>
-> +M: Cornelia Huck <cohuck@redhat.com>
->  S: Supported
->  F: hw/vfio/ccw.c
->  F: hw/s390x/s390-ccw.c
-> @@ -1048,7 +1048,7 @@ F: tests/virtio-blk-test.c
->  T: git git://github.com/stefanha/qemu.git block
-> 
->  virtio-ccw
-> -M: Cornelia Huck <cornelia.huck@de.ibm.com>
-> +M: Cornelia Huck <cohuck@redhat.com>
->  M: Christian Borntraeger <borntraeger@de.ibm.com>
->  S: Supported
->  F: hw/s390x/virtio-ccw.[hc]
-> 
+Except this was never actually a deprecation, which would imply giving
+the user a warning while the functionality continues to work for a
+number of releases before eventual removal. Instead the options were
+immediately turned into an error + exit. Given that the functionality
+is already broken, there's no point in keeping these psuedo-deprecation
+messages around any longer.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-img.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index 91ad6be..a65239f 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -464,7 +464,7 @@ static int img_create(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
++        c = getopt_long(argc, argv, ":F:b:f:ho:q",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -488,14 +488,6 @@ static int img_create(int argc, char **argv)
+         case 'f':
+             fmt = optarg;
+             break;
+-        case 'e':
+-            error_report("option -e is deprecated, please use \'-o "
+-                  "encryption\' instead!");
+-            goto fail;
+-        case '6':
+-            error_report("option -6 is deprecated, please use \'-o "
+-                  "compat6\' instead!");
+-            goto fail;
+         case 'o':
+             if (!is_valid_option_list(optarg)) {
+                 error_report("Invalid option list: %s", optarg);
+-- 
+2.9.4
