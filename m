@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dSKNd-0001CL-LW
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:44:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dSKNg-0001FQ-FR
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dSKNc-000419-DQ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:44:25 -0400
-Date: Tue, 4 Jul 2017 17:44:11 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170704094411.GO10298@lemon.lan>
-References: <20170703221456.30817-1-eblake@redhat.com>
-	<20170703221456.30817-15-eblake@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dSKNe-00042G-Uh
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:44:28 -0400
+Date: Tue, 4 Jul 2017 11:44:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170704094417.GA4253@noname.str.redhat.com>
+References: <20170704084059.6278-1-el13635@mail.ntua.gr>
+	<20170704084059.6278-2-el13635@mail.ntua.gr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170703221456.30817-15-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 14/15] block: Align block status requests
+In-Reply-To: <20170704084059.6278-2-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] block: Pass bdrv_* methods to
+ bs->file by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,175 +24,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-On Mon, 07/03 17:14, Eric Blake wrote:
-> Any device that has request_alignment greater than 512 should be
-> unable to report status at a finer granularity; it may also be
-> simpler for such devices to be guaranteed that the block layer
-> has rounded things out to the granularity boundary (the way the
-> block layer already rounds all other I/O out).  Besides, getting
-> the code correct for super-sector alignment also benefits us
-> for the fact that our public interface now has byte granularity,
-> even though none of our drivers have byte-level callbacks.
+Am 04.07.2017 um 10:40 hat Manos Pitsidianakis geschrieben:
+> The following functions fail if bs->drv does not implement them:
 > 
-> Add an assertion in blkdebug that proves that the block layer
-> never requests status of unaligned sections, similar to what it
-> does on other requests (while still keeping the generic helper
-> in place for when future patches add a throttle driver).  Note
-> note that iotest 177 already covers this (it would fail if you
-
-Drop one "note"?
-
-> use just the blkdebug.c hunk without the io.c changes).
-> Meanwhile, we can drop assertions in callers that no longer have
-> to pass in sector-aligned addresses.
+> bdrv_probe_blocksizes
+> bdrv_probe_geometry
+> bdrv_truncate
+> bdrv_has_zero_init
+> bdrv_get_info
+> bdrv_media_changed
+> bdrv_eject
+> bdrv_lock_medium
+> bdrv_co_ioctl
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Instead, the call should be passed to bs->file if it exists, to allow
+> filter drivers to support those methods without implementing them.
 > 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 > ---
-> v2: new patch
-> ---
->  include/block/block_int.h |  3 ++-
->  block/blkdebug.c          | 13 +++++++++++-
->  block/io.c                | 53 ++++++++++++++++++++++++++++++++---------------
->  3 files changed, 50 insertions(+), 19 deletions(-)
+>  block.c    | 27 +++++++++++++++++++++++++--
+>  block/io.c |  5 +++++
+>  2 files changed, 30 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index ffa22c7..5f6ba5d 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -173,7 +173,8 @@ struct BlockDriver {
->       * according to the current layer, and should not set
->       * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
->       * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
-> -     * layer guarantees non-NULL pnum and file.
-> +     * layer guarantees input aligned to request_alignment, as well as
-> +     * non-NULL pnum and file.
->       */
->      int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
->          int64_t sector_num, int nb_sectors, int *pnum,
-> diff --git a/block/blkdebug.c b/block/blkdebug.c
-> index f1539db..67736b4 100644
-> --- a/block/blkdebug.c
-> +++ b/block/blkdebug.c
-> @@ -641,6 +641,17 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
->      return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
->  }
-> 
-> +static int64_t coroutine_fn blkdebug_co_get_block_status(
-> +    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
-> +    BlockDriverState **file)
-> +{
-> +    assert(QEMU_IS_ALIGNED(sector_num | nb_sectors,
-> +                           DIV_ROUND_UP(bs->bl.request_alignment,
-> +                                        BDRV_SECTOR_SIZE)));
-> +    return bdrv_co_get_block_status_from_file(bs, sector_num, nb_sectors,
-> +                                              pnum, file);
-> +}
-> +
->  static void blkdebug_close(BlockDriverState *bs)
+> diff --git a/block.c b/block.c
+> index 69439628..8a122142 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -494,6 +494,8 @@ int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
+>  
+>      if (drv && drv->bdrv_probe_blocksizes) {
+>          return drv->bdrv_probe_blocksizes(bs, bsz);
+> +    } else if (drv && bs->file && bs->file->bs) {
+
+The check for bs->file->bs isn't really necessary, we never have a
+BdrvChild with a NULL bs.
+
+> +        return bdrv_probe_blocksizes(bs->file->bs, bsz);
+>      }
+>  
+>      return -ENOTSUP;
+
+This change actually changes existing behaviour. Basically, all of your
+additions also apply for qcow2 images or other image formats, and we
+need to check whether they make sense there.
+
+bdrv_probe_blocksizes() is used for the default values for the physical
+and logical block sizes for block devices if no value is explicitly
+specified in -device. This makes sense as it will allow the guest to
+optimise its requests so that they align with the block size that is
+optimal for the storage that contains the image. (I also think that we
+probably should implement .bdrv_probe_blocksizes() not only for
+host_device, but also for regular files to get optimal performance by
+default.)
+
+Changing the defaults can be a problem for cross-version live migration
+if the default values are used. Management tools that want to do live
+migration are supposed to explicitly provide all options they can, so
+this should be okay.
+
+Eric, does libvirt set the physical/logical block size explicitly? If
+not, it would be good if it started to do so.
+
+This hunk is non-trivial enough that it's probably worth a patch of its
+own with a detailed commit message explaining why we want this change
+and why it is safe.
+
+> @@ -511,6 +513,8 @@ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
+>  
+>      if (drv && drv->bdrv_probe_geometry) {
+>          return drv->bdrv_probe_geometry(bs, geo);
+> +    } else if (drv && bs->file && bs->file->bs) {
+> +        return bdrv_probe_geometry(bs->file->bs, geo);
+>      }
+>  
+>      return -ENOTSUP;
+
+The probed geometry would refer to the physical image file, not to the
+actually presented image. So propagating this to bs->file is wrong for
+image formats.
+
+Possibly checking .is_filter in addition would be enough.
+
+If you decide that this is the right field, please add some note to the
+comment for the .is_filter declaration that tells about the assumptions
+that are made when the field is set. I'm not completely sure what they
+are, but maybe something like this: If bs->file != NULL, then all data
+exposed by the filter node is mapped at the same offset in bs->file.
+
+> @@ -3406,11 +3410,15 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
+>  
+>      assert(child->perm & BLK_PERM_RESIZE);
+>  
+> +    /* if bs->drv == NULL, bs is closed, so there's nothing to do here */
+>      if (!drv) {
+>          error_setg(errp, "No medium inserted");
+>          return -ENOMEDIUM;
+>      }
+>      if (!drv->bdrv_truncate) {
+> +        if (bs->file && bs->file->bs) {
+> +            return bdrv_truncate(bs->file, offset, errp);
+> +        }
+>          error_setg(errp, "Image format driver does not support resize");
+>          return -ENOTSUP;
+>      }
+
+This is actively dangerous without an .is_filter check!
+
+All image formats that don't support image resizing would instead just
+truncate the image file without considering the format at all.
+
+> @@ -3778,6 +3786,9 @@ int bdrv_has_zero_init(BlockDriverState *bs)
+>      if (bs->drv->bdrv_has_zero_init) {
+>          return bs->drv->bdrv_has_zero_init(bs);
+>      }
+> +    if (bs->file && bs->file->bs) {
+> +        return bdrv_has_zero_init(bs->file->bs);
+> +    }
+>  
+>      /* safe default */
+>      return 0;
+
+This is wrong for image formats.
+
+> @@ -3832,10 +3843,16 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
+>  int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
 >  {
->      BDRVBlkdebugState *s = bs->opaque;
-> @@ -915,7 +926,7 @@ static BlockDriver bdrv_blkdebug = {
->      .bdrv_co_flush_to_disk  = blkdebug_co_flush,
->      .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
->      .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
-> -    .bdrv_co_get_block_status = bdrv_co_get_block_status_from_file,
-> +    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
-> 
->      .bdrv_debug_event           = blkdebug_debug_event,
->      .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+>      BlockDriver *drv = bs->drv;
+> -    if (!drv)
+> +    /* if bs->drv == NULL, bs is closed, so there's nothing to do here */
+> +    if (!drv) {
+>          return -ENOMEDIUM;
+> -    if (!drv->bdrv_get_info)
+> +    }
+> +    if (!drv->bdrv_get_info) {
+> +        if (bs->file && bs->file->bs) {
+> +            return bdrv_get_info(bs->file->bs, bdi);
+> +        }
+>          return -ENOTSUP;
+> +    }
+>      memset(bdi, 0, sizeof(*bdi));
+>      return drv->bdrv_get_info(bs, bdi);
+>  }
+
+Same thing.
+
+> @@ -4205,6 +4222,8 @@ int bdrv_media_changed(BlockDriverState *bs)
+>  
+>      if (drv && drv->bdrv_media_changed) {
+>          return drv->bdrv_media_changed(bs);
+> +    } else if (drv && bs->file && bs->file->bs) {
+> +        return bdrv_media_changed(bs->file->bs);
+>      }
+>      return -ENOTSUP;
+>  }
+
+This function appears to be unused, so instead of discussing whether
+this actually makes sense, we can simply remove it. :-)
+
+> @@ -4218,6 +4237,8 @@ void bdrv_eject(BlockDriverState *bs, bool eject_flag)
+>  
+>      if (drv && drv->bdrv_eject) {
+>          drv->bdrv_eject(bs, eject_flag);
+> +    } else if (drv && bs->file && bs->file->bs) {
+> +        bdrv_eject(bs->file->bs, eject_flag);
+>      }
+>  }
+>  
+> @@ -4233,6 +4254,8 @@ void bdrv_lock_medium(BlockDriverState *bs, bool locked)
+>  
+>      if (drv && drv->bdrv_lock_medium) {
+>          drv->bdrv_lock_medium(bs, locked);
+> +    } else if (drv && bs->file && bs->file->bs) {
+> +        bdrv_lock_medium(bs->file->bs, locked);
+>      }
+>  }
+
+I'm not sure if media change can be handled transparently without
+explicit support in all drivers in the chain. This is probably even true
+for filter drivers.
+
+So I think I would just drop these two hunks from the patch.
+
 > diff --git a/block/io.c b/block/io.c
-> index 91d3e99..5ed1ac7 100644
+> index 5c146b5a..c22a9bf2 100644
 > --- a/block/io.c
 > +++ b/block/io.c
-> @@ -1746,7 +1746,8 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
->      int64_t n; /* bytes */
->      int64_t ret, ret2;
->      BlockDriverState *local_file = NULL;
-> -    int count; /* sectors */
-> +    int64_t aligned_offset, aligned_bytes;
-> +    uint32_t align;
-> 
->      assert(pnum);
->      total_size = bdrv_getlength(bs);
-> @@ -1788,27 +1789,44 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
->      }
-> 
+> @@ -2425,6 +2425,11 @@ int bdrv_co_ioctl(BlockDriverState *bs, int req, void *buf)
+>      };
+>      BlockAIOCB *acb;
+>  
+> +    if (drv && !drv->bdrv_aio_ioctl && !drv->bdrv_co_ioctl &&
+> +        bs->file && bs->file->bs) {
+> +        return bdrv_co_ioctl(bs->file->bs, req, buf);
+> +    }
+> +
 >      bdrv_inc_in_flight(bs);
-> -    /*
-> -     * TODO: Rather than require aligned offsets, we could instead
-> -     * round to the driver's request_alignment here, then touch up
-> -     * count afterwards back to the caller's expectations.
-> -     */
-> -    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
-> -    ret = bs->drv->bdrv_co_get_block_status(bs, offset >> BDRV_SECTOR_BITS,
-> -                                            bytes >> BDRV_SECTOR_BITS, &count,
-> -                                            &local_file);
-> -    if (ret < 0) {
-> -        *pnum = 0;
-> -        goto out;
-> +
-> +    /* Round out to request_alignment boundaries */
-> +    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
-> +    aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-> +    aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
-> +
-> +    {
+>      if (!drv || (!drv->bdrv_aio_ioctl && !drv->bdrv_co_ioctl)) {
+>          co.ret = -ENOTSUP;
 
-Not sure why using a {} block here?
+This makes me nervous. Basically, SCSI passthrough doesn't work well
+with anything that isn't just a file-posix BDS. Bypassing block nodes
+for it, whether image formats or filter drivers, might get these drivers
+into surprising states and might even break the image.
 
-> +        int count; /* sectors */
-> +
-> +        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
-> +                               BDRV_SECTOR_SIZE));
-> +        ret = bs->drv->bdrv_co_get_block_status(
-> +            bs, aligned_offset >> BDRV_SECTOR_BITS,
-> +            aligned_bytes >> BDRV_SECTOR_BITS, &count, &local_file);
-> +        if (ret < 0) {
-> +            *pnum = 0;
-> +            goto out;
-> +        }
-> +        *pnum = count * BDRV_SECTOR_SIZE;
-> +    }
-> +
-> +    /* Clamp pnum and ret to original request */
-> +    assert(QEMU_IS_ALIGNED(*pnum, align));
-> +    *pnum -= offset - aligned_offset;
-> +    if (aligned_offset >> BDRV_SECTOR_BITS != offset >> BDRV_SECTOR_BITS &&
-> +        ret & BDRV_BLOCK_OFFSET_VALID) {
-> +        ret += QEMU_ALIGN_DOWN(offset - aligned_offset, BDRV_SECTOR_SIZE);
-> +    }
-> +    if (*pnum > bytes) {
-> +        *pnum = bytes;
->      }
-> -    *pnum = count * BDRV_SECTOR_SIZE;
-> 
->      if (ret & BDRV_BLOCK_RAW) {
->          assert(ret & BDRV_BLOCK_OFFSET_VALID && local_file);
->          ret = bdrv_co_block_status(local_file, allocation,
-> -                                   ret & BDRV_BLOCK_OFFSET_MASK,
-> +                                   (ret & BDRV_BLOCK_OFFSET_MASK) |
-> +                                   (offset & ~BDRV_BLOCK_OFFSET_MASK),
->                                     *pnum, pnum, &local_file);
-> -        assert(QEMU_IS_ALIGNED(*pnum, BDRV_SECTOR_SIZE));
->          goto out;
->      }
-> 
-> @@ -1832,7 +1850,8 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
->          int64_t file_pnum;
-> 
->          ret2 = bdrv_co_block_status(local_file, true,
-> -                                    ret & BDRV_BLOCK_OFFSET_MASK,
-> +                                    (ret & BDRV_BLOCK_OFFSET_MASK) |
-> +                                    (offset & ~BDRV_BLOCK_OFFSET_MASK),
->                                      *pnum, &file_pnum, NULL);
->          if (ret2 >= 0) {
->              /* Ignore errors.  This is just providing extra information, it
-> -- 
-> 2.9.4
-> 
+I'd rather not support bdrv_co_ioctl() for anything that can't
+explicitly handle it.
 
-Fam
+Kevin
