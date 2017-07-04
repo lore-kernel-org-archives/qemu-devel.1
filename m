@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dSPnj-0006e1-JP
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:45 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dSQ2O-0006Dy-Bn
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:46:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dSPnh-0000ec-H3
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:43 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dSPnh-0000dq-6m
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:31:41 -0400
-Received: by mail-wr0-x241.google.com with SMTP id z45so47780204wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 08:31:41 -0700 (PDT)
-From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Tue,  4 Jul 2017 11:31:03 -0400
-Message-Id: <1499182263-19139-7-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v7 6/6] fsdev: QMP interface for throttling
+	(envelope-from <kchamart@redhat.com>) id 1dSQ2M-00073a-P5
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 11:46:52 -0400
+Date: Tue, 4 Jul 2017 17:46:40 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170704154640.pb7ldjvnh32nmdai@eukaryote>
+References: <1498661881-9605-1-git-send-email-kchamart@redhat.com>
+	<1498661881-9605-2-git-send-email-kchamart@redhat.com>
+	<w51fuejq36o.fsf@maestria.local.igalia.com>
+	<f55056ef-6da8-09d3-a11a-0c97c3fc21ca@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f55056ef-6da8-09d3-a11a-0c97c3fc21ca@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 1/2] live-block-ops.txt:
+ Rename, rewrite, and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,380 +26,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, kwolf@redhat.com, stephen@that.guru, armbru@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-This patch introduces qmp interfaces for the fsdev
-devices. This provides two interfaces one 
-for querying info of all the fsdev devices. The second one
-to set the IO limits for the required fsdev device.
+On Wed, Jun 28, 2017 at 03:33:49PM -0500, Eric Blake wrote:
+> On 06/28/2017 03:15 PM, Alberto Garcia wrote:
+> > On Wed 28 Jun 2017 04:58:00 PM CEST, Kashyap Chamarthy wrote:
+> >> This patch documents (including their QMP invocations) all the four
+> >> major kinds of live block operations:
+> >>
+> >>   - `block-stream`
+> >>   - `block-commit`
+> >>   - `drive-mirror` (& `blockdev-mirror`)
+> >>   - `drive-backup` (& `blockdev-backup`)
+> > 
+> > This is excellent work, thanks for doing this!
 
-Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
----
- Makefile                    |  4 +++
- fsdev/qemu-fsdev-dummy.c    | 10 ++++++
- fsdev/qemu-fsdev-throttle.c | 76 +++++++++++++++++++++++++++++++++++++++-
- fsdev/qemu-fsdev-throttle.h | 13 +++++++
- fsdev/qemu-fsdev.c          | 37 ++++++++++++++++++++
- monitor.c                   |  5 +++
- qapi-schema.json            |  3 ++
- qapi/fsdev.json             | 84 +++++++++++++++++++++++++++++++++++++++++++++
- qmp.c                       | 14 ++++++++
- 9 files changed, 245 insertions(+), 1 deletion(-)
- create mode 100644 qapi/fsdev.json
+Thanks!
 
-diff --git a/Makefile b/Makefile
-index 16a0430..4fd7625 100644
---- a/Makefile
-+++ b/Makefile
-@@ -416,6 +416,10 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.json \
-                $(SRC_PATH)/qapi/trace.json
+> > I haven't had the time to review the complete document yet, but here are
+> > my comments from the first half:
+
+[I'm responding out of order -- as I first replied to your other email,
+which gave feedback about the sceond half.]
+
+> >> +Disk image backing chain notation
+> >> +---------------------------------
+> >   [...]
+> >> +.. important::
+> >> +    The base disk image can be raw format; however, all the overlay
+> >> +    files must be of QCOW2 format.
+> > 
+> > This is not quite like that: overlay files must be in a format that
+> > supports backing files. QCOW2 is the most common one, but there are
+> > others (qed). Grep for 'supports_backing' in the source code.
+> 
+> At the same time, other image formats are not as frequently tested, or
+> may be read-only.  Maybe a compromise of "The overlay files can
+> generally be any format that supports a backing file, although qcow2 is
+> the preferred format and the one used in this document".
+
+Yes, I'll use Eric's wording [thanks] here, that makes the intent
+clearer.
+
+> >> +(1) ``block-stream``: Live copy of data from backing files into overlay
+> >> +    files (with the optional goal of removing the backing file from the
+> >> +    chain).
+> > 
+> > optional? The backing file is removed from the chain as soon as the
+> > operation finishes, although the image file is not removed from the
+> > disk. Maybe you meant that?
+>
+> Hmm, you're right. In this case, qemu ALWAYS rewrites the backing chain
+> to get rid of the (now-streamed) backing image.
+
+Correct.  I will clarify the wording here.
+
+> >> +(2) ``block-commit``: Live merge of data from overlay files into backing
+> >> +    files (with the optional goal of removing the overlay file from the
+> >> +    chain).  Since QEMU 2.0, this includes "active ``block-commit``"
+> >> +    (i.e.  merge the current active layer into the base image).
+> > 
+> > Same question about the 'optional' here.
+> 
+> Here, optional is a bit more correct. With non-active (intermediate)
+> commit, qemu ALWAYS rewrites the backing chain to be shorter; but with
+> live commit, you can chose whether to pivot to the now-shorter chain
+> (job-complete) or whether to keep the active image intact (starting to
+> collect a new delta from the point-in-time of the just-completed commit,
+> by job-cancel).
+
+Right.  I'll workout a way to mention this, too.  [Me will not wonder
+whether it will confuse the reader about mentioning it so early -- as
+the said reader will be using these primitives to make higher level
+tools, and they can easily figure out the semantics.]
  
-+ifdef CONFIG_VIRTFS
-+qapi-modules += $(SRC_PATH)/qapi/fsdev.json
-+endif
-+
- qapi-types.c qapi-types.h :\
- $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
-diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-index 6dc0fbc..f33305d 100644
---- a/fsdev/qemu-fsdev-dummy.c
-+++ b/fsdev/qemu-fsdev-dummy.c
-@@ -19,3 +19,13 @@ int qemu_fsdev_add(QemuOpts *opts)
- {
-     return 0;
- }
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+  return;
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    abort();
-+}
-diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
-index c5e2499..4483533 100644
---- a/fsdev/qemu-fsdev-throttle.c
-+++ b/fsdev/qemu-fsdev-throttle.c
-@@ -16,7 +16,6 @@
- #include "qemu/error-report.h"
- #include "qemu-fsdev-throttle.h"
- #include "qemu/iov.h"
--#include "qemu/throttle-options.h"
- 
- static void fsdev_throttle_read_timer_cb(void *opaque)
- {
-@@ -30,6 +29,81 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
-     qemu_co_enter_next(&fst->throttled_reqs[true]);
- }
- 
-+void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
-+{
-+    ThrottleConfig cfg;
-+
-+    throttle_set_io_limits(&cfg, arg);
-+
-+    if (throttle_is_valid(&cfg, errp)) {
-+        fst->cfg = cfg;
-+        fsdev_throttle_init(fst);
-+    }
-+}
-+
-+void fsdev_get_io_throttle(FsThrottle *fst, IOThrottle **fs9pcfg,
-+                           char *fsdevice, Error **errp)
-+{
-+
-+    ThrottleConfig cfg = fst->cfg;
-+    IOThrottle *fscfg = g_malloc0(sizeof(*fscfg));
-+
-+    fscfg->has_id = true;
-+    fscfg->id = g_strdup(fsdevice);
-+    fscfg->bps = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
-+    fscfg->bps_rd = cfg.buckets[THROTTLE_BPS_READ].avg;
-+    fscfg->bps_wr = cfg.buckets[THROTTLE_BPS_WRITE].avg;
-+
-+    fscfg->iops = cfg.buckets[THROTTLE_OPS_TOTAL].avg;
-+    fscfg->iops_rd = cfg.buckets[THROTTLE_OPS_READ].avg;
-+    fscfg->iops_wr = cfg.buckets[THROTTLE_OPS_WRITE].avg;
-+
-+    fscfg->has_bps_max     = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-+    fscfg->bps_max         = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-+    fscfg->has_bps_rd_max  = cfg.buckets[THROTTLE_BPS_READ].max;
-+    fscfg->bps_rd_max      = cfg.buckets[THROTTLE_BPS_READ].max;
-+    fscfg->has_bps_wr_max  = cfg.buckets[THROTTLE_BPS_WRITE].max;
-+    fscfg->bps_wr_max      = cfg.buckets[THROTTLE_BPS_WRITE].max;
-+
-+    fscfg->has_iops_max    = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-+    fscfg->iops_max        = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-+    fscfg->has_iops_rd_max = cfg.buckets[THROTTLE_OPS_READ].max;
-+    fscfg->iops_rd_max     = cfg.buckets[THROTTLE_OPS_READ].max;
-+    fscfg->has_iops_wr_max = cfg.buckets[THROTTLE_OPS_WRITE].max;
-+    fscfg->iops_wr_max     = cfg.buckets[THROTTLE_OPS_WRITE].max;
-+
-+    fscfg->has_bps_max_length     = fscfg->has_bps_max;
-+    fscfg->bps_max_length         =
-+         cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-+    fscfg->has_bps_rd_max_length  = fscfg->has_bps_rd_max;
-+    fscfg->bps_rd_max_length      =
-+         cfg.buckets[THROTTLE_BPS_READ].burst_length;
-+    fscfg->has_bps_wr_max_length  = fscfg->has_bps_wr_max;
-+    fscfg->bps_wr_max_length      =
-+         cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-+
-+    fscfg->has_iops_max_length    = fscfg->has_iops_max;
-+    fscfg->iops_max_length        =
-+         cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-+    fscfg->has_iops_rd_max_length = fscfg->has_iops_rd_max;
-+    fscfg->iops_rd_max_length     =
-+         cfg.buckets[THROTTLE_OPS_READ].burst_length;
-+    fscfg->has_iops_wr_max_length = fscfg->has_iops_wr_max;
-+    fscfg->iops_wr_max_length     =
-+         cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-+
-+    fscfg->bps_max_length = cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-+    fscfg->bps_rd_max_length = cfg.buckets[THROTTLE_BPS_READ].burst_length;
-+    fscfg->bps_wr_max_length = cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-+    fscfg->iops_max_length = cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-+    fscfg->iops_rd_max_length = cfg.buckets[THROTTLE_OPS_READ].burst_length;
-+    fscfg->iops_wr_max_length = cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-+
-+    fscfg->iops_size = cfg.op_size;
-+
-+    *fs9pcfg = fscfg;
-+}
-+
- void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
- {
-     throttle_parse_options(&fst->cfg, opts);
-diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
-index e418643..a49b2e5 100644
---- a/fsdev/qemu-fsdev-throttle.h
-+++ b/fsdev/qemu-fsdev-throttle.h
-@@ -20,6 +20,13 @@
- #include "qemu/coroutine.h"
- #include "qapi/error.h"
- #include "qemu/throttle.h"
-+#include "qemu/throttle-options.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/types.h"
-+#include "qapi-visit.h"
-+#include "qapi/qobject-output-visitor.h"
-+#include "qapi/util.h"
-+#include "qmp-commands.h"
- 
- typedef struct FsThrottle {
-     ThrottleState ts;
-@@ -36,4 +43,10 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
-                                             struct iovec *, int);
- 
- void fsdev_throttle_cleanup(FsThrottle *);
-+
-+void fsdev_set_io_throttle(IOThrottle *, FsThrottle *, Error **errp);
-+
-+void fsdev_get_io_throttle(FsThrottle *, IOThrottle **iothp,
-+                           char *, Error **errp);
-+
- #endif /* _FSDEV_THROTTLE_H */
-diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-index 266e442..0eca7c3 100644
---- a/fsdev/qemu-fsdev.c
-+++ b/fsdev/qemu-fsdev.c
-@@ -16,6 +16,7 @@
- #include "qemu-common.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qmp-commands.h"
- 
- static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
-     QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
-@@ -98,3 +99,39 @@ FsDriverEntry *get_fsdev_fsentry(char *id)
-     }
-     return NULL;
- }
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+
-+    FsDriverEntry *fse;
-+
-+    fse = get_fsdev_fsentry(arg->has_id ? arg->id : NULL);
-+    if (!fse) {
-+        return;
-+    }
-+
-+    fsdev_set_io_throttle(arg, &fse->fst, errp);
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    IOThrottleList *head = NULL, *p_next;
-+    struct FsDriverListEntry *fsle;
-+    Error *local_err = NULL;
-+
-+    QTAILQ_FOREACH(fsle, &fsdriver_entries, next) {
-+        p_next = g_malloc0(sizeof(*p_next));
-+        fsdev_get_io_throttle(&fsle->fse.fst, &p_next->value,
-+                            fsle->fse.fsdev_id, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            g_free(p_next);
-+            qapi_free_IOThrottleList(head);
-+            return NULL;
-+        }
-+
-+        p_next->next = head;
-+        head = p_next;
-+    }
-+    return head;
-+}
-diff --git a/monitor.c b/monitor.c
-index 3c369f4..592a39e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -997,6 +997,11 @@ static void qmp_unregister_commands_hack(void)
-     && !defined(TARGET_S390X)
-     qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
- #endif
-+#ifndef CONFIG_VIRTFS
-+    qmp_unregister_command(&qmp_commands, "fsdev-set-io-throttle");
-+    qmp_unregister_command(&qmp_commands, "query-fsdev-io-throttle");
-+#endif
-+
- }
- 
- void monitor_init_qmp_commands(void)
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 4b50b65..dc676be 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -81,6 +81,9 @@
- # QAPI block definitions
- { 'include': 'qapi/block.json' }
- 
-+# QAPI fsdev definitions
-+{ 'include': 'qapi/fsdev.json' }
-+
- # QAPI event definitions
- { 'include': 'qapi/event.json' }
- 
-diff --git a/qapi/fsdev.json b/qapi/fsdev.json
-new file mode 100644
-index 0000000..eff1efe
---- /dev/null
-+++ b/qapi/fsdev.json
-@@ -0,0 +1,84 @@
-+# -*- Mode: Python -*-
-+
-+##
-+# == QAPI fsdev definitions
-+##
-+
-+# QAPI common definitions
-+{ 'include': 'iothrottle.json' }
-+
-+##
-+# @fsdev-set-io-throttle:
-+#
-+# Change I/O limits for a 9p/fsdev device.
-+#
-+# I/O limits can be enabled by setting throttle value to non-zero number.
-+#
-+# I/O limits can be disabled by setting all throttle values to 0.
-+#
-+# Returns: Nothing on success
-+#          If @device is not a valid fsdev device, DeviceNotFound
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "execute": "fsdev-set-io-throttle",
-+#      "arguments": { "id": "id0-1-0",
-+#                     "bps": 1000000,
-+#                     "bps_rd": 0,
-+#                     "bps_wr": 0,
-+#                     "iops": 0,
-+#                     "iops_rd": 0,
-+#                     "iops_wr": 0,
-+#                     "bps_max": 8000000,
-+#                     "bps_rd_max": 0,
-+#                     "bps_wr_max": 0,
-+#                     "iops_max": 0,
-+#                     "iops_rd_max": 0,
-+#                     "iops_wr_max": 0,
-+#                     "bps_max_length": 60,
-+#                     "iops_size": 0 } }
-+# <- { "returns": {} }
-+##
-+{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
-+  'data': 'IOThrottle' }
-+##
-+# @query-fsdev-io-throttle:
-+#
-+# Returns: a list of @IOThrottle describing io throttle values of each fsdev device
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "Execute": "query-fsdev-io-throttle" }
-+# <- { "returns" : [
-+#          {
-+#             "id": "id0-hd0",
-+#              "bps":1000000,
-+#              "bps_rd":0,
-+#              "bps_wr":0,
-+#              "iops":1000000,
-+#              "iops_rd":0,
-+#              "iops_wr":0,
-+#              "bps_max": 8000000,
-+#              "bps_rd_max": 0,
-+#              "bps_wr_max": 0,
-+#              "iops_max": 0,
-+#              "iops_rd_max": 0,
-+#              "iops_wr_max": 0,
-+#              "bps_max_length": 0,
-+#              "bps_rd_max_length": 0,
-+#              "bps_wr_max_length": 0,
-+#              "iops_max_length": 0,
-+#              "iops_rd_max_length": 0,
-+#              "iops_wr_max_length": 0,
-+#              "iops_size": 0
-+#            }
-+#          ]
-+#      }
-+#
-+##
-+{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'IOThrottle' ] }
-+
-diff --git a/qmp.c b/qmp.c
-index 7ee9bcf..8a60f2c 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -130,6 +130,20 @@ void qmp_cpu_add(int64_t id, Error **errp)
-     }
- }
- 
-+#if defined(_WIN64) || defined(_WIN32) || defined(__FreeBSD__)
-+
-+void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-+{
-+  return;
-+}
-+
-+IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-+{
-+    abort();
-+}
-+
-+#endif
-+
- #ifndef CONFIG_VNC
- /* If VNC support is enabled, the "true" query-vnc command is
-    defined in the VNC subsystem */
+> >> +writing to it.  (The rule of thumb is: live QEMU will always be pointing
+> >> +to the right-most image in a disk image chain.)
+> > 
+> > I think it's 'rightmost', without the hyphen.
+> 
+> Sadly, I think this is one case where both spellings work to a native
+> reader, and where I don't know of a specific style-guide preference.  I
+> probably would have written with the hyphen.
+
+Heh, indeed.  Peter Maydell has said Oxford English Dictionary has
+mentions for both variants.  But Alberto is correct that the non-hyphen
+variant, "rightmost", is much more widely used.
+
+> >> +(3) Intermediate streaming (available since QEMU 2.8): Starting afresh
+> >> +    with the original example disk image chain, with a total of four
+> >> +    images, it is possible to copy contents from image [B] into image
+> >> +    [C].  Once the copy is finished, image [B] can now be (optionally)
+> >> +    discarded; and the backing file pointer of image [C] will be
+> >> +    adjusted to point to [A].
+> > 
+> > The 'optional' usage again. [B] will be removed from the chain and can
+> > be (optionally) removed from the disk, but that you have to do yourself,
+> > QEMU won't do that.
+> 
+> Indeed, we may need to be specifically clear of the cases where qemu
+> shortens the chain, but where disk images that are no longer used by the
+> chain (whether they are still viable [as in stream], or invalidated [as
+> in commit crossing more than one element of the chain]) are still left
+> on the disk for the user to discard separately from qemu.
+
+Yes, I'll keep this in mind for v5.
+
+> >> +The ``block-commit`` command lets you to live merge data from overlay
+> >> +images into backing file(s).
+> > 
+> > I don't think "lets you to live merge data" is correct English.
+> 
+> Probably better as "lets you merge live data from overlay..."
+
+Yes.  Will fix.
+
+[...]
+
+> >> +(1) Commit content from only image [B] into image [A].  The resulting
+> >> +    chain is the following, where image [C] is adjusted to point at [A]
+> >> +    as its new backing file::
+> >> +
+> >> +        [A] <-- [C] <-- [D]
+> >> +
+> >> +(2) Commit content from images [B] and [C] into image [A].  The
+> >> +    resulting chain, where image [D] is adjusted to point to image [A]
+> >> +    as its new backing file::
+> >> +
+> >> +        [A] <-- [D]
+> > 
+> > Aren't these two just different variants of the same case?
+> 
+> Almost. But in case 1, image [B] is still viable (from a guest point of
+> view, the contents of [B] have not changed); in case 2, image [B] is
+> most likely corrupted (any changes propagated from [C] into [A] that
+> were not already overridden in [B] now read differently, making image
+> [B] no longer match anything the guest ever saw at any point in past time).
+
+Indeed.  Good explanation.  (I now wonder if I should workout a way to
+mention some comments from the guest POV)
+
+> >> +.. _`block-commit_Case-3`:
+> >> +
+> >> +(3) Commit content from images [B], [C], and the active layer [D] into
+> >> +    image [A].  The resulting chain (in this case, a consolidated single
+> >> +    image)::
+> >> +
+> >> +        [A]
+> >> +
+> >> +(4) Commit content from image only image [C] into image [B].  The
+> >> +    resulting chain::
+> >> +
+> >> +	[A] <-- [B] <-- [D]
+> >> +
+> >> +(5) Commit content from image [C] and the active layer [D] into image
+> >> +    [B].  The resulting chain::
+> >> +
+> >> +	[A] <-- [B]
+> > 
+> > Same here.
+> 
+> 4 and 5 indeed are variants of 1 and 2.
+> 
+> > 
+> > I mean, it's fine to have several different examples, but I think
+> > there's really two main cases here (as you correctly explain later).
+
+True; I just spelled out all possible cases for one primitive.  for the
+rest, I didn't -- as mentioned in a note.
+
+> > 
+> >> +    (QEMU) block-commit device=node-D base=a.qcow2 top=d.qcow2 job-id=job0
+> >> +    {
+> >> +        "execute": "block-commit",
+> >> +        "arguments": {
+> >> +            "device": "node-D",
+> >> +            "job-id": "job0",
+> >> +            "top": "d.qcow2",
+> >> +            "base": "a.qcow2"
+> >> +        }
+> >> +    }
+> > 
+> > This is correct, but I don't know if it's worth mentioning that if you
+> > omit the 'top' parameter it defaults to the active layer (node-D in this
+> > example).
+> 
+> I think it's better to be explicit in the examples (always provide all
+> parameters, even if what you provide would also be the default when
+> omitted), and then maybe the prose can mention which parameters have
+> defaults.
+
+Yeah, precisely -- I didn't wanted to skip mentioning something just
+because it's the default, for clarity's sake.
+> > 
+> > Same with 'base'.
+> > 
+> > Else this part looks good! I'll check the rest of the document tomorrow
+> > and give you my feedback.
+
+Thanks, Alberto and Eric.  I'll spin a v5 from this, and feedback from
+the other email.
+
+[...]
+
 -- 
-1.8.3.1
+/kashyap
