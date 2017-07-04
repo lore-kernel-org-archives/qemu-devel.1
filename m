@@ -1,18 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dSIEL-0008D1-JC
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:26:42 -0400
+	(envelope-from <schwidefsky@de.ibm.com>) id 1dSJ10-00075G-Fa
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dSIEH-0004H3-IJ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:26:41 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:58783)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dSIEG-0004AO-VF
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:26:37 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Wed, 5 Jul 2017 07:44:27 +0800
-Message-Id: <1499211867-3126-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] audio: st_rate_flow exist a dead loop
+	(envelope-from <schwidefsky@de.ibm.com>) id 1dSJ0v-0006eG-Gg
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:16:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37052
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <schwidefsky@de.ibm.com>)
+	id 1dSJ0v-0006cV-9v
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 04:16:53 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v648DnAm106728
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 04:16:51 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bg1rnt3u1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:16:51 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <schwidefsky@de.ibm.com>;
+	Tue, 4 Jul 2017 09:16:49 +0100
+Date: Tue, 4 Jul 2017 10:16:43 +0200
+From: Martin Schwidefsky <schwidefsky@de.ibm.com>
+In-Reply-To: <55708cff-cdda-9b1d-2106-1c6d2774f890@de.ibm.com>
+References: <75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
+	<20170424143516.GD2075@work-vm>
+	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
+	<20170424191202.GQ2362@work-vm>
+	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
+	<20170426110144.GF2098@work-vm>
+	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
+	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
+	<20170630163139.GC2437@work-vm>
+	<20170703192353-mutt-send-email-mst@kernel.org>
+	<20170703190728.GE2206@work-vm>
+	<55708cff-cdda-9b1d-2106-1c6d2774f890@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170704101643.3c20f745@mschwideX1>
+Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,36 +52,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: qemu-devel@nongnu.org, wang.yechao255@zte.com.cn, Hao Peng <peng.hao2@zte.com.cn>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
 
-From: Hao Peng <peng.hao2@zte.com.cn>
+On Tue, 4 Jul 2017 09:48:11 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-if audio device is opend for a long time in windows vm, there is a uint32_t varaible reversal.
-It will result to a dead loop.
+> On 07/03/2017 09:07 PM, Dr. David Alan Gilbert wrote:
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:  
+> >> On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:  
+> >>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:  
+> >>>> On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
+> >>>>  
+> >>>>>> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
+> >>>>>> then try changing ram_handle_compressed to always do the memset.  
+> >>>>>
+> >>>>> FWIW, changing ram_handle_compressed to always memset makes the problem go away.  
+> >>>>
+> >>>> It is still running fine now with the "always memset change"  
+> >>>
+> >>> Did we ever nail down a fix for this; as I remember Andrea said
+> >>> we shouldn't need to do that memset, but we came to the conclusion
+> >>> it was something specific to how s390 protection keys worked.
+> >>>
+> >>> Dave  
+> >>
+> >> No we didn't. Let's merge that for now, with a comment that
+> >> we don't really understand what's going on?  
+> > 
+> > Hmm no, I don't really want to change the !s390 behaviour, especially
+> > since it causes allocation that we otherwise avoid and Andrea's
+> > reply tothe original post pointed out it's not necessary.  
+> 
+> 
+> Since storage keys are per physical page we must not have shared pages.
+> Therefore in s390_enable_skey we already do a break_ksm (via ksm_madvise),
+> in other words we already allocate pages on the keyless->keyed switch.
+> 
+> So why not do the same for zero pages - instead of invalidating the page
+> table entry, lets just do a proper COW.
+> 
+> Something like this maybe (Andrea, Martin any better way to do that?)
+> 
+> 
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 4fb3d3c..11475c7 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -2149,13 +2149,18 @@ EXPORT_SYMBOL_GPL(s390_enable_sie);
+>  static int __s390_enable_skey(pte_t *pte, unsigned long addr,
+>                               unsigned long next, struct mm_walk *walk)
+>  {
+> +       struct page *page;
+>         /*
+> -        * Remove all zero page mappings,
+> +        * Remove all zero page mappings with a COW
+>          * after establishing a policy to forbid zero page mappings
+>          * following faults for that page will get fresh anonymous pages
+>          */
+> -       if (is_zero_pfn(pte_pfn(*pte)))
+> -               ptep_xchg_direct(walk->mm, addr, pte, __pte(_PAGE_INVALID));
+> +       if (is_zero_pfn(pte_pfn(*pte))) {
+> +               if (get_user_pages(addr, 1, FOLL_WRITE, &page, NULL) == 1)
+> +                       put_page(page);
+> +               else
+> +                       return -ENOMEM;
+> +       }
+>         /* Clear storage key */
+>         ptep_zap_key(walk->mm, addr, pte);
+>         return 0;
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Reviewed-by: Liu Yun <liu.yunh@zte.com.cn>
-Reviewed-by: Wang Yechao <wang.yechao255@zte.com.cn>
----
- audio/rate_template.h | 5 +++++
- 1 file changed, 5 insertions(+)
+I do not quite get the problem here. The zero-page mappings are always
+marked as _PAGE_SPECIAL. These should be safe to replace with an empty
+pte. We do mark all VMAs as unmergeable prior to the page table walk
+that replaces all zero-page mappings. What is the get_user_pages() call
+supposed to do?
 
-diff --git a/audio/rate_template.h b/audio/rate_template.h
-index bd4b1c7..1aa6c43 100644
---- a/audio/rate_template.h
-+++ b/audio/rate_template.h
-@@ -71,6 +71,11 @@ void NAME (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
-         while (rate->ipos <= (rate->opos >> 32)) {
-             ilast = *ibuf++;
-             rate->ipos++;
-+            /* if ipos reversal, there is  a dead loop */
-+            if (rate->ipos == 0xffffffff) {
-+                rate->ipos = 1;
-+                rate->opos = rate->opos & 0xffffffff;
-+            }
-             /* See if we finished the input buffer yet */
-             if (ibuf >= iend) {
-                 goto the_end;
 -- 
-1.8.3.1
+blue skies,
+   Martin.
+
+"Reality continues to ruin my life." - Calvin.
