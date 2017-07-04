@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkp-0006Rf-Ec
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:28 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkr-0006TO-4M
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkk-0001kN-CS
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:27 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36345)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSLkq-0001nL-4A
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:29 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35915)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSLkk-0001jk-6c
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:22 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y5so25527593wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:22 -0700 (PDT)
+	id 1dSLkp-0001mf-TM
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 07:12:28 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 77so46957120wrb.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 04:12:27 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  4 Jul 2017 13:11:53 +0200
-Message-Id: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/22] add disable-tcg option for x86 build
+Date: Tue,  4 Jul 2017 13:11:57 +0200
+Message-Id: <1499166735-39360-5-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
+References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 04/22] vl: convert -tb-size to qemu_strtoul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +30,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-changes from v3:
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ accel/tcg/tcg-all.c    | 2 +-
+ include/sysemu/accel.h | 2 +-
+ vl.c                   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-- patch 2: place ;; on a separate line [Daniel]
-
-- patch 14: do not touch include/exec/helper-proto.h [Richard]
-
-- patch 16: moved cpu_report_tpr_access hunk later [Richard]
-
-- patch 18: renamed tcg_update_mxcsr [Richard], added missing
-  call to cpu_post_load
-
-- patch 20: do not touch bpt_helper.c, adjust caller in machine.c
-  [Richard]
-
-- patch 21: compile out bpt_helper.c [Richard]
-
-Paolo Bonzini (10):
-  configure: factor out list of supported Xen/KVM/HAX targets
-  configure: early test for supported targets
-  configure: add --disable-tcg configure option
-  vl: convert -tb-size to qemu_strtoul
-  monitor: disable "info jit" and "info opcount" if !TCG
-  vapic: use tcg_enabled
-  tcg: move tb_lock out of translate-all.h
-  exec: elide calls to tb_lock and tb_unlock
-  target/i386: move TLB refill function out of helper.c
-  configure: warn on untested --disable-tcg
-
-Yang Zhong (12):
-  vl: add tcg_enabled() for tcg related code
-  tcg: move page_size_init() function
-  tcg: tcg_handle_interrupt() function
-  tcg: make tcg_allowed global
-  tcg: add the tcg-stub.c file into accel/stubs/
-  tcg: add CONFIG_TCG guards in headers
-  tcg: add the CONFIG_TCG into Makefiles
-  target/i386: move cpu_sync_bndcs_hflags() function
-  target/i386: make cpu_get_fp80()/cpu_set_fp80() static
-  target/i386: split cpu_set_mxcsr() and make cpu_set_fpuc() inline
-  target/i386: add the tcg_enabled() in target/i386/
-  target/i386: add the CONFIG_TCG into Makefiles
-
- Makefile.target              |   4 +-
- accel/Makefile.objs          |   2 +-
- accel/stubs/Makefile.objs    |   1 +
- accel/stubs/tcg-stub.c       |  22 +++
- accel/tcg/Makefile.objs      |   2 +-
- accel/tcg/cpu-exec-common.c  |   2 +
- accel/tcg/tcg-all.c          |  35 +++-
- accel/tcg/translate-all.c    |  29 +---
- accel/tcg/translate-common.c |  56 -------
- bsd-user/main.c              |   1 -
- configure                    | 191 +++++++++++++++-------
- exec.c                       |  23 +++
- hmp-commands-info.hx         |   4 +
- hw/i386/kvmvapic.c           |   5 +-
- include/exec/cpu-defs.h      |   4 +-
- include/exec/cputlb.h        |   2 +-
- include/exec/exec-all.h      |  57 ++++---
- include/qemu-common.h        |   7 +-
- include/sysemu/accel.h       |   2 +-
- monitor.c                    |   2 +
- qom/cpu.c                    |   2 +
- target/i386/Makefile.objs    |   8 +-
- target/i386/cpu.c            |   4 +-
- target/i386/cpu.h            |  31 +++-
- target/i386/excp_helper.c    | 343 +++++++++++++++++++++++++++++++++++++++
- target/i386/fpu_helper.c     |  29 +---
- target/i386/helper.c         | 376 ++++---------------------------------------
- target/i386/machine.c        |  31 +++-
- target/i386/mpx_helper.c     |  30 ----
- tcg/tcg.h                    |   4 -
- vl.c                         |  14 +-
- 31 files changed, 721 insertions(+), 602 deletions(-)
- create mode 100644 accel/stubs/tcg-stub.c
- delete mode 100644 accel/tcg/translate-common.c
-
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index dba9931..e327d90 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -28,7 +28,7 @@
+ #include "sysemu/sysemu.h"
+ #include "qom/object.h"
+ 
+-int tcg_tb_size;
++unsigned long tcg_tb_size;
+ static bool tcg_allowed = true;
+ 
+ static int tcg_init(MachineState *ms)
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index ecc5c84..5a632ce 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -63,7 +63,7 @@ typedef struct AccelClass {
+ #define ACCEL_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(AccelClass, (obj), TYPE_ACCEL)
+ 
+-extern int tcg_tb_size;
++extern unsigned long tcg_tb_size;
+ 
+ void configure_accelerator(MachineState *ms);
+ /* Register accelerator specific global properties */
+diff --git a/vl.c b/vl.c
+index 36ff3f4..ea8ef5f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3933,9 +3933,9 @@ int main(int argc, char **argv, char **envp)
+                 configure_rtc(opts);
+                 break;
+             case QEMU_OPTION_tb_size:
+-                tcg_tb_size = strtol(optarg, NULL, 0);
+-                if (tcg_tb_size < 0) {
+-                    tcg_tb_size = 0;
++                if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
++                    error_report("Invalid argument to -tb-size");
++                    exit(1);
+                 }
+                 break;
+             case QEMU_OPTION_icount:
 -- 
 1.8.3.1
