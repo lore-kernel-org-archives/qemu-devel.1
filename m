@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhh-0003hm-4E
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:58 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhj-0003k1-9i
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhg-00074x-3k
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:57 -0400
-Received: from [59.151.112.132] (port=28283 helo=heian.cn.fujitsu.com)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhi-00077Q-9P
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:59 -0400
+Received: from [59.151.112.132] (port=52152 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhf-0006vy-65
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:56 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dSHhh-0006rz-Tf
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 02:52:58 -0400
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Tue, 4 Jul 2017 14:53:53 +0800
-Message-ID: <1499151236-14671-10-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Tue, 4 Jul 2017 14:53:56 +0800
+Message-ID: <1499151236-14671-13-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 In-Reply-To: <1499151236-14671-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 References: <1499151236-14671-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V7 09/12] net/colo.c: Add vnet packet parse
- feature in colo-proxy
+Subject: [Qemu-devel] [PATCH V7 12/12] docs/colo-proxy.txt: Update
+ colo-proxy usage of net driver with vnet_header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Make colo-compare and filter-rewriter can parse vnet packet.
-
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 ---
- net/colo.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ docs/colo-proxy.txt | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/net/colo.c b/net/colo.c
-index 180eaed..28ce7c8 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -43,11 +43,11 @@ int parse_packet_early(Packet *pkt)
- {
-     int network_length;
-     static const uint8_t vlan[] = {0x81, 0x00};
--    uint8_t *data = pkt->data;
-+    uint8_t *data = pkt->data + pkt->vnet_hdr_len;
-     uint16_t l3_proto;
-     ssize_t l2hdr_len = eth_get_l2_hdr_length(data);
+diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+index c4941de..f6a624f 100644
+--- a/docs/colo-proxy.txt
++++ b/docs/colo-proxy.txt
+@@ -182,6 +182,32 @@ Secondary(ip:3.3.3.8):
+ -chardev socket,id=red1,host=3.3.3.3,port=9004
+ -object filter-redirector,id=f1,netdev=hn0,queue=tx,indev=red0
+ -object filter-redirector,id=f2,netdev=hn0,queue=rx,outdev=red1
++-object filter-rewriter,id=f3,netdev=hn0,queue=all
++
++If you want to use virtio-net-pci or other driver with vnet_header:
++
++Primary(ip:3.3.3.3):
++-netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown
++-device e1000,id=e0,netdev=hn0,mac=52:a4:00:12:78:66
++-chardev socket,id=mirror0,host=3.3.3.3,port=9003,server,nowait
++-chardev socket,id=compare1,host=3.3.3.3,port=9004,server,nowait
++-chardev socket,id=compare0,host=3.3.3.3,port=9001,server,nowait
++-chardev socket,id=compare0-0,host=3.3.3.3,port=9001
++-chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
++-chardev socket,id=compare_out0,host=3.3.3.3,port=9005
++-object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0,vnet_hdr_support
++-object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out,vnet_hdr_support
++-object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0,vnet_hdr_support
++-object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,vnet_hdr_support
++
++Secondary(ip:3.3.3.8):
++-netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,down script=/etc/qemu-ifdown
++-device e1000,netdev=hn0,mac=52:a4:00:12:78:66
++-chardev socket,id=red0,host=3.3.3.3,port=9003
++-chardev socket,id=red1,host=3.3.3.3,port=9004
++-object filter-redirector,id=f1,netdev=hn0,queue=tx,indev=red0,vnet_hdr_support
++-object filter-redirector,id=f2,netdev=hn0,queue=rx,outdev=red1,vnet_hdr_support
++-object filter-rewriter,id=f3,netdev=hn0,queue=all,vnet_hdr_support
  
--    if (pkt->size < ETH_HLEN) {
-+    if (pkt->size < ETH_HLEN + pkt->vnet_hdr_len) {
-         trace_colo_proxy_main("pkt->size < ETH_HLEN");
-         return 1;
-     }
-@@ -73,7 +73,7 @@ int parse_packet_early(Packet *pkt)
-     }
- 
-     network_length = pkt->ip->ip_hl * 4;
--    if (pkt->size < l2hdr_len + network_length) {
-+    if (pkt->size < l2hdr_len + network_length + pkt->vnet_hdr_len) {
-         trace_colo_proxy_main("pkt->size < network_header + network_length");
-         return 1;
-     }
+ Note:
+   a.COLO-proxy must work with COLO-frame and Block-replication.
 -- 
 2.7.4
