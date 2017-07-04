@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dSP7r-0008Jx-L4
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:48:31 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSPBI-0003Hp-IJ
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dSP7n-0001Dh-VD
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:48:27 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:38799)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dSP7n-0001Ct-Mp
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:48:23 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id f67so87108920wmh.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 07:48:23 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  4 Jul 2017 15:48:58 +0100
-Message-Id: <20170704144859.17644-11-alex.bennee@linaro.org>
-In-Reply-To: <20170704144859.17644-1-alex.bennee@linaro.org>
-References: <20170704144859.17644-1-alex.bennee@linaro.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSPBE-0003Pf-7K
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:52:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35539)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dSPBD-0003P5-Sg
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:51:56 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v64EnLBa074710
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 10:51:52 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bg9h683ct-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 10:51:51 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 4 Jul 2017 15:51:49 +0100
+References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
+	<1499177279-131407-5-git-send-email-borntraeger@de.ibm.com>
+	<20170704163730.491517ac@dhcp-192-215.str.redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 4 Jul 2017 16:51:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH 10/11] aarch64.risu: remove duplicate
- AdvSIMD scalar 2 reg misc block
+In-Reply-To: <20170704163730.491517ac@dhcp-192-215.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <930cb5d9-83d1-50e7-39a7-f7eea67ef1af@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/7] s390x: fix realize inheritance for
+ kvm-flic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,146 +44,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
-While at that also:
-  - sort alphabetically
-  - add to @AdvSIMDScalar2RegMisc group
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- aarch64.risu | 114 ++++++++++++++++++++---------------------------------------
- 1 file changed, 39 insertions(+), 75 deletions(-)
 
-diff --git a/aarch64.risu b/aarch64.risu
-index 609021a..5450cd3 100644
---- a/aarch64.risu
-+++ b/aarch64.risu
-@@ -2171,85 +2171,49 @@ FACGT    A64_V   01 1 11110 1 size:1 1 rm:5 11101 1 rn:5 rd:5 \
- 
- @
- 
--# C3.6.12 AdvSIMD scalar 2reg misc
--CMGTzero A64_V      01 0 11110 size:2 10000 01000 10 rn:5 rd:5
--CMGEzero A64_V      01 1 11110 size:2 10000 01000 10 rn:5 rd:5
--CMEQzero A64_V      01 0 11110 size:2 10000 01001 10 rn:5 rd:5
--CMLEzero A64_V      01 1 11110 size:2 10000 01001 10 rn:5 rd:5
--CMLTzero A64_V      01 0 11110 size:2 10000 01010 10 rn:5 rd:5
--ABS A64_V           01 0 11110 size:2 10000 01011 10 rn:5 rd:5
--NEG A64_V           01 1 11110 size:2 10000 01011 10 rn:5 rd:5
--
--FCMGT_S2MISC A64_V  01 0 11110 size:2 10000 01100 10 rn:5 rd:5
--FCMEQ_S2MISC A64_V  01 0 11110 size:2 10000 01101 10 rn:5 rd:5
--FCMLT_S2MISC A64_V  01 0 11110 size:2 10000 01110 10 rn:5 rd:5
--FCMGE_S2MISC A64_V  01 1 11110 size:2 10000 01100 10 rn:5 rd:5
--FCMLE_S2MISC A64_V  01 1 11110 size:2 10000 01101 10 rn:5 rd:5
--
--SCVTF_S2MISC A64_V 01 0 11110 0 sz 10000 11101 10 rn:5 rd:5
--UCVTF_S2MISC A64_V 01 1 11110 0 sz 10000 11101 10 rn:5 rd:5
--
--FCVTNS_S2MISC A64_V 01 0 11110 0 sz 10000 11010 10 rn:5 rd:5
--FCVTMS_S2MISC A64_V 01 0 11110 0 sz 10000 11011 10 rn:5 rd:5
--FCVTAS_S2MISC A64_V 01 0 11110 0 sz 10000 11100 10 rn:5 rd:5
--FCVTPS_S2MISC A64_V 01 0 11110 1 sz 10000 11010 10 rn:5 rd:5
--FCVTZS_S2MISC A64_V 01 0 11110 1 sz 10000 11011 10 rn:5 rd:5
--
--FCVTNU_S2MISC A64_V 01 1 11110 0 sz 10000 11010 10 rn:5 rd:5
--FCVTMU_S2MISC A64_V 01 1 11110 0 sz 10000 11011 10 rn:5 rd:5
--FCVTAU_S2MISC A64_V 01 1 11110 0 sz 10000 11100 10 rn:5 rd:5
--FCVTPU_S2MISC A64_V 01 1 11110 1 sz 10000 11010 10 rn:5 rd:5
--FCVTZU_S2MISC A64_V 01 1 11110 1 sz 10000 11011 10 rn:5 rd:5
--
--FCVTXN_S2MISC A64_V 01 1 11110 0 sz 10000 10110 10 rn:5 rd:5
--
--SUQADD_S2MISC A64_V 01 0 11110 size:2 10000 00011 10 rn:5 rd:5
--USQADD_S2MISC A64_V 01 1 11110 size:2 10000 00011 10 rn:5 rd:5
--SQABS_S2MISC A64_V 01 0 11110 size:2 10000 00111 10 rn:5 rd:5
--SQNEG_S2MISC A64_V 01 1 11110 size:2 10000 00111 10 rn:5 rd:5
--
--# XXX lots of others in this group
--
- # C3.6.12 AdvSIMD scalar two-reg misc
- # 31 30 29 28 27 26 25 24 23 22 21 20      16     12 11 10 9     5  4    0
- #  0  1 U   1  1  1  1  0  size  1 0 0 0 0 [ opcode ] 1 0 [  Rn  ] [  Rd  ]
- # U size opcode
--SUQADDs  A64_V          01 0 11110   size:2 10000 00011 10 rn:5 rd:5 
--SQABSs  A64_V           01 0 11110   size:2 10000 00111 10 rn:5 rd:5 
--CMGTzs  A64_V           01 0 11110   size:2 10000 01000 10 rn:5 rd:5 
--CMEQzs  A64_V           01 0 11110   size:2 10000 01001 10 rn:5 rd:5 
--CMLTzs  A64_V           01 0 11110   size:2 10000 01010 10 rn:5 rd:5 
--ABSs  A64_V             01 0 11110   size:2 10000 01011 10 rn:5 rd:5 
--SQXTN_SQXTN2s  A64_V    01 0 11110   size:2 10000 10100 10 rn:5 rd:5 
--FCVTNSvs  A64_V         01 0 11110 0 size:1 10000 11010 10 rn:5 rd:5 
--FCVTMSvs  A64_V         01 0 11110 0 size:1 10000 11011 10 rn:5 rd:5 
--FCVTASvs  A64_V         01 0 11110 0 size:1 10000 11100 10 rn:5 rd:5 
--SCVTFvis  A64_V         01 0 11110 0 size:1 10000 11101 10 rn:5 rd:5 
--FCMGTzs  A64_V          01 0 11110 1 size:1 10000 01100 10 rn:5 rd:5 
--FCMEQzs  A64_V          01 0 11110 1 size:1 10000 01101 10 rn:5 rd:5 
--FCMLTzs  A64_V          01 0 11110 1 size:1 10000 01110 10 rn:5 rd:5 
--FCVTPSvs  A64_V         01 0 11110 1 size:1 10000 11010 10 rn:5 rd:5 
--FCVTZSvis  A64_V        01 0 11110 1 size:1 10000 11011 10 rn:5 rd:5 
--FRECPEs  A64_V          01 0 11110 1 size:1 10000 11101 10 rn:5 rd:5 
--FRECPX  A64_V           01 0 11110 1 size:1 10000 11111 10 rn:5 rd:5 
--USQADDs  A64_V          01 1 11110   size:2 10000 00011 10 rn:5 rd:5 
--SQNEGs  A64_V           01 1 11110   size:2 10000 00111 10 rn:5 rd:5 
--CMGzs  A64_V            01 1 11110   size:2 10000 01000 10 rn:5 rd:5 
--CMLEzs  A64_V           01 1 11110   size:2 10000 01001 10 rn:5 rd:5 
--NEGvs  A64_V            01 1 11110   size:2 10000 01011 10 rn:5 rd:5 
--SQXTUN_SQXTUN2s  A64_V  01 1 11110   size:2 10000 10010 10 rn:5 rd:5 
--UQXTN_UQXTN2s  A64_V    01 1 11110   size:2 10000 10100 10 rn:5 rd:5 
--FCVTXN_FCVTXN2s  A64_V  01 1 11110 0 size:1 10000 10110 10 rn:5 rd:5 
--FCVTNUvs  A64_V         01 1 11110 0 size:1 10000 11010 10 rn:5 rd:5 
--FCVTMUvs  A64_V         01 1 11110 0 size:1 10000 11011 10 rn:5 rd:5 
--FCVTAUvs  A64_V         01 1 11110 0 size:1 10000 11100 10 rn:5 rd:5 
--UCVTFvis  A64_V         01 1 11110 0 size:1 10000 11101 10 rn:5 rd:5 
--FCMGEzs  A64_V          01 1 11110 1 size:1 10000 01100 10 rn:5 rd:5 
--FCMLEzs  A64_V          01 1 11110 1 size:1 10000 01101 10 rn:5 rd:5 
--FCVTPUvs  A64_V         01 1 11110 1 size:1 10000 11010 10 rn:5 rd:5 
--FCVTZUvis  A64_V        01 1 11110 1 size:1 10000 11011 10 rn:5 rd:5 
--FRSQRTEs  A64_V         01 1 11110 1 size:1 10000 11101 10 rn:5 rd:5 
-- 
-+@AdvSIMDScalar2RegMisc
-+
-+ABSs  A64_V             01 0 11110   size:2 10000 01011 10 rn:5 rd:5
-+CMEQzs  A64_V           01 0 11110   size:2 10000 01001 10 rn:5 rd:5
-+CMGTzs  A64_V           01 0 11110   size:2 10000 01000 10 rn:5 rd:5
-+CMGzs  A64_V            01 1 11110   size:2 10000 01000 10 rn:5 rd:5
-+CMLEzs  A64_V           01 1 11110   size:2 10000 01001 10 rn:5 rd:5
-+CMLTzs  A64_V           01 0 11110   size:2 10000 01010 10 rn:5 rd:5
-+FCMEQzs  A64_V          01 0 11110 1 size:1 10000 01101 10 rn:5 rd:5
-+FCMGEzs  A64_V          01 1 11110 1 size:1 10000 01100 10 rn:5 rd:5
-+FCMGTzs  A64_V          01 0 11110 1 size:1 10000 01100 10 rn:5 rd:5
-+FCMLEzs  A64_V          01 1 11110 1 size:1 10000 01101 10 rn:5 rd:5
-+FCMLTzs  A64_V          01 0 11110 1 size:1 10000 01110 10 rn:5 rd:5
-+FCVTASvs  A64_V         01 0 11110 0 size:1 10000 11100 10 rn:5 rd:5
-+FCVTAUvs  A64_V         01 1 11110 0 size:1 10000 11100 10 rn:5 rd:5
-+FCVTMSvs  A64_V         01 0 11110 0 size:1 10000 11011 10 rn:5 rd:5
-+FCVTMUvs  A64_V         01 1 11110 0 size:1 10000 11011 10 rn:5 rd:5
-+FCVTNSvs  A64_V         01 0 11110 0 size:1 10000 11010 10 rn:5 rd:5
-+FCVTNUvs  A64_V         01 1 11110 0 size:1 10000 11010 10 rn:5 rd:5
-+FCVTPSvs  A64_V         01 0 11110 1 size:1 10000 11010 10 rn:5 rd:5
-+FCVTPUvs  A64_V         01 1 11110 1 size:1 10000 11010 10 rn:5 rd:5
-+FCVTXN_FCVTXN2s  A64_V  01 1 11110 0 size:1 10000 10110 10 rn:5 rd:5
-+FCVTZSvis  A64_V        01 0 11110 1 size:1 10000 11011 10 rn:5 rd:5
-+FCVTZUvis  A64_V        01 1 11110 1 size:1 10000 11011 10 rn:5 rd:5
-+FRECPEs  A64_V          01 0 11110 1 size:1 10000 11101 10 rn:5 rd:5
-+FRECPX  A64_V           01 0 11110 1 size:1 10000 11111 10 rn:5 rd:5
-+FRSQRTEs  A64_V         01 1 11110 1 size:1 10000 11101 10 rn:5 rd:5
-+NEGvs  A64_V            01 1 11110   size:2 10000 01011 10 rn:5 rd:5
-+SCVTFvis  A64_V         01 0 11110 0 size:1 10000 11101 10 rn:5 rd:5
-+SQABSs  A64_V           01 0 11110   size:2 10000 00111 10 rn:5 rd:5
-+SQNEGs  A64_V           01 1 11110   size:2 10000 00111 10 rn:5 rd:5
-+SQXTN_SQXTN2s  A64_V    01 0 11110   size:2 10000 10100 10 rn:5 rd:5
-+SQXTUN_SQXTUN2s  A64_V  01 1 11110   size:2 10000 10010 10 rn:5 rd:5
-+SUQADDs  A64_V          01 0 11110   size:2 10000 00011 10 rn:5 rd:5
-+UCVTFvis  A64_V         01 1 11110 0 size:1 10000 11101 10 rn:5 rd:5
-+UQXTN_UQXTN2s  A64_V    01 1 11110   size:2 10000 10100 10 rn:5 rd:5
-+USQADDs  A64_V          01 1 11110   size:2 10000 00011 10 rn:5 rd:5
-+
-+@
- # C3.6.13 AdvSIMD scalar x indexed element
- # Complete coverage.
- 
--- 
-2.13.0
+On 07/04/2017 04:37 PM, Cornelia Huck wrote:
+> On Tue,  4 Jul 2017 16:07:56 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> From: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>
+>> Commit f6f4ce4211 ("s390x: add property adapter_routes_max_batch",
+>> 2016-12-09) introduces a common realize (intended to be common for all
+>> the subclasses) for flic, but fails to make sure the kvm-flic which had
+>> it's own is actually calling this common realize.
+> 
+> s/it's/its/
+> 
+
+Valid. Sorry.
+
+>>
+>> This omission fortunately does not result in a grave problem. The common
+>> realize was only supposed to catch a possible programming mistake by
+>> validating a value of a property set via the compat machine macros. Since
+>> there was no programming mistake we don't need this fixed for stable.
+>>
+>> Let's fix this problem by making sure kvm flic honors the realize of its
+>> parent class.
+>>
+>> Let us also improve on the error message we would hypothetically emit
+>> when the validation fails.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Fixes: f6f4ce4211 ("s390x: add property adapter_routes_max_batch")
+>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  hw/intc/s390_flic.c     |  4 ++--
+>>  hw/intc/s390_flic_kvm.c | 17 +++++++++++++++++
+>>  2 files changed, 19 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+>> index a99a350..837158b 100644
+>> --- a/hw/intc/s390_flic.c
+>> +++ b/hw/intc/s390_flic.c
+>> @@ -101,8 +101,8 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
+>>      uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
+>>  
+>>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
+>> -        error_setg(errp, "flic adapter_routes_max_batch too big"
+>> -                   "%d (%d allowed)", max_batch, ADAPTER_ROUTES_MAX_GSI);
+>> +        error_setg(errp, "flic property adapter_routes_max_batch too big"
+>> +                   " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
+> 
+> Unrelated message change?
+> 
+
+I've mentioned it in the commit message. It was also introduced by the
+patch I'm fixing. But yes strictly it's two different problems.
+
+
+>>      }
+>>  }
+>>  
+>> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+>> index bea3997..535d99d 100644
+>> --- a/hw/intc/s390_flic_kvm.c
+>> +++ b/hw/intc/s390_flic_kvm.c
+>> @@ -392,6 +392,17 @@ static const VMStateDescription kvm_s390_flic_vmstate = {
+>>      }
+>>  };
+>>  
+>> +typedef struct KVMS390FLICStateClass {
+>> +    S390FLICStateClass parent_class;
+>> +    DeviceRealize parent_realize;
+>> +} KVMS390FLICStateClass;
+>> +
+>> +#define KVM_S390_FLIC_GET_CLASS(obj) \
+>> +    OBJECT_GET_CLASS(KVMS390FLICStateClass, (obj), TYPE_KVM_S390_FLIC)
+>> +
+>> +#define KVM_S390_FLIC_CLASS(klass) \
+>> +    OBJECT_CLASS_CHECK(KVMS390FLICStateClass, (klass), TYPE_KVM_S390_FLIC)
+>> +
+>>  static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
+>> @@ -400,6 +411,10 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>>      int ret;
+>>      Error *errp_local = NULL;
+>>  
+>> +    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &errp_local);
+> 
+> I usually prefer to introduce a local variable for that, but don't care
+> too much.
+> 
+>> +    if (errp_local) {
+>> +        goto fail;
+>> +    }
+>>      flic_state->fd = -1;
+>>      if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
+>>          error_setg_errno(&errp_local, errno, "KVM is missing capability"
+>> @@ -454,6 +469,7 @@ static void kvm_s390_flic_class_init(ObjectClass *oc, void *data)
+>>      DeviceClass *dc = DEVICE_CLASS(oc);
+>>      S390FLICStateClass *fsc = S390_FLIC_COMMON_CLASS(oc);
+>>  
+>> +    KVM_S390_FLIC_CLASS(oc)->parent_realize = dc->realize;
+> 
+> dito
+> 
+>>      dc->realize = kvm_s390_flic_realize;
+>>      dc->vmsd = &kvm_s390_flic_vmstate;
+>>      dc->reset = kvm_s390_flic_reset;
+>> @@ -468,6 +484,7 @@ static const TypeInfo kvm_s390_flic_info = {
+>>      .name          = TYPE_KVM_S390_FLIC,
+>>      .parent        = TYPE_S390_FLIC_COMMON,
+>>      .instance_size = sizeof(KVMS390FLICState),
+>> +    .class_size    = sizeof(KVMS390FLICStateClass),
+>>      .class_init    = kvm_s390_flic_class_init,
+>>  };
+>>  
+> 
+> 
