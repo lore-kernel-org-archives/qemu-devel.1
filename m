@@ -1,38 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dSEZJ-0003YI-TE
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:32:07 -0400
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSEj4-0006UB-I5
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dSEZE-0003VI-To
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:32:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46542)
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSEj0-0005iI-KE
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:42:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51081)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dSEZE-0003Sy-KH
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:32:00 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1dSEj0-0005ho-Ao
+	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:42:06 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v643Sw54014432
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 23:31:58 -0400
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bf2bb077p-1
+	v643cgmh131464
+	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 23:42:04 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bfc04974v-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 23:31:58 -0400
+	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 23:42:04 -0400
 Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Tue, 4 Jul 2017 13:31:55 +1000
-Date: Tue, 4 Jul 2017 09:01:43 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <149908449117.14256.2821600309813941055.stgit@bahia.lan>
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Mon, 3 Jul 2017 23:42:03 -0400
+References: <20170703085107.16547-1-haoqf@linux.vnet.ibm.com>
+	<20170703085107.16547-2-haoqf@linux.vnet.ibm.com>
+	<fee6eaa0-8132-b3ce-bb3e-0a716eb72064@de.ibm.com>
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Date: Tue, 4 Jul 2017 11:41:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <149908449117.14256.2821600309813941055.stgit@bahia.lan>
-Message-Id: <20170704033143.GA7689@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix memory hotplug error path
+In-Reply-To: <fee6eaa0-8132-b3ce-bb3e-0a716eb72064@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <abf0af9b-a5fd-392f-6d12-2fd066589553@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-scsi-ccw: use ioeventfd even
+ when KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,62 +43,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, zyimin@linux.vnet.ibm.com, famz@redhat.com, peterx@redhat.com, stefanha@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-On Mon, Jul 03, 2017 at 02:21:31PM +0200, Greg Kurz wrote:
-> QEMU shouldn't abort if spapr_add_lmbs()->spapr_drc_attach() fails.
-> Let's propagate the error instead, like it is done everywhere else
-> where spapr_drc_attach() is called.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr.c |   10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 70b3fd374e2b..e103be500189 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2601,6 +2601,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
->      int i, fdt_offset, fdt_size;
->      void *fdt;
->      uint64_t addr = addr_start;
-> +    Error *local_err = NULL;
-> 
->      for (i = 0; i < nr_lmbs; i++) {
->          drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
-> @@ -2611,7 +2612,12 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
->          fdt_offset = spapr_populate_memory_node(fdt, node, addr,
->                                                  SPAPR_MEMORY_BLOCK_SIZE);
-> 
-> -        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
-> +        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-> +        if (local_err) {
-> +            g_free(fdt);
-> +            error_propagate(errp, local_err);
-> +            return;
-> +        }
 
-There is some history to this. I was doing error recovery and propagation
-here similarly during memory hotplug development phase until Igor
-suggested that we shoudn't try to recover after we have done guest
-visible changes.
 
-Refer to "changes in v6" section in this post:
-https://lists.gnu.org/archive/html/qemu-ppc/2015-06/msg00296.html
+=E5=9C=A8 2017/7/3 18:20, Christian Borntraeger =E5=86=99=E9=81=93:
+> On 07/03/2017 10:51 AM, QingFeng Hao wrote:
+>> This patch is based on a similar patch from Stefan Hajnoczi -
+>> commit c324fd0a39c (" virtio-pci: use ioeventfd even when KVM is disab=
+led)
+>>
+>> Do not check kvm_eventfds_enabled() when KVM is disabled since it
+>> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a=
+6f
+>> ("memory: emulate ioeventfd") it has been possible to use ioeventfds i=
+n
+>> qtest or TCG mode.
+>>
+>> This patch makes -device virtio-scsi-ccw,iothread=3Diothread0 work eve=
+n
+>> when KVM is disabled.
+>>
+>> I have tested that virtio-scsi-ccw works under tcg both with and witho=
+ut
+>> iothread.
+>>
+>> This patch fixes qemu-iotests 068, which was accidentally merged early
+>> despite the dependency on ioeventfd.
+>>
+>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+>> ---
+>>   hw/s390x/virtio-ccw.c | 2 +-
+>>   target/s390x/kvm.c    | 3 +++
+>>   2 files changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+>> index 90d37cb9ff..35896eb007 100644
+>> --- a/hw/s390x/virtio-ccw.c
+>> +++ b/hw/s390x/virtio-ccw.c
+>> @@ -711,7 +711,7 @@ static void virtio_ccw_device_realize(VirtioCcwDev=
+ice *dev, Error **errp)
+>>           sch->cssid, sch->ssid, sch->schid, sch->devno,
+>>           ccw_dev->devno.valid ? "user-configured" : "auto-configured"=
+);
+>>
+>> -    if (!kvm_eventfds_enabled()) {
+>> +    if (kvm_enabled() && !kvm_eventfds_enabled()) {
+>>           dev->flags &=3D ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
+>>       }
+>>
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index a3d00196f4..c37f9c3b9e 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -2220,6 +2220,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifie=
+r *notifier, uint32_t sch,
+>>           .addr =3D sch,
+>>           .len =3D 8,
+>>       };
+>> +    if (!kvm_enabled()) {
+>> +        return 0;
+>> +    }
+> thinking more about it. wouldnt it be better to do something like this =
+instead
+>
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 058ddad..cc47831 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -1240,7 +1240,11 @@ static inline int s390_assign_subch_ioeventfd(Ev=
+entNotifier *notifier,
+>                                                 uint32_t sch_id, int vq=
+,
+>                                                 bool assign)
+>   {
+> -    return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, assig=
+n);
+> +    if (kvm_enabled()) {
+> +        return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, a=
+ssign);
+> +    } else {
+> +        return 0;
+> +    }
+>   }
+Thanks. It makes sense. I'll change it.
+>   static inline void s390_crypto_reset(void)
+>
+>
+> FWIW, it seems that we (s390) do not have a functional equivalent funct=
+ion as commit
+> 8c56c1a592b5092d91da8d8943c17777d6462a6f ("memory: emulate ioeventfd") =
+, so we will
+> not use the iothreads.
+Ok, but might s390 have skipped the iothread arguments and passed the=20
+test, so we could
+still keep this test case?
+>
+>>       if (!kvm_check_extension(kvm_state, KVM_CAP_IOEVENTFD)) {
+>>           return -ENOSYS;
+>>       }
+>>
 
-However at that time we were doing memory add by DRC index method
-and hence would attach and online one LMB at a time.
-In that method, if an intermediate attach fails we would end up with a few
-LMBs being onlined by the guest already. However subsequently
-we have switched (optionally, based on dedicated_hp_event_source) to
-count-indexed method of hotplug where we do attach of all LMBs one by one
-and then request the guest to hotplug all of them at once using count-indexed
-method.
-
-So it will be a bit tricky to abort for index based case and recover
-correctly for count-indexed case.
-
-Regards,
-Bharata.
+--=20
+Regards
+QingFeng Hao
