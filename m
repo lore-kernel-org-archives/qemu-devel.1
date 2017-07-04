@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dSK2L-0000jQ-Jy
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:22:26 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dSIEL-0008D1-JC
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dSK2H-0008PF-Sb
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dSK2H-0008P9-Ld
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:22:21 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue,  4 Jul 2017 11:22:15 +0200
-Message-Id: <20170704092215.13742-2-cohuck@redhat.com>
-In-Reply-To: <20170704092215.13742-1-cohuck@redhat.com>
-References: <20170704092215.13742-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/1] Update my email address
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dSIEH-0004H3-IJ
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:26:41 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:58783)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dSIEG-0004AO-VF
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 03:26:37 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Wed, 5 Jul 2017 07:44:27 +0800
+Message-Id: <1499211867-3126-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] audio: st_rate_flow exist a dead loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +21,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, Cornelia Huck <cohuck@redhat.com>
+To: kraxel@redhat.com
+Cc: qemu-devel@nongnu.org, wang.yechao255@zte.com.cn, Hao Peng <peng.hao2@zte.com.cn>
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+From: Hao Peng <peng.hao2@zte.com.cn>
+
+if audio device is opend for a long time in windows vm, there is a uint32_t varaible reversal.
+It will result to a dead loop.
+
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+Reviewed-by: Liu Yun <liu.yunh@zte.com.cn>
+Reviewed-by: Wang Yechao <wang.yechao255@zte.com.cn>
 ---
- MAINTAINERS | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ audio/rate_template.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7df088259b..afc2b8b328 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -299,7 +299,7 @@ F: target/ppc/kvm.c
- 
- S390
- M: Christian Borntraeger <borntraeger@de.ibm.com>
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- M: Alexander Graf <agraf@suse.de>
- S: Maintained
- F: target/s390x/kvm.c
-@@ -778,7 +778,7 @@ F: include/hw/sparc/grlib.h
- S390 Machines
- -------------
- S390 Virtio-ccw
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- M: Christian Borntraeger <borntraeger@de.ibm.com>
- M: Alexander Graf <agraf@suse.de>
- S: Supported
-@@ -1006,7 +1006,7 @@ F: hw/vfio/*
- F: include/hw/vfio/
- 
- vfio-ccw
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- S: Supported
- F: hw/vfio/ccw.c
- F: hw/s390x/s390-ccw.c
-@@ -1048,7 +1048,7 @@ F: tests/virtio-blk-test.c
- T: git git://github.com/stefanha/qemu.git block
- 
- virtio-ccw
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- M: Christian Borntraeger <borntraeger@de.ibm.com>
- S: Supported
- F: hw/s390x/virtio-ccw.[hc]
+diff --git a/audio/rate_template.h b/audio/rate_template.h
+index bd4b1c7..1aa6c43 100644
+--- a/audio/rate_template.h
++++ b/audio/rate_template.h
+@@ -71,6 +71,11 @@ void NAME (void *opaque, struct st_sample *ibuf, struct st_sample *obuf,
+         while (rate->ipos <= (rate->opos >> 32)) {
+             ilast = *ibuf++;
+             rate->ipos++;
++            /* if ipos reversal, there is  a dead loop */
++            if (rate->ipos == 0xffffffff) {
++                rate->ipos = 1;
++                rate->opos = rate->opos & 0xffffffff;
++            }
+             /* See if we finished the input buffer yet */
+             if (ibuf >= iend) {
+                 goto the_end;
 -- 
-2.13.0
+1.8.3.1
