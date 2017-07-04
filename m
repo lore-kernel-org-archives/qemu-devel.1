@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dSKKu-0007IU-8M
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:41:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dSKLK-0007fY-PX
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dSKKt-0002Zm-7i
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:41:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50624)
+	(envelope-from <pbonzini@redhat.com>) id 1dSKLK-0002qJ-1u
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:42:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1dSKKt-0002ZW-13
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:41:35 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2A5A80F8E
-	for <qemu-devel@nongnu.org>; Tue,  4 Jul 2017 09:41:33 +0000 (UTC)
-Date: Tue, 4 Jul 2017 10:41:31 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170704094131.GC3004@redhat.com>
-References: <20170704093815.28285-1-rjones@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSKLJ-0002pJ-SI
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 05:42:02 -0400
+References: <1499099693-22903-1-git-send-email-pbonzini@redhat.com>
+	<1499099693-22903-19-git-send-email-pbonzini@redhat.com>
+	<0d634c91-df90-3513-b77a-cae63903dfce@twiddle.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <91a81a52-0520-d55c-bc94-9c768f346867@redhat.com>
+Date: Tue, 4 Jul 2017 11:41:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170704093815.28285-1-rjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: Error if signal(2) is used
- non-portably.
+In-Reply-To: <0d634c91-df90-3513-b77a-cae63903dfce@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 18/22] target/i386: split cpu_set_mxcsr()
+ and make cpu_set_fpuc() inline
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
 
-Ignore this, Paolo also sent a similar patch after we were discussing
-this on IRC.
 
-Rich.
+On 03/07/2017 22:14, Richard Henderson wrote:
+> On 07/03/2017 09:34 AM, Paolo Bonzini wrote:
+>> +static inline void cpu_set_mxcsr(CPUX86State *env, uint32_t mxcsr)
+>> +{
+>> +    env->mxcsr = mxcsr;
+>> +    if (tcg_enabled()) {
+>> +        tcg_update_mxcsr(env);
+> 
+> I'd prefer update_mxcsr_status for this new name.
+> 
+>> +    }
+>> +}
+>> +
+>> +static inline void cpu_set_fpuc(CPUX86State *env, uint16_t fpuc)
+>> +{
+>> +     env->fpuc = fpuc;
+>> +     if (tcg_enabled()) {
+>> +        update_fp_status(env);
+>> +     }
+>> +}
+> 
+> to match this, and to avoid the implication that it's a function in tcg/.
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+Good.  Also, the existing place in machine.c that calls update_fp_status
+should call update_mxcsr_status as well.
+
+Paolo
