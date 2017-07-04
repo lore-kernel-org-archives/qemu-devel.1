@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dSSWJ-0003QD-RW
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 14:25:56 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dSSa3-0004qM-Ff
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 14:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dSSWG-0002le-LG
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 14:25:55 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:47428
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dSSWG-0002kQ-E3
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 14:25:52 -0400
-Received: from host86-191-132-89.range86-191.btcentralplus.com
-	([86.191.132.89] helo=[192.168.1.65])
-	by s16892447.onlinehome-server.info with esmtpsa
-	(TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dSSWC-0008JR-06
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 19:25:48 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
-Date: Tue, 4 Jul 2017 19:25:41 +0100
+	(envelope-from <rth7680@gmail.com>) id 1dSSa0-00053O-9i
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 14:29:47 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:33735)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSSa0-00051Y-1T
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 14:29:44 -0400
+Received: by mail-pg0-x235.google.com with SMTP id k14so37488808pgr.0
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 11:29:42 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
+	<1499166735-39360-15-git-send-email-pbonzini@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <b7fde464-fd01-f7c0-b9c5-edb3afef3f14@twiddle.net>
+Date: Tue, 4 Jul 2017 08:29:35 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] Managing architectural restrictions with -device and
- libvirt
+In-Reply-To: <1499166735-39360-15-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 14/22] tcg: add CONFIG_TCG guards in headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, anthony.xu@intel.com, berrange@redhat.com, a.rigo@virtualopensystems.com, yang.zhong@intel.com
 
-Hi all,
+On 07/04/2017 01:12 AM, Paolo Bonzini wrote:
+> From: Yang Zhong<yang.zhong@intel.com>
+> 
+> Add the CONFIG_TCG for exec-all.h. Since function tlb_set_page_with_attrs()
+> is defined in ./accel/tcg/cputlb.c, which will be disabled if tcg is disabled.
+> This function need be implemented in accel/stubs/tcg-stub.c for disable-tcg.
+> 
+> Signed-off-by: Yang Zhong<yang.zhong@intel.com>
+> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
+> ---
+> 	v2: do not touch include/exec/helper-proto.h [Richard]
+> 
+>   include/exec/cpu-defs.h |  4 +++-
+>   include/exec/cputlb.h   |  2 +-
+>   include/exec/exec-all.h | 53 ++++++++++++++++++++++++++-----------------------
+>   3 files changed, 32 insertions(+), 27 deletions(-)
 
-I've been working on a patchset that brings the sun4u machine on
-qemu-system-sparc64 much closer to a real Ultra 5, however due to
-various design restrictions I need to be able to restrict how devices
-are added to the machine with -device.
-
-On a real Ultra 5, the root PCI bus (sabre) has 2 PCI bridges (simba A
-and simba B) with the onboard devices attached to simba A with 2 free
-slots, and an initially empty simba B.
-
-Firstly, is it possible to restrict the machine so that devices cannot
-be directly plugged into the root PCI bus, but only behind one of the
-PCI bridges? There is also an additional restriction in that slot 0
-behind simba A must be left empty to ensure that the ebus (containing
-the onboard devices) is the first device allocated.
-
-Secondly, how does libvirt handle these type of restrictions? Is it able
-to get the information from QEMU or is there some kind of libvirt
-profile that needs to be updated? And do newer versions of libvirt have
-the ability to attach devices behind PCI bridges using a GUI such as
-virt-manager, or is that only something that can only be done by
-directly editing the domain XML?
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
 
-ATB,
-
-Mark.
+r~
