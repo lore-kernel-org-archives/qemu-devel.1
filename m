@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dSErh-0001Gm-N6
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:51:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dSFcu-0003ow-Ga
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 00:39:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dSEre-0004U3-Dl
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:51:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dSEre-0004TF-4W
-	for qemu-devel@nongnu.org; Mon, 03 Jul 2017 23:51:02 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v643mYgY137773
-	for <qemu-devel@nongnu.org>; Mon, 3 Jul 2017 23:50:59 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bf27c1cbs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 03 Jul 2017 23:50:59 -0400
-Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Tue, 4 Jul 2017 13:50:56 +1000
-Date: Tue, 4 Jul 2017 09:20:50 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <149908449117.14256.2821600309813941055.stgit@bahia.lan>
-	<20170704033143.GA7689@in.ibm.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dSFct-0006in-3l
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 00:39:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170704033143.GA7689@in.ibm.com>
-Message-Id: <20170704035050.GB7689@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix memory hotplug error path
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <1499094812-13239-1-git-send-email-peter.maydell@linaro.org>
+References: <1499094812-13239-1-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 4 Jul 2017 01:39:42 -0300
+Message-ID: <CAAdtpL6MJJLy27ZRH-9jLWx-1U88+_H4xsfy0+3f=AKBdSQNfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] include/hw/ptimer.h: Add documentation
+ comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,76 +26,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Tue, Jul 04, 2017 at 09:01:43AM +0530, Bharata B Rao wrote:
-> On Mon, Jul 03, 2017 at 02:21:31PM +0200, Greg Kurz wrote:
-> > QEMU shouldn't abort if spapr_add_lmbs()->spapr_drc_attach() fails.
-> > Let's propagate the error instead, like it is done everywhere else
-> > where spapr_drc_attach() is called.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/ppc/spapr.c |   10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 70b3fd374e2b..e103be500189 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2601,6 +2601,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-> >      int i, fdt_offset, fdt_size;
-> >      void *fdt;
-> >      uint64_t addr = addr_start;
-> > +    Error *local_err = NULL;
-> > 
-> >      for (i = 0; i < nr_lmbs; i++) {
-> >          drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
-> > @@ -2611,7 +2612,12 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-> >          fdt_offset = spapr_populate_memory_node(fdt, node, addr,
-> >                                                  SPAPR_MEMORY_BLOCK_SIZE);
-> > 
-> > -        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
-> > +        spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
-> > +        if (local_err) {
-> > +            g_free(fdt);
-> > +            error_propagate(errp, local_err);
-> > +            return;
-> > +        }
-> 
-> There is some history to this. I was doing error recovery and propagation
-> here similarly during memory hotplug development phase until Igor
-> suggested that we shoudn't try to recover after we have done guest
-> visible changes.
-> 
-> Refer to "changes in v6" section in this post:
-> https://lists.gnu.org/archive/html/qemu-ppc/2015-06/msg00296.html
-> 
-> However at that time we were doing memory add by DRC index method
-> and hence would attach and online one LMB at a time.
-> In that method, if an intermediate attach fails we would end up with a few
-> LMBs being onlined by the guest already. However subsequently
-> we have switched (optionally, based on dedicated_hp_event_source) to
-> count-indexed method of hotplug where we do attach of all LMBs one by one
-> and then request the guest to hotplug all of them at once using count-indexed
-> method.
-> 
-> So it will be a bit tricky to abort for index based case and recover
-> correctly for count-indexed case.
+On Mon, Jul 3, 2017 at 12:13 PM, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+> Add documentation comments describing the public API of the
+> ptimer countdown timer.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Looked at the code again and realized that though we started with
-index based LMB addition, we later switched to count based addition. Then
-we added support for count-indexed type subject to the presence
-of dedidated hotplug event source while still retaining the support
-for count based addition.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-So presently we do attach of all LMBs one by one and then do onlining
-(count based or count-indexed based) once. Hence error recovery
-for both cases would be similar now. So I guess you should take care of
-undoing pc_dimm_memory_plug() like Igor mentioned and also undo the
-effects of partial successful attaches.
+> ---
+> I was trying to write a timer device and discovered that the ptimer
+> API wasn't actually documented, so I wrote some basic notes for it...
 
-> 
-> Regards,
-> Bharata.
+I used to believe this file had no comments on purpose, feeling hazed
+after reading "only the source code tells the full story" from the
+GettingStartedDevelopers wiki entry.
+
+/me gives Peter a big hug!
+
+>
+>  include/hw/ptimer.h | 120 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 120 insertions(+)
+>
+> diff --git a/include/hw/ptimer.h b/include/hw/ptimer.h
+> index eafc3f0..fc4ef5c 100644
+> --- a/include/hw/ptimer.h
+> +++ b/include/hw/ptimer.h
+> @@ -12,6 +12,20 @@
+>  #include "qemu/timer.h"
+>  #include "migration/vmstate.h"
+>
+> +/* The ptimer API implements a simple periodic countdown timer.
+> + * The countdown timer has a value (which can be read and written via
+> + * ptimer_get_count() and ptimer_set_count()). When it is enabled
+> + * using ptimer_run(), the value will count downwards at the frequency
+> + * which has been configured using ptimer_set_period() or ptimer_set_fre=
+q().
+> + * When it reaches zero it will trigger a QEMU bottom half handler, and
+> + * can be set to either reload itself from a specified limit value
+> + * and keep counting down, or to stop (as a one-shot timer).
+> + *
+> + * Forgetting to set the period/frequency (or setting it to zero) is a
+> + * bug in the QEMU device and will cause warning messages to be printed
+> + * to stderr when the guest attempts to enable the timer.
+> + */
+> +
+>  /* The default ptimer policy retains backward compatibility with the leg=
+acy
+>   * timers. Custom policies are adjusting the default one. Consider provi=
+ding
+>   * a correct policy for your timer.
+> @@ -59,15 +73,121 @@
+>  typedef struct ptimer_state ptimer_state;
+>  typedef void (*ptimer_cb)(void *opaque);
+>
+> +/**
+> + * ptimer_init - Allocate and return a new ptimer
+> + * @bh: QEMU bottom half which is run on timer expiry
+> + * @policy: PTIMER_POLICY_* bits specifying behaviour
+> + *
+> + * The ptimer returned must be freed using ptimer_free().
+> + * The ptimer takes ownership of @bh and will delete it
+> + * when the ptimer is eventually freed.
+> + */
+>  ptimer_state *ptimer_init(QEMUBH *bh, uint8_t policy_mask);
+> +
+> +/**
+> + * ptimer_free - Free a ptimer
+> + * @s: timer to free
+> + *
+> + * Free a ptimer created using ptimer_init() (including
+> + * deleting the bottom half which it is using).
+> + */
+>  void ptimer_free(ptimer_state *s);
+> +
+> +/**
+> + * ptimer_set_period - Set counter increment interval in nanoseconds
+> + * @s: ptimer to configure
+> + * @period: period of the counter in nanoseconds
+> + *
+> + * Note that if your counter behaviour is specified as having a
+> + * particular frequency rather than a period then ptimer_set_freq()
+> + * may be more appropriate.
+> + */
+>  void ptimer_set_period(ptimer_state *s, int64_t period);
+
+I like to use explicit unit in variable name, i.e. period_ns.
+
+> +
+> +/**
+> + * ptimer_set_freq - Set counter frequency in Hz
+> + * @s: ptimer to configure
+> + * @freq: counter frequency in Hz
+> + *
+> + * This does the same thing as ptimer_set_period(), so you only
+> + * need to call one of them. If the counter behaviour is specified
+> + * as setting the frequency then this function is more appropriate,
+> + * because it allows specifying an effective period which is
+> + * precise to fractions of a nanosecond, avoiding rounding errors.
+> + */
+>  void ptimer_set_freq(ptimer_state *s, uint32_t freq);
+> +
+> +/**
+> + * ptimer_get_limit - Get the configured limit of the ptimer
+> + * @s: ptimer to query
+> + *
+> + * This function returns the current limit (reload) value
+> + * of the down-counter; that is, the value which it will be
+> + * reset to when it hits zero.
+> + *
+> + * Generally timer devices using ptimers should be able to keep
+> + * their reload register state inside the ptimer using the get
+> + * and set limit functions rather than needing to also track it
+> + * in their own state structure.
+> + */
+>  uint64_t ptimer_get_limit(ptimer_state *s);
+> +
+> +/**
+> + * ptimer_set_limit - Set the limit of the ptimer
+> + * @s: ptimer
+> + * @limit: initial countdown value
+> + * @reload: if nonzero, then reset the counter to the new limit
+> + *
+> + * Set the limit value of the down-counter. The @reload flag can
+> + * be used to emulate the behaviour of timers which immediately
+> + * reload the counter when their reload register is written to.
+> + */
+>  void ptimer_set_limit(ptimer_state *s, uint64_t limit, int reload);
+> +
+> +/**
+> + * ptimer_get_count - Get the current value of the ptimer
+> + * @s: ptimer
+> + *
+> + * Return the current value of the down-counter. This will
+> + * return the correct value whether the counter is enabled or
+> + * disabled.
+> + */
+>  uint64_t ptimer_get_count(ptimer_state *s);
+> +
+> +/**
+> + * ptimer_set_count - Set the current value of the ptimer
+> + * @s: ptimer
+> + * @count: count value to set
+> + *
+> + * Set the value of the down-counter. If the counter is currently
+> + * enabled this will arrange for a timer callback at the appropriate
+> + * point in the future.
+> + */
+>  void ptimer_set_count(ptimer_state *s, uint64_t count);
+> +
+> +/**
+> + * ptimer_run - Start a ptimer counting
+> + * @s: ptimer
+> + * @oneshot: non-zero if this timer should only count down once
+> + *
+> + * Start a ptimer counting down; when it reaches zero the bottom half
+> + * passed to ptimer_init() will be invoked. If the @oneshot argument is =
+zero,
+> + * the counter value will then be reloaded from the limit and it will
+> + * start counting down again. If @oneshot is non-zero, then the counter
+> + * will disable itself when it reaches zero.
+> + */
+>  void ptimer_run(ptimer_state *s, int oneshot);
+> +
+> +/**
+> + * ptimer_stop - Stop a ptimer counting
+> + * @s: ptimer
+> + *
+> + * Pause a timer (the count stays at its current value until ptimer_run(=
+)
+> + * is called to start it counting again).
+> + *
+> + * Note that this can cause it to "lose" time, even if it is immediately
+> + * restarted.
+> + */
+>  void ptimer_stop(ptimer_state *s);
+>
+>  extern const VMStateDescription vmstate_ptimer;
+> --
+> 2.7.4
+>
+>
