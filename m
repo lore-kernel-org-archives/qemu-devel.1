@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dSVr6-0004NW-Sp
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:59:37 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dSVrR-0004cV-VF
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dSVr3-0006AB-Rg
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:59:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dSVr3-0006A5-Le
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:59:33 -0400
-Date: Wed, 5 Jul 2017 00:59:25 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170705005657-mutt-send-email-mst@kernel.org>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-26-dgilbert@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dSVrR-0006Ey-6x
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:59:57 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34112)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dSVrQ-0006Ec-UO
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 17:59:57 -0400
+Received: by mail-lf0-x244.google.com with SMTP id g21so19066576lfk.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 14:59:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170628190047.26159-26-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 25/29] vhu: enable = false on get_vring_base
+In-Reply-To: <1499207612-3560-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1499207612-3560-1-git-send-email-peng.hao2@zte.com.cn>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 4 Jul 2017 23:59:54 +0200
+Message-ID: <CAJ+F1CKUnefwkRtSUXdabuM6Scvu3z1OUeVnug9PFzaqz=_eoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On Wed, Jun 28, 2017 at 08:00:43PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> When we receive a GET_VRING_BASE message set enable = false
-> to stop any new received packets modifying the ring.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Hi
 
-I think I already reviewed a similar patch.
-Spec says:
-Client must only process each ring when it is started.
+On Wed, Jul 5, 2017 at 12:33 AM, Peng Hao <peng.hao2@zte.com.cn> wrote:
+> vhost exists a call for g_file_get_contents, but not call g_free.
+>
+> Signed-off-by: Peng Hao<peng.hao2@zte.com.cn>
 
-IMHO the real fix is to fix client to check the started
-flag before processing the ring.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+mst: is this better?
 
 > ---
->  contrib/libvhost-user/libvhost-user.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index ceddeac74f..d37052b7b0 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -652,6 +652,7 @@ vu_get_vring_base_exec(VuDev *dev, VhostUserMsg *vmsg)
->      vmsg->size = sizeof(vmsg->payload.state);
->  
->      dev->vq[index].started = false;
-> +    dev->vq[index].enable = false;
->      if (dev->iface->queue_set_started) {
->          dev->iface->queue_set_started(dev, index, false);
+>  hw/virtio/vhost-backend.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
+> index 4e31de1..2c481d6 100644
+> --- a/hw/virtio/vhost-backend.c
+> +++ b/hw/virtio/vhost-backend.c
+> @@ -52,11 +52,13 @@ static int vhost_kernel_memslots_limit(struct vhost_d=
+ev *dev)
+>                              &s, NULL, NULL)) {
+>          uint64_t val =3D g_ascii_strtoull(s, NULL, 10);
+>          if (!((val =3D=3D G_MAXUINT64 || !val) && errno)) {
+> +            g_free(s);
+>              return val;
+>          }
+>          error_report("ignoring invalid max_mem_regions value in vhost mo=
+dule:"
+>                       " %s", s);
 >      }
-> -- 
-> 2.13.0
+> +    g_free(s);
+>      return limit;
+>  }
+>
+> --
+> 1.8.3.1
+>
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
