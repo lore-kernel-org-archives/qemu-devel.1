@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSPEE-0006Me-AS
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:55:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dSPEL-0006Tv-Te
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:55:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSPEB-0005Ud-6p
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:55:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSPEA-0005Tu-T9
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:54:59 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1498727785.git.maozy.fnst@cn.fujitsu.com>
-	<573148b4523bcabb3436a8c17875ecd1e1ae6f6d.1498727785.git.maozy.fnst@cn.fujitsu.com>
-Date: Tue, 04 Jul 2017 16:54:54 +0200
-In-Reply-To: <573148b4523bcabb3436a8c17875ecd1e1ae6f6d.1498727785.git.maozy.fnst@cn.fujitsu.com>
-	(Mao Zhongyi's message of "Thu, 29 Jun 2017 17:43:00 +0800")
-Message-ID: <87van8mev5.fsf@dusky.pond.sub.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1dSPEL-0005bX-0k
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 10:55:10 -0400
+Date: Wed, 5 Jul 2017 00:54:54 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170704145454.GI2180@umbus.fritz.box>
+References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
+	<20170621091848.28256-3-david@gibson.dropbear.id.au>
+	<20170622113215.146bc3b8@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 2/4] net/socket: Convert several helper
- functions to Error
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="J/zg8ciPNcraoWb6"
+Content-Disposition: inline
+In-Reply-To: <20170622113215.146bc3b8@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/5] spapr: Refactor spapr_drc_detach()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,310 +25,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: mdroth@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, sursingh@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-> Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
-> net_socket_fd_init() use the function such as fprintf(), perror() to
-> report an error message.
->
-> Now, convert these functions to Error.
->
-> Cc: jasowang@redhat.com
-> Cc: armbru@redhat.com
-> Cc: berrange@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  net/socket.c | 81 +++++++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 50 insertions(+), 31 deletions(-)
->
-> diff --git a/net/socket.c b/net/socket.c
-> index 7d05e70..44fb504 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -209,7 +209,9 @@ static void net_socket_send_dgram(void *opaque)
->      }
->  }
->  
-> -static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr *localaddr)
-> +static int net_socket_mcast_create(struct sockaddr_in *mcastaddr,
-> +                                   struct in_addr *localaddr,
-> +                                   Error **errp)
->  {
->      struct ip_mreq imr;
->      int fd;
-> @@ -221,16 +223,16 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->  #endif
->  
->      if (!IN_MULTICAST(ntohl(mcastaddr->sin_addr.s_addr))) {
-> -        fprintf(stderr, "qemu: error: specified mcastaddr \"%s\" (0x%08x) "
-> -                "does not contain a multicast address\n",
-> -                inet_ntoa(mcastaddr->sin_addr),
-> -                (int)ntohl(mcastaddr->sin_addr.s_addr));
-> +        error_setg(errp, "specified mcastaddr %s (0x%08x) "
-> +                   "does not contain a multicast address",
-> +                   inet_ntoa(mcastaddr->sin_addr),
-> +                   (int)ntohl(mcastaddr->sin_addr.s_addr));
->          return -1;
->  
+--J/zg8ciPNcraoWb6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You could drop the empty line here, and ...
+On Thu, Jun 22, 2017 at 11:32:15AM +0200, Greg Kurz wrote:
+> On Wed, 21 Jun 2017 17:18:45 +0800
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > This function has two unused parameters - remove them.
+> >=20
+>=20
+> It's ok for the d argument but I'm not sure about errp... Indeed it isn't=
+ used
+> in the current code, but looking at the paths below spapr_drc_detach(), we
+> have:
+>=20
+> spapr_drc_detach()
+>  spapr_drc_release()
+>   spapr_core_release()
+>    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+>=20
+> and
+>=20
+> spapr_drc_detach()
+>  spapr_drc_release()
+>   spapr_lmb_release()
+>    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+>=20
+> Shouldn't we pass the errp down to hotplug_handler_unplug() instead of
+> aborting ?
 
->      }
+So, at first I thought you were right, and was going to rewrite on
+that basis.
 
-... maybe insert one here.
+Then I realized that calling hotplug_handler_unplug() is a bizarrely
+roundabout way of doing what we need anyway (usually the unplug
+handler is never called if there is an unplug_request() handler).
+Once we expand those out to what they actually call, the errors
+disappear again.  I'll do that in the next spin.
 
->      fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
->      if (fd < 0) {
-> -        perror("socket(PF_INET, SOCK_DGRAM)");
-> +        error_setg_errno(errp, errno, "failed to create datagram socket");
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-I suggested "can't create datagram socket" in my review of v5.  I prefer
-"can't <do something>" over "failed to <do something>" myself, but grep
-shows more strings starting "failed to" than with "can't".  I guess
-reporting "failed to <do something>" is more common.  Okay.
+--J/zg8ciPNcraoWb6
+Content-Type: application/pgp-signature; name="signature.asc"
 
->          return -1;
->      }
->  
-> @@ -242,13 +244,15 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      val = 1;
->      ret = qemu_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
->      if (ret < 0) {
-> -        perror("setsockopt(SOL_SOCKET, SO_REUSEADDR)");
-> +        error_setg_errno(errp, errno, "set the socket 'SO_REUSEADDR'"
-> +                         " attribute failed");
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Adapting my review of v5 to the next instance: I'm not a native speaker,
-but "set FOO failed" doesn't feel right to me.  Where's the subject?
-"Create" is a verb.  "Setting FOO failed" has a subject, but doesn't
-feel right.  What about "can't set socket option SO_REUSEADDR"?
+iQIcBAEBCAAGBQJZW6w8AAoJEGw4ysog2bOSWUIQAKbtlLEieL3bv2Ptw84mC/Nx
+xAFwvzyrbgioKXXcvruoqgoikg7LGxyC8kTHvpYysY+0BWwIgO96OCls2vpJvcmU
+klQvJe6R2MSp3DdFSj80hpjsOSY+dgpRFTMKIUi9yFtu/Rs1z5KHPcK8G3sgXOBU
+XmJENS3LLyG6hJlaVQe6vhJ6Cx8g1LnrPKxngkYECgH8WWxKHcEI5kjw9leKJYMD
+p5OttjJI//o/JUUdcEaCh2lj9u0id6XafNO+rqpA0AHXbe4Xcj8LQ8rqixy4sIh/
+FJC1nMvnIdu6jRRpHfNXunE3Z9OJvuY/nuyx2jko49oLTn9oo9P8MZ3CbCiaMPzA
+D8BOSUSUerz9CCBlFWBawNx0oQVROYM7MI6HhBd52xB7zPnNtO0iLPRPEgvvKPFg
+njG9S48lVZlhky2uWQxJlFk/y9vyWUSdp24zH9c/k8nWBrUUxoG5Gm4reGpQy/dQ
+kPPZgMncHcz45g0gx2oFQzp6afwr89gxsu3emutrvK3f0fe3KftSUVvMdnBzf5nw
+UHm5FBLpGMe+88kX7ULjumDx4xZJ4udJZ24Y3aH7VkY0ghFTRjCTr5C0f78ri7rM
+f4H8WRsTwum2L4C9/rSVzpijRCObMaVnHxLQWsF4ar6brAKICgckehLgTIFFJTM5
+CLtqePlBJdELcs+omNoL
+=9+kj
+-----END PGP SIGNATURE-----
 
-Also, please avoid breaking the line in the middle of an argument when
-you could just as well break it between arguments, like this:
-
-           error_setg_errno(errp, errno,
-                            "can't set socket attribute SO_REUSEADDR");
-
->          goto fail;
->      }
->  
->      ret = bind(fd, (struct sockaddr *)mcastaddr, sizeof(*mcastaddr));
->      if (ret < 0) {
-> -        perror("bind");
-> +        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
-> +                         inet_ntoa(mcastaddr->sin_addr));
-
-Likewise, "can't bind ip=%s to socket".
-
->          goto fail;
->      }
->  
-> @@ -263,7 +267,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      ret = qemu_setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
->                            &imr, sizeof(struct ip_mreq));
->      if (ret < 0) {
-> -        perror("setsockopt(IP_ADD_MEMBERSHIP)");
-> +        error_setg_errno(errp, errno, "add socket to multicast group %s"
-> +                         " failed", inet_ntoa(imr.imr_multiaddr));
-
-Likewise.
-
->          goto fail;
->      }
->  
-> @@ -272,7 +277,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->      ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP,
->                            &loop, sizeof(loop));
->      if (ret < 0) {
-> -        perror("setsockopt(SOL_IP, IP_MULTICAST_LOOP)");
-> +        error_setg_errno(errp, errno, "force multicast message to loopback"
-> +                         " failed");
-
-Likwise.
-
->          goto fail;
->      }
->  
-> @@ -281,7 +287,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
->          ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF,
->                                localaddr, sizeof(*localaddr));
->          if (ret < 0) {
-> -            perror("setsockopt(IP_MULTICAST_IF)");
-> +            error_setg_errno(errp, errno, "set the default network send "
-> +                             "interface failed");
-
-Likewise.
-
->              goto fail;
->          }
->      }
-> @@ -320,7 +327,8 @@ static NetClientInfo net_dgram_socket_info = {
->  static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->                                                  const char *model,
->                                                  const char *name,
-> -                                                int fd, int is_connected)
-> +                                                int fd, int is_connected,
-> +                                                Error **errp)
->  {
->      struct sockaddr_in saddr;
->      int newfd;
-> @@ -337,14 +345,13 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->          if (getsockname(fd, (struct sockaddr *) &saddr, &saddr_len) == 0) {
->              /* must be bound */
->              if (saddr.sin_addr.s_addr == 0) {
-> -                fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
-> -                        "cannot setup multicast dst addr\n", fd);
-> +                error_setg(errp, "init_dgram: fd=%d unbound, "
-> +                           "cannot setup multicast dst addr", fd);
-
-Yet another awful error message: "init_dgram" and the value of @fd are
-useful to a developer, but not to the user, and "dst addr" aren't even
-words.  What about "can't setup multicast destination address"?
-
-Aside: I wonder whether this is actually a programming error.  How can
-it happen?  Mao, I don't expect you to answer this :)
-
->                  goto err;
->              }
->              /* clone dgram socket */
-> -            newfd = net_socket_mcast_create(&saddr, NULL);
-> +            newfd = net_socket_mcast_create(&saddr, NULL, errp);
->              if (newfd < 0) {
-> -                /* error already reported by net_socket_mcast_create() */
->                  goto err;
->              }
->              /* clone newfd to fd, close newfd */
-> @@ -352,9 +359,9 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
->              close(newfd);
->  
->          } else {
-> -            fprintf(stderr,
-> -                    "qemu: error: init_dgram: fd=%d failed getsockname(): %s\n",
-> -                    fd, strerror(errno));
-> +            error_setg(errp,
-> +                       "init_dgram: fd=%d failed getsockname(): %s",
-> +                       fd, strerror(errno));
-
-Similarly awful error message.  What about "can't get socket name"?
-
-error_setg_errno() instead of strerror(), please.
-
->              goto err;
->          }
->      }
-> @@ -432,20 +439,22 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
->  
->  static NetSocketState *net_socket_fd_init(NetClientState *peer,
->                                            const char *model, const char *name,
-> -                                          int fd, int is_connected)
-> +                                          int fd, int is_connected,
-> +                                          Error **errp)
->  {
->      int so_type = -1, optlen=sizeof(so_type);
->  
->      if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
->          (socklen_t *)&optlen)< 0) {
-> -        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
-> -                fd);
-> +        error_setg(errp, "getsockopt(SO_TYPE) for fd=%d failed",
-> +                   fd);
-
-Another awful one.  What about "can't get socket option SO_TYPE"?
-
->          closesocket(fd);
->          return NULL;
->      }
->      switch(so_type) {
->      case SOCK_DGRAM:
-> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
-> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected,
-> +                                        errp);
->      case SOCK_STREAM:
->          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
->      default:
-> @@ -536,6 +545,7 @@ static int net_socket_connect_init(NetClientState *peer,
->      NetSocketState *s;
->      int fd, connected, ret;
->      struct sockaddr_in saddr;
-> +    Error *err = NULL;
->  
->      if (parse_host_port(&saddr, host_str) < 0)
->          return -1;
-> @@ -567,9 +577,11 @@ static int net_socket_connect_init(NetClientState *peer,
->              break;
->          }
->      }
-> -    s = net_socket_fd_init(peer, model, name, fd, connected);
-> -    if (!s)
-> +    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
-> +    if (!s) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->      snprintf(s->nc.info_str, sizeof(s->nc.info_str),
->               "socket: connect to %s:%d",
->               inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-> @@ -586,6 +598,7 @@ static int net_socket_mcast_init(NetClientState *peer,
->      int fd;
->      struct sockaddr_in saddr;
->      struct in_addr localaddr, *param_localaddr;
-> +    Error *err = NULL;
->  
->      if (parse_host_port(&saddr, host_str) < 0)
->          return -1;
-> @@ -598,13 +611,17 @@ static int net_socket_mcast_init(NetClientState *peer,
->          param_localaddr = NULL;
->      }
->  
-> -    fd = net_socket_mcast_create(&saddr, param_localaddr);
-> -    if (fd < 0)
-> +    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-> +    if (fd < 0) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
-> -    s = net_socket_fd_init(peer, model, name, fd, 0);
-> -    if (!s)
-> +    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-> +    if (!s) {
-> +        error_report_err(err);
->          return -1;
-> +    }
->  
->      s->dgram_dst = saddr;
->  
-> @@ -624,6 +641,7 @@ static int net_socket_udp_init(NetClientState *peer,
->      NetSocketState *s;
->      int fd, ret;
->      struct sockaddr_in laddr, raddr;
-> +    Error *err = NULL;
->  
->      if (parse_host_port(&laddr, lhost) < 0) {
->          return -1;
-> @@ -652,8 +670,9 @@ static int net_socket_udp_init(NetClientState *peer,
->      }
->      qemu_set_nonblock(fd);
->  
-> -    s = net_socket_fd_init(peer, model, name, fd, 0);
-> +    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
->      if (!s) {
-> +        error_report_err(err);
->          return -1;
->      }
->  
-> @@ -696,7 +715,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
->              return -1;
->          }
->          qemu_set_nonblock(fd);
-> -        if (!net_socket_fd_init(peer, "socket", name, fd, 1)) {
-> +        if (!net_socket_fd_init(peer, "socket", name, fd, 1, errp)) {
->              return -1;
->          }
->          return 0;
-
-Looks good to me otherwise.
+--J/zg8ciPNcraoWb6--
