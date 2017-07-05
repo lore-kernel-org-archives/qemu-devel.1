@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSqkd-0001sa-Ht
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:18:20 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dSquA-0004VK-Nm
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSqkc-0001rZ-IL
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:18:19 -0400
-References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-8-eblake@redhat.com>
-	<20170705114244.GA5297@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5308afcc-dede-d670-0973-8acc3e1177c2@redhat.com>
-Date: Wed, 5 Jul 2017 15:18:06 -0500
+	(envelope-from <aurelien@aurel32.net>) id 1dSqu9-0004tm-QO
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:28:10 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:40554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dSqu9-0004s1-KH
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:28:09 -0400
+Date: Wed, 5 Jul 2017 22:27:57 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170705202757.rlwd2lw3qo2g6sow@aurel32.net>
+References: <84bf1844-8d5c-2a71-c1cc-8f8c74511fca@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20170705114244.GA5297@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HculsijHDrCPLCwaw0FxjRhNbO8cPhQ0M"
-Subject: Re: [Qemu-devel] [PATCH v3 07/20] mirror: Switch MirrorBlockJob to
- byte-based
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <84bf1844-8d5c-2a71-c1cc-8f8c74511fca@vivier.eu>
+Subject: Re: [Qemu-devel] trigonometric functions in softfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,114 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Thomas Huth <huth@tuxfamily.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HculsijHDrCPLCwaw0FxjRhNbO8cPhQ0M
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com,
- Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <5308afcc-dede-d670-0973-8acc3e1177c2@redhat.com>
-Subject: Re: [PATCH v3 07/20] mirror: Switch MirrorBlockJob to byte-based
-References: <20170627192458.15519-1-eblake@redhat.com>
- <20170627192458.15519-8-eblake@redhat.com>
- <20170705114244.GA5297@noname.redhat.com>
-In-Reply-To: <20170705114244.GA5297@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 07/05/2017 06:42 AM, Kevin Wolf wrote:
-> Am 27.06.2017 um 21:24 hat Eric Blake geschrieben:
->> We are gradually converting to byte-based interfaces, as they are
->> easier to reason about than sector-based.  Continue by converting an
->> internal structure (no semantic change), and all references to the
->> buffer size.
->>
->> [checkpatch has a false positive on use of MIN() in this patch]
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: John Snow <jsnow@redhat.com>
+On 2017-07-05 10:25, Laurent Vivier wrote:
+> Hi,
 >=20
-> I wouldn't mind an assertion that granularity is a multiple of
-> BDRV_SECTOR_SIZE, along with a comment that explains that this is
-> required so that we avoid rounding problems when dealing with the bitma=
-p
-> functions.
-
-That goes away later when series two converts the bitmap functions to be
-byte-based, but you're right that the intermediate state should be
-easier to follow.
-
+> Thomas has pointed out that WinUAE[1] has an updated softfloat library
+> implementing missing operations for 680x0.
 >=20
-> blockdev_mirror_common() does already check this, but it feels like it'=
-s
-> a bit far away from where the actual problem would happen in the mirror=
+> Do you think these changes can be merged in QEMU?
 
-> job code.
+=46rom the licensing point of view, they seems to use the SoftFloat-2a
+license, so that should be fine.
 
-Indeed.
+Personally I am fine adding general trigonometric functions to
+softfloat, that might help other targets like x86 which uses  the math
+functions from libm and thus have different behaviour/precision
+depending on the host.
 
->=20
->> @@ -768,17 +765,17 @@ static void coroutine_fn mirror_run(void *opaque=
-)
->>       * the destination do COW.  Instead, we copy sectors around the
->>       * dirty data if needed.  We need a bitmap to do that.
->>       */
->> +    s->target_cluster_size =3D BDRV_SECTOR_SIZE;
->>      bdrv_get_backing_filename(target_bs, backing_filename,
->>                                sizeof(backing_filename));
->>      if (!bdrv_get_info(target_bs, &bdi) && bdi.cluster_size) {
->> -        target_cluster_size =3D bdi.cluster_size;
->> +        s->target_cluster_size =3D bdi.cluster_size;
->>      }
->=20
-> Why have the unrelated bdrv_get_backing_filename() between the two
-> assignments of s->target_cluster_size? Or actually, wouldn't it be
-> even easier to read with an else branch?
->=20
->     if (!bdrv_get_info(target_bs, &bdi) && bdi.cluster_size) {
->         s->target_cluster_size =3D bdi.cluster_size;
->     } else {
->         s->target_cluster_size =3D BDRV_SECTOR_SIZE;
->     }
+The question is more how m68k specific are those trigonometric
+functions. If we can have a way to implement them as generic
+trigonometric functions reusable by other targets, I am all for it. If
+not that code would probably be better in target/m68k.
 
-Yes, that looks nicer.
-
->=20
-> None of these comments are critical, so anyway:
->=20
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-
-I'm respinning v4 anyways, so I'll make the change (and while it is
-small, it's still enough that I'll drop R-b).
-
->=20
+Aurelien
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---HculsijHDrCPLCwaw0FxjRhNbO8cPhQ0M
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXUl+AAoJEKeha0olJ0Nq7KcIAJLSU10pQejYJh18wSrVchzr
-YxarRW9agN5e+VNOo+BeOhFFvAkzZTePqreBGale0VzaHV/hEgzjP/Ykw6fth845
-PfZXECrT6Y3sn74CJJMHGulB2dg415ZyxiKF2+8OI6xOKPTLj6l53azzLkHLSWLd
-6Rok7XwPLHYsuimv3xKtu7exJDTEzWM4mbf8yLEMz3s8f6SVy4fiz7Rgs5wpMnFv
-tVs0x9eMPNUVyj5LViW8S+BJXFZMdI9k32g09hgTgB05SZmEKfoqqJrX5Bg/uCBX
-J0gqu/yLrUcU7p0/rDyvjnEj96rIC6IJS9HR9r7Jv3094hirUn+Sjo4j026HVds=
-=T+5G
------END PGP SIGNATURE-----
-
---HculsijHDrCPLCwaw0FxjRhNbO8cPhQ0M--
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
