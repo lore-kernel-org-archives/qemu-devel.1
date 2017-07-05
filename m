@@ -1,47 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSn9b-0001Fk-Q6
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:27:53 -0400
+	(envelope-from <berrange@redhat.com>) id 1dSnA7-0001at-Dq
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dSn9X-0006iQ-S1
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:27:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40601)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dSn9X-0006hx-IV
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:27:47 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v65GOCpF053737
-	for <qemu-devel@nongnu.org>; Wed, 5 Jul 2017 12:27:46 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bgwem9e1m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 12:27:45 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 5 Jul 2017 12:27:44 -0400
-References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-	<1499177279-131407-4-git-send-email-borntraeger@de.ibm.com>
-	<20170704163103.4d6670a9@dhcp-192-215.str.redhat.com>
-	<3200e2c0-8ffe-2f6d-b7a8-049352851c96@linux.vnet.ibm.com>
-	<87aeaca3-5261-91c9-506b-eded3dededb4@linux.vnet.ibm.com>
-	<20170704185924.3eb7171d@dhcp-192-215.str.redhat.com>
-	<0a35bfd4-b1d1-ce6c-19e0-4aea225c4406@de.ibm.com>
-	<20170705135407.6221-1-pasic@linux.vnet.ibm.com>
-	<20170705172946.49f0e214@dhcp-192-215.str.redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 5 Jul 2017 18:27:37 +0200
+	(envelope-from <berrange@redhat.com>) id 1dSnA3-0006wE-9d
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:28:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dSnA3-0006vc-3U
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:28:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0C38B4A544
+	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 16:28:18 +0000 (UTC)
+Date: Wed, 5 Jul 2017 17:28:11 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170705162811.GI22008@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170705144302.32017-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170705172946.49f0e214@dhcp-192-215.str.redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <520916f1-8199-33ae-ba44-1457292c042a@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: fixup for "fix error
- propagation in kvm-flic..."
+Content-Disposition: inline
+In-Reply-To: <20170705144302.32017-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hmp: Update info vnc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,48 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lcapitulino@redhat.com, marcandre.lureau@redhat.com, armbru@redhat.com
 
-On 07/05/2017 05:29 PM, Cornelia Huck wrote:
-> On Wed,  5 Jul 2017 15:54:07 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On Wed, Jul 05, 2017 at 03:43:02PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
->> My patch "s390x: fix error propagation in kvm-flic's realize" accidentally
->> replaced with. That's wrong! So please apply this fixup before including
+> The QMP query-vnc interfaces have gained a lot more information that
+> the HMP interfaces hasn't got yet. Update it.
 > 
-> This sentence is missing something ;)
+> Note the output format has changed, but this is HMP so that's OK.
 > 
->> that patch into mainline (or any other repo).
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>
->> Hope this is appropriate.
+> In particular, this now includes client information for reverse
+> connections:
 > 
-> git actually has a 'fixup!' handling mechanism.
-> 
->> ---
->>  hw/intc/s390_flic_kvm.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
->> index 88f1555121..a587ace3df 100644
->> --- a/hw/intc/s390_flic_kvm.c
->> +++ b/hw/intc/s390_flic_kvm.c
->> @@ -467,7 +467,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
->>      ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
->>      if (ret < 0) {
->>          error_setg_errno(&errp_local, errno, "Creating the KVM device failed");
->> -        trace_flic_no_device_api(errno);
->> +        trace_flic_create_device(errno);
->>          goto fail;
->>      }
->>      flic_state->fd = cd.fd;
-> 
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> Christian, will you handle this?
+> -vnc :0
+> (qemu) info vnc
+> default:
+>   Server: 0.0.0.0:5900 (ipv4)
+>     Auth: none (Sub: none)
+>   Auth: none (Sub: none)
 
-Yes, I will fold this into the original fix and send a pull request for the whole patch list.
-Thanks for your review :-)
+If you're reporting Auth: against the individual Server entry,
+there's no reason to report it at the top level too. We only
+keep that duplication in QMP for sake of backcompat, which
+is not important for HMP
+
+> 
+>   (Now connect a client)
+> 
+> (qemu) info vnc
+> default:
+>   Server: 0.0.0.0:5900 (ipv4)
+>     Auth: none (Sub: none)
+>   Client: 127.0.0.1:51828 (ipv4)
+>     x509_dname: none
+>     username: none
+>   Auth: none (Sub: none)
+> 
+> -vnc localhost:7000,reverse
+> (qemu) info vnc
+> default:
+>   Client: ::1:7000 (ipv6)
+>     x509_dname: none
+>     username: none
+>   Auth: none (Sub: none)
+> 
+> -vnc :1,password,id=rev -vnc localhost:7000,reverse
+> (qemu) info vnc
+> default:
+>   Client: ::1:7000 (ipv6)
+>     x509_dname: none
+>     username: none
+>   Auth: none (Sub: none)
+> rev:
+>   Server: 0.0.0.0:5901 (ipv4)
+>     Auth: vnc (Sub: none)
+>   Client: 127.0.0.1:53616 (ipv4)
+>     x509_dname: none
+>     username: none
+>   Auth: vnc (Sub: none)
+> 
+> This was originally RH bz 1461682
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
