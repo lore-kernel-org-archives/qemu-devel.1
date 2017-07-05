@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dSjsb-0005ID-GT
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:58:11 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dSjsk-0005OS-TP
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dSjsa-0003F7-9u
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:58:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53910)
+	(envelope-from <stefanha@redhat.com>) id 1dSjsj-0003Hn-Gz
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:58:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dSjsa-0003Ep-0L
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:58:04 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dSjsj-0003HS-6Z
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:58:13 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  5 Jul 2017 13:57:32 +0100
-Message-Id: <20170705125738.8777-4-stefanha@redhat.com>
+Date: Wed,  5 Jul 2017 13:57:34 +0100
+Message-Id: <20170705125738.8777-6-stefanha@redhat.com>
 In-Reply-To: <20170705125738.8777-1-stefanha@redhat.com>
 References: <20170705125738.8777-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 3/9] qcow2: extract preallocation
- calculation function
+Subject: [Qemu-devel] [PATCH v9 5/9] qcow2: extract image creation option
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,168 +27,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Calculating the preallocated image size will be needed to implement
-.bdrv_measure().  Extract the code out into a separate function.
+The image creation options parsed by qcow2_create() are also needed to
+implement .bdrv_measure().  Extract the parsing code, including input
+validation.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 136 +++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 77 insertions(+), 59 deletions(-)
+ block/qcow2.c | 109 +++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 73 insertions(+), 36 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 2f94f03..058cc56 100644
+index 538f867..361a24a 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2140,6 +2140,80 @@ static int preallocate(BlockDriverState *bs)
-     return 0;
+@@ -2215,24 +2215,73 @@ static int64_t qcow2_calc_prealloc_size(int64_t total_size,
+     return meta_size + aligned_total_size;
  }
  
-+/**
-+ * qcow2_calc_prealloc_size:
-+ * @total_size: virtual disk size in bytes
-+ * @cluster_size: cluster size in bytes
-+ * @refcount_order: refcount bits power-of-2 exponent
-+ *
-+ * Returns: Total number of bytes required for the fully allocated image
-+ * (including metadata).
-+ */
-+static int64_t qcow2_calc_prealloc_size(int64_t total_size,
-+                                        size_t cluster_size,
-+                                        int refcount_order)
-+{
-+    /* Note: The following calculation does not need to be exact; if it is a
-+     * bit off, either some bytes will be "leaked" (which is fine) or we
-+     * will need to increase the file size by some bytes (which is fine,
-+     * too, as long as the bulk is allocated here). Therefore, using
-+     * floating point arithmetic is fine. */
-+    int64_t meta_size = 0;
-+    uint64_t nreftablee, nrefblocke, nl1e, nl2e, refblock_count;
-+    int64_t aligned_total_size = align_offset(total_size, cluster_size);
-+    int cluster_bits = ctz32(cluster_size);
-+    int refblock_bits, refblock_size;
-+    /* refcount entry size in bytes */
-+    double rces = (1 << refcount_order) / 8.;
-+
-+    /* see qcow2_open() */
-+    refblock_bits = cluster_bits - (refcount_order - 3);
-+    refblock_size = 1 << refblock_bits;
-+
-+    /* header: 1 cluster */
-+    meta_size += cluster_size;
-+
-+    /* total size of L2 tables */
-+    nl2e = aligned_total_size / cluster_size;
-+    nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
-+    meta_size += nl2e * sizeof(uint64_t);
-+
-+    /* total size of L1 tables */
-+    nl1e = nl2e * sizeof(uint64_t) / cluster_size;
-+    nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
-+    meta_size += nl1e * sizeof(uint64_t);
-+
-+    /* total size of refcount blocks
-+     *
-+     * note: every host cluster is reference-counted, including metadata
-+     * (even refcount blocks are recursively included).
-+     * Let:
-+     *   a = total_size (this is the guest disk size)
-+     *   m = meta size not including refcount blocks and refcount tables
-+     *   c = cluster size
-+     *   y1 = number of refcount blocks entries
-+     *   y2 = meta size including everything
-+     *   rces = refcount entry size in bytes
-+     * then,
-+     *   y1 = (y2 + a)/c
-+     *   y2 = y1 * rces + y1 * rces * sizeof(u64) / c + m
-+     * we can get y1:
-+     *   y1 = (a + m) / (c - rces - rces * sizeof(u64) / c)
-+     */
-+    nrefblocke = (aligned_total_size + meta_size + cluster_size)
-+        / (cluster_size - rces - rces * sizeof(uint64_t)
-+                / cluster_size);
-+    refblock_count = DIV_ROUND_UP(nrefblocke, refblock_size);
-+    meta_size += refblock_count * cluster_size;
-+
-+    /* total size of refcount tables */
-+    nreftablee = align_offset(refblock_count,
-+                              cluster_size / sizeof(uint64_t));
-+    meta_size += nreftablee * sizeof(uint64_t);
-+
-+    return meta_size + aligned_total_size;
+-static int qcow2_create2(const char *filename, int64_t total_size,
+-                         const char *backing_file, const char *backing_format,
+-                         int flags, size_t cluster_size, PreallocMode prealloc,
+-                         QemuOpts *opts, int version, int refcount_order,
+-                         Error **errp)
++static size_t qcow2_opt_get_cluster_size_del(QemuOpts *opts, Error **errp)
+ {
++    size_t cluster_size;
+     int cluster_bits;
+-    QDict *options;
+ 
+-    /* Calculate cluster_bits */
++    cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
++                                         DEFAULT_CLUSTER_SIZE);
+     cluster_bits = ctz32(cluster_size);
+     if (cluster_bits < MIN_CLUSTER_BITS || cluster_bits > MAX_CLUSTER_BITS ||
+         (1 << cluster_bits) != cluster_size)
+     {
+         error_setg(errp, "Cluster size must be a power of two between %d and "
+                    "%dk", 1 << MIN_CLUSTER_BITS, 1 << (MAX_CLUSTER_BITS - 10));
+-        return -EINVAL;
++        return 0;
+     }
++    return cluster_size;
 +}
 +
- static int qcow2_create2(const char *filename, int64_t total_size,
-                          const char *backing_file, const char *backing_format,
-                          int flags, size_t cluster_size, PreallocMode prealloc,
-@@ -2178,65 +2252,9 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     int ret;
++static int qcow2_opt_get_version_del(QemuOpts *opts, Error **errp)
++{
++    char *buf;
++    int ret;
++
++    buf = qemu_opt_get_del(opts, BLOCK_OPT_COMPAT_LEVEL);
++    if (!buf) {
++        ret = 3; /* default */
++    } else if (!strcmp(buf, "0.10")) {
++        ret = 2;
++    } else if (!strcmp(buf, "1.1")) {
++        ret = 3;
++    } else {
++        error_setg(errp, "Invalid compatibility level: '%s'", buf);
++        ret = -EINVAL;
++    }
++    g_free(buf);
++    return ret;
++}
++
++static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
++                                                Error **errp)
++{
++    uint64_t refcount_bits;
++
++    refcount_bits = qemu_opt_get_number_del(opts, BLOCK_OPT_REFCOUNT_BITS, 16);
++    if (refcount_bits > 64 || !is_power_of_2(refcount_bits)) {
++        error_setg(errp, "Refcount width must be a power of two and may not "
++                   "exceed 64 bits");
++        return 0;
++    }
++
++    if (version < 3 && refcount_bits != 16) {
++        error_setg(errp, "Different refcount widths than 16 bits require "
++                   "compatibility level 1.1 or above (use compat=1.1 or "
++                   "greater)");
++        return 0;
++    }
++
++    return refcount_bits;
++}
++
++static int qcow2_create2(const char *filename, int64_t total_size,
++                         const char *backing_file, const char *backing_format,
++                         int flags, size_t cluster_size, PreallocMode prealloc,
++                         QemuOpts *opts, int version, int refcount_order,
++                         Error **errp)
++{
++    QDict *options;
  
-     if (prealloc == PREALLOC_MODE_FULL || prealloc == PREALLOC_MODE_FALLOC) {
--        /* Note: The following calculation does not need to be exact; if it is a
--         * bit off, either some bytes will be "leaked" (which is fine) or we
--         * will need to increase the file size by some bytes (which is fine,
--         * too, as long as the bulk is allocated here). Therefore, using
--         * floating point arithmetic is fine. */
--        int64_t meta_size = 0;
--        uint64_t nreftablee, nrefblocke, nl1e, nl2e, refblock_count;
--        int64_t aligned_total_size = align_offset(total_size, cluster_size);
--        int refblock_bits, refblock_size;
--        /* refcount entry size in bytes */
--        double rces = (1 << refcount_order) / 8.;
+     /*
+      * Open the image file and write a minimal qcow2 header.
+@@ -2282,7 +2331,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     *header = (QCowHeader) {
+         .magic                      = cpu_to_be32(QCOW_MAGIC),
+         .version                    = cpu_to_be32(version),
+-        .cluster_bits               = cpu_to_be32(cluster_bits),
++        .cluster_bits               = cpu_to_be32(ctz32(cluster_size)),
+         .size                       = cpu_to_be64(0),
+         .l1_table_offset            = cpu_to_be64(0),
+         .l1_size                    = cpu_to_be32(0),
+@@ -2418,8 +2467,8 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     int flags = 0;
+     size_t cluster_size = DEFAULT_CLUSTER_SIZE;
+     PreallocMode prealloc;
+-    int version = 3;
+-    uint64_t refcount_bits = 16;
++    int version;
++    uint64_t refcount_bits;
+     int refcount_order;
+     Error *local_err = NULL;
+     int ret;
+@@ -2432,8 +2481,12 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+     if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+         flags |= BLOCK_FLAG_ENCRYPT;
+     }
+-    cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
+-                                         DEFAULT_CLUSTER_SIZE);
++    cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto finish;
++    }
+     buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+     prealloc = qapi_enum_parse(PreallocMode_lookup, buf,
+                                PREALLOC_MODE__MAX, PREALLOC_MODE_OFF,
+@@ -2443,16 +2496,10 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+         ret = -EINVAL;
+         goto finish;
+     }
+-    g_free(buf);
+-    buf = qemu_opt_get_del(opts, BLOCK_OPT_COMPAT_LEVEL);
+-    if (!buf) {
+-        /* keep the default */
+-    } else if (!strcmp(buf, "0.10")) {
+-        version = 2;
+-    } else if (!strcmp(buf, "1.1")) {
+-        version = 3;
+-    } else {
+-        error_setg(errp, "Invalid compatibility level: '%s'", buf);
++
++    version = qcow2_opt_get_version_del(opts, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
+         ret = -EINVAL;
+         goto finish;
+     }
+@@ -2475,19 +2522,9 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+         goto finish;
+     }
+ 
+-    refcount_bits = qemu_opt_get_number_del(opts, BLOCK_OPT_REFCOUNT_BITS,
+-                                            refcount_bits);
+-    if (refcount_bits > 64 || !is_power_of_2(refcount_bits)) {
+-        error_setg(errp, "Refcount width must be a power of two and may not "
+-                   "exceed 64 bits");
+-        ret = -EINVAL;
+-        goto finish;
+-    }
 -
--        /* see qcow2_open() */
--        refblock_bits = cluster_bits - (refcount_order - 3);
--        refblock_size = 1 << refblock_bits;
--
--        /* header: 1 cluster */
--        meta_size += cluster_size;
--
--        /* total size of L2 tables */
--        nl2e = aligned_total_size / cluster_size;
--        nl2e = align_offset(nl2e, cluster_size / sizeof(uint64_t));
--        meta_size += nl2e * sizeof(uint64_t);
--
--        /* total size of L1 tables */
--        nl1e = nl2e * sizeof(uint64_t) / cluster_size;
--        nl1e = align_offset(nl1e, cluster_size / sizeof(uint64_t));
--        meta_size += nl1e * sizeof(uint64_t);
--
--        /* total size of refcount blocks
--         *
--         * note: every host cluster is reference-counted, including metadata
--         * (even refcount blocks are recursively included).
--         * Let:
--         *   a = total_size (this is the guest disk size)
--         *   m = meta size not including refcount blocks and refcount tables
--         *   c = cluster size
--         *   y1 = number of refcount blocks entries
--         *   y2 = meta size including everything
--         *   rces = refcount entry size in bytes
--         * then,
--         *   y1 = (y2 + a)/c
--         *   y2 = y1 * rces + y1 * rces * sizeof(u64) / c + m
--         * we can get y1:
--         *   y1 = (a + m) / (c - rces - rces * sizeof(u64) / c)
--         */
--        nrefblocke = (aligned_total_size + meta_size + cluster_size)
--                   / (cluster_size - rces - rces * sizeof(uint64_t)
--                                                 / cluster_size);
--        refblock_count = DIV_ROUND_UP(nrefblocke, refblock_size);
--        meta_size += refblock_count * cluster_size;
--
--        /* total size of refcount tables */
--        nreftablee = align_offset(refblock_count,
--                                  cluster_size / sizeof(uint64_t));
--        meta_size += nreftablee * sizeof(uint64_t);
--
--        qemu_opt_set_number(opts, BLOCK_OPT_SIZE,
--                            aligned_total_size + meta_size, &error_abort);
-+        int64_t prealloc_size =
-+            qcow2_calc_prealloc_size(total_size, cluster_size, refcount_order);
-+        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_abort);
-         qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_lookup[prealloc],
-                      &error_abort);
+-    if (version < 3 && refcount_bits != 16) {
+-        error_setg(errp, "Different refcount widths than 16 bits require "
+-                   "compatibility level 1.1 or above (use compat=1.1 or "
+-                   "greater)");
++    refcount_bits = qcow2_opt_get_refcount_bits_del(opts, version, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
+         ret = -EINVAL;
+         goto finish;
      }
 -- 
 2.9.4
