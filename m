@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSjBy-0005Jk-8v
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:14:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dSjJ3-0007Fj-OU
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSjBx-0004eE-3d
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:14:02 -0400
-References: <20170627192458.15519-1-eblake@redhat.com>
-	<20170627192458.15519-5-eblake@redhat.com>
-	<20170704150057.GI4253@noname.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <49ade40a-49d2-a888-3c01-041f416b01b2@redhat.com>
-Date: Wed, 5 Jul 2017 07:13:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1dSjJ0-0006nH-J4
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:21:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSjJ0-0006n3-9t
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:21:18 -0400
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+Date: Wed, 5 Jul 2017 14:21:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170704150057.GI4253@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP"
-Subject: Re: [Qemu-devel] [PATCH v3 04/20] stream: Switch stream_run() to
- byte-based
+In-Reply-To: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +28,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com,
- Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <49ade40a-49d2-a888-3c01-041f416b01b2@redhat.com>
-Subject: Re: [PATCH v3 04/20] stream: Switch stream_run() to byte-based
-References: <20170627192458.15519-1-eblake@redhat.com>
- <20170627192458.15519-5-eblake@redhat.com>
- <20170704150057.GI4253@noname.str.redhat.com>
-In-Reply-To: <20170704150057.GI4253@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 07/04/2017 10:00 AM, Kevin Wolf wrote:
-> Am 27.06.2017 um 21:24 hat Eric Blake geschrieben:
->> We are gradually converting to byte-based interfaces, as they are
->> easier to reason about than sector-based.  Change the internal
->> loop iteration of streaming to track by bytes instead of sectors
->> (although we are still guaranteed that we iterate by steps that
->> are sector-aligned).
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: John Snow <jsnow@redhat.com>
->>
->> ---
->> v2: no change
->> ---
->>  block/stream.c | 24 ++++++++++--------------
->>  1 file changed, 10 insertions(+), 14 deletions(-)
->>
->> diff --git a/block/stream.c b/block/stream.c
->> index 746d525..2f9618b 100644
->> --- a/block/stream.c
->> +++ b/block/stream.c
->> @@ -108,12 +108,11 @@ static void coroutine_fn stream_run(void *opaque=
+
+On 04/07/2017 19:02, Peter Maydell wrote:
+> Many board models and several devices need to create auxiliary
+> regions of RAM (in addition to the main lump of 'system' memory),
+> to model static RAMs, video memory, ROMs, etc. Currently they do
+> this with a sequence like:
+>        memory_region_init_ram(sram, NULL, "sram", 0x10000, &error_fatal=
+);
+>        vmstate_register_ram_global(sram);
+
+Instead of vmstate_register_ram_global, you should use
+
+    vmstate_register_ram(mr, owner);
+
+You should even do it for all memory regions, probably.
+
+Only memory_region_init_ram_device_ptr (which sets mr->ram_device) must
+not call vmstate_register_ram.  This is a bit ugly because it requires
+inlining memory_region_init_ram_ptr into it.
+
+memory_region_init_ram_from_fd probably needs to be excluded, as well,
+based on its sole user.
+
+The destructor then can unregister the RAM.  Maybe there need to be two
+separate destructors.
+
+Unlike your patch 3/3, I suspect all occurrences have to be fixed in the
+same patch that introduces the change, so the Coccinelle patch would
+become something like
+
+@@
+(
+ memory_region_init_ram(MR, OWNER, NAME, SIZE, ERR);
+|
+ memory_region_init_ram_ptr(MR, OWNER, NAME, SIZE, PTR);
+|
+ memory_region_init_ram_from_file(MR, OWNER, NAME, SHARE, PATH, ERR);
 )
->>      BlockBackend *blk =3D s->common.blk;
->>      BlockDriverState *bs =3D blk_bs(blk);
->>      BlockDriverState *base =3D s->base;
->> -    int64_t sector_num =3D 0;
->> -    int64_t end =3D -1;
+ ... when exists
+-vmstate_register_ram(MR, OWNER);
+@@
+(
+ memory_region_init_ram(MR, NULL, NAME, SIZE, ERR);
+|
+ memory_region_init_ram_ptr(MR, NULL, NAME, SIZE, PTR);
+|
+ memory_region_init_ram_from_file(MR, NULL, NAME, SHARE, PATH, ERR);
+)
+ ... when exists
+-vmstate_register_ram_global(MR);
+
+
+with the initial disjunction extended to all other functions if there
+are any I forgot.  But it should work.
+
+> but the need for the second function call is not obvious and if
+> omitted the bug is subtle (possible migration failure). This series
+> wraps the two calls up into a single new function
+> memory_region_allocate_aux_memory(), named to parallel the existing
+> memory_region_allocate_system_memory().
 >=20
-> Here, end was initialised to -1. This made a differnce for early 'goto
-> out' paths because otherwise data->reached_end would incorrectly be tru=
-e
-> in stream_complete.
+> Patch 1 documents memory_region_allocate_system_memory() which
+> has a couple of non-obvious wrinkles. Patch 2 implements the new
+> utility function. Patch 3 changes a lot of callsites to use it
+> with the aid of the included coccinelle patch. (I think most
+> of the remaining callsites of vmstate_register_ram_global() are
+> not changed just because they report the error up to their caller
+> rather than using error_fatal. I'm not sure what kind of error you
+> might get back that wasn't "out of memory", which we usually make
+> fatal anyway, so perhaps we could change those callsites too.)
 
-Oh, good call.
+We don't make out of memory fatal on very large allocations, so I think
+it would be better if memory_region_allocate_aux_memory had an Error**
+argument and did propagation correctly.  It's reasonable to avoid
+exiting when memory is allocated from e.g. device hotplug.  But
+hopefully you can implement the alternative plan above and
+vmstate_register_ram can become an implementation detail of memory.c.
 
+Paolo
+
+> thanks
+> -- PMM
 >=20
-> Because we also check data->ret, I think the only case where it actuall=
-y
-> makes a difference is for the !bs->backing case: This used to result in=
-
-> data->reached_end =3D=3D false, but now it ends up as true. This is bec=
-ause
-> s->common.len hasn't been set yet, so it is still 0.
-
-When !bs->backing, ret is 0; so that means my commit message is wrong
-about there being no semantic change.  But remember, when !bs->backing,
-stream is a no-op (there was no backing file to stream into the current
-layer, anyways) - so which do we want, declaring that the operation
-never reached the end (odd, since we did nothing), or that it is
-complete?  In other words, is this something where I should fix the
-semantics (perhaps as a separate bug-fix patch), or where I need to fix
-this patch to preserve existing semantics?
-
-The next code reached is stream_complete().  Before my patch, it skipped
-the main body of the function (because !data->reached_end); with my
-patch, we are now calling bdrv_change_backing_file() (presumably a no-op
-when there is no backing?)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXNf9AAoJEKeha0olJ0NqUaUH/2T0sx/KMqJIb56XodCJ8u0W
-6AyNYvjGUxUqArU9u91qTFSGxcpiAV9w5qlRCQroIFeEyMW+Ec0bxtBjywf3Dvkt
-75UQA03AayiDk8LX05vUd1aOML9orEm3CeHKEcKnhtgSt5X6lHpFWHlydPG+dquC
-H3IshlQu73gNX0mCQkNecaH/+ctFNwLfguU6hD8pE5npmfl6h/u/mKU0ZA5k05Qf
-bipdztQ9W+J6S5j28F2k0sAEZlWxBRrIHCndI1doLVLJ1YI83KPG1ZIk6YJTI2zH
-km9J9sZklKmLakEiSrd7th3rwiaXgoVQSAtXi/6iF+g76+CdnSPHfO6Trwy97wE=
-=29tM
------END PGP SIGNATURE-----
-
---bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP--
+> Peter Maydell (3):
+>   include/hw/boards.h: Document memory_region_allocate_system_memory()
+>   memory.h: Add new utility function memory_region_allocate_aux_memory(=
+)
+>   hw: Use new memory_region_allocate_aux_memory() function
+>=20
+>  include/exec/memory.h                     | 23 +++++++++++++++++++++++
+>  include/hw/boards.h                       | 29 +++++++++++++++++++++++=
+++++++
+>  hw/arm/exynos4210.c                       | 10 ++++------
+>  hw/arm/exynos4_boards.c                   | 12 +++++-------
+>  hw/arm/integratorcp.c                     |  5 ++---
+>  hw/arm/mainstone.c                        |  5 ++---
+>  hw/arm/musicpal.c                         |  5 ++---
+>  hw/arm/omap1.c                            |  5 ++---
+>  hw/arm/omap2.c                            |  5 ++---
+>  hw/arm/omap_sx1.c                         | 10 ++++------
+>  hw/arm/palm.c                             |  4 +---
+>  hw/arm/pxa2xx.c                           | 20 ++++++++------------
+>  hw/arm/realview.c                         | 14 +++++---------
+>  hw/arm/spitz.c                            |  3 +--
+>  hw/arm/stellaris.c                        |  9 +++------
+>  hw/arm/stm32f205_soc.c                    | 10 +++-------
+>  hw/arm/tosa.c                             |  3 +--
+>  hw/arm/vexpress.c                         | 12 +++---------
+>  hw/arm/virt.c                             |  3 +--
+>  hw/arm/xilinx_zynq.c                      |  5 ++---
+>  hw/arm/xlnx-zynqmp.c                      |  5 ++---
+>  hw/block/onenand.c                        |  5 ++---
+>  hw/cris/axis_dev88.c                      |  5 ++---
+>  hw/display/cg3.c                          |  5 ++---
+>  hw/display/sm501.c                        |  5 ++---
+>  hw/display/tc6393xb.c                     |  5 ++---
+>  hw/display/tcx.c                          |  5 ++---
+>  hw/display/vmware_vga.c                   |  5 ++---
+>  hw/i386/pc.c                              |  5 ++---
+>  hw/i386/pc_sysfw.c                        |  8 +++-----
+>  hw/i386/xen/xen-hvm.c                     |  4 +---
+>  hw/input/milkymist-softusb.c              | 10 ++++------
+>  hw/m68k/an5206.c                          |  3 +--
+>  hw/m68k/mcf5208.c                         |  3 +--
+>  hw/microblaze/petalogix_ml605_mmu.c       | 11 +++++------
+>  hw/microblaze/petalogix_s3adsp1800_mmu.c  | 12 +++++-------
+>  hw/mips/mips_fulong2e.c                   |  4 +---
+>  hw/mips/mips_jazz.c                       | 10 ++++------
+>  hw/mips/mips_mipssim.c                    |  5 ++---
+>  hw/mips/mips_r4k.c                        |  5 ++---
+>  hw/moxie/moxiesim.c                       |  6 ++----
+>  hw/net/milkymist-minimac2.c               |  6 +++---
+>  hw/openrisc/openrisc_sim.c                |  3 +--
+>  hw/pci-host/prep.c                        |  5 +----
+>  hw/ppc/mac_newworld.c                     |  5 ++---
+>  hw/ppc/mac_oldworld.c                     |  5 ++---
+>  hw/ppc/ppc405_boards.c                    | 14 +++++---------
+>  hw/ppc/ppc405_uc.c                        |  5 ++---
+>  hw/s390x/sclp.c                           |  5 ++---
+>  hw/sh4/r2d.c                              |  3 +--
+>  hw/sh4/shix.c                             | 13 +++++--------
+>  hw/sparc/leon3.c                          |  3 +--
+>  hw/sparc/sun4m.c                          | 13 +++++--------
+>  hw/sparc64/sun4u.c                        | 10 ++++------
+>  hw/tricore/tricore_testboard.c            | 30 ++++++++++++-----------=
+-------
+>  hw/unicore32/puv3.c                       |  4 +---
+>  hw/xtensa/sim.c                           |  6 ++----
+>  hw/xtensa/xtfpga.c                        | 14 +++++---------
+>  memory.c                                  |  8 ++++++++
+>  scripts/coccinelle/allocate_aux_mem.cocci | 14 ++++++++++++++
+>  60 files changed, 228 insertions(+), 256 deletions(-)
+>  create mode 100644 scripts/coccinelle/allocate_aux_mem.cocci
+>=20
