@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSeW9-00048U-UA
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:35 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWX-0004Mi-Kq
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSeW8-0007F5-Su
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:33 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-4-mreitz@redhat.com>
-Date: Wed, 05 Jul 2017 09:14:22 +0200
-In-Reply-To: <20170703122505.32017-4-mreitz@redhat.com> (Max Reitz's message
-	of "Mon, 3 Jul 2017 14:25:03 +0200")
-Message-ID: <87k23ne4oh.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] block: qobject_is_equal() in
- bdrv_reopen_prepare()
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWT-0007Oy-0Z
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:57 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35205)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1dSeWS-0007OO-Qv
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:52 -0400
+Received: by mail-wm0-x241.google.com with SMTP id u23so30501897wma.2
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:14:52 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:05 +0200
+Message-Id: <1499238885-26161-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
+References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 02/42] qemu-doc: Add missing "@c man end"
+ statements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-Max Reitz <mreitz@redhat.com> writes:
+From: Thomas Huth <thuth@redhat.com>
 
-> Currently, bdrv_reopen_prepare() assumes that all BDS options are
-> strings. However, this is not the case if the BDS has been created
-> through the json: pseudo-protocol or blockdev-add.
->
-> Note that the user-invokable reopen command is an HMP command, so you
-> can only specify strings there. Therefore, specifying a non-string
-> option with the "same" value as it was when originally created will now
-> return an error because the values are supposedly similar (and there is
-> no way for the user to circumvent this but to just not specify the
-> option again -- however, this is still strictly better than just
-> crashing).
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block.c | 31 ++++++++++++++++++-------------
->  1 file changed, 18 insertions(+), 13 deletions(-)
->
-> diff --git a/block.c b/block.c
-> index 913bb43..45eb248 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2947,19 +2947,24 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
->          const QDictEntry *entry = qdict_first(reopen_state->options);
->  
->          do {
-> -            QString *new_obj = qobject_to_qstring(entry->value);
-> -            const char *new = qstring_get_str(new_obj);
-> -            /*
-> -             * Caution: while qdict_get_try_str() is fine, getting
-> -             * non-string types would require more care.  When
-> -             * bs->options come from -blockdev or blockdev_add, its
-> -             * members are typed according to the QAPI schema, but
-> -             * when they come from -drive, they're all QString.
-> -             */
-> -            const char *old = qdict_get_try_str(reopen_state->bs->options,
-> -                                                entry->key);
-> -
-> -            if (!old || strcmp(new, old)) {
-> +            QObject *new = entry->value;
-> +            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
-> +
-> +            /* TODO: When using -drive to specify blockdev options, all values
-> +             * will be strings; however, when using -blockdev, blockdev-add or
-> +             * filenames using the json:{} pseudo-protocol, they will be
-> +             * correctly typed.
-> +             * In contrast, reopening options are (currently) always strings
-> +             * (because you can only specify them through qemu-io; all other
-> +             * callers do not specify any options).
-> +             * Therefore, when using anything other than -drive to create a BDS,
-> +             * this cannot detect non-string options as unchanged, because
-> +             * qobject_is_equal() always returns false for objects of different
-> +             * type.  In the future, this should be remedied by correctly typing
-> +             * all options.  For now, this is not too big of an issue because
-> +             * the user simply can not specify options which cannot be changed
-> +             * anyway, so they will stay unchanged. */
+Since commit 3f2ce724f1f1 ("Move the qemu-ga description into a
+separate chapter"), the qemu.1 man page looks pretty much screwed
+up, e.g. the title was "qemu-ga - QEMU Guest Agent" instead of
+"qemu-doc - QEMU Emulator User Documentation". However, that movement
+of the gemu-ga chapter is not the real problem, it just triggered
+another bug in the qemu-doc.texi: There are some parts in the file
+which introduce a "@c man begin OPTIONS" section, but never close
+it again with "@c man end". After adding the proper end tags here,
+the title of the man page is right again and the previously wrongly
+tagged sections now also show up correctly in the man page, too.
 
-I'm not the maintainer, and this is not a demand: consider winging this
-comment and wrapping lines around column 70.
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1497863771-24929-1-git-send-email-thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ qemu-doc.texi | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-As much as I fancy word play (see your reply to Eric), I have to admit
-that I had to read "the user simply can not specify options" about three
-times to make sense of it.  Please consider a wording that's easier to
-grasp, perhaps "the user can simply refrain from specifying options that
-cannot be changed".
-
-> +            if (!qobject_is_equal(new, old)) {
->                  error_setg(errp, "Cannot change the option '%s'", entry->key);
->                  ret = -EINVAL;
->                  goto error;
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 21079fd..45f67f6 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2566,6 +2566,8 @@ so should only be used with trusted guest OS.
+ 
+ @end table
+ 
++@c man end
++
+ @node ColdFire System emulator
+ @section ColdFire System emulator
+ @cindex system emulation (ColdFire)
+@@ -2610,6 +2612,8 @@ so should only be used with trusted guest OS.
+ 
+ @end table
+ 
++@c man end
++
+ @node Cris System emulator
+ @section Cris System emulator
+ @cindex system emulation (Cris)
+@@ -2682,6 +2686,8 @@ so should only be used with trusted guest OS.
+ 
+ @end table
+ 
++@c man end
++
+ @node QEMU Guest Agent
+ @chapter QEMU Guest Agent invocation
+ 
+-- 
+1.8.3.1
