@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSrY6-0005AT-FY
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSrY7-0005BR-96
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSrY5-0002oV-6l
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSrY5-0002p3-V4
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:27 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  5 Jul 2017 16:08:37 -0500
-Message-Id: <20170705210842.960-17-eblake@redhat.com>
+Date: Wed,  5 Jul 2017 16:08:38 -0500
+Message-Id: <20170705210842.960-18-eblake@redhat.com>
 In-Reply-To: <20170705210842.960-1-eblake@redhat.com>
 References: <20170705210842.960-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 16/21] backup: Switch block_backup.h to
+Subject: [Qemu-devel] [PATCH v4 17/21] backup: Switch backup_do_cow() to
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,169 +21,171 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Continue by converting
-the public interface to backup jobs (no semantic change), including
-a change to CowRequest to track by bytes instead of cluster indices.
-
-Note that this does not change the difference between the public
-interface (starting point, and size of the subsequent range) and
-the internal interface (starting and end points).
+easier to reason about than sector-based.  Convert another internal
+function (no semantic change).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Xie Changlong <xiechanglong@cmss.chinamobile.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 
 ---
-v3-v4: no change
-v2: change a couple more parameter names
+v2-v4: no change
 ---
- include/block/block_backup.h | 11 +++++------
- block/backup.c               | 33 ++++++++++++++++-----------------
- block/replication.c          | 12 ++++++++----
- 3 files changed, 29 insertions(+), 27 deletions(-)
+ block/backup.c | 62 ++++++++++++++++++++++++----------------------------------
+ 1 file changed, 26 insertions(+), 36 deletions(-)
 
-diff --git a/include/block/block_backup.h b/include/block/block_backup.h
-index 8a75947..994a3bd 100644
---- a/include/block/block_backup.h
-+++ b/include/block/block_backup.h
-@@ -21,17 +21,16 @@
- #include "block/block_int.h"
-
- typedef struct CowRequest {
--    int64_t start;
--    int64_t end;
-+    int64_t start_byte;
-+    int64_t end_byte;
-     QLIST_ENTRY(CowRequest) list;
-     CoQueue wait_queue; /* coroutines blocked on this request */
- } CowRequest;
-
--void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
--                                          int nb_sectors);
-+void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
-+                                          uint64_t bytes);
- void backup_cow_request_begin(CowRequest *req, BlockJob *job,
--                              int64_t sector_num,
--                              int nb_sectors);
-+                              int64_t offset, uint64_t bytes);
- void backup_cow_request_end(CowRequest *req);
-
- void backup_do_checkpoint(BlockJob *job, Error **errp);
 diff --git a/block/backup.c b/block/backup.c
-index 4e64710..cfbd921 100644
+index cfbd921..c029d44 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -55,7 +55,7 @@ static inline int64_t cluster_size_sectors(BackupBlockJob *job)
-
- /* See if in-flight requests overlap and wait for them to complete */
- static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
--                                                       int64_t start,
-+                                                       int64_t offset,
-                                                        int64_t end)
- {
-     CowRequest *req;
-@@ -64,7 +64,7 @@ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
-     do {
-         retry = false;
-         QLIST_FOREACH(req, &job->inflight_reqs, list) {
--            if (end > req->start && start < req->end) {
-+            if (end > req->start_byte && offset < req->end_byte) {
-                 qemu_co_queue_wait(&req->wait_queue, NULL);
-                 retry = true;
-                 break;
-@@ -75,10 +75,10 @@ static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
-
- /* Keep track of an in-flight request */
- static void cow_request_begin(CowRequest *req, BackupBlockJob *job,
--                                     int64_t start, int64_t end)
-+                              int64_t offset, int64_t end)
- {
--    req->start = start;
--    req->end = end;
-+    req->start_byte = offset;
-+    req->end_byte = end;
-     qemu_co_queue_init(&req->wait_queue);
-     QLIST_INSERT_HEAD(&job->inflight_reqs, req, list);
- }
-@@ -114,8 +114,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-                               sector_num * BDRV_SECTOR_SIZE,
-                               nb_sectors * BDRV_SECTOR_SIZE);
-
--    wait_for_overlapping_requests(job, start, end);
--    cow_request_begin(&cow_request, job, start, end);
-+    wait_for_overlapping_requests(job, start * job->cluster_size,
-+                                  end * job->cluster_size);
-+    cow_request_begin(&cow_request, job, start * job->cluster_size,
-+                      end * job->cluster_size);
-
-     for (; start < end; start++) {
-         if (test_bit(start, job->done_bitmap)) {
-@@ -277,32 +279,29 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
-     bitmap_zero(backup_job->done_bitmap, len);
+@@ -91,7 +91,7 @@ static void cow_request_end(CowRequest *req)
  }
 
--void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
--                                          int nb_sectors)
-+void backup_wait_for_overlapping_requests(BlockJob *job, int64_t offset,
-+                                          uint64_t bytes)
+ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+-                                      int64_t sector_num, int nb_sectors,
++                                      int64_t offset, uint64_t bytes,
+                                       bool *error_is_read,
+                                       bool is_write_notifier)
  {
-     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
--    int64_t sectors_per_cluster = cluster_size_sectors(backup_job);
-     int64_t start, end;
+@@ -101,34 +101,28 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+     QEMUIOVector bounce_qiov;
+     void *bounce_buffer = NULL;
+     int ret = 0;
+-    int64_t sectors_per_cluster = cluster_size_sectors(job);
+-    int64_t start, end; /* clusters */
++    int64_t start, end; /* bytes */
+     int n; /* bytes */
 
-     assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
+     qemu_co_rwlock_rdlock(&job->flush_rwlock);
 
 -    start = sector_num / sectors_per_cluster;
 -    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
-+    start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
-+    end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
-     wait_for_overlapping_requests(backup_job, start, end);
- }
++    start = QEMU_ALIGN_DOWN(offset, job->cluster_size);
++    end = QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
 
- void backup_cow_request_begin(CowRequest *req, BlockJob *job,
--                              int64_t sector_num,
--                              int nb_sectors)
-+                              int64_t offset, uint64_t bytes)
+-    trace_backup_do_cow_enter(job, start * job->cluster_size,
+-                              sector_num * BDRV_SECTOR_SIZE,
+-                              nb_sectors * BDRV_SECTOR_SIZE);
++    trace_backup_do_cow_enter(job, start, offset, bytes);
+
+-    wait_for_overlapping_requests(job, start * job->cluster_size,
+-                                  end * job->cluster_size);
+-    cow_request_begin(&cow_request, job, start * job->cluster_size,
+-                      end * job->cluster_size);
++    wait_for_overlapping_requests(job, start, end);
++    cow_request_begin(&cow_request, job, start, end);
+
+-    for (; start < end; start++) {
+-        if (test_bit(start, job->done_bitmap)) {
+-            trace_backup_do_cow_skip(job, start * job->cluster_size);
++    for (; start < end; start += job->cluster_size) {
++        if (test_bit(start / job->cluster_size, job->done_bitmap)) {
++            trace_backup_do_cow_skip(job, start);
+             continue; /* already copied */
+         }
+
+-        trace_backup_do_cow_process(job, start * job->cluster_size);
++        trace_backup_do_cow_process(job, start);
+
+-        n = MIN(job->cluster_size,
+-                job->common.len - start * job->cluster_size);
++        n = MIN(job->cluster_size, job->common.len - start);
+
+         if (!bounce_buffer) {
+             bounce_buffer = blk_blockalign(blk, job->cluster_size);
+@@ -137,11 +131,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+         iov.iov_len = n;
+         qemu_iovec_init_external(&bounce_qiov, &iov, 1);
+
+-        ret = blk_co_preadv(blk, start * job->cluster_size,
+-                            bounce_qiov.size, &bounce_qiov,
++        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
+                             is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
+         if (ret < 0) {
+-            trace_backup_do_cow_read_fail(job, start * job->cluster_size, ret);
++            trace_backup_do_cow_read_fail(job, start, ret);
+             if (error_is_read) {
+                 *error_is_read = true;
+             }
+@@ -149,22 +142,22 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+         }
+
+         if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
+-            ret = blk_co_pwrite_zeroes(job->target, start * job->cluster_size,
++            ret = blk_co_pwrite_zeroes(job->target, start,
+                                        bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
+         } else {
+-            ret = blk_co_pwritev(job->target, start * job->cluster_size,
++            ret = blk_co_pwritev(job->target, start,
+                                  bounce_qiov.size, &bounce_qiov,
+                                  job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
+         }
+         if (ret < 0) {
+-            trace_backup_do_cow_write_fail(job, start * job->cluster_size, ret);
++            trace_backup_do_cow_write_fail(job, start, ret);
+             if (error_is_read) {
+                 *error_is_read = false;
+             }
+             goto out;
+         }
+
+-        set_bit(start, job->done_bitmap);
++        set_bit(start / job->cluster_size, job->done_bitmap);
+
+         /* Publish progress, guest I/O counts as progress too.  Note that the
+          * offset field is an opaque progress value, it is not a disk offset.
+@@ -180,8 +173,7 @@ out:
+
+     cow_request_end(&cow_request);
+
+-    trace_backup_do_cow_return(job, sector_num * BDRV_SECTOR_SIZE,
+-                               nb_sectors * BDRV_SECTOR_SIZE, ret);
++    trace_backup_do_cow_return(job, offset, bytes, ret);
+
+     qemu_co_rwlock_unlock(&job->flush_rwlock);
+
+@@ -194,14 +186,12 @@ static int coroutine_fn backup_before_write_notify(
  {
-     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
--    int64_t sectors_per_cluster = cluster_size_sectors(backup_job);
-     int64_t start, end;
+     BackupBlockJob *job = container_of(notifier, BackupBlockJob, before_write);
+     BdrvTrackedRequest *req = opaque;
+-    int64_t sector_num = req->offset >> BDRV_SECTOR_BITS;
+-    int nb_sectors = req->bytes >> BDRV_SECTOR_BITS;
 
-     assert(job->driver->job_type == BLOCK_JOB_TYPE_BACKUP);
+     assert(req->bs == blk_bs(job->common.blk));
+-    assert((req->offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-    assert((req->bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
++    assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
 
--    start = sector_num / sectors_per_cluster;
--    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
-+    start = QEMU_ALIGN_DOWN(offset, backup_job->cluster_size);
-+    end = QEMU_ALIGN_UP(offset + bytes, backup_job->cluster_size);
-     cow_request_begin(req, backup_job, start, end);
+-    return backup_do_cow(job, sector_num, nb_sectors, NULL, true);
++    return backup_do_cow(job, req->offset, req->bytes, NULL, true);
  }
 
-diff --git a/block/replication.c b/block/replication.c
-index 3885f04..8f3aba7 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -234,10 +234,14 @@ static coroutine_fn int replication_co_readv(BlockDriverState *bs,
-     }
-
-     if (job) {
--        backup_wait_for_overlapping_requests(child->bs->job, sector_num,
--                                             remaining_sectors);
--        backup_cow_request_begin(&req, child->bs->job, sector_num,
--                                 remaining_sectors);
-+        uint64_t remaining_bytes = remaining_sectors * BDRV_SECTOR_SIZE;
-+
-+        backup_wait_for_overlapping_requests(child->bs->job,
-+                                             sector_num * BDRV_SECTOR_SIZE,
-+                                             remaining_bytes);
-+        backup_cow_request_begin(&req, child->bs->job,
-+                                 sector_num * BDRV_SECTOR_SIZE,
-+                                 remaining_bytes);
-         ret = bdrv_co_readv(bs->file, sector_num, remaining_sectors,
-                             qiov);
-         backup_cow_request_end(&req);
+ static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
+@@ -406,8 +396,8 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+                 if (yield_and_check(job)) {
+                     goto out;
+                 }
+-                ret = backup_do_cow(job, cluster * sectors_per_cluster,
+-                                    sectors_per_cluster, &error_is_read,
++                ret = backup_do_cow(job, cluster * job->cluster_size,
++                                    job->cluster_size, &error_is_read,
+                                     false);
+                 if ((ret < 0) &&
+                     backup_error_action(job, error_is_read, -ret) ==
+@@ -509,8 +499,8 @@ static void coroutine_fn backup_run(void *opaque)
+             if (alloced < 0) {
+                 ret = alloced;
+             } else {
+-                ret = backup_do_cow(job, start * sectors_per_cluster,
+-                                    sectors_per_cluster, &error_is_read,
++                ret = backup_do_cow(job, start * job->cluster_size,
++                                    job->cluster_size, &error_is_read,
+                                     false);
+             }
+             if (ret < 0) {
 -- 
 2.9.4
