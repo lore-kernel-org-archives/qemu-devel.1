@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeX4-0004y0-DU
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeX4-0004xl-Bv
 	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWz-0007oO-Oc
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeX2-0007qU-Tx
 	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:30 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35278)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33195)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeWz-0007ny-I2
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:25 -0400
-Received: by mail-wm0-x242.google.com with SMTP id u23so30504077wma.2
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:25 -0700 (PDT)
+	id 1dSeX2-0007pd-Nt
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:28 -0400
+Received: by mail-wm0-x241.google.com with SMTP id j85so30448883wmj.0
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:28 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:32 +0200
-Message-Id: <1499238885-26161-30-git-send-email-pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:35 +0200
+Message-Id: <1499238885-26161-33-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 29/42] tcg: make tcg_allowed global
+Subject: [Qemu-devel] [PULL 32/42] tcg: add the tcg-stub.c file into
+ accel/stubs/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +33,52 @@ Cc: Yang Zhong <yang.zhong@intel.com>
 
 From: Yang Zhong <yang.zhong@intel.com>
 
-Change the tcg_enabled() and make sure user build still enable tcg
-even x86 softmmu disable tcg.
+If tcg is disabled, the functions in tcg-stub.c file will be called.
+This file is target-independent file, do not include any platform
+related stub functions into this file.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/tcg/cpu-exec-common.c | 2 ++
- accel/tcg/tcg-all.c         | 1 -
- accel/tcg/translate-all.c   | 6 +-----
- include/qemu-common.h       | 7 ++++++-
- 4 files changed, 9 insertions(+), 7 deletions(-)
+ accel/stubs/Makefile.objs |  1 +
+ accel/stubs/tcg-stub.c    | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 accel/stubs/tcg-stub.c
 
-diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
-index e81da27..5b4ae54 100644
---- a/accel/tcg/cpu-exec-common.c
-+++ b/accel/tcg/cpu-exec-common.c
-@@ -23,6 +23,8 @@
- #include "exec/exec-all.h"
- #include "exec/memory-internal.h"
- 
-+bool tcg_allowed;
+diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
+index bd5794f..fdfbf73 100644
+--- a/accel/stubs/Makefile.objs
++++ b/accel/stubs/Makefile.objs
+@@ -1 +1,2 @@
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
++obj-$(call lnot,$(CONFIG_TCG)) += tcg-stub.o
+diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
+new file mode 100644
+index 0000000..5dd480b
+--- /dev/null
++++ b/accel/stubs/tcg-stub.c
+@@ -0,0 +1,22 @@
++/*
++ * QEMU TCG accelerator stub
++ *
++ * Copyright Red Hat, Inc. 2013
++ *
++ * Author: Paolo Bonzini     <pbonzini@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
- /* exit the current TB, but without causing any exception to be raised */
- void cpu_loop_exit_noexc(CPUState *cpu)
- {
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index c1ccad3..56dbb56 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -33,7 +33,6 @@
- #include "qemu/main-loop.h"
- 
- unsigned long tcg_tb_size;
--static bool tcg_allowed = true;
- 
- #ifndef CONFIG_USER_ONLY
- /* mask must never be zero, except for A20 change call */
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 4fda383..f768681 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -784,6 +784,7 @@ static void tb_htable_init(void)
-    size. */
- void tcg_exec_init(unsigned long tb_size)
- {
-+    tcg_allowed = true;
-     cpu_gen_init();
-     page_init();
-     tb_htable_init();
-@@ -795,11 +796,6 @@ void tcg_exec_init(unsigned long tb_size)
- #endif
- }
- 
--bool tcg_enabled(void)
--{
--    return tcg_ctx.code_gen_buffer != NULL;
--}
--
- /*
-  * Allocate a new translation block. Flush the translation buffer if
-  * too many translation blocks or too much generated code.
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 387ef52..b5adbfa 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -76,8 +76,13 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
-     sendto(sockfd, buf, len, flags, destaddr, addrlen)
- #endif
- 
-+extern bool tcg_allowed;
- void tcg_exec_init(unsigned long tb_size);
--bool tcg_enabled(void);
-+#ifdef CONFIG_TCG
-+#define tcg_enabled() (tcg_allowed)
-+#else
-+#define tcg_enabled() 0
-+#endif
- 
- void cpu_exec_init_all(void);
- void cpu_exec_step_atomic(CPUState *cpu);
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "tcg/tcg.h"
++#include "exec/cpu-common.h"
++#include "exec/exec-all.h"
++
++void tb_flush(CPUState *cpu)
++{
++}
 -- 
 1.8.3.1
