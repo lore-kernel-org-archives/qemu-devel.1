@@ -1,43 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dShY4-0003ke-6Z
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:28:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dShot-0007Pc-CR
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dShY1-0005J5-2Q
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:28:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42761)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dShY0-0005Ii-Ox
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:28:40 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v65ANgM8133192
-	for <qemu-devel@nongnu.org>; Wed, 5 Jul 2017 06:28:39 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bgtyf112k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 06:28:38 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 5 Jul 2017 11:28:36 +0100
-References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-	<1499177279-131407-5-git-send-email-borntraeger@de.ibm.com>
-	<20170704163730.491517ac@dhcp-192-215.str.redhat.com>
-	<930cb5d9-83d1-50e7-39a7-f7eea67ef1af@linux.vnet.ibm.com>
-	<e00d3b37-a79e-6779-8627-e597685aeb18@de.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 5 Jul 2017 12:28:33 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dShoo-00038D-O1
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:46:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dShoo-00036C-ET
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:46:02 -0400
+Date: Wed, 5 Jul 2017 11:45:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170705104555.GA2284@work-vm>
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1499182263-19139-6-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <e00d3b37-a79e-6779-8627-e597685aeb18@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <1a4f96cd-9d00-5b2a-3c27-e773ca821d38@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/7] s390x: fix realize inheritance for
- kvm-flic
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499182263-19139-6-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v7 5/6] fsdev: hmp interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,73 +27,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-
-
-On 07/05/2017 12:20 PM, Christian Borntraeger wrote:
-> On 07/04/2017 04:51 PM, Halil Pasic wrote:
->>
->>
->> On 07/04/2017 04:37 PM, Cornelia Huck wrote:
->>> On Tue,  4 Jul 2017 16:07:56 +0200
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>
->>>> From: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>>
->>>> Commit f6f4ce4211 ("s390x: add property adapter_routes_max_batch",
->>>> 2016-12-09) introduces a common realize (intended to be common for all
->>>> the subclasses) for flic, but fails to make sure the kvm-flic which had
->>>> it's own is actually calling this common realize.
->>>
->>> s/it's/its/
->>>
->>
->> Valid. Sorry.
->>
->>>>
->>>> This omission fortunately does not result in a grave problem. The common
->>>> realize was only supposed to catch a possible programming mistake by
->>>> validating a value of a property set via the compat machine macros. Since
->>>> there was no programming mistake we don't need this fixed for stable.
->>>>
->>>> Let's fix this problem by making sure kvm flic honors the realize of its
->>>> parent class.
->>>>
->>>> Let us also improve on the error message we would hypothetically emit
->>>> when the validation fails.
->>>>
->>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>> Fixes: f6f4ce4211 ("s390x: add property adapter_routes_max_batch")
->>>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->>>> Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> ---
->>>>  hw/intc/s390_flic.c     |  4 ++--
->>>>  hw/intc/s390_flic_kvm.c | 17 +++++++++++++++++
->>>>  2 files changed, 19 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
->>>> index a99a350..837158b 100644
->>>> --- a/hw/intc/s390_flic.c
->>>> +++ b/hw/intc/s390_flic.c
->>>> @@ -101,8 +101,8 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
->>>>      uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
->>>>  
->>>>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
->>>> -        error_setg(errp, "flic adapter_routes_max_batch too big"
->>>> -                   "%d (%d allowed)", max_batch, ADAPTER_ROUTES_MAX_GSI);
->>>> +        error_setg(errp, "flic property adapter_routes_max_batch too big"
->>>> +                   " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
->>>
->>> Unrelated message change?
->>>
->>
->> I've mentioned it in the commit message. It was also introduced by the
->> patch I'm fixing. But yes strictly it's two different problems.
+* Pradeep Jagadeesh (pradeepkiruvale@gmail.com) wrote:
+> This patch introduces hmp interfaces for the fsdev
+> devices.
 > 
-> I will only fix the patch description ( s/it's/its/) and keep the other things
-> unchanged. Is that fine with you?
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
 
-It's fine with me, but I guess you probably asked Connie. Thanks!
+Yes I think that's better;
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hmp-commands-info.hx | 18 +++++++++++++++
+>  hmp-commands.hx      | 19 ++++++++++++++++
+>  hmp.c                | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hmp.h                |  4 ++++
+>  4 files changed, 103 insertions(+)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ae16901..5e4ea51 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -84,6 +84,24 @@ STEXI
+>  Show block device statistics.
+>  ETEXI
+>  
+> +#if defined(CONFIG_VIRTFS)
+> +
+> +    {
+> +        .name       = "fsdev_iothrottle",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show fsdev iothrottle information",
+> +        .cmd        = hmp_info_fsdev_iothrottle,
+> +    },
+> +
+> +#endif
+> +
+> +STEXI
+> +@item info fsdev_iothrottle
+> +@findex fsdev_iothrottle
+> +Show fsdev device throttle info.
+> +ETEXI
+> +
+>      {
+>          .name       = "block-jobs",
+>          .args_type  = "",
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index e763606..b7eb9a6 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1662,6 +1662,25 @@ STEXI
+>  Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+>  ETEXI
+>  
+> +#if defined(CONFIG_VIRTFS)
+> +
+> +    {
+> +        .name       = "fsdev_set_io_throttle",
+> +        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
+> +        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
+> +        .help       = "change I/O throttle limits for a fs devices",
+> +        .cmd        = hmp_fsdev_set_io_throttle,
+> +    },
+> +
+> +#endif
+> +
+> +STEXI
+> +@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+> +@findex fsdev_set_io_throttle
+> +Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+> +ETEXI
+> +
+> +
+>      {
+>          .name       = "set_password",
+>          .args_type  = "protocol:s,password:s,connected:s?",
+> diff --git a/hmp.c b/hmp.c
+> index 3f76073..97014d4 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1774,6 +1774,68 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+>      hmp_handle_error(mon, &err);
+>  }
+>  
+> +#ifdef CONFIG_VIRTFS
+> +
+> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +    IOThrottle throttle = {
+> +        .has_id = true,
+> +        .id = (char *) qdict_get_str(qdict, "device"),
+> +    };
+> +
+> +    hmp_initialize_io_throttle(&throttle, qdict);
+> +    qmp_fsdev_set_io_throttle(&throttle, &err);
+> +    hmp_handle_error(mon, &err);
+> +}
+> +
+> +static void print_fsdev_throttle_config(Monitor *mon, IOThrottle *fscfg,
+> +                                       Error *err)
+> +{
+> +    monitor_printf(mon, "%s", fscfg->id);
+> +    monitor_printf(mon, "    I/O throttling:"
+> +                   " bps=%" PRId64
+> +                   " bps_rd=%" PRId64  " bps_wr=%" PRId64
+> +                   " bps_max=%" PRId64
+> +                   " bps_rd_max=%" PRId64
+> +                   " bps_wr_max=%" PRId64
+> +                   " iops=%" PRId64 " iops_rd=%" PRId64
+> +                   " iops_wr=%" PRId64
+> +                   " iops_max=%" PRId64
+> +                   " iops_rd_max=%" PRId64
+> +                   " iops_wr_max=%" PRId64
+> +                   " iops_size=%" PRId64
+> +                   "\n",
+> +                   fscfg->bps,
+> +                   fscfg->bps_rd,
+> +                   fscfg->bps_wr,
+> +                   fscfg->bps_max,
+> +                   fscfg->bps_rd_max,
+> +                   fscfg->bps_wr_max,
+> +                   fscfg->iops,
+> +                   fscfg->iops_rd,
+> +                   fscfg->iops_wr,
+> +                   fscfg->iops_max,
+> +                   fscfg->iops_rd_max,
+> +                   fscfg->iops_wr_max,
+> +                   fscfg->iops_size);
+> +   hmp_handle_error(mon, &err);
+> +}
+> +
+> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +    IOThrottleList *fsdev_list, *info;
+> +    fsdev_list = qmp_query_fsdev_io_throttle(&err);
+> +
+> +    for (info = fsdev_list; info; info = info->next) {
+> +        print_fsdev_throttle_config(mon, info->value, err);
+> +    }
+> +    qapi_free_IOThrottleList(fsdev_list);
+> +}
+> +
+> +#endif
+> +
+>  void hmp_block_stream(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *error = NULL;
+> diff --git a/hmp.h b/hmp.h
+> index d8b94ce..dbf024d 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -81,6 +81,10 @@ void hmp_set_password(Monitor *mon, const QDict *qdict);
+>  void hmp_expire_password(Monitor *mon, const QDict *qdict);
+>  void hmp_eject(Monitor *mon, const QDict *qdict);
+>  void hmp_change(Monitor *mon, const QDict *qdict);
+> +#ifdef CONFIG_VIRTFS
+> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
+> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict);
+> +#endif
+>  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
+>  void hmp_block_stream(Monitor *mon, const QDict *qdict);
+>  void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
