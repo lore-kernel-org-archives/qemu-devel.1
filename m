@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dSjAH-00049n-QW
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:12:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSjBy-0005Jk-8v
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dSjAG-0004Mv-Sq
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:12:17 -0400
-Date: Wed, 5 Jul 2017 20:12:04 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170705121204.GG29382@lemon.lan>
-References: <20170703221456.30817-1-eblake@redhat.com>
-	<20170703221456.30817-15-eblake@redhat.com>
-	<20170704094411.GO10298@lemon.lan>
-	<9d6ff1e7-4d8a-a329-3c2a-0305f1bc706d@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dSjBx-0004eE-3d
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:14:02 -0400
+References: <20170627192458.15519-1-eblake@redhat.com>
+	<20170627192458.15519-5-eblake@redhat.com>
+	<20170704150057.GI4253@noname.str.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <49ade40a-49d2-a888-3c01-041f416b01b2@redhat.com>
+Date: Wed, 5 Jul 2017 07:13:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d6ff1e7-4d8a-a329-3c2a-0305f1bc706d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 14/15] block: Align block status requests
+In-Reply-To: <20170704150057.GI4253@noname.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP"
+Subject: Re: [Qemu-devel] [PATCH v3 04/20] stream: Switch stream_run() to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Wed, 07/05 07:01, Eric Blake wrote:
-> On 07/04/2017 04:44 AM, Fam Zheng wrote:
-> > On Mon, 07/03 17:14, Eric Blake wrote:
-> >> Any device that has request_alignment greater than 512 should be
-> >> unable to report status at a finer granularity; it may also be
-> >> simpler for such devices to be guaranteed that the block layer
-> >> has rounded things out to the granularity boundary (the way the
-> >> block layer already rounds all other I/O out).  Besides, getting
-> >> the code correct for super-sector alignment also benefits us
-> >> for the fact that our public interface now has byte granularity,
-> >> even though none of our drivers have byte-level callbacks.
-> >>
-> >> Add an assertion in blkdebug that proves that the block layer
-> >> never requests status of unaligned sections, similar to what it
-> >> does on other requests (while still keeping the generic helper
-> >> in place for when future patches add a throttle driver).  Note
-> >> note that iotest 177 already covers this (it would fail if you
-> > 
-> > Drop one "note"?
-> 
-> Indeed. There are studies on how people read that show that redundant
-> words that cross a line boundaries are the most easy to mentally overlook.
-> 
-> 
-> >> +    /* Round out to request_alignment boundaries */
-> >> +    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
-> >> +    aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-> >> +    aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
-> >> +
-> >> +    {
-> > 
-> > Not sure why using a {} block here?
-> > 
-> >> +        int count; /* sectors */
-> 
-> Because it makes it easier (less indentation churn) to delete the code
-> when series 4 later deletes the .bdrv_co_get_block_status sector-based
-> callback in favor of the newer .bdrv_co_block_status byte-based (patch
-> 16/15 which start series 4 turns it into an if statement, then a later
-> patch deletes the entire conditional); it is also justifiable because it
-> creates a tighter scope for 'int count' which is needed only on the
-> boundary of sector-based operations when the rest of the function is
-> byte-based (rather than declaring the helper variable up front).  I'll
-> have to call it out more specifically in the commit message as intentional.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jsnow@redhat.com,
+ Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <49ade40a-49d2-a888-3c01-041f416b01b2@redhat.com>
+Subject: Re: [PATCH v3 04/20] stream: Switch stream_run() to byte-based
+References: <20170627192458.15519-1-eblake@redhat.com>
+ <20170627192458.15519-5-eblake@redhat.com>
+ <20170704150057.GI4253@noname.str.redhat.com>
+In-Reply-To: <20170704150057.GI4253@noname.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for explaining, with the syntax error fixed in the commit message:
+On 07/04/2017 10:00 AM, Kevin Wolf wrote:
+> Am 27.06.2017 um 21:24 hat Eric Blake geschrieben:
+>> We are gradually converting to byte-based interfaces, as they are
+>> easier to reason about than sector-based.  Change the internal
+>> loop iteration of streaming to track by bytes instead of sectors
+>> (although we are still guaranteed that we iterate by steps that
+>> are sector-aligned).
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>
+>> ---
+>> v2: no change
+>> ---
+>>  block/stream.c | 24 ++++++++++--------------
+>>  1 file changed, 10 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/block/stream.c b/block/stream.c
+>> index 746d525..2f9618b 100644
+>> --- a/block/stream.c
+>> +++ b/block/stream.c
+>> @@ -108,12 +108,11 @@ static void coroutine_fn stream_run(void *opaque=
+)
+>>      BlockBackend *blk =3D s->common.blk;
+>>      BlockDriverState *bs =3D blk_bs(blk);
+>>      BlockDriverState *base =3D s->base;
+>> -    int64_t sector_num =3D 0;
+>> -    int64_t end =3D -1;
+>=20
+> Here, end was initialised to -1. This made a differnce for early 'goto
+> out' paths because otherwise data->reached_end would incorrectly be tru=
+e
+> in stream_complete.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Oh, good call.
+
+>=20
+> Because we also check data->ret, I think the only case where it actuall=
+y
+> makes a difference is for the !bs->backing case: This used to result in=
+
+> data->reached_end =3D=3D false, but now it ends up as true. This is bec=
+ause
+> s->common.len hasn't been set yet, so it is still 0.
+
+When !bs->backing, ret is 0; so that means my commit message is wrong
+about there being no semantic change.  But remember, when !bs->backing,
+stream is a no-op (there was no backing file to stream into the current
+layer, anyways) - so which do we want, declaring that the operation
+never reached the end (odd, since we did nothing), or that it is
+complete?  In other words, is this something where I should fix the
+semantics (perhaps as a separate bug-fix patch), or where I need to fix
+this patch to preserve existing semantics?
+
+The next code reached is stream_complete().  Before my patch, it skipped
+the main body of the function (because !data->reached_end); with my
+patch, we are now calling bdrv_change_backing_file() (presumably a no-op
+when there is no backing?)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZXNf9AAoJEKeha0olJ0NqUaUH/2T0sx/KMqJIb56XodCJ8u0W
+6AyNYvjGUxUqArU9u91qTFSGxcpiAV9w5qlRCQroIFeEyMW+Ec0bxtBjywf3Dvkt
+75UQA03AayiDk8LX05vUd1aOML9orEm3CeHKEcKnhtgSt5X6lHpFWHlydPG+dquC
+H3IshlQu73gNX0mCQkNecaH/+ctFNwLfguU6hD8pE5npmfl6h/u/mKU0ZA5k05Qf
+bipdztQ9W+J6S5j28F2k0sAEZlWxBRrIHCndI1doLVLJ1YI83KPG1ZIk6YJTI2zH
+km9J9sZklKmLakEiSrd7th3rwiaXgoVQSAtXi/6iF+g76+CdnSPHfO6Trwy97wE=
+=29tM
+-----END PGP SIGNATURE-----
+
+--bQAeHTjUbLNR6MRmmonm5TtPu1ir3frqP--
