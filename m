@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dSdL4-0006u2-P6
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:59:03 -0400
+	(envelope-from <famz@redhat.com>) id 1dSdjN-0004hn-Nu
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 02:24:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dSdKz-0002OS-89
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:59:00 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43878 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1dSdKz-0002MB-1Y
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:58:57 -0400
-From: Alexander Graf <agraf@suse.de>
-Date: Wed,  5 Jul 2017 07:59:15 +0200
-Message-Id: <1499234355-138591-1-git-send-email-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH] vnc: Set default kbd delay to 10ms
+	(envelope-from <famz@redhat.com>) id 1dSdjI-0004kx-RI
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 02:24:09 -0400
+Date: Wed, 5 Jul 2017 14:23:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170705062359.GC29382@lemon.lan>
+References: <1499170866-9068-1-git-send-email-jasowang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499170866-9068-1-git-send-email-jasowang@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-scsi: finalize IOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,50 +22,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: mst@redhat.com, pbonzini@redhat.com, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-The default keyboard delay time in the input layer is 10ms. I don't know
-how that number came to be, but empirical tests on some OpenQA driven ARM
-systems show that 10ms really is a reasonable default number for the delay.
+On Tue, 07/04 20:21, Jason Wang wrote:
+> After converting to use DMA api for virtio devices, we should use
+> dma_as instead of address_space_memory. Otherwise it won't work if
+> IOMMU is enabled.
+> 
+> Fixes: commit 8607f5c3072c ("virtio: convert to use DMA api")
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  hw/scsi/virtio-scsi.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+> index f46f06d..d076fe7 100644
+> --- a/hw/scsi/virtio-scsi.c
+> +++ b/hw/scsi/virtio-scsi.c
+> @@ -43,12 +43,13 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+>  
+>  void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
+>  {
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+>      const size_t zero_skip =
+>          offsetof(VirtIOSCSIReq, resp_iov) + sizeof(req->resp_iov);
+>  
+>      req->vq = vq;
+>      req->dev = s;
+> -    qemu_sglist_init(&req->qsgl, DEVICE(s), 8, &address_space_memory);
+> +    qemu_sglist_init(&req->qsgl, DEVICE(s), 8, vdev->dma_as);
 
-With the current 1ms we're constantly typing faster than the guest receives
-keyboard events from our XHCI attached USB HID device.
+Not related to this patch, but is our vIOMMU iotlb implementation safe for data
+plane (both virtio-blk and virtio-scsi)? There we don't have BQL to synchronize
+between IOVA lookup and update, which means threads can race when accessing the
+iotlb GHashTable.
 
-This patch moves the delay to 10ms. That way our default is much safer (good!)
-and also consistent with the input layer default (also good!).
+Did I overlook a synchronization mechanism? Or is it missing? Paolo, MST?
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
----
- qemu-options.hx | 2 +-
- ui/vnc.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Fam
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 896ff17..64806f0 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1730,7 +1730,7 @@ spec but is traditional QEMU behavior.
- @item key-delay-ms
- 
- Set keyboard delay, for key down and key up events, in milliseconds.
--Default is 1.  Keyboards are low-bandwidth devices, so this slowdown
-+Default is 10.  Keyboards are low-bandwidth devices, so this slowdown
- can help the device and guest to keep up and not lose events in case
- events are arriving in bulk.  Possible causes for the latter are flaky
- network connections, or scripts for automated testing.
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 26136f5..eb91559 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3808,7 +3808,7 @@ void vnc_display_open(const char *id, Error **errp)
-     }
- 
-     lock_key_sync = qemu_opt_get_bool(opts, "lock-key-sync", true);
--    key_delay_ms = qemu_opt_get_number(opts, "key-delay-ms", 1);
-+    key_delay_ms = qemu_opt_get_number(opts, "key-delay-ms", 10);
-     sasl = qemu_opt_get_bool(opts, "sasl", false);
- #ifndef CONFIG_VNC_SASL
-     if (sasl) {
--- 
-1.8.5.6
+>      qemu_iovec_init(&req->resp_iov, 1);
+>      memset((uint8_t *)req + zero_skip, 0, sizeof(*req) - zero_skip);
+>  }
+> -- 
+> 2.7.4
+> 
+> 
