@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSd1H-0001uK-0z
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:38:35 -0400
+	(envelope-from <agraf@suse.de>) id 1dSdL4-0006u2-P6
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:59:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSd1D-00048I-Tz
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:38:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48056)
+	(envelope-from <agraf@suse.de>) id 1dSdKz-0002OS-89
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:59:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43878 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSd1D-00047r-Na
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:38:31 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
-Date: Wed, 05 Jul 2017 07:38:26 +0200
-In-Reply-To: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk> (Mark
-	Cave-Ayland's message of "Tue, 4 Jul 2017 19:25:41 +0100")
-Message-ID: <8760f7fnot.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Managing architectural restrictions with -device
- and libvirt
+	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1dSdKz-0002MB-1Y
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:58:57 -0400
+From: Alexander Graf <agraf@suse.de>
+Date: Wed,  5 Jul 2017 07:59:15 +0200
+Message-Id: <1499234355-138591-1-git-send-email-agraf@suse.de>
+Subject: [Qemu-devel] [PATCH] vnc: Set default kbd delay to 10ms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Copying Marcel for PCI expertise.
+The default keyboard delay time in the input layer is 10ms. I don't know
+how that number came to be, but empirical tests on some OpenQA driven ARM
+systems show that 10ms really is a reasonable default number for the delay.
 
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+With the current 1ms we're constantly typing faster than the guest receives
+keyboard events from our XHCI attached USB HID device.
 
-> Hi all,
->
-> I've been working on a patchset that brings the sun4u machine on
-> qemu-system-sparc64 much closer to a real Ultra 5, however due to
-> various design restrictions I need to be able to restrict how devices
-> are added to the machine with -device.
->
-> On a real Ultra 5, the root PCI bus (sabre) has 2 PCI bridges (simba A
-> and simba B) with the onboard devices attached to simba A with 2 free
-> slots, and an initially empty simba B.
->
-> Firstly, is it possible to restrict the machine so that devices cannot
-> be directly plugged into the root PCI bus, but only behind one of the
-> PCI bridges? There is also an additional restriction in that slot 0
-> behind simba A must be left empty to ensure that the ebus (containing
-> the onboard devices) is the first device allocated.
+This patch moves the delay to 10ms. That way our default is much safer (good!)
+and also consistent with the input layer default (also good!).
 
-I figure sabre, simba A, simba B and the onboard devices attached to
-simba A are all created by MachineClass init().
+Signed-off-by: Alexander Graf <agraf@suse.de>
+---
+ qemu-options.hx | 2 +-
+ ui/vnc.c        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-What device provides "the ebus", and how is it created?
-
-Can you provide a list of all onboard PCI devices and how they are
-connected?  Diagram would be best.
-
-The real sabre has two slots, and doesn't support hot (un)plug.  Can we
-simply model that?  If yes, the root PCI bus is full after init(), and
-remains full.  Takes care of "cannot directly plugged into the root PCI
-bus".
-
-> Secondly, how does libvirt handle these type of restrictions? Is it able
-> to get the information from QEMU or is there some kind of libvirt
-> profile that needs to be updated? And do newer versions of libvirt have
-> the ability to attach devices behind PCI bridges using a GUI such as
-> virt-manager, or is that only something that can only be done by
-> directly editing the domain XML?
-
-Got nothing to add to Dan's reply.
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 896ff17..64806f0 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1730,7 +1730,7 @@ spec but is traditional QEMU behavior.
+ @item key-delay-ms
+ 
+ Set keyboard delay, for key down and key up events, in milliseconds.
+-Default is 1.  Keyboards are low-bandwidth devices, so this slowdown
++Default is 10.  Keyboards are low-bandwidth devices, so this slowdown
+ can help the device and guest to keep up and not lose events in case
+ events are arriving in bulk.  Possible causes for the latter are flaky
+ network connections, or scripts for automated testing.
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 26136f5..eb91559 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3808,7 +3808,7 @@ void vnc_display_open(const char *id, Error **errp)
+     }
+ 
+     lock_key_sync = qemu_opt_get_bool(opts, "lock-key-sync", true);
+-    key_delay_ms = qemu_opt_get_number(opts, "key-delay-ms", 1);
++    key_delay_ms = qemu_opt_get_number(opts, "key-delay-ms", 10);
+     sasl = qemu_opt_get_bool(opts, "sasl", false);
+ #ifndef CONFIG_VNC_SASL
+     if (sasl) {
+-- 
+1.8.5.6
