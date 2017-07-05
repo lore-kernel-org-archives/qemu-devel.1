@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWt-0004mR-Il
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:21 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeX0-0004tn-5l
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWp-0007im-3J
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:19 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34906)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWy-0007nl-R2
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:26 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeWo-0007iG-PC
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:15 -0400
-Received: by mail-wm0-x232.google.com with SMTP id w126so212855156wme.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:14 -0700 (PDT)
+	id 1dSeWy-0007nM-HR
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:24 -0400
+Received: by mail-wm0-x243.google.com with SMTP id y5so30408955wmh.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:24 -0700 (PDT)
+Received: from 640k.lan (94-39-191-51.adsl-ull.clienti.tiscali.it.
+	[94.39.191.51]) by smtp.gmail.com with ESMTPSA id
+	y35sm22202793wrc.51.2017.07.05.00.15.22 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 05 Jul 2017 00:15:22 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:23 +0200
-Message-Id: <1499238885-26161-21-git-send-email-pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:31 +0200
+Message-Id: <1499238885-26161-29-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 20/42] qemu-thread: Assert locks are initialized
- before using
+Subject: [Qemu-devel] [PULL 28/42] cpu: move interrupt handling out of
+ translate-common.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,459 +34,201 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+translate-common.c will not be available anymore with --disable-tcg,
+so we cannot leave cpu_interrupt_handler there.
 
-Not all platforms check whether a lock is initialized before used.  In
-particular Linux seems to be more permissive than OSX.
+Move the TCG-specific handler to accel/tcg/tcg-all.c, and adopt
+KVM's handler as the default one, since it works just as well for
+Xen and qtest.
 
-Check initialization state explicitly in our code to catch such bugs
-earlier.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170704122325.25634-1-famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/thread-posix.h |  4 ++++
- include/qemu/thread-win32.h |  5 +++++
- util/qemu-thread-posix.c    | 27 +++++++++++++++++++++++++++
- util/qemu-thread-win32.c    | 34 +++++++++++++++++++++++++++++++++-
- 4 files changed, 69 insertions(+), 1 deletion(-)
+ accel/kvm/kvm-all.c          | 11 ---------
+ accel/tcg/Makefile.objs      |  2 +-
+ accel/tcg/tcg-all.c          | 32 ++++++++++++++++++++++++++
+ accel/tcg/translate-common.c | 53 --------------------------------------------
+ qom/cpu.c                    | 13 +++++++++++
+ 5 files changed, 46 insertions(+), 65 deletions(-)
+ delete mode 100644 accel/tcg/translate-common.c
 
-diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
-index 09d1e15..e5e3a0f 100644
---- a/include/qemu/thread-posix.h
-+++ b/include/qemu/thread-posix.h
-@@ -12,10 +12,12 @@ typedef QemuMutex QemuRecMutex;
- 
- struct QemuMutex {
-     pthread_mutex_t lock;
-+    bool initialized;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index cd71e28..2eef7da 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -981,15 +981,6 @@ static MemoryListener kvm_io_listener = {
+     .priority = 10,
  };
  
- struct QemuCond {
-     pthread_cond_t cond;
-+    bool initialized;
- };
- 
- struct QemuSemaphore {
-@@ -26,6 +28,7 @@ struct QemuSemaphore {
- #else
-     sem_t sem;
- #endif
-+    bool initialized;
- };
- 
- struct QemuEvent {
-@@ -34,6 +37,7 @@ struct QemuEvent {
-     pthread_cond_t cond;
- #endif
-     unsigned value;
-+    bool initialized;
- };
- 
- struct QemuThread {
-diff --git a/include/qemu/thread-win32.h b/include/qemu/thread-win32.h
-index 4c4a261..3a05e3b 100644
---- a/include/qemu/thread-win32.h
-+++ b/include/qemu/thread-win32.h
-@@ -5,11 +5,13 @@
- 
- struct QemuMutex {
-     SRWLOCK lock;
-+    bool initialized;
- };
- 
- typedef struct QemuRecMutex QemuRecMutex;
- struct QemuRecMutex {
-     CRITICAL_SECTION lock;
-+    bool initialized;
- };
- 
- void qemu_rec_mutex_destroy(QemuRecMutex *mutex);
-@@ -19,15 +21,18 @@ void qemu_rec_mutex_unlock(QemuRecMutex *mutex);
- 
- struct QemuCond {
-     CONDITION_VARIABLE var;
-+    bool initialized;
- };
- 
- struct QemuSemaphore {
-     HANDLE sema;
-+    bool initialized;
- };
- 
- struct QemuEvent {
-     int value;
-     HANDLE event;
-+    bool initialized;
- };
- 
- typedef struct QemuThreadData QemuThreadData;
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index eacd99e..4e95d27 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -43,12 +43,15 @@ void qemu_mutex_init(QemuMutex *mutex)
-     err = pthread_mutex_init(&mutex->lock, NULL);
-     if (err)
-         error_exit(err, __func__);
-+    mutex->initialized = true;
- }
- 
- void qemu_mutex_destroy(QemuMutex *mutex)
+-static void kvm_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    cpu->interrupt_request |= mask;
+-
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    }
+-}
+-
+ int kvm_set_irq(KVMState *s, int irq, int level)
  {
-     int err;
+     struct kvm_irq_level event;
+@@ -1774,8 +1765,6 @@ static int kvm_init(MachineState *ms)
  
-+    assert(mutex->initialized);
-+    mutex->initialized = false;
-     err = pthread_mutex_destroy(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-@@ -58,6 +61,7 @@ void qemu_mutex_lock(QemuMutex *mutex)
- {
-     int err;
+     s->many_ioeventfds = kvm_check_many_ioeventfds();
  
-+    assert(mutex->initialized);
-     err = pthread_mutex_lock(&mutex->lock);
-     if (err)
-         error_exit(err, __func__);
-@@ -69,6 +73,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
- {
-     int err;
+-    cpu_interrupt_handler = kvm_handle_interrupt;
+-
+     return 0;
  
-+    assert(mutex->initialized);
-     err = pthread_mutex_trylock(&mutex->lock);
-     if (err == 0) {
-         trace_qemu_mutex_locked(mutex);
-@@ -84,6 +89,7 @@ void qemu_mutex_unlock(QemuMutex *mutex)
- {
-     int err;
+ err:
+diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
+index f173cd5..70cd474 100644
+--- a/accel/tcg/Makefile.objs
++++ b/accel/tcg/Makefile.objs
+@@ -1,3 +1,3 @@
+ obj-$(CONFIG_SOFTMMU) += tcg-all.o
+ obj-$(CONFIG_SOFTMMU) += cputlb.o
+-obj-y += cpu-exec.o cpu-exec-common.o translate-all.o translate-common.o
++obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index e327d90..c1ccad3 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -27,13 +27,45 @@
+ #include "sysemu/accel.h"
+ #include "sysemu/sysemu.h"
+ #include "qom/object.h"
++#include "qemu-common.h"
++#include "qom/cpu.h"
++#include "sysemu/cpus.h"
++#include "qemu/main-loop.h"
  
-+    assert(mutex->initialized);
-     trace_qemu_mutex_unlocked(mutex);
-     err = pthread_mutex_unlock(&mutex->lock);
-     if (err)
-@@ -102,6 +108,7 @@ void qemu_rec_mutex_init(QemuRecMutex *mutex)
-     if (err) {
-         error_exit(err, __func__);
-     }
-+    mutex->initialized = true;
- }
+ unsigned long tcg_tb_size;
+ static bool tcg_allowed = true;
  
- void qemu_cond_init(QemuCond *cond)
-@@ -111,12 +118,15 @@ void qemu_cond_init(QemuCond *cond)
-     err = pthread_cond_init(&cond->cond, NULL);
-     if (err)
-         error_exit(err, __func__);
-+    cond->initialized = true;
- }
- 
- void qemu_cond_destroy(QemuCond *cond)
- {
-     int err;
- 
-+    assert(cond->initialized);
-+    cond->initialized = false;
-     err = pthread_cond_destroy(&cond->cond);
-     if (err)
-         error_exit(err, __func__);
-@@ -126,6 +136,7 @@ void qemu_cond_signal(QemuCond *cond)
- {
-     int err;
- 
-+    assert(cond->initialized);
-     err = pthread_cond_signal(&cond->cond);
-     if (err)
-         error_exit(err, __func__);
-@@ -135,6 +146,7 @@ void qemu_cond_broadcast(QemuCond *cond)
- {
-     int err;
- 
-+    assert(cond->initialized);
-     err = pthread_cond_broadcast(&cond->cond);
-     if (err)
-         error_exit(err, __func__);
-@@ -144,6 +156,7 @@ void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
- {
-     int err;
- 
-+    assert(cond->initialized);
-     trace_qemu_mutex_unlocked(mutex);
-     err = pthread_cond_wait(&cond->cond, &mutex->lock);
-     trace_qemu_mutex_locked(mutex);
-@@ -174,12 +187,15 @@ void qemu_sem_init(QemuSemaphore *sem, int init)
-         error_exit(errno, __func__);
-     }
- #endif
-+    sem->initialized = true;
- }
- 
- void qemu_sem_destroy(QemuSemaphore *sem)
- {
-     int rc;
- 
-+    assert(sem->initialized);
-+    sem->initialized = false;
- #if defined(__APPLE__) || defined(__NetBSD__)
-     rc = pthread_cond_destroy(&sem->cond);
-     if (rc < 0) {
-@@ -201,6 +217,7 @@ void qemu_sem_post(QemuSemaphore *sem)
- {
-     int rc;
- 
-+    assert(sem->initialized);
- #if defined(__APPLE__) || defined(__NetBSD__)
-     pthread_mutex_lock(&sem->lock);
-     if (sem->count == UINT_MAX) {
-@@ -238,6 +255,7 @@ int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
-     int rc;
-     struct timespec ts;
- 
-+    assert(sem->initialized);
- #if defined(__APPLE__) || defined(__NetBSD__)
-     rc = 0;
-     compute_abs_deadline(&ts, ms);
-@@ -285,6 +303,7 @@ void qemu_sem_wait(QemuSemaphore *sem)
- {
-     int rc;
- 
-+    assert(sem->initialized);
- #if defined(__APPLE__) || defined(__NetBSD__)
-     pthread_mutex_lock(&sem->lock);
-     while (sem->count == 0) {
-@@ -310,6 +329,7 @@ void qemu_sem_wait(QemuSemaphore *sem)
- #else
- static inline void qemu_futex_wake(QemuEvent *ev, int n)
- {
-+    assert(ev->initialized);
-     pthread_mutex_lock(&ev->lock);
-     if (n == 1) {
-         pthread_cond_signal(&ev->cond);
-@@ -321,6 +341,7 @@ static inline void qemu_futex_wake(QemuEvent *ev, int n)
- 
- static inline void qemu_futex_wait(QemuEvent *ev, unsigned val)
- {
-+    assert(ev->initialized);
-     pthread_mutex_lock(&ev->lock);
-     if (ev->value == val) {
-         pthread_cond_wait(&ev->cond, &ev->lock);
-@@ -355,10 +376,13 @@ void qemu_event_init(QemuEvent *ev, bool init)
- #endif
- 
-     ev->value = (init ? EV_SET : EV_FREE);
-+    ev->initialized = true;
- }
- 
- void qemu_event_destroy(QemuEvent *ev)
- {
-+    assert(ev->initialized);
-+    ev->initialized = false;
- #ifndef __linux__
-     pthread_mutex_destroy(&ev->lock);
-     pthread_cond_destroy(&ev->cond);
-@@ -370,6 +394,7 @@ void qemu_event_set(QemuEvent *ev)
-     /* qemu_event_set has release semantics, but because it *loads*
-      * ev->value we need a full memory barrier here.
-      */
-+    assert(ev->initialized);
-     smp_mb();
-     if (atomic_read(&ev->value) != EV_SET) {
-         if (atomic_xchg(&ev->value, EV_SET) == EV_BUSY) {
-@@ -383,6 +408,7 @@ void qemu_event_reset(QemuEvent *ev)
- {
-     unsigned value;
- 
-+    assert(ev->initialized);
-     value = atomic_read(&ev->value);
-     smp_mb_acquire();
-     if (value == EV_SET) {
-@@ -398,6 +424,7 @@ void qemu_event_wait(QemuEvent *ev)
- {
-     unsigned value;
- 
-+    assert(ev->initialized);
-     value = atomic_read(&ev->value);
-     smp_mb_acquire();
-     if (value != EV_SET) {
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 653f29f..94f3491 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -46,15 +46,19 @@ static void error_exit(int err, const char *msg)
- void qemu_mutex_init(QemuMutex *mutex)
- {
-     InitializeSRWLock(&mutex->lock);
-+    mutex->initialized = true;
- }
- 
- void qemu_mutex_destroy(QemuMutex *mutex)
- {
-+    assert(mutex->initialized);
-+    mutex->initialized = false;
-     InitializeSRWLock(&mutex->lock);
- }
- 
- void qemu_mutex_lock(QemuMutex *mutex)
- {
-+    assert(mutex->initialized);
-     AcquireSRWLockExclusive(&mutex->lock);
-     trace_qemu_mutex_locked(mutex);
- }
-@@ -63,6 +67,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
- {
-     int owned;
- 
-+    assert(mutex->initialized);
-     owned = TryAcquireSRWLockExclusive(&mutex->lock);
-     if (owned) {
-         trace_qemu_mutex_locked(mutex);
-@@ -73,6 +78,7 @@ int qemu_mutex_trylock(QemuMutex *mutex)
- 
- void qemu_mutex_unlock(QemuMutex *mutex)
- {
-+    assert(mutex->initialized);
-     trace_qemu_mutex_unlocked(mutex);
-     ReleaseSRWLockExclusive(&mutex->lock);
- }
-@@ -80,25 +86,31 @@ void qemu_mutex_unlock(QemuMutex *mutex)
- void qemu_rec_mutex_init(QemuRecMutex *mutex)
- {
-     InitializeCriticalSection(&mutex->lock);
-+    mutex->initialized = true;
- }
- 
- void qemu_rec_mutex_destroy(QemuRecMutex *mutex)
- {
-+    assert(mutex->initialized);
-+    mutex->initialized = false;
-     DeleteCriticalSection(&mutex->lock);
- }
- 
- void qemu_rec_mutex_lock(QemuRecMutex *mutex)
- {
-+    assert(mutex->initialized);
-     EnterCriticalSection(&mutex->lock);
- }
- 
- int qemu_rec_mutex_trylock(QemuRecMutex *mutex)
- {
-+    assert(mutex->initialized);
-     return !TryEnterCriticalSection(&mutex->lock);
- }
- 
- void qemu_rec_mutex_unlock(QemuRecMutex *mutex)
- {
-+    assert(mutex->initialized);
-     LeaveCriticalSection(&mutex->lock);
- }
- 
-@@ -106,25 +118,31 @@ void qemu_cond_init(QemuCond *cond)
- {
-     memset(cond, 0, sizeof(*cond));
-     InitializeConditionVariable(&cond->var);
-+    cond->initialized = true;
- }
- 
- void qemu_cond_destroy(QemuCond *cond)
- {
-+    assert(cond->initialized);
-+    cond->initialized = false;
-     InitializeConditionVariable(&cond->var);
- }
- 
- void qemu_cond_signal(QemuCond *cond)
- {
-+    assert(cond->initialized);
-     WakeConditionVariable(&cond->var);
- }
- 
- void qemu_cond_broadcast(QemuCond *cond)
- {
-+    assert(cond->initialized);
-     WakeAllConditionVariable(&cond->var);
- }
- 
- void qemu_cond_wait(QemuCond *cond, QemuMutex *mutex)
- {
-+    assert(cond->initialized);
-     trace_qemu_mutex_unlocked(mutex);
-     SleepConditionVariableSRW(&cond->var, &mutex->lock, INFINITE, 0);
-     trace_qemu_mutex_locked(mutex);
-@@ -134,21 +152,28 @@ void qemu_sem_init(QemuSemaphore *sem, int init)
- {
-     /* Manual reset.  */
-     sem->sema = CreateSemaphore(NULL, init, LONG_MAX, NULL);
-+    sem->initialized = true;
- }
- 
- void qemu_sem_destroy(QemuSemaphore *sem)
- {
-+    assert(sem->initialized);
-+    sem->initialized = false;
-     CloseHandle(sem->sema);
- }
- 
- void qemu_sem_post(QemuSemaphore *sem)
- {
-+    assert(sem->initialized);
-     ReleaseSemaphore(sem->sema, 1, NULL);
- }
- 
- int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
- {
--    int rc = WaitForSingleObject(sem->sema, ms);
-+    int rc;
++#ifndef CONFIG_USER_ONLY
++/* mask must never be zero, except for A20 change call */
++static void tcg_handle_interrupt(CPUState *cpu, int mask)
++{
++    int old_mask;
++    g_assert(qemu_mutex_iothread_locked());
 +
-+    assert(sem->initialized);
-+    rc = WaitForSingleObject(sem->sema, ms);
-     if (rc == WAIT_OBJECT_0) {
-         return 0;
-     }
-@@ -160,6 +185,7 @@ int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
- 
- void qemu_sem_wait(QemuSemaphore *sem)
++    old_mask = cpu->interrupt_request;
++    cpu->interrupt_request |= mask;
++
++    /*
++     * If called from iothread context, wake the target cpu in
++     * case its halted.
++     */
++    if (!qemu_cpu_is_self(cpu)) {
++        qemu_cpu_kick(cpu);
++    } else {
++        cpu->icount_decr.u16.high = -1;
++        if (use_icount &&
++            !cpu->can_do_io
++            && (mask & ~old_mask) != 0) {
++            cpu_abort(cpu, "Raised interrupt while not in I/O function");
++        }
++    }
++}
++#endif
++
+ static int tcg_init(MachineState *ms)
  {
-+    assert(sem->initialized);
-     if (WaitForSingleObject(sem->sema, INFINITE) != WAIT_OBJECT_0) {
-         error_exit(GetLastError(), __func__);
-     }
-@@ -193,15 +219,19 @@ void qemu_event_init(QemuEvent *ev, bool init)
-     /* Manual reset.  */
-     ev->event = CreateEvent(NULL, TRUE, TRUE, NULL);
-     ev->value = (init ? EV_SET : EV_FREE);
-+    ev->initialized = true;
+     tcg_exec_init(tcg_tb_size * 1024 * 1024);
++    cpu_interrupt_handler = tcg_handle_interrupt;
+     return 0;
  }
  
- void qemu_event_destroy(QemuEvent *ev)
+diff --git a/accel/tcg/translate-common.c b/accel/tcg/translate-common.c
+deleted file mode 100644
+index e6b8c4c..0000000
+--- a/accel/tcg/translate-common.c
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/*
+- *  Host code generation common components
+- *
+- *  Copyright (c) 2015 Peter Crosthwaite <crosthwaite.peter@gmail.com>
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "qom/cpu.h"
+-#include "sysemu/cpus.h"
+-#include "qemu/main-loop.h"
+-
+-#ifndef CONFIG_USER_ONLY
+-/* mask must never be zero, except for A20 change call */
+-static void tcg_handle_interrupt(CPUState *cpu, int mask)
+-{
+-    int old_mask;
+-    g_assert(qemu_mutex_iothread_locked());
+-
+-    old_mask = cpu->interrupt_request;
+-    cpu->interrupt_request |= mask;
+-
+-    /*
+-     * If called from iothread context, wake the target cpu in
+-     * case its halted.
+-     */
+-    if (!qemu_cpu_is_self(cpu)) {
+-        qemu_cpu_kick(cpu);
+-    } else {
+-        cpu->icount_decr.u16.high = -1;
+-        if (use_icount &&
+-            !cpu->can_do_io
+-            && (mask & ~old_mask) != 0) {
+-            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+-        }
+-    }
+-}
+-
+-CPUInterruptHandler cpu_interrupt_handler = tcg_handle_interrupt;
+-#endif
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 7b20f84..8757f03 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -32,6 +32,8 @@
+ #include "hw/qdev-properties.h"
+ #include "trace-root.h"
+ 
++CPUInterruptHandler cpu_interrupt_handler;
++
+ bool cpu_exists(int64_t id)
  {
-+    assert(ev->initialized);
-+    ev->initialized = false;
-     CloseHandle(ev->event);
+     CPUState *cpu;
+@@ -417,6 +419,17 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
+     return addr;
  }
  
- void qemu_event_set(QemuEvent *ev)
++static void generic_handle_interrupt(CPUState *cpu, int mask)
++{
++    cpu->interrupt_request |= mask;
++
++    if (!qemu_cpu_is_self(cpu)) {
++        qemu_cpu_kick(cpu);
++    }
++}
++
++CPUInterruptHandler cpu_interrupt_handler = generic_handle_interrupt;
++
+ static void cpu_class_init(ObjectClass *klass, void *data)
  {
-+    assert(ev->initialized);
-     /* qemu_event_set has release semantics, but because it *loads*
-      * ev->value we need a full memory barrier here.
-      */
-@@ -218,6 +248,7 @@ void qemu_event_reset(QemuEvent *ev)
- {
-     unsigned value;
- 
-+    assert(ev->initialized);
-     value = atomic_read(&ev->value);
-     smp_mb_acquire();
-     if (value == EV_SET) {
-@@ -232,6 +263,7 @@ void qemu_event_wait(QemuEvent *ev)
- {
-     unsigned value;
- 
-+    assert(ev->initialized);
-     value = atomic_read(&ev->value);
-     smp_mb_acquire();
-     if (value != EV_SET) {
+     DeviceClass *dc = DEVICE_CLASS(klass);
 -- 
 1.8.3.1
