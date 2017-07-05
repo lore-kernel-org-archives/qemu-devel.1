@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSjcI-0005xz-Ik
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:41:15 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1dSjd4-0006RR-4t
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSjcH-0005ZJ-Dv
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:41:14 -0400
-References: <20170704084059.6278-1-el13635@mail.ntua.gr>
-	<20170704084059.6278-2-el13635@mail.ntua.gr>
-	<20170704094417.GA4253@noname.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b0b3851d-c9b8-81fb-75c5-ceb6392f8c24@redhat.com>
-Date: Wed, 5 Jul 2017 07:40:59 -0500
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1dSjd3-0005ze-0G
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:42:02 -0400
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <19a85866-1e72-58b9-d120-8b5e5b809e90@arm.com>
+Date: Wed, 5 Jul 2017 13:44:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170704094417.GA4253@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pN2IQl6Qoj6p1LLCv4TSKQNKvN52aLg2B"
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] block: Pass bdrv_* methods to
- bs->file by default
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "wei@redhat.com" <wei@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pN2IQl6Qoj6p1LLCv4TSKQNKvN52aLg2B
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block <qemu-block@nongnu.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>
-Message-ID: <b0b3851d-c9b8-81fb-75c5-ceb6392f8c24@redhat.com>
-Subject: Re: [PATCH v3 1/4] block: Pass bdrv_* methods to bs->file by default
-References: <20170704084059.6278-1-el13635@mail.ntua.gr>
- <20170704084059.6278-2-el13635@mail.ntua.gr>
- <20170704094417.GA4253@noname.str.redhat.com>
-In-Reply-To: <20170704094417.GA4253@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-[adding libvirt for block size discussion]
-
-On 07/04/2017 04:44 AM, Kevin Wolf wrote:
-> Am 04.07.2017 um 10:40 hat Manos Pitsidianakis geschrieben:
->> The following functions fail if bs->drv does not implement them:
+On 05/07/17 08:14, Tian, Kevin wrote:
+>> From: Jean-Philippe Brucker [mailto:jean-philippe.brucker@arm.com]
+>> Sent: Monday, June 19, 2017 6:15 PM
 >>
->> bdrv_probe_blocksizes
->> bdrv_probe_geometry
->> bdrv_truncate
->> bdrv_has_zero_init
->> bdrv_get_info
->> bdrv_media_changed
->> bdrv_eject
->> bdrv_lock_medium
->> bdrv_co_ioctl
+>> On 19/06/17 08:54, Bharat Bhushan wrote:
+>>> Hi Eric,
+>>>
+>>> I started added replay in virtio-iommu and came across how MSI interrupts
+>> with work with VFIO.
+>>> I understand that on intel this works differently but vsmmu will have same
+>> requirement.
+>>> kvm-msi-irq-route are added using the msi-address to be translated by
+>> viommu and not the final translated address.
+>>> While currently the irqfd framework does not know about emulated
+>> iommus (virtio-iommu, vsmmuv3/vintel-iommu).
+>>> So in my view we have following options:
+>>> - Programming with translated address when setting up kvm-msi-irq-route
+>>> - Route the interrupts via QEMU, which is bad from performance
+>>> - vhost-virtio-iommu may solve the problem in long term
+>>>
+>>> Is there any other better option I am missing?
 >>
->> Instead, the call should be passed to bs->file if it exists, to allow
->> filter drivers to support those methods without implementing them.
+>> Since we're on the topic of MSIs... I'm currently trying to figure out how
+>> we'll handle MSIs in the nested translation mode, where the guest manages
+>> S1 page tables and the host doesn't know about GVA->GPA translation.
 >>
+>> I'm also wondering about the benefits of having SW-mapped MSIs in the
+>> guest. It seems unavoidable for vSMMU since that's what a physical system
+>> would do. But in a paravirtualized solution there doesn't seem to be any
+>> compelling reason for having the guest map MSI doorbells. These addresses
+>> are never accessed directly, they are only used for setting up IRQ routing
+>> (at least on kvmtool). So here's what I'd like to have. Note that I
+>> haven't investigated the feasibility in Qemu yet, I don't know how it
+>> deals with MSIs.
+>>
+>> (1) Guest uses the guest-physical MSI doorbell when setting up MSIs. For
+>> ARM with GICv3 this would be GITS_TRANSLATER, for x86 it would be the
+>> fixed MSI doorbell. This way the host wouldn't need to inspect IOMMU
+>> mappings when handling writes to PCI MSI-X tables.
+>>
+> 
+> What do you mean by "fixed MSI doorbell"? PCI MSI-X table is part of
+> PCI MMIO bar. Accessing to it is just a memory virtualization issue (e.g.
+> trap by KVM and then emulated in Qemu) on x86. It's not a IOMMU
+> problem. I guess you may mean same thing but want to double confirm
+> here given the terminology confusion. Or do you mean the interrupt
+> triggered by IOMMU itself?
 
->=20
->> +        return bdrv_probe_blocksizes(bs->file->bs, bsz);
->>      }
->> =20
->>      return -ENOTSUP;
->=20
-> This change actually changes existing behaviour. Basically, all of your=
+Yes I didn't mean access to the MSI-X table, but how we interpret the
+address in the MSI message. In kvmtool I create MSI routes for VFIO
+devices when the guest accesses the MSI-X tables. And on ARM the tables
+contains an IOVA that needs to be translated into a PA, so handling a
+write to an MSI-X entry might mean doing the IOVA->PA translation of the
+doorbell.
 
-> additions also apply for qcow2 images or other image formats, and we
-> need to check whether they make sense there.
->=20
-> bdrv_probe_blocksizes() is used for the default values for the physical=
+On x86 the MSI address is 0xfee...., whether there is an IOMMU or not.
+That's what I meant by fixed. And it is the IOMMU that performs IRQ remapping.
 
-> and logical block sizes for block devices if no value is explicitly
-> specified in -device. This makes sense as it will allow the guest to
-> optimise its requests so that they align with the block size that is
-> optimal for the storage that contains the image. (I also think that we
-> probably should implement .bdrv_probe_blocksizes() not only for
-> host_device, but also for regular files to get optimal performance by
-> default.)
->=20
-> Changing the defaults can be a problem for cross-version live migration=
+On physical ARM systems, the SMMU doesn't treat any special address range
+as "MSI window". For the SMMU, an MSI is simply a memory transaction. MSI
+addresses are arbitrary IOVAs that get translated into PAs by the SMMU.
+The SMMU doesn't perform any IRQ remapping, only address translation. This
+PA is a doorbell register in the irqchip, which performs IRQ remapping and
+triggers an interrupt.
 
-> if the default values are used. Management tools that want to do live
-> migration are supposed to explicitly provide all options they can, so
-> this should be okay.
->=20
-> Eric, does libvirt set the physical/logical block size explicitly? If
-> not, it would be good if it started to do so.
+Therefore in an emulated ARM system, when the guest writes the MSI-X
+table, it writes an IOVA. In a strict emulation the MSI would have to
+first go through the vIOMMU, and then into the irqchip. I was wondering if
+with virtio-iommu we could skip the address translation and go to the MSI
+remapping component immediately, effectively implementing a "hardware MSI
+window". This is what x86 does, the difference being that MSI remapping is
+done by the IOMMU on x86, and by the irqchip on ARM.
 
-Libvirt supports user control of block size via this XML in <disk>:
-    <blockio logical_block_size=3D'512' physical_block_size=3D'4096'/>
-which it translates to command-line logical_block_size=3D and
-physical_block_size=3D.  But I didn't see anywhere that libvirt tries to
-do anything with block size in QMP, which makes me wonder if that is a
-libvirt bug for not allowing a block size when hot-plugging a drive, or
-a weakness in QMP.
+My current take is that we should keep the current behavior, but I will
+try to sort out the different ways of implementing MSIs with virtio-iommu
+in the next specification draft.
 
-Your point that if libvirt isn't always specifying block size, then we
-risk the block size changing on migration (that is, libvirt should be
-patched to specify block size always, and not just when the XML
-specifies it).
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---pN2IQl6Qoj6p1LLCv4TSKQNKvN52aLg2B
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXN5bAAoJEKeha0olJ0NqwBsIAJ+eDn2aah005aMonQJAZW5T
-NuBbo2ymlqAWH2lfOh0vK0+7GhAi2cx6uehsZx8HaJ7Vzehpi7cap8X24BvnWC27
-advM9D8ywLgRSjEfYB5Lt3Qf6B8nEcAbz7r8gWP/51wk6/phg+E3M745lCya/ERX
-fteUNuJGH7sLRa121xqlZoKUYfJxYyjUdB+PE/HBNfBfPqcUSyIQ68ext5mNzs5j
-b/glX1KRLmUG1UKM881mI73Vwu2FezLpvZJ6MAX3cxR7oyH3o8tVNruQrK9WWTUu
-0DlfqEk2HTO53YEa5sK540D7X6LQJRXNZgJR0pPuqF1klb20udtuCBRwNA53oxo=
-=yqQj
------END PGP SIGNATURE-----
-
---pN2IQl6Qoj6p1LLCv4TSKQNKvN52aLg2B--
+Thanks,
+Jean
