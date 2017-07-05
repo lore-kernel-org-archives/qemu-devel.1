@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSfSE-0003Oe-Em
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:14:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1dSfZ6-0005rd-Ny
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dSfSB-0005wb-A8
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:14:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36858)
+	(envelope-from <peterx@redhat.com>) id 1dSfZ5-0000Su-BM
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:21:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dSfSB-0005wJ-4I
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:14:31 -0400
-References: <1499237876.3041.4.camel@linux.intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
-Date: Wed, 5 Jul 2017 10:14:23 +0200
-MIME-Version: 1.0
-In-Reply-To: <1499237876.3041.4.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dSfZ5-0000Sh-52
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:21:39 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  5 Jul 2017 16:21:20 +0800
+Message-Id: <1499242883-2184-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1499242883-2184-1-git-send-email-peterx@redhat.com>
+References: <1499242883-2184-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] migration: fix handling for
+ --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, Marcel Apfelbaum <marcel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, haoqf@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
- Hi,
+MigrateState object is not ready at that time, so we'll get an
+assertion. Use qemu_global_option() instead.
 
-On 05.07.2017 08:57, Chao Peng wrote:
->=20
-> Q35 has been in QEMU for quite a while. Compared to the current default
-> i440FX, Q35 is probably not that mature and not widely used, however in
-> some case, Q35 has advantages, for example, in supporting new features.
-> For instance, we have some features require PCI-e support which is only
-> available on Q35 and some others need it for EFI support. It is of
-> course not necessary to change it as the default but if more and more
-> features have dependencies on Q35 because of requiring much more modern
-> features then I think it may be worth to do so. In such case we can hav=
-e
-> more people to use it and find problems we may know or not know.
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Fixes: 3df663e ("migration: move only_migratable to MigrationState")
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/migration/misc.h | 1 -
+ migration/migration.c    | 5 -----
+ vl.c                     | 2 +-
+ 3 files changed, 1 insertion(+), 7 deletions(-)
 
-Yes, IMHO at one point in time, we should switch the default machine
-type to q35. The i440FX is really quite old...
-
-> There are certainly some drawbacks:
-> -        Compatibility: current code or script may need adjustment
-
-That might be a real concern ... so I think a good point in time to
-switch to the q35 machine type would be when we switch to the next major
-version number of QEMU, i.e. when we switch to version 3.0. If the users
-see a new major version number, they might be more willing to accept
-such major changes (yeah, I know, we've discussed in the past that
-version numbers are just numbers ... but still, there is some kind of
-psychological aspect to this, too, I think)
-
-> -        Quality: we may suffer more bugs on Q35
-
-I hope that the q35 machine will become mature soon once it has been
-made the default machine.
-
- Thomas
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 2255121..c079b77 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -53,7 +53,6 @@ bool migration_has_finished(MigrationState *);
+ bool migration_has_failed(MigrationState *);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
+-void migration_only_migratable_set(void);
+ void migration_global_dump(Monitor *mon);
+ 
+ #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index 51ccd1a..dbdc121 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -128,11 +128,6 @@ MigrationState *migrate_get_current(void)
+     return current_migration;
+ }
+ 
+-void migration_only_migratable_set(void)
+-{
+-    migrate_get_current()->only_migratable = true;
+-}
+-
+ MigrationIncomingState *migration_incoming_get_current(void)
+ {
+     static bool once;
+diff --git a/vl.c b/vl.c
+index 36ff3f4..0c497a3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3958,7 +3958,7 @@ int main(int argc, char **argv, char **envp)
+                  *
+                  * "-global migration.only-migratable=true"
+                  */
+-                migration_only_migratable_set();
++                qemu_global_option("migration.only-migratable=true");
+                 break;
+             case QEMU_OPTION_nodefaults:
+                 has_defaults = 0;
+-- 
+2.7.4
