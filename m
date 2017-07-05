@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dSktE-0004wR-2a
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:54 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dSkvI-0006sF-VP
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dSkt4-0007sL-Ic
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:48 -0400
-Received: from mail-eopbgr30096.outbound.protection.outlook.com
-	([40.107.3.96]:45373
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dSkvF-0000P5-0n
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:04:56 -0400
+Received: from mail-eopbgr30094.outbound.protection.outlook.com
+	([40.107.3.94]:30676
 	helo=EUR03-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dSkt4-0007qA-22
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:38 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed,  5 Jul 2017 17:02:02 +0300
-Message-Id: <1499263324-15184-12-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1499263324-15184-1-git-send-email-anton.nefedov@virtuozzo.com>
-References: <1499263324-15184-1-git-send-email-anton.nefedov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1dSkvE-0000Nw-Hw
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:04:52 -0400
+References: <20170615163813.7255-1-stefanha@redhat.com>
+	<27a724bc-95c0-9d9f-ea90-015fcdf7dc92@virtuozzo.com>
+	<20170705125517.GB1280@stefanha-x1.localdomain>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <193c7fd3-d9e1-8dd7-c15b-6fc46870f92f@virtuozzo.com>
+Date: Wed, 5 Jul 2017 17:04:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 11/13] virtio-console: chardev hotswap
- support
+In-Reply-To: <20170705125517.GB1280@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/5] qemu-iotests: test savevm/loadvm
+ iothread (and make it work!)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, amit@kernel.org, mst@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Roman Kagan <rkagan@virtuozzo.com>
 
-In case of a backend change, the handler functions and the watch have
-to be reset.
-Also, avoid unsafe qemu_chr_fe_get_driver() usage even though the pointer
-is not really stored.
+On 05.07.2017 15:55, Stefan Hajnoczi wrote:
+> On Mon, Jun 19, 2017 at 03:26:56PM +0300, Pavel Butsykin wrote:
+>> On 15.06.2017 19:38, Stefan Hajnoczi wrote:
+>>> This series extends qemu-iotests 068 to also run with iothread enabled.  Doing
+>>> so was harder than expected because:
+>>>
+>>> 1. ioeventfd is disabled without -M accel=kvm even though it should work
+>>> 2. loadvm still has an iothread bug
+>>>
+>>> Instead of adding a ./check -iothread option I decided to always run the test.
+>>> Kevin recently recommended this approach; the advantage is that iothread *will*
+>>> always be tested iothread mode whereas people won't run ./check -iothread.
+>>
+>> Why not just add -iothread option in check-block.sh? We can do an
+>> additional run with -iothread, as it is done for different block
+>> formats.
+>>
+>> Because all the test cases already exist, we can just reuse them.
+> 
+>  From the email:
+> 
+>    "the advantage is that iothread *will* always be tested iothread mode
+>    whereas people won't run ./check -iothread"
+> 
+> Both approaches have pros and cons.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- hw/char/virtio-console.c | 35 ++++++++++++++++++++++++++++++-----
- 1 file changed, 30 insertions(+), 5 deletions(-)
+Yeah, it'd just be nice to add iothread support for all iotests.
 
-diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-index afb4949..198b2a8 100644
---- a/hw/char/virtio-console.c
-+++ b/hw/char/virtio-console.c
-@@ -49,7 +49,7 @@ static ssize_t flush_buf(VirtIOSerialPort *port,
-     VirtConsole *vcon = VIRTIO_CONSOLE(port);
-     ssize_t ret;
- 
--    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
-+    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
-         /* If there's no backend, we can just say we consumed all data. */
-         return len;
-     }
-@@ -163,12 +163,35 @@ static void chr_event(void *opaque, int event)
-     }
- }
- 
-+static int chr_be_change(void *opaque)
-+{
-+    VirtConsole *vcon = opaque;
-+    VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(vcon);
-+    VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-+
-+    if (k->is_console) {
-+        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-+                                 NULL, chr_be_change, vcon, NULL, true);
-+    } else {
-+        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-+                                 chr_event, chr_be_change, vcon, NULL, false);
-+    }
-+
-+    if (vcon->watch) {
-+        g_source_remove(vcon->watch);
-+        vcon->watch = qemu_chr_fe_add_watch(&vcon->chr,
-+                                            G_IO_OUT | G_IO_HUP,
-+                                            chr_write_unblocked, vcon);
-+    }
-+
-+    return 0;
-+}
-+
- static void virtconsole_realize(DeviceState *dev, Error **errp)
- {
-     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
-     VirtConsole *vcon = VIRTIO_CONSOLE(dev);
-     VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(dev);
--    Chardev *chr = qemu_chr_fe_get_driver(&vcon->chr);
- 
-     if (port->id == 0 && !k->is_console) {
-         error_setg(errp, "Port number 0 on virtio-serial devices reserved "
-@@ -176,7 +199,7 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    if (chr) {
-+    if (qemu_chr_fe_backend_connected(&vcon->chr)) {
-         /*
-          * For consoles we don't block guest data transfer just
-          * because nothing is connected - we'll just let it go
-@@ -188,11 +211,13 @@ static void virtconsole_realize(DeviceState *dev, Error **errp)
-          */
-         if (k->is_console) {
-             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                     NULL, NULL, vcon, NULL, true);
-+                                     NULL, chr_be_change,
-+                                     vcon, NULL, true);
-             virtio_serial_open(port);
-         } else {
-             qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
--                                     chr_event, NULL, vcon, NULL, false);
-+                                     chr_event, chr_be_change,
-+                                     vcon, NULL, false);
-         }
-     }
- }
--- 
-2.7.4
+> If we decide to use ./check -iothread then it's necessary to figure out
+> which tests -iothread even applies to.  Tests that use qemu-img/qemu-io
+> do not use iothread.  Only tests that launch QEMU can take advantage of
+> iothread today.
+
+Well, for tests which don't support the -iothread option we can define
+something like this:
+
+_unsupported_iothread
+
+or
+
+_unsupported_opts "iothread"
+
+But overall it looks like a separate patch series, which can be done in
+the future.
+
+> Stefan
+> 
