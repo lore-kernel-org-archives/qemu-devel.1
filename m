@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dSnix-0000P2-2E
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:04:24 -0400
+	(envelope-from <clg@kaod.org>) id 1dSnsQ-0003BV-P1
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dSniw-0006Nh-59
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:04:23 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-3-mreitz@redhat.com>
-	<87r2xve509.fsf@dusky.pond.sub.org>
-	<98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-	<5067e305-39fe-3590-4a7c-0f0136d8e5b1@redhat.com>
-	<e21524cb-a199-fa6e-11f6-8b445a1633db@redhat.com>
-	<33f5a5f9-0a58-6b86-d3e1-2bee632a8493@redhat.com>
-	<fabe727c-7024-9f4b-99b3-fecb5da26acf@redhat.com>
-Message-ID: <986a4919-937e-3668-d94e-f71981992e87@redhat.com>
-Date: Wed, 5 Jul 2017 19:04:11 +0200
+	(envelope-from <clg@kaod.org>) id 1dSnsL-0002eQ-Pi
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:14:10 -0400
+Received: from 12.mo3.mail-out.ovh.net ([188.165.41.191]:55495)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dSnsL-0002aN-Ga
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:14:05 -0400
+Received: from player158.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id D8279FCADA
+	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 19:13:56 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed,  5 Jul 2017 19:13:13 +0200
+Message-Id: <1499274819-15607-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <fabe727c-7024-9f4b-99b3-fecb5da26acf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Chh8ghpLOS5IXCR7LriWIbSJe4kf6LtWN"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 00/26] guest exploitation of the XIVE
+ interrupt controller (POWER9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,135 +28,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Chh8ghpLOS5IXCR7LriWIbSJe4kf6LtWN
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <986a4919-937e-3668-d94e-f71981992e87@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
-References: <20170703122505.32017-1-mreitz@redhat.com>
- <20170703122505.32017-3-mreitz@redhat.com>
- <87r2xve509.fsf@dusky.pond.sub.org>
- <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
- <5067e305-39fe-3590-4a7c-0f0136d8e5b1@redhat.com>
- <e21524cb-a199-fa6e-11f6-8b445a1633db@redhat.com>
- <33f5a5f9-0a58-6b86-d3e1-2bee632a8493@redhat.com>
- <fabe727c-7024-9f4b-99b3-fecb5da26acf@redhat.com>
-In-Reply-To: <fabe727c-7024-9f4b-99b3-fecb5da26acf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On a POWER9 sPAPR machine, the Client Architecture Support (CAS)
+negotiation process determines whether the guest operates with an
+interrupt controller using the XICS legacy model, as found on POWER8,
+or in XIVE exploitation mode, the newer POWER9 interrupt model. This
+patchset is a first proposal to add XIVE support in the sPAPR machine.
 
-On 2017-07-05 19:00, Max Reitz wrote:
-> On 2017-07-05 18:29, Eric Blake wrote:
->> On 07/05/2017 11:22 AM, Max Reitz wrote:
->>
->>>>>>     return (double)x =3D=3D x && x =3D=3D y;
->>>>>
->>>>> Yes, that would do, too; and spares me of having to think about how=
- well
->>>>> comparing an arbitrary double to UINT64_MAX actually works. :-)
->>>>
->>>> On second thought, this won't do, because (double)x =3D=3D x is alwa=
-ys true
->>>> if x is an integer (because this will implicitly cast the second x t=
-o a
->>>> double, too). However, (uint64_t)(double)x =3D=3D x should work.
->>>
->>> Hm, well, the nice thing with this is that (double)UINT64_MAX is
->>> actually UINT64_MAX + 1, and now (uint64_t)(UINT64_MAX + 1) is
->>> undefined... Urgs.
->>
->> (uint64_t)(UINT64_MAX + 1) is well-defined - it is 0.
->>
->> (Adding in unsigned integers is always well-defined - it wraps around =
-on
->> mathematical overflow modulo the integer size.  You're thinking of
->> overflow addition on signed integers, which is indeed undefined)
->=20
-> It's not. See the standard:
+The first patches introduce the XIVE exploitation mode in CAS.
 
-Or, well, yes, it is in this case, but I meant literally UINT64_MAX + 1,
-not the uint64_t value. I meant the natural number 2^64.
+Follow models for the XIVE interrupt controller, source and presenter.
+We try to reuse the ICS and ICP models of XICS because the sPAPR
+machine is tied to the XICSFabric interface and should be using a
+common framework to be able to switch from one controller model to
+another. To be discussed of course.
 
-Because the issue is that (double)UINT64_MAX will (or may, depending on
-the environment and such) give us 2.0^64 =3D=3D 0x1p64.
+Then comes support for the Hypervisor's call which are used to
+configure the interrupt sources and the event/notification queues of
+the guest.
 
-And this is where the quotation I gave below comes in. When casting an
-integer to a double we may end up with a value that is not representable
-in the original integer type, so we cannot easily cast it back.
+Finally, the last patches try to integrate the XIVE interrupt model in
+the sPAPR machine and this not without a couple of serious hacks to
+have something to test. See 'Caveats' below for more details.
 
-Max
+This is a first draft and I expect a lot of rewrite before it reaches
+mainline QEMU. Nevertheless, it compiles, boots and can be used for
+some testing.
 
-> When a finite value of real floating type is converted to an integer
-> type other than _Bool, the fractional part is discarded (i.e., the valu=
-e
-> is truncated toward zero). If the value of the integral part cannot be
-> represented by the integer type, the behavior is undefined. [61]
->=20
-> [61] The remaindering operation performed when a value of integer type
-> is converted to unsigned type need not be performed when a value of rea=
-l
-> floating type is converted to unsigned type. Thus, the range of portabl=
-e
-> real floating values is (=E2=88=921, Utype_MAX+1).
->=20
-> See for yourself:
->=20
-> printf("%i\n", (uint64_t)(double)UINT64_MAX =3D=3D UINT64_MAX);
->=20
-> This yields 1 with gcc and -O3.
->=20
->>>
->>> So I guess one thing that isn't very obvious but that should *always*=
+Code is here:
 
->>> work (and is always well-defined) is this:
->>>
->>> For uint64_t: y < 0x1p64 && (uint64_t)y =3D=3D x
->>>
->>> For int64_t: y >=3D -0x1p63 && y < 0x1p63 && (int64_t)y =3D=3D x
->>
->> That's harder to read, compared to the double-cast method which is
->> well-defined after all.
->>
->>>
->>> I hope. :-/
->>>
->>> (But finally a chance to use binary exponents! Yay!)
->>
->> Justifying the use of binary exponents is going to be harder than that=
-,
->> and would need a really good comment in the code, compared to just usi=
-ng
->> a safe double-cast.
->=20
-> It's not safe.
->=20
-> Max
->=20
+  https://github.com/legoater/qemu/commits/xive
+  https://github.com/legoater/linux/commits/xive
 
+Pre-compiled kernel (4.12) and initrd images can be found :
 
+  http://kaod.org/qemu/ppc-xive/
+      =20
+Caveats :
 
---Chh8ghpLOS5IXCR7LriWIbSJe4kf6LtWN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ - Unnecessary complexity=20
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+   I started working on XIVE looking at OPAL because I had the
+   ambition to provide a common framework for the PowerNV and sPAPR
+   machines. This is still the goal but the XIVE support for the
+   PowerNV machine will be *much *more complex and we could use
+   something simpler for sPAPR probably. This is why there are some
+   clumsiness with the IRQ allocator and at the end of the patchset
+   with the IPI interrupt source.
 
-iQEvBAEBCAAZBQJZXRwLEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQKwP
-B/9Cb7VD1g36guGu/CnYOiuklwXj2CAJ+Z9U3Ywa4UGV39WLv4jI81vjIHLWi9xX
-sdpQ79/aj/1cso4TluZWOOOUlRcn67WRceM8twMgRL4DQNtmsDcExAPiWWojJBzx
-RNyS8OhF5F1TyCykDMzqlCZZs6hK8MzgJaE6bzleOloaBPxUNpB5vAw+xPNjgH6+
-FIdrm2g7i+Tk26H4oV5ku3noFpD+wjYkUXEDWbUiX4X8rATyEKlV84cEkWiekkxC
-ncd59MPweoIntjfQJXDsE21YbwQ7NaiBYapdDnkS37W+JdqGOKxOJhwNZ61eAxyk
-M2ihUNjj6JdHeWo1K+vluuZs
-=+9UU
------END PGP SIGNATURE-----
+ - Switching interrupt model after CAS.=20
 
---Chh8ghpLOS5IXCR7LriWIbSJe4kf6LtWN--
+   We now need a way to configure the guest with the interrupt model
+   negotiated in CAS.
+
+   But, currently, the sPAPR machine make uses of the controller very
+   early in the initialization sequence. The interrupt source is used
+   to allocate IRQ numbers and populate the device tree and the
+   interrupt presenter objects are created along with the CPU.
+
+   One approach would be to support the reset of the ICP and the ICS
+   objects of the guest. We could be use a bitmap to allocate the IRQ
+   numbers needed to populate the device tree and then instantiate the
+   correct ICS with the bitmap as a parameter. The ICPs could be
+   allocated later in the boot process. May be on demand, when a CPU
+   is first notified.
+
+ - Migration not addressed
+
+ - Hotplug not addressed
+
+ - KVM support
+
+   The guest needs to be run with kernel_irqchip=3Doff on a POWER9
+   system.
+
+ - LSI
+
+   lightly tested.
+  =20
+Thanks,
+
+C.=20
+
+C=C3=A9dric Le Goater (26):
+  spapr: introduce the XIVE_EXPLOIT option in CAS
+  spapr: populate device tree depending on XIVE_EXPLOIT option
+  target/ppc/POWER9: add POWERPC_EXCP_POWER9
+  ppc/xive: introduce a skeleton for the XIVE interrupt controller model
+  ppc/xive: define XIVE internal tables
+  ppc/xive: introduce a XIVE interrupt source model
+  ppc/xive: add MMIO handlers to the XIVE interrupt source
+  ppc/xive: add flags to the XIVE interrupt source
+  ppc/xive: add an overall memory region for the ESBs
+  ppc/xive: record interrupt source MMIO address for hcalls
+  ppc/xics: introduce a print_info() handler to the ICS and ICP objects
+  ppc/xive: add a print_info() handler for the interrupt source
+  ppc/xive: introduce a XIVE interrupt presenter model
+  ppc/xive: add MMIO handlers to the XIVE interrupt presenter model
+  ppc/xive: push EQ data in OS event queues
+  ppc/xive: notify CPU when interrupt priority is more privileged
+  ppc/xive: add hcalls support
+  ppc/xive: add device tree support
+  ppc/xive: introduce a helper to map the XIVE memory regions
+  ppc/xive: introduce a helper to create XIVE interrupt source objects
+  ppc/xive: introduce routines to allocate IRQ numbers
+  ppc/xive: create an XIVE interrupt source to handle IPIs
+  spapr: add a XIVE object to the sPAPR machine
+  spapr: include the XIVE interrupt source for IPIs
+  spapr: print the XIVE interrupt source for IPIs in the monitor
+  spapr: force XIVE exploitation mode for POWER9 (HACK)
+
+ default-configs/ppc64-softmmu.mak |    2 +
+ hw/intc/Makefile.objs             |    2 +
+ hw/intc/xics.c                    |   36 +-
+ hw/intc/xive-internal.h           |  218 ++++++++
+ hw/intc/xive.c                    | 1024 +++++++++++++++++++++++++++++++=
+++++++
+ hw/intc/xive_spapr.c              |  796 ++++++++++++++++++++++++++++
+ hw/ppc/spapr.c                    |  141 ++++-
+ include/hw/ppc/spapr.h            |   17 +-
+ include/hw/ppc/spapr_ovec.h       |    1 +
+ include/hw/ppc/xics.h             |    2 +
+ include/hw/ppc/xive.h             |   80 +++
+ target/ppc/cpu-qom.h              |    2 +
+ target/ppc/excp_helper.c          |    9 +-
+ target/ppc/translate.c            |    3 +-
+ target/ppc/translate_init.c       |    2 +-
+ 15 files changed, 2306 insertions(+), 29 deletions(-)
+ create mode 100644 hw/intc/xive-internal.h
+ create mode 100644 hw/intc/xive.c
+ create mode 100644 hw/intc/xive_spapr.c
+ create mode 100644 include/hw/ppc/xive.h
+
+--=20
+2.7.5
