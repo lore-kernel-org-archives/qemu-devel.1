@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSn3v-0005vF-MN
+	(envelope-from <mlureau@redhat.com>) id 1dSn3v-0005vG-OS
 	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSn3u-00043o-NW
+	(envelope-from <mlureau@redhat.com>) id 1dSn3u-00043Z-LC
 	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:21:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44130)
+Received: from mx1.redhat.com ([209.132.183.28]:42538)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSn3u-00042U-H7
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dSn3u-00042R-Bp
 	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:21:58 -0400
-References: <8737aaeuu5.fsf@linaro.org>
-	<CAFEAcA8ZHz4vyBrHV6Vi7227h+_NafgV1oBY0g9sV7zU_8my0w@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <672d2102-5a27-47b3-ef5b-f49d1e21d9f2@redhat.com>
-Date: Wed, 5 Jul 2017 18:21:53 +0200
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5953580480
+	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 16:21:57 +0000 (UTC)
+Date: Wed, 5 Jul 2017 12:21:53 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <57935658.47275852.1499271713596.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170705144302.32017-1-dgilbert@redhat.com>
+References: <20170705144302.32017-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8ZHz4vyBrHV6Vi7227h+_NafgV1oBY0g9sV7zU_8my0w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qemu_system_reset_request() broken w.r.t BQL
- locking regime
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hmp: Update info vnc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +32,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel <qemu-devel@nongnu.org>, maciej.borzecki@open-rnd.pl
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, lcapitulino@redhat.com, armbru@redhat.com
 
 
 
-On 05/07/2017 18:14, Peter Maydell wrote:
->>   - Guest resets board, writing to some hw address (e.g.
->>     arm_sysctl_write)
->>   - This triggers qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET)
->>   - We exit iowrite and drop the BQL
->>   - vl.c schedules qemu_system_reset->qemu_devices_reset...arm_cpu_reset
->>   - we start writing new values to CPU env while still in TCG code
->>   - CHAOS!
->>
->> The general solution for this is to ensure these sort of tasks are done
->> with safe work in the CPUs context when we know nothing else is running.
->> It seems this is probably best done by modifying
->> qemu_system_reset_request to queue work up on current_cpu and execute it
->> as safe work - I don't think the vl.c thread should ever be messing
->> about with calling cpu_reset directly.
-> My first thought is that qemu_system_reset() should absolutely
-> stop every CPU (or other runnable thing like a DMA agent) in the
-> system. The semantics are basically "like a power cycle", so
-> that should include a complete stop of the world. (Is this
-> what vm_stop() does? Dunno...)
+----- Original Message -----
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> The QMP query-vnc interfaces have gained a lot more information that
+> the HMP interfaces hasn't got yet. Update it.
+>=20
+> Note the output format has changed, but this is HMP so that's OK.
+>=20
+> In particular, this now includes client information for reverse
+> connections:
+>=20
+> -vnc :0
+> (qemu) info vnc
+> default:
+>   Server: 0.0.0.0:5900 (ipv4)
+>     Auth: none (Sub: none)
+>   Auth: none (Sub: none)
+>=20
+>   (Now connect a client)
+>=20
+> (qemu) info vnc
+> default:
+>   Server: 0.0.0.0:5900 (ipv4)
+>     Auth: none (Sub: none)
+>   Client: 127.0.0.1:51828 (ipv4)
+>     x509_dname: none
+>     username: none
+>   Auth: none (Sub: none)
+>=20
+> -vnc localhost:7000,reverse
+> (qemu) info vnc
+> default:
+>   Client: ::1:7000 (ipv6)
+>     x509_dname: none
+>     username: none
+>   Auth: none (Sub: none)
+>=20
+> -vnc :1,password,id=3Drev -vnc localhost:7000,reverse
+> (qemu) info vnc
+> default:
+>   Client: ::1:7000 (ipv6)
+>     x509_dname: none
+>     username: none
+>   Auth: none (Sub: none)
+> rev:
+>   Server: 0.0.0.0:5901 (ipv4)
+>     Auth: vnc (Sub: none)
+>   Client: 127.0.0.1:53616 (ipv4)
+>     x509_dname: none
+>     username: none
+>   Auth: vnc (Sub: none)
+>=20
+> This was originally RH bz 1461682
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hmp.c | 98
+>  ++++++++++++++++++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 67 insertions(+), 31 deletions(-)
+>=20
+> diff --git a/hmp.c b/hmp.c
+> index dee40284c1..c11a5fe2c6 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -600,50 +600,86 @@ void hmp_info_blockstats(Monitor *mon, const QDict
+> *qdict)
+>      qapi_free_BlockStatsList(stats_list);
+>  }
+> =20
+> +/* Helper for hmp_info_vnc_clients, _servers */
+> +static void hmp_info_VncBasicInfo(Monitor *mon, VncBasicInfo *info,
+> +                                  const char *name)
+> +{
+> +    monitor_printf(mon, "  %s: %s:%s (%s%s)\n",
+> +                   name,
+> +                   info->host,
+> +                   info->service,
+> +                   NetworkAddressFamily_lookup[info->family],
+> +                   info->websocket ? " (Websocket)" : "");
+> +}
+> +
+> +/* Helper displaying and euth and crypt info */
+> +static void hmp_info_vnc_authcrypt(Monitor *mon, const char *indent,
+> +                                   VncPrimaryAuth auth,
+> +                                   VncVencryptSubAuth *vencrypt)
+> +{
+> +    monitor_printf(mon, "%sAuth: %s (Sub: %s)\n", indent,
+> +                   VncPrimaryAuth_lookup[auth],
+> +                   vencrypt ? VncVencryptSubAuth_lookup[*vencrypt] :
+> "none");
+> +}
+> +
+> +static void hmp_info_vnc_clients(Monitor *mon, VncClientInfoList *client=
+)
+> +{
+> +    while (client) {
+> +        VncClientInfo *cinfo =3D client->value;
+> +
+> +        hmp_info_VncBasicInfo(mon, (VncBasicInfo *)cinfo, "Client");
+> +        monitor_printf(mon, "    x509_dname: %s\n",
+> +                       cinfo->x509_dname ?
 
-I agree, it should do vm_stop() as the first thing and, if applicable,
-vm_start() as the last thing, similar to e.g. savevm.
+Why not use has_x509_dname ?
 
-In fact, the above bug probably has existed forever in KVM.
+> +                       cinfo->x509_dname : "none");
+> +        monitor_printf(mon, "    username: %s\n",
 
-Paolo
+sasl_username would be more clear
+
+> +                       cinfo->has_sasl_username ?
+> +                       cinfo->sasl_username : "none");
+> +
+> +        client =3D client->next;
+> +    }
+> +}
+> +
+> +static void hmp_info_vnc_servers(Monitor *mon, VncServerInfo2List *serve=
+r)
+> +{
+> +    while (server) {
+> +        VncServerInfo2 *sinfo =3D server->value;
+> +        hmp_info_VncBasicInfo(mon, (VncBasicInfo *)sinfo, "Server");
+> +        hmp_info_vnc_authcrypt(mon, "    ", sinfo->auth,
+> +                               sinfo->has_vencrypt ? &sinfo->vencrypt :
+> NULL);
+> +        server =3D server->next;
+> +    }
+> +}
+> +
+>  void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+>  {
+> -    VncInfo *info;
+> +    VncInfo2List *info2l;
+>      Error *err =3D NULL;
+> -    VncClientInfoList *client;
+> =20
+> -    info =3D qmp_query_vnc(&err);
+> +    info2l =3D qmp_query_vnc_servers(&err);
+>      if (err) {
+>          error_report_err(err);
+>          return;
+>      }
+> -
+> -    if (!info->enabled) {
+> -        monitor_printf(mon, "Server: disabled\n");
+> -        goto out;
+> -    }
+> -
+> -    monitor_printf(mon, "Server:\n");
+> -    if (info->has_host && info->has_service) {
+> -        monitor_printf(mon, "     address: %s:%s\n", info->host,
+> info->service);
+> -    }
+> -    if (info->has_auth) {
+> -        monitor_printf(mon, "        auth: %s\n", info->auth);
+> +    if (!info2l) {
+> +        monitor_printf(mon, "None\n");
+> +        return;
+>      }
+> =20
+> -    if (!info->has_clients || info->clients =3D=3D NULL) {
+> -        monitor_printf(mon, "Client: none\n");
+> -    } else {
+> -        for (client =3D info->clients; client; client =3D client->next) =
+{
+> -            monitor_printf(mon, "Client:\n");
+> -            monitor_printf(mon, "     address: %s:%s\n",
+> -                           client->value->host,
+> -                           client->value->service);
+> -            monitor_printf(mon, "  x509_dname: %s\n",
+> -                           client->value->x509_dname ?
+> -                           client->value->x509_dname : "none");
+> -            monitor_printf(mon, "    username: %s\n",
+> -                           client->value->has_sasl_username ?
+> -                           client->value->sasl_username : "none");
+> +    while (info2l) {
+> +        VncInfo2 *info =3D info2l->value;
+> +        monitor_printf(mon, "%s:\n", info->id);
+> +        hmp_info_vnc_servers(mon, info->server);
+> +        hmp_info_vnc_clients(mon, info->clients);
+> +        hmp_info_vnc_authcrypt(mon, "  ", info->auth,
+> +                          info->has_vencrypt ? &info->vencrypt : NULL);
+> +        if (info->has_display) {
+> +            monitor_printf(mon, "  Display: %s\n", info->display);
+>          }
+> +        info2l =3D info2l->next;
+>      }
+> =20
+> -out:
+> -    qapi_free_VncInfo(info);
+> +    qapi_free_VncInfo2List(info2l);
+> +
+>  }
+> =20
+>  #ifdef CONFIG_SPICE
+> --
+> 2.13.0
+
+Looks good to me otherwise
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
