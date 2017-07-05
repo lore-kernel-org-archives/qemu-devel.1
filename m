@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dSspO-00018w-I6
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:31:23 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dSswU-0002jy-FD
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dSspJ-00077k-Cp
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:31:22 -0400
-Received: from mga01.intel.com ([192.55.52.88]:47515)
+	(envelope-from <sstabellini@kernel.org>) id 1dSswP-0003nw-K0
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1dSspJ-00076M-1x
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:31:17 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Wed, 5 Jul 2017 22:31:13 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D2699E@SHSMSX101.ccr.corp.intel.com>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
-	<cc330a8f-e087-9b6f-2a40-38b58688d300@arm.com>
-	<20170702100659.GA22053@gmail.com>
-	<0e4f2dd4-d553-b1b7-7bec-fe0ff5242c54@arm.com>
-	<20170703103115.GB22053@gmail.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D25919@SHSMSX101.ccr.corp.intel.com>
-	<1d63c1ae-ca10-0f9d-91de-0d9c9823c104@arm.com>
-In-Reply-To: <1d63c1ae-ca10-0f9d-91de-0d9c9823c104@arm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dSswP-0003nb-B6
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:37 -0400
+Date: Wed, 5 Jul 2017 15:38:33 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1499183267-28623-3-git-send-email-igor.druzhinin@citrix.com>
+Message-ID: <alpine.DEB.2.10.1707051522320.2919@sstabellini-ThinkPad-X260>
+References: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
+	<1499183267-28623-3-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 7/8] VFIO: Add new IOCTL for IOMMU TLB
- invalidate propagation
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] xen/mapcache: add an ability to
+ create dummy mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will
-	Deacon <Will.Deacon@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
 
-PiBGcm9tOiBKZWFuLVBoaWxpcHBlIEJydWNrZXINCj4gU2VudDogV2VkbmVzZGF5LCBKdWx5IDUs
-IDIwMTcgODo0MiBQTQ0KPiANCj4gT24gMDUvMDcvMTcgMDc6NDUsIFRpYW4sIEtldmluIHdyb3Rl
-Og0KPiA+PiBGcm9tOiBMaXUsIFlpIEwNCj4gPj4gU2VudDogTW9uZGF5LCBKdWx5IDMsIDIwMTcg
-NjozMSBQTQ0KPiA+Pg0KPiA+PiBIaSBKZWFuLA0KPiA+Pg0KPiA+Pg0KPiA+Pj4NCj4gPj4+PiAy
-LiBEZWZpbmUgYSBzdHJ1Y3R1cmUgaW4gaW5jbHVkZS91YXBpL2xpbnV4L2lvbW11LmgobmV3bHkg
-YWRkZWQNCj4gaGVhZGVyDQo+ID4+IGZpbGUpDQo+ID4+Pj4NCj4gPj4+PiBzdHJ1Y3QgaW9tbXVf
-dGxiX2ludmFsaWRhdGUgew0KPiA+Pj4+IAlfX3UzMglzY29wZTsNCj4gPj4+PiAvKiBwYXNpZC1z
-ZWxlY3RpdmUgaW52YWxpZGF0aW9uIGRlc2NyaWJlZCBieSBAcGFzaWQgKi8NCj4gPj4+PiAjZGVm
-aW5lIElPTU1VX0lOVkFMSURBVEVfUEFTSUQJKDEgPDwgMCkNCj4gPj4+PiAvKiBhZGRyZXNzLXNl
-bGV2dGl2ZSBpbnZhbGlkYXRpb24gZGVzY3JpYmVkIGJ5IChAdmFkZHIsIEBzaXplKSAqLw0KPiA+
-Pj4+ICNkZWZpbmUgSU9NTVVfSU5WQUxJREFURV9WQUREUgkoMSA8PCAxKQ0KPiA+DQo+ID4gRm9y
-IFZULWQgYWJvdmUgdHdvIGZsYWdzIGFyZSByZWxhdGVkLiBUaGVyZSBpcyBubyBtZXRob2Qgb2Yg
-Zmx1c2hpbmcNCj4gPiAoQHZhZGRyLCBAc2l6ZSkgZm9yIGFsbCBwYXNpZHMsIHdoaWNoIGRvZXNu
-J3QgbWFrZSBzZW5zZS4gYWRkcmVzcy0NCj4gPiBzZWxlY3RpdmUgaW52YWxpZGF0aW9uIGlzIHZh
-bGlkIG9ubHkgZm9yIGEgZ2l2ZW4gcGFzaWQuIFNvIGl0J3Mgbm90IGFwcHJvcHJpYXRlDQo+ID4g
-dG8gcHV0IHRoZW0gaW4gc2FtZSBsZXZlbCBvZiBzY29wZSBkZWZpbml0aW9uIGF0IGxlYXN0IGZv
-ciBWVC1kLg0KPiANCj4gRm9yIEFSTSBTTU1VIHRoZSAiZmx1c2ggYWxsIGJ5IFZBIiBvcGVyYXRp
-b24gaXMgdmFsaWQuIEFsdGhvdWdoIGl0J3MNCj4gdW5jbGVhciBhdCB0aGlzIHBvaW50IGlmIHdl
-IHdpbGwgZXZlciBhbGxvdyB0aGF0LCBpdCBzaG91bGQgcHJvYmFibHkgc3RheQ0KPiBpbiB0aGUg
-Y29tbW9uIGZvcm1hdCwgaWYgdGhlcmUgaXMgb25lLg0KDQpmaW5lIGluIGNvbW1vbiBmb3JtYXQu
-IGVhcmxpZXIgSSB3YXMgdGhpbmtpbmcgd2hldGhlciBpdCBzaG91bGQNCmJlIGluIHNjb3BlLiBw
-b3NzaWJseSBmaW5lIGFmdGVyIGFub3RoZXIgdGhpbmtpbmcuIDotKQ0KDQo+IA0KPiA+Pj4+IAlf
-X3UzMglmbGFnczsNCj4gPj4+PiAvKiAgdGFyZ2V0cyBub24tcGFzaWQgbWFwcGluZ3MsIEBwYXNp
-ZCBpcyBub3QgdmFsaWQgKi8NCj4gPj4+PiAjZGVmaW5lIElPTU1VX0lOVkFMSURBVEVfTk9fUEFT
-SUQJKDEgPDwgMCkNCj4gPj4+DQo+ID4+PiBBbHRob3VnaCBpdCB3YXMgbXkgcHJvcG9zYWwsIEkg
-ZG9uJ3QgbGlrZSB0aGlzIGZsYWcuIEluIEFSTSBTTU1VLCB3ZSdyZQ0KPiA+Pj4gdXNpbmcgYSBz
-cGVjaWFsIG1vZGUgd2hlcmUgUEFTSUQgMCBpcyByZXNlcnZlZCBhbmQgYW55IHRyYWZmaWMgd2l0
-aG91dA0KPiA+Pj4gUEFTSUQgdXNlcyBlbnRyeSAwIG9mIHRoZSBQQVNJRCB0YWJsZS4gU28gSSBw
-cm9wb3NlZCB0aGUgIk5PX1BBU0lEIiBmbGFnDQo+ID4+PiB0byBpbnZhbGlkYXRlIHRoYXQgc3Bl
-Y2lhbCBjb250ZXh0IGV4cGxpY2l0bHkuIEJ1dCB0aGlzIG1lYW5zIHRoYXQNCj4gPj4+IGludmFs
-aWRhdGlvbiBwYWNrZXQgdGFyZ2V0ZWQgYXQgdGhhdCBjb250ZXh0IHdpbGwgaGF2ZSAic2NvcGUg
-PSBQQVNJRCINCj4gYW5kDQo+ID4+PiAiZmxhZ3MgPSBOT19QQVNJRCIsIHdoaWNoIGlzIHV0dGVy
-bHkgY29uZnVzaW5nLg0KPiA+Pj4NCj4gPj4+IEkgbm93IHRoaW5rIHRoYXQgd2Ugc2hvdWxkIGdl
-dCByaWQgb2YgdGhlDQo+IElPTU1VX0lOVkFMSURBVEVfTk9fUEFTSUQNCj4gPj4gZmxhZw0KPiA+
-Pj4gYW5kIGp1c3QgdXNlIFBBU0lEIDAgdG8gaW52YWxpZGF0ZSB0aGlzIGNvbnRleHQgb24gQVJN
-LiBJIGRvbid0IHRoaW5rDQo+ID4+PiBvdGhlciBhcmNoaXRlY3R1cmVzIHdvdWxkIHVzZSB0aGUg
-Tk9fUEFTSUQgZmxhZyBhbnl3YXksIGJ1dCBtaWdodCBiZQ0KPiA+PiBtaXN0YWtlbi4NCj4gPj4N
-Cj4gPj4gSSBtYXkgc3VnZ2VzdCB0byBrZWVwIGl0IHNvIGZhci4gT24gVlQtZCwgd2UgbWF5IHBh
-c3Mgc29tZSBkYXRhIGluDQo+IG9wYXF1ZSwNCj4gPj4gc28NCj4gPj4gd2UgbWF5IHdvcmsgd2l0
-aG91dCBpdC4gQnV0IGlmIG90aGVyIHZlbmRvciB3YW50IHRvIGlzc3VlIG5vbi1QQVNJRA0KPiB0
-YWdnZWQNCj4gPj4gY2FjaGUsIHRoZW4gbWF5IGVuY291bnRlciBwcm9ibGVtLg0KPiA+DQo+ID4g
-SSdtIHdvcnJpZWQgYWJvdXQgd2hhdCdzIHRoZSBjcml0ZXJpYSB3aGljaCBhdHRyaWJ1dGUgc2hv
-dWxkIGJlIGFic3RyYWN0ZWQNCj4gPiBpbiBjb21tb24gc3RydWN0dXJlIGFuZCB3aGljaCBjYW4g
-YmUgbGVmdCB0byBvcGFxdWUuIEl0IGRvZXNuJ3QgbWFrZQ0KPiA+IG11Y2ggc2Vuc2UgdG8gZG8g
-c3VjaCBhYnN0cmFjdGlvbiBwdXJlbHkgYmVjYXVzZSBkaWZmZXJlbnQgdmVuZG9yDQo+IGZvcm1h
-dHMNCj4gPiBoYXZlIHNvbWUgY29tbW9uIGZpZWxkcy4gVXN1YWxseSB3ZSBkbyBzdWNoIGFic3Ry
-YWN0aW9uIGJlY2F1c2UNCj4gPiB2ZW5kb3ItYWdub3N0aWMgY29kZSBuZWVkIHRvIGRvIHNvbWUg
-Y29tbW9uIGhhbmRsaW5nIGJlZm9yZSBnb2luZyB0bw0KPiA+IHZlbmRvciBzcGVjaWZpYyBjb2Rl
-LiBIb3dldmVyIGluIHRoaXMgY2FzZSBWRklPIGlzIG5vdCBleHBlY3RlZCB0byBkbw0KPiBhbnl0
-aGluZw0KPiA+IHdpdGggdGhvc2UgSU9NTVUgc3BlY2lmaWMgYXR0cmlidXRlcy4gVGhlbiB0aGUg
-c3RydWN0dXJlIGlzIGRpcmVjdGx5DQo+IGZvcndhcmRlZA0KPiA+IHRvIElPTU1VIGRyaXZlciwg
-d2hpY2ggc2ltcGx5IHRyYW5zbGF0ZXMgdGhlIHN0cnVjdHVyZSBpbnRvIHZlbmRvciBzcGVjaWZp
-Yw0KPiA+IG9wYXF1ZSBkYXRhIGFnYWluLiBUaGVuIHdoeSBib3RoZXJpbmcgdG8gZG8gZG91Ymxl
-IHRyYW5zbGF0aW9ucyBpbiBRZW11DQo+ID4gYW5kIElPTU1VIGRyaXZlciBzaWRlPz4NCj4gPiBU
-YWtlIFZULWQgZm9yIGV4YW1wbGUuIEJlbG93IGlzIGEgc3VtbWFyeSBvZiBhbGwgcG9zc2libGUg
-c2VsZWN0aW9ucw0KPiBhcm91bmQNCj4gPiBpbnZhbGlkYXRpb24gb2YgMXN0IGxldmVsIHN0cnVj
-dHVyZSBmb3Igc3ZtOg0KPiA+DQo+ID4gU2NvcGU6IEFsbCBQQVNJRHMsIHNpbmdsZSBQQVNJRA0K
-PiA+IGZvciBlYWNoIFBBU0lEOg0KPiA+IAlhbGwgbWFwcGluZ3MsIG9yIHBhZ2Utc2VsZWN0aXZl
-IG1hcHBpbmdzIChhZGRyLCBzaXplKQ0KPiA+IGludmFsaWRhdGlvbiB0YXJnZXQ6DQo+ID4gCUlP
-VExCIGVudHJpZXMgKGxlYWYpDQo+ID4gCXBhZ2luZyBzdHJ1Y3R1cmUgY2FjaGUgKG5vbi1sZWFm
-KQ0KPiANCj4gSSdtIGN1cmlvdXMsIGNhbiB5b3UgaW52YWxpZGF0ZSBhbGwgaW50ZXJtZWRpYXRl
-IHBhZ2luZyBzdHJ1Y3R1cmVzIGZvciBhDQo+IGdpdmVuIFBBU0lEIHdpdGhvdXQgaW52YWxpZGF0
-aW5nIHRoZSBsZWF2ZXM/DQoNCkkgZG9uJ3QgdGhpbmsgc28uIHVzdWFsbHkgSU9UTEIgZmx1c2gg
-aXMgdGhlIGJhc2UuIG9uZSBjYW4gZnVydGhlcg0Kc3BlY2lmeSB3aGV0aGVyIGZsdXNoIHNob3Vs
-ZCBhcHBseSB0byBub24tbGVhdmVzLg0KDQpUaGFua3MNCktldmluDQo=
+On Tue, 4 Jul 2017, Igor Druzhinin wrote:
+> Dummys are simple anonymous mappings that are placed instead
+> of regular foreign mappings in certain situations when we need
+> to postpone the actual mapping but still have to give a
+> memory region to QEMU to play with.
+> 
+> This is planned to be used for restore on Xen.
+> 
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+
+
+> ---
+>  hw/i386/xen/xen-mapcache.c | 40 ++++++++++++++++++++++++++++++++--------
+>  1 file changed, 32 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+> index e60156c..cd4e746 100644
+> --- a/hw/i386/xen/xen-mapcache.c
+> +++ b/hw/i386/xen/xen-mapcache.c
+> @@ -53,6 +53,8 @@ typedef struct MapCacheEntry {
+>      uint8_t *vaddr_base;
+>      unsigned long *valid_mapping;
+>      uint8_t lock;
+> +#define XEN_MAPCACHE_ENTRY_DUMMY (1 << 0)
+> +    uint8_t flags;
+>      hwaddr size;
+>      struct MapCacheEntry *next;
+>  } MapCacheEntry;
+> @@ -150,7 +152,8 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
+>  
+>  static void xen_remap_bucket(MapCacheEntry *entry,
+>                               hwaddr size,
+> -                             hwaddr address_index)
+> +                             hwaddr address_index,
+> +                             bool dummy)
+>  {
+>      uint8_t *vaddr_base;
+>      xen_pfn_t *pfns;
+> @@ -177,11 +180,27 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+>          pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
+>      }
+>  
+> -    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
+> -                                      nb_pfn, pfns, err);
+> -    if (vaddr_base == NULL) {
+> -        perror("xenforeignmemory_map");
+> -        exit(-1);
+> +    if (!dummy) {
+> +        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
+> +                                           PROT_READ|PROT_WRITE,
+> +                                           nb_pfn, pfns, err);
+> +        if (vaddr_base == NULL) {
+> +            perror("xenforeignmemory_map");
+> +            exit(-1);
+> +        }
+> +        entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
+> +    } else {
+> +        /*
+> +         * We create dummy mappings where we are unable to create a foreign
+> +         * mapping immediately due to certain circumstances (i.e. on resume now)
+> +         */
+> +        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
+> +                          MAP_ANON|MAP_SHARED, -1, 0);
+> +        if (vaddr_base == NULL) {
+> +            perror("mmap");
+> +            exit(-1);
+> +        }
+> +        entry->flags |= XEN_MAPCACHE_ENTRY_DUMMY;
+>      }
+>  
+>      entry->vaddr_base = vaddr_base;
+> @@ -211,6 +230,7 @@ static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
+>      hwaddr cache_size = size;
+>      hwaddr test_bit_size;
+>      bool translated = false;
+> +    bool dummy = false;
+>  
+>  tryagain:
+>      address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
+> @@ -262,14 +282,14 @@ tryagain:
+>      if (!entry) {
+>          entry = g_malloc0(sizeof (MapCacheEntry));
+>          pentry->next = entry;
+> -        xen_remap_bucket(entry, cache_size, address_index);
+> +        xen_remap_bucket(entry, cache_size, address_index, dummy);
+>      } else if (!entry->lock) {
+>          if (!entry->vaddr_base || entry->paddr_index != address_index ||
+>                  entry->size != cache_size ||
+>                  !test_bits(address_offset >> XC_PAGE_SHIFT,
+>                      test_bit_size >> XC_PAGE_SHIFT,
+>                      entry->valid_mapping)) {
+> -            xen_remap_bucket(entry, cache_size, address_index);
+> +            xen_remap_bucket(entry, cache_size, address_index, dummy);
+>          }
+>      }
+>  
+> @@ -282,6 +302,10 @@ tryagain:
+>              translated = true;
+>              goto tryagain;
+>          }
+> +        if (!dummy && runstate_check(RUN_STATE_INMIGRATE)) {
+> +            dummy = true;
+> +            goto tryagain;
+> +        }
+>          trace_xen_map_cache_return(NULL);
+>          return NULL;
+>      }
+> -- 
+> 2.7.4
+> 
