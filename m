@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSm78-00084K-EW
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:21:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dSm88-00009V-9U
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSm73-0007kT-Gt
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:21:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45656)
+	(envelope-from <pbonzini@redhat.com>) id 1dSm83-00083t-Bl
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:22:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSm73-0007kN-AT
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:21:09 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSm83-00083j-4x
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:22:11 -0400
 References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
-	<20170621153424.16690-3-vsementsov@virtuozzo.com>
-	<695de534-7f65-c6cc-00ac-4d35e3eb6e7d@redhat.com>
-	<a0dae7c7-f0e8-2c6b-e35e-096f597c40cb@virtuozzo.com>
+	<20170621153424.16690-6-vsementsov@virtuozzo.com>
+	<41d055f4-1952-fbd8-7cc2-fe377b3c9d7d@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0fec8f79-5d1e-307e-6f34-0f2152a6a4ca@redhat.com>
-Date: Wed, 5 Jul 2017 17:21:02 +0200
+Message-ID: <3cd91c92-71d3-2c84-53d9-b6cc9da9d45c@redhat.com>
+Date: Wed, 5 Jul 2017 17:21:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <a0dae7c7-f0e8-2c6b-e35e-096f597c40cb@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: use errp instead of LOG
+In-Reply-To: <41d055f4-1952-fbd8-7cc2-fe377b3c9d7d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rrUHqiCcRfdXxHvf3SsQCXisnIx9IV5SW"
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] nbd/client: refactor TRACE of
+ NBD_MAGIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, den@openvz.org, Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, den@openvz.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rrUHqiCcRfdXxHvf3SsQCXisnIx9IV5SW
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, den@openvz.org
+Message-ID: <3cd91c92-71d3-2c84-53d9-b6cc9da9d45c@redhat.com>
+Subject: Re: [PATCH v2 5/6] nbd/client: refactor TRACE of NBD_MAGIC
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+ <20170621153424.16690-6-vsementsov@virtuozzo.com>
+ <41d055f4-1952-fbd8-7cc2-fe377b3c9d7d@redhat.com>
+In-Reply-To: <41d055f4-1952-fbd8-7cc2-fe377b3c9d7d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
 
-On 05/07/2017 14:33, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> 
->>> -static int GCC_FMT_ATTR(4, 5)
->>> +static int GCC_FMT_ATTR(5, 6)
->>>   nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
->>> -                           uint32_t opt, const char *fmt, ...)
->>> +                           uint32_t opt, Error **errp, const char
->>> *fmt, ...)
->>>   {
->> Markus, this violates our usual idiom of errp last in code that is not
->> directly operating on an Error (the actual Error implementation in
->> error.c being the main obvious exception that lists errp first), but I
->> don't see any better approach. Do you have any thoughts on it?
+On 29/06/2017 21:36, Eric Blake wrote:
+>> +    memcpy(&nbd_magic, buf, 8);
+>> +    nbd_magic =3D be64_to_cpu(nbd_magic);
+> Do we really need to copy the memory around twice?  Can't we just use:
+>  magic =3D ldq_be_p(buf);
+> and call it good?
 
-I think it's okay as it matches functions like vfprintf.
+Yes.
 
 Paolo
+
+
+--rrUHqiCcRfdXxHvf3SsQCXisnIx9IV5SW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlldBBcACgkQv/vSX3jH
+roOG3gf+LLkjUl6DCEbAX9ez/+Qmus6vVXts4PAgRAhdSGzpVksoSn0evSLDkTBJ
+X3xKS1EDjf6Cn7Y8D4Rmza1lHD+JcIRg//ViuBG5aEwuLzkeURNsmwqX8R+l3Tf0
+GAOSoouvfalMjpv62dQPbtVvSn+Qr2EduM4uXdl3PKwHgGRHkywMdBS179fCQQEh
+FsSqp8X4lWNmQIzkgRMJIfYjF2A4UxPuJ++QE+MC618Q/hz/ynUkFcCJZuAxwtds
+4m1SxP/ZfeeHTKhYaXurDU4zlPljE+z8keIH72/PXlR9cQ16n9qWklvU7Dbha3gt
+IAPV44xGJ6Fgx5odTf3QiY5iPAo/YA==
+=U798
+-----END PGP SIGNATURE-----
+
+--rrUHqiCcRfdXxHvf3SsQCXisnIx9IV5SW--
