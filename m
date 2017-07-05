@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSsIi-00008H-DI
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:57:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSsLW-00026T-2T
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:00:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSsIf-0006AC-Qn
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:57:36 -0400
-Received: from mail-wr0-f174.google.com ([209.85.128.174]:35629)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSsIf-00069v-KR
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:57:33 -0400
-Received: by mail-wr0-f174.google.com with SMTP id k67so2926029wrc.2
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 14:57:33 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-References: <20170629132749.997-1-pbonzini@redhat.com>
-Message-ID: <c4d2c1cc-b6ae-c001-904c-bc7282e00465@redhat.com>
-Date: Wed, 5 Jul 2017 23:57:29 +0200
+	(envelope-from <eblake@redhat.com>) id 1dSsLV-0006vZ-43
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:00:30 -0400
+References: <20170703221456.30817-1-eblake@redhat.com>
+	<20170703221456.30817-2-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <04a2947d-183a-35a4-e235-6cecd64d9a42@redhat.com>
+Date: Wed, 5 Jul 2017 17:00:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170629132749.997-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/11] Block layer
- thread-safety, part 2
+In-Reply-To: <20170703221456.30817-2-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TkFKsxkNal4qLqbGGTxaSkKFSkrrQjN3K"
+Subject: Re: [Qemu-devel] [PATCH v2 01/15] block: add default
+ implementations for bdrv_co_get_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +26,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, el13635@mail.ntua.gr, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
 
-On 29/06/2017 15:27, Paolo Bonzini wrote:
-> This part takes care of drivers and devices, making sure that they can
-> accept concurrent I/O from multiple AioContext.
-> 
-> The following drivers are thread-safe without using any QemuMutex/CoMutex:
-> crypto, gluster, null, rbd, win32-aio.  NBD has already been fixed,
-> because the patch fixed an unrelated testcase.
-> 
-> The following drivers already use mutexes for everything except possibly
-> snapshots, which do not (yet?) need protection: bochs, cloop, dmg, qcow,
-> parallels, vhdx, vmdk, curl, iscsi, nfs.
-> 
-> The following drivers already use mutexes for _almost_ everything: vpc
-> (missing get_block_status), vdi (missing bitmap access), vvfat (missing
-> commit), not protected), qcow2 (must call CoQueue APIs under CoMutex).
-> They are fixed by patches 1-5.
-> 
-> The following drivers must be changed to use CoMutex to protect internal
-> data: qed (patches 6-9), sheepdog (patch 10).
-> 
-> The following driver must be changed to support I/O from any AioContext:
-> ssh.  It is fixed by patch 11.
-> 
-> Paolo
-> 
-> v1->v2: new patch 8 + adjustments to patch 9 to fix qemu-iotests testcase
->         183 (bdrv_invalidate_cache from block migration)
-> 
-> Paolo Bonzini (11):
->   qcow2: call CoQueue APIs under CoMutex
->   coroutine-lock: add qemu_co_rwlock_downgrade and
->     qemu_co_rwlock_upgrade
->   vdi: make it thread-safe
->   vpc: make it thread-safe
->   vvfat: make it thread-safe
->   qed: move tail of qed_aio_write_main to qed_aio_write_{cow,alloc}
->   block: invoke .bdrv_drain callback in coroutine context and from
->     AioContext
->   qed: introduce bdrv_qed_init_state
->   qed: protect table cache with CoMutex
->   sheepdog: add queue_lock
->   ssh: support I/O from any AioContext
-> 
->  block/io.c                 |  42 +++++++--
->  block/qcow2.c              |   4 +-
->  block/qed-cluster.c        |   4 +-
->  block/qed-l2-cache.c       |   6 ++
->  block/qed-table.c          |  24 +++--
->  block/qed.c                | 214 ++++++++++++++++++++++++++++-----------------
->  block/qed.h                |  11 ++-
->  block/sheepdog.c           |  21 ++++-
->  block/ssh.c                |  24 +++--
->  block/vdi.c                |  48 +++++-----
->  block/vpc.c                |  20 ++---
->  block/vvfat.c              |   8 +-
->  include/block/block_int.h  |   2 +-
->  include/qemu/coroutine.h   |  18 ++++
->  util/qemu-coroutine-lock.c |  35 ++++++++
->  15 files changed, 331 insertions(+), 150 deletions(-)
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TkFKsxkNal4qLqbGGTxaSkKFSkrrQjN3K
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
+ el13635@mail.ntua.gr, Jeff Cody <jcody@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ jsnow@redhat.com
+Message-ID: <04a2947d-183a-35a4-e235-6cecd64d9a42@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/15] block: add default implementations
+ for bdrv_co_get_block_status()
+References: <20170703221456.30817-1-eblake@redhat.com>
+ <20170703221456.30817-2-eblake@redhat.com>
+In-Reply-To: <20170703221456.30817-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/03/2017 05:14 PM, Eric Blake wrote:
+> From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>=20
+> bdrv_co_get_block_status_from_file() and
+> bdrv_co_get_block_status_from_backing() set *file to bs->file and
+> bs->backing respectively, so that bdrv_co_get_block_status() can recurs=
+e
+> to them. Future block drivers won't have to duplicate code to implement=
+
+> this.
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> Message-Id: <20170629184320.7151-4-el13635@mail.ntua.gr>
+>=20
+
+Missing my Signed-off-by if we take this one in isolation through my
+series, and still awaiting resolution on what will happen to the rest of
+his series (v3 had some valid review comments that still need addressing)=
 
 
-ping?
+> ---
+> v2: Including this patch from Manos, since it affects my later patches;=
 
-Paolo
+> however, I anticipate that we will get a full v3 series from Manos
+> merged first
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--TkFKsxkNal4qLqbGGTxaSkKFSkrrQjN3K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZXWFrAAoJEKeha0olJ0NqrMQH/jDD0k7cOWfaDoFYSjb/D0k/
+mxEZJjNH51OlFwfbJQVJX31clCv07WegGvfeu+qlzgUjFP+TddPJ5FlLHpik3Z8Q
+pTXyMp1ko6Wqhnb5YBPF6hCQHa6O1iDi6DcvIHuK6abSzDFoKkZoW0S+oAbOea12
+BbkKy6N3+o97Ib5/LSm4oTREvM2dGCFlz3JOIdZPgQPm0+WxmXSdUznEfo4QQYRy
+n1IhV2O9/3ewEXUudi78k1KWNmJbXsv9OZV4ZV6+oBJVo+ppGT/KLtX35SYTfm5l
+obS4Z1elt0urk+8IFUEmuNK1WrNBkwnaEhZiOWp34EXP8X3AZsGIbmWSAg+PtCI=
+=T/tY
+-----END PGP SIGNATURE-----
+
+--TkFKsxkNal4qLqbGGTxaSkKFSkrrQjN3K--
