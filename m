@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dSghQ-0005OG-1m
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:34:21 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dSgol-0007FO-5Z
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dSghO-0003Ru-Vf
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:34:20 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:32962)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dSghO-0003RR-OI
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:34:18 -0400
-Received: by mail-lf0-x241.google.com with SMTP id t72so20239673lff.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 02:34:18 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1dSgoi-0006iO-17
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:41:55 -0400
+References: <149924459296.25523.6693809356627708668.stgit@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <4d2505f5-ee00-7cb3-4933-a7be8c82fb14@redhat.com>
+Date: Wed, 5 Jul 2017 11:41:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <87a84jfob1.fsf@dusky.pond.sub.org>
-References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
-	<87a84jfob1.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 5 Jul 2017 11:34:16 +0200
-Message-ID: <CAJ+F1C+j-=E2TKU+WGwXhqXKm5NHMiLDsKwuS8Um3ihSqzOyhA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/35] RFC: coroutine annotations & clang
- check
+In-Reply-To: <149924459296.25523.6693809356627708668.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ppc/kvm: have the "family" CPU alias to
+ point to TYPE_HOST_POWERPC_CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi
+On 05/07/2017 10:49, Greg Kurz wrote:
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index f2f7c531bc7b..f7a7ea5858a3 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2445,6 +2445,7 @@ static int kvm_ppc_register_host_cpu_type(void)
+>          .class_init = kvmppc_host_cpu_class_init,
+>      };
+>      PowerPCCPUClass *pvr_pcc;
+> +    ObjectClass *oc;
+>      DeviceClass *dc;
+>      int i;
+>  
+> @@ -2455,6 +2456,9 @@ static int kvm_ppc_register_host_cpu_type(void)
+>      type_info.parent = object_class_get_name(OBJECT_CLASS(pvr_pcc));
+>      type_register(&type_info);
+>  
+> +    oc = object_class_by_name(type_info.name);
+> +    g_assert(oc);
+> +
+>  #if defined(TARGET_PPC64)
+>      type_info.name = g_strdup_printf("%s-"TYPE_SPAPR_CPU_CORE, "host");
+>      type_info.parent = TYPE_SPAPR_CPU_CORE,
+> @@ -2474,7 +2478,6 @@ static int kvm_ppc_register_host_cpu_type(void)
+>      dc = DEVICE_CLASS(ppc_cpu_get_family_class(pvr_pcc));
+>      for (i = 0; ppc_cpu_aliases[i].alias != NULL; i++) {
+>          if (strcmp(ppc_cpu_aliases[i].alias, dc->desc) == 0) {
+> -            ObjectClass *oc = OBJECT_CLASS(pvr_pcc);
+>              char *suffix;
+>  
+>              ppc_cpu_aliases[i].model = g_strdup(object_class_get_name(oc));
+> 
 
-On Wed, Jul 5, 2017 at 7:26 AM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Hi,
-> >
-> > After investigating a bit using clang-tidy to do some coroutine checks
-> > (and hitting a wall as there are no pre-processor info in the AST), it
-> > was suggested to me on the clang mailing list to try to use
-> > -Wthread-safety. I had to modify clang a bit to make it work on qemu
-> > code base (annotations on function typedef etc,
-> > https://github.com/elmarco/clang qemu-ta branch - very hackish state).
->
-> Hardcore!
+A far better solution :)
 
-I think the most hardcore part is experimenting with clang code base,
-modifying a line, and waiting 10 minutes for the linker (and restart
-it if it crashed!). This slows down progress and kill motivation. (so
-happy qemu is written in C :)
-
->
-> Are your clang modifications upstreamable once cleaned up?
-
-I am trying to get some help on clang mailing list, but it is very far
-from this point without it. My changes are gross (but it seems to do
-the job..).
-
-I would be also curious to know how hard a similar (only for this
-purpose) check could be implemented for gcc, perhaps with plugins.
-
->
-> > The analysis simply checks that coroutine_fn are called from a
-> > coroutine "context" (or "role"). I couldn't find any misuse in qemu
-> > code base, however, a number of coroutine_fn annotations are missing.
-> >
-> > (I think it would make sense to squash all the "mark coroutine_fn"
-> > commits if we apply them, I tried to split them by domains/maintainer
-> > to ease review)
-> [...]
-> >  49 files changed, 299 insertions(+), 132 deletions(-)
->
-> "A number of coroutine_fn annotations are missing" seems to be an
-> understatement :)
->
+Tested-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
