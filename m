@@ -1,10 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dSjd4-0006RR-4t
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:42:08 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1dSjdK-0006d2-9A
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:42:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dSjd3-0005ze-0G
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:42:02 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1dSjdJ-00062r-EK
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:42:18 -0400
 References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
 	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
 	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
@@ -12,12 +12,14 @@ References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
 	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
 	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
 	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
+	<5f47e723-1d3e-433b-cdaf-a56d16ba377e@redhat.com>
+	<d4277d93-d29d-7150-7962-bdfdd1c2a275@arm.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D25B77@SHSMSX101.ccr.corp.intel.com>
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <19a85866-1e72-58b9-d120-8b5e5b809e90@arm.com>
-Date: Wed, 5 Jul 2017 13:44:33 +0100
+Message-ID: <311754cd-a4cf-7bf4-4099-a81e63402137@arm.com>
+Date: Wed, 5 Jul 2017 13:44:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D25B77@SHSMSX101.ccr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -30,85 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Tian, Kevin" <kevin.tian@intel.com>, Auger Eric <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "wei@redhat.com" <wei@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-On 05/07/17 08:14, Tian, Kevin wrote:
+On 05/07/17 08:25, Tian, Kevin wrote:
 >> From: Jean-Philippe Brucker [mailto:jean-philippe.brucker@arm.com]
->> Sent: Monday, June 19, 2017 6:15 PM
+>> Sent: Tuesday, June 27, 2017 12:13 AM
 >>
->> On 19/06/17 08:54, Bharat Bhushan wrote:
->>> Hi Eric,
+>> On 26/06/17 09:22, Auger Eric wrote:
+>>> Hi Jean-Philippe,
 >>>
->>> I started added replay in virtio-iommu and came across how MSI interrupts
->> with work with VFIO.
->>> I understand that on intel this works differently but vsmmu will have same
->> requirement.
->>> kvm-msi-irq-route are added using the msi-address to be translated by
+>>> On 19/06/2017 12:15, Jean-Philippe Brucker wrote:
+>>>> On 19/06/17 08:54, Bharat Bhushan wrote:
+>>>>> Hi Eric,
+>>>>>
+>>>>> I started added replay in virtio-iommu and came across how MSI
+>> interrupts with work with VFIO.
+>>>>> I understand that on intel this works differently but vsmmu will have
+>> same requirement.
+>>>>> kvm-msi-irq-route are added using the msi-address to be translated by
 >> viommu and not the final translated address.
->>> While currently the irqfd framework does not know about emulated
+>>>>> While currently the irqfd framework does not know about emulated
 >> iommus (virtio-iommu, vsmmuv3/vintel-iommu).
->>> So in my view we have following options:
->>> - Programming with translated address when setting up kvm-msi-irq-route
->>> - Route the interrupts via QEMU, which is bad from performance
->>> - vhost-virtio-iommu may solve the problem in long term
+>>>>> So in my view we have following options:
+>>>>> - Programming with translated address when setting up kvm-msi-irq-
+>> route
+>>>>> - Route the interrupts via QEMU, which is bad from performance
+>>>>> - vhost-virtio-iommu may solve the problem in long term
+>>>>>
+>>>>> Is there any other better option I am missing?
+>>>>
+>>>> Since we're on the topic of MSIs... I'm currently trying to figure out how
+>>>> we'll handle MSIs in the nested translation mode, where the guest
+>> manages
+>>>> S1 page tables and the host doesn't know about GVA->GPA translation.
 >>>
->>> Is there any other better option I am missing?
+>>> I have a question about the "nested translation mode" terminology. Do
+>>> you mean in that case you use stage 1 + stage 2 of the physical IOMMU
+>>> (which the ARM spec normally advises or was meant for) or do you mean
+>>> stage 1 implemented in vIOMMU and stage 2 implemented in pIOMMU. At
+>> the
+>>> moment my understanding is for VFIO integration the pIOMMU uses a
+>> single
+>>> stage combining both the stage 1 and stage2 mappings but the host is not
+>>> aware of those 2 stages.
 >>
->> Since we're on the topic of MSIs... I'm currently trying to figure out how
->> we'll handle MSIs in the nested translation mode, where the guest manages
->> S1 page tables and the host doesn't know about GVA->GPA translation.
->>
->> I'm also wondering about the benefits of having SW-mapped MSIs in the
->> guest. It seems unavoidable for vSMMU since that's what a physical system
->> would do. But in a paravirtualized solution there doesn't seem to be any
->> compelling reason for having the guest map MSI doorbells. These addresses
->> are never accessed directly, they are only used for setting up IRQ routing
->> (at least on kvmtool). So here's what I'd like to have. Note that I
->> haven't investigated the feasibility in Qemu yet, I don't know how it
->> deals with MSIs.
->>
->> (1) Guest uses the guest-physical MSI doorbell when setting up MSIs. For
->> ARM with GICv3 this would be GITS_TRANSLATER, for x86 it would be the
->> fixed MSI doorbell. This way the host wouldn't need to inspect IOMMU
->> mappings when handling writes to PCI MSI-X tables.
+>> Yes at the moment the VMM merges stage-1 (GVA->GPA) from the guest with
+>> its stage-2 mappings (GPA->HPA) and creates a stage-2 mapping (GVA->HPA)
+>> in the pIOMMU via VFIO_IOMMU_MAP_DMA. stage-1 is disabled in the
+>> pIOMMU.
 >>
 > 
-> What do you mean by "fixed MSI doorbell"? PCI MSI-X table is part of
-> PCI MMIO bar. Accessing to it is just a memory virtualization issue (e.g.
-> trap by KVM and then emulated in Qemu) on x86. It's not a IOMMU
-> problem. I guess you may mean same thing but want to double confirm
-> here given the terminology confusion. Or do you mean the interrupt
-> triggered by IOMMU itself?
+> Curious whether you are describing current smmu status or general
+> vIOMMU status also applying to other vendors...
 
-Yes I didn't mean access to the MSI-X table, but how we interpret the
-address in the MSI message. In kvmtool I create MSI routes for VFIO
-devices when the guest accesses the MSI-X tables. And on ARM the tables
-contains an IOVA that needs to be translated into a PA, so handling a
-write to an MSI-X entry might mean doing the IOVA->PA translation of the
-doorbell.
-
-On x86 the MSI address is 0xfee...., whether there is an IOMMU or not.
-That's what I meant by fixed. And it is the IOMMU that performs IRQ remapping.
-
-On physical ARM systems, the SMMU doesn't treat any special address range
-as "MSI window". For the SMMU, an MSI is simply a memory transaction. MSI
-addresses are arbitrary IOVAs that get translated into PAs by the SMMU.
-The SMMU doesn't perform any IRQ remapping, only address translation. This
-PA is a doorbell register in the irqchip, which performs IRQ remapping and
-triggers an interrupt.
-
-Therefore in an emulated ARM system, when the guest writes the MSI-X
-table, it writes an IOVA. In a strict emulation the MSI would have to
-first go through the vIOMMU, and then into the irqchip. I was wondering if
-with virtio-iommu we could skip the address translation and go to the MSI
-remapping component immediately, effectively implementing a "hardware MSI
-window". This is what x86 does, the difference being that MSI remapping is
-done by the IOMMU on x86, and by the irqchip on ARM.
-
-My current take is that we should keep the current behavior, but I will
-try to sort out the different ways of implementing MSIs with virtio-iommu
-in the next specification draft.
+This particular paragraph was about the non-SVM state of things. The rest
+was about stage-1 + stage-2 (what I call nested), which would indeed be
+required for SVM. I don't think SVM can work with software merging.
 
 Thanks,
 Jean
+
+> the usage what you described is about svm, while svm requires PASID.
+> At least PASID is tied to stage-1 on Intel VT-d. Only DMA w/o PASID
+> or nested translation from stage-1 will go through stage-2. Unless
+> ARM smmu has a completely different implementation, I'm not sure
+> how svm can be virtualized w/ stage-1 translation disabled. There
+> are multiple stage-1 page tables while only one stage-2 page table per
+> device. Could merging actually work here?
+> 
+> The only case with merging happen today is for guest stage-2 usage
+> or so-called GIOVA usage. Guest programs GIOVA->GPA to vIOMMU 
+> stage-2. Then vIOMMU invokes vfio map/unmap APIs to translate/
+> merge to GIOVA->HPA to pIOMMU stage-2. Maybe what you
+> actually meant is this one?
+> 
+> Thanks
+> Kevin
+> 
