@@ -1,31 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dSY97-0004mp-7g
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 20:26:22 -0400
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSZYd-0006TG-Dh
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 21:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dSY94-00008w-3b
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 20:26:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dSY93-00007o-TT
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 20:26:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D5D393B703
-	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 00:26:16 +0000 (UTC)
-References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
-	<20170629132310.18865-8-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <646ec17e-4baa-66b9-f54b-0ca840303fe6@redhat.com>
-Date: Wed, 5 Jul 2017 02:26:12 +0200
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSZYZ-00010p-Rf
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 21:56:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39522
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1dSZYZ-00010j-LV
+	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 21:56:43 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v651rfKo122823
+	for <qemu-devel@nongnu.org>; Tue, 4 Jul 2017 21:56:42 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bgapu5df5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jul 2017 21:56:42 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Tue, 4 Jul 2017 21:56:41 -0400
+References: <20170704132350.11874-1-haoqf@linux.vnet.ibm.com>
+	<20170704132350.11874-2-haoqf@linux.vnet.ibm.com>
+	<1c49923a-e493-9faf-d642-a48aeb8bf3ad@de.ibm.com>
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Date: Wed, 5 Jul 2017 09:56:30 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170629132310.18865-8-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <1c49923a-e493-9faf-d642-a48aeb8bf3ad@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <582ef3b8-0762-1581-4589-af75b5435841@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 7/7] MAINTAINERS: add Dump maintainers
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] virtio-scsi-ccw: use ioeventfd even
+ when KVM is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +44,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, anderson@redhat.com, imammedo@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, zyimin@linux.vnet.ibm.com, famz@redhat.com, cohuck@redhat.com, peterx@redhat.com, stefanha@redhat.com
 
-On 06/29/17 15:23, Marc-Andr=C3=A9 Lureau wrote:
-> Proposing myself, since I have some familiarity with the code now.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  MAINTAINERS | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 839f7ca063..45a0eb4cb0 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1272,6 +1272,13 @@ S: Maintained
->  F: device_tree.c
->  F: include/sysemu/device_tree.h
-> =20
-> +Dump
-> +S: Supported
-> +M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> +F: dump.c
-> +F: include/sysemu/dump.h
-> +F: include/sysemu/dump-arch.h
-> +
->  Error reporting
->  M: Markus Armbruster <armbru@redhat.com>
->  S: Supported
->=20
 
-That's very kind of you, thanks!
 
-Do you have suggestions for the following files?
+=E5=9C=A8 2017/7/4 22:04, Christian Borntraeger =E5=86=99=E9=81=93:
+> On 07/04/2017 03:23 PM, QingFeng Hao wrote:
+>> This patch is based on a similar patch from Stefan Hajnoczi -
+>> commit c324fd0a39c ("virtio-pci: use ioeventfd even when KVM is disabl=
+ed")
+>>
+>> Do not check kvm_eventfds_enabled() when KVM is disabled since it
+>> always returns 0.  Since commit 8c56c1a592b5092d91da8d8943c17777d6462a=
+6f
+>> ("memory: emulate ioeventfd") it has been possible to use ioeventfds i=
+n
+>> qtest or TCG mode.
+>>
+>> This patch makes -device virtio-scsi-ccw,iothread=3Diothread0 work eve=
+n
+>> when KVM is disabled.
+>> Currently we don't have an equivalent to "memory: emulate ioeventfd"
+>> for ccw yet, but that this doesn't hurt and qemu-iotests 068 can pass =
+with
+>> skipping iothread arguments.
+>>
+>> I have tested that virtio-scsi-ccw works under tcg both with and witho=
+ut
+>> iothread.
+>>
+>> This patch fixes qemu-iotests 068, which was accidentally merged early
+>> despite the dependency on ioeventfd.
+>>
+>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> I will take it via the s390-next tree.
+>
+> thanks applied.
+Ok, thanks.
+>> ---
+>>   hw/s390x/virtio-ccw.c | 2 +-
+>>   target/s390x/cpu.h    | 6 +++++-
+>>   2 files changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+>> index 90d37cb9ff..35896eb007 100644
+>> --- a/hw/s390x/virtio-ccw.c
+>> +++ b/hw/s390x/virtio-ccw.c
+>> @@ -711,7 +711,7 @@ static void virtio_ccw_device_realize(VirtioCcwDev=
+ice *dev, Error **errp)
+>>           sch->cssid, sch->ssid, sch->schid, sch->devno,
+>>           ccw_dev->devno.valid ? "user-configured" : "auto-configured"=
+);
+>>
+>> -    if (!kvm_eventfds_enabled()) {
+>> +    if (kvm_enabled() && !kvm_eventfds_enabled()) {
+>>           dev->flags &=3D ~VIRTIO_CCW_FLAG_USE_IOEVENTFD;
+>>       }
+>>
+>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>> index 9faca04b52..bdb9bdbc9d 100644
+>> --- a/target/s390x/cpu.h
+>> +++ b/target/s390x/cpu.h
+>> @@ -1264,7 +1264,11 @@ static inline int s390_assign_subch_ioeventfd(E=
+ventNotifier *notifier,
+>>                                                 uint32_t sch_id, int v=
+q,
+>>                                                 bool assign)
+>>   {
+>> -    return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, assi=
+gn);
+>> +    if (kvm_enabled()) {
+>> +        return kvm_s390_assign_subch_ioeventfd(notifier, sch_id, vq, =
+assign);
+>> +    } else {
+>> +        return 0;
+>> +    }
+>>   }
+>>
+>>   static inline void s390_crypto_reset(void)
+>>
 
-scripts/dump-guest-memory.py
-stubs/dump.c
-target/arm/arch_dump.c
-target/i386/arch_dump.c
-target/ppc/arch_dump.c
-target/s390x/arch_dump.c
-
-(If not, I'm OK with that too.)
-
-Thanks!
-Laszlo
+--=20
+Regards
+QingFeng Hao
