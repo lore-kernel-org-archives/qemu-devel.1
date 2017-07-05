@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1dSmpB-0005gc-H4
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:06:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dSmpJ-0005m4-Ox
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:06:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1dSmpA-0004zo-L3
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:06:45 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38601)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1dSmpA-0004zA-E1
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:06:44 -0400
-Received: by mail-wm0-x231.google.com with SMTP id f67so117970649wmh.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 09:06:44 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dSmpE-00051T-2z
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:06:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dSmpD-000515-ST
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 12:06:48 -0400
+Date: Wed, 5 Jul 2017 17:06:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170705160640.GB2284@work-vm>
+References: <CAGKXQyfO-yu3qZf7RHiUPXQZDSZwn6N_48Ji8adPHozkpK9JBQ@mail.gmail.com>
+	<20170630112610.GA2437@work-vm>
+	<20170705151030.GF29910@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20170608184944.19406-1-mrolnik@gmail.com>
-	<CAK4993hiFSozkL-5B0gud-nPVFqcvP2mgBR1Rk1vQSmhts3fGQ@mail.gmail.com>
-	<7103e7ca-1504-58b0-1f32-aabba7f45792@twiddle.net>
-	<CAK4993j5SEAqySt4VQhXCwAkbU09+4YUfiaw8zypvW3803GJ_A@mail.gmail.com>
-	<517fcd97-6664-025d-dc03-114bc5b49dff@twiddle.net>
-In-Reply-To: <517fcd97-6664-025d-dc03-114bc5b49dff@twiddle.net>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Wed, 05 Jul 2017 16:06:32 +0000
-Message-ID: <CAK4993i8TtWvyZw2-fcPJD3KU2mNKgi47HUmDOGYv7MnMhsYXA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH RFC v19 00/13] QEMU AVR 8 bit cores
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170705151030.GF29910@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] DIRTY_MEMORY_BLOCK_SIZE;
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Anichang <anichang@protonmail.ch>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org
 
-No, I can't. I did not build any peripherals. I expect other people to join
-for this task.
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> On Fri, Jun 30, 2017 at 12:26:10PM +0100, Dr. David Alan Gilbert wrote:
+> > * ali saeedi (ali.saeedi56@gmail.com) wrote:
+> > > Hello
+> > > what does 'DIRTY_MEMORY_BLOCK_SIZE' mean?
+> > > is it the number of words in a block? or number of pages in a block? or
+> > > number of bytes in a block?
+> > > thanks a lot
+> > 
+> > (cc'ing Stefan)
+> > I think that DIRTY_MEMORY_BLOCK_SIZE is the number of TARGET_PAGEs
+> > within one DIRTY_MEMORY_BLOCK
+> > So with the common 4k target page that's 4k*256k*8=8GB/dirty memory
+> > block - note these are just the size of structure sin qemu, it's still
+> > got the ranularity ot mark individual target pages as dirty.
+> 
+> Right, the calculation is shown in the comment above the code:
+> 
+>  *   rcu_read_lock();
+>  *
+>  *   DirtyMemoryBlocks *blocks =
+>  *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
+>  *
+>  *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
+>  *   unsigned long *block = blocks.blocks[idx];
+>  *   ...access block bitmap...
+>  *
+>  *   rcu_read_unlock();
+> 
+> Rather than focussing on DIRTY_MEMORY_BLOCK_SIZE, make sure you
+> understand how DirtyMemoryBlocks works.  It is an array of bitmap
+> pointers.
+> 
+> Instead of directly indexing into a single huge dirty memory bitmap,
+> QEMU divides the dirty memory bitmap into fixed-sized chunks.  Each
+> chunk covers DIRTY_MEMORY_BLOCK_SIZE pages.
+> 
+> The reason for this layer of indirection is so that the dirty memory
+> bitmap can be accessed without taking a traditional lock (just RCU) and
+> also supports memory hotplug.
+> 
+> Without indirection it would be difficult to grow the bitmap while other
+> threads are writing to it.  Thanks to the indirection, it's possible to
+> allocate new chunks and continue using the old chunks when growth
+> occurs.
 
-On Wed, Jul 5, 2017, 6:59 PM Richard Henderson <rth@twiddle.net> wrote:
+I guess this works like the old non-chunk version, in that there's no
+direct correspondence between DirtyMemoryBlocks and RAMBlock's - i.e.
+one RAMBlock might span two DirtyMemoryBlocks even if it's smaller
+than DIRTY_MEMORY_BLOCK_SIZE.
 
-> On 07/04/2017 08:34 PM, Michael Rolnik wrote:
-> > Hi Richard.
-> >
-> > Thank you for finding a bug.
-> > As for the testing
-> > 1. I have a small program that calculates fibonacci numbers. I use it to
-> test
-> > mainly stack operations for different CPU flavors (1, 2 or 3 bytes PC).
-> > 2. I manually verified that I can debug with gdb, that includes
-> >      a. stepping
-> >      b. running
-> >      c. stopping
-> >      d. breakpoints
-> >      e. backtrace shows correct stack
-> > 3. I manually verified that I can save and load vm states
-> > 4. `make check` passes
-> >
-> > If you please point me to a doc that explains how automatic unit tests
-> can be
-> > added to a QEMU target, I will happily add them.
->
-> Can you boot an AVR kernel?
->
-> How about the environment that newlib builds with libgloss?  With that
-> you'd be
-> able to run the gcc testsuite, which would be extremely helpful.
->
->
-> r~
->
+Dave
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
