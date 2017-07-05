@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSb1Q-0001XW-ML
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 23:30:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1dScoO-0006zv-C3
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSb1M-0006LS-MJ
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 23:30:36 -0400
-Received: from [59.151.112.132] (port=50388 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSb1L-0006GP-MN
-	for qemu-devel@nongnu.org; Tue, 04 Jul 2017 23:30:32 -0400
-References: <cover.1498727785.git.maozy.fnst@cn.fujitsu.com>
-	<943a835da22f8e4edc549d0c1b85da5b12e65ed4.1498727785.git.maozy.fnst@cn.fujitsu.com>
-	<87o9t0jhli.fsf@dusky.pond.sub.org>
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Message-ID: <31942b7a-85c0-3735-c53b-bab9262783e7@cn.fujitsu.com>
-Date: Wed, 5 Jul 2017 11:30:08 +0800
+	(envelope-from <armbru@redhat.com>) id 1dScoK-00079X-Dr
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:25:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dScoK-00078P-87
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 01:25:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D9B94E4CA
+	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 05:25:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
+Date: Wed, 05 Jul 2017 07:25:06 +0200
+In-Reply-To: <20170704220346.29244-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 5 Jul 2017 00:03:11 +0200")
+Message-ID: <87a84jfob1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87o9t0jhli.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 4/4] net/socket: Improve -net socket
- error reporting
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/35] RFC: coroutine annotations & clang
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-
-On 07/05/2017 12:24 AM, Markus Armbruster wrote:
-> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
+> Hi,
 >
->> When -net socket fails, it first reports a specific error, then
->> a generic one, like this:
->>
->>     $ qemu-system-x86_64 -net socket,
->>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->>     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
->>
->> Convert net_socket_*_init() to Error to get rid of the superfluous second
->> error message. After the patch, the effect like this:
->>
->>     $ qemu-system-x86_64 -net socket,
->>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
->>
->> At the same time, add many explicit error handling message when it fails.
->>
->> Cc: jasowang@redhat.com
->> Cc: armbru@redhat.com
->> Cc: berrange@redhat.com
->> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
->> ---
->>  net/socket.c | 94 +++++++++++++++++++++++++++++-------------------------------
->>  1 file changed, 45 insertions(+), 49 deletions(-)
->>
->> diff --git a/net/socket.c b/net/socket.c
->> index bd80b3c..a891c3a 100644
->> --- a/net/socket.c
->> +++ b/net/socket.c
->> @@ -494,22 +494,21 @@ static void net_socket_accept(void *opaque)
->>  static int net_socket_listen_init(NetClientState *peer,
->>                                    const char *model,
->>                                    const char *name,
->> -                                  const char *host_str)
->> +                                  const char *host_str,
->> +                                  Error **errp)
->>  {
->>      NetClientState *nc;
->>      NetSocketState *s;
->>      struct sockaddr_in saddr;
->>      int fd, ret;
->> -    Error *err = NULL;
->>
->> -    if (parse_host_port(&saddr, host_str, &err) < 0) {
->> -        error_report_err(err);
->> +    if (parse_host_port(&saddr, host_str, errp) < 0) {
->>          return -1;
->>      }
->>
->>      fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
->>      if (fd < 0) {
->> -        perror("socket");
->> +        error_setg_errno(errp, errno, "failed to create stream socket");
->>          return -1;
->>      }
->>      qemu_set_nonblock(fd);
->> @@ -518,13 +517,14 @@ static int net_socket_listen_init(NetClientState *peer,
->>
->>      ret = bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
->>      if (ret < 0) {
->> -        perror("bind");
->> +        error_setg_errno(errp, errno, "bind ip=%s to socket failed",
->> +                         inet_ntoa(saddr.sin_addr));
+> After investigating a bit using clang-tidy to do some coroutine checks
+> (and hitting a wall as there are no pre-processor info in the AST), it
+> was suggested to me on the clang mailing list to try to use
+> -Wthread-safety. I had to modify clang a bit to make it work on qemu
+> code base (annotations on function typedef etc,
+> https://github.com/elmarco/clang qemu-ta branch - very hackish state).
+
+Hardcore!
+
+Are your clang modifications upstreamable once cleaned up?
+
+> The analysis simply checks that coroutine_fn are called from a
+> coroutine "context" (or "role"). I couldn't find any misuse in qemu
+> code base, however, a number of coroutine_fn annotations are missing.
 >
-> Comment on the same error message in PATCH 2 applies.
-
-OK, I will fix the similar problems right away.
-
->
->>          closesocket(fd);
->>          return -1;
->>      }
->>      ret = listen(fd, 0);
->>      if (ret < 0) {
->> -        perror("listen");
->> +        error_setg_errno(errp, errno, "listen socket failed");
->
-> Suggest "can't listen on socket".
-
-OK, I will.
-
-
->> -    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
+> (I think it would make sense to squash all the "mark coroutine_fn"
+> commits if we apply them, I tried to split them by domains/maintainer
+> to ease review)
 [...]
->>      if (sock->has_listen) {
->> -        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
->> +        if (net_socket_listen_init(peer, "socket", name,
->> +            sock->listen, errp) == -1) {
->
-> Please avoid breaking the line in the middle of an operator's operand
-> when you could just as well break it at the operator, like this:
->
->            if (net_socket_listen_init(peer, "socket", name, sock->listen, errp)
->                == -1) {
->
-> Since you're touching this line anyway, I suggest to replace == -1 by
-> the more idiomatic < 0.
->
+>  49 files changed, 299 insertions(+), 132 deletions(-)
 
-OK, I see.
-
-Thanks,
-Mao
+"A number of coroutine_fn annotations are missing" seems to be an
+understatement :)
