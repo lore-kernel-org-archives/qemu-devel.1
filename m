@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dSk0C-0004Kx-OJ
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:05:57 -0400
+	(envelope-from <famz@redhat.com>) id 1dSkU8-0004wx-Dc
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dSk09-00073X-G1
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:05:56 -0400
-Date: Wed, 5 Jul 2017 14:05:49 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170705130549.GC1280@stefanha-x1.localdomain>
-References: <20170622121713.27601-1-stefanha@redhat.com>
-	<1e102164-43ce-126f-29f3-228c407391a6@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="QRj9sO5tAVLaXnSD"
-Content-Disposition: inline
-In-Reply-To: <1e102164-43ce-126f-29f3-228c407391a6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] docs: add qemu-block-drivers(7) man page
+	(envelope-from <famz@redhat.com>) id 1dSkU7-0004E6-Ep
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:36:52 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed,  5 Jul 2017 21:36:29 +0800
+Message-Id: <20170705133635.11850-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/6] block: Add VFIO based driver for NVMe
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +18,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, el13635@mail.ntua.gr
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
 
+v3: Rebase, small tweaks/fixes and add locks to provide basic thread safety
+    (basic because it is not really tested).
 
---QRj9sO5tAVLaXnSD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+v2:
+    - Implement "split vfio addr space" appraoch. [Paolo]
+    - Add back 'device reset' in nvme_close(). [Paolo]
+    - Better variable namings. [Stefan]
+    - "Reuse" macro definitions from NVMe emulation code.
+    - Rebase onto current master which has polling by default and update
+      performance results accordingly.
+    - Update MAINTAINERS.
+    - Specify namespace in URI.
+    - The sporadical I/O error from v1 "disappeared" in this version.
+    - Tests one: qemu-img bench, fio, bonnie++ and installation of
+      ubuntu/fedora/rhel on QEMU emulated nvme and a Intel P3700 card.
 
-On Tue, Jun 27, 2017 at 10:20:10AM -0500, Eric Blake wrote:
-> Then again, much of your patch is just code motion, rather than new
-> documentation.  So my comments are probably worth separate patches.
+Fam Zheng (6):
+  stubs: Add stubs for ram block API
+  block: Add VFIO based NVMe driver
+  block: Introduce bdrv_dma_map and bdrv_dma_unmap
+  block/nvme: Implement .bdrv_dma_map and .bdrv_dma_unmap
+  qemu-img: Map bench buffer
+  block: Move NVMe spec definitions to a separate header
 
-Yes, they sound like good improvements to me but beyond the scope of
-this patch, which moves the existing documentation.
+ MAINTAINERS                    |    6 +
+ block/Makefile.objs            |    1 +
+ block/block-backend.c          |   10 +
+ block/io.c                     |   24 +
+ block/nvme-vfio.c              |  703 +++++++++++++++++++++++++
+ block/nvme-vfio.h              |   30 ++
+ block/nvme.c                   | 1103 ++++++++++++++++++++++++++++++++++++++++
+ block/nvme.h                   |  700 +++++++++++++++++++++++++
+ block/trace-events             |   32 ++
+ hw/block/nvme.h                |  698 +------------------------
+ include/block/block.h          |    2 +
+ include/block/block_int.h      |    4 +
+ include/sysemu/block-backend.h |    3 +
+ qemu-img.c                     |    9 +-
+ stubs/Makefile.objs            |    1 +
+ stubs/ram-block.c              |   16 +
+ 16 files changed, 2644 insertions(+), 698 deletions(-)
+ create mode 100644 block/nvme-vfio.c
+ create mode 100644 block/nvme-vfio.h
+ create mode 100644 block/nvme.c
+ create mode 100644 block/nvme.h
+ create mode 100644 stubs/ram-block.c
 
-Stefan
-
---QRj9sO5tAVLaXnSD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZXOQtAAoJEJykq7OBq3PI4TYIAKa93aFwc68+iQVCZsChki6Q
-pySkKMzBg0znXhqXHvbqvrkevDrbkSLDFvKiuerUUvNfA7FUnsSYTQjE7lRihYcz
-N3ddvwJ6bOdCXH6/0UpoHg6RHFjH6Qb0MiOMbVHzs/DuvMdZZZWzrmJFJO+1Hr5V
-R/TnqogZg3RYpZtbmOSHwrvP05hWeSWKSXGyyynLTc9CvEP3ismF2C4plbOy8Lfy
-mlHre3tg/pc0KtnVP674Jt+i5Pvq5IV7FcvQQEjmuRfT6aBEPo5cIrHYtXbs3u0W
-d6FWax+2iVvfPo4dAv9DW2LWOX6YkYSISdTGUsJziyHIYQoNLGdP+Pg1X0FNHD0=
-=7b9V
------END PGP SIGNATURE-----
-
---QRj9sO5tAVLaXnSD--
+-- 
+2.9.4
