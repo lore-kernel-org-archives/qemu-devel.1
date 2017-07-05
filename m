@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dSkg0-0007NK-OI
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:49:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dSkhM-0008HV-Lq
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:50:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dSkfz-0000hA-Ms
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:49:08 -0400
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-3-mreitz@redhat.com>
-	<87r2xve509.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-Date: Wed, 5 Jul 2017 15:48:53 +0200
+	(envelope-from <thuth@redhat.com>) id 1dSkhI-0001S3-9I
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 09:50:32 -0400
+References: <20170626101159.19676-1-berrange@redhat.com>
+	<c4381bd8-a417-0c3b-f3c2-1292ca9f6dfc@redhat.com>
+	<20170705134104.GD1280@stefanha-x1.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <dd89f2b0-dbcc-10a4-50dd-598c2115e8cd@redhat.com>
+Date: Wed, 5 Jul 2017 15:50:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <87r2xve509.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
+In-Reply-To: <20170705134104.GD1280@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha1;
 	protocol="application/pgp-signature";
-	boundary="i3HEqbS87ogv1uoCEo1UGG3xltB2Ecfxe"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
+	boundary="aVeKnSxLL44lBOqJfo7O0pIhV3aX8vIng"
+Subject: Re: [Qemu-devel] [PATCH] sockets: avoid formatting buffer that may
+ not be NULL terminated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,179 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i3HEqbS87ogv1uoCEo1UGG3xltB2Ecfxe
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
-References: <20170703122505.32017-1-mreitz@redhat.com>
- <20170703122505.32017-3-mreitz@redhat.com>
- <87r2xve509.fsf@dusky.pond.sub.org>
-In-Reply-To: <87r2xve509.fsf@dusky.pond.sub.org>
+--aVeKnSxLL44lBOqJfo7O0pIhV3aX8vIng
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-07-05 09:07, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
->=20
->> This generic function (along with its implementations for different
->> types) determines whether two QObjects are equal.
+On 05.07.2017 15:41, Stefan Hajnoczi wrote:
+> On Mon, Jun 26, 2017 at 12:19:40PM +0200, Thomas Huth wrote:
+>> On 26.06.2017 12:11, Daniel P. Berrange wrote:
+>>> The 'sun_path' field in the sockaddr_un struct is not required
+>>> to be NULL termianted, so when reporting an error, we must use
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> [...]
->> diff --git a/qobject/qnum.c b/qobject/qnum.c
->> index 476e81c..784d061 100644
->> --- a/qobject/qnum.c
->> +++ b/qobject/qnum.c
->> @@ -213,6 +213,59 @@ QNum *qobject_to_qnum(const QObject *obj)
->>  }
->> =20
->>  /**
->> + * qnum_is_equal(): Test whether the two QNums are equal
->> + */
->> +bool qnum_is_equal(const QObject *x, const QObject *y)
->> +{
->> +    QNum *num_x =3D qobject_to_qnum(x);
->> +    QNum *num_y =3D qobject_to_qnum(y);
->> +
->> +    switch (num_x->kind) {
->> +    case QNUM_I64:
->> +        switch (num_y->kind) {
->> +        case QNUM_I64:
->> +            /* Comparison in native int64_t type */
->> +            return num_x->u.i64 =3D=3D num_y->u.i64;
->> +        case QNUM_U64:
->> +            /* Implicit conversion of x to uin64_t, so we have to
->> +             * check its sign before */
->> +            return num_x->u.i64 >=3D 0 && num_x->u.i64 =3D=3D num_y->=
-u.u64;
->> +        case QNUM_DOUBLE:
->> +            /* Implicit conversion of x to double; no overflow
->> +             * possible */
->> +            return num_x->u.i64 =3D=3D num_y->u.dbl;
+>> s/NULL/NUL/
+>>
+>> NULL is a pointer, NUL is the '\0' character.
 >=20
-> Overflow is impossible, but loss of precision is possible:
+> I wanted to point out the same thing to someone recently, so I chased u=
+p
+> a reference to the NUL character in RFC 20 "ASCII format for Network
+> Interchange".  After all, no one can argue with an RFC.
 >=20
->     (double)9007199254740993ull =3D=3D 9007199254740992.0
+> What I found shocked me!  There must be a typo in the ASCII RFC:
+> https://tools.ietf.org/html/rfc20#section-5.2
 >=20
-> yields true.  Is this what we want?
+> I closed my browser tab quickly and headed to Wikipedia instead.  If th=
+e
+> primary source didn't support my argument, I could always count on good=
 
-I'd argue that yes, because the floating point value represents
-basically all of the values which are "equal" to it.
-
-But I don't have a string opinion. I guess the alternative would be to
-convert the double to an integer instead and check for overflows before?
-
->> +        }
->> +        abort();
->> +    case QNUM_U64:
->> +        switch (num_y->kind) {
->> +        case QNUM_I64:
->> +            return qnum_is_equal(y, x);
->> +        case QNUM_U64:
->> +            /* Comparison in native uint64_t type */
->> +            return num_x->u.u64 =3D=3D num_y->u.u64;
->> +        case QNUM_DOUBLE:
->> +            /* Implicit conversion of x to double; no overflow
->> +             * possible */
->> +            return num_x->u.u64 =3D=3D num_y->u.dbl;
+> old Wikipedia...
 >=20
-> Similar loss of precision.
+> But do you know what I found?  Someone had conflated nul and null on th=
+e
+> Wikipedia entry:
+> https://en.wikipedia.org/wiki/Null_character
 >=20
->> +        }
->> +        abort();
->> +    case QNUM_DOUBLE:
->> +        switch (num_y->kind) {
->> +        case QNUM_I64:
->> +            return qnum_is_equal(y, x);
->> +        case QNUM_U64:
->> +            return qnum_is_equal(y, x);
->> +        case QNUM_DOUBLE:
->> +            /* Comparison in native double type */
->> +            return num_x->u.dbl =3D=3D num_y->u.dbl;
->> +        }
->> +        abort();
->> +    }
->> +
->> +    abort();
->> +}
+> Amateurs!  The Wikipedia editors probably didn't have the intellectual
+> calibre to question the correctness of the RFC text the way I did.
 >=20
-> I think there's more than one sane interpretations of "is equal",
-> including:
->=20
-> * The mathematical numbers represented by @x and @y are equal.
->=20
-> * @x and @y have the same contents, i.e. same kind and u.
->=20
-> * @x and @y are the same object (listed for completeness; we don't need=
+> But to cut a long story short, as my search continued the evidence
+> became overwhelming.  It is acceptable to refer to the nul character as=
 
->   a function to compare pointers).
->=20
-> Your patch implements yet another one.  Which one do we want, and why?
+> the null character.
 
-Mine is the first one, except that I think that a floating point value
-does not represent a single number but just some number in a range.
+Well, I don't see a real problem here - as long as you write "null" with
+lowercase letters. "NULL" with uppercase letters is the pointer. "NUL"
+with uppercase letters is the character. And "null" with lowercase
+letters is just a context-sensitive word :-)
 
-> The second is easier to implement than the first.
-
-It seems much less useful, though.
-
-> If we really want the first, you need to fix the loss of precision bugs=
-=2E
-
-I'm not sure, but I don't mind either, so...
-
-> I guess the obvious fix is
->=20
->     return (double)x =3D=3D x && x =3D=3D y;
-
-Yes, that would do, too; and spares me of having to think about how well
-comparing an arbitrary double to UINT64_MAX actually works. :-)
-
-> Note that this is what you do for mixed signedness: first check @x is
-> exactly representable in @y's type, then compare in @y's type.
->=20
-> Regardless of which one we pick, the function comment needs to explain.=
+ Thomas
 
 
-OK, will do.
-
-Max
-
->> +
->> +/**
->>   * qnum_destroy_obj(): Free all memory allocated by a
->>   * QNum object
->>   */
-> [...]
->=20
-> Remainder of the patch looks good to me.
->=20
-
-
-
---i3HEqbS87ogv1uoCEo1UGG3xltB2Ecfxe
+--aVeKnSxLL44lBOqJfo7O0pIhV3aX8vIng
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQEvBAEBCAAZBQJZXO5FEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQJmr
-B/9bYrRHKHs9DqBzKtvK1EAqLynlVOb2Vgu+VCNGAhY+ob4R2oz+fEGt1NPl9/sa
-QPs615ewpyHkiGAXkIWhIg9ZCS0OSYnO7um1GeAWqdUiSEkwy6n8H8Mxcz+PD0gu
-brwyI4F1+sZ/a/zZBP1wWRMafO0jApVEIdf3KU5iyE6nntH7JHS3DP/EwB4mBIBh
-fygh4eEKAD3r2iJy/2L3eLtfASD2RQcVvY5V791yunrEz+lZR+eipnGSVs3oh8+J
-zdelFdViO+Dljb+G7LbOddARbQBtc+2JvvPkFojf3Qj/l4M0d8wHhWr0rDT0xWfg
-oMtmOgfhK0Gq5tn63tfCTjQ+
-=oopK
+iQIcBAEBAgAGBQJZXO6cAAoJEC7Z13T+cC21IPsP/2QaVCIGsQcoRMio1cEJDz8H
+TXW5SnA8NYX5LO6SquRHl41QD12K2VXQBKmhBWc2YlruJCblCWx4TpYt3QNc/IHY
+Wh5RMiegsu2czwezpxrqZdNOV/9M7qj3kSXUzSzk/952+I24ZETYIdCNZq2zeQLO
+jAbQPXkwJaxvrf8G16SeOxWpg762qNfVxUb93dPvP9TFkOv0W0U7EfFl52v/l/M1
+HTZraK6dTaeds7aj5EPOkIpCebDlCF8Ey2tAfvG15B+dfmHQ7RnPqVR9ezxWI1Ce
+7/AnWEN8M5zYz/JfNhRCdGe47Nn4mGmnNCvT5zgSRwKwmUEw4b+U/wOg45tBPQAj
+cgaiwnHHeBi6MCg4C4jAM1fMttQwx58dFWyIzCGOynIgKwnFtHFpdFLuSA0mADhJ
+JvqKgrVYiT8eT/E11KK9ddmJftCEROU0r6iwWInpvWOR4xPg8a8p31sRjZNWF6sw
+SQhD++Qqdv32IosQa5ucraoHbb5nDeDVHRKSEFqrJj1XOSXQhRdHy92lyuUE3w3S
+W2DSSnaOROrCoDiEoCBhPb+KkfiG8jWoRGI41MZR46oIgNTJ+woSUtsOdPPL8Bza
+CINVy97blIArx+yTjtFE3xLUb6fYUA+NIc851whsuI4ck8MurFdVI6H4PmAjBN1P
+jauNd1COt2n5k41YpjPo
+=/5yd
 -----END PGP SIGNATURE-----
 
---i3HEqbS87ogv1uoCEo1UGG3xltB2Ecfxe--
+--aVeKnSxLL44lBOqJfo7O0pIhV3aX8vIng--
