@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSmH6-0005rv-Bv
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:31:33 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dSmO6-0008Cg-Nb
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:38:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSmH2-0004AM-CU
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:31:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47876)
+	(envelope-from <cohuck@redhat.com>) id 1dSmO2-0007Bj-Q8
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:38:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40178)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSmH2-00049f-3N
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:31:28 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
-	<1499049848-18012-4-git-send-email-peterx@redhat.com>
-	<874lussk0x.fsf@dusky.pond.sub.org>
-	<20170705140649.GW12152@localhost.localdomain>
-Date: Wed, 05 Jul 2017 17:31:22 +0200
-In-Reply-To: <20170705140649.GW12152@localhost.localdomain> (Eduardo Habkost's
-	message of "Wed, 5 Jul 2017 11:06:49 -0300")
-Message-ID: <87k23mnbn9.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dSmO2-0007BJ-JH
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:38:42 -0400
+Date: Wed, 5 Jul 2017 17:38:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170705173838.0a5fb60f@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499268345-12552-1-git-send-email-thuth@redhat.com>
+References: <1499268345-12552-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/4] doc: add item for "-M
- enforce-config-section"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix endianness problem with
+ netboot_start_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Greg Kurz <groug@kaod.org>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On Wed,  5 Jul 2017 17:25:45 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> (CCing Greg, the original author of the code that added the
-> enforce-config-section option)
->
-> On Tue, Jul 04, 2017 at 10:06:54AM +0200, Markus Armbruster wrote:
->> Peter Xu <peterx@redhat.com> writes:
->> 
->> > It's never documented, and now we have one more parameter for it (which
->> > means this one can be obsolete in the future). Document it properly.
->> >
->> > Although now when enforce-config-section is set, it'll override the
->> > other "-global" parameter, that is not necessarily a rule. Forbid that
->> > usage in the document.
->> >
->> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
->> > Signed-off-by: Peter Xu <peterx@redhat.com>
->> > ---
->> >  qemu-options.hx | 8 ++++++++
->> >  1 file changed, 8 insertions(+)
->> >
->> > diff --git a/qemu-options.hx b/qemu-options.hx
->> > index 297bd8a..927c51f 100644
->> > --- a/qemu-options.hx
->> > +++ b/qemu-options.hx
->> > @@ -85,6 +85,14 @@ Enables or disables NVDIMM support. The default is off.
->> >  @item s390-squash-mcss=on|off
->> >  Enables or disables squashing subchannels into the default css.
->> >  The default is off.
->> > +@item enforce-config-section=on|off
->> > +Decides whether we will send the configuration section when doing
->> > +migration. By default, it is turned on. We can set this to off to
->> > +explicitly disable it. Note: this parameter will be obsolete soon,
->> > +please use "-global migration.send-configuration=on|off" instead.
->> 
->> Please say "... is deprecated, please use ...", to make it visible in
->> "git-grep -i deprecat".
->> 
->> > +"enforce-config-section" cannot be used together with "-global
->> > +migration.send-configuration". If it happens, the behavior is
->> > +undefined.
->> 
->> Nasty.  Could we catch and reject such invalid usage?
->
-> Actually, the machine option will override
-> migration.send-configuration=off, and I don't believe we will break that
-> rule.  Documenting that behavior (but warning that it is deprecated)
-> sounds easier than adding extra code to detect the conflicting options.
->
-> We can simply replace "is undefined"  with "enforce-config-section will
-> override migration.send-configuration, but enforce-config-section is
-> deprecated".
+> The start address has to be stored in big endian byte order
+> in the iplb.ccw block for the guest.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/ipl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 4e6469d..cc36003 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -418,7 +418,7 @@ void s390_ipl_prepare_cpu(S390CPU *cpu)
+>              error_report_err(err);
+>              vm_stop(RUN_STATE_INTERNAL_ERROR);
+>          }
+> -        ipl->iplb.ccw.netboot_start_addr = ipl->start_addr;
+> +        ipl->iplb.ccw.netboot_start_addr = cpu_to_be64(ipl->start_addr);
+>      }
+>  }
+>  
 
-Better than the scary "behavior is undefined".  But do we have to say
-anything at all?  If somebody gives both options with different values,
-the conflicting settings fight it out.  In a sane command line, the last
-one wins.  Ours isn't sane.  Do we really have to specify who wins?
+This seems to be the only iplb field to miss endianness handling.
 
-> I don't think anybody is relying on that option. If nobody is using it,
-> we can remove its code soon if we make it trigger a warning.
-> Machine-type compatibility code is already using
-> migration.send-configuration instead.
-
-What about
-
-      @item enforce-config-section=on|off
-      Controls sending of the configuration section when doing migration
-      (default on).  Note: this parameter is deprecated, please use
-      "-global migration.send-configuration=on|off" instead.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
