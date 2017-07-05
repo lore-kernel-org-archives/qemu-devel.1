@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dSm1X-0005TE-8P
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:15:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dSm78-00084K-EW
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dSm1W-0005Kr-EF
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:15:27 -0400
-Date: Wed, 5 Jul 2017 16:15:06 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170705151506.GH29910@stefanha-x1.localdomain>
-References: <20170704132350.11874-1-haoqf@linux.vnet.ibm.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dSm73-0007kT-Gt
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:21:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSm73-0007kN-AT
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:21:09 -0400
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+	<20170621153424.16690-3-vsementsov@virtuozzo.com>
+	<695de534-7f65-c6cc-00ac-4d35e3eb6e7d@redhat.com>
+	<a0dae7c7-f0e8-2c6b-e35e-096f597c40cb@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0fec8f79-5d1e-307e-6f34-0f2152a6a4ca@redhat.com>
+Date: Wed, 5 Jul 2017 17:21:02 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PW0Eas8rCkcu1VkF"
-Content-Disposition: inline
-In-Reply-To: <20170704132350.11874-1-haoqf@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/1] virtio-scsi-ccw: fix iotest 068 for
- s390x
+In-Reply-To: <a0dae7c7-f0e8-2c6b-e35e-096f597c40cb@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: use errp instead of LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, peterx@redhat.com, cohuck@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, den@openvz.org, Markus Armbruster <armbru@redhat.com>
 
 
---PW0Eas8rCkcu1VkF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 04, 2017 at 03:23:49PM +0200, QingFeng Hao wrote:
-> This commit fixes iotest 068 for s390x as s390x uses virtio-scsi-ccw.
-> It's based on commit c324fd0a39c by Stefan Hajnoczi.=20
-> Thanks!
->=20
-> Change history:
-> v4:
->     Got Cornelia Huck's Reviewed-by and take the comment to change the
->     commit message.
->=20
-> v3:
->     Take Christian Borntraeger and Cornelia Huck's comment to check
->     if kvm is enabled in s390_assign_subch_ioeventfd instead of
->     kvm_s390_assign_subch_ioeventfd to as the former is a general one.
->=20
-> v2:
->     Remove Stefan from sign-off list and change the patch's commit messag=
-e=20
->     according to Christian Borntraeger's comment.
->=20
-> QingFeng Hao (1):
->   virtio-scsi-ccw: use ioeventfd even when KVM is disabled
->=20
->  hw/s390x/virtio-ccw.c | 2 +-
->  target/s390x/cpu.h    | 6 +++++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
+On 05/07/2017 14:33, Vladimir Sementsov-Ogievskiy wrote:
+> 
+> 
+>>> -static int GCC_FMT_ATTR(4, 5)
+>>> +static int GCC_FMT_ATTR(5, 6)
+>>>   nbd_negotiate_send_rep_err(QIOChannel *ioc, uint32_t type,
+>>> -                           uint32_t opt, const char *fmt, ...)
+>>> +                           uint32_t opt, Error **errp, const char
+>>> *fmt, ...)
+>>>   {
+>> Markus, this violates our usual idiom of errp last in code that is not
+>> directly operating on an Error (the actual Error implementation in
+>> error.c being the main obvious exception that lists errp first), but I
+>> don't see any better approach. Do you have any thoughts on it?
 
-I didn't realize s390 also has this old check.  Thanks for fixing it!
+I think it's okay as it matches functions like vfprintf.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---PW0Eas8rCkcu1VkF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZXQJ6AAoJEJykq7OBq3PIXoIIAJiabd/VWqYQaii/4AX7ZEkq
-HnjOOzJPJxnY7LJgN3gfN1FWAOSBWO09pe1OjiXlHrGIO/3ETEqZFPvJJnGVay3q
-aItQwBnNfP0mNjVZKVHyo5PInTVlVn7ClzZ1LfdEJdizIIFDJEIEoxegGqf2PQpo
-qGsg7X/p2fKloqKteBAaA9lkc9yllKo6hn3ocVkiS4KFjMEkAjnf2p8BpW5aig8e
-NhAVdz4GqD8dpTLdoy6G08hzda5ma632CkQfLqM8fRtj6JeJmVdLq9yhOxmHUQFW
-SLZJwtkfhpjSi5Vrzhs5k3p3zO7iUvU8TH/DVyCceEJe1qN16PwEPDgZG8FBVHw=
-=uNZm
------END PGP SIGNATURE-----
-
---PW0Eas8rCkcu1VkF--
+Paolo
