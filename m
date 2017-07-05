@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWY-0004N2-6X
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:00 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWb-0004Ps-AR
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWT-0007PI-Mw
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:58 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36786)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWZ-0007Vb-Vx
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:01 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34261)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeWT-0007Nj-Df
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:53 -0400
-Received: by mail-wm0-x241.google.com with SMTP id y5so30406731wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:14:51 -0700 (PDT)
+	id 1dSeWZ-0007Ul-LR
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:59 -0400
+Received: by mail-wr0-x242.google.com with SMTP id k67so48979909wrc.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:14:59 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:04 +0200
-Message-Id: <1499238885-26161-2-git-send-email-pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:11 +0200
+Message-Id: <1499238885-26161-9-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/42] vcpu_dirty: share the same field in
- CPUState for all accelerators
+Subject: [Qemu-devel] [PULL 08/42] include/exec/poison: Mark CONFIG_KVM as
+ poisoned, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,201 +29,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
 
-This patch simply replaces the separate boolean field in CPUState that
-kvm, hax (and upcoming hvf) have for keeping track of vcpu dirtiness
-with a single shared field.
+CONFIG_KVM is only defined for target-specific code, so nobody should
+use it by accident in common code. To avoid such subtle bugs,
+CONFIG_KVM is now marked as poisoned in common code. The header
+include/sysemu/kvm.h is somewhat special since it is included
+all over the place from common code, too, so we need some extra
+logic via "#ifdef NEED_CPU_H" here to make sure that we can
+compile all files without problems.
 
-Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
-Message-Id: <20170618191101.3457-1-Sergio.G.DelReal@gmail.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1498454578-18709-4-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c   | 18 +++++++++---------
- include/qom/cpu.h     |  5 +++--
- target/i386/hax-all.c | 12 ++++++------
- target/mips/kvm.c     |  4 ++--
- 4 files changed, 20 insertions(+), 19 deletions(-)
+ hw/acpi/ich9.c        |  1 -
+ include/exec/poison.h |  1 +
+ include/sysemu/kvm.h  | 18 +++++++++++++-----
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 75feffa..cd71e28 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -318,7 +318,7 @@ int kvm_init_vcpu(CPUState *cpu)
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 5c279bb..c5d8646 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -33,7 +33,6 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/tco.h"
+-#include "sysemu/kvm.h"
+ #include "exec/address-spaces.h"
  
-     cpu->kvm_fd = ret;
-     cpu->kvm_state = s;
--    cpu->kvm_vcpu_dirty = true;
-+    cpu->vcpu_dirty = true;
+ #include "hw/i386/ich9.h"
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index 7a025b2..32707cd 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -86,6 +86,7 @@
  
-     mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
-     if (mmap_size < 0) {
-@@ -1864,15 +1864,15 @@ void kvm_flush_coalesced_mmio_buffer(void)
+ #pragma GCC poison CONFIG_LINUX_USER
+ #pragma GCC poison CONFIG_VHOST_NET
++#pragma GCC poison CONFIG_KVM
  
- static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
- {
--    if (!cpu->kvm_vcpu_dirty) {
-+    if (!cpu->vcpu_dirty) {
-         kvm_arch_get_registers(cpu);
--        cpu->kvm_vcpu_dirty = true;
-+        cpu->vcpu_dirty = true;
-     }
- }
+ #endif
+ #endif
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index ca40b6e..052e11f 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -19,11 +19,18 @@
+ #include "exec/memattrs.h"
+ #include "hw/irq.h"
  
- void kvm_cpu_synchronize_state(CPUState *cpu)
- {
--    if (!cpu->kvm_vcpu_dirty) {
-+    if (!cpu->vcpu_dirty) {
-         run_on_cpu(cpu, do_kvm_cpu_synchronize_state, RUN_ON_CPU_NULL);
-     }
- }
-@@ -1880,7 +1880,7 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
- static void do_kvm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
- {
-     kvm_arch_put_registers(cpu, KVM_PUT_RESET_STATE);
--    cpu->kvm_vcpu_dirty = false;
-+    cpu->vcpu_dirty = false;
- }
+-#ifdef CONFIG_KVM
+-#include <linux/kvm.h>
+-#include <linux/kvm_para.h>
++#ifdef NEED_CPU_H
++# ifdef CONFIG_KVM
++#  include <linux/kvm.h>
++#  include <linux/kvm_para.h>
++#  define CONFIG_KVM_IS_POSSIBLE
++# endif
++#else
++# define CONFIG_KVM_IS_POSSIBLE
+ #endif
  
- void kvm_cpu_synchronize_post_reset(CPUState *cpu)
-@@ -1891,7 +1891,7 @@ void kvm_cpu_synchronize_post_reset(CPUState *cpu)
- static void do_kvm_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
- {
-     kvm_arch_put_registers(cpu, KVM_PUT_FULL_STATE);
--    cpu->kvm_vcpu_dirty = false;
-+    cpu->vcpu_dirty = false;
- }
- 
- void kvm_cpu_synchronize_post_init(CPUState *cpu)
-@@ -1901,7 +1901,7 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
- 
- static void do_kvm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
- {
--    cpu->kvm_vcpu_dirty = true;
-+    cpu->vcpu_dirty = true;
- }
- 
- void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-@@ -1982,9 +1982,9 @@ int kvm_cpu_exec(CPUState *cpu)
-     do {
-         MemTxAttrs attrs;
- 
--        if (cpu->kvm_vcpu_dirty) {
-+        if (cpu->vcpu_dirty) {
-             kvm_arch_put_registers(cpu, KVM_PUT_RUNTIME_STATE);
--            cpu->kvm_vcpu_dirty = false;
-+            cpu->vcpu_dirty = false;
-         }
- 
-         kvm_arch_pre_run(cpu, run);
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 2fe7cff..b9440b6 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -369,7 +369,6 @@ struct CPUState {
-     vaddr mem_io_vaddr;
- 
-     int kvm_fd;
--    bool kvm_vcpu_dirty;
-     struct KVMState *kvm_state;
-     struct kvm_run *kvm_run;
- 
-@@ -386,6 +385,9 @@ struct CPUState {
-     uint32_t can_do_io;
-     int32_t exception_index; /* used by m68k TCG */
- 
-+    /* shared by kvm, hax and hvf */
-+    bool vcpu_dirty;
++#ifdef CONFIG_KVM_IS_POSSIBLE
 +
-     /* Used to keep track of an outstanding cpu throttle thread for migration
-      * autoconverge
-      */
-@@ -400,7 +402,6 @@ struct CPUState {
-         icount_decr_u16 u16;
-     } icount_decr;
+ extern bool kvm_allowed;
+ extern bool kvm_kernel_irqchip;
+ extern bool kvm_split_irqchip;
+@@ -40,7 +47,6 @@ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
  
--    bool hax_vcpu_dirty;
-     struct hax_vcpu_state *hax_vcpu;
+-#if defined CONFIG_KVM || !defined NEED_CPU_H
+ #define kvm_enabled()           (kvm_allowed)
+ /**
+  * kvm_irqchip_in_kernel:
+@@ -163,6 +169,7 @@ extern bool kvm_msi_use_devid;
+ #define kvm_msi_devid_required() (kvm_msi_use_devid)
  
-     /* The pending_tlb_flush flag is set and cleared atomically to
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index ba6117d..3ce6950 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -232,7 +232,7 @@ int hax_init_vcpu(CPUState *cpu)
-     }
+ #else
++
+ #define kvm_enabled()           (0)
+ #define kvm_irqchip_in_kernel() (false)
+ #define kvm_irqchip_is_split() (false)
+@@ -178,7 +185,8 @@ extern bool kvm_msi_use_devid;
+ #define kvm_direct_msi_enabled() (false)
+ #define kvm_ioeventfd_any_length_enabled() (false)
+ #define kvm_msi_devid_required() (false)
+-#endif
++
++#endif  /* CONFIG_KVM_IS_POSSIBLE */
  
-     cpu->hax_vcpu = hax_global.vm->vcpus[cpu->cpu_index];
--    cpu->hax_vcpu_dirty = true;
-+    cpu->vcpu_dirty = true;
-     qemu_register_reset(hax_reset_vcpu_state, (CPUArchState *) (cpu->env_ptr));
- 
-     return ret;
-@@ -599,12 +599,12 @@ static void do_hax_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
-     CPUArchState *env = cpu->env_ptr;
- 
-     hax_arch_get_registers(env);
--    cpu->hax_vcpu_dirty = true;
-+    cpu->vcpu_dirty = true;
- }
- 
- void hax_cpu_synchronize_state(CPUState *cpu)
- {
--    if (!cpu->hax_vcpu_dirty) {
-+    if (!cpu->vcpu_dirty) {
-         run_on_cpu(cpu, do_hax_cpu_synchronize_state, RUN_ON_CPU_NULL);
-     }
- }
-@@ -615,7 +615,7 @@ static void do_hax_cpu_synchronize_post_reset(CPUState *cpu,
-     CPUArchState *env = cpu->env_ptr;
- 
-     hax_vcpu_sync_state(env, 1);
--    cpu->hax_vcpu_dirty = false;
-+    cpu->vcpu_dirty = false;
- }
- 
- void hax_cpu_synchronize_post_reset(CPUState *cpu)
-@@ -628,7 +628,7 @@ static void do_hax_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
-     CPUArchState *env = cpu->env_ptr;
- 
-     hax_vcpu_sync_state(env, 1);
--    cpu->hax_vcpu_dirty = false;
-+    cpu->vcpu_dirty = false;
- }
- 
- void hax_cpu_synchronize_post_init(CPUState *cpu)
-@@ -638,7 +638,7 @@ void hax_cpu_synchronize_post_init(CPUState *cpu)
- 
- static void do_hax_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
- {
--    cpu->hax_vcpu_dirty = true;
-+    cpu->vcpu_dirty = true;
- }
- 
- void hax_cpu_synchronize_pre_loadvm(CPUState *cpu)
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index 0982e87..3317905 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -523,7 +523,7 @@ static void kvm_mips_update_state(void *opaque, int running, RunState state)
-      * already saved and can be restored when it is synced back to KVM.
-      */
-     if (!running) {
--        if (!cs->kvm_vcpu_dirty) {
-+        if (!cs->vcpu_dirty) {
-             ret = kvm_mips_save_count(cs);
-             if (ret < 0) {
-                 fprintf(stderr, "Failed saving count\n");
-@@ -539,7 +539,7 @@ static void kvm_mips_update_state(void *opaque, int running, RunState state)
-             return;
-         }
- 
--        if (!cs->kvm_vcpu_dirty) {
-+        if (!cs->vcpu_dirty) {
-             ret = kvm_mips_restore_count(cs);
-             if (ret < 0) {
-                 fprintf(stderr, "Failed restoring count\n");
+ struct kvm_run;
+ struct kvm_lapic_state;
 -- 
 1.8.3.1
