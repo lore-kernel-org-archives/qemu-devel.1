@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWy-0004s2-Nn
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:26 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dSeX4-0004yD-N1
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWx-0007n2-Jv
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:24 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeWx-0007mT-DT
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:23 -0400
-Received: by mail-wm0-x242.google.com with SMTP id j85so30448584wmj.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:23 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:30 +0200
-Message-Id: <1499238885-26161-28-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 27/42] tcg: move page_size_init() function
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dSeX3-0007qm-EC
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:30 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Wed, 5 Jul 2017 07:15:18 +0000
+Message-ID: <HE1PR0401MB25566B2B6CC08476BE69AD6A9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
+In-Reply-To: <589f1642-775c-4805-74ac-bf67eb504733@arm.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yang Zhong <yang.zhong@intel.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-From: Yang Zhong <yang.zhong@intel.com>
-
-translate-all.c will be disabled if tcg is disabled in the build,
-so page_size_init() function and related variables will be moved
-to exec.c file.
-
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- accel/tcg/translate-all.c    | 18 ------------------
- accel/tcg/translate-common.c |  3 ---
- exec.c                       | 20 ++++++++++++++++++++
- 3 files changed, 20 insertions(+), 21 deletions(-)
-
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index dc7e816..4fda383 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -112,9 +112,6 @@ typedef struct PageDesc {
- #define V_L2_BITS 10
- #define V_L2_SIZE (1 << V_L2_BITS)
- 
--uintptr_t qemu_host_page_size;
--intptr_t qemu_host_page_mask;
--
- /*
-  * L1 Mapping properties
-  */
-@@ -363,21 +360,6 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
-     return r;
- }
- 
--void page_size_init(void)
--{
--    /* NOTE: we can always suppose that qemu_host_page_size >=
--       TARGET_PAGE_SIZE */
--    qemu_real_host_page_size = getpagesize();
--    qemu_real_host_page_mask = -(intptr_t)qemu_real_host_page_size;
--    if (qemu_host_page_size == 0) {
--        qemu_host_page_size = qemu_real_host_page_size;
--    }
--    if (qemu_host_page_size < TARGET_PAGE_SIZE) {
--        qemu_host_page_size = TARGET_PAGE_SIZE;
--    }
--    qemu_host_page_mask = -(intptr_t)qemu_host_page_size;
--}
--
- static void page_init(void)
- {
-     page_size_init();
-diff --git a/accel/tcg/translate-common.c b/accel/tcg/translate-common.c
-index 40fe5a1..e6b8c4c 100644
---- a/accel/tcg/translate-common.c
-+++ b/accel/tcg/translate-common.c
-@@ -23,9 +23,6 @@
- #include "sysemu/cpus.h"
- #include "qemu/main-loop.h"
- 
--uintptr_t qemu_real_host_page_size;
--intptr_t qemu_real_host_page_mask;
--
- #ifndef CONFIG_USER_ONLY
- /* mask must never be zero, except for A20 change call */
- static void tcg_handle_interrupt(CPUState *cpu, int mask)
-diff --git a/exec.c b/exec.c
-index 42ad1ea..ee61915 100644
---- a/exec.c
-+++ b/exec.c
-@@ -118,6 +118,11 @@ __thread CPUState *current_cpu;
-    2 = Adaptive rate instruction counting.  */
- int use_icount;
- 
-+uintptr_t qemu_host_page_size;
-+intptr_t qemu_host_page_mask;
-+uintptr_t qemu_real_host_page_size;
-+intptr_t qemu_real_host_page_mask;
-+
- bool set_preferred_target_page_bits(int bits)
- {
-     /* The target page size is the lowest common denominator for all
-@@ -3590,3 +3595,18 @@ err:
- }
- 
- #endif
-+
-+void page_size_init(void)
-+{
-+    /* NOTE: we can always suppose that qemu_host_page_size >=
-+       TARGET_PAGE_SIZE */
-+    qemu_real_host_page_size = getpagesize();
-+    qemu_real_host_page_mask = -(intptr_t)qemu_real_host_page_size;
-+    if (qemu_host_page_size == 0) {
-+        qemu_host_page_size = qemu_real_host_page_size;
-+    }
-+    if (qemu_host_page_size < TARGET_PAGE_SIZE) {
-+        qemu_host_page_size = TARGET_PAGE_SIZE;
-+    }
-+    qemu_host_page_mask = -(intptr_t)qemu_host_page_size;
-+}
--- 
-1.8.3.1
+SGkgSmVhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKZWFuLVBo
+aWxpcHBlIEJydWNrZXIgW21haWx0bzpqZWFuLXBoaWxpcHBlLmJydWNrZXJAYXJtLmNvbV0NCj4g
+U2VudDogTW9uZGF5LCBKdW5lIDE5LCAyMDE3IDM6NDUgUE0NCj4gVG86IEJoYXJhdCBCaHVzaGFu
+IDxiaGFyYXQuYmh1c2hhbkBueHAuY29tPjsgQXVnZXIgRXJpYw0KPiA8ZXJpYy5hdWdlckByZWRo
+YXQuY29tPjsgZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFy
+by5vcmc7IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcWVt
+dS1hcm1Abm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiB3ZWlAcmVkaGF0
+LmNvbTsga2V2aW4udGlhbkBpbnRlbC5jb207IG1hcmMuenluZ2llckBhcm0uY29tOw0KPiB0bkBz
+ZW1paGFsZi5jb207IHdpbGwuZGVhY29uQGFybS5jb207IGRyam9uZXNAcmVkaGF0LmNvbTsNCj4g
+cm9iaW4ubXVycGh5QGFybS5jb207IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZw0KPiBTdWJq
+ZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgMC84XSBWSVJUSU8tSU9NTVUgZGV2aWNlDQo+
+IA0KPiBPbiAxOS8wNi8xNyAwODo1NCwgQmhhcmF0IEJodXNoYW4gd3JvdGU6DQo+ID4gSGkgRXJp
+YywNCj4gPg0KPiA+IEkgc3RhcnRlZCBhZGRlZCByZXBsYXkgaW4gdmlydGlvLWlvbW11IGFuZCBj
+YW1lIGFjcm9zcyBob3cgTVNJIGludGVycnVwdHMNCj4gd2l0aCB3b3JrIHdpdGggVkZJTy4NCj4g
+PiBJIHVuZGVyc3RhbmQgdGhhdCBvbiBpbnRlbCB0aGlzIHdvcmtzIGRpZmZlcmVudGx5IGJ1dCB2
+c21tdSB3aWxsIGhhdmUgc2FtZQ0KPiByZXF1aXJlbWVudC4NCj4gPiBrdm0tbXNpLWlycS1yb3V0
+ZSBhcmUgYWRkZWQgdXNpbmcgdGhlIG1zaS1hZGRyZXNzIHRvIGJlIHRyYW5zbGF0ZWQgYnkNCj4g
+dmlvbW11IGFuZCBub3QgdGhlIGZpbmFsIHRyYW5zbGF0ZWQgYWRkcmVzcy4NCj4gPiBXaGlsZSBj
+dXJyZW50bHkgdGhlIGlycWZkIGZyYW1ld29yayBkb2VzIG5vdCBrbm93IGFib3V0IGVtdWxhdGVk
+DQo+IGlvbW11cyAodmlydGlvLWlvbW11LCB2c21tdXYzL3ZpbnRlbC1pb21tdSkuDQo+ID4gU28g
+aW4gbXkgdmlldyB3ZSBoYXZlIGZvbGxvd2luZyBvcHRpb25zOg0KPiA+IC0gUHJvZ3JhbW1pbmcg
+d2l0aCB0cmFuc2xhdGVkIGFkZHJlc3Mgd2hlbiBzZXR0aW5nIHVwDQo+ID4ga3ZtLW1zaS1pcnEt
+cm91dGUNCj4gPiAtIFJvdXRlIHRoZSBpbnRlcnJ1cHRzIHZpYSBRRU1VLCB3aGljaCBpcyBiYWQg
+ZnJvbSBwZXJmb3JtYW5jZQ0KPiA+IC0gdmhvc3QtdmlydGlvLWlvbW11IG1heSBzb2x2ZSB0aGUg
+cHJvYmxlbSBpbiBsb25nIHRlcm0NCj4gPg0KPiA+IElzIHRoZXJlIGFueSBvdGhlciBiZXR0ZXIg
+b3B0aW9uIEkgYW0gbWlzc2luZz8NCj4gDQo+IFNpbmNlIHdlJ3JlIG9uIHRoZSB0b3BpYyBvZiBN
+U0lzLi4uIEknbSBjdXJyZW50bHkgdHJ5aW5nIHRvIGZpZ3VyZSBvdXQgaG93IHdlJ2xsDQo+IGhh
+bmRsZSBNU0lzIGluIHRoZSBuZXN0ZWQgdHJhbnNsYXRpb24gbW9kZSwgd2hlcmUgdGhlIGd1ZXN0
+IG1hbmFnZXMNCj4gUzEgcGFnZSB0YWJsZXMgYW5kIHRoZSBob3N0IGRvZXNuJ3Qga25vdyBhYm91
+dCBHVkEtPkdQQSB0cmFuc2xhdGlvbi4NCj4gDQo+IEknbSBhbHNvIHdvbmRlcmluZyBhYm91dCB0
+aGUgYmVuZWZpdHMgb2YgaGF2aW5nIFNXLW1hcHBlZCBNU0lzIGluIHRoZQ0KPiBndWVzdC4gSXQg
+c2VlbXMgdW5hdm9pZGFibGUgZm9yIHZTTU1VIHNpbmNlIHRoYXQncyB3aGF0IGEgcGh5c2ljYWwg
+c3lzdGVtDQo+IHdvdWxkIGRvLiBCdXQgaW4gYSBwYXJhdmlydHVhbGl6ZWQgc29sdXRpb24gdGhl
+cmUgZG9lc24ndCBzZWVtIHRvIGJlIGFueQ0KPiBjb21wZWxsaW5nIHJlYXNvbiBmb3IgaGF2aW5n
+IHRoZSBndWVzdCBtYXAgTVNJIGRvb3JiZWxscy4gVGhlc2UgYWRkcmVzc2VzDQo+IGFyZSBuZXZl
+ciBhY2Nlc3NlZCBkaXJlY3RseSwgdGhleSBhcmUgb25seSB1c2VkIGZvciBzZXR0aW5nIHVwIElS
+USByb3V0aW5nIChhdA0KPiBsZWFzdCBvbiBrdm10b29sKS4gU28gaGVyZSdzIHdoYXQgSSdkIGxp
+a2UgdG8gaGF2ZS4gTm90ZSB0aGF0IEkgaGF2ZW4ndA0KPiBpbnZlc3RpZ2F0ZWQgdGhlIGZlYXNp
+YmlsaXR5IGluIFFlbXUgeWV0LCBJIGRvbid0IGtub3cgaG93IGl0IGRlYWxzIHdpdGggTVNJcy4N
+Cj4gDQo+ICgxKSBHdWVzdCB1c2VzIHRoZSBndWVzdC1waHlzaWNhbCBNU0kgZG9vcmJlbGwgd2hl
+biBzZXR0aW5nIHVwIE1TSXMuIEZvcg0KPiBBUk0gd2l0aCBHSUN2MyB0aGlzIHdvdWxkIGJlIEdJ
+VFNfVFJBTlNMQVRFUiwgZm9yIHg4NiBpdCB3b3VsZCBiZSB0aGUNCj4gZml4ZWQgTVNJIGRvb3Ji
+ZWxsLiBUaGlzIHdheSB0aGUgaG9zdCB3b3VsZG4ndCBuZWVkIHRvIGluc3BlY3QgSU9NTVUNCj4g
+bWFwcGluZ3Mgd2hlbiBoYW5kbGluZyB3cml0ZXMgdG8gUENJIE1TSS1YIHRhYmxlcy4NCg0KU29y
+cnkgZm9yIGxhdGUgcmVwbHksIGRvZXMgdGhpcyBtZWFuIHRoYXQgd2UgY2FuIHVzZSBJT01NVV9S
+RVNWX01TSSBmb3IgdmlydGlvLWlvbW11IGRyaXZlcj8gVGhpcyB3aWxsIG5vdCBjcmVhdGUgbWFw
+cGluZyBpbiBJT01NVT8NCkkgdHJpZWQgdGhpcyBQQ0kgcGFzcy10aHJvdWdoIHVzaW5nIFFFTVUg
+KGludGVncmF0ZWQgdmZpbyB3aXRoIHZpcnRpby1pb21tdSkgYW5kIE1TSSBpbnRlcnJ1cHRzIHdv
+cmtzIHdpdGhvdXQgYW55IGNoYW5nZS4NCg0KVGhhbmtzDQotQmhhcmF0DQoNCj4gDQo+ICgyKSBJ
+biBuZXN0ZWQgbW9kZSAod2l0aCBWRklPKSBvbiBBUk0sIHRoZSBwU01NVSB3aWxsIHN0aWxsIHRy
+YW5zbGF0ZSBNU0lzDQo+IHZpYSBTMStTMi4gVGhlcmVmb3JlIHRoZSBob3N0IG5lZWRzIHRvIG1h
+cCBNU0lzIGF0IHN0YWdlLTEsIGFuZCBJJ2QgbGlrZSB0bw0KPiB1c2UgdGhlIChjdXJyZW50bHkg
+dW51c2VkKSBUVEIxIHRhYmxlcyBpbiB0aGF0IGNhc2UuIEluIGFkZGl0aW9uLCB1c2luZw0KPiBU
+VEIxIHdvdWxkIGJlIHVzZWZ1bCBmb3IgU1ZNLCB3aGVuIGVuZHBvaW50cyB3cml0ZSBNU0lzIHdp
+dGggUEFTSURzIGFuZA0KPiB3ZSBkb24ndCB3YW50IHRvIG1hcCB0aGVtIGluIHVzZXIgYWRkcmVz
+cyBzcGFjZS4NCj4gDQo+IFRoaXMgbWVhbnMgdGhhdCB0aGUgaG9zdCBuZWVkcyB0byB1c2UgZGlm
+ZmVyZW50IGRvb3JiZWxsIGFkZHJlc3NlcyBpbiBuZXN0ZWQNCj4gbW9kZSwgc2luY2UgaXQgd291
+bGQgYmUgdW5hYmxlIHRvIG1hcCBhdCBTMSB0aGUgc2FtZSBJT1ZBIGFzIFMyDQo+IChUVEIxIG1h
+bmFnZXMgbmVnYXRpdmUgYWRkcmVzc2VzIC0gMHhmZmZmLi4uLi4uLi4uLi4uLCB3aGljaCBhcmUg
+bm90DQo+IHJlcHJlc2VudGFibGUgYXMgR1BBcy4pIEl0IGFsc28gcmVxdWlyZXMgdG8gdXNlIDMy
+LWJpdCBwYWdlIHRhYmxlcyBmb3INCj4gZW5kcG9pbnRzIHRoYXQgYXJlIG5vdCBjYXBhYmxlIG9m
+IHVzaW5nIDY0LWJpdCBNU0kgYWRkcmVzc2VzLg0KPiANCj4gTm93ICgyKSBpcyBlbnRpcmVseSBo
+YW5kbGVkIGluIHRoZSBob3N0IGtlcm5lbCwgc28gaXQncyBtb3JlIGEgTGludXggcXVlc3Rpb24u
+DQo+IEJ1dCBkb2VzICgxKSBzZWVtIGFjY2VwdGFibGUgZm9yIHZpcnRpby1pb21tdSBpbiBRZW11
+Pw0KPiANCj4gVGhhbmtzLA0KPiBKZWFuDQo=
