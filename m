@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSman-0004nw-V3
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:51:54 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dSmg0-0007A8-9U
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSmak-0005cu-SV
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:51:54 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170626101159.19676-1-berrange@redhat.com>
-	<c4381bd8-a417-0c3b-f3c2-1292ca9f6dfc@redhat.com>
-	<20170705134104.GD1280@stefanha-x1.localdomain>
-Date: Wed, 05 Jul 2017 17:51:43 +0200
-In-Reply-To: <20170705134104.GD1280@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Wed, 5 Jul 2017 14:41:04 +0100")
-Message-ID: <87bmoynapc.fsf@dusky.pond.sub.org>
+	(envelope-from <alistair23@gmail.com>) id 1dSmfz-0000Ai-0F
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:57:16 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35097)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dSmfy-00009b-Mp
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 11:57:14 -0400
+Received: by mail-wm0-x244.google.com with SMTP id u23so33451077wma.2
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 08:57:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] sockets: avoid formatting buffer that may
- not be NULL terminated
+In-Reply-To: <87r2xwae1q.fsf@dusky.pond.sub.org>
+References: <cover.1498761179.git.alistair.francis@xilinx.com>
+	<0b14290d85eceaa145e0333c26826b14304e23e4.1498761179.git.alistair.francis@xilinx.com>
+	<20170630085426.GA23259@redhat.com> <87ziclipgm.fsf@dusky.pond.sub.org>
+	<20170703141537.GB955@redhat.com> <87r2xwae1q.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 5 Jul 2017 08:56:42 -0700
+Message-ID: <CAKmqyKO9taJeQz+saFbByV9cUPPUUaNf9tHu9MqvhmsiURcjyQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v2 2/3] qemu-error: Implement a more generic
+ error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +32,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, philippe@mathieu-daude.net, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Stefan Hajnoczi <stefanha@gmail.com> writes:
+On Mon, Jul 3, 2017 at 11:53 PM, Markus Armbruster <armbru@redhat.com> wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>
+>> On Mon, Jul 03, 2017 at 04:07:21PM +0200, Markus Armbruster wrote:
+>>> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>>>
+>>> > On Thu, Jun 29, 2017 at 12:42:38PM -0700, Alistair Francis wrote:
+>>> >> This patch removes the exisinting error_vreport() function and replaces it
+>>> >> with a more generic vreport() function that takes an enum describing the
+>>> >> information to be reported.
+>>>
+>>> Why remove error_vreport()?
 
-> On Mon, Jun 26, 2017 at 12:19:40PM +0200, Thomas Huth wrote:
->> On 26.06.2017 12:11, Daniel P. Berrange wrote:
->> > The 'sun_path' field in the sockaddr_un struct is not required
->> > to be NULL termianted, so when reporting an error, we must use
->> 
->> s/NULL/NUL/
->> 
->> NULL is a pointer, NUL is the '\0' character.
->
-> I wanted to point out the same thing to someone recently, so I chased up
-> a reference to the NUL character in RFC 20 "ASCII format for Network
-> Interchange".  After all, no one can argue with an RFC.
->
-> What I found shocked me!  There must be a typo in the ASCII RFC:
-> https://tools.ietf.org/html/rfc20#section-5.2
->
-> I closed my browser tab quickly and headed to Wikipedia instead.  If the
-> primary source didn't support my argument, I could always count on good
-> old Wikipedia...
->
-> But do you know what I found?  Someone had conflated nul and null on the
-> Wikipedia entry:
-> https://en.wikipedia.org/wiki/Null_character
->
-> Amateurs!  The Wikipedia editors probably didn't have the intellectual
-> calibre to question the correctness of the RFC text the way I did.
->
-> But to cut a long story short, as my search continued the evidence
-> became overwhelming.  It is acceptable to refer to the nul character as
-> the null character.
->
-> Coming back to the patch in question, although we can't complain about
-> the "NULL" it's with considerable joy that I'd like to highlight:
->
-> s/termianted/terminated/
->
-> :)
-> Stefan
+I just thought that the name didn't make sense now that we are using
+it for info and warning reports as well.
 
-Despite this shocking, shocking precedence, I formally object to the use
-of NULL in the context of C for anything other than "one particular null
-pointer".  C's confusing enough without overloading identifiers.
+>>>
+>>> >> As part of this change a report() function is added as well with the
+>>> >> same capability.
+>>> >>
+>>> >> To maintain full compatibility the original error_report() function is
+>>> >> maintained and no changes to the way errors are printed have been made.
+>>> >>
+>>> >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>> >> ---
+>>> >>
+>>> >>  hw/virtio/virtio.c          |  2 +-
+>>> >>  include/qemu/error-report.h | 10 +++++++++-
+>>> >>  scripts/checkpatch.pl       |  3 ++-
+>>> >>  util/qemu-error.c           | 33 ++++++++++++++++++++++++++++++---
+>>> >>  4 files changed, 42 insertions(+), 6 deletions(-)
+>>> >>
+>>> >> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>>> >> index 464947f76d..bd3d26abb7 100644
+>>> >> --- a/hw/virtio/virtio.c
+>>> >> +++ b/hw/virtio/virtio.c
+>>> >> @@ -2448,7 +2448,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+>>> >>      va_list ap;
+>>> >>
+>>> >>      va_start(ap, fmt);
+>>> >> -    error_vreport(fmt, ap);
+>>> >> +    vreport(ERROR, fmt, ap);
+>>> >>      va_end(ap);
+>>> >>
+>>> >>      if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+>>> >> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+>>> >> index 3001865896..39b554c3b9 100644
+>>> >> --- a/include/qemu/error-report.h
+>>> >> +++ b/include/qemu/error-report.h
+>>> >> @@ -21,6 +21,12 @@ typedef struct Location {
+>>> >>      struct Location *prev;
+>>> >>  } Location;
+>>> >>
+>>> >> +typedef enum {
+>>> >> +    ERROR,
+>>> >> +    WARN,
+>>> >> +    INFO,
+>>> >> +} report_types;
+>>> >
+>>> > Woah, those are faaar to generic names to be used. There is way too much
+>>> > chance of those clashing with definitions from headers we pull in - particularly
+>>> > windows which pollutes its system headers with loads of generic names.
+>>> >
+>>> > I'd suggest  QMSG_ERROR, QMSG_WARN, QMSG_INFO
+>>> >
+>>> >> +
+>>> >>  Location *loc_push_restore(Location *loc);
+>>> >>  Location *loc_push_none(Location *loc);
+>>> >>  Location *loc_pop(Location *loc);
+>>> >> @@ -30,12 +36,14 @@ void loc_set_none(void);
+>>> >>  void loc_set_cmdline(char **argv, int idx, int cnt);
+>>> >>  void loc_set_file(const char *fname, int lno);
+>>> >>
+>>> >> +void vreport(report_types type, const char *fmt, va_list ap) GCC_FMT_ATTR(2, 0);
+>>> >> +void report(report_types type, const char *fmt, ...)  GCC_FMT_ATTR(2, 3);
+>>> >
+>>> > Those names are too generic too IMHO.  I'd suggest  qmsg_report, qmsg_vreport
+
+Ok, I was trying to make them as short as possible to allow less line
+wrapping, but I agree report() is too generic.
+
+>>> >
+>>> > As mentioned in the previous review, there should be wrappers which
+>>> > call these with suitable enum to make usage less verbose. eg
+>>> >
+>>> >   qmsg_info(fmt, ....)  should call qmsg_report(QMSG_INFO, fmt, ...)
+>>> >   qmsg_vinfo(fmt, ....)  should call qmsg_vreport(QMSG_INFO, fmt, ...)
+>>> >
+>>> > likewise, for other message levels
+>>>
+>>> We then have qmsg_warning() for warnings, and error_report() for errors.
+>>> Ugh!
+>>>
+>>> If I had known back then what I know now, I wouldn't have used the
+>>> error_ prefix.
+>>>
+>>> Naming things is hard.
+>>>
+>>> Ideas anyone?
+>>
+>> I guess implicit in my suggestion would be to switch to qmsg_error()
+>> over some (long) period of time, but that would be a massive amount
+>> of churn that would harm backporting.
+>>
+>> So perhaps, just have error_report warning_report, info_report, and
+>> accept that the naming convention is slightly reversed from "normality"
+>
+> That's not half bad.
+>
+> The matching enum would be
+>
+>     typedef enum {
+>         REPORT_TYPE_ERROR,
+>         REPORT_TYPE_WARNING,
+>         REPORT_TYPE_INFO,
+>     } report_type;
+>
+> Note the typedef name is *singular*.  Compare
+>
+>     report_type rtype;
+>
+> to
+>
+>     report_types rtype;
+>
+> @rtype is *one* report type, not multiple.
+>
+> Let's stick report_type, report() and vreport() into qemu-error.c
+> (static linkage) until we have a genuine need for them elsewhere.
+
+Ok, I'll send out another version later today then.
+
+Thanks,
+Alistair
