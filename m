@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWv-0004pA-Vt
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:22 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeXA-00054n-5f
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWv-0007lo-1R
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:21 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36856)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeX9-0007wk-58
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:36 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35912)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeWu-0007lY-Rv
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:20 -0400
-Received: by mail-wm0-x243.google.com with SMTP id y5so30408742wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:20 -0700 (PDT)
-Received: from 640k.lan (94-39-191-51.adsl-ull.clienti.tiscali.it.
-	[94.39.191.51]) by smtp.gmail.com with ESMTPSA id
-	y35sm22202793wrc.51.2017.07.05.00.15.18 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 05 Jul 2017 00:15:19 -0700 (PDT)
+	id 1dSeX8-0007uj-Uc
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:35 -0400
+Received: by mail-wr0-x242.google.com with SMTP id 77so49088394wrb.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:28 +0200
-Message-Id: <1499238885-26161-26-git-send-email-pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:41 +0200
+Message-Id: <1499238885-26161-39-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 25/42] vl: convert -tb-size to qemu_strtoul
+Subject: [Qemu-devel] [PULL 38/42] target/i386: make
+ cpu_get_fp80()/cpu_set_fp80() static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +29,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>
 
+From: Yang Zhong <yang.zhong@intel.com>
+
+Move cpu_get_fp80()/cpu_set_fp80() from fpu_helper.c to
+machine.c because fpu_helper.c will be disabled if tcg is
+disabled in the build.
+
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/tcg/tcg-all.c    | 2 +-
- include/sysemu/accel.h | 2 +-
- vl.c                   | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ target/i386/cpu.h        |  2 --
+ target/i386/fpu_helper.c | 18 ------------------
+ target/i386/machine.c    | 18 ++++++++++++++++++
+ 3 files changed, 18 insertions(+), 20 deletions(-)
 
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index dba9931..e327d90 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -28,7 +28,7 @@
- #include "sysemu/sysemu.h"
- #include "qom/object.h"
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index c5e143e..8d9ba36 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1418,8 +1418,6 @@ int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
  
--int tcg_tb_size;
-+unsigned long tcg_tb_size;
- static bool tcg_allowed = true;
+ /* op_helper.c */
+ /* used for debug or cpu save/restore */
+-void cpu_get_fp80(uint64_t *pmant, uint16_t *pexp, floatx80 f);
+-floatx80 cpu_set_fp80(uint64_t mant, uint16_t upper);
  
- static int tcg_init(MachineState *ms)
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index ecc5c84..5a632ce 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -63,7 +63,7 @@ typedef struct AccelClass {
- #define ACCEL_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(AccelClass, (obj), TYPE_ACCEL)
+ /* cpu-exec.c */
+ /* the following helpers are only usable in user mode simulation as
+diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
+index 69ea33a..34fb5fc 100644
+--- a/target/i386/fpu_helper.c
++++ b/target/i386/fpu_helper.c
+@@ -1539,24 +1539,6 @@ void helper_xsetbv(CPUX86State *env, uint32_t ecx, uint64_t mask)
+     raise_exception_ra(env, EXCP0D_GPF, GETPC());
+ }
  
--extern int tcg_tb_size;
-+extern unsigned long tcg_tb_size;
+-void cpu_get_fp80(uint64_t *pmant, uint16_t *pexp, floatx80 f)
+-{
+-    CPU_LDoubleU temp;
+-
+-    temp.d = f;
+-    *pmant = temp.l.lower;
+-    *pexp = temp.l.upper;
+-}
+-
+-floatx80 cpu_set_fp80(uint64_t mant, uint16_t upper)
+-{
+-    CPU_LDoubleU temp;
+-
+-    temp.l.upper = upper;
+-    temp.l.lower = mant;
+-    return temp.d;
+-}
+-
+ /* MMX/SSE */
+ /* XXX: optimize by storing fptt and fptags in the static cpu state */
  
- void configure_accelerator(MachineState *ms);
- /* Register accelerator specific global properties */
-diff --git a/vl.c b/vl.c
-index 36ff3f4..ea8ef5f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3933,9 +3933,9 @@ int main(int argc, char **argv, char **envp)
-                 configure_rtc(opts);
-                 break;
-             case QEMU_OPTION_tb_size:
--                tcg_tb_size = strtol(optarg, NULL, 0);
--                if (tcg_tb_size < 0) {
--                    tcg_tb_size = 0;
-+                if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
-+                    error_report("Invalid argument to -tb-size");
-+                    exit(1);
-                 }
-                 break;
-             case QEMU_OPTION_icount:
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 8c7a822..53587ae 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -142,6 +142,24 @@ typedef struct x86_FPReg_tmp {
+     uint16_t tmp_exp;
+ } x86_FPReg_tmp;
+ 
++static void cpu_get_fp80(uint64_t *pmant, uint16_t *pexp, floatx80 f)
++{
++    CPU_LDoubleU temp;
++
++    temp.d = f;
++    *pmant = temp.l.lower;
++    *pexp = temp.l.upper;
++}
++
++static floatx80 cpu_set_fp80(uint64_t mant, uint16_t upper)
++{
++    CPU_LDoubleU temp;
++
++    temp.l.upper = upper;
++    temp.l.lower = mant;
++    return temp.d;
++}
++
+ static void fpreg_pre_save(void *opaque)
+ {
+     x86_FPReg_tmp *tmp = opaque;
 -- 
 1.8.3.1
