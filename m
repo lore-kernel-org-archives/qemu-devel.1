@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSi4n-0003ZI-4I
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:02:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dSi6a-0005Qb-Ny
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSi4l-0000G3-Iz
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:02:33 -0400
-Received: from [59.151.112.132] (port=12066 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSi4k-0000FR-A2
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:02:31 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Wed, 5 Jul 2017 19:01:57 +0800
-Message-ID: <e1eb4e611b444bf3abeeb072e87fbd2fd291045d.1499250206.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1499250206.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1499250206.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dSi6Z-0000h7-CA
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:04:24 -0400
+Date: Wed, 5 Jul 2017 21:04:14 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170705110414.GN2180@umbus.fritz.box>
+References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
+	<f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 4/4] net/socket: Improve -net socket error
- reporting
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="xTKfHyrFnSV9DG3y"
+Content-Disposition: inline
+In-Reply-To: <f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
+ VI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,307 +25,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: mdroth@linux.vnet.ibm.com, lvivier@redhat.com, sursingh@redhat.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
 
-When -net socket fails, it first reports a specific error, then
-a generic one, like this:
 
-    $ qemu-system-x86_64 -net socket,
-    qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
-    qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
+--xTKfHyrFnSV9DG3y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Convert net_socket_*_init() to Error to get rid of the superfluous second
-error message. After the patch, the effect like this:
+On Tue, Jul 04, 2017 at 06:13:31PM -0300, Daniel Henrique Barboza wrote:
+> I just tested this patch set on top of current ppc-for-2.10 branch (which
+> contains
+> the patches from part V). It applied cleanly but required a couple of
+> trivial
+> fixes to build probably because it was made on top of an older code base.
 
-    $ qemu-system-x86_64 -net socket,
-    qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
+Right, I fixed that up locally already, but haven't gotten around to
+reposting yet.  You can look at the 'drcVI' branch on my github tree,
+if you're interested.
 
-At the same time, add many explicit error handling message when it fails.
+> The trivial migration test worked fine. The libvirt scenario (attaching a
+> device on
+> target before migration, try to unplug after migration) isn't working as
+> expected
+> but we have a different result with this series. Instead of silently fail=
+ing
+> to unplug
+> with error messages on dmesg, the hot unplug works on QEMU level:
 
-Cc: jasowang@redhat.com
-Cc: armbru@redhat.com
-Cc: berrange@redhat.com
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
----
- net/socket.c | 92 +++++++++++++++++++++++++++++-------------------------------
- 1 file changed, 44 insertions(+), 48 deletions(-)
+Thanks for testing.  Just to clarify what you're saying here, you
+haven't spotted a regression with this series, but there is a case
+which was broken and is still broken with slightly different
+symptoms.  Yes?
 
-diff --git a/net/socket.c b/net/socket.c
-index 1d4c515..ca1878f 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -491,22 +491,21 @@ static void net_socket_accept(void *opaque)
- static int net_socket_listen_init(NetClientState *peer,
-                                   const char *model,
-                                   const char *name,
--                                  const char *host_str)
-+                                  const char *host_str,
-+                                  Error **errp)
- {
-     NetClientState *nc;
-     NetSocketState *s;
-     struct sockaddr_in saddr;
-     int fd, ret;
--    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&saddr, host_str, errp) < 0) {
-         return -1;
-     }
- 
-     fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
-     if (fd < 0) {
--        perror("socket");
-+        error_setg_errno(errp, errno, "can't create stream socket");
-         return -1;
-     }
-     qemu_set_nonblock(fd);
-@@ -515,13 +514,14 @@ static int net_socket_listen_init(NetClientState *peer,
- 
-     ret = bind(fd, (struct sockaddr *)&saddr, sizeof(saddr));
-     if (ret < 0) {
--        perror("bind");
-+        error_setg_errno(errp, errno, "can't bind ip=%s to socket",
-+                         inet_ntoa(saddr.sin_addr));
-         closesocket(fd);
-         return -1;
-     }
-     ret = listen(fd, 0);
-     if (ret < 0) {
--        perror("listen");
-+        error_setg_errno(errp, errno, "can't listen on socket");
-         closesocket(fd);
-         return -1;
-     }
-@@ -540,21 +540,20 @@ static int net_socket_listen_init(NetClientState *peer,
- static int net_socket_connect_init(NetClientState *peer,
-                                    const char *model,
-                                    const char *name,
--                                   const char *host_str)
-+                                   const char *host_str,
-+                                   Error **errp)
- {
-     NetSocketState *s;
-     int fd, connected, ret;
-     struct sockaddr_in saddr;
--    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&saddr, host_str, errp) < 0) {
-         return -1;
-     }
- 
-     fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
-     if (fd < 0) {
--        perror("socket");
-+        error_setg_errno(errp, errno, "can't create stream socket");
-         return -1;
-     }
-     qemu_set_nonblock(fd);
-@@ -570,7 +569,7 @@ static int net_socket_connect_init(NetClientState *peer,
-                        errno == EINVAL) {
-                 break;
-             } else {
--                perror("connect");
-+                error_setg_errno(errp, errno, "can't connect socket");
-                 closesocket(fd);
-                 return -1;
-             }
-@@ -579,9 +578,8 @@ static int net_socket_connect_init(NetClientState *peer,
-             break;
-         }
-     }
--    s = net_socket_fd_init(peer, model, name, fd, connected, &err);
-+    s = net_socket_fd_init(peer, model, name, fd, connected, errp);
-     if (!s) {
--        error_report_err(err);
-         return -1;
-     }
-     snprintf(s->nc.info_str, sizeof(s->nc.info_str),
-@@ -594,36 +592,36 @@ static int net_socket_mcast_init(NetClientState *peer,
-                                  const char *model,
-                                  const char *name,
-                                  const char *host_str,
--                                 const char *localaddr_str)
-+                                 const char *localaddr_str,
-+                                 Error **errp)
- {
-     NetSocketState *s;
-     int fd;
-     struct sockaddr_in saddr;
-     struct in_addr localaddr, *param_localaddr;
--    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&saddr, host_str, errp) < 0) {
-         return -1;
-     }
- 
-     if (localaddr_str != NULL) {
--        if (inet_aton(localaddr_str, &localaddr) == 0)
-+        if (inet_aton(localaddr_str, &localaddr) == 0) {
-+            error_setg(errp, "localaddr '%s' is not a valid IPv4 address",
-+                       localaddr_str);
-             return -1;
-+        }
-         param_localaddr = &localaddr;
-     } else {
-         param_localaddr = NULL;
-     }
- 
--    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-+    fd = net_socket_mcast_create(&saddr, param_localaddr, errp);
-     if (fd < 0) {
--        error_report_err(err);
-         return -1;
-     }
- 
--    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-+    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
-     if (!s) {
--        error_report_err(err);
-         return -1;
-     }
- 
-@@ -640,45 +638,45 @@ static int net_socket_udp_init(NetClientState *peer,
-                                  const char *model,
-                                  const char *name,
-                                  const char *rhost,
--                                 const char *lhost)
-+                                 const char *lhost,
-+                                 Error **errp)
- {
-     NetSocketState *s;
-     int fd, ret;
-     struct sockaddr_in laddr, raddr;
--    Error *err = NULL;
- 
--    if (parse_host_port(&laddr, lhost, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&laddr, lhost, errp) < 0) {
-         return -1;
-     }
- 
--    if (parse_host_port(&raddr, rhost, &err) < 0) {
--        error_report_err(err);
-+    if (parse_host_port(&raddr, rhost, errp) < 0) {
-         return -1;
-     }
- 
-     fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
-     if (fd < 0) {
--        perror("socket(PF_INET, SOCK_DGRAM)");
-+        error_setg_errno(errp, errno, "can't create datagram socket");
-         return -1;
-     }
- 
-     ret = socket_set_fast_reuse(fd);
-     if (ret < 0) {
-+        error_setg_errno(errp, errno,
-+                         "can't set socket option SO_REUSEADDR");
-         closesocket(fd);
-         return -1;
-     }
-     ret = bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
-     if (ret < 0) {
--        perror("bind");
-+        error_setg_errno(errp, errno, "can't bind ip=%s to socket",
-+                         inet_ntoa(laddr.sin_addr));
-         closesocket(fd);
-         return -1;
-     }
-     qemu_set_nonblock(fd);
- 
--    s = net_socket_fd_init(peer, model, name, fd, 0, &err);
-+    s = net_socket_fd_init(peer, model, name, fd, 0, errp);
-     if (!s) {
--        error_report_err(err);
-         return -1;
-     }
- 
-@@ -693,8 +691,6 @@ static int net_socket_udp_init(NetClientState *peer,
- int net_init_socket(const Netdev *netdev, const char *name,
-                     NetClientState *peer, Error **errp)
- {
--    /* FIXME error_setg(errp, ...) on failure */
--    Error *err = NULL;
-     const NetdevSocketOptions *sock;
- 
-     assert(netdev->type == NET_CLIENT_DRIVER_SOCKET);
-@@ -702,22 +698,21 @@ int net_init_socket(const Netdev *netdev, const char *name,
- 
-     if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
-         sock->has_udp != 1) {
--        error_report("exactly one of fd=, listen=, connect=, mcast= or udp="
--                     " is required");
-+        error_setg(errp, "exactly one of fd=, listen=, connect=, mcast= or udp="
-+                   " is required");
-         return -1;
-     }
- 
-     if (sock->has_localaddr && !sock->has_mcast && !sock->has_udp) {
--        error_report("localaddr= is only valid with mcast= or udp=");
-+        error_setg(errp, "localaddr= is only valid with mcast= or udp=");
-         return -1;
-     }
- 
-     if (sock->has_fd) {
-         int fd;
- 
--        fd = monitor_fd_param(cur_mon, sock->fd, &err);
-+        fd = monitor_fd_param(cur_mon, sock->fd, errp);
-         if (fd == -1) {
--            error_report_err(err);
-             return -1;
-         }
-         qemu_set_nonblock(fd);
-@@ -728,15 +723,16 @@ int net_init_socket(const Netdev *netdev, const char *name,
-     }
- 
-     if (sock->has_listen) {
--        if (net_socket_listen_init(peer, "socket", name, sock->listen) == -1) {
-+        if (net_socket_listen_init(peer, "socket", name, sock->listen, errp)
-+            < 0) {
-             return -1;
-         }
-         return 0;
-     }
- 
-     if (sock->has_connect) {
--        if (net_socket_connect_init(peer, "socket", name, sock->connect) ==
--            -1) {
-+        if (net_socket_connect_init(peer, "socket", name, sock->connect, errp)
-+            < 0) {
-             return -1;
-         }
-         return 0;
-@@ -746,7 +742,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
-         /* if sock->localaddr is missing, it has been initialized to "all bits
-          * zero" */
-         if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
--            sock->localaddr) == -1) {
-+            sock->localaddr, errp) < 0) {
-             return -1;
-         }
-         return 0;
-@@ -754,11 +750,11 @@ int net_init_socket(const Netdev *netdev, const char *name,
- 
-     assert(sock->has_udp);
-     if (!sock->has_localaddr) {
--        error_report("localaddr= is mandatory with udp=");
-+        error_setg(errp, "localaddr= is mandatory with udp=");
-         return -1;
-     }
--    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
--        -1) {
-+    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
-+        errp) < 0) {
-         return -1;
-     }
-     return 0;
--- 
-2.9.4
+>=20
+> (qemu) device_del core1
+> (qemu)
+> (qemu) info cpus
+> * CPU #0: nip=3D0xc0000000000a3e0c thread_id=3D86162
+> (qemu) info hotpluggable-cpus
+> Hotpluggable CPUs:
+>   type: "host-spapr-cpu-core"
+>   vcpus_count: "1"
+>   CPUInstance Properties:
+>     core-id: "3"
+>   type: "host-spapr-cpu-core"
+>   vcpus_count: "1"
+>   CPUInstance Properties:
+>     core-id: "2"
+>   type: "host-spapr-cpu-core"
+>   vcpus_count: "1"
+>   CPUInstance Properties:
+>     core-id: "1"
+>   type: "host-spapr-cpu-core"
+>   vcpus_count: "1"
+>   qom_path: "/machine/unattached/device[0]"
+>   CPUInstance Properties:
+>     core-id: "0"
+> (qemu)
+>=20
+>=20
+> However, any operation on the guest afterwards (tried with lscpu and dmes=
+g)
+> seems
+> to hung the guest. This is what I got when trying to do a dmesg after the
+> hot unplug:
+
+Ouch.  That's bad.  I'll have to look into it.
+
+I have rather a lot on my plate at the moment - if you get a chance to
+work out which of the patches in the series causes this behaviour,
+that could be handy.
+
+> danielhb@ubuntu1704:~$
+> danielhb@ubuntu1704:~$
+> danielhb@ubuntu1704:~$ dmesg | tail -n 5
+> ^C
+>=20
+> [  362.749693] INFO: task kworker/u8:1:30 blocked for more than 120 secon=
+ds.
+> [  362.749819]       Not tainted 4.10.0-26-generic #30-Ubuntu
+> [  362.749892] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
+> this message.
+> [  362.750224] INFO: task kworker/0:3:1887 blocked for more than 120
+> seconds.
+> [  362.750320]       Not tainted 4.10.0-26-generic #30-Ubuntu
+> [  362.750394] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
+> this message.
+> [  483.568842] INFO: task kworker/u8:1:30 blocked for more than 120 secon=
+ds.
+> [  483.568997]       Not tainted 4.10.0-26-generic #30-Ubuntu
+> [  483.569067] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
+> this message.
+> [  483.569364] INFO: task kworker/0:3:1887 blocked for more than 120
+> seconds.
+> (...)
+>=20
+>=20
+> I am not sure if it was intended for this scenario to work with this patch
+> set already. Figured
+> it can serve as a FYI for the next series.
+
+This might be due to a problem I've discussed previously with
+Laurent.  libvirt uses device_add on the destination's monitor before
+sending the migration stream, rather than starting the destination
+with already-hotplugged devices as -device.
+
+To my surprise, there doesn't seem to be a system reset between that
+device_add phase and processing the incoming stream, which means DRCs
+for those devices might be in the wrong state.
+
+I might need to explicitly trigger a reset of DRC state at incoming
+migration time to handle this.
+
+> Given that hotplug/unplug without migration still works and on the
+> assumption that
+> we'll look more into this libvirt scenario in the next spins, +1.
+>=20
+>=20
+> Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+>=20
+>=20
+>=20
+> On 06/21/2017 06:18 AM, David Gibson wrote:
+> > This sixth set of DRC cleanup patches (to be applied on top of the
+> > patches from part V) is a complete rework of DRC state management.  We
+> > stop tracking some unnecessary things, and change the basic state
+> > representation to a simpler and more robust model.
+> >=20
+> > Most of the patches in this set "break" migration from earlier git
+> > snapshots, but not from any released qemu version.  The previous
+> > migration stream format had multiple problems, so better to fix them
+> > now, before 2.10 is out.
+> >=20
+> > David Gibson (5):
+> >    spapr: Remove 'awaiting_allocation' DRC flag
+> >    spapr: Refactor spapr_drc_detach()
+> >    spapr: Cleanups relating to DRC awaiting_release field
+> >    spapr: Consolidate DRC state variables
+> >    spapr: Remove sPAPRConfigureConnectorState sub-structure
+> >=20
+> >   hw/ppc/spapr.c             |   9 +-
+> >   hw/ppc/spapr_drc.c         | 321 +++++++++++++++++++++---------------=
+---------
+> >   hw/ppc/spapr_pci.c         |  13 +-
+> >   hw/ppc/trace-events        |   3 +-
+> >   include/hw/ppc/spapr_drc.h |  53 +++++---
+> >   5 files changed, 187 insertions(+), 212 deletions(-)
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--xTKfHyrFnSV9DG3y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZXMesAAoJEGw4ysog2bOSiH8P/31lYQZbvYBsxlvfGbq1eZT2
+ylSprcQJ8RCOB737G6bmSbzHsy2/sU4S3wA5XFOJ/ysiLpabWde6/H4fRjy1vMWW
+w+gsvf48/m3ewz0dwGoiJszJhjEAxqQUZX5x8xodTPOwIxOEKYoh4QYOZIRhR2Rf
+XeCyum3mTBHXXLv7OiYBi6EJjCRSfYhdWUD+KJkcjcCKHeGch1lEstokhsK3vDuI
+S+4Jf1jIgX5inTh9yZh4lmLec8djdYc83dArx6XyCOCbehogZMa9/h6SYAdcBmPL
+UrVwr31bSJbgl9KvlBz4gyREMrmSakRW/x04GsVhn7/2snfu536XiuMlyt5CQGAe
+lNtNEIvz/fC1DqOQMjOcWLximG9uLkwHeoRw/NzI0qRb9PUN57sNKM83ojokSh46
+kczbGlN1kPLCdjqP0bk53WN9lbtg9W3hHVUakczeTVKCCLRs9TmbU7JCk/MAkczS
+g1gCqDt+g7MBLukCvdoclfyq/eSDdJpHablH+9fu8d7pfqXSHFvHtzj6Vjl5+V7a
+z9QzQnCDJsT3+4d34/sOsQLmBTk+8FyijT6sFg8LS6mQN2Tu650P33IfR7USDpbB
+YNTZ0EDkTunmy4epLu7R9KjRip+3NZqgAESUlqz+TT+lmFDw4G+ZdTT5sYUqEX68
+2af/qJZbdiNjQi8IusiN
+=wA0P
+-----END PGP SIGNATURE-----
+
+--xTKfHyrFnSV9DG3y--
