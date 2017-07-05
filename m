@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSogh-0005mk-Bg
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:06:09 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dSoi1-0006cx-HG
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dSogd-0005NO-7Y
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:06:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSogc-0005MN-Uz
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:06:03 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
-	<8760f7fnot.fsf@dusky.pond.sub.org>
-	<54df7dce-5108-40d4-e765-03137af3ad73@ilande.co.uk>
-	<87fueanaxt.fsf@dusky.pond.sub.org>
-	<70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk>
-Date: Wed, 05 Jul 2017 20:05:57 +0200
-In-Reply-To: <70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk> (Mark
-	Cave-Ayland's message of "Wed, 5 Jul 2017 17:33:41 +0100")
-Message-ID: <87lgo2hi7u.fsf@dusky.pond.sub.org>
+	(envelope-from <alistair23@gmail.com>) id 1dSohz-0006FQ-VJ
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:07:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Managing architectural restrictions with -device
- and libvirt
+In-Reply-To: <1499057115-6773-3-git-send-email-sundeep.lkml@gmail.com>
+References: <1499057115-6773-1-git-send-email-sundeep.lkml@gmail.com>
+	<1499057115-6773-3-git-send-email-sundeep.lkml@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 5 Jul 2017 11:06:55 -0700
+Message-ID: <CAKmqyKORKWWOUSAQ8_GtF6rOspE0mtJOEhJTvfuJ6h7JAru74A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel v6 PATCH 2/5] msf2: Microsemi
+ Smartfusion2 System Register block.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,171 +23,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+On Sun, Jul 2, 2017 at 9:45 PM, Subbaraya Sundeep
+<sundeep.lkml@gmail.com> wrote:
+> Added Sytem register block of Smartfusion2.
+> This block has PLL registers which are accessed by guest.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+>  hw/misc/Makefile.objs         |   1 +
+>  hw/misc/msf2-sysreg.c         | 200 ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/misc/msf2-sysreg.h |  82 +++++++++++++++++
+>  3 files changed, 283 insertions(+)
+>  create mode 100644 hw/misc/msf2-sysreg.c
+>  create mode 100644 include/hw/misc/msf2-sysreg.h
+>
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index c8b4893..0f52354 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
+>  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+>  obj-$(CONFIG_AUX) += auxbus.o
+>  obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+> +obj-$(CONFIG_MSF2) += msf2-sysreg.o
+> diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
+> new file mode 100644
+> index 0000000..64ee141
+> --- /dev/null
+> +++ b/hw/misc/msf2-sysreg.c
+> @@ -0,0 +1,200 @@
+> +/*
+> + * System Register block model of Microsemi SmartFusion2.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License
+> + * as published by the Free Software Foundation; either version
+> + * 2 of the License, or (at your option) any later version.
+> + *
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "hw/misc/msf2-sysreg.h"
 
-> On 05/07/17 16:46, Markus Armbruster wrote:
->
->>>>> I've been working on a patchset that brings the sun4u machine on
->>>>> qemu-system-sparc64 much closer to a real Ultra 5, however due to
->>>>> various design restrictions I need to be able to restrict how devices
->>>>> are added to the machine with -device.
->>>>>
->>>>> On a real Ultra 5, the root PCI bus (sabre) has 2 PCI bridges (simba A
->>>>> and simba B) with the onboard devices attached to simba A with 2 free
->>>>> slots, and an initially empty simba B.
->>>>>
->>>>> Firstly, is it possible to restrict the machine so that devices cannot
->>>>> be directly plugged into the root PCI bus, but only behind one of the
->>>>> PCI bridges? There is also an additional restriction in that slot 0
->>>>> behind simba A must be left empty to ensure that the ebus (containing
->>>>> the onboard devices) is the first device allocated.
->>>>
->>>> I figure sabre, simba A, simba B and the onboard devices attached to
->>>> simba A are all created by MachineClass init().
->>>
->>> Yes that is effectively correct, although the Simba devices are created
->>> as part of the PCI host bridge (apb) creation in pci_apb_init().
->> 
->> Anything that runs within init() counts as "created by init()".
->
-> Okay, in that case we should be fine here.
->
->>>> What device provides "the ebus", and how is it created?
->>>
->>> It's actually just an ISA bus, so the ebus device is effectively a
->>> PCI-ISA bridge for legacy devices.
->> 
->> Is this bridge created by init()?
->
-> Yes, it too is called via the machine init function.
->
->>>> Can you provide a list of all onboard PCI devices and how they are
->>>> connected?  Diagram would be best.
->>>
->>> I can try and come up with something more concise later, however I can
->>> quickly give you the OpenBIOS DT from my WIP patchset if that helps:
->>>
->>> 0 > show-devs
->>> ffe1bf38 /
->>> ffe1c110 /aliases
->>> ffe1c238 /openprom (BootROM)
->>> ffe26b50 /openprom/client-services
->>> ffe1c4f0 /options
->>> ffe1c5d0 /chosen
->>> ffe1c710 /builtin
->>> ffe1c838 /builtin/console
->>> ffe26618 /packages
->>> ffe28640 /packages/cmdline
->>> ffe28890 /packages/disk-label
->>> ffe2c8d8 /packages/deblocker
->>> ffe2cef0 /packages/grubfs-files
->>> ffe2d300 /packages/sun-parts
->>> ffe2d718 /packages/elf-loader
->>> ffe2b210 /memory@0,0 (memory)
->>> ffe2b370 /virtual-memory
->>> ffe2d878 /pci@1fe,0 (pci)
->>> ffe2e1a8 /pci@1fe,0/pci@1,1 (pci)
->>> ffe2e960 /pci@1fe,0/pci@1,1/ebus@1
->>> ffe2f1b0 /pci@1fe,0/pci@1,1/ebus@1/eeprom@0
->>> ffe2f328 /pci@1fe,0/pci@1,1/ebus@1/fdthree@0 (block)
->>> ffe2f878 /pci@1fe,0/pci@1,1/ebus@1/su@0 (serial)
->>> ffe2fc08 /pci@1fe,0/pci@1,1/ebus@1/8042@0 (8042)
->>> ffe2fe00 /pci@1fe,0/pci@1,1/ebus@1/8042@0/kb_ps2@0 (serial)
->>> ffe301b0 /pci@1fe,0/pci@1,1/NE2000@1,1 (network)
->>> ffe307c8 /pci@1fe,0/pci@1,1/QEMU,VGA@2 (display)
->>> ffe31e40 /pci@1fe,0/pci@1,1/ide@3 (ide)
->>> ffe32398 /pci@1fe,0/pci@1,1/ide@3/ide0@4100 (ide)
->>> ffe32678 /pci@1fe,0/pci@1,1/ide@3/ide1@4200 (ide)
->>> ffe32910 /pci@1fe,0/pci@1,1/ide@3/ide1@4200/cdrom@0 (block)
->>> ffe32f98 /pci@1fe,0/pci@1 (pci)
->>> ffe336e8 /SUNW,UltraSPARC-IIi (cpu)
->>>  ok
->>>
->>> For comparison you can see the DT from a real Ultra 5 here:
->>> http://www.pearsonitcertification.com/articles/article.aspx?p=440286&seqNum=7
->>>
->>>> The real sabre has two slots, and doesn't support hot (un)plug.  Can we
->>>> simply model that?  If yes, the root PCI bus is full after init(), and
->>>> remains full.  Takes care of "cannot directly plugged into the root PCI
->>>> bus".
->>>
->>> Right. So what you're saying is that if we add the 2 simba devices to
->>> the sabre PCI host bridge during machine init and then mark the sabre
->>> PCI root bus as not hotplug-able then that will prevent people adding
->>> extra devices from the command line via -device? I will see if I can
->>> find time to try this later this evening.
->> 
->> No.  Marking the bus "not hotpluggable" only prevents *hotplug*,
->> i.e. plug/unplug after machine initialization completed, commonly with
->> device_add.  -device is *cold* plug; it happens during machine
->> initialization.
->> 
->> However, if you limit sabre's bus to two slots (modelling real hardware
->> faithfully), then you can't cold plug anything (there's no free slot).
->> If you additionally mark the bus or both simba devices not hotpluggable
->> (again modelling real hardware faithfully), you can't unplug the simbas.
->> I believe that's what you want.
->
-> It seems like limiting the size of the bus would solve the majority of
-> the problem. I've had a quick look around pci.c and while I can see that
-> the PCIBus creation functions take a devfn_min parameter, I can't see
-> anything that limits the number of slots available on the bus?
+Same #include comment from patch 1.
 
-Marcel?
+> +
+> +#ifndef MSF2_SYSREG_ERR_DEBUG
+> +#define MSF2_SYSREG_ERR_DEBUG  0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (MSF2_SYSREG_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt "\n", __func__, ## args); \
+> +    } \
+> +} while (0);
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+> +
+> +static inline int msf2_divbits(uint32_t div)
+> +{
+> +    int ret = 0;
+> +
+> +    switch (div) {
+> +    case 1:
+> +        ret = 0;
+> +        break;
+> +    case 2:
+> +        ret = 1;
+> +        break;
+> +    case 4:
+> +        ret = 2;
+> +        break;
+> +    case 8:
+> +        ret = 4;
+> +        break;
+> +    case 16:
+> +        ret = 5;
+> +        break;
+> +    case 32:
+> +        ret = 6;
+> +        break;
+> +    default:
+> +        break;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void msf2_sysreg_reset(DeviceState *d)
+> +{
+> +    MSF2SysregState *s = MSF2_SYSREG(d);
+> +
+> +    DB_PRINT("RESET");
+> +
+> +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x021A2358;
+> +    s->regs[MSSDDR_PLL_STATUS] = 0x3;
+> +    s->regs[MSSDDR_FACC1_CR] = msf2_divbits(s->apb0div) << 5 |
+> +                               msf2_divbits(s->apb1div) << 2;
+> +}
+> +
+> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
+> +    unsigned size)
+> +{
+> +    MSF2SysregState *s = opaque;
+> +    offset /= 4;
 
-> And presumably if the user did try and coldplug something into a full
-> bus then they would get the standard "PCI: no slot/function
-> available..." error?
+Probably best to use a bitshift.
 
-That's what I'd expect.
+> +    uint32_t ret = 0;
+> +
+> +    if (offset < ARRAY_SIZE(s->regs)) {
+> +        ret = s->regs[offset];
+> +        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32,
+> +                    offset * 4, ret);
 
->>> My understanding from reading various bits of documentation is that the
->>> the empty simba bridge (bus B) can hold a maximum of 4 devices, whilst
->>> the non-empty simba bridge (bus A) can hold a maximum of 2 devices
->>> (presumably due to the on-board hardware). And in order to make sure
->>> OpenBIOS maps the PCI IO ranges correctly, the ebus must be the first
->>> on-board device found during a PCI bus scan which means slot 0 on bus A
->>> must be blacklisted.
->> 
->> Assuming init() plugs in the device providing ebus: plug it into slot 0,
->> mark it not hotpluggable, done.
+Bitshift here as well.
+
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
+> +                    offset * 4);
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
+> +                          uint64_t val, unsigned size)
+> +{
+> +    MSF2SysregState *s = (MSF2SysregState *)opaque;
+> +    uint32_t newval = val;
+> +    uint32_t oldval;
+> +
+> +    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64,
+> +            offset, val);
+> +
+> +    offset /= 4;
+
+Same here
+
+> +
+> +    switch (offset) {
+> +    case MSSDDR_PLL_STATUS:
+> +        break;
+> +
+> +    case ESRAM_CR:
+> +        oldval = s->regs[ESRAM_CR];
+> +        if (oldval ^ newval) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                       TYPE_MSF2_SYSREG": eSRAM remapping not supported\n");
+> +            abort();
+
+The guest should not be able to kill QEMU, a guest error should never
+result in an abort.
+
+> +        }
+> +        break;
+> +
+> +    case DDR_CR:
+> +        oldval = s->regs[DDR_CR];
+> +        if (oldval ^ newval) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                       TYPE_MSF2_SYSREG": DDR remapping not supported\n");
+> +            abort();
+> +        }
+> +        break;
+> +
+> +    case ENVM_REMAP_BASE_CR:
+> +        oldval = s->regs[ENVM_REMAP_BASE_CR];
+> +        if (oldval ^ newval) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                       TYPE_MSF2_SYSREG": eNVM remapping not supported\n");
+> +            abort();
+> +        }
+> +        break;
+> +
+> +    default:
+> +        if (offset < ARRAY_SIZE(s->regs)) {
+> +            s->regs[offset] = val;
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
+> +                        offset * 4);
+> +        }
+> +        break;
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps sysreg_ops = {
+> +    .read = msf2_sysreg_read,
+> +    .write = msf2_sysreg_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static void msf2_sysreg_init(Object *obj)
+> +{
+> +    MSF2SysregState *s = MSF2_SYSREG(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s, TYPE_MSF2_SYSREG,
+> +                          MSF2_SYSREG_MMIO_SIZE);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
+> +}
+> +
+> +static const VMStateDescription vmstate_msf2_sysreg = {
+> +    .name = TYPE_MSF2_SYSREG,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState, MSF2_SYSREG_MMIO_SIZE / 4),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+
+This just reminded me that I don't think your first patch has a
+VMState. Can you add that
+
+Thanks,
+Alistair
+
+> +
+> +static Property msf2_sysreg_properties[] = {
+> +    /* default divisors in Libero GUI */
+> +    DEFINE_PROP_UINT32("apb0divisor", MSF2SysregState, apb0div, 2),
+> +    DEFINE_PROP_UINT32("apb1divisor", MSF2SysregState, apb1div, 2),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->vmsd = &vmstate_msf2_sysreg;
+> +    dc->reset = msf2_sysreg_reset;
+> +    dc->props = msf2_sysreg_properties;
+> +}
+> +
+> +static const TypeInfo msf2_sysreg_info = {
+> +    .name  = TYPE_MSF2_SYSREG,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .class_init = msf2_sysreg_class_init,
+> +    .instance_size  = sizeof(MSF2SysregState),
+> +    .instance_init = msf2_sysreg_init,
+> +};
+> +
+> +static void msf2_sysreg_register_types(void)
+> +{
+> +    type_register_static(&msf2_sysreg_info);
+> +}
+> +
+> +type_init(msf2_sysreg_register_types)
+> diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg.h
+> new file mode 100644
+> index 0000000..5e9ea99
+> --- /dev/null
+> +++ b/include/hw/misc/msf2-sysreg.h
+> @@ -0,0 +1,82 @@
+> +/*
+> + * Microsemi SmartFusion2 SYSREG
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_MSF2_SYSREG_H
+> +#define HW_MSF2_SYSREG_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/hw.h"
+> +#include "sysemu/sysemu.h"
+> +#include "qemu/log.h"
+> +
+> +enum {
+> +    ESRAM_CR        = 0x00 / 4,
+> +    ESRAM_MAX_LAT,
+> +    DDR_CR,
+> +    ENVM_CR,
+> +    ENVM_REMAP_BASE_CR,
+> +    ENVM_REMAP_FAB_CR,
+> +    CC_CR,
+> +    CC_REGION_CR,
+> +    CC_LOCK_BASE_ADDR_CR,
+> +    CC_FLUSH_INDX_CR,
+> +    DDRB_BUF_TIMER_CR,
+> +    DDRB_NB_ADDR_CR,
+> +    DDRB_NB_SIZE_CR,
+> +    DDRB_CR,
+> +
+> +    SOFT_RESET_CR  = 0x48 / 4,
+> +    M3_CR,
+> +
+> +    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
+> +
+> +    MDDR_CR = 0x60 / 4,
+> +
+> +    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
+> +    MSSDDR_PLL_STATUS_HIGH_CR,
+> +    MSSDDR_FACC1_CR,
+> +    MSSDDR_FACC2_CR,
+> +
+> +    MSSDDR_PLL_STATUS = 0x150 / 4,
+> +
+> +};
+> +
+> +#define MSF2_SYSREG_MMIO_SIZE     0x300
+> +
+> +#define TYPE_MSF2_SYSREG          "msf2-sysreg"
+> +#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj), TYPE_MSF2_SYSREG)
+> +
+> +typedef struct MSF2SysregState {
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion iomem;
+> +
+> +    uint32_t apb0div;
+> +    uint32_t apb1div;
+> +
+> +    uint32_t regs[MSF2_SYSREG_MMIO_SIZE / 4];
+> +} MSF2SysregState;
+> +
+> +#endif /* HW_MSF2_SYSREG_H */
+> --
+> 2.5.0
 >
-> That is good solution in theory except that I'd like to keep the ebus in
-> slot 1 so that it matches the real DT as much as possible. In the future
-> it could be possible for people to boot using PROMs from a real Sun and
-> I'm not yet convinced that there aren't hardcoded references to some of
-> the onboard legacy devices in a real PROM.
-
-Misunderstanding on my part!  You don't have to blacklist slot 0 to have
-the PCI core put ebus in slot 1.  Simply ask for slot 1 by passing
-PCI_DEVFN(1, 0) to pci_create() or similar.
-
->>> I guess what I'm looking for is some kind of hook that runs after both
->>> machine init and all the devices have been specified on the command
->>> line, which I can use to validate the configuration and provide a
->>> suitable error message/hint if the configuration is invalid?
->> 
->> You should be able to construct the machine you want, and protect the
->> parts the user shouldn't mess with from messing users.  No need to
->> validate the mess afterwards then.
->
-> Unfortunately there would be issues if the user was allowed to construct
-> a machine with more PCI devices than slots in real hardware, since the
-> PCI interrupt number is limited to 4 bits - 2 bits for the PCI interrupt
-> number (A to D), and 2 bits for the slot. So if a user tries to plug in
-> more than 4 devices into each simba bus then the interrupts won't be
-> mapped correctly.
->
-> My feeling is that it makes more sense to error out if the user tries to
-> add too many devices to the bus and/or in the wrong slots rather than
-> let them carry on and wonder why the virtual devices don't work
-> correctly, but I'm open to other options.
-
-My advice is to model the physical hardware faithfully.  If it has four
-PCI slots on a certain PCI bus, provide exactly four.  If it has onboard
-devices hardwired into a certain slot, put them exactly there, and
-disable unplug.  Make it impossible to plug too many devices into a bus,
-or into the wrong slots.
