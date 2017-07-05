@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSo12-0002dj-4w
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:23:05 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dSo6G-0007vI-Ea
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSo11-0007Xi-4d
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:23:04 -0400
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-3-mreitz@redhat.com>
-	<87r2xve509.fsf@dusky.pond.sub.org>
-	<98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-	<5067e305-39fe-3590-4a7c-0f0136d8e5b1@redhat.com>
-	<e21524cb-a199-fa6e-11f6-8b445a1633db@redhat.com>
-	<33f5a5f9-0a58-6b86-d3e1-2bee632a8493@redhat.com>
-	<fabe727c-7024-9f4b-99b3-fecb5da26acf@redhat.com>
-	<986a4919-937e-3668-d94e-f71981992e87@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <275f6b2c-e68e-17f0-f48d-9cc95f84fdc9@redhat.com>
-Date: Wed, 5 Jul 2017 12:22:54 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1dSo6C-0002LJ-EH
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:28:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dSo6C-0002Jz-5R
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:28:24 -0400
+Date: Wed, 5 Jul 2017 11:28:16 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170705112816.56554f65@w520.home>
+In-Reply-To: <1d63c1ae-ca10-0f9d-91de-0d9c9823c104@arm.com>
+References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
+	<1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
+	<cc330a8f-e087-9b6f-2a40-38b58688d300@arm.com>
+	<20170702100659.GA22053@gmail.com>
+	<0e4f2dd4-d553-b1b7-7bec-fe0ff5242c54@arm.com>
+	<20170703103115.GB22053@gmail.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D25919@SHSMSX101.ccr.corp.intel.com>
+	<1d63c1ae-ca10-0f9d-91de-0d9c9823c104@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <986a4919-937e-3668-d94e-f71981992e87@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DmrIv6xGaBgFfD9B8awExNXoLpXKkMIUc"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 7/8] VFIO: Add new IOCTL for IOMMU TLB
+ invalidate propagation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +35,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Liu, Yi
+	L" <yi.l.liu@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DmrIv6xGaBgFfD9B8awExNXoLpXKkMIUc
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <275f6b2c-e68e-17f0-f48d-9cc95f84fdc9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
-References: <20170703122505.32017-1-mreitz@redhat.com>
- <20170703122505.32017-3-mreitz@redhat.com>
- <87r2xve509.fsf@dusky.pond.sub.org>
- <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
- <5067e305-39fe-3590-4a7c-0f0136d8e5b1@redhat.com>
- <e21524cb-a199-fa6e-11f6-8b445a1633db@redhat.com>
- <33f5a5f9-0a58-6b86-d3e1-2bee632a8493@redhat.com>
- <fabe727c-7024-9f4b-99b3-fecb5da26acf@redhat.com>
- <986a4919-937e-3668-d94e-f71981992e87@redhat.com>
-In-Reply-To: <986a4919-937e-3668-d94e-f71981992e87@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 5 Jul 2017 13:42:03 +0100
+Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 
-On 07/05/2017 12:04 PM, Max Reitz wrote:
+> On 05/07/17 07:45, Tian, Kevin wrote:
+> >> From: Liu, Yi L
+> >> Sent: Monday, July 3, 2017 6:31 PM
+> >>
+> >> Hi Jean,
+> >>
+> >>  
+> >>>  
+> >>>> 2. Define a structure in include/uapi/linux/iommu.h(newly added header  
+> >> file)  
+> >>>>
+> >>>> struct iommu_tlb_invalidate {
+> >>>> 	__u32	scope;
+> >>>> /* pasid-selective invalidation described by @pasid */
+> >>>> #define IOMMU_INVALIDATE_PASID	(1 << 0)
+> >>>> /* address-selevtive invalidation described by (@vaddr, @size) */
+> >>>> #define IOMMU_INVALIDATE_VADDR	(1 << 1)  
+> > 
+> > For VT-d above two flags are related. There is no method of flushing
+> > (@vaddr, @size) for all pasids, which doesn't make sense. address-
+> > selective invalidation is valid only for a given pasid. So it's not appropriate
+> > to put them in same level of scope definition at least for VT-d.  
+> 
+> For ARM SMMU the "flush all by VA" operation is valid. Although it's
+> unclear at this point if we will ever allow that, it should probably stay
+> in the common format, if there is one.
+> 
+> >>>> 	__u32	flags;
+> >>>> /*  targets non-pasid mappings, @pasid is not valid */
+> >>>> #define IOMMU_INVALIDATE_NO_PASID	(1 << 0)  
+> >>>
+> >>> Although it was my proposal, I don't like this flag. In ARM SMMU, we're
+> >>> using a special mode where PASID 0 is reserved and any traffic without
+> >>> PASID uses entry 0 of the PASID table. So I proposed the "NO_PASID" flag
+> >>> to invalidate that special context explicitly. But this means that
+> >>> invalidation packet targeted at that context will have "scope = PASID" and
+> >>> "flags = NO_PASID", which is utterly confusing.
+> >>>
+> >>> I now think that we should get rid of the IOMMU_INVALIDATE_NO_PASID  
+> >> flag  
+> >>> and just use PASID 0 to invalidate this context on ARM. I don't think
+> >>> other architectures would use the NO_PASID flag anyway, but might be  
+> >> mistaken.
+> >>
+> >> I may suggest to keep it so far. On VT-d, we may pass some data in opaque,
+> >> so
+> >> we may work without it. But if other vendor want to issue non-PASID tagged
+> >> cache, then may encounter problem.  
+> > 
+> > I'm worried about what's the criteria which attribute should be abstracted
+> > in common structure and which can be left to opaque. It doesn't make
+> > much sense to do such abstraction purely because different vendor formats
+> > have some common fields. Usually we do such abstraction because 
+> > vendor-agnostic code need to do some common handling before going to
+> > vendor specific code. However in this case VFIO is not expected to do anything
+> > with those IOMMU specific attributes. Then the structure is directly forwarded
+> > to IOMMU driver, which simply translates the structure into vendor specific
+> > opaque data again. Then why bothering to do double translations in Qemu
+> > and IOMMU driver side?>
+> > Take VT-d for example. Below is a summary of all possible selections around
+> > invalidation of 1st level structure for svm:
+> > 
+> > Scope: All PASIDs, single PASID
+> > for each PASID:
+> > 	all mappings, or page-selective mappings (addr, size)
+> > invalidation target:
+> > 	IOTLB entries (leaf)
+> > 	paging structure cache (non-leaf)  
+> 
+> I'm curious, can you invalidate all intermediate paging structures for a
+> given PASID without invalidating the leaves?
+> 
+> > 	PASID cache (pasid->cr3)  
+> I guess any implementations that gives the whole PASID table to userspace
+> will need the PASID cache invalidation. This was missing from my proposal
+> since it was from virtio-iommu.
+> 
+> > invalidation hint:
+> > 	whether global pages are included
+> > 	drain reads/writes>
+> > Above are pretty architectural attributes if just looking at functional
+> > purpose. Then if we really consider defining a common structure, it
+> > might be more natural to define a superset of all vendors' capabilities
+> > and remove the opaque field at all. But as said earlier the purpose of
+> > doing such abstraction is not clear if there is no vendor-agnostic
+> > user actually digesting those fields. Then should we reconsider the
+> > full opaque approach?
+> > 
+> > Welcome comments since I may overlook something here. :-)  
+> 
+> I guess on x86 the invalidation packet formats are stable, but for ARM I'm
+> reluctant to deal with vendor-specific formats at the API level, because
+> they tend to be volatile. If a virtual IOMMU version is different from the
+> physical one, then the page table format will be the same but invalidation
+> format will not.
+> 
+> So it would be good to define common fields that have the same effects
+> regardless on the underlying pIOMMU. And the fields that differ between
+> ARM and x86 seem to only be hints.
+> 
+> In addition on ARM SMMU, the guest cannot build an invalidation command
+> that the host could simply copy into the hardware command queue. The
+> pIOMMU driver needs to craft an invalidation command with a Virtual
+> Machine ID, that the guest is never aware of, and a separate ATS
+> invalidation command. It might also need to retrieve an Address Space ID
+> associated with the given PASID if it chose to hide it from the guest.
+> 
+> So for us the invalidation structure would always be different from the
+> hardware one. That's why I do not have any reason the prefer an opaque
+> structure in the first place, and defining generic fields looks much
+> neater :) Then again, I don't have any strong technical objection to it.
 
-> Or, well, yes, it is in this case, but I meant literally UINT64_MAX + 1=
-,
-> not the uint64_t value. I meant the natural number 2^64.
->=20
-> Because the issue is that (double)UINT64_MAX will (or may, depending on=
+I have an objection to opaque data, it's not documented for users,
+can't be considered a stable ABI, introduces compatibility issues, and
+makes debugging difficult.  vfio should have the right to and the
+ability to validate anything coming from the user, whether it's vendor
+specific or generic.  Your concern about hardware changing is just as
+valid on VT-d.  Even if we're emulating VT-d in userspace on a VT-d
+host, how do we know that the two are strictly compatible?  It may be
+today, but we cannot predict the future.  A fully specified ABI means
+that we can properly version it, and if necessary provide compatibility
+handlers if the hardware changes.  Thanks,
 
-> the environment and such) give us 2.0^64 =3D=3D 0x1p64.
->=20
-> And this is where the quotation I gave below comes in. When casting an
-> integer to a double we may end up with a value that is not representabl=
-e
-> in the original integer type, so we cannot easily cast it back.
-
-And it's more than just UINT64_MAX that rounds to the double value of
-0x1p64.  Okay, I'm starting to be convinced that using a floating-point
-comparison to 0x1p64 is going to be easier than an integer comparison to
-the rounding point (what point is that, anyways: where the low-order 11
-bits that don't fit in 53 bits of precision cause us to round up instead
-of down?)
-
->>> Justifying the use of binary exponents is going to be harder than tha=
-t,
->>> and would need a really good comment in the code, compared to just us=
-ing
->>> a safe double-cast.
->>
->> It's not safe.
->>
->> Max
->>
->=20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---DmrIv6xGaBgFfD9B8awExNXoLpXKkMIUc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXSBuAAoJEKeha0olJ0NqynAH/A4R3zvjRdBH13GYp4y7xN8k
-Ufcm7Mish6rplkvezGQaGyGodaKHpbFwrcrRjrZgu5/pAeTdi2I0iAGGYe8ypzuC
-9cb72HD+zJJEyCXzj3gthMepBJMVM21M6BeTkLw19yL8Tyx7YPue+RxvxZ4SKRCn
-Rkdtkk2Mxmt5Hhq5mfkjUmMHclAW6BKouNAvA3PBECshgIcDkOWlyUu04/pwNmp7
-cNpEOcvUFbKkWqdhNNjvoC9mcETv0aTktRPgYA8cy3/Aoi8/jexo6X6xBI7Y+9rc
-MV5Qp5ypS4dhIwgERJ8fRv6gUWPeuEAVQb+LfJ/ADXaaVQXoDGDoXYH58wk3Nro=
-=oYBk
------END PGP SIGNATURE-----
-
---DmrIv6xGaBgFfD9B8awExNXoLpXKkMIUc--
+Alex
