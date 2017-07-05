@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dSeW8-00048J-BB
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1dSeW9-00048U-UA
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dSeW3-0007DW-B9
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:32 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Wed, 5 Jul 2017 07:14:20 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-In-Reply-To: <589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1dSeW8-0007F5-Su
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:14:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170703122505.32017-1-mreitz@redhat.com>
+	<20170703122505.32017-4-mreitz@redhat.com>
+Date: Wed, 05 Jul 2017 09:14:22 +0200
+In-Reply-To: <20170703122505.32017-4-mreitz@redhat.com> (Max Reitz's message
+	of "Mon, 3 Jul 2017 14:25:03 +0200")
+Message-ID: <87k23ne4oh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] block: qobject_is_equal() in
+ bdrv_reopen_prepare()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-PiBGcm9tOiBKZWFuLVBoaWxpcHBlIEJydWNrZXIgW21haWx0bzpqZWFuLXBoaWxpcHBlLmJydWNr
-ZXJAYXJtLmNvbV0NCj4gU2VudDogTW9uZGF5LCBKdW5lIDE5LCAyMDE3IDY6MTUgUE0NCj4gDQo+
-IE9uIDE5LzA2LzE3IDA4OjU0LCBCaGFyYXQgQmh1c2hhbiB3cm90ZToNCj4gPiBIaSBFcmljLA0K
-PiA+DQo+ID4gSSBzdGFydGVkIGFkZGVkIHJlcGxheSBpbiB2aXJ0aW8taW9tbXUgYW5kIGNhbWUg
-YWNyb3NzIGhvdyBNU0kgaW50ZXJydXB0cw0KPiB3aXRoIHdvcmsgd2l0aCBWRklPLg0KPiA+IEkg
-dW5kZXJzdGFuZCB0aGF0IG9uIGludGVsIHRoaXMgd29ya3MgZGlmZmVyZW50bHkgYnV0IHZzbW11
-IHdpbGwgaGF2ZSBzYW1lDQo+IHJlcXVpcmVtZW50Lg0KPiA+IGt2bS1tc2ktaXJxLXJvdXRlIGFy
-ZSBhZGRlZCB1c2luZyB0aGUgbXNpLWFkZHJlc3MgdG8gYmUgdHJhbnNsYXRlZCBieQ0KPiB2aW9t
-bXUgYW5kIG5vdCB0aGUgZmluYWwgdHJhbnNsYXRlZCBhZGRyZXNzLg0KPiA+IFdoaWxlIGN1cnJl
-bnRseSB0aGUgaXJxZmQgZnJhbWV3b3JrIGRvZXMgbm90IGtub3cgYWJvdXQgZW11bGF0ZWQNCj4g
-aW9tbXVzICh2aXJ0aW8taW9tbXUsIHZzbW11djMvdmludGVsLWlvbW11KS4NCj4gPiBTbyBpbiBt
-eSB2aWV3IHdlIGhhdmUgZm9sbG93aW5nIG9wdGlvbnM6DQo+ID4gLSBQcm9ncmFtbWluZyB3aXRo
-IHRyYW5zbGF0ZWQgYWRkcmVzcyB3aGVuIHNldHRpbmcgdXAga3ZtLW1zaS1pcnEtcm91dGUNCj4g
-PiAtIFJvdXRlIHRoZSBpbnRlcnJ1cHRzIHZpYSBRRU1VLCB3aGljaCBpcyBiYWQgZnJvbSBwZXJm
-b3JtYW5jZQ0KPiA+IC0gdmhvc3QtdmlydGlvLWlvbW11IG1heSBzb2x2ZSB0aGUgcHJvYmxlbSBp
-biBsb25nIHRlcm0NCj4gPg0KPiA+IElzIHRoZXJlIGFueSBvdGhlciBiZXR0ZXIgb3B0aW9uIEkg
-YW0gbWlzc2luZz8NCj4gDQo+IFNpbmNlIHdlJ3JlIG9uIHRoZSB0b3BpYyBvZiBNU0lzLi4uIEkn
-bSBjdXJyZW50bHkgdHJ5aW5nIHRvIGZpZ3VyZSBvdXQgaG93DQo+IHdlJ2xsIGhhbmRsZSBNU0lz
-IGluIHRoZSBuZXN0ZWQgdHJhbnNsYXRpb24gbW9kZSwgd2hlcmUgdGhlIGd1ZXN0IG1hbmFnZXMN
-Cj4gUzEgcGFnZSB0YWJsZXMgYW5kIHRoZSBob3N0IGRvZXNuJ3Qga25vdyBhYm91dCBHVkEtPkdQ
-QSB0cmFuc2xhdGlvbi4NCj4gDQo+IEknbSBhbHNvIHdvbmRlcmluZyBhYm91dCB0aGUgYmVuZWZp
-dHMgb2YgaGF2aW5nIFNXLW1hcHBlZCBNU0lzIGluIHRoZQ0KPiBndWVzdC4gSXQgc2VlbXMgdW5h
-dm9pZGFibGUgZm9yIHZTTU1VIHNpbmNlIHRoYXQncyB3aGF0IGEgcGh5c2ljYWwgc3lzdGVtDQo+
-IHdvdWxkIGRvLiBCdXQgaW4gYSBwYXJhdmlydHVhbGl6ZWQgc29sdXRpb24gdGhlcmUgZG9lc24n
-dCBzZWVtIHRvIGJlIGFueQ0KPiBjb21wZWxsaW5nIHJlYXNvbiBmb3IgaGF2aW5nIHRoZSBndWVz
-dCBtYXAgTVNJIGRvb3JiZWxscy4gVGhlc2UgYWRkcmVzc2VzDQo+IGFyZSBuZXZlciBhY2Nlc3Nl
-ZCBkaXJlY3RseSwgdGhleSBhcmUgb25seSB1c2VkIGZvciBzZXR0aW5nIHVwIElSUSByb3V0aW5n
-DQo+IChhdCBsZWFzdCBvbiBrdm10b29sKS4gU28gaGVyZSdzIHdoYXQgSSdkIGxpa2UgdG8gaGF2
-ZS4gTm90ZSB0aGF0IEkNCj4gaGF2ZW4ndCBpbnZlc3RpZ2F0ZWQgdGhlIGZlYXNpYmlsaXR5IGlu
-IFFlbXUgeWV0LCBJIGRvbid0IGtub3cgaG93IGl0DQo+IGRlYWxzIHdpdGggTVNJcy4NCj4gDQo+
-ICgxKSBHdWVzdCB1c2VzIHRoZSBndWVzdC1waHlzaWNhbCBNU0kgZG9vcmJlbGwgd2hlbiBzZXR0
-aW5nIHVwIE1TSXMuIEZvcg0KPiBBUk0gd2l0aCBHSUN2MyB0aGlzIHdvdWxkIGJlIEdJVFNfVFJB
-TlNMQVRFUiwgZm9yIHg4NiBpdCB3b3VsZCBiZSB0aGUNCj4gZml4ZWQgTVNJIGRvb3JiZWxsLiBU
-aGlzIHdheSB0aGUgaG9zdCB3b3VsZG4ndCBuZWVkIHRvIGluc3BlY3QgSU9NTVUNCj4gbWFwcGlu
-Z3Mgd2hlbiBoYW5kbGluZyB3cml0ZXMgdG8gUENJIE1TSS1YIHRhYmxlcy4NCj4gDQoNCldoYXQg
-ZG8geW91IG1lYW4gYnkgImZpeGVkIE1TSSBkb29yYmVsbCI/IFBDSSBNU0ktWCB0YWJsZSBpcyBw
-YXJ0IG9mDQpQQ0kgTU1JTyBiYXIuIEFjY2Vzc2luZyB0byBpdCBpcyBqdXN0IGEgbWVtb3J5IHZp
-cnR1YWxpemF0aW9uIGlzc3VlIChlLmcuDQp0cmFwIGJ5IEtWTSBhbmQgdGhlbiBlbXVsYXRlZCBp
-biBRZW11KSBvbiB4ODYuIEl0J3Mgbm90IGEgSU9NTVUNCnByb2JsZW0uIEkgZ3Vlc3MgeW91IG1h
-eSBtZWFuIHNhbWUgdGhpbmcgYnV0IHdhbnQgdG8gZG91YmxlIGNvbmZpcm0NCmhlcmUgZ2l2ZW4g
-dGhlIHRlcm1pbm9sb2d5IGNvbmZ1c2lvbi4gT3IgZG8geW91IG1lYW4gdGhlIGludGVycnVwdA0K
-dHJpZ2dlcmVkIGJ5IElPTU1VIGl0c2VsZj8NCg0KVGhhbmtzDQpLZXZpbg0K
+Max Reitz <mreitz@redhat.com> writes:
+
+> Currently, bdrv_reopen_prepare() assumes that all BDS options are
+> strings. However, this is not the case if the BDS has been created
+> through the json: pseudo-protocol or blockdev-add.
+>
+> Note that the user-invokable reopen command is an HMP command, so you
+> can only specify strings there. Therefore, specifying a non-string
+> option with the "same" value as it was when originally created will now
+> return an error because the values are supposedly similar (and there is
+> no way for the user to circumvent this but to just not specify the
+> option again -- however, this is still strictly better than just
+> crashing).
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block.c | 31 ++++++++++++++++++-------------
+>  1 file changed, 18 insertions(+), 13 deletions(-)
+>
+> diff --git a/block.c b/block.c
+> index 913bb43..45eb248 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2947,19 +2947,24 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>          const QDictEntry *entry = qdict_first(reopen_state->options);
+>  
+>          do {
+> -            QString *new_obj = qobject_to_qstring(entry->value);
+> -            const char *new = qstring_get_str(new_obj);
+> -            /*
+> -             * Caution: while qdict_get_try_str() is fine, getting
+> -             * non-string types would require more care.  When
+> -             * bs->options come from -blockdev or blockdev_add, its
+> -             * members are typed according to the QAPI schema, but
+> -             * when they come from -drive, they're all QString.
+> -             */
+> -            const char *old = qdict_get_try_str(reopen_state->bs->options,
+> -                                                entry->key);
+> -
+> -            if (!old || strcmp(new, old)) {
+> +            QObject *new = entry->value;
+> +            QObject *old = qdict_get(reopen_state->bs->options, entry->key);
+> +
+> +            /* TODO: When using -drive to specify blockdev options, all values
+> +             * will be strings; however, when using -blockdev, blockdev-add or
+> +             * filenames using the json:{} pseudo-protocol, they will be
+> +             * correctly typed.
+> +             * In contrast, reopening options are (currently) always strings
+> +             * (because you can only specify them through qemu-io; all other
+> +             * callers do not specify any options).
+> +             * Therefore, when using anything other than -drive to create a BDS,
+> +             * this cannot detect non-string options as unchanged, because
+> +             * qobject_is_equal() always returns false for objects of different
+> +             * type.  In the future, this should be remedied by correctly typing
+> +             * all options.  For now, this is not too big of an issue because
+> +             * the user simply can not specify options which cannot be changed
+> +             * anyway, so they will stay unchanged. */
+
+I'm not the maintainer, and this is not a demand: consider winging this
+comment and wrapping lines around column 70.
+
+As much as I fancy word play (see your reply to Eric), I have to admit
+that I had to read "the user simply can not specify options" about three
+times to make sense of it.  Please consider a wording that's easier to
+grasp, perhaps "the user can simply refrain from specifying options that
+cannot be changed".
+
+> +            if (!qobject_is_equal(new, old)) {
+>                  error_setg(errp, "Cannot change the option '%s'", entry->key);
+>                  ret = -EINVAL;
+>                  goto error;
