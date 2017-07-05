@@ -1,49 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSnub-00057e-Nt
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:16:26 -0400
+	(envelope-from <clg@kaod.org>) id 1dSnug-0005Co-Rx
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:16:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dSnuX-0004KD-Mt
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:16:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60623
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dSnuX-0004Jc-H4
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:16:21 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v65HDftU173204
-	for <qemu-devel@nongnu.org>; Wed, 5 Jul 2017 13:16:20 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bh0y4a5ew-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 13:16:20 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 5 Jul 2017 18:16:18 +0100
-References: <1499177279-131407-1-git-send-email-borntraeger@de.ibm.com>
-	<1499177279-131407-4-git-send-email-borntraeger@de.ibm.com>
-	<20170704163103.4d6670a9@dhcp-192-215.str.redhat.com>
-	<3200e2c0-8ffe-2f6d-b7a8-049352851c96@linux.vnet.ibm.com>
-	<87aeaca3-5261-91c9-506b-eded3dededb4@linux.vnet.ibm.com>
-	<20170704185924.3eb7171d@dhcp-192-215.str.redhat.com>
-	<0a35bfd4-b1d1-ce6c-19e0-4aea225c4406@de.ibm.com>
-	<20170705135407.6221-1-pasic@linux.vnet.ibm.com>
-	<20170705172946.49f0e214@dhcp-192-215.str.redhat.com>
-	<520916f1-8199-33ae-ba44-1457292c042a@de.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 5 Jul 2017 19:16:14 +0200
+	(envelope-from <clg@kaod.org>) id 1dSnuc-0004Og-Or
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:16:30 -0400
+Received: from 2.mo3.mail-out.ovh.net ([46.105.75.36]:34496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dSnuc-0004NT-GJ
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:16:26 -0400
+Received: from player158.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 50A4AFCD9C
+	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 19:16:25 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed,  5 Jul 2017 19:13:37 +0200
+Message-Id: <1499274819-15607-25-git-send-email-clg@kaod.org>
+In-Reply-To: <1499274819-15607-1-git-send-email-clg@kaod.org>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <520916f1-8199-33ae-ba44-1457292c042a@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <2edbb1d0-264b-05fc-313a-d62bbee0e19e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x: fixup for "fix error
- propagation in kvm-flic..."
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH 24/26] spapr: include the XIVE interrupt
+ source for IPIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,59 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/xive_spapr.c  | 10 ++++++++++
+ hw/ppc/spapr.c        | 11 ++++++++++-
+ include/hw/ppc/xive.h |  1 +
+ 3 files changed, 21 insertions(+), 1 deletion(-)
 
-
-On 07/05/2017 06:27 PM, Christian Borntraeger wrote:
-> On 07/05/2017 05:29 PM, Cornelia Huck wrote:
->> On Wed,  5 Jul 2017 15:54:07 +0200
->> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>
->>> My patch "s390x: fix error propagation in kvm-flic's realize" accidentally
->>> replaced with. That's wrong! So please apply this fixup before including
->>
->> This sentence is missing something ;)
->>
->>> that patch into mainline (or any other repo).
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> ---
->>>
->>> Hope this is appropriate.
->>
->> git actually has a 'fixup!' handling mechanism.
->>
->>> ---
->>>  hw/intc/s390_flic_kvm.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
->>> index 88f1555121..a587ace3df 100644
->>> --- a/hw/intc/s390_flic_kvm.c
->>> +++ b/hw/intc/s390_flic_kvm.c
->>> @@ -467,7 +467,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
->>>      ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
->>>      if (ret < 0) {
->>>          error_setg_errno(&errp_local, errno, "Creating the KVM device failed");
->>> -        trace_flic_no_device_api(errno);
->>> +        trace_flic_create_device(errno);
->>>          goto fail;
->>>      }
->>>      flic_state->fd = cd.fd;
->>
->> Acked-by: Cornelia Huck <cohuck@redhat.com>
->>
->> Christian, will you handle this?
-> 
-> Yes, I will fold this into the original fix and send a pull request for the whole patch list.
-> Thanks for your review :-)
-> 
-
-Thanks Christian, Connie! I will try to remember git checkin --fixup (I was
-not aware of this feature) next time, and of course try to avoid next time
-from happening in the first.
-
-Regards,
-Halil
+diff --git a/hw/intc/xive_spapr.c b/hw/intc/xive_spapr.c
+index 64282cb4bfab..eb8a5c081e51 100644
+--- a/hw/intc/xive_spapr.c
++++ b/hw/intc/xive_spapr.c
+@@ -26,6 +26,16 @@
+=20
+ #include "xive-internal.h"
+=20
++/*
++ * Used by the XICSFabric ics_get handler in sPAPR
++ */
++ICSState *xive_ics_get(XIVE *x, uint32_t lisn)
++{
++    ICSState *ics =3D ICS_BASE(&x->ipi_xs);
++
++    return ics_valid_irq(ics, lisn) ? ics : NULL;
++}
++
+ static XiveICSState *xive_ics_find(sPAPRMachineState *spapr, uint32_t li=
+sn)
+ {
+     XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(spapr);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 45527b4c5eca..816661f4c9ad 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3361,7 +3361,16 @@ static ICSState *spapr_ics_get(XICSFabric *dev, in=
+t irq)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(dev);
+=20
+-    return ics_valid_irq(spapr->ics, irq) ? spapr->ics : NULL;
++    if (ics_valid_irq(spapr->ics, irq)) {
++        return spapr->ics;
++    }
++
++    /* If needed, check the XIVE IPI source also */
++    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
++        return xive_ics_get(spapr->xive, irq);
++    }
++
++    return NULL;
+ }
+=20
+ static void spapr_ics_resend(XICSFabric *dev)
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 3c1cd96ea4d0..dc5309264422 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -74,5 +74,6 @@ uint32_t xive_alloc_hw_irqs(XIVE *x, uint32_t count, ui=
+nt32_t align);
+ void xive_ics_create(XiveICSState *xs, XIVE *x, uint32_t offset,
+                      uint32_t nr_irqs, uint32_t shift, uint32_t flags,
+                      Error **errp);
++ICSState *xive_ics_get(XIVE *x, uint32_t lisn);
+=20
+ #endif /* PPC_XIVE_H */
+--=20
+2.7.5
