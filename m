@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1dSgBa-0004Rp-Ay
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:01:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dSgXl-0001wK-2H
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1dSgBW-0000yv-7u
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:01:26 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dSgBW-0000yq-1c
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:01:22 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y5so30943574wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 02:01:21 -0700 (PDT)
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Wed,  5 Jul 2017 12:01:13 +0300
-Message-Id: <20170705090113.7036-2-sameeh@daynix.com>
-In-Reply-To: <20170705090113.7036-1-sameeh@daynix.com>
-References: <20170705090113.7036-1-sameeh@daynix.com>
-Subject: [Qemu-devel] [Qemu-GA-Win PATCH v3] qga-win: fix installation on
- localized windows
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dSgXk-0007SO-AM
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 05:24:21 -0400
+References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
+	<20170216130409.GA28784@lemon.lan>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
+Date: Wed, 5 Jul 2017 12:24:01 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170216130409.GA28784@lemon.lan>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
+ dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-From: Daniel Rempel <daniel@daynix.com>
+16.02.2017 16:04, Fam Zheng wrote:
+>> +            dbms->node_name = bdrv_get_node_name(bs);
+>> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
+>> +                dbms->node_name = bdrv_get_device_name(bs);
+>> +            }
+>> +            dbms->bitmap = bitmap;
+> What protects the case that the bitmap is released before migration completes?
+>
+What is the source of such deletion? qmp command? Theoretically possible.
 
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1357789
-Replace hardcoded user and group names ("Administrators", "SYSTEM") with the ones acquired from system. Windows uses localized strings for these names and it may cause the installation to fail.
-Windows has Well-known SIDs for "Administrators" group and "SYSTEM" user so they were used to identify required users and groups.
-Well-known SIDs: https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
+I see the following variants:
 
-Signed-off-by: Daniel Rempel <daniel@daynix.com>
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
----
- qga/vss-win32/install.cpp | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+1. additional variable BdrvDirtyBItmap.migration, which forbids bitmap 
+deletion
 
-diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-index f41fcdf..ba7c94e 100644
---- a/qga/vss-win32/install.cpp
-+++ b/qga/vss-win32/install.cpp
-@@ -18,6 +18,9 @@
- #include <wbemidl.h>
- #include <comdef.h>
- #include <comutil.h>
-+#include <sddl.h>
-+
-+#define BUFFER_SIZE 1024
- 
- extern HINSTANCE g_hinstDll;
- 
-@@ -135,6 +138,27 @@ out:
-     return hr;
- }
- 
-+/* Acquire group or user name by SID */
-+static HRESULT getNameByStringSID(
-+    const wchar_t *sid, LPWSTR buffer, LPDWORD bufferLen)
-+{
-+    HRESULT hr = S_OK;
-+    PSID psid = NULL;
-+    SID_NAME_USE groupType;
-+    DWORD domainNameLen = BUFFER_SIZE;
-+    wchar_t domainName[BUFFER_SIZE];
-+
-+    chk(ConvertStringSidToSidW(sid, &psid));
-+    LookupAccountSidW(NULL, psid, buffer, bufferLen,
-+                domainName, &domainNameLen, &groupType);
-+    hr = HRESULT_FROM_WIN32(GetLastError());
-+
-+    LocalFree(psid);
-+
-+out:
-+    return hr;
-+}
-+
- /* Find and iterate QGA VSS provider in COM+ Application Catalog */
- static HRESULT QGAProviderFind(
-     HRESULT (*found)(ICatalogCollection *, int, void *), void *arg)
-@@ -216,6 +240,10 @@ STDAPI COMRegister(void)
-     CHAR dllPath[MAX_PATH], tlbPath[MAX_PATH];
-     bool unregisterOnFailure = false;
-     int count = 0;
-+    DWORD bufferLen = BUFFER_SIZE;
-+    wchar_t buffer[BUFFER_SIZE];
-+    const wchar_t *administratorsGroupSID = L"S-1-5-32-544";
-+    const wchar_t *systemUserSID = L"S-1-5-18";
- 
-     if (!g_hinstDll) {
-         errmsg(E_FAIL, "Failed to initialize DLL");
-@@ -284,11 +312,12 @@ STDAPI COMRegister(void)
- 
-     /* Setup roles of the applicaion */
- 
-+    chk(getNameByStringSID(administratorsGroupSID, buffer, &bufferLen));
-     chk(pApps->GetCollection(_bstr_t(L"Roles"), key,
-                              (IDispatch **)pRoles.replace()));
-     chk(pRoles->Populate());
-     chk(pRoles->Add((IDispatch **)pObj.replace()));
--    chk(put_Value(pObj, L"Name",        L"Administrators"));
-+    chk(put_Value(pObj, L"Name", buffer));
-     chk(put_Value(pObj, L"Description", L"Administrators group"));
-     chk(pRoles->SaveChanges(&n));
-     chk(pObj->get_Key(&key));
-@@ -303,8 +332,10 @@ STDAPI COMRegister(void)
-     chk(GetAdminName(&name));
-     chk(put_Value(pObj, L"User", _bstr_t(".\\") + name));
- 
-+    bufferLen = BUFFER_SIZE;
-+    chk(getNameByStringSID(systemUserSID, buffer, &bufferLen));
-     chk(pUsersInRole->Add((IDispatch **)pObj.replace()));
--    chk(put_Value(pObj, L"User", L"SYSTEM"));
-+    chk(put_Value(pObj, L"User", buffer));
-     chk(pUsersInRole->SaveChanges(&n));
- 
- out:
+2. make bitmap anonymous (bdrv_dirty_bitmap_make_anon) - it will not be 
+available through qmp
+
+what do you think?
+
 -- 
-2.9.4
+Best regards,
+Vladimir
