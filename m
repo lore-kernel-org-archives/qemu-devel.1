@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeXA-00054n-5f
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:41 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeXF-00059J-77
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeX9-0007wk-58
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:36 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35912)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeXD-00080o-01
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:41 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35302)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeX8-0007uj-Uc
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:35 -0400
-Received: by mail-wr0-x242.google.com with SMTP id 77so49088394wrb.3
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:34 -0700 (PDT)
+	id 1dSeXC-00080H-Ll
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:38 -0400
+Received: by mail-wm0-x243.google.com with SMTP id u23so30504867wma.2
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:38 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:41 +0200
-Message-Id: <1499238885-26161-39-git-send-email-pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:44 +0200
+Message-Id: <1499238885-26161-42-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 38/42] target/i386: make
- cpu_get_fp80()/cpu_set_fp80() static
+Subject: [Qemu-devel] [PULL 41/42] target/i386: add the tcg_enabled() in
+ target/i386/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,88 +33,107 @@ Cc: Yang Zhong <yang.zhong@intel.com>
 
 From: Yang Zhong <yang.zhong@intel.com>
 
-Move cpu_get_fp80()/cpu_set_fp80() from fpu_helper.c to
-machine.c because fpu_helper.c will be disabled if tcg is
-disabled in the build.
+Add the tcg_enabled() where the x86 target needs to disable
+TCG-specific code.
 
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.h        |  2 --
- target/i386/fpu_helper.c | 18 ------------------
- target/i386/machine.c    | 18 ++++++++++++++++++
- 3 files changed, 18 insertions(+), 20 deletions(-)
+ target/i386/cpu.c     |  4 +++-
+ target/i386/cpu.h     |  8 +++++++-
+ target/i386/helper.c  |  2 +-
+ target/i386/machine.c | 10 +++++-----
+ 4 files changed, 16 insertions(+), 8 deletions(-)
 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 642519a..c571772 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4040,8 +4040,10 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->class_by_name = x86_cpu_class_by_name;
+     cc->parse_features = x86_cpu_parse_featurestr;
+     cc->has_work = x86_cpu_has_work;
++#ifdef CONFIG_TCG
+     cc->do_interrupt = x86_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = x86_cpu_exec_interrupt;
++#endif
+     cc->dump_state = x86_cpu_dump_state;
+     cc->get_crash_info = x86_cpu_get_crash_info;
+     cc->set_pc = x86_cpu_set_pc;
+@@ -4070,7 +4072,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     cc->gdb_core_xml_file = "i386-32bit.xml";
+     cc->gdb_num_core_regs = 41;
+ #endif
+-#ifndef CONFIG_USER_ONLY
++#if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
+     cc->debug_excp_handler = breakpoint_handler;
+ #endif
+     cc->cpu_exec_enter = x86_cpu_exec_enter;
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index c5e143e..8d9ba36 100644
+index 3495a91..7a228af 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -1418,8 +1418,6 @@ int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
+@@ -52,7 +52,9 @@
  
- /* op_helper.c */
- /* used for debug or cpu save/restore */
--void cpu_get_fp80(uint64_t *pmant, uint16_t *pexp, floatx80 f);
--floatx80 cpu_set_fp80(uint64_t mant, uint16_t upper);
+ #include "exec/cpu-defs.h"
  
- /* cpu-exec.c */
- /* the following helpers are only usable in user mode simulation as
-diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 69ea33a..34fb5fc 100644
---- a/target/i386/fpu_helper.c
-+++ b/target/i386/fpu_helper.c
-@@ -1539,24 +1539,6 @@ void helper_xsetbv(CPUX86State *env, uint32_t ecx, uint64_t mask)
-     raise_exception_ra(env, EXCP0D_GPF, GETPC());
++#ifdef CONFIG_TCG
+ #include "fpu/softfloat.h"
++#endif
+ 
+ #define R_EAX 0
+ #define R_ECX 1
+@@ -1597,7 +1599,11 @@ uint32_t cpu_cc_compute_all(CPUX86State *env1, int op);
+ 
+ static inline uint32_t cpu_compute_eflags(CPUX86State *env)
+ {
+-    return env->eflags | cpu_cc_compute_all(env, CC_OP) | (env->df & DF_MASK);
++    uint32_t eflags = env->eflags;
++    if (tcg_enabled()) {
++        eflags |= cpu_cc_compute_all(env, CC_OP) | (env->df & DF_MASK);
++    }
++    return eflags;
  }
  
--void cpu_get_fp80(uint64_t *pmant, uint16_t *pexp, floatx80 f)
--{
--    CPU_LDoubleU temp;
--
--    temp.d = f;
--    *pmant = temp.l.lower;
--    *pexp = temp.l.upper;
--}
--
--floatx80 cpu_set_fp80(uint64_t mant, uint16_t upper)
--{
--    CPU_LDoubleU temp;
--
--    temp.l.upper = upper;
--    temp.l.lower = mant;
--    return temp.d;
--}
--
- /* MMX/SSE */
- /* XXX: optimize by storing fptt and fptags in the static cpu state */
+ /* NOTE: the translator must set DisasContext.cc_op to CC_OP_EFLAGS
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index bcf9b22..f63eb3d 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -990,7 +990,7 @@ void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
+         env->tpr_access_type = access;
  
+         cpu_interrupt(cs, CPU_INTERRUPT_TPR);
+-    } else {
++    } else if (tcg_enabled()) {
+         cpu_restore_state(cs, cs->mem_io_pc);
+ 
+         apic_handle_tpr_access_report(cpu->apic_state, env->eip, access);
 diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 8c7a822..53587ae 100644
+index e0417fe..eab3372 100644
 --- a/target/i386/machine.c
 +++ b/target/i386/machine.c
-@@ -142,6 +142,24 @@ typedef struct x86_FPReg_tmp {
-     uint16_t tmp_exp;
- } x86_FPReg_tmp;
+@@ -281,16 +281,16 @@ static int cpu_post_load(void *opaque, int version_id)
+         env->fptags[i] = (env->fptag_vmstate >> i) & 1;
+     }
+     if (tcg_enabled()) {
++        target_ulong dr7;
+         update_fp_status(env);
+         update_mxcsr_status(env);
+-    }
  
-+static void cpu_get_fp80(uint64_t *pmant, uint16_t *pexp, floatx80 f)
-+{
-+    CPU_LDoubleU temp;
+-    cpu_breakpoint_remove_all(cs, BP_CPU);
+-    cpu_watchpoint_remove_all(cs, BP_CPU);
+-    {
++        cpu_breakpoint_remove_all(cs, BP_CPU);
++        cpu_watchpoint_remove_all(cs, BP_CPU);
 +
-+    temp.d = f;
-+    *pmant = temp.l.lower;
-+    *pexp = temp.l.upper;
-+}
-+
-+static floatx80 cpu_set_fp80(uint64_t mant, uint16_t upper)
-+{
-+    CPU_LDoubleU temp;
-+
-+    temp.l.upper = upper;
-+    temp.l.lower = mant;
-+    return temp.d;
-+}
-+
- static void fpreg_pre_save(void *opaque)
- {
-     x86_FPReg_tmp *tmp = opaque;
+         /* Indicate all breakpoints disabled, as they are, then
+            let the helper re-enable them.  */
+-        target_ulong dr7 = env->dr[7];
++        dr7 = env->dr[7];
+         env->dr[7] = dr7 & ~(DR7_GLOBAL_BP_MASK | DR7_LOCAL_BP_MASK);
+         cpu_x86_update_dr7(env, dr7);
+     }
 -- 
 1.8.3.1
