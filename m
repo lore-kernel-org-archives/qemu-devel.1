@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dSquA-0004VK-Nm
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:28:11 -0400
+	(envelope-from <tom.k.cook@gmail.com>) id 1dSoXx-0001D3-DS
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:57:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dSqu9-0004tm-QO
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:28:10 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:40554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dSqu9-0004s1-KH
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:28:09 -0400
-Date: Wed, 5 Jul 2017 22:27:57 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170705202757.rlwd2lw3qo2g6sow@aurel32.net>
-References: <84bf1844-8d5c-2a71-c1cc-8f8c74511fca@vivier.eu>
+	(envelope-from <tom.k.cook@gmail.com>) id 1dSoXw-0008TA-H9
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:57:05 -0400
+Received: from mail-yb0-x22b.google.com ([2607:f8b0:4002:c09::22b]:32935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tom.k.cook@gmail.com>)
+	id 1dSoXw-0008Rs-BX
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:57:04 -0400
+Received: by mail-yb0-x22b.google.com with SMTP id 84so74687991ybe.0
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 10:57:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <84bf1844-8d5c-2a71-c1cc-8f8c74511fca@vivier.eu>
-Subject: Re: [Qemu-devel] trigonometric functions in softfloat
+From: Tom Cook <tom.k.cook@gmail.com>
+Date: Wed, 05 Jul 2017 17:56:51 +0000
+Message-ID: <CAFSh4Uw0bH=a18C0s0k9FReSTebihesfEuwT+PV2Vp50LsX8sA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Modular hardware emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Thomas Huth <huth@tuxfamily.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi,
+I'm using qemu to emulate a certain fruit-flavoured single-board computer -
+which is fantastic for testing changes configuration, by the way.
 
-On 2017-07-05 10:25, Laurent Vivier wrote:
-> Hi,
->=20
-> Thomas has pointed out that WinUAE[1] has an updated softfloat library
-> implementing missing operations for 680x0.
->=20
-> Do you think these changes can be merged in QEMU?
+We have a bit of custom hardware attached to that single-board computer -
+essentially an SPI-slave 8-channel ADC with some analog electronics
+attached.
 
-=46rom the licensing point of view, they seems to use the SoftFloat-2a
-license, so that should be fine.
+I'm trying to get a feel for the level of effort involved in writing an
+emulation of this custom hardware that will work with qemu.  I can see two
+extremes:  At one end of the scale, there might be a nice Python interface
+already in place for writing SPI device emulations and all I need to do is
+point a command-line parameter at a suitable script and away it goes.  At
+the other end, I need to hack around in the qemu source, understand about
+3/4 of it and create a custom build of the whole emulator.
 
-Personally I am fine adding general trigonometric functions to
-softfloat, that might help other targets like x86 which uses  the math
-functions from libm and thus have different behaviour/precision
-depending on the host.
+Can someone give me some sort of idea what level of effort is involved, and
+perhaps a pointer in the right direction, please?
 
-The question is more how m68k specific are those trigonometric
-functions. If we can have a way to implement them as generic
-trigonometric functions reusable by other targets, I am all for it. If
-not that code would probably be better in target/m68k.
-
-Aurelien
-
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Regards,
+Tom
