@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dSswZ-0002xC-4l
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:48 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dSswp-0003CM-I3
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dSswX-0003rR-Rx
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55406)
+	(envelope-from <sstabellini@kernel.org>) id 1dSswk-0003x3-Kw
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:39:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dSswX-0003qd-JE
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:45 -0400
-Date: Wed, 5 Jul 2017 15:38:43 -0700 (PDT)
+	id 1dSswk-0003wD-Bo
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 18:38:58 -0400
+Date: Wed, 5 Jul 2017 15:38:55 -0700 (PDT)
 From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1499183267-28623-5-git-send-email-igor.druzhinin@citrix.com>
-Message-ID: <alpine.DEB.2.10.1707051522260.2919@sstabellini-ThinkPad-X260>
+In-Reply-To: <1499183267-28623-4-git-send-email-igor.druzhinin@citrix.com>
+Message-ID: <alpine.DEB.2.10.1707051524250.2919@sstabellini-ThinkPad-X260>
 References: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
-	<1499183267-28623-5-git-send-email-igor.druzhinin@citrix.com>
+	<1499183267-28623-4-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] xen: don't use xenstore to
- save/restore physmap anymore
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] xen/mapcache: introduce
+ xen_replace_cache_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,141 +32,256 @@ To: Igor Druzhinin <igor.druzhinin@citrix.com>
 Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, pbonzini@redhat.com
 
 On Tue, 4 Jul 2017, Igor Druzhinin wrote:
-> If we have a system with xenforeignmemory_map2() implemented
-> we don't need to save/restore physmap on suspend/restore
-> anymore. In case we resume a VM without physmap - try to
-> recreate the physmap during memory region restore phase and
-> remap map cache entries accordingly. The old code is left
-> for compatibility reasons.
+> This new call is trying to update a requested map cache entry
+> according to the changes in the physmap. The call is searching
+> for the entry, unmaps it and maps again at the same place using
+> a new guest address. If the mapping is dummy this call will
+> make it real.
+> 
+> This function makes use of a new xenforeignmemory_map2() call
+> with an extended interface that was recently introduced in
+> libxenforeignmemory [1].
+> 
+> [1] https://www.mail-archive.com/xen-devel@lists.xen.org/msg113007.html
 > 
 > Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
 > ---
->  hw/i386/xen/xen-hvm.c       | 48 ++++++++++++++++++++++++++++++++++-----------
->  include/hw/xen/xen_common.h |  1 +
->  2 files changed, 38 insertions(+), 11 deletions(-)
+>  configure                     | 18 ++++++++++
+>  hw/i386/xen/xen-mapcache.c    | 79 ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/xen/xen_common.h   |  7 ++++
+>  include/sysemu/xen-mapcache.h | 11 +++++-
+>  4 files changed, 106 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index d259cf7..d24ca47 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -289,6 +289,7 @@ static XenPhysmap *get_physmapping(XenIOState *state,
->      return NULL;
->  }
->  
-> +#ifdef XEN_COMPAT_PHYSMAP
->  static hwaddr xen_phys_offset_to_gaddr(hwaddr start_addr,
->                                                     ram_addr_t size, void *opaque)
->  {
-> @@ -334,6 +335,12 @@ static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
->      }
->      return 0;
->  }
-> +#else
-> +static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
-> +{
-> +    return 0;
+> diff --git a/configure b/configure
+> index c571ad1..ad6156b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2021,6 +2021,24 @@ EOF
+>      # Xen unstable
+>      elif
+>          cat > $TMPC <<EOF &&
+> +#undef XC_WANT_COMPAT_MAP_FOREIGN_API
+> +#include <xenforeignmemory.h>
+> +int main(void) {
+> +  xenforeignmemory_handle *xfmem;
+> +
+> +  xfmem = xenforeignmemory_open(0, 0);
+> +  xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
+> +
+> +  return 0;
 > +}
-> +#endif
+> +EOF
+> +        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
+> +      then
+> +      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
+> +      xen_ctrl_version=41000
+> +      xen=yes
+> +    elif
+> +        cat > $TMPC <<EOF &&
+>  #undef XC_WANT_COMPAT_DEVICEMODEL_API
+>  #define __XEN_TOOLS__
+>  #include <xendevicemodel.h>
+> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+> index cd4e746..a988be7 100644
+> --- a/hw/i386/xen/xen-mapcache.c
+> +++ b/hw/i386/xen/xen-mapcache.c
+> @@ -151,6 +151,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
+>  }
 >  
->  static int xen_add_to_physmap(XenIOState *state,
->                                hwaddr start_addr,
-> @@ -368,6 +375,26 @@ go_physmap:
->      DPRINTF("mapping vram to %"HWADDR_PRIx" - %"HWADDR_PRIx"\n",
->              start_addr, start_addr + size);
+>  static void xen_remap_bucket(MapCacheEntry *entry,
+> +                             void *vaddr,
+>                               hwaddr size,
+>                               hwaddr address_index,
+>                               bool dummy)
+> @@ -167,7 +168,9 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+>      err = g_malloc0(nb_pfn * sizeof (int));
 >  
-> +    mr_name = memory_region_name(mr);
-> +
-> +    physmap = g_malloc(sizeof (XenPhysmap));
-> +
-> +    physmap->start_addr = start_addr;
-> +    physmap->size = size;
-> +    physmap->name = mr_name;
-> +    physmap->phys_offset = phys_offset;
-> +
-> +    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
-> +
-> +    if (runstate_check(RUN_STATE_INMIGRATE)) {
-> +        /* Now when we have a physmap entry we can replace a dummy mapping with
-> +         * a real one of guest foreign memory. */
-> +        uint8_t *p = xen_replace_cache_entry(phys_offset, start_addr, size);
-> +        assert(p && p == memory_region_get_ram_ptr(mr));
-> +
-> +        return 0;
+>      if (entry->vaddr_base != NULL) {
+> -        ram_block_notify_remove(entry->vaddr_base, entry->size);
+> +        if (entry->vaddr_base != vaddr) {
+> +            ram_block_notify_remove(entry->vaddr_base, entry->size);
+> +        }
+
+I would prefer to see checks based on the dummy flag, rather than
+entry->vaddr_base != vaddr.
+
+
+>          if (munmap(entry->vaddr_base, entry->size) != 0) {
+>              perror("unmap fails");
+>              exit(-1);
+> @@ -181,11 +184,11 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+>      }
+>  
+>      if (!dummy) {
+> -        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
+> -                                           PROT_READ|PROT_WRITE,
+> +        vaddr_base = xenforeignmemory_map2(xen_fmem, xen_domid, vaddr,
+> +                                           PROT_READ|PROT_WRITE, 0,
+>                                             nb_pfn, pfns, err);
+>          if (vaddr_base == NULL) {
+> -            perror("xenforeignmemory_map");
+> +            perror("xenforeignmemory_map2");
+>              exit(-1);
+>          }
+
+Can we print a warning if (!dummy && vaddr != NULL)?
+
+
+>          entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
+> @@ -194,7 +197,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+>           * We create dummy mappings where we are unable to create a foreign
+>           * mapping immediately due to certain circumstances (i.e. on resume now)
+>           */
+> -        vaddr_base = mmap(NULL, size, PROT_READ|PROT_WRITE,
+> +        vaddr_base = mmap(vaddr, size, PROT_READ|PROT_WRITE,
+>                            MAP_ANON|MAP_SHARED, -1, 0);
+>          if (vaddr_base == NULL) {
+>              perror("mmap");
+> @@ -203,13 +206,16 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+>          entry->flags |= XEN_MAPCACHE_ENTRY_DUMMY;
+>      }
+>  
+> +    if (entry->vaddr_base == NULL || entry->vaddr_base != vaddr) {
+> +        ram_block_notify_add(vaddr_base, size);
 > +    }
-> +
->      pfn = phys_offset >> TARGET_PAGE_BITS;
->      start_gpfn = start_addr >> TARGET_PAGE_BITS;
->      for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
-> @@ -382,17 +409,6 @@ go_physmap:
+
+Please also check (or check instead) on the dummy flag.
+
+
+>      entry->vaddr_base = vaddr_base;
+>      entry->paddr_index = address_index;
+>      entry->size = size;
+>      entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
+>              BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
+>  
+> -    ram_block_notify_add(entry->vaddr_base, entry->size);
+>      bitmap_zero(entry->valid_mapping, nb_pfn);
+>      for (i = 0; i < nb_pfn; i++) {
+>          if (!err[i]) {
+> @@ -282,14 +288,14 @@ tryagain:
+>      if (!entry) {
+>          entry = g_malloc0(sizeof (MapCacheEntry));
+>          pentry->next = entry;
+> -        xen_remap_bucket(entry, cache_size, address_index, dummy);
+> +        xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
+>      } else if (!entry->lock) {
+>          if (!entry->vaddr_base || entry->paddr_index != address_index ||
+>                  entry->size != cache_size ||
+>                  !test_bits(address_offset >> XC_PAGE_SHIFT,
+>                      test_bit_size >> XC_PAGE_SHIFT,
+>                      entry->valid_mapping)) {
+> -            xen_remap_bucket(entry, cache_size, address_index, dummy);
+> +            xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
 >          }
 >      }
 >  
-> -    mr_name = memory_region_name(mr);
-> -
-> -    physmap = g_malloc(sizeof (XenPhysmap));
-> -
-> -    physmap->start_addr = start_addr;
-> -    physmap->size = size;
-> -    physmap->name = mr_name;
-> -    physmap->phys_offset = phys_offset;
-> -
-> -    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
-> -
->      xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
->                                     start_addr >> TARGET_PAGE_BITS,
->                                     (start_addr + size - 1) >> TARGET_PAGE_BITS,
-> @@ -1158,6 +1174,7 @@ static void xen_exit_notifier(Notifier *n, void *data)
->      xs_daemon_close(state->xenstore);
->  }
+> @@ -486,3 +492,60 @@ void xen_invalidate_map_cache(void)
 >  
-> +#ifdef XEN_COMPAT_PHYSMAP
->  static void xen_read_physmap(XenIOState *state)
->  {
->      XenPhysmap *physmap = NULL;
-> @@ -1205,6 +1222,11 @@ static void xen_read_physmap(XenIOState *state)
->      }
->      free(entries);
+>      mapcache_unlock();
 >  }
-> +#else
-> +static void xen_read_physmap(XenIOState *state)
+> +
+> +static uint8_t *xen_replace_cache_entry_unlocked(hwaddr old_phys_addr,
+> +                                                 hwaddr new_phys_addr,
+> +                                                 hwaddr size)
 > +{
+> +    MapCacheEntry *entry;
+> +    hwaddr address_index;
+> +    hwaddr address_offset;
+> +    hwaddr cache_size = size;
+> +    hwaddr test_bit_size;
+> +
+> +    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
+> +    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
+> +
+> +    assert(size);
+> +    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
+> +    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
+> +    if (test_bit_size % XC_PAGE_SIZE) {
+> +        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
+> +    }
+> +    cache_size = size + address_offset;
+> +    if (cache_size % MCACHE_BUCKET_SIZE) {
+> +        cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
+> +    }
+> +
+> +    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
+> +    while (entry && !(entry->paddr_index == address_index && entry->size == cache_size)) {
+> +        entry = entry->next;
+> +    }
+> +    if (!entry) {
+> +        DPRINTF("Trying to update an entry for %lx that is not in the mapcache!\n", phys_addr);
+> +        return NULL;
+> +    }
+> +
+> +    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
+> +    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
+> +
+> +    xen_remap_bucket(entry, entry->vaddr_base, cache_size, address_index, false);
+> +    if(!test_bits(address_offset >> XC_PAGE_SHIFT,
+> +                test_bit_size >> XC_PAGE_SHIFT,
+> +                entry->valid_mapping)) {
+> +        DPRINTF("Unable to update an entry for %lx in the mapcache!\n", phys_addr);
+> +        return NULL;
+> +    }
+> +    return entry->vaddr_base + address_offset;
 > +}
-> +#endif
->  
->  static void xen_wakeup_notifier(Notifier *notifier, void *data)
->  {
-> @@ -1331,7 +1353,11 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->      state->bufioreq_local_port = rc;
->  
->      /* Init RAM management */
-> +#ifdef XEN_COMPAT_PHYSMAP
->      xen_map_cache_init(xen_phys_offset_to_gaddr, state);
-> +#else
-> +    xen_map_cache_init(NULL, state);
-> +#endif
-
-This is good. I would also like to #ifdef the
-
-  if (!translated && mapcache->phys_offset_to_gaddr) {
-
-block in xen_map_cache_unlocked
-
-
->      xen_ram_init(pcms, ram_size, ram_memory);
->  
->      qemu_add_vm_change_state_handler(xen_hvm_change_state_handler, state);
+> +
+> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr, hwaddr new_phys_addr, hwaddr size)
+> +{
+> +    uint8_t *p;
+> +
+> +    mapcache_lock();
+> +    p = xen_replace_cache_entry_unlocked(old_phys_addr, new_phys_addr, size);
+> +    mapcache_unlock();
+> +    return p;
+> +}
 > diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index 70a5cad..c04c5c9 100644
+> index e00ddd7..70a5cad 100644
 > --- a/include/hw/xen/xen_common.h
 > +++ b/include/hw/xen/xen_common.h
-> @@ -80,6 +80,7 @@ extern xenforeignmemory_handle *xen_fmem;
+> @@ -78,6 +78,13 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
 >  
->  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+>  extern xenforeignmemory_handle *xen_fmem;
 >  
-> +#define XEN_COMPAT_PHYSMAP
->  #define xenforeignmemory_map2(h, d, a, p, f, ps, ar, e) \
->      xenforeignmemory_map(h, d, p, ps, ar, e)
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
+> +
+> +#define xenforeignmemory_map2(h, d, a, p, f, ps, ar, e) \
+> +    xenforeignmemory_map(h, d, p, ps, ar, e)
+> +
+> +#endif
+> +
+>  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
 >  
+>  typedef xc_interface xendevicemodel_handle;
+> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+> index 01daaad..b38962c 100644
+> --- a/include/sysemu/xen-mapcache.h
+> +++ b/include/sysemu/xen-mapcache.h
+> @@ -21,7 +21,9 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+>  ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
+>  void xen_invalidate_map_cache_entry(uint8_t *buffer);
+>  void xen_invalidate_map_cache(void);
+> -
+> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+> +                                 hwaddr new_phys_addr,
+> +                                 hwaddr size);
+>  #else
+>  
+>  static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+> @@ -50,6 +52,13 @@ static inline void xen_invalidate_map_cache(void)
+>  {
+>  }
+>  
+> +uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+> +                                 hwaddr new_phys_addr,
+> +                                 hwaddr size)
+> +{
+> +    abort();
+> +}
+> +
+>  #endif
+>  
+>  #endif /* XEN_MAPCACHE_H */
 > -- 
 > 2.7.4
 > 
