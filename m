@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSqLd-0001hU-MV
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 15:52:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSqYK-0006Vq-7N
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSqLc-00019l-Ri
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 15:52:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSqYI-0005tz-Gm
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 16:05:36 -0400
 References: <20170705190404.22449-1-mreitz@redhat.com>
-	<20170705190404.22449-4-mreitz@redhat.com>
+	<20170705190404.22449-6-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <4227ab64-b25b-e497-8898-3d2554ca79e4@redhat.com>
-Date: Wed, 5 Jul 2017 14:52:17 -0500
+Message-ID: <6c9acef7-aa25-d5da-50b7-d527bd51a52f@redhat.com>
+Date: Wed, 5 Jul 2017 15:05:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170705190404.22449-4-mreitz@redhat.com>
+In-Reply-To: <20170705190404.22449-6-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="lwLvUpBlp9dhR0lCpPskgCGrHBUEFTPSv"
-Subject: Re: [Qemu-devel] [PATCH v4 3/5] block: qobject_is_equal() in
- bdrv_reopen_prepare()
+	boundary="gnXM1PrfgN5UII0sejMmx3jsSvH2p6p6x"
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] tests: Add check-qobject for
+ equality tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,222 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lwLvUpBlp9dhR0lCpPskgCGrHBUEFTPSv
+--gnXM1PrfgN5UII0sejMmx3jsSvH2p6p6x
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Markus Armbruster <armbru@redhat.com>
-Message-ID: <4227ab64-b25b-e497-8898-3d2554ca79e4@redhat.com>
-Subject: Re: [PATCH v4 3/5] block: qobject_is_equal() in bdrv_reopen_prepare()
+Message-ID: <6c9acef7-aa25-d5da-50b7-d527bd51a52f@redhat.com>
+Subject: Re: [PATCH v4 5/5] tests: Add check-qobject for equality tests
 References: <20170705190404.22449-1-mreitz@redhat.com>
- <20170705190404.22449-4-mreitz@redhat.com>
-In-Reply-To: <20170705190404.22449-4-mreitz@redhat.com>
+ <20170705190404.22449-6-mreitz@redhat.com>
+In-Reply-To: <20170705190404.22449-6-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 07/05/2017 02:04 PM, Max Reitz wrote:
-> Currently, bdrv_reopen_prepare() assumes that all BDS options are
-> strings. However, this is not the case if the BDS has been created
-> through the json: pseudo-protocol or blockdev-add.
+> Add a new test file (check-qobject.c) for unit tests that concern
+> QObjects as a whole.
 >=20
-> Note that the user-invokable reopen command is an HMP command, so you
-> can only specify strings there. Therefore, specifying a non-string
-> option with the "same" value as it was when originally created will now=
-
-> return an error because the values are supposedly similar (and there is=
-
-> no way for the user to circumvent this but to just not specify the
-> option again -- however, this is still strictly better than just
-> crashing).
+> Its only purpose for now is to test the qobject_is_equal() function.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block.c | 29 ++++++++++++++++++-----------
->  1 file changed, 18 insertions(+), 11 deletions(-)
+>  tests/Makefile.include |   4 +-
+>  qobject/qnum.c         |  16 +-
+>  tests/check-qobject.c  | 404 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  3 files changed, 417 insertions(+), 7 deletions(-)
+>  create mode 100644 tests/check-qobject.c
 >=20
 
+> +++ b/qobject/qnum.c
+> @@ -217,12 +217,16 @@ QNum *qobject_to_qnum(const QObject *obj)
+>  /**
+>   * qnum_is_equal(): Test whether the two QNums are equal
+>   *
+> - * Negative integers are never considered equal to unsigned integers.
+> - * Doubles are only considered equal to integers if their fractional
+> - * part is zero and their integral part is exactly equal to the
+> - * integer.  Because doubles have limited precision, there are
+> - * therefore integers which do not have an equal double (e.g.
+> - * INT64_MAX).
+> + * This comparison is done independently of the internal
+> + * representation.  Any two numbers are considered equal if they are
+> + * mathmatically equal, that means:
+
+s/mathmatically/mathematically/
+
+> + * - Negative integers are never considered equal to unsigned
+> + *   integers.
+> + * - Floating point values are only considered equal to integers if
+> + *   their fractional part is zero and their integral part is exactly
+> + *   equal to the integer.  Because doubles have limited precision,
+> + *   there are therefore integers which do not have an equal floating
+> + *   point value (e.g. INT64_MAX).
+>   */
+
+> +static void qobject_is_equal_num_test(void)
+> +{
+> +    QNum *u0, *i0, *d0, *d0p25, *dnan, *um42, *im42, *dm42;
+
+Given my comments on 2/5, do you want a dinf?
+
+> +    QNum *umax, *imax, *umax_exact, *umax_exact_p1;
+> +    QNum *dumax, *dimax, *dumax_exact, *dumax_exact_p1;
+> +    QString *s0, *s_empty;
+> +    QBool *bfalse;
+> +
+> +    u0 =3D qnum_from_uint(0u);
+> +    i0 =3D qnum_from_int(0);
+> +    d0 =3D qnum_from_double(0.0);
+> +    d0p25 =3D qnum_from_double(0.25);
+> +    dnan =3D qnum_from_double(0.0 / 0.0);
+
+Are there compilers that complain if we open-code division by zero
+instead of using NAN from <math.h> (similarly, if you test infinity, I'd
+use the INFINITY macro instead of an open-coded computation)
+
+> +    um42 =3D qnum_from_uint((uint64_t)-42);
+> +    im42 =3D qnum_from_int(-42);
+> +    dm42 =3D qnum_from_int(-42.0);
+> +
+> +    /* 2^64 - 1: Not exactly representable as a double (needs 64 bits
+> +     * of precision, but double only has 53).  The double equivalent
+> +     * may be either 2^64 or 2^64 - 2^11. */
+> +    umax =3D qnum_from_uint(UINT64_MAX);
+> +
+> +    /* 2^63 - 1: Not exactly representable as a double (needs 63 bits
+> +     * of precision, but double only has 53).  The double equivalent
+> +     * may be either 2^63 or 2^63 - 2^10. */
+> +    imax =3D qnum_from_int(INT64_MAX);
+> +    /* 2^64 - 2^11: Exactly representable as a double (the least
+> +     * significant 11 bits are set to 0, so we only need the 53 bits
+> +     * of precision double offers).  This is the maximum value which
+> +     * is exactly representable both as a uint64_t and a double. */
+> +    umax_exact =3D qnum_from_uint(UINT64_MAX - 0x7ff);
+> +
+> +    /* 2^64 - 2^11 + 1: Not exactly representable as a double (needs
+> +     * 64 bits again), but whereas (double)UINT64_MAX may be rounded
+> +     * up to 2^64, this will most likely be rounded down to
+> +     * 2^64 - 2^11. */
+> +    umax_exact_p1 =3D qnum_from_uint(UINT64_MAX - 0x7ff + 1);
+
+Nice.
+
+> +
+> +    dumax =3D qnum_from_double((double)qnum_get_uint(umax));
+> +    dimax =3D qnum_from_double((double)qnum_get_int(imax));
+> +    dumax_exact =3D qnum_from_double((double)qnum_get_uint(umax_exact)=
+);
+> +    dumax_exact_p1 =3D qnum_from_double((double)qnum_get_uint(umax_exa=
+ct_p1));
+
+Compiler-dependent what values (some) of these doubles hold.
+
+> +
+> +    s0 =3D qstring_from_str("0");
+> +    s_empty =3D qstring_new();
+> +    bfalse =3D qbool_from_bool(false);
+> +
+> +    /* The internal representation should not matter, as long as the
+> +     * precision is sufficient */
+> +    test_equality(true, u0, i0, d0);
+> +
+> +    /* No automatic type conversion */
+> +    test_equality(false, u0, s0, s_empty, bfalse, qnull(), NULL);
+> +    test_equality(false, i0, s0, s_empty, bfalse, qnull(), NULL);
+> +    test_equality(false, d0, s0, s_empty, bfalse, qnull(), NULL);
+> +
+> +    /* Do not round */
+> +    test_equality(false, u0, d0p25);
+> +    test_equality(false, i0, d0p25);
+> +
+> +    /* Do not assume any object is equal to itself -- note however
+> +     * that NaN cannot occur in a JSON object anyway. */
+> +    g_assert(qobject_is_equal(QOBJECT(dnan), QOBJECT(dnan)) =3D=3D fal=
+se);
+
+If you test infinity, that also cannot occur in JSON objects.
+
+> +
+> +    /* No unsigned overflow */
+> +    test_equality(false, um42, im42);
+> +    test_equality(false, um42, dm42);
+> +    test_equality(true, im42, dm42);
+> +
+> +
+> +    /*
+> +     * Floating point values must match integers exactly to be
+> +     * considered equal; it does not suffice that converting the
+> +     * integer to a double yields the same value.
+> +     * Each of the following four tests follows the same pattern:
+> +     * 1. Check that both QNum objects compare unequal because they
+> +     *    are (mathematically).  The third test is an exception,
+> +     *    because here they are indeed equal.
+> +     * 2. Check that when converting the integer QNum to a double,
+> +     *    that value is equal to the double QNum.  We can thus see
+> +     *    that the QNum comparison does not simply convert the
+> +     *    integer to a floating point value (in a potentially lossy
+> +     *    operation).
+> +     * 3. Sanity checks: Check that the double QNum has the expected
+> +     *    value (which may be one of two in case it was rounded; the
+> +     *    exact result is then implementation-defined).
+> +     *    If there are multiple valid values, check that they are
+> +     *    distinct values when represented as double (just proving
+> +     *    that our assumptions about the precision of doubles are
+> +     *    correct).
+> +     *
+> +     * The first two tests are interesting because they may involve a
+> +     * double value which is out of the uint64_t or int64_t range,
+> +     * respectively (if it is rounded to 2^64 or 2^63 during
+> +     * conversion).
+> +     *
+> +     * Since both are intended to involve rounding the value up during=
+
+> +     * conversion, we also have the fourth test which is indended to
+
+s/indended/intended/
+
+> +     * test behavior if the value was rounded down. This is the fourth=
+
+> +     * test.
+> +     *
+> +     * The third test simply proves that the value used in the fourth
+> +     * test is indeed just one above a number that can be exactly
+> +     * represented in a double.
+> +     */
+> +
+> +    test_equality(false, umax, dumax);
+> +    g_assert(qnum_get_double(umax) =3D=3D qnum_get_double(dumax));
+> +    g_assert(qnum_get_double(dumax) =3D=3D 0x1p64 ||
+> +             qnum_get_double(dumax) =3D=3D 0x1p64 - 0x1p11);
+> +    g_assert(0x1p64 !=3D 0x1p64 - 0x1p11);
+> +
+> +    test_equality(false, imax, dimax);
+> +    g_assert(qnum_get_double(imax) =3D=3D qnum_get_double(dimax));
+> +    g_assert(qnum_get_double(dimax) =3D=3D 0x1p63 ||
+> +             qnum_get_double(dimax) =3D=3D 0x1p63 - 0x1p10);
+> +    g_assert(0x1p63 !=3D 0x1p63 - 0x1p10);
+> +
+> +    test_equality(true, umax_exact, dumax_exact);
+> +    g_assert(qnum_get_double(umax_exact) =3D=3D qnum_get_double(dumax_=
+exact));
+> +    g_assert(qnum_get_double(dumax_exact) =3D=3D 0x1p64 - 0x1p11);
+> +
+> +    test_equality(false, umax_exact_p1, dumax_exact_p1);
+> +    g_assert(qnum_get_double(umax_exact_p1) =3D=3D qnum_get_double(dum=
+ax_exact_p1));
+> +    g_assert(qnum_get_double(dumax_exact_p1) =3D=3D 0x1p64 ||
+> +             qnum_get_double(dumax_exact_p1) =3D=3D 0x1p64 - 0x1p11);
+> +    g_assert(0x1p64 !=3D 0x1p64 - 0x1p11);
+
+Okay, and you catered to the indeterminate nature of the compiler
+rounding pointed out earlier in the creation of the various doubles.
+
+So all-in-all, you may want to add tests for infinity (given the
+undefined nature of casting infinity to integer and any impact to commit
+2/5), but what you have looks good:
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -71,7 +253,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---lwLvUpBlp9dhR0lCpPskgCGrHBUEFTPSv
+--gnXM1PrfgN5UII0sejMmx3jsSvH2p6p6x
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -81,13 +263,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZXUNyAAoJEKeha0olJ0NqIOYH/3QXZmBlol0kdMVvOq99/EBK
-RCGcnJJUO9rlOvXzM8xLEz8Vfry7VKrVGCR6pmLKwlOk7CMDcgHsfOeT4Ha0QRd0
-LNXXe1EAL1EV7quGqJAoTnWda7z1W1lLp1mvdsWzEH3qCHsr4gEyqVl3oMydOe6e
-VCipnuySJZPM/8BipA7v5nFeUBLcUufShvqjvNjbzUgU2EgUFkNRCvz2aovWBUiS
-9KFO/6OoOFo3WrYe8Fj6YorhsLpjot6aoH4S58f3JO4gtUn+xNFQWVmfxp+Fo3MF
-kQ+nFpBsgVqaBB5daXzGRkFgT4J3+7brltg4byPS+54CUQ8ChAhc1fPdMyvOeg0=
-=YI6M
+iQEcBAEBCAAGBQJZXUaEAAoJEKeha0olJ0NqCukH/jovOTlyjG0L5M/HPWGCfP7J
+6ETAdDNF4M5VMrKXVZF9u6c5bE9aaesvmSNE3r9T2sQo5GdwcQq8OY8oeRQibQHh
+kCRCUTVFUCbm4vGT1c+eS2h9PIW+YIlT/QtxAk8EuVjxzFZHo3560hEpeH2CZ5z0
+DZ4z++0S4T6K6qLnwH605lr75v9A25EE8/E24dYtBTNLPw+e6xsO72Pk14nAsCuu
+ldTBcVR2MapshA7Rerp8FaxU/M6tYox2ol3YbecqFeF44W87mf4SET1CMpLJwr0L
+m5r2fGfTfpQxoE+6juRqMRUVVvkUYCImVd7PqdcyaZ1YrKIMTXXBkxP2fKAKf+Y=
+=08JP
 -----END PGP SIGNATURE-----
 
---lwLvUpBlp9dhR0lCpPskgCGrHBUEFTPSv--
+--gnXM1PrfgN5UII0sejMmx3jsSvH2p6p6x--
