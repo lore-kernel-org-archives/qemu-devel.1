@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dSoZn-0001v3-Cs
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:59:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1dSogh-0005mk-Bg
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dSoZl-0000vv-SH
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 13:58:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1dSogd-0005NO-7Y
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:06:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dSogc-0005MN-Uz
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 14:06:03 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
+	<8760f7fnot.fsf@dusky.pond.sub.org>
+	<54df7dce-5108-40d4-e765-03137af3ad73@ilande.co.uk>
+	<87fueanaxt.fsf@dusky.pond.sub.org>
+	<70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk>
+Date: Wed, 05 Jul 2017 20:05:57 +0200
+In-Reply-To: <70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk> (Mark
+	Cave-Ayland's message of "Wed, 5 Jul 2017 17:33:41 +0100")
+Message-ID: <87lgo2hi7u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOyaJQKOmGK=+jgUOJ5vKeUXJH2OEQmxU-qsD8ftC-25Q@mail.gmail.com>
-References: <1499057115-6773-1-git-send-email-sundeep.lkml@gmail.com>
-	<1499057115-6773-2-git-send-email-sundeep.lkml@gmail.com>
-	<CAKmqyKOyaJQKOmGK=+jgUOJ5vKeUXJH2OEQmxU-qsD8ftC-25Q@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 5 Jul 2017 10:58:25 -0700
-Message-ID: <CAKmqyKORLF24EYEhLMeMqZ7znqVULixQ36OyLZO6V0R_E1gEEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel v6 PATCH 1/5] msf2: Add Smartfusion2
- System timer
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Managing architectural restrictions with -device
+ and libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,255 +31,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Wed, Jul 5, 2017 at 10:56 AM, Alistair Francis <alistair23@gmail.com> wrote:
-> On Sun, Jul 2, 2017 at 9:45 PM, Subbaraya Sundeep
-> <sundeep.lkml@gmail.com> wrote:
->> Modelled System Timer in Microsemi's Smartfusion2 Soc.
->> Timer has two 32bit down counters and two interrupts.
->>
->> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->> ---
->>  hw/timer/Makefile.objs       |   1 +
->>  hw/timer/mss-timer.c         | 261 +++++++++++++++++++++++++++++++++++++++++++
->>  include/hw/timer/mss-timer.h |  67 +++++++++++
->>  3 files changed, 329 insertions(+)
->>  create mode 100644 hw/timer/mss-timer.c
->>  create mode 100644 include/hw/timer/mss-timer.h
->>
->> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
->> index dd6f27e..fc4d2da 100644
->> --- a/hw/timer/Makefile.objs
->> +++ b/hw/timer/Makefile.objs
->> @@ -41,3 +41,4 @@ common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
->>  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
->>
->>  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
->> +common-obj-$(CONFIG_MSF2) += mss-timer.o
->> diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
->> new file mode 100644
->> index 0000000..e46d118
->> --- /dev/null
->> +++ b/hw/timer/mss-timer.c
->> @@ -0,0 +1,261 @@
->> +/*
->> + * Block model of System timer present in
->> + * Microsemi's SmartFusion2 and SmartFusion SoCs.
->> + *
->> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining a copy
->> + * of this software and associated documentation files (the "Software"), to deal
->> + * in the Software without restriction, including without limitation the rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "hw/timer/mss-timer.h"
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-Also just noticed (this applies to the whole series) that you need the
-headers in the C file.
+> On 05/07/17 16:46, Markus Armbruster wrote:
+>
+>>>>> I've been working on a patchset that brings the sun4u machine on
+>>>>> qemu-system-sparc64 much closer to a real Ultra 5, however due to
+>>>>> various design restrictions I need to be able to restrict how devices
+>>>>> are added to the machine with -device.
+>>>>>
+>>>>> On a real Ultra 5, the root PCI bus (sabre) has 2 PCI bridges (simba A
+>>>>> and simba B) with the onboard devices attached to simba A with 2 free
+>>>>> slots, and an initially empty simba B.
+>>>>>
+>>>>> Firstly, is it possible to restrict the machine so that devices cannot
+>>>>> be directly plugged into the root PCI bus, but only behind one of the
+>>>>> PCI bridges? There is also an additional restriction in that slot 0
+>>>>> behind simba A must be left empty to ensure that the ebus (containing
+>>>>> the onboard devices) is the first device allocated.
+>>>>
+>>>> I figure sabre, simba A, simba B and the onboard devices attached to
+>>>> simba A are all created by MachineClass init().
+>>>
+>>> Yes that is effectively correct, although the Simba devices are created
+>>> as part of the PCI host bridge (apb) creation in pci_apb_init().
+>> 
+>> Anything that runs within init() counts as "created by init()".
+>
+> Okay, in that case we should be fine here.
+>
+>>>> What device provides "the ebus", and how is it created?
+>>>
+>>> It's actually just an ISA bus, so the ebus device is effectively a
+>>> PCI-ISA bridge for legacy devices.
+>> 
+>> Is this bridge created by init()?
+>
+> Yes, it too is called via the machine init function.
+>
+>>>> Can you provide a list of all onboard PCI devices and how they are
+>>>> connected?  Diagram would be best.
+>>>
+>>> I can try and come up with something more concise later, however I can
+>>> quickly give you the OpenBIOS DT from my WIP patchset if that helps:
+>>>
+>>> 0 > show-devs
+>>> ffe1bf38 /
+>>> ffe1c110 /aliases
+>>> ffe1c238 /openprom (BootROM)
+>>> ffe26b50 /openprom/client-services
+>>> ffe1c4f0 /options
+>>> ffe1c5d0 /chosen
+>>> ffe1c710 /builtin
+>>> ffe1c838 /builtin/console
+>>> ffe26618 /packages
+>>> ffe28640 /packages/cmdline
+>>> ffe28890 /packages/disk-label
+>>> ffe2c8d8 /packages/deblocker
+>>> ffe2cef0 /packages/grubfs-files
+>>> ffe2d300 /packages/sun-parts
+>>> ffe2d718 /packages/elf-loader
+>>> ffe2b210 /memory@0,0 (memory)
+>>> ffe2b370 /virtual-memory
+>>> ffe2d878 /pci@1fe,0 (pci)
+>>> ffe2e1a8 /pci@1fe,0/pci@1,1 (pci)
+>>> ffe2e960 /pci@1fe,0/pci@1,1/ebus@1
+>>> ffe2f1b0 /pci@1fe,0/pci@1,1/ebus@1/eeprom@0
+>>> ffe2f328 /pci@1fe,0/pci@1,1/ebus@1/fdthree@0 (block)
+>>> ffe2f878 /pci@1fe,0/pci@1,1/ebus@1/su@0 (serial)
+>>> ffe2fc08 /pci@1fe,0/pci@1,1/ebus@1/8042@0 (8042)
+>>> ffe2fe00 /pci@1fe,0/pci@1,1/ebus@1/8042@0/kb_ps2@0 (serial)
+>>> ffe301b0 /pci@1fe,0/pci@1,1/NE2000@1,1 (network)
+>>> ffe307c8 /pci@1fe,0/pci@1,1/QEMU,VGA@2 (display)
+>>> ffe31e40 /pci@1fe,0/pci@1,1/ide@3 (ide)
+>>> ffe32398 /pci@1fe,0/pci@1,1/ide@3/ide0@4100 (ide)
+>>> ffe32678 /pci@1fe,0/pci@1,1/ide@3/ide1@4200 (ide)
+>>> ffe32910 /pci@1fe,0/pci@1,1/ide@3/ide1@4200/cdrom@0 (block)
+>>> ffe32f98 /pci@1fe,0/pci@1 (pci)
+>>> ffe336e8 /SUNW,UltraSPARC-IIi (cpu)
+>>>  ok
+>>>
+>>> For comparison you can see the DT from a real Ultra 5 here:
+>>> http://www.pearsonitcertification.com/articles/article.aspx?p=440286&seqNum=7
+>>>
+>>>> The real sabre has two slots, and doesn't support hot (un)plug.  Can we
+>>>> simply model that?  If yes, the root PCI bus is full after init(), and
+>>>> remains full.  Takes care of "cannot directly plugged into the root PCI
+>>>> bus".
+>>>
+>>> Right. So what you're saying is that if we add the 2 simba devices to
+>>> the sabre PCI host bridge during machine init and then mark the sabre
+>>> PCI root bus as not hotplug-able then that will prevent people adding
+>>> extra devices from the command line via -device? I will see if I can
+>>> find time to try this later this evening.
+>> 
+>> No.  Marking the bus "not hotpluggable" only prevents *hotplug*,
+>> i.e. plug/unplug after machine initialization completed, commonly with
+>> device_add.  -device is *cold* plug; it happens during machine
+>> initialization.
+>> 
+>> However, if you limit sabre's bus to two slots (modelling real hardware
+>> faithfully), then you can't cold plug anything (there's no free slot).
+>> If you additionally mark the bus or both simba devices not hotpluggable
+>> (again modelling real hardware faithfully), you can't unplug the simbas.
+>> I believe that's what you want.
+>
+> It seems like limiting the size of the bus would solve the majority of
+> the problem. I've had a quick look around pci.c and while I can see that
+> the PCIBus creation functions take a devfn_min parameter, I can't see
+> anything that limits the number of slots available on the bus?
 
-Move every #include that you can from the mss-timer.h files to this
-file, headers should be local to where they are called. Also make sure
-you include the os-dep header in every file.
+Marcel?
 
-Thanks,
-Alistair
+> And presumably if the user did try and coldplug something into a full
+> bus then they would get the standard "PCI: no slot/function
+> available..." error?
 
->> +
->> +#ifndef MSS_TIMER_ERR_DEBUG
->> +#define MSS_TIMER_ERR_DEBUG  0
->> +#endif
->> +
->> +#define DB_PRINT_L(lvl, fmt, args...) do { \
->> +    if (MSS_TIMER_ERR_DEBUG >= lvl) { \
->> +        qemu_log("%s: " fmt "\n", __func__, ## args); \
->> +    } \
->> +} while (0);
->> +
->> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
->> +
->> +#define R_TIM_VAL         0
->> +#define R_TIM_LOADVAL     1
->> +#define R_TIM_BGLOADVAL   2
->> +#define R_TIM_CTRL        3
->> +#define R_TIM_RIS         4
->> +#define R_TIM_MIS         5
->> +
->> +#define TIMER_CTRL_ENBL     (1 << 0)
->> +#define TIMER_CTRL_ONESHOT  (1 << 1)
->> +#define TIMER_CTRL_INTR     (1 << 2)
->> +#define TIMER_RIS_ACK       (1 << 0)
->> +#define TIMER_RST_CLR       (1 << 6)
->> +#define TIMER_MODE          (1 << 0)
->> +
->> +static void timer_update_irq(struct Msf2Timer *st)
->> +{
->> +    bool isr, ier;
->> +
->> +    isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
->> +    ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
->> +    qemu_set_irq(st->irq, (ier && isr));
->> +}
->> +
->> +static void timer_update(struct Msf2Timer *st)
->> +{
->> +    uint64_t count;
->> +
->> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL)) {
->> +        ptimer_stop(st->ptimer);
->> +        return;
->> +    }
->> +
->> +    count = st->regs[R_TIM_LOADVAL];
->> +    ptimer_set_limit(st->ptimer, count, 1);
->> +    ptimer_run(st->ptimer, 1);
->> +}
->> +
->> +static uint64_t
->> +timer_read(void *opaque, hwaddr offset, unsigned int size)
->> +{
->> +    MSSTimerState *t = opaque;
->> +    hwaddr addr;
->> +    struct Msf2Timer *st;
->> +    uint32_t ret = 0;
->> +    int timer = 0;
->> +    int isr;
->> +    int ier;
->> +
->> +    addr = offset >> 2;
->> +    /*
->> +     * Two independent timers has same base address.
->> +     * Based on address passed figure out which timer is being used.
->> +     */
->> +    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
->> +        timer = 1;
->> +        addr -= R_TIM1_MAX;
->> +    }
->> +
->> +    st = &t->timers[timer];
->> +
->> +    switch (addr) {
->> +    case R_TIM_VAL:
->> +        ret = ptimer_get_count(st->ptimer);
->> +        break;
->> +
->> +    case R_TIM_MIS:
->> +        isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
->> +        ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
->> +        ret = ier & isr;
->> +        break;
->> +
->> +    default:
->> +        if (addr < NUM_TIMERS * R_TIM1_MAX) {
+That's what I'd expect.
+
+>>> My understanding from reading various bits of documentation is that the
+>>> the empty simba bridge (bus B) can hold a maximum of 4 devices, whilst
+>>> the non-empty simba bridge (bus A) can hold a maximum of 2 devices
+>>> (presumably due to the on-board hardware). And in order to make sure
+>>> OpenBIOS maps the PCI IO ranges correctly, the ebus must be the first
+>>> on-board device found during a PCI bus scan which means slot 0 on bus A
+>>> must be blacklisted.
+>> 
+>> Assuming init() plugs in the device providing ebus: plug it into slot 0,
+>> mark it not hotpluggable, done.
 >
-> Shouldn't this just be: addr < R_TIM1_MAX?
+> That is good solution in theory except that I'd like to keep the ebus in
+> slot 1 so that it matches the real DT as much as possible. In the future
+> it could be possible for people to boot using PROMs from a real Sun and
+> I'm not yet convinced that there aren't hardcoded references to some of
+> the onboard legacy devices in a real PROM.
+
+Misunderstanding on my part!  You don't have to blacklist slot 0 to have
+the PCI core put ebus in slot 1.  Simply ask for slot 1 by passing
+PCI_DEVFN(1, 0) to pci_create() or similar.
+
+>>> I guess what I'm looking for is some kind of hook that runs after both
+>>> machine init and all the devices have been specified on the command
+>>> line, which I can use to validate the configuration and provide a
+>>> suitable error message/hint if the configuration is invalid?
+>> 
+>> You should be able to construct the machine you want, and protect the
+>> parts the user shouldn't mess with from messing users.  No need to
+>> validate the mess afterwards then.
 >
-> At this point you have already subjected the offset for multiple timers.
+> Unfortunately there would be issues if the user was allowed to construct
+> a machine with more PCI devices than slots in real hardware, since the
+> PCI interrupt number is limited to 4 bits - 2 bits for the PCI interrupt
+> number (A to D), and 2 bits for the slot. So if a user tries to plug in
+> more than 4 devices into each simba bus then the interrupts won't be
+> mapped correctly.
 >
->> +            ret = st->regs[addr];
->> +        } else {
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
->
-> Maybe add a return here so you don't print the other debug message after this.
->
->> +        }
->> +        break;
->> +    }
->> +
->> +    DB_PRINT("timer=%d 0x%" HWADDR_PRIx "=0x%" PRIx32, timer, offset,
->> +            ret);
->> +    return ret;
->> +}
->> +
->> +static void
->> +timer_write(void *opaque, hwaddr offset,
->> +            uint64_t val64, unsigned int size)
->> +{
->> +    MSSTimerState *t = opaque;
->> +    hwaddr addr;
->> +    struct Msf2Timer *st;
->> +    int timer = 0;
->> +    uint32_t value = val64;
->> +
->> +    addr = offset >> 2;
->> +    /*
->> +     * Two independent timers has same base address.
->> +     * Based on addr passed figure out which timer is being used.
->> +     */
->> +    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
->> +        timer = 1;
->> +        addr -= R_TIM1_MAX;
->> +    }
->> +
->> +    st = &t->timers[timer];
->> +
->> +    DB_PRINT("addr=0x%" HWADDR_PRIx " val=0x%" PRIx32 " (timer=%d)", offset,
->> +            value, timer);
->> +
->> +    switch (addr) {
->> +    case R_TIM_CTRL:
->> +        st->regs[R_TIM_CTRL] = value;
->> +        timer_update(st);
->> +        break;
->> +
->> +    case R_TIM_RIS:
->> +        if (value & TIMER_RIS_ACK) {
->> +            st->regs[R_TIM_RIS] &= ~TIMER_RIS_ACK;
->> +        }
->> +        break;
->> +
->> +    case R_TIM_LOADVAL:
->> +        st->regs[R_TIM_LOADVAL] = value;
->> +        if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
->> +            timer_update(st);
->> +        }
->> +        break;
->> +
->> +    case R_TIM_BGLOADVAL:
->> +        st->regs[R_TIM_BGLOADVAL] = value;
->> +        st->regs[R_TIM_LOADVAL] = value;
->> +        break;
->> +
->> +    case R_TIM_VAL:
->> +    case R_TIM_MIS:
->> +        break;
->> +
->> +    default:
->> +        if (addr < NUM_TIMERS * R_TIM1_MAX) {
->
-> Same comment as above.
->
->> +            st->regs[addr] = value;
->> +        } else {
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
->> +            return;
->> +        }
->> +        break;
->> +    }
->> +    timer_update_irq(st);
->> +}
->
-> Once those comments above are addressed:
->
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->
-> Thanks,
-> Alistair
+> My feeling is that it makes more sense to error out if the user tries to
+> add too many devices to the bus and/or in the wrong slots rather than
+> let them carry on and wonder why the virtual devices don't work
+> correctly, but I'm open to other options.
+
+My advice is to model the physical hardware faithfully.  If it has four
+PCI slots on a certain PCI bus, provide exactly four.  If it has onboard
+devices hardwired into a certain slot, put them exactly there, and
+disable unplug.  Make it impossible to plug too many devices into a bus,
+or into the wrong slots.
