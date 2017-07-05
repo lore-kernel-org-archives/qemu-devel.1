@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dSu6Y-0006sg-3i
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 19:53:12 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dSu7b-0007xb-F8
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 19:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dSu6Q-0008Sq-S3
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 19:53:10 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dSu7Y-0000Ju-8w
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 19:54:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dSu7Y-0000Jo-06
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 19:54:12 -0400
+Date: Wed, 5 Jul 2017 16:54:09 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1499087861-2132-3-git-send-email-owen.smith@citrix.com>
+Message-ID: <alpine.DEB.2.10.1707051643190.2919@sstabellini-ThinkPad-X260>
+References: <1499087861-2132-1-git-send-email-owen.smith@citrix.com>
+	<1499087861-2132-3-git-send-email-owen.smith@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <1498830302-19274-2-git-send-email-edgar.iglesias@gmail.com>
-References: <1498830302-19274-1-git-send-email-edgar.iglesias@gmail.com>
-	<1498830302-19274-2-git-send-email-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 5 Jul 2017 16:52:30 -0700
-Message-ID: <CAKmqyKNwa9UNxMJ0yQjiUa374bD6MY3hO63gSCk7cP_21RFGmg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] target-arm: Move the regime_xxx
- helpers
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 2/2 v2] xenfb: Allow vkbd to connect
+ without a DisplayState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,452 +28,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Owen Smith <owen.smith@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, sstabellini@kernel.org, anthony.perard@citrix.com, kraxel@redhat.com
 
-On Fri, Jun 30, 2017 at 6:45 AM, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Move the regime_xxx helpers in preparation for future code
-> that will reuse them.
->
-> No functional change.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-Alistair
-
+On Mon, 3 Jul 2017, Owen Smith wrote:
+> If the vkbd device model is registered and the vfb device model
+> is not registered, the backend will not transition to connected.
+> If there is no DisplayState, then the absolute coordinates cannot
+> be scaled, and will remain in the range [0, 0x7fff].
+> Backend writes "feature-raw-pointer" to indicate that the backend
+> supports reporting absolute position without rescaling.
+> The frontend uses "request-raw-pointer" to request raw unscaled
+> pointer values. If there is no DisplayState, the absolute values
+> are always raw unscaled values.
+> 
+> Signed-off-by: Owen Smith <owen.smith@citrix.com>
 > ---
->  target/arm/helper.c | 404 ++++++++++++++++++++++++++--------------------------
->  1 file changed, 202 insertions(+), 202 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 2594faa..fd1027e 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -35,6 +35,208 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
->  #define PMCRD   0x8
->  #define PMCRC   0x4
->  #define PMCRE   0x1
-> +
-> +/* Return the exception level which controls this address translation regime */
-> +static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    switch (mmu_idx) {
-> +    case ARMMMUIdx_S2NS:
-> +    case ARMMMUIdx_S1E2:
-> +        return 2;
-> +    case ARMMMUIdx_S1E3:
-> +        return 3;
-> +    case ARMMMUIdx_S1SE0:
-> +        return arm_el_is_aa64(env, 3) ? 1 : 3;
-> +    case ARMMMUIdx_S1SE1:
-> +    case ARMMMUIdx_S1NSE0:
-> +    case ARMMMUIdx_S1NSE1:
-> +    case ARMMMUIdx_MPriv:
-> +    case ARMMMUIdx_MNegPri:
-> +    case ARMMMUIdx_MUser:
-> +        return 1;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +/* Return true if this address translation regime is secure */
-> +static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    switch (mmu_idx) {
-> +    case ARMMMUIdx_S12NSE0:
-> +    case ARMMMUIdx_S12NSE1:
-> +    case ARMMMUIdx_S1NSE0:
-> +    case ARMMMUIdx_S1NSE1:
-> +    case ARMMMUIdx_S1E2:
-> +    case ARMMMUIdx_S2NS:
-> +    case ARMMMUIdx_MPriv:
-> +    case ARMMMUIdx_MNegPri:
-> +    case ARMMMUIdx_MUser:
-> +        return false;
-> +    case ARMMMUIdx_S1E3:
-> +    case ARMMMUIdx_S1SE0:
-> +    case ARMMMUIdx_S1SE1:
-> +        return true;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +/* Return the SCTLR value which controls this address translation regime */
-> +static inline uint32_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    return env->cp15.sctlr_el[regime_el(env, mmu_idx)];
-> +}
-> +
-> +/* Return true if the specified stage of address translation is disabled */
-> +static inline bool regime_translation_disabled(CPUARMState *env,
-> +                                               ARMMMUIdx mmu_idx)
-> +{
-> +    if (arm_feature(env, ARM_FEATURE_M)) {
-> +        switch (env->v7m.mpu_ctrl &
-> +                (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
-> +        case R_V7M_MPU_CTRL_ENABLE_MASK:
-> +            /* Enabled, but not for HardFault and NMI */
-> +            return mmu_idx == ARMMMUIdx_MNegPri;
-> +        case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
-> +            /* Enabled for all cases */
-> +            return false;
-> +        case 0:
-> +        default:
-> +            /* HFNMIENA set and ENABLE clear is UNPREDICTABLE, but
-> +             * we warned about that in armv7m_nvic.c when the guest set it.
-> +             */
-> +            return true;
-> +        }
-> +    }
-> +
-> +    if (mmu_idx == ARMMMUIdx_S2NS) {
-> +        return (env->cp15.hcr_el2 & HCR_VM) == 0;
-> +    }
-> +    return (regime_sctlr(env, mmu_idx) & SCTLR_M) == 0;
-> +}
-> +
-> +static inline bool regime_translation_big_endian(CPUARMState *env,
-> +                                                 ARMMMUIdx mmu_idx)
-> +{
-> +    return (regime_sctlr(env, mmu_idx) & SCTLR_EE) != 0;
-> +}
-> +
-> +/* Return the TCR controlling this translation regime */
-> +static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    if (mmu_idx == ARMMMUIdx_S2NS) {
-> +        return &env->cp15.vtcr_el2;
-> +    }
-> +    return &env->cp15.tcr_el[regime_el(env, mmu_idx)];
-> +}
-> +
-> +/* Convert a possible stage1+2 MMU index into the appropriate
-> + * stage 1 MMU index
-> + */
-> +static inline ARMMMUIdx stage_1_mmu_idx(ARMMMUIdx mmu_idx)
-> +{
-> +    if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> +        mmu_idx += (ARMMMUIdx_S1NSE0 - ARMMMUIdx_S12NSE0);
-> +    }
-> +    return mmu_idx;
-> +}
-> +
-> +/* Returns TBI0 value for current regime el */
-> +uint32_t arm_regime_tbi0(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    TCR *tcr;
-> +    uint32_t el;
-> +
-> +    /* For EL0 and EL1, TBI is controlled by stage 1's TCR, so convert
-> +     * a stage 1+2 mmu index into the appropriate stage 1 mmu index.
-> +     */
-> +    mmu_idx = stage_1_mmu_idx(mmu_idx);
-> +
-> +    tcr = regime_tcr(env, mmu_idx);
-> +    el = regime_el(env, mmu_idx);
-> +
-> +    if (el > 1) {
-> +        return extract64(tcr->raw_tcr, 20, 1);
+>  hw/display/xenfb.c | 36 ++++++++++++++++++++++++++----------
+>  1 file changed, 26 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+> index 88815df..d40af6e 100644
+> --- a/hw/display/xenfb.c
+> +++ b/hw/display/xenfb.c
+> @@ -53,6 +53,7 @@ struct common {
+>  struct XenInput {
+>      struct common c;
+>      int abs_pointer_wanted; /* Whether guest supports absolute pointer */
+> +    int raw_pointer_wanted; /* Whether guest supports unscaled pointer */
+>      int button_state;       /* Last seen pointer button state */
+>      int extended;
+>      /* kbd */
+> @@ -329,18 +330,22 @@ static void xenfb_mouse_event(void *opaque,
+>  			      int dx, int dy, int dz, int button_state)
+>  {
+>      struct XenInput *xenfb = opaque;
+> -    DisplaySurface *surface = qemu_console_surface(xenfb->c.con);
+> -    int dw = surface_width(surface);
+> -    int dh = surface_height(surface);
+> -    int i;
+> +    int i, x, y;
+> +    if (xenfb->c.con && xenfb->raw_pointer_wanted != 1) {
+> +        DisplaySurface *surface = qemu_console_surface(xenfb->c.con);
+> +        int dw = surface_width(surface);
+> +        int dh = surface_height(surface);
+> +        x = dx * (dw - 1) / 0x7fff;
+> +        y = dy * (dh - 1) / 0x7fff;
 > +    } else {
-> +        return extract64(tcr->raw_tcr, 37, 1);
+> +        x = dx;
+> +        y = dy;
 > +    }
-> +}
-> +
-> +/* Returns TBI1 value for current regime el */
-> +uint32_t arm_regime_tbi1(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    TCR *tcr;
-> +    uint32_t el;
-> +
-> +    /* For EL0 and EL1, TBI is controlled by stage 1's TCR, so convert
-> +     * a stage 1+2 mmu index into the appropriate stage 1 mmu index.
-> +     */
-> +    mmu_idx = stage_1_mmu_idx(mmu_idx);
-> +
-> +    tcr = regime_tcr(env, mmu_idx);
-> +    el = regime_el(env, mmu_idx);
-> +
-> +    if (el > 1) {
-> +        return 0;
-> +    } else {
-> +        return extract64(tcr->raw_tcr, 38, 1);
-> +    }
-> +}
-> +
-> +/* Return the TTBR associated with this translation regime */
-> +static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
-> +                                   int ttbrn)
-> +{
-> +    if (mmu_idx == ARMMMUIdx_S2NS) {
-> +        return env->cp15.vttbr_el2;
-> +    }
-> +    if (ttbrn == 0) {
-> +        return env->cp15.ttbr0_el[regime_el(env, mmu_idx)];
-> +    } else {
-> +        return env->cp15.ttbr1_el[regime_el(env, mmu_idx)];
-> +    }
-> +}
-> +
-> +/* Return true if the translation regime is using LPAE format page tables */
-> +static bool regime_using_lpae_format(CPUARMState *env,
-> +                                     ARMMMUIdx mmu_idx)
-> +{
-> +    int el = regime_el(env, mmu_idx);
-> +    if (el == 2 || arm_el_is_aa64(env, el)) {
-> +        return true;
-> +    }
-> +    if (arm_feature(env, ARM_FEATURE_LPAE)
-> +        && (regime_tcr(env, mmu_idx)->raw_tcr & TTBCR_EAE)) {
-> +        return true;
-> +    }
-> +    return false;
-> +}
-> +
-> +/* Returns true if the stage 1 translation regime is using LPAE format page
-> + * tables. Used when raising alignment exceptions, whose FSR changes depending
-> + * on whether the long or short descriptor format is in use. */
-> +bool arm_s1_regime_using_lpae_format(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    mmu_idx = stage_1_mmu_idx(mmu_idx);
-> +
-> +    return regime_using_lpae_format(env, mmu_idx);
-> +}
-> +
-> +static inline bool regime_is_user(CPUARMState *env, ARMMMUIdx mmu_idx)
-> +{
-> +    switch (mmu_idx) {
-> +    case ARMMMUIdx_S1SE0:
-> +    case ARMMMUIdx_S1NSE0:
-> +    case ARMMMUIdx_MUser:
-> +        return true;
-> +    default:
-> +        return false;
-> +    case ARMMMUIdx_S12NSE0:
-> +    case ARMMMUIdx_S12NSE1:
-> +        g_assert_not_reached();
-> +    }
-> +}
->  #endif
->
->  static int vfp_gdb_get_reg(CPUARMState *env, uint8_t *buf, int reg)
-> @@ -7022,208 +7224,6 @@ void arm_cpu_do_interrupt(CPUState *cs)
->      }
+>  
+>      trace_xenfb_mouse_event(opaque, dx, dy, dz, button_state,
+>                              xenfb->abs_pointer_wanted);
+>      if (xenfb->abs_pointer_wanted)
+
+Shouldn't this be:
+
+  if (xenfb->abs_pointer_wanted || xenfb->raw_pointer_wanted)
+
+?
+It it possible to have raw_pointer_wanted && !abs_pointer_wanted? If
+not, we should check at connection or initialization time.
+
+
+> -	xenfb_send_position(xenfb,
+> -			    dx * (dw - 1) / 0x7fff,
+> -			    dy * (dh - 1) / 0x7fff,
+> -			    dz);
+> +        xenfb_send_position(xenfb, x, y, dz);
+>      else
+>  	xenfb_send_motion(xenfb, dx, dy, dz);
+>  
+> @@ -423,6 +428,7 @@ static void xenfb_legacy_mouse_sync(DeviceState *dev)
+>  static int input_init(struct XenDevice *xendev)
+>  {
+>      xenstore_write_be_int(xendev, "feature-abs-pointer", 1);
+> +    xenstore_write_be_int(xendev, "feature-raw-pointer", 1);
+>      return 0;
 >  }
->
-> -/* Return the exception level which controls this address translation regime */
-> -static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    switch (mmu_idx) {
-> -    case ARMMMUIdx_S2NS:
-> -    case ARMMMUIdx_S1E2:
-> -        return 2;
-> -    case ARMMMUIdx_S1E3:
-> -        return 3;
-> -    case ARMMMUIdx_S1SE0:
-> -        return arm_el_is_aa64(env, 3) ? 1 : 3;
-> -    case ARMMMUIdx_S1SE1:
-> -    case ARMMMUIdx_S1NSE0:
-> -    case ARMMMUIdx_S1NSE1:
-> -    case ARMMMUIdx_MPriv:
-> -    case ARMMMUIdx_MNegPri:
-> -    case ARMMMUIdx_MUser:
-> -        return 1;
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> -}
-> -
-> -/* Return true if this address translation regime is secure */
-> -static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    switch (mmu_idx) {
-> -    case ARMMMUIdx_S12NSE0:
-> -    case ARMMMUIdx_S12NSE1:
-> -    case ARMMMUIdx_S1NSE0:
-> -    case ARMMMUIdx_S1NSE1:
-> -    case ARMMMUIdx_S1E2:
-> -    case ARMMMUIdx_S2NS:
-> -    case ARMMMUIdx_MPriv:
-> -    case ARMMMUIdx_MNegPri:
-> -    case ARMMMUIdx_MUser:
-> -        return false;
-> -    case ARMMMUIdx_S1E3:
-> -    case ARMMMUIdx_S1SE0:
-> -    case ARMMMUIdx_S1SE1:
-> -        return true;
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> -}
-> -
-> -/* Return the SCTLR value which controls this address translation regime */
-> -static inline uint32_t regime_sctlr(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    return env->cp15.sctlr_el[regime_el(env, mmu_idx)];
-> -}
-> -
-> -/* Return true if the specified stage of address translation is disabled */
-> -static inline bool regime_translation_disabled(CPUARMState *env,
-> -                                               ARMMMUIdx mmu_idx)
-> -{
-> -    if (arm_feature(env, ARM_FEATURE_M)) {
-> -        switch (env->v7m.mpu_ctrl &
-> -                (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
-> -        case R_V7M_MPU_CTRL_ENABLE_MASK:
-> -            /* Enabled, but not for HardFault and NMI */
-> -            return mmu_idx == ARMMMUIdx_MNegPri;
-> -        case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
-> -            /* Enabled for all cases */
-> -            return false;
-> -        case 0:
-> -        default:
-> -            /* HFNMIENA set and ENABLE clear is UNPREDICTABLE, but
-> -             * we warned about that in armv7m_nvic.c when the guest set it.
-> -             */
-> -            return true;
-> -        }
-> -    }
-> -
-> -    if (mmu_idx == ARMMMUIdx_S2NS) {
-> -        return (env->cp15.hcr_el2 & HCR_VM) == 0;
-> -    }
-> -    return (regime_sctlr(env, mmu_idx) & SCTLR_M) == 0;
-> -}
-> -
-> -static inline bool regime_translation_big_endian(CPUARMState *env,
-> -                                                 ARMMMUIdx mmu_idx)
-> -{
-> -    return (regime_sctlr(env, mmu_idx) & SCTLR_EE) != 0;
-> -}
-> -
-> -/* Return the TCR controlling this translation regime */
-> -static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    if (mmu_idx == ARMMMUIdx_S2NS) {
-> -        return &env->cp15.vtcr_el2;
-> -    }
-> -    return &env->cp15.tcr_el[regime_el(env, mmu_idx)];
-> -}
-> -
-> -/* Convert a possible stage1+2 MMU index into the appropriate
-> - * stage 1 MMU index
-> - */
-> -static inline ARMMMUIdx stage_1_mmu_idx(ARMMMUIdx mmu_idx)
-> -{
-> -    if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> -        mmu_idx += (ARMMMUIdx_S1NSE0 - ARMMMUIdx_S12NSE0);
-> -    }
-> -    return mmu_idx;
-> -}
-> -
-> -/* Returns TBI0 value for current regime el */
-> -uint32_t arm_regime_tbi0(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    TCR *tcr;
-> -    uint32_t el;
-> -
-> -    /* For EL0 and EL1, TBI is controlled by stage 1's TCR, so convert
-> -     * a stage 1+2 mmu index into the appropriate stage 1 mmu index.
-> -     */
-> -    mmu_idx = stage_1_mmu_idx(mmu_idx);
-> -
-> -    tcr = regime_tcr(env, mmu_idx);
-> -    el = regime_el(env, mmu_idx);
-> -
-> -    if (el > 1) {
-> -        return extract64(tcr->raw_tcr, 20, 1);
-> -    } else {
-> -        return extract64(tcr->raw_tcr, 37, 1);
-> -    }
-> -}
-> -
-> -/* Returns TBI1 value for current regime el */
-> -uint32_t arm_regime_tbi1(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    TCR *tcr;
-> -    uint32_t el;
-> -
-> -    /* For EL0 and EL1, TBI is controlled by stage 1's TCR, so convert
-> -     * a stage 1+2 mmu index into the appropriate stage 1 mmu index.
-> -     */
-> -    mmu_idx = stage_1_mmu_idx(mmu_idx);
-> -
-> -    tcr = regime_tcr(env, mmu_idx);
-> -    el = regime_el(env, mmu_idx);
-> -
-> -    if (el > 1) {
-> -        return 0;
-> -    } else {
-> -        return extract64(tcr->raw_tcr, 38, 1);
-> -    }
-> -}
-> -
-> -/* Return the TTBR associated with this translation regime */
-> -static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
-> -                                   int ttbrn)
-> -{
-> -    if (mmu_idx == ARMMMUIdx_S2NS) {
-> -        return env->cp15.vttbr_el2;
-> -    }
-> -    if (ttbrn == 0) {
-> -        return env->cp15.ttbr0_el[regime_el(env, mmu_idx)];
-> -    } else {
-> -        return env->cp15.ttbr1_el[regime_el(env, mmu_idx)];
-> -    }
-> -}
-> -
-> -/* Return true if the translation regime is using LPAE format page tables */
-> -static inline bool regime_using_lpae_format(CPUARMState *env,
-> -                                            ARMMMUIdx mmu_idx)
-> -{
-> -    int el = regime_el(env, mmu_idx);
-> -    if (el == 2 || arm_el_is_aa64(env, el)) {
-> -        return true;
-> -    }
-> -    if (arm_feature(env, ARM_FEATURE_LPAE)
-> -        && (regime_tcr(env, mmu_idx)->raw_tcr & TTBCR_EAE)) {
-> -        return true;
-> -    }
-> -    return false;
-> -}
-> -
-> -/* Returns true if the stage 1 translation regime is using LPAE format page
-> - * tables. Used when raising alignment exceptions, whose FSR changes depending
-> - * on whether the long or short descriptor format is in use. */
-> -bool arm_s1_regime_using_lpae_format(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    mmu_idx = stage_1_mmu_idx(mmu_idx);
-> -
-> -    return regime_using_lpae_format(env, mmu_idx);
-> -}
-> -
-> -static inline bool regime_is_user(CPUARMState *env, ARMMMUIdx mmu_idx)
-> -{
-> -    switch (mmu_idx) {
-> -    case ARMMMUIdx_S1SE0:
-> -    case ARMMMUIdx_S1NSE0:
-> -    case ARMMMUIdx_MUser:
-> -        return true;
-> -    default:
-> -        return false;
-> -    case ARMMMUIdx_S12NSE0:
-> -    case ARMMMUIdx_S12NSE1:
-> -        g_assert_not_reached();
-> -    }
-> -}
-> -
->  /* Translate section/page access permissions to page
->   * R/W protection flags
->   *
-> --
-> 2.7.4
->
->
+>  
+> @@ -432,8 +438,14 @@ static int input_initialise(struct XenDevice *xendev)
+>      int rc;
+>  
+>      if (!in->c.con) {
+> -        xen_pv_printf(xendev, 1, "ds not set (yet)\n");
+> -        return -1;
+> +        char *vfb = xenstore_read_str(NULL, "device/vfb");
+
+Isn't it better to do xenstore_read_str("device", "vfb") ?
+
+
+> +        if (vfb == NULL) {
+> +            /* there is no vfb, run vkbd on its own */
+> +        } else {
+
+if (vfb != NULL)
+
+
+> +            free(vfb);
+
+g_free
+
+
+> +            xen_pv_printf(xendev, 1, "ds not set (yet)\n");
+> +            return -1;
+> +        }
+>      }
+>  
+>      rc = common_bind(&in->c);
+> @@ -451,6 +463,10 @@ static void input_connected(struct XenDevice *xendev)
+>                               &in->abs_pointer_wanted) == -1) {
+>          in->abs_pointer_wanted = 0;
+>      }
+> +    if (xenstore_read_fe_int(xendev, "request-raw-pointer",
+> +                             &in->raw_pointer_wanted) == -1) {
+> +        in->raw_pointer_wanted = 0;
+> +    }
+>  
+>      if (in->qkbd) {
+>          qemu_input_handler_unregister(in->qkbd);
+> -- 
+> 2.1.4
+> 
