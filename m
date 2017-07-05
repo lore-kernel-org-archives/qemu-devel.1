@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSl5P-0008VG-KP
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:15:24 -0400
+	(envelope-from <mst@redhat.com>) id 1dSl5Y-00009V-6e
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:15:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSl5O-0005nl-KA
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:15:23 -0400
-References: <20170703122505.32017-1-mreitz@redhat.com>
-	<20170703122505.32017-3-mreitz@redhat.com>
-	<87r2xve509.fsf@dusky.pond.sub.org>
-	<98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7e9bdf55-c11d-e7cd-d92b-5ccef7e48d3c@redhat.com>
-Date: Wed, 5 Jul 2017 09:15:09 -0500
+	(envelope-from <mst@redhat.com>) id 1dSl5V-0005qe-18
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:15:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dSl5U-0005pf-Nd
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:15:28 -0400
+Date: Wed, 5 Jul 2017 17:15:19 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170705171437-mutt-send-email-mst@kernel.org>
+References: <1499263324-15184-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1499263324-15184-14-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wwrOvVrvTKWEUTX2qJoaDD23I0A6mSACB"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499263324-15184-14-git-send-email-anton.nefedov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v5 13/13] serial: chardev hotswap support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, amit@kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wwrOvVrvTKWEUTX2qJoaDD23I0A6mSACB
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <7e9bdf55-c11d-e7cd-d92b-5ccef7e48d3c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] qapi: Add qobject_is_equal()
-References: <20170703122505.32017-1-mreitz@redhat.com>
- <20170703122505.32017-3-mreitz@redhat.com>
- <87r2xve509.fsf@dusky.pond.sub.org>
- <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-In-Reply-To: <98cccb52-4fca-2625-5f69-30c348962377@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/05/2017 08:48 AM, Max Reitz wrote:
->>>  /**
->>> + * qnum_is_equal(): Test whether the two QNums are equal
->>> + */
->>> +bool qnum_is_equal(const QObject *x, const QObject *y)
->>> +{
->>> +    QNum *num_x =3D qobject_to_qnum(x);
->>> +    QNum *num_y =3D qobject_to_qnum(y);
->>> +
->>> +    switch (num_x->kind) {
->>> +    case QNUM_I64:
->>> +        switch (num_y->kind) {
->>> +        case QNUM_I64:
->>> +            /* Comparison in native int64_t type */
->>> +            return num_x->u.i64 =3D=3D num_y->u.i64;
->>> +        case QNUM_U64:
->>> +            /* Implicit conversion of x to uin64_t, so we have to
->>> +             * check its sign before */
->>> +            return num_x->u.i64 >=3D 0 && num_x->u.i64 =3D=3D num_y-=
->u.u64;
->>> +        case QNUM_DOUBLE:
->>> +            /* Implicit conversion of x to double; no overflow
->>> +             * possible */
->>> +            return num_x->u.i64 =3D=3D num_y->u.dbl;
->>
->> Overflow is impossible, but loss of precision is possible:
->>
->>     (double)9007199254740993ull =3D=3D 9007199254740992.0
->>
->> yields true.  Is this what we want?
->=20
-> I'd argue that yes, because the floating point value represents
-> basically all of the values which are "equal" to it.
-
-But the problem is that we CAN represent the fully-precise number as an
-integer, so having multiple distinct integers that compare differently
-against each other, but equal to the same double, is awkward.
-
->=20
-> But I don't have a string opinion. I guess the alternative would be to
-> convert the double to an integer instead and check for overflows before=
-?
-
-That's the solution Markus gave, and I'm in favor of the tighter check:
-
->=20
->> I guess the obvious fix is
->>
->>     return (double)x =3D=3D x && x =3D=3D y;
->=20
-> Yes, that would do, too; and spares me of having to think about how wel=
-l
-> comparing an arbitrary double to UINT64_MAX actually works. :-)
-
-It basically says that we are unwilling to declare an integer equivalent
-to the double if the double loses precision when trying to store the
-integer.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+On Wed, Jul 05, 2017 at 05:02:04PM +0300, Anton Nefedov wrote:
+> for a backend change, a number of ioctls has to be replayed to sync
+> the current setup of a frontend to a backend tty. This is hopefully
+> enough so we don't have to track, store and replay the whole original
+> control byte sequence.
+> 
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 
---wwrOvVrvTKWEUTX2qJoaDD23I0A6mSACB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Could you please add a description of the feature here?
+How does one use it e.g. for windbg?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXPRtAAoJEKeha0olJ0Nq40AH/jGyRxRQeVUJjoMvNjtAK0db
-7n5odUS0G2UE/zP6gIv9/7LxHk5pVNOrKmjCo3A8fGIflyMPXKpOI8amRkgS4JAq
-TW4IBeRhsVG5mkvgLc5lz07kaKhH77C0PbkOY4D1bFXjXPWclMvKaaKYL+TZIIRb
-D0UHZPP8TLAGK6Fka0sSGTNcVWn2b2tOrWR016YKSsIqYeReESZDF9NgDTdy4cfl
-NcsYkLhUheHfxst3dhjPQpsOilyLhqwVpuBKzHboD5P0VFA1j4lZ1uI2mQ4Cncjo
-j0xyiwsnRK9GWvSC4E9qhRDzAaZcQJ/0/0bMqCLU33SCq5+noaleuG5pK8p/hZ0=
-=9h4R
------END PGP SIGNATURE-----
-
---wwrOvVrvTKWEUTX2qJoaDD23I0A6mSACB--
+> ---
+>  hw/char/serial.c | 32 ++++++++++++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index e47f0b6..9aec6c6 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -891,9 +891,37 @@ static void serial_reset(void *opaque)
+>      s->msr &= ~UART_MSR_ANY_DELTA;
+>  }
+>  
+> +static int serial_be_change(void *opaque)
+> +{
+> +    SerialState *s = opaque;
+> +
+> +    qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
+> +                             serial_event, serial_be_change, s, NULL, true);
+> +
+> +    serial_update_parameters(s);
+> +
+> +    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_BREAK,
+> +                      &s->last_break_enable);
+> +
+> +    s->poll_msl = (s->ier & UART_IER_MSI) ? 1 : 0;
+> +    serial_update_msl(s);
+> +
+> +    if (s->poll_msl >= 0 && !(s->mcr & UART_MCR_LOOP)) {
+> +        serial_update_tiocm(s);
+> +    }
+> +
+> +    if (s->watch_tag > 0) {
+> +        g_source_remove(s->watch_tag);
+> +        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
+> +                                             serial_watch_cb, s);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  void serial_realize_core(SerialState *s, Error **errp)
+>  {
+> -    if (!qemu_chr_fe_get_driver(&s->chr)) {
+> +    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+>          error_setg(errp, "Can't create serial device, empty char device");
+>          return;
+>      }
+> @@ -904,7 +932,7 @@ void serial_realize_core(SerialState *s, Error **errp)
+>      qemu_register_reset(serial_reset, s);
+>  
+>      qemu_chr_fe_set_handlers(&s->chr, serial_can_receive1, serial_receive1,
+> -                             serial_event, NULL, s, NULL, true);
+> +                             serial_event, serial_be_change, s, NULL, true);
+>      fifo8_create(&s->recv_fifo, UART_FIFO_LENGTH);
+>      fifo8_create(&s->xmit_fifo, UART_FIFO_LENGTH);
+>      serial_reset(s);
+> -- 
+> 2.7.4
