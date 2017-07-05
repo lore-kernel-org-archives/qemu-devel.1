@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dSksu-0004hx-81
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:29 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dSksw-0004j2-1R
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dSkss-0007js-Ex
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:28 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dSkst-0007kY-Tt
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:30 -0400
 Received: from mail-eopbgr40113.outbound.protection.outlook.com
 	([40.107.4.113]:64062
 	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dSkss-0007gG-5S
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:26 -0400
+	id 1dSkst-0007gG-Fp
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 10:02:27 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed,  5 Jul 2017 17:01:54 +0300
-Message-Id: <1499263324-15184-4-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Wed,  5 Jul 2017 17:01:56 +0300
+Message-ID: <1499263324-15184-6-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1499263324-15184-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1499263324-15184-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 03/13] char: chardevice hotswap
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 05/13] char: avoid chardevice direct access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,314 +32,416 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, amit@kernel.org, mst@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-This patch adds a possibility to change a char device without a frontend
-removal.
-
-1. Ideally, it would have to happen transparently to a frontend, i.e.
-frontend would continue its regular operation.
-However, backends are not stateless and are set up by the frontends
-via qemu_chr_fe_<> functions, and it's not (generally) possible to replay
-that setup entirely in a backend code, as different chardevs respond
-to the setup calls differently, so do frontends work differently basing
-on those setup responses.
-Moreover, some frontend can generally get and save the backend pointer
-(qemu_chr_fe_get_driver()), and it will become invalid after backend change.
-
-So, a frontend which would like to support chardev hotswap has to register
-a "backend change" handler, and redo its backend setup there.
-
-2. Write path can be used by multiple threads and thus protected with
-chr_write_lock.
-So hotswap also has to be protected so write functions won't access
-a backend being replaced.
+frontends should avoid accessing CharDriver struct where possible
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/chardev/char-fe.h | 17 ++++++++++
- include/chardev/char.h    |  9 +++++
- chardev/char-fe.c         | 33 +++++++++++++-----
- chardev/char.c            | 86 +++++++++++++++++++++++++++++++++++++++++++++++
- qapi-schema.json          | 40 ++++++++++++++++++++++
- 5 files changed, 176 insertions(+), 9 deletions(-)
+ include/chardev/char-fe.h   | 7 +++++++
+ chardev/char-fe.c           | 5 +++++
+ hw/arm/strongarm.c          | 2 +-
+ hw/char/cadence_uart.c      | 2 +-
+ hw/char/debugcon.c          | 2 +-
+ hw/char/escc.c              | 6 +++---
+ hw/char/exynos4210_uart.c   | 2 +-
+ hw/char/grlib_apbuart.c     | 2 +-
+ hw/char/ipoctal232.c        | 2 +-
+ hw/char/parallel.c          | 2 +-
+ hw/char/sclpconsole-lm.c    | 2 +-
+ hw/char/sclpconsole.c       | 2 +-
+ hw/char/sh_serial.c         | 2 +-
+ hw/char/spapr_vty.c         | 2 +-
+ hw/char/terminal3270.c      | 2 +-
+ hw/char/xen_console.c       | 2 +-
+ hw/ipmi/ipmi_bmc_extern.c   | 2 +-
+ hw/misc/ivshmem.c           | 4 ++--
+ hw/usb/ccid-card-passthru.c | 4 ++--
+ hw/usb/dev-serial.c         | 5 ++---
+ hw/usb/redirect.c           | 5 ++---
+ net/filter-mirror.c         | 2 +-
+ 22 files changed, 38 insertions(+), 28 deletions(-)
 
 diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
-index 9f38060..0314870 100644
+index 385aa99..61c7f97 100644
 --- a/include/chardev/char-fe.h
 +++ b/include/chardev/char-fe.h
-@@ -10,6 +10,12 @@ typedef int BackendChangeHandler(void *opaque);
-  * Chardev */
- struct CharBackend {
-     Chardev *chr;
-+    /* chr_lock is used to ensure thread-safety of operations with
-+     * the associated Chardev.
-+     * There is no guarantee otherwise, generally, that *chr won't become
-+     * invalid.
-+     */
-+    QemuMutex chr_lock;
-     IOEventHandler *chr_event;
-     IOCanReadHandler *chr_can_read;
-     IOReadHandler *chr_read;
-@@ -42,6 +48,17 @@ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp);
- void qemu_chr_fe_deinit(CharBackend *b, bool del);
- 
+@@ -77,6 +77,13 @@ Chardev *qemu_chr_fe_get_driver(CharBackend *be);
+ bool qemu_chr_fe_backend_connected(CharBackend *be);
+=20
  /**
-+ * @qemu_chr_fe_connect:
++ * @qemu_chr_fe_backend_open:
 + *
-+ * Connects the already initialized front end with a given Chardev.
-+ * Call qemu_chr_fe_deinit() to remove the association and
-+ * release the driver.
-+ *
-+ * Returns: false on error.
++ * Returns true if chardevice associated with @be is open.
 + */
-+bool qemu_chr_fe_connect(CharBackend *b, Chardev *s, Error **errp);
++bool qemu_chr_fe_backend_open(CharBackend *be);
 +
 +/**
-  * @qemu_chr_fe_get_driver:
-  *
-  * Returns the driver associated with a CharBackend or NULL if no
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 8a9ade4..22fd734 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -93,6 +93,15 @@ void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
- Chardev *qemu_chr_new(const char *label, const char *filename);
- 
- /**
-+ * @qemu_chr_change:
-+ *
-+ * Change an existing character backend
-+ *
-+ * @opts the new backend options
-+ */
-+void qemu_chr_change(QemuOpts *opts, Error **errp);
-+
-+/**
-  * @qemu_chr_cleanup:
-  *
-  * Delete all chardevs (when leaving qemu)
+  * @qemu_chr_fe_set_handlers:
+  * @b: a CharBackend
+  * @fd_can_read: callback to get the amount of data the frontend may
 diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index 7054863..86a878b 100644
+index be96fb5..3120441 100644
 --- a/chardev/char-fe.c
 +++ b/chardev/char-fe.c
-@@ -33,24 +33,28 @@
- 
- int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
- {
--    Chardev *s = be->chr;
-+    int ret = 0;
- 
--    if (!s) {
--        return 0;
-+    qemu_mutex_lock(&be->chr_lock);
-+    if (be->chr) {
-+        ret = qemu_chr_write(be->chr, buf, len, false);
-     }
-+    qemu_mutex_unlock(&be->chr_lock);
- 
--    return qemu_chr_write(s, buf, len, false);
-+    return ret;
+@@ -193,6 +193,11 @@ bool qemu_chr_fe_backend_connected(CharBackend *be)
+     return !!be->chr;
  }
- 
- int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
- {
--    Chardev *s = be->chr;
-+    int ret = 0;
- 
--    if (!s) {
--        return 0;
-+    qemu_mutex_lock(&be->chr_lock);
-+    if (be->chr) {
-+        ret = qemu_chr_write(be->chr, buf, len, true);
-     }
-+    qemu_mutex_unlock(&be->chr_lock);
- 
--    return qemu_chr_write(s, buf, len, true);
-+    return ret;
- }
- 
- int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
-@@ -182,7 +186,7 @@ Chardev *qemu_chr_fe_get_driver(CharBackend *be)
-     return be->chr;
- }
- 
--bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
-+bool qemu_chr_fe_connect(CharBackend *b, Chardev *s, Error **errp)
- {
-     int tag = 0;
- 
-@@ -211,6 +215,16 @@ unavailable:
-     return false;
- }
- 
-+bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
+=20
++bool qemu_chr_fe_backend_open(CharBackend *be)
 +{
-+    if (!qemu_chr_fe_connect(b, s, errp)) {
-+        return false;
-+    }
-+
-+    qemu_mutex_init(&b->chr_lock);
-+    return true;
++    return be->chr && be->chr->be_open;
 +}
 +
- void qemu_chr_fe_deinit(CharBackend *b, bool del)
+ bool qemu_chr_fe_connect(CharBackend *b, Chardev *s, Error **errp)
  {
-     assert(b);
-@@ -228,6 +242,7 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
-             object_unparent(OBJECT(b->chr));
+     int tag =3D 0;
+diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+index 1fa082c..6a45dcc 100644
+--- a/hw/arm/strongarm.c
++++ b/hw/arm/strongarm.c
+@@ -1106,7 +1106,7 @@ static void strongarm_uart_tx(void *opaque)
+=20
+     if (s->utcr3 & UTCR3_LBM) /* loopback */ {
+         strongarm_uart_receive(s, &s->tx_fifo[s->tx_start], 1);
+-    } else if (qemu_chr_fe_get_driver(&s->chr)) {
++    } else if (qemu_chr_fe_backend_connected(&s->chr)) {
+         /* XXX this blocks entire thread. Rewrite to use
+          * qemu_chr_fe_write and background I/O callbacks */
+         qemu_chr_fe_write_all(&s->chr, &s->tx_fifo[s->tx_start], 1);
+diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+index 3a9335c..6143494 100644
+--- a/hw/char/cadence_uart.c
++++ b/hw/char/cadence_uart.c
+@@ -279,7 +279,7 @@ static gboolean cadence_uart_xmit(GIOChannel *chan, GIO=
+Condition cond,
+     int ret;
+=20
+     /* instant drain the fifo when there's no back-end */
+-    if (!qemu_chr_fe_get_driver(&s->chr)) {
++    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+         s->tx_count =3D 0;
+         return FALSE;
+     }
+diff --git a/hw/char/debugcon.c b/hw/char/debugcon.c
+index 9b56fb8..95ccec6 100644
+--- a/hw/char/debugcon.c
++++ b/hw/char/debugcon.c
+@@ -87,7 +87,7 @@ static const MemoryRegionOps debugcon_ops =3D {
+=20
+ static void debugcon_realize_core(DebugconState *s, Error **errp)
+ {
+-    if (!qemu_chr_fe_get_driver(&s->chr)) {
++    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+         error_setg(errp, "Can't create debugcon device, empty char device"=
+);
+         return;
+     }
+diff --git a/hw/char/escc.c b/hw/char/escc.c
+index 3546df3..89ae9eb 100644
+--- a/hw/char/escc.c
++++ b/hw/char/escc.c
+@@ -417,7 +417,7 @@ static void escc_update_parameters(ChannelState *s)
+     int speed, parity, data_bits, stop_bits;
+     QEMUSerialSetParams ssp;
+=20
+-    if (!qemu_chr_fe_get_driver(&s->chr) || s->type !=3D ser)
++    if (!qemu_chr_fe_backend_connected(&s->chr) || s->type !=3D ser)
+         return;
+=20
+     if (s->wregs[W_TXCTRL1] & TXCTRL1_PAREN) {
+@@ -557,7 +557,7 @@ static void escc_mem_write(void *opaque, hwaddr addr,
+         trace_escc_mem_writeb_data(CHN_C(s), val);
+         s->tx =3D val;
+         if (s->wregs[W_TXCTRL2] & TXCTRL2_TXEN) { // tx enabled
+-            if (qemu_chr_fe_get_driver(&s->chr)) {
++            if (qemu_chr_fe_backend_connected(&s->chr)) {
+                 /* XXX this blocks entire thread. Rewrite to use
+                  * qemu_chr_fe_write and background I/O callbacks */
+                 qemu_chr_fe_write_all(&s->chr, &s->tx, 1);
+@@ -1013,7 +1013,7 @@ static void escc_realize(DeviceState *dev, Error **er=
+rp)
+                           ESCC_SIZE << s->it_shift);
+=20
+     for (i =3D 0; i < 2; i++) {
+-        if (qemu_chr_fe_get_driver(&s->chn[i].chr)) {
++        if (qemu_chr_fe_backend_connected(&s->chn[i].chr)) {
+             s->chn[i].clock =3D s->frequency / 2;
+             qemu_chr_fe_set_handlers(&s->chn[i].chr, serial_can_receive,
+                                      serial_receive1, serial_event, NULL,
+diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
+index a84d2c3..3957e78 100644
+--- a/hw/char/exynos4210_uart.c
++++ b/hw/char/exynos4210_uart.c
+@@ -380,7 +380,7 @@ static void exynos4210_uart_write(void *opaque, hwaddr =
+offset,
+         break;
+=20
+     case UTXH:
+-        if (qemu_chr_fe_get_driver(&s->chr)) {
++        if (qemu_chr_fe_backend_connected(&s->chr)) {
+             s->reg[I_(UTRSTAT)] &=3D ~(UTRSTAT_TRANSMITTER_EMPTY |
+                     UTRSTAT_Tx_BUFFER_EMPTY);
+             ch =3D (uint8_t)val;
+diff --git a/hw/char/grlib_apbuart.c b/hw/char/grlib_apbuart.c
+index 12d0c99..bac11be 100644
+--- a/hw/char/grlib_apbuart.c
++++ b/hw/char/grlib_apbuart.c
+@@ -201,7 +201,7 @@ static void grlib_apbuart_write(void *opaque, hwaddr ad=
+dr,
+     case DATA_OFFSET:
+     case DATA_OFFSET + 3:       /* When only one byte write */
+         /* Transmit when character device available and transmitter enable=
+d */
+-        if (qemu_chr_fe_get_driver(&uart->chr) &&
++        if (qemu_chr_fe_backend_connected(&uart->chr) &&
+             (uart->control & UART_TRANSMIT_ENABLE)) {
+             c =3D value & 0xFF;
+             /* XXX this blocks entire thread. Rewrite to use
+diff --git a/hw/char/ipoctal232.c b/hw/char/ipoctal232.c
+index cc8c8dc..5e09caf 100644
+--- a/hw/char/ipoctal232.c
++++ b/hw/char/ipoctal232.c
+@@ -542,7 +542,7 @@ static void ipoctal_realize(DeviceState *dev, Error **e=
+rrp)
+         ch->ipoctal =3D s;
+=20
+         /* Redirect IP-Octal channels to host character devices */
+-        if (qemu_chr_fe_get_driver(&ch->dev)) {
++        if (qemu_chr_fe_backend_connected(&ch->dev)) {
+             qemu_chr_fe_set_handlers(&ch->dev, hostdev_can_receive,
+                                      hostdev_receive, hostdev_event,
+                                      NULL, ch, NULL, true);
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 75a1a2f..055789f 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -513,7 +513,7 @@ static void parallel_isa_realizefn(DeviceState *dev, Er=
+ror **errp)
+     int base;
+     uint8_t dummy;
+=20
+-    if (!qemu_chr_fe_get_driver(&s->chr)) {
++    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+         error_setg(errp, "Can't create parallel device, empty char device"=
+);
+         return;
+     }
+diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+index 741c641..c500bda 100644
+--- a/hw/char/sclpconsole-lm.c
++++ b/hw/char/sclpconsole-lm.c
+@@ -195,7 +195,7 @@ static int write_console_data(SCLPEvent *event, const u=
+int8_t *buf, int len)
+ {
+     SCLPConsoleLM *scon =3D SCLPLM_CONSOLE(event);
+=20
+-    if (!qemu_chr_fe_get_driver(&scon->chr)) {
++    if (!qemu_chr_fe_backend_connected(&scon->chr)) {
+         /* If there's no backend, we can just say we consumed all data. */
+         return len;
+     }
+diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+index a92baa8..d0265df 100644
+--- a/hw/char/sclpconsole.c
++++ b/hw/char/sclpconsole.c
+@@ -163,7 +163,7 @@ static ssize_t write_console_data(SCLPEvent *event, con=
+st uint8_t *buf,
+ {
+     SCLPConsole *scon =3D SCLP_CONSOLE(event);
+=20
+-    if (!qemu_chr_fe_get_driver(&scon->chr)) {
++    if (!qemu_chr_fe_backend_connected(&scon->chr)) {
+         /* If there's no backend, we can just say we consumed all data. */
+         return len;
+     }
+diff --git a/hw/char/sh_serial.c b/hw/char/sh_serial.c
+index ad043bd..835b537 100644
+--- a/hw/char/sh_serial.c
++++ b/hw/char/sh_serial.c
+@@ -110,7 +110,7 @@ static void sh_serial_write(void *opaque, hwaddr offs,
          }
-         b->chr = NULL;
-+        qemu_mutex_destroy(&b->chr_lock);
+         return;
+     case 0x0c: /* FTDR / TDR */
+-        if (qemu_chr_fe_get_driver(&s->chr)) {
++        if (qemu_chr_fe_backend_connected(&s->chr)) {
+             ch =3D val;
+             /* XXX this blocks entire thread. Rewrite to use
+              * qemu_chr_fe_write and background I/O callbacks */
+diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
+index ddd1b00..0fa416c 100644
+--- a/hw/char/spapr_vty.c
++++ b/hw/char/spapr_vty.c
+@@ -78,7 +78,7 @@ static void spapr_vty_realize(VIOsPAPRDevice *sdev, Error=
+ **errp)
+ {
+     VIOsPAPRVTYDevice *dev =3D VIO_SPAPR_VTY_DEVICE(sdev);
+=20
+-    if (!qemu_chr_fe_get_driver(&dev->chardev)) {
++    if (!qemu_chr_fe_backend_connected(&dev->chardev)) {
+         error_setg(errp, "chardev property not set");
+         return;
+     }
+diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
+index 5adf95b..28f5991 100644
+--- a/hw/char/terminal3270.c
++++ b/hw/char/terminal3270.c
+@@ -239,7 +239,7 @@ static int write_payload_3270(EmulatedCcw3270Device *de=
+v, uint8_t cmd,
+             return 0;
+         }
+     }
+-    if (!qemu_chr_fe_get_driver(&t->chr)) {
++    if (!qemu_chr_fe_backend_connected(&t->chr)) {
+         /* We just say we consumed all data if there's no backend. */
+         return count;
+     }
+diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
+index c4e8c72..3643dfe 100644
+--- a/hw/char/xen_console.c
++++ b/hw/char/xen_console.c
+@@ -150,7 +150,7 @@ static void xencons_send(struct XenConsole *con)
+     ssize_t len, size;
+=20
+     size =3D con->buffer.size - con->buffer.consumed;
+-    if (qemu_chr_fe_get_driver(&con->chr)) {
++    if (qemu_chr_fe_backend_connected(&con->chr)) {
+         len =3D qemu_chr_fe_write(&con->chr,
+                                 con->buffer.data + con->buffer.consumed,
+                                 size);
+diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+index 182de58..abab3bb 100644
+--- a/hw/ipmi/ipmi_bmc_extern.c
++++ b/hw/ipmi/ipmi_bmc_extern.c
+@@ -447,7 +447,7 @@ static void ipmi_bmc_extern_realize(DeviceState *dev, E=
+rror **errp)
+ {
+     IPMIBmcExtern *ibe =3D IPMI_BMC_EXTERN(dev);
+=20
+-    if (!qemu_chr_fe_get_driver(&ibe->chr)) {
++    if (!qemu_chr_fe_backend_connected(&ibe->chr)) {
+         error_setg(errp, "IPMI external bmc requires chardev attribute");
+         return;
+     }
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index a857e50..7f678d0 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -1128,7 +1128,7 @@ static void ivshmem_doorbell_realize(PCIDevice *dev, =
+Error **errp)
+ {
+     IVShmemState *s =3D IVSHMEM_COMMON(dev);
+=20
+-    if (!qemu_chr_fe_get_driver(&s->server_chr)) {
++    if (!qemu_chr_fe_backend_connected(&s->server_chr)) {
+         error_setg(errp, "You must specify a 'chardev'");
+         return;
+     }
+@@ -1257,7 +1257,7 @@ static void ivshmem_realize(PCIDevice *dev, Error **e=
+rrp)
+                      " or ivshmem-doorbell instead");
+     }
+=20
+-    if (!!qemu_chr_fe_get_driver(&s->server_chr) + !!s->shmobj !=3D 1) {
++    if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj !=3D 1=
+) {
+         error_setg(errp, "You must specify either 'shm' or 'chardev'");
+         return;
+     }
+diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+index e9f58c9..45d96b0 100644
+--- a/hw/usb/ccid-card-passthru.c
++++ b/hw/usb/ccid-card-passthru.c
+@@ -322,7 +322,7 @@ static void passthru_apdu_from_guest(
+ {
+     PassthruState *card =3D PASSTHRU_CCID_CARD(base);
+=20
+-    if (!qemu_chr_fe_get_driver(&card->cs)) {
++    if (!qemu_chr_fe_backend_connected(&card->cs)) {
+         printf("ccid-passthru: no chardev, discarding apdu length %d\n", l=
+en);
+         return;
+     }
+@@ -343,7 +343,7 @@ static int passthru_initfn(CCIDCardState *base)
+=20
+     card->vscard_in_pos =3D 0;
+     card->vscard_in_hdr =3D 0;
+-    if (qemu_chr_fe_get_driver(&card->cs)) {
++    if (qemu_chr_fe_backend_connected(&card->cs)) {
+         DPRINTF(card, D_INFO, "initing chardev\n");
+         qemu_chr_fe_set_handlers(&card->cs,
+             ccid_card_vscard_can_read,
+diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+index dc145a6..94b5c34 100644
+--- a/hw/usb/dev-serial.c
++++ b/hw/usb/dev-serial.c
+@@ -484,13 +484,12 @@ static void usb_serial_realize(USBDevice *dev, Error =
+**errp)
+ {
+     USBSerialState *s =3D USB_SERIAL_DEV(dev);
+     Error *local_err =3D NULL;
+-    Chardev *chr =3D qemu_chr_fe_get_driver(&s->cs);
+=20
+     usb_desc_create_serial(dev);
+     usb_desc_init(dev);
+     dev->auto_attach =3D 0;
+=20
+-    if (!chr) {
++    if (!qemu_chr_fe_backend_connected(&s->cs)) {
+         error_setg(errp, "Property chardev is required");
+         return;
+     }
+@@ -505,7 +504,7 @@ static void usb_serial_realize(USBDevice *dev, Error **=
+errp)
+                              usb_serial_event, NULL, s, NULL, true);
+     usb_serial_handle_reset(dev);
+=20
+-    if (chr->be_open && !dev->attached) {
++    if (qemu_chr_fe_backend_open(&s->cs) && !dev->attached) {
+         usb_device_attach(dev, &error_abort);
      }
  }
- 
-diff --git a/chardev/char.c b/chardev/char.c
-index 839eff6..a7b342f 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -951,6 +951,92 @@ ChardevReturn *qmp_chardev_add(const char *id, ChardevBackend *backend,
-     return ret;
- }
- 
-+ChardevReturn *qmp_chardev_change(const char *id, ChardevBackend *backend,
-+                                  Error **errp)
-+{
-+    CharBackend *be;
-+    const ChardevClass *cc;
-+    Chardev *chr, *chr_new;
-+    bool closed_sent = false;
-+    ChardevReturn *ret;
-+
-+    chr = qemu_chr_find(id);
-+    if (!chr) {
-+        error_setg(errp, "Chardev '%s' does not exist", id);
-+        return NULL;
-+    }
-+
-+    if (CHARDEV_IS_MUX(chr)) {
-+        error_setg(errp, "Mux device hotswap not supported yet");
-+        return NULL;
-+    }
-+
-+    if (qemu_chr_replay(chr)) {
-+        error_setg(errp,
-+            "Chardev '%s' cannot be changed in record/replay mode", id);
-+        return NULL;
-+    }
-+
-+    be = chr->be;
-+    if (!be) {
-+        /* easy case */
-+        object_unparent(OBJECT(chr));
-+        return qmp_chardev_add(id, backend, errp);
-+    }
-+
-+    if (!be->chr_be_change) {
-+        error_setg(errp, "Chardev user does not support chardev hotswap");
-+        return NULL;
-+    }
-+
-+    cc = char_get_class(ChardevBackendKind_lookup[backend->type], errp);
-+    if (!cc) {
-+        return NULL;
-+    }
-+
-+    chr_new = qemu_chardev_new(NULL, object_class_get_name(OBJECT_CLASS(cc)),
-+                               backend, errp);
-+    if (!chr_new) {
-+        return NULL;
-+    }
-+    chr_new->label = g_strdup(id);
-+
-+    if (chr->be_open && !chr_new->be_open) {
-+        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-+        closed_sent = true;
-+    }
-+
-+    qemu_mutex_lock(&be->chr_lock);
-+    chr->be = NULL;
-+    qemu_chr_fe_connect(be, chr_new, &error_abort);
-+
-+    if (be->chr_be_change(be->opaque) < 0) {
-+        error_setg(errp, "Chardev '%s' change failed", chr_new->label);
-+        chr_new->be = NULL;
-+        qemu_chr_fe_connect(be, chr, &error_abort);
-+        qemu_mutex_unlock(&be->chr_lock);
-+        if (closed_sent) {
-+            qemu_chr_be_event(chr, CHR_EVENT_OPENED);
-+        }
-+        object_unref(OBJECT(chr_new));
-+        return NULL;
-+    }
-+    qemu_mutex_unlock(&be->chr_lock);
-+
-+    object_unparent(OBJECT(chr));
-+    object_property_add_child(get_chardevs_root(), chr_new->label,
-+                              OBJECT(chr_new), &error_abort);
-+    object_unref(OBJECT(chr_new));
-+
-+    ret = g_new0(ChardevReturn, 1);
-+    if (CHARDEV_IS_PTY(chr_new)) {
-+        ret->pty = g_strdup(chr_new->filename + 4);
-+        ret->has_pty = true;
-+    }
-+
-+    return ret;
-+}
-+
- void qmp_chardev_remove(const char *id, Error **errp)
+diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+index 115efb9..c597145 100644
+--- a/hw/usb/redirect.c
++++ b/hw/usb/redirect.c
+@@ -273,10 +273,9 @@ static gboolean usbredir_write_unblocked(GIOChannel *c=
+han, GIOCondition cond,
+ static int usbredir_write(void *priv, uint8_t *data, int count)
  {
-     Chardev *chr;
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 37c4b95..0090fbf 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -5098,6 +5098,46 @@
-   'returns': 'ChardevReturn' }
- 
- ##
-+# @chardev-change:
-+#
-+# Change a character device backend
-+#
-+# @id: the chardev's ID, must exist
-+# @backend: new backend type and parameters
-+#
-+# Returns: ChardevReturn.
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "execute" : "chardev-change",
-+#      "arguments" : { "id" : "baz",
-+#                      "backend" : { "type" : "pty", "data" : {} } } }
-+# <- { "return": { "pty" : "/dev/pty/42" } }
-+#
-+# -> {"execute" : "chardev-change",
-+#     "arguments" : {
-+#         "id" : "charchannel2",
-+#         "backend" : {
-+#             "type" : "socket",
-+#             "data" : {
-+#                 "addr" : {
-+#                     "type" : "unix" ,
-+#                     "data" : {
-+#                         "path" : "/tmp/charchannel2.socket"
-+#                     }
-+#                  },
-+#                  "server" : true,
-+#                  "wait" : false }}}}
-+# <- {"return": {}}
-+#
-+##
-+{ 'command': 'chardev-change', 'data': {'id'      : 'str',
-+                                        'backend' : 'ChardevBackend' },
-+  'returns': 'ChardevReturn' }
-+
-+##
- # @chardev-remove:
- #
- # Remove a character device backend
--- 
+     USBRedirDevice *dev =3D priv;
+-    Chardev *chr =3D qemu_chr_fe_get_driver(&dev->cs);
+     int r;
+=20
+-    if (!chr->be_open) {
++    if (!qemu_chr_fe_backend_open(&dev->cs)) {
+         return 0;
+     }
+=20
+@@ -1366,7 +1365,7 @@ static void usbredir_realize(USBDevice *udev, Error *=
+*errp)
+     USBRedirDevice *dev =3D USB_REDIRECT(udev);
+     int i;
+=20
+-    if (!qemu_chr_fe_get_driver(&dev->cs)) {
++    if (!qemu_chr_fe_backend_connected(&dev->cs)) {
+         error_setg(errp, QERR_MISSING_PARAMETER, "chardev");
+         return;
+     }
+diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+index 62a8265..6043549 100644
+--- a/net/filter-mirror.c
++++ b/net/filter-mirror.c
+@@ -163,7 +163,7 @@ static ssize_t filter_redirector_receive_iov(NetFilterS=
+tate *nf,
+     MirrorState *s =3D FILTER_REDIRECTOR(nf);
+     int ret;
+=20
+-    if (qemu_chr_fe_get_driver(&s->chr_out)) {
++    if (qemu_chr_fe_backend_connected(&s->chr_out)) {
+         ret =3D filter_send(&s->chr_out, iov, iovcnt);
+         if (ret) {
+             error_report("filter redirector send failed(%s)", strerror(-re=
+t));
+--=20
 2.7.4
