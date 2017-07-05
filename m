@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSrXy-00051J-Nn
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSrY3-00055z-2j
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSrXx-0002kf-BV
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSrXx-0002ky-SV
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 17:09:23 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  5 Jul 2017 16:08:33 -0500
-Message-Id: <20170705210842.960-13-eblake@redhat.com>
+Date: Wed,  5 Jul 2017 16:08:34 -0500
+Message-Id: <20170705210842.960-14-eblake@redhat.com>
 In-Reply-To: <20170705210842.960-1-eblake@redhat.com>
 References: <20170705210842.960-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 12/21] mirror: Switch mirror_do_read() to
+Subject: [Qemu-devel] [PATCH v4 13/21] mirror: Switch mirror_iteration() to
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,161 +24,229 @@ To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert another internal
-function (no semantic change).
+easier to reason about than sector-based.  Change the internal
+loop iteration of mirroring to track by bytes instead of sectors
+(although we are still guaranteed that we iterate by steps that
+are both sector-aligned and multiples of the granularity).  Drop
+the now-unused mirror_clip_sectors().
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
-
 ---
-v3-v4: no change
-v2: rebase to earlier changes
+v4: no change
+v3: rebase to Paolo's thread-safety changes, R-b kept
+v2: straightforward rebase to earlier mirror_clip_bytes() change, R-b kept
 ---
- block/mirror.c | 75 ++++++++++++++++++++++++++--------------------------------
- 1 file changed, 33 insertions(+), 42 deletions(-)
+ block/mirror.c | 105 +++++++++++++++++++++++++--------------------------------
+ 1 file changed, 46 insertions(+), 59 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index 374cefd..d3325d0 100644
+index d3325d0..f54a8d7 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -196,7 +196,7 @@ static inline int mirror_clip_sectors(MirrorBlockJob *s,
+@@ -184,15 +184,6 @@ static inline int64_t mirror_clip_bytes(MirrorBlockJob *s,
+     return MIN(bytes, s->bdev_length - offset);
+ }
+
+-/* Clip nb_sectors relative to sector_num to not exceed end-of-file */
+-static inline int mirror_clip_sectors(MirrorBlockJob *s,
+-                                      int64_t sector_num,
+-                                      int nb_sectors)
+-{
+-    return MIN(nb_sectors,
+-               s->bdev_length / BDRV_SECTOR_SIZE - sector_num);
+-}
+-
  /* Round offset and/or bytes to target cluster if COW is needed, and
   * return the offset of the adjusted tail against original. */
  static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
--                            unsigned int *bytes)
-+                            uint64_t *bytes)
+@@ -336,30 +327,28 @@ static void mirror_do_zero_or_discard(MirrorBlockJob *s,
+ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
  {
-     bool need_cow;
-     int ret = 0;
-@@ -204,6 +204,7 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
-     unsigned int align_bytes = *bytes;
-     int max_bytes = s->granularity * s->max_iov;
+     BlockDriverState *source = s->source;
+-    int64_t sector_num, first_chunk;
++    int64_t offset, first_chunk;
+     uint64_t delay_ns = 0;
+     /* At least the first dirty chunk is mirrored in one iteration. */
+     int nb_chunks = 1;
+-    int64_t end = s->bdev_length / BDRV_SECTOR_SIZE;
+     int sectors_per_chunk = s->granularity >> BDRV_SECTOR_BITS;
+     bool write_zeroes_ok = bdrv_can_write_zeroes_with_unmap(blk_bs(s->target));
+     int max_io_bytes = MAX(s->buf_size / MAX_IN_FLIGHT, MAX_IO_BYTES);
 
-+    assert(*bytes < INT_MAX);
-     need_cow = !test_bit(*offset / s->granularity, s->cow_bitmap);
-     need_cow |= !test_bit((*offset + *bytes - 1) / s->granularity,
-                           s->cow_bitmap);
-@@ -239,59 +240,50 @@ static inline void mirror_wait_for_io(MirrorBlockJob *s)
- }
-
- /* Submit async read while handling COW.
-- * Returns: The number of sectors copied after and including sector_num,
-- *          excluding any sectors copied prior to sector_num due to alignment.
-- *          This will be nb_sectors if no alignment is necessary, or
-- *          (new_end - sector_num) if tail is rounded up or down due to
-+ * Returns: The number of bytes copied after and including offset,
-+ *          excluding any bytes copied prior to offset due to alignment.
-+ *          This will be @bytes if no alignment is necessary, or
-+ *          (new_end - offset) if tail is rounded up or down due to
-  *          alignment or buffer limit.
-  */
--static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
--                          int nb_sectors)
-+static uint64_t mirror_do_read(MirrorBlockJob *s, int64_t offset,
-+                               uint64_t bytes)
- {
-     BlockBackend *source = s->common.blk;
--    int sectors_per_chunk, nb_chunks;
--    int ret;
-+    int nb_chunks;
-+    uint64_t ret;
-     MirrorOp *op;
--    int max_sectors;
-+    uint64_t max_bytes;
-
--    sectors_per_chunk = s->granularity >> BDRV_SECTOR_BITS;
--    max_sectors = sectors_per_chunk * s->max_iov;
-+    max_bytes = s->granularity * s->max_iov;
-
-     /* We can only handle as much as buf_size at a time. */
--    nb_sectors = MIN(s->buf_size >> BDRV_SECTOR_BITS, nb_sectors);
--    nb_sectors = MIN(max_sectors, nb_sectors);
--    assert(nb_sectors);
--    assert(nb_sectors < BDRV_REQUEST_MAX_SECTORS);
--    ret = nb_sectors;
-+    bytes = MIN(s->buf_size, MIN(max_bytes, bytes));
-+    assert(bytes);
-+    assert(bytes < BDRV_REQUEST_MAX_BYTES);
-+    ret = bytes;
-
-     if (s->cow_bitmap) {
--        int64_t offset = sector_num * BDRV_SECTOR_SIZE;
--        unsigned int bytes = nb_sectors * BDRV_SECTOR_SIZE;
--        int gap;
--
--        gap = mirror_cow_align(s, &offset, &bytes);
--        sector_num = offset / BDRV_SECTOR_SIZE;
--        nb_sectors = bytes / BDRV_SECTOR_SIZE;
--        ret += gap / BDRV_SECTOR_SIZE;
-+        ret += mirror_cow_align(s, &offset, &bytes);
+     bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+-    sector_num = bdrv_dirty_iter_next(s->dbi);
+-    if (sector_num < 0) {
++    offset = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++    if (offset < 0) {
+         bdrv_set_dirty_iter(s->dbi, 0);
+-        sector_num = bdrv_dirty_iter_next(s->dbi);
++        offset = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
+         trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap) *
+                                   BDRV_SECTOR_SIZE);
+-        assert(sector_num >= 0);
++        assert(offset >= 0);
      }
--    assert(nb_sectors << BDRV_SECTOR_BITS <= s->buf_size);
--    /* The sector range must meet granularity because:
-+    assert(bytes <= s->buf_size);
-+    /* The range will be sector-aligned because:
-      * 1) Caller passes in aligned values;
--     * 2) mirror_cow_align is used only when target cluster is larger. */
--    assert(!(sector_num % sectors_per_chunk));
--    nb_chunks = DIV_ROUND_UP(nb_sectors, sectors_per_chunk);
-+     * 2) mirror_cow_align is used only when target cluster is larger.
-+     * But it might not be cluster-aligned at end-of-file. */
-+    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
-+    nb_chunks = DIV_ROUND_UP(bytes, s->granularity);
+     bdrv_dirty_bitmap_unlock(s->dirty_bitmap);
 
-     while (s->buf_free_count < nb_chunks) {
+-    first_chunk = sector_num / sectors_per_chunk;
++    first_chunk = offset / s->granularity;
+     while (test_bit(first_chunk, s->in_flight_bitmap)) {
 -        trace_mirror_yield_in_flight(s, sector_num * BDRV_SECTOR_SIZE,
 -                                     s->in_flight);
 +        trace_mirror_yield_in_flight(s, offset, s->in_flight);
          mirror_wait_for_io(s);
      }
 
-     /* Allocate a MirrorOp that is used as an AIO callback.  */
-     op = g_new(MirrorOp, 1);
-     op->s = s;
--    op->offset = sector_num * BDRV_SECTOR_SIZE;
--    op->bytes = nb_sectors * BDRV_SECTOR_SIZE;
-+    op->offset = offset;
-+    op->bytes = bytes;
+@@ -368,25 +357,26 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+     /* Find the number of consective dirty chunks following the first dirty
+      * one, and wait for in flight requests in them. */
+     bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+-    while (nb_chunks * sectors_per_chunk < (s->buf_size >> BDRV_SECTOR_BITS)) {
++    while (nb_chunks * s->granularity < s->buf_size) {
+         int64_t next_dirty;
+-        int64_t next_sector = sector_num + nb_chunks * sectors_per_chunk;
+-        int64_t next_chunk = next_sector / sectors_per_chunk;
+-        if (next_sector >= end ||
+-            !bdrv_get_dirty_locked(source, s->dirty_bitmap, next_sector)) {
++        int64_t next_offset = offset + nb_chunks * s->granularity;
++        int64_t next_chunk = next_offset / s->granularity;
++        if (next_offset >= s->bdev_length ||
++            !bdrv_get_dirty_locked(source, s->dirty_bitmap,
++                                   next_offset >> BDRV_SECTOR_BITS)) {
+             break;
+         }
+         if (test_bit(next_chunk, s->in_flight_bitmap)) {
+             break;
+         }
 
-     /* Now make a QEMUIOVector taking enough granularity-sized chunks
-      * from s->buf_free.
-@@ -299,7 +291,7 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
-     qemu_iovec_init(&op->qiov, nb_chunks);
-     while (nb_chunks-- > 0) {
-         MirrorBuffer *buf = QSIMPLEQ_FIRST(&s->buf_free);
--        size_t remaining = nb_sectors * BDRV_SECTOR_SIZE - op->qiov.size;
-+        size_t remaining = bytes - op->qiov.size;
+-        next_dirty = bdrv_dirty_iter_next(s->dbi);
+-        if (next_dirty > next_sector || next_dirty < 0) {
++        next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++        if (next_dirty > next_offset || next_dirty < 0) {
+             /* The bitmap iterator's cache is stale, refresh it */
+-            bdrv_set_dirty_iter(s->dbi, next_sector);
+-            next_dirty = bdrv_dirty_iter_next(s->dbi);
++            bdrv_set_dirty_iter(s->dbi, next_offset >> BDRV_SECTOR_BITS);
++            next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
+         }
+-        assert(next_dirty == next_sector);
++        assert(next_dirty == next_offset);
+         nb_chunks++;
+     }
 
-         QSIMPLEQ_REMOVE_HEAD(&s->buf_free, next);
-         s->buf_free_count--;
-@@ -308,12 +300,10 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
+@@ -394,14 +384,15 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+      * calling bdrv_get_block_status_above could yield - if some blocks are
+      * marked dirty in this window, we need to know.
+      */
+-    bdrv_reset_dirty_bitmap_locked(s->dirty_bitmap, sector_num,
+-                                  nb_chunks * sectors_per_chunk);
++    bdrv_reset_dirty_bitmap_locked(s->dirty_bitmap, offset >> BDRV_SECTOR_BITS,
++                                   nb_chunks * sectors_per_chunk);
+     bdrv_dirty_bitmap_unlock(s->dirty_bitmap);
 
-     /* Copy the dirty cluster.  */
-     s->in_flight++;
--    s->bytes_in_flight += nb_sectors * BDRV_SECTOR_SIZE;
--    trace_mirror_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
--                               nb_sectors * BDRV_SECTOR_SIZE);
-+    s->bytes_in_flight += bytes;
-+    trace_mirror_one_iteration(s, offset, bytes);
+-    bitmap_set(s->in_flight_bitmap, sector_num / sectors_per_chunk, nb_chunks);
+-    while (nb_chunks > 0 && sector_num < end) {
++    bitmap_set(s->in_flight_bitmap, offset / s->granularity, nb_chunks);
++    while (nb_chunks > 0 && offset < s->bdev_length) {
+         int64_t ret;
+         int io_sectors;
++        unsigned int io_bytes;
+         int64_t io_bytes_acct;
+         BlockDriverState *file;
+         enum MirrorMethod {
+@@ -410,28 +401,28 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             MIRROR_METHOD_DISCARD
+         } mirror_method = MIRROR_METHOD_COPY;
 
--    blk_aio_preadv(source, sector_num * BDRV_SECTOR_SIZE, &op->qiov, 0,
--                   mirror_read_complete, op);
-+    blk_aio_preadv(source, offset, &op->qiov, 0, mirror_read_complete, op);
-     return ret;
- }
+-        assert(!(sector_num % sectors_per_chunk));
+-        ret = bdrv_get_block_status_above(source, NULL, sector_num,
++        assert(!(offset % s->granularity));
++        ret = bdrv_get_block_status_above(source, NULL,
++                                          offset >> BDRV_SECTOR_BITS,
+                                           nb_chunks * sectors_per_chunk,
+                                           &io_sectors, &file);
++        io_bytes = io_sectors * BDRV_SECTOR_SIZE;
+         if (ret < 0) {
+-            io_sectors = MIN(nb_chunks * sectors_per_chunk,
+-                             max_io_bytes >> BDRV_SECTOR_BITS);
++            io_bytes = MIN(nb_chunks * s->granularity, max_io_bytes);
+         } else if (ret & BDRV_BLOCK_DATA) {
+-            io_sectors = MIN(io_sectors, max_io_bytes >> BDRV_SECTOR_BITS);
++            io_bytes = MIN(io_bytes, max_io_bytes);
+         }
 
-@@ -461,8 +451,9 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         io_sectors = mirror_clip_sectors(s, sector_num, io_sectors);
+-        io_sectors -= io_sectors % sectors_per_chunk;
+-        if (io_sectors < sectors_per_chunk) {
+-            io_sectors = sectors_per_chunk;
++        io_bytes -= io_bytes % s->granularity;
++        if (io_bytes < s->granularity) {
++            io_bytes = s->granularity;
+         } else if (ret >= 0 && !(ret & BDRV_BLOCK_DATA)) {
+-            int64_t target_sector_num;
+-            int target_nb_sectors;
+-            bdrv_round_sectors_to_clusters(blk_bs(s->target), sector_num,
+-                                           io_sectors,  &target_sector_num,
+-                                           &target_nb_sectors);
+-            if (target_sector_num == sector_num &&
+-                target_nb_sectors == io_sectors) {
++            int64_t target_offset;
++            unsigned int target_bytes;
++            bdrv_round_to_clusters(blk_bs(s->target), offset, io_bytes,
++                                   &target_offset, &target_bytes);
++            if (target_offset == offset &&
++                target_bytes == io_bytes) {
+                 mirror_method = ret & BDRV_BLOCK_ZERO ?
+                                     MIRROR_METHOD_ZERO :
+                                     MIRROR_METHOD_DISCARD;
+@@ -439,8 +430,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+         }
+
+         while (s->in_flight >= MAX_IN_FLIGHT) {
+-            trace_mirror_yield_in_flight(s, sector_num * BDRV_SECTOR_SIZE,
+-                                         s->in_flight);
++            trace_mirror_yield_in_flight(s, offset, s->in_flight);
+             mirror_wait_for_io(s);
+         }
+
+@@ -448,30 +438,27 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             return 0;
+         }
+
+-        io_sectors = mirror_clip_sectors(s, sector_num, io_sectors);
++        io_bytes = mirror_clip_bytes(s, offset, io_bytes);
          switch (mirror_method) {
          case MIRROR_METHOD_COPY:
--            io_sectors = mirror_do_read(s, sector_num, io_sectors);
--            io_bytes_acct = io_sectors * BDRV_SECTOR_SIZE;
-+            io_bytes_acct = mirror_do_read(s, sector_num * BDRV_SECTOR_SIZE,
-+                                           io_sectors * BDRV_SECTOR_SIZE);
-+            io_sectors = io_bytes_acct / BDRV_SECTOR_SIZE;
+-            io_bytes_acct = mirror_do_read(s, sector_num * BDRV_SECTOR_SIZE,
+-                                           io_sectors * BDRV_SECTOR_SIZE);
+-            io_sectors = io_bytes_acct / BDRV_SECTOR_SIZE;
++            io_bytes = io_bytes_acct = mirror_do_read(s, offset, io_bytes);
              break;
          case MIRROR_METHOD_ZERO:
          case MIRROR_METHOD_DISCARD:
+-            mirror_do_zero_or_discard(s, sector_num * BDRV_SECTOR_SIZE,
+-                                      io_sectors * BDRV_SECTOR_SIZE,
++            mirror_do_zero_or_discard(s, offset, io_bytes,
+                                       mirror_method == MIRROR_METHOD_DISCARD);
+             if (write_zeroes_ok) {
+                 io_bytes_acct = 0;
+             } else {
+-                io_bytes_acct = io_sectors * BDRV_SECTOR_SIZE;
++                io_bytes_acct = io_bytes;
+             }
+             break;
+         default:
+             abort();
+         }
+-        assert(io_sectors);
+-        sector_num += io_sectors;
+-        nb_chunks -= DIV_ROUND_UP(io_sectors, sectors_per_chunk);
++        assert(io_bytes);
++        offset += io_bytes;
++        nb_chunks -= DIV_ROUND_UP(io_bytes, s->granularity);
+         if (s->common.speed) {
+             delay_ns = ratelimit_calculate_delay(&s->limit, io_bytes_acct);
+         }
 -- 
 2.9.4
