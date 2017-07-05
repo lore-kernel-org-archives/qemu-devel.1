@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dSfyk-0007bw-S5
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:48:11 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dSg0S-0000XD-R2
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:49:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dSfyh-0004Gi-Qj
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:48:10 -0400
-Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:41525)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dSfyh-0004G4-K8
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:48:07 -0400
-Received: from player159.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 19A8D7DDCC
-	for <qemu-devel@nongnu.org>; Wed,  5 Jul 2017 10:48:03 +0200 (CEST)
-Date: Wed, 5 Jul 2017 10:47:51 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170705104751.041323f5@bahia.lan>
-In-Reply-To: <41cfc821-c7f8-0c3d-3bc8-d2877ac5db04@redhat.com>
-References: <20170704110126.26806-1-lvivier@redhat.com>
-	<20170704110126.26806-3-lvivier@redhat.com>
-	<20170704131500.3ef448c8@bahia.lan>
-	<20170704114151.GG2180@umbus.fritz.box>
-	<20170704150239.2e4adb64@bahia.lan>
-	<20170705063641.GK2180@umbus.fritz.box>
-	<41cfc821-c7f8-0c3d-3bc8-d2877ac5db04@redhat.com>
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dSg0R-00055v-3j
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 04:49:56 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Wed, 5 Jul 2017 08:49:43 +0000
+Message-ID: <HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
+	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
+In-Reply-To: <8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/I2KXfsP98/S0VPteMXm5H7O";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] target/ppc: move POWER9 DD1
- workaround to init_proc_POWER9()
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +31,310 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, joserz@linux.vnet.ibm.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Singh <sursingh@redhat.com>, =?UTF-8?B?Q8Op?= =?UTF-8?B?ZHJpYw==?= Le Goater <clg@kaod.org>, Sam Bobroff <sbobroff@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
---Sig_/I2KXfsP98/S0VPteMXm5H7O
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Eric,
 
-On Wed, 5 Jul 2017 09:56:15 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 05.07.2017 08:36, David Gibson wrote:
-> > On Tue, Jul 04, 2017 at 03:02:39PM +0200, Greg Kurz wrote: =20
-> >> On Tue, 4 Jul 2017 21:41:51 +1000
-> >> David Gibson <david@gibson.dropbear.id.au> wrote:
-> >> =20
-> >>> On Tue, Jul 04, 2017 at 01:15:00PM +0200, Greg Kurz wrote: =20
-> >>>> On Tue,  4 Jul 2017 13:01:26 +0200
-> >>>> Laurent Vivier <lvivier@redhat.com> wrote:
-> >>>>    =20
-> >>>>> Commit 5f3066d ("target/ppc: Allow workarounds for POWER9 DD1")
-> >>>>> disables compatibility mode for POWER9 DD1 to allow to
-> >>>>> boot on POWER9 DD1 host with KVM.
-> >>>>>
-> >>>>> As the workaround has been added in kvmppc_host_cpu_class_init(),
-> >>>>> it applies only on CPU created with "-cpu host".
-> >>>>> As we want to be able to use also "-cpu POWER9" on a POWER9 DD1
-> >>>>> host, this patch moves the workaround from kvmppc_host_cpu_class_in=
-it()
-> >>>>> to init_proc_POWER9().
-> >>>>>    =20
-> >>>>
-> >>>> As with ppc_cpu_initfn() in your previous version, init_proc_POWER9(=
-) is
-> >>>> called for every CPU instance.. ie, all CPU will adjust the @pcr_sup=
-ported
-> >>>> class attribute...   =20
-> >>>
-> >>> Ah.. yeah.. I didn't notice that before.  That's definitely not right.
-> >>> =20
-> >>>> What about moving the workaround to ppc_POWER9_cpu_family_class_init=
-()
-> >>>> instead ? This would just require to expose mfpvr() in some header. =
-  =20
-> >>>
-> >>> Yeah, as someone else pointed out using the host PVR is also
-> >>> definitely not right (unless you're in a function specifically
-> >>> connected to the host cpu class).
-> >>> =20
+> -----Original Message-----
+> From: Auger Eric [mailto:eric.auger@redhat.com]
+> Sent: Wednesday, July 05, 2017 2:14 PM
+> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
+> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+> Cc: wei@redhat.com; kevin.tian@intel.com; marc.zyngier@arm.com;
+> tn@semihalf.com; will.deacon@arm.com; drjones@redhat.com;
+> robin.murphy@arm.com; christoffer.dall@linaro.org
+> Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+>=20
+> Hi Bharat,
+>=20
+> On 05/07/2017 10:23, Bharat Bhushan wrote:
+> > Hi Eric,
+> >
+> >> -----Original Message-----
+> >> From: Auger Eric [mailto:eric.auger@redhat.com]
+> >> Sent: Monday, June 26, 2017 1:25 PM
+> >> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+> >> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+> >> alex.williamson@redhat.com; mst@redhat.com; qemu-arm@nongnu.org;
+> >> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+> >> Cc: wei@redhat.com; kevin.tian@intel.com; marc.zyngier@arm.com;
+> >> tn@semihalf.com; will.deacon@arm.com; drjones@redhat.com;
+> >> robin.murphy@arm.com; christoffer.dall@linaro.org
+> >> Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 > >>
-> >> I agree but the root issue is that we accept to pass -cpu POWER9 inste=
-ad of
-> >> -cpu host with -enable-kvm. And the host cpu class isn't involved in t=
-his
-> >> case. =20
-> >=20
-> > Well.. it sort of is.  I believe the way we make this work (since
-> > Thomas' cleanup) is that when KVM is active, we alter the alias for
-> > the host cpu's family to point to the host cpu class, instead of
-> > whatever specific version it usually points to. =20
+> >> Hi Bharat,
+> >>
+> >> On 19/06/2017 09:54, Bharat Bhushan wrote:
+> >>> Hi Eric,
+> >>>
+> >>> I started added replay in virtio-iommu and came across how MSI
+> >>> interrupts
+> >> with work with VFIO.
+> >>> I understand that on intel this works differently but vsmmu will
+> >>> have same
+> >> requirement.
+> >>> kvm-msi-irq-route are added using the msi-address to be translated
+> >>> by
+> >> viommu and not the final translated address.
+> >>> While currently the irqfd framework does not know about emulated
+> >> iommus (virtio-iommu, vsmmuv3/vintel-iommu).
+> >>> So in my view we have following options:
+> >>> - Programming with translated address when setting up
+> >>> kvm-msi-irq-route
+> >>> - Route the interrupts via QEMU, which is bad from performance
+> >>> - vhost-virtio-iommu may solve the problem in long term
+> >>
+> >> Sorry for the delay. With regard to the vsmmuv3/vfio integration I
+> >> think we need to use the guest physical address otherwise the MSI
+> >> address will not be recognized as an MSI doorbell.
+> >>
+> >> Also the fact on ARM we map the MSI doorbell causes an assert in
+> >> vfio_get_vaddr() as the vITS doorbell is not a RAM region. We will
+> >> need to handle this specifically.
+> >
+> > Also when setup msi-route kvm_irqchip_add_msi_route() we needed to
+> provide the translated address.
+> > According to my understanding this is required because kernel does no g=
+o
+> through viommu translation when generating interrupt, no?
 >=20
-
-Yeah, I saw that and I guess there's a problem: we alter the alias to
-point to the class with the same PVR as the host CPU, not to the
-host CPU class itself. The CPUs don't belong to TYPE_HOST_POWERPC_CPU
-and aren't configured according to kvmppc_host_cpu_class_init().
-
-> Right, it's the code at the and of the kvm_ppc_register_host_cpu_type()
-> function. Maybe that function could also be a good spot to move the DD1
-> workaround into (just a quick idea, I haven't checked whether it's
-> feasible)?
+> yes this is needed when KVM MSI routes are set up, ie. along with GICV3 I=
+TS.
+> With GICv2M, qemu direct gsi mapping is used and this is not needed.
 >=20
+> So I do not understand your previous sentence saying "MSI interrupts work=
+s
+> without any change".
 
-I have a patch to change the alias to point to TYPE_HOST_POWERPC_CPU. This
-allows to use "-cpu POWER9" with KVM on a DD1 host.
+I have almost completed vfio integration with virtio-iommu and now testing =
+the changes by assigning e1000 device to VM. For this I have changed virtio=
+-iommu driver to use IOMMU_RESV_MSI rather than sw-msi and this does not ne=
+ed changed in vfio_get_addr()  and kvm_irqchip_add_msi_route()
 
-Cheers,
+Thanks
+-Bharat
 
---
-Greg
-
->  Thomas
 >=20
-
-
---Sig_/I2KXfsP98/S0VPteMXm5H7O
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllcp7cACgkQAvw66wEB28LSkQCgirD7w+FEzrozlyEJG8Fg70Wk
-b4QAn220am9FYYS7ytlHO3QlwOwYziA3
-=43wX
------END PGP SIGNATURE-----
-
---Sig_/I2KXfsP98/S0VPteMXm5H7O--
+> Thanks
+>=20
+> Eric
+>=20
+> >
+> > Thanks
+> > -Bharat
+> >
+> >>
+> >> Besides I have not looked specifically at the virtio-iommu/vfio
+> >> integration yet.
+> >>
+> >> Thanks
+> >>
+> >> Eric
+> >>>
+> >>> Is there any other better option I am missing?
+> >>>
+> >>> Thanks
+> >>> -Bharat
+> >>>
+> >>>> -----Original Message-----
+> >>>> From: Auger Eric [mailto:eric.auger@redhat.com]
+> >>>> Sent: Friday, June 09, 2017 5:24 PM
+> >>>> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+> >>>> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+> >>>> alex.williamson@redhat.com; mst@redhat.com; qemu-
+> arm@nongnu.org;
+> >>>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+> >>>> Cc: wei@redhat.com; kevin.tian@intel.com; marc.zyngier@arm.com;
+> >>>> tn@semihalf.com; will.deacon@arm.com; drjones@redhat.com;
+> >>>> robin.murphy@arm.com; christoffer.dall@linaro.org
+> >>>> Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+> >>>>
+> >>>> Hi Bharat,
+> >>>>
+> >>>> On 09/06/2017 13:30, Bharat Bhushan wrote:
+> >>>>> Hi Eric,
+> >>>>>
+> >>>>>> -----Original Message-----
+> >>>>>> From: Auger Eric [mailto:eric.auger@redhat.com]
+> >>>>>> Sent: Friday, June 09, 2017 12:14 PM
+> >>>>>> To: Bharat Bhushan <bharat.bhushan@nxp.com>;
+> >>>>>> eric.auger.pro@gmail.com; peter.maydell@linaro.org;
+> >>>>>> alex.williamson@redhat.com; mst@redhat.com; qemu-
+> >> arm@nongnu.org;
+> >>>>>> qemu-devel@nongnu.org; jean-philippe.brucker@arm.com
+> >>>>>> Cc: will.deacon@arm.com; robin.murphy@arm.com;
+> >>>> kevin.tian@intel.com;
+> >>>>>> marc.zyngier@arm.com; christoffer.dall@linaro.org;
+> >>>>>> drjones@redhat.com; wei@redhat.com; tn@semihalf.com
+> >>>>>> Subject: Re: [RFC v2 0/8] VIRTIO-IOMMU device
+> >>>>>>
+> >>>>>> Hi Bharat,
+> >>>>>>
+> >>>>>> On 09/06/2017 08:16, Bharat Bhushan wrote:
+> >>>>>>> Hi Eric,
+> >>>>>>>
+> >>>>>>>> -----Original Message-----
+> >>>>>>>> From: Eric Auger [mailto:eric.auger@redhat.com]
+> >>>>>>>> Sent: Wednesday, June 07, 2017 9:31 PM
+> >>>>>>>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> >>>>>>>> peter.maydell@linaro.org; alex.williamson@redhat.com;
+> >>>>>> mst@redhat.com;
+> >>>>>>>> qemu-arm@nongnu.org; qemu-devel@nongnu.org; jean-
+> >>>>>>>> philippe.brucker@arm.com
+> >>>>>>>> Cc: will.deacon@arm.com; robin.murphy@arm.com;
+> >>>>>> kevin.tian@intel.com;
+> >>>>>>>> marc.zyngier@arm.com; christoffer.dall@linaro.org;
+> >>>>>>>> drjones@redhat.com; wei@redhat.com; tn@semihalf.com;
+> Bharat
+> >>>>>> Bhushan
+> >>>>>>>> <bharat.bhushan@nxp.com>
+> >>>>>>>> Subject: [RFC v2 0/8] VIRTIO-IOMMU device
+> >>>>>>>>
+> >>>>>>>> This series implements the virtio-iommu device. This is a proof
+> >>>>>>>> of concept based on the virtio-iommu specification written by
+> >>>>>>>> Jean-Philippe
+> >>>>>> Brucker [1].
+> >>>>>>>> This was tested with a guest using the virtio-iommu driver [2]
+> >>>>>>>> and exposed with a virtio-net-pci using dma ops.
+> >>>>>>>>
+> >>>>>>>> The device gets instantiated using the "-device virtio-iommu-
+> device"
+> >>>>>>>> option. It currently works with ARM virt machine only as the
+> >>>>>>>> machine must handle the dt binding between the virtio-mmio
+> >> "iommu"
+> >>>>>>>> node and the PCI host bridge node. ACPI booting is not yet
+> >> supported.
+> >>>>>>>>
+> >>>>>>>> This should allow to start some benchmarking activities against
+> >>>>>>>> pure emulated IOMMU (especially ARM SMMU).
+> >>>>>>>
+> >>>>>>> I am testing this on ARM64 and see below continuous error prints:
+> >>>>>>>
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>> 	virtio_iommu_translate sid=3D8 is not known!!
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> Also in guest I do not see device-tree node with virtio-iommu.
+> >>>>>> do you mean the virtio-mmio with #iommu-cells property?
+> >>>>>>
+> >>>>>> This one is created statically by virt machine. I would be
+> >>>>>> surprised if it were not there. Are you using the virt =3D virt2.1=
+0
+> machine.
+> >>>>>> Machines before do not support its instantiation.
+> >>>>>>
+> >>>>>> Please can you add a printf in hw/arm/virt.c create_virtio_mmio()
+> >>>>>> at the moment when this node is created. Also you can add a
+> >>>>>> printf in
+> >>>>>> bind_virtio_iommu_device() to make sure the binding with the PCI
+> >>>>>> host bridge is added on machine init done.
+> >>>>>>
+> >>>>>> Also worth to check, CONFIG_VIRTIO_IOMMU=3Dy on guest side.
+> >>>>>
+> >>>>> It works on my side.
+> >>>> Great.
+> >>>>
+> >>>>  The driver config was disabled and also I was using guest kernel
+> >>>> which was not have deferred-probing.
+> >>>> Yes I did not mention in my cover letter the guest I have been
+> >>>> using is based on Jean-Philippe's branch, featuring deferred IOMMU
+> probing.
+> >>>> I I have not tried yet with an upstream guest.
+> >>>>  Now after fixing it works on my side
+> >>>>> I placed some prints to see dma-map are mapping regions in
+> >>>>> virtio-iommu,
+> >>>> it uses emulated iommu.
+> >>>>>
+> >>>>> I will continue to add VFIO support now on this and more testing !!
+> >>>>
+> >>>> OK. I will do the VFIO integration first on the vsmmuv3 device as I
+> >>>> already prepared the VFIO replay and hopefully we will sync ;-)
+> >>>>
+> >>>> Thanks
+> >>>>
+> >>>> Eric
+> >>>>>
+> >>>>> Thanks
+> >>>>> -Bharat
+> >>>>>
+> >>>>>>
+> >>>>>> Thanks
+> >>>>>>
+> >>>>>> Eric
+> >>>>>>
+> >>>>>>> I am using qemu-tree you mentioned below and iommu-driver
+> >> patches
+> >>>>>> published by Jean-P.
+> >>>>>>> Qemu command line have additional ""-device virtio-iommu-
+> device".
+> >>>>>>> What
+> >>>>>> I am missing ?
+> >>>>>>
+> >>>>>>
+> >>>>>>>
+> >>>>>>> Thanks
+> >>>>>>> -Bharat
+> >>>>>>>
+> >>>>>>>>
+> >>>>>>>> Best Regards
+> >>>>>>>>
+> >>>>>>>> Eric
+> >>>>>>>>
+> >>>>>>>> This series can be found at:
+> >>>>>>>> https://github.com/eauger/qemu/tree/virtio-iommu-rfcv2
+> >>>>>>>>
+> >>>>>>>> References:
+> >>>>>>>> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU, [2] [RFC
+> >>>>>>>> PATCH linux]
+> >>>>>>>> iommu: Add virtio-iommu driver [3] [RFC PATCH kvmtool 00/15]
+> >>>>>>>> Add
+> >>>>>>>> virtio- iommu
+> >>>>>>>>
+> >>>>>>>> History:
+> >>>>>>>> v1 -> v2:
+> >>>>>>>> - fix redifinition of viommu_as typedef
+> >>>>>>>>
+> >>>>>>>> Eric Auger (8):
+> >>>>>>>>   update-linux-headers: import virtio_iommu.h
+> >>>>>>>>   linux-headers: Update for virtio-iommu
+> >>>>>>>>   virtio_iommu: add skeleton
+> >>>>>>>>   virtio-iommu: Decode the command payload
+> >>>>>>>>   virtio_iommu: Add the iommu regions
+> >>>>>>>>   virtio-iommu: Implement the translation and commands
+> >>>>>>>>   hw/arm/virt: Add 2.10 machine type
+> >>>>>>>>   hw/arm/virt: Add virtio-iommu the virt board
+> >>>>>>>>
+> >>>>>>>>  hw/arm/virt.c                                 | 116 ++++-
+> >>>>>>>>  hw/virtio/Makefile.objs                       |   1 +
+> >>>>>>>>  hw/virtio/trace-events                        |  14 +
+> >>>>>>>>  hw/virtio/virtio-iommu.c                      | 623
+> >>>>>> ++++++++++++++++++++++++++
+> >>>>>>>>  include/hw/arm/virt.h                         |   5 +
+> >>>>>>>>  include/hw/virtio/virtio-iommu.h              |  60 +++
+> >>>>>>>>  include/standard-headers/linux/virtio_ids.h   |   1 +
+> >>>>>>>>  include/standard-headers/linux/virtio_iommu.h | 142 ++++++
+> >>>>>>>>  linux-headers/linux/virtio_iommu.h            |   1 +
+> >>>>>>>>  scripts/update-linux-headers.sh               |   3 +
+> >>>>>>>>  10 files changed, 957 insertions(+), 9 deletions(-)  create
+> >>>>>>>> mode
+> >>>>>>>> 100644 hw/virtio/virtio-iommu.c  create mode 100644
+> >>>>>>>> include/hw/virtio/virtio- iommu.h  create mode 100644
+> >>>>>>>> include/standard- headers/linux/virtio_iommu.h  create mode
+> >>>>>>>> 100644 linux-headers/linux/virtio_iommu.h
+> >>>>>>>>
+> >>>>>>>> --
+> >>>>>>>> 2.5.5
+> >>>>>>>
+> >>>>>
+> >>>
