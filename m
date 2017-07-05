@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSjeW-0007kr-OU
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:43:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dSjin-0001ph-KN
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:47:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dSjeR-0006K0-Sl
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:43:32 -0400
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:37509)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dSjeR-0006JP-NF
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:43:27 -0400
-Received: by mail-wm0-f43.google.com with SMTP id i127so165484571wma.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 05:43:27 -0700 (PDT)
-References: <1499237876.3041.4.camel@linux.intel.com>
-	<20170705110431.GE22008@redhat.com> <20170705114411.GE29382@lemon.lan>
-	<c1f43fc3-7db8-50af-ee8c-331895721bd6@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <198fdd58-7793-8990-8adc-989c189ba529@redhat.com>
-Date: Wed, 5 Jul 2017 14:43:24 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dSjij-0007vh-NY
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 08:47:57 -0400
+Date: Wed, 5 Jul 2017 13:47:48 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170705124748.GA1280@stefanha-x1.localdomain>
+References: <CAJSP0QUD58kjc=8WAxwocK_HGJGqG-YeR5LqU3cCZCgdemZe4g@mail.gmail.com>
+	<71215f3b-4b44-accc-d84a-87d4749bf391@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c1f43fc3-7db8-50af-ee8c-331895721bd6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Dxnq1zWXvFF0Q93v"
+Content-Disposition: inline
+In-Reply-To: <71215f3b-4b44-accc-d84a-87d4749bf391@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] Fuzzing event loops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Chao Peng <chao.p.peng@linux.intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On 05/07/2017 13:58, Thomas Huth wrote:
-> On 05.07.2017 13:44, Fam Zheng wrote:
->> On Wed, 07/05 12:04, Daniel P. Berrange wrote:
->>> While you can say people should just add '-M pc' that isn't a nice
->>> user experiance, because it makes the assumption that people actually
->>> understand what caused their breakage. When the incompatibilities
->>> arise the error messages are unlikely to give any hint to users that
->>> the problems are caused by the machine type change. So unless someone
->>> is very familiar with debugging QEMU, they're not going to realize
->>> that '-M pc' will fix their problem.
->>
->> While we change the default, can we start to print a message like 'machine type
->> ("-M" option) not specified, default to Q35. If you find compatibility issues,
->> try "-M pc"'?
-> 
-> Or we could simply remove the default machine type completely for a
-> couple of releases? That would force people to update their script with
-> "-M pc" ... and once this has been established, we can finally make q35
-> the default?
 
-Apart from the user experience issues pointed out by Fam, this would
-lead to people using "-M pc" without understanding it, and not being
-able to use q35 features.
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think there are two cases:
+On Mon, Jun 26, 2017 at 04:53:45PM -0400, John Snow wrote:
+> On 06/11/2017 06:47 AM, Stefan Hajnoczi wrote:
+> > I wanted to share this idea about fuzzing event loops:
+> >=20
+> > https://blog.acolyer.org/2017/06/09/node-fz-fuzzing-the-server-side-eve=
+nt-driven-architecture/
+> >=20
+> > The idea is to expose ordering dependencies and atomicity bugs in
+> > event loop callbacks/coroutines by randomly shuffling the order in
+> > which fd handlers, timers, etc execute.
+> >=20
+> > I'm not sure we'd find many bugs since QEMU tends to use big locks or
+> > request serialization when concurrency gets tricky in the block layer.
+> > Still, it's an interesting concept that we could apply in the future.
+> >=20
+> > Stefan
+> >=20
+>=20
+> Sounds fun, probably too detailed for a GSoC/Outreachy project, right?
+> Do we have a page on the wiki for random "Hey, this might be nice..." ide=
+as?
+>=20
+> (Or is that a bad idea itself so we don't have a graveyard of 'not my
+> problem' projects?)
 
-- if we are worried about command-line users' IDE VMs not booting after
-the q35 upgrade (because the PATA adapter becomes SATA/AHCI), we cannot
-change the default in QEMU, period.  This would affect at least Windows
-VMs; Fedora and derivatives should have both ATA_PIIX and SATA_AHCI as
-built-in drivers, I don't know about Debian derivatives and e.g. Gentoo.
+This idea is difficult as an internship because it's an investigation
+project.  It may produce no results or may require deep knowledge of
+QEMU internals to resolve issues that are identified.
 
-- if we are not, and we think q35 is okay for every new VM except
-Windows 95 or 2003, we can change the default to "-M q35".  Windows 95
-and 2003 users can be asked to add "-M pc".
+I just wanted to share the idea.
 
-In the second case, libvirt could still switch from pc to q35 and/or
-libosinfo could be changed to suggest q35 instead of pc.
+Stefan
 
-If possible, NICs should keep the same PCI address after upgrade.
+--Dxnq1zWXvFF0Q93v
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Paolo
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZXN/0AAoJEJykq7OBq3PIYDsH/iJkWjBCNSM5EWFavINZFsuv
+5HZ2yiY4EvCvjE40ZtHPsl7k4UATc2R21IyLu3jt0hJ2E5A5ZJeWX+XU/KLQ2Hp/
+9BFi0jlWsV6W4fFG0/YEMyPtkyWWrOFcLU2emhBVxBz3wFZCZIu5DxurDuKTCt7F
+jC9yfaCFxJAoKv5pR+K4PclFtEYONNgkf3XwgZze31bd7jajVcKcg3w/XmuSLdUq
+FoslXBYzJdxQedMQe2NZm75nnew85fdMj8P9mBRlYv7Cf3M1v/umfyr5k5O5N1jy
+cDRP02wE8CEwGdvvZeWWqUWZReOcSM1LoKkrMg6Xu5ejmR5z0NZ9RU7eIs/UXBU=
+=6r2I
+-----END PGP SIGNATURE-----
+
+--Dxnq1zWXvFF0Q93v--
