@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dShzR-0002Dg-Le
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:57:02 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSi4l-0003Z2-FY
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dShzM-0007EF-SB
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:57:01 -0400
-Received: from mail-wr0-f182.google.com ([209.85.128.182]:34517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dShzM-0007Cl-M8
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 06:56:56 -0400
-Received: by mail-wr0-f182.google.com with SMTP id 77so261070407wrb.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 03:56:56 -0700 (PDT)
-References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
-	<20170704220346.29244-5-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f00c4251-ad8d-475b-5c3c-653835791552@redhat.com>
-Date: Wed, 5 Jul 2017 12:56:53 +0200
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSi4i-0000FI-Ma
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:02:31 -0400
+Received: from [59.151.112.132] (port=56355 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dSi4i-0000EX-AZ
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 07:02:28 -0400
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Date: Wed, 5 Jul 2017 19:01:53 +0800
+Message-ID: <cover.1499250206.git.maozy.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <20170704220346.29244-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 04/35] coroutine: remove coroutine_fn from
- qemu_coroutine_self()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 0/4] Improve error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +23,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, armbru@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com
 
-On 05/07/2017 00:03, Marc-André Lureau wrote:
-> The function may be safely called from non-coroutine context.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+v8:
+* PATCH 02 & 04
+  -resetting the error message for the user to read.   [Markus Armbruster]
+  
+v7:
+* PATCH 01
+  -fix the error message.    [Daniel P. Berrange]
+  -adjust the Indentation problem.    [Eric Blake]
+* PATCH 03
+  -print a generic message when gethostbyname() failed in parse_host_port(),
+   drop the misleading ": unkonwn host" part.    [Markus Armbruster]
 
-It can, but it shouldn't...  What are the callers?
+v6:
+* PATCH 02
+  -rename the subject
+  -drop the "qemu: error: " prefix.
+  -correct inappropriate error information settings.
+* PATCH 03,04
+  -correct inappropriate error information settings.    [Markus Armbruster]
 
-Paolo
+v5:
+* PATCH 01 make the commit message more exact about the actual function.    [Markus Armbruster]
+* PATCH 02, 03, 04 still retains the original function, but specific
+           content and order of each patch has been adjusted substantially, 
+           so that ensure each patch is a completed fix.    [Markus Armbruster]
 
-> ---
->  include/qemu/coroutine.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> index 35ff394f51..ec55fe295c 100644
-> --- a/include/qemu/coroutine.h
-> +++ b/include/qemu/coroutine.h
-> @@ -121,7 +121,7 @@ void coroutine_fn qemu_coroutine_yield(void);
->  /**
->   * Get the currently executing coroutine
->   */
-> -Coroutine *coroutine_fn qemu_coroutine_self(void);
-> +Coroutine *qemu_coroutine_self(void);
->  
->  /**
->   * Return whether or not currently inside a coroutine
-> 
+v4: 
+* PATCH 01 is redoing previous patch 1, replace the fprintf() with error_report()
+		     in the 'default' case of net_socket_fd_init() [Markus Armbruster]
+
+v3:
+* PATCH 01 is suggested by Markus and Daniel that removes the dubious 'default' case
+           in the net_socket_fd_init(). Jason agreed.
+* PATCH 02 is redoing previous patch 4.
+* PATCH 04 is redoing previous patch 2, improves sort of error messages. 
+
+v2:
+* PATCH 02 reworking of patch 2 following Markus's suggestion that convert error_report()
+           in the function called by net_socket_*_init() to Error. Also add many error 
+           handling information.
+* PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and net_socket_fd_init() 
+           use the function such as fprintf, perror to report an error message. Convert it 
+           to Error.
+* PATCH 04 parse_host_port() may fail without reporting an error. Now, fix it to set an
+           error when it fails.
+
+Cc: jasowang@redhat.com
+Cc: armbru@redhat.com
+Cc: berrange@redhat.com
+Cc: kraxel@redhat.com
+Cc: pbonzini@redhat.com
+Cc: eblake@redhat.com
+
+Mao Zhongyi (4):
+  net/socket: Don't treat odd socket type as SOCK_STREAM
+  net/socket: Convert several helper functions to Error
+  net/net: Convert parse_host_port() to Error
+  net/socket: Improve -net socket error reporting
+
+ include/qemu/sockets.h |   3 +-
+ net/net.c              |  22 +++++--
+ net/socket.c           | 153 ++++++++++++++++++++++++++++---------------------
+ 3 files changed, 106 insertions(+), 72 deletions(-)
+
+-- 
+2.9.4
