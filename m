@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWm-0004f9-Rg
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:13 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWi-0004YV-JX
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWl-0007gw-KF
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:12 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38366)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dSeWc-0007Xq-Tl
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:08 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33131)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dSeWl-0007gT-DZ
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:11 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id f67so102817981wmh.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:11 -0700 (PDT)
+	id 1dSeWc-0007XD-Nu
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 03:15:02 -0400
+Received: by mail-wm0-x242.google.com with SMTP id j85so30447249wmj.0
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 00:15:02 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  5 Jul 2017 09:14:20 +0200
-Message-Id: <1499238885-26161-18-git-send-email-pbonzini@redhat.com>
+Date: Wed,  5 Jul 2017 09:14:13 +0200
+Message-Id: <1499238885-26161-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/42] main_loop: Make main_loop_wait() return
- void
+Subject: [Qemu-devel] [PULL 10/42] include/exec/poison: Mark CONFIG_SOFTMMU
+ as poisoned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +29,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
 
-The last users of main_loop_wait() that cared about the return value
-have now been changed to no longer use it. Drop the now-useless return
-value and make the function return void.
+CONFIG_SOFTMMU should never be used in common code, so mark
+it as poisoned, too.
 
-We avoid the awkwardness of ifdeffery to handle the 'ret'
-variable in main_loop_wait() only being wanted if CONFIG_SLIRP
-by simply dropping all the ifdefs. There are stub implementations
-of slirp_pollfds_poll() and slirp_pollfds_fill() already in
-stubs/slirp.c which do nothing, as required.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-DaudÃ© <f4bug@amsat.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <1498584769-12439-3-git-send-email-peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1498454578-18709-6-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qemu/main-loop.h | 2 +-
- util/main-loop.c         | 8 +-------
- 2 files changed, 2 insertions(+), 8 deletions(-)
+ include/exec/poison.h | 1 +
+ include/qom/cpu.h     | 8 ++++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index d7e24af..6b4b60b 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -79,7 +79,7 @@ int qemu_init_main_loop(Error **errp);
-  *
-  * @nonblocking: Whether the caller should block until an event occurs.
-  */
--int main_loop_wait(int nonblocking);
-+void main_loop_wait(int nonblocking);
+diff --git a/include/exec/poison.h b/include/exec/poison.h
+index 32707cd..41cd2eb 100644
+--- a/include/exec/poison.h
++++ b/include/exec/poison.h
+@@ -87,6 +87,7 @@
+ #pragma GCC poison CONFIG_LINUX_USER
+ #pragma GCC poison CONFIG_VHOST_NET
+ #pragma GCC poison CONFIG_KVM
++#pragma GCC poison CONFIG_SOFTMMU
  
- /**
-  * qemu_get_aio_context: Return the main loop's AioContext
-diff --git a/util/main-loop.c b/util/main-loop.c
-index 19cad6b..2f48f41 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -487,7 +487,7 @@ static int os_host_main_loop_wait(int64_t timeout)
+ #endif
+ #endif
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index b9440b6..7bfd50c 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -817,6 +817,8 @@ void cpu_interrupt(CPUState *cpu, int mask);
+ 
+ #endif /* USER_ONLY */
+ 
++#ifdef NEED_CPU_H
++
+ #ifdef CONFIG_SOFTMMU
+ static inline void cpu_unassigned_access(CPUState *cpu, hwaddr addr,
+                                          bool is_write, bool is_exec,
+@@ -839,6 +841,8 @@ static inline void cpu_unaligned_access(CPUState *cpu, vaddr addr,
  }
  #endif
  
--int main_loop_wait(int nonblocking)
-+void main_loop_wait(int nonblocking)
- {
-     int ret;
-     uint32_t timeout = UINT32_MAX;
-@@ -500,9 +500,7 @@ int main_loop_wait(int nonblocking)
-     /* poll any events */
-     g_array_set_size(gpollfds, 0); /* reset for new iteration */
-     /* XXX: separate device handlers from system ones */
--#ifdef CONFIG_SLIRP
-     slirp_pollfds_fill(gpollfds, &timeout);
--#endif
++#endif /* NEED_CPU_H */
++
+ /**
+  * cpu_set_pc:
+  * @cpu: The CPU to set the program counter for.
+@@ -1015,6 +1019,8 @@ void cpu_exec_initfn(CPUState *cpu);
+ void cpu_exec_realizefn(CPUState *cpu, Error **errp);
+ void cpu_exec_unrealizefn(CPUState *cpu);
  
-     if (timeout == UINT32_MAX) {
-         timeout_ns = -1;
-@@ -515,16 +513,12 @@ int main_loop_wait(int nonblocking)
-                                           &main_loop_tlg));
- 
-     ret = os_host_main_loop_wait(timeout_ns);
--#ifdef CONFIG_SLIRP
-     slirp_pollfds_poll(gpollfds, (ret < 0));
--#endif
- 
-     /* CPU thread can infinitely wait for event after
-        missing the warp */
-     qemu_start_warp_timer();
-     qemu_clock_run_all_timers();
--
--    return ret;
++#ifdef NEED_CPU_H
++
+ #ifdef CONFIG_SOFTMMU
+ extern const struct VMStateDescription vmstate_cpu_common;
+ #else
+@@ -1029,6 +1035,8 @@ extern const struct VMStateDescription vmstate_cpu_common;
+     .offset = 0,                                                            \
  }
  
- /* Functions to operate on the main QEMU AioContext.  */
++#endif /* NEED_CPU_H */
++
+ #define UNASSIGNED_CPU_INDEX -1
+ 
+ #endif
 -- 
 1.8.3.1
