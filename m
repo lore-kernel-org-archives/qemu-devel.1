@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9y4-0005JX-EY
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:49:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1dT9zr-0006Vf-Og
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9y0-00059Y-Gn
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:49:28 -0400
-Received: from mail-wr0-f174.google.com ([209.85.128.174]:35827)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dT9y0-00059C-9e
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:49:24 -0400
-Received: by mail-wr0-f174.google.com with SMTP id k67so10532025wrc.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 09:49:24 -0700 (PDT)
-References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
-	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
-	<CAFEAcA-xkd94VTVOuOvXeowb92TPose4y8LKB5o56UyRMNXsfw@mail.gmail.com>
-	<8ebbc85e-5b44-1f49-296f-4be51405d521@redhat.com>
-	<CAFEAcA-G6=FfgXrHVE+eUP0YLd9Bp0b26n_0pTiW-joF++BcBg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f24131b0-4fbb-8f65-d9d4-703fd8bce1b2@redhat.com>
-Date: Thu, 6 Jul 2017 18:49:20 +0200
+	(envelope-from <eblake@redhat.com>) id 1dT9zn-0006x5-Sw
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:51:19 -0400
+References: <20170706163828.24082-1-pbonzini@redhat.com>
+	<20170706163828.24082-2-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <23f32d9e-3510-5859-9ca7-03106b67d8aa@redhat.com>
+Date: Thu, 6 Jul 2017 11:51:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-G6=FfgXrHVE+eUP0YLd9Bp0b26n_0pTiW-joF++BcBg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
- memory_region_allocate_aux_memory()
+In-Reply-To: <20170706163828.24082-2-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="uXHSXqWsExn1RTHjwfd0HGEC0XXOCiHGH"
+Subject: Re: [Qemu-devel] [PATCH 01/11] block: prepare write threshold code
+ for thread safety
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-On 06/07/2017 18:26, Peter Maydell wrote:
-> 
-> I think that to avoid getting tangled up in trying to fix
-> or deal with these handful of oddball cases at the same time
-> as doing a global change to the easy cases, we should:
-> 
->  * globally rename memory_region_init_ram to memory_region_init_ram_nomigrate
->    (and document that it is the caller's job to arrange to migrate the RAM)
->  * add new memory_region_init_ram which does memory_region_init_ram_nomigrate
->    + vmstate_register_ram
->  * coccinelle patch to switch to using that new function where possible
->  * get that lot committed, because it touches so many files and
->    is a recipe for conflicts
->  * look at the remaining handful of _nomigrate calls and perhaps
->    switch them where that would be a bug fix
-> 
-> Q: should we have _nomigrate versions of any of the other
-> memory_region_init_ram* functions? I think it makes sense
-> for only the basic _init_ram to do the migration for you,
-> because that's the only case where the memory system is
-> creating the backing storage for the caller, rather than the
-> caller passing in the backing storage.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uXHSXqWsExn1RTHjwfd0HGEC0XXOCiHGH
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+Message-ID: <23f32d9e-3510-5859-9ca7-03106b67d8aa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/11] block: prepare write threshold code
+ for thread safety
+References: <20170706163828.24082-1-pbonzini@redhat.com>
+ <20170706163828.24082-2-pbonzini@redhat.com>
+In-Reply-To: <20170706163828.24082-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-memory_region_init_ram_from_file theoretically would also fit this
-description, but all of its callers would use the _nomigrate version.
+On 07/06/2017 11:38 AM, Paolo Bonzini wrote:
+> Code refactoring only.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/write-threshold.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
+>=20
 
-Paolo
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> "Be consistent for
-> the full set of functions" would be the other obvious approach;
-> I don't think I care too much either way.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--uXHSXqWsExn1RTHjwfd0HGEC0XXOCiHGH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZXmp6AAoJEKeha0olJ0NqW18H/17vKZANfArmM1wUCUPyZo1G
+UENLriSkqW2Tcb5aPXINMDUdtySnbwUw0yx7NdCjtCkNQj1MJ7vExClLeqJsYuPP
+OAJz8hXxk1+7J4OtPlIEAwJlKebWL/YRo6TM3vu2KxCZuxcO3b/U8fRjQESFI1Rk
+GgbveaGBYi3I17/xH0nuxh9nGsjAZBjWejwW2DBDPope7kbuGft3G31o5yE9jJTl
+4vCGRDVSPb/L/TlBiIStc9xIS89yo3Bc6YjZCwvfbeOgDYboM90FM1nb9sA2pABr
+lUL5fZkdTFtuAXbe9VSzG+ZQDVuQk5eTBcykFUHh0y272niNbdaAkeAdt/hU9gY=
+=eAm/
+-----END PGP SIGNATURE-----
+
+--uXHSXqWsExn1RTHjwfd0HGEC0XXOCiHGH--
