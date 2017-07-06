@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dTASt-00079N-3P
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:21:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dTAY1-0001Zd-Ts
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dTASs-0005Jk-3P
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:21:19 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35709)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dTASr-0005Ia-Ri
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:21:18 -0400
-Received: by mail-lf0-x244.google.com with SMTP id z78so1285589lff.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 10:21:17 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1dTAXw-0000Zz-UP
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:26:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dTAXw-0000Ze-O6
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:26:32 -0400
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+	<CAFEAcA-VGRYZ7+Osa8J1Ew+P=wf42uOtVvmV9mmGBTwC-f++8w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6861810e-0546-d1e4-4573-7cdb18696c03@redhat.com>
+Date: Thu, 6 Jul 2017 19:26:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <72817738-deb5-f64e-7247-89dbdf10ddbd@redhat.com>
-References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
-	<20170706101611.27031-6-marcandre.lureau@redhat.com>
-	<72817738-deb5-f64e-7247-89dbdf10ddbd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 6 Jul 2017 19:21:15 +0200
-Message-ID: <CAJ+F1C+um2ep_SF-jWxmLH2PRhCQhcv9LPFW3RyXoCcs=GVh7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] kdump: add vmcoreinfo ELF note
+In-Reply-To: <CAFEAcA-VGRYZ7+Osa8J1Ew+P=wf42uOtVvmV9mmGBTwC-f++8w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Dave Anderson <anderson@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-
-Hi
-
-On Thu, Jul 6, 2017 at 7:13 PM, Laszlo Ersek <lersek@redhat.com> wrote:
-> On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
->> kdump header provides offset and size of the vmcoreinfo ELF note,
->> append it if available.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  dump.c | 20 ++++++++++++++++++++
->>  1 file changed, 20 insertions(+)
->>
->> diff --git a/dump.c b/dump.c
->> index f699198204..dd416ad271 100644
->> --- a/dump.c
->> +++ b/dump.c
->> @@ -839,6 +839,16 @@ static void create_header32(DumpState *s, Error **e=
-rrp)
->>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
->>
->>      offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
->> +    if (s->vmcoreinfo) {
->> +        uint64_t hsize, name_size, size_vmcoreinfo_desc, offset_vmcorei=
-nfo;
->> +
->> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size, &size_vmco=
-reinfo_desc);
->> +        offset_vmcoreinfo =3D offset_note + s->note_size - s->vmcoreinf=
-o_size +
->> +            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) * 4;
->> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo);
->> +        kh->size_vmcoreinfo =3D cpu_to_dump32(s, size_vmcoreinfo_desc);
->> +    }
->> +
->>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
->>      kh->note_size =3D cpu_to_dump32(s, s->note_size);
->>
->> @@ -939,6 +949,16 @@ static void create_header64(DumpState *s, Error **e=
-rrp)
->>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
->>
->>      offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
->> +    if (s->vmcoreinfo) {
->> +        uint64_t hsize, name_size, size_vmcoreinfo_desc, offset_vmcorei=
-nfo;
->> +
->> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size, &size_vmco=
-reinfo_desc);
->> +        offset_vmcoreinfo =3D offset_note + s->note_size - s->vmcoreinf=
-o_size +
->> +            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) * 4;
->> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo);
->> +        kh->size_vmcoreinfo =3D cpu_to_dump64(s, size_vmcoreinfo_desc);
->> +    }
->> +
->>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
->>      kh->note_size =3D cpu_to_dump64(s, s->note_size);
->>
->>
->
-> I continue to think that this patch is unnecessary, but if you insist,
-> it does look OK to me.
->
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Without it, crash doesn't read the vmcoreinfo PT_NOTE. And for some
-reason, the phys_base in the header wasn't enough (to be doubled
-checked).
-
-Any comment Dave about crash handling of vmcoreinfo in kdump files?
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+On 06/07/2017 19:13, Peter Maydell wrote:
+> Slightly awkward because owner is an Object but vmstate_register_ram()
+> needs a DeviceState. Is this OK, or too much magic?
+> 
+>     DeviceState *owner_dev;
+>     Error *err = NULL;
+> 
+>     memory_region_init_ram(mr, owner, name, ram_size, &err);
+>     if (err) {
+>         error_propagate(errp, err);
+>         return;
+>     }
+>     /* Note that owner_dev may be NULL if owner is not a DeviceState;
+>      * in that case this is equivalent to calling vmstate_register_ram_global().
+>      */
+>     owner_dev = object_dynamic_cast(owner, TYPE_DEVICE);
+>     vmstate_register_ram(mr, owner_dev);
+
+Maybe, for memory_region_init_ram only, the owner argument can be made a
+DeviceState (or NULL)?
+
+Paolo
