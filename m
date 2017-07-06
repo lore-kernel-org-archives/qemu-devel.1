@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dT2GH-0006u7-4w
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:35:46 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dT2Hj-0007T0-MQ
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dT2GC-0006wu-9Z
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:35:45 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:57195)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dT2GB-0006w3-SK
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:35:40 -0400
-References: <20170706002401.10507-1-rth@twiddle.net>
-	<20170706002401.10507-6-rth@twiddle.net>
-	<e969146b-3061-e0ee-3e5c-e709c73abc11@vivier.eu>
-	<20170706081045.GA7838@physik.fu-berlin.de>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <25f0470b-4a22-32e4-a298-c93975537ee8@vivier.eu>
-Date: Thu, 6 Jul 2017 10:35:15 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dT2He-0007mV-PV
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:37:15 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34566)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dT2He-0007mH-Fe
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:37:10 -0400
+Received: by mail-wr0-x231.google.com with SMTP id 77so18840219wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 01:37:10 -0700 (PDT)
+References: <8737aaeuu5.fsf@linaro.org>
+	<CAFEAcA8ZHz4vyBrHV6Vi7227h+_NafgV1oBY0g9sV7zU_8my0w@mail.gmail.com>
+	<672d2102-5a27-47b3-ef5b-f49d1e21d9f2@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <672d2102-5a27-47b3-ef5b-f49d1e21d9f2@redhat.com>
+Date: Thu, 06 Jul 2017 09:37:07 +0100
+Message-ID: <87pode9d1o.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170706081045.GA7838@physik.fu-berlin.de>
-Content-Type: multipart/mixed; boundary="------------BB5F90111DE1E6A4FB9F2DA6"
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 05/11] linux-user/sh4: Notice gUSA regions
- during signal delivery
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qemu_system_reset_request() broken w.r.t BQL
+ locking regime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,251 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, bruno@clisp.org, aurelien@aurel32.net
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel <qemu-devel@nongnu.org>, maciej.borzecki@rndity.com
 
-This is a multi-part message in MIME format.
---------------BB5F90111DE1E6A4FB9F2DA6
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 
-Le 06/07/2017 à 10:10, John Paul Adrian Glaubitz a écrit :
-> Hi!
-> 
-> Wow, great to see that there is actually now support for handling gUSA
-> in qemu-user on sh4. I wonder whether this will help resolve the
-> lock-up issues on qemu-sh4-user when building Debian packages for
-> sh4.
-> 
-> The lockups occur fairly often when any process uses
-> multi-threading. Would this help here?
-> 
-> Was gUSA support recently added to qemu or is this just a fix?
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-This is a patch series proposed by Richard, it is not included in qemu
-at the moment:
+> On 05/07/2017 18:14, Peter Maydell wrote:
+>>>   - Guest resets board, writing to some hw address (e.g.
+>>>     arm_sysctl_write)
+>>>   - This triggers qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET)
+>>>   - We exit iowrite and drop the BQL
+>>>   - vl.c schedules qemu_system_reset->qemu_devices_reset...arm_cpu_reset
+>>>   - we start writing new values to CPU env while still in TCG code
+>>>   - CHAOS!
+>>>
+>>> The general solution for this is to ensure these sort of tasks are done
+>>> with safe work in the CPUs context when we know nothing else is running.
+>>> It seems this is probably best done by modifying
+>>> qemu_system_reset_request to queue work up on current_cpu and execute it
+>>> as safe work - I don't think the vl.c thread should ever be messing
+>>> about with calling cpu_reset directly.
+>> My first thought is that qemu_system_reset() should absolutely
+>> stop every CPU (or other runnable thing like a DMA agent) in the
+>> system. The semantics are basically "like a power cycle", so
+>> that should include a complete stop of the world. (Is this
+>> what vm_stop() does? Dunno...)
+>
+> I agree, it should do vm_stop() as the first thing and, if applicable,
+> vm_start() as the last thing, similar to e.g. savevm.
 
-http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg01196.html
+OK I did some more digging and basically the problem is cpu_stop_current
+does the wrong thing. It can set cpu->stopped while still in the vCPU
+thread which means when the vl.c thread does pause_all_vcpus() it thinks
+the thread is paused when in fact it isn't leading to the chaos. I think
+the fix is to tighten up our usage of these two functions. So my current
+plan is:
 
-I think it would be interesting if you generate a qemu binary with it
-and use it in your buildds to test it.
+* pause_all_vcpus() should never be called from vCPU/HW emulation
 
-I guess the series can be pulled directly from Richard's branch:
+One case in kvm_apic has been fixed by Pranith. The other case in s390
+should be converted to use async_safe_work. Once this is done we can
+assert that pause_all_vcpus() is not in a vCPU thread and keep it for
+qmp,hmp and gdb type operations.
 
-git://github.com/rth7680/qemu.git tgt-sh4
+* vm_stop() is probably being misused by vCPU threads
 
-Thanks,
-Laurent
+There are more uses than pause_all_vcpus here but they all seem to be
+for error handling bail-out type things.
 
---------------BB5F90111DE1E6A4FB9F2DA6
-Content-Type: application/pgp-keys;
- name="0x3F2FBE3C.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="0x3F2FBE3C.asc"
+* cpu_stop_current() is probably superfluous now
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v2
+It certainly shouldn't be called directly from the vCPU code
+(rtas_power_off) and once we know pause_all_vcpus() can't be called
+directly at least one call is gone. I think the current_cpu handling is
+a relic of the days of single-threaded handling when it was a global.
 
-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
-9yjq9UVB7wmaC1EXxYUk
-=3DFctz
------END PGP PUBLIC KEY BLOCK-----
+Does that sound reasonable?
 
---------------BB5F90111DE1E6A4FB9F2DA6--
+--
+Alex Bennée
