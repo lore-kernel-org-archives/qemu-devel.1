@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dSub6-0007aP-CX
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:45 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dSub7-0007aR-GX
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dSub3-0002R0-7S
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:44 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33022)
+	(envelope-from <rth7680@gmail.com>) id 1dSub5-0002RV-SS
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:45 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32809)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSub3-0002Qs-3B
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:41 -0400
-Received: by mail-qk0-x244.google.com with SMTP id p21so661623qke.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 17:24:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSub5-0002RR-Na
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:43 -0400
+Received: by mail-qt0-x244.google.com with SMTP id c20so651159qte.0
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 17:24:43 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  5 Jul 2017 14:23:56 -1000
-Message-Id: <20170706002401.10507-7-rth@twiddle.net>
+Date: Wed,  5 Jul 2017 14:23:57 -1000
+Message-Id: <20170706002401.10507-8-rth@twiddle.net>
 In-Reply-To: <20170706002401.10507-1-rth@twiddle.net>
 References: <20170706002401.10507-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 06/11] target/sh4: Hoist register bank selection
+Subject: [Qemu-devel] [PATCH 07/11] target/sh4: Unify cpu_fregs into FREG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +29,292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, bruno@clisp.org
 
-Compute which register bank to use once at the start of translation.
+We were treating FREG as an index and REG as a TCGv.
+Making FREG return a TCGv is both less confusing and
+a step toward cleaner banking of cpu_fregs.
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/sh4/translate.c | 43 ++++++++++++++++++++++++++++++-------------
- 1 file changed, 30 insertions(+), 13 deletions(-)
+ target/sh4/translate.c | 123 +++++++++++++++++++++----------------------------
+ 1 file changed, 52 insertions(+), 71 deletions(-)
 
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 9ab7d6e..20e24d5 100644
+index 20e24d5..e4fd6f2 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -35,6 +35,8 @@
+@@ -382,10 +382,11 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
+ #define REG(x)     ctx->gregs[x]
+ #define ALTREG(x)  ctx->altregs[x]
  
- typedef struct DisasContext {
-     struct TranslationBlock *tb;
-+    TCGv *gregs;         /* active bank */
-+    TCGv *altregs;       /* inactive, alternate, bank */
-     target_ulong pc;
-     uint16_t opcode;
-     uint32_t tbflags;    /* should stay unmodified during the TB translation */
-@@ -64,7 +66,7 @@ enum {
- 
- /* global register indexes */
- static TCGv_env cpu_env;
--static TCGv cpu_gregs[24];
-+static TCGv cpu_gregs[2][16];
- static TCGv cpu_sr, cpu_sr_m, cpu_sr_q, cpu_sr_t;
- static TCGv cpu_pc, cpu_ssr, cpu_spc, cpu_gbr;
- static TCGv cpu_vbr, cpu_sgr, cpu_dbr, cpu_mach, cpu_macl;
-@@ -99,16 +101,31 @@ void sh4_translate_init(void)
-         "FPR12_BANK1", "FPR13_BANK1", "FPR14_BANK1", "FPR15_BANK1",
-     };
- 
--    if (done_init)
-+    if (done_init) {
-         return;
-+    }
- 
-     cpu_env = tcg_global_reg_new_ptr(TCG_AREG0, "env");
-     tcg_ctx.tcg_env = cpu_env;
- 
--    for (i = 0; i < 24; i++)
--        cpu_gregs[i] = tcg_global_mem_new_i32(cpu_env,
--                                              offsetof(CPUSH4State, gregs[i]),
--                                              gregnames[i]);
-+    for (i = 0; i < 8; i++) {
-+        cpu_gregs[0][i]
-+            = tcg_global_mem_new_i32(cpu_env,
-+                                     offsetof(CPUSH4State, gregs[i]),
-+                                     gregnames[i]);
-+    }
-+    for (i = 8; i < 16; i++) {
-+        cpu_gregs[0][i] = cpu_gregs[1][i]
-+            = tcg_global_mem_new_i32(cpu_env,
-+                                     offsetof(CPUSH4State, gregs[i]),
-+                                     gregnames[i]);
-+    }
-+    for (i = 16; i < 24; i++) {
-+        cpu_gregs[1][i - 16]
-+            = tcg_global_mem_new_i32(cpu_env,
-+                                     offsetof(CPUSH4State, gregs[i]),
-+                                     gregnames[i]);
-+    }
- 
-     cpu_pc = tcg_global_mem_new_i32(cpu_env,
-                                     offsetof(CPUSH4State, pc), "PC");
-@@ -362,13 +379,8 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
- #define B11_8 ((ctx->opcode >> 8) & 0xf)
- #define B15_12 ((ctx->opcode >> 12) & 0xf)
- 
--#define REG(x) ((x) < 8 && (ctx->tbflags & (1u << SR_MD))\
--                        && (ctx->tbflags & (1u << SR_RB))\
--                ? (cpu_gregs[x + 16]) : (cpu_gregs[x]))
--
--#define ALTREG(x) ((x) < 8 && (!(ctx->tbflags & (1u << SR_MD))\
--                               || !(ctx->tbflags & (1u << SR_RB)))\
--		? (cpu_gregs[x + 16]) : (cpu_gregs[x]))
-+#define REG(x)     ctx->gregs[x]
-+#define ALTREG(x)  ctx->altregs[x]
- 
- #define FREG(x) (ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x))
+-#define FREG(x) (ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x))
++#define FREG(x) cpu_fregs[ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x)]
  #define XHACK(x) ((((x) & 1 ) << 4) | ((x) & 0xe))
-@@ -2214,6 +2226,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     target_ulong pc_start;
-     int num_insns;
-     int max_insns;
-+    int bank;
+-#define XREG(x) (ctx->tbflags & FPSCR_FR ? XHACK(x) ^ 0x10 : XHACK(x))
+-#define DREG(x) FREG(x) /* Assumes lsb of (x) is always 0 */
++#define XREG(x) FREG(XHACK(x))
++/* Assumes lsb of (x) is always 0 */
++#define DREG(x) (ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x))
  
-     pc_start = tb->pc;
-     ctx.pc = pc_start;
-@@ -2229,6 +2242,10 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     ctx.features = env->features;
-     ctx.has_movcal = (ctx.tbflags & TB_FLAG_PENDING_MOVCA);
- 
-+    bank = (ctx.tbflags & (1 << SR_MD)) && (ctx.tbflags & (1 << SR_RB));
-+    ctx.gregs = cpu_gregs[bank];
-+    ctx.altregs = cpu_gregs[bank ^ 1];
-+
-     max_insns = tb->cflags & CF_COUNT_MASK;
-     if (max_insns == 0) {
-         max_insns = CF_COUNT_MASK;
+ #define CHECK_NOT_DELAY_SLOT \
+     if (ctx->envflags & DELAY_SLOT_MASK) {                           \
+@@ -1005,56 +1006,51 @@ static void _decode_opc(DisasContext * ctx)
+ 	CHECK_FPU_ENABLED
+         if (ctx->tbflags & FPSCR_SZ) {
+ 	    TCGv_i64 fp = tcg_temp_new_i64();
+-	    gen_load_fpr64(fp, XREG(B7_4));
+-	    gen_store_fpr64(fp, XREG(B11_8));
++	    gen_load_fpr64(fp, XHACK(B7_4));
++	    gen_store_fpr64(fp, XHACK(B11_8));
+ 	    tcg_temp_free_i64(fp);
+ 	} else {
+-	    tcg_gen_mov_i32(cpu_fregs[FREG(B11_8)], cpu_fregs[FREG(B7_4)]);
++	    tcg_gen_mov_i32(FREG(B11_8), FREG(B7_4));
+ 	}
+ 	return;
+     case 0xf00a: /* fmov {F,D,X}Rm,@Rn - FPSCR: Nothing */
+ 	CHECK_FPU_ENABLED
+         if (ctx->tbflags & FPSCR_SZ) {
+ 	    TCGv addr_hi = tcg_temp_new();
+-	    int fr = XREG(B7_4);
++	    int fr = XHACK(B7_4);
+ 	    tcg_gen_addi_i32(addr_hi, REG(B11_8), 4);
+-            tcg_gen_qemu_st_i32(cpu_fregs[fr], REG(B11_8),
+-                                ctx->memidx, MO_TEUL);
+-            tcg_gen_qemu_st_i32(cpu_fregs[fr+1], addr_hi,
+-                                ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_st_i32(FREG(fr), REG(B11_8), ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_st_i32(FREG(fr + 1), addr_hi, ctx->memidx, MO_TEUL);
+ 	    tcg_temp_free(addr_hi);
+ 	} else {
+-            tcg_gen_qemu_st_i32(cpu_fregs[FREG(B7_4)], REG(B11_8),
+-                                ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_st_i32(FREG(B7_4), REG(B11_8), ctx->memidx, MO_TEUL);
+ 	}
+ 	return;
+     case 0xf008: /* fmov @Rm,{F,D,X}Rn - FPSCR: Nothing */
+ 	CHECK_FPU_ENABLED
+         if (ctx->tbflags & FPSCR_SZ) {
+ 	    TCGv addr_hi = tcg_temp_new();
+-	    int fr = XREG(B11_8);
++	    int fr = XHACK(B11_8);
+ 	    tcg_gen_addi_i32(addr_hi, REG(B7_4), 4);
+-            tcg_gen_qemu_ld_i32(cpu_fregs[fr], REG(B7_4), ctx->memidx, MO_TEUL);
+-            tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr_hi, ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_ld_i32(FREG(fr), REG(B7_4), ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_ld_i32(FREG(fr + 1), addr_hi, ctx->memidx, MO_TEUL);
+ 	    tcg_temp_free(addr_hi);
+ 	} else {
+-            tcg_gen_qemu_ld_i32(cpu_fregs[FREG(B11_8)], REG(B7_4),
+-                                ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_ld_i32(FREG(B11_8), REG(B7_4), ctx->memidx, MO_TEUL);
+ 	}
+ 	return;
+     case 0xf009: /* fmov @Rm+,{F,D,X}Rn - FPSCR: Nothing */
+ 	CHECK_FPU_ENABLED
+         if (ctx->tbflags & FPSCR_SZ) {
+ 	    TCGv addr_hi = tcg_temp_new();
+-	    int fr = XREG(B11_8);
++	    int fr = XHACK(B11_8);
+ 	    tcg_gen_addi_i32(addr_hi, REG(B7_4), 4);
+-            tcg_gen_qemu_ld_i32(cpu_fregs[fr], REG(B7_4), ctx->memidx, MO_TEUL);
+-            tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr_hi, ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_ld_i32(FREG(fr), REG(B7_4), ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_ld_i32(FREG(fr + 1), addr_hi, ctx->memidx, MO_TEUL);
+ 	    tcg_gen_addi_i32(REG(B7_4), REG(B7_4), 8);
+ 	    tcg_temp_free(addr_hi);
+ 	} else {
+-            tcg_gen_qemu_ld_i32(cpu_fregs[FREG(B11_8)], REG(B7_4),
+-                                ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_ld_i32(FREG(B11_8), REG(B7_4), ctx->memidx, MO_TEUL);
+ 	    tcg_gen_addi_i32(REG(B7_4), REG(B7_4), 4);
+ 	}
+ 	return;
+@@ -1063,13 +1059,12 @@ static void _decode_opc(DisasContext * ctx)
+         TCGv addr = tcg_temp_new_i32();
+         tcg_gen_subi_i32(addr, REG(B11_8), 4);
+         if (ctx->tbflags & FPSCR_SZ) {
+-	    int fr = XREG(B7_4);
+-            tcg_gen_qemu_st_i32(cpu_fregs[fr+1], addr, ctx->memidx, MO_TEUL);
++	    int fr = XHACK(B7_4);
++            tcg_gen_qemu_st_i32(FREG(fr + 1), addr, ctx->memidx, MO_TEUL);
+ 	    tcg_gen_subi_i32(addr, addr, 4);
+-            tcg_gen_qemu_st_i32(cpu_fregs[fr], addr, ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_st_i32(FREG(fr), addr, ctx->memidx, MO_TEUL);
+ 	} else {
+-            tcg_gen_qemu_st_i32(cpu_fregs[FREG(B7_4)], addr,
+-                                ctx->memidx, MO_TEUL);
++            tcg_gen_qemu_st_i32(FREG(B7_4), addr, ctx->memidx, MO_TEUL);
+ 	}
+         tcg_gen_mov_i32(REG(B11_8), addr);
+         tcg_temp_free(addr);
+@@ -1080,15 +1075,12 @@ static void _decode_opc(DisasContext * ctx)
+ 	    TCGv addr = tcg_temp_new_i32();
+ 	    tcg_gen_add_i32(addr, REG(B7_4), REG(0));
+             if (ctx->tbflags & FPSCR_SZ) {
+-		int fr = XREG(B11_8);
+-                tcg_gen_qemu_ld_i32(cpu_fregs[fr], addr,
+-                                    ctx->memidx, MO_TEUL);
++		int fr = XHACK(B11_8);
++                tcg_gen_qemu_ld_i32(FREG(fr), addr, ctx->memidx, MO_TEUL);
+ 		tcg_gen_addi_i32(addr, addr, 4);
+-                tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr,
+-                                    ctx->memidx, MO_TEUL);
++                tcg_gen_qemu_ld_i32(FREG(fr + 1), addr, ctx->memidx, MO_TEUL);
+ 	    } else {
+-                tcg_gen_qemu_ld_i32(cpu_fregs[FREG(B11_8)], addr,
+-                                    ctx->memidx, MO_TEUL);
++                tcg_gen_qemu_ld_i32(FREG(B11_8), addr, ctx->memidx, MO_TEUL);
+ 	    }
+ 	    tcg_temp_free(addr);
+ 	}
+@@ -1099,15 +1091,12 @@ static void _decode_opc(DisasContext * ctx)
+ 	    TCGv addr = tcg_temp_new();
+ 	    tcg_gen_add_i32(addr, REG(B11_8), REG(0));
+             if (ctx->tbflags & FPSCR_SZ) {
+-		int fr = XREG(B7_4);
+-                tcg_gen_qemu_ld_i32(cpu_fregs[fr], addr,
+-                                    ctx->memidx, MO_TEUL);
++		int fr = XHACK(B7_4);
++                tcg_gen_qemu_ld_i32(FREG(fr), addr, ctx->memidx, MO_TEUL);
+ 		tcg_gen_addi_i32(addr, addr, 4);
+-                tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr,
+-                                    ctx->memidx, MO_TEUL);
++                tcg_gen_qemu_ld_i32(FREG(fr + 1), addr, ctx->memidx, MO_TEUL);
+ 	    } else {
+-                tcg_gen_qemu_st_i32(cpu_fregs[FREG(B7_4)], addr,
+-                                    ctx->memidx, MO_TEUL);
++                tcg_gen_qemu_st_i32(FREG(B7_4), addr, ctx->memidx, MO_TEUL);
+ 	    }
+ 	    tcg_temp_free(addr);
+ 	}
+@@ -1155,32 +1144,26 @@ static void _decode_opc(DisasContext * ctx)
+ 	    } else {
+                 switch (ctx->opcode & 0xf00f) {
+                 case 0xf000:		/* fadd Rm,Rn */
+-                    gen_helper_fadd_FT(cpu_fregs[FREG(B11_8)], cpu_env,
+-                                       cpu_fregs[FREG(B11_8)],
+-                                       cpu_fregs[FREG(B7_4)]);
++                    gen_helper_fadd_FT(FREG(B11_8), cpu_env,
++                                       FREG(B11_8), FREG(B7_4));
+                     break;
+                 case 0xf001:		/* fsub Rm,Rn */
+-                    gen_helper_fsub_FT(cpu_fregs[FREG(B11_8)], cpu_env,
+-                                       cpu_fregs[FREG(B11_8)],
+-                                       cpu_fregs[FREG(B7_4)]);
++                    gen_helper_fsub_FT(FREG(B11_8), cpu_env,
++                                       FREG(B11_8), FREG(B7_4));
+                     break;
+                 case 0xf002:		/* fmul Rm,Rn */
+-                    gen_helper_fmul_FT(cpu_fregs[FREG(B11_8)], cpu_env,
+-                                       cpu_fregs[FREG(B11_8)],
+-                                       cpu_fregs[FREG(B7_4)]);
++                    gen_helper_fmul_FT(FREG(B11_8), cpu_env,
++                                       FREG(B11_8), FREG(B7_4));
+                     break;
+                 case 0xf003:		/* fdiv Rm,Rn */
+-                    gen_helper_fdiv_FT(cpu_fregs[FREG(B11_8)], cpu_env,
+-                                       cpu_fregs[FREG(B11_8)],
+-                                       cpu_fregs[FREG(B7_4)]);
++                    gen_helper_fdiv_FT(FREG(B11_8), cpu_env,
++                                       FREG(B11_8), FREG(B7_4));
+                     break;
+                 case 0xf004:		/* fcmp/eq Rm,Rn */
+-                    gen_helper_fcmp_eq_FT(cpu_env, cpu_fregs[FREG(B11_8)],
+-                                          cpu_fregs[FREG(B7_4)]);
++                    gen_helper_fcmp_eq_FT(cpu_env, FREG(B11_8), FREG(B7_4));
+                     return;
+                 case 0xf005:		/* fcmp/gt Rm,Rn */
+-                    gen_helper_fcmp_gt_FT(cpu_env, cpu_fregs[FREG(B11_8)],
+-                                          cpu_fregs[FREG(B7_4)]);
++                    gen_helper_fcmp_gt_FT(cpu_env, FREG(B11_8), FREG(B7_4));
+                     return;
+                 }
+ 	    }
+@@ -1192,9 +1175,8 @@ static void _decode_opc(DisasContext * ctx)
+             if (ctx->tbflags & FPSCR_PR) {
+                 break; /* illegal instruction */
+             } else {
+-                gen_helper_fmac_FT(cpu_fregs[FREG(B11_8)], cpu_env,
+-                                   cpu_fregs[FREG(0)], cpu_fregs[FREG(B7_4)],
+-                                   cpu_fregs[FREG(B11_8)]);
++                gen_helper_fmac_FT(FREG(B11_8), cpu_env,
++                                   FREG(0), FREG(B7_4), FREG(B11_8));
+                 return;
+             }
+         }
+@@ -1732,11 +1714,11 @@ static void _decode_opc(DisasContext * ctx)
+         return;
+     case 0xf00d: /* fsts FPUL,FRn - FPSCR: Nothing */
+ 	CHECK_FPU_ENABLED
+-	tcg_gen_mov_i32(cpu_fregs[FREG(B11_8)], cpu_fpul);
++	tcg_gen_mov_i32(FREG(B11_8), cpu_fpul);
+ 	return;
+     case 0xf01d: /* flds FRm,FPUL - FPSCR: Nothing */
+ 	CHECK_FPU_ENABLED
+-	tcg_gen_mov_i32(cpu_fpul, cpu_fregs[FREG(B11_8)]);
++	tcg_gen_mov_i32(cpu_fpul, FREG(B11_8));
+ 	return;
+     case 0xf02d: /* float FPUL,FRn/DRn - FPSCR: R[PR,Enable.I]/W[Cause,Flag] */
+ 	CHECK_FPU_ENABLED
+@@ -1750,7 +1732,7 @@ static void _decode_opc(DisasContext * ctx)
+ 	    tcg_temp_free_i64(fp);
+ 	}
+ 	else {
+-            gen_helper_float_FT(cpu_fregs[FREG(B11_8)], cpu_env, cpu_fpul);
++            gen_helper_float_FT(FREG(B11_8), cpu_env, cpu_fpul);
+ 	}
+ 	return;
+     case 0xf03d: /* ftrc FRm/DRm,FPUL - FPSCR: R[PR,Enable.V]/W[Cause,Flag] */
+@@ -1765,13 +1747,13 @@ static void _decode_opc(DisasContext * ctx)
+ 	    tcg_temp_free_i64(fp);
+ 	}
+ 	else {
+-            gen_helper_ftrc_FT(cpu_fpul, cpu_env, cpu_fregs[FREG(B11_8)]);
++            gen_helper_ftrc_FT(cpu_fpul, cpu_env, FREG(B11_8));
+ 	}
+ 	return;
+     case 0xf04d: /* fneg FRn/DRn - FPSCR: Nothing */
+ 	CHECK_FPU_ENABLED
+ 	{
+-	    gen_helper_fneg_T(cpu_fregs[FREG(B11_8)], cpu_fregs[FREG(B11_8)]);
++	    gen_helper_fneg_T(FREG(B11_8), FREG(B11_8));
+ 	}
+ 	return;
+     case 0xf05d: /* fabs FRn/DRn */
+@@ -1785,7 +1767,7 @@ static void _decode_opc(DisasContext * ctx)
+ 	    gen_store_fpr64(fp, DREG(B11_8));
+ 	    tcg_temp_free_i64(fp);
+ 	} else {
+-	    gen_helper_fabs_FT(cpu_fregs[FREG(B11_8)], cpu_fregs[FREG(B11_8)]);
++	    gen_helper_fabs_FT(FREG(B11_8), FREG(B11_8));
+ 	}
+ 	return;
+     case 0xf06d: /* fsqrt FRn */
+@@ -1799,8 +1781,7 @@ static void _decode_opc(DisasContext * ctx)
+ 	    gen_store_fpr64(fp, DREG(B11_8));
+ 	    tcg_temp_free_i64(fp);
+ 	} else {
+-            gen_helper_fsqrt_FT(cpu_fregs[FREG(B11_8)], cpu_env,
+-                                cpu_fregs[FREG(B11_8)]);
++            gen_helper_fsqrt_FT(FREG(B11_8), cpu_env, FREG(B11_8));
+ 	}
+ 	return;
+     case 0xf07d: /* fsrra FRn */
+@@ -1809,13 +1790,13 @@ static void _decode_opc(DisasContext * ctx)
+     case 0xf08d: /* fldi0 FRn - FPSCR: R[PR] */
+ 	CHECK_FPU_ENABLED
+         if (!(ctx->tbflags & FPSCR_PR)) {
+-	    tcg_gen_movi_i32(cpu_fregs[FREG(B11_8)], 0);
++	    tcg_gen_movi_i32(FREG(B11_8), 0);
+ 	}
+ 	return;
+     case 0xf09d: /* fldi1 FRn - FPSCR: R[PR] */
+ 	CHECK_FPU_ENABLED
+         if (!(ctx->tbflags & FPSCR_PR)) {
+-	    tcg_gen_movi_i32(cpu_fregs[FREG(B11_8)], 0x3f800000);
++	    tcg_gen_movi_i32(FREG(B11_8), 0x3f800000);
+ 	}
+ 	return;
+     case 0xf0ad: /* fcnvsd FPUL,DRn */
 -- 
 2.9.4
