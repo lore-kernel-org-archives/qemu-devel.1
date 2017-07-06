@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSwe0-0002VQ-TK
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:35:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1dSwf1-0002wH-8n
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dSwdz-0003eY-S3
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:35:52 -0400
-References: <20170703221456.30817-1-eblake@redhat.com>
-	<20170703221456.30817-4-eblake@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3ff30569-67ca-ce9a-02c6-55e7d9150aed@redhat.com>
-Date: Wed, 5 Jul 2017 21:35:36 -0500
+	(envelope-from <thuth@redhat.com>) id 1dSwex-000492-Ai
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:36:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dSwex-00048o-4u
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:36:51 -0400
+References: <cover.1499276048.git.alistair.francis@xilinx.com>
+	<170687a37cb487aec9b2b600e563f3d93440b2e8.1499276048.git.alistair.francis@xilinx.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <09e83b45-8b34-0639-3626-331fd828fc56@redhat.com>
+Date: Thu, 6 Jul 2017 04:36:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170703221456.30817-4-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj"
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] block: Add flag to avoid wasted
- work in bdrv_is_allocated()
+In-Reply-To: <170687a37cb487aec9b2b600e563f3d93440b2e8.1499276048.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v3 1/3] util/qemu-error: Rename
+ error_print_loc() to be more generic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, philippe@mathieu-daude.net, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
- el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
-Message-ID: <3ff30569-67ca-ce9a-02c6-55e7d9150aed@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] block: Add flag to avoid wasted
- work in bdrv_is_allocated()
-References: <20170703221456.30817-1-eblake@redhat.com>
- <20170703221456.30817-4-eblake@redhat.com>
-In-Reply-To: <20170703221456.30817-4-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/03/2017 05:14 PM, Eric Blake wrote:
-> Not all callers care about which BDS owns the mapping for a given
-> range of the file.  In particular, bdrv_is_allocated() cares more
-> about finding the largest run of allocated data from the guest
-> perspective, whether or not that data is consecutive from the
-> host perspective.  Therefore, doing subsequent refinements such
-> as checking how much of the format-layer allocation also satisfies
-> BDRV_BLOCK_ZERO at the protocol layer is wasted work - in the best
-> case, it just costs extra CPU cycles during a single
-> bdrv_is_allocated(), but in the worst case, it results in a smaller
-> *pnum, and forces callers to iterate through more status probes when
-> visiting the entire file for even more extra CPU cycles.
+On 05.07.2017 19:36, Alistair Francis wrote:
+> Rename the error_print_loc() function in preparation for using it to
+> print warnings as well.
 >=20
-> This patch only optimizes the block layer.  But subsequent patches
-> will tweak the driver callback to be byte-based, and in the process,
-> can also pass this hint through to the driver.
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+>  util/qemu-error.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-
-> @@ -1810,12 +1817,13 @@ static int64_t coroutine_fn bdrv_co_get_block_s=
-tatus(BlockDriverState *bs,
->          }
+> diff --git a/util/qemu-error.c b/util/qemu-error.c
+> index b331f8f4a4..1c5e35ecdb 100644
+> --- a/util/qemu-error.c
+> +++ b/util/qemu-error.c
+> @@ -146,7 +146,7 @@ const char *error_get_progname(void)
+>  /*
+>   * Print current location to current monitor if we have one, else to s=
+tderr.
+>   */
+> -static void error_print_loc(void)
+> +static void print_loc(void)
+>  {
+>      const char *sep =3D "";
+>      int i;
+> @@ -197,7 +197,7 @@ void error_vreport(const char *fmt, va_list ap)
+>          g_free(timestr);
 >      }
->=20
-> -    if (local_file && local_file !=3D bs &&
-> +    if (!allocation && local_file && local_file !=3D bs &&
->          (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
->          (ret & BDRV_BLOCK_OFFSET_VALID)) {
->          int file_pnum;
->=20
-> -        ret2 =3D bdrv_co_get_block_status(local_file, ret >> BDRV_SECT=
-OR_BITS,
-> +        ret2 =3D bdrv_co_get_block_status(local_file, true,
-> +                                        ret >> BDRV_SECTOR_BITS,
->                                          *pnum, &file_pnum, NULL);
->          if (ret2 >=3D 0) {
->              /* Ignore errors.  This is just providing extra informatio=
-n, it
+> =20
+> -    error_print_loc();
+> +    print_loc();
+>      error_vprintf(fmt, ap);
+>      error_printf("\n");
+>  }
 
-Hmm. My initial thinking here was that if we already have a good primary
-status, we want our secondary status (where we are probing bs->file for
-whether we can add BDRV_BLOCK_ZERO) to be as fast as possible, so I
-hard-coded the answer that favors is_allocated (I have to be careful
-describing this, since v3 will switch from 'bool allocated=3Dtrue' to
-'bool mapping=3Dfalse' to express that same request).  But it turns out
-that, at least for file-posix.c (for that matter, for several protocol
-drivers), it's a LOT faster to just blindly state that the entire file
-is allocated and data than it is to lseek(SEEK_HOLE).  So favoring
-allocation status instead of mapping status defeats the purpose, and
-this should be s/true/allocation/ (which is always false at this point)
-[or conversely s/false/mapping/, which is always true, in v3].
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXaH4AAoJEKeha0olJ0NqV0MH/2xZMOgxRxFBhMiPo1C5MX6C
-71j+fiEzqm2fWFcgchRrB+c32k3EhPC56WGVekAWDPdYaKpaz0hjG/uuzyGHyVUk
-QSqV/4nXGxqhMIv5W9RsMTesnuPreGJJmKkuM03N6fIPta60aRWLwtLepxRTa0S5
-8xqquuWbS1Sa0uxHcS6Xr6FSMs2WT3RETppNbG622lSK2Tge5/P3LFJT0SokQcE0
-QxewMQvehE/WBgLUQrUwPHgqbznweAmsHTIqfi2ctKzQcighVVr8iIbB5Q52q9a0
-kA/ZTHLcgYN4+9j6DAlEfBeFzHfbyCBXWscuUh+boitF1vqlcK2rPswG5DJHSvM=
-=xRtg
------END PGP SIGNATURE-----
-
---oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
