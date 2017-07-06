@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSwOT-0006W3-MM
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:19:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1dSwe0-0002VQ-TK
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1dSwOO-0006M3-On
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:19:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34822
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1dSwOO-0006Lj-IR
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:19:44 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v662JMGB085417
-	for <qemu-devel@nongnu.org>; Wed, 5 Jul 2017 22:19:43 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bgvqkf0br-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 22:19:43 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Wed, 5 Jul 2017 22:19:42 -0400
-References: <20170704132350.11874-1-haoqf@linux.vnet.ibm.com>
-	<20170705151506.GH29910@stefanha-x1.localdomain>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Thu, 6 Jul 2017 10:19:28 +0800
+	(envelope-from <eblake@redhat.com>) id 1dSwdz-0003eY-S3
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:35:52 -0400
+References: <20170703221456.30817-1-eblake@redhat.com>
+	<20170703221456.30817-4-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3ff30569-67ca-ce9a-02c6-55e7d9150aed@redhat.com>
+Date: Wed, 5 Jul 2017 21:35:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170705151506.GH29910@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Message-Id: <1d870e0b-f182-b0c7-818e-ec011bfd2261@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/1] virtio-scsi-ccw: fix iotest 068 for
- s390x
+In-Reply-To: <20170703221456.30817-4-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj"
+Subject: Re: [Qemu-devel] [PATCH v2 03/15] block: Add flag to avoid wasted
+ work in bdrv_is_allocated()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,44 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, borntraeger@de.ibm.com, zyimin@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, peterx@redhat.com, cohuck@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org,
+ el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+Message-ID: <3ff30569-67ca-ce9a-02c6-55e7d9150aed@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/15] block: Add flag to avoid wasted
+ work in bdrv_is_allocated()
+References: <20170703221456.30817-1-eblake@redhat.com>
+ <20170703221456.30817-4-eblake@redhat.com>
+In-Reply-To: <20170703221456.30817-4-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 07/03/2017 05:14 PM, Eric Blake wrote:
+> Not all callers care about which BDS owns the mapping for a given
+> range of the file.  In particular, bdrv_is_allocated() cares more
+> about finding the largest run of allocated data from the guest
+> perspective, whether or not that data is consecutive from the
+> host perspective.  Therefore, doing subsequent refinements such
+> as checking how much of the format-layer allocation also satisfies
+> BDRV_BLOCK_ZERO at the protocol layer is wasted work - in the best
+> case, it just costs extra CPU cycles during a single
+> bdrv_is_allocated(), but in the worst case, it results in a smaller
+> *pnum, and forces callers to iterate through more status probes when
+> visiting the entire file for even more extra CPU cycles.
+>=20
+> This patch only optimizes the block layer.  But subsequent patches
+> will tweak the driver callback to be byte-based, and in the process,
+> can also pass this hint through to the driver.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
 
-=E5=9C=A8 2017/7/5 23:15, Stefan Hajnoczi =E5=86=99=E9=81=93:
-> On Tue, Jul 04, 2017 at 03:23:49PM +0200, QingFeng Hao wrote:
->> This commit fixes iotest 068 for s390x as s390x uses virtio-scsi-ccw.
->> It's based on commit c324fd0a39c by Stefan Hajnoczi.
->> Thanks!
->>
->> Change history:
->> v4:
->>      Got Cornelia Huck's Reviewed-by and take the comment to change th=
-e
->>      commit message.
->>
->> v3:
->>      Take Christian Borntraeger and Cornelia Huck's comment to check
->>      if kvm is enabled in s390_assign_subch_ioeventfd instead of
->>      kvm_s390_assign_subch_ioeventfd to as the former is a general one.
->>
->> v2:
->>      Remove Stefan from sign-off list and change the patch's commit me=
-ssage
->>      according to Christian Borntraeger's comment.
->>
->> QingFeng Hao (1):
->>    virtio-scsi-ccw: use ioeventfd even when KVM is disabled
->>
->>   hw/s390x/virtio-ccw.c | 2 +-
->>   target/s390x/cpu.h    | 6 +++++-
->>   2 files changed, 6 insertions(+), 2 deletions(-)
-> I didn't realize s390 also has this old check.  Thanks for fixing it!
-Thanks Stefan!
->
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> @@ -1810,12 +1817,13 @@ static int64_t coroutine_fn bdrv_co_get_block_s=
+tatus(BlockDriverState *bs,
+>          }
+>      }
+>=20
+> -    if (local_file && local_file !=3D bs &&
+> +    if (!allocation && local_file && local_file !=3D bs &&
+>          (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
+>          (ret & BDRV_BLOCK_OFFSET_VALID)) {
+>          int file_pnum;
+>=20
+> -        ret2 =3D bdrv_co_get_block_status(local_file, ret >> BDRV_SECT=
+OR_BITS,
+> +        ret2 =3D bdrv_co_get_block_status(local_file, true,
+> +                                        ret >> BDRV_SECTOR_BITS,
+>                                          *pnum, &file_pnum, NULL);
+>          if (ret2 >=3D 0) {
+>              /* Ignore errors.  This is just providing extra informatio=
+n, it
+
+Hmm. My initial thinking here was that if we already have a good primary
+status, we want our secondary status (where we are probing bs->file for
+whether we can add BDRV_BLOCK_ZERO) to be as fast as possible, so I
+hard-coded the answer that favors is_allocated (I have to be careful
+describing this, since v3 will switch from 'bool allocated=3Dtrue' to
+'bool mapping=3Dfalse' to express that same request).  But it turns out
+that, at least for file-posix.c (for that matter, for several protocol
+drivers), it's a LOT faster to just blindly state that the entire file
+is allocated and data than it is to lseek(SEEK_HOLE).  So favoring
+allocation status instead of mapping status defeats the purpose, and
+this should be s/true/allocation/ (which is always false at this point)
+[or conversely s/false/mapping/, which is always true, in v3].
 
 --=20
-Regards
-QingFeng Hao
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZXaH4AAoJEKeha0olJ0NqV0MH/2xZMOgxRxFBhMiPo1C5MX6C
+71j+fiEzqm2fWFcgchRrB+c32k3EhPC56WGVekAWDPdYaKpaz0hjG/uuzyGHyVUk
+QSqV/4nXGxqhMIv5W9RsMTesnuPreGJJmKkuM03N6fIPta60aRWLwtLepxRTa0S5
+8xqquuWbS1Sa0uxHcS6Xr6FSMs2WT3RETppNbG622lSK2Tge5/P3LFJT0SokQcE0
+QxewMQvehE/WBgLUQrUwPHgqbznweAmsHTIqfi2ctKzQcighVVr8iIbB5Q52q9a0
+kA/ZTHLcgYN4+9j6DAlEfBeFzHfbyCBXWscuUh+boitF1vqlcK2rPswG5DJHSvM=
+=xRtg
+-----END PGP SIGNATURE-----
+
+--oL1gMJhIxlDJNNSoiEORvt7og4dTLAmMj--
