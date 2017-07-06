@@ -1,42 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dT7ow-0005gU-J3
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:31:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dT7qY-0006Xv-KB
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:33:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dT7os-0002pb-5i
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:31:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dT7or-0002p7-S8
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:31:50 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v66ESXXG147191
-	for <qemu-devel@nongnu.org>; Thu, 6 Jul 2017 10:31:48 -0400
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bhm2r8k7h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 10:31:47 -0400
-Received: from localhost
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Thu, 6 Jul 2017 11:31:45 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
-	<f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
-	<20170705110414.GN2180@umbus.fritz.box>
-	<0e4deabe-58e9-6c15-5910-cda9f8e63f9b@linux.vnet.ibm.com>
-Date: Thu, 6 Jul 2017 11:31:35 -0300
+	(envelope-from <eblake@redhat.com>) id 1dT7qX-0003Xn-HX
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:33:34 -0400
+References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
+	<20170704220346.29244-14-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b4fae9ff-ee50-c4b6-f3ee-2a3157c0fc6a@redhat.com>
+Date: Thu, 6 Jul 2017 09:33:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <0e4deabe-58e9-6c15-5910-cda9f8e63f9b@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <89240dbb-56b7-e540-8981-b6af20eb0d8c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
- VI)
+In-Reply-To: <20170704220346.29244-14-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dWaLEvBlRxj1EAFk45jBcImsWlucNq1Oa"
+Subject: Re: [Qemu-devel] [PATCH 13/35] nbd: mark coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,37 +24,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, sursingh@redhat.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dWaLEvBlRxj1EAFk45jBcImsWlucNq1Oa
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b4fae9ff-ee50-c4b6-f3ee-2a3157c0fc6a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/35] nbd: mark coroutine_fn
+References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
+ <20170704220346.29244-14-marcandre.lureau@redhat.com>
+In-Reply-To: <20170704220346.29244-14-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/04/2017 05:03 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  block/nbd-client.h | 10 +++++-----
+>  block/nbd-client.c | 24 ++++++++++++++++--------
+>  block/nbd.c        |  3 ++-
+>  nbd/server.c       |  3 ++-
+>  4 files changed, 25 insertions(+), 15 deletions(-)
+>=20
+
+> diff --git a/block/nbd-client.h b/block/nbd-client.h
+> index 49636bc621..473d1f88fd 100644
+> --- a/block/nbd-client.h
+> +++ b/block/nbd-client.h
+> @@ -42,13 +42,13 @@ int nbd_client_init(BlockDriverState *bs,
+>                      Error **errp);
+>  void nbd_client_close(BlockDriverState *bs);
+> =20
+> -int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int b=
+ytes);
+> -int nbd_client_co_flush(BlockDriverState *bs);
+> -int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+> +int coroutine_fn nbd_client_co_pdiscard(BlockDriverState *bs, int64_t =
+offset, int bytes);
+> +int coroutine_fn nbd_client_co_flush(BlockDriverState *bs);
+> +int coroutine_fn nbd_client_co_pwritev(BlockDriverState *bs, uint64_t =
+offset,
+>                            uint64_t bytes, QEMUIOVector *qiov, int flag=
+s);
+
+Indentation is off.
+
+> -int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+> +int coroutine_fn nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int=
+64_t offset,
+>                                  int bytes, BdrvRequestFlags flags);
+> -int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+> +int coroutine_fn nbd_client_co_preadv(BlockDriverState *bs, uint64_t o=
+ffset,
+>                           uint64_t bytes, QEMUIOVector *qiov, int flags=
+);
+> =20
+
+and some more
+
+>  void nbd_client_detach_aio_context(BlockDriverState *bs);
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 02e928142e..63c0210c37 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -111,7 +111,8 @@ static coroutine_fn void nbd_read_reply_entry(void =
+*opaque)
+>      s->read_reply_co =3D NULL;
+>  }
+> =20
+> -static int nbd_co_send_request(BlockDriverState *bs,
+> +static int coroutine_fn
+> +nbd_co_send_request(BlockDriverState *bs,
+>                                 NBDRequest *request,
+>                                 QEMUIOVector *qiov)
+>  {
+
+I know some project specifically like the newline between return type
+and function name (it becomes easier to search for function
+implementations if ALL function names start in the first column), but it
+looks a bit odd compared to the usual qemu style.  I guess you did it
+for line length reasons.  But once you do it, now the indentation is off
+on the remaining parameters.
+
+> @@ -158,7 +159,8 @@ static int nbd_co_send_request(BlockDriverState *bs=
+,
+>      return rc;
+>  }
+> =20
+> -static void nbd_co_receive_reply(NBDClientSession *s,
+> +static void coroutine_fn
+> +nbd_co_receive_reply(NBDClientSession *s,
+>                                   NBDRequest *request,
+>                                   NBDReply *reply,
+>                                   QEMUIOVector *qiov)
+
+Recurring theme of whitespace.
+
+> @@ -185,7 +187,8 @@ static void nbd_co_receive_reply(NBDClientSession *=
+s,
+>      }
+>  }
+> =20
+> -static void nbd_coroutine_end(BlockDriverState *bs,
+> +static void coroutine_fn
+> +nbd_coroutine_end(BlockDriverState *bs,
+>                                NBDRequest *request)
+
+This even fits on one line now.
+
+Whitespace fixes are trivial enough, so I'm still okay if you add:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--dWaLEvBlRxj1EAFk45jBcImsWlucNq1Oa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 07/05/2017 06:53 PM, Daniel Henrique Barboza wrote:
-> Worth a try. I'll see if I can make a POC of this DRC reset at incoming
-> migration time. 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
+iQEcBAEBCAAGBQJZXkovAAoJEKeha0olJ0NqHlQIAKgukiHv4EJCYqE8/FAZ4/ai
+cHzApfCzEv+Qmwaqy+ez2EeI6bpWpeiIg6lpD1pyQAkKBD5NIsbIm1SHASZ+3VTz
+h2xZF68u5t8S+x3HpG8MxqvjpNQaIbSiqU2EDj8WolQZbqRumy7xzMnpCgb5jEiQ
+QB6d0dI3GkQmo6v8srU4g4AOJGow9d9cNX4EY7bGAElClLpchTwoawCURF9u9B57
+LfozT0O9ZacpwdEXsswsmxS3NZ0IYqCO50EQLaLRRx0SnQbfqyQkC9OPrEwjpWOX
+kUpXRd7s5IzNqo1jGwsgMWQkpGGRYk6mXEerAknCFFfelCBgVveGMm3DRAuS5zs=
+=4x5f
+-----END PGP SIGNATURE-----
 
-Just played a little with the idea of manual reset during migration. 
-I've created a
-POC that resets the CPU DRCs in a pre_load hook. Then I've done the same
-experiment - device_add on both source and target before the migration,
-hot unplug the device after migration is completed. The hot unplug worked as
-expected in both QEMU and guest.
-
-To minimize the impact I am resetting only the DRCs of the CPUs that 
-were hotplugged
-in the target instead of resetting everybody.
-
-I'll see if this solution works for LMBs and PCI devices. In case 
-affirmative, and
-if we are fine with this solution of resetting the DRCs in pre_load (not 
-sure if pre_load is
-the right place for doing it - suggestions welcome), I can send a patch 
-to be applied on top
-of this series.
-
-
-
-Thanks,
-
-Daniel
+--dWaLEvBlRxj1EAFk45jBcImsWlucNq1Oa--
