@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dT18o-00035R-6m
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:23:59 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dT18p-00035X-NV
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dT18j-0005JE-5b
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:23:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55850)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dT18l-0005KK-7r
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:23:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57087)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dT18i-0005Is-RL
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:23:53 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1dT18k-0005Jm-TG
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:23:55 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v667NoSl089381
-	for <qemu-devel@nongnu.org>; Thu, 6 Jul 2017 03:23:51 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bh38m5vuf-1
+	v667NpKC023478
+	for <qemu-devel@nongnu.org>; Thu, 6 Jul 2017 03:23:52 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bh39dwp5f-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:23:50 -0400
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:23:52 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 6 Jul 2017 08:23:43 +0100
+	Thu, 6 Jul 2017 08:23:42 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu,  6 Jul 2017 09:23:32 +0200
+Date: Thu,  6 Jul 2017 09:23:33 +0200
 In-Reply-To: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
 References: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1499325817-9166-4-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 3/8] s390x: fix error propagation in kvm-flic's
- realize
+Message-Id: <1499325817-9166-5-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 4/8] s390x: fix realize inheritance for kvm-flic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,69 +42,96 @@ Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Corneli
 
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
->From the moment it was introduced by commit a2875e6f98 ("s390x/kvm:
-implement floating-interrupt controller device", 2013-07-16) the kvm-flic
-is not making realize fail properly in case it's impossible to create the
-KVM device which basically serves as a backend and is absolutely
-essential for having an operational kvm-flic.
+Commit f6f4ce4211 ("s390x: add property adapter_routes_max_batch",
+2016-12-09) introduces a common realize (intended to be common for all
+the subclasses) for flic, but fails to make sure the kvm-flic which had
+its own is actually calling this common realize.
 
-Let's fix this by making sure we do proper error propagation in realize.
+This omission fortunately does not result in a grave problem. The common
+realize was only supposed to catch a possible programming mistake by
+validating a value of a property set via the compat machine macros. Since
+there was no programming mistake we don't need this fixed for stable.
+
+Let's fix this problem by making sure kvm flic honors the realize of its
+parent class.
+
+Let us also improve on the error message we would hypothetically emit
+when the validation fails.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Fixes: a2875e6f98 "s390x/kvm: implement floating-interrupt controller device"
+Fixes: f6f4ce4211 ("s390x: add property adapter_routes_max_batch")
 Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 Reviewed-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/intc/s390_flic_kvm.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ hw/intc/s390_flic.c     |  4 ++--
+ hw/intc/s390_flic_kvm.c | 17 +++++++++++++++++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index b4c61d8..56f1b81 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -15,6 +15,7 @@
- #include "cpu.h"
- #include <sys/ioctl.h>
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "sysemu/kvm.h"
- #include "hw/s390x/s390_flic.h"
-@@ -397,18 +398,22 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     struct kvm_create_device cd = {0};
-     struct kvm_device_attr test_attr = {0};
-     int ret;
-+    Error *errp_local = NULL;
+diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+index a99a350..837158b 100644
+--- a/hw/intc/s390_flic.c
++++ b/hw/intc/s390_flic.c
+@@ -101,8 +101,8 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
+     uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
  
-     flic_state->fd = -1;
-     if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
-+        error_setg_errno(&errp_local, errno, "KVM is missing capability"
-+                         " KVM_CAP_DEVICE_CTRL");
-         trace_flic_no_device_api(errno);
--        return;
-+        goto fail;
+     if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
+-        error_setg(errp, "flic adapter_routes_max_batch too big"
+-                   "%d (%d allowed)", max_batch, ADAPTER_ROUTES_MAX_GSI);
++        error_setg(errp, "flic property adapter_routes_max_batch too big"
++                   " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
      }
- 
-     cd.type = KVM_DEV_TYPE_FLIC;
-     ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
-     if (ret < 0) {
-+        error_setg_errno(&errp_local, errno, "Creating the KVM device failed");
-         trace_flic_create_device(errno);
--        return;
-+        goto fail;
-     }
-     flic_state->fd = cd.fd;
- 
-@@ -417,6 +422,9 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     flic_state->clear_io_supported = !ioctl(flic_state->fd,
-                                             KVM_HAS_DEVICE_ATTR, test_attr);
- 
-+    return;
-+fail:
-+    error_propagate(errp, errp_local);
  }
  
- static void kvm_s390_flic_reset(DeviceState *dev)
+diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+index 56f1b81..0bcd49f 100644
+--- a/hw/intc/s390_flic_kvm.c
++++ b/hw/intc/s390_flic_kvm.c
+@@ -392,6 +392,17 @@ static const VMStateDescription kvm_s390_flic_vmstate = {
+     }
+ };
+ 
++typedef struct KVMS390FLICStateClass {
++    S390FLICStateClass parent_class;
++    DeviceRealize parent_realize;
++} KVMS390FLICStateClass;
++
++#define KVM_S390_FLIC_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(KVMS390FLICStateClass, (obj), TYPE_KVM_S390_FLIC)
++
++#define KVM_S390_FLIC_CLASS(klass) \
++    OBJECT_CLASS_CHECK(KVMS390FLICStateClass, (klass), TYPE_KVM_S390_FLIC)
++
+ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+ {
+     KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
+@@ -400,6 +411,10 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+     int ret;
+     Error *errp_local = NULL;
+ 
++    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &errp_local);
++    if (errp_local) {
++        goto fail;
++    }
+     flic_state->fd = -1;
+     if (!kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
+         error_setg_errno(&errp_local, errno, "KVM is missing capability"
+@@ -454,6 +469,7 @@ static void kvm_s390_flic_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     S390FLICStateClass *fsc = S390_FLIC_COMMON_CLASS(oc);
+ 
++    KVM_S390_FLIC_CLASS(oc)->parent_realize = dc->realize;
+     dc->realize = kvm_s390_flic_realize;
+     dc->vmsd = &kvm_s390_flic_vmstate;
+     dc->reset = kvm_s390_flic_reset;
+@@ -468,6 +484,7 @@ static const TypeInfo kvm_s390_flic_info = {
+     .name          = TYPE_KVM_S390_FLIC,
+     .parent        = TYPE_S390_FLIC_COMMON,
+     .instance_size = sizeof(KVMS390FLICState),
++    .class_size    = sizeof(KVMS390FLICStateClass),
+     .class_init    = kvm_s390_flic_class_init,
+ };
+ 
 -- 
 2.7.4
