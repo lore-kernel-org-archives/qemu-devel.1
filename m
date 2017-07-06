@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dT1kk-0002qi-T8
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:03:12 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dT1ni-00043l-NS
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:06:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dT1kg-0006OX-Ua
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:03:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56162)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dT1kg-0006ON-O0
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:03:06 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D56AC04D28B
-	for <qemu-devel@nongnu.org>; Thu,  6 Jul 2017 08:03:04 +0000 (UTC)
-Date: Thu, 6 Jul 2017 09:02:53 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170706080253.GA3988@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170705144302.32017-1-dgilbert@redhat.com>
-	<20170705162811.GI22008@redhat.com> <20170705163324.GC2284@work-vm>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dT1nh-0007eC-Nc
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:06:14 -0400
+References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
+	<20170216130409.GA28784@lemon.lan>
+	<d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
+	<15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <66e7f481-06f4-2a7e-77fb-1a5c9fc1f301@virtuozzo.com>
+Date: Thu, 6 Jul 2017 11:05:55 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170705163324.GC2284@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] hmp: Update info vnc
+In-Reply-To: <15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
+ dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lcapitulino@redhat.com, marcandre.lureau@redhat.com, armbru@redhat.com
+To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
 
-On Wed, Jul 05, 2017 at 05:33:24PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Wed, Jul 05, 2017 at 03:43:02PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > The QMP query-vnc interfaces have gained a lot more information that
-> > > the HMP interfaces hasn't got yet. Update it.
-> > > 
-> > > Note the output format has changed, but this is HMP so that's OK.
-> > > 
-> > > In particular, this now includes client information for reverse
-> > > connections:
-> > > 
-> > > -vnc :0
-> > > (qemu) info vnc
-> > > default:
-> > >   Server: 0.0.0.0:5900 (ipv4)
-> > >     Auth: none (Sub: none)
-> > >   Auth: none (Sub: none)
-> > 
-> > If you're reporting Auth: against the individual Server entry,
-> > there's no reason to report it at the top level too. We only
-> > keep that duplication in QMP for sake of backcompat, which
-> > is not important for HMP
-> 
-> Where would it get reported for a 'reverse' connection then?
-> That has no server entry.
+06.07.2017 00:46, John Snow wrote:
+>
+> On 07/05/2017 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 16.02.2017 16:04, Fam Zheng wrote:
+>>>> +            dbms->node_name = bdrv_get_node_name(bs);
+>>>> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
+>>>> +                dbms->node_name = bdrv_get_device_name(bs);
+>>>> +            }
+>>>> +            dbms->bitmap = bitmap;
+>>> What protects the case that the bitmap is released before migration
+>>> completes?
+>>>
+>> What is the source of such deletion? qmp command? Theoretically possible.
+>>
+>> I see the following variants:
+>>
+>> 1. additional variable BdrvDirtyBItmap.migration, which forbids bitmap
+>> deletion
+>>
+>> 2. make bitmap anonymous (bdrv_dirty_bitmap_make_anon) - it will not be
+>> available through qmp
+>>
+> Making the bitmap anonymous would forbid us to query the bitmap, which
+> there is no general reason to do, excepting the idea that a third party
+> attempting to use the bitmap during a migration is probably a bad idea.
+> I don't really like the idea of "hiding" information from the user,
+> though, because then we'd have to worry about name collisions when we
+> de-anonymized the bitmap again. That's not so palatable.
+>
+>> what do you think?
+>>
+> The modes for bitmaps are getting messy.
+>
+> As a reminder, the officially exposed "modes" of a bitmap are currently:
+>
+> FROZEN: Cannot be reset/deleted. Implication is that the bitmap is
+> otherwise "ACTIVE."
+> DISABLED: Not recording any writes (by choice.)
+> ACTIVE: Actively recording writes.
+>
+> These are documented in the public API as possibilities for
+> DirtyBitmapStatus in block-core.json. We didn't add a new condition for
+> "readonly" either, which I think is actually required:
+>
+> READONLY: Not recording any writes (by necessity.)
+>
+>
+> Your new use case here sounds like Frozen to me, but it simply does not
+> have an anonymous successor to force it to be recognized as "frozen." We
+> can add a `bool protected` or `bool frozen` field to force recognition
+> of this status and adjust the json documentation accordingly.
 
-Ah right. So lets only report it at the top level, if operating
-in reverse mode.
+Bitmaps are selected for migration when source is running, so we should 
+protect them (from deletion (or frozing or disabling), not from chaning 
+bits) before source stop, so that is not like frozen. Bitmaps may be 
+changed in this state.
+It is more like ACTIVE.
+
+We can move bitmap selection on the point after precopy migration, after 
+source stop, but I'm not sure that it would be good.
+
+>
+> I think then we'd have four recognized states:
+>
+> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
+> other internal process. Bitmap is otherwise ACTIVE.
+
+? Frozen means that all writes goes to the successor and frozen bitmap 
+itself is unchanged, no?
+
+> DISABLED: Not recording any writes (by choice.)
+> READONLY: Not able to record any writes (by necessity.)
+> ACTIVE: Normal bitmap status.
+>
+> Sound right?
 
 
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Best regards,
+Vladimir
