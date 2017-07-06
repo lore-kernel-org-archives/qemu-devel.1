@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTBoN-0007PN-0o
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:47:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dTBoY-0007SS-3K
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTBoI-0003uj-Oi
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:47:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34124)
+	(envelope-from <ehabkost@redhat.com>) id 1dTBoT-00040v-4q
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:47:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36632)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTBoI-0003tv-8Q
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:47:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1499182263-19139-7-git-send-email-pradeep.jagadeesh@huawei.com>
-Date: Thu, 06 Jul 2017 20:47:26 +0200
-In-Reply-To: <1499182263-19139-7-git-send-email-pradeep.jagadeesh@huawei.com>
-	(Pradeep Jagadeesh's message of "Tue, 4 Jul 2017 11:31:03 -0400")
-Message-ID: <87poddbdxd.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTBoS-0003zs-UF
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:47:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D7554C04B946
+	for <qemu-devel@nongnu.org>; Thu,  6 Jul 2017 18:47:39 +0000 (UTC)
+Date: Thu, 6 Jul 2017 15:47:36 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170706184736.GB5167@localhost.localdomain>
+References: <20170614203000.19984-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 6/6] fsdev: QMP interface for throttling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170614203000.19984-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] hostmem-file: Add "persistent" option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,436 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, qemu-devel@nongnu.org, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
+On Wed, Jun 14, 2017 at 05:29:55PM -0300, Eduardo Habkost wrote:
+> This series adds a new "persistent" option to
+> memory-backend-file.  The new option it will be useful if
+> somebody is sharing RAM contents on a file using share=on, but
+> don't need it to be flushed to disk when QEMU exits.
+> 
+> Internally, it will trigger a madvise(MADV_REMOVE) or
+> fallocate(FALLOC_FL_PUNCH_HOLE) call when the memory backend is
+> destroyed.
+> 
+> To make we actually trigger the new code when QEMU exits, the
+> first patch in the series ensures we destroy all user-created
+> objects when exiting QEMU.
 
-> This patch introduces qmp interfaces for the fsdev
-> devices. This provides two interfaces one 
-> for querying info of all the fsdev devices. The second one
-> to set the IO limits for the required fsdev device.
->
-> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> ---
->  Makefile                    |  4 +++
->  fsdev/qemu-fsdev-dummy.c    | 10 ++++++
->  fsdev/qemu-fsdev-throttle.c | 76 +++++++++++++++++++++++++++++++++++++++-
->  fsdev/qemu-fsdev-throttle.h | 13 +++++++
->  fsdev/qemu-fsdev.c          | 37 ++++++++++++++++++++
->  monitor.c                   |  5 +++
->  qapi-schema.json            |  3 ++
->  qapi/fsdev.json             | 84 +++++++++++++++++++++++++++++++++++++++++++++
->  qmp.c                       | 14 ++++++++
->  9 files changed, 245 insertions(+), 1 deletion(-)
->  create mode 100644 qapi/fsdev.json
->
-> diff --git a/Makefile b/Makefile
-> index 16a0430..4fd7625 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -416,6 +416,10 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
->                 $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.json \
->                 $(SRC_PATH)/qapi/trace.json
->  
-> +ifdef CONFIG_VIRTFS
+In addition to the additional fixes I have planned for v2, it
+looks like this series won't be enough: the memory regions will
+still have a non-zero reference count when exiting QEMU.  I'm not
+sure how much extra work will be required to fix that.
 
-Uh, qapi-schema.json includes fsdev.json *unconditionally*, doesn't it?
-
-> +qapi-modules += $(SRC_PATH)/qapi/fsdev.json
-> +endif
-> +
->  qapi-types.c qapi-types.h :\
->  $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
->  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-types.py \
-> diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-> index 6dc0fbc..f33305d 100644
-> --- a/fsdev/qemu-fsdev-dummy.c
-> +++ b/fsdev/qemu-fsdev-dummy.c
-> @@ -19,3 +19,13 @@ int qemu_fsdev_add(QemuOpts *opts)
->  {
->      return 0;
->  }
-> +
-> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-> +{
-> +  return;
-
-Indentation is off.
-
-> +}
-> +
-> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-> +{
-> +    abort();
-> +}
-
-Any particular reason why one of the stubs abort()s, but not the other?
-
-> diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
-> index c5e2499..4483533 100644
-> --- a/fsdev/qemu-fsdev-throttle.c
-> +++ b/fsdev/qemu-fsdev-throttle.c
-> @@ -16,7 +16,6 @@
->  #include "qemu/error-report.h"
->  #include "qemu-fsdev-throttle.h"
->  #include "qemu/iov.h"
-> -#include "qemu/throttle-options.h"
->  
->  static void fsdev_throttle_read_timer_cb(void *opaque)
->  {
-> @@ -30,6 +29,81 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
->      qemu_co_enter_next(&fst->throttled_reqs[true]);
->  }
->  
-> +void fsdev_set_io_throttle(IOThrottle *arg, FsThrottle *fst, Error **errp)
-> +{
-> +    ThrottleConfig cfg;
-> +
-> +    throttle_set_io_limits(&cfg, arg);
-> +
-> +    if (throttle_is_valid(&cfg, errp)) {
-> +        fst->cfg = cfg;
-> +        fsdev_throttle_init(fst);
-> +    }
-> +}
-> +
-> +void fsdev_get_io_throttle(FsThrottle *fst, IOThrottle **fs9pcfg,
-> +                           char *fsdevice, Error **errp)
-> +{
-> +
-> +    ThrottleConfig cfg = fst->cfg;
-> +    IOThrottle *fscfg = g_malloc0(sizeof(*fscfg));
-> +
-> +    fscfg->has_id = true;
-> +    fscfg->id = g_strdup(fsdevice);
-> +    fscfg->bps = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
-> +    fscfg->bps_rd = cfg.buckets[THROTTLE_BPS_READ].avg;
-> +    fscfg->bps_wr = cfg.buckets[THROTTLE_BPS_WRITE].avg;
-> +
-> +    fscfg->iops = cfg.buckets[THROTTLE_OPS_TOTAL].avg;
-> +    fscfg->iops_rd = cfg.buckets[THROTTLE_OPS_READ].avg;
-> +    fscfg->iops_wr = cfg.buckets[THROTTLE_OPS_WRITE].avg;
-> +
-> +    fscfg->has_bps_max     = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-> +    fscfg->bps_max         = cfg.buckets[THROTTLE_BPS_TOTAL].max;
-> +    fscfg->has_bps_rd_max  = cfg.buckets[THROTTLE_BPS_READ].max;
-> +    fscfg->bps_rd_max      = cfg.buckets[THROTTLE_BPS_READ].max;
-> +    fscfg->has_bps_wr_max  = cfg.buckets[THROTTLE_BPS_WRITE].max;
-> +    fscfg->bps_wr_max      = cfg.buckets[THROTTLE_BPS_WRITE].max;
-> +
-> +    fscfg->has_iops_max    = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-> +    fscfg->iops_max        = cfg.buckets[THROTTLE_OPS_TOTAL].max;
-> +    fscfg->has_iops_rd_max = cfg.buckets[THROTTLE_OPS_READ].max;
-> +    fscfg->iops_rd_max     = cfg.buckets[THROTTLE_OPS_READ].max;
-> +    fscfg->has_iops_wr_max = cfg.buckets[THROTTLE_OPS_WRITE].max;
-> +    fscfg->iops_wr_max     = cfg.buckets[THROTTLE_OPS_WRITE].max;
-> +
-> +    fscfg->has_bps_max_length     = fscfg->has_bps_max;
-> +    fscfg->bps_max_length         =
-> +         cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-> +    fscfg->has_bps_rd_max_length  = fscfg->has_bps_rd_max;
-> +    fscfg->bps_rd_max_length      =
-> +         cfg.buckets[THROTTLE_BPS_READ].burst_length;
-> +    fscfg->has_bps_wr_max_length  = fscfg->has_bps_wr_max;
-> +    fscfg->bps_wr_max_length      =
-> +         cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-> +
-> +    fscfg->has_iops_max_length    = fscfg->has_iops_max;
-> +    fscfg->iops_max_length        =
-> +         cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-> +    fscfg->has_iops_rd_max_length = fscfg->has_iops_rd_max;
-> +    fscfg->iops_rd_max_length     =
-> +         cfg.buckets[THROTTLE_OPS_READ].burst_length;
-> +    fscfg->has_iops_wr_max_length = fscfg->has_iops_wr_max;
-> +    fscfg->iops_wr_max_length     =
-> +         cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-> +
-> +    fscfg->bps_max_length = cfg.buckets[THROTTLE_BPS_TOTAL].burst_length;
-> +    fscfg->bps_rd_max_length = cfg.buckets[THROTTLE_BPS_READ].burst_length;
-> +    fscfg->bps_wr_max_length = cfg.buckets[THROTTLE_BPS_WRITE].burst_length;
-> +    fscfg->iops_max_length = cfg.buckets[THROTTLE_OPS_TOTAL].burst_length;
-> +    fscfg->iops_rd_max_length = cfg.buckets[THROTTLE_OPS_READ].burst_length;
-> +    fscfg->iops_wr_max_length = cfg.buckets[THROTTLE_OPS_WRITE].burst_length;
-> +
-> +    fscfg->iops_size = cfg.op_size;
-
-Duplicates bdrv_block_device_info(), which makes me sad.  Could the
-common code be factored out?
-
-> +
-> +    *fs9pcfg = fscfg;
-> +}
-
-Why do you need to store through a parameter?  What's wrong with simply
-returning fscfg?
-
-> +
->  void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
->  {
->      throttle_parse_options(&fst->cfg, opts);
-> diff --git a/fsdev/qemu-fsdev-throttle.h b/fsdev/qemu-fsdev-throttle.h
-> index e418643..a49b2e5 100644
-> --- a/fsdev/qemu-fsdev-throttle.h
-> +++ b/fsdev/qemu-fsdev-throttle.h
-> @@ -20,6 +20,13 @@
-
-   #include "block/aio.h"
-   #include "qemu/main-loop.h"
->  #include "qemu/coroutine.h"
->  #include "qapi/error.h"
->  #include "qemu/throttle.h"
-> +#include "qemu/throttle-options.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qapi/qmp/types.h"
-> +#include "qapi-visit.h"
-> +#include "qapi/qobject-output-visitor.h"
-> +#include "qapi/util.h"
-> +#include "qmp-commands.h"
-
-The header actually needs two out of these twelve: coroutine.h and
-throttle.h.  Lazy use of include makes for slow compiles.  Drop the ten
-unused ones, then fix up the .c to include what they need.
-
->  
->  typedef struct FsThrottle {
->      ThrottleState ts;
-> @@ -36,4 +43,10 @@ void coroutine_fn fsdev_co_throttle_request(FsThrottle *, bool ,
->                                              struct iovec *, int);
->  
->  void fsdev_throttle_cleanup(FsThrottle *);
-> +
-> +void fsdev_set_io_throttle(IOThrottle *, FsThrottle *, Error **errp);
-> +
-> +void fsdev_get_io_throttle(FsThrottle *, IOThrottle **iothp,
-> +                           char *, Error **errp);
-> +
->  #endif /* _FSDEV_THROTTLE_H */
-> diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-> index 266e442..0eca7c3 100644
-> --- a/fsdev/qemu-fsdev.c
-> +++ b/fsdev/qemu-fsdev.c
-> @@ -16,6 +16,7 @@
->  #include "qemu-common.h"
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
-> +#include "qmp-commands.h"
->  
->  static QTAILQ_HEAD(FsDriverEntry_head, FsDriverListEntry) fsdriver_entries =
->      QTAILQ_HEAD_INITIALIZER(fsdriver_entries);
-> @@ -98,3 +99,39 @@ FsDriverEntry *get_fsdev_fsentry(char *id)
->      }
->      return NULL;
->  }
-> +
-> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-> +{
-> +
-> +    FsDriverEntry *fse;
-> +
-> +    fse = get_fsdev_fsentry(arg->has_id ? arg->id : NULL);
-> +    if (!fse) {
-> +        return;
-
-Why isn't this an error?
-
-> +    }
-> +
-> +    fsdev_set_io_throttle(arg, &fse->fst, errp);
-> +}
-> +
-> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-> +{
-> +    IOThrottleList *head = NULL, *p_next;
-> +    struct FsDriverListEntry *fsle;
-> +    Error *local_err = NULL;
-> +
-> +    QTAILQ_FOREACH(fsle, &fsdriver_entries, next) {
-> +        p_next = g_malloc0(sizeof(*p_next));
-
-Okay, but you might want to consider g_new0(IOThrottleList) for a bit of
-extra type checking.
-
-> +        fsdev_get_io_throttle(&fsle->fse.fst, &p_next->value,
-> +                            fsle->fse.fsdev_id, &local_err);
-
-Indentation is off.
-
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            g_free(p_next);
-> +            qapi_free_IOThrottleList(head);
-> +            return NULL;
-> +        }
-> +
-> +        p_next->next = head;
-> +        head = p_next;
-> +    }
-> +    return head;
-> +}
-> diff --git a/monitor.c b/monitor.c
-> index 3c369f4..592a39e 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -997,6 +997,11 @@ static void qmp_unregister_commands_hack(void)
->      && !defined(TARGET_S390X)
->      qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
->  #endif
-> +#ifndef CONFIG_VIRTFS
-> +    qmp_unregister_command(&qmp_commands, "fsdev-set-io-throttle");
-> +    qmp_unregister_command(&qmp_commands, "query-fsdev-io-throttle");
-> +#endif
-> +
->  }
->  
->  void monitor_init_qmp_commands(void)
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 4b50b65..dc676be 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -81,6 +81,9 @@
->  # QAPI block definitions
->  { 'include': 'qapi/block.json' }
->  
-> +# QAPI fsdev definitions
-> +{ 'include': 'qapi/fsdev.json' }
-> +
->  # QAPI event definitions
->  { 'include': 'qapi/event.json' }
->  
-> diff --git a/qapi/fsdev.json b/qapi/fsdev.json
-> new file mode 100644
-> index 0000000..eff1efe
-> --- /dev/null
-> +++ b/qapi/fsdev.json
-> @@ -0,0 +1,84 @@
-> +# -*- Mode: Python -*-
-> +
-> +##
-> +# == QAPI fsdev definitions
-> +##
-> +
-> +# QAPI common definitions
-> +{ 'include': 'iothrottle.json' }
-> +
-> +##
-> +# @fsdev-set-io-throttle:
-> +#
-> +# Change I/O limits for a 9p/fsdev device.
-> +#
-> +# I/O limits can be enabled by setting throttle value to non-zero number.
-> +#
-> +# I/O limits can be disabled by setting all throttle values to 0.
-> +#
-> +# Returns: Nothing on success
-> +#          If @device is not a valid fsdev device, DeviceNotFound
-
-Aha, qmp_fsdev_set_io_throttle()'s early return should be an error!
-Make it GenericError rather than DeviceNotFound, please; just use
-error_setg().
-
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "fsdev-set-io-throttle",
-> +#      "arguments": { "id": "id0-1-0",
-> +#                     "bps": 1000000,
-> +#                     "bps_rd": 0,
-> +#                     "bps_wr": 0,
-> +#                     "iops": 0,
-> +#                     "iops_rd": 0,
-> +#                     "iops_wr": 0,
-> +#                     "bps_max": 8000000,
-> +#                     "bps_rd_max": 0,
-> +#                     "bps_wr_max": 0,
-> +#                     "iops_max": 0,
-> +#                     "iops_rd_max": 0,
-> +#                     "iops_wr_max": 0,
-> +#                     "bps_max_length": 60,
-> +#                     "iops_size": 0 } }
-> +# <- { "returns": {} }
-> +##
-> +{ 'command': 'fsdev-set-io-throttle', 'boxed': true,
-> +  'data': 'IOThrottle' }
-> +##
-> +# @query-fsdev-io-throttle:
-> +#
-> +# Returns: a list of @IOThrottle describing io throttle values of each fsdev device
-
-"io" is not a word, make it "I/O".  Also: long line.  Please wrap your
-comment lines around column 70.
-
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "Execute": "query-fsdev-io-throttle" }
-> +# <- { "returns" : [
-> +#          {
-> +#             "id": "id0-hd0",
-
-Indentation is off again.
-
-> +#              "bps":1000000,
-> +#              "bps_rd":0,
-> +#              "bps_wr":0,
-> +#              "iops":1000000,
-> +#              "iops_rd":0,
-> +#              "iops_wr":0,
-> +#              "bps_max": 8000000,
-> +#              "bps_rd_max": 0,
-> +#              "bps_wr_max": 0,
-> +#              "iops_max": 0,
-> +#              "iops_rd_max": 0,
-> +#              "iops_wr_max": 0,
-> +#              "bps_max_length": 0,
-> +#              "bps_rd_max_length": 0,
-> +#              "bps_wr_max_length": 0,
-> +#              "iops_max_length": 0,
-> +#              "iops_rd_max_length": 0,
-> +#              "iops_wr_max_length": 0,
-> +#              "iops_size": 0
-> +#            }
-> +#          ]
-> +#      }
-> +#
-> +##
-> +{ 'command': 'query-fsdev-io-throttle', 'returns': [ 'IOThrottle' ] }
-> +
-
-Trailing blank line.
-
-> diff --git a/qmp.c b/qmp.c
-> index 7ee9bcf..8a60f2c 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -130,6 +130,20 @@ void qmp_cpu_add(int64_t id, Error **errp)
->      }
->  }
->  
-> +#if defined(_WIN64) || defined(_WIN32) || defined(__FreeBSD__)
-> +
-> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
-> +{
-> +  return;
-
-Indentation is off.
-
-> +}
-> +
-> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
-> +{
-> +    abort();
-> +}
-> +
-> +#endif
-> +
-
-Why do you need stubs both here and in fsdev/qemu-fsdev-dummy.c?
-
->  #ifndef CONFIG_VNC
->  /* If VNC support is enabled, the "true" query-vnc command is
->     defined in the VNC subsystem */
+-- 
+Eduardo
