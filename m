@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dTGHj-0006U7-6r
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:34:12 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dTGKm-0007H8-Gs
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dTGHi-00066X-8H
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:34:11 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Thu, 6 Jul 2017 23:33:07 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D28807@SHSMSX101.ccr.corp.intel.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
-	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
-	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
-	<AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
-	<BN4PR07MB2161B5CCE84496804B848326E3D50@BN4PR07MB2161.namprd07.prod.outlook.com>
-In-Reply-To: <BN4PR07MB2161B5CCE84496804B848326E3D50@BN4PR07MB2161.namprd07.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <sstabellini@kernel.org>) id 1dTGKj-0000KG-Bz
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:37:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1dTGKj-0000JO-3F
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:37:17 -0400
+Date: Thu, 6 Jul 2017 16:37:14 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <7ecfe394c646482faddf97a40bda944d@AMSPEX02CL03.citrite.net>
+Message-ID: <alpine.DEB.2.10.1707061613540.2919@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1706281125330.2919@sstabellini-ThinkPad-X260>
+	<7ecfe394c646482faddf97a40bda944d@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-arm]  [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2] xenfb: remove xen_init_display
+ "temporary" hack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,22 +28,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Kalra, Ashish" <Ashish.Kalra@cavium.com>, Auger Eric <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>
 
-PiBGcm9tOiBLYWxyYSwgQXNoaXNoIFttYWlsdG86QXNoaXNoLkthbHJhQGNhdml1bS5jb21dDQo+
-IFNlbnQ6IEZyaWRheSwgSnVseSA3LCAyMDE3IDc6MjQgQU0NCj4gDQo+IEkgaGF2ZSBhIGdlbmVy
-aWMgcXVlc3Rpb24gb24gdklPTU1VIHN1cHBvcnQsIGlzIHRoZXJlIGFueSBwcm9wb3NhbC9wbGFu
-IHRvDQo+IGFkZCBBVFMvUFJJIGV4dGVuc2lvbiBzdXBwb3J0IHRvIHZJT01NVXMgYW5kIGFsbG93
-DQo+IGhhbmRsaW5nIGZvciBlbmQgdG8gZW5kICh2KUlPTU1VIFBhZ2UgZmF1bHRzICh3L3QgdGhl
-IGRldmljZSBzaWRlDQo+IGltcGxlbWVudGF0aW9uIG9uIFZob3N0KSA/DQo+IA0KPiBBZ2Fpbiwg
-dGhlIG1vdGl2YXRpb24gd2lsbCBiZSB0byBkbyBETUEgb24gcGFnZWQgZ3Vlc3QgbWVtb3J5IGFu
-ZA0KPiBwb3RlbnRpYWxseSBhdm9pZGluZyB0aGUgcmVxdWlyZW1lbnQgb2YgcGlubmVkL2xvY2tl
-ZA0KPiBndWVzdCBwaHlzaWNhbCBtZW1vcnkgZm9yIERNQS4NCg0KeWVzLCB0aGF0J3MgYSBuZWNl
-c3NhcnkgcGFydCB0byBzdXBwb3J0IFNWTSBpbiBib3RoIHZpcnRpby1pb21tdSANCmFwcHJvYWNo
-IGFuZCBmdWxseSBlbXVsYXRlZCBhcHByb2FjaCAoZS5nLiBmb3IgSW50ZWwgVlRkKS4gVGhlcmUN
-CmFyZSBhbHJlYWR5IHBhdGNoZXMgYW5kIGRpc2N1c3Npb25zIGluIG90aGVyIHRocmVhZCBhYm91
-dCBob3cgdG8NCnByb3BhZ2F0ZSBJT01NVSBwYWdlIGZhdWx0IHRvIHZJT01NVS4gVGhlbiBhZnRl
-ciBpdCBpcyBkb25lDQp2SU9NTVUgcGFnZSBmYXVsdCBlbXVsYXRpb24gd2lsbCBiZSBmdXJ0aGVy
-IGFkZGVkLg0KDQpodHRwczovL2xrbWwub3JnL2xrbWwvMjAxNy82LzI3Lzk2NA0KDQpUaGFua3MN
-CktldmluDQo=
+On Thu, 29 Jun 2017, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > Sent: 28 June 2017 19:37
+> > To: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
+> > Cc: sstabellini@kernel.org; peter.maydell@linaro.org; Anthony Perard
+> > <anthony.perard@citrix.com>; kraxel@redhat.com; Paul Durrant
+> > <Paul.Durrant@citrix.com>
+> > Subject: [PATCH v2] xenfb: remove xen_init_display "temporary" hack
+> > 
+> > Initialize xenfb properly, as all other backends, from its own
+> > "initialise" function.
+> > 
+> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+> > 
+> > ---
+> > Changes in v2:
+> > - remove xen_init_display from xen_backend.h
+> > - handle cases where vkbd is missing
+> > 
+> > diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+> > index e76c0d8..3b0168b 100644
+> > --- a/hw/display/xenfb.c
+> > +++ b/hw/display/xenfb.c
+> > @@ -71,7 +71,6 @@ struct XenFB {
+> >      int               fbpages;
+> >      int               feature_update;
+> >      int               bug_trigger;
+> > -    int               have_console;
+> >      int               do_resize;
+> > 
+> >      struct {
+> > @@ -80,6 +79,7 @@ struct XenFB {
+> >      int               up_count;
+> >      int               up_fullscreen;
+> >  };
+> > +static const GraphicHwOps xenfb_ops;
+> > 
+> >  /* -------------------------------------------------------------------- */
+> > 
+> > @@ -855,6 +855,8 @@ static int fb_init(struct XenDevice *xendev)
+> >  static int fb_initialise(struct XenDevice *xendev)
+> >  {
+> >      struct XenFB *fb = container_of(xendev, struct XenFB, c.xendev);
+> > +    struct XenDevice *xin;
+> > +    struct XenInput *in;
+> 
+> I think the scope of 'in' can be limited to the 'else' clause where it is used below.
+> 
+> >      struct xenfb_page *fb_page;
+> >      int videoram;
+> >      int rc;
+> > @@ -877,16 +879,16 @@ static int fb_initialise(struct XenDevice *xendev)
+> >      if (rc != 0)
+> >  	return rc;
+> > 
+> > -#if 0  /* handled in xen_init_display() for now */
+> > -    if (!fb->have_console) {
+> > -        fb->c.ds = graphic_console_init(xenfb_update,
+> > -                                        xenfb_invalidate,
+> > -                                        NULL,
+> > -                                        NULL,
+> > -                                        fb);
+> > -        fb->have_console = 1;
+> > +    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
+> > +
+> > +    xin = xen_pv_find_xendev("vkbd", xen_domid, 0);
+> > +    if (xin == NULL) {
+> > +        xen_pv_printf(xendev, 1, "xenfb is up, but vkbd is not present\n");
+> > +    } else {
+> > +        in = container_of(xin, struct XenInput, c.xendev);
+> > +        in->c.con = fb->c.con;
+> 
+> I notice that in->c.con is tested in input_initialise() and it will fail if NULL, so there is an inherent race between the frontends and also processing of xenstore watches. That seems a little fragile at best, but the dependency of input_initialise() on in->c.con is also somewhat bogus as the vkbd backend is created for xenfv machine types whereas xenfb is only there for xenpv machine types. I think this needs to be fixed before xenfb can be relied on to initialize correctly in all circumstances.
+
+Yes, you are right that it is fragile. Also, there is no need for this
+dependency: I'll remove it, and use qemu_console_lookup_by_index
+instead.
+
+Owen's patch will take care of making the qemu_console_lookup_by_index
+call conditional on xenfb->raw_pointer_wanted != 1. 
+
+
+> > +        xen_be_check_state(xin);
+> >      }
+> > -#endif
+> > 
+> >      if (xenstore_read_fe_int(xendev, "feature-update", &fb-
+> > >feature_update) == -1)
+> >  	fb->feature_update = 0;
+> > @@ -972,42 +974,3 @@ static const GraphicHwOps xenfb_ops = {
+> >      .gfx_update  = xenfb_update,
+> >      .update_interval = xenfb_update_interval,
+> >  };
+> > -
+> > -/*
+> > - * FIXME/TODO: Kill this.
+> > - * Temporary needed while DisplayState reorganization is in flight.
+> > - */
+> > -void xen_init_display(int domid)
+> > -{
+> > -    struct XenDevice *xfb, *xin;
+> > -    struct XenFB *fb;
+> > -    struct XenInput *in;
+> > -    int i = 0;
+> > -
+> > -wait_more:
+> > -    i++;
+> > -    main_loop_wait(true);
+> > -    xfb = xen_pv_find_xendev("vfb", domid, 0);
+> > -    xin = xen_pv_find_xendev("vkbd", domid, 0);
+> > -    if (!xfb || !xin) {
+> > -        if (i < 256) {
+> > -            usleep(10000);
+> > -            goto wait_more;
+> > -        }
+> > -        xen_pv_printf(NULL, 1, "displaystate setup failed\n");
+> > -        return;
+> > -    }
+> > -
+> > -    /* vfb */
+> > -    fb = container_of(xfb, struct XenFB, c.xendev);
+> > -    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
+> > -    fb->have_console = 1;
+> > -
+> > -    /* vkbd */
+> > -    in = container_of(xin, struct XenInput, c.xendev);
+> > -    in->c.con = fb->c.con;
+> > -
+> > -    /* retry ->init() */
+> > -    xen_be_check_state(xin);
+> > -    xen_be_check_state(xfb);
+> > -}
+> > diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+> > index 79aef4e..31d2f25 100644
+> > --- a/hw/xenpv/xen_machine_pv.c
+> > +++ b/hw/xenpv/xen_machine_pv.c
+> > @@ -94,9 +94,6 @@ static void xen_init_pv(MachineState *machine)
+> > 
+> >      /* config cleanup hook */
+> >      atexit(xen_config_cleanup);
+> > -
+> > -    /* setup framebuffer */
+> > -    xen_init_display(xen_domid);
+> >  }
+> > 
+> >  static void xenpv_machine_init(MachineClass *mc)
+> > diff --git a/include/hw/xen/xen_backend.h
+> > b/include/hw/xen/xen_backend.h
+> > index 852c2ea..8a6fbcb 100644
+> > --- a/include/hw/xen/xen_backend.h
+> > +++ b/include/hw/xen/xen_backend.h
+> > @@ -55,8 +55,6 @@ extern struct XenDevOps xen_netdev_ops;       /*
+> > xen_nic.c         */
+> >  extern struct XenDevOps xen_usb_ops;          /* xen-usb.c         */
+> >  #endif
+> > 
+> > -void xen_init_display(int domid);
+> > -
+> >  /* configuration (aka xenbus setup) */
+> >  void xen_config_cleanup(void);
+> >  int xen_config_dev_blk(DriveInfo *disk);
+> 
