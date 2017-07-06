@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dSw1G-00006p-Tc
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 21:55:52 -0400
+	(envelope-from <peterx@redhat.com>) id 1dSw5c-0001bG-LT
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dSw1B-0007LA-VF
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 21:55:51 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dSw1B-0007Kf-NR
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 21:55:45 -0400
-Received: by mail-qk0-x244.google.com with SMTP id 91so848993qkq.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 18:55:43 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170706002401.10507-1-rth@twiddle.net>
-	<20170706002401.10507-8-rth@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <09234b5f-c837-3cb0-ea27-449591753b42@amsat.org>
-Date: Wed, 5 Jul 2017 22:55:38 -0300
+	(envelope-from <peterx@redhat.com>) id 1dSw5X-0000K8-Ko
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:00:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35018)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dSw5X-0000Jm-CB
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 22:00:15 -0400
+Date: Thu, 6 Jul 2017 10:00:03 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170706020003.GA25897@pxdev.xzpeter.org>
+References: <1499049848-18012-1-git-send-email-peterx@redhat.com>
+	<1499049848-18012-4-git-send-email-peterx@redhat.com>
+	<874lussk0x.fsf@dusky.pond.sub.org>
+	<20170705140649.GW12152@localhost.localdomain>
+	<87k23mnbn9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170706002401.10507-8-rth@twiddle.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] target/sh4: Unify cpu_fregs into FREG
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87k23mnbn9.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 3/4] doc: add item for "-M
+ enforce-config-section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,298 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: bruno@clisp.org, aurelien@aurel32.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 07/05/2017 09:23 PM, Richard Henderson wrote:
-> We were treating FREG as an index and REG as a TCGv.
-> Making FREG return a TCGv is both less confusing and
-> a step toward cleaner banking of cpu_fregs.
+On Wed, Jul 05, 2017 at 05:31:22PM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 > 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> > (CCing Greg, the original author of the code that added the
+> > enforce-config-section option)
+> >
+> > On Tue, Jul 04, 2017 at 10:06:54AM +0200, Markus Armbruster wrote:
+> >> Peter Xu <peterx@redhat.com> writes:
+> >> 
+> >> > It's never documented, and now we have one more parameter for it (which
+> >> > means this one can be obsolete in the future). Document it properly.
+> >> >
+> >> > Although now when enforce-config-section is set, it'll override the
+> >> > other "-global" parameter, that is not necessarily a rule. Forbid that
+> >> > usage in the document.
+> >> >
+> >> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> >> > ---
+> >> >  qemu-options.hx | 8 ++++++++
+> >> >  1 file changed, 8 insertions(+)
+> >> >
+> >> > diff --git a/qemu-options.hx b/qemu-options.hx
+> >> > index 297bd8a..927c51f 100644
+> >> > --- a/qemu-options.hx
+> >> > +++ b/qemu-options.hx
+> >> > @@ -85,6 +85,14 @@ Enables or disables NVDIMM support. The default is off.
+> >> >  @item s390-squash-mcss=on|off
+> >> >  Enables or disables squashing subchannels into the default css.
+> >> >  The default is off.
+> >> > +@item enforce-config-section=on|off
+> >> > +Decides whether we will send the configuration section when doing
+> >> > +migration. By default, it is turned on. We can set this to off to
+> >> > +explicitly disable it. Note: this parameter will be obsolete soon,
+> >> > +please use "-global migration.send-configuration=on|off" instead.
+> >> 
+> >> Please say "... is deprecated, please use ...", to make it visible in
+> >> "git-grep -i deprecat".
+> >> 
+> >> > +"enforce-config-section" cannot be used together with "-global
+> >> > +migration.send-configuration". If it happens, the behavior is
+> >> > +undefined.
+> >> 
+> >> Nasty.  Could we catch and reject such invalid usage?
+> >
+> > Actually, the machine option will override
+> > migration.send-configuration=off, and I don't believe we will break that
+> > rule.  Documenting that behavior (but warning that it is deprecated)
+> > sounds easier than adding extra code to detect the conflicting options.
+> >
+> > We can simply replace "is undefined"  with "enforce-config-section will
+> > override migration.send-configuration, but enforce-config-section is
+> > deprecated".
+> 
+> Better than the scary "behavior is undefined".  But do we have to say
+> anything at all?  If somebody gives both options with different values,
+> the conflicting settings fight it out.  In a sane command line, the last
+> one wins.  Ours isn't sane.  Do we really have to specify who wins?
+> 
+> > I don't think anybody is relying on that option. If nobody is using it,
+> > we can remove its code soon if we make it trigger a warning.
+> > Machine-type compatibility code is already using
+> > migration.send-configuration instead.
+> 
+> What about
+> 
+>       @item enforce-config-section=on|off
+>       Controls sending of the configuration section when doing migration
+>       (default on).
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Sorry to be misleading in current patch. Its default should be "off"
+but not "on" (as corrected by Eduardo, the point is we are talking
+about "enforce-config-section", not "migration.send-configuration").
+Actually it won't make much sense if someone specify "off" here.
 
-> ---
->   target/sh4/translate.c | 123 +++++++++++++++++++++----------------------------
->   1 file changed, 52 insertions(+), 71 deletions(-)
-> 
-> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-> index 20e24d5..e4fd6f2 100644
-> --- a/target/sh4/translate.c
-> +++ b/target/sh4/translate.c
-> @@ -382,10 +382,11 @@ static inline void gen_store_fpr64 (TCGv_i64 t, int reg)
->   #define REG(x)     ctx->gregs[x]
->   #define ALTREG(x)  ctx->altregs[x]
->   
-> -#define FREG(x) (ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x))
-> +#define FREG(x) cpu_fregs[ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x)]
->   #define XHACK(x) ((((x) & 1 ) << 4) | ((x) & 0xe))
-> -#define XREG(x) (ctx->tbflags & FPSCR_FR ? XHACK(x) ^ 0x10 : XHACK(x))
-> -#define DREG(x) FREG(x) /* Assumes lsb of (x) is always 0 */
-> +#define XREG(x) FREG(XHACK(x))
-> +/* Assumes lsb of (x) is always 0 */
-> +#define DREG(x) (ctx->tbflags & FPSCR_FR ? (x) ^ 0x10 : (x))
->   
->   #define CHECK_NOT_DELAY_SLOT \
->       if (ctx->envflags & DELAY_SLOT_MASK) {                           \
-> @@ -1005,56 +1006,51 @@ static void _decode_opc(DisasContext * ctx)
->   	CHECK_FPU_ENABLED
->           if (ctx->tbflags & FPSCR_SZ) {
->   	    TCGv_i64 fp = tcg_temp_new_i64();
-> -	    gen_load_fpr64(fp, XREG(B7_4));
-> -	    gen_store_fpr64(fp, XREG(B11_8));
-> +	    gen_load_fpr64(fp, XHACK(B7_4));
-> +	    gen_store_fpr64(fp, XHACK(B11_8));
->   	    tcg_temp_free_i64(fp);
->   	} else {
-> -	    tcg_gen_mov_i32(cpu_fregs[FREG(B11_8)], cpu_fregs[FREG(B7_4)]);
-> +	    tcg_gen_mov_i32(FREG(B11_8), FREG(B7_4));
->   	}
->   	return;
->       case 0xf00a: /* fmov {F,D,X}Rm,@Rn - FPSCR: Nothing */
->   	CHECK_FPU_ENABLED
->           if (ctx->tbflags & FPSCR_SZ) {
->   	    TCGv addr_hi = tcg_temp_new();
-> -	    int fr = XREG(B7_4);
-> +	    int fr = XHACK(B7_4);
->   	    tcg_gen_addi_i32(addr_hi, REG(B11_8), 4);
-> -            tcg_gen_qemu_st_i32(cpu_fregs[fr], REG(B11_8),
-> -                                ctx->memidx, MO_TEUL);
-> -            tcg_gen_qemu_st_i32(cpu_fregs[fr+1], addr_hi,
-> -                                ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_st_i32(FREG(fr), REG(B11_8), ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_st_i32(FREG(fr + 1), addr_hi, ctx->memidx, MO_TEUL);
->   	    tcg_temp_free(addr_hi);
->   	} else {
-> -            tcg_gen_qemu_st_i32(cpu_fregs[FREG(B7_4)], REG(B11_8),
-> -                                ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_st_i32(FREG(B7_4), REG(B11_8), ctx->memidx, MO_TEUL);
->   	}
->   	return;
->       case 0xf008: /* fmov @Rm,{F,D,X}Rn - FPSCR: Nothing */
->   	CHECK_FPU_ENABLED
->           if (ctx->tbflags & FPSCR_SZ) {
->   	    TCGv addr_hi = tcg_temp_new();
-> -	    int fr = XREG(B11_8);
-> +	    int fr = XHACK(B11_8);
->   	    tcg_gen_addi_i32(addr_hi, REG(B7_4), 4);
-> -            tcg_gen_qemu_ld_i32(cpu_fregs[fr], REG(B7_4), ctx->memidx, MO_TEUL);
-> -            tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr_hi, ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_ld_i32(FREG(fr), REG(B7_4), ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_ld_i32(FREG(fr + 1), addr_hi, ctx->memidx, MO_TEUL);
->   	    tcg_temp_free(addr_hi);
->   	} else {
-> -            tcg_gen_qemu_ld_i32(cpu_fregs[FREG(B11_8)], REG(B7_4),
-> -                                ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_ld_i32(FREG(B11_8), REG(B7_4), ctx->memidx, MO_TEUL);
->   	}
->   	return;
->       case 0xf009: /* fmov @Rm+,{F,D,X}Rn - FPSCR: Nothing */
->   	CHECK_FPU_ENABLED
->           if (ctx->tbflags & FPSCR_SZ) {
->   	    TCGv addr_hi = tcg_temp_new();
-> -	    int fr = XREG(B11_8);
-> +	    int fr = XHACK(B11_8);
->   	    tcg_gen_addi_i32(addr_hi, REG(B7_4), 4);
-> -            tcg_gen_qemu_ld_i32(cpu_fregs[fr], REG(B7_4), ctx->memidx, MO_TEUL);
-> -            tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr_hi, ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_ld_i32(FREG(fr), REG(B7_4), ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_ld_i32(FREG(fr + 1), addr_hi, ctx->memidx, MO_TEUL);
->   	    tcg_gen_addi_i32(REG(B7_4), REG(B7_4), 8);
->   	    tcg_temp_free(addr_hi);
->   	} else {
-> -            tcg_gen_qemu_ld_i32(cpu_fregs[FREG(B11_8)], REG(B7_4),
-> -                                ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_ld_i32(FREG(B11_8), REG(B7_4), ctx->memidx, MO_TEUL);
->   	    tcg_gen_addi_i32(REG(B7_4), REG(B7_4), 4);
->   	}
->   	return;
-> @@ -1063,13 +1059,12 @@ static void _decode_opc(DisasContext * ctx)
->           TCGv addr = tcg_temp_new_i32();
->           tcg_gen_subi_i32(addr, REG(B11_8), 4);
->           if (ctx->tbflags & FPSCR_SZ) {
-> -	    int fr = XREG(B7_4);
-> -            tcg_gen_qemu_st_i32(cpu_fregs[fr+1], addr, ctx->memidx, MO_TEUL);
-> +	    int fr = XHACK(B7_4);
-> +            tcg_gen_qemu_st_i32(FREG(fr + 1), addr, ctx->memidx, MO_TEUL);
->   	    tcg_gen_subi_i32(addr, addr, 4);
-> -            tcg_gen_qemu_st_i32(cpu_fregs[fr], addr, ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_st_i32(FREG(fr), addr, ctx->memidx, MO_TEUL);
->   	} else {
-> -            tcg_gen_qemu_st_i32(cpu_fregs[FREG(B7_4)], addr,
-> -                                ctx->memidx, MO_TEUL);
-> +            tcg_gen_qemu_st_i32(FREG(B7_4), addr, ctx->memidx, MO_TEUL);
->   	}
->           tcg_gen_mov_i32(REG(B11_8), addr);
->           tcg_temp_free(addr);
-> @@ -1080,15 +1075,12 @@ static void _decode_opc(DisasContext * ctx)
->   	    TCGv addr = tcg_temp_new_i32();
->   	    tcg_gen_add_i32(addr, REG(B7_4), REG(0));
->               if (ctx->tbflags & FPSCR_SZ) {
-> -		int fr = XREG(B11_8);
-> -                tcg_gen_qemu_ld_i32(cpu_fregs[fr], addr,
-> -                                    ctx->memidx, MO_TEUL);
-> +		int fr = XHACK(B11_8);
-> +                tcg_gen_qemu_ld_i32(FREG(fr), addr, ctx->memidx, MO_TEUL);
->   		tcg_gen_addi_i32(addr, addr, 4);
-> -                tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr,
-> -                                    ctx->memidx, MO_TEUL);
-> +                tcg_gen_qemu_ld_i32(FREG(fr + 1), addr, ctx->memidx, MO_TEUL);
->   	    } else {
-> -                tcg_gen_qemu_ld_i32(cpu_fregs[FREG(B11_8)], addr,
-> -                                    ctx->memidx, MO_TEUL);
-> +                tcg_gen_qemu_ld_i32(FREG(B11_8), addr, ctx->memidx, MO_TEUL);
->   	    }
->   	    tcg_temp_free(addr);
->   	}
-> @@ -1099,15 +1091,12 @@ static void _decode_opc(DisasContext * ctx)
->   	    TCGv addr = tcg_temp_new();
->   	    tcg_gen_add_i32(addr, REG(B11_8), REG(0));
->               if (ctx->tbflags & FPSCR_SZ) {
-> -		int fr = XREG(B7_4);
-> -                tcg_gen_qemu_ld_i32(cpu_fregs[fr], addr,
-> -                                    ctx->memidx, MO_TEUL);
-> +		int fr = XHACK(B7_4);
-> +                tcg_gen_qemu_ld_i32(FREG(fr), addr, ctx->memidx, MO_TEUL);
->   		tcg_gen_addi_i32(addr, addr, 4);
-> -                tcg_gen_qemu_ld_i32(cpu_fregs[fr+1], addr,
-> -                                    ctx->memidx, MO_TEUL);
-> +                tcg_gen_qemu_ld_i32(FREG(fr + 1), addr, ctx->memidx, MO_TEUL);
->   	    } else {
-> -                tcg_gen_qemu_st_i32(cpu_fregs[FREG(B7_4)], addr,
-> -                                    ctx->memidx, MO_TEUL);
-> +                tcg_gen_qemu_st_i32(FREG(B7_4), addr, ctx->memidx, MO_TEUL);
->   	    }
->   	    tcg_temp_free(addr);
->   	}
-> @@ -1155,32 +1144,26 @@ static void _decode_opc(DisasContext * ctx)
->   	    } else {
->                   switch (ctx->opcode & 0xf00f) {
->                   case 0xf000:		/* fadd Rm,Rn */
-> -                    gen_helper_fadd_FT(cpu_fregs[FREG(B11_8)], cpu_env,
-> -                                       cpu_fregs[FREG(B11_8)],
-> -                                       cpu_fregs[FREG(B7_4)]);
-> +                    gen_helper_fadd_FT(FREG(B11_8), cpu_env,
-> +                                       FREG(B11_8), FREG(B7_4));
->                       break;
->                   case 0xf001:		/* fsub Rm,Rn */
-> -                    gen_helper_fsub_FT(cpu_fregs[FREG(B11_8)], cpu_env,
-> -                                       cpu_fregs[FREG(B11_8)],
-> -                                       cpu_fregs[FREG(B7_4)]);
-> +                    gen_helper_fsub_FT(FREG(B11_8), cpu_env,
-> +                                       FREG(B11_8), FREG(B7_4));
->                       break;
->                   case 0xf002:		/* fmul Rm,Rn */
-> -                    gen_helper_fmul_FT(cpu_fregs[FREG(B11_8)], cpu_env,
-> -                                       cpu_fregs[FREG(B11_8)],
-> -                                       cpu_fregs[FREG(B7_4)]);
-> +                    gen_helper_fmul_FT(FREG(B11_8), cpu_env,
-> +                                       FREG(B11_8), FREG(B7_4));
->                       break;
->                   case 0xf003:		/* fdiv Rm,Rn */
-> -                    gen_helper_fdiv_FT(cpu_fregs[FREG(B11_8)], cpu_env,
-> -                                       cpu_fregs[FREG(B11_8)],
-> -                                       cpu_fregs[FREG(B7_4)]);
-> +                    gen_helper_fdiv_FT(FREG(B11_8), cpu_env,
-> +                                       FREG(B11_8), FREG(B7_4));
->                       break;
->                   case 0xf004:		/* fcmp/eq Rm,Rn */
-> -                    gen_helper_fcmp_eq_FT(cpu_env, cpu_fregs[FREG(B11_8)],
-> -                                          cpu_fregs[FREG(B7_4)]);
-> +                    gen_helper_fcmp_eq_FT(cpu_env, FREG(B11_8), FREG(B7_4));
->                       return;
->                   case 0xf005:		/* fcmp/gt Rm,Rn */
-> -                    gen_helper_fcmp_gt_FT(cpu_env, cpu_fregs[FREG(B11_8)],
-> -                                          cpu_fregs[FREG(B7_4)]);
-> +                    gen_helper_fcmp_gt_FT(cpu_env, FREG(B11_8), FREG(B7_4));
->                       return;
->                   }
->   	    }
-> @@ -1192,9 +1175,8 @@ static void _decode_opc(DisasContext * ctx)
->               if (ctx->tbflags & FPSCR_PR) {
->                   break; /* illegal instruction */
->               } else {
-> -                gen_helper_fmac_FT(cpu_fregs[FREG(B11_8)], cpu_env,
-> -                                   cpu_fregs[FREG(0)], cpu_fregs[FREG(B7_4)],
-> -                                   cpu_fregs[FREG(B11_8)]);
-> +                gen_helper_fmac_FT(FREG(B11_8), cpu_env,
-> +                                   FREG(0), FREG(B7_4), FREG(B11_8));
->                   return;
->               }
->           }
-> @@ -1732,11 +1714,11 @@ static void _decode_opc(DisasContext * ctx)
->           return;
->       case 0xf00d: /* fsts FPUL,FRn - FPSCR: Nothing */
->   	CHECK_FPU_ENABLED
-> -	tcg_gen_mov_i32(cpu_fregs[FREG(B11_8)], cpu_fpul);
-> +	tcg_gen_mov_i32(FREG(B11_8), cpu_fpul);
->   	return;
->       case 0xf01d: /* flds FRm,FPUL - FPSCR: Nothing */
->   	CHECK_FPU_ENABLED
-> -	tcg_gen_mov_i32(cpu_fpul, cpu_fregs[FREG(B11_8)]);
-> +	tcg_gen_mov_i32(cpu_fpul, FREG(B11_8));
->   	return;
->       case 0xf02d: /* float FPUL,FRn/DRn - FPSCR: R[PR,Enable.I]/W[Cause,Flag] */
->   	CHECK_FPU_ENABLED
-> @@ -1750,7 +1732,7 @@ static void _decode_opc(DisasContext * ctx)
->   	    tcg_temp_free_i64(fp);
->   	}
->   	else {
-> -            gen_helper_float_FT(cpu_fregs[FREG(B11_8)], cpu_env, cpu_fpul);
-> +            gen_helper_float_FT(FREG(B11_8), cpu_env, cpu_fpul);
->   	}
->   	return;
->       case 0xf03d: /* ftrc FRm/DRm,FPUL - FPSCR: R[PR,Enable.V]/W[Cause,Flag] */
-> @@ -1765,13 +1747,13 @@ static void _decode_opc(DisasContext * ctx)
->   	    tcg_temp_free_i64(fp);
->   	}
->   	else {
-> -            gen_helper_ftrc_FT(cpu_fpul, cpu_env, cpu_fregs[FREG(B11_8)]);
-> +            gen_helper_ftrc_FT(cpu_fpul, cpu_env, FREG(B11_8));
->   	}
->   	return;
->       case 0xf04d: /* fneg FRn/DRn - FPSCR: Nothing */
->   	CHECK_FPU_ENABLED
->   	{
-> -	    gen_helper_fneg_T(cpu_fregs[FREG(B11_8)], cpu_fregs[FREG(B11_8)]);
-> +	    gen_helper_fneg_T(FREG(B11_8), FREG(B11_8));
->   	}
->   	return;
->       case 0xf05d: /* fabs FRn/DRn */
-> @@ -1785,7 +1767,7 @@ static void _decode_opc(DisasContext * ctx)
->   	    gen_store_fpr64(fp, DREG(B11_8));
->   	    tcg_temp_free_i64(fp);
->   	} else {
-> -	    gen_helper_fabs_FT(cpu_fregs[FREG(B11_8)], cpu_fregs[FREG(B11_8)]);
-> +	    gen_helper_fabs_FT(FREG(B11_8), FREG(B11_8));
->   	}
->   	return;
->       case 0xf06d: /* fsqrt FRn */
-> @@ -1799,8 +1781,7 @@ static void _decode_opc(DisasContext * ctx)
->   	    gen_store_fpr64(fp, DREG(B11_8));
->   	    tcg_temp_free_i64(fp);
->   	} else {
-> -            gen_helper_fsqrt_FT(cpu_fregs[FREG(B11_8)], cpu_env,
-> -                                cpu_fregs[FREG(B11_8)]);
-> +            gen_helper_fsqrt_FT(FREG(B11_8), cpu_env, FREG(B11_8));
->   	}
->   	return;
->       case 0xf07d: /* fsrra FRn */
-> @@ -1809,13 +1790,13 @@ static void _decode_opc(DisasContext * ctx)
->       case 0xf08d: /* fldi0 FRn - FPSCR: R[PR] */
->   	CHECK_FPU_ENABLED
->           if (!(ctx->tbflags & FPSCR_PR)) {
-> -	    tcg_gen_movi_i32(cpu_fregs[FREG(B11_8)], 0);
-> +	    tcg_gen_movi_i32(FREG(B11_8), 0);
->   	}
->   	return;
->       case 0xf09d: /* fldi1 FRn - FPSCR: R[PR] */
->   	CHECK_FPU_ENABLED
->           if (!(ctx->tbflags & FPSCR_PR)) {
-> -	    tcg_gen_movi_i32(cpu_fregs[FREG(B11_8)], 0x3f800000);
-> +	    tcg_gen_movi_i32(FREG(B11_8), 0x3f800000);
->   	}
->   	return;
->       case 0xf0ad: /* fcnvsd FPUL,DRn */
-> 
+> Note: this parameter is deprecated, please use
+>       "-global migration.send-configuration=on|off" instead.
+
+This is a suggestion I would like to take. I'll remove the whole
+"undefined" sentence and update my post. Thanks,
+
+-- 
+Peter Xu
