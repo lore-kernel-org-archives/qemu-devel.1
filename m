@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dTDEX-0006vc-SF
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 16:18:42 -0400
+	(envelope-from <cota@braap.org>) id 1dTDMb-0008DO-MY
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 16:27:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dTDEW-00050K-Q0
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 16:18:41 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 6 Jul 2017 13:15:14 -0700
-Message-ID: <9307b70e9876c4e9e3c4478524a32a23a3d5dd05.1499368180.git.alistair.francis@xilinx.com>
+	(envelope-from <cota@braap.org>) id 1dTDMW-000382-RS
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 16:27:01 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:43857)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dTDMW-00036w-IK
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 16:26:56 -0400
+Date: Thu, 6 Jul 2017 16:26:52 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170706202652.GA18201@flamenco>
+References: <1499166735-39360-1-git-send-email-pbonzini@redhat.com>
+	<1499166735-39360-10-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/1] util/aio-win32: Only select on what we
- are actually waiting for
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499166735-39360-10-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/22] monitor: disable "info jit" and
+ "info opcount" if !TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, qemu-block@nongnu.org, philippe@mathieu-daude.net, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, yang.zhong@intel.com, thuth@redhat.com, a.rigo@virtualopensystems.com, anthony.xu@intel.com, rth@twiddle.net
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
-Changes in V2:
- - Rebase on master
-Changes since RFC:
- - Include more bitmasks for the select call
+On Tue, Jul 04, 2017 at 13:12:02 +0200, Paolo Bonzini wrote:
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  accel/tcg/translate-all.c | 5 +++++
+>  hmp-commands-info.hx      | 4 ++++
+>  monitor.c                 | 2 ++
+>  3 files changed, 11 insertions(+)
+> 
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 4c1d8c9..093207a 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1851,6 +1851,11 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+>  
+>      tb_lock();
+>  
+> +    if (!tcg_enabled()) {
+> +        cpu_fprintf(f, "TCG not enabled\n");
+> +        return;
+> +    }
 
- util/aio-win32.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Sorry I missed this before it was merged, but:
 
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index bca496a47a..d6d5e02f00 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -71,6 +71,7 @@ void aio_set_fd_handler(AioContext *ctx,
-         }
-     } else {
-         HANDLE event;
-+        long bitmask =3D 0;
-=20
-         if (node =3D=3D NULL) {
-             /* Alloc and insert if it's not already there */
-@@ -95,10 +96,16 @@ void aio_set_fd_handler(AioContext *ctx,
-         node->io_write =3D io_write;
-         node->is_external =3D is_external;
-=20
-+        if (io_read) {
-+            bitmask |=3D FD_READ | FD_ACCEPT | FD_CLOSE;
-+        }
-+
-+        if (io_write) {
-+            bitmask |=3D FD_WRITE | FD_CONNECT;
-+        }
-+
-         event =3D event_notifier_get_handle(&ctx->notifier);
--        WSAEventSelect(node->pfd.fd, event,
--                       FD_READ | FD_ACCEPT | FD_CLOSE |
--                       FD_CONNECT | FD_WRITE | FD_OOB);
-+        WSAEventSelect(node->pfd.fd, event, bitmask);
-     }
-=20
-     qemu_lockcnt_unlock(&ctx->list_lock);
---=20
-2.11.0
+- We're returning with tb_lock held
+- This check is redundant; see b7da97eef ("monitor: Check whether TCG
+  is enabled before running the "info jit" code") which was merged
+  in April (hmp_info_jit is the only caller of dump_exec_info).
+
+I suggest we get rid of the check, although moving it above tb_lock is
+also OK with me.
+
+Thanks,
+
+		Emilio
