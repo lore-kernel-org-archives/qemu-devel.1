@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dT7Hl-0000sF-SU
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 09:57:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dT7Jw-0001iM-Fc
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 09:59:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dT7Hh-0000Gq-W1
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 09:57:37 -0400
-Resent-Message-Id: <E1dT7Hh-0000Gq-W1@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dT7Hh-0000FZ-OK
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 09:57:33 -0400
-In-Reply-To: <1499183267-28623-1-git-send-email-igor.druzhinin@citrix.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149934943159.27.12466789738046560512@f0098f8687cc>
+	(envelope-from <kwolf@redhat.com>) id 1dT7Jv-0002Fy-Lr
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 09:59:52 -0400
+Date: Thu, 6 Jul 2017 15:59:38 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170706135938.GH5975@noname.redhat.com>
+References: <20170705210842.960-1-eblake@redhat.com>
+	<20170705210842.960-16-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Jul 2017 06:57:12 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] xen: don't save/restore the physmap
- on VM save/restore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170705210842.960-16-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 15/21] backup: Switch BackupBlockJob to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: igor.druzhinin@citrix.com
-Cc: famz@redhat.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, anthony.perard@citrix.com, sstabellini@kernel.org, paul.durrant@citrix.com, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-OTE4MzI2Ny0yODYyMy0xLWdpdC1zZW5kLWVtYWlsLWlnb3IuZHJ1emhpbmluQGNpdHJpeC5jb20K
-VHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC80XSB4ZW46IGRv
-bid0IHNhdmUvcmVzdG9yZSB0aGUgcGh5c21hcCBvbiBWTSBzYXZlL3Jlc3RvcmUKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCmM1ZjQ5YmYgeGVuOiBkb24ndCB1c2UgeGVuc3RvcmUgdG8gc2F2ZS9yZXN0b3JlIHBo
-eXNtYXAgYW55bW9yZQpkYTNmYzFiIHhlbi9tYXBjYWNoZTogaW50cm9kdWNlIHhlbl9yZXBsYWNl
-X2NhY2hlX2VudHJ5KCkKZTkwNjljOCB4ZW4vbWFwY2FjaGU6IGFkZCBhbiBhYmlsaXR5IHRvIGNy
-ZWF0ZSBkdW1teSBtYXBwaW5ncwpkZmJkOGM2IHhlbjogbW92ZSBwaHlzbWFwIHNhdmluZyBpbnRv
-IGEgc2VwYXJhdGUgZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvNDogeGVuOiBtb3ZlIHBoeXNtYXAgc2F2aW5nIGludG8gYSBzZXBhcmF0ZSBmdW5jdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCAyLzQ6IHhlbi9tYXBjYWNoZTogYWRkIGFuIGFiaWxpdHkgdG8gY3Jl
-YXRlIGR1bW15IG1hcHBpbmdzLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
-J3wnIChjdHg6VnhWKQojNTI6IEZJTEU6IGh3L2kzODYveGVuL3hlbi1tYXBjYWNoZS5jOjE4NToK
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQUk9UX1JFQUR8UFJP
-VF9XUklURSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikK
-IzY0OiBGSUxFOiBody9pMzg2L3hlbi94ZW4tbWFwY2FjaGUuYzoxOTc6CisgICAgICAgIHZhZGRy
-X2Jhc2UgPSBtbWFwKE5VTEwsIHNpemUsIFBST1RfUkVBRHxQUk9UX1dSSVRFLAogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzY1OiBGSUxFOiBody9pMzg2L3hlbi94
-ZW4tbWFwY2FjaGUuYzoxOTg6CisgICAgICAgICAgICAgICAgICAgICAgICAgIE1BUF9BTk9OfE1B
-UF9TSEFSRUQsIC0xLCAwKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0
-b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDgyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvNDogeGVuL21hcGNh
-Y2hlOiBpbnRyb2R1Y2UgeGVuX3JlcGxhY2VfY2FjaGVfZW50cnkoKS4uLgpFUlJPUjogc3BhY2Vz
-IHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzgwOiBGSUxFOiBody9pMzg2L3hl
-bi94ZW4tbWFwY2FjaGUuYzoxODg6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgUFJPVF9SRUFEfFBST1RfV1JJVEUsIDAsCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiM5MzogRklMRTogaHcvaTM4Ni94ZW4veGVuLW1hcGNh
-Y2hlLmM6MjAwOgorICAgICAgICB2YWRkcl9iYXNlID0gbW1hcCh2YWRkciwgc2l6ZSwgUFJPVF9S
-RUFEfFBST1RfV1JJVEUsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTYyOiBGSUxFOiBo
-dy9pMzg2L3hlbi94ZW4tbWFwY2FjaGUuYzo1MjE6CisgICAgd2hpbGUgKGVudHJ5ICYmICEoZW50
-cnktPnBhZGRyX2luZGV4ID09IGFkZHJlc3NfaW5kZXggJiYgZW50cnktPnNpemUgPT0gY2FjaGVf
-c2l6ZSkpIHsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTY2OiBGSUxFOiBody9p
-Mzg2L3hlbi94ZW4tbWFwY2FjaGUuYzo1MjU6CisgICAgICAgIERQUklOVEYoIlRyeWluZyB0byB1
-cGRhdGUgYW4gZW50cnkgZm9yICVseCB0aGF0IGlzIG5vdCBpbiB0aGUgbWFwY2FjaGUhXG4iLCBw
-aHlzX2FkZHIpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3MzogRklMRTog
-aHcvaTM4Ni94ZW4veGVuLW1hcGNhY2hlLmM6NTMyOgorICAgIHhlbl9yZW1hcF9idWNrZXQoZW50
-cnksIGVudHJ5LT52YWRkcl9iYXNlLCBjYWNoZV9zaXplLCBhZGRyZXNzX2luZGV4LCBmYWxzZSk7
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwoj
-MTc0OiBGSUxFOiBody9pMzg2L3hlbi94ZW4tbWFwY2FjaGUuYzo1MzM6CisgICAgaWYoIXRlc3Rf
-Yml0cyhhZGRyZXNzX29mZnNldCA+PiBYQ19QQUdFX1NISUZULAoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzE3NzogRklMRTogaHcvaTM4Ni94ZW4veGVuLW1hcGNhY2hlLmM6NTM2
-OgorICAgICAgICBEUFJJTlRGKCJVbmFibGUgdG8gdXBkYXRlIGFuIGVudHJ5IGZvciAlbHggaW4g
-dGhlIG1hcGNhY2hlIVxuIiwgcGh5c19hZGRyKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxODQ6IEZJTEU6IGh3L2kzODYveGVuL3hlbi1tYXBjYWNoZS5jOjU0MzoKK3VpbnQ4
-X3QgKnhlbl9yZXBsYWNlX2NhY2hlX2VudHJ5KGh3YWRkciBvbGRfcGh5c19hZGRyLCBod2FkZHIg
-bmV3X3BoeXNfYWRkciwgaHdhZGRyIHNpemUpCgp0b3RhbDogNCBlcnJvcnMsIDQgd2FybmluZ3Ms
-IDE5MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CgpDaGVja2luZyBQQVRDSCA0LzQ6IHhlbjogZG9uJ3QgdXNlIHhlbnN0b3JlIHRvIHNhdmUvcmVz
-dG9yZSBwaHlzbWFwIGFueW1vcmUuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
-dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDc6IEZJTEU6IGh3L2kzODYv
-eGVuL3hlbi1odm0uYzozODA6CisgICAgcGh5c21hcCA9IGdfbWFsbG9jKHNpemVvZiAoWGVuUGh5
-c21hcCkpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5OCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Am 05.07.2017 um 23:08 hat Eric Blake geschrieben:
+> We are gradually converting to byte-based interfaces, as they are
+> easier to reason about than sector-based.  Continue by converting an
+> internal structure (no semantic change), and all references to
+> tracking progress.  Drop a redundant local variable bytes_per_cluster.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
