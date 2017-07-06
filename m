@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dT4q8-0005cb-Fp
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:20:57 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dT4tH-0006HG-Fx
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dT4q5-0005Iq-BF
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:20:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46861)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dT4q5-0005IW-6L
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:20:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dT4q3-00027h-N9
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 11:20:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7EF662E80E8
-	for <qemu-devel@nongnu.org>; Thu,  6 Jul 2017 11:20:51 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dT4tG-0006FB-A9
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:24:11 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Thu, 6 Jul 2017 11:24:01 +0000
+Message-ID: <AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
+	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
+	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
+In-Reply-To: <e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Jul 2017 11:07:11 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1702621 <1702621@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149932544038.24380.387410318124517933.malonedeb@soybean.canonical.com>
-Message-Id: <149933923198.15700.16156177817840160854.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1702621] Re: colo: secondary vm crash during
- loadvm
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +33,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-I haven't tried COLO for a while; I've got a note I hit a similar error in =
- the past - =
-
-I think I came to the conclusion it was the e1000 that was unhappy - probab=
-ly sending an interrupt after it had stopped.
-Try a different NIC.  I flipped to using a virtio-net at one point (but I t=
-hink I had to disable vhost, there are some patches for this recently).
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1702621
-
-Title:
-  colo: secondary vm crash during loadvm
-
-Status in QEMU:
-  New
-
-Bug description:
-  Following document 'COLO-FT.txt', I test colo feature on my hosts. It see=
-ms goes well. But after a while the secondary vm crash.  The stack is as fo=
-llows:
-  #0  0x00007f191456dc37 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-  #1  0x00007f1914571028 in abort () from /lib/x86_64-linux-gnu/libc.so.6
-  #2  0x00007f1914566bf6 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-  #3  0x00007f1914566ca2 in __assert_fail () from /lib/x86_64-linux-gnu/lib=
-c.so.6
-  #4  0x0000564154ad9147 in pcibus_reset (qbus=3D0x564156760d10) at ../hw/p=
-ci/pci.c:311
-  #5  0x0000564154a07cdb in qbus_reset_one (bus=3D0x564156760d10, opaque=3D=
-0x0) at hw/core/qdev.c:319
-  #6  0x0000564154a0d721 in qbus_walk_children (bus=3D0x564156760d10, pre_d=
-evfn=3D0, pre_busfn=3D0, =
-
-      post_devfn=3D0x564154a07c26 <qdev_reset_one>, post_busfn=3D0x564154a0=
-7c6c <qbus_reset_one>, opaque=3D0x0)
-      at hw/core/bus.c:68
-  #7  0x0000564154a08b4d in qdev_walk_children (dev=3D0x56415675f2b0, pre_d=
-evfn=3D0, pre_busfn=3D0, =
-
-      post_devfn=3D0x564154a07c26 <qdev_reset_one>, post_busfn=3D0x564154a0=
-7c6c <qbus_reset_one>, opaque=3D0x0)
-      at hw/core/qdev.c:617
-  #8  0x0000564154a0d6e5 in qbus_walk_children (bus=3D0x564156594d30, pre_d=
-evfn=3D0, pre_busfn=3D0, =
-
-      post_devfn=3D0x564154a07c26 <qdev_reset_one>, post_busfn=3D0x564154a0=
-7c6c <qbus_reset_one>, opaque=3D0x0)
-      at hw/core/bus.c:59
-  #9  0x0000564154a07df5 in qbus_reset_all (bus=3D0x564156594d30) at hw/cor=
-e/qdev.c:336
-  #10 0x0000564154a07e3a in qbus_reset_all_fn (opaque=3D0x564156594d30) at =
-hw/core/qdev.c:342
-  #11 0x0000564154a0e222 in qemu_devices_reset () at hw/core/reset.c:69
-  #12 0x00005641548b3b47 in pc_machine_reset () at /vms/git/qemu/hw/i386/pc=
-.c:2234
-  #13 0x0000564154972ca7 in qemu_system_reset (report=3Dfalse) at vl.c:1697
-  #14 0x0000564154b9d007 in colo_process_incoming_thread (opaque=3D0x564155=
-3c1280) at migration/colo.c:617
-  #15 0x00007f1914907184 in start_thread () from /lib/x86_64-linux-gnu/libp=
-thread.so.0
-  #16 0x00007f1914634bed in clone () from /lib/x86_64-linux-gnu/libc.so.6
-
-  (gdb) frame 4
-  #4  0x0000564154ad9147 in pcibus_reset (qbus=3D0x564156760d10) at ../hw/p=
-ci/pci.c:311
-  warning: Source file is more recent than executable.
-  311             assert(bus->irq_count[i] =3D=3D 0);
-  (gdb) ^CQuit
-  (gdb) p bus->irq_count[i]
-  $1 =3D -1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1702621/+subscriptions
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmVhbi1QaGlsaXBwZSBC
+cnVja2VyIFttYWlsdG86amVhbi1waGlsaXBwZS5icnVja2VyQGFybS5jb21dDQo+IFNlbnQ6IFRo
+dXJzZGF5LCBKdWx5IDA2LCAyMDE3IDM6MzMgUE0NCj4gVG86IEJoYXJhdCBCaHVzaGFuIDxiaGFy
+YXQuYmh1c2hhbkBueHAuY29tPjsgQXVnZXIgRXJpYw0KPiA8ZXJpYy5hdWdlckByZWRoYXQuY29t
+PjsgZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc7
+IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcWVtdS1hcm1A
+bm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiB3ZWlAcmVkaGF0LmNvbTsg
+a2V2aW4udGlhbkBpbnRlbC5jb207IG1hcmMuenluZ2llckBhcm0uY29tOw0KPiB0bkBzZW1paGFs
+Zi5jb207IHdpbGwuZGVhY29uQGFybS5jb207IGRyam9uZXNAcmVkaGF0LmNvbTsNCj4gcm9iaW4u
+bXVycGh5QGFybS5jb207IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZw0KPiBTdWJqZWN0OiBS
+ZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgMC84XSBWSVJUSU8tSU9NTVUgZGV2aWNlDQo+IA0KPiBP
+biAwNS8wNy8xNyAwOTo0OSwgQmhhcmF0IEJodXNoYW4gd3JvdGU6Pj4+IEFsc28gd2hlbiBzZXR1
+cCBtc2ktcm91dGUNCj4ga3ZtX2lycWNoaXBfYWRkX21zaV9yb3V0ZSgpIHdlIG5lZWRlZCB0bw0K
+PiA+PiBwcm92aWRlIHRoZSB0cmFuc2xhdGVkIGFkZHJlc3MuDQo+ID4+PiBBY2NvcmRpbmcgdG8g
+bXkgdW5kZXJzdGFuZGluZyB0aGlzIGlzIHJlcXVpcmVkIGJlY2F1c2Uga2VybmVsIGRvZXMNCj4g
+Pj4+IG5vIGdvDQo+ID4+IHRocm91Z2ggdmlvbW11IHRyYW5zbGF0aW9uIHdoZW4gZ2VuZXJhdGlu
+ZyBpbnRlcnJ1cHQsIG5vPw0KPiA+Pg0KPiA+PiB5ZXMgdGhpcyBpcyBuZWVkZWQgd2hlbiBLVk0g
+TVNJIHJvdXRlcyBhcmUgc2V0IHVwLCBpZS4gYWxvbmcgd2l0aCBHSUNWMw0KPiBJVFMuDQo+ID4+
+IFdpdGggR0lDdjJNLCBxZW11IGRpcmVjdCBnc2kgbWFwcGluZyBpcyB1c2VkIGFuZCB0aGlzIGlz
+IG5vdCBuZWVkZWQuDQo+ID4+DQo+ID4+IFNvIEkgZG8gbm90IHVuZGVyc3RhbmQgeW91ciBwcmV2
+aW91cyBzZW50ZW5jZSBzYXlpbmcgIk1TSSBpbnRlcnJ1cHRzDQo+ID4+IHdvcmtzIHdpdGhvdXQg
+YW55IGNoYW5nZSIuDQo+ID4NCj4gPiBJIGhhdmUgYWxtb3N0IGNvbXBsZXRlZCB2ZmlvIGludGVn
+cmF0aW9uIHdpdGggdmlydGlvLWlvbW11IGFuZCBub3cNCj4gPiB0ZXN0aW5nIHRoZSBjaGFuZ2Vz
+IGJ5IGFzc2lnbmluZyBlMTAwMCBkZXZpY2UgdG8gVk0uIEZvciB0aGlzIEkgaGF2ZQ0KPiA+IGNo
+YW5nZWQgdmlydGlvLWlvbW11IGRyaXZlciB0byB1c2UgSU9NTVVfUkVTVl9NU0kgcmF0aGVyIHRo
+YW4gc3ctbXNpDQo+ID4gYW5kIHRoaXMgZG9lcyBub3QgbmVlZCBjaGFuZ2VkIGluIHZmaW9fZ2V0
+X2FkZHIoKSAgYW5kDQo+ID4ga3ZtX2lycWNoaXBfYWRkX21zaV9yb3V0ZSgpDQo+IA0KPiBJIHVu
+ZGVyc3RhbmQgeW91J3JlIHJlc2VydmluZyByZWdpb24gMHgwODAwMDAwMC0weDA4MTAwMDAwIGFz
+DQo+IElPTU1VX1JFU1ZfTVNJIGluc3RlYWQgb2YgSU9NTVVfUkVTVl9TV19NU0k/IEkgdGhpbmsg
+dGhpcyBvbmx5DQo+IHdvcmtzIGJlY2F1c2UgUWVtdSBwbGFjZXMgdGhlIHZnaWMgaW4gdGhhdCBh
+cmVhIGFzIHdlbGwgKGluIGh3L2FybS92aXJ0LmMpLg0KPiBJdCdzIG5vdCBhIGNvaW5jaWRlbmNl
+IGlmIHRoZSBhZGRyZXNzZXMgYXJlIHRoZSBzYW1lLCBiZWNhdXNlIEVyaWMgY2hvc2UgdGhlbQ0K
+PiBmb3IgdGhlIExpbnV4IFNNTVUgZHJpdmVycyBhbmQgSSBjb3BpZWQgdGhlbS4NCj4gDQo+IFdl
+IGNhbid0IHJlbHkgb24gdGhhdCBiZWhhdmlvciwgdGhvdWdoLCBpdCB3aWxsIGJyZWFrIE1TSXMg
+aW4gZW11bGF0ZWQNCj4gZGV2aWNlcy4gQW5kIGlmIFFlbXUgaGFwcGVucyB0byBtb3ZlIHRoZSBN
+U0kgZG9vcmJlbGwgaW4gZnV0dXJlIG1hY2hpbmUNCj4gcmV2aXNpb25zLCB0aGVuIGl0IHdvdWxk
+IGFsc28gYnJlYWsgVkZJTy4NCg0KWWVzLCBtYWtlIHNlbnNlIHRvIG1lDQoNCj4gDQo+IEp1c3Qg
+Zm9yIG15IG93biB1bmRlcnN0YW5kaW5nIC0tIHdoYXQgaGFwcGVucywgSSB0aGluaywgaXMgdGhh
+dCBpbiBMaW51eA0KPiBpb3ZhX3Jlc2VydmVfaW9tbXVfcmVnaW9ucyBpbml0aWFsbHkgcmVzZXJ2
+ZXMgdGhlIGd1ZXN0LXBoeXNpY2FsIGRvb3JiZWxsDQo+IDB4MDgwMDAwMDAtMHgwODEwMDAwMC4g
+VGhlbiBtdWNoIGxhdGVyLCB3aGVuIHRoZSBkZXZpY2UgZHJpdmVyIHJlcXVlc3RzDQo+IGFuIE1T
+SSwgdGhlIGlycWNoaXAgZHJpdmVyIGNhbGxzIGlvbW11X2RtYV9tYXBfbXNpX21zZyB3aXRoIHRo
+ZSBndWVzdC0NCj4gcGh5c2ljYWwgZ2ljdjJtIGFkZHJlc3MgMHgwODAyMDAwMC4gVGhlIGZ1bmN0
+aW9uIGZpbmRzIHRoZSByaWdodCBwYWdlIGluDQo+IG1zaV9wYWdlX2xpc3QsIHdoaWNoIHdhcyBh
+ZGRlZCBieSBjb29raWVfaW5pdF9od19tc2lfcmVnaW9uLCB0aGVyZWZvcmUNCj4gYnlwYXNzaW5n
+IHRoZSB2aW9tbXUgYW5kIHRoZSBHUEEgZ2V0cyB3cml0dGVuIGluIHRoZSBNU0ktWCB0YWJsZS4N
+Cg0KVGhpcyBtZWFucyBpbiBjYXNlIHRvbW9ycm93IHdoZW4gcWVtdSBjaGFuZ2VzIHZpcnQgbWFj
+aGluZSBhZGRyZXNzIG1hcCBhbmQgdmdpYy1pdHMgKGl0cy10cmFuc2xhdG9yIHJlZ2lzdGVyIGFk
+ZHJlc3MpIGFkZHJlc3MgcmFuZ2UgZG9lcyBub3QgZmFsbCBpbiB0aGUgbXNpX3BhZ2VfbGlzdCB0
+aGVuIGl0IHdpbGwgYWxsb2NhdGUgYSBuZXcgaW92YSwgY3JlYXRlIG1hcHBpbmcgaW4gaW9tbXUu
+IFNvIHRoaXMgd2lsbCBubyBsb25nZXIgYmUgaWRlbnRpdHkgbWFwcGVkIGFuZCBmYWlsIHRvIHdv
+cmsgd2l0aCBuZXcgcWVtdT8NCg0KPiANCj4gSWYgYW4gZW11bGF0ZWQgZGV2aWNlIHN1Y2ggYXMg
+dmlydGlvLW5ldC1wY2kgd2VyZSB0byBnZW5lcmF0ZSBhbiBNU0ksIHRoZW4NCj4gUWVtdSB3b3Vs
+ZCBhdHRlbXB0IHRvIGFjY2VzcyB0aGUgZG9vcmJlbGwgd3JpdHRlbiBieSBMaW51eCBpbnRvIHRo
+ZSBNU0ktWA0KPiB0YWJsZSwgMHgwODAyMDAwMCwgYW5kIGZhdWx0IGJlY2F1c2UgdGhhdCBhZGRy
+ZXNzIHdhc24ndCBtYXBwZWQgaW4gdGhlDQo+IHZpb21tdS4NCj4gDQo+IFNvIGZvciBWRklPLCB5
+b3UgZWl0aGVyIG5lZWQgdG8gdHJhbnNsYXRlIHRoZSBNU0ktWCBlbnRyeSB1c2luZyB0aGUgdmlv
+bW11LA0KPiBvciBqdXN0IGFzc3VtZSB0aGF0IHRoZSB2YWRkciBjb3JyZXNwb25kcyB0byB0aGUg
+b25seSBNU0kgZG9vcmJlbGwNCj4gYWNjZXNzaWJsZSBieSB0aGlzIGRldmljZSAoYmVjYXVzZSBo
+b3cgY2FuIHdlIGJlIGNlcnRhaW4gdGhhdCB0aGUgZ3Vlc3QNCj4gYWxyZWFkeSBtYXBwZWQgdGhl
+IGRvb3JiZWxsIGJlZm9yZSB3cml0aW5nIHRoZSBlbnRyeT8pDQo+IA0KPiBGb3IgQVJNIG1hY2hp
+bmVzIGl0J3MgcHJvYmFibHkgYmVzdCB0byBzdGljayB3aXRoIElPTU1VX1JFU1ZfU1dfTVNJLg0K
+PiBIb3dldmVyLCBhIG5pY2Ugd2F5IHRvIHVzZSBJT01NVV9SRVNWX01TSSB3b3VsZCBiZSBmb3Ig
+dGhlIHZpcnRpby0NCj4gaW9tbXUgZGV2aWNlIHRvIGFkdmVydGlzZSBpZGVudGl0eS1tYXBwZWQv
+cmVzZXJ2ZWQgcmVnaW9ucywgYW5kIGJ5cGFzcw0KPiB0cmFuc2xhdGlvbiBvbiB0aGVzZSByZWdp
+b25zLiBUaGVuIHRoZSBkcml2ZXIgY291bGQgcmVzZXJ2ZSB0aG9zZSB3aXRoDQo+IElPTU1VX1JF
+U1ZfTVNJLg0KDQpDb3JyZWN0IG1lIGlmIEkgZGlkIG5vdCB1bmRlcnN0b29kIHlvdSBjb3JyZWN0
+bHksIHRvZGF5IGlvbW11LWRyaXZlciBkZWNpZGVzIG1zaS1yZXNlcnZlZCByZWdpb24sIHdoYXQg
+aWYgd2UgY2hhbmdlIHRoaXMgYW5kIHZpcnRpby1pb21tdSBkZXZpY2Ugd2lsbCBwcm92aWRlIHRo
+ZSByZXNlcnZlZCBtc2kgcmVnaW9uIGFzIHBlciB0aGUgZW11bGF0ZWQgbWFjaGluZSAodmlydC9p
+bnRlbCkuIFNvIHZpcnRpby1pb21tdSBkcml2ZXIgd2lsbCB1c2UgdGhlIGFkZHJlc3MgYWR2ZXJ0
+aXNlZCBieSB2aXJ0aW8taW9tbXUgZGV2aWNlIGFzIElPTU1VX1JFU1ZfTVNJLiBJbiB0aGlzIGNh
+c2UgbXNpLXBhZ2UtbGlzdCB3aWxsIGFsd2F5cyBoYXZlIHRoZSByZXNlcnZlZCByZWdpb24gZm9y
+IE1TSS4NCk9uIHFlbXUgc2lkZSwgZm9yIGVtdWxhdGVkIGRldmljZXMgd2Ugd2lsbCBsZXQgdmly
+dGlvLWlvbW11IHJldHVybiBzYW1lIGFkZHJlc3MgYXMgdHJhbnNsYXRlZCBhZGRyZXNzIGFzIGl0
+IGZhbGxzIGluIE1TSS1yZXNlcnZlZCBwYWdlIGFscmVhZHkga25vd24gdG8gaXQuDQoNCg0KPiBG
+b3IgeDg2IHdlIHdpbGwgbmVlZCBzdWNoIGEgc3lzdGVtLCB3aXRoIGFuIGFkZGVkIElSUQ0KPiBy
+ZW1hcHBpbmcgZmVhdHVyZS4NCg0KSSBkbyBub3QgdW5kZXJzdGFuZCB4ODYgTVNJIGludGVycnVw
+dCBnZW5lcmF0aW9uLCBidXQgSWYgYWJvdmUgdW5kZXJzdGFuZCBpcyBjb3JyZWN0LCB0aGVuIHdo
+eSB3ZSBuZWVkIElSUSByZW1hcHBpbmcgZm9yIHg4Nj8NCldpbGwgdGhlIHg4NiBtYWNoaW5lIGVt
+dWxhdGVkIGluIFFFTVUgcHJvdmlkZXMgYSBiaWcgYWRkcmVzcyByYW5nZSBmb3IgTVNJcyBhbmQg
+d2hlbiBhY3R1YWxseSBnZW5lcmF0aW5nIE1TSSBpdCBuZWVkZWQgc29tZSBleHRyYSBwcm9jZXNz
+aW5nIChJUlEtcmVtYXBwaW5nIHByb2Nlc3NpbmcpIGJlZm9yZSBhY3R1YWxseSBnZW5lcmF0aW5n
+IHdyaXRlIHRyYW5zYWN0aW9uIGZvciBNU0kgaW50ZXJydXB0ID8gDQoNClRoYW5rcw0KLUJoYXJh
+dA0KDQo+IA0KPiBUaGFua3MsDQo+IEplYW4NCg==
