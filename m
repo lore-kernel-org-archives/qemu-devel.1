@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dT24C-0002HE-8l
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:23:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dT2Aw-000430-TA
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dT249-00017M-51
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:23:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dT248-00016y-V0
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:23:13 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170601124143.10915-1-marcandre.lureau@redhat.com>
-Date: Thu, 06 Jul 2017 10:23:05 +0200
-In-Reply-To: <20170601124143.10915-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Thu, 1 Jun 2017 16:41:41 +0400")
-Message-ID: <87k23m6kk6.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1dT2At-0004eO-Oy
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:30:14 -0400
+Resent-Message-Id: <E1dT2At-0004eO-Oy@eggs.gnu.org>
+Message-ID: <149932978745.651.8882232064448148813@239b34022e6d>
+In-Reply-To: <cover.1498756113.git.alistair.francis@xilinx.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] scripts: use build_ prefix for
- string not piped through cgen()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 6 Jul 2017 01:29:48 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v1 0/3]  Windows runtime improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: alistair.francis@xilinx.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.comfamz@redhat.com, edgar.iglesias@xilinx.com, philippe@mathieu-daude.net, qemu-block@nongnu.org, pbonzini@redhat.com, alistair23@gmail.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Suggested by Markus Armbruster:
-
-Replacing the line above with ...
-
-> The gen_ prefix is awkward.  Generated C should go through cgen()
-> exactly once (see commit 1f9a7a1).  The common way to get this wrong is
-> passing a foo=3Dgen_foo() keyword argument to mcgen().  I'd like us to
-> adopt a naming convention where gen_ means "something that's been piped
-> through cgen(), and thus must not be passed to cgen() or mcgen()".
-> Requires renaming gen_params(), gen_marshal_proto() and
-> gen_event_send_proto().
-
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Applied, thanks!
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MSAwLzNdICBXaW5kb3dzIHJ1bnRpbWUgaW1wcm92ZW1lbnRzClR5cGU6
+IHNlcmllcwpNZXNzYWdlLWlkOiBjb3Zlci4xNDk4NzU2MTEzLmdpdC5hbGlzdGFpci5mcmFuY2lz
+QHhpbGlueC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0g
+ICAgICBwYXRjaGV3LzE0OTkyNDI4ODMtMjE4NC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyeEByZWRo
+YXQuY29tIC0+IHBhdGNoZXcvMTQ5OTI0Mjg4My0yMTg0LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4
+QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmZWRlNjYxIHV0aWwv
+b3NsaWItd2luMzI6IFJlbW92ZSBpZiBjb25kaXRpb25hbApmNDY0YjE0IHV0aWwvb3NsaWItd2lu
+MzI6IFJlbW92ZSBpbnZhbGlkIGNoZWNrCjI5ZmIyMGQgdXRpbC9haW8td2luMzI6IE9ubHkgc2Vs
+ZWN0IG9uIHdoYXQgd2UgYXJlIGFjdHVhbGx5IHdhaXRpbmcgZm9yCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHV0aWwvYWlvLXdpbjMyOiBPbmx5IHNlbGVjdCBvbiB3
+aGF0IHdlIGFyZSBhY3R1YWxseSB3YWl0aW5nIGZvci4uLgpDaGVja2luZyBQQVRDSCAyLzM6IHV0
+aWwvb3NsaWItd2luMzI6IFJlbW92ZSBpbnZhbGlkIGNoZWNrLi4uCkNoZWNraW5nIFBBVENIIDMv
+MzogdXRpbC9vc2xpYi13aW4zMjogUmVtb3ZlIGlmIGNvbmRpdGlvbmFsLi4uCkVSUk9SOiBzcGFj
+ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojMzA6IEZJTEU6IHV0aWwvb3Ns
+aWItd2luMzIuYzo0NDI6CisgICAgICAgICAgICAgICAgaGFuZGxlc1tpLTFdID0gaGFuZGxlc1tp
+XTsKICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDEyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
+cmVlbGlzdHMub3Jn
