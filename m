@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9nf-0004nc-7B
+	(envelope-from <pbonzini@redhat.com>) id 1dT9nf-0004nr-I1
 	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9ne-00060w-D3
+	(envelope-from <pbonzini@redhat.com>) id 1dT9ne-00061Q-Mh
 	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:38:43 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  6 Jul 2017 18:38:19 +0200
-Message-Id: <20170706163828.24082-3-pbonzini@redhat.com>
+Date: Thu,  6 Jul 2017 18:38:20 +0200
+Message-Id: <20170706163828.24082-4-pbonzini@redhat.com>
 In-Reply-To: <20170706163828.24082-1-pbonzini@redhat.com>
 References: <20170706163828.24082-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/11] block: make write-threshold thread-safe
+Subject: [Qemu-devel] [PATCH 03/11] util: use RCU accessors for notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,40 +22,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-For simplicity, use bdrv_drained_begin/end to avoid concurrent
-writes to the write threshold, or reading it while it is being set.
-qmp_block_set_write_threshold is protected by the BQL.
+This provides more flexibility for its users.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/write-threshold.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ util/notify.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/block/write-threshold.c b/block/write-threshold.c
-index c8ebc32b4d..64ddd3d653 100644
---- a/block/write-threshold.c
-+++ b/block/write-threshold.c
-@@ -112,7 +112,6 @@ void qmp_block_set_write_threshold(const char *node_name,
-                                    Error **errp)
+diff --git a/util/notify.c b/util/notify.c
+index 06de63a839..16fff8d07d 100644
+--- a/util/notify.c
++++ b/util/notify.c
+@@ -16,6 +16,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/notify.h"
++#include "qemu/rcu_queue.h"
+ 
+ void notifier_list_init(NotifierList *list)
  {
-     BlockDriverState *bs;
--    AioContext *aio_context;
+@@ -24,19 +25,19 @@ void notifier_list_init(NotifierList *list)
  
-     bs = bdrv_find_node(node_name);
-     if (!bs) {
-@@ -120,10 +119,8 @@ void qmp_block_set_write_threshold(const char *node_name,
-         return;
-     }
- 
--    aio_context = bdrv_get_aio_context(bs);
--    aio_context_acquire(aio_context);
--
-+    /* Avoid a concurrent write_threshold_disable.  */
-+    bdrv_drained_begin(bs);
-     bdrv_write_threshold_set(bs, threshold_bytes);
--
--    aio_context_release(aio_context);
-+    bdrv_drained_end(bs);
+ void notifier_list_add(NotifierList *list, Notifier *notifier)
+ {
+-    QLIST_INSERT_HEAD(&list->notifiers, notifier, node);
++    QLIST_INSERT_HEAD_RCU(&list->notifiers, notifier, node);
  }
+ 
+ void notifier_remove(Notifier *notifier)
+ {
+-    QLIST_REMOVE(notifier, node);
++    QLIST_REMOVE_RCU(notifier, node);
+ }
+ 
+ void notifier_list_notify(NotifierList *list, void *data)
+ {
+     Notifier *notifier, *next;
+ 
+-    QLIST_FOREACH_SAFE(notifier, &list->notifiers, node, next) {
++    QLIST_FOREACH_SAFE_RCU(notifier, &list->notifiers, node, next) {
+         notifier->notify(notifier, data);
+     }
+ }
+@@ -49,12 +50,12 @@ void notifier_with_return_list_init(NotifierWithReturnList *list)
+ void notifier_with_return_list_add(NotifierWithReturnList *list,
+                                    NotifierWithReturn *notifier)
+ {
+-    QLIST_INSERT_HEAD(&list->notifiers, notifier, node);
++    QLIST_INSERT_HEAD_RCU(&list->notifiers, notifier, node);
+ }
+ 
+ void notifier_with_return_remove(NotifierWithReturn *notifier)
+ {
+-    QLIST_REMOVE(notifier, node);
++    QLIST_REMOVE_RCU(notifier, node);
+ }
+ 
+ int notifier_with_return_list_notify(NotifierWithReturnList *list, void *data)
+@@ -62,7 +63,7 @@ int notifier_with_return_list_notify(NotifierWithReturnList *list, void *data)
+     NotifierWithReturn *notifier, *next;
+     int ret = 0;
+ 
+-    QLIST_FOREACH_SAFE(notifier, &list->notifiers, node, next) {
++    QLIST_FOREACH_SAFE_RCU(notifier, &list->notifiers, node, next) {
+         ret = notifier->notify(notifier, data);
+         if (ret != 0) {
+             break;
 -- 
 2.13.0
