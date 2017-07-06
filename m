@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dT2SQ-0004Py-Ee
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:48:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dT2bc-0001CO-7q
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dT2SN-0001CA-WF
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:48:18 -0400
-Received: from [59.151.112.132] (port=64450 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dT2SN-0001Aq-Jq
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:48:15 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Thu, 6 Jul 2017 16:47:44 +0800
-Message-ID: <d6cba505174f8cd7208faac323184528de37e1f3.1499329674.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1499329674.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1499329674.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dT2bY-0005ZA-As
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:57:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dT2bY-0005Yy-4i
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:57:44 -0400
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+	<20170621153424.16690-7-vsementsov@virtuozzo.com>
+	<c5b1b1bb-f637-24b7-bdac-0c6c3f310c83@redhat.com>
+	<5aafa3cf-4ee1-f198-ce09-5c2d66e643cd@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1caf5855-2119-e48a-329b-a266cc3f41e6@redhat.com>
+Date: Thu, 6 Jul 2017 10:57:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 3/4] net/net: Convert parse_host_port() to
- Error
+In-Reply-To: <5aafa3cf-4ee1-f198-ce09-5c2d66e643cd@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] nbd: use generic trace subsystem
+ instead of TRACE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,148 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, jasowang@redhat.com, armbru@redhat.com, eblake@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, eblake@redhat.com, den@openvz.org
 
-Cc: berrange@redhat.com
-Cc: kraxel@redhat.com
-Cc: pbonzini@redhat.com
-Cc: jasowang@redhat.com
-Cc: armbru@redhat.com
-Cc: eblake@redhat.com
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- include/qemu/sockets.h |  3 ++-
- net/net.c              | 22 +++++++++++++++++-----
- net/socket.c           | 19 ++++++++++++++-----
- 3 files changed, 33 insertions(+), 11 deletions(-)
 
-diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index 5c326db..78e2b30 100644
---- a/include/qemu/sockets.h
-+++ b/include/qemu/sockets.h
-@@ -53,7 +53,8 @@ void socket_listen_cleanup(int fd, Error **errp);
- int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
- 
- /* Old, ipv4 only bits.  Don't use for new code. */
--int parse_host_port(struct sockaddr_in *saddr, const char *str);
-+int parse_host_port(struct sockaddr_in *saddr, const char *str,
-+                    Error **errp);
- int socket_init(void);
- 
- /**
-diff --git a/net/net.c b/net/net.c
-index 6235aab..77b6deb 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -100,7 +100,8 @@ static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
-     return 0;
- }
- 
--int parse_host_port(struct sockaddr_in *saddr, const char *str)
-+int parse_host_port(struct sockaddr_in *saddr, const char *str,
-+                    Error **errp)
- {
-     char buf[512];
-     struct hostent *he;
-@@ -108,24 +109,35 @@ int parse_host_port(struct sockaddr_in *saddr, const char *str)
-     int port;
- 
-     p = str;
--    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0)
-+    if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-+        error_setg(errp, "host address '%s' doesn't contain ':' "
-+                   "separating host from port", str);
-         return -1;
-+    }
-     saddr->sin_family = AF_INET;
-     if (buf[0] == '\0') {
-         saddr->sin_addr.s_addr = 0;
-     } else {
-         if (qemu_isdigit(buf[0])) {
--            if (!inet_aton(buf, &saddr->sin_addr))
-+            if (!inet_aton(buf, &saddr->sin_addr)) {
-+                error_setg(errp, "host address '%s' is not a valid "
-+                           "IPv4 address", buf);
-                 return -1;
-+            }
-         } else {
--            if ((he = gethostbyname(buf)) == NULL)
-+            he = gethostbyname(buf);
-+            if (he == NULL) {
-+                error_setg(errp, "can't resolve host address '%s'", buf);
-                 return - 1;
-+            }
-             saddr->sin_addr = *(struct in_addr *)he->h_addr;
-         }
-     }
-     port = strtol(p, (char **)&r, 0);
--    if (r == p)
-+    if (r == p) {
-+        error_setg(errp, "port number '%s' is invalid", p);
-         return -1;
-+    }
-     saddr->sin_port = htons(port);
-     return 0;
- }
-diff --git a/net/socket.c b/net/socket.c
-index 3dd4459..1d4c515 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -497,9 +497,12 @@ static int net_socket_listen_init(NetClientState *peer,
-     NetSocketState *s;
-     struct sockaddr_in saddr;
-     int fd, ret;
-+    Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str) < 0)
-+    if (parse_host_port(&saddr, host_str, &err) < 0) {
-+        error_report_err(err);
-         return -1;
-+    }
- 
-     fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
-     if (fd < 0) {
-@@ -544,8 +547,10 @@ static int net_socket_connect_init(NetClientState *peer,
-     struct sockaddr_in saddr;
-     Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str) < 0)
-+    if (parse_host_port(&saddr, host_str, &err) < 0) {
-+        error_report_err(err);
-         return -1;
-+    }
- 
-     fd = qemu_socket(PF_INET, SOCK_STREAM, 0);
-     if (fd < 0) {
-@@ -597,8 +602,10 @@ static int net_socket_mcast_init(NetClientState *peer,
-     struct in_addr localaddr, *param_localaddr;
-     Error *err = NULL;
- 
--    if (parse_host_port(&saddr, host_str) < 0)
-+    if (parse_host_port(&saddr, host_str, &err) < 0) {
-+        error_report_err(err);
-         return -1;
-+    }
- 
-     if (localaddr_str != NULL) {
-         if (inet_aton(localaddr_str, &localaddr) == 0)
-@@ -640,11 +647,13 @@ static int net_socket_udp_init(NetClientState *peer,
-     struct sockaddr_in laddr, raddr;
-     Error *err = NULL;
- 
--    if (parse_host_port(&laddr, lhost) < 0) {
-+    if (parse_host_port(&laddr, lhost, &err) < 0) {
-+        error_report_err(err);
-         return -1;
-     }
- 
--    if (parse_host_port(&raddr, rhost) < 0) {
-+    if (parse_host_port(&raddr, rhost, &err) < 0) {
-+        error_report_err(err);
-         return -1;
-     }
- 
--- 
-2.9.4
+
+On 06/07/2017 10:45, Vladimir Sementsov-Ogievskiy wrote:
+>>> +do_nbd_trip_read(uint32_t len) "Read %" PRIu32" byte(s)"
+>> This one is good.
+>=20
+> why do you like this and do not like nbd_trip_write_zeros?
+
+I'm not sure I understand: this one is after blk_pread returns.  It
+tells you that the socket is about to receive the payload.
+
+For write, nothing special happened since do_nbd_trip_cmd_write.
+
+For write zeroes, nothing special happened since
+nbd_co_receive_request_decode_type.
+
+>>
+>>> +do_nbd_trip_cmd_write(void) "Request type is WRITE"
+>>> +do_nbd_trip_cmd_write_readonly(void) "Server is read-only, return
+>>> error"
+>> These can be removed.
+>=20
+> I think the second is informative, isn't it?
+
+Can you instead add a trace point at the beginning of nbd_co_send_reply,
+with handle/error/len?  Then you can remove do_nbd_trip_read and
+do_nbd_trip_complete, too.
+
+>>> +do_nbd_trip_write(void) "Writing to device"
+>> Please add the handle here.
+>=20
+> handle will be printed in nbd_co_receive_request_decode_type..
+
+You need it in case there are multiple requests in flight.
+
+>>> +do_nbd_trip_cmd_write_zeroes(void) "Request type is WRITE_ZEROES"
+>>> +do_nbd_trip_write_zeroes(void) "Writing to device"
+>>> +do_nbd_trip_cmd_flush(void) "Request type is FLUSH"
+>>> +do_nbd_trip_cmd_trim(void) "Request type is TRIM"
+>> Can all be removed.
+>=20
+> then, remove nbd_trip_write too ?
+
+Write is different because it happens after nbd_read(client->ioc,
+req->data, request->len, NULL) has completed.  You can add a tracepoint
+to nbd_co_receive_request instead.
+
+Paolo
