@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dT42O-0003Zy-89
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:29:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dT43h-0004Dv-MT
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dT42J-0005r6-6D
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:29:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34154)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dT42I-0005qo-Te
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:29:27 -0400
-References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
-	<20170629132310.18865-5-marcandre.lureau@redhat.com>
-	<d002d6bb-19ad-f8ba-bfa9-fda9915009ee@redhat.com>
-	<CAJ+F1CLgvHO3cm6+KM6RVG5AghronCq0KTG6GbEkLRa5Lo9m1A@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f2f82e05-f9af-ed63-b5cc-37307f48cd95@redhat.com>
-Date: Thu, 6 Jul 2017 12:29:22 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dT43c-0006O7-G4
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:30:53 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33212)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dT43c-0006Nr-81
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:30:48 -0400
+Received: by mail-lf0-x242.google.com with SMTP id t72so1743626lff.0
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:30:48 -0700 (PDT)
+Date: Thu, 6 Jul 2017 11:30:43 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170706103043.GJ30447@stefanha-x1.localdomain>
+References: <1499237876.3041.4.camel@linux.intel.com>
+	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
+	<20170705110757.GF22008@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLgvHO3cm6+KM6RVG5AghronCq0KTG6GbEkLRa5Lo9m1A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] dump: add vmcoreinfo ELF note
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UlxN1C6awaFNesUv"
+Content-Disposition: inline
+In-Reply-To: <20170705110757.GF22008@redhat.com>
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Dave Anderson <anderson@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
 
-On 07/05/17 23:52, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+
+--UlxN1C6awaFNesUv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jul 05, 2017 at 12:07:57PM +0100, Daniel P. Berrange wrote:
+> On Wed, Jul 05, 2017 at 10:14:23AM +0200, Thomas Huth wrote:
+> >  Hi,
+> >=20
+> > On 05.07.2017 08:57, Chao Peng wrote:
+> > >=20
+> > > Q35 has been in QEMU for quite a while. Compared to the current defau=
+lt
+> > > i440FX, Q35 is probably not that mature and not widely used, however =
+in
+> > > some case, Q35 has advantages, for example, in supporting new feature=
+s.
+> > > For instance, we have some features require PCI-e support which is on=
+ly
+> > > available on Q35 and some others need it for EFI support. It is of
+> > > course not necessary to change it as the default but if more and more
+> > > features have dependencies on Q35 because of requiring much more mode=
+rn
+> > > features then I think it may be worth to do so. In such case we can h=
+ave
+> > > more people to use it and find problems we may know or not know.
+> >=20
+> > Yes, IMHO at one point in time, we should switch the default machine
+> > type to q35. The i440FX is really quite old...
+> >=20
+> > > There are certainly some drawbacks:
+> > > -        Compatibility: current code or script may need adjustment
+> >=20
+> > That might be a real concern ... so I think a good point in time to
+> > switch to the q35 machine type would be when we switch to the next major
+> > version number of QEMU, i.e. when we switch to version 3.0. If the users
+> > see a new major version number, they might be more willing to accept
+> > such major changes (yeah, I know, we've discussed in the past that
+> > version numbers are just numbers ... but still, there is some kind of
+> > psychological aspect to this, too, I think)
 >=20
-> On Wed, Jul 5, 2017 at 1:48 AM, Laszlo Ersek <lersek@redhat.com> wrote:
->> On 06/29/17 15:23, Marc-Andr=C3=A9 Lureau wrote:
+> Most users aren't even aware of version numbers of QEMU - they'll just
+> take whatever their distro has provided run it. The notion that their
+> latest distro version happened to pull in a "major" version instead of
+> previously pulling in a "minor" version is invisible to everyone,
+> except the minority of people who care about the low level details.
 
->>> @@ -258,6 +280,8 @@ static void write_elf64_notes(WriteCoreDumpFuncti=
-on f, DumpState *s,
->>>              return;
->>>          }
->>>      }
->>> +
->>> +    write_vmcoreinfo_note(f, s, errp);
->>>  }
->>>
->>>  static void write_elf32_note(DumpState *s, Error **errp)
->>> @@ -303,6 +327,8 @@ static void write_elf32_notes(WriteCoreDumpFuncti=
-on f, DumpState *s,
->>>              return;
->>>          }
->>>      }
->>> +
->>> +    write_vmcoreinfo_note(f, s, errp);
->>>  }
->>>
->>
->> Wait, I'm confused again. You explained why it was OK to hook this log=
-ic
->> into the kdump handling too, but I don't think I understand your
->> explanation, so let me repeat my confusion below :)
->>
->> In the ELF case, this code works fine, I think. As long as the guest
->> provided us with a well-formed note, a well-formed note will be append=
-ed
->> to the ELF dump.
->>
->> But, this code is also invoked in the kdump case, and I don't understa=
-nd
->> why that's a good thing. If I understand the next patch correctly, the
->> kdump format already provides crash with a (trimmed) copy of the guest
->> kernels vmcoreinfo note. So in the kdump case, why do we have to creat=
-e
->> yet another copy of the guest kernel's vmcoreinfo note?
->>
->> Thus, my confusion persists, and I can only think (again) that
->> write_vmcoreinfo_note() should be called from dump_begin() only (at th=
-e
->> end). (And the s->note_size adjustment should take that into account.)
->>
->> Alternatively, we should keep this logic, and drop patch #5.
->=20
-> You are right, sorry for my misunderstanding, although crash is seems
-> fine as long as size/offsets are ok.
->=20
-> So, instead of duplicating the info, let's keep the complete ELF note
-> (with the header) in the dump, and simply adjust kdump header to point
-> to the adjusted offset/size. This has the advantage of not making the
-> code unnecessarily more complicated wrt s->note_size handling etc, and
-> is consistent with the rest of the elf notes.
+When user-visible changes break existing setups it's common for
+packagers to ship a new family of packages that includes the major
+version number (e.g. apache2, postgresql-9.6).
 
-I guess that's OK, although I don't really see why even that is
-necessary. The vmcoreinfo note should be possible to find in the kdump
-output with the rest of the ELF notes, even without pointing some kdump
-header fields into that specific note.
+The last QEMU 2.x version would be considered stable and still available
+=66rom package repos.  Only critical bug and security fixes could be
+released for another, say, 2 years.
 
-Snipping the rest because I'm going to see updates on those things in v2
-anyway (which you've just posted).
+This way users don't have to migrate to QEMU 3.x until they are ready.
 
-Thanks
-Laszlo
+Stefan
+
+--UlxN1C6awaFNesUv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZXhFTAAoJEJykq7OBq3PIFP0IAJ8kIuSTFToucgKvX7xCHlOL
+VX1AmfLoJvLxv5xSA8Eq6qwII7HpTjzXxP1Or/z/xPse+xA0v+CQNNyG0EuVV3Dt
+SGKOXN59B9xKfrjR3vYi1C8OkNeznMlgOAyk2jJ0RSZguVasEyYM8g3+OZCqhCk8
+jU4lwPiXaS60KzUQh03+PTU6LXQ61Mm/4/vBho9zwDNgWSl7+sYAksxCpwEYB1n4
+JSSbHmlYEyw/DHNgAIqSTk2TYDK6s7v2OsGEpIJJpkRa2xKkIBvu+deEoKkvFLuM
+MomFJ7h9tBsxtnyiD928OiEv1LF0+wOB2kaafKueWrWccLmkEtPR7cv9ATMI708=
+=gSBJ
+-----END PGP SIGNATURE-----
+
+--UlxN1C6awaFNesUv--
