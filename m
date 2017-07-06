@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9nz-00058U-H0
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:39:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dT9o1-0005AP-Ig
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9nu-0006At-Im
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:39:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dT9nz-0006E6-N7
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:39:05 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  6 Jul 2017 18:38:27 +0200
-Message-Id: <20170706163828.24082-11-pbonzini@redhat.com>
+Date: Thu,  6 Jul 2017 18:38:28 +0200
+Message-Id: <20170706163828.24082-12-pbonzini@redhat.com>
 In-Reply-To: <20170706163828.24082-1-pbonzini@redhat.com>
 References: <20170706163828.24082-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/11] block: do not take AioContext around
- reopen
+Subject: [Qemu-devel] [PATCH 11/11] block/snapshot: do not take AioContext
+ lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,237 +23,463 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-Reopen needs to handle AioContext carefully due to calling
-bdrv_drain_all_begin/end.  By not taking AioContext around calls to
-bdrv_reopen_multiple, we can drop the function's release/acquire
-pair and the AioContext argument too.
+Snapshots are only created/destroyed/loaded under the BQL, while no
+other I/O is happening.  Snapshot information could be accessed while
+other I/O is happening, but also under the BQL so they cannot be
+modified concurrently.  The AioContext lock is overkill.  If needed,
+in the future the BQL could be split to a separate lock covering all
+snapshot operations, and the create/destroy/goto callbacks changed
+to run in a coroutine (so the driver can do mutual exclusion as usual).
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block.c               |  6 ++----
- block/block-backend.c |  5 -----
- block/commit.c        |  2 +-
- block/mirror.c        |  9 ---------
- block/replication.c   |  3 +--
- blockdev.c            | 19 ++++++-------------
- include/block/block.h |  2 +-
- qemu-io-cmds.c        |  2 +-
- 8 files changed, 12 insertions(+), 36 deletions(-)
+ block/snapshot.c          | 28 +---------------------------
+ blockdev.c                | 43 ++++++++++++-------------------------------
+ hmp.c                     |  7 -------
+ include/block/block_int.h |  5 +++++
+ include/block/snapshot.h  |  4 +---
+ migration/savevm.c        | 22 ----------------------
+ monitor.c                 | 10 ++--------
+ 7 files changed, 21 insertions(+), 98 deletions(-)
 
-diff --git a/block.c b/block.c
-index af0a9a1c22..4bf6ab11f7 100644
---- a/block.c
-+++ b/block.c
-@@ -2793,7 +2793,7 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-  * to all devices.
-  *
-  */
--int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp)
-+int bdrv_reopen_multiple(BlockReopenQueue *bs_queue, Error **errp)
- {
-     int ret = -1;
-     BlockReopenQueueEntry *bs_entry, *next;
-@@ -2801,9 +2801,7 @@ int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **er
- 
-     assert(bs_queue != NULL);
- 
--    aio_context_release(ctx);
-     bdrv_drain_all_begin();
--    aio_context_acquire(ctx);
- 
-     QSIMPLEQ_FOREACH(bs_entry, bs_queue, entry) {
-         if (bdrv_reopen_prepare(&bs_entry->state, bs_queue, &local_err)) {
-@@ -2847,7 +2845,7 @@ int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
-     Error *local_err = NULL;
-     BlockReopenQueue *queue = bdrv_reopen_queue(NULL, bs, NULL, bdrv_flags);
- 
--    ret = bdrv_reopen_multiple(bdrv_get_aio_context(bs), queue, &local_err);
-+    ret = bdrv_reopen_multiple(queue, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-     }
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0df3457a09..0ce1fb1c26 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1888,17 +1888,12 @@ int blk_commit_all(void)
-     BlockBackend *blk = NULL;
- 
-     while ((blk = blk_all_next(blk)) != NULL) {
--        AioContext *aio_context = blk_get_aio_context(blk);
--
--        aio_context_acquire(aio_context);
-         if (blk_is_inserted(blk) && blk->root->bs->backing) {
-             int ret = bdrv_commit(blk->root->bs);
-             if (ret < 0) {
--                aio_context_release(aio_context);
-                 return ret;
-             }
-         }
--        aio_context_release(aio_context);
-     }
-     return 0;
+diff --git a/block/snapshot.c b/block/snapshot.c
+index a46564e7b7..08c59d6166 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -384,9 +384,7 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
  }
-diff --git a/block/commit.c b/block/commit.c
-index 8c09c3dbcd..1fe67fa8db 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -335,7 +335,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-                                          orig_overlay_flags | BDRV_O_RDWR);
-     }
-     if (reopen_queue) {
--        bdrv_reopen_multiple(bdrv_get_aio_context(bs), reopen_queue, &local_err);
-+        bdrv_reopen_multiple(reopen_queue, &local_err);
-         if (local_err != NULL) {
-             error_propagate(errp, local_err);
+ 
+ 
+-/* Group operations. All block drivers are involved.
+- * These functions will properly handle dataplane (take aio_context_acquire
+- * when appropriate for appropriate block drivers) */
++/* Group operations. All block drivers are involved.  */
+ 
+ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs)
+ {
+@@ -395,13 +393,9 @@ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs)
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *ctx = bdrv_get_aio_context(bs);
+-
+-        aio_context_acquire(ctx);
+         if (bdrv_is_inserted(bs) && !bdrv_is_read_only(bs)) {
+             ok = bdrv_can_snapshot(bs);
+         }
+-        aio_context_release(ctx);
+         if (!ok) {
              goto fail;
-diff --git a/block/mirror.c b/block/mirror.c
-index 68744a17e8..804edbad21 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -505,7 +505,6 @@ static void mirror_exit(BlockJob *job, void *opaque)
- {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common);
-     MirrorExitData *data = opaque;
--    AioContext *replace_aio_context = NULL;
-     BlockDriverState *src = s->source;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
-@@ -545,11 +544,6 @@ static void mirror_exit(BlockJob *job, void *opaque)
          }
-     }
+@@ -421,14 +415,10 @@ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
+     QEMUSnapshotInfo sn1, *snapshot = &sn1;
  
--    if (s->to_replace) {
--        replace_aio_context = bdrv_get_aio_context(s->to_replace);
--        aio_context_acquire(replace_aio_context);
--    }
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *ctx = bdrv_get_aio_context(bs);
 -
-     if (s->should_complete && data->ret == 0) {
-         BlockDriverState *to_replace = src;
-         if (s->to_replace) {
-@@ -575,9 +569,6 @@ static void mirror_exit(BlockJob *job, void *opaque)
-         error_free(s->replace_blocker);
-         bdrv_unref(s->to_replace);
-     }
--    if (replace_aio_context) {
--        aio_context_release(replace_aio_context);
--    }
-     g_free(s->replaces);
-     bdrv_unref(target_bs);
+-        aio_context_acquire(ctx);
+         if (bdrv_can_snapshot(bs) &&
+                 bdrv_snapshot_find(bs, snapshot, name) >= 0) {
+             ret = bdrv_snapshot_delete_by_id_or_name(bs, name, err);
+         }
+-        aio_context_release(ctx);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -447,13 +437,9 @@ int bdrv_all_goto_snapshot(const char *name, BlockDriverState **first_bad_bs)
+     BdrvNextIterator it;
  
-diff --git a/block/replication.c b/block/replication.c
-index 7a3b94b90f..9350ef100b 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -381,8 +381,7 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
-     }
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *ctx = bdrv_get_aio_context(bs);
+-
+-        aio_context_acquire(ctx);
+         if (bdrv_can_snapshot(bs)) {
+             err = bdrv_snapshot_goto(bs, name);
+         }
+-        aio_context_release(ctx);
+         if (err < 0) {
+             goto fail;
+         }
+@@ -472,13 +458,9 @@ int bdrv_all_find_snapshot(const char *name, BlockDriverState **first_bad_bs)
+     BdrvNextIterator it;
  
-     if (reopen_queue) {
--        bdrv_reopen_multiple(bdrv_get_aio_context(bs),
--                             reopen_queue, &local_err);
-+        bdrv_reopen_multiple(reopen_queue, &local_err);
-         error_propagate(errp, local_err);
-     }
- }
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *ctx = bdrv_get_aio_context(bs);
+-
+-        aio_context_acquire(ctx);
+         if (bdrv_can_snapshot(bs)) {
+             err = bdrv_snapshot_find(bs, &sn, name);
+         }
+-        aio_context_release(ctx);
+         if (err < 0) {
+             goto fail;
+         }
+@@ -499,9 +481,6 @@ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *ctx = bdrv_get_aio_context(bs);
+-
+-        aio_context_acquire(ctx);
+         if (bs == vm_state_bs) {
+             sn->vm_state_size = vm_state_size;
+             err = bdrv_snapshot_create(bs, sn);
+@@ -509,7 +488,6 @@ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
+             sn->vm_state_size = 0;
+             err = bdrv_snapshot_create(bs, sn);
+         }
+-        aio_context_release(ctx);
+         if (err < 0) {
+             goto fail;
+         }
+@@ -526,13 +504,9 @@ BlockDriverState *bdrv_all_find_vmstate_bs(void)
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+-        AioContext *ctx = bdrv_get_aio_context(bs);
+         bool found;
+ 
+-        aio_context_acquire(ctx);
+         found = bdrv_can_snapshot(bs);
+-        aio_context_release(ctx);
+-
+         if (found) {
+             break;
+         }
 diff --git a/blockdev.c b/blockdev.c
-index b2c305402d..88ab606949 100644
+index 88ab606949..56ef9c41a3 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -3710,7 +3710,6 @@ void qmp_change_backing_file(const char *device,
-                              Error **errp)
+@@ -1280,7 +1280,6 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+                                                          Error **errp)
  {
-     BlockDriverState *bs = NULL;
+     BlockDriverState *bs;
 -    AioContext *aio_context;
-     BlockDriverState *image_bs = NULL;
+     QEMUSnapshotInfo sn;
      Error *local_err = NULL;
-     bool ro;
-@@ -3722,37 +3721,34 @@ void qmp_change_backing_file(const char *device,
+     SnapshotInfo *info = NULL;
+@@ -1290,8 +1289,6 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+     if (!bs) {
+         return NULL;
+     }
+-    aio_context = bdrv_get_aio_context(bs);
+-    aio_context_acquire(aio_context);
+ 
+     if (!has_id) {
+         id = NULL;
+@@ -1303,34 +1300,32 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+ 
+     if (!id && !name) {
+         error_setg(errp, "Name or id must be provided");
+-        goto out_aio_context;
++        return NULL;
+     }
+ 
+     if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_INTERNAL_SNAPSHOT_DELETE, errp)) {
+-        goto out_aio_context;
++        return NULL;
+     }
+ 
+     ret = bdrv_snapshot_find_by_id_and_name(bs, id, name, &sn, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        goto out_aio_context;
++        return NULL;
+     }
+     if (!ret) {
+         error_setg(errp,
+                    "Snapshot with id '%s' and name '%s' does not exist on "
+                    "device '%s'",
+                    STR_OR_NULL(id), STR_OR_NULL(name), device);
+-        goto out_aio_context;
++        return NULL;
+     }
+ 
+     bdrv_snapshot_delete(bs, id, name, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        goto out_aio_context;
++        return NULL;
+     }
+ 
+-    aio_context_release(aio_context);
+-
+     info = g_new0(SnapshotInfo, 1);
+     info->id = g_strdup(sn.id_str);
+     info->name = g_strdup(sn.name);
+@@ -1341,10 +1336,6 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
+ 
+     return info;
+-
+-out_aio_context:
+-    aio_context_release(aio_context);
+-    return NULL;
+ }
+ 
+ /**
+@@ -1446,7 +1437,6 @@ struct BlkActionState {
+ typedef struct InternalSnapshotState {
+     BlkActionState common;
+     BlockDriverState *bs;
+-    AioContext *aio_context;
+     QEMUSnapshotInfo sn;
+     bool created;
+ } InternalSnapshotState;
+@@ -1498,10 +1488,6 @@ static void internal_snapshot_prepare(BlkActionState *common,
          return;
      }
  
--    aio_context = bdrv_get_aio_context(bs);
--    aio_context_acquire(aio_context);
+-    /* AioContext is released in .clean() */
+-    state->aio_context = bdrv_get_aio_context(bs);
+-    aio_context_acquire(state->aio_context);
 -
-     image_bs = bdrv_lookup_bs(NULL, image_node_name, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--        goto out;
-+        return;
-     }
+     state->bs = bs;
+     bdrv_drained_begin(bs);
  
-     if (!image_bs) {
-         error_setg(errp, "image file not found");
--        goto out;
-+        return;
-     }
+@@ -1585,11 +1571,8 @@ static void internal_snapshot_clean(BlkActionState *common)
+     InternalSnapshotState *state = DO_UPCAST(InternalSnapshotState,
+                                              common, common);
  
-     if (bdrv_find_base(image_bs) == image_bs) {
-         error_setg(errp, "not allowing backing file change on an image "
-                          "without a backing file");
--        goto out;
-+        return;
+-    if (state->aio_context) {
+-        if (state->bs) {
+-            bdrv_drained_end(state->bs);
+-        }
+-        aio_context_release(state->aio_context);
++    if (state->bs) {
++        bdrv_drained_end(state->bs);
      }
- 
-     /* even though we are not necessarily operating on bs, we need it to
-      * determine if block ops are currently prohibited on the chain */
-     if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_CHANGE, errp)) {
--        goto out;
-+        return;
-     }
- 
-     /* final sanity check */
-     if (!bdrv_chain_contains(bs, image_bs)) {
-         error_setg(errp, "'%s' and image file are not in the same chain",
-                    device);
--        goto out;
-+        return;
-     }
- 
-     /* if not r/w, reopen to make r/w */
-@@ -3763,7 +3759,7 @@ void qmp_change_backing_file(const char *device,
-         bdrv_reopen(image_bs, open_flags | BDRV_O_RDWR, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
--            goto out;
-+            return;
-         }
-     }
- 
-@@ -3781,9 +3777,6 @@ void qmp_change_backing_file(const char *device,
-         bdrv_reopen(image_bs, open_flags, &local_err);
-         error_propagate(errp, local_err);
-     }
--
--out:
--    aio_context_release(aio_context);
  }
  
- void hmp_drive_add_node(Monitor *mon, const char *optstr)
-diff --git a/include/block/block.h b/include/block/block.h
-index 85e4be7462..f533f80f1f 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -265,7 +265,7 @@ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
- BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
-                                     BlockDriverState *bs,
-                                     QDict *options, int flags);
--int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue, Error **errp);
-+int bdrv_reopen_multiple(BlockReopenQueue *bs_queue, Error **errp);
- int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp);
- int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
-                         BlockReopenQueue *queue, Error **errp);
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index b0ea327024..19d3114542 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2006,7 +2006,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-     qemu_opts_reset(&reopen_opts);
+@@ -1598,7 +1581,6 @@ typedef struct ExternalSnapshotState {
+     BlkActionState common;
+     BlockDriverState *old_bs;
+     BlockDriverState *new_bs;
+-    AioContext *aio_context;
+     bool overlay_appended;
+ } ExternalSnapshotState;
  
-     brq = bdrv_reopen_queue(NULL, bs, opts, flags);
--    bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-+    bdrv_reopen_multiple(brq, &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-     } else {
+@@ -1654,9 +1636,7 @@ static void external_snapshot_prepare(BlkActionState *common,
+         return;
+     }
+ 
+-    /* Acquire AioContext now so any threads operating on old_bs stop */
+-    state->aio_context = bdrv_get_aio_context(state->old_bs);
+-    aio_context_acquire(state->aio_context);
++    /* Make any threads operating on old_bs stop */
+     bdrv_drained_begin(state->old_bs);
+ 
+     if (!bdrv_is_inserted(state->old_bs)) {
+@@ -1756,7 +1736,7 @@ static void external_snapshot_prepare(BlkActionState *common,
+         return;
+     }
+ 
+-    bdrv_set_aio_context(state->new_bs, state->aio_context);
++    bdrv_set_aio_context(state->new_bs, bdrv_get_aio_context(state->old_bs));
+ 
+     /* This removes our old bs and adds the new bs. This is an operation that
+      * can fail, so we need to do it in .prepare; undoing it for abort is
+@@ -1775,6 +1755,8 @@ static void external_snapshot_commit(BlkActionState *common)
+     ExternalSnapshotState *state =
+                              DO_UPCAST(ExternalSnapshotState, common, common);
+ 
++    bdrv_set_aio_context(state->new_bs, bdrv_get_aio_context(state->old_bs));
++
+     /* We don't need (or want) to use the transactional
+      * bdrv_reopen_multiple() across all the entries at once, because we
+      * don't want to abort all of them if one of them fails the reopen */
+@@ -1803,9 +1785,8 @@ static void external_snapshot_clean(BlkActionState *common)
+ {
+     ExternalSnapshotState *state =
+                              DO_UPCAST(ExternalSnapshotState, common, common);
+-    if (state->aio_context) {
++    if (state->old_bs) {
+         bdrv_drained_end(state->old_bs);
+-        aio_context_release(state->aio_context);
+         bdrv_unref(state->new_bs);
+     }
+ }
+diff --git a/hmp.c b/hmp.c
+index 8c72c58b20..3c63ea7a72 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1321,7 +1321,6 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+     int nb_sns, i;
+     int total;
+     int *global_snapshots;
+-    AioContext *aio_context;
+ 
+     typedef struct SnapshotEntry {
+         QEMUSnapshotInfo sn;
+@@ -1345,11 +1344,8 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "No available block device supports snapshots\n");
+         return;
+     }
+-    aio_context = bdrv_get_aio_context(bs);
+ 
+-    aio_context_acquire(aio_context);
+     nb_sns = bdrv_snapshot_list(bs, &sn_tab);
+-    aio_context_release(aio_context);
+ 
+     if (nb_sns < 0) {
+         monitor_printf(mon, "bdrv_snapshot_list: error %d\n", nb_sns);
+@@ -1360,9 +1356,7 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+         int bs1_nb_sns = 0;
+         ImageEntry *ie;
+         SnapshotEntry *se;
+-        AioContext *ctx = bdrv_get_aio_context(bs1);
+ 
+-        aio_context_acquire(ctx);
+         if (bdrv_can_snapshot(bs1)) {
+             sn = NULL;
+             bs1_nb_sns = bdrv_snapshot_list(bs1, &sn);
+@@ -1380,7 +1374,6 @@ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+             }
+             g_free(sn);
+         }
+-        aio_context_release(ctx);
+     }
+ 
+     if (no_snapshot) {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 43c9f4fcae..38d1067fa8 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -217,6 +217,11 @@ struct BlockDriver {
+     int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
+ 
++    /*
++     * Snapshots are only created/destroyed/loaded under the BQL, while no
++     * other I/O is happening.  snapshots/nb_snapshots is read while other
++     * I/O is happening, but also under the BQL.
++     */
+     int (*bdrv_snapshot_create)(BlockDriverState *bs,
+                                 QEMUSnapshotInfo *sn_info);
+     int (*bdrv_snapshot_goto)(BlockDriverState *bs,
+diff --git a/include/block/snapshot.h b/include/block/snapshot.h
+index e5c0553115..735d0f694c 100644
+--- a/include/block/snapshot.h
++++ b/include/block/snapshot.h
+@@ -76,9 +76,7 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
+                                          Error **errp);
+ 
+ 
+-/* Group operations. All block drivers are involved.
+- * These functions will properly handle dataplane (take aio_context_acquire
+- * when appropriate for appropriate block drivers */
++/* Group operations. All block drivers are involved.  */
+ 
+ bool bdrv_all_can_snapshot(BlockDriverState **first_bad_bs);
+ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bsd_bs,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index c7a49c93c5..1b168c3ba8 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2073,7 +2073,6 @@ int save_snapshot(const char *name, Error **errp)
+     uint64_t vm_state_size;
+     qemu_timeval tv;
+     struct tm tm;
+-    AioContext *aio_context;
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+         error_setg(errp, "Device '%s' is writable but does not support "
+@@ -2096,7 +2095,6 @@ int save_snapshot(const char *name, Error **errp)
+         error_setg(errp, "No block device can accept snapshots");
+         return ret;
+     }
+-    aio_context = bdrv_get_aio_context(bs);
+ 
+     saved_vm_running = runstate_is_running();
+ 
+@@ -2109,8 +2107,6 @@ int save_snapshot(const char *name, Error **errp)
+ 
+     bdrv_drain_all_begin();
+ 
+-    aio_context_acquire(aio_context);
+-
+     memset(sn, 0, sizeof(*sn));
+ 
+     /* fill auxiliary fields */
+@@ -2146,14 +2142,6 @@ int save_snapshot(const char *name, Error **errp)
+         goto the_end;
+     }
+ 
+-    /* The bdrv_all_create_snapshot() call that follows acquires the AioContext
+-     * for itself.  BDRV_POLL_WHILE() does not support nested locking because
+-     * it only releases the lock once.  Therefore synchronous I/O will deadlock
+-     * unless we release the AioContext before bdrv_all_create_snapshot().
+-     */
+-    aio_context_release(aio_context);
+-    aio_context = NULL;
+-
+     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+     if (ret < 0) {
+         error_setg(errp, "Error while creating snapshot on '%s'",
+@@ -2164,10 +2152,6 @@ int save_snapshot(const char *name, Error **errp)
+     ret = 0;
+ 
+  the_end:
+-    if (aio_context) {
+-        aio_context_release(aio_context);
+-    }
+-
+     bdrv_drain_all_end();
+ 
+     if (saved_vm_running) {
+@@ -2241,7 +2225,6 @@ int load_snapshot(const char *name, Error **errp)
+     QEMUSnapshotInfo sn;
+     QEMUFile *f;
+     int ret;
+-    AioContext *aio_context;
+     MigrationIncomingState *mis = migration_incoming_get_current();
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+@@ -2263,12 +2246,9 @@ int load_snapshot(const char *name, Error **errp)
+         error_setg(errp, "No block device supports snapshots");
+         return -ENOTSUP;
+     }
+-    aio_context = bdrv_get_aio_context(bs_vm_state);
+ 
+     /* Don't even try to load empty VM states */
+-    aio_context_acquire(aio_context);
+     ret = bdrv_snapshot_find(bs_vm_state, &sn, name);
+-    aio_context_release(aio_context);
+     if (ret < 0) {
+         return ret;
+     } else if (sn.vm_state_size == 0) {
+@@ -2298,10 +2278,8 @@ int load_snapshot(const char *name, Error **errp)
+     qemu_system_reset(SHUTDOWN_CAUSE_NONE);
+     mis->from_src_file = f;
+ 
+-    aio_context_acquire(aio_context);
+     ret = qemu_loadvm_state(f);
+     migration_incoming_state_destroy();
+-    aio_context_release(aio_context);
+ 
+     bdrv_drain_all_end();
+ 
+diff --git a/monitor.c b/monitor.c
+index 3c369f4dd5..48687aa94d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3639,15 +3639,9 @@ static void vm_completion(ReadLineState *rs, const char *str)
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         SnapshotInfoList *snapshots, *snapshot;
+-        AioContext *ctx = bdrv_get_aio_context(bs);
+-        bool ok = false;
+ 
+-        aio_context_acquire(ctx);
+-        if (bdrv_can_snapshot(bs)) {
+-            ok = bdrv_query_snapshot_info_list(bs, &snapshots, NULL) == 0;
+-        }
+-        aio_context_release(ctx);
+-        if (!ok) {
++        if (!bdrv_can_snapshot(bs) ||
++            bdrv_query_snapshot_info_list(bs, &snapshots, NULL) != 0) {
+             continue;
+         }
+ 
 -- 
 2.13.0
