@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dT194-0003Lf-KQ
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1dT19W-00041M-HW
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dT190-0005R7-5O
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:14 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41527
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dT18z-0005Qs-VI
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:10 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v667O6rD117538
-	for <qemu-devel@nongnu.org>; Thu, 6 Jul 2017 03:24:09 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bgvqkr3g5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:24:08 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 6 Jul 2017 08:23:44 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu,  6 Jul 2017 09:23:34 +0200
-In-Reply-To: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
-References: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1499325817-9166-6-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 5/8] s390x/MAINTAINERS: Update my email address
+	(envelope-from <armbru@redhat.com>) id 1dT19R-0005ie-Vv
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35646)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dT19R-0005ht-N6
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:37 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1499250206.git.maozy.fnst@cn.fujitsu.com>
+	<e1eb4e611b444bf3abeeb072e87fbd2fd291045d.1499250206.git.maozy.fnst@cn.fujitsu.com>
+Date: Thu, 06 Jul 2017 09:24:34 +0200
+In-Reply-To: <e1eb4e611b444bf3abeeb072e87fbd2fd291045d.1499250206.git.maozy.fnst@cn.fujitsu.com>
+	(Mao Zhongyi's message of "Wed, 5 Jul 2017 19:01:57 +0800")
+Message-ID: <877ezm9gel.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v8 4/4] net/socket: Improve -net socket
+ error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,57 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-From: Cornelia Huck <cohuck@redhat.com>
+Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20170704092215.13742-2-cohuck@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- MAINTAINERS | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> When -net socket fails, it first reports a specific error, then
+> a generic one, like this:
+>
+>     $ qemu-system-x86_64 -net socket,
+>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
+>     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
+>
+> Convert net_socket_*_init() to Error to get rid of the superfluous second
+> error message. After the patch, the effect like this:
+>
+>     $ qemu-system-x86_64 -net socket,
+>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
+>
+> At the same time, add many explicit error handling message when it fails.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 839f7ca..4e17216 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -299,7 +299,7 @@ F: target/ppc/kvm.c
- 
- S390
- M: Christian Borntraeger <borntraeger@de.ibm.com>
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- M: Alexander Graf <agraf@suse.de>
- S: Maintained
- F: target/s390x/kvm.c
-@@ -778,7 +778,7 @@ F: include/hw/sparc/grlib.h
- S390 Machines
- -------------
- S390 Virtio-ccw
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- M: Christian Borntraeger <borntraeger@de.ibm.com>
- M: Alexander Graf <agraf@suse.de>
- S: Supported
-@@ -1006,7 +1006,7 @@ F: hw/vfio/*
- F: include/hw/vfio/
- 
- vfio-ccw
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- S: Supported
- F: hw/vfio/ccw.c
- F: hw/s390x/s390-ccw.c
-@@ -1048,7 +1048,7 @@ F: tests/virtio-blk-test.c
- T: git git://github.com/stefanha/qemu.git block
- 
- virtio-ccw
--M: Cornelia Huck <cornelia.huck@de.ibm.com>
-+M: Cornelia Huck <cohuck@redhat.com>
- M: Christian Borntraeger <borntraeger@de.ibm.com>
- S: Supported
- F: hw/s390x/virtio-ccw.[hc]
--- 
-2.7.4
+Suggest "This also fixes a few silent failures to report an error."
+
+Perhaps Jason can touch this up for you.
+
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Cc: berrange@redhat.com
+> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> ---
+>  net/socket.c | 92 +++++++++++++++++++++++++++++-------------------------------
+>  1 file changed, 44 insertions(+), 48 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index 1d4c515..ca1878f 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+[...]
+> @@ -746,7 +742,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>          /* if sock->localaddr is missing, it has been initialized to "all bits
+>           * zero" */
+>          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
+> -            sock->localaddr) == -1) {
+> +            sock->localaddr, errp) < 0) {
+
+Indent like this:
+
+                                     sock->localaddr, errp) < 0) {
+
+Perhaps Jason can touch this up for you.
+
+>              return -1;
+>          }
+>          return 0;
+> @@ -754,11 +750,11 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>  
+>      assert(sock->has_udp);
+>      if (!sock->has_localaddr) {
+> -        error_report("localaddr= is mandatory with udp=");
+> +        error_setg(errp, "localaddr= is mandatory with udp=");
+>          return -1;
+>      }
+> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
+> -        -1) {
+> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
+> +        errp) < 0) {
+
+Likewise.
+
+>          return -1;
+>      }
+>      return 0;
+
+With the indentation fixed:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
