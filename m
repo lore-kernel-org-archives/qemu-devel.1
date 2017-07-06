@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dT7Qw-0005Ct-R3
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:07:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dT7SZ-00069Y-PD
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dT7Qq-00027N-Sh
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:07:06 -0400
-Resent-Message-Id: <E1dT7Qq-00027N-Sh@eggs.gnu.org>
-In-Reply-To: <20170705133635.11850-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149934999661.27.13789728207994914021@f0098f8687cc>
+	(envelope-from <ehabkost@redhat.com>) id 1dT7SY-0003mF-G2
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:08:47 -0400
+Date: Thu, 6 Jul 2017 11:08:37 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170706140837.GE12152@localhost.localdomain>
+References: <20170608133906.12737-1-ehabkost@redhat.com>
+	<20170608133906.12737-2-ehabkost@redhat.com>
+	<87fuebrtuk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Jul 2017 07:06:37 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] block: Add VFIO based driver for
- NVMe device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87fuebrtuk.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 1/5] xilinx: Fix error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, keith.busch@intel.com, stefanha@redhat.com, pbonzini@redhat.com, krister@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA3MDUxMzM2MzUuMTE4NTAtMS1mYW16QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC82XSBibG9jazogQWRkIFZGSU8gYmFzZWQgZHJpdmVy
-IGZvciBOVk1lIGRldmljZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
-QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
-ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
-JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
-ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
-IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
-ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDc5ZWE1OSBibG9jazogTW92ZSBOVk1l
-IHNwZWMgZGVmaW5pdGlvbnMgdG8gYSBzZXBhcmF0ZSBoZWFkZXIKMjhiMGVhNSBxZW11LWltZzog
-TWFwIGJlbmNoIGJ1ZmZlcgowYzVmZTYyIGJsb2NrL252bWU6IEltcGxlbWVudCAuYmRydl9kbWFf
-bWFwIGFuZCAuYmRydl9kbWFfdW5tYXAKYmI1OWU3YyBibG9jazogSW50cm9kdWNlIGJkcnZfZG1h
-X21hcCBhbmQgYmRydl9kbWFfdW5tYXAKYmU0ZGFiMSBibG9jazogQWRkIFZGSU8gYmFzZWQgTlZN
-ZSBkcml2ZXIKNzRjMDE1OCBzdHViczogQWRkIHN0dWJzIGZvciByYW0gYmxvY2sgQVBJCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IHN0dWJzOiBBZGQgc3R1YnMgZm9y
-IHJhbSBibG9jayBBUEkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBibG9jazogQWRkIFZGSU8gYmFz
-ZWQgTlZNZSBkcml2ZXIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5MTog
-RklMRTogYmxvY2svbnZtZS12ZmlvLmM6MTMzOgorICAgIGlmIChpb2N0bChzLT5kZXZpY2UsIFZG
-SU9fREVWSUNFX0dFVF9SRUdJT05fSU5GTywgJnMtPmJhcl9yZWdpb25faW5mb1tpbmRleF0pKSB7
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjc5OiBGSUxFOiBibG9jay9udm1l
-LXZmaW8uYzoyMjE6CitzdGF0aWMgaW50IG52bWVfdmZpb19wY2lfd3JpdGVfY29uZmlnKE5WTWVW
-RklPU3RhdGUgKnMsIHZvaWQgKmJ1ZiwgaW50IHNpemUsIGludCBvZnMpCgpFUlJPUjogVXNlIG9m
-IHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0aWxlLWNv
-bnNpZGVyZWQtaGFybWZ1bC50eHQKIzg0MzogRklMRTogYmxvY2svbnZtZS5jOjQwOgorICAgIHZv
-bGF0aWxlIHVpbnQzMl90ICpkb29yYmVsbDsKCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1
-YWxseSB3cm9uZzogc2VlIERvY3VtZW50YXRpb24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVs
-LnR4dAojODY5OiBGSUxFOiBibG9jay9udm1lLmM6NjY6Cit0eXBlZGVmIHZvbGF0aWxlIHN0cnVj
-dCB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTM4MTogRklMRTogYmxvY2sv
-bnZtZS5jOjU3ODoKKyAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlRpbWVvdXQgd2hpbGUg
-d2FpdGluZyBmb3IgZGV2aWNlIHRvIHJlc2V0ICglbGQgbXMpIiwKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMxNDEwOiBGSUxFOiBibG9jay9udm1lLmM6NjA3OgorICAgICAgICAg
-ICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVGltZW91dCB3aGlsZSB3YWl0aW5nIGZvciBkZXZpY2UgdG8g
-c3RhcnQgKCVsZCBtcykiLAoKdG90YWw6IDIgZXJyb3JzLCA0IHdhcm5pbmdzLCAxODc4IGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDMvNjogYmxvY2s6IEludHJvZHVjZSBiZHJ2X2RtYV9tYXAgYW5kIGJkcnZfZG1hX3Vu
-bWFwLi4uCkNoZWNraW5nIFBBVENIIDQvNjogYmxvY2svbnZtZTogSW1wbGVtZW50IC5iZHJ2X2Rt
-YV9tYXAgYW5kIC5iZHJ2X2RtYV91bm1hcC4uLgpDaGVja2luZyBQQVRDSCA1LzY6IHFlbXUtaW1n
-OiBNYXAgYmVuY2ggYnVmZmVyLi4uCkNoZWNraW5nIFBBVENIIDYvNjogYmxvY2s6IE1vdmUgTlZN
-ZSBzcGVjIGRlZmluaXRpb25zIHRvIGEgc2VwYXJhdGUgaGVhZGVyLi4uCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Wed, Jul 05, 2017 at 01:44:35PM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > Assigning directly to *errp is not valid, as errp may be NULL,
+> > &error_fatal, or &error_abort.  Use error_propagate() instead.
+> >
+> > error_propagate() handles non-NULL *errp correctly, so the
+> > "if (!*errp)" check can be removed.
+> >
+> > Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> > Cc: Alistair Francis <alistair.francis@xilinx.com>
+> > Cc: Jason Wang <jasowang@redhat.com>
+> > Cc: qemu-arm@nongnu.org
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  hw/dma/xilinx_axidma.c  | 4 +---
+> >  hw/net/xilinx_axienet.c | 4 +---
+> >  2 files changed, 2 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> > index 6065689ad1..3987b5ff96 100644
+> > --- a/hw/dma/xilinx_axidma.c
+> > +++ b/hw/dma/xilinx_axidma.c
+> > @@ -554,9 +554,7 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+> >      return;
+> >  
+> >  xilinx_axidma_realize_fail:
+> > -    if (!*errp) {
+> > -        *errp = local_err;
+> > -    }
+> > +    error_propagate(errp, local_err);
+> >  }
+> >  
+> >  static void xilinx_axidma_init(Object *obj)
+> > diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+> > index b6701844d3..5ffa739f68 100644
+> > --- a/hw/net/xilinx_axienet.c
+> > +++ b/hw/net/xilinx_axienet.c
+> > @@ -981,9 +981,7 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
+> >      return;
+> >  
+> >  xilinx_enet_realize_fail:
+> > -    if (!*errp) {
+> > -        *errp = local_err;
+> > -    }
+> > +    error_propagate(errp, local_err);
+> >  }
+> >  
+> >  static void xilinx_enet_init(Object *obj)
+> 
+> The qdev core always passes &err.  So this is "merely" a fix for a
+> latent bug.
+> 
+> If it could pass null, you'd fix a crash bug.
+> 
+> If it could pass pointer to non-null (&error_fatal, &error_abort), you'd
+> plug a memory leak.
+> 
+> Suggest to rephrase the commit message:
+> 
+>     xilinx: Fix latent error handling bug
+> 
+>     Assigning directly to *errp is not valid, as errp may be null,
+>     &error_fatal, or &error_abort.  The !*errp conditional protects
+>     against the latter two, but we then leak @local_err.  Fortunately,
+>     the qdev core always passes pointer to null, so this is "merely" a
+>     latent bug.
+> 
+>     Use error_propagate() instead.
+> 
+> What do you think?
+
+Looks good to me.  Do you want to fix it when applying?
+
+> 
+> With something like that:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks!
+
+-- 
+Eduardo
