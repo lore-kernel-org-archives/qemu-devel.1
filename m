@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dSxXU-0000HK-LI
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 23:33:13 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dSzKB-0007Q9-Br
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 01:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dSxXP-0007Zw-OR
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 23:33:12 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1498820791-8130-1-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dcf0bab4-8bf1-a21f-c4b6-05ac081d37f7@amsat.org>
-Date: Thu, 6 Jul 2017 00:33:03 -0300
+	(envelope-from <hpoussin@reactos.org>) id 1dSzKA-0002yg-Bw
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 01:27:35 -0400
+References: <20170522211205.14265-1-hpoussin@reactos.org>
+	<20170703165047.GB4936@noname.redhat.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <fd2f738e-238b-8617-c3bb-0f753fde7788@reactos.org>
+Date: Thu, 6 Jul 2017 07:27:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <1498820791-8130-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target-arm: v7M: ignore writes
- to CONTROL.SPSEL from Thread mode
+In-Reply-To: <20170703165047.GB4936@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] vvfat: misc fixes for read-only
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Hi Peter,
+Hi,
 
-On 06/30/2017 08:06 AM, Peter Maydell wrote:
-> For v7M, writes to the CONTROL register are only permitted for
-> privileged code. However even if the code is privileged, the
-> write must not affect the SPSEL bit in the CONTROL register
-> if the CPU is in Thread mode (as documented in the pseudocode
-> for the MSR instruction). Implement this, instead of permitting
-> SPSEL to be written in all cases.
-> 
-> This was causing mbed applications not to run, because the
-> RTX RTOS they use relies on this behaviour.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org> > ---
->   target/arm/helper.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 2594faa..4ed32c5 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8768,9 +8768,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
->           }
->           break;
->       case 20: /* CONTROL */
-> -        switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
-> -        env->v7m.control = val & (R_V7M_CONTROL_SPSEL_MASK |
-> -                                  R_V7M_CONTROL_NPRIV_MASK);
-> +        /* Writing to the SPSEL bit only has an effect if we are in
-> +         * thread mode; other bits can be updated by any privileged code.
-> +         * switch_v7m_sp() deals with updating the SPSEL bit in
-> +         * env->v7m.control, so we only need update the others.
-> +         */
+Thanks to have taken this patch series.
 
-I'v been thinking about adding some function like v7m_is_privileged() 
-v7m_is_thread_mode() !v7m_exception_pending() to ease code readability, 
-like armv7m_nvic_can_take_pending_exception() or is_singlestepping().
-Not much inspired yet :(
+However, I already have in my repository the v3 patch series, whose chang=
+elog is:
 
-> +        if (env->v7m.exception == 0) {
-> +            switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
-> +        }
-> +        env->v7m.control &= ~R_V7M_CONTROL_NPRIV_MASK;
-> +        env->v7m.control |= val & R_V7M_CONTROL_NPRIV_MASK;
->           break;
->       default:
->           qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
-> 
+Changes v2->v3:
+- added patches 5, 12, 16
+- fixed warning (unused variable) (patch 11)
+- added #defines for constants for deleted byte following Philippe remark=
+s (patch 14)
+- added #define and explanations for OEM name following Philippe remarks =
+(patch 15)
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Changes v1->v2:
+- small changes following Kevin remarks (patches 3, 5, 6)
+- use g_utf8_* functions instead of ad-hock code (patches 8 and 9)
+- fix a bug with filenames starting with a dot (patch 9)
+
+Herv=E9 Poussineau (16):
+   vvfat: fix qemu-img map and qemu-img convert
+   vvfat: replace tabs by 8 spaces
+   vvfat: fix typos
+   vvfat: rename useless enumeration values
+   vvfat: add constants for special values of name[0]
+   vvfat: introduce offset_to_bootsector, offset_to_fat and
+     offset_to_root_dir
+   vvfat: fix field names in FAT12/FAT16 and FAT32 boot sectors
+   vvfat: always create . and .. entries at first and in that order
+   vvfat: correctly create long names for non-ASCII filenames
+   vvfat: correctly create base short names for non-ASCII filenames
+   vvfat: correctly generate numeric-tail of short file names
+   vvfat: correctly parse non-ASCII short and long file names
+   vvfat: limit number of entries in root directory in FAT12/FAT16
+   vvfat: handle KANJI lead byte 0xe5
+   vvfat: change OEM name to 'MSWIN4.1'
+   vvfat: initialize memory after allocating it
+
+Should I rebase on top of your branch, or should I send the v3 as is?
+
+It fixes the last random errors I had in Win9x Scandisk (uninitialized me=
+mory).
 
 Regards,
 
-Phil.
+Herv=E9
+
+Le 03/07/2017 =E0 18:50, Kevin Wolf a =E9crit :
+> Am 22.05.2017 um 23:11 hat Herv=E9 Poussineau geschrieben:
+>> Hi,
+>>
+>> This patchset fixes some of issues I encountered when trying to use vv=
+fat, and fixes
+>> bug #1599539: https://bugs.launchpad.net/qemu/+bug/1599539
+>>
+>> Patch 1 fixes a crash when using 'qemu-img convert'.
+>> Patches 2 to 6 are code cleanup. No functionnal changes.
+>> Patches 7 to 13 fix problems detected by disk checking utilities in re=
+ad-only mode.
+>>
+>> With these patches, vvfat creates valid FAT volumes and can be used wi=
+th QEMU disk utilities.
+>>
+>> Read-write mode is still buggy after this patchset, but at least, I wa=
+s not
+>> able to crash QEMU anymore.
+>>
+>> Note that patch 2 doesn't pass checkpatch.pl, as it changes indentatio=
+n only.
+>
+> Thanks, fixed the build error in patch 9 (yet unused variables) and
+> applied to the block branch.
+>
+> There were a few more minor comments for this series, but it has been o=
+n
+> the list for long enough and I figured that they can be addressed on
+> top.
+>
+> Kevin
+>
