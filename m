@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiaxin.wu@intel.com>) id 1dT872-0000kK-P9
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:50:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dT89T-0001ON-Hb
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:53:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiaxin.wu@intel.com>) id 1dT86z-0004mt-G6
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:50:36 -0400
-Received: from mga01.intel.com ([192.55.52.88]:20605)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jiaxin.wu@intel.com>) id 1dT86y-0004lk-TP
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:50:33 -0400
-From: "Wu, Jiaxin" <jiaxin.wu@intel.com>
-Date: Thu, 6 Jul 2017 14:49:14 +0000
-Message-ID: <895558F6EA4E3B41AC93A00D163B7274162E2A33@SHSMSX103.ccr.corp.intel.com>
-References: <895558F6EA4E3B41AC93A00D163B7274162E2512@SHSMSX103.ccr.corp.intel.com>
-	<503895c7-4649-a568-2ee4-0fea1908fd60@redhat.com>
-	<537c874c-a5d4-30ce-6bb2-1a2bc345f66a@redhat.com>
-	<d3c0a77d-3559-c67e-705c-002460b783b2@redhat.com>
-In-Reply-To: <d3c0a77d-3559-c67e-705c-002460b783b2@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1dT89S-0005z6-K6
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:53:07 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35324)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dT89S-0005yV-CD
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:53:06 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id k67so6172819wrc.2
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 07:53:05 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] The maximum limit of virtual network device
+In-Reply-To: <3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 6 Jul 2017 15:52:44 +0100
+Message-ID: <CAFEAcA-xkd94VTVOuOvXeowb92TPose4y8LKB5o56UyRMNXsfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alexander Bezzubikov <zuban32s@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-VGhhbmtzIExhc3psbyBhbmQgTWFyY2VsIGZvciB0aGUgY29tbWVudHMvc3VnZ2VzdGlvbi4gSXQg
-aXMgcXVpdGUgaGVscGZ1bCBhZ2FpbnN0IG15IHVzYWdlIGNhc2UuDQoNCj4gPj4gLSB1c2UgUTM1
-IChmb3IgYSBsYXJnZXIgSU8gc3BhY2UpLA0KPiA+PiAtIHBsdWcgYSBETUktUENJIGJyaWRnZSBp
-bnRvIHRoZSByb290IGJyaWRnZSwNCj4gPj4gLSBwbHVnIDUgUENJIGJyaWRnZXMgaW50byB0aGUg
-RE1JLVBDSSBicmlkZ2UsDQo+ID4+IC0gcGx1ZyAzMSBOSUNzIHBlciBQQ0kgYnJpZGdlLCBlYWNo
-IE5JQyBpbnRvIGEgc2VwYXJhdGUgc2xvdC4NCg0KQmVzdCByZWdhcmRzIQ0KSmlheGluDQoNCg0K
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMYXN6bG8gRXJzZWsgW21haWx0
-bzpsZXJzZWtAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEp1bHkgNiwgMjAxNyA1OjQ2
-IFBNDQo+IFRvOiBNYXJjZWwgQXBmZWxiYXVtIDxtYXJjZWxAcmVkaGF0LmNvbT47IFd1LCBKaWF4
-aW4NCj4gPGppYXhpbi53dUBpbnRlbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEFsZXhh
-bmRlciBCZXp6dWJpa292DQo+IDx6dWJhbjMyc0BnbWFpbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBb
-UWVtdS1kZXZlbF0gVGhlIG1heGltdW0gbGltaXQgb2YgdmlydHVhbCBuZXR3b3JrIGRldmljZQ0K
-PiANCj4gT24gMDcvMDYvMTcgMTE6MjQsIE1hcmNlbCBBcGZlbGJhdW0gd3JvdGU6DQo+ID4gT24g
-MDYvMDcvMjAxNyAxMTozMSwgTGFzemxvIEVyc2VrIHdyb3RlOg0KPiANCj4gPj4gPiBOb3csIEkg
-d291bGQgbm9ybWFsbHkgcmVjb21tZW5kIHN0aWNraW5nIHdpdGggaTQ0MGZ4IGZvciBzaW1wbGlj
-aXR5Lg0KPiA+PiBIb3dldmVyLCBlYWNoIFBDSSBicmlkZ2UgcmVxdWlyZXMgNEtCIG9mIElPIHNw
-YWNlIChtZWFuaW5nICgxICsgNSkgKiA0S0INCj4gPj4gPSAyNEtCKSwgIGFuZCBPVk1GIG9uIHRo
-ZSBpNDQwZnggZG9lcyBub3Qgc3VwcG9ydCB0aGF0IG11Y2ggKG9ubHkNCj4gPj4gMHg0MDAwKS4g
-U28sIEknbGwgcmVjb21tZW5kIFEzNSBmb3IgSU8gc3BhY2UgcHVycG9zZXM7IE9WTUYgb24gUTM1
-DQo+ID4+IHByb3ZpZGVzIDB4QTAwMCAoNDBLQikuDQo+ID4NCj4gPiBTbyBpZiB3ZSB1c2UgT1ZN
-RiwgZ29pbmcgZm9yIFEzNSBnaXZlcyB1cyBhY3R1YWxseSBtb3JlIElPIHNwYWNlLCBuaWNlIQ0K
-PiA+IEhvd2V2ZXIgcmVjb21tZW5kaW5nIFEzNSBmb3IgSU8gc3BhY2Ugc2VlbXMgb2RkIDopDQo+
-IA0KPiBPVk1GIHVzZWQgdG8gaGF2ZSBvbmx5IDB4NDAwMCBieXRlcyBmb3IgUENJIElPIGFwZXJ0
-dXJlLCBzaW5jZSB0aGUNCj4gYmVnaW5uaW5nLiBJbiA8aHR0cHM6Ly9idWd6aWxsYS5yZWRoYXQu
-Y29tL3Nob3dfYnVnLmNnaT9pZD0xMzMzMjM4PiBJDQo+IGludmVzdGlnYXRlZCBob3cgbXVjaCBJ
-IGNvdWxkIGdyb3cgdGhlIGFwZXJ0dXJlLiBPbiBRMzUsIGl0IHdhcyBwb3NzaWJsZQ0KPiB0byBn
-cm93IGl0IHRvIDB4QTAwMCBieXRlcyAoYnV0IGV2ZW4gdGhlbiB5b3UgaGF2ZSB0byBkaXNhYmxl
-IHZtcG9ydCwNCj4gd2hpY2ggc29ydCBvZiBzaXRzIGluIHRoZSBtaWRkbGUgb3RoZXJ3aXNlKS4g
-T24gaTQ0MGZ4LCB0aGUgSU8gcG9ydHMgaW4NCj4gdXNlIGJ5IHBsYXRmb3JtIGRldmljZXMgd2Vy
-ZSBzbyBiYWRseSBkaXN0cmlidXRlZCB0aGF0IG1vdmluZyBiZXlvbmQNCj4gMHg0MDAwIHdhcyBu
-b3QgcG9zc2libGUuIFNlZSBpbiBwYXJ0aWN1bGFyOg0KPiANCj4gaHR0cHM6Ly9idWd6aWxsYS5y
-ZWRoYXQuY29tL3Nob3dfYnVnLmNnaT9pZD0xMzMzMjM4I2MxNg0KPiBodHRwczovL2J1Z3ppbGxh
-LnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTEzMzMyMzgjYzE5DQo+IA0KPiA+PiBUaGVyZWZv
-cmUgSSBndWVzcyB0aGUgc2ltcGxlc3QgZXhhbXBsZSBJIGNhbiBnaXZlIG5vdyBpczoNCj4gPj4g
-LSB1c2UgUTM1IChmb3IgYSBsYXJnZXIgSU8gc3BhY2UpLA0KPiA+PiAtIHBsdWcgYSBETUktUENJ
-IGJyaWRnZSBpbnRvIHRoZSByb290IGJyaWRnZSwNCj4gPj4gLSBwbHVnIDUgUENJIGJyaWRnZXMg
-aW50byB0aGUgRE1JLVBDSSBicmlkZ2UsDQo+ID4+IC0gcGx1ZyAzMSBOSUNzIHBlciBQQ0kgYnJp
-ZGdlLCBlYWNoIE5JQyBpbnRvIGEgc2VwYXJhdGUgc2xvdC4NCj4gPj4NCj4gPg0KPiA+IFRoZSBz
-ZXR1cCBsb29rcyBPSyB0byBtZSAoYXNzdW1pbmcgT1ZNRiBpcyBuZWVkZWQsIG90aGVyd2lzZQ0K
-PiA+IFBDICsgcGNpLWJyaWRnZXMgd2lsbCByZXN1bHQgaW4gbW9yZSBkZXZpY2VzKSwNCj4gDQo+
-IE9WTUYgaXMgcXVpdGUgbmVlZGVkOyBKaWF4aW4gaXMgb25lIG9mIHRoZSBlZGsyIG5ldHdvcmtp
-bmcgbWFpbnRhaW5lcnMsDQo+IGFuZCBJIHRoaW5rIGhlJ3MgdXNpbmcgUUVNVSBhbmQgT1ZNRiBh
-cyBhIHRlc3RiZWQgZm9yIG90aGVyd2lzZQ0KPiBwaHlzaWNhbGx5LW9yaWVudGVkIFVFRkkgZGV2
-ZWxvcG1lbnQuDQo+IA0KPiA+IEkgZG8gaGF2ZSBhIGxpdHRsZSBjb25jZXJuLg0KPiA+IFdlIHdh
-bnQgdG8gZGVwcmVjYXRlIHRoZSBkbWktcGNpIGJyaWRnZSBzaW5jZSBpdCBkb2VzIG5vdCBzdXBw
-b3J0DQo+ID4gaG90LXBsdWcgKGZvciBpdHNlbGYgb3IgZGV2aWNlcyBiZWhpbmQgaXQpLg0KPiA+
-IEFsZXhhbmRyIChDQ2VkKSBpcyBhIEdTT0Mgc3R1ZGVudCB3b3JraW5nIG9uIGEgZ2VuZXJpYw0K
-PiA+IHBjaWUtcGNpIGJyaWRnZSB0aGF0IGNhbiAoZXZlbnR1YWxseSkgYmUgaG90LXBsdWdnZWQN
-Cj4gPiBpbnRvIGEgUENJZSBSb290IFBvcnQgYW5kIGtlZXBzIHRoZSBtYWNoaW5lIGNsZWFuZXIu
-DQo+IA0KPiBOaWNlIQ0KPiANCj4gUGxlYXNlIGluY2x1ZGUgYW4gdXBkYXRlIHRvICJkb2NzL3Bj
-aWUudHh0IiBpbiB0aGUgc2NvcGUgOikNCj4gDQo+IFRoYW5rcyENCj4gTGFzemxvDQo=
+On 5 July 2017 at 13:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 04/07/2017 19:02, Peter Maydell wrote:
+>> Many board models and several devices need to create auxiliary
+>> regions of RAM (in addition to the main lump of 'system' memory),
+>> to model static RAMs, video memory, ROMs, etc. Currently they do
+>> this with a sequence like:
+>>        memory_region_init_ram(sram, NULL, "sram", 0x10000, &error_fatal);
+>>        vmstate_register_ram_global(sram);
+>
+> Instead of vmstate_register_ram_global, you should use
+>
+>     vmstate_register_ram(mr, owner);
+>
+> You should even do it for all memory regions, probably.
+
+This sounds like a good thing, but it's awkward for migration
+compatibility, because these callers to memory_region_init_ram()
+don't call vmstate_register_ram():
+
+hw/arm/highbank.c (a bug)
+hw/mips/mips_malta.c (region is ro)
+hw/net/dp3893x.c (prom, ro, contains mac address)
+hw/pci-host/xilinx-pcie.c (dummy region; migrating wouldn't hurt)
+backends/hostmem-ram.c (bug, or is migration handled elsewhere?)
+
+and if we add an implicit call then we break migration compat
+for those boards/devices.
+
+> Only memory_region_init_ram_device_ptr (which sets mr->ram_device) must
+> not call vmstate_register_ram.  This is a bit ugly because it requires
+> inlining memory_region_init_ram_ptr into it.
+>
+> memory_region_init_ram_from_fd probably needs to be excluded, as well,
+> based on its sole user.
+
+Callers of memory_region_init_ram_from_file() which don't
+call vmstate_register_ram():
+backends/hostmem-ram.c
+
+Callers of memory_region_init_ram_ptr() which don't call
+vmstate_register_ram():
+hw/misc/mmio_interface.c
+ -- seems to be an implementation detail of the exceute-from-device
+    support so maybe it doesn't need migration support ??
+
+thanks
+-- PMM
