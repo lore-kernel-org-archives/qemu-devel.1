@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dSuJ5-000274-3N
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:06:08 -0400
+	(envelope-from <mst@redhat.com>) id 1dSuLa-0003RJ-H6
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dSuJ4-0004Kj-4O
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:06:07 -0400
-References: <20170705210842.960-1-eblake@redhat.com>
-	<20170705210842.960-5-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <7db9ec5c-862a-f6a9-b95d-c0a899a9585a@redhat.com>
-Date: Wed, 5 Jul 2017 20:05:59 -0400
+	(envelope-from <mst@redhat.com>) id 1dSuLX-0005O9-Ri
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:08:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dSuLX-0005Nc-LU
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:08:39 -0400
+Date: Thu, 6 Jul 2017 03:08:37 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170706030726-mutt-send-email-mst@kernel.org>
+References: <1498617479-5809-1-git-send-email-wei.w.wang@intel.com>
+	<20170703220017-mutt-send-email-mst@kernel.org>
+	<595B7617.4060203@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170705210842.960-5-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/21] stream: Drop reached_end for
- stream_complete()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <595B7617.4060203@intel.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v4] virtio-net: enable
+ configurable tx queue size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: jasowang@redhat.com, eblake@redhat.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@gmail.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+
+On Tue, Jul 04, 2017 at 07:03:51PM +0800, Wei Wang wrote:
+> On 07/04/2017 03:18 AM, Michael S. Tsirkin wrote:
+> > On Wed, Jun 28, 2017 at 10:37:59AM +0800, Wei Wang wrote:
+> > > This patch enables the virtio-net tx queue size to be configurable
+> > > between 256 (the default queue size) and 1024 by the user when the
+> > > vhost-user backend is used.
+> > > 
+> > > Currently, the maximum tx queue size for other backends is 512 due
+> > > to the following limitations:
+> > > - QEMU backend: the QEMU backend implementation in some cases may
+> > > send 1024+1 iovs to writev.
+> > > - Vhost_net backend: there are possibilities that the guest sends
+> > > a vring_desc of memory which crosses a MemoryRegion thereby
+> > > generating more than 1024 iovs after translation from guest-physical
+> > > address in the backend.
+> > > 
+> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > I was going to apply this, but run into a host of issues:
+> > 
+> > This segfaults:
+> > $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-net,tx_queue_size=1024
+> > Segmentation fault (core dumped)
+> > 
+> > I tried to tweak this code a bit to avoid the crash, and I run into a further issue:
+> > $ ./x86_64-softmmu/qemu-system-x86_64 -device virtio-net,tx_queue_size=1024
+> > Bad ram offset aa49002
+> > Aborted (core dumped)
+> > 
+> > the second issue is especially concerning.
+> > 
+> 
+> AFAIK, all the virtio-net backends require "-netdev". I'm wondering if there
+> is any case that virtio-net can work without a "-netdev" created in QEMU?
+
+Of course. Old style -net with vlans still work.
+
+> If not, would it be better if we just stop the device creation at the
+> beginning of
+> virtio_net_device_realize() if "-netdev" is not given (i.e.
+> !n->nic_conf.peers.ncs[0])?
+> 
+> Best,
+> Wei
+
+That will break a ton of scripts without any real benefit
+to users.
 
 
-
-On 07/05/2017 05:08 PM, Eric Blake wrote:
-> stream_complete() skips the work of rewriting the backing file if
-> the job was cancelled, if data->reached_end is false, or if there
-> was an error detected (non-zero data->ret) during the streaming.
-> But note that in stream_run(), data->reached_end is only set if the
-> loop ran to completion, and data->ret is only 0 in two cases:
-> either the loop ran to completion (possibly by cancellation, but
-> stream_complete checks for that), or we took an early goto out
-> because there is no bs->backing.  Thus, we can preserve the same
-> semantics without the use of reached_end, by merely checking for
-> bs->backing (and logically, if there was no backing file, streaming
-> is a no-op, so there is no backing file to rewrite).
-> 
-> Suggested-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v4: new patch
-> ---
->  block/stream.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/block/stream.c b/block/stream.c
-> index 746d525..12f1659 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -59,7 +59,6 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
-> 
->  typedef struct {
->      int ret;
-> -    bool reached_end;
->  } StreamCompleteData;
-> 
->  static void stream_complete(BlockJob *job, void *opaque)
-> @@ -70,7 +69,7 @@ static void stream_complete(BlockJob *job, void *opaque)
->      BlockDriverState *base = s->base;
->      Error *local_err = NULL;
-> 
-> -    if (!block_job_is_cancelled(&s->common) && data->reached_end &&
-> +    if (!block_job_is_cancelled(&s->common) && bs->backing &&
->          data->ret == 0) {
->          const char *base_id = NULL, *base_fmt = NULL;
->          if (base) {
-> @@ -211,7 +210,6 @@ out:
->      /* Modify backing chain and close BDSes in main loop */
->      data = g_malloc(sizeof(*data));
->      data->ret = ret;
-> -    data->reached_end = sector_num == end;
->      block_job_defer_to_main_loop(&s->common, stream_complete, data);
->  }
-> 
-
-This seems ever so slightly less intuitive to me, but it is functionally
-identical.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+-- 
+MST
