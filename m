@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dTBrz-00017x-Hs
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:51:20 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dTCAN-0004DV-Pq
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 15:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dTBrw-0007HH-FE
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:51:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33204)
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dTCAK-000345-JC
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 15:10:19 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:42808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dTBrw-0007Gd-5R
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:51:16 -0400
-References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
-	<20170706101611.27031-6-marcandre.lureau@redhat.com>
-	<72817738-deb5-f64e-7247-89dbdf10ddbd@redhat.com>
-	<CAJ+F1C+um2ep_SF-jWxmLH2PRhCQhcv9LPFW3RyXoCcs=GVh7A@mail.gmail.com>
-	<850987754.33489091.1499364558887.JavaMail.zimbra@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <be1c5e8a-d57d-cafb-b01c-dfe9eba40d7c@redhat.com>
-Date: Thu, 6 Jul 2017 20:51:12 +0200
-MIME-Version: 1.0
-In-Reply-To: <850987754.33489091.1499364558887.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] kdump: add vmcoreinfo ELF note
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dTCAJ-0002yb-Hu
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 15:10:16 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Fri,  7 Jul 2017 00:38:47 +0530
+Message-Id: <1499368127-19855-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH v2] Python3 Support for qmp.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,121 +24,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Anderson <anderson@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-On 07/06/17 20:09, Dave Anderson wrote:
->=20
->=20
-> ----- Original Message -----
->> Hi
->>
->> On Thu, Jul 6, 2017 at 7:13 PM, Laszlo Ersek <lersek@redhat.com> wrote=
-:
->>> On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
->>>> kdump header provides offset and size of the vmcoreinfo ELF note,
->>>> append it if available.
->>>>
->>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>>> ---
->>>>  dump.c | 20 ++++++++++++++++++++
->>>>  1 file changed, 20 insertions(+)
->>>>
->>>> diff --git a/dump.c b/dump.c
->>>> index f699198204..dd416ad271 100644
->>>> --- a/dump.c
->>>> +++ b/dump.c
->>>> @@ -839,6 +839,16 @@ static void create_header32(DumpState *s, Error
->>>> **errp)
->>>>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
->>>>
->>>>      offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
->>>> +    if (s->vmcoreinfo) {
->>>> +        uint64_t hsize, name_size, size_vmcoreinfo_desc,
->>>> offset_vmcoreinfo;
->>>> +
->>>> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size,
->>>> &size_vmcoreinfo_desc);
->>>> +        offset_vmcoreinfo =3D offset_note + s->note_size -
->>>> s->vmcoreinfo_size +
->>>> +            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) *=
- 4;
->>>> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinf=
-o);
->>>> +        kh->size_vmcoreinfo =3D cpu_to_dump32(s, size_vmcoreinfo_de=
-sc);
->>>> +    }
->>>> +
->>>>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
->>>>      kh->note_size =3D cpu_to_dump32(s, s->note_size);
->>>>
->>>> @@ -939,6 +949,16 @@ static void create_header64(DumpState *s, Error
->>>> **errp)
->>>>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
->>>>
->>>>      offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
->>>> +    if (s->vmcoreinfo) {
->>>> +        uint64_t hsize, name_size, size_vmcoreinfo_desc,
->>>> offset_vmcoreinfo;
->>>> +
->>>> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size,
->>>> &size_vmcoreinfo_desc);
->>>> +        offset_vmcoreinfo =3D offset_note + s->note_size -
->>>> s->vmcoreinfo_size +
->>>> +            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) *=
- 4;
->>>> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinf=
-o);
->>>> +        kh->size_vmcoreinfo =3D cpu_to_dump64(s, size_vmcoreinfo_de=
-sc);
->>>> +    }
->>>> +
->>>>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
->>>>      kh->note_size =3D cpu_to_dump64(s, s->note_size);
->>>>
->>>>
->>>
->>> I continue to think that this patch is unnecessary, but if you insist=
-,
->=20
->>> it does look OK to me.
->>>
->>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>
->> Without it, crash doesn't read the vmcoreinfo PT_NOTE. And for some
->> reason, the phys_base in the header wasn't enough (to be doubled
->> checked).
->>
->> Any comment Dave about crash handling of vmcoreinfo in kdump files?
->=20
-> It just reads the kdump_sub_header's offset_vmcoreinfo and size_vmcorei=
-nfo
-> fields to gather the vmcoreinfo data into a local buffer of memory, and
-> scans the strings for whatever it's looking for.=20
->=20
-> With respect to phys_base, the only thing that might be of consequence
-> is this fairly recent change that's currently only in the github repo,
-> queued for crash-7.2.0:
->=20
->   commit a4a538caca140a8e948bbdae2be311168db7a1eb
->   Author: Dave Anderson <anderson@redhat.com>
->   Date:   Tue May 2 16:51:53 2017 -0400
->=20
->     Fix for Linux 4.10 and later kdump dumpfiles, or kernels that have
->     backported commit 401721ecd1dcb0a428aa5d6832ee05ffbdbffbbe, titled
->     "kexec: export the value of phys_base instead of symbol address".
->     Without the patch, if the x86_64 "phys_base" value in the VMCOREINF=
-O
->     note is a negative decimal number, the crash session fails during
->     session intialization with a "page excluded" or "seek error" when
->     reading "page_offset_base".
->     (anderson@redhat.com)
->=20
-> Also, crash-7.1.9 was the first version that started looking in the=20
-> vmcoreinfo data for phys_base instead of in the kdump_sub_header.
+This patch intends to make qmp.py compatible with both python2 and python3.
 
-OK, if crash (or earlier versions of crash) need this QEMU patch, then
-I'm fine with it -- my R-b stands.
+ * Python 3 does not have dict.has_key(key), use key in dict instead
+ * Avoid line-based I/O since Python 2/3 have different character
+   encoding behavior.  Explicitly encode/decode JSON UTF-8.
+ * Replace print by print function.
 
-Thanks
-Laszlo
+Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+---
+ scripts/qmp/qmp.py | 58 ++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 21 deletions(-)
+
+diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+index 62d3651..58fb7d1 100644
+--- a/scripts/qmp/qmp.py
++++ b/scripts/qmp/qmp.py
+@@ -42,6 +42,7 @@ class QEMUMonitorProtocol:
+         self.__address = address
+         self._debug = debug
+         self.__sock = self.__get_sock()
++        self.__data = b""
+         if server:
+             self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+             self.__sock.bind(self.__address)
+@@ -56,7 +57,7 @@ class QEMUMonitorProtocol:
+ 
+     def __negotiate_capabilities(self):
+         greeting = self.__json_read()
+-        if greeting is None or not greeting.has_key('QMP'):
++        if greeting is None or 'QMP' not in greeting:
+             raise QMPConnectError
+         # Greeting seems ok, negotiate capabilities
+         resp = self.cmd('qmp_capabilities')
+@@ -64,15 +65,28 @@ class QEMUMonitorProtocol:
+             return greeting
+         raise QMPCapabilitiesError
+ 
++    def __sock_readline(self):
++        while True:
++            ch = self.__sock.recv(1)
++            if ch is None:
++                if self.__data:
++                    raise ValueError('socket closed mid-line')
++                return None
++            self.__data += ch
++            if ch == b'\n':
++                line = self.__data.decode('utf-8')
++                self.__data = b""
++                return line
++
+     def __json_read(self, only_event=False):
+         while True:
+-            data = self.__sockfile.readline()
++            data = self.__sock_readline()
+             if not data:
+                 return
+             resp = json.loads(data)
+             if 'event' in resp:
+                 if self._debug:
+-                    print >>sys.stderr, "QMP:<<< %s" % resp
++                    print("QMP:<<< %s" % resp)
+                 self.__events.append(resp)
+                 if not only_event:
+                     continue
+@@ -87,10 +101,10 @@ class QEMUMonitorProtocol:
+         @param wait (bool): block until an event is available.
+         @param wait (float): If wait is a float, treat it as a timeout value.
+ 
+-        @raise QMPTimeoutError: If a timeout float is provided and the timeout
+-                                period elapses.
+-        @raise QMPConnectError: If wait is True but no events could be retrieved
+-                                or if some other error occurred.
++        @raise QMPTimeoutError: If a timeout float is provided and the
++                                timeout period elapses.
++        @raise QMPConnectError: If wait is True but no events could be
++                                retrieved or if some other error occurred.
+         """
+ 
+         # Check for new events regardless and pull them into the cache:
+@@ -98,9 +112,11 @@ class QEMUMonitorProtocol:
+         try:
+             self.__json_read()
+         except socket.error as err:
+-            if err[0] == errno.EAGAIN:
++            if err.errno == errno.EAGAIN:
+                 # No data available
+                 pass
++            else:
++                raise
+         self.__sock.setblocking(1)
+ 
+         # Wait for new events, if needed.
+@@ -128,7 +144,6 @@ class QEMUMonitorProtocol:
+         @raise QMPCapabilitiesError if fails to negotiate capabilities
+         """
+         self.__sock.connect(self.__address)
+-        self.__sockfile = self.__sock.makefile()
+         if negotiate:
+             return self.__negotiate_capabilities()
+ 
+@@ -143,7 +158,6 @@ class QEMUMonitorProtocol:
+         """
+         self.__sock.settimeout(15)
+         self.__sock, _ = self.__sock.accept()
+-        self.__sockfile = self.__sock.makefile()
+         return self.__negotiate_capabilities()
+ 
+     def cmd_obj(self, qmp_cmd):
+@@ -155,16 +169,17 @@ class QEMUMonitorProtocol:
+                 been closed
+         """
+         if self._debug:
+-            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
++            print("QMP:>>> %s" % qmp_cmd)
+         try:
+-            self.__sock.sendall(json.dumps(qmp_cmd))
++            command = json.dumps(qmp_cmd)
++            self.__sock.sendall(command.encode('UTF-8'))
+         except socket.error as err:
+-            if err[0] == errno.EPIPE:
++            if err.errno == errno.EPIPE:
+                 return
+-            raise socket.error(err)
++            raise
+         resp = self.__json_read()
+         if self._debug:
+-            print >>sys.stderr, "QMP:<<< %s" % resp
++            print("QMP:<<< %s" % resp)
+         return resp
+ 
+     def cmd(self, name, args=None, id=None):
+@@ -175,7 +190,7 @@ class QEMUMonitorProtocol:
+         @param args: command arguments (dict)
+         @param id: command id (dict, list, string or int)
+         """
+-        qmp_cmd = { 'execute': name }
++        qmp_cmd = {'execute': name}
+         if args:
+             qmp_cmd['arguments'] = args
+         if id:
+@@ -184,7 +199,7 @@ class QEMUMonitorProtocol:
+ 
+     def command(self, cmd, **kwds):
+         ret = self.cmd(cmd, kwds)
+-        if ret.has_key('error'):
++        if 'error' in ret:
+             raise Exception(ret['error']['desc'])
+         return ret['return']
+ 
+@@ -197,8 +212,8 @@ class QEMUMonitorProtocol:
+ 
+         @raise QMPTimeoutError: If a timeout float is provided and the timeout
+                                 period elapses.
+-        @raise QMPConnectError: If wait is True but no events could be retrieved
+-                                or if some other error occurred.
++        @raise QMPConnectError: If wait is True but no events could be
++                                retrieved or if some other error occurred.
+ 
+         @return The first available QMP event, or None.
+         """
+@@ -217,8 +232,8 @@ class QEMUMonitorProtocol:
+ 
+         @raise QMPTimeoutError: If a timeout float is provided and the timeout
+                                 period elapses.
+-        @raise QMPConnectError: If wait is True but no events could be retrieved
+-                                or if some other error occurred.
++        @raise QMPConnectError: If wait is True but no events could be
++                                retrieved or if some other error occurred.
+ 
+         @return The list of available QMP events.
+         """
+@@ -245,3 +260,4 @@ class QEMUMonitorProtocol:
+ 
+     def is_scm_available(self):
+         return self.__sock.family == socket.AF_UNIX
++
+-- 
+2.7.4
