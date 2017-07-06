@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dT1ni-00043l-NS
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:06:15 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dT1pC-0004qA-7F
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dT1nh-0007eC-Nc
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:06:14 -0400
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
-	<20170216130409.GA28784@lemon.lan>
-	<d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
-	<15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <66e7f481-06f4-2a7e-77fb-1a5c9fc1f301@virtuozzo.com>
-Date: Thu, 6 Jul 2017 11:05:55 +0300
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dT1p7-0008JH-Jv
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:07:46 -0400
+Received: from [59.151.112.132] (port=13681 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dT1p7-0008Fm-7d
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 04:07:41 -0400
+References: <cover.1499250206.git.maozy.fnst@cn.fujitsu.com>
+	<e1eb4e611b444bf3abeeb072e87fbd2fd291045d.1499250206.git.maozy.fnst@cn.fujitsu.com>
+	<877ezm9gel.fsf@dusky.pond.sub.org>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <2447a8ea-2adc-fefc-9f73-d375fdb59445@cn.fujitsu.com>
+Date: Thu, 6 Jul 2017 16:07:02 +0800
 MIME-Version: 1.0
-In-Reply-To: <15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <877ezm9gel.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
- dirty bitmaps
+Subject: Re: [Qemu-devel] [PATCH v8 4/4] net/socket: Improve -net socket
+ error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-06.07.2017 00:46, John Snow wrote:
+Hi, Markus
+
+On 07/06/2017 03:24 PM, Markus Armbruster wrote:
+> Mao Zhongyi <maozy.fnst@cn.fujitsu.com> writes:
 >
-> On 07/05/2017 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 16.02.2017 16:04, Fam Zheng wrote:
->>>> +            dbms->node_name = bdrv_get_node_name(bs);
->>>> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
->>>> +                dbms->node_name = bdrv_get_device_name(bs);
->>>> +            }
->>>> +            dbms->bitmap = bitmap;
->>> What protects the case that the bitmap is released before migration
->>> completes?
->>>
->> What is the source of such deletion? qmp command? Theoretically possible.
+>> When -net socket fails, it first reports a specific error, then
+>> a generic one, like this:
 >>
->> I see the following variants:
+>>     $ qemu-system-x86_64 -net socket,
+>>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
+>>     qemu-system-x86_64: -net socket: Device 'socket' could not be initialized
 >>
->> 1. additional variable BdrvDirtyBItmap.migration, which forbids bitmap
->> deletion
+>> Convert net_socket_*_init() to Error to get rid of the superfluous second
+>> error message. After the patch, the effect like this:
 >>
->> 2. make bitmap anonymous (bdrv_dirty_bitmap_make_anon) - it will not be
->> available through qmp
+>>     $ qemu-system-x86_64 -net socket,
+>>     qemu-system-x86_64: -net socket: exactly one of fd=, listen=, connect=, mcast= or udp= is required
 >>
-> Making the bitmap anonymous would forbid us to query the bitmap, which
-> there is no general reason to do, excepting the idea that a third party
-> attempting to use the bitmap during a migration is probably a bad idea.
-> I don't really like the idea of "hiding" information from the user,
-> though, because then we'd have to worry about name collisions when we
-> de-anonymized the bitmap again. That's not so palatable.
+>> At the same time, add many explicit error handling message when it fails.
 >
->> what do you think?
+> Suggest "This also fixes a few silent failures to report an error."
+>
+> Perhaps Jason can touch this up for you.
+>
+>> Cc: jasowang@redhat.com
+>> Cc: armbru@redhat.com
+>> Cc: berrange@redhat.com
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>  net/socket.c | 92 +++++++++++++++++++++++++++++-------------------------------
+>>  1 file changed, 44 insertions(+), 48 deletions(-)
 >>
-> The modes for bitmaps are getting messy.
+>> diff --git a/net/socket.c b/net/socket.c
+>> index 1d4c515..ca1878f 100644
+>> --- a/net/socket.c
+>> +++ b/net/socket.c
+> [...]
+>> @@ -746,7 +742,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>>          /* if sock->localaddr is missing, it has been initialized to "all bits
+>>           * zero" */
+>>          if (net_socket_mcast_init(peer, "socket", name, sock->mcast,
+>> -            sock->localaddr) == -1) {
+>> +            sock->localaddr, errp) < 0) {
 >
-> As a reminder, the officially exposed "modes" of a bitmap are currently:
+> Indent like this:
 >
-> FROZEN: Cannot be reset/deleted. Implication is that the bitmap is
-> otherwise "ACTIVE."
-> DISABLED: Not recording any writes (by choice.)
-> ACTIVE: Actively recording writes.
+>                                      sock->localaddr, errp) < 0) {
 >
-> These are documented in the public API as possibilities for
-> DirtyBitmapStatus in block-core.json. We didn't add a new condition for
-> "readonly" either, which I think is actually required:
+> Perhaps Jason can touch this up for you.
 >
-> READONLY: Not recording any writes (by necessity.)
+>>              return -1;
+>>          }
+>>          return 0;
+>> @@ -754,11 +750,11 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>>
+>>      assert(sock->has_udp);
+>>      if (!sock->has_localaddr) {
+>> -        error_report("localaddr= is mandatory with udp=");
+>> +        error_setg(errp, "localaddr= is mandatory with udp=");
+>>          return -1;
+>>      }
+>> -    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr) ==
+>> -        -1) {
+>> +    if (net_socket_udp_init(peer, "socket", name, sock->udp, sock->localaddr,
+>> +        errp) < 0) {
 >
+> Likewise.
 >
-> Your new use case here sounds like Frozen to me, but it simply does not
-> have an anonymous successor to force it to be recognized as "frozen." We
-> can add a `bool protected` or `bool frozen` field to force recognition
-> of this status and adjust the json documentation accordingly.
+>>          return -1;
+>>      }
+>>      return 0;
+>
+> With the indentation fixed:
 
-Bitmaps are selected for migration when source is running, so we should 
-protect them (from deletion (or frozing or disabling), not from chaning 
-bits) before source stop, so that is not like frozen. Bitmaps may be 
-changed in this state.
-It is more like ACTIVE.
+Thanks for your review :)
+I will fix and resend it as soon as possible.
 
-We can move bitmap selection on the point after precopy migration, after 
-source stop, but I'm not sure that it would be good.
+Thanks,
+Mao
 
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 >
-> I think then we'd have four recognized states:
 >
-> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
-> other internal process. Bitmap is otherwise ACTIVE.
-
-? Frozen means that all writes goes to the successor and frozen bitmap 
-itself is unchanged, no?
-
-> DISABLED: Not recording any writes (by choice.)
-> READONLY: Not able to record any writes (by necessity.)
-> ACTIVE: Normal bitmap status.
 >
-> Sound right?
-
-
--- 
-Best regards,
-Vladimir
