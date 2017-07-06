@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dT5c5-0005se-By
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:10:33 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dT5cB-0005wZ-A7
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dT5c1-0004tF-B1
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:10:29 -0400
-Received: from mail-ve1eur01on0108.outbound.protection.outlook.com
-	([104.47.1.108]:65168
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dT5c7-0004y5-76
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:10:35 -0400
+Received: from mail-db5eur01on0101.outbound.protection.outlook.com
+	([104.47.2.101]:5600
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1dT5c0-0004se-Rn
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:10:25 -0400
+	id 1dT5c6-0004v6-OE
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:10:31 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Thu,  6 Jul 2017 15:08:56 +0300
-Message-ID: <1499342940-56739-10-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Thu,  6 Jul 2017 15:08:57 +0300
+Message-Id: <1499342940-56739-11-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1499342940-56739-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1499342940-56739-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 09/13] test-char: add hotswap test
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v6 10/13] hmp: add hmp analogue for
+ qmp-chardev-change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +33,148 @@ To: qemu-devel@nongnu.org
 Cc: den@virtuozzo.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, amit@kernel.org, mst@redhat.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/test-char.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- 1 file changed, 71 insertions(+)
+ include/chardev/char.h | 10 ++++++++++
+ hmp.h                  |  1 +
+ chardev/char.c         |  2 +-
+ hmp-commands.hx        | 18 +++++++++++++++++-
+ hmp.c                  | 34 ++++++++++++++++++++++++++++++++++
+ tests/test-hmp.c       |  1 +
+ 6 files changed, 64 insertions(+), 2 deletions(-)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index de72974..9ca233f 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -662,6 +662,76 @@ static void char_invalid_test(void)
-     g_assert_null(chr);
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 22fd734..1604ea9 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -81,6 +81,16 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+ void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
+ 
+ /**
++ * @qemu_chr_parse_opts:
++ *
++ * Parse the options to the ChardevBackend struct.
++ *
++ * Returns: a new backend or NULL on error
++ */
++ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
++                                    Error **errp);
++
++/**
+  * @qemu_chr_new:
+  *
+  * Create a new character backend from a URI.
+diff --git a/hmp.h b/hmp.h
+index 214b261..1ff4552 100644
+--- a/hmp.h
++++ b/hmp.h
+@@ -102,6 +102,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
++void hmp_chardev_change(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_send_break(Monitor *mon, const QDict *qdict);
+ void hmp_qemu_io(Monitor *mon, const QDict *qdict);
+diff --git a/chardev/char.c b/chardev/char.c
+index d6b9d89..c34b44a 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -567,7 +567,7 @@ static const char *chardev_alias_translate(const char *name)
+     return name;
  }
-=20
-+static int chardev_change(void *opaque)
-+{
-+    return 0;
-+}
-+
-+static int chardev_change_denied(void *opaque)
-+{
-+    return -1;
-+}
-+
-+static void char_hotswap_test(void)
-+{
-+    char *chr_args;
-+    Chardev *chr;
-+    CharBackend be;
-+
-+    gchar *tmp_path =3D g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
-+    char *filename =3D g_build_filename(tmp_path, "file", NULL);
-+    ChardevFile file =3D { .out =3D filename };
-+    ChardevBackend backend =3D { .type =3D CHARDEV_BACKEND_KIND_FILE,
-+                               .u.file.data =3D &file };
-+    ChardevReturn *ret;
-+
-+    int port;
-+    int sock =3D make_udp_socket(&port);
-+    g_assert_cmpint(sock, >, 0);
-+
-+    chr_args =3D g_strdup_printf("udp:127.0.0.1:%d", port);
-+
-+    chr =3D qemu_chr_new("chardev", chr_args);
-+    qemu_chr_fe_init(&be, chr, &error_abort);
-+
-+    /* check that chardev operates correctly */
-+    char_udp_test_internal(chr, sock);
-+
-+    /* set the handler that denies the hotswap */
-+    qemu_chr_fe_set_handlers(&be, NULL, NULL,
-+                             NULL, chardev_change_denied, NULL, NULL, true=
-);
-+
-+    /* now, change is denied and has to keep the old backend operating */
-+    ret =3D qmp_chardev_change("chardev", &backend, NULL);
-+    g_assert(!ret);
-+    g_assert(be.chr =3D=3D chr);
-+
-+    char_udp_test_internal(chr, sock);
-+
-+    /* now allow the change */
-+    qemu_chr_fe_set_handlers(&be, NULL, NULL,
-+                             NULL, chardev_change, NULL, NULL, true);
-+
-+    /* has to succeed now */
-+    ret =3D qmp_chardev_change("chardev", &backend, &error_abort);
-+    g_assert(be.chr !=3D chr);
-+
-+    close(sock);
-+    chr =3D be.chr;
-+
-+    /* run the file chardev test */
-+    char_file_test_internal(chr, filename);
-+
-+    object_unparent(OBJECT(chr));
-+
-+    qapi_free_ChardevReturn(ret);
-+    g_unlink(filename);
-+    g_free(filename);
-+    g_rmdir(tmp_path);
-+    g_free(tmp_path);
-+    g_free(chr_args);
-+}
-+
- int main(int argc, char **argv)
+ 
+-static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
++ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
  {
-     qemu_init_main_loop(&error_abort);
-@@ -696,6 +766,7 @@ int main(int argc, char **argv)
- #ifdef HAVE_CHARDEV_SERIAL
-     g_test_add_func("/char/serial", char_serial_test);
- #endif
-+    g_test_add_func("/char/hotswap", char_hotswap_test);
-=20
-     return g_test_run();
+     Error *local_err = NULL;
+     const ChardevClass *cc;
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 275ccdf..c4c96db 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1724,7 +1724,23 @@ ETEXI
+ STEXI
+ @item chardev-add args
+ @findex chardev-add
+-chardev_add accepts the same parameters as the -chardev command line switch.
++chardev-add accepts the same parameters as the -chardev command line switch.
++
++ETEXI
++
++    {
++        .name       = "chardev-change",
++        .args_type  = "id:s,args:s",
++        .params     = "id args",
++        .help       = "change chardev",
++        .cmd        = hmp_chardev_change,
++    },
++
++STEXI
++@item chardev-change args
++@findex chardev-change
++chardev-change accepts existing chardev @var{id} and then the same arguments
++as the -chardev command line switch (except for "id").
+ 
+ ETEXI
+ 
+diff --git a/hmp.c b/hmp.c
+index dee4028..1b443e1 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2228,6 +2228,40 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, &err);
  }
---=20
+ 
++void hmp_chardev_change(Monitor *mon, const QDict *qdict)
++{
++    const char *args = qdict_get_str(qdict, "args");
++    const char *id;
++    Error *err = NULL;
++    ChardevBackend *backend = NULL;
++    ChardevReturn *ret = NULL;
++    QemuOpts *opts = qemu_opts_parse_noisily(qemu_find_opts("chardev"), args,
++                                             true);
++    if (!opts) {
++        error_setg(&err, "Parsing chardev args failed");
++        goto end;
++    }
++
++    id = qdict_get_str(qdict, "id");
++    if (qemu_opts_id(opts)) {
++        error_setg(&err, "Unexpected 'id' parameter");
++        goto end;
++    }
++
++    backend = qemu_chr_parse_opts(opts, &err);
++    if (!backend) {
++        goto end;
++    }
++
++    ret = qmp_chardev_change(id, backend, &err);
++
++end:
++    qapi_free_ChardevReturn(ret);
++    qapi_free_ChardevBackend(backend);
++    qemu_opts_del(opts);
++    hmp_handle_error(mon, &err);
++}
++
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict)
+ {
+     Error *local_err = NULL;
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+index 6dfa0c3..d77b3c8 100644
+--- a/tests/test-hmp.c
++++ b/tests/test-hmp.c
+@@ -23,6 +23,7 @@ static const char *hmp_cmds[] = {
+     "boot_set ndc",
+     "chardev-add null,id=testchardev1",
+     "chardev-send-break testchardev2",
++    "chardev-change testchardev1 ringbuf",
+     "chardev-remove testchardev1",
+     "commit all",
+     "cpu-add 1",
+-- 
 2.7.4
