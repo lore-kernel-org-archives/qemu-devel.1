@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dSuan-0007Nj-CB
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:26 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dSuaq-0007Pj-BM
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dSuak-0002Kw-84
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:25 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33859)
+	(envelope-from <rth7680@gmail.com>) id 1dSuap-0002Mb-A5
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:28 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33869)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSuak-0002KN-2E
-	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:22 -0400
-Received: by mail-qt0-x243.google.com with SMTP id m54so644925qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 17:24:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dSuap-0002MW-5m
+	for qemu-devel@nongnu.org; Wed, 05 Jul 2017 20:24:27 -0400
+Received: by mail-qt0-x244.google.com with SMTP id m54so645233qtb.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Jul 2017 17:24:27 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  5 Jul 2017 14:23:50 -1000
-Message-Id: <20170706002401.10507-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 00/11] target/sh4 improvments
+Date: Wed,  5 Jul 2017 14:23:52 -1000
+Message-Id: <20170706002401.10507-3-rth@twiddle.net>
+In-Reply-To: <20170706002401.10507-1-rth@twiddle.net>
+References: <20170706002401.10507-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH 02/11] target/sh4: Consolidate end-of-TB tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +29,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, bruno@clisp.org
 
-This fixes two problems with atomic operations on sh4,
-including an attempt at supporting the user-space atomics
-technique used by most sh-linux-user binaries.
+We can fold 3 different tests within the decode loop
+into a more accurate computation of max_insns to start.
 
-This is good enough to run the one occurrence in linux-user-test-0.3.
-I'm still downloading enough of a cross environment to be able to run
-more recent sh4 binaries.  Including the one in the LP bug report.
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ target/sh4/translate.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
-Thoughts and more extensive testing appreciated.
-
-
-r~
-
-
-Richard Henderson (11):
-  target/sh4: Use cmpxchg for movco
-  target/sh4: Consolidate end-of-TB tests
-  target/sh4: Handle user-space atomics
-  target/sh4: Recognize common gUSA sequences
-  linux-user/sh4: Notice gUSA regions during signal delivery
-  target/sh4: Hoist register bank selection
-  target/sh4: Unify cpu_fregs into FREG
-  target/sh4: Pass DisasContext to fpr64 routines
-  target/sh4: Avoid a potential translator crash for malformed FPR64
-  target/sh4: Hoist fp bank selection
-  target/sh4: Eliminate DREG macro
-
- target/sh4/cpu.h       |  24 +-
- target/sh4/helper.h    |   1 +
- linux-user/signal.c    |  21 ++
- target/sh4/op_helper.c |   6 +
- target/sh4/translate.c | 724 ++++++++++++++++++++++++++++++++++++++-----------
- 5 files changed, 621 insertions(+), 155 deletions(-)
-
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 6b247fa..e1661e9 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1856,7 +1856,6 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+     ctx.features = env->features;
+     ctx.has_movcal = (ctx.tbflags & TB_FLAG_PENDING_MOVCA);
+ 
+-    num_insns = 0;
+     max_insns = tb->cflags & CF_COUNT_MASK;
+     if (max_insns == 0) {
+         max_insns = CF_COUNT_MASK;
+@@ -1864,9 +1863,23 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+     if (max_insns > TCG_MAX_INSNS) {
+         max_insns = TCG_MAX_INSNS;
+     }
++    /* Since the ISA is fixed-width, we can bound by the number
++       of instructions remaining on the page.  */
++    num_insns = (TARGET_PAGE_SIZE - (ctx.pc & (TARGET_PAGE_SIZE - 1))) / 2;
++    if (max_insns > num_insns) {
++        max_insns = num_insns;
++    }
++    /* Single stepping means just that.  */
++    if (ctx.singlestep_enabled || singlestep) {
++        max_insns = 1;
++    }
+ 
+     gen_tb_start(tb);
+-    while (ctx.bstate == BS_NONE && !tcg_op_buf_full()) {
++    num_insns = 0;
++
++    while (ctx.bstate == BS_NONE
++           && num_insns < max_insns
++           && !tcg_op_buf_full()) {
+         tcg_gen_insn_start(ctx.pc, ctx.envflags);
+         num_insns++;
+ 
+@@ -1890,18 +1903,10 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+         ctx.opcode = cpu_lduw_code(env, ctx.pc);
+ 	decode_opc(&ctx);
+ 	ctx.pc += 2;
+-	if ((ctx.pc & (TARGET_PAGE_SIZE - 1)) == 0)
+-	    break;
+-        if (cs->singlestep_enabled) {
+-	    break;
+-        }
+-        if (num_insns >= max_insns)
+-            break;
+-        if (singlestep)
+-            break;
+     }
+-    if (tb->cflags & CF_LAST_IO)
++    if (tb->cflags & CF_LAST_IO) {
+         gen_io_end();
++    }
+     if (cs->singlestep_enabled) {
+         gen_save_cpu_state(&ctx, true);
+         gen_helper_debug(cpu_env);
 -- 
 2.9.4
