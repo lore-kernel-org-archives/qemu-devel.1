@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anderson@redhat.com>) id 1dTBDT-0006dQ-MY
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:09:28 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dTBFJ-0007Hb-Oy
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:11:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anderson@redhat.com>) id 1dTBDP-0005YW-LQ
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:09:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anderson@redhat.com>) id 1dTBDP-0005Xd-Cy
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:09:23 -0400
-Date: Thu, 6 Jul 2017 14:09:18 -0400 (EDT)
-From: Dave Anderson <anderson@redhat.com>
-Message-ID: <850987754.33489091.1499364558887.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAJ+F1C+um2ep_SF-jWxmLH2PRhCQhcv9LPFW3RyXoCcs=GVh7A@mail.gmail.com>
-References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
-	<20170706101611.27031-6-marcandre.lureau@redhat.com>
-	<72817738-deb5-f64e-7247-89dbdf10ddbd@redhat.com>
-	<CAJ+F1C+um2ep_SF-jWxmLH2PRhCQhcv9LPFW3RyXoCcs=GVh7A@mail.gmail.com>
+	(envelope-from <kchamart@redhat.com>) id 1dTBFJ-0006y4-0R
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 14:11:21 -0400
+Date: Thu, 6 Jul 2017 20:11:10 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170706181110.jcnd3xf63qpf5ktn@eukaryote>
+References: <1499351806-3359-1-git-send-email-kchamart@redhat.com>
+	<1499351806-3359-3-git-send-email-kchamart@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] kdump: add vmcoreinfo ELF note
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499351806-3359-3-git-send-email-kchamart@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] live-block-ops.txt: Rename, rewrite,
+ and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,119 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com
 
+On Thu, Jul 06, 2017 at 04:36:46PM +0200, Kashyap Chamarthy wrote:
+> This patch documents (including their QMP invocations) all the four
+> major kinds of live block operations:
 
+[...]
 
------ Original Message -----
-> Hi
->=20
-> On Thu, Jul 6, 2017 at 7:13 PM, Laszlo Ersek <lersek@redhat.com> wrote:
-> > On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
-> >> kdump header provides offset and size of the vmcoreinfo ELF note,
-> >> append it if available.
-> >>
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >> ---
-> >>  dump.c | 20 ++++++++++++++++++++
-> >>  1 file changed, 20 insertions(+)
-> >>
-> >> diff --git a/dump.c b/dump.c
-> >> index f699198204..dd416ad271 100644
-> >> --- a/dump.c
-> >> +++ b/dump.c
-> >> @@ -839,6 +839,16 @@ static void create_header32(DumpState *s, Error
-> >> **errp)
-> >>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
-> >>
-> >>      offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
-> >> +    if (s->vmcoreinfo) {
-> >> +        uint64_t hsize, name_size, size_vmcoreinfo_desc,
-> >> offset_vmcoreinfo;
-> >> +
-> >> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size,
-> >> &size_vmcoreinfo_desc);
-> >> +        offset_vmcoreinfo =3D offset_note + s->note_size -
-> >> s->vmcoreinfo_size +
-> >> +            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) * 4=
-;
-> >> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo)=
-;
-> >> +        kh->size_vmcoreinfo =3D cpu_to_dump32(s, size_vmcoreinfo_desc=
-);
-> >> +    }
-> >> +
-> >>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
-> >>      kh->note_size =3D cpu_to_dump32(s, s->note_size);
-> >>
-> >> @@ -939,6 +949,16 @@ static void create_header64(DumpState *s, Error
-> >> **errp)
-> >>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
-> >>
-> >>      offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
-> >> +    if (s->vmcoreinfo) {
-> >> +        uint64_t hsize, name_size, size_vmcoreinfo_desc,
-> >> offset_vmcoreinfo;
-> >> +
-> >> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size,
-> >> &size_vmcoreinfo_desc);
-> >> +        offset_vmcoreinfo =3D offset_note + s->note_size -
-> >> s->vmcoreinfo_size +
-> >> +            (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name_size, 4)) * 4=
-;
-> >> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo)=
-;
-> >> +        kh->size_vmcoreinfo =3D cpu_to_dump64(s, size_vmcoreinfo_desc=
-);
-> >> +    }
-> >> +
-> >>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
-> >>      kh->note_size =3D cpu_to_dump64(s, s->note_size);
-> >>
-> >>
-> >
-> > I continue to think that this patch is unnecessary, but if you insist,
+> (cherry picked from commit aef3e734f2d30b97e29345943d9e1cab794d0846)
 
-> > it does look OK to me.
-> >
-> > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->=20
-> Without it, crash doesn't read the vmcoreinfo PT_NOTE. And for some
-> reason, the phys_base in the header wasn't enough (to be doubled
-> checked).
->
-> Any comment Dave about crash handling of vmcoreinfo in kdump files?
+Oops, the above "cherry picked" line is accidental -- as I was doing
+some local branch wrangling.  It can be removed when applying the patch.
+If the maintainer asks, I can respin.  But I'll first wait for any other
+feedback, if there is.
 
-It just reads the kdump_sub_header's offset_vmcoreinfo and size_vmcoreinfo
-fields to gather the vmcoreinfo data into a local buffer of memory, and
-scans the strings for whatever it's looking for.=20
+> ---
+>  docs/interop/live-block-operations.rst | 1072 ++++++++++++++++++++++++++++++++
+>  docs/live-block-ops.txt                |   72 ---
+>  2 files changed, 1072 insertions(+), 72 deletions(-)
+>  create mode 100644 docs/interop/live-block-operations.rst
+>  delete mode 100644 docs/live-block-ops.txt
 
-With respect to phys_base, the only thing that might be of consequence
-is this fairly recent change that's currently only in the github repo,
-queued for crash-7.2.0:
+[...]
 
-  commit a4a538caca140a8e948bbdae2be311168db7a1eb
-  Author: Dave Anderson <anderson@redhat.com>
-  Date:   Tue May 2 16:51:53 2017 -0400
-
-    Fix for Linux 4.10 and later kdump dumpfiles, or kernels that have
-    backported commit 401721ecd1dcb0a428aa5d6832ee05ffbdbffbbe, titled
-    "kexec: export the value of phys_base instead of symbol address".
-    Without the patch, if the x86_64 "phys_base" value in the VMCOREINFO
-    note is a negative decimal number, the crash session fails during
-    session intialization with a "page excluded" or "seek error" when
-    reading "page_offset_base".
-    (anderson@redhat.com)
-
-Also, crash-7.1.9 was the first version that started looking in the=20
-vmcoreinfo data for phys_base instead of in the kdump_sub_header.
-
-Dave
-
->=20
->=20
->=20
-> --
-> Marc-Andr=C3=A9 Lureau
->=20
+-- 
+/kashyap
