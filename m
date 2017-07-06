@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dTAJe-0000WM-TC
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:11:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dTALI-0001RU-1a
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:13:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dTAJb-00068u-MA
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:11:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38944)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dTAJb-00068B-DS
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:11:43 -0400
-Date: Thu, 6 Jul 2017 13:11:35 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <67124212.47615869.1499361095640.JavaMail.zimbra@redhat.com>
-In-Reply-To: <7813DE88-EB6D-4330-AC69-27E7051C4000@intel.com>
-References: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
-	<20170302214746.GA4711@redhat.com>
-	<9950C259-FD65-4286-84D0-89FA00420E86@nutanix.com>
-	<20170706164014-mutt-send-email-mst@kernel.org>
-	<757B1E6A-A74C-47E2-A239-893F40922DD2@intel.com>
-	<30b1f1cb-f959-7711-96c2-5d5c138135e1@redhat.com>
-	<7813DE88-EB6D-4330-AC69-27E7051C4000@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dTALH-0007gO-4e
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:13:28 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34655)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dTALG-0007fm-Ss
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 13:13:27 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id 77so11494792wrb.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 10:13:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] Introduce vhost-user-scsi and
- sample application
+In-Reply-To: <3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 6 Jul 2017 18:13:05 +0100
+Message-ID: <CAFEAcA-VGRYZ7+Osa8J1Ew+P=wf42uOtVvmV9mmGBTwC-f++8w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James R Harris <james.r.harris@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Hi
+On 5 July 2017 at 13:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 04/07/2017 19:02, Peter Maydell wrote:
+>> Many board models and several devices need to create auxiliary
+>> regions of RAM (in addition to the main lump of 'system' memory),
+>> to model static RAMs, video memory, ROMs, etc. Currently they do
+>> this with a sequence like:
+>>        memory_region_init_ram(sram, NULL, "sram", 0x10000, &error_fatal);
+>>        vmstate_register_ram_global(sram);
+>
+> Instead of vmstate_register_ram_global, you should use
+>
+>     vmstate_register_ram(mr, owner);
+>
+> You should even do it for all memory regions, probably.
 
------ Original Message -----
-> 
-> > On Jul 6, 2017, at 9:56 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > 
-> > 
-> > On 06/07/2017 18:54, Harris, James R wrote:
-> >> Hi Michael,
-> >> 
-> >> Yes - we (SPDK team at Intel) have this on our TODO list, in addition
-> >> to a polled mode virtio-scsi driver (akin to the DPDK virtio-net driver
-> >> that
-> >> can be used in the guest).
-> > 
-> > Can you also look at virtio-blk poll-mode drivers and vhost-user-blk
-> > (vhost-user-blk would be really easy to write, the sample server being
-> > much more work than the QEMU code)?
-> > 
-> > Paolo
-> 
-> Hi Paolo,
-> 
-> vhost-user-blk:
-> 
-> We have an initial implementation in our SPDK QEMU repo.  Changpeng Liu
-> (added)
-> will be sending this to the QEMU mailing list shortly.  If you are interested
-> in viewing it
-> before it hits the mailing list, you can take a look at the patch here:
-> 
-> https://github.com/spdk/qemu/commit/db2fcb0f5002c3d195e756eab07bd976ccf6e7c8
+Slightly awkward because owner is an Object but vmstate_register_ram()
+needs a DeviceState. Is this OK, or too much magic?
 
-Great! I also just started looking into this, I'll take a look at your implementation. Do you also have a "server"/slave side, or plan to share one?
+    DeviceState *owner_dev;
+    Error *err = NULL;
 
-(fwiw, I have vhost-user-input & gpu in this branch https://github.com/elmarco/qemu/commits/vhost-user - I just rebased/fixed it, as it was 1y old already - there are a few changes I'd like to make now)
+    memory_region_init_ram(mr, owner, name, ram_size, &err);
+    if (err) {
+        error_propagate(errp, err);
+        return;
+    }
+    /* Note that owner_dev may be NULL if owner is not a DeviceState;
+     * in that case this is equivalent to calling vmstate_register_ram_global().
+     */
+    owner_dev = object_dynamic_cast(owner, TYPE_DEVICE);
+    vmstate_register_ram(mr, owner_dev);
 
-> 
-> virtio-blk poll-mode driver:
-> 
-> Yes - this is part of our plan as well - once we have virtio-scsi in place,
-> adding virtio-blk
-> will be relatively straightforward.
-> 
-> Thanks,
-> 
-> -Jim
-> 
-> 
+thanks
+-- PMM
