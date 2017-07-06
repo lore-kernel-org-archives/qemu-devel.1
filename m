@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dT85v-00006K-Pu
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:49:28 -0400
+	(envelope-from <jiaxin.wu@intel.com>) id 1dT872-0000kK-P9
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dT85s-00048T-2P
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:49:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47630)
+	(envelope-from <jiaxin.wu@intel.com>) id 1dT86z-0004mt-G6
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:50:36 -0400
+Received: from mga01.intel.com ([192.55.52.88]:20605)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dT85r-00047y-Pa
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:49:24 -0400
-References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
-	<20170621153424.16690-7-vsementsov@virtuozzo.com>
-	<ac4e0a9b-1846-86b2-1e78-f8ae6a61c3ec@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <04346a67-66b0-2ca3-0b2c-ecdb8d2c2012@redhat.com>
-Date: Thu, 6 Jul 2017 09:49:18 -0500
+	(Exim 4.71) (envelope-from <jiaxin.wu@intel.com>) id 1dT86y-0004lk-TP
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:50:33 -0400
+From: "Wu, Jiaxin" <jiaxin.wu@intel.com>
+Date: Thu, 6 Jul 2017 14:49:14 +0000
+Message-ID: <895558F6EA4E3B41AC93A00D163B7274162E2A33@SHSMSX103.ccr.corp.intel.com>
+References: <895558F6EA4E3B41AC93A00D163B7274162E2512@SHSMSX103.ccr.corp.intel.com>
+	<503895c7-4649-a568-2ee4-0fea1908fd60@redhat.com>
+	<537c874c-a5d4-30ce-6bb2-1a2bc345f66a@redhat.com>
+	<d3c0a77d-3559-c67e-705c-002460b783b2@redhat.com>
+In-Reply-To: <d3c0a77d-3559-c67e-705c-002460b783b2@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <ac4e0a9b-1846-86b2-1e78-f8ae6a61c3ec@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cvBBOVKKq6lqRpmi11EdRu71OfpJKfOAx"
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] nbd: use generic trace subsystem
- instead of TRACE macro
+Subject: Re: [Qemu-devel] The maximum limit of virtual network device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, stefanha@redhat.com, den@openvz.org
+To: Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alexander Bezzubikov <zuban32s@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cvBBOVKKq6lqRpmi11EdRu71OfpJKfOAx
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, stefanha@redhat.com, den@openvz.org
-Message-ID: <04346a67-66b0-2ca3-0b2c-ecdb8d2c2012@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] nbd: use generic trace subsystem
- instead of TRACE macro
-References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
- <20170621153424.16690-7-vsementsov@virtuozzo.com>
- <ac4e0a9b-1846-86b2-1e78-f8ae6a61c3ec@redhat.com>
-In-Reply-To: <ac4e0a9b-1846-86b2-1e78-f8ae6a61c3ec@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06/29/2017 03:12 PM, Eric Blake wrote:
-> On 06/21/2017 10:34 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Starting from this patch to enable traces use -trace option of qemu or=
-
->> -T, --trace option of qemu-img, qemu-io and qemu-nbd. For qemu traces
->> also can be managed by qmp commands trace-event-{get,set}-state.
->=20
-> Maybe:
->=20
-> Let NBD use the trace mechanisms already present in qemu. Now you can
-> use the -trace optino of qemu, or the -T/--trace option of qemu-img,
-> qemu-io, and qemu-nbd, to select nbd traces.  For qemu, the QMP command=
-s
-> trace-event-{get,set}-state can also toggle tracing on the fly.
->=20
-> I also mentioned in v1 that an actual command line example might be
-> helpful (for example, is it qemu-nbd --trace "nbd_*" to get ALL nbd
-> traces enabled?)
-
-Answering myself: almost.  Either you have to use the pattern --trace
-"*nbd_*", or better, you follow Paolo's advice to rename any 'do_nbd_'
-traces to be just 'nbd_'.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---cvBBOVKKq6lqRpmi11EdRu71OfpJKfOAx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZXk3vAAoJEKeha0olJ0NqqyYH/02mmJtRnXfQXmNTp5R0wvxh
-aeZdV+F3LIHqEot1nyprFe2RUjDT1R8hg14cwY9O6qiVkfPfFBRkLsqatEQqEKVz
-8HG/+qh4x4gybV6tGwcZUqJbR/TFNOwvbXqRrIqi60RAAJW46Q+cOlQe0Lkw4MiX
-KipR7S2NbS5PLfW2qqJJJLA2DReMOZ8CSim4zWv4z9o1IPZKdIqgoOe8vd1ilhM5
-Wls54QqQlGizhBaVztiHwchgDFBLtdo3Bvm/y41eUhd1xdM3u4SOfL/oIFbfTrpz
-QJ4Dm6W93+VR6xe72b17ZMIzsUl9Xrgn1f9fOLIhPwb1+E0uclsoH3ATF3MS2NI=
-=e4S2
------END PGP SIGNATURE-----
-
---cvBBOVKKq6lqRpmi11EdRu71OfpJKfOAx--
+VGhhbmtzIExhc3psbyBhbmQgTWFyY2VsIGZvciB0aGUgY29tbWVudHMvc3VnZ2VzdGlvbi4gSXQg
+aXMgcXVpdGUgaGVscGZ1bCBhZ2FpbnN0IG15IHVzYWdlIGNhc2UuDQoNCj4gPj4gLSB1c2UgUTM1
+IChmb3IgYSBsYXJnZXIgSU8gc3BhY2UpLA0KPiA+PiAtIHBsdWcgYSBETUktUENJIGJyaWRnZSBp
+bnRvIHRoZSByb290IGJyaWRnZSwNCj4gPj4gLSBwbHVnIDUgUENJIGJyaWRnZXMgaW50byB0aGUg
+RE1JLVBDSSBicmlkZ2UsDQo+ID4+IC0gcGx1ZyAzMSBOSUNzIHBlciBQQ0kgYnJpZGdlLCBlYWNo
+IE5JQyBpbnRvIGEgc2VwYXJhdGUgc2xvdC4NCg0KQmVzdCByZWdhcmRzIQ0KSmlheGluDQoNCg0K
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMYXN6bG8gRXJzZWsgW21haWx0
+bzpsZXJzZWtAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEp1bHkgNiwgMjAxNyA1OjQ2
+IFBNDQo+IFRvOiBNYXJjZWwgQXBmZWxiYXVtIDxtYXJjZWxAcmVkaGF0LmNvbT47IFd1LCBKaWF4
+aW4NCj4gPGppYXhpbi53dUBpbnRlbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEFsZXhh
+bmRlciBCZXp6dWJpa292DQo+IDx6dWJhbjMyc0BnbWFpbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBb
+UWVtdS1kZXZlbF0gVGhlIG1heGltdW0gbGltaXQgb2YgdmlydHVhbCBuZXR3b3JrIGRldmljZQ0K
+PiANCj4gT24gMDcvMDYvMTcgMTE6MjQsIE1hcmNlbCBBcGZlbGJhdW0gd3JvdGU6DQo+ID4gT24g
+MDYvMDcvMjAxNyAxMTozMSwgTGFzemxvIEVyc2VrIHdyb3RlOg0KPiANCj4gPj4gPiBOb3csIEkg
+d291bGQgbm9ybWFsbHkgcmVjb21tZW5kIHN0aWNraW5nIHdpdGggaTQ0MGZ4IGZvciBzaW1wbGlj
+aXR5Lg0KPiA+PiBIb3dldmVyLCBlYWNoIFBDSSBicmlkZ2UgcmVxdWlyZXMgNEtCIG9mIElPIHNw
+YWNlIChtZWFuaW5nICgxICsgNSkgKiA0S0INCj4gPj4gPSAyNEtCKSwgIGFuZCBPVk1GIG9uIHRo
+ZSBpNDQwZnggZG9lcyBub3Qgc3VwcG9ydCB0aGF0IG11Y2ggKG9ubHkNCj4gPj4gMHg0MDAwKS4g
+U28sIEknbGwgcmVjb21tZW5kIFEzNSBmb3IgSU8gc3BhY2UgcHVycG9zZXM7IE9WTUYgb24gUTM1
+DQo+ID4+IHByb3ZpZGVzIDB4QTAwMCAoNDBLQikuDQo+ID4NCj4gPiBTbyBpZiB3ZSB1c2UgT1ZN
+RiwgZ29pbmcgZm9yIFEzNSBnaXZlcyB1cyBhY3R1YWxseSBtb3JlIElPIHNwYWNlLCBuaWNlIQ0K
+PiA+IEhvd2V2ZXIgcmVjb21tZW5kaW5nIFEzNSBmb3IgSU8gc3BhY2Ugc2VlbXMgb2RkIDopDQo+
+IA0KPiBPVk1GIHVzZWQgdG8gaGF2ZSBvbmx5IDB4NDAwMCBieXRlcyBmb3IgUENJIElPIGFwZXJ0
+dXJlLCBzaW5jZSB0aGUNCj4gYmVnaW5uaW5nLiBJbiA8aHR0cHM6Ly9idWd6aWxsYS5yZWRoYXQu
+Y29tL3Nob3dfYnVnLmNnaT9pZD0xMzMzMjM4PiBJDQo+IGludmVzdGlnYXRlZCBob3cgbXVjaCBJ
+IGNvdWxkIGdyb3cgdGhlIGFwZXJ0dXJlLiBPbiBRMzUsIGl0IHdhcyBwb3NzaWJsZQ0KPiB0byBn
+cm93IGl0IHRvIDB4QTAwMCBieXRlcyAoYnV0IGV2ZW4gdGhlbiB5b3UgaGF2ZSB0byBkaXNhYmxl
+IHZtcG9ydCwNCj4gd2hpY2ggc29ydCBvZiBzaXRzIGluIHRoZSBtaWRkbGUgb3RoZXJ3aXNlKS4g
+T24gaTQ0MGZ4LCB0aGUgSU8gcG9ydHMgaW4NCj4gdXNlIGJ5IHBsYXRmb3JtIGRldmljZXMgd2Vy
+ZSBzbyBiYWRseSBkaXN0cmlidXRlZCB0aGF0IG1vdmluZyBiZXlvbmQNCj4gMHg0MDAwIHdhcyBu
+b3QgcG9zc2libGUuIFNlZSBpbiBwYXJ0aWN1bGFyOg0KPiANCj4gaHR0cHM6Ly9idWd6aWxsYS5y
+ZWRoYXQuY29tL3Nob3dfYnVnLmNnaT9pZD0xMzMzMjM4I2MxNg0KPiBodHRwczovL2J1Z3ppbGxh
+LnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTEzMzMyMzgjYzE5DQo+IA0KPiA+PiBUaGVyZWZv
+cmUgSSBndWVzcyB0aGUgc2ltcGxlc3QgZXhhbXBsZSBJIGNhbiBnaXZlIG5vdyBpczoNCj4gPj4g
+LSB1c2UgUTM1IChmb3IgYSBsYXJnZXIgSU8gc3BhY2UpLA0KPiA+PiAtIHBsdWcgYSBETUktUENJ
+IGJyaWRnZSBpbnRvIHRoZSByb290IGJyaWRnZSwNCj4gPj4gLSBwbHVnIDUgUENJIGJyaWRnZXMg
+aW50byB0aGUgRE1JLVBDSSBicmlkZ2UsDQo+ID4+IC0gcGx1ZyAzMSBOSUNzIHBlciBQQ0kgYnJp
+ZGdlLCBlYWNoIE5JQyBpbnRvIGEgc2VwYXJhdGUgc2xvdC4NCj4gPj4NCj4gPg0KPiA+IFRoZSBz
+ZXR1cCBsb29rcyBPSyB0byBtZSAoYXNzdW1pbmcgT1ZNRiBpcyBuZWVkZWQsIG90aGVyd2lzZQ0K
+PiA+IFBDICsgcGNpLWJyaWRnZXMgd2lsbCByZXN1bHQgaW4gbW9yZSBkZXZpY2VzKSwNCj4gDQo+
+IE9WTUYgaXMgcXVpdGUgbmVlZGVkOyBKaWF4aW4gaXMgb25lIG9mIHRoZSBlZGsyIG5ldHdvcmtp
+bmcgbWFpbnRhaW5lcnMsDQo+IGFuZCBJIHRoaW5rIGhlJ3MgdXNpbmcgUUVNVSBhbmQgT1ZNRiBh
+cyBhIHRlc3RiZWQgZm9yIG90aGVyd2lzZQ0KPiBwaHlzaWNhbGx5LW9yaWVudGVkIFVFRkkgZGV2
+ZWxvcG1lbnQuDQo+IA0KPiA+IEkgZG8gaGF2ZSBhIGxpdHRsZSBjb25jZXJuLg0KPiA+IFdlIHdh
+bnQgdG8gZGVwcmVjYXRlIHRoZSBkbWktcGNpIGJyaWRnZSBzaW5jZSBpdCBkb2VzIG5vdCBzdXBw
+b3J0DQo+ID4gaG90LXBsdWcgKGZvciBpdHNlbGYgb3IgZGV2aWNlcyBiZWhpbmQgaXQpLg0KPiA+
+IEFsZXhhbmRyIChDQ2VkKSBpcyBhIEdTT0Mgc3R1ZGVudCB3b3JraW5nIG9uIGEgZ2VuZXJpYw0K
+PiA+IHBjaWUtcGNpIGJyaWRnZSB0aGF0IGNhbiAoZXZlbnR1YWxseSkgYmUgaG90LXBsdWdnZWQN
+Cj4gPiBpbnRvIGEgUENJZSBSb290IFBvcnQgYW5kIGtlZXBzIHRoZSBtYWNoaW5lIGNsZWFuZXIu
+DQo+IA0KPiBOaWNlIQ0KPiANCj4gUGxlYXNlIGluY2x1ZGUgYW4gdXBkYXRlIHRvICJkb2NzL3Bj
+aWUudHh0IiBpbiB0aGUgc2NvcGUgOikNCj4gDQo+IFRoYW5rcyENCj4gTGFzemxvDQo=
