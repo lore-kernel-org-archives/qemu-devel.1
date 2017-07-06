@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dT9U9-0007cf-V7
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:18:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dT9a7-00017P-Ri
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dT9U6-0008Fk-Ox
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:18:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38424)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dT9U6-0008Ej-EU
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:18:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C86C34E334
-	for <qemu-devel@nongnu.org>; Thu,  6 Jul 2017 16:18:28 +0000 (UTC)
-References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
-	<20170706101611.27031-4-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9d4f167c-70b1-bad7-7a87-7727f9b1ccf8@redhat.com>
-Date: Thu, 6 Jul 2017 18:18:24 +0200
+	(envelope-from <eblake@redhat.com>) id 1dT9a6-0003xj-5x
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:24:43 -0400
+References: <20170705210842.960-1-eblake@redhat.com>
+	<20170705210842.960-20-eblake@redhat.com>
+	<20170706160203.GM5975@noname.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8bc92879-aa6d-5528-cd42-d99f2c88324c@redhat.com>
+Date: Thu, 6 Jul 2017 11:24:27 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170706101611.27031-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] tests: add simple vmcoreinfo test
+In-Reply-To: <20170706160203.GM5975@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jUCkGO91HR5gbFhMXx4FXue1Lx9CjkgP4"
+Subject: Re: [Qemu-devel] [PATCH v4 19/21] block: Make bdrv_is_allocated()
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,205 +26,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, anderson@redhat.com, imammedo@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-I didn't look at this patch in the previous version, hoping that someone
-else would. Apparently that hasn't happened, so I'll comment, purely
-based on a comparison with the vmgenid test:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jUCkGO91HR5gbFhMXx4FXue1Lx9CjkgP4
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, jcody@redhat.com,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <8bc92879-aa6d-5528-cd42-d99f2c88324c@redhat.com>
+Subject: Re: [PATCH v4 19/21] block: Make bdrv_is_allocated() byte-based
+References: <20170705210842.960-1-eblake@redhat.com>
+ <20170705210842.960-20-eblake@redhat.com>
+ <20170706160203.GM5975@noname.redhat.com>
+In-Reply-To: <20170706160203.GM5975@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
-> This test is based off vmgenid test from Ben Warren
-> <ben@skyportsystems.com>. It simply checks the vmcoreinfo ACPI device
-> is present and that the memory region associated can be read.
+On 07/06/2017 11:02 AM, Kevin Wolf wrote:
+> Am 05.07.2017 um 23:08 hat Eric Blake geschrieben:
+>> We are gradually moving away from sector-based interfaces, towards
+>> byte-based.  In the common case, allocation is unlikely to ever use
+>> values that are not naturally sector-aligned, but it is possible
+>> that byte-based values will let us be more precise about allocation
+>> at the end of an unaligned file that can do byte-based access.
+>>
+>> Changing the signature of the function to use int64_t *pnum ensures
+>> that the compiler enforces that all callers are updated.  For now,
+>> the io.c layer still assert()s that all callers are sector-aligned
+>> on input and that *pnum is sector-aligned on return to the caller,
+>> but that can be relaxed when a later patch implements byte-based
+>> block status.  Therefore, this code adds usages like
+>> DIV_ROUND_UP(,BDRV_SECTOR_SIZE) to callers that still want aligned
+>> values, where the call might reasonbly give non-aligned results
+>> in the future; on the other hand, no rounding is needed for callers
+>> that should just continue to work with byte alignment.
+>>
+>> For the most part this patch is just the addition of scaling at the
+>> callers followed by inverse scaling at bdrv_is_allocated().  But
+>> some code, particularly bdrv_commit(), gets a lot simpler because it
+>> no longer has to mess with sectors; also, it is now possible to pass
+>> NULL if the caller does not care how much of the image is allocated
+>> beyond the initial offset.
+>>
+>> For ease of review, bdrv_is_allocated_above() will be tackled
+>> separately.
+>>
+
+>> @@ -1036,14 +1036,15 @@ static int coroutine_fn bdrv_aligned_preadv(Bd=
+rvChild *child,
+
+>>
+>> -        if (!ret || pnum !=3D nb_sectors) {
+>> +        if (!ret || pnum !=3D nb_sectors << BDRV_SECTOR_BITS) {
+>>              ret =3D bdrv_co_do_copy_on_readv(child, offset, bytes, qi=
+ov);
+>>              goto out;
+>>          }
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/vmcoreinfo-test.c | 130 ++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/Makefile.include  |   2 +
->  2 files changed, 132 insertions(+)
->  create mode 100644 tests/vmcoreinfo-test.c
+> This code would become a lot simpler if you just removed the local
+> variables start_sector/end_sector and used the byte offsets instead tha=
+t
+> are available in this function. (And even simpler once sector alignment=
+
+> isn't required any more for bdrv_is_allocated(). Should we leave a
+> comment here so we won't forget the conversion?)
+
+Hmm - that cleanup is not (yet) done in my bdrv_get_block_status series
+(where I finally drop the need for sector alignment in
+bdrv_is_allocated).  Yes, I can add a temporary comment here (that aids
+with the understanding of intermediate states), as well as a new
+followup patch that actually does the cleanup.
+
+>> -int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t sect=
+or_num,
+>> -                                   int nb_sectors, int *pnum)
+>> +int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offs=
+et,
+>> +                                   int64_t bytes, int64_t *pnum)
+>>  {
+>>      BlockDriverState *file;
+>> -    int64_t ret =3D bdrv_get_block_status(bs, sector_num, nb_sectors,=
+ pnum,
+>> -                                        &file);
+>> +    int64_t sector_num =3D offset >> BDRV_SECTOR_BITS;
+>> +    int nb_sectors =3D bytes >> BDRV_SECTOR_BITS;
+>> +    int64_t ret;
+>> +    int psectors;
+>> +
+>> +    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
+>> +    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE) &&
+>> +           bytes < INT_MAX * BDRV_SECTOR_SIZE);
 >=20
-> diff --git a/tests/vmcoreinfo-test.c b/tests/vmcoreinfo-test.c
-> new file mode 100644
-> index 0000000000..c8b073366e
-> --- /dev/null
-> +++ b/tests/vmcoreinfo-test.c
-> @@ -0,0 +1,130 @@
-> +/*
-> + * QTest testcase for VM coreinfo device
-> + *
-> + * Copyright (c) 2017 Red Hat, Inc.
-> + * Copyright (c) 2017 Skyport Systems
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include <glib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include "qemu/osdep.h"
-> +#include "qemu/bitmap.h"
-> +#include "qemu/uuid.h"
-> +#include "hw/acpi/acpi-defs.h"
-> +#include "acpi-utils.h"
-> +#include "libqtest.h"
-> +
-> +#define VMCOREINFO_OFFSET 40     /* allow space for
-> +                                  * OVMF SDT Header Probe Supressor
-> +                                  */
-> +#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address =
-*/
-> +#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
-> +#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
-> +
-> +typedef struct {
-> +    AcpiTableHeader header;
-> +    gchar name_op;
-> +    gchar vcia[4];
-> +    gchar val_op;
-> +    uint32_t vcia_val;
-> +} QEMU_PACKED VgidTable;
+> I think we can actually assert bytes <=3D INT_MAX. Both ways to write t=
+he
+> assertion are only true because of BDRV_REQUEST_MAX_SECTORS, which
+> ensures that the byte counts fit in an int.
 
-This should be called something resembling "vmcoreinfo table".
+That's a tighter assertion, but if it passes, I'm fine using it.
 
-> +
-> +static uint32_t acpi_find_vcia(void)
-> +{
-> +    uint32_t off;
-> +    AcpiRsdpDescriptor rsdp_table;
-> +    uint32_t rsdt;
-> +    AcpiRsdtDescriptorRev1 rsdt_table;
-> +    int tables_nr;
-> +    uint32_t *tables;
-> +    AcpiTableHeader ssdt_table;
-> +    VgidTable vgid_table;
-
-ditto.
-
-With these fixed:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
-
-> +    int i;
-> +
-> +    /* Tables may take a short time to be set up by the guest */
-> +    for (i =3D 0; i < RSDP_TRIES_MAX; i++) {
-> +        off =3D acpi_find_rsdp_address();
-> +        if (off < RSDP_ADDR_INVALID) {
-> +            break;
-> +        }
-> +        g_usleep(RSDP_SLEEP_US);
-> +    }
-> +    g_assert_cmphex(off, <, RSDP_ADDR_INVALID);
-> +
-> +    acpi_parse_rsdp_table(off, &rsdp_table);
-> +
-> +    rsdt =3D rsdp_table.rsdt_physical_address;
-> +    /* read the header */
-> +    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-> +    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-> +
-> +    /* compute the table entries in rsdt */
-> +    tables_nr =3D (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1))=
- /
-> +                sizeof(uint32_t);
-> +    g_assert_cmpint(tables_nr, >, 0);
-> +
-> +    /* get the addresses of the tables pointed by rsdt */
-> +    tables =3D g_new0(uint32_t, tables_nr);
-> +    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-> +
-> +    for (i =3D 0; i < tables_nr; i++) {
-> +        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-> +        if (!strncmp((char *)ssdt_table.oem_table_id, "VMCOREIN", 8)) =
-{
-> +            /* the first entry in the table should be VCIA
-> +             * That's all we need
-> +             */
-> +            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
-> +            g_assert(vgid_table.name_op =3D=3D 0x08);  /* name */
-> +            ACPI_READ_ARRAY(vgid_table.vcia, tables[i]);
-> +            g_assert(memcmp(vgid_table.vcia, "VCIA", 4) =3D=3D 0);
-> +            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
-> +            g_assert(vgid_table.val_op =3D=3D 0x0C);  /* dword */
-> +            ACPI_READ_FIELD(vgid_table.vcia_val, tables[i]);
-> +            /* The GUID is written at a fixed offset into the fw_cfg f=
-ile
-> +             * in order to implement the "OVMF SDT Header probe suppre=
-ssor"
-> +             * see docs/specs/vmgenid.txt for more details
-> +             */
-> +            g_free(tables);
-> +            return vgid_table.vcia_val;
-> +        }
-> +    }
-> +    g_free(tables);
-> +    return 0;
-> +}
-> +
-> +static void vmcoreinfo_test(void)
-> +{
-> +    gchar *cmd;
-> +    uint32_t vmci_addr;
-> +    int i;
-> +
-> +    cmd =3D g_strdup_printf("-machine accel=3Dtcg -device vmcoreinfo,i=
-d=3Dvmci");
-> +    qtest_start(cmd);
-> +
-> +    vmci_addr =3D acpi_find_vcia();
-> +    g_assert(vmci_addr);
-> +
-> +    for (i =3D 0; i < 4096; i++) {
-> +        /* check the memory region can be read */
-> +        readb(vmci_addr + i);
-> +    }
-> +
-> +    qtest_quit(global_qtest);
-> +    g_free(cmd);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    int ret;
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    qtest_add_func("/vmcoreinfo/test", vmcoreinfo_test);
-> +    ret =3D g_test_run();
-> +
-> +    return ret;
-> +}
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 18cd06a6b3..f573c1d3c8 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -251,6 +251,7 @@ gcov-files-i386-y +=3D hw/usb/hcd-xhci.c
->  check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
->  check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
->  check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
-> +check-qtest-i386-y +=3D tests/vmcoreinfo-test$(EXESUF)
->  gcov-files-i386-y +=3D hw/pci-host/q35.c
->  check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D tests/vhost-user-t=
-est$(EXESUF)
->  ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-> @@ -762,6 +763,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mpt=
-imer.o
->  tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-=
-y)
->  tests/numa-test$(EXESUF): tests/numa-test.o
->  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
-> +tests/vmcoreinfo-test$(EXESUF): tests/vmcoreinfo-test.o tests/acpi-uti=
-ls.o
-> =20
->  tests/migration/stress$(EXESUF): tests/migration/stress.o
->  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $<=
- ,"LINK","$(TARGET_DIR)$@")
 >=20
+> Some of the places that call bdrv_is_allocated() actually depend on thi=
+s
+> because your patches tend to use nb_sectors << BDRV_SECTOR_BITS (which
+> truncates) rather than nb_sectors * BDRV_SECTOR_BYTES (which is always =
+a
+> 64 bit calculation).
+
+Actually, for this series of cleanups, I tried really hard to use *
+_BYTES everywhere that I widen sectors to bytes, and limit myself to >>
+_BITS for going from bytes back to sectors (after also checking if I
+needed DIV_ROUND_UP instead of straight division).  If you spot places
+where I'm still doing a 32-bit << _BITS, please call it out (as I do
+remember that I caused bugs that way back when I converted pdiscard to
+byte-based, back near commit d2cb36af).
+
+
+>> +++ b/block/stream.c
+>> @@ -137,6 +137,7 @@ static void coroutine_fn stream_run(void *opaque)
+>>
+>>      for ( ; offset < s->common.len; offset +=3D n * BDRV_SECTOR_SIZE)=
+ {
+>>          bool copy;
+>> +        int64_t count =3D 0;
+>>
+>>          /* Note that even when no rate limit is applied we need to yi=
+eld
+>>           * with no pending I/O here so that bdrv_drain_all() returns.=
+
+>> @@ -148,8 +149,8 @@ static void coroutine_fn stream_run(void *opaque)
+>>
+>>          copy =3D false;
+>>
+>> -        ret =3D bdrv_is_allocated(bs, offset / BDRV_SECTOR_SIZE,
+>> -                                STREAM_BUFFER_SIZE / BDRV_SECTOR_SIZE=
+, &n);
+>> +        ret =3D bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &co=
+unt);
+>> +        n =3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+>>          if (ret =3D=3D 1) {
+>>              /* Allocated in the top, no need to copy.  */
+>>          } else if (ret >=3D 0) {
+>=20
+> I'm not sure if I agree with rounding up here. If ret =3D=3D 0, it coul=
+d
+> mean that we skip some data that is actually allocated. So I'd like an
+> assertion better.
+>=20
+> The last patch of the series gets rid of this by switching the whole
+> function to bytes, so not that important.
+
+A temporary assertion is fine (and you're right that the assertion goes
+away once the function uses bytes everywhere).
+
+Sounds like we're racking up enough cleanups that I'll spin a v5, but
+also sounds like we're real close to getting this in.
+
+>> @@ -274,9 +275,9 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMi=
+gDevState *bmds)
+>>          /* Skip unallocated sectors; intentionally treats failure as
+>>           * an allocated sector */
+>>          while (cur_sector < total_sectors &&
+>> -               !bdrv_is_allocated(blk_bs(bb), cur_sector,
+>> -                                  MAX_IS_ALLOCATED_SEARCH, &nr_sector=
+s)) {
+>> -            cur_sector +=3D nr_sectors;
+>> +               !bdrv_is_allocated(blk_bs(bb), cur_sector * BDRV_SECTO=
+R_SIZE,
+>> +                                  MAX_IS_ALLOCATED_SEARCH, &count)) {=
+
+>> +            cur_sector +=3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+>>          }
+>>          aio_context_release(blk_get_aio_context(bb));
+>>          qemu_mutex_unlock_iothread();
+>=20
+> This one stays and it has the same problem. I think you need to round
+> down if you don't want to accidentally skip migrating allocated data.
+
+I haven't (yet) tackled trying to rewrite this one to do byte-base
+iteration, but that may help.  I'm also worried (in general) that if
+something truncates down a sub-sector result in code that is still
+sector-based, then we could get stuck in an inf-loop of querying the
+same sector offset over and over again instead of making progress.
+
+But for this particular code, I see what you are saying - we are trying
+to optimize the migration by skipping unallocated sectors, but if there
+is nothing to skip, we still make migration progress as long as I
+remember to break from the loop if I ever get a sub-sector answer (thus
+migrating the whole sector, including the [unlikely] initial unallocated
+portion).  Okay, I'll fix it for v5.
+
+>=20
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index d5a1560..5271b41 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -3229,6 +3229,7 @@ static int img_rebase(int argc, char **argv)
+>>          int64_t new_backing_num_sectors =3D 0;
+>>          uint64_t sector;
+>>          int n;
+>> +        int64_t count;
+>>          float local_progress =3D 0;
+>>
+>>          buf_old =3D blk_blockalign(blk, IO_BUF_SIZE);
+>> @@ -3276,12 +3277,14 @@ static int img_rebase(int argc, char **argv)
+>>              }
+>>
+>>              /* If the cluster is allocated, we don't need to take act=
+ion */
+>> -            ret =3D bdrv_is_allocated(bs, sector, n, &n);
+>> +            ret =3D bdrv_is_allocated(bs, sector << BDRV_SECTOR_BITS,=
+
+>> +                                    n << BDRV_SECTOR_BITS, &count);
+>>              if (ret < 0) {
+>>                  error_report("error while reading image metadata: %s"=
+,
+>>                               strerror(-ret));
+>>                  goto out;
+>>              }
+>> +            n =3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+>>              if (ret) {
+>>                  continue;
+>>              }
+>=20
+> Same thing. Sectors that are half allocated and half free must be
+> considered completely allocated if the caller can't do byte alignment.
+> Just rounding up without looking at ret isn't correct.
+>=20
+>> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+>> index b0ea327..e529b8f 100644
+>> --- a/qemu-io-cmds.c
+>> +++ b/qemu-io-cmds.c
+>> @@ -1894,15 +1889,14 @@ static int map_f(BlockBackend *blk, int argc, =
+char **argv)
+>>          }
+>>
+>>          retstr =3D ret ? "    allocated" : "not allocated";
+>> -        cvtstr(num << BDRV_SECTOR_BITS, s1, sizeof(s1));
+>> -        cvtstr(offset << BDRV_SECTOR_BITS, s2, sizeof(s2));
+>> +        cvtstr(num, s1, sizeof(s1));
+>> +        cvtstr(offset, s2, sizeof(s2));
+>>          printf("%s (0x%" PRIx64 ") bytes %s at offset %s (0x%" PRIx64=
+ ")\n",
+>> -               s1, num << BDRV_SECTOR_BITS, retstr,
+>> -               s2, offset << BDRV_SECTOR_BITS);
+>> +               s1, num, retstr, s2, offset);
+>>
+>>          offset +=3D num;
+>> -        nb_sectors -=3D num;
+>> -    } while (offset < total_sectors);
+>> +        bytes -=3D num;
+>> +    };
+>=20
+> This semicolon isn't needed.
+
+Indeed. I converted do/while to plain while, but not quite correctly ;)
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--jUCkGO91HR5gbFhMXx4FXue1Lx9CjkgP4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZXmQ7AAoJEKeha0olJ0NqPsAH/iK3LlFZhxFG+p1MnYZpfAYb
++IZCe31XaGCoY8AX8qSNcFADL3vLWuK4mWX3Bm/Ca8vdojAHPr/VBxYWCYQs9+ev
+UHqcUhoS4VOKA9mrNBejh8oFkEZGsC5mPt3GKUjawrbpKNkgj99HV6qjUEzTAm4Y
+s5lN+f9cVDEa9tyzDpiHbUjDxCznMmnDf44boFdHZKv58hILoi92yjIaq2xK648X
+hrFVmiCvqZisPrpw5qRoQ5Lpp7zV7MuJDX5NWZfBaodMWOM1ZJ+iu0yKqfVHp2Bb
+wodUbF+9PCJoLuR90PzBwIXjTAuetahE+BaYhkEixpTEWDRRhjG9Err2ZFLpJJM=
+=sKVP
+-----END PGP SIGNATURE-----
+
+--jUCkGO91HR5gbFhMXx4FXue1Lx9CjkgP4--
