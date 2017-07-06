@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9nf-0004ne-8O
+	(envelope-from <pbonzini@redhat.com>) id 1dT9nf-0004nm-EO
 	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dT9ne-000612-Es
+	(envelope-from <pbonzini@redhat.com>) id 1dT9ne-00061A-Ge
 	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 12:38:43 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu,  6 Jul 2017 18:38:18 +0200
-Message-Id: <20170706163828.24082-2-pbonzini@redhat.com>
-In-Reply-To: <20170706163828.24082-1-pbonzini@redhat.com>
-References: <20170706163828.24082-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/11] block: prepare write threshold code for
- thread safety
+Date: Thu,  6 Jul 2017 18:38:17 +0200
+Message-Id: <20170706163828.24082-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 00/11] Block layer thread-safety, next part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +20,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com
 
-Code refactoring only.
+Here, patches 1-6 make the remaining part of the block layer thread safe.
+Patches 7-11 start removing aio_context_acquire/release, so the line
+count goes down instead of up.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/write-threshold.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+This is the penultimate series.  The remaining part makes virtio-blk,
+virtio-scsi and block jobs thread safe, so that the AioContext lock
+can go away altogether.
 
-diff --git a/block/write-threshold.c b/block/write-threshold.c
-index 0bd1a01c86..c8ebc32b4d 100644
---- a/block/write-threshold.c
-+++ b/block/write-threshold.c
-@@ -37,18 +37,22 @@ static void write_threshold_disable(BlockDriverState *bs)
-     }
- }
- 
-+static uint64_t exceeded_amount(const BdrvTrackedRequest *req,
-+                                uint64_t thres)
-+{
-+    if (thres > 0 && req->offset + req->bytes > thres) {
-+        return req->offset + req->bytes - thres;
-+    } else {
-+        return 0;
-+    }
-+}
-+
- uint64_t bdrv_write_threshold_exceeded(const BlockDriverState *bs,
-                                        const BdrvTrackedRequest *req)
- {
--    if (bdrv_write_threshold_is_set(bs)) {
--        if (req->offset > bs->write_threshold_offset) {
--            return (req->offset - bs->write_threshold_offset) + req->bytes;
--        }
--        if ((req->offset + req->bytes) > bs->write_threshold_offset) {
--            return (req->offset + req->bytes) - bs->write_threshold_offset;
--        }
--    }
--    return 0;
-+    uint64_t thres = bdrv_write_threshold_get(bs);
-+
-+    return exceeded_amount(req, thres);
- }
- 
- static int coroutine_fn before_write_notify(NotifierWithReturn *notifier,
-@@ -56,14 +60,14 @@ static int coroutine_fn before_write_notify(NotifierWithReturn *notifier,
- {
-     BdrvTrackedRequest *req = opaque;
-     BlockDriverState *bs = req->bs;
--    uint64_t amount = 0;
-+    uint64_t thres = bdrv_write_threshold_get(bs);
-+    uint64_t amount = exceeded_amount(req, thres);
- 
--    amount = bdrv_write_threshold_exceeded(bs, req);
-     if (amount > 0) {
-         qapi_event_send_block_write_threshold(
-             bs->node_name,
-             amount,
--            bs->write_threshold_offset,
-+            thres,
-             &error_abort);
- 
-         /* autodisable to avoid flooding the monitor */
+Paolo
+
+Paolo Bonzini (11):
+  block: prepare write threshold code for thread safety
+  block: make write-threshold thread-safe
+  util: use RCU accessors for notifiers
+  block: make before-write notifiers thread-safe
+  block-backup: add reqs_lock
+  block: more notes on locking
+  block: do not acquire AioContext in check_to_replace_node
+  block: drain I/O around key management
+  block/replication: do not acquire AioContext
+  block: do not take AioContext around reopen
+  block/snapshot: do not take AioContext lock
+  qdev: do not take AioContext when releasing (and thus closing)
+    backends
+
+ block.c                          | 19 +++--------
+ block/backup.c                   | 37 +++++++++++++++------
+ block/block-backend.c            |  5 ---
+ block/commit.c                   |  2 +-
+ block/io.c                       | 12 +++++++
+ block/mirror.c                   |  9 ------
+ block/replication.c              | 56 ++++++++------------------------
+ block/snapshot.c                 | 28 +---------------
+ block/write-threshold.c          | 39 +++++++++++-----------
+ blockdev.c                       | 70 ++++++++++++----------------------------
+ hmp.c                            |  7 ----
+ include/block/block.h            |  2 +-
+ include/block/block_backup.h     |  2 +-
+ include/block/block_int.h        | 31 ++++++++++++++++--
+ include/block/snapshot.h         |  4 +--
+ migration/savevm.c               | 22 -------------
+ monitor.c                        | 10 ++----
+ qemu-io-cmds.c                   |  2 +-
+ util/notify.c                    | 13 ++++----
+ 19 files changed, 142 insertions(+), 228 deletions(-)
+
 -- 
 2.13.0
