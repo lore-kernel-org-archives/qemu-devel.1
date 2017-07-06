@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dT6HZ-0002To-HK
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:53:22 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dT6I4-0002yy-FT
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dT6HY-0000mO-8s
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:53:21 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36435)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dT6I3-0000vW-Cq
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:53:52 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34617)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dT6HX-0000lr-Rv
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:53:20 -0400
-Received: by mail-lf0-x242.google.com with SMTP id f28so191651lfi.3
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 05:53:19 -0700 (PDT)
+	id 1dT6I3-0000vM-1U
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 08:53:51 -0400
+Received: by mail-lf0-x241.google.com with SMTP id g21so208747lfk.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 05:53:50 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <1499342940-56739-4-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1499342940-56739-1-git-send-email-anton.nefedov@virtuozzo.com>
 	<1499342940-56739-4-git-send-email-anton.nefedov@virtuozzo.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 6 Jul 2017 05:53:17 -0700
-Message-ID: <CAJ+F1CK_Cti6hUV7LAjK9HCrOprOVNXhPN_-A-G99fEqNmRLzw@mail.gmail.com>
+Date: Thu, 6 Jul 2017 05:53:48 -0700
+Message-ID: <CAJ+F1CLjJF9zCQxMQvXmMu8neM5EwH6auWOsi-oNZ0qWkviESw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v6 03/13] char: chardevice hotswap
@@ -55,6 +55,9 @@ r
 >
 > Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 
 > ---
 >  include/chardev/char.h |  9 ++++++
