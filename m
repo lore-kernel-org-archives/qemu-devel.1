@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dT3LL-0006r6-T2
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 05:45:04 -0400
+	(envelope-from <lersek@redhat.com>) id 1dT3MQ-0007QJ-I4
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 05:46:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dT3LH-0006lq-25
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 05:45:03 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35691)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dT3LG-0006kL-R7
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 05:44:58 -0400
-Received: by mail-wr0-x243.google.com with SMTP id z45so3735889wrb.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 02:44:58 -0700 (PDT)
-Date: Thu, 6 Jul 2017 10:44:55 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170706094455.GE30447@stefanha-x1.localdomain>
-References: <CAGKXQyfO-yu3qZf7RHiUPXQZDSZwn6N_48Ji8adPHozkpK9JBQ@mail.gmail.com>
-	<20170630112610.GA2437@work-vm>
-	<20170705151030.GF29910@stefanha-x1.localdomain>
-	<20170705160640.GB2284@work-vm>
+	(envelope-from <lersek@redhat.com>) id 1dT3ML-0007LY-NU
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 05:46:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dT3ML-0007Kv-Gr
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 05:46:05 -0400
+References: <895558F6EA4E3B41AC93A00D163B7274162E2512@SHSMSX103.ccr.corp.intel.com>
+	<503895c7-4649-a568-2ee4-0fea1908fd60@redhat.com>
+	<537c874c-a5d4-30ce-6bb2-1a2bc345f66a@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d3c0a77d-3559-c67e-705c-002460b783b2@redhat.com>
+Date: Thu, 6 Jul 2017 11:46:00 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pY3vCvL1qV+PayAL"
-Content-Disposition: inline
-In-Reply-To: <20170705160640.GB2284@work-vm>
-Subject: Re: [Qemu-devel] DIRTY_MEMORY_BLOCK_SIZE;
+In-Reply-To: <537c874c-a5d4-30ce-6bb2-1a2bc345f66a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] The maximum limit of virtual network device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, ali saeedi <ali.saeedi56@gmail.com>, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>, "Wu, Jiaxin" <jiaxin.wu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alexander Bezzubikov <zuban32s@gmail.com>
 
+On 07/06/17 11:24, Marcel Apfelbaum wrote:
+> On 06/07/2017 11:31, Laszlo Ersek wrote:
 
---pY3vCvL1qV+PayAL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> > Now, I would normally recommend sticking with i440fx for simplicity.
+>> However, each PCI bridge requires 4KB of IO space (meaning (1 + 5) * 4KB
+>> = 24KB),  and OVMF on the i440fx does not support that much (only
+>> 0x4000). So, I'll recommend Q35 for IO space purposes; OVMF on Q35
+>> provides 0xA000 (40KB).
+> 
+> So if we use OVMF, going for Q35 gives us actually more IO space, nice!
+> However recommending Q35 for IO space seems odd :)
 
-On Wed, Jul 05, 2017 at 05:06:41PM +0100, Dr. David Alan Gilbert wrote:
-> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > On Fri, Jun 30, 2017 at 12:26:10PM +0100, Dr. David Alan Gilbert wrote:
-> > > * ali saeedi (ali.saeedi56@gmail.com) wrote:
-> > > > Hello
-> > > > what does 'DIRTY_MEMORY_BLOCK_SIZE' mean?
-> > > > is it the number of words in a block? or number of pages in a block=
-? or
-> > > > number of bytes in a block?
-> > > > thanks a lot
-> > >=20
-> > > (cc'ing Stefan)
-> > > I think that DIRTY_MEMORY_BLOCK_SIZE is the number of TARGET_PAGEs
-> > > within one DIRTY_MEMORY_BLOCK
-> > > So with the common 4k target page that's 4k*256k*8=3D8GB/dirty memory
-> > > block - note these are just the size of structure sin qemu, it's still
-> > > got the ranularity ot mark individual target pages as dirty.
-> >=20
-> > Right, the calculation is shown in the comment above the code:
-> >=20
-> >  *   rcu_read_lock();
-> >  *
-> >  *   DirtyMemoryBlocks *blocks =3D
-> >  *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]=
-);
-> >  *
-> >  *   ram_addr_t idx =3D (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK=
-_SIZE;
-> >  *   unsigned long *block =3D blocks.blocks[idx];
-> >  *   ...access block bitmap...
-> >  *
-> >  *   rcu_read_unlock();
-> >=20
-> > Rather than focussing on DIRTY_MEMORY_BLOCK_SIZE, make sure you
-> > understand how DirtyMemoryBlocks works.  It is an array of bitmap
-> > pointers.
-> >=20
-> > Instead of directly indexing into a single huge dirty memory bitmap,
-> > QEMU divides the dirty memory bitmap into fixed-sized chunks.  Each
-> > chunk covers DIRTY_MEMORY_BLOCK_SIZE pages.
-> >=20
-> > The reason for this layer of indirection is so that the dirty memory
-> > bitmap can be accessed without taking a traditional lock (just RCU) and
-> > also supports memory hotplug.
-> >=20
-> > Without indirection it would be difficult to grow the bitmap while other
-> > threads are writing to it.  Thanks to the indirection, it's possible to
-> > allocate new chunks and continue using the old chunks when growth
-> > occurs.
->=20
-> I guess this works like the old non-chunk version, in that there's no
-> direct correspondence between DirtyMemoryBlocks and RAMBlock's - i.e.
-> one RAMBlock might span two DirtyMemoryBlocks even if it's smaller
-> than DIRTY_MEMORY_BLOCK_SIZE.
+OVMF used to have only 0x4000 bytes for PCI IO aperture, since the
+beginning. In <https://bugzilla.redhat.com/show_bug.cgi?id=1333238> I
+investigated how much I could grow the aperture. On Q35, it was possible
+to grow it to 0xA000 bytes (but even then you have to disable vmport,
+which sort of sits in the middle otherwise). On i440fx, the IO ports in
+use by platform devices were so badly distributed that moving beyond
+0x4000 was not possible. See in particular:
 
-Yes.
+https://bugzilla.redhat.com/show_bug.cgi?id=1333238#c16
+https://bugzilla.redhat.com/show_bug.cgi?id=1333238#c19
 
-Stefan
+>> Therefore I guess the simplest example I can give now is:
+>> - use Q35 (for a larger IO space),
+>> - plug a DMI-PCI bridge into the root bridge,
+>> - plug 5 PCI bridges into the DMI-PCI bridge,
+>> - plug 31 NICs per PCI bridge, each NIC into a separate slot.
+>>
+> 
+> The setup looks OK to me (assuming OVMF is needed, otherwise
+> PC + pci-bridges will result in more devices),
 
---pY3vCvL1qV+PayAL
-Content-Type: application/pgp-signature; name="signature.asc"
+OVMF is quite needed; Jiaxin is one of the edk2 networking maintainers,
+and I think he's using QEMU and OVMF as a testbed for otherwise
+physically-oriented UEFI development.
 
------BEGIN PGP SIGNATURE-----
+> I do have a little concern.
+> We want to deprecate the dmi-pci bridge since it does not support
+> hot-plug (for itself or devices behind it).
+> Alexandr (CCed) is a GSOC student working on a generic
+> pcie-pci bridge that can (eventually) be hot-plugged
+> into a PCIe Root Port and keeps the machine cleaner.
 
-iQEcBAEBAgAGBQJZXgaXAAoJEJykq7OBq3PItx0IALyVLb7z5AWhKqd9WkN9k+iK
-i3CinjQPX6Jw2U7OU+XK1goa5DdoLIEW0wJiHjVsj+TTiGr7VgnYFo+O0vx6QSd+
-KTMEvujHYNyZUnqLlp6pbkzA6jDmiBsSOM3DONHdMvYEpMWm7hODTNV4cyA34yWg
-I5Ijn1hotD5JtMoj6UvZuNsi40XxW/SfsIyfjGZEKNTyNipQMA6qlhNVoHD6KGSA
-M5R4O3Nqbl9u+2suwzsPYS9KFJtcisnZ5f4crdV1ryinhi/TTS6lpdQIpmlvPnCc
-O6xGAgq4MNDSOSWxMMyq9kTKGL/q/Yg32+4OVWM+hLwpp2P/5ejRDy/OsbCZ6G0=
-=Se+2
------END PGP SIGNATURE-----
+Nice!
 
---pY3vCvL1qV+PayAL--
+Please include an update to "docs/pcie.txt" in the scope :)
+
+Thanks!
+Laszlo
