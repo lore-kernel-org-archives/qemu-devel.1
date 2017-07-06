@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dT4uu-0007YM-H5
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:25:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1dT4wM-000884-PL
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dT4ur-00070Y-C5
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:25:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48696)
+	(envelope-from <armbru@redhat.com>) id 1dT4wJ-0007Cx-Hl
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:27:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46460)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dT4uq-00070N-Uw
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:25:49 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dT4wJ-0007Cr-8P
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:27:19 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
-	<8760f7fnot.fsf@dusky.pond.sub.org>
-	<54df7dce-5108-40d4-e765-03137af3ad73@ilande.co.uk>
-	<87fueanaxt.fsf@dusky.pond.sub.org>
-	<70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk>
-	<87lgo2hi7u.fsf@dusky.pond.sub.org>
-	<7c78b873-1d97-f7ef-395b-21d6f7e8634a@redhat.com>
-Date: Thu, 06 Jul 2017 13:25:43 +0200
-In-Reply-To: <7c78b873-1d97-f7ef-395b-21d6f7e8634a@redhat.com> (Marcel
-	Apfelbaum's message of "Thu, 6 Jul 2017 11:57:39 +0300")
-Message-ID: <87podd4xjc.fsf@dusky.pond.sub.org>
+References: <cover.1499276048.git.alistair.francis@xilinx.com>
+	<2c9645b5dce991f7a324dc2b61e2553e08230a9f.1499276048.git.alistair.francis@xilinx.com>
+	<87r2xuay5h.fsf@dusky.pond.sub.org> <20170706080741.GB3988@redhat.com>
+Date: Thu, 06 Jul 2017 13:27:15 +0200
+In-Reply-To: <20170706080741.GB3988@redhat.com> (Daniel P. Berrange's message
+	of "Thu, 6 Jul 2017 09:07:42 +0100")
+Message-ID: <87lgo14xgs.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] Managing architectural restrictions with -device
- and libvirt
+Subject: Re: [Qemu-devel] [RFC v3 2/3] qemu-error: Implement a more generic
+ error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: alistair23@gmail.com, philippe@mathieu-daude.net, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
 
-Marcel Apfelbaum <marcel@redhat.com> writes:
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-> On 05/07/2017 21:05, Markus Armbruster wrote:
->> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
-[...]
->>> It seems like limiting the size of the bus would solve the majority of
->>> the problem. I've had a quick look around pci.c and while I can see that
->>> the PCIBus creation functions take a devfn_min parameter, I can't see
->>> anything that limits the number of slots available on the bus?
->>
->> Marcel?
->>
+> On Thu, Jul 06, 2017 at 08:15:54AM +0200, Markus Armbruster wrote:
+>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>> 
+>> > This patch converts the existing error_vreport() function into a generic
+>> > qmesg_vreport() function that takes an enum describing the
+>> > information to be reported.
+>> >
+>> > As part of this change a new qmesg_report() function is added as well with the
+>> > same capability.
+>> >
+>> > To maintain full compatibility the original error_report() function is
+>> > maintained and no changes to the way errors are printed have been made.
+>> > To improve access to the new informaiton and warning options wrapper functions
+>> > similar to error_report() have been added for warnings and information
+>> > printing.
+>> >
+>> > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 >
-> Hi Markus,
-> Sorry for my late reply.
+>> > diff --git a/util/qemu-error.c b/util/qemu-error.c
+>> > index 1c5e35ecdb..63fdc0e174 100644
+>> > --- a/util/qemu-error.c
+>> > +++ b/util/qemu-error.c
+>> > @@ -179,17 +179,29 @@ static void print_loc(void)
+>> >  
+>> >  bool enable_timestamp_msg;
+>> >  /*
+>> > - * Print an error message to current monitor if we have one, else to stderr.
+>> > + * Print a message to current monitor if we have one, else to stderr.
+>> >   * Format arguments like vsprintf().  The resulting message should be
+>> >   * a single phrase, with no newline or trailing punctuation.
+>> >   * Prepend the current location and append a newline.
+>> >   * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+>> >   */
+>> > -void error_vreport(const char *fmt, va_list ap)
+>> > +void qmsg_vreport(report_type type, const char *fmt, va_list ap)
+>> >  {
+>> >      GTimeVal tv;
+>> >      gchar *timestr;
+>> >  
+>> > +    switch (type) {
+>> > +    case REPORT_TYPE_ERROR:
+>> > +        /* To maintain compatibility we don't add anything here */
+>> 
+>> I feel the comment isn't going to be useful in the future.  Let's drop
+>> it.
 >
-> Indeed, we don't have currently a restriction on the number of usable
-> slots on a bus, however deriving from PCIBus class and implementing
-> the new policy should not be much trouble.
+> Do we really need to care about compatibility of the precise way we output
+> error messages. It has never been something we call a "stable API", as we
+> don't guarantee error message text will remain the same across releases. So
+> anyone relying on scraping QEMU stderr to match some error message has always
+> been liable to break.
 >
->
->>> And presumably if the user did try and coldplug something into a full
->>> bus then they would get the standard "PCI: no slot/function
->>> available..." error?
->>
->> That's what I'd expect.
->>
->>>>> My understanding from reading various bits of documentation is that the
->>>>> the empty simba bridge (bus B) can hold a maximum of 4 devices, whilst
->>>>> the non-empty simba bridge (bus A) can hold a maximum of 2 devices
->>>>> (presumably due to the on-board hardware). And in order to make sure
->>>>> OpenBIOS maps the PCI IO ranges correctly, the ebus must be the first
->>>>> on-board device found during a PCI bus scan which means slot 0 on bus A
->>>>> must be blacklisted.
->>>>
->>>> Assuming init() plugs in the device providing ebus: plug it into slot 0,
->>>> mark it not hotpluggable, done.
->>>
->>> That is good solution in theory except that I'd like to keep the ebus in
->>> slot 1 so that it matches the real DT as much as possible. In the future
->>> it could be possible for people to boot using PROMs from a real Sun and
->>> I'm not yet convinced that there aren't hardcoded references to some of
->>> the onboard legacy devices in a real PROM.
->>
->> Misunderstanding on my part!  You don't have to blacklist slot 0 to have
->> the PCI core put ebus in slot 1.  Simply ask for slot 1 by passing
->> PCI_DEVFN(1, 0) to pci_create() or similar.
->>
->
-> Right, hard-coding the device creation in machine init will solve that,
-> however it will be against our long-term goal to create the machine as
-> a puzzle, and for that, the devices should be created in some
-> order. I suspect the task would not be easy to integrate as
-> part of this project though.
+> IOW, just add an "error: " prefix to the text
 
-Even in a world where we start with an empty board, then plug in stuff
-directed by configuration file, an onboard device's PCI address should
-be explicit.  Having to count PCI devices to figure out their address
-sucks.
+I agree the error message format isn't ABI.
 
->>>>> I guess what I'm looking for is some kind of hook that runs after both
->>>>> machine init and all the devices have been specified on the command
->>>>> line, which I can use to validate the configuration and provide a
->>>>> suitable error message/hint if the configuration is invalid?
->>>>
->>>> You should be able to construct the machine you want, and protect the
->>>> parts the user shouldn't mess with from messing users.  No need to
->>>> validate the mess afterwards then.
->>>
->>> Unfortunately there would be issues if the user was allowed to construct
->>> a machine with more PCI devices than slots in real hardware, since the
->>> PCI interrupt number is limited to 4 bits - 2 bits for the PCI interrupt
->>> number (A to D), and 2 bits for the slot. So if a user tries to plug in
->>> more than 4 devices into each simba bus then the interrupts won't be
->>> mapped correctly.
->>>
->>> My feeling is that it makes more sense to error out if the user tries to
->>> add too many devices to the bus and/or in the wrong slots rather than
->>> let them carry on and wonder why the virtual devices don't work
->>> correctly, but I'm open to other options.
->>
->> My advice is to model the physical hardware faithfully.  If it has four
->> PCI slots on a certain PCI bus, provide exactly four.  If it has onboard
->> devices hardwired into a certain slot, put them exactly there, and
->> disable unplug.  Make it impossible to plug too many devices into a bus,
->> or into the wrong slots.
->>
->
-> I agree, but still the user will see an error. However the error would
-> be "slot x does not exist" which is clean.
->
->
-> I see two ways to continue:
->  1. A new kind of pci-bridge should be created with a "special"
->     secondary bus that has less slots. (harder to implement)
->  2. Add the limitation of the number of slots to the PCIBus class,
->     (simpler to implement, but since is not a widely used case maybe
->     is not the best way to go.
-
-I suspect (2) would be trivial.  I like trivial.
+But what would adding "error: " buy us?
