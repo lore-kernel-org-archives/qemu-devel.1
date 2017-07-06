@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dT3lv-0002hZ-4j
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:12:32 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dT3pc-0004IJ-Kq
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dT3lr-0005uU-S5
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:12:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39758)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dT3pZ-0000Jm-DK
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:16:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dT3lr-0005tT-LH
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:12:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dT3pZ-0000Ic-4q
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:16:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 363A84DD49
-	for <qemu-devel@nongnu.org>; Thu,  6 Jul 2017 10:12:26 +0000 (UTC)
-Date: Thu, 6 Jul 2017 11:12:18 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170706101218.GG3988@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170706095545.5632-1-dgilbert@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C4F3C0587F2
+	for <qemu-devel@nongnu.org>; Thu,  6 Jul 2017 10:16:15 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  6 Jul 2017 12:16:04 +0200
+Message-Id: <20170706101611.27031-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170706095545.5632-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hmp: Update info vnc
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/7] KASLR kernel dump support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +31,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lcapitulino@redhat.com, marcandre.lureau@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, Jul 06, 2017 at 10:55:45AM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> The QMP query-vnc interfaces have gained a lot more information that
-> the HMP interfaces hasn't got yet. Update it.
-> 
-> Note the output format has changed, but this is HMP so that's OK.
-> 
-> In particular, this now includes client information for reverse
-> connections:
-> 
-> -vnc :0
-> (qemu) info vnc
-> default:
->   Server: 0.0.0.0:5900 (ipv4)
->     Auth: none (Sub: none)
-> 
->   (Now connect a client)
-> 
-> (qemu) info vnc
-> default:
->   Server: 0.0.0.0:5900 (ipv4)
->     Auth: none (Sub: none)
->   Client: 127.0.0.1:51828 (ipv4)
->     x509_dname: none
->     sasl_username: none
-> 
-> -vnc localhost:7000,reverse
-> (qemu) info vnc
-> default:
->   Client: ::1:7000 (ipv6)
->     x509_dname: none
->     sasl_username: none
->   Auth: none (Sub: none)
-> 
-> -vnc :1,password,id=pass -vnc localhost:7000,reverse
-> (qemu) info vnc
-> default:
->   Client: ::1:7000 (ipv6)
->     x509_dname: none
->     sasl_username: none
->   Auth: none (Sub: none)
-> rev:
->   Server: 0.0.0.0:5901 (ipv4)
->     Auth: vnc (Sub: none)
->   Client: 127.0.0.1:53616 (ipv4)
->     x509_dname: none
->     sasl_username: none
-> 
-> This was originally RH bz 1461682
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Recent linux kernels enable KASLR to randomize phys/virt memory
+addresses. This series aims to provide enough information in qemu
+dumps so that crash utility can work with randomized kernel too (it
+hasn't been tested on other archs than x86 though, help welcome).
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+The vmcoreinfo device is an emulated ACPI device that exposes a 4k
+memory range to the guest to store various informations useful to
+debug the guest OS. (it is greatly inspired by the VMGENID device
+implementation). The version field with value 0 is meant to give
+paddr/size of the VMCOREINFO ELF PT_NOTE, other values can be used for
+different purposes or OSes. (note: some wanted to see pvpanic somehow
+merged with this device, I have no clear idea how to do that, nor do I
+think this is a good idea since the devices are quite different, used
+at different time for different purposes. And it can be done as a
+future iteration if it is appropriate, feel free to send patches)
 
+Crash 7.1.9 will parse the "phys_base" value from the VMCOREINFO note,
+and thus will work with KASLR-dump produced by this series.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+By priority, VMCOREINFO "phys_base" value is the most accurate. If not
+available, qemu will keep the current guessed value.
+
+The series implements the VMCOREINFO note addition in qemu ELF/kdump,
+as well as the python scripts/dump-guest-memory.py.
+
+To test:
+
+Compile and run a guest kernel with CONFIG_RANDOMIZE_BASE=3Dy.
+
+Run qemu with -device vmcoreinfo.
+
+Load the experimental vmcoreinfo module in guest
+https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c.
+
+Produce an ELF dump:
+{ "execute": "dump-guest-memory", "arguments": { "protocol": "file:dump",=
+ "paging": false } }
+
+Produce a kdump:
+{ "execute": "dump-guest-memory", "arguments": { "protocol": "file:dump",=
+ "paging": false, "format": "kdump-zlib" } }
+
+Or with (gdb) dump-guest-memory, with scripts/dump-guest-memory.py script=
+.
+
+Analyze with crash >=3D 7.1.9
+$ crash vmlinux dump
+
+v2: from Laszlo review
+- vmci: fix guest endianess handling
+- vmci: fix wrong sizeof()
+- vmci: add back reset logic from vmgenid
+- dump: have 1MB size limit for vmcoreinfo
+- dump: fix potential off-by-1 buffer manipulation
+- dump: use temporary variable for qemu_strtou64
+- dump: fixed VMCOREINFO duplication in kdump
+- update gdb script to not call into qemu process
+- update MAINTAINERS with some new files
+
+Marc-Andr=C3=A9 Lureau (7):
+  vmgenid: replace x-write-pointer-available hack
+  acpi: add vmcoreinfo device
+  tests: add simple vmcoreinfo test
+  dump: add vmcoreinfo ELF note
+  kdump: add vmcoreinfo ELF note
+  scripts/dump-guest-memory.py: add vmcoreinfo
+  MAINTAINERS: add Dump maintainers
+
+ scripts/dump-guest-memory.py         |  40 +++++++
+ include/hw/acpi/aml-build.h          |   1 +
+ include/hw/acpi/bios-linker-loader.h |   2 +
+ include/hw/acpi/vmcoreinfo.h         |  36 ++++++
+ include/hw/compat.h                  |   4 -
+ include/sysemu/dump.h                |   2 +
+ dump.c                               | 145 ++++++++++++++++++++++++
+ hw/acpi/aml-build.c                  |   2 +
+ hw/acpi/bios-linker-loader.c         |  10 ++
+ hw/acpi/vmcoreinfo.c                 | 211 +++++++++++++++++++++++++++++=
+++++++
+ hw/acpi/vmgenid.c                    |   9 +-
+ hw/i386/acpi-build.c                 |  14 +++
+ tests/vmcoreinfo-test.c              | 130 +++++++++++++++++++++
+ MAINTAINERS                          |   9 ++
+ default-configs/arm-softmmu.mak      |   1 +
+ default-configs/i386-softmmu.mak     |   1 +
+ default-configs/x86_64-softmmu.mak   |   1 +
+ docs/specs/vmcoreinfo.txt            | 138 +++++++++++++++++++++++
+ hw/acpi/Makefile.objs                |   1 +
+ tests/Makefile.include               |   2 +
+ 20 files changed, 747 insertions(+), 12 deletions(-)
+ create mode 100644 include/hw/acpi/vmcoreinfo.h
+ create mode 100644 hw/acpi/vmcoreinfo.c
+ create mode 100644 tests/vmcoreinfo-test.c
+ create mode 100644 docs/specs/vmcoreinfo.txt
+
+--=20
+2.13.1.395.gf7b71de06
