@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dTFoD-0007KM-Qw
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:03:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dTFyD-0000pP-0Q
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dTFoD-0005Ku-4Z
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:03:41 -0400
-References: <20170703151051.31327-1-eblake@redhat.com>
-	<20170703151051.31327-3-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1362c967-0b9a-d37c-0b32-b01dc6984382@redhat.com>
-Date: Thu, 6 Jul 2017 19:03:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dTFyC-00037A-11
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:14:00 -0400
+Date: Thu, 6 Jul 2017 19:13:49 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1454897311.14540623.1499382829440.JavaMail.zimbra@redhat.com>
+In-Reply-To: <9307b70e9876c4e9e3c4478524a32a23a3d5dd05.1499368180.git.alistair.francis@xilinx.com>
+References: <9307b70e9876c4e9e3c4478524a32a23a3d5dd05.1499368180.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20170703151051.31327-3-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/17] hbitmap: Rename
- serialization_granularity to serialization_align
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] util/aio-win32: Only select on what
+ we are actually waiting for
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,21 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com, alistair23@gmail.com, edgar iglesias <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org, philippe@mathieu-daude.net
 
+Looks good, but I noticed now that you may want to do that for
+qio_channel_create_socket_watch too.
 
+Paolo
 
-On 07/03/2017 11:10 AM, Eric Blake wrote:
-> The only client of hbitmap_serialization_granularity() is dirty-bitmap's
-> bdrv_dirty_bitmap_serialization_align().  Keeping the two names consistent
-> is worthwhile, and the shorter name is more representative of what the
-> function returns (the required alignment to be used for start/count of
-> other serialization functions, where violating the alignment causes
-> assertion failures).
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-
-One of the two hard problems in computer science.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+----- Original Message -----
+> From: "Alistair Francis" <alistair.francis@xilinx.com>
+> To: qemu-devel@nongnu.org, stefanha@redhat.com, famz@redhat.com
+> Cc: "alistair francis" <alistair.francis@xilinx.com>, alistair23@gmail.co=
+m, "edgar iglesias"
+> <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org, philippe@mathieu-daud=
+e.net, pbonzini@redhat.com
+> Sent: Thursday, July 6, 2017 10:15:14 PM
+> Subject: [PATCH v2 1/1] util/aio-win32: Only select on what we are actual=
+ly waiting for
+>=20
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> Changes in V2:
+>  - Rebase on master
+> Changes since RFC:
+>  - Include more bitmasks for the select call
+>=20
+>  util/aio-win32.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/util/aio-win32.c b/util/aio-win32.c
+> index bca496a47a..d6d5e02f00 100644
+> --- a/util/aio-win32.c
+> +++ b/util/aio-win32.c
+> @@ -71,6 +71,7 @@ void aio_set_fd_handler(AioContext *ctx,
+>          }
+>      } else {
+>          HANDLE event;
+> +        long bitmask =3D 0;
+> =20
+>          if (node =3D=3D NULL) {
+>              /* Alloc and insert if it's not already there */
+> @@ -95,10 +96,16 @@ void aio_set_fd_handler(AioContext *ctx,
+>          node->io_write =3D io_write;
+>          node->is_external =3D is_external;
+> =20
+> +        if (io_read) {
+> +            bitmask |=3D FD_READ | FD_ACCEPT | FD_CLOSE;
+> +        }
+> +
+> +        if (io_write) {
+> +            bitmask |=3D FD_WRITE | FD_CONNECT;
+> +        }
+> +
+>          event =3D event_notifier_get_handle(&ctx->notifier);
+> -        WSAEventSelect(node->pfd.fd, event,
+> -                       FD_READ | FD_ACCEPT | FD_CLOSE |
+> -                       FD_CONNECT | FD_WRITE | FD_OOB);
+> +        WSAEventSelect(node->pfd.fd, event, bitmask);
+>      }
+> =20
+>      qemu_lockcnt_unlock(&ctx->list_lock);
+> --
+> 2.11.0
+>=20
+>=20
