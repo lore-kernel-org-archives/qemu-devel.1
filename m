@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dT4Fa-0008FR-KW
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:43:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1dT4M3-0002ML-9m
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dT4FZ-0008J8-QY
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:43:10 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dT4FZ-0008Ir-Jw
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:43:09 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id 77so23322870wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:43:09 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dT4M0-0001tU-1Q
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:49:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dT4Lz-0001tF-OY
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:49:47 -0400
+Date: Thu, 6 Jul 2017 11:49:40 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170706104940.GJ3988@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499237876.3041.4.camel@linux.intel.com>
+	<20170705110431.GE22008@redhat.com>
+	<20170705114411.GE29382@lemon.lan>
+	<c1f43fc3-7db8-50af-ee8c-331895721bd6@redhat.com>
+	<20170705122200.GH29382@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Jul 2017 11:42:47 +0100
-Message-ID: <CAFEAcA8vvfrzxo_WKEA86nEMaAo2Sgg3B0sSYTTxdkNrdqY35A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/42] Misc changes for 2017-07-05
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170705122200.GH29382@lemon.lan>
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, qemu-devel@nongnu.org
 
-On 5 July 2017 at 08:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 0c7a8b9baa744ae4323bb46cb4fe942355beaa85:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-07-04 11:17:02 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 44eff673411381062b826d048ba9d6630d2b2bdb:
->
->   target/i386: add the CONFIG_TCG into Makefiles (2017-07-05 09:12:44 +0200)
->
-> ----------------------------------------------------------------
-> * qemu-thread portability improvement (Fam)
-> * virtio-scsi IOMMU fix (Jason)
-> * poisoning and common-obj-y cleanups (Thomas)
-> * initial Hypervisor.framework refactoring (Sergio)
-> * x86 TCG interrupt injection fixes (Wu Xiang, me)
-> * --disable-tcg support for x86 (Yang Zhong, me)
-> * various other bugfixes and cleanups (Daniel, Peter, Thomas)
->
+On Wed, Jul 05, 2017 at 08:22:00PM +0800, Fam Zheng wrote:
+> On Wed, 07/05 13:58, Thomas Huth wrote:
+> > On 05.07.2017 13:44, Fam Zheng wrote:
+> > > On Wed, 07/05 12:04, Daniel P. Berrange wrote:
+> > >> While you can say people should just add '-M pc' that isn't a nice
+> > >> user experiance, because it makes the assumption that people actually
+> > >> understand what caused their breakage. When the incompatibilities
+> > >> arise the error messages are unlikely to give any hint to users that
+> > >> the problems are caused by the machine type change. So unless someone
+> > >> is very familiar with debugging QEMU, they're not going to realize
+> > >> that '-M pc' will fix their problem.
+> > > 
+> > > While we change the default, can we start to print a message like 'machine type
+> > > ("-M" option) not specified, default to Q35. If you find compatibility issues,
+> > > try "-M pc"'?
+> > 
+> > Or we could simply remove the default machine type completely for a
+> > couple of releases? That would force people to update their script with
+> > "-M pc" ... and once this has been established, we can finally make q35
+> > the default?
+> 
+> I wouldn't do that.. Defaults are for those who don't care about setting it, or
+> want something that just works, by default. It's fine not to provide a default
+> machine type if we decide there isn't a clear win, just like arm, but IMHO
+> removing it just to restore it later in order to educate people makes a very
+> poor experience.
 
-Applied, thanks.
+Since the idea of removing the default machine type was brought up, we should
+perhaps consider that as a distinct solution. Going from using 'pc' by defailt
+to having no default machine type, has significantly better user experiance
+than changing the default machine to 'q35' IMHO.
 
--- PMM
+eg if we killed the default, currently QEMU would say something like
+
+   qemu-system-x86_64: No machine specified, and there is no default
+   Use -machine help to list supported machines
+
+We could augment that with further details:
+
+   qemu-system-x86_64: No machine specified, and there is no default
+   Use -machine help to list supported machines
+
+   For compatibility with previous releases of QEMU, pick the 'pc'
+   machine type. New deployments are suggested to use the 'q35'
+   machine type.
+
+This avoids the user having problems with guest ABI silently changing
+behind their back, or migration suddenly failing to load vm state,
+and gives them clear immediate guidance on how to resolve the problem
+they're facing, as well as encouraging usage of 'q35' going forward,
+without having to actually make it the default.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
