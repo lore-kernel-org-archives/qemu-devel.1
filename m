@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dTGYf-0003jR-Kq
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:51:42 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dTGZJ-0004Fq-0k
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:52:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dTGYe-0000J2-DL
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:51:41 -0400
-Resent-Message-Id: <E1dTGYe-0000J2-DL@eggs.gnu.org>
-In-Reply-To: <20170629060300.29869-1-el13635@mail.ntua.gr>
-Message-ID: <149938496797.27.11708429179775046632@7a482c8a7db2>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <alistai@xilinx.com>) id 1dTGZE-0000a6-5W
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:52:21 -0400
+Received: from mail-cys01nam02on0045.outbound.protection.outlook.com
+	([104.47.37.45]:28384
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dTGZD-0000Za-MB
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:52:16 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 6 Jul 2017 16:49:03 -0700
+Message-ID: <cover.1499381754.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 6 Jul 2017 16:49:28 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] block: fix bs->file leak in
- bdrv_new_open_driver()
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1 0/6]  Implement a warning_report function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: el13635@mail.ntua.gr
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gYmxvY2s6IGZpeCBicy0+ZmlsZSBsZWFrIGluIGJkcnZfbmV3X29wZW5f
-ZHJpdmVyKCkKTWVzc2FnZS1pZDogMjAxNzA2MjkwNjAzMDAuMjk4NjktMS1lbDEzNjM1QG1haWwu
-bnR1YS5ncgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9y
-bWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hv
-ICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRj
-KS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVj
-aG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJ
-UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
-MzM4NApmYXRhbDogQ2Fubm90IHVwZGF0ZSBwYXRocyBhbmQgc3dpdGNoIHRvIGJyYW5jaCAndGVz
-dCcgYXQgdGhlIHNhbWUgdGltZS4KRGlkIHlvdSBpbnRlbmQgdG8gY2hlY2tvdXQgJ29yaWdpbi9w
-YXRjaGV3LzIwMTcwNjI5MDYwMzAwLjI5ODY5LTEtZWwxMzYzNUBtYWlsLm50dWEuZ3InIHdoaWNo
-IGNhbiBub3QgYmUgcmVzb2x2ZWQgYXMgY29tbWl0PwpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNh
-bGwgbGFzdCk6CiAgRmlsZSAiL2hvbWUvZmFtL2Jpbi9wYXRjaGV3IiwgbGluZSA0NDAsIGluIHRl
-c3Rfb25lCiAgICBnaXRfY2xvbmVfcmVwbyhjbG9uZSwgclsicmVwbyJdLCByWyJoZWFkIl0sIGxv
-Z2YpCiAgRmlsZSAiL2hvbWUvZmFtL2Jpbi9wYXRjaGV3IiwgbGluZSA1MywgaW4gZ2l0X2Nsb25l
-X3JlcG8KICAgIGN3ZD1jbG9uZSkKICBGaWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNS9zdWJwcm9j
-ZXNzLnB5IiwgbGluZSAyNzEsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NF
-cnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5k
-ICdbJ2dpdCcsICdjaGVja291dCcsICdvcmlnaW4vcGF0Y2hldy8yMDE3MDYyOTA2MDMwMC4yOTg2
-OS0xLWVsMTM2MzVAbWFpbC5udHVhLmdyJywgJy1iJywgJ3Rlc3QnXScgcmV0dXJuZWQgbm9uLXpl
-cm8gZXhpdCBzdGF0dXMgMTI4CgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+QEMU currently has a standard method to report errors with
+error_repot(). This ensure a sane and standard format when printing
+errors. This series is attempting to extend this functionality for
+warnings and information as well.
+
+This patch renames error_print_loc() function to be more clear, but I
+didn't bother renaming the others. It seems silly to change
+error_printf() to error_warning_printf() and printf is already taken so
+I just left it as is.
+
+v1:
+ - Convert all of the existing warning messages in QEMU
+ - Add a error_report*_err() functions as well
+RFCv3:
+ - Use more detailed enum and function names
+ - Add wrapper functions for the info and warning reporting
+RFCv2:
+ - Use enums for ERROR, WARN and INFO with a generic report() function
+   instead of adding new functions
+
+Alistair Francis (6):
+  util/qemu-error: Rename error_print_loc() to be more generic
+  error: Functions to report warnings and informational messages
+  Convert error_report() to warn_report()
+  char-socket: Report TCP socket waiting as information
+  error: Implement the warn and free Error functions
+  Convert error_report*_err() to warn_report*_err()
+
+ block/backup.c                 | 10 +++---
+ block/gluster.c                |  2 +-
+ block/iscsi.c                  |  2 +-
+ block/nfs.c                    | 12 +++----
+ block/rbd.c                    |  6 ++--
+ block/ssh.c                    |  4 +--
+ blockdev.c                     |  2 +-
+ chardev/char-socket.c          |  4 +--
+ cpus.c                         |  2 +-
+ hw/9pfs/9p.c                   |  2 +-
+ hw/arm/highbank.c              |  6 ++--
+ hw/arm/imx25_pdk.c             |  6 ++--
+ hw/arm/kzm.c                   |  6 ++--
+ hw/core/machine.c              | 10 +++---
+ hw/core/qdev-properties.c      | 10 +++---
+ hw/i386/acpi-build.c           | 10 +++---
+ hw/i386/kvm/pci-assign.c       |  6 ++--
+ hw/i386/pc.c                   | 15 ++++----
+ hw/i386/pc_piix.c              |  8 ++---
+ hw/i386/pc_q35.c               |  6 ++--
+ hw/misc/aspeed_sdmc.c          |  8 ++---
+ hw/nvram/fw_cfg.c              |  2 +-
+ hw/pci-host/piix.c             |  2 +-
+ hw/ppc/pnv.c                   |  6 ++--
+ hw/ppc/spapr.c                 |  4 +--
+ hw/ppc/spapr_iommu.c           |  2 +-
+ hw/scsi/scsi-bus.c             |  6 ++--
+ hw/usb/dev-smartcard-reader.c  |  6 ++--
+ hw/usb/redirect.c              |  2 +-
+ include/qapi/error.h           | 11 ++++++
+ include/qemu/error-report.h    |  7 ++++
+ net/tap-linux.c                |  2 +-
+ scripts/checkpatch.pl          |  8 ++++-
+ target/i386/cpu.c              | 22 ++++++------
+ target/i386/kvm.c              | 10 +++---
+ target/s390x/cpu_models.c      |  6 ++--
+ target/s390x/kvm.c             |  4 +--
+ tests/test-qdev-global-props.c |  6 ++--
+ trace/control.c                |  8 ++---
+ util/error.c                   | 19 ++++++++++
+ util/qemu-error.c              | 82 +++++++++++++++++++++++++++++++++++++-=
+----
+ vl.c                           | 20 +++++------
+ 42 files changed, 239 insertions(+), 133 deletions(-)
+
+--=20
+2.11.0
