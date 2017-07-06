@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dT192-0003Jw-SG
+	(envelope-from <borntraeger@de.ibm.com>) id 1dT194-0003Lf-KQ
 	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dT18y-0005Qb-TI
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41370
+	(envelope-from <borntraeger@de.ibm.com>) id 1dT190-0005R7-5O
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41527
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dT18y-0005QN-N1
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:08 -0400
+	id 1dT18z-0005Qs-VI
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 03:24:10 -0400
 Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v667O6Jv117522
-	for <qemu-devel@nongnu.org>; Thu, 6 Jul 2017 03:24:08 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bgvqkr3fg-1
+	v667O6rD117538
+	for <qemu-devel@nongnu.org>; Thu, 6 Jul 2017 03:24:09 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bgvqkr3g5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:24:07 -0400
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:24:08 -0400
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 6 Jul 2017 08:23:42 +0100
+	Thu, 6 Jul 2017 08:23:44 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu,  6 Jul 2017 09:23:29 +0200
-Message-Id: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 0/8] s390x/kvm/migration: fixes,
- enhancements and cleanups
+Date: Thu,  6 Jul 2017 09:23:34 +0200
+In-Reply-To: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
+References: <1499325817-9166-1-git-send-email-borntraeger@de.ibm.com>
+Message-Id: <1499325817-9166-6-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 5/8] s390x/MAINTAINERS: Update my email address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,59 +41,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Peter,
+From: Cornelia Huck <cohuck@redhat.com>
 
-the following changes since commit 2185c93ba80f81bfa27ce6f259c7f2ef4f08b668:
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20170704092215.13742-2-cohuck@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ MAINTAINERS | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-  Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next.for-upstream' into staging (2017-07-04 13:05:30 +0100)
-
-are available in the git repository at:
-
-  git://github.com/borntraeger/qemu.git tags/s390x-20170706
-
-for you to fetch changes up to 1045e3cdafaf1218d9f771080ba5c9d4f64346e4:
-
-  hw/s390x/ipl: Fix endianness problem with netboot_start_addr (2017-07-05 19:46:30 +0200)
-
-----------------------------------------------------------------
-s390x/kvm/migration: fixes, enhancements and cleanups
-
-- new email address for Cornelia
-- Fixes: 3270, flic, virtio-scsi-ccw, ipl
-- Enhancements, cpumodel, migration
-
-----------------------------------------------------------------
-Cornelia Huck (1):
-      s390x/MAINTAINERS: Update my email address
-
-Dong Jia Shi (1):
-      s390x/3270: fix instruction interception handler
-
-Halil Pasic (3):
-      s390x: vmstatify config migration for virtio-ccw
-      s390x: fix error propagation in kvm-flic's realize
-      s390x: fix realize inheritance for kvm-flic
-
-QingFeng Hao (1):
-      virtio-scsi-ccw: use ioeventfd even when KVM is disabled
-
-Thomas Huth (1):
-      hw/s390x/ipl: Fix endianness problem with netboot_start_addr
-
-Viktor Mihajlovski (1):
-      s390x: return unavailable features via query-cpu-definitions
-
- MAINTAINERS                  |   8 +-
- hw/intc/s390_flic.c          |  32 +++-
- hw/intc/s390_flic_kvm.c      |  29 +++-
- hw/s390x/3270-ccw.c          |   1 +
- hw/s390x/ccw-device.c        |  10 ++
- hw/s390x/ccw-device.h        |   4 +
- hw/s390x/css.c               | 378 +++++++++++++++++++++++++------------------
- hw/s390x/ipl.c               |   2 +-
- hw/s390x/virtio-ccw.c        | 160 +++++++++---------
- include/hw/s390x/css.h       |  12 +-
- include/hw/s390x/s390_flic.h |   5 +
- target/s390x/cpu.h           |   6 +-
- target/s390x/cpu_models.c    |  62 ++++++-
- 13 files changed, 456 insertions(+), 253 deletions(-)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 839f7ca..4e17216 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -299,7 +299,7 @@ F: target/ppc/kvm.c
+ 
+ S390
+ M: Christian Borntraeger <borntraeger@de.ibm.com>
+-M: Cornelia Huck <cornelia.huck@de.ibm.com>
++M: Cornelia Huck <cohuck@redhat.com>
+ M: Alexander Graf <agraf@suse.de>
+ S: Maintained
+ F: target/s390x/kvm.c
+@@ -778,7 +778,7 @@ F: include/hw/sparc/grlib.h
+ S390 Machines
+ -------------
+ S390 Virtio-ccw
+-M: Cornelia Huck <cornelia.huck@de.ibm.com>
++M: Cornelia Huck <cohuck@redhat.com>
+ M: Christian Borntraeger <borntraeger@de.ibm.com>
+ M: Alexander Graf <agraf@suse.de>
+ S: Supported
+@@ -1006,7 +1006,7 @@ F: hw/vfio/*
+ F: include/hw/vfio/
+ 
+ vfio-ccw
+-M: Cornelia Huck <cornelia.huck@de.ibm.com>
++M: Cornelia Huck <cohuck@redhat.com>
+ S: Supported
+ F: hw/vfio/ccw.c
+ F: hw/s390x/s390-ccw.c
+@@ -1048,7 +1048,7 @@ F: tests/virtio-blk-test.c
+ T: git git://github.com/stefanha/qemu.git block
+ 
+ virtio-ccw
+-M: Cornelia Huck <cornelia.huck@de.ibm.com>
++M: Cornelia Huck <cohuck@redhat.com>
+ M: Christian Borntraeger <borntraeger@de.ibm.com>
+ S: Supported
+ F: hw/s390x/virtio-ccw.[hc]
+-- 
+2.7.4
