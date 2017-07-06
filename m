@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dTGKm-0007H8-Gs
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:37:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dTGRJ-00009k-BL
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dTGKj-0000KG-Bz
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:37:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dTGKj-0000JO-3F
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:37:17 -0400
-Date: Thu, 6 Jul 2017 16:37:14 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <7ecfe394c646482faddf97a40bda944d@AMSPEX02CL03.citrite.net>
-Message-ID: <alpine.DEB.2.10.1707061613540.2919@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1706281125330.2919@sstabellini-ThinkPad-X260>
-	<7ecfe394c646482faddf97a40bda944d@AMSPEX02CL03.citrite.net>
+	(envelope-from <jsnow@redhat.com>) id 1dTGRI-0003mm-JH
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:44:05 -0400
+References: <20170703151051.31327-1-eblake@redhat.com>
+	<20170703151051.31327-5-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c9ed6265-d0d4-49cf-8f0f-c859a1f02171@redhat.com>
+Date: Thu, 6 Jul 2017 19:43:54 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2] xenfb: remove xen_init_display
- "temporary" hack
+In-Reply-To: <20170703151051.31327-5-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/17] dirty-bitmap: Drop unused
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,169 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Thu, 29 Jun 2017, Paul Durrant wrote:
-> > -----Original Message-----
-> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > Sent: 28 June 2017 19:37
-> > To: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org
-> > Cc: sstabellini@kernel.org; peter.maydell@linaro.org; Anthony Perard
-> > <anthony.perard@citrix.com>; kraxel@redhat.com; Paul Durrant
-> > <Paul.Durrant@citrix.com>
-> > Subject: [PATCH v2] xenfb: remove xen_init_display "temporary" hack
-> > 
-> > Initialize xenfb properly, as all other backends, from its own
-> > "initialise" function.
-> > 
-> > Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> > 
-> > ---
-> > Changes in v2:
-> > - remove xen_init_display from xen_backend.h
-> > - handle cases where vkbd is missing
-> > 
-> > diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-> > index e76c0d8..3b0168b 100644
-> > --- a/hw/display/xenfb.c
-> > +++ b/hw/display/xenfb.c
-> > @@ -71,7 +71,6 @@ struct XenFB {
-> >      int               fbpages;
-> >      int               feature_update;
-> >      int               bug_trigger;
-> > -    int               have_console;
-> >      int               do_resize;
-> > 
-> >      struct {
-> > @@ -80,6 +79,7 @@ struct XenFB {
-> >      int               up_count;
-> >      int               up_fullscreen;
-> >  };
-> > +static const GraphicHwOps xenfb_ops;
-> > 
-> >  /* -------------------------------------------------------------------- */
-> > 
-> > @@ -855,6 +855,8 @@ static int fb_init(struct XenDevice *xendev)
-> >  static int fb_initialise(struct XenDevice *xendev)
-> >  {
-> >      struct XenFB *fb = container_of(xendev, struct XenFB, c.xendev);
-> > +    struct XenDevice *xin;
-> > +    struct XenInput *in;
+
+
+On 07/03/2017 11:10 AM, Eric Blake wrote:
+> We had several functions that no one is currently using, and which
+> use sector-based interfaces.  I'm trying to convert towards byte-based
+> interfaces, so it's easier to just drop the unused functions:
 > 
-> I think the scope of 'in' can be limited to the 'else' clause where it is used below.
+> bdrv_dirty_bitmap_get_meta
+> bdrv_dirty_bitmap_get_meta_locked
+> bdrv_dirty_bitmap_reset_meta
+> bdrv_dirty_bitmap_meta_granularity
 > 
-> >      struct xenfb_page *fb_page;
-> >      int videoram;
-> >      int rc;
-> > @@ -877,16 +879,16 @@ static int fb_initialise(struct XenDevice *xendev)
-> >      if (rc != 0)
-> >  	return rc;
-> > 
-> > -#if 0  /* handled in xen_init_display() for now */
-> > -    if (!fb->have_console) {
-> > -        fb->c.ds = graphic_console_init(xenfb_update,
-> > -                                        xenfb_invalidate,
-> > -                                        NULL,
-> > -                                        NULL,
-> > -                                        fb);
-> > -        fb->have_console = 1;
-> > +    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
-> > +
-> > +    xin = xen_pv_find_xendev("vkbd", xen_domid, 0);
-> > +    if (xin == NULL) {
-> > +        xen_pv_printf(xendev, 1, "xenfb is up, but vkbd is not present\n");
-> > +    } else {
-> > +        in = container_of(xin, struct XenInput, c.xendev);
-> > +        in->c.con = fb->c.con;
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
-> I notice that in->c.con is tested in input_initialise() and it will fail if NULL, so there is an inherent race between the frontends and also processing of xenstore watches. That seems a little fragile at best, but the dependency of input_initialise() on in->c.con is also somewhat bogus as the vkbd backend is created for xenfv machine types whereas xenfb is only there for xenpv machine types. I think this needs to be fixed before xenfb can be relied on to initialize correctly in all circumstances.
 
-Yes, you are right that it is fragile. Also, there is no need for this
-dependency: I'll remove it, and use qemu_console_lookup_by_index
-instead.
+Admittedly I forget entirely why some of these are here, or to be more
+precise I forget entirely why they are unused as I remember exactly why
+we needed them -- but I forget why we merged them without a caller.
 
-Owen's patch will take care of making the qemu_console_lookup_by_index
-call conditional on xenfb->raw_pointer_wanted != 1. 
+Oh well. If they're unused, they're unused, and can be re-added,
+especially if we're changing the underpinnings.
 
+I bet my last review on this email used nearly identical wordings.
 
-> > +        xen_be_check_state(xin);
-> >      }
-> > -#endif
-> > 
-> >      if (xenstore_read_fe_int(xendev, "feature-update", &fb-
-> > >feature_update) == -1)
-> >  	fb->feature_update = 0;
-> > @@ -972,42 +974,3 @@ static const GraphicHwOps xenfb_ops = {
-> >      .gfx_update  = xenfb_update,
-> >      .update_interval = xenfb_update_interval,
-> >  };
-> > -
-> > -/*
-> > - * FIXME/TODO: Kill this.
-> > - * Temporary needed while DisplayState reorganization is in flight.
-> > - */
-> > -void xen_init_display(int domid)
-> > -{
-> > -    struct XenDevice *xfb, *xin;
-> > -    struct XenFB *fb;
-> > -    struct XenInput *in;
-> > -    int i = 0;
-> > -
-> > -wait_more:
-> > -    i++;
-> > -    main_loop_wait(true);
-> > -    xfb = xen_pv_find_xendev("vfb", domid, 0);
-> > -    xin = xen_pv_find_xendev("vkbd", domid, 0);
-> > -    if (!xfb || !xin) {
-> > -        if (i < 256) {
-> > -            usleep(10000);
-> > -            goto wait_more;
-> > -        }
-> > -        xen_pv_printf(NULL, 1, "displaystate setup failed\n");
-> > -        return;
-> > -    }
-> > -
-> > -    /* vfb */
-> > -    fb = container_of(xfb, struct XenFB, c.xendev);
-> > -    fb->c.con = graphic_console_init(NULL, 0, &xenfb_ops, fb);
-> > -    fb->have_console = 1;
-> > -
-> > -    /* vkbd */
-> > -    in = container_of(xin, struct XenInput, c.xendev);
-> > -    in->c.con = fb->c.con;
-> > -
-> > -    /* retry ->init() */
-> > -    xen_be_check_state(xin);
-> > -    xen_be_check_state(xfb);
-> > -}
-> > diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-> > index 79aef4e..31d2f25 100644
-> > --- a/hw/xenpv/xen_machine_pv.c
-> > +++ b/hw/xenpv/xen_machine_pv.c
-> > @@ -94,9 +94,6 @@ static void xen_init_pv(MachineState *machine)
-> > 
-> >      /* config cleanup hook */
-> >      atexit(xen_config_cleanup);
-> > -
-> > -    /* setup framebuffer */
-> > -    xen_init_display(xen_domid);
-> >  }
-> > 
-> >  static void xenpv_machine_init(MachineClass *mc)
-> > diff --git a/include/hw/xen/xen_backend.h
-> > b/include/hw/xen/xen_backend.h
-> > index 852c2ea..8a6fbcb 100644
-> > --- a/include/hw/xen/xen_backend.h
-> > +++ b/include/hw/xen/xen_backend.h
-> > @@ -55,8 +55,6 @@ extern struct XenDevOps xen_netdev_ops;       /*
-> > xen_nic.c         */
-> >  extern struct XenDevOps xen_usb_ops;          /* xen-usb.c         */
-> >  #endif
-> > 
-> > -void xen_init_display(int domid);
-> > -
-> >  /* configuration (aka xenbus setup) */
-> >  void xen_config_cleanup(void);
-> >  int xen_config_dev_blk(DriveInfo *disk);
-> 
+I'm CCing Vladimir so he has a chance to see that we're removing
+functions that he may have wanted to use for his migration series.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
