@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1dT4tH-0006HG-Fx
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:24:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1dT4uu-0007YM-H5
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1dT4tG-0006FB-A9
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:24:11 -0400
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Date: Thu, 6 Jul 2017 11:24:01 +0000
-Message-ID: <AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
-	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
-	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
-In-Reply-To: <e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1dT4ur-00070Y-C5
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:25:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dT4uq-00070N-Uw
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 07:25:49 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
+	<8760f7fnot.fsf@dusky.pond.sub.org>
+	<54df7dce-5108-40d4-e765-03137af3ad73@ilande.co.uk>
+	<87fueanaxt.fsf@dusky.pond.sub.org>
+	<70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk>
+	<87lgo2hi7u.fsf@dusky.pond.sub.org>
+	<7c78b873-1d97-f7ef-395b-21d6f7e8634a@redhat.com>
+Date: Thu, 06 Jul 2017 13:25:43 +0200
+In-Reply-To: <7c78b873-1d97-f7ef-395b-21d6f7e8634a@redhat.com> (Marcel
+	Apfelbaum's message of "Thu, 6 Jul 2017 11:57:39 +0300")
+Message-ID: <87podd4xjc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Managing architectural restrictions with -device
+ and libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +33,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmVhbi1QaGlsaXBwZSBC
-cnVja2VyIFttYWlsdG86amVhbi1waGlsaXBwZS5icnVja2VyQGFybS5jb21dDQo+IFNlbnQ6IFRo
-dXJzZGF5LCBKdWx5IDA2LCAyMDE3IDM6MzMgUE0NCj4gVG86IEJoYXJhdCBCaHVzaGFuIDxiaGFy
-YXQuYmh1c2hhbkBueHAuY29tPjsgQXVnZXIgRXJpYw0KPiA8ZXJpYy5hdWdlckByZWRoYXQuY29t
-PjsgZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc7
-IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcWVtdS1hcm1A
-bm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiB3ZWlAcmVkaGF0LmNvbTsg
-a2V2aW4udGlhbkBpbnRlbC5jb207IG1hcmMuenluZ2llckBhcm0uY29tOw0KPiB0bkBzZW1paGFs
-Zi5jb207IHdpbGwuZGVhY29uQGFybS5jb207IGRyam9uZXNAcmVkaGF0LmNvbTsNCj4gcm9iaW4u
-bXVycGh5QGFybS5jb207IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZw0KPiBTdWJqZWN0OiBS
-ZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgMC84XSBWSVJUSU8tSU9NTVUgZGV2aWNlDQo+IA0KPiBP
-biAwNS8wNy8xNyAwOTo0OSwgQmhhcmF0IEJodXNoYW4gd3JvdGU6Pj4+IEFsc28gd2hlbiBzZXR1
-cCBtc2ktcm91dGUNCj4ga3ZtX2lycWNoaXBfYWRkX21zaV9yb3V0ZSgpIHdlIG5lZWRlZCB0bw0K
-PiA+PiBwcm92aWRlIHRoZSB0cmFuc2xhdGVkIGFkZHJlc3MuDQo+ID4+PiBBY2NvcmRpbmcgdG8g
-bXkgdW5kZXJzdGFuZGluZyB0aGlzIGlzIHJlcXVpcmVkIGJlY2F1c2Uga2VybmVsIGRvZXMNCj4g
-Pj4+IG5vIGdvDQo+ID4+IHRocm91Z2ggdmlvbW11IHRyYW5zbGF0aW9uIHdoZW4gZ2VuZXJhdGlu
-ZyBpbnRlcnJ1cHQsIG5vPw0KPiA+Pg0KPiA+PiB5ZXMgdGhpcyBpcyBuZWVkZWQgd2hlbiBLVk0g
-TVNJIHJvdXRlcyBhcmUgc2V0IHVwLCBpZS4gYWxvbmcgd2l0aCBHSUNWMw0KPiBJVFMuDQo+ID4+
-IFdpdGggR0lDdjJNLCBxZW11IGRpcmVjdCBnc2kgbWFwcGluZyBpcyB1c2VkIGFuZCB0aGlzIGlz
-IG5vdCBuZWVkZWQuDQo+ID4+DQo+ID4+IFNvIEkgZG8gbm90IHVuZGVyc3RhbmQgeW91ciBwcmV2
-aW91cyBzZW50ZW5jZSBzYXlpbmcgIk1TSSBpbnRlcnJ1cHRzDQo+ID4+IHdvcmtzIHdpdGhvdXQg
-YW55IGNoYW5nZSIuDQo+ID4NCj4gPiBJIGhhdmUgYWxtb3N0IGNvbXBsZXRlZCB2ZmlvIGludGVn
-cmF0aW9uIHdpdGggdmlydGlvLWlvbW11IGFuZCBub3cNCj4gPiB0ZXN0aW5nIHRoZSBjaGFuZ2Vz
-IGJ5IGFzc2lnbmluZyBlMTAwMCBkZXZpY2UgdG8gVk0uIEZvciB0aGlzIEkgaGF2ZQ0KPiA+IGNo
-YW5nZWQgdmlydGlvLWlvbW11IGRyaXZlciB0byB1c2UgSU9NTVVfUkVTVl9NU0kgcmF0aGVyIHRo
-YW4gc3ctbXNpDQo+ID4gYW5kIHRoaXMgZG9lcyBub3QgbmVlZCBjaGFuZ2VkIGluIHZmaW9fZ2V0
-X2FkZHIoKSAgYW5kDQo+ID4ga3ZtX2lycWNoaXBfYWRkX21zaV9yb3V0ZSgpDQo+IA0KPiBJIHVu
-ZGVyc3RhbmQgeW91J3JlIHJlc2VydmluZyByZWdpb24gMHgwODAwMDAwMC0weDA4MTAwMDAwIGFz
-DQo+IElPTU1VX1JFU1ZfTVNJIGluc3RlYWQgb2YgSU9NTVVfUkVTVl9TV19NU0k/IEkgdGhpbmsg
-dGhpcyBvbmx5DQo+IHdvcmtzIGJlY2F1c2UgUWVtdSBwbGFjZXMgdGhlIHZnaWMgaW4gdGhhdCBh
-cmVhIGFzIHdlbGwgKGluIGh3L2FybS92aXJ0LmMpLg0KPiBJdCdzIG5vdCBhIGNvaW5jaWRlbmNl
-IGlmIHRoZSBhZGRyZXNzZXMgYXJlIHRoZSBzYW1lLCBiZWNhdXNlIEVyaWMgY2hvc2UgdGhlbQ0K
-PiBmb3IgdGhlIExpbnV4IFNNTVUgZHJpdmVycyBhbmQgSSBjb3BpZWQgdGhlbS4NCj4gDQo+IFdl
-IGNhbid0IHJlbHkgb24gdGhhdCBiZWhhdmlvciwgdGhvdWdoLCBpdCB3aWxsIGJyZWFrIE1TSXMg
-aW4gZW11bGF0ZWQNCj4gZGV2aWNlcy4gQW5kIGlmIFFlbXUgaGFwcGVucyB0byBtb3ZlIHRoZSBN
-U0kgZG9vcmJlbGwgaW4gZnV0dXJlIG1hY2hpbmUNCj4gcmV2aXNpb25zLCB0aGVuIGl0IHdvdWxk
-IGFsc28gYnJlYWsgVkZJTy4NCg0KWWVzLCBtYWtlIHNlbnNlIHRvIG1lDQoNCj4gDQo+IEp1c3Qg
-Zm9yIG15IG93biB1bmRlcnN0YW5kaW5nIC0tIHdoYXQgaGFwcGVucywgSSB0aGluaywgaXMgdGhh
-dCBpbiBMaW51eA0KPiBpb3ZhX3Jlc2VydmVfaW9tbXVfcmVnaW9ucyBpbml0aWFsbHkgcmVzZXJ2
-ZXMgdGhlIGd1ZXN0LXBoeXNpY2FsIGRvb3JiZWxsDQo+IDB4MDgwMDAwMDAtMHgwODEwMDAwMC4g
-VGhlbiBtdWNoIGxhdGVyLCB3aGVuIHRoZSBkZXZpY2UgZHJpdmVyIHJlcXVlc3RzDQo+IGFuIE1T
-SSwgdGhlIGlycWNoaXAgZHJpdmVyIGNhbGxzIGlvbW11X2RtYV9tYXBfbXNpX21zZyB3aXRoIHRo
-ZSBndWVzdC0NCj4gcGh5c2ljYWwgZ2ljdjJtIGFkZHJlc3MgMHgwODAyMDAwMC4gVGhlIGZ1bmN0
-aW9uIGZpbmRzIHRoZSByaWdodCBwYWdlIGluDQo+IG1zaV9wYWdlX2xpc3QsIHdoaWNoIHdhcyBh
-ZGRlZCBieSBjb29raWVfaW5pdF9od19tc2lfcmVnaW9uLCB0aGVyZWZvcmUNCj4gYnlwYXNzaW5n
-IHRoZSB2aW9tbXUgYW5kIHRoZSBHUEEgZ2V0cyB3cml0dGVuIGluIHRoZSBNU0ktWCB0YWJsZS4N
-Cg0KVGhpcyBtZWFucyBpbiBjYXNlIHRvbW9ycm93IHdoZW4gcWVtdSBjaGFuZ2VzIHZpcnQgbWFj
-aGluZSBhZGRyZXNzIG1hcCBhbmQgdmdpYy1pdHMgKGl0cy10cmFuc2xhdG9yIHJlZ2lzdGVyIGFk
-ZHJlc3MpIGFkZHJlc3MgcmFuZ2UgZG9lcyBub3QgZmFsbCBpbiB0aGUgbXNpX3BhZ2VfbGlzdCB0
-aGVuIGl0IHdpbGwgYWxsb2NhdGUgYSBuZXcgaW92YSwgY3JlYXRlIG1hcHBpbmcgaW4gaW9tbXUu
-IFNvIHRoaXMgd2lsbCBubyBsb25nZXIgYmUgaWRlbnRpdHkgbWFwcGVkIGFuZCBmYWlsIHRvIHdv
-cmsgd2l0aCBuZXcgcWVtdT8NCg0KPiANCj4gSWYgYW4gZW11bGF0ZWQgZGV2aWNlIHN1Y2ggYXMg
-dmlydGlvLW5ldC1wY2kgd2VyZSB0byBnZW5lcmF0ZSBhbiBNU0ksIHRoZW4NCj4gUWVtdSB3b3Vs
-ZCBhdHRlbXB0IHRvIGFjY2VzcyB0aGUgZG9vcmJlbGwgd3JpdHRlbiBieSBMaW51eCBpbnRvIHRo
-ZSBNU0ktWA0KPiB0YWJsZSwgMHgwODAyMDAwMCwgYW5kIGZhdWx0IGJlY2F1c2UgdGhhdCBhZGRy
-ZXNzIHdhc24ndCBtYXBwZWQgaW4gdGhlDQo+IHZpb21tdS4NCj4gDQo+IFNvIGZvciBWRklPLCB5
-b3UgZWl0aGVyIG5lZWQgdG8gdHJhbnNsYXRlIHRoZSBNU0ktWCBlbnRyeSB1c2luZyB0aGUgdmlv
-bW11LA0KPiBvciBqdXN0IGFzc3VtZSB0aGF0IHRoZSB2YWRkciBjb3JyZXNwb25kcyB0byB0aGUg
-b25seSBNU0kgZG9vcmJlbGwNCj4gYWNjZXNzaWJsZSBieSB0aGlzIGRldmljZSAoYmVjYXVzZSBo
-b3cgY2FuIHdlIGJlIGNlcnRhaW4gdGhhdCB0aGUgZ3Vlc3QNCj4gYWxyZWFkeSBtYXBwZWQgdGhl
-IGRvb3JiZWxsIGJlZm9yZSB3cml0aW5nIHRoZSBlbnRyeT8pDQo+IA0KPiBGb3IgQVJNIG1hY2hp
-bmVzIGl0J3MgcHJvYmFibHkgYmVzdCB0byBzdGljayB3aXRoIElPTU1VX1JFU1ZfU1dfTVNJLg0K
-PiBIb3dldmVyLCBhIG5pY2Ugd2F5IHRvIHVzZSBJT01NVV9SRVNWX01TSSB3b3VsZCBiZSBmb3Ig
-dGhlIHZpcnRpby0NCj4gaW9tbXUgZGV2aWNlIHRvIGFkdmVydGlzZSBpZGVudGl0eS1tYXBwZWQv
-cmVzZXJ2ZWQgcmVnaW9ucywgYW5kIGJ5cGFzcw0KPiB0cmFuc2xhdGlvbiBvbiB0aGVzZSByZWdp
-b25zLiBUaGVuIHRoZSBkcml2ZXIgY291bGQgcmVzZXJ2ZSB0aG9zZSB3aXRoDQo+IElPTU1VX1JF
-U1ZfTVNJLg0KDQpDb3JyZWN0IG1lIGlmIEkgZGlkIG5vdCB1bmRlcnN0b29kIHlvdSBjb3JyZWN0
-bHksIHRvZGF5IGlvbW11LWRyaXZlciBkZWNpZGVzIG1zaS1yZXNlcnZlZCByZWdpb24sIHdoYXQg
-aWYgd2UgY2hhbmdlIHRoaXMgYW5kIHZpcnRpby1pb21tdSBkZXZpY2Ugd2lsbCBwcm92aWRlIHRo
-ZSByZXNlcnZlZCBtc2kgcmVnaW9uIGFzIHBlciB0aGUgZW11bGF0ZWQgbWFjaGluZSAodmlydC9p
-bnRlbCkuIFNvIHZpcnRpby1pb21tdSBkcml2ZXIgd2lsbCB1c2UgdGhlIGFkZHJlc3MgYWR2ZXJ0
-aXNlZCBieSB2aXJ0aW8taW9tbXUgZGV2aWNlIGFzIElPTU1VX1JFU1ZfTVNJLiBJbiB0aGlzIGNh
-c2UgbXNpLXBhZ2UtbGlzdCB3aWxsIGFsd2F5cyBoYXZlIHRoZSByZXNlcnZlZCByZWdpb24gZm9y
-IE1TSS4NCk9uIHFlbXUgc2lkZSwgZm9yIGVtdWxhdGVkIGRldmljZXMgd2Ugd2lsbCBsZXQgdmly
-dGlvLWlvbW11IHJldHVybiBzYW1lIGFkZHJlc3MgYXMgdHJhbnNsYXRlZCBhZGRyZXNzIGFzIGl0
-IGZhbGxzIGluIE1TSS1yZXNlcnZlZCBwYWdlIGFscmVhZHkga25vd24gdG8gaXQuDQoNCg0KPiBG
-b3IgeDg2IHdlIHdpbGwgbmVlZCBzdWNoIGEgc3lzdGVtLCB3aXRoIGFuIGFkZGVkIElSUQ0KPiBy
-ZW1hcHBpbmcgZmVhdHVyZS4NCg0KSSBkbyBub3QgdW5kZXJzdGFuZCB4ODYgTVNJIGludGVycnVw
-dCBnZW5lcmF0aW9uLCBidXQgSWYgYWJvdmUgdW5kZXJzdGFuZCBpcyBjb3JyZWN0LCB0aGVuIHdo
-eSB3ZSBuZWVkIElSUSByZW1hcHBpbmcgZm9yIHg4Nj8NCldpbGwgdGhlIHg4NiBtYWNoaW5lIGVt
-dWxhdGVkIGluIFFFTVUgcHJvdmlkZXMgYSBiaWcgYWRkcmVzcyByYW5nZSBmb3IgTVNJcyBhbmQg
-d2hlbiBhY3R1YWxseSBnZW5lcmF0aW5nIE1TSSBpdCBuZWVkZWQgc29tZSBleHRyYSBwcm9jZXNz
-aW5nIChJUlEtcmVtYXBwaW5nIHByb2Nlc3NpbmcpIGJlZm9yZSBhY3R1YWxseSBnZW5lcmF0aW5n
-IHdyaXRlIHRyYW5zYWN0aW9uIGZvciBNU0kgaW50ZXJydXB0ID8gDQoNClRoYW5rcw0KLUJoYXJh
-dA0KDQo+IA0KPiBUaGFua3MsDQo+IEplYW4NCg==
+Marcel Apfelbaum <marcel@redhat.com> writes:
+
+> On 05/07/2017 21:05, Markus Armbruster wrote:
+>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+[...]
+>>> It seems like limiting the size of the bus would solve the majority of
+>>> the problem. I've had a quick look around pci.c and while I can see that
+>>> the PCIBus creation functions take a devfn_min parameter, I can't see
+>>> anything that limits the number of slots available on the bus?
+>>
+>> Marcel?
+>>
+>
+> Hi Markus,
+> Sorry for my late reply.
+>
+> Indeed, we don't have currently a restriction on the number of usable
+> slots on a bus, however deriving from PCIBus class and implementing
+> the new policy should not be much trouble.
+>
+>
+>>> And presumably if the user did try and coldplug something into a full
+>>> bus then they would get the standard "PCI: no slot/function
+>>> available..." error?
+>>
+>> That's what I'd expect.
+>>
+>>>>> My understanding from reading various bits of documentation is that the
+>>>>> the empty simba bridge (bus B) can hold a maximum of 4 devices, whilst
+>>>>> the non-empty simba bridge (bus A) can hold a maximum of 2 devices
+>>>>> (presumably due to the on-board hardware). And in order to make sure
+>>>>> OpenBIOS maps the PCI IO ranges correctly, the ebus must be the first
+>>>>> on-board device found during a PCI bus scan which means slot 0 on bus A
+>>>>> must be blacklisted.
+>>>>
+>>>> Assuming init() plugs in the device providing ebus: plug it into slot 0,
+>>>> mark it not hotpluggable, done.
+>>>
+>>> That is good solution in theory except that I'd like to keep the ebus in
+>>> slot 1 so that it matches the real DT as much as possible. In the future
+>>> it could be possible for people to boot using PROMs from a real Sun and
+>>> I'm not yet convinced that there aren't hardcoded references to some of
+>>> the onboard legacy devices in a real PROM.
+>>
+>> Misunderstanding on my part!  You don't have to blacklist slot 0 to have
+>> the PCI core put ebus in slot 1.  Simply ask for slot 1 by passing
+>> PCI_DEVFN(1, 0) to pci_create() or similar.
+>>
+>
+> Right, hard-coding the device creation in machine init will solve that,
+> however it will be against our long-term goal to create the machine as
+> a puzzle, and for that, the devices should be created in some
+> order. I suspect the task would not be easy to integrate as
+> part of this project though.
+
+Even in a world where we start with an empty board, then plug in stuff
+directed by configuration file, an onboard device's PCI address should
+be explicit.  Having to count PCI devices to figure out their address
+sucks.
+
+>>>>> I guess what I'm looking for is some kind of hook that runs after both
+>>>>> machine init and all the devices have been specified on the command
+>>>>> line, which I can use to validate the configuration and provide a
+>>>>> suitable error message/hint if the configuration is invalid?
+>>>>
+>>>> You should be able to construct the machine you want, and protect the
+>>>> parts the user shouldn't mess with from messing users.  No need to
+>>>> validate the mess afterwards then.
+>>>
+>>> Unfortunately there would be issues if the user was allowed to construct
+>>> a machine with more PCI devices than slots in real hardware, since the
+>>> PCI interrupt number is limited to 4 bits - 2 bits for the PCI interrupt
+>>> number (A to D), and 2 bits for the slot. So if a user tries to plug in
+>>> more than 4 devices into each simba bus then the interrupts won't be
+>>> mapped correctly.
+>>>
+>>> My feeling is that it makes more sense to error out if the user tries to
+>>> add too many devices to the bus and/or in the wrong slots rather than
+>>> let them carry on and wonder why the virtual devices don't work
+>>> correctly, but I'm open to other options.
+>>
+>> My advice is to model the physical hardware faithfully.  If it has four
+>> PCI slots on a certain PCI bus, provide exactly four.  If it has onboard
+>> devices hardwired into a certain slot, put them exactly there, and
+>> disable unplug.  Make it impossible to plug too many devices into a bus,
+>> or into the wrong slots.
+>>
+>
+> I agree, but still the user will see an error. However the error would
+> be "slot x does not exist" which is clean.
+>
+>
+> I see two ways to continue:
+>  1. A new kind of pci-bridge should be created with a "special"
+>     secondary bus that has less slots. (harder to implement)
+>  2. Add the limitation of the number of slots to the PCIBus class,
+>     (simpler to implement, but since is not a widely used case maybe
+>     is not the best way to go.
+
+I suspect (2) would be trivial.  I like trivial.
