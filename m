@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dT7QP-0004px-Jp
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:06:34 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dT7Qw-0005Ct-R3
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:07:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dT7QM-0001fQ-DI
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:06:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dT7QM-0001eU-3V
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:06:30 -0400
-Date: Thu, 6 Jul 2017 15:06:23 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170706140623.GP3988@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <no-reply@patchew.org>) id 1dT7Qq-00027N-Sh
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 10:07:06 -0400
+Resent-Message-Id: <E1dT7Qq-00027N-Sh@eggs.gnu.org>
+In-Reply-To: <20170705133635.11850-1-famz@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149934999661.27.13789728207994914021@f0098f8687cc>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4 00/18] crypto: add afalg-backend support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 6 Jul 2017 07:06:37 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] block: Add VFIO based driver for
+ NVMe device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, keith.busch@intel.com, stefanha@redhat.com, pbonzini@redhat.com, krister@redhat.com
 
-On Tue, Jul 04, 2017 at 04:56:52PM +0800, Longpeng(Mike) wrote:
-> The AF_ALG socket family is the userspace interface for linux
-> crypto API, users can use it to access hardware accelerators.
-> 
-> This patchset adds a afalg-backend for qemu crypto subsystem. Currently
-> when performs encrypt/decrypt, we'll try afalg-backend first and will
-> back to libiary-backend if it failed.
-> 
-> In the next step, It would support a command parameter to specifies
-> which backends prefer to and some other improvements.
-> 
-> I measured the performance about the afalg-backend impls, I tested
-> how many data could be encrypted in 5 seconds.
-> 
-> NOTE: If we use specific hardware crypto cards, I think afalg-backend
->       would even faster.
-> 
-> test-environment: Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
-> 
-> *sha256*
-> chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
-> 512                 93.03                       185.87
-> 1024                146.32                      201.78
-> 2048                213.32                      210.93
-> 4096                275.48                      215.26
-> 8192                321.77                      217.49
-> 16384               349.60                      219.26
-> 32768               363.59                      219.73
-> 65536               375.79                      219.99
-> 
-> *hmac(sha256)*
-> chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
-> 512                 71.26                       165.55
-> 1024                117.43                      189.15
-> 2048                180.96                      203.24
-> 4096                247.60                      211.38
-> 8192                301.99                      215.65
-> 16384               340.79                      218.22
-> 32768               365.51                      219.49
-> 65536               377.92                      220.24
-> 
-> *cbc(aes128)*
-> chunk_size(bytes)   MB/sec(afalg:cbc-aes-aesni)  MB/sec(nettle)
-> 512                 371.76                       188.41
-> 1024                559.86                       189.64
-> 2048                768.66                       192.11
-> 4096                939.15                       192.40
-> 8192                1029.48                      192.49
-> 16384               1072.79                      190.52
-> 32768               1109.38                      190.41
-> 65536               1102.38                      190.40
-
-Thanks for the updated series. I've not had time to look at it yet, but
-its on my todo list. I'd like to aim to get this mergable in time for
-the 2.10 soft freeze on July 18th.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA3MDUxMzM2MzUuMTE4NTAtMS1mYW16QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC82XSBibG9jazogQWRkIFZGSU8gYmFzZWQgZHJpdmVy
+IGZvciBOVk1lIGRldmljZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoK
+QkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkK
+ZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9
+JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNo
+ZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4u
+IgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwog
+ICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBF
+TkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMDc5ZWE1OSBibG9jazogTW92ZSBOVk1l
+IHNwZWMgZGVmaW5pdGlvbnMgdG8gYSBzZXBhcmF0ZSBoZWFkZXIKMjhiMGVhNSBxZW11LWltZzog
+TWFwIGJlbmNoIGJ1ZmZlcgowYzVmZTYyIGJsb2NrL252bWU6IEltcGxlbWVudCAuYmRydl9kbWFf
+bWFwIGFuZCAuYmRydl9kbWFfdW5tYXAKYmI1OWU3YyBibG9jazogSW50cm9kdWNlIGJkcnZfZG1h
+X21hcCBhbmQgYmRydl9kbWFfdW5tYXAKYmU0ZGFiMSBibG9jazogQWRkIFZGSU8gYmFzZWQgTlZN
+ZSBkcml2ZXIKNzRjMDE1OCBzdHViczogQWRkIHN0dWJzIGZvciByYW0gYmxvY2sgQVBJCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IHN0dWJzOiBBZGQgc3R1YnMgZm9y
+IHJhbSBibG9jayBBUEkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi82OiBibG9jazogQWRkIFZGSU8gYmFz
+ZWQgTlZNZSBkcml2ZXIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5MTog
+RklMRTogYmxvY2svbnZtZS12ZmlvLmM6MTMzOgorICAgIGlmIChpb2N0bChzLT5kZXZpY2UsIFZG
+SU9fREVWSUNFX0dFVF9SRUdJT05fSU5GTywgJnMtPmJhcl9yZWdpb25faW5mb1tpbmRleF0pKSB7
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjc5OiBGSUxFOiBibG9jay9udm1l
+LXZmaW8uYzoyMjE6CitzdGF0aWMgaW50IG52bWVfdmZpb19wY2lfd3JpdGVfY29uZmlnKE5WTWVW
+RklPU3RhdGUgKnMsIHZvaWQgKmJ1ZiwgaW50IHNpemUsIGludCBvZnMpCgpFUlJPUjogVXNlIG9m
+IHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0aWxlLWNv
+bnNpZGVyZWQtaGFybWZ1bC50eHQKIzg0MzogRklMRTogYmxvY2svbnZtZS5jOjQwOgorICAgIHZv
+bGF0aWxlIHVpbnQzMl90ICpkb29yYmVsbDsKCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1
+YWxseSB3cm9uZzogc2VlIERvY3VtZW50YXRpb24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVs
+LnR4dAojODY5OiBGSUxFOiBibG9jay9udm1lLmM6NjY6Cit0eXBlZGVmIHZvbGF0aWxlIHN0cnVj
+dCB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTM4MTogRklMRTogYmxvY2sv
+bnZtZS5jOjU3ODoKKyAgICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgIlRpbWVvdXQgd2hpbGUg
+d2FpdGluZyBmb3IgZGV2aWNlIHRvIHJlc2V0ICglbGQgbXMpIiwKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiMxNDEwOiBGSUxFOiBibG9jay9udm1lLmM6NjA3OgorICAgICAgICAg
+ICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVGltZW91dCB3aGlsZSB3YWl0aW5nIGZvciBkZXZpY2UgdG8g
+c3RhcnQgKCVsZCBtcykiLAoKdG90YWw6IDIgZXJyb3JzLCA0IHdhcm5pbmdzLCAxODc4IGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDMvNjogYmxvY2s6IEludHJvZHVjZSBiZHJ2X2RtYV9tYXAgYW5kIGJkcnZfZG1hX3Vu
+bWFwLi4uCkNoZWNraW5nIFBBVENIIDQvNjogYmxvY2svbnZtZTogSW1wbGVtZW50IC5iZHJ2X2Rt
+YV9tYXAgYW5kIC5iZHJ2X2RtYV91bm1hcC4uLgpDaGVja2luZyBQQVRDSCA1LzY6IHFlbXUtaW1n
+OiBNYXAgYmVuY2ggYnVmZmVyLi4uCkNoZWNraW5nIFBBVENIIDYvNjogYmxvY2s6IE1vdmUgTlZN
+ZSBzcGVjIGRlZmluaXRpb25zIHRvIGEgc2VwYXJhdGUgaGVhZGVyLi4uCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
