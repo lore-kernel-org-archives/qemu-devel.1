@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dT3aN-0007tf-5l
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:00:40 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dT3eo-0000KD-VE
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jean-philippe.brucker@arm.com>) id 1dT3aH-0007GC-Hj
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:00:35 -0400
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
-	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
-	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-Message-ID: <e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
-Date: Thu, 6 Jul 2017 11:02:55 +0100
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dT3en-0002R0-VL
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:05:10 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:36225)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dT3en-0002Po-Ms
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 06:05:09 -0400
+Received: by mail-lf0-x242.google.com with SMTP id f28so1625976lfi.3
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 03:05:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+In-Reply-To: <f71401ea-2a98-5cc1-8d9f-5f2ffb683877@redhat.com>
+References: <20170629132310.18865-1-marcandre.lureau@redhat.com>
+	<20170629132310.18865-6-marcandre.lureau@redhat.com>
+	<f71401ea-2a98-5cc1-8d9f-5f2ffb683877@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 6 Jul 2017 03:05:07 -0700
+Message-ID: <CAJ+F1CKoEy7JfJEC25MFVuQQbknZhu7+AnY2r29_Yn2cA-OCEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/7] kdump: add vmcoreinfo ELF note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Dave Anderson <anderson@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 05/07/17 09:49, Bharat Bhushan wrote:>>> Also when setup msi-route
-kvm_irqchip_add_msi_route() we needed to
->> provide the translated address.
->>> According to my understanding this is required because kernel does no go
->> through viommu translation when generating interrupt, no?
+Hi
+
+On Wed, Jul 5, 2017 at 2:07 AM, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 06/29/17 15:23, Marc-Andr=C3=A9 Lureau wrote:
+>> kdump header provides offset and size of the vmcoreinfo ELF note,
+>> append it if available.
 >>
->> yes this is needed when KVM MSI routes are set up, ie. along with GICV3 ITS.
->> With GICv2M, qemu direct gsi mapping is used and this is not needed.
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  dump.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
+>>  1 file changed, 44 insertions(+), 4 deletions(-)
 >>
->> So I do not understand your previous sentence saying "MSI interrupts works
->> without any change".
-> 
-> I have almost completed vfio integration with virtio-iommu and now testing the changes by assigning e1000 device to VM. For this I have changed virtio-iommu driver to use IOMMU_RESV_MSI rather than sw-msi and this does not need changed in vfio_get_addr()  and kvm_irqchip_add_msi_route()
+>> diff --git a/dump.c b/dump.c
+>> index 8fda5cc1ed..b78bc1fda7 100644
+>> --- a/dump.c
+>> +++ b/dump.c
+>> @@ -788,8 +788,9 @@ static void create_header32(DumpState *s, Error **er=
+rp)
+>>      uint32_t sub_hdr_size;
+>>      uint32_t bitmap_blocks;
+>>      uint32_t status =3D 0;
+>> -    uint64_t offset_note;
+>> +    uint64_t offset_note, offset_vmcoreinfo, size_vmcoreinfo =3D 0;
+>>      Error *local_err =3D NULL;
+>> +    uint8_t *vmcoreinfo =3D NULL;
+>>
+>>      /* write common header, the version of kdump-compressed format is 6=
+th */
+>>      size =3D sizeof(DiskDumpHeader32);
+>> @@ -838,7 +839,18 @@ static void create_header32(DumpState *s, Error **e=
+rrp)
+>>      kh->phys_base =3D cpu_to_dump32(s, s->dump_info.phys_base);
+>>      kh->dump_level =3D cpu_to_dump32(s, DUMP_LEVEL);
+>>
+>> -    offset_note =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
+>> +    offset_vmcoreinfo =3D DISKDUMP_HEADER_BLOCKS * block_size + size;
+>> +    if (s->vmcoreinfo) {
+>> +        uint64_t hsize, name_size;
+>> +
+>> +        get_note_sizes(s, s->vmcoreinfo, &hsize, &name_size, &size_vmco=
+reinfo);
+>
+> Should we round up "size_vmcoreinfo" as well? (Without the rounding,
+> offset_note might become unaligned, plus I simply don't know what
+> alignment is expected from kh->size_vmcoreinfo.)
 
-I understand you're reserving region 0x08000000-0x08100000 as
-IOMMU_RESV_MSI instead of IOMMU_RESV_SW_MSI? I think this only works
-because Qemu places the vgic in that area as well (in hw/arm/virt.c). It's
-not a coincidence if the addresses are the same, because Eric chose them
-for the Linux SMMU drivers and I copied them.
+In the last iteration, it only sets the kh->offset/size_vmcoreinfo. I
+don't see any alignment requirement in crash.
+Dave, any comment?
 
-We can't rely on that behavior, though, it will break MSIs in emulated
-devices. And if Qemu happens to move the MSI doorbell in future machine
-revisions, then it would also break VFIO.
+>
+>> +        vmcoreinfo =3D
+>> +            s->vmcoreinfo + (DIV_ROUND_UP(hsize, 4) + DIV_ROUND_UP(name=
+_size, 4)) * 4;
+>> +        kh->offset_vmcoreinfo =3D cpu_to_dump64(s, offset_vmcoreinfo);
+>> +        kh->size_vmcoreinfo =3D cpu_to_dump32(s, size_vmcoreinfo);
+>> +    }
+>> +
+>> +    offset_note =3D offset_vmcoreinfo + size_vmcoreinfo;
+>>      kh->offset_note =3D cpu_to_dump64(s, offset_note);
+>>      kh->note_size =3D cpu_to_dump32(s, s->note_size);
+>>
+>> @@ -848,6 +860,14 @@ static void create_header32(DumpState *s, Error **e=
+rrp)
+>>          goto out;
+>>      }
+>>
+>> +    if (vmcoreinfo) {
+>> +        if (write_buffer(s->fd, offset_vmcoreinfo, vmcoreinfo,
+>> +                         size_vmcoreinfo) < 0) {
+>> +            error_setg(errp, "dump: failed to vmcoreinfo");
+>
+> The verb "write" is missing from the message.
+>
+> Same comments for create_header64() below.
+>
 
-Just for my own understanding -- what happens, I think, is that in Linux
-iova_reserve_iommu_regions initially reserves the guest-physical doorbell
-0x08000000-0x08100000. Then much later, when the device driver requests an
-MSI, the irqchip driver calls iommu_dma_map_msi_msg with the
-guest-physical gicv2m address 0x08020000. The function finds the right
-page in msi_page_list, which was added by cookie_init_hw_msi_region,
-therefore bypassing the viommu and the GPA gets written in the MSI-X table.
+gone
 
-If an emulated device such as virtio-net-pci were to generate an MSI, then
-Qemu would attempt to access the doorbell written by Linux into the MSI-X
-table, 0x08020000, and fault because that address wasn't mapped in the viommu.
+thanks
 
-So for VFIO, you either need to translate the MSI-X entry using the
-viommu, or just assume that the vaddr corresponds to the only MSI doorbell
-accessible by this device (because how can we be certain that the guest
-already mapped the doorbell before writing the entry?)
-
-For ARM machines it's probably best to stick with IOMMU_RESV_SW_MSI.
-However, a nice way to use IOMMU_RESV_MSI would be for the virtio-iommu
-device to advertise identity-mapped/reserved regions, and bypass
-translation on these regions. Then the driver could reserve those with
-IOMMU_RESV_MSI. For x86 we will need such a system, with an added IRQ
-remapping feature.
-
-Thanks,
-Jean
+--=20
+Marc-Andr=C3=A9 Lureau
