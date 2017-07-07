@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlU-0005Lf-PE
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlc-0005U0-0m
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlT-0008Dy-9l
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlX-0008Kz-Uu
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:07 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:51 +0200
-Message-Id: <1499447335-6125-37-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:55 +0200
+Message-Id: <1499447335-6125-41-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 036/100] backup: Switch backup_do_cow() to
+Subject: [Qemu-devel] [PULL 040/100] block: Make bdrv_is_allocated_above()
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,168 +25,362 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Convert another internal
-function (no semantic change).
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  In the common case, allocation is unlikely to ever use
+values that are not naturally sector-aligned, but it is possible
+that byte-based values will let us be more precise about allocation
+at the end of an unaligned file that can do byte-based access.
+
+Changing the signature of the function to use int64_t *pnum ensures
+that the compiler enforces that all callers are updated.  For now,
+the io.c layer still assert()s that all callers are sector-aligned,
+but that can be relaxed when a later patch implements byte-based
+block status.  Therefore, for the most part this patch is just the
+addition of scaling at the callers followed by inverse scaling at
+bdrv_is_allocated().  But some code, particularly stream_run(),
+gets a lot simpler because it no longer has to mess with sectors.
+Leave comments where we can further simplify by switching to
+byte-based iterations, once later patches eliminate the need for
+sector-aligned operations.
+
+For ease of review, bdrv_is_allocated() was tackled separately.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/backup.c | 62 ++++++++++++++++++++++++----------------------------------
- 1 file changed, 26 insertions(+), 36 deletions(-)
+ block/commit.c        | 20 ++++++++------------
+ block/io.c            | 38 ++++++++++++++++++--------------------
+ block/mirror.c        |  8 +++++++-
+ block/replication.c   | 17 ++++++++++++-----
+ block/stream.c        | 23 +++++++++--------------
+ include/block/block.h |  2 +-
+ qemu-img.c            | 13 ++++++++++---
+ 7 files changed, 65 insertions(+), 56 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 503fbec..f7e14db 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -91,7 +91,7 @@ static void cow_request_end(CowRequest *req)
- }
- 
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
--                                      int64_t sector_num, int nb_sectors,
-+                                      int64_t offset, uint64_t bytes,
-                                       bool *error_is_read,
-                                       bool is_write_notifier)
- {
-@@ -101,34 +101,28 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     QEMUIOVector bounce_qiov;
-     void *bounce_buffer = NULL;
+diff --git a/block/commit.c b/block/commit.c
+index 241aa95..774a8a5 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -146,7 +146,7 @@ static void coroutine_fn commit_run(void *opaque)
+     int64_t offset;
+     uint64_t delay_ns = 0;
      int ret = 0;
--    int64_t sectors_per_cluster = cluster_size_sectors(job);
--    int64_t start, end; /* clusters */
-+    int64_t start, end; /* bytes */
-     int n; /* bytes */
+-    int n = 0; /* sectors */
++    int64_t n = 0; /* bytes */
+     void *buf = NULL;
+     int bytes_written = 0;
+     int64_t base_len;
+@@ -171,7 +171,7 @@ static void coroutine_fn commit_run(void *opaque)
  
-     qemu_co_rwlock_rdlock(&job->flush_rwlock);
+     buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
  
--    start = sector_num / sectors_per_cluster;
--    end = DIV_ROUND_UP(sector_num + nb_sectors, sectors_per_cluster);
-+    start = QEMU_ALIGN_DOWN(offset, job->cluster_size);
-+    end = QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
+-    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
++    for (offset = 0; offset < s->common.len; offset += n) {
+         bool copy;
  
--    trace_backup_do_cow_enter(job, start * job->cluster_size,
--                              sector_num * BDRV_SECTOR_SIZE,
--                              nb_sectors * BDRV_SECTOR_SIZE);
-+    trace_backup_do_cow_enter(job, start, offset, bytes);
- 
--    wait_for_overlapping_requests(job, start * job->cluster_size,
--                                  end * job->cluster_size);
--    cow_request_begin(&cow_request, job, start * job->cluster_size,
--                      end * job->cluster_size);
-+    wait_for_overlapping_requests(job, start, end);
-+    cow_request_begin(&cow_request, job, start, end);
- 
--    for (; start < end; start++) {
--        if (test_bit(start, job->done_bitmap)) {
--            trace_backup_do_cow_skip(job, start * job->cluster_size);
-+    for (; start < end; start += job->cluster_size) {
-+        if (test_bit(start / job->cluster_size, job->done_bitmap)) {
-+            trace_backup_do_cow_skip(job, start);
-             continue; /* already copied */
+         /* Note that even when no rate limit is applied we need to yield
+@@ -183,15 +183,12 @@ static void coroutine_fn commit_run(void *opaque)
          }
- 
--        trace_backup_do_cow_process(job, start * job->cluster_size);
-+        trace_backup_do_cow_process(job, start);
- 
--        n = MIN(job->cluster_size,
--                job->common.len - start * job->cluster_size);
-+        n = MIN(job->cluster_size, job->common.len - start);
- 
-         if (!bounce_buffer) {
-             bounce_buffer = blk_blockalign(blk, job->cluster_size);
-@@ -137,11 +131,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-         iov.iov_len = n;
-         qemu_iovec_init_external(&bounce_qiov, &iov, 1);
- 
--        ret = blk_co_preadv(blk, start * job->cluster_size,
--                            bounce_qiov.size, &bounce_qiov,
-+        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
-                             is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-         if (ret < 0) {
--            trace_backup_do_cow_read_fail(job, start * job->cluster_size, ret);
-+            trace_backup_do_cow_read_fail(job, start, ret);
-             if (error_is_read) {
-                 *error_is_read = true;
-             }
-@@ -149,22 +142,22 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-         }
- 
-         if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
--            ret = blk_co_pwrite_zeroes(job->target, start * job->cluster_size,
-+            ret = blk_co_pwrite_zeroes(job->target, start,
-                                        bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
-         } else {
--            ret = blk_co_pwritev(job->target, start * job->cluster_size,
-+            ret = blk_co_pwritev(job->target, start,
-                                  bounce_qiov.size, &bounce_qiov,
-                                  job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
+         /* Copy if allocated above the base */
+         ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
+-                                      offset / BDRV_SECTOR_SIZE,
+-                                      COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
+-                                      &n);
++                                      offset, COMMIT_BUFFER_SIZE, &n);
+         copy = (ret == 1);
+-        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
++        trace_commit_one_iteration(s, offset, n, ret);
+         if (copy) {
+-            ret = commit_populate(s->top, s->base, offset,
+-                                  n * BDRV_SECTOR_SIZE, buf);
+-            bytes_written += n * BDRV_SECTOR_SIZE;
++            ret = commit_populate(s->top, s->base, offset, n, buf);
++            bytes_written += n;
          }
          if (ret < 0) {
--            trace_backup_do_cow_write_fail(job, start * job->cluster_size, ret);
-+            trace_backup_do_cow_write_fail(job, start, ret);
-             if (error_is_read) {
-                 *error_is_read = false;
+             BlockErrorAction action =
+@@ -204,11 +201,10 @@ static void coroutine_fn commit_run(void *opaque)
              }
-             goto out;
          }
+         /* Publish progress */
+-        s->common.offset += n * BDRV_SECTOR_SIZE;
++        s->common.offset += n;
  
--        set_bit(start, job->done_bitmap);
-+        set_bit(start / job->cluster_size, job->done_bitmap);
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit,
+-                                                 n * BDRV_SECTOR_SIZE);
++            delay_ns = ratelimit_calculate_delay(&s->limit, n);
+         }
+     }
  
-         /* Publish progress, guest I/O counts as progress too.  Note that the
-          * offset field is an opaque progress value, it is not a disk offset.
-@@ -180,8 +173,7 @@ out:
- 
-     cow_request_end(&cow_request);
- 
--    trace_backup_do_cow_return(job, sector_num * BDRV_SECTOR_SIZE,
--                               nb_sectors * BDRV_SECTOR_SIZE, ret);
-+    trace_backup_do_cow_return(job, offset, bytes, ret);
- 
-     qemu_co_rwlock_unlock(&job->flush_rwlock);
- 
-@@ -194,14 +186,12 @@ static int coroutine_fn backup_before_write_notify(
+diff --git a/block/io.c b/block/io.c
+index aad7fd3..23170a5 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1926,50 +1926,48 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+ /*
+  * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
+  *
+- * Return true if the given sector is allocated in any image between
+- * BASE and TOP (inclusive).  BASE can be NULL to check if the given
+- * sector is allocated in any image of the chain.  Return false otherwise,
++ * Return true if (a prefix of) the given range is allocated in any image
++ * between BASE and TOP (inclusive).  BASE can be NULL to check if the given
++ * offset is allocated in any image of the chain.  Return false otherwise,
+  * or negative errno on failure.
+  *
+- * 'pnum' is set to the number of sectors (including and immediately following
+- *  the specified sector) that are known to be in the same
+- *  allocated/unallocated state.
++ * 'pnum' is set to the number of bytes (including and immediately
++ * following the specified offset) that are known to be in the same
++ * allocated/unallocated state.  Note that a subsequent call starting
++ * at 'offset + *pnum' may return the same allocation status (in other
++ * words, the result is not necessarily the maximum possible range);
++ * but 'pnum' will only be 0 when end of file is reached.
+  *
+  */
+ int bdrv_is_allocated_above(BlockDriverState *top,
+                             BlockDriverState *base,
+-                            int64_t sector_num,
+-                            int nb_sectors, int *pnum)
++                            int64_t offset, int64_t bytes, int64_t *pnum)
  {
-     BackupBlockJob *job = container_of(notifier, BackupBlockJob, before_write);
-     BdrvTrackedRequest *req = opaque;
--    int64_t sector_num = req->offset >> BDRV_SECTOR_BITS;
--    int nb_sectors = req->bytes >> BDRV_SECTOR_BITS;
+     BlockDriverState *intermediate;
+-    int ret, n = nb_sectors;
++    int ret;
++    int64_t n = bytes;
  
-     assert(req->bs == blk_bs(job->common.blk));
--    assert((req->offset & (BDRV_SECTOR_SIZE - 1)) == 0);
--    assert((req->bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-+    assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
-+    assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
+     intermediate = top;
+     while (intermediate && intermediate != base) {
+         int64_t pnum_inter;
+         int64_t size_inter;
+-        int psectors_inter;
  
--    return backup_do_cow(job, sector_num, nb_sectors, NULL, true);
-+    return backup_do_cow(job, req->offset, req->bytes, NULL, true);
- }
+-        ret = bdrv_is_allocated(intermediate, sector_num * BDRV_SECTOR_SIZE,
+-                                nb_sectors * BDRV_SECTOR_SIZE,
+-                                &pnum_inter);
++        ret = bdrv_is_allocated(intermediate, offset, bytes, &pnum_inter);
+         if (ret < 0) {
+             return ret;
+         }
+-        assert(pnum_inter < INT_MAX * BDRV_SECTOR_SIZE);
+-        psectors_inter = pnum_inter >> BDRV_SECTOR_BITS;
+         if (ret) {
+-            *pnum = psectors_inter;
++            *pnum = pnum_inter;
+             return 1;
+         }
  
- static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
-@@ -406,8 +396,8 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
-                 if (yield_and_check(job)) {
-                     goto out;
-                 }
--                ret = backup_do_cow(job, cluster * sectors_per_cluster,
--                                    sectors_per_cluster, &error_is_read,
-+                ret = backup_do_cow(job, cluster * job->cluster_size,
-+                                    job->cluster_size, &error_is_read,
-                                     false);
-                 if ((ret < 0) &&
-                     backup_error_action(job, error_is_read, -ret) ==
-@@ -509,8 +499,8 @@ static void coroutine_fn backup_run(void *opaque)
-             if (alloced < 0) {
-                 ret = alloced;
-             } else {
--                ret = backup_do_cow(job, start * sectors_per_cluster,
--                                    sectors_per_cluster, &error_is_read,
-+                ret = backup_do_cow(job, start * job->cluster_size,
-+                                    job->cluster_size, &error_is_read,
-                                     false);
+-        size_inter = bdrv_nb_sectors(intermediate);
++        size_inter = bdrv_getlength(intermediate);
+         if (size_inter < 0) {
+             return size_inter;
+         }
+-        if (n > psectors_inter &&
+-            (intermediate == top || sector_num + psectors_inter < size_inter)) {
+-            n = psectors_inter;
++        if (n > pnum_inter &&
++            (intermediate == top || offset + pnum_inter < size_inter)) {
++            n = pnum_inter;
+         }
+ 
+         intermediate = backing_bs(intermediate);
+diff --git a/block/mirror.c b/block/mirror.c
+index b33f4bb..eaf0fe7 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -621,6 +621,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+     BlockDriverState *bs = s->source;
+     BlockDriverState *target_bs = blk_bs(s->target);
+     int ret, n;
++    int64_t count;
+ 
+     end = s->bdev_length / BDRV_SECTOR_SIZE;
+ 
+@@ -670,11 +671,16 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             return 0;
+         }
+ 
+-        ret = bdrv_is_allocated_above(bs, base, sector_num, nb_sectors, &n);
++        ret = bdrv_is_allocated_above(bs, base, sector_num * BDRV_SECTOR_SIZE,
++                                      nb_sectors * BDRV_SECTOR_SIZE, &count);
+         if (ret < 0) {
+             return ret;
+         }
+ 
++        /* TODO: Relax this once bdrv_is_allocated_above and dirty
++         * bitmaps no longer require sector alignment. */
++        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
++        n = count >> BDRV_SECTOR_BITS;
+         assert(n > 0);
+         if (ret == 1) {
+             bdrv_set_dirty_bitmap(s->dirty_bitmap, sector_num, n);
+diff --git a/block/replication.c b/block/replication.c
+index 8f3aba7..bf4462c 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -264,7 +264,8 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
+     BdrvChild *top = bs->file;
+     BdrvChild *base = s->secondary_disk;
+     BdrvChild *target;
+-    int ret, n;
++    int ret;
++    int64_t n;
+ 
+     ret = replication_get_io_status(s);
+     if (ret < 0) {
+@@ -283,14 +284,20 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
+      */
+     qemu_iovec_init(&hd_qiov, qiov->niov);
+     while (remaining_sectors > 0) {
+-        ret = bdrv_is_allocated_above(top->bs, base->bs, sector_num,
+-                                      remaining_sectors, &n);
++        int64_t count;
++
++        ret = bdrv_is_allocated_above(top->bs, base->bs,
++                                      sector_num * BDRV_SECTOR_SIZE,
++                                      remaining_sectors * BDRV_SECTOR_SIZE,
++                                      &count);
+         if (ret < 0) {
+             goto out1;
+         }
+ 
++        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
++        n = count >> BDRV_SECTOR_BITS;
+         qemu_iovec_reset(&hd_qiov);
+-        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, n * BDRV_SECTOR_SIZE);
++        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, count);
+ 
+         target = ret ? top : base;
+         ret = bdrv_co_writev(target, sector_num, n, &hd_qiov);
+@@ -300,7 +307,7 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
+ 
+         remaining_sectors -= n;
+         sector_num += n;
+-        bytes_done += n * BDRV_SECTOR_SIZE;
++        bytes_done += count;
+     }
+ 
+ out1:
+diff --git a/block/stream.c b/block/stream.c
+index df9679c..e6f7234 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -111,7 +111,7 @@ static void coroutine_fn stream_run(void *opaque)
+     uint64_t delay_ns = 0;
+     int error = 0;
+     int ret = 0;
+-    int n = 0; /* sectors */
++    int64_t n = 0; /* bytes */
+     void *buf;
+ 
+     if (!bs->backing) {
+@@ -135,9 +135,8 @@ static void coroutine_fn stream_run(void *opaque)
+         bdrv_enable_copy_on_read(bs);
+     }
+ 
+-    for ( ; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
++    for ( ; offset < s->common.len; offset += n) {
+         bool copy;
+-        int64_t count = 0;
+ 
+         /* Note that even when no rate limit is applied we need to yield
+          * with no pending I/O here so that bdrv_drain_all() returns.
+@@ -149,28 +148,25 @@ static void coroutine_fn stream_run(void *opaque)
+ 
+         copy = false;
+ 
+-        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &count);
+-        /* TODO relax this once bdrv_is_allocated does not enforce sectors */
+-        assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+-        n = count >> BDRV_SECTOR_BITS;
++        ret = bdrv_is_allocated(bs, offset, STREAM_BUFFER_SIZE, &n);
+         if (ret == 1) {
+             /* Allocated in the top, no need to copy.  */
+         } else if (ret >= 0) {
+             /* Copy if allocated in the intermediate images.  Limit to the
+              * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
+             ret = bdrv_is_allocated_above(backing_bs(bs), base,
+-                                          offset / BDRV_SECTOR_SIZE, n, &n);
++                                          offset, n, &n);
+ 
+             /* Finish early if end of backing file has been reached */
+             if (ret == 0 && n == 0) {
+-                n = (s->common.len - offset) / BDRV_SECTOR_SIZE;
++                n = s->common.len - offset;
              }
+ 
+             copy = (ret == 1);
+         }
+-        trace_stream_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
++        trace_stream_one_iteration(s, offset, n, ret);
+         if (copy) {
+-            ret = stream_populate(blk, offset, n * BDRV_SECTOR_SIZE, buf);
++            ret = stream_populate(blk, offset, n, buf);
+         }
+         if (ret < 0) {
+             BlockErrorAction action =
+@@ -189,10 +185,9 @@ static void coroutine_fn stream_run(void *opaque)
+         ret = 0;
+ 
+         /* Publish progress */
+-        s->common.offset += n * BDRV_SECTOR_SIZE;
++        s->common.offset += n;
+         if (copy && s->common.speed) {
+-            delay_ns = ratelimit_calculate_delay(&s->limit,
+-                                                 n * BDRV_SECTOR_SIZE);
++            delay_ns = ratelimit_calculate_delay(&s->limit, n);
+         }
+     }
+ 
+diff --git a/include/block/block.h b/include/block/block.h
+index 8d16cc1..4a27252 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -430,7 +430,7 @@ int64_t bdrv_get_block_status_above(BlockDriverState *bs,
+ int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
+                       int64_t *pnum);
+ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+-                            int64_t sector_num, int nb_sectors, int *pnum);
++                            int64_t offset, int64_t bytes, int64_t *pnum);
+ 
+ bool bdrv_is_read_only(BlockDriverState *bs);
+ bool bdrv_is_writable(BlockDriverState *bs);
+diff --git a/qemu-img.c b/qemu-img.c
+index 86e2433..f7ffb79 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1508,12 +1508,16 @@ static int img_compare(int argc, char **argv)
+         }
+ 
+         for (;;) {
++            int64_t count;
++
+             nb_sectors = sectors_to_process(total_sectors_over, sector_num);
+             if (nb_sectors <= 0) {
+                 break;
+             }
+-            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL, sector_num,
+-                                          nb_sectors, &pnum);
++            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
++                                          sector_num * BDRV_SECTOR_SIZE,
++                                          nb_sectors * BDRV_SECTOR_SIZE,
++                                          &count);
              if (ret < 0) {
+                 ret = 3;
+                 error_report("Sector allocation test failed for %s",
+@@ -1521,7 +1525,10 @@ static int img_compare(int argc, char **argv)
+                 goto out;
+ 
+             }
+-            nb_sectors = pnum;
++            /* TODO relax this once bdrv_is_allocated_above does not enforce
++             * sector alignment */
++            assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
++            nb_sectors = count >> BDRV_SECTOR_BITS;
+             if (ret) {
+                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
+                                           filename_over, buf1, quiet);
 -- 
 1.8.3.1
