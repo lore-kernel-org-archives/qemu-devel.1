@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dTGa5-0004tV-So
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:53:12 -0400
+	(envelope-from <famz@redhat.com>) id 1dTGhS-0003KA-HI
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 20:00:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dTGa1-00010j-Ps
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:53:09 -0400
-Received: from mail-co1nam03on0053.outbound.protection.outlook.com
-	([104.47.40.53]:12512
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dTGa1-0000zU-Aa
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 19:53:05 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 6 Jul 2017 16:49:47 -0700
-Message-ID: <77970edd100d0ddbaeb433d0cb13c96b2be15006.1499381754.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1499381754.git.alistair.francis@xilinx.com>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
+	(envelope-from <famz@redhat.com>) id 1dTGhR-0006YY-Na
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 20:00:46 -0400
+Date: Fri, 7 Jul 2017 08:00:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170707000034.GB1529@lemon.lan>
+References: <20170627154120.20346-1-stefanha@redhat.com>
+	<149938491950.27.16467577801751003579@7a482c8a7db2>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 4/6] char-socket: Report TCP socket waiting
- as information
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <149938491950.27.16467577801751003579@7a482c8a7db2>
+Subject: Re: [Qemu-devel] [PATCH v2] docs: add qemu-block-drivers(7) man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +24,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com
+Cc: stefanha@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr
 
-When QEMU is waiting for a TCP socket connection it reports that message as
-an error. This isn't an error it is just information so let's change the
-report to use info_report() instead.
+On Thu, 07/06 16:48, no-reply@patchew.org wrote:
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> fatal: unable to access 'https://github.com/patchew-project/qemu/': Could not resolve host: github.com
+> error: Could not fetch 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Traceback (most recent call last):
+>   File "/home/fam/bin/patchew", line 440, in test_one
+>     git_clone_repo(clone, r["repo"], r["head"], logf)
+>   File "/home/fam/bin/patchew", line 48, in git_clone_repo
+>     stdout=logf, stderr=logf)
+>   File "/usr/lib64/python3.5/subprocess.py", line 271, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['git', 'remote', 'add', '-f', '--mirror=fetch', '3c8cf5a9c21ff8782164d1def7f44bd888713384', 'https://github.com/patchew-project/qemu']' returned non-zero exit status 1
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
+Ignore this please, patchew is recovering from a bad state.
 
- chardev/char-socket.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index ccc499cfa1..a050a686ea 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -765,8 +765,8 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
-      * in TLS and telnet cases, only wait for an accepted socket */
-     while (!s->ioc) {
-         if (s->is_listen) {
--            error_report("QEMU waiting for connection on: %s",
--                         chr->filename);
-+            info_report("QEMU waiting for connection on: %s",
-+                        chr->filename);
-             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NULL);
-             tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
-             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), false, NULL);
--- 
-2.11.0
+Fam
