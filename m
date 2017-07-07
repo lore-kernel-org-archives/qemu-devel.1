@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWky-0004ju-44
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:29 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWkx-0007gE-2v
+	(envelope-from <kwolf@redhat.com>) id 1dTWkx-0004jV-Of
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:28 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1dTWkw-0007fw-Pa
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:27 +0200
-Message-Id: <1499447335-6125-13-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:25 +0200
+Message-Id: <1499447335-6125-11-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 012/100] vvfat: correctly create long names for
- non-ASCII filenames
+Subject: [Qemu-devel] [PULL 010/100] vvfat: fix field names in FAT12/FAT16
+ and FAT32 boot sectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +28,71 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-Assume that input filename is encoded as UTF-8, so correctly create UTF-1=
-6 encoding.
-
+Specification: "FAT: General overview of on-disk format" v1.03, pages 11-=
+13
 Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vvfat.c | 38 ++++++++++++++++++--------------------
- 1 file changed, 18 insertions(+), 20 deletions(-)
+ block/vvfat.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
 diff --git a/block/vvfat.c b/block/vvfat.c
-index 0c6d0f4..c52c9ba 100644
+index 88d1879..676cacb 100644
 --- a/block/vvfat.c
 +++ b/block/vvfat.c
-@@ -424,28 +424,19 @@ static void init_mbr(BDRVVVFATState *s, int cyls, i=
-nt heads, int secs)
+@@ -217,23 +217,30 @@ typedef struct bootsector_t {
+     union {
+         struct {
+             uint8_t drive_number;
+-            uint8_t current_head;
++            uint8_t reserved1;
+             uint8_t signature;
+             uint32_t id;
+             uint8_t volume_label[11];
++            uint8_t fat_type[8];
++            uint8_t ignored[0x1c0];
+         } QEMU_PACKED fat16;
+         struct {
+             uint32_t sectors_per_fat;
+             uint16_t flags;
+             uint8_t major,minor;
+-            uint32_t first_cluster_of_root_directory;
++            uint32_t first_cluster_of_root_dir;
+             uint16_t info_sector;
+             uint16_t backup_boot_sector;
+-            uint16_t ignored;
++            uint8_t reserved[12];
++            uint8_t drive_number;
++            uint8_t reserved1;
++            uint8_t signature;
++            uint32_t id;
++            uint8_t volume_label[11];
++            uint8_t fat_type[8];
++            uint8_t ignored[0x1a4];
+         } QEMU_PACKED fat32;
+     } u;
+-    uint8_t fat_type[8];
+-    uint8_t ignored[0x1c0];
+     uint8_t magic[2];
+ } QEMU_PACKED bootsector_t;
 =20
- /* direntry functions */
+@@ -973,13 +980,13 @@ static int init_directories(BDRVVVFATState* s,
+     /* LATER TODO: if FAT32, this is wrong */
+     /* drive_number: fda=3D0, hda=3D0x80 */
+     bootsector->u.fat16.drive_number =3D s->offset_to_bootsector =3D=3D =
+0 ? 0 : 0x80;
+-    bootsector->u.fat16.current_head=3D0;
+     bootsector->u.fat16.signature=3D0x29;
+     bootsector->u.fat16.id=3Dcpu_to_le32(0xfabe1afd);
 =20
--/* dest is assumed to hold 258 bytes, and pads with 0xffff up to next mu=
-ltiple of 26 */
--static inline int short2long_name(char* dest,const char* src)
-+static direntry_t *create_long_filename(BDRVVVFATState *s, const char *f=
-ilename)
- {
--    int i;
--    int len;
--    for(i=3D0;i<129 && src[i];i++) {
--        dest[2*i]=3Dsrc[i];
--        dest[2*i+1]=3D0;
-+    int number_of_entries, i;
-+    glong length;
-+    direntry_t *entry;
-+
-+    gunichar2 *longname =3D g_utf8_to_utf16(filename, -1, NULL, &length,=
- NULL);
-+    if (!longname) {
-+        fprintf(stderr, "vvfat: invalid UTF-8 name: %s\n", filename);
-+        return NULL;
-     }
--    len=3D2*i;
--    dest[2*i]=3Ddest[2*i+1]=3D0;
--    for(i=3D2*i+2;(i%26);i++)
--        dest[i]=3D0xff;
--    return len;
--}
+     memcpy(bootsector->u.fat16.volume_label, s->volume_label,
+            sizeof(bootsector->u.fat16.volume_label));
+-    memcpy(bootsector->fat_type,(s->fat_type=3D=3D12?"FAT12   ":s->fat_t=
+ype=3D=3D16?"FAT16   ":"FAT32   "),8);
++    memcpy(bootsector->u.fat16.fat_type,
++           s->fat_type =3D=3D 12 ? "FAT12   " : "FAT16   ", 8);
+     bootsector->magic[0]=3D0x55; bootsector->magic[1]=3D0xaa;
 =20
--static inline direntry_t* create_long_filename(BDRVVVFATState* s,const c=
-har* filename)
--{
--    char buffer[258];
--    int length=3Dshort2long_name(buffer,filename),
--        number_of_entries=3D(length+25)/26,i;
--    direntry_t* entry;
-+    number_of_entries =3D (length * 2 + 25) / 26;
-=20
-     for(i=3D0;i<number_of_entries;i++) {
-         entry=3Darray_get_next(&(s->directory));
-@@ -460,8 +451,15 @@ static inline direntry_t* create_long_filename(BDRVV=
-VFATState* s,const char* fil
-         else if(offset<22) offset=3D14+offset-10;
-         else offset=3D28+offset-22;
-         entry=3Darray_get(&(s->directory),s->directory.next-1-(i/26));
--        entry->name[offset]=3Dbuffer[i];
-+        if (i >=3D 2 * length + 2) {
-+            entry->name[offset] =3D 0xff;
-+        } else if (i % 2 =3D=3D 0) {
-+            entry->name[offset] =3D longname[i / 2] & 0xff;
-+        } else {
-+            entry->name[offset] =3D longname[i / 2] >> 8;
-+        }
-     }
-+    g_free(longname);
-     return array_get(&(s->directory),s->directory.next-number_of_entries=
-);
- }
-=20
+     return 0;
 --=20
 1.8.3.1
