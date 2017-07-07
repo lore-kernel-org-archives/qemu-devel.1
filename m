@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmX-0006dv-8o
+	(envelope-from <kwolf@redhat.com>) id 1dTWmX-0006eF-JN
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmW-00013G-BT
+	(envelope-from <kwolf@redhat.com>) id 1dTWmW-00013W-E9
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:05 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:40 +0200
-Message-Id: <1499447335-6125-86-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:41 +0200
+Message-Id: <1499447335-6125-87-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 085/100] qmp: add persistent flag to
+Subject: [Qemu-devel] [PULL 086/100] qmp: add autoload parameter to
  block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,85 +25,88 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
-Default is false.
+Optional. Default is false.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Denis V. Lunev <den@openvz.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170628120530.31251-24-vsementsov@virtuozzo.com
+Message-id: 20170628120530.31251-25-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- blockdev.c           | 18 +++++++++++++++++-
- qapi/block-core.json |  8 +++++++-
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ blockdev.c           | 18 ++++++++++++++++--
+ qapi/block-core.json |  6 +++++-
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index edeb36b..2ef731b 100644
+index 2ef731b..b7c1449 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -1983,6 +1983,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
-     /* AIO context taken and released within qmp_block_dirty_bitmap_add */
+@@ -1984,6 +1984,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
      qmp_block_dirty_bitmap_add(action->node, action->name,
                                 action->has_granularity, action->granularity,
-+                               action->has_persistent, action->persistent,
+                                action->has_persistent, action->persistent,
++                               action->has_autoload, action->autoload,
                                 &local_err);
  
      if (!local_err) {
-@@ -2708,9 +2709,11 @@ out:
- 
+@@ -2710,6 +2711,7 @@ out:
  void qmp_block_dirty_bitmap_add(const char *node, const char *name,
                                  bool has_granularity, uint32_t granularity,
-+                                bool has_persistent, bool persistent,
+                                 bool has_persistent, bool persistent,
++                                bool has_autoload, bool autoload,
                                  Error **errp)
  {
      BlockDriverState *bs;
-+    BdrvDirtyBitmap *bitmap;
- 
-     if (!name || name[0] == '\0') {
-         error_setg(errp, "Bitmap name cannot be empty");
-@@ -2733,7 +2736,20 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         granularity = bdrv_get_default_bitmap_granularity(bs);
+@@ -2739,6 +2741,15 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     if (!has_persistent) {
+         persistent = false;
      }
- 
--    bdrv_create_dirty_bitmap(bs, granularity, name, errp);
-+    if (!has_persistent) {
-+        persistent = false;
++    if (!has_autoload) {
++        autoload = false;
 +    }
 +
-+    if (persistent &&
-+        !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-+    {
++    if (has_autoload && !persistent) {
++        error_setg(errp, "Autoload flag must be used only for persistent "
++                         "bitmaps");
 +        return;
 +    }
+ 
+     if (persistent &&
+         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
+@@ -2747,9 +2758,12 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     }
+ 
+     bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
+-    if (bitmap != NULL) {
+-        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++    if (bitmap == NULL) {
++        return;
+     }
 +
-+    bitmap = bdrv_create_dirty_bitmap(bs, granularity, name, errp);
-+    if (bitmap != NULL) {
-+        bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
-+    }
++    bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
++    bdrv_dirty_bitmap_set_autoload(bitmap, autoload);
  }
  
  void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 9570963..907ac9d 100644
+index 907ac9d..fb69efe 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1553,10 +1553,16 @@
- # @granularity: the bitmap granularity, default is 64k for
- #               block-dirty-bitmap-add
+@@ -1558,11 +1558,15 @@
+ #              Qcow2 disks support persistent bitmaps. Default is false for
+ #              block-dirty-bitmap-add. (Since: 2.10)
  #
-+# @persistent: the bitmap is persistent, i.e. it will be saved to the
-+#              corresponding block device image file on its close. For now only
-+#              Qcow2 disks support persistent bitmaps. Default is false for
-+#              block-dirty-bitmap-add. (Since: 2.10)
++# @autoload: the bitmap will be automatically loaded when the image it is stored
++#            in is opened. This flag may only be specified for persistent
++#            bitmaps. Default is false for block-dirty-bitmap-add. (Since: 2.10)
 +#
  # Since: 2.4
  ##
  { 'struct': 'BlockDirtyBitmapAdd',
--  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32' } }
-+  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
-+            '*persistent': 'bool' } }
+   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+-            '*persistent': 'bool' } }
++            '*persistent': 'bool', '*autoload': 'bool' } }
  
  ##
  # @block-dirty-bitmap-add:
