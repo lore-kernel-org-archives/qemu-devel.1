@@ -1,45 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dTQTv-0002a1-E3
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:30 -0400
+	(envelope-from <wanghaibin.wang@huawei.com>) id 1dTQTw-0002T9-Hg
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dTQQ7-0000qt-OW
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:23:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46287
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dTQQ7-0000qU-I0
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:23:31 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v67AIjG9039132
-	for <qemu-devel@nongnu.org>; Fri, 7 Jul 2017 06:23:30 -0400
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bj3v6sxqj-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 06:23:29 -0400
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Fri, 7 Jul 2017 07:23:27 -0300
-References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
-	<f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
-	<20170705110414.GN2180@umbus.fritz.box>
-	<0e4deabe-58e9-6c15-5910-cda9f8e63f9b@linux.vnet.ibm.com>
-	<89240dbb-56b7-e540-8981-b6af20eb0d8c@linux.vnet.ibm.com>
-	<20170707071409.GF24325@umbus.fritz.box>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Fri, 7 Jul 2017 07:23:18 -0300
+	(envelope-from <wanghaibin.wang@huawei.com>) id 1dTQNA-0008Sx-3y
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:20:33 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3901)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <wanghaibin.wang@huawei.com>) id 1dTQN9-0008RU-Ga
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:20:28 -0400
+Message-ID: <595F6049.9050700@huawei.com>
+Date: Fri, 7 Jul 2017 18:19:53 +0800
+From: wanghaibin <wanghaibin.wang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707071409.GF24325@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <0a4bc3ed-530f-ba4a-44af-37781ea41ad5@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
- VI)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] virtio-gpu: bug report : vnc connect can not display
+ when migrate to destination.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,62 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org, kraxel@redhat.com, airlied@redhat.com, zhaoshenglong@huawei.com, wu.wubin@huawei.com
+
+Hi, all:
+
+I met a problem.
+
+I boot a aarch64 kernel with virtio-gpu device on aarch64 board. The cmdline just like：
+
+qemu-system-aarch64 -name guest=vm,debug-threads=on -S -machine virt-2.6,accel=kvm,usb=off,gic-version=3 -cpu host -m 8192 -realtime mlock=off -smp 4,sockets=4,cores=1,threads=1
+-no-user-config -nodefaults -no-shutdown -boot strict=on -kernel /mnt/linux-stable/arch/arm64/boot/Image -append console=ttyAMA0 root=/dev/sda2 earlyprintk=pl011,0x9000000 rw
+-device ioh3420,port=0x8,chassis=1,id=pci.1,bus=pcie.0,addr=0x1 -device i82801b11-bridge,id=pci.2,bus=pcie.0,addr=0x2 -device pci-bridge,chassis_nr=3,id=pci.3,bus=pci.2,addr=0x0
+-device ioh3420,port=0x18,chassis=4,id=pci.4,bus=pcie.0,addr=0x3 -device ioh3420,port=0x20,chassis=5,id=pci.5,bus=pcie.0,addr=0x4 -device ioh3420,port=0x28,chassis=6,id=pci.6,bus=pcie.0,addr=0x5
+-device usb-ehci,id=usb,bus=pci.3,addr=0x1 -device virtio-scsi-pci,id=scsi0,bus=pci.4,addr=0x0 -drive file=/mnt/euler_b500.raw,format=raw,if=none,id=drive-scsi0-0-0-0,cache=none,aio=native
+-device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1 -netdev tap,fd=27,id=hostnet0,vhost=on,vhostfd=28
+-device virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:af:3c:c5,bus=pci.1,addr=0x0 -serial pty -device usb-tablet,id=input0 -device usb-kbd,id=input1
+-vnc 0.0.0.0:0 -device virtio-gpu-pci,id=video0,bus=pci.5,addr=0x0
+
+Using the VNC4 client connect to the vm, every is OK.
+
+After migrate to destination, Using the VNC4 client connect to the vm , it cannot display normally. Using the tightVNC client, display normally.
 
 
-
-On 07/07/2017 04:14 AM, David Gibson wrote:
-> On Thu, Jul 06, 2017 at 11:31:35AM -0300, Daniel Henrique Barboza wrote:
->>
->> On 07/05/2017 06:53 PM, Daniel Henrique Barboza wrote:
->>> Worth a try. I'll see if I can make a POC of this DRC reset at incoming
->>> migration time.
->>
->> Just played a little with the idea of manual reset during migration. I've
->> created a
->> POC that resets the CPU DRCs in a pre_load hook.
-> Ok.  I'm not sure does the pre_load hook get called for objects where
-> nothing ends up being sent in the migration stream?
-
-In this POC I've added a pre_load hook in the machine state to ensure
-that it will be called.  I saw that we already had a post_load hook in there
-that does adjustments in the CPU and RADIX state, so adding a pre_load hook
-sounded viable too. I am not sure if we can add some form of hook for
-the DRCs that won't be migrated in the DRC state or if there is a better
-VMSD to do the reset of the DRCs.
-
-Anyway, this was more of an experiment than a serious fix proposal.
-I believe the general idea is solid but it'll get a couple of spins to get a
-good patch for pushing. I'll send the POC as a RFC to get things started and
-we'll see what happens.
+I try to debug this problem, and the info just as follow:
+(1) Guest kernel driver use soft_cursor update the cursor, not the virtio-gpu driver virtio_gpu_cursor_ping func
+    (qemu virtio-gpu backend does not call update_cursor)
+(2) Migrate to destination, I notice virtio_gpu_load func will call update_cursor (call to vnc_dpy_cursor_define, define vd->cursor).
+    At the source, vd->cursor is not define.
+(3) After migrate, using the VNC4 client, display failed caused by set_encodings(VNC_ENCODING_RICH_CURSOR: vnc_cursor_define(vs);, i don't know why),
 
 
-Daniel
+I don't understand very well about console, virtio-gpu, I just doubt this problem though compared the source and destination state difference.
+So just supply these message.
 
->> Then I've done the same
->> experiment - device_add on both source and target before the migration,
->> hot unplug the device after migration is completed. The hot unplug worked as
->> expected in both QEMU and guest.
-> That's encouraging.
->
->> To minimize the impact I am resetting only the DRCs of the CPUs that were
->> hotplugged
->> in the target instead of resetting everybody.
-> That sounds like more trouble than it's worth, I think it'll be easier
-> and safer to reset all DRCs.
->
->> I'll see if this solution works for LMBs and PCI devices. In case
->> affirmative, and
->> if we are fine with this solution of resetting the DRCs in pre_load (not
->> sure if pre_load is
->> the right place for doing it - suggestions welcome), I can send a patch to
->> be applied on top
->> of this series.
->>
->>
->>
->> Thanks,
->>
->> Daniel
->>
+BTW: just a simple test, delete the virtio_gpu_load func update_cursor line, VNC4 client display OK at destination ...
+
+
+Thanks.
