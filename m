@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlr-0005qL-PL
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWls-0005r4-Cf
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlq-00008R-Bt
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlp-00007s-Ob
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:07 +0200
-Message-Id: <1499447335-6125-53-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:04 +0200
+Message-Id: <1499447335-6125-50-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 052/100] qcow2: extend specification to cover
- LUKS encryption
+Subject: [Qemu-devel] [PULL 049/100] qcow: convert QCow to use QCryptoBlock
+ for encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,147 +25,520 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Update the qcow2 specification to describe how the LUKS header is
-placed inside a qcow2 file, when using LUKS encryption for the
-qcow2 payload instead of the legacy AES-CBC encryption
+This converts the qcow driver to make use of the QCryptoBlock
+APIs for encrypting image content. This is only wired up to
+permit use of the legacy QCow encryption format. Users who wish
+to have the strong LUKS format should switch to qcow2 instead.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+With this change it is now required to use the QCryptoSecret
+object for providing passwords, instead of the current block
+password APIs / interactive prompting.
+
+  $QEMU \
+    -object secret,id=sec0,file=/home/berrange/encrypted.pw \
+    -drive file=/home/berrange/encrypted.qcow,encrypt.format=aes,\
+           encrypt.key-secret=sec0
+
+Though note that running QEMU system emulators with the AES
+encryption is no longer supported, so while the above syntax
+is valid, QEMU will refuse to actually run the VM in this
+particular example.
+
+Likewise when creating images with the legacy AES-CBC format
+
+  qemu-img create -f qcow \
+    --object secret,id=sec0,file=/home/berrange/encrypted.pw \
+    -o encrypt.format=aes,encrypt.key-secret=sec0 \
+    /home/berrange/encrypted.qcow 64M
+
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170623162419.26068-13-berrange@redhat.com
+Message-id: 20170623162419.26068-10-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- docs/interop/qcow2.txt | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 103 insertions(+)
+ block/crypto.c       |  10 +++
+ block/crypto.h       |  20 ++++--
+ block/qcow.c         | 198 +++++++++++++++++++++++++--------------------------
+ qapi/block-core.json |  38 +++++++++-
+ 4 files changed, 158 insertions(+), 108 deletions(-)
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 80cdfd0..886a546 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -45,6 +45,7 @@ The first cluster of a qcow2 image contains the file header:
-          32 - 35:   crypt_method
-                     0 for no encryption
-                     1 for AES encryption
-+                    2 for LUKS encryption
+diff --git a/block/crypto.c b/block/crypto.c
+index 9df1e5d..da4be74 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -181,6 +181,11 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+             v, &ret->u.luks, &local_err);
+         break;
  
-          36 - 39:   l1_size
-                     Number of entries in the active L1 table
-@@ -135,6 +136,7 @@ be stored. Each extension has a structure like the following:
-                         0xE2792ACA - Backing file format name
-                         0x6803f857 - Feature name table
-                         0x23852875 - Bitmaps extension
-+                        0x0537be77 - Full disk encryption header pointer
-                         other      - Unknown header extension, can be safely
-                                      ignored
++    case Q_CRYPTO_BLOCK_FORMAT_QCOW:
++        visit_type_QCryptoBlockOptionsQCow_members(
++            v, &ret->u.qcow, &local_err);
++        break;
++
+     default:
+         error_setg(&local_err, "Unsupported block format %d", format);
+         break;
+@@ -227,6 +232,11 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
+             v, &ret->u.luks, &local_err);
+         break;
  
-@@ -207,6 +209,107 @@ The fields of the bitmaps extension are:
-                    Offset into the image file at which the bitmap directory
-                    starts. Must be aligned to a cluster boundary.
++    case Q_CRYPTO_BLOCK_FORMAT_QCOW:
++        visit_type_QCryptoBlockOptionsQCow_members(
++            v, &ret->u.qcow, &local_err);
++        break;
++
+     default:
+         error_setg(&local_err, "Unsupported block format %d", format);
+         break;
+diff --git a/block/crypto.h b/block/crypto.h
+index 3430dcd..0f985ea 100644
+--- a/block/crypto.h
++++ b/block/crypto.h
+@@ -21,6 +21,19 @@
+ #ifndef BLOCK_CRYPTO_H__
+ #define BLOCK_CRYPTO_H__
  
-+== Full disk encryption header pointer ==
++#define BLOCK_CRYPTO_OPT_DEF_KEY_SECRET(prefix, helpstr)                \
++    {                                                                   \
++        .name = prefix BLOCK_CRYPTO_OPT_QCOW_KEY_SECRET,                \
++        .type = QEMU_OPT_STRING,                                        \
++        .help = helpstr,                                                \
++    }
 +
-+The full disk encryption header must be present if, and only if, the
-+'crypt_method' header requires metadata. Currently this is only true
-+of the 'LUKS' crypt method. The header extension must be absent for
-+other methods.
++#define BLOCK_CRYPTO_OPT_QCOW_KEY_SECRET "key-secret"
 +
-+This header provides the offset at which the crypt method can store
-+its additional data, as well as the length of such data.
++#define BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET(prefix)                    \
++    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET(prefix,                             \
++        "ID of the secret that provides the AES encryption key")
 +
-+    Byte  0 -  7:   Offset into the image file at which the encryption
-+                    header starts in bytes. Must be aligned to a cluster
-+                    boundary.
-+    Byte  8 - 15:   Length of the written encryption header in bytes.
-+                    Note actual space allocated in the qcow2 file may
-+                    be larger than this value, since it will be rounded
-+                    to the nearest multiple of the cluster size. Any
-+                    unused bytes in the allocated space will be initialized
-+                    to 0.
-+
-+For the LUKS crypt method, the encryption header works as follows.
-+
-+The first 592 bytes of the header clusters will contain the LUKS
-+partition header. This is then followed by the key material data areas.
-+The size of the key material data areas is determined by the number of
-+stripes in the key slot and key size. Refer to the LUKS format
-+specification ('docs/on-disk-format.pdf' in the cryptsetup source
-+package) for details of the LUKS partition header format.
-+
-+In the LUKS partition header, the "payload-offset" field will be
-+calculated as normal for the LUKS spec. ie the size of the LUKS
-+header, plus key material regions, plus padding, relative to the
-+start of the LUKS header. This offset value is not required to be
-+qcow2 cluster aligned. Its value is currently never used in the
-+context of qcow2, since the qcow2 file format itself defines where
-+the real payload offset is, but none the less a valid payload offset
-+should always be present.
-+
-+In the LUKS key slots header, the "key-material-offset" is relative
-+to the start of the LUKS header clusters in the qcow2 container,
-+not the start of the qcow2 file.
-+
-+Logically the layout looks like
-+
-+  +-----------------------------+
-+  | QCow2 header                |
-+  | QCow2 header extension X    |
-+  | QCow2 header extension FDE  |
-+  | QCow2 header extension ...  |
-+  | QCow2 header extension Z    |
-+  +-----------------------------+
-+  | ....other QCow2 tables....  |
-+  .                             .
-+  .                             .
-+  +-----------------------------+
-+  | +-------------------------+ |
-+  | | LUKS partition header   | |
-+  | +-------------------------+ |
-+  | | LUKS key material 1     | |
-+  | +-------------------------+ |
-+  | | LUKS key material 2     | |
-+  | +-------------------------+ |
-+  | | LUKS key material ...   | |
-+  | +-------------------------+ |
-+  | | LUKS key material 8     | |
-+  | +-------------------------+ |
-+  +-----------------------------+
-+  | QCow2 cluster payload       |
-+  .                             .
-+  .                             .
-+  .                             .
-+  |                             |
-+  +-----------------------------+
-+
-+== Data encryption ==
-+
-+When an encryption method is requested in the header, the image payload
-+data must be encrypted/decrypted on every write/read. The image headers
-+and metadata are never encrypted.
-+
-+The algorithms used for encryption vary depending on the method
-+
-+ - AES:
-+
-+   The AES cipher, in CBC mode, with 256 bit keys.
-+
-+   Initialization vectors generated using plain64 method, with
-+   the virtual disk sector as the input tweak.
-+
-+   This format is no longer supported in QEMU system emulators, due
-+   to a number of design flaws affecting its security. It is only
-+   supported in the command line tools for the sake of back compatibility
-+   and data liberation.
-+
-+ - LUKS:
-+
-+   The algorithms are specified in the LUKS header.
-+
-+   Initialization vectors generated using the method specified
-+   in the LUKS header, with the physical disk sector as the
-+   input tweak.
+ #define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
+ #define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
+ #define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
+@@ -30,11 +43,8 @@
+ #define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
  
- == Host cluster management ==
+ #define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET(prefix)                    \
+-    {                                                                   \
+-        .name = prefix BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                \
+-        .type = QEMU_OPT_STRING,                                        \
+-        .help = "ID of the secret that provides the keyslot passphrase", \
+-    }
++    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET(prefix,                             \
++        "ID of the secret that provides the keyslot passphrase")
  
+ #define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG(prefix)       \
+     {                                                      \
+diff --git a/block/qcow.c b/block/qcow.c
+index 3a3dbf9..db0c5a9 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -31,8 +31,10 @@
+ #include "qemu/bswap.h"
+ #include <zlib.h>
+ #include "qapi/qmp/qerror.h"
+-#include "crypto/cipher.h"
++#include "qapi/qmp/qstring.h"
++#include "crypto/block.h"
+ #include "migration/blocker.h"
++#include "block/crypto.h"
+ 
+ /**************************************************************/
+ /* QEMU COW block driver with compression and encryption support */
+@@ -77,7 +79,7 @@ typedef struct BDRVQcowState {
+     uint8_t *cluster_cache;
+     uint8_t *cluster_data;
+     uint64_t cluster_cache_offset;
+-    QCryptoCipher *cipher; /* NULL if no key yet */
++    QCryptoBlock *crypto; /* Disk encryption format driver */
+     uint32_t crypt_method_header;
+     CoMutex lock;
+     Error *migration_blocker;
+@@ -97,6 +99,15 @@ static int qcow_probe(const uint8_t *buf, int buf_size, const char *filename)
+         return 0;
+ }
+ 
++static QemuOptsList qcow_runtime_opts = {
++    .name = "qcow",
++    .head = QTAILQ_HEAD_INITIALIZER(qcow_runtime_opts.head),
++    .desc = {
++        BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET("encrypt."),
++        { /* end of list */ }
++    },
++};
++
+ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+                      Error **errp)
+ {
+@@ -105,11 +116,19 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+     int ret;
+     QCowHeader header;
+     Error *local_err = NULL;
++    QCryptoBlockOpenOptions *crypto_opts = NULL;
++    unsigned int cflags = 0;
++    QDict *encryptopts = NULL;
++    const char *encryptfmt;
++
++    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
++    encryptfmt = qdict_get_try_str(encryptopts, "format");
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+     if (!bs->file) {
+-        return -EINVAL;
++        ret = -EINVAL;
++        goto fail;
+     }
+ 
+     ret = bdrv_pread(bs->file, 0, &header, sizeof(header));
+@@ -155,17 +174,6 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
+-    if (header.crypt_method > QCOW_CRYPT_AES) {
+-        error_setg(errp, "invalid encryption method in qcow header");
+-        ret = -EINVAL;
+-        goto fail;
+-    }
+-    if (!qcrypto_cipher_supports(QCRYPTO_CIPHER_ALG_AES_128,
+-                                 QCRYPTO_CIPHER_MODE_CBC)) {
+-        error_setg(errp, "AES cipher not available");
+-        ret = -EINVAL;
+-        goto fail;
+-    }
+     s->crypt_method_header = header.crypt_method;
+     if (s->crypt_method_header) {
+         if (bdrv_uses_whitelist() &&
+@@ -181,8 +189,38 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+             ret = -ENOSYS;
+             goto fail;
+         }
++        if (s->crypt_method_header == QCOW_CRYPT_AES) {
++            if (encryptfmt && !g_str_equal(encryptfmt, "aes")) {
++                error_setg(errp,
++                           "Header reported 'aes' encryption format but "
++                           "options specify '%s'", encryptfmt);
++                ret = -EINVAL;
++                goto fail;
++            }
++            qdict_del(encryptopts, "format");
++            crypto_opts = block_crypto_open_opts_init(
++                Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
++            if (!crypto_opts) {
++                ret = -EINVAL;
++                goto fail;
++            }
+ 
++            if (flags & BDRV_O_NO_IO) {
++                cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
++            }
++            s->crypto = qcrypto_block_open(crypto_opts, NULL, NULL,
++                                           cflags, errp);
++            if (!s->crypto) {
++                ret = -EINVAL;
++                goto fail;
++            }
++        } else {
++            error_setg(errp, "invalid encryption method in qcow header");
++            ret = -EINVAL;
++            goto fail;
++        }
+         bs->encrypted = true;
++        bs->valid_key = true;
+     }
+     s->cluster_bits = header.cluster_bits;
+     s->cluster_size = 1 << s->cluster_bits;
+@@ -266,6 +304,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
++    QDECREF(encryptopts);
++    qapi_free_QCryptoBlockOpenOptions(crypto_opts);
+     qemu_co_mutex_init(&s->lock);
+     return 0;
+ 
+@@ -274,6 +314,9 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+     qemu_vfree(s->l2_cache);
+     g_free(s->cluster_cache);
+     g_free(s->cluster_data);
++    qcrypto_block_free(s->crypto);
++    QDECREF(encryptopts);
++    qapi_free_QCryptoBlockOpenOptions(crypto_opts);
+     return ret;
+ }
+ 
+@@ -286,81 +329,6 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
+     return 0;
+ }
+ 
+-static int qcow_set_key(BlockDriverState *bs, const char *key)
+-{
+-    BDRVQcowState *s = bs->opaque;
+-    uint8_t keybuf[16];
+-    int len, i;
+-    Error *err;
+-
+-    memset(keybuf, 0, 16);
+-    len = strlen(key);
+-    if (len > 16)
+-        len = 16;
+-    /* XXX: we could compress the chars to 7 bits to increase
+-       entropy */
+-    for(i = 0;i < len;i++) {
+-        keybuf[i] = key[i];
+-    }
+-    assert(bs->encrypted);
+-
+-    qcrypto_cipher_free(s->cipher);
+-    s->cipher = qcrypto_cipher_new(
+-        QCRYPTO_CIPHER_ALG_AES_128,
+-        QCRYPTO_CIPHER_MODE_CBC,
+-        keybuf, G_N_ELEMENTS(keybuf),
+-        &err);
+-
+-    if (!s->cipher) {
+-        /* XXX would be nice if errors in this method could
+-         * be properly propagate to the caller. Would need
+-         * the bdrv_set_key() API signature to be fixed. */
+-        error_free(err);
+-        return -1;
+-    }
+-    return 0;
+-}
+-
+-/* The crypt function is compatible with the linux cryptoloop
+-   algorithm for < 4 GB images. */
+-static int encrypt_sectors(BDRVQcowState *s, int64_t sector_num,
+-                           uint8_t *buf, int nb_sectors, bool enc,
+-                           Error **errp)
+-{
+-    union {
+-        uint64_t ll[2];
+-        uint8_t b[16];
+-    } ivec;
+-    int i;
+-    int ret;
+-
+-    for(i = 0; i < nb_sectors; i++) {
+-        ivec.ll[0] = cpu_to_le64(sector_num);
+-        ivec.ll[1] = 0;
+-        if (qcrypto_cipher_setiv(s->cipher,
+-                                 ivec.b, G_N_ELEMENTS(ivec.b),
+-                                 errp) < 0) {
+-            return -1;
+-        }
+-        if (enc) {
+-            ret = qcrypto_cipher_encrypt(s->cipher,
+-                                         buf, buf,
+-                                         512,
+-                                         errp);
+-        } else {
+-            ret = qcrypto_cipher_decrypt(s->cipher,
+-                                         buf, buf,
+-                                         512,
+-                                         errp);
+-        }
+-        if (ret < 0) {
+-            return -1;
+-        }
+-        sector_num++;
+-        buf += 512;
+-    }
+-    return 0;
+-}
+ 
+ /* 'allocate' is:
+  *
+@@ -475,15 +443,16 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
+                 if (bs->encrypted &&
+                     (n_end - n_start) < s->cluster_sectors) {
+                     uint64_t start_sect;
+-                    assert(s->cipher);
++                    assert(s->crypto);
+                     start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
+                     for(i = 0; i < s->cluster_sectors; i++) {
+                         if (i < n_start || i >= n_end) {
+                             Error *err = NULL;
+                             memset(s->cluster_data, 0x00, 512);
+-                            if (encrypt_sectors(s, start_sect + i,
+-                                                s->cluster_data, 1,
+-                                                true, &err) < 0) {
++                            if (qcrypto_block_encrypt(s->crypto, start_sect + i,
++                                                      s->cluster_data,
++                                                      BDRV_SECTOR_SIZE,
++                                                      &err) < 0) {
+                                 error_free(err);
+                                 errno = EIO;
+                                 return -1;
+@@ -528,7 +497,7 @@ static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
+     if (!cluster_offset) {
+         return 0;
+     }
+-    if ((cluster_offset & QCOW_OFLAG_COMPRESSED) || s->cipher) {
++    if ((cluster_offset & QCOW_OFLAG_COMPRESSED) || s->crypto) {
+         return BDRV_BLOCK_DATA;
+     }
+     cluster_offset |= (index_in_cluster << BDRV_SECTOR_BITS);
+@@ -659,9 +628,9 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+                 break;
+             }
+             if (bs->encrypted) {
+-                assert(s->cipher);
+-                if (encrypt_sectors(s, sector_num, buf,
+-                                    n, false, &err) < 0) {
++                assert(s->crypto);
++                if (qcrypto_block_decrypt(s->crypto, sector_num, buf,
++                                          n * BDRV_SECTOR_SIZE, &err) < 0) {
+                     goto fail;
+                 }
+             }
+@@ -734,8 +703,9 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+         }
+         if (bs->encrypted) {
+             Error *err = NULL;
+-            assert(s->cipher);
+-            if (encrypt_sectors(s, sector_num, buf, n, true, &err) < 0) {
++            assert(s->crypto);
++            if (qcrypto_block_encrypt(s->crypto, sector_num, buf,
++                                      n * BDRV_SECTOR_SIZE, &err) < 0) {
+                 error_free(err);
+                 ret = -EIO;
+                 break;
+@@ -770,8 +740,8 @@ static void qcow_close(BlockDriverState *bs)
+ {
+     BDRVQcowState *s = bs->opaque;
+ 
+-    qcrypto_cipher_free(s->cipher);
+-    s->cipher = NULL;
++    qcrypto_block_free(s->crypto);
++    s->crypto = NULL;
+     g_free(s->l1_table);
+     qemu_vfree(s->l2_cache);
+     g_free(s->cluster_cache);
+@@ -792,6 +762,10 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     int ret;
+     BlockBackend *qcow_blk;
+     const char *encryptfmt = NULL;
++    QDict *options;
++    QDict *encryptopts = NULL;
++    QCryptoBlockCreateOptions *crypto_opts = NULL;
++    QCryptoBlock *crypto = NULL;
+ 
+     /* Read out options */
+     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+@@ -866,6 +840,10 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     l1_size = (total_size + (1LL << shift) - 1) >> shift;
+ 
+     header.l1_table_offset = cpu_to_be64(header_size);
++
++    options = qemu_opts_to_qdict(opts, NULL);
++    qdict_extract_subqdict(options, &encryptopts, "encrypt.");
++    QDECREF(options);
+     if (encryptfmt) {
+         if (!g_str_equal(encryptfmt, "aes")) {
+             error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
+@@ -874,6 +852,19 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+             goto exit;
+         }
+         header.crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
++
++        crypto_opts = block_crypto_create_opts_init(
++            Q_CRYPTO_BLOCK_FORMAT_QCOW, encryptopts, errp);
++        if (!crypto_opts) {
++            ret = -EINVAL;
++            goto exit;
++        }
++
++        crypto = qcrypto_block_create(crypto_opts, NULL, NULL, NULL, errp);
++        if (!crypto) {
++            ret = -EINVAL;
++            goto exit;
++        }
+     } else {
+         header.crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
+     }
+@@ -908,6 +899,9 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+ exit:
+     blk_unref(qcow_blk);
+ cleanup:
++    QDECREF(encryptopts);
++    qcrypto_block_free(crypto);
++    qapi_free_QCryptoBlockCreateOptions(crypto_opts);
+     g_free(backing_file);
+     return ret;
+ }
+@@ -1054,6 +1048,7 @@ static QemuOptsList qcow_create_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "Encrypt the image, format choices: 'aes'",
+         },
++        BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET("encrypt."),
+         { /* end of list */ }
+     }
+ };
+@@ -1074,7 +1069,6 @@ static BlockDriver bdrv_qcow = {
+     .bdrv_co_writev         = qcow_co_writev,
+     .bdrv_co_get_block_status   = qcow_co_get_block_status,
+ 
+-    .bdrv_set_key           = qcow_set_key,
+     .bdrv_make_empty        = qcow_make_empty,
+     .bdrv_co_pwritev_compressed = qcow_co_pwritev_compressed,
+     .bdrv_get_info          = qcow_get_info,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index f85c223..c4b7e6e 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2282,6 +2282,42 @@
+             'mode':  'Qcow2OverlapCheckMode' } }
+ 
+ ##
++# @BlockdevQcowEncryptionFormat:
++#
++# @aes: AES-CBC with plain64 initialization vectors
++#
++# Since: 2.10
++##
++{ 'enum': 'BlockdevQcowEncryptionFormat',
++  'data': [ 'aes' ] }
++
++##
++# @BlockdevQcowEncryption:
++#
++# Since: 2.10
++##
++{ 'union': 'BlockdevQcowEncryption',
++  'base': { 'format': 'BlockdevQcowEncryptionFormat' },
++  'discriminator': 'format',
++  'data': { 'aes': 'QCryptoBlockOptionsQCow' } }
++
++##
++# @BlockdevOptionsQcow:
++#
++# Driver specific block device options for qcow.
++#
++# @encrypt:               Image decryption options. Mandatory for
++#                         encrypted images, except when doing a metadata-only
++#                         probe of the image.
++#
++# Since: 2.10
++##
++{ 'struct': 'BlockdevOptionsQcow',
++  'base': 'BlockdevOptionsGenericCOWFormat',
++  'data': { '*encrypt': 'BlockdevQcowEncryption' } }
++
++
++##
+ # @BlockdevOptionsQcow2:
+ #
+ # Driver specific block device options for qcow2.
+@@ -2976,7 +3012,7 @@
+       'null-co':    'BlockdevOptionsNull',
+       'parallels':  'BlockdevOptionsGenericFormat',
+       'qcow2':      'BlockdevOptionsQcow2',
+-      'qcow':       'BlockdevOptionsGenericCOWFormat',
++      'qcow':       'BlockdevOptionsQcow',
+       'qed':        'BlockdevOptionsGenericCOWFormat',
+       'quorum':     'BlockdevOptionsQuorum',
+       'raw':        'BlockdevOptionsRaw',
 -- 
 1.8.3.1
