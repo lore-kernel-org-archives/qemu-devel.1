@@ -1,26 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTajh-0004gs-Hz
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:24:26 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dTakQ-00054W-5N
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTaje-0004R8-DW
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:24:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47046)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTaje-0004Qf-3m
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:24:22 -0400
-References: <20170707151546.7893-1-berrange@redhat.com>
-	<20170707151546.7893-6-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <89e0436f-2b95-b3e4-e372-688e9408178a@redhat.com>
-Date: Fri, 7 Jul 2017 16:24:19 -0500
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dTakN-0004qL-0j
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:25:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38871)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dTakM-0004pB-MO
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:25:06 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v67LOsDV131615
+	for <qemu-devel@nongnu.org>; Fri, 7 Jul 2017 17:25:05 -0400
+Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bjg03mapt-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 17:25:04 -0400
+Received: from localhost
+	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 7 Jul 2017 18:25:01 -0300
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
+	<f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
+	<20170705110414.GN2180@umbus.fritz.box>
+	<0e4deabe-58e9-6c15-5910-cda9f8e63f9b@linux.vnet.ibm.com>
+	<89240dbb-56b7-e540-8981-b6af20eb0d8c@linux.vnet.ibm.com>
+	<20170707071409.GF24325@umbus.fritz.box>
+	<0a4bc3ed-530f-ba4a-44af-37781ea41ad5@linux.vnet.ibm.com>
+Date: Fri, 7 Jul 2017 18:24:52 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170707151546.7893-6-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oIrSoEU2We0Wcl9v2ltA6MAbo3ADSPA7P"
-Subject: Re: [Qemu-devel] [PATCH v5 5/5] tests: add functional test
- validating ipv4/ipv6 address flag handling
+In-Reply-To: <0a4bc3ed-530f-ba4a-44af-37781ea41ad5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <5ad4a1c3-1d14-0aa1-b347-f8e7e77b6883@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
+ VI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +48,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oIrSoEU2We0Wcl9v2ltA6MAbo3ADSPA7P
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Gerd Hoffmann <kraxel@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <89e0436f-2b95-b3e4-e372-688e9408178a@redhat.com>
-Subject: Re: [PATCH v5 5/5] tests: add functional test validating ipv4/ipv6
- address flag handling
-References: <20170707151546.7893-1-berrange@redhat.com>
- <20170707151546.7893-6-berrange@redhat.com>
-In-Reply-To: <20170707151546.7893-6-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/07/2017 10:15 AM, Daniel P. Berrange wrote:
-> The semantics around handling ipv4=3Don|off & ipv6=3Don|off are quite
-> subtle to understand in combination with the various hostname addresses=
-
-> and backend types. Introduce a massive test matrix that launches QEMU
-> and validates the ability to connect a client on each protocol as
-> appropriate.
->=20
-> The test requires that the host has ability to bind to both :: and
-> 0.0.0.0, on port 9000. If either protocol is not available, or if
-> something is already listening on that port the test will skip.
->=20
-> Although it isn't using the QTest APIs, it expects the
-> QTEST_QEMU_BINARY env variable to be set.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
-
-The only difference in v5 appears to be the pid-file cleanup that I
-mentioned on v4.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, sursingh@redhat.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---oIrSoEU2We0Wcl9v2ltA6MAbo3ADSPA7P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Anyway, this was more of an experiment than a serious fix proposal.
+> I believe the general idea is solid but it'll get a couple of spins to 
+> get a
+> good patch for pushing. I'll send the POC as a RFC to get things 
+> started and
+> we'll see what happens.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+I've sent the POC as RFC here:
 
-iQEcBAEBCAAGBQJZX/wDAAoJEKeha0olJ0NqJdAH/0oMtkUUWoxzcIDZzFJizTNo
-mywZFDpdTfZMe5jcIhJ8HHGvWoe/+QyqSXhYY9X7QArv5B2b66TCE+iQpeVYVcpe
-V31gk0iE2/LObbaVHNCXuQxz4va+vpipWXtAHVsRzgdPHOfnN/JAwZD0f5NGJiKy
-SlAwRv7ZldNl5+QLu4SV6GmoL9dkkS3Vct1sGI/WhweYJJMahN4MzWB/721Oxspa
-OMolVc+nwRInbUmndmEeiiKmNu0ZXu6JALI7r51sJyVW6zU4/FuHN6wQfkCRKXTV
-qH5lKv0p1k3AlkJphijEV/y14G0DMiatWoH9Sef1mDQaYuXCzDrqNkVzc/wkyCo=
-=FtxH
------END PGP SIGNATURE-----
+"[RFC drcVI PATCH] spapr: reset DRCs on migration pre_load"
 
---oIrSoEU2We0Wcl9v2ltA6MAbo3ADSPA7P--
+
+The patch mentions drcVI because it was made on top of this series. Let 
+me know
+what you think.
+
+Daniel
