@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTSGw-0008HL-56
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:11 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dTSGx-0008Im-Nd
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTSGv-0005r8-5w
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45178)
+	(envelope-from <cohuck@redhat.com>) id 1dTSGx-0005rg-0a
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:7246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSGu-0005qk-Vl
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:09 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSGw-0005rQ-Qt
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:10 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  7 Jul 2017 14:21:55 +0200
-Message-Id: <20170707122159.24714-4-cohuck@redhat.com>
+Date: Fri,  7 Jul 2017 14:21:56 +0200
+Message-Id: <20170707122159.24714-5-cohuck@redhat.com>
 In-Reply-To: <20170707122159.24714-1-cohuck@redhat.com>
 References: <20170707122159.24714-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 3/7] s390x/sclp: properly guard
- pci-specific functions
+Subject: [Qemu-devel] [PATCH RFC 4/7] s390x/ccw: create s390 phb
+ conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +27,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-For non-pci builds, pci reconfiguration via sclp is not available.
-Don't indicate it in the sclp facilities and return an invalid
-command if the guest tries to issue pci configure/deconfigure.
+Don't create the s390 pci host bridge for non-pci builds.
 
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/sclp.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 83d6023894..d20baa3bbd 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -59,6 +59,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     int rnsize, rnmax;
-     int slots = MIN(machine->ram_slots, s390_get_memslot_count(kvm_state));
-     IplParameterBlock *ipib = s390_ipl_get_iplb();
-+    uint64_t sclp_facilities = SCLP_HAS_CPU_INFO;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 41ca6668e2..563f7702a1 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -114,7 +114,6 @@ static void ccw_init(MachineState *machine)
+ {
+     int ret;
+     VirtualCssBus *css_bus;
+-    DeviceState *dev;
  
-     CPU_FOREACH(cpu) {
-         cpu_count++;
-@@ -79,8 +80,10 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
- 
-     prepare_cpu_entries(sclp, read_info->entries, cpu_count);
- 
--    read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
--                                        SCLP_HAS_PCI_RECONFIG);
+     s390_sclp_init();
+     s390_memory_init(machine->ram_size);
+@@ -126,12 +125,14 @@ static void ccw_init(MachineState *machine)
+     s390_init_ipl_dev(machine->kernel_filename, machine->kernel_cmdline,
+                       machine->initrd_filename, "s390-ccw.img",
+                       "s390-netboot.img", true);
+-
+-    dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
 +#ifdef CONFIG_PCI
-+    sclp_facilities |= SCLP_HAS_PCI_RECONFIG;
++    {
++    DeviceState *dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+     object_property_add_child(qdev_get_machine(), TYPE_S390_PCI_HOST_BRIDGE,
+                               OBJECT(dev), NULL);
+     qdev_init_nofail(dev);
+-
++    }
 +#endif
-+    read_info->facilities = cpu_to_be64(sclp_facilities);
+     /* register hypercalls */
+     virtio_ccw_register_hcalls();
  
-     /* Memory Hotplug is only supported for the ccw machine type */
-     if (mhd) {
-@@ -386,10 +389,18 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
-         sclp_c->unassign_storage(sclp, sccb);
-         break;
-     case SCLP_CMDW_CONFIGURE_PCI:
-+#ifdef CONFIG_PCI
-         s390_pci_sclp_configure(sccb);
-+#else
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-+#endif
-         break;
-     case SCLP_CMDW_DECONFIGURE_PCI:
--        s390_pci_sclp_deconfigure(sccb);
-+#ifdef CONFIG_PCI
-+        sclp_c->pci_sclp_deconfigure(sccb);
-+#else
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-+#endif
-         break;
-     default:
-         efc->command_handler(ef, sccb, code);
 -- 
 2.13.0
