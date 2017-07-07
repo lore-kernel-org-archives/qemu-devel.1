@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZu2-0002oL-Ij
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuB-0002tK-QT
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZu1-0003fe-Id
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuB-0003tP-0V
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:11 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  7 Jul 2017 15:30:40 -0500
-Message-Id: <20170707203049.534-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 0/9] Implement NBD_OPT_GO,
- block size advertisement
+Date: Fri,  7 Jul 2017 15:30:42 -0500
+Message-Id: <20170707203049.534-3-eblake@redhat.com>
+In-Reply-To: <20170707203049.534-1-eblake@redhat.com>
+References: <20170707203049.534-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 2/9] nbd: Don't bother tracing an
+ NBD_OPT_ABORT response failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +23,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org
 
-The NBD protocol has now finalized the extension that fixes
-several shortcomings with NBD_OPT_EXPORT_NAME (namely, no error
-reporting, no way for the server to advertise block sizes to the
-client):
-https://github.com/NetworkBlockDevice/nbd/blob/extension-info/doc/proto.md
+We really don't care if our spec-compliant reply to NBD_OPT_ABORT
+was received, so shave off some lines of code by not even tracing it.
 
-This sort of overlaps with the work Vladimir is proposing for
-implementing NBD_CMD_BLOCK_STATUS, but initial versions of these
-patches have been on the list for over a year now (see patches 37-44):
-https://lists.gnu.org/archive/html/qemu-devel/2016-04/msg03526.html
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-v4 was here:
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04528.html
-Differences since then (if it is even worth comparing) include
-rebasing on top of Vladimir's cleanups and final tweaks to match
-the upstream NBD protocol that was finally promoted from experimental.
+---
+v5: new patch
+---
+ nbd/server.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-Depends on my NBD staging tree (currently Vladimir's v3 nbd refactoring):
-http://repo.or.cz/qemu/ericb.git/shortlog/refs/heads/nbd
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01805.html
+diff --git a/nbd/server.c b/nbd/server.c
+index 9b0c588..e15385b 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -376,7 +376,6 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+ {
+     uint32_t flags;
+     bool fixedNewstyle = false;
+-    Error *local_err = NULL;
 
-001/9:[0047] [FC] 'nbd: Create struct for tracking export info'
-002/9:[down] 'nbd: Don't bother tracing an NBD_OPT_ABORT response failure'
-003/9:[0108] [FC] 'nbd: Expose and debug more NBD constants'
-004/9:[down] 'nbd: Simplify trace of client flags in negotiation'
-005/9:[down] 'nbd: Refactor reply to NBD_OPT_EXPORT_NAME'
-006/9:[0146] [FC] 'nbd: Implement NBD_OPT_GO on server'
-007/9:[0041] [FC] 'nbd: Implement NBD_OPT_GO on client'
-008/9:[0014] [FC] 'nbd: Implement NBD_INFO_BLOCK_SIZE on server'
-009/9:[0050] [FC] 'nbd: Implement NBD_INFO_BLOCK_SIZE on client'
+     /* Client sends:
+         [ 0 ..   3]   client flags
+@@ -479,7 +478,9 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+                 if (ret < 0) {
+                     return ret;
+                 }
+-                /* Let the client keep trying, unless they asked to quit */
++                /* Let the client keep trying, unless they asked to
++                 * quit. In this mode, we've already sent an error, so
++                 * we can't ack the abort.  */
+                 if (option == NBD_OPT_ABORT) {
+                     return 1;
+                 }
+@@ -498,15 +499,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+                 /* NBD spec says we must try to reply before
+                  * disconnecting, but that we must also tolerate
+                  * guests that don't wait for our reply. */
+-                nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, option,
+-                                       &local_err);
+-
+-                if (local_err != NULL) {
+-                    const char *error = error_get_pretty(local_err);
+-                    trace_nbd_opt_abort_reply_failed(error);
+-                    error_free(local_err);
+-                }
+-
++                nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, option, NULL);
+                 return 1;
 
-Eric Blake (9):
-  nbd: Create struct for tracking export info
-  nbd: Don't bother tracing an NBD_OPT_ABORT response failure
-  nbd: Expose and debug more NBD constants
-  nbd: Simplify trace of client flags in negotiation
-  nbd: Refactor reply to NBD_OPT_EXPORT_NAME
-  nbd: Implement NBD_OPT_GO on server
-  nbd: Implement NBD_OPT_GO on client
-  nbd: Implement NBD_INFO_BLOCK_SIZE on server
-  nbd: Implement NBD_INFO_BLOCK_SIZE on client
-
- block/nbd-client.h  |   3 +-
- include/block/nbd.h |  56 +++++++---
- nbd/nbd-internal.h  |  13 +--
- block/nbd-client.c  |  22 ++--
- block/nbd.c         |  16 ++-
- nbd/client.c        | 283 ++++++++++++++++++++++++++++++++++++++++--------
- nbd/common.c        |  92 ++++++++++++++++
- nbd/server.c        | 304 ++++++++++++++++++++++++++++++++++++++++++++--------
- qemu-nbd.c          |  10 +-
- nbd/trace-events    |  24 +++--
- 10 files changed, 685 insertions(+), 138 deletions(-)
-
+             case NBD_OPT_EXPORT_NAME:
 -- 
 2.9.4
