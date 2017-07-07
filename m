@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTT6R-00027S-OU
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:15:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1dTT75-0002cb-OH
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTT6M-0004IZ-Pn
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:15:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60982)
+	(envelope-from <armbru@redhat.com>) id 1dTT71-0004eh-8X
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:16:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTT6M-0004Hv-KM
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:15:18 -0400
-Date: Fri, 7 Jul 2017 15:15:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170707151514.284f09f8@dhcp-192-215.str.redhat.com>
-In-Reply-To: <9cf42975-297b-1011-ef72-67f512edebde@redhat.com>
-References: <20170707122159.24714-1-cohuck@redhat.com>
-	<20170707122159.24714-2-cohuck@redhat.com>
-	<9cf42975-297b-1011-ef72-67f512edebde@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTT71-0004dL-3M
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:15:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499368127-19855-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Date: Fri, 07 Jul 2017 15:15:50 +0200
+In-Reply-To: <1499368127-19855-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(Ishani Chugh's message of "Fri, 7 Jul 2017 00:38:47 +0530")
+Message-ID: <87eftswfp5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/7] kvm: remove hard dependency on pci
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] Python3 Support for qmp.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
 
-On Fri, 7 Jul 2017 15:11:15 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Ishani Chugh <chugh.ishani@research.iiit.ac.in> writes:
 
-> On 07.07.2017 14:21, Cornelia Huck wrote:
-> > The msi routing code in kvm calls some pci functions: provide
-> > some stubs to enable builds without pci.
-> > 
-> > Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
-> > Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  hw/pci/pci-stub.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-> > index 36d2c430c5..ec12962d73 100644
-> > --- a/hw/pci/pci-stub.c
-> > +++ b/hw/pci/pci-stub.c
-> > @@ -23,6 +23,7 @@
-> >  #include "monitor/monitor.h"
-> >  #include "qapi/qmp/qerror.h"
-> >  #include "hw/pci/pci.h"
-> > +#include "hw/pci/msi.h"
-> >  #include "qmp-commands.h"
-> >  
-> >  PciInfoList *qmp_query_pci(Error **errp)
-> > @@ -35,3 +36,14 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
-> >  {
-> >      monitor_printf(mon, "PCI devices not supported\n");
-> >  }
-> > +
-> > +/* kvm-all wants this */
-> > +MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
-> > +{
-> > +    assert(false);
-> > +}
-> > +
-> > +uint16_t pci_requester_id(PCIDevice *dev)
-> > +{
-> > +    assert(false);
-> > +}  
-> 
-> Do you need a dummy return statement in here in case somebody ever tries
-> to compile the code with NDEBUG ? Or maybe rather use abort() instead?
+> This patch intends to make qmp.py compatible with both python2 and python3.
+>
+>  * Python 3 does not have dict.has_key(key), use key in dict instead
+>  * Avoid line-based I/O since Python 2/3 have different character
+>    encoding behavior.  Explicitly encode/decode JSON UTF-8.
+>  * Replace print by print function.
+>
+> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-Right, I did not consider that.
+$ scripts/get_maintainer.pl -f $your_patch
+Markus Armbruster <armbru@redhat.com> (supporter:QMP)
+qemu-devel@nongnu.org (open list:All patches CC here)
 
-Probably assert() + return. Should Never Happen(tm), but I don't really
-want qemu to abort() on an unsuspecting user.
+Just sayin' :)
