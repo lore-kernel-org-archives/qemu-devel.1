@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dTX6v-0000KF-Db
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:10 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTX7Z-0000qu-UW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dTX6r-0004a6-Em
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:09 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33567)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dTX6r-0004Z6-76
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:05 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id r103so56172818wrb.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 10:32:05 -0700 (PDT)
-References: <20170707161822.29659-1-alex.bennee@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170707161822.29659-1-alex.bennee@linaro.org>
-Date: Fri, 07 Jul 2017 18:32:02 +0100
-Message-ID: <87inj49mr1.fsf@linaro.org>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTX7V-0004j4-Va
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:49 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865801156.17063.15618379976159104550.stgit@frigg.lan>
+	<244b5aab-8863-3139-f252-09cc02333eda@twiddle.net>
+	<87inj4ebqn.fsf@frigg.lan>
+	<c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net>
+Date: Fri, 07 Jul 2017 19:32:29 +0200
+In-Reply-To: <c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net> (Richard
+	Henderson's message of "Fri, 7 Jul 2017 05:46:19 -1000")
+Message-ID: <87a84gcfv6.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the
- run-loop
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+
+Richard Henderson writes:
+
+> On 07/07/2017 01:18 AM, Llu=C3=ADs Vilanova wrote:
+>>>> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>>>> index 9c870f6d07..586a01a2de 100644
+>>>> --- a/target/arm/translate-a64.c
+>>>> +++ b/target/arm/translate-a64.c
+>>>> @@ -11244,6 +11244,9 @@ static void aarch64_trblock_init_disas_context=
+(DisasContextBase *dcbase,
+dc-> is_ldex =3D false;
+dc-> ss_same_el =3D (arm_debug_target_el(env) =3D=3D dc->current_el);
+>>>> +    dc->next_page_start =3D
+>>>> +        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+>>=20
+>>> I think a better solution for a fixed-length ISA is to adjust max_insns=
+. Perhaps
+>>> the init_disas_context hook should be able to modify it?
+>>=20
+>> ARM has the thumb instructions, so it really isn't a fixed-length ISA.
+
+> From the filename above we're talking about AArch64 here.
+> Whcih is most definitely a fixed-width ISA.
 
 
-Alex Bennée <alex.bennee@linaro.org> writes:
+> That said, even for AArch32 we know by the TB flags whether or not we're =
+going
+> to be generating arm or thumb code.  I think that these hooks will allow =
+arm and
+> thumb mode to finally be split apart cleanly, instead of the tangle that =
+they
+> are now.
 
-> Previously DISAS_JUMP did ensure this but with the optimisation of
-> 8a6b28c7 (optimize indirect branches) we might not leave the loop.
-> This means if any pending interrupts are cleared by changing IRQ flags
-> we might never get around to servicing them. You usually notice this
-> by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
-> while cpu->interrupt_request remains high and the exit_request has not
-> been set.
->
-> This breaks amongst other things the OPTEE test suite which executes
-> an eret from the secure world after a non-secure world IRQ has gone
-> pending which then never gets serviced.
->
-> An alternate approach might be for the exception helpers to ensure the
-> exit request flag is set if an IRQ is now unmasked.
->
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> CC: Etienne Carriere <etienne.carriere@linaro.org>
-> CC: Joakim Bech <joakim.bech@linaro.org>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Emilio G. Cota <cota@braap.org>
-> CC: Richard Henderson <rth@twiddle.net>
-> ---
->  target/arm/translate-a64.c | 3 ++-
->  target/arm/translate.c     | 6 ++++--
->  2 files changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index e55547d95d..3ee88b2590 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1788,7 +1788,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
->              return;
->          }
->          gen_helper_exception_return(cpu_env);
-> -        s->is_jmp = DISAS_JUMP;
-> +        /* Must exit loop to check un-masked IRQs */
-> +        s->is_jmp = DISAS_EXIT;
+> I see arm's gen_intermediate_code eventually looking like
 
-Given the wording of:
+>   const TranslatorOps *ops =3D &arm_translator_ops;
+>   if (ARM_TBFLAG_THUMB(tb->flags)) {
+>     ops =3D &thumb_translator_ops;
+>   }
+> #ifdef TARGET_AARCH64
+>   if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+>     ops =3D &aarch64_translator_ops;
+>   }
+> #endif
+>   translator_loop(ops, &dc.base, cpu, tb);
 
-/* is_jmp field values */
-#define DISAS_NEXT    0 /* next instruction can be analyzed */
-#define DISAS_JUMP    1 /* only pc was modified dynamically */
-#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
-#define DISAS_TB_JUMP 3 /* only pc was modified statically */
+> There would certainly be some amount of shared code, but it would also al=
+low
+> quite a few of the existing dc->thumb checks to be eliminated.
 
-I'm thinking that really these DISAS_JUMP's should be DISAS_UPDATEs and
-we need to disable the TB chaining optimisations for this. I'll prepare
-a more comprehensive series next week. However testing this patch for
-known failure modes will be useful.
+Does this really need to be addressed on this series?
 
 
->          return;
->      case 5: /* DRPS */
->          if (rn != 0x1f) {
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 0862f9e4aa..920fb41395 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -4475,7 +4475,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
->       */
->      gen_helper_cpsr_write_eret(cpu_env, cpsr);
->      tcg_temp_free_i32(cpsr);
-> -    s->is_jmp = DISAS_JUMP;
-> +    /* Must exit loop to check un-masked IRQs */
-> +    s->is_jmp = DISAS_EXIT;
->  }
->
->  /* Generate an old-style exception return. Marks pc as dead. */
-> @@ -9519,7 +9520,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->                      tmp = load_cpu_field(spsr);
->                      gen_helper_cpsr_write_eret(cpu_env, tmp);
->                      tcg_temp_free_i32(tmp);
-> -                    s->is_jmp = DISAS_JUMP;
-> +                    /* Must exit loop to check un-masked IRQs */
-> +                    s->is_jmp = DISAS_EXIT;
->                  }
->              }
->              break;
+>>> And, while I'm thinking of it -- why is the init_globals hook separate?=
+ There's
+>>> nothing in between the two hook calls, and the more modern target front=
+ ends
+>>> won't need it.
+>>=20
+>> You mean merging init_disas_context and init_globals? I wanted to keep
+>> semantically different code on separate hooks, but I can pull the init_g=
+lobals
+>> code into init_disas_context (hoping that as targets get modernized, the=
+y won't
+>> initialize any global there).
+
+> I suppose you can leave the two hooks separate for now.  It doesn't hurt,=
+ and
+> it's kind of a reminder of things that need cleaning up.
+
+Well, I've sent a (too rushed) v12 that features the merge. Since I'll have=
+ to
+send a v13, I can split them again if you want.
 
 
---
-Alex Bennée
+> I do wonder if we should provide a generic empty hook, so that a target t=
+hat
+> does not need a particular hook need not define an empty function.  It co=
+uld
+> just put e.g. "translator_noop" into the structure.  Ok, maybe a better n=
+ame
+> than that...
+
+I'm not really sure it's worth the effort. The original version trated NULL=
+s as
+a "skip this operation" (as Emilio suggests to revive), but after discussin=
+g the
+approach it was decided that defining an empty function was not too much ef=
+fort,
+so that's what I went for.
+
+I can restore the NULL approach or add a default empty hook implementation
+(translator_ignored_op?) if there's a strong feeling to change it.
+
+
+Cheers,
+  Lluis
