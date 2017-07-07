@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTTEA-0008Tu-DD
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:23:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1dTTGR-0002EB-6t
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTTE6-0000Np-E4
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:23:22 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri,  7 Jul 2017 15:23:02 +0200
-Message-Id: <149943378206.8972.1141843062606418973.stgit@frigg.lan>
-In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	(envelope-from <armbru@redhat.com>) id 1dTTGP-0001SC-Uu
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:25:43 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-24-vsementsov@virtuozzo.com>
+	<871sps7kdj.fsf@dusky.pond.sub.org>
+	<652acde8-a873-f0ec-50e6-1cecdd72184b@virtuozzo.com>
+Date: Fri, 07 Jul 2017 15:25:26 +0200
+In-Reply-To: <652acde8-a873-f0ec-50e6-1cecdd72184b@virtuozzo.com> (Vladimir
+	Sementsov-Ogievskiy's message of "Fri, 7 Jul 2017 15:21:24 +0300")
+Message-ID: <87bmowwf95.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 25/27] target/arm: [tcg] Port to disas_log
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v22 23/30] qmp: add persistent flag to
+ block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate.c |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+> 07.07.2017 10:54, Markus Armbruster wrote:
+>> QAPI schema review only...  I apologize for its lateness.
+>>
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>
+>>> Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
+>>> Default is false.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>> ---
+>> [...]
+>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>>> index f85c2235c7..13f98ec146 100644
+>>> --- a/qapi/block-core.json
+>>> +++ b/qapi/block-core.json
+>>> @@ -1561,10 +1561,16 @@
+>>>   # @granularity: the bitmap granularity, default is 64k for
+>>>   #               block-dirty-bitmap-add
+>>>   #
+>>> +# @persistent: the bitmap is persistent, i.e. it will be saved to the
+>>> +#              corresponding block device image file on its close. For now only
+>>> +#              Qcow2 disks support persistent bitmaps. Default is false for
+>>> +#              block-dirty-bitmap-add. (Since: 2.10)
+>> "for block-dirty-bitmap-add" suggests there could be other users, with
+>> different (but unspecified) defaults.  What about replacing the sentence
+>> by "(default: false)"?
+>>
+>> Please wrap your comment lines around column 70.
+>
+> Why 70, is it written somewhere? There are a lot of lines over 70
+> characters in this file, so, as series are already in Max's block
+> branch I think it would be better to fix the whole file, if it is
+> really needed.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 00cac01d66..5db381491f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12133,6 +12133,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcb=
-ase, CPUState *cpu)
-     }
- }
-=20
-+static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *c=
-pu)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+
-+    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
-+    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
-+                     dc->thumb | (dc->sctlr_b << 1));
-+}
-+
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
-@@ -12236,9 +12245,7 @@ done_generating:
-         qemu_log_in_addr_range(dc->base.pc_first)) {
-         qemu_log_lock();
-         qemu_log("----------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_fir=
-st,
--                         dc->thumb | (dc->sctlr_b << 1));
-+        arm_tr_disas_log(&dc->base, cs);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
+There's no hard rule on comment line length.  I routinely advise people
+to wrap anyway, for legibility.  Humans tend to have trouble following
+long lines with their eyes (I sure do).  Typographic manuals suggest to
+limit columns to roughly 60 characters for exactly that reason[*].
+
+I'm not the maintainer here, so this is really advice, not a demand.
+
+
+
+[*] https://en.wikipedia.org/wiki/Column_(typography)#Typographic_style
