@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTPL5-0004Xb-Tv
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:14:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTPVy-0006lJ-Lx
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTPL4-0004Ek-Hg
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:14:15 -0400
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
-	<20170216130409.GA28784@lemon.lan>
-	<d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
-	<15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
-	<66e7f481-06f4-2a7e-77fb-1a5c9fc1f301@virtuozzo.com>
-	<255b6c77-48e4-217d-f1da-d2544db5b646@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <53adc05a-03a5-6621-8be1-026003938162@virtuozzo.com>
-Date: Fri, 7 Jul 2017 12:13:57 +0300
+	(envelope-from <kwolf@redhat.com>) id 1dTPVx-0007pA-E0
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:25:30 -0400
+Date: Fri, 7 Jul 2017 11:25:11 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170707092511.GA5027@noname.redhat.com>
+References: <20170705210842.960-1-eblake@redhat.com>
+	<20170705210842.960-20-eblake@redhat.com>
+	<20170706160203.GM5975@noname.redhat.com>
+	<2ab0a0d0-5db0-8e5f-38ea-58b90bd92f41@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <255b6c77-48e4-217d-f1da-d2544db5b646@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
- dirty bitmaps
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="G4iJoqBmSsgzjUCe"
+Content-Disposition: inline
+In-Reply-To: <2ab0a0d0-5db0-8e5f-38ea-58b90bd92f41@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 19/21] block: Make bdrv_is_allocated()
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,131 +27,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
-
-06.07.2017 20:53, John Snow wrote:
->
-> On 07/06/2017 04:05 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 06.07.2017 00:46, John Snow wrote:
->>> On 07/05/2017 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 16.02.2017 16:04, Fam Zheng wrote:
->>>>>> +            dbms->node_name = bdrv_get_node_name(bs);
->>>>>> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
->>>>>> +                dbms->node_name = bdrv_get_device_name(bs);
->>>>>> +            }
->>>>>> +            dbms->bitmap = bitmap;
->>>>> What protects the case that the bitmap is released before migration
->>>>> completes?
->>>>>
->>>> What is the source of such deletion? qmp command? Theoretically
->>>> possible.
->>>>
->>>> I see the following variants:
->>>>
->>>> 1. additional variable BdrvDirtyBItmap.migration, which forbids bitmap
->>>> deletion
->>>>
->>>> 2. make bitmap anonymous (bdrv_dirty_bitmap_make_anon) - it will not be
->>>> available through qmp
->>>>
->>> Making the bitmap anonymous would forbid us to query the bitmap, which
->>> there is no general reason to do, excepting the idea that a third party
->>> attempting to use the bitmap during a migration is probably a bad idea.
->>> I don't really like the idea of "hiding" information from the user,
->>> though, because then we'd have to worry about name collisions when we
->>> de-anonymized the bitmap again. That's not so palatable.
->>>
->>>> what do you think?
->>>>
->>> The modes for bitmaps are getting messy.
->>>
->>> As a reminder, the officially exposed "modes" of a bitmap are currently:
->>>
->>> FROZEN: Cannot be reset/deleted. Implication is that the bitmap is
->>> otherwise "ACTIVE."
->>> DISABLED: Not recording any writes (by choice.)
->>> ACTIVE: Actively recording writes.
->>>
->>> These are documented in the public API as possibilities for
->>> DirtyBitmapStatus in block-core.json. We didn't add a new condition for
->>> "readonly" either, which I think is actually required:
->>>
->>> READONLY: Not recording any writes (by necessity.)
->>>
->>>
->>> Your new use case here sounds like Frozen to me, but it simply does not
->>> have an anonymous successor to force it to be recognized as "frozen." We
->>> can add a `bool protected` or `bool frozen` field to force recognition
->>> of this status and adjust the json documentation accordingly.
->> Bitmaps are selected for migration when source is running, so we should
->> protect them (from deletion (or frozing or disabling), not from chaning
->> bits) before source stop, so that is not like frozen. Bitmaps may be
->> changed in this state.
->> It is more like ACTIVE.
->>
-> Right, it's not exactly like frozen's _implementation_ today, but...
->
->> We can move bitmap selection on the point after precopy migration, after
->> source stop, but I'm not sure that it would be good.
->>
->>> I think then we'd have four recognized states:
->>>
->>> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
->>> other internal process. Bitmap is otherwise ACTIVE.
->> ? Frozen means that all writes goes to the successor and frozen bitmap
->> itself is unchanged, no?
->>
-> I was thinking from the point of view of the API. Of course internally,
-> you're correct; a "frozen bitmap" is one that is actually disabled and
-> has an anonymous successor, and that successor records IO.
->
->  From the point of view of the API, a frozen bitmap is just "one bitmap"
-> that is still recording reads/writes, but is protected from being edited
-> from QMP.
->
-> It depends on if you're looking at bitmaps as opaque API objects or if
-> you're looking at the implementation.
->
->  From an API point of view, protecting an Active bitmap from being
-> renamed/cleared/deleted is functionally identical to the existing case
-> of protecting a bitmap-and-successor pair during a backup job.
-
-then, this should be described in API ref..
-
-for now I see here:
-# @frozen: The bitmap is currently in-use by a backup operation or block 
-job,
-#          and is immutable.
-
-Which looks more like the bitmap is unchanged at all.
-
----
-
-Do not we want in future allow user to create successors through qmp?
-
-We have the following case: exteranal backup.
-
-Backup should be done through image fleecing (temporary image, online 
-drive is backing for temp, start backup with sync=none from online drive 
-to temp, export temp through nbd).
-To make this backup incremental here is BLOCK_STATUS nbd extension, 
-which allows dirty bitmap export.
-But we need also frozen-bitmap mechanism like with normal incremental 
-backup.. Should we create qmp_create_bitmap_successor and friends for it?
-Or we will add separate mechanism like qmp_start_external_backup, 
-qmp_finish_external_backup(success = true/false) ?
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 
+--G4iJoqBmSsgzjUCe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
->>> DISABLED: Not recording any writes (by choice.)
->>> READONLY: Not able to record any writes (by necessity.)
->>> ACTIVE: Normal bitmap status.
->>>
->>> Sound right?
->>
+Am 07.07.2017 um 04:55 hat Eric Blake geschrieben:
+> On 07/06/2017 11:02 AM, Kevin Wolf wrote:
+>=20
+> >> +++ b/qemu-img.c
+> >> @@ -3229,6 +3229,7 @@ static int img_rebase(int argc, char **argv)
+> >>          int64_t new_backing_num_sectors =3D 0;
+> >>          uint64_t sector;
+> >>          int n;
+> >> +        int64_t count;
+> >>          float local_progress =3D 0;
+> >>
+> >>          buf_old =3D blk_blockalign(blk, IO_BUF_SIZE);
+> >> @@ -3276,12 +3277,14 @@ static int img_rebase(int argc, char **argv)
+> >>              }
+> >>
+> >>              /* If the cluster is allocated, we don't need to take act=
+ion */
+> >> -            ret =3D bdrv_is_allocated(bs, sector, n, &n);
+> >> +            ret =3D bdrv_is_allocated(bs, sector << BDRV_SECTOR_BITS,
+> >> +                                    n << BDRV_SECTOR_BITS, &count);
+> >>              if (ret < 0) {
+> >>                  error_report("error while reading image metadata: %s",
+> >>                               strerror(-ret));
+> >>                  goto out;
+> >>              }
+> >> +            n =3D DIV_ROUND_UP(count, BDRV_SECTOR_SIZE);
+> >>              if (ret) {
+> >>                  continue;
+> >>              }
+> >=20
+> > Same thing. Sectors that are half allocated and half free must be
+> > considered completely allocated if the caller can't do byte alignment.
+> > Just rounding up without looking at ret isn't correct.
+>=20
+> In reality, qemu-img rebase should probably be rewritten to exploit
+> bdrv_get_block_status() instead of the weaker bdrv_is_allocated(). Right
+> now, it is manually calling buffer_is_zero() on every sector to learn
+> what sectors are candidates for optimizing, rather than being able to
+> exploit BDRV_BLOCK_ZERO where possible
 
--- 
-Best regards,
-Vladimir
+Yes, that's true, but also unrelated. As soon as you convert
+bdrv_get_block_status() to byte granularity, you get the same thing
+again.
+
+Actually, having another look at this code, the solution for this
+specific case is to convert the whole loop (or even function) to byte
+granularity. The bdrv_is_allocated() call was the only thing that
+required sectors.
+
+> (yes, we may STILL want to call buffer_is_zero() on BDRV_BLOCK_DATA
+> when we are trying to squeeze out all parts of an image that can be
+> compressed, but maybe that should be an option, just as GNU dd has
+> options for creating as much sparseness as possible (slow, because it
+> reads data) vs. preserving existing sparseness (faster, because it
+> relies on hole detection but leaves explicit written zeroes as
+> non-sparse).
+
+I'd expect that typically buffer_is_zero() is only slow if it's also
+effective. Most data blocks start with non-zero data in the first few
+bytes, so that's really quick. And I'm sure that checking whether a
+buffer is zero is faster than doing disk I/O for the same buffer, so the
+case of actual zero buffers should benefit, too. The only problem is
+with cases where the buffer starts with many zeros and then ends in some
+real data. I'm not sure how common this is.
+
+> I guess there's still lots of ground for improving qemu-img, so for
+> THIS series, I'll just leave it at an assertion that things are
+> sector-aligned.
+
+Sounds okay. If you want, you can add another patch to convert the
+function to bytes, or we can do it later on top.
+
+Kevin
+
+--G4iJoqBmSsgzjUCe
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZX1N3AAoJEH8JsnLIjy/WIzYP/1Iko3hhYxFP1HWjjVTgIhw5
+hXEc3+c4ebP9M9phBqiVV7gfyIdVfyvcHBuaL4Lf3wXJZhSFEzgfIK775ScYZStQ
+zz7VD3l13RJ+nPZpnoE8RLIi+N8fY9TS2alEDTomBtZkeets4Xy+0EdAAZ9KsJff
+H3Ef/2miWITWFfJn82f2vij0gIM6FF/RP473Nc7f10Agc00fn7Y6fMFpy0r1x4gE
+DzOFWOhlxRTJGxA5r48XAub9b0FKtOU4+uLLw6/xvHXNfxZStKG0Qzsdzb6VwZzQ
+yo5/i9DUECcorOqAgfbc04/YhKumcpa31wbZIaWf62xBqq9JGv5ShepIaBt+4j0D
+5kDPBJaH3sSK+1CBMcQh+WoBw/mgaGm06AHD2n0Pok4RZZJqIYrGIqu2/xBF5NMn
++b2INOXLfXe4ju0OswQkU8feM1I9Cqz8rTfmXDPOj3NUHww/y4MFIRbfndIbSwps
+BHnBm5CVW2zZoI6y+O9t8YRNtxu0X7svHNN6yrlbOw4YW5x8COqhUMR7R5atWlCX
+6Sw/LyTCsjM1wuG6nfZY75fDyhCwKE8FBhsNGEs/QacqziGnAfCI5/9R3OKMzsQz
+YyMgL3HXrpgO7IMcZ+bHyW6BAKr5mnRqO1m+yR1pbhwFrbiv335D8zUXbZp6OqW6
+KYc7SO0UdGdHBHdUSeWe
+=3MWV
+-----END PGP SIGNATURE-----
+
+--G4iJoqBmSsgzjUCe--
