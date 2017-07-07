@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dTRcH-0004cA-8H
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:10 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTRcc-0004qm-D6
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dTRcE-0002rv-4F
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dTRcD-0002rj-Tt
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:06 -0400
-Date: Fri, 7 Jul 2017 12:39:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170707113951.GB2451@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-30-dgilbert@redhat.com>
-	<09cc072b-68c1-5212-c9ad-8cb0cf64a892@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTRcZ-0002zF-8R
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:30 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:33974 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTRcY-0002yo-NS
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:27 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 13:40:08 +0200
+Message-Id: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09cc072b-68c1-5212-c9ad-8cb0cf64a892@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 29/29] vhost-user: Claim support for postcopy
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 00/27] translate: [tcg] Generic translation
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +25,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
-> 
-> 
-> On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Tell QEMU we understand the protocol features needed for postcopy.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >   contrib/libvhost-user/libvhost-user.c | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> > index c1716d1a62..1c46aecfb3 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -797,7 +797,8 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >   static bool
-> >   vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >   {
-> > -    uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
-> > +    uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
-> > +                        1ULL << VHOST_USER_PROTOCOL_F_POSTCOPY;
-> 
-> Maybe advertising VHOST_USER_PROTOCOL_F_POSTCOPY could be done only
-> if userfaultfd syscall is supported?
+This series proposes a generic (target-agnostic) instruction translation
+framework.
 
-Done.
+It basically provides a generic main loop for instruction disassembly, wh=
+ich
+calls target-specific functions when necessary. This generalization makes
+inserting new code in the main loop easier, and helps in keeping all targ=
+ets in
+synch as to the contents of it.
 
-Dave
+This series also paves the way towards adding events to trace guest code
+execution (BBLs and instructions).
 
-> >       if (dev->iface->get_protocol_features) {
-> >           features |= dev->iface->get_protocol_features(dev);
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
+in the
+current organization, but will port the rest when this series gets merged.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v12
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Do not rename cs -> cpu when using CPUState arg in gen_intermediate_cod=
+e().
+* Avoid merge conflicts with queued patches.
+* Fix documentation typos.
+* Rename translate_block -> translator_loop.
+* Fix misplaced changes (wrong patch).
+* Rename _trblock_ -> _tr_.
+* Drop DISAS_SS and DISAS_PAGE_CROSS from arm targets.
+* Refactor calculation of TranslatorOps in arm targets.
+* Merge init_globals() into init_disas_context().
+* Minor cosmetic changes.
+
+
+Changes in v11
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Convert gen_intermediate_code_a64 [Emilio G. Cota].
+* Replace "cpu_env" argument in icount functions with "tcg_ctx.cpu_env"
+  [Emilio G. Cota].
+* Drop QTAILQ_FOREACH_CONTINUE and cpu_breakpoint_get in favour of an exp=
+licit
+  breakpoint traversal [Richard Henderson].
+* Rename translate-block.[ch] into translator.[ch] [Emilio G. Cota].
+* Revert DJ_* names into DISAS_*, and provide generic DISAS_TARGET_* enum=
+ values
+  instead of defining them as integers on each target.
+* Do not use DisasContextBase directly in target code (helps the compiler=
+'s
+  alias analysis) [Richard Henderson].
+* Make all generic translator hooks mandatory [Richard Henderson].
+* Rename TranslatorOps::disas_insn as TranslatorOps::translate_insn
+  [Richard Henderson].
+* Generalize TranslatorOps::disas_flags into TranslatorOps::disas_log to =
+support
+  future targets [Richard Henderson].
+* Split arm and aarch64 changes in different patches [Emilio G. Cota].
+* Make translator op structs constant [Richard Henderson].
+* Write a single entry point for both arm and aarch64 translation
+  [Richard Henderson].
+* Change format of commit titles [Emilio G. Cota].
+* Remove cross-page check from generic code (it's already embedded in mor=
+e
+  complex, and mandatory, checks in most targets).
+
+
+Changes in v10
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 931892e8a6.
+* Fix build errors for hppa, nios2 and openrisc.
+
+
+Changes in v9
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Further increase inter-mail sleep time during sending.
+
+
+Changes in v8
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Increase inter-mail sleep time during sending (list keeps refusing some=
+ emails
+  due to an excessive send rate).
+
+
+Changes in v7
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
+* Move target-specific translation functions to a struct (TranslatorOps).
+* Split target-specific changes into multiple patches.
+* Rebase on edf8bc9842.
+
+
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on upstream master (64175afc69).
+* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
+on].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Remove stray uses of "restrict" keyword.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
+* Fix coding style errors reported by checkpatch.
+* Remove use of "restrict" in added functions; it makes older gcc version=
+s barf
+  about compilation errors.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Port ARM and AARCH64 targets.
+* Fold single-stepping checks into "max_insns" [Richard Henderson].
+* Move instruction start marks to target code [Richard Henderson].
+* Add target hook for TB start.
+* Check for TCG temporary leaks.
+* Move instruction disassembly into a target hook.
+* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
+
+
+Llu=C3=ADs Vilanova (27):
+      Pass generic CPUState to gen_intermediate_code()
+      cpu-exec: Avoid global variables in icount-related functions
+      target: [tcg] Use a generic enum for DISAS_ values
+      target: [tcg] Add generic translation framework
+      target/i386: [tcg] Port to DisasContextBase
+      target/i386: [tcg] Port to init_disas_context
+      target/i386: [tcg] Port to insn_start
+      target/i386: [tcg] Port to breakpoint_check
+      target/i386: [tcg] Port to translate_insn
+      target/i386: [tcg] Port to tb_stop
+      target/i386: [tcg] Port to disas_log
+      target/i386: [tcg] Port to generic translation framework
+      target/arm: [tcg] Port to DisasContextBase
+      target/arm: [tcg] Port to init_disas_context
+      target/arm: [tcg,a64] Port to init_disas_context
+      target/arm: [tcg] Port to tb_start
+      target/arm: [tcg] Port to insn_start
+      target/arm: [tcg,a64] Port to insn_start
+      target/arm: [tcg] Port to breakpoint_check
+      target/arm: [tcg,a64] Port to breakpoint_check
+      target/arm: [tcg] Port to translate_insn
+      target/arm: [tcg,a64] Port to translate_insn
+      target/arm: [tcg] Port to tb_stop
+      target/arm: [tcg,a64] Port to tb_stop
+      target/arm: [tcg] Port to disas_log
+      target/arm: [tcg,a64] Port to disas_log
+      target/arm: [tcg] Port to generic translation framework
+
+
+ accel/tcg/Makefile.objs       |    1=20
+ accel/tcg/translate-all.c     |    2=20
+ accel/tcg/translator.c        |  152 +++++++++++++++
+ include/exec/exec-all.h       |    8 -
+ include/exec/gen-icount.h     |   12 +
+ include/exec/translator.h     |  138 +++++++++++++
+ target/alpha/translate.c      |    5=20
+ target/arm/translate-a64.c    |  275 +++++++++++++--------------
+ target/arm/translate.c        |  420 +++++++++++++++++++++--------------=
+------
+ target/arm/translate.h        |   39 ++--
+ target/cris/translate.c       |   14 +
+ target/hppa/translate.c       |    5=20
+ target/i386/translate.c       |  300 +++++++++++++++--------------
+ target/lm32/translate.c       |   10 +
+ target/m68k/translate.c       |   12 +
+ target/microblaze/translate.c |   10 +
+ target/mips/translate.c       |    5=20
+ target/moxie/translate.c      |    4=20
+ target/nios2/translate.c      |   11 +
+ target/openrisc/translate.c   |   10 +
+ target/ppc/translate.c        |    5=20
+ target/s390x/translate.c      |    8 -
+ target/sh4/translate.c        |    5=20
+ target/sparc/translate.c      |    5=20
+ target/tilegx/translate.c     |    5=20
+ target/tricore/translate.c    |    5=20
+ target/unicore32/translate.c  |   12 +
+ target/xtensa/translate.c     |    9 +
+ 28 files changed, 899 insertions(+), 588 deletions(-)
+ create mode 100644 accel/tcg/translator.c
+ create mode 100644 include/exec/translator.h
+
+
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Cc: Emilio G. Cota <cota@braap.org>
