@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTTUJ-0004im-3l
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:40:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1dTP8r-0000em-Eg
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTTUF-00087n-VG
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:40:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37494)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTTUF-00087R-ON
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:39:59 -0400
-From: "Eduardo Habkost" <ehabkost@redhat.com>
-Date: Fri, 7 Jul 2017 10:39:49 -0300
-Message-ID: <20170707133949.GH10776@localhost.localdomain>
-References: <1499237876.3041.4.camel@linux.intel.com>
-	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
-	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1dTP8o-0001ss-C6
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:01:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49517)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dTP8o-0001qn-6s
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:01:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dTP8m-0001Hp-6h
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 09:01:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EB1352E819D
+	for <qemu-devel@nongnu.org>; Fri,  7 Jul 2017 09:01:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Jul 2017 08:48:55 -0000
+From: Zhang Chen <zhangckid@gmail.com>
+Reply-To: Bug 1702621 <1702621@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149932544038.24380.387410318124517933.malonedeb@soybean.canonical.com>
+Message-Id: <149941733532.26197.9331432696671027927.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1702621] Re: colo: secondary vm crash during
+ loadvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +37,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
-> On 05/07/2017 11:14, Thomas Huth wrote:
-> >   Hi,
-> > 
-> 
-> Hi,
-> 
-> > On 05.07.2017 08:57, Chao Peng wrote:
-> > > 
-> > > Q35 has been in QEMU for quite a while. Compared to the current default
-> > > i440FX, Q35 is probably not that mature and not widely used, however in
-> > > some case, Q35 has advantages, for example, in supporting new features.
-> > > For instance, we have some features require PCI-e support which is only
-> > > available on Q35 and some others need it for EFI support. It is of
-> > > course not necessary to change it as the default but if more and more
-> > > features have dependencies on Q35 because of requiring much more modern
-> > > features then I think it may be worth to do so. In such case we can have
-> > > more people to use it and find problems we may know or not know.
-> > 
-> 
-> Agreed
-> 
-> > Yes, IMHO at one point in time, we should switch the default machine
-> > type to q35.
-> 
-> +1
-> 
-> > The i440FX is really quite old...
-> > 
-> > > There are certainly some drawbacks:
-> > > -        Compatibility: current code or script may need adjustment
-> > 
-> > That might be a real concern ...
-> 
-> I am not so sure about that. Developers working on upstream projects
-> should expect such changes and, for our case,
-> modifying the command line by adding "-M pc" should not be a big deal.
+I agree with David, you can try the RTL8139.
 
-We could print a warning for 1 or 2 releases when users don't add
-a explicit "-M pc" or "-M q35" argument to qemu-system-x86_64,
-but:
+-- =
 
-> 
-> The upper layers should manage the defaults by themselves so
-> are not supposed to be affected.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1702621
 
-But they would be.  libvirt uses the default machine-type from
-QEMU.
+Title:
+  colo: secondary vm crash during loadvm
 
+Status in QEMU:
+  New
 
-> [...]
+Bug description:
+  Following document 'COLO-FT.txt', I test colo feature on my hosts. It see=
+ms goes well. But after a while the secondary vm crash.  The stack is as fo=
+llows:
+  #0  0x00007f191456dc37 in raise () from /lib/x86_64-linux-gnu/libc.so.6
+  #1  0x00007f1914571028 in abort () from /lib/x86_64-linux-gnu/libc.so.6
+  #2  0x00007f1914566bf6 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  #3  0x00007f1914566ca2 in __assert_fail () from /lib/x86_64-linux-gnu/lib=
+c.so.6
+  #4  0x0000564154ad9147 in pcibus_reset (qbus=3D0x564156760d10) at ../hw/p=
+ci/pci.c:311
+  #5  0x0000564154a07cdb in qbus_reset_one (bus=3D0x564156760d10, opaque=3D=
+0x0) at hw/core/qdev.c:319
+  #6  0x0000564154a0d721 in qbus_walk_children (bus=3D0x564156760d10, pre_d=
+evfn=3D0, pre_busfn=3D0, =
 
--- 
-Eduardo
+      post_devfn=3D0x564154a07c26 <qdev_reset_one>, post_busfn=3D0x564154a0=
+7c6c <qbus_reset_one>, opaque=3D0x0)
+      at hw/core/bus.c:68
+  #7  0x0000564154a08b4d in qdev_walk_children (dev=3D0x56415675f2b0, pre_d=
+evfn=3D0, pre_busfn=3D0, =
+
+      post_devfn=3D0x564154a07c26 <qdev_reset_one>, post_busfn=3D0x564154a0=
+7c6c <qbus_reset_one>, opaque=3D0x0)
+      at hw/core/qdev.c:617
+  #8  0x0000564154a0d6e5 in qbus_walk_children (bus=3D0x564156594d30, pre_d=
+evfn=3D0, pre_busfn=3D0, =
+
+      post_devfn=3D0x564154a07c26 <qdev_reset_one>, post_busfn=3D0x564154a0=
+7c6c <qbus_reset_one>, opaque=3D0x0)
+      at hw/core/bus.c:59
+  #9  0x0000564154a07df5 in qbus_reset_all (bus=3D0x564156594d30) at hw/cor=
+e/qdev.c:336
+  #10 0x0000564154a07e3a in qbus_reset_all_fn (opaque=3D0x564156594d30) at =
+hw/core/qdev.c:342
+  #11 0x0000564154a0e222 in qemu_devices_reset () at hw/core/reset.c:69
+  #12 0x00005641548b3b47 in pc_machine_reset () at /vms/git/qemu/hw/i386/pc=
+.c:2234
+  #13 0x0000564154972ca7 in qemu_system_reset (report=3Dfalse) at vl.c:1697
+  #14 0x0000564154b9d007 in colo_process_incoming_thread (opaque=3D0x564155=
+3c1280) at migration/colo.c:617
+  #15 0x00007f1914907184 in start_thread () from /lib/x86_64-linux-gnu/libp=
+thread.so.0
+  #16 0x00007f1914634bed in clone () from /lib/x86_64-linux-gnu/libc.so.6
+
+  (gdb) frame 4
+  #4  0x0000564154ad9147 in pcibus_reset (qbus=3D0x564156760d10) at ../hw/p=
+ci/pci.c:311
+  warning: Source file is more recent than executable.
+  311             assert(bus->irq_count[i] =3D=3D 0);
+  (gdb) ^CQuit
+  (gdb) p bus->irq_count[i]
+  $1 =3D -1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1702621/+subscriptions
