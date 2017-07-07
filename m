@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTIuZ-0001Kd-Mc
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:22:29 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTIuk-0001UB-Ll
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTIuW-00087A-Cc
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:22:27 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33183)
+	(envelope-from <rth7680@gmail.com>) id 1dTIuh-0008HI-HI
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:22:38 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35230)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTIuW-00086t-6W
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:22:24 -0400
-Received: by mail-qt0-x243.google.com with SMTP id c20so2721967qte.0
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 19:22:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTIuh-0008H0-CH
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:22:35 -0400
+Received: by mail-qt0-x241.google.com with SMTP id w12so2708505qta.2
+	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 19:22:35 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  6 Jul 2017 16:20:50 -1000
-Message-Id: <20170707022111.21836-7-rth@twiddle.net>
+Date: Thu,  6 Jul 2017 16:20:51 -1000
+Message-Id: <20170707022111.21836-8-rth@twiddle.net>
 In-Reply-To: <20170707022111.21836-1-rth@twiddle.net>
 References: <20170707022111.21836-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space atomics
+Subject: [Qemu-devel] [PATCH v2 07/27] target/sh4: Recognize common gUSA
+ sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,285 +30,352 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-For uniprocessors, SH4 uses optimistic restartable atomic sequences.
-Upon an interrupt, a real kernel would simply notice magic values in
-the registers and reset the PC to the start of the sequence.
+For many of the sequences produced by gcc or glibc,
+we can translate these as host atomic operations.
+Which saves the need to acquire the exclusive lock.
 
-For QEMU, we cannot do this in quite the same way.  Instead, we notice
-the normal start of such a sequence (mov #-x,r15), and start a new TB
-that can be executed under cpu_exec_step_atomic.
-
-Reported-by: Bruno Haible  <bruno@clisp.org>
-LP: https://bugs.launchpad.net/bugs/1701971
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/sh4/cpu.h       |  18 +++++--
- target/sh4/helper.h    |   1 +
- target/sh4/op_helper.c |   6 +++
- target/sh4/translate.c | 131 +++++++++++++++++++++++++++++++++++++++++++++++--
- 4 files changed, 148 insertions(+), 8 deletions(-)
+ target/sh4/translate.c | 316 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 316 insertions(+)
 
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index da31805..e3abb6a 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -98,7 +98,18 @@
- 
- #define TB_FLAG_PENDING_MOVCA  (1 << 3)
- 
--#define TB_FLAG_ENVFLAGS_MASK  DELAY_SLOT_MASK
-+#define GUSA_SHIFT             4
-+#ifdef CONFIG_USER_ONLY
-+#define GUSA_EXCLUSIVE         (1 << 12)
-+#define GUSA_MASK              ((0xff << GUSA_SHIFT) | GUSA_EXCLUSIVE)
-+#else
-+/* Provide dummy versions of the above to allow tests against tbflags
-+   to be elided while avoiding ifdefs.  */
-+#define GUSA_EXCLUSIVE         0
-+#define GUSA_MASK              0
-+#endif
-+
-+#define TB_FLAG_ENVFLAGS_MASK  (DELAY_SLOT_MASK | GUSA_MASK)
- 
- typedef struct tlb_t {
-     uint32_t vpn;		/* virtual page number */
-@@ -390,8 +401,9 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
- {
-     *pc = env->pc;
--    *cs_base = 0;
--    *flags = env->flags                                        /* Bits  0-2 */
-+    /* For a gUSA region, notice the end of the region.  */
-+    *cs_base = env->flags & GUSA_MASK ? env->gregs[0] : 0;
-+    *flags = env->flags /* TB_FLAG_ENVFLAGS_MASK: bits 0-2, 4-12 */
-             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
-             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
-             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
-diff --git a/target/sh4/helper.h b/target/sh4/helper.h
-index 767a6d5..6c6fa04 100644
---- a/target/sh4/helper.h
-+++ b/target/sh4/helper.h
-@@ -6,6 +6,7 @@ DEF_HELPER_1(raise_slot_fpu_disable, noreturn, env)
- DEF_HELPER_1(debug, noreturn, env)
- DEF_HELPER_1(sleep, noreturn, env)
- DEF_HELPER_2(trapa, noreturn, env, i32)
-+DEF_HELPER_1(exclusive, noreturn, env)
- 
- DEF_HELPER_3(movcal, void, env, i32, i32)
- DEF_HELPER_1(discard_movcal_backup, void, env)
-diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-index c3d19b1..8513f38 100644
---- a/target/sh4/op_helper.c
-+++ b/target/sh4/op_helper.c
-@@ -115,6 +115,12 @@ void helper_trapa(CPUSH4State *env, uint32_t tra)
-     raise_exception(env, 0x160, 0);
- }
- 
-+void helper_exclusive(CPUSH4State *env)
-+{
-+    /* We do not want cpu_restore_state to run.  */
-+    cpu_loop_exit_atomic(ENV_GET_CPU(env), 0);
-+}
-+
- void helper_movcal(CPUSH4State *env, uint32_t address, uint32_t value)
- {
-     if (cpu_sh4_is_cached (env, address))
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index cf53cd6..653c06c 100644
+index 653c06c..73b3e02 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -235,7 +235,9 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
-     if (unlikely(ctx->singlestep_enabled)) {
-         return false;
-     }
--
-+    if (ctx->tbflags & GUSA_EXCLUSIVE) {
-+        return false;
-+    }
- #ifndef CONFIG_USER_ONLY
-     return (ctx->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
- #else
-@@ -278,6 +280,28 @@ static void gen_conditional_jump(DisasContext * ctx,
- 				 target_ulong ift, target_ulong ifnott)
+@@ -1894,10 +1894,17 @@ static void decode_opc(DisasContext * ctx)
+ */
+ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
  {
-     TCGLabel *l1 = gen_new_label();
++    uint16_t insns[5];
++    int ld_adr, ld_dst, ld_mop;
++    int op_dst, op_src, op_opc;
++    int mv_src, mt_dst, st_src, st_mop;
++    TCGv op_arg;
 +
-+    if (ctx->tbflags & GUSA_EXCLUSIVE) {
-+        /* When in an exclusive region, we must continue to the end.
-+           Therefore, exit the region on a taken branch, but otherwise
-+           fall through to the next instruction.  */
-+        uint32_t taken;
-+        TCGCond cond;
+     uint32_t pc = ctx->pc;
+     uint32_t pc_end = ctx->tb->cs_base;
+     int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
+     int max_insns = (pc_end - pc) / 2;
++    int i;
+ 
+     if (pc != pc_end + backup || max_insns < 2) {
+         /* This is a malformed gUSA region.  Don't do anything special,
+@@ -1914,6 +1921,315 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+         return 0;
+     }
+ 
++    /* The state machine below will consume only a few insns.
++       If there are more than that in a region, fail now.  */
++    if (max_insns > ARRAY_SIZE(insns)) {
++        goto fail;
++    }
 +
-+        if (ift == ctx->pc + 2) {
-+            taken = ifnott;
-+            cond = TCG_COND_NE;
++    /* Read all of the insns for the region.  */
++    for (i = 0; i < max_insns; ++i) {
++        insns[i] = cpu_lduw_code(env, pc + i * 2);
++    }
++
++    ld_adr = ld_dst = ld_mop = -1;
++    mv_src = -1;
++    op_dst = op_src = op_opc = -1;
++    mt_dst = -1;
++    st_src = st_mop = -1;
++    TCGV_UNUSED(op_arg);
++    i = 0;
++
++#define NEXT_INSN \
++    do { if (i >= max_insns) goto fail; ctx->opcode = insns[i++]; } while (0)
++
++    /*
++     * Expect a load to begin the region.
++     */
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x6000: /* mov.b @Rm,Rn */
++        ld_mop = MO_SB;
++        break;
++    case 0x6001: /* mov.w @Rm,Rn */
++        ld_mop = MO_TESW;
++        break;
++    case 0x6002: /* mov.l @Rm,Rn */
++        ld_mop = MO_TESL;
++        break;
++    default:
++        goto fail;
++    }
++    ld_adr = B7_4;
++    ld_dst = B11_8;
++    if (ld_adr == ld_dst) {
++        goto fail;
++    }
++    /* Unless we see a mov, any two-operand operation must use ld_dst.  */
++    op_dst = ld_dst;
++
++    /*
++     * Expect an optional register move.
++     */
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x6003: /* mov Rm,Rn */
++        /* Here we want to recognize ld_dst being saved for later consumtion,
++           or for another input register being copied so that ld_dst need not
++           be clobbered during the operation.  */
++        op_dst = B11_8;
++        mv_src = B7_4;
++        if (op_dst == ld_dst) {
++            /* Overwriting the load output.  */
++            goto fail;
++        }
++        if (mv_src != ld_dst) {
++            /* Copying a new input; constrain op_src to match the load.  */
++            op_src = ld_dst;
++        }
++        break;
++
++    default:
++        /* Put back and re-examine as operation.  */
++        --i;
++    }
++
++    /*
++     * Expect the operation.
++     */
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x300c: /* add Rm,Rn */
++        op_opc = INDEX_op_add_i32;
++        goto do_reg_op;
++    case 0x2009: /* and Rm,Rn */
++        op_opc = INDEX_op_and_i32;
++        goto do_reg_op;
++    case 0x200a: /* xor Rm,Rn */
++        op_opc = INDEX_op_xor_i32;
++        goto do_reg_op;
++    case 0x200b: /* or Rm,Rn */
++        op_opc = INDEX_op_or_i32;
++    do_reg_op:
++        /* The operation register should be as expected, and the
++           other input cannot depend on the load.  */
++        if (op_dst != B11_8) {
++            goto fail;
++        }
++        if (op_src < 0) {
++            /* Unconstrainted input.  */
++            op_src = B7_4;
++        } else if (op_src == B7_4) {
++            /* Constrained input matched load.  All operations are
++               commutative; "swap" them by "moving" the load output
++               to the (implicit) first argument and the move source
++               to the (explicit) second argument.  */
++            op_src = mv_src;
 +        } else {
-+            taken = ift;
-+            cond = TCG_COND_EQ;
++            goto fail;
 +        }
-+        tcg_gen_brcondi_i32(cond, cpu_sr_t, 0, l1);
-+        tcg_gen_movi_i32(cpu_flags, ctx->envflags & ~GUSA_MASK);
-+        gen_goto_tb(ctx, 0, taken);
-+        gen_set_label(l1);
-+        return;
-+    }
++        op_arg = REG(op_src);
++        break;
 +
-     gen_save_cpu_state(ctx, false);
-     tcg_gen_brcondi_i32(TCG_COND_NE, cpu_sr_t, 0, l1);
-     gen_goto_tb(ctx, 0, ifnott);
-@@ -289,13 +313,26 @@ static void gen_conditional_jump(DisasContext * ctx,
- /* Delayed conditional jump (bt or bf) */
- static void gen_delayed_conditional_jump(DisasContext * ctx)
- {
--    TCGLabel *l1;
--    TCGv ds;
-+    TCGLabel *l1 = gen_new_label();
-+    TCGv ds = tcg_temp_new();
- 
--    l1 = gen_new_label();
--    ds = tcg_temp_new();
-     tcg_gen_mov_i32(ds, cpu_delayed_cond);
-     tcg_gen_discard_i32(cpu_delayed_cond);
-+
-+    if (ctx->tbflags & GUSA_EXCLUSIVE) {
-+        /* When in an exclusive region, we must continue to the end.
-+           Therefore, exit the region on a taken branch, but otherwise
-+           fall through to the next instruction.  */
-+        tcg_gen_brcondi_i32(TCG_COND_EQ, ds, 0, l1);
-+
-+        /* Leave the gUSA region.  */
-+        tcg_gen_movi_i32(cpu_flags, ctx->envflags & ~GUSA_MASK);
-+        gen_jump(ctx);
-+
-+        gen_set_label(l1);
-+        return;
-+    }
-+
-     tcg_gen_brcondi_i32(TCG_COND_NE, ds, 0, l1);
-     gen_goto_tb(ctx, 1, ctx->pc + 2);
-     gen_set_label(l1);
-@@ -480,6 +517,15 @@ static void _decode_opc(DisasContext * ctx)
- 	}
- 	return;
-     case 0xe000:		/* mov #imm,Rn */
-+#ifdef CONFIG_USER_ONLY
-+        /* Detect the start of a gUSA region.  If so, update envflags
-+           and end the TB.  This will allow us to see the end of the
-+           region (stored in R0) in the next TB.  */
-+        if (B11_8 == 15 && B7_0s < 0) {
-+            ctx->envflags = deposit32(ctx->envflags, GUSA_SHIFT, 8, B7_0s);
-+            ctx->bstate = BS_STOP;
++    case 0x6007: /* not Rm,Rn */
++        if (ld_dst != B7_4 || mv_src >= 0) {
++            goto fail;
 +        }
-+#endif
- 	tcg_gen_movi_i32(REG(B11_8), B7_0s);
- 	return;
-     case 0x9000:		/* mov.w @(disp,PC),Rn */
-@@ -1814,6 +1860,18 @@ static void decode_opc(DisasContext * ctx)
-     if (old_flags & DELAY_SLOT_MASK) {
-         /* go out of the delay slot */
-         ctx->envflags &= ~DELAY_SLOT_MASK;
++        op_dst = B11_8;
++        op_opc = INDEX_op_xor_i32;
++        op_arg = tcg_const_i32(-1);
++        break;
 +
-+        /* When in an exclusive region, we must continue to the end
-+           for conditional branches.  */
-+        if (ctx->tbflags & GUSA_EXCLUSIVE
-+            && old_flags & DELAY_SLOT_CONDITIONAL) {
-+            gen_delayed_conditional_jump(ctx);
-+            return;
++    case 0x7000 ... 0x700f: /* add #imm,Rn */
++        if (op_dst != B11_8 || op_src >= 0) {
++            goto fail;
 +        }
-+        /* Otherwise this is probably an invalid gUSA region.
-+           Drop the GUSA bits so the next TB doesn't see them.  */
-+        ctx->envflags &= ~GUSA_MASK;
++        op_opc = INDEX_op_add_i32;
++        op_arg = tcg_const_i32(B7_0s);
++        break;
 +
-         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
-         ctx->bstate = BS_BRANCH;
-         if (old_flags & DELAY_SLOT_CONDITIONAL) {
-@@ -1821,9 +1879,60 @@ static void decode_opc(DisasContext * ctx)
-         } else {
-             gen_jump(ctx);
- 	}
++    case 0x3000: /* cmp/eq Rm,Rn */
++        /* Looking for the middle of a compare-and-swap sequence,
++           beginning with the compare.  Operands can be either order,
++           but with only one overlapping the load.  */
++        if ((ld_dst == B11_8) + (ld_dst == B7_4) != 1 || mv_src >= 0) {
++            goto fail;
++        }
++        op_opc = INDEX_op_setcond_i32;  /* placeholder */
++        op_src = (ld_dst == B11_8 ? B7_4 : B11_8);
++        op_arg = REG(op_src);
++
++        NEXT_INSN;
++        switch (ctx->opcode & 0xff00) {
++        case 0x8b00: /* bf label */
++        case 0x8f00: /* bf/s label */
++            if (pc + (i + 1 + B7_0s) * 2 != pc_end) {
++                goto fail;
++            }
++            if ((ctx->opcode & 0xff00) == 0x8b00) { /* bf label */
++                break;
++            }
++            /* We're looking to unconditionally modify Rn with the
++               result of the comparison, within the delay slot of
++               the branch.  This is used by older gcc.  */
++            NEXT_INSN;
++            if ((ctx->opcode & 0xf0ff) == 0x0029) { /* movt Rn */
++                mt_dst = B11_8;
++            } else {
++                goto fail;
++            }
++            break;
++
++        default:
++            goto fail;
++        }
++        break;
++
++    case 0x2008: /* tst Rm,Rn */
++        /* Looking for a compare-and-swap against zero.  */
++        if (ld_dst != B11_8 || ld_dst != B7_4 || mv_src >= 0) {
++            goto fail;
++        }
++        op_opc = INDEX_op_setcond_i32;
++        op_arg = tcg_const_i32(0);
++
++        NEXT_INSN;
++        if ((ctx->opcode & 0xff00) != 0x8900 /* bt label */
++            || pc + (i + 1 + B7_0s) * 2 != pc_end) {
++            goto fail;
++        }
++        break;
++
++    default:
++        /* Put back and re-examine as store.  */
++        --i;
 +    }
-+}
- 
-+#ifdef CONFIG_USER_ONLY
-+/* For uniprocessors, SH4 uses optimistic restartable atomic sequences.
-+   Upon an interrupt, a real kernel would simply notice magic values in
-+   the registers and reset the PC to the start of the sequence.
 +
-+   For QEMU, we cannot do this in quite the same way.  Instead, we notice
-+   the normal start of such a sequence (mov #-x,r15).  While we can handle
-+   any sequence via cpu_exec_step_atomic, we can recognize the "normal"
-+   sequences and transform them into atomic operations as seen by the host.
-+*/
-+static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-+{
-+    uint32_t pc = ctx->pc;
-+    uint32_t pc_end = ctx->tb->cs_base;
-+    int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
-+    int max_insns = (pc_end - pc) / 2;
-+
-+    if (pc != pc_end + backup || max_insns < 2) {
-+        /* This is a malformed gUSA region.  Don't do anything special,
-+           since the interpreter is likely to get confused.  */
-+        ctx->envflags &= ~GUSA_MASK;
-+        return 0;
++    /*
++     * Expect the store.
++     */
++    /* The store must be the last insn.  */
++    if (i != max_insns - 1) {
++        goto fail;
 +    }
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x2000: /* mov.b Rm,@Rn */
++        st_mop = MO_UB;
++        break;
++    case 0x2001: /* mov.w Rm,@Rn */
++        st_mop = MO_UW;
++        break;
++    case 0x2002: /* mov.l Rm,@Rn */
++        st_mop = MO_UL;
++        break;
++    default:
++        goto fail;
++    }
++    /* The store must match the load.  */
++    if (ld_adr != B11_8 || st_mop != (ld_mop & MO_SIZE)) {
++        goto fail;
++    }
++    st_src = B7_4;
 +
-+    if (ctx->tbflags & GUSA_EXCLUSIVE) {
-+        /* Regardless of single-stepping or the end of the page,
-+           we must complete execution of the gUSA region while
-+           holding the exclusive lock.  */
-+        *pmax_insns = max_insns;
-+        return 0;
-     }
++#undef NEXT_INSN
 +
-+    qemu_log_mask(LOG_UNIMP, "Unrecognized gUSA sequence %08x-%08x\n",
-+                  pc, pc_end);
-+
-+    /* Restart with the EXCLUSIVE bit set, within a TB run via
-+       cpu_exec_step_atomic holding the exclusive lock.  */
++    /*
++     * Emit the operation.
++     */
 +    tcg_gen_insn_start(pc, ctx->envflags);
-+    ctx->envflags |= GUSA_EXCLUSIVE;
-+    gen_save_cpu_state(ctx, false);
-+    gen_helper_exclusive(cpu_env);
-+    ctx->bstate = BS_EXCP;
++    switch (op_opc) {
++    case -1:
++        /* No operation found.  Look for exchange pattern.  */
++        if (st_src == ld_dst || mv_src >= 0) {
++            goto fail;
++        }
++        tcg_gen_atomic_xchg_i32(REG(ld_dst), REG(ld_adr), REG(st_src),
++                                ctx->memidx, ld_mop);
++        break;
 +
-+    /* We're not executing an instruction, but we must report one for the
-+       purposes of accounting within the TB.  We might as well report the
-+       entire region consumed via ctx->pc so that it's immediately available
-+       in the disassembly dump.  */
++    case INDEX_op_add_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst && st_mop == MO_UL) {
++            tcg_gen_atomic_add_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_add_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++            if (op_dst != ld_dst) {
++                /* Note that mop sizes < 4 cannot use add_fetch
++                   because it won't carry into the higher bits.  */
++                tcg_gen_add_i32(REG(op_dst), REG(ld_dst), op_arg);
++            }
++        }
++        break;
++
++    case INDEX_op_and_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst) {
++            tcg_gen_atomic_and_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_and_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++            tcg_gen_and_i32(REG(op_dst), REG(ld_dst), op_arg);
++        }
++        break;
++
++    case INDEX_op_or_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst) {
++            tcg_gen_atomic_or_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                        op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_or_i32(REG(ld_dst), REG(ld_adr),
++                                        op_arg, ctx->memidx, ld_mop);
++            tcg_gen_or_i32(REG(op_dst), REG(ld_dst), op_arg);
++        }
++        break;
++
++    case INDEX_op_xor_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst) {
++            tcg_gen_atomic_xor_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_xor_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++            tcg_gen_xor_i32(REG(op_dst), REG(ld_dst), op_arg);
++        }
++        break;
++
++    case INDEX_op_setcond_i32:
++        if (st_src == ld_dst) {
++            goto fail;
++        }
++        tcg_gen_atomic_cmpxchg_i32(REG(ld_dst), REG(ld_adr), op_arg,
++                                   REG(st_src), ctx->memidx, ld_mop);
++        tcg_gen_setcond_i32(TCG_COND_EQ, cpu_sr_t, REG(ld_dst), op_arg);
++        if (mt_dst >= 0) {
++            tcg_gen_mov_i32(REG(mt_dst), cpu_sr_t);
++        }
++        break;
++
++    default:
++        g_assert_not_reached();
++    }
++
++    /* The entire region has been translated.  */
++    ctx->envflags &= ~GUSA_MASK;
 +    ctx->pc = pc_end;
-+    return 1;
- }
-+#endif
++    return max_insns;
++
++ fail:
+     qemu_log_mask(LOG_UNIMP, "Unrecognized gUSA sequence %08x-%08x\n",
+                   pc, pc_end);
  
- void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
- {
-@@ -1869,6 +1978,12 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     gen_tb_start(tb);
-     num_insns = 0;
- 
-+#ifdef CONFIG_USER_ONLY
-+    if (ctx.tbflags & GUSA_MASK) {
-+        num_insns = decode_gusa(&ctx, env, &max_insns);
-+    }
-+#endif
-+
-     while (ctx.bstate == BS_NONE
-            && num_insns < max_insns
-            && !tcg_op_buf_full()) {
-@@ -1899,6 +2014,12 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
-     if (tb->cflags & CF_LAST_IO) {
-         gen_io_end();
-     }
-+
-+    if (ctx.tbflags & GUSA_EXCLUSIVE) {
-+        /* Ending the region of exclusivity.  Clear the bits.  */
-+        ctx.envflags &= ~GUSA_MASK;
-+    }
-+
-     if (cs->singlestep_enabled) {
-         gen_save_cpu_state(&ctx, true);
-         gen_helper_debug(cpu_env);
 -- 
 2.9.4
