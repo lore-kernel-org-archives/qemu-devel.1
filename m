@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWle-0005YT-Hf
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:11 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlf-0005ZS-2R
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWld-0008Re-BR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:10 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWld-0008SB-MK
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:11 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:59 +0200
-Message-Id: <1499447335-6125-45-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:58 +0200
+Message-Id: <1499447335-6125-44-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 044/100] qcow: require image size to be > 1 for
- new images
+Subject: [Qemu-devel] [PULL 043/100] qcow: document another weakness of qcow
+ AES encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,56 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The qcow driver refuses to open images which are less than
-2 bytes in size, but will happily create such images. Add
-a check in the create path to avoid this discrepancy.
+Document that use of guest virtual sector numbers as the basis for
+the initialization vectors is a potential weakness, when combined
+with internal snapshots or multiple images using the same passphrase.
+This fixes the formatting of the itemized list too.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170623162419.26068-5-berrange@redhat.com
+Message-id: 20170623162419.26068-4-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ qemu-img.texi | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 7bd94dc..49871fb 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -811,6 +811,12 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     /* Read out options */
-     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-                           BDRV_SECTOR_SIZE);
-+    if (total_size == 0) {
-+        error_setg(errp, "Image size is too small, cannot be zero length");
-+        ret = -EINVAL;
-+        goto cleanup;
-+    }
-+
-     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-     if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-         flags |= BLOCK_FLAG_ENCRYPT;
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 5b925ec..f335139 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -567,16 +567,29 @@ The use of encryption in qcow and qcow2 images is considered to be flawed by
+ modern cryptography standards, suffering from a number of design problems:
+ 
+ @itemize @minus
+-@item The AES-CBC cipher is used with predictable initialization vectors based
++@item
++The AES-CBC cipher is used with predictable initialization vectors based
+ on the sector number. This makes it vulnerable to chosen plaintext attacks
+ which can reveal the existence of encrypted data.
+-@item The user passphrase is directly used as the encryption key. A poorly
++@item
++The user passphrase is directly used as the encryption key. A poorly
+ chosen or short passphrase will compromise the security of the encryption.
+-@item In the event of the passphrase being compromised there is no way to
++@item
++In the event of the passphrase being compromised there is no way to
+ change the passphrase to protect data in any qcow images. The files must
+ be cloned, using a different encryption passphrase in the new file. The
+ original file must then be securely erased using a program like shred,
+ though even this is ineffective with many modern storage technologies.
++@item
++Initialization vectors used to encrypt sectors are based on the
++guest virtual sector number, instead of the host physical sector. When
++a disk image has multiple internal snapshots this means that data in
++multiple physical sectors is encrypted with the same initialization
++vector. With the CBC mode, this opens the possibility of watermarking
++attacks if the attack can collect multiple sectors encrypted with the
++same IV and some predictable data. Having multiple qcow2 images with
++the same passphrase also exposes this weakness since the passphrase
++is directly used as the key.
+ @end itemize
+ 
+ Use of qcow / qcow2 encryption is thus strongly discouraged. Users are
 -- 
 1.8.3.1
