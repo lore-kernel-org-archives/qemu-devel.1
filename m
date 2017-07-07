@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dTSkK-00070f-Ir
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:52:33 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dTSlx-0000Ap-R8
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dTSkJ-0003YQ-Nx
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:52:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46384)
+	(envelope-from <cohuck@redhat.com>) id 1dTSlu-00042L-P4
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:54:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dTSkJ-0003Xn-EQ
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:52:31 -0400
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-25-dgilbert@redhat.com>
-	<2f4c1067-14a4-d943-0dff-790d705778f1@redhat.com>
-	<20170707115353.GD2451@work-vm>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <119d6cb5-b62b-bea8-5c89-39a88f914eb9@redhat.com>
-Date: Fri, 7 Jul 2017 14:52:14 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSlu-000425-FS
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:54:10 -0400
+Date: Fri, 7 Jul 2017 14:54:02 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170707145402.30187319@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499423224-23060-4-git-send-email-thuth@redhat.com>
+References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
+	<1499423224-23060-4-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707115353.GD2451@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 24/29] vhost+postcopy: Lock around
- set_mem_table
+Subject: Re: [Qemu-devel] [RFC PATCH v2 3/8] pc-bios/s390-ccw: Move
+ virtio-block related functions into a separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, mst@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
+On Fri,  7 Jul 2017 12:26:59 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-
-On 07/07/2017 01:53 PM, Dr. David Alan Gilbert wrote:
-> * Maxime Coquelin (maxime.coquelin@redhat.com) wrote:
->>
->>
->> On 06/28/2017 09:00 PM, Dr. David Alan Gilbert (git) wrote:
->>> From: "Dr. David Alan Gilbert"<dgilbert@redhat.com>
->>>
->>> **HACK - better solution needed **
->>> We have the situation where:
->>>
->>>        qemu                      bridge
->>>
->>>        send set_mem_table
->>>                                 map memory
->>>     a)                          mark area with UFD
->>>                                 send reply with map addresses
->>>     b)                          start using
->>>     c) receive reply
->>>
->>>     As soon as (a) happens qemu might start seeing faults
->>> from memory accesses (but doesn't until b); but it can't
->>> process those faults until (c) when it's received the
->>> mmap addresses.
->>>
->>> Make the fault handler spin until it gets the reply in (c).
->>>
->>> At the very least this needs some proper locks, but preferably
->>> we need to split the message.
->>
->> Yes, maybe the slave channel could be used to send the ufds with
->> a dedicated request? The backend would set the reply-ack flag, so that
->> it starts accessing the guest memory only when Qemu is ready to handle
->> faults.
+> The netboot code is going to link against the code from virtio.c, too,
+> so we've got to move the virtio-block related code out of the way.
 > 
-> Yes, that would make life a lot easier.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/Makefile     |   2 +-
+>  pc-bios/s390-ccw/main.c       |   2 +-
+>  pc-bios/s390-ccw/s390-ccw.h   |   2 +-
+>  pc-bios/s390-ccw/virtio-blk.c | 296 ++++++++++++++++++++++++++++++++++++++++++
+>  pc-bios/s390-ccw/virtio.c     | 273 +-------------------------------------
+>  pc-bios/s390-ccw/virtio.h     |   4 +
+>  6 files changed, 307 insertions(+), 272 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/virtio-blk.c
 > 
->> Note that the slave channel support has not been implemented in Qemu's
->> libvhost-user yet, but this is something I can do if we feel the need.
-> 
-> Can you tell me a bit about how the slave channel works?
 
-When the backend advertises VHOST_USER_PROTOCOL_F_SLAVE_REQ protocol
-feature, Qemu creates a new channel using socketpair() and pass one of
-the file descriptor to the backend using a dedicated request.
+> diff --git a/pc-bios/s390-ccw/virtio-blk.c b/pc-bios/s390-ccw/virtio-blk.c
+> new file mode 100644
+> index 0000000..6cb77bc
+> --- /dev/null
+> +++ b/pc-bios/s390-ccw/virtio-blk.c
+> @@ -0,0 +1,296 @@
+> +/*
+> + * Virtio driver bits
+> + *
+> + * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
 
-Then, the backend can send requests to Qemu, using the same protocol
-Qemu uses to send requests to the backend. So, as "master" channel, the
-backend can set the VHOST_USER_F_NEED_REPLY flag to the request, so that
-it can wait for Qemu to ack (or nack) that the request has been handled.
+The original code carries the same copyright notice, but there's a lot
+of IBM code in there. Just saying.
 
-It is currently only used by the backend to send IOTLB miss requests.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#include "libc.h"
+> +#include "s390-ccw.h"
+> +#include "virtio.h"
+> +#include "virtio-scsi.h"
+> +
+> +static int virtio_blk_read_many(VDev *vdev,
+> +                                ulong sector, void *load_addr, int sec_num)
+> +{
+> +    VirtioBlkOuthdr out_hdr;
+> +    u8 status;
+> +    VRing *vr = &vdev->vrings[vdev->cmd_vr_idx];
+> +
+> +    /* Tell the host we want to read */
+> +    out_hdr.type = VIRTIO_BLK_T_IN;
+> +    out_hdr.ioprio = 99;
+> +    out_hdr.sector = virtio_sector_adjust(sector);
+> +
+> +    vring_send_buf(vr, &out_hdr, sizeof(out_hdr), VRING_DESC_F_NEXT);
+> +
+> +    /* This is where we want to receive data */
+> +    vring_send_buf(vr, load_addr, virtio_get_block_size() * sec_num,
+> +                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN |
+> +                   VRING_DESC_F_NEXT);
+> +
+> +    /* status field */
+> +    vring_send_buf(vr, &status, sizeof(u8),
+> +                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN);
+> +
+> +    /* Now we can tell the host to read */
+> +    vring_wait_reply();
+> +
+> +    if (drain_irqs(vr->schid)) {
+> +        /* Well, whatever status is supposed to contain... */
+> +        status = 1;
+> +    }
+> +    return status;
+> +}
+> +
+> +int virtio_read_many(ulong sector, void *load_addr, int sec_num)
+> +{
+> +    VDev *vdev = virtio_get_device();
+> +
+> +    switch (vdev->senseid.cu_model) {
+> +    case VIRTIO_ID_BLOCK:
+> +        return virtio_blk_read_many(vdev, sector, load_addr, sec_num);
+> +    case VIRTIO_ID_SCSI:
+> +        return virtio_scsi_read_many(vdev, sector, load_addr, sec_num);
 
-Note that you might be careful regarding deadlocks, as the libvhost-user
-is single-threaded.
+This is scsi, not blk. Should virtio_read_many() stay in virtio.c?
 
-More info may be found in docs/interop/vhost-user.txt
-(docs/specs/vhost-user.txt in older versions)
-Maxime
-> Dave
-> 
->> Maxime
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+> +    }
+> +    panic("\n! No readable IPL device !\n");
+> +    return -1;
+> +}
+
+(...)
+
+> +void virtio_assume_scsi(void)
+> +{
+> +    VDev *vdev = virtio_get_device();
+> +
+> +    switch (vdev->senseid.cu_model) {
+> +    case VIRTIO_ID_BLOCK:
+> +        vdev->guessed_disk_nature = VIRTIO_GDN_SCSI;
+> +        vdev->config.blk.blk_size = VIRTIO_SCSI_BLOCK_SIZE;
+> +        vdev->config.blk.physical_block_exp = 0;
+> +        vdev->blk_factor = 1;
+> +        break;
+> +    case VIRTIO_ID_SCSI:
+> +        vdev->scsi_block_size = VIRTIO_SCSI_BLOCK_SIZE;
+
+More scsi. Maybe the file just needs a different name :)
+
+> +        break;
+> +    }
+> +}
+
+General ack on splitting out this code.
