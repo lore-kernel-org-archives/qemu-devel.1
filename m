@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dTVT6-0002WI-0H
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:46:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTVUZ-0003ZM-KT
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:48:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dTVT2-0001i0-TA
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:46:56 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  7 Jul 2017 17:46:46 +0200
-Message-Id: <20170707154646.22230-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] hxtool: remove dead -q option
+	(envelope-from <eblake@redhat.com>) id 1dTVUW-0002IY-HR
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:48:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTVUW-0002IK-94
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:48:24 -0400
+References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
+	<20170707152918.23086-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bb9ce7a0-7fa9-6638-5d38-908a1441e350@redhat.com>
+Date: Fri, 7 Jul 2017 10:48:18 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170707152918.23086-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK"
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] nbd/server: use errp instead of
+ LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,90 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-trivial@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com, den@openvz.org
 
-This was used to extract .txt documentation for QMP.  This was
-changed to use the QAPI schema instead, so zap it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
+ den@openvz.org
+Message-ID: <bb9ce7a0-7fa9-6638-5d38-908a1441e350@redhat.com>
+Subject: Re: [PATCH v3 03/10] nbd/server: use errp instead of LOG
+References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
+ <20170707152918.23086-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20170707152918.23086-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/hxtool | 46 +---------------------------------------------
- 1 file changed, 1 insertion(+), 45 deletions(-)
+On 07/07/2017 10:29 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Move to modern errp scheme from just LOGging errors.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/server.c | 266 +++++++++++++++++++++++++++++++++++----------------=
+--------
+>  1 file changed, 160 insertions(+), 106 deletions(-)
+>=20
 
-diff --git a/scripts/hxtool b/scripts/hxtool
-index 5468cd7782..1e2c97c5e6 100644
---- a/scripts/hxtool
-+++ b/scripts/hxtool
-@@ -7,7 +7,7 @@ hxtoh()
-         case $str in
-             HXCOMM*)
-             ;;
--            STEXI*|ETEXI*|SQMP*|EQMP*) flag=$(($flag^1))
-+            STEXI*|ETEXI*) flag=$(($flag^1))
-             ;;
-             *)
-             test $flag -eq 1 && printf "%s\n" "$str"
-@@ -45,12 +45,6 @@ hxtotexi()
-             fi
-             flag=0
-             ;;
--            SQMP*|EQMP*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected ETEXI, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            ;;
-             DEFHEADING*)
-             print_texi_heading "$(expr "$str" : "DEFHEADING(\(.*\))")"
-             ;;
-@@ -65,47 +59,9 @@ hxtotexi()
-     done
- }
- 
--hxtoqmp()
--{
--    IFS=
--    flag=0
--    line=1
--    while read -r str; do
--        case "$str" in
--            HXCOMM*)
--            ;;
--            SQMP*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected EQMP, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            flag=1
--            ;;
--            EQMP*)
--            if test $flag -ne 1 ; then
--                printf "line %d: syntax error: expected SQMP, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            flag=0
--            ;;
--            STEXI*|ETEXI*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected EQMP, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            ;;
--            *)
--            test $flag -eq 1 && printf '%s\n' "$str"
--            ;;
--        esac
--        line=$((line+1))
--    done
--}
--
- case "$1" in
- "-h") hxtoh ;;
- "-t") hxtotexi ;;
--"-q") hxtoqmp ;;
- *) exit 1 ;;
- esac
- 
--- 
-2.13.0
+> @@ -142,23 +142,26 @@ static int nbd_negotiate_send_rep_len(QIOChannel =
+*ioc, uint32_t type,
+>            type, opt, len);
+> =20
+>      magic =3D cpu_to_be64(NBD_REP_MAGIC);
+> -    if (nbd_write(ioc, &magic, sizeof(magic), NULL) < 0) {
+> -        LOG("write failed (rep magic)");
+> +    if (nbd_write(ioc, &magic, sizeof(magic), errp) < 0) {
+> +        error_prepend(errp, "write failed (rep magic): ");
+>          return -EINVAL;
+
+I wonder if we should try harder to preserve the errno returned by
+nbd_write() instead of blindly slamming -EINVAL/-EIO everywhere.  But
+I'm not going to let it hold up my review of this patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZX61DAAoJEKeha0olJ0NqCXwH/338bnC+hbqLAhj/f0HDYkYE
+vZc/wjBiSHrLXIarvA27dhV5OLwvRk5N7RRSfSMxIk89SgmOM+Q+NN4R4WgJnJf9
+WrATn3BecoVqbxur1I426zh4NZva0kBGTsjavBjmaG55CVRLjq6NNyQCMw0xMPUN
+o77zCTN+CHbxSoAtZa9RAOlXgyaZ69NvX+hLRY0Q/b3utaRYoVlR8L+PkKNVMWdB
+CGZnqGhv2Xlv+/E+pKzA2uySNiCjZeJhv5pK8zGpzIxTx7gnoYWAF02YQjjFNQDM
+y+qyB/ub/H5A6rwAWiaEuKt6bG/JYQGM1gB6zDNTS0OmLuOdl60reoION7eY6K8=
+=gMfT
+-----END PGP SIGNATURE-----
+
+--L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK--
