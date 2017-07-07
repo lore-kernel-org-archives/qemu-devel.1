@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTT1r-0005x3-TR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:10:40 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTT2q-0006mw-J7
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTT1m-00025Q-Vs
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:10:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34827)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTT1m-00025I-P3
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:10:34 -0400
-Date: Fri, 7 Jul 2017 15:10:30 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170707151030.1352cecf@dhcp-192-215.str.redhat.com>
-In-Reply-To: <8815f788-c1ba-d979-6c5d-2ab615b34d46@redhat.com>
-References: <20170707122159.24714-1-cohuck@redhat.com>
-	<20170707122159.24714-6-cohuck@redhat.com>
-	<8815f788-c1ba-d979-6c5d-2ab615b34d46@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTT2A-0002DS-FW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:11:40 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 15:10:42 +0200
+Message-Id: <149943304189.8972.11359609778243205068.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 5/7] s390x/pci: fence off instructions
- for non-pci
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 22/27] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +23,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Fri, 7 Jul 2017 15:00:20 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-> On 07.07.2017 14:21, Cornelia Huck wrote:
-> > If a guest running on a non-pci build issues a pci instruction,
-> > throw them an exception.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  target/s390x/kvm.c | 24 ++++++++++++++++++++++++
-> >  1 file changed, 24 insertions(+)
-> > 
-> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> > index a3d00196f4..c5c7c27a21 100644
-> > --- a/target/s390x/kvm.c
-> > +++ b/target/s390x/kvm.c
-> > @@ -1160,6 +1160,9 @@ static int kvm_clp_service_call(S390CPU *cpu, struct kvm_run *run)
-> >  {
-> >      uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
-> >  
-> > +#ifndef CONFIG_PCI
-> > +    return -1;
-> > +#endif
-> >      return clp_service_call(cpu, r2);
-> >  }
-> >  
-> > @@ -1168,6 +1171,9 @@ static int kvm_pcilg_service_call(S390CPU *cpu, struct kvm_run *run)
-> >      uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-> >      uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
-> >  
-> > +#ifndef CONFIG_PCI
-> > +    return -1;
-> > +#endif
-> >      return pcilg_service_call(cpu, r1, r2);
-> >  }  
-> 
-> pcilg_service_call() seems to be defined in s390-pci-inst.c ... which
-> you later remove from the !CONFIG_PCI builds... so I wonder why this
-> still compiles ... I guess GCC is smart enough to optimize it away.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/arm/translate-a64.c |   74 +++++++++++++++++++++++++++-----------=
+------
+ 1 file changed, 46 insertions(+), 28 deletions(-)
 
-Yes, as the second return is not reachable anymore.
-
-> Anyway, to be on the safe side (and to be able to compile with -O0), you
-> should maybe rather do this instead:
-> 
-> #ifndef CONFIG_PCI
->     return -1;
-> #else
->     return pcilg_service_call(cpu, r1, r2);
-> #endif
-> 
-> ?
-
-I'll try Christian's suggestion to use the cpu model first. However,
-we'll need some ifdeffery somewhere... maybe we should introduce a
-zpci-stub.c for the referenced functions.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index a32f07f4bd..c4cb9afb02 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11244,6 +11244,9 @@ static void aarch64_tr_init_disas_context(DisasCo=
+ntextBase *dcbase,
+     dc->is_ldex =3D false;
+     dc->ss_same_el =3D (arm_debug_target_el(env) =3D=3D dc->current_el);
+=20
++    dc->next_page_start =3D
++        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
++
+     init_tmp_a64_array(dc);
+ }
+=20
+@@ -11278,12 +11281,45 @@ static BreakpointCheckType aarch64_tr_breakpoin=
+t_check(
+     }
+ }
+=20
++static target_ulong aarch64_tr_translate_insn(DisasContextBase *dcbase,
++                                                   CPUState *cpu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++    CPUARMState *env =3D cpu->env_ptr;
++
++
++    if (dc->ss_active && !dc->pstate_ss) {
++        /* Singlestep state is Active-pending.
++         * If we're in this state at the start of a TB then either
++         *  a) we just took an exception to an EL which is being debugge=
+d
++         *     and this is the first insn in the exception handler
++         *  b) debug exceptions were masked and we just unmasked them
++         *     without changing EL (eg by clearing PSTATE.D)
++         * In either case we're going to take a swstep exception in the
++         * "did not step an insn" case, and so the syndrome ISV and EX
++         * bits should be zero.
++         */
++        assert(dc->base.num_insns =3D=3D 1);
++        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
++                      default_exception_el(dc));
++        dc->base.is_jmp =3D DISAS_EXC;
++    } else {
++        disas_a64_insn(env, dc);
++    }
++
++    if (dc->base.is_jmp =3D=3D DISAS_NEXT) {
++        if (dc->ss_active || dc->pc >=3D dc->next_page_start) {
++            dc->base.is_jmp =3D DISAS_TOO_MANY;
++        }
++    }
++
++    return dc->pc;
++}
++
+ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+                                TranslationBlock *tb)
+ {
+-    CPUARMState *env =3D cs->env_ptr;
+     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+-    target_ulong next_page_start;
+     int max_insns;
+=20
+     dc->base.tb =3D tb;
+@@ -11294,7 +11330,6 @@ void gen_intermediate_code_a64(DisasContextBase *=
+dcbase, CPUState *cs,
+     dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+     aarch64_tr_init_disas_context(&dc->base, cs);
+=20
+-    next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_=
+PAGE_SIZE;
+     max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
+     if (max_insns =3D=3D 0) {
+         max_insns =3D CF_COUNT_MASK;
+@@ -11344,42 +11379,24 @@ void gen_intermediate_code_a64(DisasContextBase=
+ *dcbase, CPUState *cs,
+             gen_io_start();
+         }
+=20
+-        if (dc->ss_active && !dc->pstate_ss) {
+-            /* Singlestep state is Active-pending.
+-             * If we're in this state at the start of a TB then either
+-             *  a) we just took an exception to an EL which is being deb=
+ugged
+-             *     and this is the first insn in the exception handler
+-             *  b) debug exceptions were masked and we just unmasked the=
+m
+-             *     without changing EL (eg by clearing PSTATE.D)
+-             * In either case we're going to take a swstep exception in =
+the
+-             * "did not step an insn" case, and so the syndrome ISV and =
+EX
+-             * bits should be zero.
+-             */
+-            assert(dc->base.num_insns =3D=3D 1);
+-            gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+-                          default_exception_el(dc));
+-            dc->base.is_jmp =3D DISAS_EXC;
+-            break;
+-        }
+-
+-        disas_a64_insn(env, dc);
++        dc->base.pc_next =3D aarch64_tr_translate_insn(&dc->base, cs);
+=20
+         if (tcg_check_temp_count()) {
+             fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
+                     dc->pc);
+         }
+=20
++        if (!dc->base.is_jmp && (tcg_op_buf_full() || cs->singlestep_ena=
+bled ||
++                            singlestep || dc->base.num_insns >=3D max_in=
+sns)) {
++            dc->base.is_jmp =3D DISAS_TOO_MANY;
++        }
++
+         /* Translation stops when a conditional branch is encountered.
+          * Otherwise the subsequent code could get translated several ti=
+mes.
+          * Also stop translation when a page boundary is reached.  This
+          * ensures prefetch aborts occur at the right place.
+          */
+-    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
+-             !cs->singlestep_enabled &&
+-             !singlestep &&
+-             !dc->ss_active &&
+-             dc->pc < next_page_start &&
+-             dc->base.num_insns < max_insns);
++    } while (!dc->base.is_jmp);
+=20
+     if (dc->base.tb->cflags & CF_LAST_IO) {
+         gen_io_end();
+@@ -11404,6 +11421,7 @@ void gen_intermediate_code_a64(DisasContextBase *=
+dcbase, CPUState *cs,
+     } else {
+         switch (dc->base.is_jmp) {
+         case DISAS_NEXT:
++        case DISAS_TOO_MANY:
+             gen_goto_tb(dc, 1, dc->pc);
+             break;
+         default:
