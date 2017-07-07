@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlJ-00058l-Ej
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlH-00057E-QT
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlI-00082c-2V
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlG-00080S-LV
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:47 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:44 +0200
-Message-Id: <1499447335-6125-30-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:40 +0200
+Message-Id: <1499447335-6125-26-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 029/100] mirror: Update signature of
- mirror_clip_sectors()
+Subject: [Qemu-devel] [PULL 025/100] commit: Switch commit_populate() to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +25,65 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-Rather than having a void function that modifies its input
-in-place as the output, change the signature to reduce a layer
-of indirection and return the result.
+We are gradually converting to byte-based interfaces, as they are
+easier to reason about than sector-based.  Start by converting an
+internal function (no semantic change).
 
-Suggested-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/mirror.c | 15 ++++++++-------
+ block/commit.c | 15 ++++++++-------
  1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 60eefbd..a41ef25 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -176,12 +176,12 @@ static void mirror_read_complete(void *opaque, int ret)
-     aio_context_release(blk_get_aio_context(s->common.blk));
- }
+diff --git a/block/commit.c b/block/commit.c
+index 4cda7f2..6f67d78 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -47,26 +47,25 @@ typedef struct CommitBlockJob {
+ } CommitBlockJob;
  
--static inline void mirror_clip_sectors(MirrorBlockJob *s,
--                                       int64_t sector_num,
--                                       int *nb_sectors)
-+static inline int mirror_clip_sectors(MirrorBlockJob *s,
-+                                      int64_t sector_num,
-+                                      int nb_sectors)
+ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
+-                                        int64_t sector_num, int nb_sectors,
++                                        int64_t offset, uint64_t bytes,
+                                         void *buf)
  {
--    *nb_sectors = MIN(*nb_sectors,
--                      s->bdev_length / BDRV_SECTOR_SIZE - sector_num);
-+    return MIN(nb_sectors,
-+               s->bdev_length / BDRV_SECTOR_SIZE - sector_num);
- }
+     int ret = 0;
+     QEMUIOVector qiov;
+     struct iovec iov = {
+         .iov_base = buf,
+-        .iov_len = nb_sectors * BDRV_SECTOR_SIZE,
++        .iov_len = bytes,
+     };
  
- /* Round sector_num and/or nb_sectors to target cluster if COW is needed, and
-@@ -216,7 +216,8 @@ static int mirror_cow_align(MirrorBlockJob *s,
++    assert(bytes < SIZE_MAX);
+     qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+-    ret = blk_co_preadv(bs, sector_num * BDRV_SECTOR_SIZE,
+-                        qiov.size, &qiov, 0);
++    ret = blk_co_preadv(bs, offset, qiov.size, &qiov, 0);
+     if (ret < 0) {
+         return ret;
      }
-     /* Clipping may result in align_nb_sectors unaligned to chunk boundary, but
-      * that doesn't matter because it's already the end of source image. */
--    mirror_clip_sectors(s, align_sector_num, &align_nb_sectors);
-+    align_nb_sectors = mirror_clip_sectors(s, align_sector_num,
-+                                           align_nb_sectors);
  
-     ret = align_sector_num + align_nb_sectors - (*sector_num + *nb_sectors);
-     *sector_num = align_sector_num;
-@@ -445,7 +446,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-             return 0;
+-    ret = blk_co_pwritev(base, sector_num * BDRV_SECTOR_SIZE,
+-                         qiov.size, &qiov, 0);
++    ret = blk_co_pwritev(base, offset, qiov.size, &qiov, 0);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -193,7 +192,9 @@ static void coroutine_fn commit_run(void *opaque)
+         trace_commit_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
+                                    n * BDRV_SECTOR_SIZE, ret);
+         if (copy) {
+-            ret = commit_populate(s->top, s->base, sector_num, n, buf);
++            ret = commit_populate(s->top, s->base,
++                                  sector_num * BDRV_SECTOR_SIZE,
++                                  n * BDRV_SECTOR_SIZE, buf);
+             bytes_written += n * BDRV_SECTOR_SIZE;
          }
- 
--        mirror_clip_sectors(s, sector_num, &io_sectors);
-+        io_sectors = mirror_clip_sectors(s, sector_num, io_sectors);
-         switch (mirror_method) {
-         case MIRROR_METHOD_COPY:
-             io_sectors = mirror_do_read(s, sector_num, io_sectors);
+         if (ret < 0) {
 -- 
 1.8.3.1
