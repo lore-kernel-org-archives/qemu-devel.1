@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dTXBf-0004cm-IP
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:37:04 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTXDO-00066W-AU
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dTXBe-0006he-MK
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:37:03 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35201)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dTXBe-0006gM-FH
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:37:02 -0400
-Received: by mail-wr0-x231.google.com with SMTP id k67so55988086wrc.2
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 10:37:02 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dTXDN-0007xS-D8
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:38:50 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865776960.17063.4875279139522061160.stgit@frigg.lan>
+	<2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net>
+	<87podcebyi.fsf@frigg.lan>
+	<3745ae02-3fb0-1503-9c99-98dce369f697@twiddle.net>
+	<87lgo0cgij.fsf@frigg.lan>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <260addd5-45fe-ad10-5208-35906fd3f197@twiddle.net>
+Date: Fri, 7 Jul 2017 07:38:26 -1000
 MIME-Version: 1.0
-In-Reply-To: <87inj49mr1.fsf@linaro.org>
-References: <20170707161822.29659-1-alex.bennee@linaro.org>
-	<87inj49mr1.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Jul 2017 18:36:40 +0100
-Message-ID: <CAFEAcA_YvS8OQVTPnvRtWyVuAKO2bccyNALOs1Oq7snTO1WwkA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the
- run-loop
+In-Reply-To: <87lgo0cgij.fsf@frigg.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 23/29] target/arm: [tcg] Port to
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 7 July 2017 at 18:32, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Given the wording of:
->
-> /* is_jmp field values */
-> #define DISAS_NEXT    0 /* next instruction can be analyzed */
-> #define DISAS_JUMP    1 /* only pc was modified dynamically */
-> #define DISAS_UPDATE  2 /* cpu state was modified dynamically */
-> #define DISAS_TB_JUMP 3 /* only pc was modified statically */
->
-> I'm thinking that really these DISAS_JUMP's should be DISAS_UPDATEs and
-> we need to disable the TB chaining optimisations for this. I'll prepare
-> a more comprehensive series next week. However testing this patch for
-> known failure modes will be useful.
+On 07/07/2017 07:18 AM, Lluís Vilanova wrote:
+> There was no code being generated after this specific case, but I haven't
+> checked if DISAS_EXC is set in any other place that is not immediately followed
+> by a "goto done_generating".
 
-The problem I think is that a lot of our current code assumes
-that DISAS_UPDATE means "go back to the top loop".
+Typically we haven't actually done a goto, but simply exit the loop and emit 
+nothing within the final cleanup (tb_stop?).
 
-In any case I think you are right that DISAS_UPDATE should not
-allow chaining to the next TB, because it implies that perhaps
-a TB flags bit got changed, so you need to look in the hash
-table again.
+> Does this mean DISAS_EXC should be on the generic code and do a "goto
+> done_generating" whenever it is found? And if so, what are the correct places to
+> check for this? After ops->insn_start, ops->translate_insn, ops->tb_stop?
 
-thanks
--- PMM
+Yes, this should be handled generically, since all targets need it.
+
+That said, I would prefer a better name like DISAS_NORETURN, which does not 
+imply that an actual exception has been raised, but explicitly says that all 
+following code is dead.
+
+
+r~
