@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTSPU-0007w0-Rk
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:31:02 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dTSQz-0000gz-NZ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTSPT-0001VE-No
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:31:00 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-26-vsementsov@virtuozzo.com>
-	<87r2xs65a5.fsf@dusky.pond.sub.org> <20170707081305.GA15945@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e6ae8d91-c348-8fea-b957-8e150301c35f@redhat.com>
-Date: Fri, 7 Jul 2017 07:30:39 -0500
+	(envelope-from <stefanha@redhat.com>) id 1dTSQy-0002OD-QV
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:32:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dTSQy-0002O5-Ja
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:32:32 -0400
+Date: Fri, 7 Jul 2017 13:32:21 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170707123221.GB18375@stefanha-x1.localdomain>
+References: <cover.1499381754.git.alistair.francis@xilinx.com>
+	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707081305.GA15945@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v22 25/30] qmp: add
- x-debug-block-dirty-bitmap-sha256
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="s/l3CgOIzMHHjg/5"
+Content-Disposition: inline
+In-Reply-To: <0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy
- <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, den@openvz.org
-Message-ID: <e6ae8d91-c348-8fea-b957-8e150301c35f@redhat.com>
-Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v22 25/30] qmp: add
- x-debug-block-dirty-bitmap-sha256
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
- <20170628120530.31251-26-vsementsov@virtuozzo.com>
- <87r2xs65a5.fsf@dusky.pond.sub.org> <20170707081305.GA15945@redhat.com>
-In-Reply-To: <20170707081305.GA15945@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/07/2017 03:13 AM, Daniel P. Berrange wrote:
-> On Fri, Jul 07, 2017 at 10:05:22AM +0200, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>>  block/dirty-bitmap.c         |  5 +++++
->>>  blockdev.c                   | 25 +++++++++++++++++++++++++
->>>  include/block/dirty-bitmap.h |  1 +
->>>  include/qemu/hbitmap.h       |  8 ++++++++
->>>  qapi/block-core.json         | 27 +++++++++++++++++++++++++++
->>>  tests/Makefile.include       |  2 +-
->>>  util/hbitmap.c               | 11 +++++++++++
->>>  7 files changed, 78 insertions(+), 1 deletion(-)
->> [...]
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index 5c42cc7790..6ad8585400 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -1644,6 +1644,33 @@
->>>    'data': 'BlockDirtyBitmap' }
->>> =20
->>>  ##
->>> +# @BlockDirtyBitmapSha256:
->>> +#
->>> +# SHA256 hash of dirty bitmap data
->>> +#
->>> +# @sha256: ASCII representation of SHA256 bitmap hash
->>
->> Spell it SHA-256, please.  The member name @sha256 can stay.
->>
->> SHA-256 is 256 binary bits.  Please specify how they are represented i=
-n
->> ASCII.  It better be base64 (RFC 4648), because we use that elsewhere.=
-
->=20
-> It is filled later in this patch using qcrypto_hash_digest, so it is ju=
-st
-> a hex string representing the hash, not base64. For the latter you can
-> use qcrypto_hash_base64
-
-hex (aka base16) is used for displaying UUIDs across QMP.  Furthermore,
-this is an x- command, useful only for debugging, so we can feel free to
-change the underlying implementation without breaking clients (if we
-prefer to go with the shorter base64 string instead of the longer hex
-string, even if we make that switch after a release).  Still, it's nice
-to avoid churn, and Markus does have a point about reusing a common
-base64 theme for displaying arbitrary binary data, rather than having ad
-hoc differences.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Josh Durgin <jdurgin@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
 
---f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp
+--s/l3CgOIzMHHjg/5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+trace/control.c and blockdev.c:
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--s/l3CgOIzMHHjg/5
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZX37vAAoJEKeha0olJ0NqQvQH/RaCJm+tkde3iSkxw+lA4JR1
-crHjIxqBuUMN0fqbNe6fnFPuYh5ezV0TvyR0MIDV5znOkve7ic0kTEC5VDRDOtoQ
-qsWJ/oBJwpzReFja1Y9bGwDxOZZ7l6r3kzfka856rq18rllD22TDvwPk2V+nBAlP
-clvYuZQ9XnvitGi0sEpnX4v7JR6mmiHbhsRhozz/3VCPtKFhF68qfR9ZOgu8Nq5F
-6ToOYfWNRjVtAciJd8Q6fMiJiYTAAWoUAsm5V4/n73vXdqZGvfM0jzIvPP2tIB+V
-POeRNU0BDL1aqG2OdsCJalR6eqNHFjZxoCr7ZPnX7C0F/8/K7VvAWdfFEYUYeVM=
-=vEll
+iQEcBAEBAgAGBQJZX39VAAoJEJykq7OBq3PIx3IIAI+5kYBn3UlwvrS6ffizqsYj
+rmx4lCWcAg6igZAqykfXeBY5Uw9pckKAjDN90yOFND1bEBn1qp1z0Wqr1AUOCfSa
+MmHluVAACOveqLyKQvLo3DBDTaYItdK7X1eej4S9Cb2ZmyMBBHI9fNt/lnoS2Tx4
+HpEARqRHSLJZcrO3gBGXLk5QUlG6iJ0ngRN7iKgff+hJqCfUKzlxbE+q0C6fTLNG
+vy0+crDt4uOV+lXfPtvDmalIseA16lxMGBy3VteGxoAFy2owRiRzrrDelhVzW8yQ
+iDVVhLPYmw0jH/jt+1C7SGNeRa0vRhIF1inEXmnnnCnvpYgeIm9PnFMbvbNvqNA=
+=7kKL
 -----END PGP SIGNATURE-----
 
---f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp--
+--s/l3CgOIzMHHjg/5--
