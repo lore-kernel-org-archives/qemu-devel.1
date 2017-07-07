@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTSuG-0007my-Go
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:02:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dTSwO-0001Mh-ER
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:05:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTSuD-0007dz-EL
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:02:48 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri,  7 Jul 2017 15:02:28 +0200
-Message-Id: <149943254813.8972.12950702637872655040.stgit@frigg.lan>
-In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	(envelope-from <cohuck@redhat.com>) id 1dTSwL-0008SL-9g
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:05:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51106)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSwL-0008R6-40
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:04:57 -0400
+Date: Fri, 7 Jul 2017 15:04:52 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170707150452.1f12890b@dhcp-192-215.str.redhat.com>
+In-Reply-To: <7e4e8d2d-66f6-8884-96a1-83f285171c13@de.ibm.com>
+References: <20170707122159.24714-1-cohuck@redhat.com>
+	<20170707122159.24714-6-cohuck@redhat.com>
+	<7e4e8d2d-66f6-8884-96a1-83f285171c13@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 20/27] target/arm: [tcg,
- a64] Port to breakpoint_check
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 5/7] s390x/pci: fence off instructions
+ for non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+On Fri, 7 Jul 2017 14:55:23 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate-a64.c |   58 +++++++++++++++++++++++++++++++++-----=
-------
- 1 file changed, 43 insertions(+), 15 deletions(-)
+> On 07/07/2017 02:21 PM, Cornelia Huck wrote:
+> > If a guest running on a non-pci build issues a pci instruction,
+> > throw them an exception.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  target/s390x/kvm.c | 24 ++++++++++++++++++++++++
+> >  1 file changed, 24 insertions(+)
+> > 
+> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> > index a3d00196f4..c5c7c27a21 100644
+> > --- a/target/s390x/kvm.c
+> > +++ b/target/s390x/kvm.c
+> > @@ -1160,6 +1160,9 @@ static int kvm_clp_service_call(S390CPU *cpu, struct kvm_run *run)
+> >  {
+> >      uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
+> > 
+> > +#ifndef CONFIG_PCI
+> > +    return -1;
+> > +#endif  
+> 
+> Instead of this ifdefing, can you use the cpu model to decide if the instruction
+> should be available? We need to do this anyway for proper handling.
+> 
+> You can then fence off the PCI bits in the CPU model for
+> CONFIG_PCI == off.
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index dc91661df0..a32f07f4bd 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11255,6 +11255,29 @@ static void aarch64_tr_insn_start(DisasContextBa=
-se *dcbase, CPUState *cpu)
-     tcg_gen_insn_start(dc->pc, 0, 0);
- }
-=20
-+static BreakpointCheckType aarch64_tr_breakpoint_check(
-+    DisasContextBase *dcbase, CPUState *cpu, const CPUBreakpoint *bp)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+
-+    if (bp->flags & BP_CPU) {
-+        gen_a64_set_pc_im(dc->pc);
-+        gen_helper_check_breakpoints(cpu_env);
-+        /* End the TB early; it likely won't be executed */
-+        dc->base.is_jmp =3D DISAS_UPDATE;
-+        return BC_HIT_INSN;
-+    } else {
-+        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
-+        /* The address covered by the breakpoint must be
-+           included in [tb->pc, tb->pc + tb->size) in order
-+           to for it to be properly cleared -- thus we
-+           increment the PC here so that the logic setting
-+           tb->size below does the right thing.  */
-+        dc->pc +=3D 4;
-+        return BC_HIT_TB;
-+    }
-+}
-+
- void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
-                                TranslationBlock *tb)
- {
-@@ -11291,26 +11314,31 @@ void gen_intermediate_code_a64(DisasContextBase=
- *dcbase, CPUState *cs,
-         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
-             CPUBreakpoint *bp;
-             QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
--                if (bp->pc =3D=3D dc->pc) {
--                    if (bp->flags & BP_CPU) {
--                        gen_a64_set_pc_im(dc->pc);
--                        gen_helper_check_breakpoints(cpu_env);
--                        /* End the TB early; it likely won't be executed=
- */
--                        dc->base.is_jmp =3D DISAS_UPDATE;
--                    } else {
--                        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
--                        /* The address covered by the breakpoint must be
--                           included in [dc->base.tb->pc, dc->base.tb->pc=
- + dc->base.tb->size) in order
--                           to for it to be properly cleared -- thus we
--                           increment the PC here so that the logic setti=
-ng
--                           dc->base.tb->size below does the right thing.=
-  */
--                        dc->pc +=3D 4;
-+                if (bp->pc =3D=3D dc->base.pc_next) {
-+                    BreakpointCheckType bp_check =3D
-+                        aarch64_tr_breakpoint_check(&dc->base, cs, bp);
-+                    switch (bp_check) {
-+                    case BC_MISS:
-+                        /* Target ignored this breakpoint, go to next */
-+                        break;
-+                    case BC_HIT_INSN:
-+                        /* Hit, keep translating */
-+                        /*
-+                         * TODO: if we're never going to have more than =
-one
-+                         *       BP in a single address, we can simply u=
-se a
-+                         *       bool here.
-+                         */
-+                        goto done_breakpoints;
-+                    case BC_HIT_TB:
-+                        /* Hit, end TB */
-                         goto done_generating;
-+                    default:
-+                        g_assert_not_reached();
-                     }
--                    break;
-                 }
-             }
-         }
-+    done_breakpoints:
-=20
-         if (dc->base.num_insns =3D=3D max_insns && (dc->base.tb->cflags =
-& CF_LAST_IO)) {
-             gen_io_start();
+Sounds like a good idea, I'll give it a try.
+
+We'll probably also want to fence off the sclp facility bit via that
+mechanism.
