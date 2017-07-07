@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTVUZ-0003ZM-KT
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:48:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTVVx-0004S4-DM
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:49:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTVUW-0002IY-HR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:48:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58736)
+	(envelope-from <eblake@redhat.com>) id 1dTVVt-0002wv-JT
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:49:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTVUW-0002IK-94
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:48:24 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTVVt-0002wd-AA
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:49:49 -0400
 References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
-	<20170707152918.23086-4-vsementsov@virtuozzo.com>
+	<20170707152918.23086-7-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <bb9ce7a0-7fa9-6638-5d38-908a1441e350@redhat.com>
-Date: Fri, 7 Jul 2017 10:48:18 -0500
+Message-ID: <e3309e31-4cd3-ec58-e5c0-01b79631fe6e@redhat.com>
+Date: Fri, 7 Jul 2017 10:49:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170707152918.23086-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20170707152918.23086-7-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK"
-Subject: Re: [Qemu-devel] [PATCH v3 03/10] nbd/server: use errp instead of
- LOG
+	boundary="ffV5s5wGh60qpjoGr03UDbUHiTJpU1CLB"
+Subject: Re: [Qemu-devel] [PATCH v3 06/10] nbd/client: refactor TRACE of
+ NBD_MAGIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +33,29 @@ To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.o
 Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK
+--ffV5s5wGh60qpjoGr03UDbUHiTJpU1CLB
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
  den@openvz.org
-Message-ID: <bb9ce7a0-7fa9-6638-5d38-908a1441e350@redhat.com>
-Subject: Re: [PATCH v3 03/10] nbd/server: use errp instead of LOG
+Message-ID: <e3309e31-4cd3-ec58-e5c0-01b79631fe6e@redhat.com>
+Subject: Re: [PATCH v3 06/10] nbd/client: refactor TRACE of NBD_MAGIC
 References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
- <20170707152918.23086-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20170707152918.23086-4-vsementsov@virtuozzo.com>
+ <20170707152918.23086-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20170707152918.23086-7-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 07/07/2017 10:29 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Move to modern errp scheme from just LOGging errors.
+> We are going to switch from TRACE macro to trace points,
+> this TRACE complicates things, this patch simplifies it.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  nbd/server.c | 266 +++++++++++++++++++++++++++++++++++----------------=
---------
->  1 file changed, 160 insertions(+), 106 deletions(-)
+>  nbd/client.c | 11 ++---------
+>  1 file changed, 2 insertions(+), 9 deletions(-)
 >=20
-
-> @@ -142,23 +142,26 @@ static int nbd_negotiate_send_rep_len(QIOChannel =
-*ioc, uint32_t type,
->            type, opt, len);
-> =20
->      magic =3D cpu_to_be64(NBD_REP_MAGIC);
-> -    if (nbd_write(ioc, &magic, sizeof(magic), NULL) < 0) {
-> -        LOG("write failed (rep magic)");
-> +    if (nbd_write(ioc, &magic, sizeof(magic), errp) < 0) {
-> +        error_prepend(errp, "write failed (rep magic): ");
->          return -EINVAL;
-
-I wonder if we should try harder to preserve the errno returned by
-nbd_write() instead of blindly slamming -EINVAL/-EIO everywhere.  But
-I'm not going to let it hold up my review of this patch.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -80,7 +65,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK
+--ffV5s5wGh60qpjoGr03UDbUHiTJpU1CLB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -90,13 +75,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZX61DAAoJEKeha0olJ0NqCXwH/338bnC+hbqLAhj/f0HDYkYE
-vZc/wjBiSHrLXIarvA27dhV5OLwvRk5N7RRSfSMxIk89SgmOM+Q+NN4R4WgJnJf9
-WrATn3BecoVqbxur1I426zh4NZva0kBGTsjavBjmaG55CVRLjq6NNyQCMw0xMPUN
-o77zCTN+CHbxSoAtZa9RAOlXgyaZ69NvX+hLRY0Q/b3utaRYoVlR8L+PkKNVMWdB
-CGZnqGhv2Xlv+/E+pKzA2uySNiCjZeJhv5pK8zGpzIxTx7gnoYWAF02YQjjFNQDM
-y+qyB/ub/H5A6rwAWiaEuKt6bG/JYQGM1gB6zDNTS0OmLuOdl60reoION7eY6K8=
-=gMfT
+iQEcBAEBCAAGBQJZX62YAAoJEKeha0olJ0NqrBwH/2IObK0wKlNEYlfaMXkSM8L/
++2R7Mmfn/KJ7aZMS7WtgUW2XFhVPt444aD8KRZhtpSstpUZa0tmALqpay4Q+AZKf
+1XBReUdrzQZeXnDbvlq6RupjJRlAU+tAhVdERSCZl9ToQ8ZiiEPeaHxLHNNMk4/1
+4fr43glIKBxIVHFhUWrR9Tl+pf/uhi+NtLTES+g0JZ6IolJx4Rdz4/vv3PNdNPc/
+47ovjOgrnKONgQfykCqDQ1TT8kQXYYDsFsvCo+aVEb1131OEsKe8P9qYbUO+on7F
+8g/ev9tj+csJ6VkRBcpfVF7J1DlOH6nlStekFVZC4b0Jqhp3Mim2ilXRossHPnE=
+=RIjx
 -----END PGP SIGNATURE-----
 
---L1KA2pFPt0qgnm6CAm6kuOGxXxFJMvAQK--
+--ffV5s5wGh60qpjoGr03UDbUHiTJpU1CLB--
