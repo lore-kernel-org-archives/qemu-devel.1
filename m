@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1dTMi3-0002hv-MI
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:25:49 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dTMkY-0003cT-OA
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1dTMi2-0001ul-1N
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:25:47 -0400
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Date: Fri, 7 Jul 2017 06:25:35 +0000
-Message-ID: <AM5PR0401MB2545C23F66D6D0E096DCB0369AAA0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
-	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
-	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
-	<AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
-In-Reply-To: <15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dTMkU-0002jI-RR
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:28:22 -0400
+Received: from [59.151.112.132] (port=48443 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dTMkU-0002iT-Et
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:28:18 -0400
+References: <1499406231-3877-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499406231-3877-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<a759bab5-4042-12c4-9055-a2856d5ffc12@cn.fujitsu.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <63a954bd-09cc-9d3b-7575-5645aa60250a@cn.fujitsu.com>
+Date: Fri, 7 Jul 2017 14:30:18 +0800
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+In-Reply-To: <a759bab5-4042-12c4-9055-a2856d5ffc12@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/4] net/colo-compare.c: Add checkpoint min
+ period to optimize performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,138 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBdWdlciBF
-cmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlkYXksIEp1bHkg
-MDcsIDIwMTcgMjo0NyBBTQ0KPiBUbzogQmhhcmF0IEJodXNoYW4gPGJoYXJhdC5iaHVzaGFuQG54
-cC5jb20+OyBKZWFuLVBoaWxpcHBlIEJydWNrZXINCj4gPGplYW4tcGhpbGlwcGUuYnJ1Y2tlckBh
-cm0uY29tPjsgZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFy
-by5vcmc7IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcWVt
-dS1hcm1Abm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiB3ZWlAcmVkaGF0
-LmNvbTsga2V2aW4udGlhbkBpbnRlbC5jb207IG1hcmMuenluZ2llckBhcm0uY29tOw0KPiB0bkBz
-ZW1paGFsZi5jb207IHdpbGwuZGVhY29uQGFybS5jb207IGRyam9uZXNAcmVkaGF0LmNvbTsNCj4g
-cm9iaW4ubXVycGh5QGFybS5jb207IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZw0KPiBTdWJq
-ZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgMC84XSBWSVJUSU8tSU9NTVUgZGV2aWNlDQo+
-IA0KPiBIaSBCaGFyYXQsDQo+IA0KPiBPbiAwNi8wNy8yMDE3IDEzOjI0LCBCaGFyYXQgQmh1c2hh
-biB3cm90ZToNCj4gPg0KPiA+DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+
-IEZyb206IEplYW4tUGhpbGlwcGUgQnJ1Y2tlciBbbWFpbHRvOmplYW4tcGhpbGlwcGUuYnJ1Y2tl
-ckBhcm0uY29tXQ0KPiA+PiBTZW50OiBUaHVyc2RheSwgSnVseSAwNiwgMjAxNyAzOjMzIFBNDQo+
-ID4+IFRvOiBCaGFyYXQgQmh1c2hhbiA8YmhhcmF0LmJodXNoYW5AbnhwLmNvbT47IEF1Z2VyIEVy
-aWMNCj4gPj4gPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNv
-bTsNCj4gPj4gcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0
-LmNvbTsNCj4gbXN0QHJlZGhhdC5jb207DQo+ID4+IHFlbXUtYXJtQG5vbmdudS5vcmc7IHFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZw0KPiA+PiBDYzogd2VpQHJlZGhhdC5jb207IGtldmluLnRpYW5AaW50
-ZWwuY29tOyBtYXJjLnp5bmdpZXJAYXJtLmNvbTsNCj4gPj4gdG5Ac2VtaWhhbGYuY29tOyB3aWxs
-LmRlYWNvbkBhcm0uY29tOyBkcmpvbmVzQHJlZGhhdC5jb207DQo+ID4+IHJvYmluLm11cnBoeUBh
-cm0uY29tOyBjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmcNCj4gPj4gU3ViamVjdDogUmU6IFtR
-ZW11LWRldmVsXSBbUkZDIHYyIDAvOF0gVklSVElPLUlPTU1VIGRldmljZQ0KPiA+Pg0KPiA+PiBP
-biAwNS8wNy8xNyAwOTo0OSwgQmhhcmF0IEJodXNoYW4gd3JvdGU6Pj4+IEFsc28gd2hlbiBzZXR1
-cCBtc2ktcm91dGUNCj4gPj4ga3ZtX2lycWNoaXBfYWRkX21zaV9yb3V0ZSgpIHdlIG5lZWRlZCB0
-bw0KPiA+Pj4+IHByb3ZpZGUgdGhlIHRyYW5zbGF0ZWQgYWRkcmVzcy4NCj4gPj4+Pj4gQWNjb3Jk
-aW5nIHRvIG15IHVuZGVyc3RhbmRpbmcgdGhpcyBpcyByZXF1aXJlZCBiZWNhdXNlIGtlcm5lbCBk
-b2VzDQo+ID4+Pj4+IG5vIGdvDQo+ID4+Pj4gdGhyb3VnaCB2aW9tbXUgdHJhbnNsYXRpb24gd2hl
-biBnZW5lcmF0aW5nIGludGVycnVwdCwgbm8/DQo+ID4+Pj4NCj4gPj4+PiB5ZXMgdGhpcyBpcyBu
-ZWVkZWQgd2hlbiBLVk0gTVNJIHJvdXRlcyBhcmUgc2V0IHVwLCBpZS4gYWxvbmcgd2l0aA0KPiA+
-Pj4+IEdJQ1YzDQo+ID4+IElUUy4NCj4gPj4+PiBXaXRoIEdJQ3YyTSwgcWVtdSBkaXJlY3QgZ3Np
-IG1hcHBpbmcgaXMgdXNlZCBhbmQgdGhpcyBpcyBub3QgbmVlZGVkLg0KPiA+Pj4+DQo+ID4+Pj4g
-U28gSSBkbyBub3QgdW5kZXJzdGFuZCB5b3VyIHByZXZpb3VzIHNlbnRlbmNlIHNheWluZyAiTVNJ
-DQo+ID4+Pj4gaW50ZXJydXB0cyB3b3JrcyB3aXRob3V0IGFueSBjaGFuZ2UiLg0KPiA+Pj4NCj4g
-Pj4+IEkgaGF2ZSBhbG1vc3QgY29tcGxldGVkIHZmaW8gaW50ZWdyYXRpb24gd2l0aCB2aXJ0aW8t
-aW9tbXUgYW5kIG5vdw0KPiA+Pj4gdGVzdGluZyB0aGUgY2hhbmdlcyBieSBhc3NpZ25pbmcgZTEw
-MDAgZGV2aWNlIHRvIFZNLiBGb3IgdGhpcyBJIGhhdmUNCj4gPj4+IGNoYW5nZWQgdmlydGlvLWlv
-bW11IGRyaXZlciB0byB1c2UgSU9NTVVfUkVTVl9NU0kgcmF0aGVyIHRoYW4gc3ctDQo+IG1zaQ0K
-PiA+Pj4gYW5kIHRoaXMgZG9lcyBub3QgbmVlZCBjaGFuZ2VkIGluIHZmaW9fZ2V0X2FkZHIoKSAg
-YW5kDQo+ID4+PiBrdm1faXJxY2hpcF9hZGRfbXNpX3JvdXRlKCkNCj4gPj4NCj4gPj4gSSB1bmRl
-cnN0YW5kIHlvdSdyZSByZXNlcnZpbmcgcmVnaW9uIDB4MDgwMDAwMDAtMHgwODEwMDAwMCBhcw0K
-PiA+PiBJT01NVV9SRVNWX01TSSBpbnN0ZWFkIG9mIElPTU1VX1JFU1ZfU1dfTVNJPyBJIHRoaW5r
-IHRoaXMgb25seQ0KPiB3b3Jrcw0KPiA+PiBiZWNhdXNlIFFlbXUgcGxhY2VzIHRoZSB2Z2ljIGlu
-IHRoYXQgYXJlYSBhcyB3ZWxsIChpbiBody9hcm0vdmlydC5jKS4NCj4gPj4gSXQncyBub3QgYSBj
-b2luY2lkZW5jZSBpZiB0aGUgYWRkcmVzc2VzIGFyZSB0aGUgc2FtZSwgYmVjYXVzZSBFcmljDQo+
-ID4+IGNob3NlIHRoZW0gZm9yIHRoZSBMaW51eCBTTU1VIGRyaXZlcnMgYW5kIEkgY29waWVkIHRo
-ZW0uDQo+ID4+DQo+ID4+IFdlIGNhbid0IHJlbHkgb24gdGhhdCBiZWhhdmlvciwgdGhvdWdoLCBp
-dCB3aWxsIGJyZWFrIE1TSXMgaW4NCj4gPj4gZW11bGF0ZWQgZGV2aWNlcy4gQW5kIGlmIFFlbXUg
-aGFwcGVucyB0byBtb3ZlIHRoZSBNU0kgZG9vcmJlbGwgaW4NCj4gPj4gZnV0dXJlIG1hY2hpbmUg
-cmV2aXNpb25zLCB0aGVuIGl0IHdvdWxkIGFsc28gYnJlYWsgVkZJTy4NCj4gPg0KPiA+IFllcywg
-bWFrZSBzZW5zZSB0byBtZQ0KPiA+DQo+ID4+DQo+ID4+IEp1c3QgZm9yIG15IG93biB1bmRlcnN0
-YW5kaW5nIC0tIHdoYXQgaGFwcGVucywgSSB0aGluaywgaXMgdGhhdCBpbg0KPiA+PiBMaW51eCBp
-b3ZhX3Jlc2VydmVfaW9tbXVfcmVnaW9ucyBpbml0aWFsbHkgcmVzZXJ2ZXMgdGhlDQo+ID4+IGd1
-ZXN0LXBoeXNpY2FsIGRvb3JiZWxsIDB4MDgwMDAwMDAtMHgwODEwMDAwMC4gVGhlbiBtdWNoIGxh
-dGVyLCB3aGVuDQo+ID4+IHRoZSBkZXZpY2UgZHJpdmVyIHJlcXVlc3RzIGFuIE1TSSwgdGhlIGly
-cWNoaXAgZHJpdmVyIGNhbGxzDQo+ID4+IGlvbW11X2RtYV9tYXBfbXNpX21zZyB3aXRoIHRoZSBn
-dWVzdC0gcGh5c2ljYWwgZ2ljdjJtIGFkZHJlc3MNCj4gPj4gMHgwODAyMDAwMC4gVGhlIGZ1bmN0
-aW9uIGZpbmRzIHRoZSByaWdodCBwYWdlIGluIG1zaV9wYWdlX2xpc3QsIHdoaWNoDQo+ID4+IHdh
-cyBhZGRlZCBieSBjb29raWVfaW5pdF9od19tc2lfcmVnaW9uLCB0aGVyZWZvcmUgYnlwYXNzaW5n
-IHRoZQ0KPiB2aW9tbXUgYW5kIHRoZSBHUEEgZ2V0cyB3cml0dGVuIGluIHRoZSBNU0ktWCB0YWJs
-ZS4NCj4gPg0KPiA+IFRoaXMgbWVhbnMgaW4gY2FzZSB0b21vcnJvdyB3aGVuIHFlbXUgY2hhbmdl
-cyB2aXJ0IG1hY2hpbmUgYWRkcmVzcw0KPiBtYXAgYW5kIHZnaWMtaXRzIChpdHMtdHJhbnNsYXRv
-ciByZWdpc3RlciBhZGRyZXNzKSBhZGRyZXNzIHJhbmdlIGRvZXMgbm90IGZhbGwNCj4gaW4gdGhl
-IG1zaV9wYWdlX2xpc3QgdGhlbiBpdCB3aWxsIGFsbG9jYXRlIGEgbmV3IGlvdmEsIGNyZWF0ZSBt
-YXBwaW5nIGluDQo+IGlvbW11LiBTbyB0aGlzIHdpbGwgbm8gbG9uZ2VyIGJlIGlkZW50aXR5IG1h
-cHBlZCBhbmQgZmFpbCB0byB3b3JrIHdpdGggbmV3DQo+IHFlbXU/DQo+ID4NCj4gWWVzIHRoYXQn
-cyBjb3JyZWN0Lg0KPiA+Pg0KPiA+PiBJZiBhbiBlbXVsYXRlZCBkZXZpY2Ugc3VjaCBhcyB2aXJ0
-aW8tbmV0LXBjaSB3ZXJlIHRvIGdlbmVyYXRlIGFuIE1TSSwNCj4gPj4gdGhlbiBRZW11IHdvdWxk
-IGF0dGVtcHQgdG8gYWNjZXNzIHRoZSBkb29yYmVsbCB3cml0dGVuIGJ5IExpbnV4IGludG8NCj4g
-Pj4gdGhlIE1TSS1YIHRhYmxlLCAweDA4MDIwMDAwLCBhbmQgZmF1bHQgYmVjYXVzZSB0aGF0IGFk
-ZHJlc3Mgd2Fzbid0DQo+ID4+IG1hcHBlZCBpbiB0aGUgdmlvbW11Lg0KPiA+Pg0KPiA+PiBTbyBm
-b3IgVkZJTywgeW91IGVpdGhlciBuZWVkIHRvIHRyYW5zbGF0ZSB0aGUgTVNJLVggZW50cnkgdXNp
-bmcgdGhlDQo+ID4+IHZpb21tdSwgb3IganVzdCBhc3N1bWUgdGhhdCB0aGUgdmFkZHIgY29ycmVz
-cG9uZHMgdG8gdGhlIG9ubHkgTVNJDQo+ID4+IGRvb3JiZWxsIGFjY2Vzc2libGUgYnkgdGhpcyBk
-ZXZpY2UgKGJlY2F1c2UgaG93IGNhbiB3ZSBiZSBjZXJ0YWluDQo+ID4+IHRoYXQgdGhlIGd1ZXN0
-IGFscmVhZHkgbWFwcGVkIHRoZSBkb29yYmVsbCBiZWZvcmUgd3JpdGluZyB0aGUgZW50cnk/KQ0K
-PiA+Pg0KPiA+PiBGb3IgQVJNIG1hY2hpbmVzIGl0J3MgcHJvYmFibHkgYmVzdCB0byBzdGljayB3
-aXRoDQo+IElPTU1VX1JFU1ZfU1dfTVNJLg0KPiA+PiBIb3dldmVyLCBhIG5pY2Ugd2F5IHRvIHVz
-ZSBJT01NVV9SRVNWX01TSSB3b3VsZCBiZSBmb3IgdGhlIHZpcnRpby0NCj4gPj4gaW9tbXUgZGV2
-aWNlIHRvIGFkdmVydGlzZSBpZGVudGl0eS1tYXBwZWQvcmVzZXJ2ZWQgcmVnaW9ucywgYW5kDQo+
-ID4+IGJ5cGFzcyB0cmFuc2xhdGlvbiBvbiB0aGVzZSByZWdpb25zLiBUaGVuIHRoZSBkcml2ZXIg
-Y291bGQgcmVzZXJ2ZQ0KPiA+PiB0aG9zZSB3aXRoIElPTU1VX1JFU1ZfTVNJLg0KPiA+DQo+ID4g
-Q29ycmVjdCBtZSBpZiBJIGRpZCBub3QgdW5kZXJzdG9vZCB5b3UgY29ycmVjdGx5LCB0b2RheSBp
-b21tdS1kcml2ZXINCj4gZGVjaWRlcyBtc2ktcmVzZXJ2ZWQgcmVnaW9uLCB3aGF0IGlmIHdlIGNo
-YW5nZSB0aGlzIGFuZCB2aXJ0aW8taW9tbXUgZGV2aWNlDQo+IHdpbGwgcHJvdmlkZSB0aGUgcmVz
-ZXJ2ZWQgbXNpIHJlZ2lvbiBhcyBwZXIgdGhlIGVtdWxhdGVkIG1hY2hpbmUgKHZpcnQvaW50ZWwp
-Lg0KPiBTbyB2aXJ0aW8taW9tbXUgZHJpdmVyIHdpbGwgdXNlIHRoZSBhZGRyZXNzIGFkdmVydGlz
-ZWQgYnkgdmlydGlvLWlvbW11IGRldmljZQ0KPiBhcyBJT01NVV9SRVNWX01TSS4gSW4gdGhpcyBj
-YXNlIG1zaS1wYWdlLWxpc3Qgd2lsbCBhbHdheXMgaGF2ZSB0aGUNCj4gcmVzZXJ2ZWQgcmVnaW9u
-IGZvciBNU0kuDQo+ID4gT24gcWVtdSBzaWRlLCBmb3IgZW11bGF0ZWQgZGV2aWNlcyB3ZSB3aWxs
-IGxldCB2aXJ0aW8taW9tbXUgcmV0dXJuIHNhbWUNCj4gYWRkcmVzcyBhcyB0cmFuc2xhdGVkIGFk
-ZHJlc3MgYXMgaXQgZmFsbHMgaW4gTVNJLXJlc2VydmVkIHBhZ2UgYWxyZWFkeSBrbm93bg0KPiB0
-byBpdC4NCj4gDQo+IEkgdGhpbmsgd2hhdCB5b3UncmUgcHJvcG9zaW5nIGhlcmUgY29ycmVzcG9u
-ZHMgdG8gdGhlIDFzdCBhcHByb2FjaCB0aGF0IHdhcw0KPiBmb2xsb3dlZCBmb3IgUENJZSBwYXNz
-dGhyb3VnaC9NU0kgb24gQVJNLCBpZS4gdGhlIHVzZXJzcGFjZSB3YXMgcHJvdmlkaW5nDQo+IHRo
-ZSByZXNlcnZlZCByZWdpb24gYmFzZSBhZGRyZXNzICYgc2l6ZS4NCj4gIFRoaXMgd2FzIHJ1bGVk
-IG91dCBhbmQgbm93IHRoaXMNCj4gcmVnaW9uIGlzIGFyYml0cmFyaWx5IHNldCBieSB0aGUgc21t
-dS1kcml2ZXIuIEF0IHRoZSBtb21lbnQgdGhpcyBtZWFucyB0aGlzDQo+IHJlZ2lvbiBjYW5ub3Qg
-Y29udGFpbiBndWVzdCBSQU0uDQoNCkluIHJlamVjdGVkIHByb3Bvc2FsLCB1c2VyLXNwYWNlIHVz
-ZWQgdG8gY2hvb3NlIGEgcmVzZXJ2ZSByZWdpb24gYW5kIHByb3ZpZGUgdGhhdCB0byBIb3N0IExp
-bnV4LiBIb3N0IExpbnV4IHVzZXMgdGhhdCBNU0kgbWFwcGluZy4gSnVzdCBmb3IgbXkgdW5kZXJz
-dGFuZGluZyBpZiB0b21vcnJvdyBRRU1VIGNoYW5nZXMgaXRzIGFkZHJlc3Mgc3BhY2UgdGhlbiBp
-dCBtYXkgbm90IHdvcmsgd2l0aG91dCBjaGFuZ2luZyBTTU1VIG1zaS1yZXNlcnZlZC1pb3ZhIGlu
-IGhvc3QgZHJpdmVyLCByaWdodD8gRm9yIGV4YW1wbGUgaWYgZW11bGF0ZWQgbWFjaGluZSBoYXZl
-IFJBTSBhdCB0aGlzIGFkZHJlc3MgdGhlbiBpdCB3aWxsIG5vdCB3b3JrPw0KDQpJbiB0aGlzIHBy
-b3Bvc2FsLCBRRU1VIHJlc2VydmVzIGEgaW92YS1yYW5nZSBmb3IgZ3Vlc3QgKG5vdCBob3N0KSBh
-bmQgZ3Vlc3Qga2VybmVsIHdpbGwgdXNlIHRoaXMgYXMgbXNpLWlvdmEgdW50cmFuc2xhdGVkIChJ
-T01NVV9SRVNWX01TSSkuIFdoaWxlIHRoaXMgZG9lcyBub3QgY2hhbmdlIGhvc3QgaW50ZXJmYWNl
-IGFuZCBpdCB3aWxsIGNvbnRpbnVlIHRvIHVzZSBob3N0IHJlc2VydmVkIG1hcHBpbmcgZm9yIGFj
-dHVhbCBpbnRlcnJ1cHQgZ2VuZXJhdGlvbiwgbm8/DQoNClRoYW5rcw0KLUJoYXJhdA0KDQo+IA0K
-PiA+DQo+ID4NCj4gPj4gRm9yIHg4NiB3ZSB3aWxsIG5lZWQgc3VjaCBhIHN5c3RlbSwgd2l0aCBh
-biBhZGRlZCBJUlEgcmVtYXBwaW5nDQo+ID4+IGZlYXR1cmUuDQo+ID4NCj4gPiBJIGRvIG5vdCB1
-bmRlcnN0YW5kIHg4NiBNU0kgaW50ZXJydXB0IGdlbmVyYXRpb24sIGJ1dCBJZiBhYm92ZSB1bmRl
-cnN0YW5kDQo+IGlzIGNvcnJlY3QsIHRoZW4gd2h5IHdlIG5lZWQgSVJRIHJlbWFwcGluZyBmb3Ig
-eDg2Pw0KPiBUbyBtZSB4ODYgSVIgY29ycmVzcG9uZHMgc2ltcGx5IGNvcnJlc3BvbmRzIHRvIHRo
-ZSBJVFMgTVNJIGNvbnRyb2xsZXINCj4gbW9kYWxpdHkgb24gQVJNLiBTbyBhcyB5b3Ugc3RpbGwg
-bmVlZCB2SVRTIGFsb25nIHdpdGggdmlydGlvLWlvbW11IG9uIEFSTSwNCj4geW91IG5lZWQgdklS
-USBhbG9uZ3Mgd2l0aCB2aXJ0aW8taW9tbXUgb24gSW50ZWwuIERvZXMgdGhhdCBtYWtlIHNlbnNl
-Pw0KPiANCj4gU28gaW4gYW55IGNhc2Ugd2UgbmVlZCB0byBtYWtlIHN1cmUgdGhlIGd1ZXN0IHVz
-ZXMgYSB2SVRTIG9yIHZJUiB0byBtYWtlDQo+IHN1cmUgTVNJcyBhcmUgY29ycmVjdGx5IGlzb2xh
-dGVkLg0KPiANCj4gDQo+ID4gV2lsbCB0aGUgeDg2IG1hY2hpbmUgZW11bGF0ZWQgaW4gUUVNVSBw
-cm92aWRlcyBhIGJpZyBhZGRyZXNzIHJhbmdlIGZvcg0KPiBNU0lzIGFuZCB3aGVuIGFjdHVhbGx5
-IGdlbmVyYXRpbmcgTVNJIGl0IG5lZWRlZCBzb21lIGV4dHJhIHByb2Nlc3NpbmcNCj4gKElSUS1y
-ZW1hcHBpbmcgcHJvY2Vzc2luZykgYmVmb3JlIGFjdHVhbGx5IGdlbmVyYXRpbmcgd3JpdGUgdHJh
-bnNhY3Rpb24gZm9yDQo+IE1TSSBpbnRlcnJ1cHQgPw0KPiBNeSB1bmRlcnN0YW5kaW5nIGlzIG9u
-IHg4NiwgdGhlIE1TSSB3aW5kb3cgaXMgZml4ZWQgYW5kIG1hdGNoZXMNCj4gW0ZFRTBfMDAwMGgg
-4oCTIEZFRjBfMDAwaF0uIE1TSXMgYXJlIGNvbnZleWVkIG9uIGEgc2VwYXJhdGUgYWRkcmVzcyBz
-cGFjZQ0KPiB0aGFuIHVzdWFsIERNQSBhY2Nlc3Nlcy4gQW5kIHllcyB0aGV5IGVuZCB1cCBpbiBJ
-UiBpZiBzdXBwb3J0ZWQgaW4gdGhlIEhXLg0KPiANCj4gVGhhbmtzDQo+IA0KPiBFcmljDQo+ID4N
-Cj4gPiBUaGFua3MNCj4gPiAtQmhhcmF0DQo+ID4NCj4gPj4NCj4gPj4gVGhhbmtzLA0KPiA+PiBK
-ZWFuDQo=
+
+
+On 07/07/2017 02:06 PM, Li Zhijian wrote:
+>
+> On 07/07/2017 01:43 PM, Zhang Chen wrote:
+>> If colo-compare find out the first different packet
+>
+> at this situation, why not trigger the checkpoint, and then flush all 
+> primary packets and drop secondary packets?
+
+In this time we already do this job, but before this checkpoint to be done,
+a lot of checkpoint has been triggered. It is no sense do many 
+checkpoint in very short time.
+So we just need do once checkpoint in this situation.
+
+Thanks
+Zhang Chen
+
+>
+>
+>>   that means
+>> the following packet almost is different. we needn't do a lot
+>> of checkpoint in this time, so we set the no-need-checkpoint
+>> peroid, default just set 3 second.
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   net/colo-compare.c | 13 ++++++++++++-
+>>   1 file changed, 12 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index 6d500e1..0f8e198 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -40,6 +40,9 @@
+>>   /* TODO: Should be configurable */
+>>   #define REGULAR_PACKET_CHECK_MS 3000
+>>   +/* TODO: Should be configurable */
+>> +#define CHECKPOINT_MIN_TIME 3000
+>> +
+>>   /*
+>>     + CompareState ++
+>>     |               |
+>> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, 
+>> void *user_data)
+>>       Packet *pkt = NULL;
+>>       GList *result = NULL;
+>>       int ret;
+>> +    static int64_t checkpoint_time_ms;
+>>         while (!g_queue_is_empty(&conn->primary_list) &&
+>>              !g_queue_is_empty(&conn->secondary_list)) {
+>> @@ -494,7 +498,14 @@ static void colo_compare_connection(void 
+>> *opaque, void *user_data)
+>>                */
+>>               trace_colo_compare_main("packet different");
+>>               g_queue_push_tail(&conn->primary_list, pkt);
+>> -            /* TODO: colo_notify_checkpoint();*/
+>> +
+>> +            if (pkt->creation_ms - checkpoint_time_ms > 
+>> CHECKPOINT_MIN_TIME) {
+>> +                /*
+>> +                 * TODO: Notify colo frame to do checkpoint.
+>> +                 * colo_compare_inconsistent_notify();
+>> +                 */
+>> +                checkpoint_time_ms = pkt->creation_ms;
+>> +            }
+>>               break;
+>>           }
+>>       }
+>
+
+-- 
+Thanks
+Zhang Chen
