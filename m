@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dTMkY-0003cT-OA
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:28:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1dTMpi-0004nF-5Q
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dTMkU-0002jI-RR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:28:22 -0400
-Received: from [59.151.112.132] (port=48443 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dTMkU-0002iT-Et
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:28:18 -0400
-References: <1499406231-3877-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1499406231-3877-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<a759bab5-4042-12c4-9055-a2856d5ffc12@cn.fujitsu.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <63a954bd-09cc-9d3b-7575-5645aa60250a@cn.fujitsu.com>
-Date: Fri, 7 Jul 2017 14:30:18 +0800
+	(envelope-from <thuth@redhat.com>) id 1dTMpe-0003xH-7l
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:33:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dTMpd-0003x0-VW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:33:38 -0400
+References: <cover.1499381754.git.alistair.francis@xilinx.com>
+	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bf86d70d-2518-676d-8ac7-63fb4646449e@redhat.com>
+Date: Fri, 7 Jul 2017 08:33:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <a759bab5-4042-12c4-9055-a2856d5ffc12@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 1/4] net/colo-compare.c: Add checkpoint min
- period to optimize performance
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Zhijian <lizhijian@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, armbru@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, philippe@mathieu-daude.net, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Peter Chubb <peter.chubb@nicta.com.au>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, alistair23@gmail.com, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On 07.07.2017 01:49, Alistair Francis wrote:
+> Convert all uses of error_report("[Ww]arning:"... to use warn_report()
+> instead. This helps standardise on a single method of printing warnings
+> to the user.
+> 
+> All of the warnings were found using this regex expression:
+>     error_report.*[Ww]arning:
+> and replaced with:
+>     warn_report("
+[...]
+> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
+> index 48e5b7315f..b25fe892ed 100644
+> --- a/tests/test-qdev-global-props.c
+> +++ b/tests/test-qdev-global-props.c
+> @@ -232,10 +232,10 @@ static void test_dynamic_globalprop(void)
+>      g_test_trap_assert_passed();
+>      g_test_trap_assert_stderr_unmatched("*prop1*");
+>      g_test_trap_assert_stderr_unmatched("*prop2*");
+> -    g_test_trap_assert_stderr("*Warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
+> +    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
+>      g_test_trap_assert_stderr_unmatched("*prop4*");
+> -    g_test_trap_assert_stderr("*Warning: global nohotplug-type.prop5=105 not used\n*");
+> -    g_test_trap_assert_stderr("*Warning: global nondevice-type.prop6 has invalid class name\n*");
+> +    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used\n*");
+> +    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name\n*");
+>      g_test_trap_assert_stdout("");
+>  }
 
+These changes are unrelated ... please drop them from your patch.
 
-On 07/07/2017 02:06 PM, Li Zhijian wrote:
->
-> On 07/07/2017 01:43 PM, Zhang Chen wrote:
->> If colo-compare find out the first different packet
->
-> at this situation, why not trigger the checkpoint, and then flush all 
-> primary packets and drop secondary packets?
-
-In this time we already do this job, but before this checkpoint to be done,
-a lot of checkpoint has been triggered. It is no sense do many 
-checkpoint in very short time.
-So we just need do once checkpoint in this situation.
-
-Thanks
-Zhang Chen
-
->
->
->>   that means
->> the following packet almost is different. we needn't do a lot
->> of checkpoint in this time, so we set the no-need-checkpoint
->> peroid, default just set 3 second.
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/colo-compare.c | 13 ++++++++++++-
->>   1 file changed, 12 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 6d500e1..0f8e198 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -40,6 +40,9 @@
->>   /* TODO: Should be configurable */
->>   #define REGULAR_PACKET_CHECK_MS 3000
->>   +/* TODO: Should be configurable */
->> +#define CHECKPOINT_MIN_TIME 3000
->> +
->>   /*
->>     + CompareState ++
->>     |               |
->> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, 
->> void *user_data)
->>       Packet *pkt = NULL;
->>       GList *result = NULL;
->>       int ret;
->> +    static int64_t checkpoint_time_ms;
->>         while (!g_queue_is_empty(&conn->primary_list) &&
->>              !g_queue_is_empty(&conn->secondary_list)) {
->> @@ -494,7 +498,14 @@ static void colo_compare_connection(void 
->> *opaque, void *user_data)
->>                */
->>               trace_colo_compare_main("packet different");
->>               g_queue_push_tail(&conn->primary_list, pkt);
->> -            /* TODO: colo_notify_checkpoint();*/
->> +
->> +            if (pkt->creation_ms - checkpoint_time_ms > 
->> CHECKPOINT_MIN_TIME) {
->> +                /*
->> +                 * TODO: Notify colo frame to do checkpoint.
->> +                 * colo_compare_inconsistent_notify();
->> +                 */
->> +                checkpoint_time_ms = pkt->creation_ms;
->> +            }
->>               break;
->>           }
->>       }
->
-
--- 
-Thanks
-Zhang Chen
+ Thomas
