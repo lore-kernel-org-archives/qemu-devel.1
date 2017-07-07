@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmv-00076R-5B
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWnC-0007LU-5X
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWms-0001LR-Mo
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWn3-0001OX-9k
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:46 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:55 +0200
-Message-Id: <1499447335-6125-101-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:52 +0200
+Message-Id: <1499447335-6125-98-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 100/100] tests: Avoid non-portable 'echo -ARG'
+Subject: [Qemu-devel] [PULL 097/100] iotests: chown LUKS device before
+ qemu-io launches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,402 +23,1541 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-POSIX says that backslashes in the arguments to 'echo', as well as
-any use of 'echo -n' and 'echo -e', are non-portable; it recommends
-people should favor 'printf' instead.  This is definitely true where
-we do not control which shell is running (such as in makefile snippets
-or in documentation examples).  But even for scripts where we
-require bash (and therefore, where echo does what we want by default),
-it is still possible to use 'shopt -s xpg_echo' to change bash's
-behavior of echo.  And setting a good example never hurts when we are
-not sure if a snippet will be copied from a bash-only script to a
-general shell script (although I don't change the use of non-portable
-\e for ESC when we know the running shell is bash).
+On some distros, whenever you close a block device file
+descriptor there is a udev rule that resets the file
+permissions. This can race with the test script when
+we run qemu-io multiple times against the same block
+device. Occasionally the second qemu-io invocation
+will find udev has reset the permissions causing failure.
 
-Replace 'echo -n "..."' with 'printf %s "..."', and 'echo -e "..."'
-with 'printf %b "...\n"', with the optimization that the %s/%b
-argument can be omitted if the string being printed is a strict
-literal with no '%', '$', or '`' (we could technically also make
-this optimization when there are $ or `` substitutions but where
-we can prove their results will not be problematic, but proving
-that such substitutions are safe makes the patch less trivial
-compared to just being consistent).
-
-In the qemu-iotests check script, fix unusual shell quoting
-that would result in word-splitting if 'date' outputs a space.
-
-In test 051, take an opportunity to shorten the line.
-
-In test 068, get rid of a pointless second invocation of bash.
-
-CC: qemu-trivial@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-id: 20170703180950.9895-1-eblake@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170626123510.20134-6-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-options.hx             |  4 ++--
- tests/multiboot/run_test.sh | 10 +++++-----
- tests/qemu-iotests/051      |  7 ++++---
- tests/qemu-iotests/068      |  2 +-
- tests/qemu-iotests/142      | 48 ++++++++++++++++++++++-----------------------
- tests/qemu-iotests/171      | 14 ++++++-------
- tests/qemu-iotests/check    | 18 ++++++++---------
- tests/rocker/all            | 10 +++++-----
- tests/tcg/cris/Makefile     |  8 ++++----
- 9 files changed, 61 insertions(+), 60 deletions(-)
+ tests/qemu-iotests/149     |  12 +-
+ tests/qemu-iotests/149.out | 344 ++++++++++++++++++++++-----------------------
+ 2 files changed, 177 insertions(+), 179 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ddab656..b465fea 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4368,7 +4368,7 @@ The simplest (insecure) usage is to provide the secret inline
+diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+index 5faf585..223cd68 100755
+--- a/tests/qemu-iotests/149
++++ b/tests/qemu-iotests/149
+@@ -186,7 +186,7 @@ def chown(config):
+     msg = proc.communicate()[0]
  
- The simplest secure usage is to provide the secret via a file
+     if proc.returncode != 0:
+-        raise Exception("Cannot change owner on %s" % path)
++        raise Exception(msg)
  
-- # echo -n "letmein" > mypasswd.txt
-+ # printf "letmein" > mypasswd.txt
-  # $QEMU -object secret,id=sec0,file=mypasswd.txt,format=raw
  
- For greater security, AES-256-CBC should be used. To illustrate usage,
-@@ -4396,7 +4396,7 @@ telling openssl to base64 encode the result, but it could be left
- as raw bytes if desired.
+ def cryptsetup_open(config):
+@@ -271,6 +271,8 @@ def qemu_io_image_args(config, dev=False):
+ def qemu_io_write_pattern(config, pattern, offset_mb, size_mb, dev=False):
+     """Write a pattern of data to a LUKS image or device"""
  
- @example
-- # SECRET=$(echo -n "letmein" |
-+ # SECRET=$(printf "letmein" |
-             openssl enc -aes-256-cbc -a -K $KEY -iv $IV)
- @end example
++    if dev:
++        chown(config)
+     args = ["-c", "write -P 0x%x %dM %dM" % (pattern, offset_mb, size_mb)]
+     args.extend(qemu_io_image_args(config, dev))
+     iotests.log("qemu-io " + " ".join(args), filters=[iotests.filter_test_dir])
+@@ -281,6 +283,8 @@ def qemu_io_write_pattern(config, pattern, offset_mb, size_mb, dev=False):
+ def qemu_io_read_pattern(config, pattern, offset_mb, size_mb, dev=False):
+     """Read a pattern of data to a LUKS image or device"""
  
-diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
-index 78d7edf..c8f3da8 100755
---- a/tests/multiboot/run_test.sh
-+++ b/tests/multiboot/run_test.sh
-@@ -26,7 +26,7 @@ run_qemu() {
-     local kernel=$1
-     shift
++    if dev:
++        chown(config)
+     args = ["-c", "read -P 0x%x %dM %dM" % (pattern, offset_mb, size_mb)]
+     args.extend(qemu_io_image_args(config, dev))
+     iotests.log("qemu-io " + " ".join(args), filters=[iotests.filter_test_dir])
+@@ -331,9 +335,6 @@ def test_once(config, qemu_img=False):
+         cryptsetup_open(config)
  
--    echo -e "\n\n=== Running test case: $kernel $@ ===\n" >> test.log
-+    printf %b "\n\n=== Running test case: $kernel $@ ===\n\n" >> test.log
+         try:
+-            iotests.log("# Set dev owner")
+-            chown(config)
+-
+             iotests.log("# Write test pattern 0xa7")
+             qemu_io_write_pattern(config, 0xa7, lowOffsetMB, 10, dev=True)
+             iotests.log("# Write test pattern 0x13")
+@@ -365,9 +366,6 @@ def test_once(config, qemu_img=False):
+         cryptsetup_open(config)
  
-     $QEMU \
-         -kernel $kernel \
-@@ -68,21 +68,21 @@ for t in mmap modules; do
-     pass=1
+         try:
+-            iotests.log("# Set dev owner")
+-            chown(config)
+-
+             iotests.log("# Read test pattern 0x91")
+             qemu_io_read_pattern(config, 0x91, lowOffsetMB, 10, dev=True)
+             iotests.log("# Read test pattern 0x5e")
+diff --git a/tests/qemu-iotests/149.out b/tests/qemu-iotests/149.out
+index 2f0454f..5dea00b 100644
+--- a/tests/qemu-iotests/149.out
++++ b/tests/qemu-iotests/149.out
+@@ -5,14 +5,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha1.img qiotest-145-aes-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-     if [ $debugexit != 1 ]; then
--        echo -e "\e[31m ?? \e[0m $t (no debugexit used, exit code $ret)"
-+        printf %b "\e[31m ?? \e[0m $t (no debugexit used, exit code $ret)\n"
-         pass=0
-     elif [ $ret != 0 ]; then
--        echo -e "\e[31mFAIL\e[0m $t (exit code $ret)"
-+        printf %b "\e[31mFAIL\e[0m $t (exit code $ret)\n"
-         pass=0
-     fi
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -41,14 +41,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
-     if ! diff $t.out test.log > /dev/null 2>&1; then
--        echo -e "\e[31mFAIL\e[0m $t (output difference)"
-+        printf %b "\e[31mFAIL\e[0m $t (output difference)\n"
-         diff -u $t.out test.log
-         pass=0
-     fi
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha1.img qiotest-145-aes-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-     if [ $pass == 1 ]; then
--        echo -e "\e[32mPASS\e[0m $t"
-+        printf %b "\e[32mPASS\e[0m $t\n"
-     fi
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -65,14 +65,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha1.img', fmt=luks size=439804651
  
- done
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index 26c29de..c8cfc76 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -217,7 +217,7 @@ run_qemu -drive driver=null-co,cache=invalid_value
- # Test 142 checks the direct=on cases
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha1.img qiotest-145-aes-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
- for cache in writeback writethrough unsafe invalid_value; do
--    echo -e "info block\ninfo block file\ninfo block backing\ninfo block backing-file" | \
-+    printf "info block %s\n" '' file backing backing-file | \
-     run_qemu -drive file="$TEST_IMG",cache=$cache,backing.file.filename="$TEST_IMG.base",backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=$device_id -nodefaults
- done
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -101,14 +101,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
-@@ -325,8 +325,9 @@ echo "qemu-io $device_id \"write -P 0x22 0 4k\"" | run_qemu -drive file="$TEST_I
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha1.img qiotest-145-aes-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
- $QEMU_IO -c "read -P 0x22 0 4k" "$TEST_IMG" | _filter_qemu_io
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -125,14 +125,14 @@ truncate TEST_DIR/luks-twofish-256-xts-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher twofish-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-twofish-256-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-256-xts-plain64-sha1.img qiotest-145-twofish-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--echo -e "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id" | run_qemu -drive file="$TEST_IMG",snapshot=on,if=none,id=$device_id\
--                                                                       | _filter_qemu_io
-+printf %b "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id\n" |
-+    run_qemu -drive file="$TEST_IMG",snapshot=on,if=none,id=$device_id |
-+    _filter_qemu_io
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -161,14 +161,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
- $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filter_qemu_io
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-256-xts-plain64-sha1.img qiotest-145-twofish-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index 3801b65..cfa0f2a 100755
---- a/tests/qemu-iotests/068
-+++ b/tests/qemu-iotests/068
-@@ -76,7 +76,7 @@ for extra_args in \
-     _make_test_img $IMG_SIZE
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -185,14 +185,14 @@ Formatting 'TEST_DIR/luks-twofish-256-xts-plain64-sha1.img', fmt=luks size=43980
  
-     # Give qemu some time to boot before saving the VM state
--    bash -c 'sleep 1; echo -e "savevm 0\nquit"' | _qemu $extra_args
-+    { sleep 1; printf "savevm 0\nquit\n"; } | _qemu $extra_args
-     # Now try to continue from that VM state (this should just work)
-     echo quit | _qemu $extra_args -loadvm 0
- done
-diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
-index 9a5b713..1639c83 100755
---- a/tests/qemu-iotests/142
-+++ b/tests/qemu-iotests/142
-@@ -94,36 +94,36 @@ function check_cache_all()
-     # cache.direct is supposed to be inherited by both bs->file and
-     # bs->backing
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-256-xts-plain64-sha1.img qiotest-145-twofish-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--    echo -e "cache.direct=on on none0"
-+    printf "cache.direct=on on none0\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
--    echo -e "\ncache.direct=on on file"
-+    printf "\ncache.direct=on on file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",file.cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
--    echo -e "\ncache.direct=on on backing"
-+    printf "\ncache.direct=on on backing\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
--    echo -e "\ncache.direct=on on backing-file"
-+    printf "\ncache.direct=on on backing-file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.file.cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -221,14 +221,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
-     # cache.writeback is supposed to be inherited by bs->backing; bs->file
-     # always gets cache.writeback=on
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-256-xts-plain64-sha1.img qiotest-145-twofish-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--    echo -e "\n\ncache.writeback=off on none0"
-+    printf "\n\ncache.writeback=off on none0\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",cache.writeback=off | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.writeback=off on file"
-+    printf "\ncache.writeback=off on file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",file.cache.writeback=off | grep -e "doesn't" -e "does not"
--    echo -e "\ncache.writeback=off on backing"
-+    printf "\ncache.writeback=off on backing\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.cache.writeback=off | grep -e "doesn't" -e "does not"
--    echo -e "\ncache.writeback=off on backing-file"
-+    printf "\ncache.writeback=off on backing-file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.file.cache.writeback=off | grep -e "doesn't" -e "does not"
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -245,14 +245,14 @@ truncate TEST_DIR/luks-serpent-256-xts-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-serpent-256-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-256-xts-plain64-sha1.img qiotest-145-serpent-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-     # cache.no-flush is supposed to be inherited by both bs->file and bs->backing
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -281,14 +281,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
--    echo -e "\n\ncache.no-flush=on on none0"
-+    printf "\n\ncache.no-flush=on on none0\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.no-flush=on on file"
-+    printf "\ncache.no-flush=on on file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",file.cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.no-flush=on on backing"
-+    printf "\ncache.no-flush=on on backing\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.no-flush=on on backing-file"
-+    printf "\ncache.no-flush=on on backing-file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.file.cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
- }
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-256-xts-plain64-sha1.img qiotest-145-serpent-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-@@ -236,35 +236,35 @@ function check_cache_all_separate()
- {
-     # Check cache.direct
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -305,14 +305,14 @@ Formatting 'TEST_DIR/luks-serpent-256-xts-plain64-sha1.img', fmt=luks size=43980
  
--    echo -e "cache.direct=on on blk"
-+    printf "cache.direct=on on blk\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img",cache.direct=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.direct=on on file"
-+    printf "\ncache.direct=on on file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file",cache.direct=on -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.direct=on on backing"
-+    printf "\ncache.direct=on on backing\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk",cache.direct=on -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.direct=on on backing-file"
-+    printf "\ncache.direct=on on backing-file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile",cache.direct=on -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-256-xts-plain64-sha1.img qiotest-145-serpent-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-     # Check cache.writeback
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -341,14 +341,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
--    echo -e "\n\ncache.writeback=off on blk"
-+    printf "\n\ncache.writeback=off on blk\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img",cache.writeback=off | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.writeback=off on file"
-+    printf "\ncache.writeback=off on file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file",cache.writeback=off -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.writeback=off on backing"
-+    printf "\ncache.writeback=off on backing\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk",cache.writeback=off -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.writeback=off on backing-file"
-+    printf "\ncache.writeback=off on backing-file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile",cache.writeback=off -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-256-xts-plain64-sha1.img qiotest-145-serpent-256-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-     # Check cache.no-flush
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-256-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -365,14 +365,14 @@ truncate TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher cast5-cbc-plain64 --key-size 128 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img qiotest-145-cast5-128-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--    echo -e "\n\ncache.no-flush=on on blk"
-+    printf "\n\ncache.no-flush=on on blk\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img",cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.no-flush=on on file"
-+    printf "\ncache.no-flush=on on file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file",cache.no-flush=on -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.no-flush=on on backing"
-+    printf "\ncache.no-flush=on on backing\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk",cache.no-flush=on -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
--    echo -e "\ncache.no-flush=on on backing-file"
-+    printf "\ncache.no-flush=on on backing-file\n"
-     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile",cache.no-flush=on -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
- }
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -401,14 +401,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
-diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
-index 257be10..bcfaaf1 100755
---- a/tests/qemu-iotests/171
-+++ b/tests/qemu-iotests/171
-@@ -45,15 +45,15 @@ _supported_os Linux
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img qiotest-145-cast5-128-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
- # Create JSON with options
- img_json() {
--    echo -n 'json:{"driver":"raw", '
--    echo -n "\"offset\":\"$img_offset\", "
-+    printf %s 'json:{"driver":"raw", '
-+    printf %s "\"offset\":\"$img_offset\", "
-     if [ "$img_size" -ne -1 ] ; then
--        echo -n "\"size\":\"$img_size\", "
-+        printf %s "\"size\":\"$img_size\", "
-     fi
--    echo -n '"file": {'
--    echo -n    '"driver":"file", '
--    echo -n    "\"filename\":\"$TEST_IMG\" "
--    echo -n "} }"
-+    printf %s '"file": {'
-+    printf %s   '"driver":"file", '
-+    printf %s   "\"filename\":\"$TEST_IMG\" "
-+    printf %s "} }"
- }
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -425,14 +425,14 @@ Formatting 'TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img', fmt=luks size=4398046
  
- do_general_test() {
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 4b1c674..9ded37c 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -141,7 +141,7 @@ _wallclock()
- _timestamp()
- {
-     now=`date "+%T"`
--    echo -n " [$now]"
-+    printf %s " [$now]"
- }
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img qiotest-145-cast5-128-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
- _wrapup()
-@@ -255,7 +255,7 @@ seq="check"
- for seq in $list
- do
-     err=false
--    echo -n "$seq"
-+    printf %s "$seq"
-     if [ -n "$TESTS_REMAINING_LOG" ] ; then
-         sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
-         mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
-@@ -281,9 +281,9 @@ do
-         rm -f $seq.out.bad
-         lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
-         if [ "X$lasttime" != X ]; then
--                echo -n " ${lasttime}s ..."
-+                printf %s " ${lasttime}s ..."
-         else
--                echo -n "        "        # prettier output with timestamps.
-+                printf "        "        # prettier output with timestamps.
-         fi
-         rm -f core $seq.notrun
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -461,14 +461,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
-@@ -291,7 +291,7 @@ do
-         echo "$seq" > "${TEST_DIR}"/check.sts
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img qiotest-145-cast5-128-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-         start=`_wallclock`
--        $timestamp && echo -n "        ["`date "+%T"`"]"
-+        $timestamp && printf %s "        [$(date "+%T")]"
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-cast5-128-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -486,14 +486,14 @@ truncate TEST_DIR/luks-aes-256-cbc-plain-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-plain-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain-sha1.img qiotest-145-aes-256-cbc-plain-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-         if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
-             run_command="$PYTHON $seq"
-@@ -314,21 +314,21 @@ do
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -522,14 +522,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
-         if [ -f core ]
-         then
--            echo -n " [dumped core]"
-+            printf " [dumped core]"
-             mv core $seq.core
-             err=true
-         fi
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain-sha1.img qiotest-145-aes-256-cbc-plain-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
-         if [ -f $seq.notrun ]
-         then
--            $timestamp || echo -n " [not run] "
--            $timestamp && echo " [not run]" && echo -n "        $seq -- "
-+            $timestamp || printf " [not run] "
-+            $timestamp && echo " [not run]" && printf %s "        $seq -- "
-             cat $seq.notrun
-             notrun="$notrun $seq"
-         else
-             if [ $sts -ne 0 ]
-             then
--                echo -n " [failed, exit status $sts]"
-+                printf %s " [failed, exit status $sts]"
-                 err=true
-             fi
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -546,14 +546,14 @@ Formatting 'TEST_DIR/luks-aes-256-cbc-plain-sha1.img', fmt=luks size=43980465111
  
-diff --git a/tests/rocker/all b/tests/rocker/all
-index d5ae963..3f9b786 100755
---- a/tests/rocker/all
-+++ b/tests/rocker/all
-@@ -1,19 +1,19 @@
--echo -n "Running port test...              "
-+printf "Running port test...              "
- ./port
- if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain-sha1.img qiotest-145-aes-256-cbc-plain-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--echo -n "Running bridge test...            "
-+printf "Running bridge test...            "
- ./bridge
- if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -582,14 +582,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
--echo -n "Running bridge STP test...        "
-+printf "Running bridge STP test...        "
- ./bridge-stp
- if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain-sha1.img qiotest-145-aes-256-cbc-plain-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--echo -n "Running bridge VLAN test...       "
-+printf "Running bridge VLAN test...       "
- ./bridge-vlan
- if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -606,14 +606,14 @@ truncate TEST_DIR/luks-aes-256-cbc-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha1.img qiotest-145-aes-256-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
--echo -n "Running bridge VLAN STP test...   "
-+printf "Running bridge VLAN STP test...   "
- ./bridge-vlan-stp
- if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
-diff --git a/tests/tcg/cris/Makefile b/tests/tcg/cris/Makefile
-index 6b3dba4..664b30c 100644
---- a/tests/tcg/cris/Makefile
-+++ b/tests/tcg/cris/Makefile
-@@ -150,17 +150,17 @@ check_addcv17.tst: crtv10.o sysv10.o
- build: $(CRT) $(SYS) $(TESTCASES)
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -642,14 +642,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
  
- check: $(CRT) $(SYS) $(TESTCASES)
--	@echo -e "\nQEMU simulator."
-+	@printf "\nQEMU simulator.\n"
- 	for case in $(TESTCASES); do \
--		echo -n "$$case "; \
-+		printf %s "$$case "; \
- 		SIMARGS=; \
- 		case $$case in *v17*) SIMARGS="-cpu crisv17";; esac; \
- 		$(SIM) $$SIMARGS ./$$case; \
- 	done
- check-g: $(CRT) $(SYS) $(TESTCASES)
--	@echo -e "\nGDB simulator."
-+	@printf "\nGDB simulator.\n"
- 	@for case in $(TESTCASES); do \
--		echo -n "$$case "; \
-+		printf %s "$$case "; \
- 		$(SIMG) $$case; \
- 	done
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha1.img qiotest-145-aes-256-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
  
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -666,14 +666,14 @@ Formatting 'TEST_DIR/luks-aes-256-cbc-plain64-sha1.img', fmt=luks size=439804651
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha1.img qiotest-145-aes-256-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -702,14 +702,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha1.img qiotest-145-aes-256-cbc-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -726,14 +726,14 @@ truncate TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-cbc-essiv:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img qiotest-145-aes-256-cbc-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -762,14 +762,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img qiotest-145-aes-256-cbc-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -786,14 +786,14 @@ Formatting 'TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img', fmt=luks size=4398
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img qiotest-145-aes-256-cbc-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -822,14 +822,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img qiotest-145-aes-256-cbc-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -846,14 +846,14 @@ truncate TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-essiv:sha256 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img qiotest-145-aes-256-xts-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -882,14 +882,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img qiotest-145-aes-256-xts-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -906,14 +906,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img', fmt=luks size=4398
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img qiotest-145-aes-256-xts-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -942,14 +942,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img qiotest-145-aes-256-xts-essiv-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-essiv-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -966,14 +966,14 @@ truncate TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img qiotest-145-aes-128-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1002,14 +1002,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img qiotest-145-aes-128-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1026,14 +1026,14 @@ Formatting 'TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img', fmt=luks size=43
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img qiotest-145-aes-128-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1062,14 +1062,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img qiotest-145-aes-128-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-128-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1086,14 +1086,14 @@ truncate TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 384 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img qiotest-145-aes-192-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1122,14 +1122,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img qiotest-145-aes-192-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1146,14 +1146,14 @@ Formatting 'TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img', fmt=luks size=43
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img qiotest-145-aes-192-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1182,14 +1182,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img qiotest-145-aes-192-xts-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-192-xts-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1206,14 +1206,14 @@ truncate TEST_DIR/luks-twofish-128-xts-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher twofish-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-twofish-128-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-128-xts-plain64-sha1.img qiotest-145-twofish-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1242,14 +1242,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-128-xts-plain64-sha1.img qiotest-145-twofish-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1266,14 +1266,14 @@ Formatting 'TEST_DIR/luks-twofish-128-xts-plain64-sha1.img', fmt=luks size=43980
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-128-xts-plain64-sha1.img qiotest-145-twofish-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1302,14 +1302,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-128-xts-plain64-sha1.img qiotest-145-twofish-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-twofish-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1327,14 +1327,14 @@ truncate TEST_DIR/luks-serpent-128-xts-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-serpent-128-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-128-xts-plain64-sha1.img qiotest-145-serpent-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1363,14 +1363,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-128-xts-plain64-sha1.img qiotest-145-serpent-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1387,14 +1387,14 @@ Formatting 'TEST_DIR/luks-serpent-128-xts-plain64-sha1.img', fmt=luks size=43980
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-128-xts-plain64-sha1.img qiotest-145-serpent-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1423,14 +1423,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-128-xts-plain64-sha1.img qiotest-145-serpent-128-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-128-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1447,14 +1447,14 @@ truncate TEST_DIR/luks-serpent-192-xts-plain64-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 384 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-serpent-192-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-192-xts-plain64-sha1.img qiotest-145-serpent-192-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1483,14 +1483,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-192-xts-plain64-sha1.img qiotest-145-serpent-192-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1507,14 +1507,14 @@ Formatting 'TEST_DIR/luks-serpent-192-xts-plain64-sha1.img', fmt=luks size=43980
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-192-xts-plain64-sha1.img qiotest-145-serpent-192-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1543,14 +1543,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-192-xts-plain64-sha1.img qiotest-145-serpent-192-xts-plain64-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-serpent-192-xts-plain64-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1569,14 +1569,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain64-sha224.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha224 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha224.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha224.img qiotest-145-aes-256-xts-plain64-sha224
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1605,14 +1605,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha224.img qiotest-145-aes-256-xts-plain64-sha224
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1629,14 +1629,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha224.img', fmt=luks size=4398046
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha224.img qiotest-145-aes-256-xts-plain64-sha224
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1665,14 +1665,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha224.img qiotest-145-aes-256-xts-plain64-sha224
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha224
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1689,14 +1689,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain64-sha256.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha256 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha256.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha256.img qiotest-145-aes-256-xts-plain64-sha256
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1725,14 +1725,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha256.img qiotest-145-aes-256-xts-plain64-sha256
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1749,14 +1749,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha256.img', fmt=luks size=4398046
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha256.img qiotest-145-aes-256-xts-plain64-sha256
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1785,14 +1785,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha256.img qiotest-145-aes-256-xts-plain64-sha256
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha256
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1809,14 +1809,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain64-sha384.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha384 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha384.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha384.img qiotest-145-aes-256-xts-plain64-sha384
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1845,14 +1845,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha384.img qiotest-145-aes-256-xts-plain64-sha384
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1869,14 +1869,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha384.img', fmt=luks size=4398046
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha384.img qiotest-145-aes-256-xts-plain64-sha384
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1905,14 +1905,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha384.img qiotest-145-aes-256-xts-plain64-sha384
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha384
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1929,14 +1929,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain64-sha512.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha512 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha512.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha512.img qiotest-145-aes-256-xts-plain64-sha512
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1965,14 +1965,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha512.img qiotest-145-aes-256-xts-plain64-sha512
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -1989,14 +1989,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha512.img', fmt=luks size=4398046
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha512.img qiotest-145-aes-256-xts-plain64-sha512
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2025,14 +2025,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha512.img qiotest-145-aes-256-xts-plain64-sha512
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-sha512
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2049,14 +2049,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash ripemd160 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img qiotest-145-aes-256-xts-plain64-ripemd160
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2085,14 +2085,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img qiotest-145-aes-256-xts-plain64-ripemd160
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2109,14 +2109,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img', fmt=luks size=4398
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img qiotest-145-aes-256-xts-plain64-ripemd160
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2145,14 +2145,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-ripemd160.img qiotest-145-aes-256-xts-plain64-ripemd160
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain64-ripemd160
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2169,14 +2169,14 @@ truncate TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain --key-size 512 --hash sha1 --key-slot 3 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img qiotest-145-aes-256-xts-plain-sha1-pwslot3
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2205,14 +2205,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img qiotest-145-aes-256-xts-plain-sha1-pwslot3
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2243,14 +2243,14 @@ sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots
+ sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 7 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img qiotest-145-aes-256-xts-plain-sha1-pwallslots
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2279,14 +2279,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img qiotest-145-aes-256-xts-plain-sha1-pwallslots
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2303,14 +2303,14 @@ Formatting 'TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img', fmt=luks size=
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img qiotest-145-aes-256-xts-plain-sha1-pwallslots
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2339,14 +2339,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img qiotest-145-aes-256-xts-plain-sha1-pwallslots
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2363,14 +2363,14 @@ truncate TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-cbc-essiv:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img qiotest-145-aes-256-cbc-essiv-auto-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2399,14 +2399,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img qiotest-145-aes-256-cbc-essiv-auto-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2423,14 +2423,14 @@ Formatting 'TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img', fmt=luks size=439804
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img qiotest-145-aes-256-cbc-essiv-auto-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2459,14 +2459,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img qiotest-145-aes-256-cbc-essiv-auto-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-essiv-auto-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2483,14 +2483,14 @@ truncate TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img --size 4194304MB
+ sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain64:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img qiotest-145-aes-256-cbc-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2519,14 +2519,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img qiotest-145-aes-256-cbc-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2543,14 +2543,14 @@ Formatting 'TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img', fmt=luks size=43
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img qiotest-145-aes-256-cbc-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ # Write test pattern 0xa7
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c write -P 0xa7 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Write test pattern 0x13
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c write -P 0x13 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ wrote 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -2579,14 +2579,14 @@ wrote 10485760/10485760 bytes at offset 3298534883328
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img qiotest-145-aes-256-cbc-plain64-sha256-sha1
+-# Set dev owner
+-sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ # Read test pattern 0x91
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c read -P 0x91 100M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 104857600
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ # Read test pattern 0x5e
++sudo chown UID:GID /dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ qemu-io -c read -P 0x5e 3145728M 10M --image-opts driver=file,filename=/dev/mapper/qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ read 10485760/10485760 bytes at offset 3298534883328
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 -- 
 1.8.3.1
