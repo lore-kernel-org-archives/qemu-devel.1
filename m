@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dTaAp-0003Af-Ai
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:48:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTaDk-0004Ld-Vy
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dTaAm-0006kP-8r
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:48:23 -0400
-Received: from mail-wr0-f171.google.com ([209.85.128.171]:36738)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dTaAm-0006hk-2d
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:48:20 -0400
-Received: by mail-wr0-f171.google.com with SMTP id c11so62224017wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 13:48:17 -0700 (PDT)
-Date: Fri, 7 Jul 2017 22:48:13 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20170707224813.0d30653a@fiorina>
-In-Reply-To: <20170625232517.34d1ca38@fiorina>
-References: <cover.1498222907.git.tgolembi@redhat.com>
-	<CAJ+F1C+-fXWoVjeML1Op67+h-nYbe03k-k0TYdkNA2RQ7t9-ow@mail.gmail.com>
-	<20170625232517.34d1ca38@fiorina>
+	(envelope-from <eblake@redhat.com>) id 1dTaDj-00084y-VO
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:51:25 -0400
+References: <20170707203049.534-1-eblake@redhat.com>
+	<20170707203049.534-4-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b0976309-fe36-e624-c6bd-36f4700694d8@redhat.com>
+Date: Fri, 7 Jul 2017 15:51:14 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/3] qemu-ga: support for sending events
+In-Reply-To: <20170707203049.534-4-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AXSIin7vA3uj1s17eOD2s1wupmLFAwmFI"
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] nbd: Expose and debug more NBD
+ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, marcandre.lureau@redhat.com, pbonzini@redhat.com
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AXSIin7vA3uj1s17eOD2s1wupmLFAwmFI
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ den@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com
+Message-ID: <b0976309-fe36-e624-c6bd-36f4700694d8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] nbd: Expose and debug more NBD
+ constants
+References: <20170707203049.534-1-eblake@redhat.com>
+ <20170707203049.534-4-eblake@redhat.com>
+In-Reply-To: <20170707203049.534-4-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 25 Jun 2017 23:25:17 +0200
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
-
-> Hi,
+On 07/07/2017 03:30 PM, Eric Blake wrote:
+> The NBD protocol has several constants defined in various extensions
+> that we are about to implement.  Expose them to the code, along with
+> an easy way to map various constants to strings during diagnostic
+> messages.
 >=20
-> On Fri, 23 Jun 2017 13:25:34 +0000
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >=20
-> > Hi
-> >=20
-> > On Fri, Jun 23, 2017 at 3:03 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgol=
-embi@redhat.com>
-> > wrote:
-> >  =20
-> > > This is just a draft, or a request for comments if you will.
-> > >
-> > > This patch sets drafts the support of sending events by QEMU Guest Ag=
-ent.
-> > > Events can plan important role in monitoring of the guest OS behaviou=
-r. The
-> > > range of use cases ranges from events important for scheduling, e.g.
-> > > memory and
-> > > CPU usage statistics, to things like changes to IP addresses on netwo=
-rk
-> > > interfaces to for example changes in the list of active users.
-> > >
-> > > For now the patch set adds single periodic callback function to the G=
-A main
-> > > loop that can perform checks and trigger events that have occured sin=
-ce
-> > > previous run of the callback.
-> > >
-> > > We can of course take it one step further and add a general framwork =
-for
-> > > periodically running any of the already implemented commands. Add a
-> > > function
-> > > that would maintain a list of registered checks. Client would use some
-> > > command
-> > > (register-monitor-command) passing it a command name and timeout in
-> > > seconds and
-> > > the monitoring handler would then run the specified command and repor=
-t the
-> > > result... or report only if the return value changed since previous
-> > > invocation.
-> > > This feature would remove part of the communication overhead between
-> > > client and
-> > > GA.
-> > >
-> > > So before I invest any more time in either of these approaches, tell =
-me.
-> > > Would
-> > > somethign like this be wanted or is that too controversial? Any other
-> > > thoughts
-> > > and ideas?
-> > >
-> > >   =20
-> > It doesn't feel wrong, but Is there really too much overhead and/or lat=
-ency
-> > if a request is periodic from the client? ie did you do some measuremen=
-ts
-> > before coming to this proposal? =20
->=20
-> No, I didn't do any measurements. And it may be even true that in the
-> grand scheme of things the overhead/latency may be insignificant, if we
-> imagine a client that repeatedly calls about 5 to 10 commands every 5 or
-> 10 seconds. Still, it just feels like a more correct approach to me. But
-> that may be just my feeling, that's why I brought this to the list to
-> get the opinion of others.
->=20
+> ---
+> v5: rebase to master, add command name lookup; enough changes that
+> R-b is dropped
+> v4: new patch
 
-This is not really a wild discussion I have anticipated. Or does the
-silence mean I should drop the idea?
+Worth squashing this in:
 
-If some measurements are necessary can you suggest how to construct the
-benchmark? What numbers would be convincing to support the idea?
+diff --git i/nbd/client.c w/nbd/client.c
+index af2b46d..8dd2d69 100644
+--- i/nbd/client.c
++++ w/nbd/client.c
+@@ -902,7 +902,8 @@ ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest
+*request)
+     uint8_t buf[NBD_REQUEST_SIZE];
 
-Still, let me restate that I see it more as an architectural decision
-rather than something where latency or overhead would be the main
-factor.
+     trace_nbd_send_request(request->from, request->len, request->handle,=
 
+-                           request->flags, request->type);
++                           request->flags, request->type,
++                           nbd_cmd_lookup(request->type));
 
-    Tomas
+     stl_be_p(buf, NBD_REQUEST_MAGIC);
+     stw_be_p(buf + 4, request->flags);
+diff --git i/nbd/trace-events w/nbd/trace-events
+index b18d051..74ed3b8 100644
+--- i/nbd/trace-events
++++ w/nbd/trace-events
+@@ -28,7 +28,7 @@ nbd_client_loop(void) "Doing NBD loop"
+ nbd_client_loop_ret(int ret, const char *error) "NBD loop returned %d: %=
+s"
+ nbd_client_clear_queue(void) "Clearing NBD queue"
+ nbd_client_clear_socket(void) "Clearing NBD socket"
+-nbd_send_request(uint64_t from, uint32_t len, uint64_t handle, uint16_t
+flags, uint16_t type) "Sending request to server: { .from =3D %" PRIu64",=
 
->=20
-> >=20
-> > Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (3): =20
-> > >   qemu-ga: add support for events
-> > >   qemu-ga: add simple event reporting memory statistics
-> > >   qemu-ga: add support for periodic command runner
-> > >
-> > >  Makefile               |  7 +++-
-> > >  qga/Makefile.objs      |  2 +-
-> > >  qga/channel-posix.c    |  8 +++++
-> > >  qga/channel-win32.c    |  6 ++++
-> > >  qga/channel.h          |  1 +
-> > >  qga/guest-agent-core.h |  1 +
-> > >  qga/main.c             | 98
-> > > ++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  qga/qapi-event.json    | 35 ++++++++++++++++++
-> > >  qga/qapi-schema.json   |  2 ++
-> > >  9 files changed, 158 insertions(+), 2 deletions(-)
-> > >  create mode 100644 qga/qapi-event.json
-> > >
-> > > --
-> > > 2.13.1
-> > >
-> > >
-> > > --   =20
-> > Marc-Andr=C3=A9 Lureau =20
->=20
->=20
-> --=20
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+=2Elen =3D %" PRIu32 ", .handle =3D %" PRIu64 ", .flags =3D %" PRIx16 ", =
+=2Etype =3D
+%" PRIu16 " }"
++nbd_send_request(uint64_t from, uint32_t len, uint64_t handle, uint16_t
+flags, uint16_t type, const char *name) "Sending request to server: {
+=2Efrom =3D %" PRIu64", .len =3D %" PRIu32 ", .handle =3D %" PRIu64 ", .f=
+lags =3D
+%" PRIx16 ", .type =3D %" PRIu16 " (%s) }"
+ nbd_receive_reply(uint32_t magic, int32_t error, uint64_t handle) "Got
+reply: { magic =3D 0x%" PRIx32 ", .error =3D % " PRId32 ", handle =3D %"
+PRIu64" }"
 
+ # nbd/server.c
 
 --=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AXSIin7vA3uj1s17eOD2s1wupmLFAwmFI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZX/RCAAoJEKeha0olJ0NqdyQH/3RNgyX0EsHwjmQLeQ2FgkLG
+7ePxnCPmeyram21zKGpQcL4YxcTWB7Gpe77k4gYxvZfkiA6d6aokvznUX5zYoeje
+S1bFs1+SamPa/0zEbSQsFmD08RkmxUTWw/zNu9WLhrh8ldNvwa1CdTr6+ZUfK7Dy
+SDPDSf/D6sXWyQOS918JZV4K4FtiUrWr9R7uuM6J4A/HgsfL4e/tCeEz4SwvYaQ6
+GefjRwLhF13u3/+EueJor2XTVPYQavdICJDc/kCm/doHUxhtjyTdBEGtKmMopF3g
+OvHmKJsLqYTAmzIUPxJzOz1hay/bMfSlDWl3gx1A+Lf8RceP42SPchWhpANq9Kg=
+=jq+4
+-----END PGP SIGNATURE-----
+
+--AXSIin7vA3uj1s17eOD2s1wupmLFAwmFI--
