@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dTT7c-00035G-4Q
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:16:37 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dTT99-0004Fi-PW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:18:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dTT7Y-0004oh-Mw
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:16:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dTT7Y-0004oR-Dg
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:16:32 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
-	<20170706101611.27031-3-marcandre.lureau@redhat.com>
-	<1ee1639b-3fa8-3dff-9957-31d96b8bf962@redhat.com>
-Message-ID: <262443f1-8fbb-211d-463d-a9fca66d479c@redhat.com>
-Date: Fri, 7 Jul 2017 15:16:21 +0200
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dTT94-0005F0-QQ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:18:11 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:16986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dTT94-0005Da-GF
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:18:06 -0400
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87podcrcxu.fsf@dusky.pond.sub.org>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <98d8c4a6-4032-e8e3-de52-9761e05b02a4@huawei.com>
+Date: Fri, 7 Jul 2017 15:16:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <1ee1639b-3fa8-3dff-9957-31d96b8bf962@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] acpi: add vmcoreinfo device
+In-Reply-To: <87podcrcxu.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
 
-On 07/07/17 15:13, Laszlo Ersek wrote:
-> Marc-Andr=C3=A9,
->=20
-> sorry about this, but I have another late comment (I shoudl have pointe=
-d
-> this out in v1). Regarding:
->=20
-> On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
->=20
->> +#define VMCOREINFO_OFFSET           40   /* allow space for
->> +                                          * OVMF SDT Header Probe Sup=
-ressor
->> +                                          */
->=20
-> and
->=20
->> +            Method (ADDR, 0, NotSerialized)
->> +            {
->> +                Local0 =3D Package (0x02) {}
->> +                Local0 [Zero] =3D (VCIA + 0x28)
->> +                Local0 [One] =3D Zero
->> +                Return (Local0)
->> +            }
->=20
-> and
->=20
->> +In order to implement an OVMF "SDT Header Probe Suppressor", the cont=
-ents of
->> +the vmcoreinfo blob has 40 bytes of padding:
->> +
->> ++-----------------------------------+
->> +| SSDT with OEM Table ID =3D VMCOREIN |
->> ++-----------------------------------+
->> +| ...                               |       TOP OF PAGE
->> +| VCIA dword object ----------------|-----> +------------------------=
----+
->> +| ...                               |       | fw-allocated array for =
-   |
->> +| _STA method referring to VCIA     |       | "etc/vmcoreinfo"       =
-   |
->> +| ...                               |       +------------------------=
----+
->> +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header pro=
-be |
->> +| ...                               |       |     suppressor         =
-   |
->> ++-----------------------------------+       | 40: uint32 version fiel=
-d  |
->> +                                            | 44: info contents      =
-   |
->> +                                            |     ....               =
-   |
->> +                                            +------------------------=
----+
->> +                                            END OF PAGE
->=20
-> Please define the VMCOREINFO_OFFSET macro like this:
->=20
->   #define VMCOREINFO_OFFSET sizeof(AcpiTableHeader)
->=20
-> and then please refresh the documentation as well:
-> - replace decimal "40" with "36",
+On 7/7/2017 8:14 AM, Markus Armbruster wrote:
+> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
+>
+>> These patches provide the qmp interface, to query the io throttle
+>> status of the all fsdev devices that are present in a vm.
+>> also, it provides an interface to set the io throttle parameters of a
+>> fsdev to a required value. some of the patches also remove the duplicate
+>> code that was present in block and fsdev files.
+>>
+>> Pradeep Jagadeesh (6):
+>>   throttle: factor out duplicate code
+>>   qmp: Create IOThrottle structure
+>>   throttle: move out function to reuse the code
+>>   hmp: create a throttle initialization function for code reusability
+>>   fsdev: hmp interface for throttling
+>>   fsdev: QMP interface for throttling
+>>
+>>  Makefile                        |   4 ++
+>>  blockdev.c                      |  97 ++-------------------------------
+>>  fsdev/qemu-fsdev-dummy.c        |  10 ++++
+>>  fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
+>>  fsdev/qemu-fsdev-throttle.h     |  13 +++++
+>>  fsdev/qemu-fsdev.c              |  37 +++++++++++++
+>>  hmp-commands-info.hx            |  18 ++++++
+>>  hmp-commands.hx                 |  19 +++++++
+>>  hmp.c                           |  81 +++++++++++++++++++++++++--
+>>  hmp.h                           |   4 ++
+>>  include/qemu/throttle-options.h |   7 +++
+>>  include/qemu/throttle.h         |   4 +-
+>>  include/qemu/typedefs.h         |   1 +
+>>  monitor.c                       |   5 ++
+>>  qapi-schema.json                |   3 +
+>>  qapi/block-core.json            |  76 +-------------------------
+>>  qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
+>>  qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
+>>  qmp.c                           |  14 +++++
+>>  util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
+>>  20 files changed, 577 insertions(+), 216 deletions(-)
+>>  create mode 100644 qapi/fsdev.json
+>>  create mode 100644 qapi/iothrottle.json
+>
+> No test coverage?
+Not yet, I am yet to write the tests. I can do it only after I finish 
+this work.
 
-also replace decimal "44", the offset of "info contents", with "40"...
-you get the idea.
-
-Thanks
-Laszlo
-
-> - replace 0x28 in the dumped SSDT with 0x24.
->=20
-> Namely, in order to suppress the OVMF ACP Table Header Probe -- "SDT"
-> simply means "System Description Table" --, it's enough to add
-> zero-padding that *precisely* covers such a header.
->=20
-> Given that we have a typedef for this header in QEMU, we should use it
-> in the definition of VMCOREINFO_OFFSET.
->=20
-> Now, the reason why VMGENID uses 40 instead comes from another
-> requirement: the VMGENID GUID has to be aligned at 8 bytes. (See
-> requirement "R1a" in "docs/specs/vmgenid.txt".) Therefore the directly
-> necessary 36 bytes of padding are rounded up to 40. See again
-> "docs/specs/vmgenid.txt":
->=20
-> ----------------------------------+
-> | SSDT with OEM Table ID =3D VMGENID |
-> +----------------------------------+
-> | ...                              |       TOP OF PAGE
-> | VGIA dword object ---------------|-----> +---------------------------=
-+
-> | ...                              |       | fw-allocated array for    =
-|
-> | _STA method referring to VGIA    |       | "etc/vmgenid_guid"        =
-|
-> | ...                              |       +---------------------------=
-+
-> | ADDR method referring to VGIA    |       |  0: OVMF SDT Header probe =
-|
-> | ...                              |       |     suppressor            =
-|
-> +----------------------------------+       | 36: padding for 8-byte    =
-|
->                                            |     alignment             =
-|
->                                            | 40: GUID                  =
-|
->                                            | 56: padding to page size  =
-|
->                                            +---------------------------=
-+
->                                            END OF PAGE
->=20
-> At offset 36 of "etc/vmgenid_guid", it says "padding for 8-byte alignme=
-nt".
->=20
-> For VMCOREINFO, you don't need this extra alignment to 8 bytes, before
-> the "version" field is listed. So please make the VMCOREINFO_OFFSET
-> reflect what's actually necessary.
->=20
-> The rest of the code doesn't have to be modified (including your
-> experimental guest kernel driver); changing VMCOREINFO_OFFSET will
-> update all necessary locations automatically, including the generated
-> AML. Only the docs have to be synced manually.
->=20
-> ... In fact, there *is* yet another location to update: the test case. =
-I
-> suggest to include "hw/acpi/vmcoreinfo.h" in "tests/vmcoreinfo-test.c",
-> rather than open-code VMCOREINFO_OFFSET there. ... Oh wait: in the test
-> case you don't even use VMCOREINFO_OFFSET for anything. So just delete
-> the macro definition from that patch.
->=20
-> Thank you (and sorry about the churn),
-> Laszlo
->=20
+-Pradeep
+>
