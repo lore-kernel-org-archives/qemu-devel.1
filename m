@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWl8-0004vs-8E
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlA-0004yU-8I
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWl7-0007qP-4g
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWl9-0007rt-7C
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:40 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:33 +0200
-Message-Id: <1499447335-6125-19-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:37 +0200
+Message-Id: <1499447335-6125-23-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 018/100] qemu-img: drop -e and -6 options from
- the 'create' & 'convert' commands
+Subject: [Qemu-devel] [PULL 022/100] stream: Switch stream_populate() to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-The '-e' and '-6' options to the 'create' & 'convert' commands were
-"deprecated" in favour of the more generic '-o' option many years ago:
+We are gradually converting to byte-based interfaces, as they are
+easier to reason about than sector-based.  Start by converting an
+internal function (no semantic change).
 
-  commit eec77d9e712bd4157a4e1c0b5a9249d168add738
-  Author: Jes Sorensen <Jes.Sorensen@redhat.com>
-  Date:   Tue Dec 7 17:44:34 2010 +0100
-
-    qemu-img: Deprecate obsolete -6 and -e options
-
-Except this was never actually a deprecation, which would imply giving
-the user a warning while the functionality continues to work for a
-number of releases before eventual removal. Instead the options were
-immediately turned into an error + exit. Given that the functionality
-is already broken, there's no point in keeping these psuedo-deprecation
-messages around any longer.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-img.c | 20 ++------------------
- 1 file changed, 2 insertions(+), 18 deletions(-)
+ block/stream.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 91ad6be..c5f00db 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -464,7 +464,7 @@ static int img_create(int argc, char **argv)
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
-+        c = getopt_long(argc, argv, ":F:b:f:ho:q",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-@@ -488,14 +488,6 @@ static int img_create(int argc, char **argv)
-         case 'f':
-             fmt = optarg;
-             break;
--        case 'e':
--            error_report("option -e is deprecated, please use \'-o "
--                  "encryption\' instead!");
--            goto fail;
--        case '6':
--            error_report("option -6 is deprecated, please use \'-o "
--                  "compat6\' instead!");
--            goto fail;
-         case 'o':
-             if (!is_valid_option_list(optarg)) {
-                 error_report("Invalid option list: %s", optarg);
-@@ -1985,7 +1977,7 @@ static int img_convert(int argc, char **argv)
-             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:WU",
-+        c = getopt_long(argc, argv, ":hf:O:B:co:s:l:S:pt:T:qnm:WU",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-@@ -2012,14 +2004,6 @@ static int img_convert(int argc, char **argv)
-         case 'c':
-             s.compressed = true;
-             break;
--        case 'e':
--            error_report("option -e is deprecated, please use \'-o "
--                  "encryption\' instead!");
--            goto fail_getopt;
--        case '6':
--            error_report("option -6 is deprecated, please use \'-o "
--                  "compat6\' instead!");
--            goto fail_getopt;
-         case 'o':
-             if (!is_valid_option_list(optarg)) {
-                 error_report("Invalid option list: %s", optarg);
+diff --git a/block/stream.c b/block/stream.c
+index 6cb3939..746d525 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -41,20 +41,20 @@ typedef struct StreamBlockJob {
+ } StreamBlockJob;
+ 
+ static int coroutine_fn stream_populate(BlockBackend *blk,
+-                                        int64_t sector_num, int nb_sectors,
++                                        int64_t offset, uint64_t bytes,
+                                         void *buf)
+ {
+     struct iovec iov = {
+         .iov_base = buf,
+-        .iov_len  = nb_sectors * BDRV_SECTOR_SIZE,
++        .iov_len  = bytes,
+     };
+     QEMUIOVector qiov;
+ 
++    assert(bytes < SIZE_MAX);
+     qemu_iovec_init_external(&qiov, &iov, 1);
+ 
+     /* Copy-on-read the unallocated clusters */
+-    return blk_co_preadv(blk, sector_num * BDRV_SECTOR_SIZE, qiov.size, &qiov,
+-                         BDRV_REQ_COPY_ON_READ);
++    return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
+ }
+ 
+ typedef struct {
+@@ -171,7 +171,8 @@ static void coroutine_fn stream_run(void *opaque)
+         trace_stream_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
+                                    n * BDRV_SECTOR_SIZE, ret);
+         if (copy) {
+-            ret = stream_populate(blk, sector_num, n, buf);
++            ret = stream_populate(blk, sector_num * BDRV_SECTOR_SIZE,
++                                  n * BDRV_SECTOR_SIZE, buf);
+         }
+         if (ret < 0) {
+             BlockErrorAction action =
 -- 
 1.8.3.1
