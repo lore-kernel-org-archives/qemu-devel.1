@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dTQTi-0002Sy-AG
+	(envelope-from <thuth@redhat.com>) id 1dTQTi-0002Sx-AE
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dTQTg-0001nO-TO
+	(envelope-from <thuth@redhat.com>) id 1dTQTf-0001mk-5p
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38734)
+Received: from mx1.redhat.com ([209.132.183.28]:37718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dTQTg-0001n2-K7
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:12 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dTQTe-0001mP-Sl
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:11 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  7 Jul 2017 12:26:57 +0200
-Message-Id: <1499423224-23060-2-git-send-email-thuth@redhat.com>
-In-Reply-To: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH v2 1/8] pc-bios/s390-ccw: Move libc
- functions to separate header
+Date: Fri,  7 Jul 2017 12:26:56 +0200
+Message-Id: <1499423224-23060-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH v2 0/8] Implement network booting directly
+ into the s390-ccw BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,209 +25,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-The upcoming netboot code will use the libc from SLOF. To be able
-to still use s390-ccw.h there, the libc related functions in this
-header have to be moved to a different location.
-And while we're at it, remove the duplicate memcpy() function from
-sclp.c.
+It's already possible to do a network boot of an s390x guest with an
+external netboot image based on a Linux installation, but it would
+be much more convenient if the s390-ccw firmware supported network
+booting right out of the box, without the need to assemble such an
+external image first.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/bootmap.c     |  1 +
- pc-bios/s390-ccw/libc.h        | 43 ++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/main.c        |  1 +
- pc-bios/s390-ccw/s390-ccw.h    | 29 ----------------------------
- pc-bios/s390-ccw/sclp.c        | 10 ++--------
- pc-bios/s390-ccw/virtio-scsi.c |  1 +
- pc-bios/s390-ccw/virtio.c      |  1 +
- 7 files changed, 49 insertions(+), 37 deletions(-)
+This patch series now introduces a s390-netboot.img that can be used
+for network booting via DHCP and TFTP by re-using the networking stack
+from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
+and adds a driver for virtio-net-ccw devices.
+
+The code can only be built if the roms/SLOF/ submodule has been checked
+out, and you apply the following pending SLOF patch on top of it:
+
+ https://patchwork.ozlabs.org/patch/785384/
+
+Then it should be possible to download a combined kernel + initrd
+image via TFTP, e.g. by starting QEMU with:
+
+ qemu-system-s390x ... -device virtio-net,netdev=n1,bootindex=1 \
+       -netdev user,id=n1,tftp=/path/to/tftp,bootfile=kernel.img
+
+Note that this version does not support downloading via config
+files (i.e. pxelinux config files or .INS config files) yet. This
+will be added later.
+
+v2:
+ - Put the network boot loader into a separate s390-netboot.img
+   binary instead of linking it directly into the s390-ccw firmware.
+ - Use the SLOF sources from the roms/SLOF/ submodule instead of
+   copying them into the pc-bios/s390-ccw folder
+ - Removed the .INS config file loading code for now - only support
+   combined kernel + initrd images in this initial implementation.
+
+Thomas Huth (8):
+  pc-bios/s390-ccw: Move libc functions to separate header
+  pc-bios/s390-ccw: Move ebc2asc to sclp.c
+  pc-bios/s390-ccw: Move virtio-block related functions into a separate
+    file
+  pc-bios/s390-ccw: Add a write() function for stdio
+  roms/SLOF: Update submodule to latest status
+  pc-bios/s390-ccw: Add core files for the network bootloading program
+  pc-bios/s390-ccw: Add virtio-net driver code
+  pc-bios/s390-ccw: Link libnet into the netboot image and do the TFTP
+    load
+
+ pc-bios/s390-ccw/Makefile      |  13 +-
+ pc-bios/s390-ccw/bootmap.c     |   1 +
+ pc-bios/s390-ccw/libc.h        |  43 +++++
+ pc-bios/s390-ccw/main.c        |  14 +-
+ pc-bios/s390-ccw/netboot.mak   |  51 ++++++
+ pc-bios/s390-ccw/netmain.c     | 365 +++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/s390-ccw.h    |  31 +---
+ pc-bios/s390-ccw/sclp.c        |  37 +++--
+ pc-bios/s390-ccw/virtio-blk.c  | 296 +++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/virtio-net.c  | 130 +++++++++++++++
+ pc-bios/s390-ccw/virtio-scsi.c |   1 +
+ pc-bios/s390-ccw/virtio.c      | 283 ++------------------------------
+ pc-bios/s390-ccw/virtio.h      |  17 +-
+ roms/SLOF                      |   2 +-
+ 14 files changed, 955 insertions(+), 329 deletions(-)
  create mode 100644 pc-bios/s390-ccw/libc.h
+ create mode 100644 pc-bios/s390-ccw/netboot.mak
+ create mode 100644 pc-bios/s390-ccw/netmain.c
+ create mode 100644 pc-bios/s390-ccw/virtio-blk.c
+ create mode 100644 pc-bios/s390-ccw/virtio-net.c
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 523fa78..458d3da 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "bootmap.h"
- #include "virtio.h"
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-new file mode 100644
-index 0000000..9076bb7
---- /dev/null
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -0,0 +1,43 @@
-+/*
-+ * libc-style definitions and functions
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
-+ */
-+
-+#ifndef S390_CCW_LIBC_H
-+#define S390_CCW_LIBC_H
-+
-+typedef long               size_t;
-+typedef int                bool;
-+typedef unsigned char      uint8_t;
-+typedef unsigned short     uint16_t;
-+typedef unsigned int       uint32_t;
-+typedef unsigned long long uint64_t;
-+
-+static inline void *memset(void *s, int c, size_t n)
-+{
-+    int i;
-+    unsigned char *p = s;
-+
-+    for (i = 0; i < n; i++) {
-+        p[i] = c;
-+    }
-+
-+    return s;
-+}
-+
-+static inline void *memcpy(void *s1, const void *s2, size_t n)
-+{
-+    uint8_t *p1 = s1;
-+    const uint8_t *p2 = s2;
-+
-+    while (n--) {
-+        p1[n] = p2[n];
-+    }
-+    return s1;
-+}
-+
-+#endif
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 1cacc1b..40cba8d 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- 
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 2089274..43e2d42 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -18,12 +18,6 @@ typedef unsigned short     u16;
- typedef unsigned int       u32;
- typedef unsigned long long u64;
- typedef unsigned long      ulong;
--typedef long               size_t;
--typedef int                bool;
--typedef unsigned char      uint8_t;
--typedef unsigned short     uint16_t;
--typedef unsigned int       uint32_t;
--typedef unsigned long long uint64_t;
- typedef unsigned char      __u8;
- typedef unsigned short     __u16;
- typedef unsigned int       __u32;
-@@ -88,18 +82,6 @@ ulong get_second(void);
- /* bootmap.c */
- void zipl_load(void);
- 
--static inline void *memset(void *s, int c, size_t n)
--{
--    int i;
--    unsigned char *p = s;
--
--    for (i = 0; i < n; i++) {
--        p[i] = c;
--    }
--
--    return s;
--}
--
- static inline void fill_hex(char *out, unsigned char val)
- {
-     const char hex[] = "0123456789abcdef";
-@@ -169,17 +151,6 @@ static inline void sleep(unsigned int seconds)
-     }
- }
- 
--static inline void *memcpy(void *s1, const void *s2, size_t n)
--{
--    uint8_t *p1 = s1;
--    const uint8_t *p2 = s2;
--
--    while (n--) {
--        p1[n] = p2[n];
--    }
--    return s1;
--}
--
- static inline void IPL_assert(bool term, const char *message)
- {
-     if (!term) {
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index a1639ba..aa1c862 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "sclp.h"
- 
-@@ -59,13 +60,6 @@ static int _strlen(const char *str)
-     return i;
- }
- 
--static void _memcpy(char *dest, const char *src, int len)
--{
--    int i;
--    for (i = 0; i < len; i++)
--        dest[i] = src[i];
--}
--
- void sclp_print(const char *str)
- {
-     int len = _strlen(str);
-@@ -76,7 +70,7 @@ void sclp_print(const char *str)
-     sccb->ebh.length = sizeof(EventBufferHeader) + len;
-     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-     sccb->ebh.flags = 0;
--    _memcpy(sccb->data, str, len);
-+    memcpy(sccb->data, str, len);
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
- }
-diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
-index f61ecf0..c92f5d3 100644
---- a/pc-bios/s390-ccw/virtio-scsi.c
-+++ b/pc-bios/s390-ccw/virtio-scsi.c
-@@ -9,6 +9,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "scsi.h"
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index 6ee93d5..8768331 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "virtio-scsi.h"
 -- 
 1.8.3.1
