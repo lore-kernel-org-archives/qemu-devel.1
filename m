@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dTPyK-0004sa-Ad
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:54:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dTQ5g-0006On-Mv
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dTPyJ-0005Jw-5X
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:54:48 -0400
-Date: Fri, 7 Jul 2017 12:53:55 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170707095355.upel5lfe6lay666c@postretch>
-References: <20170629060300.29869-1-el13635@mail.ntua.gr>
-	<20170629111824.GC4618@noname.redhat.com>
-	<20170629120741.lkjam3jrlse6jxq2@postretch>
-	<20170629135749.GD4618@noname.redhat.com>
-	<20170629200613.u7cu3gr4uakqtgc4@postretch>
-	<20170707092815.GB5027@noname.redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dTQ5d-0008Gl-JN
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:02:24 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dTQ5d-0008GK-Ac
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:02:21 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id r103so39799111wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 03:02:19 -0700 (PDT)
+References: <20170629071129.29362-1-bobby.prani@gmail.com>
+	<20170629071129.29362-3-bobby.prani@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170629071129.29362-3-bobby.prani@gmail.com>
+Date: Fri, 07 Jul 2017 11:02:16 +0100
+Message-ID: <87mv8ga7kn.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nkneqfxl4zrwsevk"
-Content-Disposition: inline
-In-Reply-To: <20170707092815.GB5027@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: fix bs->file leak in
- bdrv_new_open_driver()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] mttcg/i386: Patch instruction using
+ async_safe_* framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, pbonzini@redhat.com, ehabkost@redhat.com, Peter Maydell <peter.maydell@linaro.org>
 
 
---nkneqfxl4zrwsevk
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Pranith Kumar <bobby.prani@gmail.com> writes:
 
-On Fri, Jul 07, 2017 at 11:28:15AM +0200, Kevin Wolf wrote:
->Am 29.06.2017 um 22:06 hat Manos Pitsidianakis geschrieben:
->> On Thu, Jun 29, 2017 at 03:57:49PM +0200, Kevin Wolf wrote:
->> >Am 29.06.2017 um 14:07 hat Manos Pitsidianakis geschrieben:
->> >>On Thu, Jun 29, 2017 at 01:18:24PM +0200, Kevin Wolf wrote:
->> >>>Am 29.06.2017 um 08:03 hat Manos Pitsidianakis geschrieben:
->> >>>>bdrv_open_driver() is called in two places, bdrv_new_open_driver() a=
-nd
->> >>>>bdrv_open_common(). In the latter, failure cleanup in is in its call=
-er,
->> >>>>bdrv_open_inherit(), which unrefs the bs->file of the failed driver =
-open
->> >>>>if it exists. Let's check for this in bdrv_new_open_driver() as well.
->> >>>>
->> >>>>Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->> >>>>---
->> >>>> block.c | 3 +++
->> >>>> 1 file changed, 3 insertions(+)
->> >>>>
->> >>>>diff --git a/block.c b/block.c
->> >>>>index 694396281b..aeacd520e0 100644
->> >>>>--- a/block.c
->> >>>>+++ b/block.c
->> >>>>@@ -1165,6 +1165,9 @@ BlockDriverState *bdrv_new_open_driver(BlockDr=
-iver *drv, const char *node_name,
->> >>>>
->> >>>>     ret =3D bdrv_open_driver(bs, drv, node_name, bs->options, flags=
-, errp);
->> >>>>     if (ret < 0) {
->> >>>>+        if (bs->file !=3D NULL) {
->> >>>>+            bdrv_unref_child(bs, bs->file);
->> >>>>+        }
->> >>>>         QDECREF(bs->explicit_options);
->> >>>>         QDECREF(bs->options);
->> >>>>         bdrv_unref(bs);
->> >>>
->> >>>I think we should set bs->file =3D NULL here to remove the dangling
->> >>>pointer. I think it is never accessed anyway because of the
->> >>>bs->drv =3D NULL in the error path of bdrv_open_driver(), but better =
-safe
->> >>>than sorry.
->> >>
->> >>You can't see it in the diff but after bdrv_unref(bs),
->> >>bdrv_new_open_driver returns NULL so there won't be any access to bs
->> >>anyway. And since bs is destroyed by bdrv_unref (its refcount is 1),
->> >>there's not really a point in setting bs->file =3D NULL.
->> >
->> >Yes, but bdrv_unref() doesn't have to expect inconsistent BDSes. It
->> >doesn't access bs->file currently when bs->drv =3D=3D NULL, but that's =
-more
->> >by luck than by design.
->> >
->> >>>But what would you think about avoiding the code duplication and just
->> >>>moving the bdrv_unref_child() call from bdrv_open_inherit() down to
->> >>>bdrv_open_driver(), so that bdrv_new_open_driver() is automatically
->> >>>covered?
->> >>
->> >>The result would be the same, but this will cover future callers of
->> >>bdrv_open_driver. Should I submit a v2?
->> >
->> >I would prefer this, yes.
->>
->> Perhaps it would be better to destroy bs at failure in
->> bdrv_open_driver and not leave it to the caller which takes care of
->> bdrv_close and unrefing bs->file anyway (Also bs->children). Setting
->> bs->drv to NULL at failure in bdrv_open_driver means some things
->> won't be executed in bdrv_close when the bs is destroyed eventually
->> as well, so that fixes another mistake.
+> In mttcg, calling pause_all_vcpus() during execution from the
+> generated TBs causes a deadlock if some vCPU is waiting for exclusive
+> execution in start_exclusive(). Fix this by using the aync_safe_*
+> framework instead of pausing vcpus for patching instructions.
+
+It looks like this needs to be re-based. Can you spin a new version and
+then I'll pull it into my tree while I look at fixing:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01061.html
+
 >
->Oh, didn't I reply here yet? Your suggestion sounds good to me.
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+> ---
+>  hw/i386/kvmvapic.c | 73 +++++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 42 insertions(+), 31 deletions(-)
+>
+> diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+> index 82a49556af..5e0c8219b0 100644
+> --- a/hw/i386/kvmvapic.c
+> +++ b/hw/i386/kvmvapic.c
+> @@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr, uint8_t byte)
+>      cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
+>  }
+>
+> -static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+> -                       uint32_t target)
+> +static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
+>  {
+>      uint32_t offset;
+>
+> @@ -393,23 +392,24 @@ static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+>      cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset), 1);
+>  }
+>
+> -static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+> +struct PatchInfo {
+> +    VAPICHandlers *handler;
+> +    target_ulong ip;
+> +};
+> +
+> +static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
+>  {
+> -    CPUState *cs = CPU(cpu);
+> -    CPUX86State *env = &cpu->env;
+> -    VAPICHandlers *handlers;
+> +    X86CPU *x86_cpu = X86_CPU(cs);
+> +    CPUX86State *env = &x86_cpu->env;
+> +    struct PatchInfo *info = (struct PatchInfo *) data.host_ptr;
+> +    VAPICHandlers *handlers = info->handler;
+> +    target_ulong ip = info->ip;
+>      uint8_t opcode[2];
+>      uint32_t imm32 = 0;
+>      target_ulong current_pc = 0;
+>      target_ulong current_cs_base = 0;
+>      uint32_t current_flags = 0;
+>
+> -    if (smp_cpus == 1) {
+> -        handlers = &s->rom_state.up;
+> -    } else {
+> -        handlers = &s->rom_state.mp;
+> -    }
+> -
+>      if (!kvm_enabled()) {
+>          cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
+>                               &current_flags);
+> @@ -421,48 +421,59 @@ static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+>          }
+>      }
+>
+> -    pause_all_vcpus();
+> -
+>      cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
+>
+>      switch (opcode[0]) {
+>      case 0x89: /* mov r32 to r/m32 */
+> -        patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
+> -        patch_call(s, cpu, ip + 1, handlers->set_tpr);
+> +        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
+> +        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
+>          break;
+>      case 0x8b: /* mov r/m32 to r32 */
+> -        patch_byte(cpu, ip, 0x90);
+> -        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
+> +        patch_byte(x86_cpu, ip, 0x90);
+> +        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
+>          break;
+>      case 0xa1: /* mov abs to eax */
+> -        patch_call(s, cpu, ip, handlers->get_tpr[0]);
+> +        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
+>          break;
+>      case 0xa3: /* mov eax to abs */
+> -        patch_call(s, cpu, ip, handlers->set_tpr_eax);
+> +        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
+>          break;
+>      case 0xc7: /* mov imm32, r/m32 (c7/0) */
+> -        patch_byte(cpu, ip, 0x68);  /* push imm32 */
+> +        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
+>          cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
+>          cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
+> -        patch_call(s, cpu, ip + 5, handlers->set_tpr);
+> +        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
+>          break;
+>      case 0xff: /* push r/m32 */
+> -        patch_byte(cpu, ip, 0x50); /* push eax */
+> -        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
+> +        patch_byte(x86_cpu, ip, 0x50); /* push eax */
+> +        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
+>          break;
+>      default:
+>          abort();
+>      }
+>
+> -    resume_all_vcpus();
+> +    g_free(info);
+> +}
+>
+> -    if (!kvm_enabled()) {
+> -        /* Both tb_lock and iothread_mutex will be reset when
+> -         *  longjmps back into the cpu_exec loop. */
+> -        tb_lock();
+> -        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
+> -        cpu_loop_exit_noexc(cs);
+> +static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
+> +{
+> +    CPUState *cs = CPU(cpu);
+> +    VAPICHandlers *handlers;
+> +    struct PatchInfo *info;
+> +    const run_on_cpu_func fn = do_patch_instruction;
+> +
+> +    if (smp_cpus == 1) {
+> +        handlers = &s->rom_state.up;
+> +    } else {
+> +        handlers = &s->rom_state.mp;
+>      }
+> +
+> +    info  = g_new(struct PatchInfo, 1);
+> +    info->handler = handlers;
+> +    info->ip = ip;
+> +
+> +    async_safe_run_on_cpu(cs, fn, RUN_ON_CPU_HOST_PTR(info));
+> +    cpu_exit(cs);
+>  }
+>
+>  void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulong ip,
 
-I ended up sending a v2 some days ago, and instead just not setting=20
-bs->drv to NULL unless open failed which I think is cleaner.
 
-https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg00019.html
-
-The open's ret value is stored in a boolean, but probably would be=20
-better to goto a specific open_fail label. If you think the change is ok=20
-I will resend it.
-
---nkneqfxl4zrwsevk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllfWjMACgkQc2J8L2kN
-9xACrw/9EZpykTRkVJCtz7NLUVR+Z+RyYOEfli4o08iCCCBS3eS14nJ9YuTtQY+9
-9dkPS4+fJ/rA99frsBEL5CY5l5EZgJTkTrOcjl29GsZO+O9EYYx8ce1acDwz7eE1
-onjMhdQ1d2zIq77j4NdC44b9Bg3Ro73MEAglfM9RObBHb/HDInj38WMfm8u1w/FC
-5Ri7CEEI/KzpkjXPnmMYfJa4f7GmbV9mKvyaG1U6gj2T/DO4BDgwynvJs/cpEYBT
-WWnwArtuvUOf0lqPPEK7NZJZxKwZxlVBoToNYoep4fREpjLOfanQQQmvCvKWQwgY
-vj1z/0eSTxo236f4RkaiYWqOfAGMHE3rD7iqOCVMl05Ivk1/139aV13hVEb1hzya
-PZZkQp2w0+10bMRZFo5I1xuqdXATregXWtStds/dicZrw2FLYSojhU3Gs9JIzG86
-OISpSfHEUEaFpIHsLxX+X0yUrWOHLQWs7eSfyVbFjfEpcCEWHh7Y8lx2hFH/xN11
-II4eYlsWVcf61Z2tbwjIMzlE0b5I4mvRhr/mPKwdaVVXuUN+fVwtXEPW/1RsUQeF
-4xN43rB93BLnEAftANG5vYurSnq3WIAjtIxoSIirs7N6M6E7wpgg3+Ltl7XxgAY9
-SqN/ZScARPh39j+trw9qEglvrj2Noo3N90jNNYgWRz1gaQQCix4=
-=Effz
------END PGP SIGNATURE-----
-
---nkneqfxl4zrwsevk--
+--
+Alex Bennée
