@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTOeG-00076f-QV
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:30:02 -0400
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTOf5-0007mF-Oi
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTOeD-0004tj-Mf
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:30:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59112)
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTOf2-0005JK-Lh
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:30:51 -0400
+Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:52689)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTOeD-0004rg-D4
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:29:57 -0400
-Date: Fri, 7 Jul 2017 10:29:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170707102937.582a55fb@dhcp-192-215.str.redhat.com>
-In-Reply-To: <0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
-	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
+	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
+	id 1dTOf2-0005IJ-EE
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:30:48 -0400
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-9-rth@twiddle.net>
+	<9645bafa-2c7e-96e8-5f3c-9cf7a9415285@physik.fu-berlin.de>
+	<51a3a21f-6145-d721-170f-b8cf20cbc2d9@twiddle.net>
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Message-ID: <313d3f03-f487-4881-5f0a-6dd150f1ebdc@physik.fu-berlin.de>
+Date: Fri, 7 Jul 2017 10:30:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <51a3a21f-6145-d721-170f-b8cf20cbc2d9@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
- warn_report()
+Subject: Re: [Qemu-devel] [PATCH v2 08/27] linux-user/sh4: Notice gUSA
+ regions during signal delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Josh Durgin <jdurgin@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-On Thu, 6 Jul 2017 16:49:44 -0700
-Alistair Francis <alistair.francis@xilinx.com> wrote:
+On 07/07/2017 10:20 AM, Richard Henderson wrote:
+> How do I reproduce this from the filesystem image you linked earlier?
 
-> Convert all uses of error_report("[Ww]arning:"... to use warn_report()
-> instead. This helps standardise on a single method of printing warnings
-> to the user.
-> 
-> All of the warnings were found using this regex expression:
->     error_report.*[Ww]arning:
-> and replaced with:
->     warn_report("
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Cc: Jeff Cody <jcody@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Lieven <pl@kamp.de>
-> Cc: Josh Durgin <jdurgin@redhat.com>
-> Cc: "Richard W.M. Jones" <rjones@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
-> Cc: Greg Kurz <groug@kaod.org>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Peter Chubb <peter.chubb@nicta.com.au>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> 
->  block/backup.c                 | 10 +++++-----
->  block/gluster.c                |  2 +-
->  block/iscsi.c                  |  2 +-
->  block/nfs.c                    | 12 ++++++------
->  block/rbd.c                    |  6 +++---
->  block/ssh.c                    |  4 ++--
->  blockdev.c                     |  2 +-
->  cpus.c                         |  2 +-
->  hw/9pfs/9p.c                   |  2 +-
->  hw/arm/highbank.c              |  6 +++---
->  hw/arm/imx25_pdk.c             |  6 +++---
->  hw/arm/kzm.c                   |  6 +++---
->  hw/core/machine.c              | 10 +++++-----
->  hw/core/qdev-properties.c      |  8 ++++----
->  hw/i386/acpi-build.c           | 10 +++++-----
->  hw/i386/kvm/pci-assign.c       |  6 +++---
->  hw/i386/pc.c                   | 12 ++++++------
->  hw/i386/pc_piix.c              |  8 ++++----
->  hw/i386/pc_q35.c               |  6 +++---
->  hw/misc/aspeed_sdmc.c          |  8 ++++----
->  hw/nvram/fw_cfg.c              |  2 +-
->  hw/pci-host/piix.c             |  2 +-
->  hw/ppc/pnv.c                   |  6 +++---
->  hw/ppc/spapr.c                 |  4 ++--
->  hw/ppc/spapr_iommu.c           |  2 +-
->  hw/scsi/scsi-bus.c             |  6 +++---
->  hw/usb/dev-smartcard-reader.c  |  6 +++---
->  hw/usb/redirect.c              |  2 +-
->  net/tap-linux.c                |  2 +-
->  target/i386/cpu.c              | 22 +++++++++++-----------
->  target/i386/kvm.c              | 10 +++++-----
->  target/s390x/cpu_models.c      |  6 +++---
->  target/s390x/kvm.c             |  4 ++--
->  tests/test-qdev-global-props.c |  6 +++---
->  trace/control.c                |  8 ++++----
->  vl.c                           | 20 ++++++++++----------
->  36 files changed, 118 insertions(+), 118 deletions(-)
+So, the problem happens in the tzdata package when it's being configured:
 
-s390x parts:
+(sid-sh4-sbuild)root@nofan:/# dpkg-reconfigure tzdata
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+        LANGUAGE = "en_US:en",
+        LC_ALL = "en_US.UTF-8",
+        LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+debconf: unable to initialize frontend: Dialog
+debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 76.)
+debconf: falling back to frontend: Readline
+Configuring tzdata
+------------------
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Please select the geographic area in which you live. Subsequent configuration questions will narrow this down by
+presenting a list of cities, representing the time zones in which they are located.
+
+  1. Africa   3. Antarctica  5. Arctic  7. Atlantic  9. Indian    11. SystemV  13. Etc
+  2. America  4. Australia   6. Asia    8. Europe    10. Pacific  12. US
+Geographic area: 8
+
+Please select the city or region corresponding to your time zone.
+
+  1. Amsterdam   10. Bucharest   19. Isle_of_Man  28. Luxembourg  37. Paris       46. Simferopol  55. Vaduz
+  2. Andorra     11. Budapest    20. Istanbul     29. Madrid      38. Podgorica   47. Skopje      56. Vatican
+  3. Astrakhan   12. Busingen    21. Jersey       30. Malta       39. Prague      48. Sofia       57. Vienna
+  4. Athens      13. Chisinau    22. Kaliningrad  31. Mariehamn   40. Riga        49. Stockholm   58. Vilnius
+  5. Belfast     14. Copenhagen  23. Kiev         32. Minsk       41. Rome        50. Tallinn     59. Volgograd
+  6. Belgrade    15. Dublin      24. Kirov        33. Monaco      42. Samara      51. Tirane      60. Warsaw
+  7. Berlin      16. Gibraltar   25. Lisbon       34. Moscow      43. San_Marino  52. Tiraspol    61. Zagreb
+  8. Bratislava  17. Guernsey    26. Ljubljana    35. Nicosia     44. Sarajevo    53. Ulyanovsk   62. Zaporozhye
+  9. Brussels    18. Helsinki    27. London       36. Oslo        45. Saratov     54. Uzhgorod    63. Zurich
+Time zone: 7
+
+
+Current default time zone: 'Europe/Berlin'
+Local time is now:      Fri Jul  7 10:26:31 CEST 2017.
+Universal Time is now:  Fri Jul  7 08:26:31 UTC 2017.
+
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault
+(sid-sh4-sbuild)root@nofan:/#
+
+The scripts which are run here can be found as /var/lib/dpkg/info/tzdata.{config,postinst). I don't know
+yet which command in particular triggers the crash.
+
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
