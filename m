@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmG-0006JP-8J
+	(envelope-from <kwolf@redhat.com>) id 1dTWmF-0006Ho-8v
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmB-0000WO-JR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmE-0000aB-AL
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:47 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:20 +0200
-Message-Id: <1499447335-6125-66-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:26 +0200
+Message-Id: <1499447335-6125-72-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 065/100] hbitmap: improve dirty iter
+Subject: [Qemu-devel] [PULL 071/100] block/dirty-bitmap: fix comment for
+ BlockDirtyBitmap.disabled field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +25,28 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Make dirty iter resistant to resetting bits in corresponding HBitmap.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170628120530.31251-4-vsementsov@virtuozzo.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20170628120530.31251-10-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qemu/hbitmap.h | 26 ++++----------------------
- util/hbitmap.c         | 23 ++++++++++++++++++++++-
- 2 files changed, 26 insertions(+), 23 deletions(-)
+ block/dirty-bitmap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 9239fe5..6b04391 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -256,10 +256,9 @@ void hbitmap_free(HBitmap *hb);
-  * the lowest-numbered bit that is set in @hb, starting at @first.
-  *
-  * Concurrent setting of bits is acceptable, and will at worst cause the
-- * iteration to miss some of those bits.  Resetting bits before the current
-- * position of the iterator is also okay.  However, concurrent resetting of
-- * bits can lead to unexpected behavior if the iterator has not yet reached
-- * those bits.
-+ * iteration to miss some of those bits.
-+ *
-+ * The concurrent resetting of bits is OK.
-  */
- void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
- 
-@@ -298,24 +297,7 @@ void hbitmap_free_meta(HBitmap *hb);
-  * Return the next bit that is set in @hbi's associated HBitmap,
-  * or -1 if all remaining bits are zero.
-  */
--static inline int64_t hbitmap_iter_next(HBitmapIter *hbi)
--{
--    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1];
--    int64_t item;
--
--    if (cur == 0) {
--        cur = hbitmap_iter_skip_words(hbi);
--        if (cur == 0) {
--            return -1;
--        }
--    }
--
--    /* The next call will resume work from the next bit.  */
--    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
--    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
--
--    return item << hbi->granularity;
--}
-+int64_t hbitmap_iter_next(HBitmapIter *hbi);
- 
- /**
-  * hbitmap_iter_next_word:
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 35088e1..0b38817 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -106,8 +106,9 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
- 
-     unsigned long cur;
-     do {
--        cur = hbi->cur[--i];
-+        i--;
-         pos >>= BITS_PER_LEVEL;
-+        cur = hbi->cur[i] & hb->levels[i][pos];
-     } while (cur == 0);
- 
-     /* Check for end of iteration.  We always use fewer than BITS_PER_LONG
-@@ -139,6 +140,26 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
-     return cur;
- }
- 
-+int64_t hbitmap_iter_next(HBitmapIter *hbi)
-+{
-+    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
-+            hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
-+    int64_t item;
-+
-+    if (cur == 0) {
-+        cur = hbitmap_iter_skip_words(hbi);
-+        if (cur == 0) {
-+            return -1;
-+        }
-+    }
-+
-+    /* The next call will resume work from the next bit.  */
-+    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-+    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
-+
-+    return item << hbi->granularity;
-+}
-+
- void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
- {
-     unsigned i, bit;
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index f502c45..a8fe149 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -43,7 +43,8 @@ struct BdrvDirtyBitmap {
+     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
+     char *name;                 /* Optional non-empty unique ID */
+     int64_t size;               /* Size of the bitmap (Number of sectors) */
+-    bool disabled;              /* Bitmap is read-only */
++    bool disabled;              /* Bitmap is disabled. It ignores all writes to
++                                   the device */
+     int active_iterators;       /* How many iterators are active */
+     QLIST_ENTRY(BdrvDirtyBitmap) list;
+ };
 -- 
 1.8.3.1
