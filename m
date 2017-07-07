@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWm5-00064p-BB
+	(envelope-from <kwolf@redhat.com>) id 1dTWm5-00065U-OE
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWm1-0000HF-4W
+	(envelope-from <kwolf@redhat.com>) id 1dTWm1-0000ID-Mj
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:37 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:12 +0200
-Message-Id: <1499447335-6125-58-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:13 +0200
+Message-Id: <1499447335-6125-59-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 057/100] block: remove all encryption handling
- APIs
+Subject: [Qemu-devel] [PULL 058/100] block: pass option prefix down to
+ crypto layer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,389 +25,324 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Now that all encryption keys must be provided upfront via
-the QCryptoSecret API and associated block driver properties
-there is no need for any explicit encryption handling APIs
-in the block layer. Encryption can be handled transparently
-within the block driver. We only retain an API for querying
-whether an image is encrypted or not, since that is a
-potentially useful piece of metadata to report to the user.
+While the crypto layer uses a fixed option name "key-secret",
+the upper block layer may have a prefix on the options. e.g.
+"encrypt.key-secret", in order to avoid clashes between crypto
+option names & other block option names. To ensure the crypto
+layer can report accurate error messages, we must tell it what
+option name prefix was used.
 
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170623162419.26068-18-berrange@redhat.com
+Message-id: 20170623162419.26068-19-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                   | 77 +----------------------------------------------
- block/crypto.c            |  1 -
- block/qapi.c              |  2 +-
- block/qcow.c              |  8 ++++-
- block/qcow2.c             |  1 -
- blockdev.c                | 37 ++---------------------
- hmp-commands.hx           |  2 ++
- include/block/block.h     |  3 --
- include/block/block_int.h |  1 -
- include/qapi/error.h      |  1 -
- qapi/block-core.json      | 37 ++---------------------
- qapi/common.json          |  5 +--
- 12 files changed, 16 insertions(+), 159 deletions(-)
+ block/crypto.c            | 4 ++--
+ block/qcow.c              | 7 ++++---
+ block/qcow2.c             | 8 ++++----
+ crypto/block-luks.c       | 8 ++++++--
+ crypto/block-qcow.c       | 8 ++++++--
+ crypto/block.c            | 6 ++++--
+ crypto/blockpriv.h        | 2 ++
+ include/crypto/block.h    | 6 +++++-
+ tests/test-crypto-block.c | 8 ++++----
+ 9 files changed, 37 insertions(+), 20 deletions(-)
 
-diff --git a/block.c b/block.c
-index 6943962..edfa6b7 100644
---- a/block.c
-+++ b/block.c
-@@ -2573,15 +2573,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-         goto close_and_fail;
-     }
- 
--    if (!bdrv_key_required(bs)) {
--        bdrv_parent_cb_change_media(bs, true);
--    } else if (!runstate_check(RUN_STATE_PRELAUNCH)
--               && !runstate_check(RUN_STATE_INMIGRATE)
--               && !runstate_check(RUN_STATE_PAUSED)) { /* HACK */
--        error_setg(errp,
--                   "Guest must be stopped for opening of encrypted image");
--        goto close_and_fail;
--    }
-+    bdrv_parent_cb_change_media(bs, true);
- 
-     QDECREF(options);
- 
-@@ -3072,7 +3064,6 @@ static void bdrv_close(BlockDriverState *bs)
-         bs->backing_format[0] = '\0';
-         bs->total_sectors = 0;
-         bs->encrypted = false;
--        bs->valid_key = false;
-         bs->sg = false;
-         QDECREF(bs->options);
-         QDECREF(bs->explicit_options);
-@@ -3502,72 +3493,6 @@ bool bdrv_is_encrypted(BlockDriverState *bs)
-     return bs->encrypted;
- }
- 
--bool bdrv_key_required(BlockDriverState *bs)
--{
--    BdrvChild *backing = bs->backing;
--
--    if (backing && backing->bs->encrypted && !backing->bs->valid_key) {
--        return true;
--    }
--    return (bs->encrypted && !bs->valid_key);
--}
--
--int bdrv_set_key(BlockDriverState *bs, const char *key)
--{
--    int ret;
--    if (bs->backing && bs->backing->bs->encrypted) {
--        ret = bdrv_set_key(bs->backing->bs, key);
--        if (ret < 0)
--            return ret;
--        if (!bs->encrypted)
--            return 0;
--    }
--    if (!bs->encrypted) {
--        return -EINVAL;
--    } else if (!bs->drv || !bs->drv->bdrv_set_key) {
--        return -ENOMEDIUM;
--    }
--    ret = bs->drv->bdrv_set_key(bs, key);
--    if (ret < 0) {
--        bs->valid_key = false;
--    } else if (!bs->valid_key) {
--        /* call the change callback now, we skipped it on open */
--        bs->valid_key = true;
--        bdrv_parent_cb_change_media(bs, true);
--    }
--    return ret;
--}
--
--/*
-- * Provide an encryption key for @bs.
-- * If @key is non-null:
-- *     If @bs is not encrypted, fail.
-- *     Else if the key is invalid, fail.
-- *     Else set @bs's key to @key, replacing the existing key, if any.
-- * If @key is null:
-- *     If @bs is encrypted and still lacks a key, fail.
-- *     Else do nothing.
-- * On failure, store an error object through @errp if non-null.
-- */
--void bdrv_add_key(BlockDriverState *bs, const char *key, Error **errp)
--{
--    if (key) {
--        if (!bdrv_is_encrypted(bs)) {
--            error_setg(errp, "Node '%s' is not encrypted",
--                      bdrv_get_device_or_node_name(bs));
--        } else if (bdrv_set_key(bs, key) < 0) {
--            error_setg(errp, QERR_INVALID_PASSWORD);
--        }
--    } else {
--        if (bdrv_key_required(bs)) {
--            error_set(errp, ERROR_CLASS_DEVICE_ENCRYPTED,
--                      "'%s' (%s) is encrypted",
--                      bdrv_get_device_or_node_name(bs),
--                      bdrv_get_encrypted_filename(bs));
--        }
--    }
--}
--
- const char *bdrv_get_format_name(BlockDriverState *bs)
- {
-     return bs->drv ? bs->drv->format_name : NULL;
 diff --git a/block/crypto.c b/block/crypto.c
-index da4be74..3ad4b20 100644
+index 3ad4b20..c561cba 100644
 --- a/block/crypto.c
 +++ b/block/crypto.c
-@@ -308,7 +308,6 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+@@ -296,7 +296,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+     if (flags & BDRV_O_NO_IO) {
+         cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+     }
+-    crypto->block = qcrypto_block_open(open_opts,
++    crypto->block = qcrypto_block_open(open_opts, NULL,
+                                        block_crypto_read_func,
+                                        bs,
+                                        cflags,
+@@ -340,7 +340,7 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
+         return -1;
      }
  
-     bs->encrypted = true;
--    bs->valid_key = true;
- 
-     ret = 0;
-  cleanup:
-diff --git a/block/qapi.c b/block/qapi.c
-index 0a41d59..080eb8f 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -45,7 +45,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
-     info->ro                     = bs->read_only;
-     info->drv                    = g_strdup(bs->drv->format_name);
-     info->encrypted              = bs->encrypted;
--    info->encryption_key_missing = bdrv_key_required(bs);
-+    info->encryption_key_missing = false;
- 
-     info->cache = g_new(BlockdevCacheInfo, 1);
-     *info->cache = (BlockdevCacheInfo) {
+-    crypto = qcrypto_block_create(create_opts,
++    crypto = qcrypto_block_create(create_opts, NULL,
+                                   block_crypto_init_func,
+                                   block_crypto_write_func,
+                                   &data,
 diff --git a/block/qcow.c b/block/qcow.c
-index db0c5a9..8a24930 100644
+index 8a24930..2002c16 100644
 --- a/block/qcow.c
 +++ b/block/qcow.c
-@@ -220,7 +220,13 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-             goto fail;
+@@ -208,8 +208,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(crypto_opts, NULL, NULL,
+-                                           cflags, errp);
++            s->crypto = qcrypto_block_open(crypto_opts, "encrypt.",
++                                           NULL, NULL, cflags, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -866,7 +866,8 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+             goto exit;
          }
-         bs->encrypted = true;
--        bs->valid_key = true;
-+    } else {
-+        if (encryptfmt) {
-+            error_setg(errp, "No encryption in image header, but options "
-+                       "specified format '%s'", encryptfmt);
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-     }
-     s->cluster_bits = header.cluster_bits;
-     s->cluster_size = 1 << s->cluster_bits;
+ 
+-        crypto = qcrypto_block_create(crypto_opts, NULL, NULL, NULL, errp);
++        crypto = qcrypto_block_create(crypto_opts, "encrypt.",
++                                      NULL, NULL, NULL, errp);
+         if (!crypto) {
+             ret = -EINVAL;
+             goto exit;
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 7d1c5a3..2dd5d51 100644
+index 2dd5d51..f597fd0 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -1171,7 +1171,6 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+@@ -279,7 +279,7 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(s->crypto_opts,
++            s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
+                                            qcow2_crypto_hdr_read_func,
+                                            bs, cflags, errp);
+             if (!s->crypto) {
+@@ -1313,8 +1313,8 @@ static int qcow2_do_open(BlockDriverState *bs, QDict *options, int flags,
+             if (flags & BDRV_O_NO_IO) {
+                 cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
+             }
+-            s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
+-                                           cflags, errp);
++            s->crypto = qcrypto_block_open(s->crypto_opts, "encrypt.",
++                                           NULL, NULL, cflags, errp);
+             if (!s->crypto) {
+                 ret = -EINVAL;
+                 goto fail;
+@@ -2318,7 +2318,7 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
+     }
+     s->crypt_method_header = fmt;
+ 
+-    crypto = qcrypto_block_create(cryptoopts,
++    crypto = qcrypto_block_create(cryptoopts, "encrypt.",
+                                   qcow2_crypto_hdr_init_func,
+                                   qcow2_crypto_hdr_write_func,
+                                   bs, errp);
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index 2b97d89..afb8543 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -638,6 +638,7 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
+ static int
+ qcrypto_block_luks_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
++                        const char *optprefix,
+                         QCryptoBlockReadFunc readfunc,
+                         void *opaque,
+                         unsigned int flags,
+@@ -661,7 +662,8 @@ qcrypto_block_luks_open(QCryptoBlock *block,
+ 
+     if (!(flags & QCRYPTO_BLOCK_OPEN_NO_IO)) {
+         if (!options->u.luks.key_secret) {
+-            error_setg(errp, "Parameter 'key-secret' is required for cipher");
++            error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                       optprefix ? optprefix : "");
+             return -1;
          }
+         password = qcrypto_secret_lookup_as_utf8(
+@@ -885,6 +887,7 @@ qcrypto_block_luks_uuid_gen(uint8_t *uuidstr)
+ static int
+ qcrypto_block_luks_create(QCryptoBlock *block,
+                           QCryptoBlockCreateOptions *options,
++                          const char *optprefix,
+                           QCryptoBlockInitFunc initfunc,
+                           QCryptoBlockWriteFunc writefunc,
+                           void *opaque,
+@@ -937,7 +940,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+      * be silently ignored, for compatibility with dm-crypt */
  
-         bs->encrypted = true;
--        bs->valid_key = true;
+     if (!options->u.luks.key_secret) {
+-        error_setg(errp, "Parameter 'key-secret' is required for cipher");
++        error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                   optprefix ? optprefix : "");
+         return -1;
      }
- 
-     s->l2_bits = s->cluster_bits - 3; /* L2 is always one cluster */
-diff --git a/blockdev.c b/blockdev.c
-index e2016b6..92c5991 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -593,10 +593,6 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
- 
-         bs->detect_zeroes = detect_zeroes;
- 
--        if (bdrv_key_required(bs)) {
--            autostart = 0;
--        }
--
-         block_acct_setup(blk_get_stats(blk), account_invalid, account_failed);
- 
-         if (!parse_stats_intervals(blk_get_stats(blk), interval_list, errp)) {
-@@ -2265,24 +2261,8 @@ void qmp_block_passwd(bool has_device, const char *device,
-                       bool has_node_name, const char *node_name,
-                       const char *password, Error **errp)
+     password = qcrypto_secret_lookup_as_utf8(luks_opts.key_secret, errp);
+diff --git a/crypto/block-qcow.c b/crypto/block-qcow.c
+index be88c6f..a456fe3 100644
+--- a/crypto/block-qcow.c
++++ b/crypto/block-qcow.c
+@@ -94,6 +94,7 @@ qcrypto_block_qcow_init(QCryptoBlock *block,
+ static int
+ qcrypto_block_qcow_open(QCryptoBlock *block,
+                         QCryptoBlockOpenOptions *options,
++                        const char *optprefix,
+                         QCryptoBlockReadFunc readfunc G_GNUC_UNUSED,
+                         void *opaque G_GNUC_UNUSED,
+                         unsigned int flags,
+@@ -104,7 +105,8 @@ qcrypto_block_qcow_open(QCryptoBlock *block,
+     } else {
+         if (!options->u.qcow.key_secret) {
+             error_setg(errp,
+-                       "Parameter 'key-secret' is required for cipher");
++                       "Parameter '%skey-secret' is required for cipher",
++                       optprefix ? optprefix : "");
+             return -1;
+         }
+         return qcrypto_block_qcow_init(block,
+@@ -116,13 +118,15 @@ qcrypto_block_qcow_open(QCryptoBlock *block,
+ static int
+ qcrypto_block_qcow_create(QCryptoBlock *block,
+                           QCryptoBlockCreateOptions *options,
++                          const char *optprefix,
+                           QCryptoBlockInitFunc initfunc G_GNUC_UNUSED,
+                           QCryptoBlockWriteFunc writefunc G_GNUC_UNUSED,
+                           void *opaque G_GNUC_UNUSED,
+                           Error **errp)
  {
--    Error *local_err = NULL;
--    BlockDriverState *bs;
--    AioContext *aio_context;
--
--    bs = bdrv_lookup_bs(has_device ? device : NULL,
--                        has_node_name ? node_name : NULL,
--                        &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    aio_context = bdrv_get_aio_context(bs);
--    aio_context_acquire(aio_context);
--
--    bdrv_add_key(bs, password, errp);
--
--    aio_context_release(aio_context);
-+    error_setg(errp,
-+               "Setting block passwords directly is no longer supported");
- }
- 
- /*
-@@ -2591,12 +2571,6 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
-         goto fail;
+     if (!options->u.qcow.key_secret) {
+-        error_setg(errp, "Parameter 'key-secret' is required for cipher");
++        error_setg(errp, "Parameter '%skey-secret' is required for cipher",
++                   optprefix ? optprefix : "");
+         return -1;
      }
+     /* QCow2 has no special header, since everything is hardwired */
+diff --git a/crypto/block.c b/crypto/block.c
+index 64c8420..b097d45 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -48,6 +48,7 @@ bool qcrypto_block_has_format(QCryptoBlockFormat format,
  
--    bdrv_add_key(medium_bs, NULL, &err);
--    if (err) {
--        error_propagate(errp, err);
--        goto fail;
--    }
--
-     rc = do_open_tray(has_device ? device : NULL,
-                       has_id ? id : NULL,
-                       false, &err);
-@@ -3866,13 +3840,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
  
-     QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
+ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
++                                 const char *optprefix,
+                                  QCryptoBlockReadFunc readfunc,
+                                  void *opaque,
+                                  unsigned int flags,
+@@ -67,7 +68,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
  
--    if (bs && bdrv_key_required(bs)) {
--        QTAILQ_REMOVE(&monitor_bdrv_states, bs, monitor_list);
--        bdrv_unref(bs);
--        error_setg(errp, "blockdev-add doesn't support encrypted devices");
--        goto fail;
--    }
--
- fail:
-     visit_free(v);
- }
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 275ccdf..75f8bac 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1646,6 +1646,8 @@ STEXI
- @item block_passwd @var{device} @var{password}
- @findex block_passwd
- Set the encrypted device @var{device} password to @var{password}
-+
-+This command is now obsolete and will always return an error since 2.10
- ETEXI
+     block->driver = qcrypto_block_drivers[options->format];
  
-     {
-diff --git a/include/block/block.h b/include/block/block.h
-index 4a27252..2d637d1 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -464,9 +464,6 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it);
+-    if (block->driver->open(block, options,
++    if (block->driver->open(block, options, optprefix,
+                             readfunc, opaque, flags, errp) < 0) {
+         g_free(block);
+         return NULL;
+@@ -78,6 +79,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
  
- BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
- bool bdrv_is_encrypted(BlockDriverState *bs);
--bool bdrv_key_required(BlockDriverState *bs);
--int bdrv_set_key(BlockDriverState *bs, const char *key);
--void bdrv_add_key(BlockDriverState *bs, const char *key, Error **errp);
- void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
-                          void *opaque);
- const char *bdrv_get_node_name(const BlockDriverState *bs);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 701508d..b9069c5 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -529,7 +529,6 @@ struct BlockDriverState {
-     int open_flags; /* flags used to open the file, re-used for re-open */
-     bool read_only; /* if true, the media is read only */
-     bool encrypted; /* if true, the media is encrypted */
--    bool valid_key; /* if true, a valid encryption key has been set */
-     bool sg;        /* if true, the device is a /dev/sg* */
-     bool probed;    /* if true, format was probed rather than specified */
-     bool force_share; /* if true, always allow all shared permissions */
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index 7e532d0..5d5e737 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -125,7 +125,6 @@
- typedef enum ErrorClass {
-     ERROR_CLASS_GENERIC_ERROR = QAPI_ERROR_CLASS_GENERICERROR,
-     ERROR_CLASS_COMMAND_NOT_FOUND = QAPI_ERROR_CLASS_COMMANDNOTFOUND,
--    ERROR_CLASS_DEVICE_ENCRYPTED = QAPI_ERROR_CLASS_DEVICEENCRYPTED,
-     ERROR_CLASS_DEVICE_NOT_ACTIVE = QAPI_ERROR_CLASS_DEVICENOTACTIVE,
-     ERROR_CLASS_DEVICE_NOT_FOUND = QAPI_ERROR_CLASS_DEVICENOTFOUND,
-     ERROR_CLASS_KVM_MISSING_CAP = QAPI_ERROR_CLASS_KVMMISSINGCAP,
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index bb075c0..d04d277 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -259,8 +259,7 @@
- #
- # @encrypted: true if the backing device is encrypted
- #
--# @encryption_key_missing: true if the backing device is encrypted but an
--#                          valid encryption key is missing
-+# @encryption_key_missing: Deprecated; always false
- #
- # @detect_zeroes: detect and optimize zero writes (Since 2.1)
- #
-@@ -946,39 +945,7 @@
- # This command sets the password of a block device that has not been open
- # with a password and requires one.
- #
--# The two cases where this can happen are a block device is created through
--# QEMU's initial command line or a block device is changed through the legacy
--# @change interface.
--#
--# In the event that the block device is created through the initial command
--# line, the VM will start in the stopped state regardless of whether '-S' is
--# used.  The intention is for a management tool to query the block devices to
--# determine which ones are encrypted, set the passwords with this command, and
--# then start the guest with the @cont command.
--#
--# Either @device or @node-name must be set but not both.
--#
--# @device: the name of the block backend device to set the password on
--#
--# @node-name: graph node name to set the password on (Since 2.0)
--#
--# @password: the password to use for the device
--#
--# Returns: nothing on success
--#          If @device is not a valid block device, DeviceNotFound
--#          If @device is not encrypted, DeviceNotEncrypted
--#
--# Notes:  Not all block formats support encryption and some that do are not
--#         able to validate that a password is correct.  Disk corruption may
--#         occur if an invalid password is specified.
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "block_passwd", "arguments": { "device": "ide0-hd0",
--#                                                "password": "12345" } }
--# <- { "return": {} }
-+# This command is now obsolete and will always return an error since 2.10
- #
- ##
- { 'command': 'block_passwd', 'data': {'*device': 'str',
-diff --git a/qapi/common.json b/qapi/common.json
-index b626647..8355d5a 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -14,9 +14,6 @@
- #
- # @CommandNotFound: the requested command has not been found
- #
--# @DeviceEncrypted: the requested operation can't be fulfilled because the
--#                   selected device is encrypted
--#
- # @DeviceNotActive: a device has failed to be become active
- #
- # @DeviceNotFound: the requested device has not been found
-@@ -28,7 +25,7 @@
- ##
- { 'enum': 'QapiErrorClass',
-   # Keep this in sync with ErrorClass in error.h
--  'data': [ 'GenericError', 'CommandNotFound', 'DeviceEncrypted',
-+  'data': [ 'GenericError', 'CommandNotFound',
-             'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
  
- ##
+ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
++                                   const char *optprefix,
+                                    QCryptoBlockInitFunc initfunc,
+                                    QCryptoBlockWriteFunc writefunc,
+                                    void *opaque,
+@@ -97,7 +99,7 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
+ 
+     block->driver = qcrypto_block_drivers[options->format];
+ 
+-    if (block->driver->create(block, options, initfunc,
++    if (block->driver->create(block, options, optprefix, initfunc,
+                               writefunc, opaque, errp) < 0) {
+         g_free(block);
+         return NULL;
+diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
+index 68f0f06..0edb810 100644
+--- a/crypto/blockpriv.h
++++ b/crypto/blockpriv.h
+@@ -41,6 +41,7 @@ struct QCryptoBlock {
+ struct QCryptoBlockDriver {
+     int (*open)(QCryptoBlock *block,
+                 QCryptoBlockOpenOptions *options,
++                const char *optprefix,
+                 QCryptoBlockReadFunc readfunc,
+                 void *opaque,
+                 unsigned int flags,
+@@ -48,6 +49,7 @@ struct QCryptoBlockDriver {
+ 
+     int (*create)(QCryptoBlock *block,
+                   QCryptoBlockCreateOptions *options,
++                  const char *optprefix,
+                   QCryptoBlockInitFunc initfunc,
+                   QCryptoBlockWriteFunc writefunc,
+                   void *opaque,
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index 013a435..f0e543b 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -71,6 +71,7 @@ typedef enum {
+ /**
+  * qcrypto_block_open:
+  * @options: the encryption options
++ * @optprefix: name prefix for options
+  * @readfunc: callback for reading data from the volume
+  * @opaque: data to pass to @readfunc
+  * @flags: bitmask of QCryptoBlockOpenFlags values
+@@ -102,6 +103,7 @@ typedef enum {
+  * Returns: a block encryption format, or NULL on error
+  */
+ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
++                                 const char *optprefix,
+                                  QCryptoBlockReadFunc readfunc,
+                                  void *opaque,
+                                  unsigned int flags,
+@@ -109,7 +111,8 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+ 
+ /**
+  * qcrypto_block_create:
+- * @format: the encryption format
++ * @options: the encryption options
++ * @optprefix: name prefix for options
+  * @initfunc: callback for initializing volume header
+  * @writefunc: callback for writing data to the volume header
+  * @opaque: data to pass to @initfunc and @writefunc
+@@ -133,6 +136,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOptions *options,
+  * Returns: a block encryption format, or NULL on error
+  */
+ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOptions *options,
++                                   const char *optprefix,
+                                    QCryptoBlockInitFunc initfunc,
+                                    QCryptoBlockWriteFunc writefunc,
+                                    void *opaque,
+diff --git a/tests/test-crypto-block.c b/tests/test-crypto-block.c
+index 95c4bd5..bd7fe59 100644
+--- a/tests/test-crypto-block.c
++++ b/tests/test-crypto-block.c
+@@ -281,7 +281,7 @@ static void test_block(gconstpointer opaque)
+     memset(&header, 0, sizeof(header));
+     buffer_init(&header, "header");
+ 
+-    blk = qcrypto_block_create(data->create_opts,
++    blk = qcrypto_block_create(data->create_opts, NULL,
+                                test_block_init_func,
+                                test_block_write_func,
+                                &header,
+@@ -300,7 +300,7 @@ static void test_block(gconstpointer opaque)
+     object_unparent(sec);
+ 
+     /* Ensure we can't open without the secret */
+-    blk = qcrypto_block_open(data->open_opts,
++    blk = qcrypto_block_open(data->open_opts, NULL,
+                              test_block_read_func,
+                              &header,
+                              0,
+@@ -308,7 +308,7 @@ static void test_block(gconstpointer opaque)
+     g_assert(blk == NULL);
+ 
+     /* Ensure we can't open without the secret, unless NO_IO */
+-    blk = qcrypto_block_open(data->open_opts,
++    blk = qcrypto_block_open(data->open_opts, NULL,
+                              test_block_read_func,
+                              &header,
+                              QCRYPTO_BLOCK_OPEN_NO_IO,
+@@ -322,7 +322,7 @@ static void test_block(gconstpointer opaque)
+ 
+     /* Now open for real with secret */
+     sec = test_block_secret();
+-    blk = qcrypto_block_open(data->open_opts,
++    blk = qcrypto_block_open(data->open_opts, NULL,
+                              test_block_read_func,
+                              &header,
+                              0,
 -- 
 1.8.3.1
