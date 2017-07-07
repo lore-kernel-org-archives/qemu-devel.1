@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTSGU-0007yj-7C
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:21:43 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dTSGt-0008Go-Th
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTSGT-0005ha-C8
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:21:42 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:30256 helo=relay.sw.ru)
+	(envelope-from <cohuck@redhat.com>) id 1dTSGp-0005os-G7
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dTSGT-0005hA-0e
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:21:41 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-24-vsementsov@virtuozzo.com>
-	<871sps7kdj.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <652acde8-a873-f0ec-50e6-1cecdd72184b@virtuozzo.com>
-Date: Fri, 7 Jul 2017 15:21:24 +0300
-MIME-Version: 1.0
-In-Reply-To: <871sps7kdj.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v22 23/30] qmp: add persistent flag to
- block-dirty-bitmap-add
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSGp-0005oT-Ae
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:03 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Fri,  7 Jul 2017 14:21:52 +0200
+Message-Id: <20170707122159.24714-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 0/7] s390x: zPCI detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-07.07.2017 10:54, Markus Armbruster wrote:
-> QAPI schema review only...  I apologize for its lateness.
->
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->
->> Add optional 'persistent' flag to qmp command block-dirty-bitmap-add.
->> Default is false.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->> Reviewed-by: John Snow <jsnow@redhat.com>
->> ---
-> [...]
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index f85c2235c7..13f98ec146 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1561,10 +1561,16 @@
->>   # @granularity: the bitmap granularity, default is 64k for
->>   #               block-dirty-bitmap-add
->>   #
->> +# @persistent: the bitmap is persistent, i.e. it will be saved to the
->> +#              corresponding block device image file on its close. For now only
->> +#              Qcow2 disks support persistent bitmaps. Default is false for
->> +#              block-dirty-bitmap-add. (Since: 2.10)
-> "for block-dirty-bitmap-add" suggests there could be other users, with
-> different (but unspecified) defaults.  What about replacing the sentence
-> by "(default: false)"?
->
-> Please wrap your comment lines around column 70.
+Current support of zPCI in qemu is still a bit sketchy. For example,
+we're not actually advertising the pci cpu facilities to the guest,
+and therefore a Linux guest will not even try to use any pci devices.
+We're also still missing a proper SIC implementation.
 
-Why 70, is it written somewhere? There are a lot of lines over 70 
-characters in this file, so, as series are already in Max's block branch 
-I think it would be better to fix the whole file, if it is really needed.
+This can lead to a situation where pci devices are configured for an
+instance but the guest user is not able to make proper use of them.
+In order to avoid such surprises, it makes sense to be able to configure
+out pci support for s390x so that no pci devices show up in the list
+of available devices.
 
->
->> +#
->>   # Since: 2.4
->>   ##
->>   { 'struct': 'BlockDirtyBitmapAdd',
->> -  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32' } }
->> +  'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
->> +            '*persistent': 'bool' } }
->>   
->>   ##
->>   # @block-dirty-bitmap-add:
+This RFC patch set (also available at github.com/cohuck/qemu no-zpci) tries
+to clean up some of the s390x pci intertwinings so that we can do a non-pci
+build by simply removing 'CONFIG_PCI=y' from the default config. It also
+removes a dependency on pci by kvm code, which is probably unintended (it
+seems all kvm platforms also support pci).
 
+Patch set is RFC as:
+- I'm not sure whether my fencing is architecturally correct, as I don't
+  have access to the respective documentation,
+- I don't really like the #ifdeffery too much.
+
+Cornelia Huck (7):
+  kvm: remove hard dependency on pci
+  s390x: chsc nt2 events are pci-only
+  s390x/sclp: properly guard pci-specific functions
+  s390x/ccw: create s390 phb conditionally
+  s390x/pci: fence off instructions for non-pci
+  s390x/kvm: msi route fixup for non-pci
+  s390x: refine pci dependencies
+
+ default-configs/s390x-softmmu.mak |  2 +-
+ hw/pci/pci-stub.c                 | 12 ++++++++++++
+ hw/s390x/Makefile.objs            |  2 +-
+ hw/s390x/s390-pci-bus.c           |  4 ++--
+ hw/s390x/s390-pci-bus.h           |  4 ++--
+ hw/s390x/s390-virtio-ccw.c        |  9 +++++----
+ hw/s390x/sclp.c                   | 17 ++++++++++++++---
+ target/s390x/ioinst.c             | 18 ++++++++++++++++++
+ target/s390x/kvm.c                | 28 ++++++++++++++++++++++++++++
+ 9 files changed, 83 insertions(+), 13 deletions(-)
 
 -- 
-Best regards,
-Vladimir
+2.13.0
