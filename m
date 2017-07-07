@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTNto-0007XL-2S
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:42:00 -0400
+	(envelope-from <armbru@redhat.com>) id 1dTNvT-0008Rt-DD
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:43:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTNtk-0005vV-WA
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:42:00 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:49360)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTNtk-0005uW-JO
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:41:56 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865365245.17063.7830070270971603805.stgit@frigg.lan>
-	<20170629235133.GE13979@flamenco>
-Date: Fri, 07 Jul 2017 09:41:30 +0200
-In-Reply-To: <20170629235133.GE13979@flamenco> (Emilio G. Cota's message of
-	"Thu, 29 Jun 2017 19:51:33 -0400")
-Message-ID: <87mv8gg0d1.fsf@frigg.lan>
+	(envelope-from <armbru@redhat.com>) id 1dTNvQ-0007LF-Bb
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:43:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTNvQ-0007Jb-64
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:43:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170630133139.7907-1-vadim.galitsyn@profitbricks.com>
+	<20170630133139.7907-2-vadim.galitsyn@profitbricks.com>
+	<87lgo0900x.fsf@dusky.pond.sub.org>
+Date: Fri, 07 Jul 2017 09:43:36 +0200
+In-Reply-To: <87lgo0900x.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 07 Jul 2017 09:30:38 +0200")
+Message-ID: <877ezk7kuv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 06/29] target/i386: [tcg] Refactor
- init_disas_context
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4] hmp,
+ qmp: introduce memory-size-summary commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+Cc: Mohammed Gamal <mohammed.gamal@profitbricks.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-Emilio G Cota writes:
+Markus Armbruster <armbru@redhat.com> writes:
 
-> On Wed, Jun 28, 2017 at 15:40:52 +0300, Llu=C3=ADs Vilanova wrote:
-[,,,]
->> @@ -8425,7 +8415,7 @@ void gen_intermediate_code(CPUState *cpu, Translat=
-ionBlock *tb)
->>      dc-> code64 =3D (flags >> HF_CS64_SHIFT) & 1;
->> #endif
->>      dc-> flags =3D flags;
->> -    dc->jmp_opt =3D !(dc->tf || cpu->singlestep_enabled ||
->> +    dc->jmp_opt =3D !(dc->tf || dc->base.singlestep_enabled ||
+> Sorry for the late review, got a bit overwhelmed...
+>
+> Vadim Galitsyn <vadim.galitsyn@profitbricks.com> writes:
+>
+>> Commands above provide the following memory information in bytes:
+>>
+>>   * base-memory - amount of unremovable memory specified
+>>     with '-m' option at the start of the QEMU process.
+>>
+>>   * hotpluggable-memory - amount of memory that was hot-plugged.
+>>     If target does not have CONFIG_MEM_HOTPLUG enabled, no
+>>     value is reported.
+>>
+>>   * balloon-actual-memory - size of the memory that remains
+>>     available to the guest after ballooning, as reported by the
+>>     guest. If the guest has not reported its memory, this value
+>>     equals to @base-memory + @hot-plug-memory. If ballooning
+>>     is not enabled, no value is reported.
+>>
+>> NOTE:
+>>
+>>     Parameter @balloon-actual-memory reports the same as
+>>     "info balloon" command when ballooning is enabled. The idea
+>>     to have it in scope of this command(s) comes from
+>>     https://lists.gnu.org/archive/html/qemu-devel/2012-07/msg01472.html.
+[...]
+>>  9 files changed, 113 insertions(+), 1 deletion(-)
+>>  rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (60%)
+>
+> No test coverage?
 
-> Why this change and not leaving cpu->singlestep_enabled?
+Maybe no need, because ...
 
-The single-stepping info is initialized by the generic code into dc->base, =
-and
-so I wanted to keep a bit more code consistency by unifying its use (on pla=
-ces I
-touched). In fact, using dc->base ensures translation will be consistent ev=
-en if
-in the future cpu->singlestep_enabled is allowed to change.
+[...]
+> query-memory-size-summary combines three queries:
+>
+> (1) base-memory (query can't fail)
+>
+> (2) hotpluggable-memory (query must not fail, i.e. &error_abort)
+>
+> (3) balloon-actual-memory (query can fail, and we throw away the error
+>     then)
+>
+> Including (3) adds a failure mode.  The fact that we sweep the failure
+> under the rug doesn't change that.
+>
+> Why is this a good idea?
 
+... with (3) and its failure mode removed, there's less need for
+specific tests.  The (future, hopefully near future) generic smoke test
+of queries that can't fail should do.
 
-Cheers,
-  Lluis
+[...]
