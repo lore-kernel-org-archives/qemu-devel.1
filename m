@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTKcx-0005AG-Lm
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 00:12:24 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dTL3X-0000Gn-V0
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 00:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTKcu-0001tH-Gn
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 00:12:23 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTKcu-0001t1-Bg
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 00:12:20 -0400
-Received: by mail-qk0-x242.google.com with SMTP id 91so2974885qkq.1
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 21:12:20 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1499397307-13605-1-git-send-email-jiang.biao2@zte.com.cn>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6b623406-d340-6c54-ef6a-894eb2825b8a@twiddle.net>
-Date: Thu, 6 Jul 2017 18:12:12 -1000
-MIME-Version: 1.0
-In-Reply-To: <1499397307-13605-1-git-send-email-jiang.biao2@zte.com.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/mips: Bugfix for crash when running
- program with qemu-i386.
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dTL3U-0002LJ-SA
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 00:39:52 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:49094)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dTL3U-0002JD-Ab
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 00:39:48 -0400
+Date: Fri, 7 Jul 2017 12:39:37 +0800 (CST)
+Message-ID: <201707071239370955018@zte.com.cn>
+References: 1499397307-13605-1-git-send-email-jiang.biao2@zte.com.cn,
+	6b623406-d340-6c54-ef6a-894eb2825b8a@twiddle.net
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gdGNnL21pcHM6?=
+ =?utf-8?q?_Bugfix_for_crash_when_runningprogram_with_qemu-i386=2E?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiang Biao <jiang.biao2@zte.com.cn>, qemu-devel@nongnu.org
-Cc: jinguojie@loongson.cn, james.hogan@imgtec.com, jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, zhong.weidong@zte.com.cn
+To: rth@twiddle.net
+Cc: qemu-devel@nongnu.org, james.hogan@imgtec.com, zhong.weidong@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, jinguojie@loongson.cn, jiang.yong5@zte.com.cn
 
-On 07/06/2017 05:15 PM, Jiang Biao wrote:
-> When running a helloworld program with qemu-i386 in linux-user
-> mode on Loongson 3A3000, it will crash. This patch fix the bug.
-> 
-> Signed-off-by: Jiang Biao<jiang.biao2@zte.com.cn>
-> ---
->   tcg/mips/tcg-target.inc.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-> index 8cff9a6..e6fedc9 100644
-> --- a/tcg/mips/tcg-target.inc.c
-> +++ b/tcg/mips/tcg-target.inc.c
-> @@ -1540,7 +1540,7 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is_64)
->   #else
->       if (TCG_TARGET_REG_BITS > TARGET_LONG_BITS) {
->           tcg_out_ext32u(s, base, addr_regl);
-> -        addr_regl = base;
-> +        tcg_out_mov(s, TCG_TYPE_PTR, addr_regl, base);
->       }
->       if (guest_base == 0 && data_regl != addr_regl) {
->           base = addr_regl;
-
-This is wrong, because you're not allowed to modify the input operands.
-
-Try this, just a few lines lower in the function:
-
--        tcg_out_movi(s, TCG_TYPE_PTR, base, guest_base);
--        tcg_out_opc_reg(s, ALIAS_PADD, base, base, addr_regl);
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_TMP0, guest_base);
-+        tcg_out_opc_reg(s, ALIAS_PADD, base, TCG_TMP0, addr_regl);
-
-and you'll need the same change within tcg_out_qemu_st.
-
-Better would be to reserve a register for the guest_base, like we do for ppc. 
-See all of the uses of TCG_GUEST_BASE_REG in tcg/ppc/tcg-target.inc.c.
-
-
-r~
+Pg0KDQoNCg0KPiBUaGlzIGlzIHdyb25nLCBiZWNhdXNlIHlvdSdyZSBub3QgYWxsb3dlZCB0byBt
+b2RpZnkgdGhlIGlucHV0IG9wZXJhbmRzLg0KPiANCj4gVHJ5IHRoaXMsIGp1c3QgYSBmZXcgbGlu
+ZXMgbG93ZXIgaW4gdGhlIGZ1bmN0aW9uOg0KPiANCj4gLSAgICAgICAgdGNnX291dF9tb3ZpKHMs
+IFRDR19UWVBFX1BUUiwgYmFzZSwgZ3Vlc3RfYmFzZSkNCj4gLSAgICAgICAgdGNnX291dF9vcGNf
+cmVnKHMsIEFMSUFTX1BBREQsIGJhc2UsIGJhc2UsIGFkZHJfcmVnbCkNCj4gKyAgICAgICAgdGNn
+X291dF9tb3ZpKHMsIFRDR19UWVBFX1BUUiwgVENHX1RNUDAsIGd1ZXN0X2Jhc2UpDQo+ICsgICAg
+ICAgIHRjZ19vdXRfb3BjX3JlZyhzLCBBTElBU19QQURELCBiYXNlLCBUQ0dfVE1QMCwgYWRkcl9y
+ZWdsKQ0KPiANCj4gYW5kIHlvdSdsbCBuZWVkIHRoZSBzYW1lIGNoYW5nZSB3aXRoaW4gdGNnX291
+dF9xZW11X3N0Lg0KPiANCj4gQmV0dGVyIHdvdWxkIGJlIHRvIHJlc2VydmUgYSByZWdpc3RlciBm
+b3IgdGhlIGd1ZXN0X2Jhc2UsIGxpa2Ugd2UgZG8gZm9yIHBwYy4gDQo+IFNlZSBhbGwgb2YgdGhl
+IHVzZXMgb2YgVENHX0dVRVNUX0JBU0VfUkVHIGluIHRjZy9wcGMvdGNnLXRhcmdldC5pbmMuYy4N
+ClRoYW5rcyBhIGxvdCBmb3IgdGhlIHJldmlld2luZywgSSdsbCBjaGVjayBvbiB0aGVzZS4=
