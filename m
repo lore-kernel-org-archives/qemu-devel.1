@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlA-0004yU-8I
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlB-0004zi-De
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWl9-0007rt-7C
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlA-0007si-BZ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:41 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:37 +0200
-Message-Id: <1499447335-6125-23-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:38 +0200
+Message-Id: <1499447335-6125-24-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 022/100] stream: Switch stream_populate() to
- byte-based
+Subject: [Qemu-devel] [PULL 023/100] stream: Drop reached_end for
+ stream_complete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +25,55 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Start by converting an
-internal function (no semantic change).
+stream_complete() skips the work of rewriting the backing file if
+the job was cancelled, if data->reached_end is false, or if there
+was an error detected (non-zero data->ret) during the streaming.
+But note that in stream_run(), data->reached_end is only set if the
+loop ran to completion, and data->ret is only 0 in two cases:
+either the loop ran to completion (possibly by cancellation, but
+stream_complete checks for that), or we took an early goto out
+because there is no bs->backing.  Thus, we can preserve the same
+semantics without the use of reached_end, by merely checking for
+bs->backing (and logically, if there was no backing file, streaming
+is a no-op, so there is no backing file to rewrite).
 
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/stream.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ block/stream.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/block/stream.c b/block/stream.c
-index 6cb3939..746d525 100644
+index 746d525..12f1659 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -41,20 +41,20 @@ typedef struct StreamBlockJob {
- } StreamBlockJob;
- 
- static int coroutine_fn stream_populate(BlockBackend *blk,
--                                        int64_t sector_num, int nb_sectors,
-+                                        int64_t offset, uint64_t bytes,
-                                         void *buf)
- {
-     struct iovec iov = {
-         .iov_base = buf,
--        .iov_len  = nb_sectors * BDRV_SECTOR_SIZE,
-+        .iov_len  = bytes,
-     };
-     QEMUIOVector qiov;
- 
-+    assert(bytes < SIZE_MAX);
-     qemu_iovec_init_external(&qiov, &iov, 1);
- 
-     /* Copy-on-read the unallocated clusters */
--    return blk_co_preadv(blk, sector_num * BDRV_SECTOR_SIZE, qiov.size, &qiov,
--                         BDRV_REQ_COPY_ON_READ);
-+    return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
- }
+@@ -59,7 +59,6 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
  
  typedef struct {
-@@ -171,7 +171,8 @@ static void coroutine_fn stream_run(void *opaque)
-         trace_stream_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
-                                    n * BDRV_SECTOR_SIZE, ret);
-         if (copy) {
--            ret = stream_populate(blk, sector_num, n, buf);
-+            ret = stream_populate(blk, sector_num * BDRV_SECTOR_SIZE,
-+                                  n * BDRV_SECTOR_SIZE, buf);
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
+     int ret;
+-    bool reached_end;
+ } StreamCompleteData;
+ 
+ static void stream_complete(BlockJob *job, void *opaque)
+@@ -70,7 +69,7 @@ static void stream_complete(BlockJob *job, void *opaque)
+     BlockDriverState *base = s->base;
+     Error *local_err = NULL;
+ 
+-    if (!block_job_is_cancelled(&s->common) && data->reached_end &&
++    if (!block_job_is_cancelled(&s->common) && bs->backing &&
+         data->ret == 0) {
+         const char *base_id = NULL, *base_fmt = NULL;
+         if (base) {
+@@ -211,7 +210,6 @@ out:
+     /* Modify backing chain and close BDSes in main loop */
+     data = g_malloc(sizeof(*data));
+     data->ret = ret;
+-    data->reached_end = sector_num == end;
+     block_job_defer_to_main_loop(&s->common, stream_complete, data);
+ }
+ 
 -- 
 1.8.3.1
