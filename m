@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlJ-00058Z-4E
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlL-0005AC-1F
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlH-00082A-Tj
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlJ-000854-L9
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:51 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:41 +0200
-Message-Id: <1499447335-6125-27-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:45 +0200
+Message-Id: <1499447335-6125-31-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 026/100] commit: Switch commit_run() to
+Subject: [Qemu-devel] [PULL 030/100] mirror: Switch mirror_cow_align() to
  byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,10 +26,11 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 From: Eric Blake <eblake@redhat.com>
 
 We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Change the internal
-loop iteration of committing to track by bytes instead of sectors
-(although we are still guaranteed that we iterate by steps that
-are sector-aligned).
+easier to reason about than sector-based.  Convert another internal
+function (no semantic change), and add mirror_clip_bytes() as a
+counterpart to mirror_clip_sectors().  Some of the conversion is
+a bit tricky, requiring temporaries to convert between units; it
+will be cleared up in a following patch.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
@@ -37,63 +38,112 @@ Reviewed-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/commit.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ block/mirror.c | 63 ++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 26 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index 6f67d78..c3a7bca 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -143,17 +143,16 @@ static void coroutine_fn commit_run(void *opaque)
+diff --git a/block/mirror.c b/block/mirror.c
+index a41ef25..0378bd2 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -176,6 +176,15 @@ static void mirror_read_complete(void *opaque, int ret)
+     aio_context_release(blk_get_aio_context(s->common.blk));
+ }
+ 
++/* Clip bytes relative to offset to not exceed end-of-file */
++static inline int64_t mirror_clip_bytes(MirrorBlockJob *s,
++                                        int64_t offset,
++                                        int64_t bytes)
++{
++    return MIN(bytes, s->bdev_length - offset);
++}
++
++/* Clip nb_sectors relative to sector_num to not exceed end-of-file */
+ static inline int mirror_clip_sectors(MirrorBlockJob *s,
+                                       int64_t sector_num,
+                                       int nb_sectors)
+@@ -184,44 +193,38 @@ static inline int mirror_clip_sectors(MirrorBlockJob *s,
+                s->bdev_length / BDRV_SECTOR_SIZE - sector_num);
+ }
+ 
+-/* Round sector_num and/or nb_sectors to target cluster if COW is needed, and
+- * return the offset of the adjusted tail sector against original. */
+-static int mirror_cow_align(MirrorBlockJob *s,
+-                            int64_t *sector_num,
+-                            int *nb_sectors)
++/* Round offset and/or bytes to target cluster if COW is needed, and
++ * return the offset of the adjusted tail against original. */
++static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
++                            unsigned int *bytes)
  {
-     CommitBlockJob *s = opaque;
-     CommitCompleteData *data;
--    int64_t sector_num, end;
-+    int64_t offset;
-     uint64_t delay_ns = 0;
+     bool need_cow;
      int ret = 0;
--    int n = 0;
-+    int n = 0; /* sectors */
-     void *buf = NULL;
-     int bytes_written = 0;
-     int64_t base_len;
+-    int chunk_sectors = s->granularity >> BDRV_SECTOR_BITS;
+-    int64_t align_sector_num = *sector_num;
+-    int align_nb_sectors = *nb_sectors;
+-    int max_sectors = chunk_sectors * s->max_iov;
++    int64_t align_offset = *offset;
++    unsigned int align_bytes = *bytes;
++    int max_bytes = s->granularity * s->max_iov;
  
-     ret = s->common.len = blk_getlength(s->top);
- 
--
-     if (s->common.len < 0) {
-         goto out;
+-    need_cow = !test_bit(*sector_num / chunk_sectors, s->cow_bitmap);
+-    need_cow |= !test_bit((*sector_num + *nb_sectors - 1) / chunk_sectors,
++    need_cow = !test_bit(*offset / s->granularity, s->cow_bitmap);
++    need_cow |= !test_bit((*offset + *bytes - 1) / s->granularity,
+                           s->cow_bitmap);
+     if (need_cow) {
+-        bdrv_round_sectors_to_clusters(blk_bs(s->target), *sector_num,
+-                                       *nb_sectors, &align_sector_num,
+-                                       &align_nb_sectors);
++        bdrv_round_to_clusters(blk_bs(s->target), *offset, *bytes,
++                               &align_offset, &align_bytes);
      }
-@@ -170,10 +169,9 @@ static void coroutine_fn commit_run(void *opaque)
+ 
+-    if (align_nb_sectors > max_sectors) {
+-        align_nb_sectors = max_sectors;
++    if (align_bytes > max_bytes) {
++        align_bytes = max_bytes;
+         if (need_cow) {
+-            align_nb_sectors = QEMU_ALIGN_DOWN(align_nb_sectors,
+-                                               s->target_cluster_size >>
+-                                               BDRV_SECTOR_BITS);
++            align_bytes = QEMU_ALIGN_DOWN(align_bytes, s->target_cluster_size);
          }
      }
+-    /* Clipping may result in align_nb_sectors unaligned to chunk boundary, but
++    /* Clipping may result in align_bytes unaligned to chunk boundary, but
+      * that doesn't matter because it's already the end of source image. */
+-    align_nb_sectors = mirror_clip_sectors(s, align_sector_num,
+-                                           align_nb_sectors);
++    align_bytes = mirror_clip_bytes(s, align_offset, align_bytes);
  
--    end = s->common.len >> BDRV_SECTOR_BITS;
-     buf = blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
+-    ret = align_sector_num + align_nb_sectors - (*sector_num + *nb_sectors);
+-    *sector_num = align_sector_num;
+-    *nb_sectors = align_nb_sectors;
++    ret = align_offset + align_bytes - (*offset + *bytes);
++    *offset = align_offset;
++    *bytes = align_bytes;
+     assert(ret >= 0);
+     return ret;
+ }
+@@ -257,10 +260,18 @@ static int mirror_do_read(MirrorBlockJob *s, int64_t sector_num,
+     nb_sectors = MIN(s->buf_size >> BDRV_SECTOR_BITS, nb_sectors);
+     nb_sectors = MIN(max_sectors, nb_sectors);
+     assert(nb_sectors);
++    assert(nb_sectors < BDRV_REQUEST_MAX_SECTORS);
+     ret = nb_sectors;
  
--    for (sector_num = 0; sector_num < end; sector_num += n) {
-+    for (offset = 0; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
-         bool copy;
- 
-         /* Note that even when no rate limit is applied we need to yield
-@@ -185,15 +183,13 @@ static void coroutine_fn commit_run(void *opaque)
-         }
-         /* Copy if allocated above the base */
-         ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base),
--                                      sector_num,
-+                                      offset / BDRV_SECTOR_SIZE,
-                                       COMMIT_BUFFER_SIZE / BDRV_SECTOR_SIZE,
-                                       &n);
-         copy = (ret == 1);
--        trace_commit_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
--                                   n * BDRV_SECTOR_SIZE, ret);
-+        trace_commit_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
-         if (copy) {
--            ret = commit_populate(s->top, s->base,
--                                  sector_num * BDRV_SECTOR_SIZE,
-+            ret = commit_populate(s->top, s->base, offset,
-                                   n * BDRV_SECTOR_SIZE, buf);
-             bytes_written += n * BDRV_SECTOR_SIZE;
-         }
+     if (s->cow_bitmap) {
+-        ret += mirror_cow_align(s, &sector_num, &nb_sectors);
++        int64_t offset = sector_num * BDRV_SECTOR_SIZE;
++        unsigned int bytes = nb_sectors * BDRV_SECTOR_SIZE;
++        int gap;
++
++        gap = mirror_cow_align(s, &offset, &bytes);
++        sector_num = offset / BDRV_SECTOR_SIZE;
++        nb_sectors = bytes / BDRV_SECTOR_SIZE;
++        ret += gap / BDRV_SECTOR_SIZE;
+     }
+     assert(nb_sectors << BDRV_SECTOR_BITS <= s->buf_size);
+     /* The sector range must meet granularity because:
 -- 
 1.8.3.1
