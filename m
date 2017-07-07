@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dTTHp-0003PO-SI
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:10 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTTI9-0003gp-DR
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dTTHl-000248-TQ
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dTTHl-00022l-Ml
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:05 -0400
-Date: Fri, 7 Jul 2017 15:27:00 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170707152700.4e18f6f9@nial.brq.redhat.com>
-In-Reply-To: <20170707124719.GA17544@rkaganb.sw.ru>
-References: <20170621162424.10462-1-rkagan@virtuozzo.com>
-	<20170621162424.10462-15-rkagan@virtuozzo.com>
-	<20170629170546.6450586d@nial.brq.redhat.com>
-	<20170629175100.GB13435@rkaganb.sw.ru>
-	<20170707142220.4d0f14fe@nial.brq.redhat.com>
-	<20170707124719.GA17544@rkaganb.sw.ru>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTTI5-0002Fm-FB
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:29 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 15:27:08 +0200
+Message-Id: <149943402876.8972.12271214453548015446.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 14/23] hyperv: qom-ify SynIC
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 26/27] target/arm: [tcg,
+ a64] Port to disas_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Fri, 7 Jul 2017 15:47:19 +0300
-Roman Kagan <rkagan@virtuozzo.com> wrote:
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-> On Fri, Jul 07, 2017 at 02:22:20PM +0200, Igor Mammedov wrote:
-> > On Thu, 29 Jun 2017 20:51:01 +0300
-> > Roman Kagan <rkagan@virtuozzo.com> wrote:
-> >   
-> > > On Thu, Jun 29, 2017 at 05:05:46PM +0200, Igor Mammedov wrote:  
-> > > > On Wed, 21 Jun 2017 19:24:15 +0300
-> > > > Roman Kagan <rkagan@virtuozzo.com> wrote:    
-> > [...]  
-> > >   
-> > > > > +    if (cpu->hyperv_synic) {
-> > > > > +        if (kvm_vcpu_enable_cap(CPU(cpu), KVM_CAP_HYPERV_SYNIC, 0)) {
-> > > > > +            fprintf(stderr, "failed to enable Hyper-V SynIC\n");
-> > > > > +            return -ENOSYS;
-> > > > > +        }
-> > > > > +
-> > > > > +        hyperv_synic_add(cpu);    
-> > > > is synic KVM specific or may it work with TCG accel?    
-> > > 
-> > > No, it's exclusively KVM.  Actually most of it sits in the kernel.
-> > >   
-> > > > in either case, looks like hyperv_synic_add() should be called from
-> > > > x86_cpu_realizefn(), the same like we do with APIC creating it
-> > > > depending feature being enabled.    
-> > > 
-> > > I'm not sure I understand the reason, in view of it being exclusively
-> > > KVM.  
-> > couldn't synic be emulated (if missing QEMU part is written) in TCG mode
-> > or it relies on specific KVM features?  
-> 
-> At the moment it depends on KVM and, in particular, relies on lapic
-> being in KVM.  I guess with certain effort it can be done in TCG too,
-> but we didn't even consider this so far, and have no plans for it.
-we would avoid rewriting synic code if you can keep synic parts
-that could be reused by TCG outside of kvm specific files.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/arm/translate-a64.c |   14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-Refactoring to qom/device and moving that code in separate file
-is a good time to start doing it and keeping kvm related parts isolated/minimal
-should help in future when TCG synic model could be written.
-(but I don't insist on it).
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index cead9d382c..ea60d43a95 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11379,6 +11379,16 @@ static void aarch64_tr_tb_stop(DisasContextBase =
+*dcbase, CPUState *cpu)
+     }
+ }
+=20
++static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
++                                      CPUState *cpu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++
++    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
++    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
++                     4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
++}
++
+ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+                                TranslationBlock *tb)
+ {
+@@ -11475,9 +11485,7 @@ done_generating:
+         qemu_log_in_addr_range(dc->base.pc_first)) {
+         qemu_log_lock();
+         qemu_log("----------------\n");
+-        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+-        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_fir=
+st,
+-                         4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
++        aarch64_tr_disas_log(&dc->base, cs);
+         qemu_log("\n");
+         qemu_log_unlock();
+     }
