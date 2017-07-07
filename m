@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTVP5-0000vY-8z
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:42:48 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTVSh-0002Jn-GC
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTVP1-0008LJ-Vk
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:42:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTVP1-0008Ke-Mg
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:42:43 -0400
-References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
-	<20170707152918.23086-3-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a85d5193-e500-d798-7048-d35701d4caa6@redhat.com>
-Date: Fri, 7 Jul 2017 10:42:09 -0500
+	(envelope-from <rth7680@gmail.com>) id 1dTVSg-0001VB-K0
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:46:31 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865801156.17063.15618379976159104550.stgit@frigg.lan>
+	<244b5aab-8863-3139-f252-09cc02333eda@twiddle.net>
+	<87inj4ebqn.fsf@frigg.lan>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net>
+Date: Fri, 7 Jul 2017 05:46:19 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170707152918.23086-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo"
-Subject: Re: [Qemu-devel] [PATCH v3 02/10] nbd/server: refactor nbd_negotiate
+In-Reply-To: <87inj4ebqn.fsf@frigg.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
- den@openvz.org
-Message-ID: <a85d5193-e500-d798-7048-d35701d4caa6@redhat.com>
-Subject: Re: [PATCH v3 02/10] nbd/server: refactor nbd_negotiate
-References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
- <20170707152918.23086-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20170707152918.23086-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 07/07/2017 01:18 AM, Lluís Vilanova wrote:
+>>> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>>> index 9c870f6d07..586a01a2de 100644
+>>> --- a/target/arm/translate-a64.c
+>>> +++ b/target/arm/translate-a64.c
+>>> @@ -11244,6 +11244,9 @@ static void aarch64_trblock_init_disas_context(DisasContextBase *dcbase,
+> dc-> is_ldex = false;
+> dc-> ss_same_el = (arm_debug_target_el(env) == dc->current_el);
+>>> +    dc->next_page_start =
+>>> +        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+> 
+>> I think a better solution for a fixed-length ISA is to adjust max_insns. Perhaps
+>> the init_disas_context hook should be able to modify it?
+> 
+> ARM has the thumb instructions, so it really isn't a fixed-length ISA.
 
-On 07/07/2017 10:29 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Combine two successive "if (oldStyle) {...} else {...}" into one.
->=20
-> Block "if (client->tlscreds)" under "if (oldStyle)" is unreachable,
-> as we have "oldStyle =3D client->exp !=3D NULL && !client->tlscreds;".
-> So, delete this block.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ From the filename above we're talking about AArch64 here.
+Whcih is most definitely a fixed-width ISA.
 
 
---s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+That said, even for AArch32 we know by the TB flags whether or not we're going 
+to be generating arm or thumb code.  I think that these hooks will allow arm 
+and thumb mode to finally be split apart cleanly, instead of the tangle that 
+they are now.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+I see arm's gen_intermediate_code eventually looking like
 
-iQEcBAEBCAAGBQJZX6vRAAoJEKeha0olJ0NqsKwH/i3V6czvoONZYqFlwDZNJfP7
-zLliTuZ1tpbsqFaQi+NyJcmRlkmEuLrHxo2CfkL/PKgvm6p03lNV9OykcRjS7648
-6h7G46zUQ29rUhdJ4+xpLATzGIHxU3dWSQCBnITjG+Xg6EjRzz8Zaxkp278nG7L8
-xCU0FUVLkYEoFNvFmdsFTUetWFH1Dg1oPCMIgWBGyWWt/y8LsO9plamFn12cLY38
-GTO44gI4ZWIRDv4DFUZfPBGhx4kwWggRLWkO1dm7G+FJACjOyZ17pUS3FfkTLZxy
-q4bHvZFnSQZVn5JXkXjvcX209fnbZXTeYgdR1BT77ifigI1mJ2kXPEPTiqauI30=
-=z+60
------END PGP SIGNATURE-----
+   const TranslatorOps *ops = &arm_translator_ops;
+   if (ARM_TBFLAG_THUMB(tb->flags)) {
+     ops = &thumb_translator_ops;
+   }
+#ifdef TARGET_AARCH64
+   if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+     ops = &aarch64_translator_ops;
+   }
+#endif
+   translator_loop(ops, &dc.base, cpu, tb);
 
---s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo--
+There would certainly be some amount of shared code, but it would also allow 
+quite a few of the existing dc->thumb checks to be eliminated.
+
+
+>> And, while I'm thinking of it -- why is the init_globals hook separate? There's
+>> nothing in between the two hook calls, and the more modern target front ends
+>> won't need it.
+> 
+> You mean merging init_disas_context and init_globals? I wanted to keep
+> semantically different code on separate hooks, but I can pull the init_globals
+> code into init_disas_context (hoping that as targets get modernized, they won't
+> initialize any global there).
+
+I suppose you can leave the two hooks separate for now.  It doesn't hurt, and 
+it's kind of a reminder of things that need cleaning up.
+
+I do wonder if we should provide a generic empty hook, so that a target that 
+does not need a particular hook need not define an empty function.  It could 
+just put e.g. "translator_noop" into the structure.  Ok, maybe a better name 
+than that...
+
+
+r~
