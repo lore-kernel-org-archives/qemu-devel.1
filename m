@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTUu4-0005Z2-Vr
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:45 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1dTUvH-0006Vk-T9
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTUu0-0007xU-Tz
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:44 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:45182 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dTUu0-0007uy-GM
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:40 -0400
-References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
-	<20170621153424.16690-3-vsementsov@virtuozzo.com>
-	<b8174b0b-1782-48ae-6bef-3f2a6a08f025@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0c0712e3-3136-5a62-3c5b-90c9e861c469@virtuozzo.com>
-Date: Fri, 7 Jul 2017 18:10:37 +0300
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1dTUvG-0000Wi-VQ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:11:59 -0400
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
+	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
+	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
+	<AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
+	<BN4PR07MB2161B5CCE84496804B848326E3D50@BN4PR07MB2161.namprd07.prod.outlook.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D28807@SHSMSX101.ccr.corp.intel.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <67cb3a84-9aa7-2b4f-43b6-be6dea15b66f@arm.com>
+Date: Fri, 7 Jul 2017 16:14:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <b8174b0b-1782-48ae-6bef-3f2a6a08f025@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D190D28807@SHSMSX101.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: use errp instead of LOG
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm]  [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>, "Kalra, Ashish" <Ashish.Kalra@cavium.com>, Auger Eric <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-07.07.2017 17:40, Eric Blake wrote:
-> On 06/21/2017 10:34 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Move to modern errp scheme from just LOGging errors.
+Hi Ashish,
+
+On 07/07/17 00:33, Tian, Kevin wrote:
+>> From: Kalra, Ashish [mailto:Ashish.Kalra@cavium.com]
+>> Sent: Friday, July 7, 2017 7:24 AM
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   nbd/server.c | 268 +++++++++++++++++++++++++++++++++++------------------------
->>   1 file changed, 161 insertions(+), 107 deletions(-)
->> -static coroutine_fn int nbd_negotiate(NBDClient *client)
->> +static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
->>   {
->>       char buf[8 + 8 + 8 + 128];
->>       int ret;
-> Now that you have this,
->
->>      qio_channel_set_blocking(client->ioc, false, NULL);
+>> I have a generic question on vIOMMU support, is there any proposal/plan to
+>> add ATS/PRI extension support to vIOMMUs and allow
+>> handling for end to end (v)IOMMU Page faults (w/t the device side
+>> implementation on Vhost) ?
 >>
-> you should probably pass errp through to qio_channel_set_blocking and
-> return early if that fails (either here or in one of the followup
-> patches) [hmm, I note that most callers of qio_channel_set_blocking()
-> ignore errors - outside of NBD, so that's a separate cleanup series]
+>> Again, the motivation will be to do DMA on paged guest memory and
+>> potentially avoiding the requirement of pinned/locked
+>> guest physical memory for DMA.
+> 
+> yes, that's a necessary part to support SVM in both virtio-iommu 
+> approach and fully emulated approach (e.g. for Intel VTd). There
+> are already patches and discussions in other thread about how to
+> propagate IOMMU page fault to vIOMMU. Then after it is done
+> vIOMMU page fault emulation will be further added.
+> 
+> https://lkml.org/lkml/2017/6/27/964
 
-I've looked through realizations of ioc_klass->io_set_blocking - looks 
-like they all are returning zero always.
+For virtio-iommu, I'd like to add an event virtqueue for the device to
+send page faults to the driver, in a format similar to a PRI Page Request.
+The driver would then send a reply via the request virtqueue in a format
+similar to a PRG Response.
 
->
->
->> @@ -591,21 +617,23 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
->>   
->>       if (oldStyle) {
->>           if (client->tlscreds) {
->> -            TRACE("TLS cannot be enabled with oldstyle protocol");
->> +            error_setg(errp, "TLS cannot be enabled with oldstyle protocol");
->>               return -EINVAL;
-> This code is unreachable, since earlier we have:
->
->>      oldStyle = client->exp != NULL && !client->tlscreds;
-> You could just as easily delete the conditional.  In fact, our code has:
->
-> if (oldStyle) {
->      do stuff
-> } else {
->      do stuff
-> }
->
-> if (oldStyle) {
->      do stuff
-> } else {
->      do stuff
-> }
->
-> and it would be simple to merge that into a single if statement.
->
+In Qemu the device implementation would hopefully be based on the same
+mechanism as VTd. The vhost implementation would receive IO Page Faults
+from VFIO and forward them on the event virtqueue similarly to the
+userspace implementation.
 
--- 
-Best regards,
-Vladimir
+Thanks,
+Jean
