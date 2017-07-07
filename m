@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTMX7-00073T-Rf
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:14:30 -0400
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1dTMdG-0008Q4-2G
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTMX2-0005oS-UR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:14:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTMX2-0005o7-Nl
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:14:24 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Date: Fri, 07 Jul 2017 08:14:21 +0200
-In-Reply-To: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	(Pradeep Jagadeesh's message of "Tue, 4 Jul 2017 11:30:57 -0400")
-Message-ID: <87podcrcxu.fsf@dusky.pond.sub.org>
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1dTMdB-00086o-Hu
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:20:50 -0400
+Received: from [59.151.112.132] (port=6515 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lizhijian@cn.fujitsu.com>) id 1dTMdB-00085W-4o
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:20:45 -0400
+References: <1499406231-3877-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499406231-3877-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Li Zhijian <lizhijian@cn.fujitsu.com>
+Message-ID: <a860a0c8-ca76-27b9-8990-ea2d5c564887@cn.fujitsu.com>
+Date: Fri, 7 Jul 2017 14:20:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
- throttling
+In-Reply-To: <1499406231-3877-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 2/4] net/colo-compare.c: compare tcp packet
+ base on sequence number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, jani kokkonen <jani.kokkonen@huawei.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
+this title confused me
 
-> These patches provide the qmp interface, to query the io throttle 
-> status of the all fsdev devices that are present in a vm.
-> also, it provides an interface to set the io throttle parameters of a
-> fsdev to a required value. some of the patches also remove the duplicate
-> code that was present in block and fsdev files. 
+i think you want to express "only compare the packets that has the same sequence number"
+
+and i think this optimization can not reduce this checkpoint optimization.
+
+Thanks
+
+
+On 07/07/2017 01:43 PM, Zhang Chen wrote:
+> If primary packet's sequence number not same with secondary packet's
+> sequence number, no need to compare the packet other field.
 >
-> Pradeep Jagadeesh (6):
->   throttle: factor out duplicate code
->   qmp: Create IOThrottle structure
->   throttle: move out function to reuse the code
->   hmp: create a throttle initialization function for code reusability
->   fsdev: hmp interface for throttling
->   fsdev: QMP interface for throttling
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
 >
->  Makefile                        |   4 ++
->  blockdev.c                      |  97 ++-------------------------------
->  fsdev/qemu-fsdev-dummy.c        |  10 ++++
->  fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++--------------
->  fsdev/qemu-fsdev-throttle.h     |  13 +++++
->  fsdev/qemu-fsdev.c              |  37 +++++++++++++
->  hmp-commands-info.hx            |  18 ++++++
->  hmp-commands.hx                 |  19 +++++++
->  hmp.c                           |  81 +++++++++++++++++++++++++--
->  hmp.h                           |   4 ++
->  include/qemu/throttle-options.h |   7 +++
->  include/qemu/throttle.h         |   4 +-
->  include/qemu/typedefs.h         |   1 +
->  monitor.c                       |   5 ++
->  qapi-schema.json                |   3 +
->  qapi/block-core.json            |  76 +-------------------------
->  qapi/fsdev.json                 |  84 ++++++++++++++++++++++++++++
->  qapi/iothrottle.json            |  88 ++++++++++++++++++++++++++++++
->  qmp.c                           |  14 +++++
->  util/throttle.c                 | 110 +++++++++++++++++++++++++++++++++++++
->  20 files changed, 577 insertions(+), 216 deletions(-)
->  create mode 100644 qapi/fsdev.json
->  create mode 100644 qapi/iothrottle.json
-
-No test coverage?
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 0f8e198..2caeb80 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -222,6 +222,12 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+>       ptcp = (struct tcphdr *)ppkt->transport_header;
+>       stcp = (struct tcphdr *)spkt->transport_header;
+>   
+> +    if ((ptcp->th_flags & TH_SYN) != TH_SYN &&
+> +        ptcp->th_seq != stcp->th_seq) {
+> +        trace_colo_compare_main("colo_packet_compare_tcp seq not same");
+> +        return -1;
+> +    }
+> +
+>       /*
+>        * The 'identification' field in the IP header is *very* random
+>        * it almost never matches.  Fudge this by ignoring differences in
