@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTPKS-0004Es-NA
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:13:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dTPL5-0004Xb-Tv
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:14:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTPKN-0003Ct-OZ
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:13:36 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:44993)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1dTPKN-00039P-GY
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:13:31 -0400
-References: <20170707022111.21836-1-rth@twiddle.net>
-	<20170707022111.21836-9-rth@twiddle.net>
-	<0fbb03b7-d701-765a-6de8-54b6bb5ec1ec@vivier.eu>
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <3dd8627d-e967-eb7d-d8ae-436065793983@physik.fu-berlin.de>
-Date: Fri, 7 Jul 2017 11:13:24 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dTPL4-0004Ek-Hg
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:14:15 -0400
+References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
+	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
+	<20170216130409.GA28784@lemon.lan>
+	<d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
+	<15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
+	<66e7f481-06f4-2a7e-77fb-1a5c9fc1f301@virtuozzo.com>
+	<255b6c77-48e4-217d-f1da-d2544db5b646@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <53adc05a-03a5-6621-8be1-026003938162@virtuozzo.com>
+Date: Fri, 7 Jul 2017 12:13:57 +0300
 MIME-Version: 1.0
-In-Reply-To: <0fbb03b7-d701-765a-6de8-54b6bb5ec1ec@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <255b6c77-48e4-217d-f1da-d2544db5b646@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/27] linux-user/sh4: Notice gUSA
- regions during signal delivery
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
+ dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, bruno@clisp.org, glaubitz@debian.org
+To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
 
-On 07/07/2017 11:05 AM, Laurent Vivier wrote:> I think unwind_gusa() should be moved after the get_sigfram() (in both> cases), because r15  can be updated and
-the sigframe base lost.
-Tried the change. "dpkg-reconfigure tzdata" now crashes differently:
+06.07.2017 20:53, John Snow wrote:
+>
+> On 07/06/2017 04:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 06.07.2017 00:46, John Snow wrote:
+>>> On 07/05/2017 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 16.02.2017 16:04, Fam Zheng wrote:
+>>>>>> +            dbms->node_name = bdrv_get_node_name(bs);
+>>>>>> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
+>>>>>> +                dbms->node_name = bdrv_get_device_name(bs);
+>>>>>> +            }
+>>>>>> +            dbms->bitmap = bitmap;
+>>>>> What protects the case that the bitmap is released before migration
+>>>>> completes?
+>>>>>
+>>>> What is the source of such deletion? qmp command? Theoretically
+>>>> possible.
+>>>>
+>>>> I see the following variants:
+>>>>
+>>>> 1. additional variable BdrvDirtyBItmap.migration, which forbids bitmap
+>>>> deletion
+>>>>
+>>>> 2. make bitmap anonymous (bdrv_dirty_bitmap_make_anon) - it will not be
+>>>> available through qmp
+>>>>
+>>> Making the bitmap anonymous would forbid us to query the bitmap, which
+>>> there is no general reason to do, excepting the idea that a third party
+>>> attempting to use the bitmap during a migration is probably a bad idea.
+>>> I don't really like the idea of "hiding" information from the user,
+>>> though, because then we'd have to worry about name collisions when we
+>>> de-anonymized the bitmap again. That's not so palatable.
+>>>
+>>>> what do you think?
+>>>>
+>>> The modes for bitmaps are getting messy.
+>>>
+>>> As a reminder, the officially exposed "modes" of a bitmap are currently:
+>>>
+>>> FROZEN: Cannot be reset/deleted. Implication is that the bitmap is
+>>> otherwise "ACTIVE."
+>>> DISABLED: Not recording any writes (by choice.)
+>>> ACTIVE: Actively recording writes.
+>>>
+>>> These are documented in the public API as possibilities for
+>>> DirtyBitmapStatus in block-core.json. We didn't add a new condition for
+>>> "readonly" either, which I think is actually required:
+>>>
+>>> READONLY: Not recording any writes (by necessity.)
+>>>
+>>>
+>>> Your new use case here sounds like Frozen to me, but it simply does not
+>>> have an anonymous successor to force it to be recognized as "frozen." We
+>>> can add a `bool protected` or `bool frozen` field to force recognition
+>>> of this status and adjust the json documentation accordingly.
+>> Bitmaps are selected for migration when source is running, so we should
+>> protect them (from deletion (or frozing or disabling), not from chaning
+>> bits) before source stop, so that is not like frozen. Bitmaps may be
+>> changed in this state.
+>> It is more like ACTIVE.
+>>
+> Right, it's not exactly like frozen's _implementation_ today, but...
+>
+>> We can move bitmap selection on the point after precopy migration, after
+>> source stop, but I'm not sure that it would be good.
+>>
+>>> I think then we'd have four recognized states:
+>>>
+>>> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
+>>> other internal process. Bitmap is otherwise ACTIVE.
+>> ? Frozen means that all writes goes to the successor and frozen bitmap
+>> itself is unchanged, no?
+>>
+> I was thinking from the point of view of the API. Of course internally,
+> you're correct; a "frozen bitmap" is one that is actually disabled and
+> has an anonymous successor, and that successor records IO.
+>
+>  From the point of view of the API, a frozen bitmap is just "one bitmap"
+> that is still recording reads/writes, but is protected from being edited
+> from QMP.
+>
+> It depends on if you're looking at bitmaps as opaque API objects or if
+> you're looking at the implementation.
+>
+>  From an API point of view, protecting an Active bitmap from being
+> renamed/cleared/deleted is functionally identical to the existing case
+> of protecting a bitmap-and-successor pair during a backup job.
 
-Current default time zone: 'Europe/Berlin'
-Local time is now:      Fri Jul  7 11:11:52 CEST 2017.
-Universal Time is now:  Fri Jul  7 09:11:52 UTC 2017.
+then, this should be described in API ref..
 
-Unhandled trap: 0x180
-pc=0xf6fff39a sr=0x00000100 pr=0x00512c28 fpscr=0x00080004
-spc=0x00000000 ssr=0x00000000 gbr=0xf6585470 vbr=0x00000000
-sgr=0x00000000 dbr=0x00000000 delayed_pc=0xf6fff3ac fpul=0x00000002
-r0=0xffffffe0 r1=0x00000470 r2=0x00afc048 r3=0x00000004
-r4=0x0000000a r5=0x00bbdc18 r6=0x00000001 r7=0x00000001
-r8=0x00bbdc18 r9=0x00bbdc18 r10=0x00000001 r11=0x0041728c
-r12=0x0000000a r13=0x0041744c r14=0x0058a384 r15=0x00000470
-r16=0x00000000 r17=0x00000000 r18=0x00000000 r19=0x00000000
-r20=0x00000000 r21=0x00000000 r22=0x00000000 r23=0x00000000
-(sid-sh4-sbuild)root@nofan:/#
+for now I see here:
+# @frozen: The bitmap is currently in-use by a backup operation or block 
+job,
+#          and is immutable.
 
-The crash on terminal resize is still present, too.
+Which looks more like the bitmap is unchanged at all.
 
-Adrian
+---
+
+Do not we want in future allow user to create successors through qmp?
+
+We have the following case: exteranal backup.
+
+Backup should be done through image fleecing (temporary image, online 
+drive is backing for temp, start backup with sync=none from online drive 
+to temp, export temp through nbd).
+To make this backup incremental here is BLOCK_STATUS nbd extension, 
+which allows dirty bitmap export.
+But we need also frozen-bitmap mechanism like with normal incremental 
+backup.. Should we create qmp_create_bitmap_successor and friends for it?
+Or we will add separate mechanism like qmp_start_external_backup, 
+qmp_finish_external_backup(success = true/false) ?
+
+
+
+>
+>>> DISABLED: Not recording any writes (by choice.)
+>>> READONLY: Not able to record any writes (by necessity.)
+>>> ACTIVE: Normal bitmap status.
+>>>
+>>> Sound right?
+>>
 
 -- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+Best regards,
+Vladimir
