@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTTI9-0003gp-DR
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dTTKy-0006WQ-T0
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTTI5-0002Fm-FB
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:27:29 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri,  7 Jul 2017 15:27:08 +0200
-Message-Id: <149943402876.8972.12271214453548015446.stgit@frigg.lan>
-In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	(envelope-from <ehabkost@redhat.com>) id 1dTTKy-0003Xt-5K
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:30:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60693)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTTKx-0003XW-VB
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:30:24 -0400
+Date: Fri, 7 Jul 2017 10:30:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170707133016.GU12152@localhost.localdomain>
+References: <1499242883-2184-1-git-send-email-peterx@redhat.com>
+	<1499242883-2184-5-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 26/27] target/arm: [tcg,
- a64] Port to disas_log
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499242883-2184-5-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] doc: update TYPE_MIGRATION documents
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +27,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, haoqf@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+On Wed, Jul 05, 2017 at 04:21:23PM +0800, Peter Xu wrote:
+> [Peter collected Eduardo's patch comment and formatted into patch]
+> 
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate-a64.c |   14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+In case it was not merged yet:
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index cead9d382c..ea60d43a95 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11379,6 +11379,16 @@ static void aarch64_tr_tb_stop(DisasContextBase =
-*dcbase, CPUState *cpu)
-     }
- }
-=20
-+static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
-+                                      CPUState *cpu)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+
-+    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
-+    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
-+                     4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
-+}
-+
- void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
-                                TranslationBlock *tb)
- {
-@@ -11475,9 +11485,7 @@ done_generating:
-         qemu_log_in_addr_range(dc->base.pc_first)) {
-         qemu_log_lock();
-         qemu_log("----------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_fir=
-st,
--                         4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
-+        aarch64_tr_disas_log(&dc->base, cs);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+-- 
+Eduardo
