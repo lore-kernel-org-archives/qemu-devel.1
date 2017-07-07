@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmk-0006tZ-Lt
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmr-000725-BG
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmj-0001Hj-4C
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmq-0001KJ-Ec
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:25 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:49 +0200
-Message-Id: <1499447335-6125-95-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:53 +0200
+Message-Id: <1499447335-6125-99-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 094/100] iotests: fix remainining tests to work
- with LUKS
+Subject: [Qemu-devel] [PULL 098/100] iotests: Use absolute paths for
+ executables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,274 +23,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-The tests 033, 140, 145 and 157 were all broken
-when run with LUKS, since they did not correctly use
-the required image opts args syntax to specify the
-decryption secret. Further, the 120 test simply does
-not make sense to run with luks, as the scenario
-exercised is not relevant.
+A user may specify a relative path for accessing qemu, qemu-img, etc.
+through environment variables ($QEMU_PROG and friends) or a symlink.
 
-The test 181 was broken when run with LUKS because
-it didn't take account of fact that $TEST_IMG was
-already in image opts syntax. The launch_qemu
-helper also didn't register the secret object
-providing the LUKS password.
+If a test decides to change its working directory, relative paths will
+cease to work, however. Work around this by making all of the paths to
+programs that should undergo testing absolute. Besides "realpath", we
+also have to use "type -p" to support programs in $PATH.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+As a side effect, this fixes specifying these programs as symlinks for
+out-of-tree builds: Before, you would have to create two symlinks, one
+in the build and one in the source tree (the first one for common.config
+to find, the second one for the iotest to use). Now it is sufficient to
+create one in the build tree because common.config will resolve it.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20170702150510.23276-2-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170626123510.20134-3-berrange@redhat.com
+Tested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/033         | 12 ++++++++++--
- tests/qemu-iotests/120         |  1 +
- tests/qemu-iotests/140         |  9 ++++++++-
- tests/qemu-iotests/145         | 19 +++++++++++++++++--
- tests/qemu-iotests/157         | 17 ++++++++++++++---
- tests/qemu-iotests/157.out     | 16 ++++++++--------
- tests/qemu-iotests/174         |  2 +-
- tests/qemu-iotests/181         | 21 ++++++++++++++++-----
- tests/qemu-iotests/common.qemu |  9 +++++++--
- 9 files changed, 82 insertions(+), 24 deletions(-)
+ tests/qemu-iotests/common.config | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index 16edcf2..2cdfd13 100755
---- a/tests/qemu-iotests/033
-+++ b/tests/qemu-iotests/033
-@@ -50,10 +50,18 @@ do_test()
- 	local align=$1
- 	local iocmd=$2
- 	local img=$3
-+	if [ "$IMGOPTSSYNTAX" = "true" ]
-+	then
-+	    IO_OPEN_ARG="$img"
-+	    IO_EXTRA_ARGS="--image-opts"
-+	else
-+	    IO_OPEN_ARG="-o driver=$IMGFMT,file.align=$align blkdebug::$img"
-+	    IO_EXTRA_ARGS=""
-+	fi
- 	{
--		echo "open -o driver=$IMGFMT,file.align=$align blkdebug::$img"
-+		echo "open $IO_OPEN_ARG"
- 		echo $iocmd
--	} | $QEMU_IO
-+	} | $QEMU_IO $IO_EXTRA_ARGS
- }
+diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+index d1b45f5..e0883a0 100644
+--- a/tests/qemu-iotests/common.config
++++ b/tests/qemu-iotests/common.config
+@@ -103,6 +103,17 @@ if [ -z "$QEMU_VXHS_PROG" ]; then
+     export QEMU_VXHS_PROG="`set_prog_path qnio_server`"
+ fi
  
- for write_zero_cmd in "write -z" "aio_write -z"; do
-diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-index 4f88a67..f40b97d 100755
---- a/tests/qemu-iotests/120
-+++ b/tests/qemu-iotests/120
-@@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
-+_unsupported_fmt luks
- 
- _make_test_img 64M
- 
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 8c80a5a..f89d0d6 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -52,8 +52,15 @@ _make_test_img 64k
- 
- $QEMU_IO -c 'write -P 42 0 64k' "$TEST_IMG" | _filter_qemu_io
- 
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    SYSEMU_DRIVE_ARG=if=none,media=cdrom,id=drv,"$TEST_IMG"
-+else
-+    SYSEMU_DRIVE_ARG=if=none,media=cdrom,id=drv,file="$TEST_IMG",driver=$IMGFMT
++export QEMU_PROG=$(realpath -- "$(type -p "$QEMU_PROG")")
++export QEMU_IMG_PROG=$(realpath -- "$(type -p "$QEMU_IMG_PROG")")
++export QEMU_IO_PROG=$(realpath -- "$(type -p "$QEMU_IO_PROG")")
++export QEMU_NBD_PROG=$(realpath -- "$(type -p "$QEMU_NBD_PROG")")
++
++# This program is not built as part of qemu but (possibly) provided by the
++# system, so it may not be present at all
++if [ -n "$QEMU_VXHS_PROG" ]; then
++    export QEMU_VXHS_PROG=$(realpath -- "$(type -p "$QEMU_VXHS_PROG")")
 +fi
 +
- keep_stderr=y \
--_launch_qemu -drive if=none,media=cdrom,id=drv,file="$TEST_IMG",format=$IMGFMT \
-+_launch_qemu -drive $SYSEMU_DRIVE_ARG \
-     2> >(_filter_nbd)
- 
- _send_qemu_cmd $QEMU_HANDLE \
-diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-index e6c6bc4..c371b3c 100755
---- a/tests/qemu-iotests/145
-+++ b/tests/qemu-iotests/145
-@@ -43,8 +43,23 @@ _supported_proto generic
- _supported_os Linux
- 
- _make_test_img 1M
--echo quit | $QEMU -nographic -hda "$TEST_IMG" -incoming 'exec:true' -snapshot -serial none -monitor stdio |
--    _filter_qemu | _filter_hmp
-+
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    SYSEMU_DRIVE_ARG=if=none,$TEST_IMG
-+    SYSEMU_EXTRA_ARGS=""
-+    if [ -n "$IMGKEYSECRET" ]; then
-+        SECRET_ARG="secret,id=keysec0,data=$IMGKEYSECRET"
-+        SYSEMU_EXTRA_ARGS="-object $SECRET_ARG"
-+    fi
-+else
-+    SYSEMU_DRIVE_ARG=if=none,file="$TEST_IMG",driver=$IMGFMT
-+    SYSEMU_EXTRA_ARGS=""
-+fi
-+
-+echo quit | $QEMU -nographic $SYSEMU_EXTRA_ARGS -drive $SYSEMU_DRIVE_ARG \
-+                  -incoming 'exec:true' -snapshot -serial none -monitor stdio \
-+          | _filter_qemu | _filter_hmp
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-index 8d939cb..2bf02be 100755
---- a/tests/qemu-iotests/157
-+++ b/tests/qemu-iotests/157
-@@ -43,7 +43,6 @@ _supported_os Linux
- 
- function do_run_qemu()
+ _qemu_wrapper()
  {
--    echo Testing: "$@"
      (
-         if ! test -t 0; then
-             while read cmd; do
-@@ -63,7 +62,18 @@ function run_qemu()
- 
- 
- size=128M
--drive="if=none,file=$TEST_IMG,driver=$IMGFMT"
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    SYSEMU_DRIVE_ARG=if=none,$TEST_IMG
-+    SYSEMU_EXTRA_ARGS=""
-+    if [ -n "$IMGKEYSECRET" ]; then
-+        SECRET_ARG="secret,id=keysec0,data=$IMGKEYSECRET"
-+        SYSEMU_EXTRA_ARGS="-object $SECRET_ARG"
-+    fi
-+else
-+    SYSEMU_DRIVE_ARG=if=none,file="$TEST_IMG",driver=$IMGFMT
-+    SYSEMU_EXTRA_ARGS=""
-+fi
- 
- _make_test_img $size
- 
-@@ -76,8 +86,9 @@ echo
- 
- for cache in "writeback" "writethrough"; do
-     for wce in "" ",write-cache=auto" ",write-cache=on" ",write-cache=off"; do
-+        echo "Testing: cache='$cache' wce='$wce'"
-         echo "info block" \
--            | run_qemu -drive "$drive,cache=$cache" \
-+            | run_qemu $SYSEMU_EXTRA_ARGS -drive "$SYSEMU_DRIVE_ARG,cache=$cache" \
-                        -device "virtio-blk,drive=none0$wce" \
-             | grep -e "Testing" -e "Cache mode"
-     done
-diff --git a/tests/qemu-iotests/157.out b/tests/qemu-iotests/157.out
-index 77a9c03..fdc807f 100644
---- a/tests/qemu-iotests/157.out
-+++ b/tests/qemu-iotests/157.out
-@@ -3,20 +3,20 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- 
- === Setting WCE with qdev and with manually created BB ===
- 
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0
-+Testing: cache='writeback' wce=''
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0,write-cache=auto
-+Testing: cache='writeback' wce=',write-cache=auto'
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0,write-cache=on
-+Testing: cache='writeback' wce=',write-cache=on'
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0,write-cache=off
-+Testing: cache='writeback' wce=',write-cache=off'
-     Cache mode:       writethrough
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0
-+Testing: cache='writethrough' wce=''
-     Cache mode:       writethrough
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0,write-cache=auto
-+Testing: cache='writethrough' wce=',write-cache=auto'
-     Cache mode:       writethrough
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0,write-cache=on
-+Testing: cache='writethrough' wce=',write-cache=on'
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0,write-cache=off
-+Testing: cache='writethrough' wce=',write-cache=off'
-     Cache mode:       writethrough
- *** done
-diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-index c1c20a1a..552879d 100755
---- a/tests/qemu-iotests/174
-+++ b/tests/qemu-iotests/174
-@@ -41,7 +41,7 @@ _unsupported_fmt raw
- 
- 
- size=256K
--IMGFMT=raw IMGOPTS= _make_test_img $size | _filter_imgfmt
-+IMGFMT=raw IMGKEYSECRET= IMGOPTS= _make_test_img $size | _filter_imgfmt
- 
- echo
- echo "== reading wrong format should fail =="
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index f73ad5a..0333dda 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -57,13 +57,24 @@ echo
- 
- qemu_comm_method="monitor"
- 
--_launch_qemu \
--    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+fi
- src=$QEMU_HANDLE
- 
--_launch_qemu \
--    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
--    -incoming "unix:${MIG_SOCKET}"
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+fi
- dest=$QEMU_HANDLE
- 
- echo
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index 76ef298..7645f1d 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -153,14 +153,19 @@ function _launch_qemu()
-     mkfifo "${fifo_out}"
-     mkfifo "${fifo_in}"
- 
-+    object_options=
-+    if [ -n "$IMGKEYSECRET" ]; then
-+        object_options="--object secret,id=keysec0,data=$IMGKEYSECRET"
-+    fi
-+
-     if [ -z "$keep_stderr" ]; then
-         QEMU_NEED_PID='y'\
--        ${QEMU} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-+        ${QEMU} ${object_options} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-                                                        2>&1 \
-                                                        <"${fifo_in}" &
-     elif [ "$keep_stderr" = "y" ]; then
-         QEMU_NEED_PID='y'\
--        ${QEMU} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-+        ${QEMU} ${object_options} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-                                                        <"${fifo_in}" &
-     else
-         exit 1
 -- 
 1.8.3.1
