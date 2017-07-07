@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dTV1B-0002vV-Tp
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:06 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTV1l-0003Vy-0W
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dTV17-0003Mt-Tq
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dTV17-0003MS-Ml
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:01 -0400
-Date: Fri, 7 Jul 2017 18:17:57 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170707181642-mutt-send-email-mst@kernel.org>
-References: <1499237876.3041.4.camel@linux.intel.com>
-	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
-	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
-	<20170707133949.GH10776@localhost.localdomain>
+	(envelope-from <rth7680@gmail.com>) id 1dTV1h-0003eo-1M
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:40 -0400
+Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:36329)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTV1g-0003ef-Sd
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:36 -0400
+Received: by mail-qt0-x232.google.com with SMTP id i2so29584968qta.3
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 08:18:36 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865462073.17063.17488435214703164893.stgit@frigg.lan>
+	<20170630004134.GJ13979@flamenco> <87h8yofvka.fsf@frigg.lan>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <9104ecbc-fe41-e318-d35f-d59d618acbf4@twiddle.net>
+Date: Fri, 7 Jul 2017 05:18:30 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707133949.GH10776@localhost.localdomain>
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+In-Reply-To: <87h8yofvka.fsf@frigg.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 10/29] target/i386: [tcg] Refactor
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +33,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
-> On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
-> > On 05/07/2017 11:14, Thomas Huth wrote:
-> > >   Hi,
-> > > 
-> > 
-> > Hi,
-> > 
-> > > On 05.07.2017 08:57, Chao Peng wrote:
-> > > > 
-> > > > Q35 has been in QEMU for quite a while. Compared to the current default
-> > > > i440FX, Q35 is probably not that mature and not widely used, however in
-> > > > some case, Q35 has advantages, for example, in supporting new features.
-> > > > For instance, we have some features require PCI-e support which is only
-> > > > available on Q35 and some others need it for EFI support. It is of
-> > > > course not necessary to change it as the default but if more and more
-> > > > features have dependencies on Q35 because of requiring much more modern
-> > > > features then I think it may be worth to do so. In such case we can have
-> > > > more people to use it and find problems we may know or not know.
-> > > 
-> > 
-> > Agreed
-> > 
-> > > Yes, IMHO at one point in time, we should switch the default machine
-> > > type to q35.
-> > 
-> > +1
-> > 
-> > > The i440FX is really quite old...
-> > > 
-> > > > There are certainly some drawbacks:
-> > > > -        Compatibility: current code or script may need adjustment
-> > > 
-> > > That might be a real concern ...
-> > 
-> > I am not so sure about that. Developers working on upstream projects
-> > should expect such changes and, for our case,
-> > modifying the command line by adding "-M pc" should not be a big deal.
+On 07/06/2017 11:25 PM, Lluís Vilanova wrote:
+>>> /* convert one instruction. s->base.is_jmp is set if the translation must
+>>> be stopped. Return the next pc value */
+>>> -static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>>> -                               target_ulong pc_start)
+>>> +static target_ulong disas_insn(DisasContextBase *dcbase, CPUState *cpu)
+>>> {
+>>> +    DisasContext *s = container_of(dcbase, DisasContext, base);
+>>> +    CPUX86State *env = cpu->env_ptr;
 > 
-> We could print a warning for 1 or 2 releases when users don't add
-> a explicit "-M pc" or "-M q35" argument to qemu-system-x86_64,
-> but:
+>> Minor nit: you can pass dc (*s) here directly, no need for container_of
+> [...]
 > 
-> > 
-> > The upper layers should manage the defaults by themselves so
-> > are not supposed to be affected.
-> 
-> But they would be.  libvirt uses the default machine-type from
-> QEMU.
+> I prefer not to so that the code will work in the future (i.e., not assuming the
+> location of base inside disascontext).
 
-How about extending the command for supported machines with a
-recommended machine type, and teaching libvirt to use that?
+There's clearly a misunderstanding here.
 
-This way no existing users will be affected.
+Emilio is saying that disas_insn is not a hook and private to the front-end. 
+Therefore the argument to the function should be "DisasContet *s" and not 
+"DisasContextBase *dcbase".
 
-> 
-> > [...]
-> 
-> -- 
-> Eduardo
+And I agree.  Passing DisasContext should be preferred where possible.
+
+
+r~
