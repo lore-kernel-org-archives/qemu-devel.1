@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dTT4a-0008QO-Hm
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:13:29 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTT6E-0001ob-GW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:15:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dTT4V-0003WM-JS
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:13:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dTT4V-0003W9-9s
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:13:23 -0400
-References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
-	<20170706101611.27031-3-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1ee1639b-3fa8-3dff-9957-31d96b8bf962@redhat.com>
-Date: Fri, 7 Jul 2017 15:13:11 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTT69-00047u-Gj
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:15:10 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 15:14:48 +0200
+Message-Id: <149943328848.8972.1818197840780080665.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170706101611.27031-3-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] acpi: add vmcoreinfo device
+Subject: [Qemu-devel] [PATCH v12 23/27] target/arm: [tcg] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +22,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-Marc-Andr=C3=A9,
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-sorry about this, but I have another late comment (I shoudl have pointed
-this out in v1). Regarding:
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/arm/translate.c |  191 +++++++++++++++++++++++++-----------------=
+------
+ 1 file changed, 101 insertions(+), 90 deletions(-)
 
-On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
-
-> +#define VMCOREINFO_OFFSET           40   /* allow space for
-> +                                          * OVMF SDT Header Probe Supr=
-essor
-> +                                          */
-
-and
-
-> +            Method (ADDR, 0, NotSerialized)
-> +            {
-> +                Local0 =3D Package (0x02) {}
-> +                Local0 [Zero] =3D (VCIA + 0x28)
-> +                Local0 [One] =3D Zero
-> +                Return (Local0)
-> +            }
-
-and
-
-> +In order to implement an OVMF "SDT Header Probe Suppressor", the conte=
-nts of
-> +the vmcoreinfo blob has 40 bytes of padding:
-> +
-> ++-----------------------------------+
-> +| SSDT with OEM Table ID =3D VMCOREIN |
-> ++-----------------------------------+
-> +| ...                               |       TOP OF PAGE
-> +| VCIA dword object ----------------|-----> +-------------------------=
---+
-> +| ...                               |       | fw-allocated array for  =
-  |
-> +| _STA method referring to VCIA     |       | "etc/vmcoreinfo"        =
-  |
-> +| ...                               |       +-------------------------=
---+
-> +| ADDR method referring to VCIA     |       |  0: OVMF SDT Header prob=
-e |
-> +| ...                               |       |     suppressor          =
-  |
-> ++-----------------------------------+       | 40: uint32 version field=
-  |
-> +                                            | 44: info contents       =
-  |
-> +                                            |     ....                =
-  |
-> +                                            +-------------------------=
---+
-> +                                            END OF PAGE
-
-Please define the VMCOREINFO_OFFSET macro like this:
-
-  #define VMCOREINFO_OFFSET sizeof(AcpiTableHeader)
-
-and then please refresh the documentation as well:
-- replace decimal "40" with "36",
-- replace 0x28 in the dumped SSDT with 0x24.
-
-Namely, in order to suppress the OVMF ACP Table Header Probe -- "SDT"
-simply means "System Description Table" --, it's enough to add
-zero-padding that *precisely* covers such a header.
-
-Given that we have a typedef for this header in QEMU, we should use it
-in the definition of VMCOREINFO_OFFSET.
-
-Now, the reason why VMGENID uses 40 instead comes from another
-requirement: the VMGENID GUID has to be aligned at 8 bytes. (See
-requirement "R1a" in "docs/specs/vmgenid.txt".) Therefore the directly
-necessary 36 bytes of padding are rounded up to 40. See again
-"docs/specs/vmgenid.txt":
-
-----------------------------------+
-| SSDT with OEM Table ID =3D VMGENID |
-+----------------------------------+
-| ...                              |       TOP OF PAGE
-| VGIA dword object ---------------|-----> +---------------------------+
-| ...                              |       | fw-allocated array for    |
-| _STA method referring to VGIA    |       | "etc/vmgenid_guid"        |
-| ...                              |       +---------------------------+
-| ADDR method referring to VGIA    |       |  0: OVMF SDT Header probe |
-| ...                              |       |     suppressor            |
-+----------------------------------+       | 36: padding for 8-byte    |
-                                           |     alignment             |
-                                           | 40: GUID                  |
-                                           | 56: padding to page size  |
-                                           +---------------------------+
-                                           END OF PAGE
-
-At offset 36 of "etc/vmgenid_guid", it says "padding for 8-byte alignment=
-".
-
-For VMCOREINFO, you don't need this extra alignment to 8 bytes, before
-the "version" field is listed. So please make the VMCOREINFO_OFFSET
-reflect what's actually necessary.
-
-The rest of the code doesn't have to be modified (including your
-experimental guest kernel driver); changing VMCOREINFO_OFFSET will
-update all necessary locations automatically, including the generated
-AML. Only the docs have to be synced manually.
-
-... In fact, there *is* yet another location to update: the test case. I
-suggest to include "hw/acpi/vmcoreinfo.h" in "tests/vmcoreinfo-test.c",
-rather than open-code VMCOREINFO_OFFSET there. ... Oh wait: in the test
-case you don't even use VMCOREINFO_OFFSET for anything. So just delete
-the macro definition from that patch.
-
-Thank you (and sorry about the churn),
-Laszlo
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 9d033f2fb7..00cac01d66 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12017,101 +12017,17 @@ static target_ulong arm_tr_translate_insn(Disa=
+sContextBase *dcbase,
+     return dc->pc;
+ }
+=20
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+ {
+-    DisasContext dc1, *dc =3D &dc1;
+-    int max_insns;
+-
+-    /* generate intermediate code */
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+=20
+-    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
+-     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
+-     */
+-    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+-        gen_intermediate_code_a64(&dc->base, cs, tb);
++    if (dc->base.is_jmp =3D=3D DISAS_SKIP) {
+         return;
+     }
+=20
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D dc->base.tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+-    arm_tr_init_disas_context(&dc->base, cs);
+-
+-    max_insns =3D tb->cflags & CF_COUNT_MASK;
+-    if (max_insns =3D=3D 0) {
+-        max_insns =3D CF_COUNT_MASK;
+-    }
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns =3D TCG_MAX_INSNS;
+-    }
+-
+-    gen_tb_start(tb);
+-
+-    tcg_clear_temp_count();
+-    arm_tr_tb_start(&dc->base, cs);
+-
+-    do {
+-        dc->base.num_insns++;
+-        arm_tr_insn_start(&dc->base, cs);
+-
+-        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+-            CPUBreakpoint *bp;
+-            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+-                if (bp->pc =3D=3D dc->base.pc_next) {
+-                    BreakpointCheckType bp_check =3D
+-                        arm_tr_breakpoint_check(&dc->base, cs, bp);
+-                    switch (bp_check) {
+-                    case BC_MISS:
+-                        /* Target ignored this breakpoint, go to next */
+-                        break;
+-                    case BC_HIT_INSN:
+-                        /* Hit, keep translating */
+-                        /*
+-                         * TODO: if we're never going to have more than =
+one
+-                         *       BP in a single address, we can simply u=
+se a
+-                         *       bool here.
+-                         */
+-                        goto done_breakpoints;
+-                    case BC_HIT_TB:
+-                        /* Hit, end TB */
+-                        goto done_generating;
+-                    default:
+-                        g_assert_not_reached();
+-                    }
+-                }
+-            }
+-        }
+-    done_breakpoints:
+-
+-        if (dc->base.num_insns =3D=3D max_insns && (tb->cflags & CF_LAST=
+_IO)) {
+-            gen_io_start();
+-        }
+-
+-        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
+-
+-        if (tcg_check_temp_count()) {
+-            fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
+-                    dc->pc);
+-        }
+-
+-        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
+-                            dc->base.num_insns >=3D max_insns)) {
+-            dc->base.is_jmp =3D DISAS_TOO_MANY;
+-        }
+-    } while (!dc->base.is_jmp);
+-
+-    if (dc->base.is_jmp !=3D DISAS_SKIP) {
+-    if (tb->cflags & CF_LAST_IO) {
+-        if (dc->condjmp) {
+-            /* FIXME:  This can theoretically happen with self-modifying
+-               code.  */
+-            cpu_abort(cs, "IO on conditional branch instruction");
+-        }
+-        gen_io_end();
++    if (dc->base.tb->cflags & CF_LAST_IO && dc->condjmp) {
++        /* FIXME: This can theoretically happen with self-modifying code=
+. */
++        cpu_abort(cpu, "IO on conditional branch instruction");
+     }
+=20
+     /* At this stage dc->condjmp will only be set when the skipped
+@@ -12215,6 +12131,101 @@ void gen_intermediate_code(CPUState *cs, Transl=
+ationBlock *tb)
+             gen_goto_tb(dc, 1, dc->pc);
+         }
+     }
++}
++
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++{
++    DisasContext dc1, *dc =3D &dc1;
++    int max_insns;
++
++    /* generate intermediate code */
++
++    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
++     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
++     */
++    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
++        gen_intermediate_code_a64(&dc->base, cs, tb);
++        return;
++    }
++
++    dc->base.tb =3D tb;
++    dc->base.pc_first =3D dc->base.tb->pc;
++    dc->base.pc_next =3D dc->base.pc_first;
++    dc->base.is_jmp =3D DISAS_NEXT;
++    dc->base.num_insns =3D 0;
++    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
++    arm_tr_init_disas_context(&dc->base, cs);
++
++
++    arm_tr_init_globals(&dc->base, cs);
++    max_insns =3D tb->cflags & CF_COUNT_MASK;
++    if (max_insns =3D=3D 0) {
++        max_insns =3D CF_COUNT_MASK;
++    }
++    if (max_insns > TCG_MAX_INSNS) {
++        max_insns =3D TCG_MAX_INSNS;
++    }
++
++    gen_tb_start(tb);
++
++    tcg_clear_temp_count();
++    arm_tr_tb_start(&dc->base, cs);
++
++    do {
++        dc->base.num_insns++;
++        arm_tr_insn_start(&dc->base, cs);
++
++        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
++            CPUBreakpoint *bp;
++            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
++                if (bp->pc =3D=3D dc->base.pc_next) {
++                    BreakpointCheckType bp_check =3D
++                        arm_tr_breakpoint_check(&dc->base, cs, bp);
++                    switch (bp_check) {
++                    case BC_MISS:
++                        /* Target ignored this breakpoint, go to next */
++                        break;
++                    case BC_HIT_INSN:
++                        /* Hit, keep translating */
++                        /*
++                         * TODO: if we're never going to have more than =
+one
++                         *       BP in a single address, we can simply u=
+se a
++                         *       bool here.
++                         */
++                        goto done_breakpoints;
++                    case BC_HIT_TB:
++                        /* Hit, end TB */
++                        goto done_generating;
++                    default:
++                        g_assert_not_reached();
++                    }
++                }
++            }
++        }
++    done_breakpoints:
++
++        if (dc->base.num_insns =3D=3D max_insns && (tb->cflags & CF_LAST=
+_IO)) {
++            gen_io_start();
++        }
++
++        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
++
++        if (tcg_check_temp_count()) {
++            fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
++                    dc->pc);
++        }
++
++        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
++                            dc->base.num_insns >=3D max_insns)) {
++            dc->base.is_jmp =3D DISAS_TOO_MANY;
++        }
++    } while (!dc->base.is_jmp);
++
++    arm_tr_tb_stop(&dc->base, cs);
++
++    if (dc->base.tb->cflags & CF_LAST_IO) {
++        gen_io_end();
+     }
+=20
+ done_generating:
