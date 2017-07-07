@@ -1,45 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dTakQ-00054W-5N
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:25:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTale-0006F1-NI
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dTakN-0004qL-0j
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:25:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38871)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dTakM-0004pB-MO
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:25:06 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v67LOsDV131615
-	for <qemu-devel@nongnu.org>; Fri, 7 Jul 2017 17:25:05 -0400
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bjg03mapt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 17:25:04 -0400
-Received: from localhost
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Fri, 7 Jul 2017 18:25:01 -0300
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
-	<f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
-	<20170705110414.GN2180@umbus.fritz.box>
-	<0e4deabe-58e9-6c15-5910-cda9f8e63f9b@linux.vnet.ibm.com>
-	<89240dbb-56b7-e540-8981-b6af20eb0d8c@linux.vnet.ibm.com>
-	<20170707071409.GF24325@umbus.fritz.box>
-	<0a4bc3ed-530f-ba4a-44af-37781ea41ad5@linux.vnet.ibm.com>
-Date: Fri, 7 Jul 2017 18:24:52 -0300
+	(envelope-from <eblake@redhat.com>) id 1dTald-0005rE-PV
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:26:26 -0400
+References: <20170707143028.692-1-pbutsykin@virtuozzo.com>
+	<20170707143028.692-4-pbutsykin@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <15af9be5-dbc2-cac1-31b4-432492fb7477@redhat.com>
+Date: Fri, 7 Jul 2017 16:26:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <0a4bc3ed-530f-ba4a-44af-37781ea41ad5@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <5ad4a1c3-1d14-0aa1-b347-f8e7e77b6883@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
- VI)
+In-Reply-To: <20170707143028.692-4-pbutsykin@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HGBH6nCg3WMXxmwMvGKtKbX823hkVpIqf"
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,24 +24,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, sursingh@redhat.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@openvz.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HGBH6nCg3WMXxmwMvGKtKbX823hkVpIqf
+From: Eric Blake <eblake@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, den@openvz.org
+Message-ID: <15af9be5-dbc2-cac1-31b4-432492fb7477@redhat.com>
+Subject: Re: [PATCH v3 3/4] qcow2: add shrink image support
+References: <20170707143028.692-1-pbutsykin@virtuozzo.com>
+ <20170707143028.692-4-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170707143028.692-4-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/07/2017 09:30 AM, Pavel Butsykin wrote:
+> This patch add shrinking of the image file for qcow2. As a result, this=
+ allows
+> us to reduce the virtual image size and free up space on the disk witho=
+ut
+> copying the image. Image can be fragmented and shrink is done by punchi=
+ng holes
+> in the image file.
+>=20
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> ---
+>  block/qcow2-cluster.c  |  40 +++++++++++++++++++
+>  block/qcow2-refcount.c | 103 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/qcow2.c          |  42 +++++++++++++++-----
+>  block/qcow2.h          |  14 +++++++
+>  qapi/block-core.json   |   3 +-
+>  5 files changed, 191 insertions(+), 11 deletions(-)
+>=20
+
+> +++ b/qapi/block-core.json
+> @@ -2372,7 +2372,8 @@
+>              'cluster_alloc_bytes', 'cluster_free', 'flush_to_os',
+>              'flush_to_disk', 'pwritev_rmw_head', 'pwritev_rmw_after_he=
+ad',
+>              'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
+> -            'pwritev_zero', 'pwritev_done', 'empty_image_prepare' ] }
+> +            'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
+> +            'l1_shrink_write_table', 'l1_shrink_free_l2_clusters' ] }
+
+Missing documentation for the additions.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> Anyway, this was more of an experiment than a serious fix proposal.
-> I believe the general idea is solid but it'll get a couple of spins to 
-> get a
-> good patch for pushing. I'll send the POC as a RFC to get things 
-> started and
-> we'll see what happens.
+--HGBH6nCg3WMXxmwMvGKtKbX823hkVpIqf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I've sent the POC as RFC here:
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-"[RFC drcVI PATCH] spapr: reset DRCs on migration pre_load"
+iQEcBAEBCAAGBQJZX/x6AAoJEKeha0olJ0Nq4I0H/1NDeWtkeW49pcqetABbrT5k
+DI2VPyM0Uxgg6Ys/6T09PZfq90kfNazy+H2VybHd9t/fmKR3sG6hO18ImAGiOXl7
+f0faE9mpaMGXjr6iuS41tuL9jNB5DDBMmFsviEqu3vAZnyHgEXlDBYICuO9Vc6PY
+e7yux6GwhamVL7moJJP5x14dzvE8spgObM7X6nlDLvKYGxmCg2fTc8D/B8Cf1QYL
+8L3BP+nPMBTDe1q6lDovnFnjOXFXT3aZxamF4iXxwz1a//47rUkc4vYXZGTzrSmQ
+JtDdn77+hK7+sKKzXPIABkjZ3ki+anIebHInTJTdbbWxrGfMjWUpEiO7J4CowrU=
+=6DI5
+-----END PGP SIGNATURE-----
 
-
-The patch mentions drcVI because it was made on top of this series. Let 
-me know
-what you think.
-
-Daniel
+--HGBH6nCg3WMXxmwMvGKtKbX823hkVpIqf--
