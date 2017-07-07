@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTYN2-0001kO-Hl
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:52:53 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTYUL-0004ON-SW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 15:00:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTYN1-0003qd-PV
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:52:52 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTYUI-0000ji-OY
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 15:00:25 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTYUI-0000jX-Jf
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 15:00:22 -0400
+Received: by mail-qt0-x241.google.com with SMTP id m54so5354865qtb.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 12:00:22 -0700 (PDT)
+Received: from bigtime.twiddle.net (rrcs-66-91-136-156.west.biz.rr.com.
+	[66.91.136.156]) by smtp.googlemail.com with ESMTPSA id
+	b195sm3072499qka.20.2017.07.07.12.00.19 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 07 Jul 2017 12:00:20 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170707161822.29659-1-alex.bennee@linaro.org>
-	<87inj49mr1.fsf@linaro.org>
-	<CAFEAcA_YvS8OQVTPnvRtWyVuAKO2bccyNALOs1Oq7snTO1WwkA@mail.gmail.com>
-	<a391e7e5-0be9-0863-bfb7-88d9168484f3@twiddle.net>
-	<87h8yo9k2n.fsf@linaro.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <638cda88-5bd8-2a86-d720-04005fa1c1c8@twiddle.net>
-Date: Fri, 7 Jul 2017 08:52:39 -1000
+References: <3349c01e-1f1a-2111-28c2-70fb5cc077cd@physik.fu-berlin.de>
+	<20170707163826.22631-1-rth@twiddle.net>
+	<CAD-reDZ5RUnTm3JZG7rQ_dDSE41KJ_HoARQuiCLpT0wkdcowAQ@mail.gmail.com>
+Message-ID: <6894e2eb-2ca2-cf92-80fc-b715996aba3e@twiddle.net>
+Date: Fri, 7 Jul 2017 09:00:15 -1000
 MIME-Version: 1.0
-In-Reply-To: <87h8yo9k2n.fsf@linaro.org>
+In-Reply-To: <CAD-reDZ5RUnTm3JZG7rQ_dDSE41KJ_HoARQuiCLpT0wkdcowAQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the
- run-loop
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Fwd: [PATCH v2.5] fixup! linux-user/sh4: Notice
+ gUSA regions during signal delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +38,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>
+To: qemu-devel <qemu-devel@nongnu.org>
 
-On 07/07/2017 08:29 AM, Alex Bennée wrote:
->> Naming all of these different exit conditions is certainly
->> non-trivial.
-> 
-> Given the variation of usage this is something that should probably be
-> done after Lluís common run loop goes in and we can beef up the
-> semantics of the various exit conditions.
+On 07/07/2017 07:57 AM, Richard Henderson wrote:
+> +    /* ??? The SH4 kernel checks for and address above 0xC0000000.
+> +       However, the page mappings in qemu linux-user aren't as restricted
+> +       and we wind up with the normal stack mapped above 0xF0000000.
+> +       That said, there is no reason why the kernel should be allowing
+> +       a gUSA region that spans 1GB.  Use a tighter check here, for what
+> +       can actually be enabled by the immediate move.  */
 
-Definitely.
+Additionally, I can (and should) fix the address space problem for SH4 in 
+linux-user/main.c, where we have already done so for MIPS and Nios2.
 
-> One thing I have noticed in the ARM translator is DISAS_UPDATE does a:
-> 
->      gen_a64_set_pc_im(dc->pc);
-> 
-> I think this is to deal with handling exceptions either side of various
-> instructions. Am I right in thinking this is superfluous now as we can
-> derive the PC from the translated code address?
-
-Yes and no.
-
-We have typically distinguished between two kinds of exceptions: those that are 
-dynamic (fp state, page permissions) and those that are static (illegal opcodes).
-
-For the dynamic, we used to pessimistically save state, but now use the 
-unwinder to restore it.  The unwinding is expensive but is used infrequently 
-(especially compared to the number of load/store insns executed).
-
-For the static, we know the exception must be raised, and we know the state 
-that must be saved.  By doing that, we save the expense of the unwinding.
-
-So, for the static case you're talking about, we could get the PC (and other 
-state) back, and remove the explicit stores, but we shouldn't.
+See the initialization of reserved_va.
 
 
 r~
