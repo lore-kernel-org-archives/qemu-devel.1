@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuD-0002uq-ET
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuF-0002x2-IF
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuC-0003vq-Ek
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuE-0003xs-D1
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:15 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  7 Jul 2017 15:30:44 -0500
-Message-Id: <20170707203049.534-5-eblake@redhat.com>
+Date: Fri,  7 Jul 2017 15:30:45 -0500
+Message-Id: <20170707203049.534-6-eblake@redhat.com>
 In-Reply-To: <20170707203049.534-1-eblake@redhat.com>
 References: <20170707203049.534-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 4/9] nbd: Simplify trace of client flags in
- negotiation
+Subject: [Qemu-devel] [PATCH v5 5/9] nbd: Refactor reply to
+ NBD_OPT_EXPORT_NAME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,158 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org
 
-Simplify the tracing of client flags in the server, and return -EINVAL
-instead of -EIO if we successfully read but don't like those flags.
+Reply directly in nbd_negotiate_handle_export_name(), rather than
+waiting until nbd_negotiate_options() completes.  This will make it
+easier to implement NBD_OPT_GO.  Pass additional parameters around,
+rather than stashing things inside NBDClient.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
 v5: new patch
 ---
- nbd/server.c     | 6 ++----
- nbd/trace-events | 4 +---
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ nbd/server.c | 50 ++++++++++++++++++++++++++++----------------------
+ 1 file changed, 28 insertions(+), 22 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 27a0aab..8e363d3 100644
+index 8e363d3..841986d 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -396,21 +396,19 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-         error_prepend(errp, "read failed: ");
-         return -EIO;
+@@ -84,7 +84,6 @@ struct NBDClient {
+     int refcount;
+     void (*close_fn)(NBDClient *client, bool negotiated);
+
+-    bool no_zeroes;
+     NBDExport *exp;
+     QCryptoTLSCreds *tlscreds;
+     char *tlsaclname;
+@@ -277,9 +276,13 @@ static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length,
+ }
+
+ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
++                                            uint16_t myflags, bool no_zeroes,
+                                             Error **errp)
+ {
+     char name[NBD_MAX_NAME_SIZE + 1];
++    char buf[8 + 4 + 124] = "";
++    size_t len;
++    int ret;
+
+     /* Client sends:
+         [20 ..  xx]   export name (length bytes)
+@@ -303,6 +306,17 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
+         return -EINVAL;
      }
--    trace_nbd_negotiate_options_flags();
-     be32_to_cpus(&flags);
-+    trace_nbd_negotiate_options_flags(flags);
-     if (flags & NBD_FLAG_C_FIXED_NEWSTYLE) {
--        trace_nbd_negotiate_options_newstyle();
-         fixedNewstyle = true;
+
++    trace_nbd_negotiate_new_style_size_flags(client->exp->size,
++                                             client->exp->nbdflags | myflags);
++    stq_be_p(buf, client->exp->size);
++    stw_be_p(buf + 8, client->exp->nbdflags | myflags);
++    len = no_zeroes ? 10 : sizeof(buf);
++    ret = nbd_write(client->ioc, buf, len, errp);
++    if (ret < 0) {
++        error_prepend(errp, "write failed: ");
++        return ret;
++    }
++
+     QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
+     nbd_export_get(client->exp);
+
+@@ -373,14 +387,17 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+  * 1       if client sent NBD_OPT_ABORT, i.e. on valid disconnect,
+  *         errp is not set
+  */
+-static int nbd_negotiate_options(NBDClient *client, Error **errp)
++static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
++                                 Error **errp)
+ {
+     uint32_t flags;
+     bool fixedNewstyle = false;
++    bool no_zeroes = false;
+
+     /* Client sends:
+         [ 0 ..   3]   client flags
+
++       Then we loop until NBD_OPT_EXPORT_NAME:
+         [ 0 ..   7]   NBD_OPTS_MAGIC
+         [ 8 ..  11]   NBD option
+         [12 ..  15]   Data length
+@@ -403,7 +420,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
          flags &= ~NBD_FLAG_C_FIXED_NEWSTYLE;
      }
      if (flags & NBD_FLAG_C_NO_ZEROES) {
--        trace_nbd_negotiate_options_no_zeroes();
-         client->no_zeroes = true;
+-        client->no_zeroes = true;
++        no_zeroes = true;
          flags &= ~NBD_FLAG_C_NO_ZEROES;
      }
      if (flags != 0) {
-         error_setg(errp, "Unknown client flags 0x%" PRIx32 " received", flags);
--        return -EIO;
-+        return -EINVAL;
+@@ -503,7 +520,9 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+                 return 1;
+
+             case NBD_OPT_EXPORT_NAME:
+-                return nbd_negotiate_handle_export_name(client, length, errp);
++                return nbd_negotiate_handle_export_name(client, length,
++                                                        myflags, no_zeroes,
++                                                        errp);
+
+             case NBD_OPT_STARTTLS:
+                 if (nbd_drop(client->ioc, length, errp) < 0) {
+@@ -546,7 +565,9 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+              */
+             switch (option) {
+             case NBD_OPT_EXPORT_NAME:
+-                return nbd_negotiate_handle_export_name(client, length, errp);
++                return nbd_negotiate_handle_export_name(client, length,
++                                                        myflags, no_zeroes,
++                                                        errp);
+
+             default:
+                 error_setg(errp, "Unsupported option 0x%" PRIx32 " (%s)",
+@@ -572,7 +593,6 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
+                               NBD_FLAG_SEND_WRITE_ZEROES);
+     bool oldStyle;
+-    size_t len;
+
+     /* Old style negotiation header without options
+         [ 0 ..   7]   passwd       ("NBDMAGIC")
+@@ -586,10 +606,7 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+         [ 0 ..   7]   passwd       ("NBDMAGIC")
+         [ 8 ..  15]   magic        (NBD_OPTS_MAGIC)
+         [16 ..  17]   server flags (0)
+-        ....options sent....
+-        [18 ..  25]   size
+-        [26 ..  27]   export flags
+-        [28 .. 151]   reserved     (0, omit if no_zeroes)
++        ....options sent, ending in NBD_OPT_EXPORT_NAME....
+      */
+
+     qio_channel_set_blocking(client->ioc, false, NULL);
+@@ -618,24 +635,13 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+             error_prepend(errp, "write failed: ");
+             return -EINVAL;
+         }
+-        ret = nbd_negotiate_options(client, errp);
++        ret = nbd_negotiate_options(client, myflags, errp);
+         if (ret != 0) {
+             if (ret < 0) {
+                 error_prepend(errp, "option negotiation failed: ");
+             }
+             return ret;
+         }
+-
+-        trace_nbd_negotiate_new_style_size_flags(
+-            client->exp->size, client->exp->nbdflags | myflags);
+-        stq_be_p(buf + 18, client->exp->size);
+-        stw_be_p(buf + 26, client->exp->nbdflags | myflags);
+-        len = client->no_zeroes ? 10 : sizeof(buf) - 18;
+-        ret = nbd_write(client->ioc, buf + 18, len, errp);
+-        if (ret < 0) {
+-            error_prepend(errp, "write failed: ");
+-            return ret;
+-        }
      }
 
-     while (1) {
-diff --git a/nbd/trace-events b/nbd/trace-events
-index e61feda..765f5f4 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -35,9 +35,7 @@ nbd_negotiate_handle_export_name(void) "Checking length"
- nbd_negotiate_handle_export_name_request(const char *name) "Client requested export '%s'"
- nbd_negotiate_handle_starttls(void) "Setting up TLS"
- nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
--nbd_negotiate_options_flags(void) "Checking client flags"
--nbd_negotiate_options_newstyle(void) "Client supports fixed newstyle handshake"
--nbd_negotiate_options_no_zeroes(void) "Client supports no zeroes at handshake end"
-+nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
- nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
- nbd_negotiate_options_check_option(uint32_t option, const char *name) "Checking option 0x%" PRIx32 " (%s)"
- nbd_opt_abort_reply_failed(const char *error) "Reply to NBD_OPT_ABORT request failed: %s"
+     trace_nbd_negotiate_success();
 -- 
 2.9.4
