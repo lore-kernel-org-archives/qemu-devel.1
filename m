@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dTXEW-0007PB-Jx
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:40:02 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTXGe-0000tp-Fd
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dTXEV-00008n-7i
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:40:00 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36334)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dTXEU-00008e-Tp
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:39:59 -0400
-Received: by mail-wr0-x242.google.com with SMTP id 77so9081588wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 10:39:58 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dTXGd-0000lj-OP
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:42:12 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865801156.17063.15618379976159104550.stgit@frigg.lan>
+	<244b5aab-8863-3139-f252-09cc02333eda@twiddle.net>
+	<87inj4ebqn.fsf@frigg.lan>
+	<c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net>
+	<87a84gcfv6.fsf@frigg.lan>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <9611b022-c352-0191-67f6-716b36c8f1e6@twiddle.net>
+Date: Fri, 7 Jul 2017 07:41:49 -1000
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170707120600.GQ12152@localhost.localdomain>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
-	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-	<20170707120600.GQ12152@localhost.localdomain>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 7 Jul 2017 10:39:26 -0700
-Message-ID: <CAKmqyKN11wYpnW8PQQwT+_T1ezKqccT3DxZvG6_F+f29dLDVwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
- warn_report()
+In-Reply-To: <87a84gcfv6.fsf@frigg.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,243 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, philippe@mathieu-daude.net, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>, Josh Durgin <jdurgin@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Rob Herring <robh@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Jason Wang <jasowang@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Fri, Jul 7, 2017 at 5:06 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Thu, Jul 06, 2017 at 04:49:44PM -0700, Alistair Francis wrote:
->> Convert all uses of error_report("[Ww]arning:"... to use warn_report()
->> instead. This helps standardise on a single method of printing warnings
->> to the user.
->>
->> All of the warnings were found using this regex expression:
->>     error_report.*[Ww]arning:
->> and replaced with:
->>     warn_report("
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> Suggested-by: Thomas Huth <thuth@redhat.com>
->
-> I have reviewed the changes in: */i386/*, qdev-properties.c,
-> vl.c, and tests/test-qdev-global-props.c.  They look good, except
-> for kvm_arch_init_vcpu() below.
->
-> There are also a few places below where we could improve the
-> error messages in a follow-up patch (or in a new version of this
-> patch if you prefer).
+On 07/07/2017 07:32 AM, Lluís Vilanova wrote:
+>> That said, even for AArch32 we know by the TB flags whether or not we're going
+>> to be generating arm or thumb code.  I think that these hooks will allow arm and
+>> thumb mode to finally be split apart cleanly, instead of the tangle that they
+>> are now.
+>> 
+>> I see arm's gen_intermediate_code eventually looking like
+>> 
+>>    const TranslatorOps *ops = &arm_translator_ops;
+>>    if (ARM_TBFLAG_THUMB(tb->flags)) {
+>>      ops = &thumb_translator_ops;
+>>    }
+>> #ifdef TARGET_AARCH64
+>>    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+>>      ops = &aarch64_translator_ops;
+>>    }
+>> #endif
+>>    translator_loop(ops, &dc.base, cpu, tb);
+> 
+>> There would certainly be some amount of shared code, but it would also allow
+>> quite a few of the existing dc->thumb checks to be eliminated.
+> 
+> Does this really need to be addressed on this series?
 
-I split your comments into a new patch as I wasn't trying to fix the
-messages in this patch.
+No.  It is quite a tangle and it'll take some time to rectify.
 
->
-> [...]
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 5464977424..6b7bade183 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -2766,17 +2766,17 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->>                       ACPI_BUILD_ALIGN_SIZE);
->>          if (tables_blob->len > legacy_table_size) {
->>              /* Should happen only with PCI bridges and -M pc-i440fx-2.0.  */
->> -            error_report("Warning: migration may not work.");
->> +            warn_report("migration may not work.");
->
-> I suggest removing the period.
->
-> Adding a justification to why migration may not work is a good
-> idea, too.  We could copy the messages below (replacing "64k"
-> with legacy_table_size).
+>> I suppose you can leave the two hooks separate for now.  It doesn't hurt, and
+>> it's kind of a reminder of things that need cleaning up.
+> 
+> Well, I've sent a (too rushed) v12 that features the merge. Since I'll have to
+> send a v13, I can split them again if you want.
 
-Done.
+Don't go to any extra trouble if no one else has any strong feelings.
 
->
->
->>          }
->>          g_array_set_size(tables_blob, legacy_table_size);
->>      } else {
->>          /* Make sure we have a buffer in case we need to resize the tables. */
->>          if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
->>              /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
->> -            error_report("Warning: ACPI tables are larger than 64k.");
->> -            error_report("Warning: migration may not work.");
->> -            error_report("Warning: please remove CPUs, NUMA nodes, "
->> -                         "memory slots or PCI bridges.");
->> +            warn_report("ACPI tables are larger than 64k.");
->> +            warn_report("migration may not work.");
->> +            warn_report("please remove CPUs, NUMA nodes, "
->> +                        "memory slots or PCI bridges.");
->
-> I was going to suggest removing the periods here, but I'm not
-> sure because we have multiple full sentences.
->
-> However, if we are going to keep full sentences, I believe we
-> should use uppercase letters.
+> I can restore the NULL approach or add a default empty hook implementation
+> (translator_ignored_op?) if there's a strong feeling to change it.
 
-They aren't really sentences when every message has a prefix, so I
-just removed the periods.
+Ok, we can work that out.
 
->
->>          }
->>          acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
->>      }
->> diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
->> index 9f2615cbe0..33e20cb3e8 100644
->> --- a/hw/i386/kvm/pci-assign.c
->> +++ b/hw/i386/kvm/pci-assign.c
->> @@ -1353,9 +1353,9 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
->>                             PCI_CAP_ID_EXP);
->>                  return -EINVAL;
->>              } else if (size != 0x3c) {
->> -                error_report("WARNING, %s: PCIe cap-id 0x%x has "
->> -                             "non-standard size 0x%x; std size should be 0x3c",
->> -                             __func__, PCI_CAP_ID_EXP, size);
->> +                warn_report("%s: PCIe cap-id 0x%x has "
->> +                            "non-standard size 0x%x; std size should be 0x3c",
->> +                            __func__, PCI_CAP_ID_EXP, size);
->>              }
->>          } else if (version == 0) {
->>              uint16_t vid, did;
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 224fe58fe7..58f8a4f4a5 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -381,8 +381,8 @@ ISADevice *pc_find_fdc0(void)
->>      }
->>
->>      if (state.multiple) {
->> -        error_report("warning: multiple floppy disk controllers with "
->> -                     "iobase=0x3f0 have been found");
->> +        warn_report("multiple floppy disk controllers with "
->> +                    "iobase=0x3f0 have been found");
->>          error_printf("the one being picked for CMOS setup might not reflect "
->>                       "your intent\n");
->
-> The error_printf() on the second line could use warn_report() for
-> consistency?  In either case, the "\n" needs to be removed.
 
-Fixed.
-
->
->
->>      }
->> @@ -1310,7 +1310,7 @@ void pc_acpi_init(const char *default_dsdt)
->>
->>      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
->>      if (filename == NULL) {
->> -        fprintf(stderr, "WARNING: failed to find %s\n", default_dsdt);
->> +        warn_report("failed to find %s", default_dsdt);
->>      } else {
->>          QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
->>                                            &error_abort);
->> @@ -2087,9 +2087,9 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
->>      }
->>
->>      if (value < (1ULL << 20)) {
->> -        error_report("Warning: small max_ram_below_4g(%"PRIu64
->> -                     ") less than 1M.  BIOS may not work..",
->> -                     value);
->> +        warn_report("small max_ram_below_4g(%"PRIu64
->> +                    ") less than 1M.  BIOS may not work..",
->> +                    value);
->
-> I suggest removing the "..", adding a space before "(", and
-> possibly removing the word "small".
->
-> Maybe we could use the same "<fact>; <possible consequence>."
-> pattern from the other messages below?  e.g.:
->
->         warn_report("max_ram_below_4g(%" PRIu64 ") is less than 1M; "
->                     "BIOS may not work.", value);
-
-Fixed.
-
->
->
->>      }
->>
->>      pcms->max_ram_below_4g = value;
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index 22dbef64c6..11b4336a42 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -131,10 +131,10 @@ static void pc_init1(MachineState *machine,
->>                      lowmem = 0xc0000000;
->>                  }
->>                  if (lowmem & ((1ULL << 30) - 1)) {
->> -                    error_report("Warning: Large machine and max_ram_below_4g "
->> -                                 "(%" PRIu64 ") not a multiple of 1G; "
->> -                                 "possible bad performance.",
->> -                                 pcms->max_ram_below_4g);
->> +                    warn_report("Large machine and max_ram_below_4g "
->> +                                "(%" PRIu64 ") not a multiple of 1G; "
->> +                                "possible bad performance.",
->> +                                pcms->max_ram_below_4g);
->>                  }
->>              }
->>          }
->> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->> index 8f696b7cb6..1653a47f0a 100644
->> --- a/hw/i386/pc_q35.c
->> +++ b/hw/i386/pc_q35.c
->> @@ -101,9 +101,9 @@ static void pc_q35_init(MachineState *machine)
->>          lowmem = pcms->max_ram_below_4g;
->>          if (machine->ram_size - lowmem > lowmem &&
->>              lowmem & ((1ULL << 30) - 1)) {
->> -            error_report("Warning: Large machine and max_ram_below_4g(%"PRIu64
->> -                         ") not a multiple of 1G; possible bad performance.",
->> -                         pcms->max_ram_below_4g);
->> +            warn_report("Large machine and max_ram_below_4g(%"PRIu64
->> +                        ") not a multiple of 1G; possible bad performance.",
->> +                        pcms->max_ram_below_4g);
->
-> I suggest a space before "(".
-
-Fixed.
-
->
->>          }
->>      }
->>
-> [...]
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index f84a49d366..3b29f5a758 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -600,10 +600,10 @@ static int kvm_arch_set_tsc_khz(CPUState *cs)
->>                         kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
->>                         -ENOTSUP;
->>          if (cur_freq <= 0 || cur_freq != env->tsc_khz) {
->> -            error_report("warning: TSC frequency mismatch between "
->> -                         "VM (%" PRId64 " kHz) and host (%d kHz), "
->> -                         "and TSC scaling unavailable",
->> -                         env->tsc_khz, cur_freq);
->> +            warn_report("TSC frequency mismatch between "
->> +                        "VM (%" PRId64 " kHz) and host (%d kHz), "
->> +                        "and TSC scaling unavailable",
->> +                        env->tsc_khz, cur_freq);
->>              return r;
->>          }
->>      }
->> @@ -919,7 +919,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>                  error_report("kvm: LMCE not supported");
->>                  return -ENOTSUP;
->>              }
->> -            error_report("warning: Unsupported MCG_CAP bits: 0x%" PRIx64,
->> +            warn_report(" Unsupported MCG_CAP bits: 0x%" PRIx64,
->>                           unsupported_caps);
->
-> Extra whitespace here.
-
-Fixed.
-
-Thanks,
-Alistair
-
->
->
->>          }
->>
-> [...]
->
-> --
-> Eduardo
+r~
