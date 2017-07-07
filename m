@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dTVxq-00048K-E2
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:18:43 -0400
+	(envelope-from <cota@braap.org>) id 1dTVyS-0004hk-M4
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:19:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dTVxm-0008JG-FB
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:18:42 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36782)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dTVxm-0008Ii-7I
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:18:38 -0400
-Received: by mail-wr0-x230.google.com with SMTP id c11so53448781wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 09:18:38 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  7 Jul 2017 17:18:22 +0100
-Message-Id: <20170707161822.29659-1-alex.bennee@linaro.org>
+	(envelope-from <cota@braap.org>) id 1dTVyS-0000Gf-0N
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:19:20 -0400
+Date: Fri, 7 Jul 2017 12:19:13 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170707161913.GA16183@flamenco>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865801156.17063.15618379976159104550.stgit@frigg.lan>
+	<244b5aab-8863-3139-f252-09cc02333eda@twiddle.net>
+	<87inj4ebqn.fsf@frigg.lan>
+	<c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the run-loop
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-Previously DISAS_JUMP did ensure this but with the optimisation of
-8a6b28c7 (optimize indirect branches) we might not leave the loop.
-This means if any pending interrupts are cleared by changing IRQ flags
-we might never get around to servicing them. You usually notice this
-by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
-while cpu->interrupt_request remains high and the exit_request has not
-been set.
+On Fri, Jul 07, 2017 at 05:46:19 -1000, Richard Henderson wrote:
+> I do wonder if we should provide a generic empty hook, so that a target that
+> does not need a particular hook need not define an empty function.  It could
+> just put e.g. "translator_noop" into the structure.  Ok, maybe a better name
+> than that...
 
-This breaks amongst other things the OPTEE test suite which executes
-an eret from the secure world after a non-secure world IRQ has gone
-pending which then never gets serviced.
+NULL would serve that purpose well. The subsequent "if (hook)" branch
+would be essentially free because it'd be trivially predicted.
 
-An alternate approach might be for the exception helpers to ensure the
-exit request flag is set if an IRQ is now unmasked.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-CC: Etienne Carriere <etienne.carriere@linaro.org>
-CC: Joakim Bech <joakim.bech@linaro.org>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Emilio G. Cota <cota@braap.org>
-CC: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate-a64.c | 3 ++-
- target/arm/translate.c     | 6 ++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e55547d95d..3ee88b2590 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1788,7 +1788,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-             return;
-         }
-         gen_helper_exception_return(cpu_env);
--        s->is_jmp = DISAS_JUMP;
-+        /* Must exit loop to check un-masked IRQs */
-+        s->is_jmp = DISAS_EXIT;
-         return;
-     case 5: /* DRPS */
-         if (rn != 0x1f) {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 0862f9e4aa..920fb41395 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4475,7 +4475,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
-      */
-     gen_helper_cpsr_write_eret(cpu_env, cpsr);
-     tcg_temp_free_i32(cpsr);
--    s->is_jmp = DISAS_JUMP;
-+    /* Must exit loop to check un-masked IRQs */
-+    s->is_jmp = DISAS_EXIT;
- }
- 
- /* Generate an old-style exception return. Marks pc as dead. */
-@@ -9519,7 +9520,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                     tmp = load_cpu_field(spsr);
-                     gen_helper_cpsr_write_eret(cpu_env, tmp);
-                     tcg_temp_free_i32(tmp);
--                    s->is_jmp = DISAS_JUMP;
-+                    /* Must exit loop to check un-masked IRQs */
-+                    s->is_jmp = DISAS_EXIT;
-                 }
-             }
-             break;
--- 
-2.13.0
+		E.
