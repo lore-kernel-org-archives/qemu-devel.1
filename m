@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dTNT2-000065-RA
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:14:21 -0400
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTNeA-0001l1-SX
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dTNSz-0000mC-M1
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:14:20 -0400
-Date: Fri, 7 Jul 2017 17:14:09 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170707071409.GF24325@umbus.fritz.box>
-References: <20170621091848.28256-1-david@gibson.dropbear.id.au>
-	<f89c6897-9555-100a-7252-a705fcbc8ee6@linux.vnet.ibm.com>
-	<20170705110414.GN2180@umbus.fritz.box>
-	<0e4deabe-58e9-6c15-5910-cda9f8e63f9b@linux.vnet.ibm.com>
-	<89240dbb-56b7-e540-8981-b6af20eb0d8c@linux.vnet.ibm.com>
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTNe5-0007tN-Uc
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:25:50 -0400
+Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:41581)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
+	id 1dTNe5-0007sJ-NJ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:25:45 -0400
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-9-rth@twiddle.net>
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Message-ID: <9645bafa-2c7e-96e8-5f3c-9cf7a9415285@physik.fu-berlin.de>
+Date: Fri, 7 Jul 2017 09:25:39 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/aVve/J9H4Wl5yVO"
-Content-Disposition: inline
-In-Reply-To: <89240dbb-56b7-e540-8981-b6af20eb0d8c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/5] spapr: DRC cleanups (part
- VI)
+In-Reply-To: <20170707022111.21836-9-rth@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/27] linux-user/sh4: Notice gUSA
+ regions during signal delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, sursingh@redhat.com, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
+On 07/07/2017 04:20 AM, Richard Henderson wrote:
+> We translate gUSA regions atomically in a parallel context.
+> But in a serial context a gUSA region may be interrupted.
+> In that case, restart the region as the kernel would.
 
---/aVve/J9H4Wl5yVO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch is still causing random segfaults, unfortunately:
 
-On Thu, Jul 06, 2017 at 11:31:35AM -0300, Daniel Henrique Barboza wrote:
->=20
->=20
-> On 07/05/2017 06:53 PM, Daniel Henrique Barboza wrote:
-> > Worth a try. I'll see if I can make a POC of this DRC reset at incoming
-> > migration time.
->=20
->=20
-> Just played a little with the idea of manual reset during migration. I've
-> created a
-> POC that resets the CPU DRCs in a pre_load hook.
+Setting up dpkg (1.18.24+b1) ...
+Setting up perl-base (5.24.1-5) ...
+Setting up grep (2.27-2) ...
+Setting up debconf (1.5.62) ...
+Setting up tzdata (2017b-2) ...
 
-Ok.  I'm not sure does the pre_load hook get called for objects where
-nothing ends up being sent in the migration stream?
+Current default time zone: 'Etc/UTC'
+Local time is now:      Fri Jul  7 07:17:20 UTC 2017.
+Universal Time is now:  Fri Jul  7 07:17:20 UTC 2017.
+Run 'dpkg-reconfigure tzdata' if you wish to change it.
 
-> Then I've done the same
-> experiment - device_add on both source and target before the migration,
-> hot unplug the device after migration is completed. The hot unplug worked=
- as
-> expected in both QEMU and guest.
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+dpkg: error processing package tzdata (--configure):
+ subprocess installed post-installation script was killed by signal (Segmentation fault)
+Setting up gzip (1.6-5) ...
+Setting up dash (0.5.8-2.4) ...
+Setting up init-system-helpers (1.48) ...
+Setting up libpam0g:sh4 (1.1.8-3.6) ...
+Setting up libpam-modules-bin (1.1.8-3.6) ...
+Setting up bash (4.4-5) ...
 
-That's encouraging.
+Adrian
 
->=20
-> To minimize the impact I am resetting only the DRCs of the CPUs that were
-> hotplugged
-> in the target instead of resetting everybody.
-
-That sounds like more trouble than it's worth, I think it'll be easier
-and safer to reset all DRCs.
-
-> I'll see if this solution works for LMBs and PCI devices. In case
-> affirmative, and
-> if we are fine with this solution of resetting the DRCs in pre_load (not
-> sure if pre_load is
-> the right place for doing it - suggestions welcome), I can send a patch to
-> be applied on top
-> of this series.
->=20
->=20
->=20
-> Thanks,
->=20
-> Daniel
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---/aVve/J9H4Wl5yVO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZXzTBAAoJEGw4ysog2bOSzP8QAIYDBbHFgvhVGDJEowP90CJg
-CenvB0BRmsWNztDCnqKzcswy3PPkwX+NTaatJptSn/8WWhjJtkJcyK5P0y27TDMv
-ujtj+OnJCHR4t+Sk227Io6tY0+xQctk6MPH3jXJqEkGzXpU4tFPynFGscOeemxqc
-zaY3Lxz427yWuaTSB3R2NtfKhk2f4hPu+hIDknaGcxHqhQ84jncaBOb5bTKtZTmx
-zVFgsPbmgCLv0X41MY2UReeyD1ivDe+iK0J/GIfVF91hYJr2zyHMEHVNuzFIV45x
-JY+AnxCehSNKygxUsXFqZUc2pN1mzgAgrFqxqC9xXnkwa1L1kwCebehlMsdut3EH
-sIZRHA2jQJ7NriRA2ob1dzn3+W4Kv5YlKdO2E/e/FeeO2yqBNtfxLYUu81j9q6ld
-3rYvbHRNYw9BZmRj7Ii6z3JQiqndS3tvuwrBqh/zuy0UTPIrHtqhdShFtGN4CXBU
-88nH5881VflqmdLFNTntBM6bJEn8i2EzHYxzf3Q7bodjcjP2xRggmhztkpy/5Nkh
-i3ggf2CJWUmc1jqEfATYZJd+V+uavpZvekcOZDtytCmkANxOL7ePJpmhk3oBZK9J
-zSG14uaSkuJ94g/J5pfB5+F8YOD3fmkOO1IKnBtcPlNBBe7oG4sX1VhB1635owT9
-wktwDD/UqBVuMxm+jcgs
-=wCrz
------END PGP SIGNATURE-----
-
---/aVve/J9H4Wl5yVO--
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
