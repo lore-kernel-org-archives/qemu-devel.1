@@ -1,23 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTU90-0007gJ-99
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:22:07 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUHi-000131-57
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTU8v-000497-7d
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:22:06 -0400
-Received: from mail-db5eur01on0097.outbound.protection.outlook.com
-	([104.47.2.97]:11364
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
-	id 1dTU8u-00047K-Cy
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:22:01 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUHg-0007WY-Us
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:06 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri,  7 Jul 2017 17:21:38 +0300
-Message-Id: <20170707142138.411-1-pbutsykin@virtuozzo.com>
+Date: Fri,  7 Jul 2017 17:30:24 +0300
+Message-Id: <20170707143028.692-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+Subject: [Qemu-devel] [PATCH v3 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +19,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: amit@kernel.org, mst@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-We should guarantee that RAM will not be modified while VM has a stopped
-state, otherwise it can lead to negative consequences during post-copy
-migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
-source side will not be modified as this could lead to non-consistent vm state
-on the destination side. Also RAM access during postcopy-ram migration with
-enabled release-ram capability can lead to sad consequences.
+This patch add shrinking of the image file for qcow2. As a result, this allows
+us to reduce the virtual image size and free up space on the disk without
+copying the image. Image can be fragmented and shrink is done by punching holes
+in the image file.
 
-Let's add enable_backend() callback to avoid undesirable virtioqueue changes
-in the guest memory.
+# ./qemu-img create -f qcow2 image.qcow2 4G
+Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
----
- hw/char/virtio-console.c          | 21 +++++++++++++++++++++
- hw/char/virtio-serial-bus.c       |  7 +++++++
- include/hw/virtio/virtio-serial.h |  3 +++
- 3 files changed, 31 insertions(+)
+# ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+wrote 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
 
-diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-index 0cb1668c8a..b55905892e 100644
---- a/hw/char/virtio-console.c
-+++ b/hw/char/virtio-console.c
-@@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
-     }
- }
- 
-+static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
-+{
-+    VirtConsole *vcon = VIRTIO_CONSOLE(port);
-+
-+    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
-+        return;
-+    }
-+
-+    if (enable) {
-+        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-+
-+        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-+                                 k->is_console ? NULL : chr_event,
-+                                 vcon, NULL, false);
-+    } else {
-+        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
-+                                 NULL, NULL, NULL, false);
-+    }
-+}
-+
- static void virtconsole_realize(DeviceState *dev, Error **errp)
- {
-     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
-@@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
-     k->unrealize = virtconsole_unrealize;
-     k->have_data = flush_buf;
-     k->set_guest_connected = set_guest_connected;
-+    k->enable_backend = virtconsole_enable_backend;
-     k->guest_writable = guest_writable;
-     dc->props = virtserialport_properties;
- }
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index f5bc173844..f0f18c8e7c 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
-     if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-         guest_reset(vser);
-     }
-+
-+    QTAILQ_FOREACH(port, &vser->ports, next) {
-+        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-+        if (vsc->enable_backend) {
-+            vsc->enable_backend(port, vdev->vm_running);
-+        }
-+    }
- }
- 
- static void vser_reset(VirtIODevice *vdev)
-diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
-index b19c44727f..12657a9f39 100644
---- a/include/hw/virtio/virtio-serial.h
-+++ b/include/hw/virtio/virtio-serial.h
-@@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
-         /* Guest opened/closed device. */
-     void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
- 
-+    /* Enable/disable backend for virtio serial port */
-+    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
-+
-         /* Guest is now ready to accept data (virtqueues set up). */
-     void (*guest_ready)(VirtIOSerialPort *port);
- 
+# ./qemu-img resize image.qcow2 512M
+qemu-img: Warning: Shrinking an image will delete all data beyondthe shrunken image's end. Before performing such anoperation, make sure there is no important data there.
+qemu-img: Use the --shrink option to perform a shrink operation.
+
+# ./qemu-img resize --shrink image.qcow2 128M
+Image resized.
+
+# ./qemu-img info image.qcow2
+image: image.qcow2
+file format: qcow2
+virtual size: 128M (134217728 bytes)
+disk size: 128M
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+
+# du -h image.qcow2 
+129M    image.qcow2
+
+Changes from v1:
+- add --shrink flag for qemu-img resize
+- add qcow2_cache_discard
+- simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
+- add new qemu-iotests for shrinking images
+
+Changes from v2:
+- replace qprintf() on error_report() (1)
+- rewrite warning messages (1)
+- enforce --shrink flag for all formats except raw (1)
+- split qcow2_cache_discard() (2)
+- minor fixes according to comments (3)
+- rewrite the last part of qcow2_shrink_reftable() to avoid
+  qcow2_free_clusters() calls inside (3)
+- improve test for shrinking image (4)
+
+Pavel Butsykin (4):
+  qemu-img: add --shrink flag for resize
+  qcow2: add qcow2_cache_discard
+  qcow2: add shrink image support
+  qemu-iotests: add shrinking image test
+
+ block/qcow2-cache.c        |  26 +++++++
+ block/qcow2-cluster.c      |  40 +++++++++++
+ block/qcow2-refcount.c     | 117 +++++++++++++++++++++++++++++++
+ block/qcow2.c              |  42 ++++++++---
+ block/qcow2.h              |  17 +++++
+ qapi/block-core.json       |   3 +-
+ qemu-img-cmds.hx           |   4 +-
+ qemu-img.c                 |  23 ++++++
+ qemu-img.texi              |   7 +-
+ tests/qemu-iotests/102     |   4 +-
+ tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/163.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 13 files changed, 443 insertions(+), 16 deletions(-)
+ create mode 100644 tests/qemu-iotests/163
+ create mode 100644 tests/qemu-iotests/163.out
+
 -- 
 2.13.0
