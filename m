@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTSON-0006ot-HS
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:29:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTSPU-0007w0-Rk
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTSOJ-0000cs-El
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:29:51 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:53526 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTSOI-0000cE-UP
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:29:47 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri,  7 Jul 2017 14:29:30 +0200
-Message-Id: <149943057043.8972.16059991065061793515.stgit@frigg.lan>
-In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	(envelope-from <eblake@redhat.com>) id 1dTSPT-0001VE-No
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:31:00 -0400
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-26-vsementsov@virtuozzo.com>
+	<87r2xs65a5.fsf@dusky.pond.sub.org> <20170707081305.GA15945@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e6ae8d91-c348-8fea-b957-8e150301c35f@redhat.com>
+Date: Fri, 7 Jul 2017 07:30:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 12/27] target/i386: [tcg] Port to generic
- translation framework
+In-Reply-To: <20170707081305.GA15945@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v22 25/30] qmp: add
+ x-debug-block-dirty-bitmap-sha256
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,169 +26,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Tested-by: Emilio G. Cota <cota@braap.org>
----
- target/i386/translate.c |  121 +++++++----------------------------------=
-------
- 1 file changed, 19 insertions(+), 102 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy
+ <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, den@openvz.org
+Message-ID: <e6ae8d91-c348-8fea-b957-8e150301c35f@redhat.com>
+Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v22 25/30] qmp: add
+ x-debug-block-dirty-bitmap-sha256
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+ <20170628120530.31251-26-vsementsov@virtuozzo.com>
+ <87r2xs65a5.fsf@dusky.pond.sub.org> <20170707081305.GA15945@redhat.com>
+In-Reply-To: <20170707081305.GA15945@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 94b09e0f6d..22a22aea8d 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8450,6 +8450,10 @@ static void i386_tr_init_disas_context(DisasContex=
-tBase *dcbase, CPUState *cpu)
-     cpu_cc_srcT =3D tcg_temp_local_new();
- }
-=20
-+static void i386_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-+{
-+}
-+
- static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-@@ -8468,7 +8472,7 @@ static BreakpointCheckType i386_tr_breakpoint_check=
-(
-         /* The address covered by the breakpoint must be included in
-            [tb->pc, tb->pc + tb->size) in order to for it to be
-            properly cleared -- thus we increment the PC here so that
--           the logic setting tb->size below does the right thing.  */
-+           the generic logic setting tb->size later does the right thing=
-.  */
-         dc->base.pc_next +=3D 1;
-         return BC_HIT_TB;
-     } else {
-@@ -8539,109 +8543,22 @@ static void i386_tr_disas_log(const DisasContext=
-Base *dcbase,
-=20
- }
-=20
--/* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
--{
--    DisasContext dc1, *dc =3D &dc1;
--    int num_insns;
--    int max_insns;
--
--    /* generate intermediate code */
--    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
--    dc->base.tb =3D tb;
--    dc->base.is_jmp =3D DISAS_NEXT;
--    dc->base.pc_first =3D tb->pc;
--    dc->base.pc_next =3D dc->base.pc_first;
--    i386_tr_init_disas_context(&dc->base, cs);
--
--    num_insns =3D 0;
--    max_insns =3D tb->cflags & CF_COUNT_MASK;
--    if (max_insns =3D=3D 0) {
--        max_insns =3D CF_COUNT_MASK;
--    }
--    if (max_insns > TCG_MAX_INSNS) {
--        max_insns =3D TCG_MAX_INSNS;
--    }
--
--    gen_tb_start(tb);
--    for(;;) {
--        i386_tr_insn_start(&dc->base, cs);
--        num_insns++;
--
--        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
--            CPUBreakpoint *bp;
--            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
--                if (bp->pc =3D=3D dc->base.pc_next) {
--                    BreakpointCheckType bp_check =3D
--                        i386_tr_breakpoint_check(&dc->base, cs, bp);
--                    switch (bp_check) {
--                    case BC_MISS:
--                        /* Target ignored this breakpoint, go to next */
--                        break;
--                    case BC_HIT_INSN:
--                        /* Hit, keep translating */
--                        /*
--                         * TODO: if we're never going to have more than =
-one
--                         *       BP in a single address, we can simply u=
-se a
--                         *       bool here.
--                         */
--                        goto done_breakpoints;
--                    case BC_HIT_TB:
--                        /* Hit, end TB */
--                        goto done_generating;
--                    default:
--                        g_assert_not_reached();
--                    }
--                }
--            }
--        }
--    done_breakpoints:
--
--        if (num_insns =3D=3D max_insns && (tb->cflags & CF_LAST_IO)) {
--            gen_io_start();
--        }
--
--        dc->base.pc_next =3D i386_tr_translate_insn(&dc->base, cs);
--        /* stop translation if indicated */
--        if (dc->base.is_jmp) {
--            break;
--        }
--        /* if single step mode, we generate only one instruction and
--           generate an exception */
--        if (dc->base.singlestep_enabled) {
--            dc->base.is_jmp =3D DISAS_TOO_MANY;
--            break;
--        }
--        /* if too long translation, stop generation too */
--        if (tcg_op_buf_full() ||
--            num_insns >=3D max_insns) {
--            dc->base.is_jmp =3D DISAS_TOO_MANY;
--            break;
--        }
--        if (singlestep) {
--            dc->base.is_jmp =3D DISAS_TOO_MANY;
--            break;
--        }
--    }
--    i386_tr_tb_stop(&dc->base, cs);
--    if (tb->cflags & CF_LAST_IO)
--        gen_io_end();
--done_generating:
--    gen_tb_end(tb, num_insns);
-+static const TranslatorOps i386_tr_ops =3D {
-+    .init_disas_context =3D i386_tr_init_disas_context,
-+    .tb_start           =3D i386_tr_tb_start,
-+    .insn_start         =3D i386_tr_insn_start,
-+    .breakpoint_check   =3D i386_tr_breakpoint_check,
-+    .translate_insn     =3D i386_tr_translate_insn,
-+    .tb_stop            =3D i386_tr_tb_stop,
-+    .disas_log          =3D i386_tr_disas_log,
-+};
-=20
--#ifdef DEBUG_DISAS
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
--        && qemu_log_in_addr_range(dc->base.pc_first)) {
--        qemu_log_lock();
--        qemu_log("----------------\n");
--        i386_tr_disas_log(&dc->base, cs);
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
--#endif
-+/* generate intermediate code for basic block 'tb'.  */
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
-+{
-+    DisasContext dc;
-=20
--    tb->size =3D dc->base.pc_next - dc->base.pc_first;
--    tb->icount =3D num_insns;
-+    translator_loop(&i386_tr_ops, &dc.base, cpu, tb);
- }
-=20
- void restore_state_to_opc(CPUX86State *env, TranslationBlock *tb,
+On 07/07/2017 03:13 AM, Daniel P. Berrange wrote:
+> On Fri, Jul 07, 2017 at 10:05:22AM +0200, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
+>>>  block/dirty-bitmap.c         |  5 +++++
+>>>  blockdev.c                   | 25 +++++++++++++++++++++++++
+>>>  include/block/dirty-bitmap.h |  1 +
+>>>  include/qemu/hbitmap.h       |  8 ++++++++
+>>>  qapi/block-core.json         | 27 +++++++++++++++++++++++++++
+>>>  tests/Makefile.include       |  2 +-
+>>>  util/hbitmap.c               | 11 +++++++++++
+>>>  7 files changed, 78 insertions(+), 1 deletion(-)
+>> [...]
+>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>>> index 5c42cc7790..6ad8585400 100644
+>>> --- a/qapi/block-core.json
+>>> +++ b/qapi/block-core.json
+>>> @@ -1644,6 +1644,33 @@
+>>>    'data': 'BlockDirtyBitmap' }
+>>> =20
+>>>  ##
+>>> +# @BlockDirtyBitmapSha256:
+>>> +#
+>>> +# SHA256 hash of dirty bitmap data
+>>> +#
+>>> +# @sha256: ASCII representation of SHA256 bitmap hash
+>>
+>> Spell it SHA-256, please.  The member name @sha256 can stay.
+>>
+>> SHA-256 is 256 binary bits.  Please specify how they are represented i=
+n
+>> ASCII.  It better be base64 (RFC 4648), because we use that elsewhere.=
+
+>=20
+> It is filled later in this patch using qcrypto_hash_digest, so it is ju=
+st
+> a hex string representing the hash, not base64. For the latter you can
+> use qcrypto_hash_base64
+
+hex (aka base16) is used for displaying UUIDs across QMP.  Furthermore,
+this is an x- command, useful only for debugging, so we can feel free to
+change the underlying implementation without breaking clients (if we
+prefer to go with the shorter base64 string instead of the longer hex
+string, even if we make that switch after a release).  Still, it's nice
+to avoid churn, and Markus does have a point about reusing a common
+base64 theme for displaying arbitrary binary data, rather than having ad
+hoc differences.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZX37vAAoJEKeha0olJ0NqQvQH/RaCJm+tkde3iSkxw+lA4JR1
+crHjIxqBuUMN0fqbNe6fnFPuYh5ezV0TvyR0MIDV5znOkve7ic0kTEC5VDRDOtoQ
+qsWJ/oBJwpzReFja1Y9bGwDxOZZ7l6r3kzfka856rq18rllD22TDvwPk2V+nBAlP
+clvYuZQ9XnvitGi0sEpnX4v7JR6mmiHbhsRhozz/3VCPtKFhF68qfR9ZOgu8Nq5F
+6ToOYfWNRjVtAciJd8Q6fMiJiYTAAWoUAsm5V4/n73vXdqZGvfM0jzIvPP2tIB+V
+POeRNU0BDL1aqG2OdsCJalR6eqNHFjZxoCr7ZPnX7C0F/8/K7VvAWdfFEYUYeVM=
+=vEll
+-----END PGP SIGNATURE-----
+
+--f8cQs1nMrEqLLpHd0wgLgHCNX5DSjAfmp--
