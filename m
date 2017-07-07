@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTRub-0003F1-HN
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:59:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dTRui-0003Jz-Fm
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:59:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTRuY-0003fc-Ff
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:59:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33033)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTRuY-0003f2-77
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:59:02 -0400
-Date: Fri, 7 Jul 2017 08:58:49 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170707115849.GP12152@localhost.localdomain>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
-	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-	<bf86d70d-2518-676d-8ac7-63fb4646449e@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dTRuh-0003iR-Kz
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:59:12 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dTRuh-0003i7-Bb
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:59:11 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id r103so43967746wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 04:59:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bf86d70d-2518-676d-8ac7-63fb4646449e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
- warn_report()
+In-Reply-To: <6861810e-0546-d1e4-4573-7cdb18696c03@redhat.com>
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+	<CAFEAcA-VGRYZ7+Osa8J1Ew+P=wf42uOtVvmV9mmGBTwC-f++8w@mail.gmail.com>
+	<6861810e-0546-d1e4-4573-7cdb18696c03@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Jul 2017 12:58:49 +0100
+Message-ID: <CAFEAcA_TWBxNJDODCVaHBqt=MQD2G+mj7R_FmEttfsz1ipA_HA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, armbru@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, philippe@mathieu-daude.net, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Peter Chubb <peter.chubb@nicta.com.au>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, alistair23@gmail.com, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Fri, Jul 07, 2017 at 08:33:19AM +0200, Thomas Huth wrote:
-> On 07.07.2017 01:49, Alistair Francis wrote:
-> > Convert all uses of error_report("[Ww]arning:"... to use warn_report()
-> > instead. This helps standardise on a single method of printing warnings
-> > to the user.
-> > 
-> > All of the warnings were found using this regex expression:
-> >     error_report.*[Ww]arning:
-> > and replaced with:
-> >     warn_report("
-> [...]
-> > diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
-> > index 48e5b7315f..b25fe892ed 100644
-> > --- a/tests/test-qdev-global-props.c
-> > +++ b/tests/test-qdev-global-props.c
-> > @@ -232,10 +232,10 @@ static void test_dynamic_globalprop(void)
-> >      g_test_trap_assert_passed();
-> >      g_test_trap_assert_stderr_unmatched("*prop1*");
-> >      g_test_trap_assert_stderr_unmatched("*prop2*");
-> > -    g_test_trap_assert_stderr("*Warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
-> > +    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
-> >      g_test_trap_assert_stderr_unmatched("*prop4*");
-> > -    g_test_trap_assert_stderr("*Warning: global nohotplug-type.prop5=105 not used\n*");
-> > -    g_test_trap_assert_stderr("*Warning: global nondevice-type.prop6 has invalid class name\n*");
-> > +    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used\n*");
-> > +    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name\n*");
-> >      g_test_trap_assert_stdout("");
-> >  }
-> 
-> These changes are unrelated ... please drop them from your patch.
+On 6 July 2017 at 18:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 06/07/2017 19:13, Peter Maydell wrote:
+>> Slightly awkward because owner is an Object but vmstate_register_ram()
+>> needs a DeviceState. Is this OK, or too much magic?
+>>
+>>     DeviceState *owner_dev;
+>>     Error *err = NULL;
+>>
+>>     memory_region_init_ram(mr, owner, name, ram_size, &err);
+>>     if (err) {
+>>         error_propagate(errp, err);
+>>         return;
+>>     }
+>>     /* Note that owner_dev may be NULL if owner is not a DeviceState;
+>>      * in that case this is equivalent to calling vmstate_register_ram_global().
+>>      */
+>>     owner_dev = object_dynamic_cast(owner, TYPE_DEVICE);
+>>     vmstate_register_ram(mr, owner_dev);
+>
+> Maybe, for memory_region_init_ram only, the owner argument can be made a
+> DeviceState (or NULL)?
 
-Are they?  I believe they are necessary so the test case won't be
-broken by the qdev-properties.c changes.
+Hmm. I don't much like the way that breaks the symmetry of the
+API with the other memory region init functions, and it makes
+it harder to script the conversion. I'd rather keep it as an
+Object*, especially since the only purpose of the pointer is to
+make the RAM name unique for migration purposes.
+(Better still would be if we had a uniquification mechanism
+for Objects...)
 
--- 
-Eduardo
+Incidentally if you use vmstate_register_ram_global() in
+a device then it implicitly makes the device "only usable once"
+since if you create a 2nd one it'll abort in qemu_ram_set_idstr().
+For instance:
+
+qemu-system-ppc -device sm501 -device sm501
+RAMBlock "sm501.local" already registered, abort!
+Aborted (core dumped)
+
+thanks
+-- PMM
