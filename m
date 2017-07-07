@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dTT9a-0004f5-Bw
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:18:39 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTTAD-0005JZ-JR
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dTT9Z-0005Pp-Ag
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:18:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55554)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dTT9Z-0005Pb-27
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:18:37 -0400
-Date: Fri, 7 Jul 2017 15:18:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170707151829.017c9eb2@nial.brq.redhat.com>
-In-Reply-To: <CAFEAcA-G6=FfgXrHVE+eUP0YLd9Bp0b26n_0pTiW-joF++BcBg@mail.gmail.com>
-References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
-	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
-	<CAFEAcA-xkd94VTVOuOvXeowb92TPose4y8LKB5o56UyRMNXsfw@mail.gmail.com>
-	<8ebbc85e-5b44-1f49-296f-4be51405d521@redhat.com>
-	<CAFEAcA-G6=FfgXrHVE+eUP0YLd9Bp0b26n_0pTiW-joF++BcBg@mail.gmail.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTTA8-0005gI-Lb
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:19:17 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 15:18:55 +0200
+Message-Id: <149943353527.8972.10583420262960708622.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
- memory_region_allocate_aux_memory()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 24/27] target/arm: [tcg,
+ a64] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +23,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Thu, 6 Jul 2017 17:26:10 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-> On 6 July 2017 at 15:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> >
-> > On 06/07/2017 16:52, Peter Maydell wrote:  
-> >> On 5 July 2017 at 13:21, Paolo Bonzini <pbonzini@redhat.com> wrote:  
-> >>>
-> >>>
-> >>> On 04/07/2017 19:02, Peter Maydell wrote:  
-> >>>> Many board models and several devices need to create auxiliary
-> >>>> regions of RAM (in addition to the main lump of 'system' memory),
-> >>>> to model static RAMs, video memory, ROMs, etc. Currently they do
-> >>>> this with a sequence like:
-> >>>>        memory_region_init_ram(sram, NULL, "sram", 0x10000, &error_fatal);
-> >>>>        vmstate_register_ram_global(sram);  
-> >>>
-> >>> Instead of vmstate_register_ram_global, you should use
-> >>>
-> >>>     vmstate_register_ram(mr, owner);
-> >>>
-> >>> You should even do it for all memory regions, probably.  
-> >>
-> >> This sounds like a good thing, but it's awkward for migration
-> >> compatibility, because these callers to memory_region_init_ram()
-> >> don't call vmstate_register_ram():
-> >>
-> >> hw/arm/highbank.c (a bug)
-> >> hw/mips/mips_malta.c (region is ro)
-> >> hw/net/dp3893x.c (prom, ro, contains mac address)
-> >> hw/pci-host/xilinx-pcie.c (dummy region; migrating wouldn't hurt)
-> >> backends/hostmem-ram.c (bug, or is migration handled elsewhere?)  
-> >
-> > It's handled by memory_region_allocate_system_memory.  
-> 
-> OK. To sum up an IRC conversation...
-> 
-> I think that to avoid getting tangled up in trying to fix
-> or deal with these handful of oddball cases at the same time
-> as doing a global change to the easy cases, we should:
-> 
->  * globally rename memory_region_init_ram to memory_region_init_ram_nomigrate
->    (and document that it is the caller's job to arrange to migrate the RAM)
-it would be a bit weird when MR created as _nomigrate()
-is then registered with vmstate_register_ram() and being migrated.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/arm/translate-a64.c |  123 +++++++++++++++++++++++---------------=
+------
+ 1 file changed, 65 insertions(+), 58 deletions(-)
 
-maybe other way around, places that don't wanna to use explicit
-vmstate_register_ram() could replace 2 calls with helper memory_region_init_ram_automigrate()
-
-
->  * add new memory_region_init_ram which does memory_region_init_ram_nomigrate
->    + vmstate_register_ram
->  * coccinelle patch to switch to using that new function where possible
->  * get that lot committed, because it touches so many files and
->    is a recipe for conflicts
->  * look at the remaining handful of _nomigrate calls and perhaps
->    switch them where that would be a bug fix
-> 
-> Q: should we have _nomigrate versions of any of the other
-> memory_region_init_ram* functions? I think it makes sense
-> for only the basic _init_ram to do the migration for you,
-> because that's the only case where the memory system is
-> creating the backing storage for the caller, rather than the
-> caller passing in the backing storage. "Be consistent for
-> the full set of functions" would be the other obvious approach;
-> I don't think I care too much either way.
-I 'd keep current way where memory_region and vmstate APIs are split
-and consistent in what they are doing instead of making Frankenstein
-from memory_region API.
-
-> thanks
-> -- PMM
-> 
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c4cb9afb02..cead9d382c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11316,6 +11316,69 @@ static target_ulong aarch64_tr_translate_insn(Di=
+sasContextBase *dcbase,
+     return dc->pc;
+ }
+=20
++static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++
++    if (unlikely(dc->base.singlestep_enabled || dc->ss_active)
++        && dc->base.is_jmp !=3D DISAS_EXC) {
++        /* Note that this means single stepping WFI doesn't halt the CPU.
++         * For conditional branch insns this is harmless unreachable cod=
+e as
++         * gen_goto_tb() has already handled emitting the debug exceptio=
+n
++         * (and thus a tb-jump is not possible when singlestepping).
++         */
++        assert(dc->base.is_jmp !=3D DISAS_TB_JUMP);
++        if (dc->base.is_jmp !=3D DISAS_JUMP) {
++            gen_a64_set_pc_im(dc->pc);
++        }
++        if (dc->base.singlestep_enabled) {
++            gen_exception_internal(EXCP_DEBUG);
++        } else {
++            gen_step_complete_exception(dc);
++        }
++    } else {
++        switch (dc->base.is_jmp) {
++        case DISAS_NEXT:
++        case DISAS_TOO_MANY:
++            gen_goto_tb(dc, 1, dc->pc);
++            break;
++        default:
++        case DISAS_UPDATE:
++            gen_a64_set_pc_im(dc->pc);
++            /* fall through */
++        case DISAS_JUMP:
++            tcg_gen_lookup_and_goto_ptr(cpu_pc);
++            break;
++        case DISAS_EXIT:
++            tcg_gen_exit_tb(0);
++            break;
++        case DISAS_TB_JUMP:
++        case DISAS_EXC:
++        case DISAS_SWI:
++            break;
++        case DISAS_WFE:
++            gen_a64_set_pc_im(dc->pc);
++            gen_helper_wfe(cpu_env);
++            break;
++        case DISAS_YIELD:
++            gen_a64_set_pc_im(dc->pc);
++            gen_helper_yield(cpu_env);
++            break;
++        case DISAS_WFI:
++            /* This is a special case because we don't want to just halt=
+ the CPU
++             * if trying to debug across a WFI.
++             */
++            gen_a64_set_pc_im(dc->pc);
++            gen_helper_wfi(cpu_env);
++            /* The helper doesn't necessarily throw an exception, but we
++             * must go back to the main loop to check for interrupts any=
+way.
++             */
++            tcg_gen_exit_tb(0);
++            break;
++        }
++    }
++}
++
+ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+                                TranslationBlock *tb)
+ {
+@@ -11398,68 +11461,12 @@ void gen_intermediate_code_a64(DisasContextBase=
+ *dcbase, CPUState *cs,
+          */
+     } while (!dc->base.is_jmp);
+=20
++    aarch64_tr_tb_stop(&dc->base, cs);
++
+     if (dc->base.tb->cflags & CF_LAST_IO) {
+         gen_io_end();
+     }
+=20
+-    if (unlikely(cs->singlestep_enabled || dc->ss_active)
+-        && dc->base.is_jmp !=3D DISAS_EXC) {
+-        /* Note that this means single stepping WFI doesn't halt the CPU.
+-         * For conditional branch insns this is harmless unreachable cod=
+e as
+-         * gen_goto_tb() has already handled emitting the debug exceptio=
+n
+-         * (and thus a tb-jump is not possible when singlestepping).
+-         */
+-        assert(dc->base.is_jmp !=3D DISAS_TB_JUMP);
+-        if (dc->base.is_jmp !=3D DISAS_JUMP) {
+-            gen_a64_set_pc_im(dc->pc);
+-        }
+-        if (cs->singlestep_enabled) {
+-            gen_exception_internal(EXCP_DEBUG);
+-        } else {
+-            gen_step_complete_exception(dc);
+-        }
+-    } else {
+-        switch (dc->base.is_jmp) {
+-        case DISAS_NEXT:
+-        case DISAS_TOO_MANY:
+-            gen_goto_tb(dc, 1, dc->pc);
+-            break;
+-        default:
+-        case DISAS_UPDATE:
+-            gen_a64_set_pc_im(dc->pc);
+-            /* fall through */
+-        case DISAS_JUMP:
+-            tcg_gen_lookup_and_goto_ptr(cpu_pc);
+-            break;
+-        case DISAS_EXIT:
+-            tcg_gen_exit_tb(0);
+-            break;
+-        case DISAS_TB_JUMP:
+-        case DISAS_EXC:
+-        case DISAS_SWI:
+-            break;
+-        case DISAS_WFE:
+-            gen_a64_set_pc_im(dc->pc);
+-            gen_helper_wfe(cpu_env);
+-            break;
+-        case DISAS_YIELD:
+-            gen_a64_set_pc_im(dc->pc);
+-            gen_helper_yield(cpu_env);
+-            break;
+-        case DISAS_WFI:
+-            /* This is a special case because we don't want to just halt=
+ the CPU
+-             * if trying to debug across a WFI.
+-             */
+-            gen_a64_set_pc_im(dc->pc);
+-            gen_helper_wfi(cpu_env);
+-            /* The helper doesn't necessarily throw an exception, but we
+-             * must go back to the main loop to check for interrupts any=
+way.
+-             */
+-            tcg_gen_exit_tb(0);
+-            break;
+-        }
+-    }
+-
+ done_generating:
+     gen_tb_end(tb, dc->base.num_insns);
+=20
