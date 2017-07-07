@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dTX89-0001KY-47
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:33:26 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTX8J-0001aA-HI
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dTX88-0004v4-0f
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:33:25 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dTX87-0004uQ-RL
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:33:23 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id 77so56076914wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 10:33:22 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <3745ae02-3fb0-1503-9c99-98dce369f697@twiddle.net>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTX8F-0004x8-K4
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:33:35 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
 References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865776960.17063.4875279139522061160.stgit@frigg.lan>
-	<2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net>
-	<87podcebyi.fsf@frigg.lan>
-	<3745ae02-3fb0-1503-9c99-98dce369f697@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Jul 2017 18:33:00 +0100
-Message-ID: <CAFEAcA_tKBtOOc8XCHYRGFT7qN3FmDD7awfvZrZA+2kbQNp82Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 23/29] target/arm: [tcg] Port to
- translate_insn
+	<149865801156.17063.15618379976159104550.stgit@frigg.lan>
+	<244b5aab-8863-3139-f252-09cc02333eda@twiddle.net>
+	<87inj4ebqn.fsf@frigg.lan>
+	<c35a41d9-4c9d-3daf-2759-17a784b8711b@twiddle.net>
+	<20170707161913.GA16183@flamenco>
+Date: Fri, 07 Jul 2017 19:33:16 +0200
+In-Reply-To: <20170707161913.GA16183@flamenco> (Emilio G. Cota's message of
+	"Fri, 7 Jul 2017 12:19:13 -0400")
+Message-ID: <8760f4cftv.fsf@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v11 24/29] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 7 July 2017 at 16:26, Richard Henderson <rth@twiddle.net> wrote:
-> That is the purpose of DISAS_EXC too.  We've called a noreturn helper to
-> raise an exception and all following code is unreached.  If there *was* any
-> code being emitted afterward, that is arguably a bug.
+Emilio G Cota writes:
 
-One exception to that is a conditionally executed
-exception generating exception -- there will in that
-case be a following label for the condfail case to branch
-to and the code for the condfail path.
+> On Fri, Jul 07, 2017 at 05:46:19 -1000, Richard Henderson wrote:
+>> I do wonder if we should provide a generic empty hook, so that a target that
+>> does not need a particular hook need not define an empty function.  It could
+>> just put e.g. "translator_noop" into the structure.  Ok, maybe a better name
+>> than that...
 
-The distinction in the case that this code fragment is touching
-is that the cases handled in current master via 'goto
-done_generating' and in Lluis' patch as
-DISAS_SKIP are the "this insn is going to generate an
-exception without even thinking about conditional
-exception" (ie breakpoints, singlestep); DISAS_EXC
-is for "the instruction itself generates an exception,
-so don't bother with emitting too much unreachable
-code to update the PC etc, but we still need to handle
-the usual end-of-insn condfail path".
+> NULL would serve that purpose well. The subsequent "if (hook)" branch
+> would be essentially free because it'd be trivially predicted.
 
-We do a few things in the DISAS_EXC codepath
-(like calling gen_set_condexec()) which strictly speaking
-are pointless but which it didn't seem worth trying to
-avoid just to avoid generating a few extra bytes in the
-generated code in a not-terribly-likely case.
+Someone (Richard? can't remember exactly) already objected to using NULL.
 
-thanks
--- PMM
+
+Cheers,
+  Lluis
