@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTScA-00083s-3K
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:44:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTSdI-0000ON-Lz
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dTSc6-0008CQ-VZ
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:44:06 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:44045 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dTSc6-0008C2-Jt
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:44:02 -0400
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-26-vsementsov@virtuozzo.com>
-	<87r2xs65a5.fsf@dusky.pond.sub.org> <20170707081305.GA15945@redhat.com>
-	<87fue839m5.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5f9bd366-4bf0-6463-3de9-a60afffab7e0@virtuozzo.com>
-Date: Fri, 7 Jul 2017 15:43:44 +0300
-MIME-Version: 1.0
-In-Reply-To: <87fue839m5.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v22 25/30] qmp: add
- x-debug-block-dirty-bitmap-sha256
+	(envelope-from <eblake@redhat.com>) id 1dTSdH-0000Ps-HN
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:45:16 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Fri,  7 Jul 2017 07:44:38 -0500
+Message-Id: <20170707124459.10269-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 00/21] make bdrv_is_allocated[_above]
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +18,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org
 
-07.07.2017 12:00, Markus Armbruster wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
->
->> On Fri, Jul 07, 2017 at 10:05:22AM +0200, Markus Armbruster wrote:
->>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>   block/dirty-bitmap.c         |  5 +++++
->>>>   blockdev.c                   | 25 +++++++++++++++++++++++++
->>>>   include/block/dirty-bitmap.h |  1 +
->>>>   include/qemu/hbitmap.h       |  8 ++++++++
->>>>   qapi/block-core.json         | 27 +++++++++++++++++++++++++++
->>>>   tests/Makefile.include       |  2 +-
->>>>   util/hbitmap.c               | 11 +++++++++++
->>>>   7 files changed, 78 insertions(+), 1 deletion(-)
->>> [...]
->>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>>> index 5c42cc7790..6ad8585400 100644
->>>> --- a/qapi/block-core.json
->>>> +++ b/qapi/block-core.json
->>>> @@ -1644,6 +1644,33 @@
->>>>     'data': 'BlockDirtyBitmap' }
->>>>   
->>>>   ##
->>>> +# @BlockDirtyBitmapSha256:
->>>> +#
->>>> +# SHA256 hash of dirty bitmap data
->>>> +#
->>>> +# @sha256: ASCII representation of SHA256 bitmap hash
->>> Spell it SHA-256, please.  The member name @sha256 can stay.
->>>
->>> SHA-256 is 256 binary bits.  Please specify how they are represented in
->>> ASCII.  It better be base64 (RFC 4648), because we use that elsewhere.
->> It is filled later in this patch using qcrypto_hash_digest, so it is just
->> a hex string representing the hash, not base64. For the latter you can
->> use qcrypto_hash_base64
-> I got two points:
->
-> 1. Whatever encoding we use, it needs to be documented.
->
-> 2. The fewer binary -> ASCII encodings we use, the better.  We already
-> use base64.
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (this series, v4 was at [1])
+part 2: dirty-bitmap (v4 is posted [2]; needs reviews)
+part 3: bdrv_get_block_status (v2 is posted [3] and is mostly reviewed)
+part 4: upcoming series, for .bdrv_co_block_status (second half of v1 [4])
 
-ASCII format for check sum is more common as it is more readable. It is 
-used in the internet to check downloads, it is used by standard utility 
-sha256sum. So, it may be better for the monitor.
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-allocated-v5
 
-However, if it is needed, I can make a follow-up patch, it is very easy, 
-just s/qcrypto_hash_digest/qcrypto_hash_base64/ in util/hbitmap.c. 
-iotest 165 - the only user of the feature - doesn't need any changes.
+Depends on Max's block branch (which in turn includes Kevin's)
 
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01151.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00269.html
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00427.html
+[4] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
 
+Changes since v4:
+- patches 8, 11: formatting tweak [Kevin], R-b kept
+- patches 12, 19, 21: fix/add assertions [Kevin], R-b dropped
+- patch 16: tweak parameter naming [Kevin], R-b kept
+- patch 20: kill confusing comment [Kevin], R-b kept
+
+001/21:[----] [--] 'blockjob: Track job ratelimits via bytes, not sectors'
+002/21:[----] [--] 'trace: Show blockjob actions via bytes, not sectors'
+003/21:[----] [--] 'stream: Switch stream_populate() to byte-based'
+004/21:[----] [--] 'stream: Drop reached_end for stream_complete()'
+005/21:[----] [--] 'stream: Switch stream_run() to byte-based'
+006/21:[----] [--] 'commit: Switch commit_populate() to byte-based'
+007/21:[----] [--] 'commit: Switch commit_run() to byte-based'
+008/21:[0004] [FC] 'mirror: Switch MirrorBlockJob to byte-based'
+009/21:[----] [--] 'mirror: Switch mirror_do_zero_or_discard() to byte-based'
+010/21:[----] [--] 'mirror: Update signature of mirror_clip_sectors()'
+011/21:[0003] [FC] 'mirror: Switch mirror_cow_align() to byte-based'
+012/21:[0007] [FC] 'mirror: Switch mirror_do_read() to byte-based'
+013/21:[----] [--] 'mirror: Switch mirror_iteration() to byte-based'
+014/21:[----] [--] 'block: Drop unused bdrv_round_sectors_to_clusters()'
+015/21:[----] [--] 'backup: Switch BackupBlockJob to byte-based'
+016/21:[0008] [FC] 'backup: Switch block_backup.h to byte-based'
+017/21:[----] [--] 'backup: Switch backup_do_cow() to byte-based'
+018/21:[----] [--] 'backup: Switch backup_run() to byte-based'
+019/21:[0035] [FC] 'block: Make bdrv_is_allocated() byte-based'
+020/21:[0004] [FC] 'block: Minimize raw use of bds->total_sectors'
+021/21:[0020] [FC] 'block: Make bdrv_is_allocated_above() byte-based'
+
+Eric Blake (21):
+  blockjob: Track job ratelimits via bytes, not sectors
+  trace: Show blockjob actions via bytes, not sectors
+  stream: Switch stream_populate() to byte-based
+  stream: Drop reached_end for stream_complete()
+  stream: Switch stream_run() to byte-based
+  commit: Switch commit_populate() to byte-based
+  commit: Switch commit_run() to byte-based
+  mirror: Switch MirrorBlockJob to byte-based
+  mirror: Switch mirror_do_zero_or_discard() to byte-based
+  mirror: Update signature of mirror_clip_sectors()
+  mirror: Switch mirror_cow_align() to byte-based
+  mirror: Switch mirror_do_read() to byte-based
+  mirror: Switch mirror_iteration() to byte-based
+  block: Drop unused bdrv_round_sectors_to_clusters()
+  backup: Switch BackupBlockJob to byte-based
+  backup: Switch block_backup.h to byte-based
+  backup: Switch backup_do_cow() to byte-based
+  backup: Switch backup_run() to byte-based
+  block: Make bdrv_is_allocated() byte-based
+  block: Minimize raw use of bds->total_sectors
+  block: Make bdrv_is_allocated_above() byte-based
+
+ include/block/block.h        |  10 +-
+ include/block/block_backup.h |  11 +-
+ include/qemu/ratelimit.h     |   3 +-
+ block/backup.c               | 128 ++++++++----------
+ block/commit.c               |  54 ++++----
+ block/io.c                   |  97 +++++++-------
+ block/mirror.c               | 308 ++++++++++++++++++++++---------------------
+ block/replication.c          |  29 ++--
+ block/stream.c               |  37 +++---
+ block/vvfat.c                |  34 +++--
+ migration/block.c            |  16 ++-
+ qemu-img.c                   |  21 ++-
+ qemu-io-cmds.c               |  70 +++++-----
+ block/trace-events           |  14 +-
+ 14 files changed, 413 insertions(+), 419 deletions(-)
 
 -- 
-Best regards,
-Vladimir
+2.9.4
