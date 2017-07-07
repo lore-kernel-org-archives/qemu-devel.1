@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dTVvs-0003Nb-Et
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:16:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dTVxq-00048K-E2
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dTVvo-0007PP-GE
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:16:40 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:55417
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dTVvo-0007P8-8c
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:16:36 -0400
-References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170703113940.0e0415a2@nial.brq.redhat.com>
-	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
-	<20170707133320.2e0d741d@nial.brq.redhat.com>
-	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
-	<20170707132619.GT12152@localhost.localdomain>
-	<b3616dc1-2d8e-3cce-cf40-b239d20c1d83@ilande.co.uk>
-	<20170707144806.GX12152@localhost.localdomain>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <204ed1c5-c38f-6bca-f5f8-3761f171d473@ilande.co.uk>
-Date: Fri, 7 Jul 2017 17:16:26 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1dTVxm-0008JG-FB
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:18:42 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dTVxm-0008Ii-7I
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:18:38 -0400
+Received: by mail-wr0-x230.google.com with SMTP id c11so53448781wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 09:18:38 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  7 Jul 2017 17:18:22 +0100
+Message-Id: <20170707161822.29659-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170707144806.GX12152@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
- fw_cfg_init1() to callers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the run-loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, lersek@redhat.com
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
 
-On 07/07/17 15:48, Eduardo Habkost wrote:
+Previously DISAS_JUMP did ensure this but with the optimisation of
+8a6b28c7 (optimize indirect branches) we might not leave the loop.
+This means if any pending interrupts are cleared by changing IRQ flags
+we might never get around to servicing them. You usually notice this
+by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
+while cpu->interrupt_request remains high and the exit_request has not
+been set.
 
->>> I don't see what needs to be fixed.  It is not a bug to leave
->>> fw_cfg in /machine/unattached, as long as fw_cfg_find() works
->>> properly.
->>
->> Yeah. I wonder if I've been leading myself astray down the wrong path
->> here? Let me do some more local tests without
->> fw_cfg_unattached_at_realize() and with an ambiguous argument in
->> fw_cfg_find().
-> 
-> Note that if you add assert(!ambiguous) to fw_cfg_find(), you
-> need to choose what to do when multiple devices are instantiated:
-> a) Calling fw_cfg_find() on realize, making it abort instead of
->    returning an error;
-> b) Not calling fw_cfg_find() on realize, and returning an error
->    using object_resolve_path_type() manually;
-> c) Not calling fw_cfg_find(), not returning an error, and letting
->    QEMU abort when fw_cfg_find() is called by other code.
-> 
-> I think it's simpler to just do like vmgenid does and simply
-> return NULL when there are multiple devices.  We just need to
-> document that clearly, and be aware of that when calling
-> fw_cfg_find() on realize.  But I won't object if you choose
-> another option.
+This breaks amongst other things the OPTEE test suite which executes
+an eret from the secure world after a non-secure world IRQ has gone
+pending which then never gets serviced.
 
-Yes, I agree. I should add that I've been testing without the ambiguous
-argument and everything seems to be working now...
+An alternate approach might be for the exception helpers to ensure the
+exit request flag is set if an IRQ is now unmasked.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+CC: Etienne Carriere <etienne.carriere@linaro.org>
+CC: Joakim Bech <joakim.bech@linaro.org>
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Emilio G. Cota <cota@braap.org>
+CC: Richard Henderson <rth@twiddle.net>
+---
+ target/arm/translate-a64.c | 3 ++-
+ target/arm/translate.c     | 6 ++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-ATB,
-
-Mark.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index e55547d95d..3ee88b2590 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1788,7 +1788,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+             return;
+         }
+         gen_helper_exception_return(cpu_env);
+-        s->is_jmp = DISAS_JUMP;
++        /* Must exit loop to check un-masked IRQs */
++        s->is_jmp = DISAS_EXIT;
+         return;
+     case 5: /* DRPS */
+         if (rn != 0x1f) {
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 0862f9e4aa..920fb41395 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4475,7 +4475,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
+      */
+     gen_helper_cpsr_write_eret(cpu_env, cpsr);
+     tcg_temp_free_i32(cpsr);
+-    s->is_jmp = DISAS_JUMP;
++    /* Must exit loop to check un-masked IRQs */
++    s->is_jmp = DISAS_EXIT;
+ }
+ 
+ /* Generate an old-style exception return. Marks pc as dead. */
+@@ -9519,7 +9520,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                     tmp = load_cpu_field(spsr);
+                     gen_helper_cpsr_write_eret(cpu_env, tmp);
+                     tcg_temp_free_i32(tmp);
+-                    s->is_jmp = DISAS_JUMP;
++                    /* Must exit loop to check un-masked IRQs */
++                    s->is_jmp = DISAS_EXIT;
+                 }
+             }
+             break;
+-- 
+2.13.0
