@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dTcbz-0008Bg-Pk
+	(envelope-from <alistai@xilinx.com>) id 1dTcc0-0008C2-4a
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 19:24:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dTcbu-0005as-MZ
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 19:24:35 -0400
-Received: from mail-co1nam03on0081.outbound.protection.outlook.com
-	([104.47.40.81]:39691
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dTcbv-0005bH-9x
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 19:24:36 -0400
+Received: from mail-cys01nam02on0074.outbound.protection.outlook.com
+	([104.47.37.74]:55707
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dTcbu-0005a9-7K
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 19:24:30 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dTcbu-0005aa-TE
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 19:24:31 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 7 Jul 2017 16:21:11 -0700
-Message-ID: <0b9bd5ca41a8e9ba6e9a43f5392a71ee2f0193f6.1499453788.git.alistair.francis@xilinx.com>
+Date: Fri, 7 Jul 2017 16:21:17 -0700
+Message-ID: <c711242fba4b3b6f0e1a5862bf361b9f787bbbea.1499453788.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1499453787.git.alistair.francis@xilinx.com>
 References: <cover.1499453787.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 4/8] hw/i386: Improve some of the warning
- messages
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 5/8] char-socket: Report TCP socket waiting
+ as information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +32,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com
 
+When QEMU is waiting for a TCP socket connection it reports that message as
+an error. This isn't an error it is just information so let's change the
+report to use info_report() instead.
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
 
- hw/i386/acpi-build.c | 7 ++++---
- hw/i386/pc.c         | 9 ++++-----
- hw/i386/pc_q35.c     | 4 ++--
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ chardev/char-socket.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6b7bade183..f9efb6be41 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2766,7 +2766,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-                      ACPI_BUILD_ALIGN_SIZE);
-         if (tables_blob->len > legacy_table_size) {
-             /* Should happen only with PCI bridges and -M pc-i440fx-2.0.  */
--            warn_report("migration may not work.");
-+            warn_report("ACPI tables are larger than legacy_table_size");
-+            warn_report("migration may not work");
-         }
-         g_array_set_size(tables_blob, legacy_table_size);
-     } else {
-@@ -2774,9 +2775,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-         if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
-             /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
-             warn_report("ACPI tables are larger than 64k.");
--            warn_report("migration may not work.");
-+            warn_report("migration may not work");
-             warn_report("please remove CPUs, NUMA nodes, "
--                        "memory slots or PCI bridges.");
-+                        "memory slots or PCI bridges");
-         }
-         acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
-     }
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 58f8a4f4a5..3cc580a245 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -383,8 +383,8 @@ ISADevice *pc_find_fdc0(void)
-     if (state.multiple) {
-         warn_report("multiple floppy disk controllers with "
-                     "iobase=0x3f0 have been found");
--        error_printf("the one being picked for CMOS setup might not reflect "
--                     "your intent\n");
-+        warn_report("the one being picked for CMOS setup might not reflect "
-+                    "your intent");
-     }
- 
-     return state.floppy;
-@@ -2087,9 +2087,8 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-     }
- 
-     if (value < (1ULL << 20)) {
--        warn_report("small max_ram_below_4g(%"PRIu64
--                    ") less than 1M.  BIOS may not work..",
--                    value);
-+        warn_report("max_ram_below_4g (%" PRIu64 ") is less than 1M; "
-+                    "BIOS may not work.", value);
-     }
- 
-     pcms->max_ram_below_4g = value;
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 1653a47f0a..682c576cf1 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -101,8 +101,8 @@ static void pc_q35_init(MachineState *machine)
-         lowmem = pcms->max_ram_below_4g;
-         if (machine->ram_size - lowmem > lowmem &&
-             lowmem & ((1ULL << 30) - 1)) {
--            warn_report("Large machine and max_ram_below_4g(%"PRIu64
--                        ") not a multiple of 1G; possible bad performance.",
-+            warn_report("Large machine and max_ram_below_4g (%"PRIu64") not a "
-+                        "multiple of 1G; possible bad performance.",
-                         pcms->max_ram_below_4g);
-         }
-     }
--- 
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index ccc499cfa1..a050a686ea 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -765,8 +765,8 @@ static int tcp_chr_wait_connected(Chardev *chr, Error *=
+*errp)
+      * in TLS and telnet cases, only wait for an accepted socket */
+     while (!s->ioc) {
+         if (s->is_listen) {
+-            error_report("QEMU waiting for connection on: %s",
+-                         chr->filename);
++            info_report("QEMU waiting for connection on: %s",
++                        chr->filename);
+             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, NUL=
+L);
+             tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
+             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), false, NU=
+LL);
+--=20
 2.11.0
