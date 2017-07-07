@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dTRzG-00073y-8l
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:03:55 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTS0V-0007qO-Li
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dTRzC-0006KH-DV
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:03:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51884)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dTRzC-0006Jk-7e
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:03:50 -0400
-References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
-	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
-	<CAFEAcA-VGRYZ7+Osa8J1Ew+P=wf42uOtVvmV9mmGBTwC-f++8w@mail.gmail.com>
-	<6861810e-0546-d1e4-4573-7cdb18696c03@redhat.com>
-	<CAFEAcA_TWBxNJDODCVaHBqt=MQD2G+mj7R_FmEttfsz1ipA_HA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <693fd8ba-ea92-3fc7-f500-e1e0c89109a4@redhat.com>
-Date: Fri, 7 Jul 2017 14:03:37 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTS0S-0006vG-FO
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:05:11 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:33100 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTS0S-0006uH-3V
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:05:08 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 14:04:50 +0200
+Message-Id: <149942909046.8972.7267856934982201630.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TWBxNJDODCVaHBqt=MQD2G+mj7R_FmEttfsz1ipA_HA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
- memory_region_allocate_aux_memory()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 06/27] target/i386: [tcg] Port to
+ init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +27,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/i386/translate.c |   41 +++++++++++++++++++++++------------------
+ 1 file changed, 23 insertions(+), 18 deletions(-)
 
-On 07/07/2017 13:58, Peter Maydell wrote:
->>>
->>>     memory_region_init_ram(mr, owner, name, ram_size, &err);
->>>     if (err) {
->>>         error_propagate(errp, err);
->>>         return;
->>>     }
->>>     /* Note that owner_dev may be NULL if owner is not a DeviceState;
->>>      * in that case this is equivalent to calling vmstate_register_ram_global().
->>>      */
->>>     owner_dev = object_dynamic_cast(owner, TYPE_DEVICE);
->>>     vmstate_register_ram(mr, owner_dev);
->> Maybe, for memory_region_init_ram only, the owner argument can be made a
->> DeviceState (or NULL)?
-> Hmm. I don't much like the way that breaks the symmetry of the
-> API with the other memory region init functions, and it makes
-> it harder to script the conversion. I'd rather keep it as an
-> Object*, especially since the only purpose of the pointer is to
-> make the RAM name unique for migration purposes.
-
-In that case, I would assert the object is a device and add a TODO to
-support non-device objects.
-
-Paolo
-
-> (Better still would be if we had a uniquification mechanism
-> for Objects...)
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index f61f5c7227..7819545e37 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8379,20 +8379,12 @@ void tcg_x86_init(void)
+     }
+ }
+=20
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++static void i386_tr_init_disas_context(DisasContextBase *dcbase, CPUStat=
+e *cpu)
+ {
+-    CPUX86State *env =3D cs->env_ptr;
+-    DisasContext dc1, *dc =3D &dc1;
+-    uint32_t flags;
+-    target_ulong cs_base;
+-    int num_insns;
+-    int max_insns;
+-
+-    /* generate intermediate code */
+-    dc->base.pc_first =3D tb->pc;
+-    cs_base =3D tb->cs_base;
+-    flags =3D tb->flags;
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++    CPUX86State *env =3D cpu->env_ptr;
++    uint32_t flags =3D dc->base.tb->flags;
++    target_ulong cs_base =3D dc->base.tb->cs_base;
+=20
+     dc->pe =3D (flags >> HF_PE_SHIFT) & 1;
+     dc->code32 =3D (flags >> HF_CS32_SHIFT) & 1;
+@@ -8403,11 +8395,9 @@ void gen_intermediate_code(CPUState *cs, Translati=
+onBlock *tb)
+     dc->cpl =3D (flags >> HF_CPL_SHIFT) & 3;
+     dc->iopl =3D (flags >> IOPL_SHIFT) & 3;
+     dc->tf =3D (flags >> TF_SHIFT) & 1;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+     dc->cc_op =3D CC_OP_DYNAMIC;
+     dc->cc_op_dirty =3D false;
+     dc->cs_base =3D cs_base;
+-    dc->base.tb =3D tb;
+     dc->popl_esp_hack =3D 0;
+     /* select memory access functions */
+     dc->mem_index =3D 0;
+@@ -8425,7 +8415,7 @@ void gen_intermediate_code(CPUState *cs, Translatio=
+nBlock *tb)
+     dc->code64 =3D (flags >> HF_CS64_SHIFT) & 1;
+ #endif
+     dc->flags =3D flags;
+-    dc->jmp_opt =3D !(dc->tf || cs->singlestep_enabled ||
++    dc->jmp_opt =3D !(dc->tf || dc->base.singlestep_enabled ||
+                     (flags & HF_INHIBIT_IRQ_MASK));
+     /* Do not optimize repz jumps at all in icount mode, because
+        rep movsS instructions are execured with different paths
+@@ -8437,7 +8427,7 @@ void gen_intermediate_code(CPUState *cs, Translatio=
+nBlock *tb)
+        record/replay modes and there will always be an
+        additional step for ecx=3D0 when icount is enabled.
+      */
+-    dc->repz_opt =3D !dc->jmp_opt && !(tb->cflags & CF_USE_ICOUNT);
++    dc->repz_opt =3D !dc->jmp_opt && !(dc->base.tb->cflags & CF_USE_ICOU=
+NT);
+ #if 0
+     /* check addseg logic */
+     if (!dc->addseg && (dc->vm86 || !dc->pe || !dc->code32))
+@@ -8456,9 +8446,24 @@ void gen_intermediate_code(CPUState *cs, Translati=
+onBlock *tb)
+     cpu_ptr0 =3D tcg_temp_new_ptr();
+     cpu_ptr1 =3D tcg_temp_new_ptr();
+     cpu_cc_srcT =3D tcg_temp_local_new();
++}
+=20
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++{
++    CPUX86State *env =3D cs->env_ptr;
++    DisasContext dc1, *dc =3D &dc1;
++    int num_insns;
++    int max_insns;
++
++    /* generate intermediate code */
++    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
++    dc->base.tb =3D tb;
+     dc->base.is_jmp =3D DISAS_NEXT;
++    dc->base.pc_first =3D tb->pc;
+     dc->base.pc_next =3D dc->base.pc_first;
++    i386_tr_init_disas_context(&dc->base, cs);
++
+     num_insns =3D 0;
+     max_insns =3D tb->cflags & CF_COUNT_MASK;
+     if (max_insns =3D=3D 0) {
+@@ -8500,7 +8505,7 @@ void gen_intermediate_code(CPUState *cs, Translatio=
+nBlock *tb)
+            the flag and abort the translation to give the irqs a
+            change to be happen */
+         if (dc->tf || dc->base.singlestep_enabled ||
+-            (flags & HF_INHIBIT_IRQ_MASK)) {
++            (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
+             gen_jmp_im(dc->base.pc_next - dc->cs_base);
+             gen_eob(dc);
+             break;
