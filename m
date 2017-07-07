@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTUUh-0006xG-67
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:44:32 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dTUVE-0007bx-JP
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTUUe-0004eR-2I
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:44:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44268)
+	(envelope-from <imammedo@redhat.com>) id 1dTUVB-0004sK-FC
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:45:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTUUd-0004e4-P0
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:44:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E0DF7F3E0
-	for <qemu-devel@nongnu.org>; Fri,  7 Jul 2017 14:44:26 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170705144302.32017-1-dgilbert@redhat.com>
-Date: Fri, 07 Jul 2017 16:44:19 +0200
-In-Reply-To: <20170705144302.32017-1-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Wed, 5 Jul 2017 15:43:02 +0100")
-Message-ID: <87r2xsqpbw.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dTUVB-0004rn-5C
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:45:01 -0400
+Date: Fri, 7 Jul 2017 16:44:53 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170707164453.4ba325fd@nial.brq.redhat.com>
+In-Reply-To: <1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
+References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170703113940.0e0415a2@nial.brq.redhat.com>
+	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
+	<20170707133320.2e0d741d@nial.brq.redhat.com>
+	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hmp: Update info vnc
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,220 +32,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, marcandre.lureau@redhat.com, lcapitulino@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+On Fri, 7 Jul 2017 14:12:19 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The QMP query-vnc interfaces have gained a lot more information that
-> the HMP interfaces hasn't got yet. Update it.
->
-> Note the output format has changed, but this is HMP so that's OK.
->
-> In particular, this now includes client information for reverse
-> connections:
->
-> -vnc :0
-> (qemu) info vnc
-> default:
->   Server: 0.0.0.0:5900 (ipv4)
->     Auth: none (Sub: none)
->   Auth: none (Sub: none)
->
->   (Now connect a client)
->
-> (qemu) info vnc
-> default:
->   Server: 0.0.0.0:5900 (ipv4)
->     Auth: none (Sub: none)
->   Client: 127.0.0.1:51828 (ipv4)
->     x509_dname: none
->     username: none
->   Auth: none (Sub: none)
->
-> -vnc localhost:7000,reverse
-> (qemu) info vnc
-> default:
->   Client: ::1:7000 (ipv6)
->     x509_dname: none
->     username: none
->   Auth: none (Sub: none)
->
-> -vnc :1,password,id=rev -vnc localhost:7000,reverse
-> (qemu) info vnc
-> default:
->   Client: ::1:7000 (ipv6)
->     x509_dname: none
->     username: none
->   Auth: none (Sub: none)
-> rev:
->   Server: 0.0.0.0:5901 (ipv4)
->     Auth: vnc (Sub: none)
->   Client: 127.0.0.1:53616 (ipv4)
->     x509_dname: none
->     username: none
->   Auth: vnc (Sub: none)
->
-> This was originally RH bz 1461682
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hmp.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++---------------------
->  1 file changed, 67 insertions(+), 31 deletions(-)
->
-> diff --git a/hmp.c b/hmp.c
-> index dee40284c1..c11a5fe2c6 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -600,50 +600,86 @@ void hmp_info_blockstats(Monitor *mon, const QDict *qdict)
->      qapi_free_BlockStatsList(stats_list);
->  }
->  
-> +/* Helper for hmp_info_vnc_clients, _servers */
+> On 07/07/17 12:33, Igor Mammedov wrote:
+> 
+> > On Tue, 4 Jul 2017 19:08:44 +0100
+> > Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+> >   
+> >> On 03/07/17 10:39, Igor Mammedov wrote:
+> >>  
+> >>> On Thu, 29 Jun 2017 15:07:19 +0100
+> >>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+> >>>     
+> >>>> When looking to instantiate a TYPE_FW_CFG_MEM or TYPE_FW_CFG_IO device to be
+> >>>> able to wire it up differently, it is much more convenient for the caller to
+> >>>> instantiate the device and have the fw_cfg default files already preloaded
+> >>>> during realize.
+> >>>>
+> >>>> Move fw_cfg_init1() to the end of both the fw_cfg_mem_realize() and
+> >>>> fw_cfg_io_realize() functions so it no longer needs to be called manually
+> >>>> when instantiating the device, and also rename it to fw_cfg_common_realize()
+> >>>> which better describes its new purpose.
+> >>>>
+> >>>> Since it is now the responsibility of the machine to wire up the fw_cfg device
+> >>>> it is necessary to introduce a object_property_add_child() call into
+> >>>> fw_cfg_init_io() and fw_cfg_init_mem() to link the fw_cfg device to the root
+> >>>> machine object as before.
+> >>>>
+> >>>> Finally we can now convert the asserts() preventing multiple fw_cfg devices
+> >>>> and unparented fw_cfg devices being instantiated and replace them with proper
+> >>>> error reporting at realize time. This allows us to remove FW_CFG_NAME and
+> >>>> FW_CFG_PATH since they are no longer required.
+> >>>>
+> >>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> >>>> ---
+> >>>>  hw/nvram/fw_cfg.c |   41 +++++++++++++++++++++++++++++------------
+> >>>>  1 file changed, 29 insertions(+), 12 deletions(-)
+> >>>>
+> >>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> >>>> index 2291121..31029ac 100644
+> >>>> --- a/hw/nvram/fw_cfg.c
+> >>>> +++ b/hw/nvram/fw_cfg.c
+> >>>> @@ -37,9 +37,6 @@
+> >>>>  
+> >>>>  #define FW_CFG_FILE_SLOTS_DFLT 0x20
+> >>>>  
+> >>>> -#define FW_CFG_NAME "fw_cfg"
+> >>>> -#define FW_CFG_PATH "/machine/" FW_CFG_NAME
+> >>>> -
+> >>>>  #define TYPE_FW_CFG     "fw_cfg"
+> >>>>  #define TYPE_FW_CFG_IO  "fw_cfg_io"
+> >>>>  #define TYPE_FW_CFG_MEM "fw_cfg_mem"
+> >>>> @@ -920,19 +917,22 @@ static int fw_cfg_unattached_at_realize(void)
+> >>>>  }
+> >>>>  
+> >>>>  
+> >>>> -static void fw_cfg_init1(DeviceState *dev)
+> >>>> +static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
+> >>>>  {
+> >>>>      FWCfgState *s = FW_CFG(dev);
+> >>>>      MachineState *machine = MACHINE(qdev_get_machine());
+> >>>>      uint32_t version = FW_CFG_VERSION;
+> >>>>  
+> >>>> -    assert(!object_resolve_path(FW_CFG_PATH, NULL));
+> >>>> -
+> >>>> -    object_property_add_child(OBJECT(machine), FW_CFG_NAME, OBJECT(s), NULL);
+> >>>> -
+> >>>> -    qdev_init_nofail(dev);
+> >>>> +    if (!fw_cfg_find()) {    
+> >>> maybe add comment that here, that fw_cfg_find() will return NULL if more than
+> >>> 1 device is found.    
+> >>
+> >> This should be the same behaviour as before, i.e. a NULL means that the
+> >> fw_cfg device couldn't be found. It seems intuitive to me from the name
+> >> of the function exactly what it does, so I don't find the lack of
+> >> comment too confusing. Does anyone else have any thoughts here?  
+> >
+> > intuitive meaning from the function name would be return NULL if nothing were found,
+> > however it's not the case here.  
+> 
+> The function with its current name has always existed, so all I'm doing
+> here is reusing it as per your comment on an earlier patchset.
+that's why I've asked for comment explaining what's going on here
 
-Not sure this comment is worth its keep.
 
-> +static void hmp_info_VncBasicInfo(Monitor *mon, VncBasicInfo *info,
-> +                                  const char *name)
-> +{
-> +    monitor_printf(mon, "  %s: %s:%s (%s%s)\n",
-> +                   name,
-> +                   info->host,
-> +                   info->service,
-> +                   NetworkAddressFamily_lookup[info->family],
-> +                   info->websocket ? " (Websocket)" : "");
-> +}
-> +
-> +/* Helper displaying and euth and crypt info */
+> > taking in account that fwcfg in not user creatable device how about:
+> > 
+> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> > index 316fca9..8f6eef8 100644
+> > --- a/hw/nvram/fw_cfg.c
+> > +++ b/hw/nvram/fw_cfg.c
+> > @@ -1014,7 +1014,10 @@ FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
+> >  
+> >  FWCfgState *fw_cfg_find(void)
+> >  {
+> > -    return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+> > +    bool ambig = false;
+> > +    FWCfgState *f = FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, &ambig));
+> > +    assert(!ambig);
+> > +    return f;
+> >  }
+> > 
+> > or if we must to print user friendly error and fail realize gracefully
+> > (not sure why) just add errp argument to function so it could report
+> > error back to caller, then places that do not care much about graceful
+> > exit would use error_abort as argument and realize would use
+> > its local_error/errp argument.  
+> 
+> My understanding from the thread was that we should only use assert()s
+> where there is no other choice so that any failures can be handled in a
+> more friendly manner.
+the rule I use to decide assert vs nice error handling:
+1: try to avoid crash on hotplug path
+2: if error could be induced by end user on startup, try to print nice error
+   before dying
+3: when error should not happen just assert or use error_abort
+   which would print nice error message before dying.
 
-"euth"?  Do you mean "auth"?
+> Now as Laszlo pointed out, fw_cfg_find() is used externally to locate
+> the fw_cfg device in other parts of the QEMU codebase. Yes I agree that
+> it is possible to change the way in which it returns, however I would
+> argue that changing those semantics are outside of the scope of this patch.
+I'd just kill qemu in fw_cfg case, which is small not intrusive change.
 
-Not sure this comment is worth its keep.
+[...]
 
-> +static void hmp_info_vnc_authcrypt(Monitor *mon, const char *indent,
-> +                                   VncPrimaryAuth auth,
-> +                                   VncVencryptSubAuth *vencrypt)
-> +{
-> +    monitor_printf(mon, "%sAuth: %s (Sub: %s)\n", indent,
-> +                   VncPrimaryAuth_lookup[auth],
-> +                   vencrypt ? VncVencryptSubAuth_lookup[*vencrypt] : "none");
-> +}
-> +
-> +static void hmp_info_vnc_clients(Monitor *mon, VncClientInfoList *client)
-> +{
-> +    while (client) {
-> +        VncClientInfo *cinfo = client->value;
-> +
-> +        hmp_info_VncBasicInfo(mon, (VncBasicInfo *)cinfo, "Client");
+> >>>>  
+> >>>> -    assert(!fw_cfg_unattached_at_realize());
+> >>>> +    if (fw_cfg_unattached_at_realize()) {    
+> >>> as I pointed out in v6, this condition will always be false,
+> >>> I suggest to drop 4/6 patch and this hunk here so it won't to confuse
+> >>> readers with assumption that condition might succeed.    
+> >>
+> >> Definitely look more closely at the fw_cfg_unattached_at_realize()
+> >> implementation in patch 4. You'll see that the check to determine if the
+> >> device is attached does not check obj->parent but checks to see if the
+> >> device exists under /machine/unattached which is what the
+> >> device_set_realised() does if the device doesn't have a parent.  
+> >
+> > looking more fw_cfg_unattached_at_realize(),
+> >  returns true if fwcfg is direct child of/machine/unattached
+> > meaning implicit parent assignment.
+> > 
+> > As result, above condition essentially forbids having fwcfg under
+> > /machine/unattached and forces user to explicitly set parent
+> > outside of /machine/unattached or be a child of some other device.
+> > 
+> > Is this your intent (why)?  
+> 
+> Yes that is entirely correct. All current fw_cfg users setup the device
+> using fw_cfg_init_io() and fw_cfg_init_mem() which is fine for those
+> cases because these functions attach the fw_cfg device directly to the
+> machine at /machine/fw_cfg. This makes it trivial to determine whether
+> or not an existing fw_cfg has been instantiated and prevent any more
+> instances, which Laszlo has stated is an underlying assumption for
+> fw_cfg_find().
+> 
+> In my particular use case for SPARC64, I need to move the fw_cfg device
+> behind a PCI bridge. Therefore in order to allow the QOM tree to reflect
+> the actual hardware DT then the fw_cfg device needs to be attached to
+> the PCI bridge and not the machine. Hence the check for an existing
+> device at /machine/fw_cfg is no longer good enough to determine if a
+> fw_cfg device already exists since if they do, they can be in several
+> different locations in the QOM tree.
+> 
+> This explains the change to fw_cfg_find() to make sure that we find any
+> other fw_cfg instances, no matter where they are in the QOM tree.
+without using ambiguous argument object_resolve_path_type() isn't
+returning NULL in case of duplicates in different leafs of tree.
 
-QAPI provides a type-safe conversion from type to base type:
-qapi_TYPE_base().  You could write qapi_VncClientInfo_base(cinfo) here.
-More conversions to base type below.
+for reason, see https://www.mail-archive.com/qemu-devel@nongnu.org/msg460692.html
+or look at object_resolve_partial_path() impl.
 
-> +        monitor_printf(mon, "    x509_dname: %s\n",
-> +                       cinfo->x509_dname ?
-> +                       cinfo->x509_dname : "none");
-> +        monitor_printf(mon, "    username: %s\n",
-> +                       cinfo->has_sasl_username ?
-> +                       cinfo->sasl_username : "none");
+> However this causes us a problem: if you instantiate the fw_cfg yourself
+> with qdev_create()...qdev_init_nofail() then you can potentially access
+> the underlying MemoryRegions directly and wire up the device without
+> attaching it to the QOM tree. This is an invalid configuration but
+> wouldn't be detected with fw_cfg_find().
+device_set_realized() makes sure that it's attached to QOM tree,
 
-When an optional QAPI member FOO is a pointer, checking FOO instead of
-has_FOO is totally fine.  But mixing the two in one breath looks odd.
+it's up to board to decide if default /machine/unattached parent
+is sufficient or fwcfg should be placed explicitly under another
+parent. it's not upto device to decide on it's location though.
 
-I'd like to get rid of the redundant has_FOOs some day.
 
-> +
-> +        client = client->next;
-> +    }
+> The correct way to handle this is to wire up the device yourself with
+> object_property_add_child() but then you find the situation whereby the
+> people who know that you have to call object_property_add_child() when
+> adding the fw_cfg device are the ones who don't need the error message.
+> 
+> Therefore the solution was to enforce that the fw_cfg device has been
+> added to the QOM tree before realize because it solves all the problems:
+there is no need to enforce that as device_set_realized() guaranties
+that device's a child of some QOM object (explicitly or implictly) by the time
+leaf realize is called.
 
-I prefer to keep loop control in one place, and I also prefer not to
-change parameters:
 
-       for (cl = client; cl; cl = cl->next) {
+> 1) The fw_cfg device can now be placed anywhere in the QOM tree, meaning
+> that the QOM tree can be a topologically correct representation of the
+> machine
+with this series it can't be placed under /machine/unattached
+I don't see any reason to disable it.
 
-Matter of taste; your artistic license applies.  More of the same below.
+> 2) By enforcing that the fw_cfg device has been parented, we guarantee
+> that the fw_cfg_find() check is correct and it is impossible to access a
+> fw_cfg device that hasn't been wired up to the machine
+fw_cfg_find() check at realize or later time is always correct if you use
+ambiguous argument so object_resolve_path_type could properly detect duplicates.
 
-> +}
-> +
-> +static void hmp_info_vnc_servers(Monitor *mon, VncServerInfo2List *server)
-> +{
-> +    while (server) {
-> +        VncServerInfo2 *sinfo = server->value;
-> +        hmp_info_VncBasicInfo(mon, (VncBasicInfo *)sinfo, "Server");
-> +        hmp_info_vnc_authcrypt(mon, "    ", sinfo->auth,
-> +                               sinfo->has_vencrypt ? &sinfo->vencrypt : NULL);
-> +        server = server->next;
-> +    }
-> +}
-> +
->  void hmp_info_vnc(Monitor *mon, const QDict *qdict)
->  {
-> -    VncInfo *info;
-> +    VncInfo2List *info2l;
->      Error *err = NULL;
-> -    VncClientInfoList *client;
->  
-> -    info = qmp_query_vnc(&err);
-> +    info2l = qmp_query_vnc_servers(&err);
->      if (err) {
->          error_report_err(err);
->          return;
->      }
-> -
-> -    if (!info->enabled) {
-> -        monitor_printf(mon, "Server: disabled\n");
-> -        goto out;
-> -    }
-> -
-> -    monitor_printf(mon, "Server:\n");
-> -    if (info->has_host && info->has_service) {
-> -        monitor_printf(mon, "     address: %s:%s\n", info->host, info->service);
-> -    }
-> -    if (info->has_auth) {
-> -        monitor_printf(mon, "        auth: %s\n", info->auth);
-> +    if (!info2l) {
-> +        monitor_printf(mon, "None\n");
-> +        return;
->      }
->  
-> -    if (!info->has_clients || info->clients == NULL) {
-> -        monitor_printf(mon, "Client: none\n");
-> -    } else {
-> -        for (client = info->clients; client; client = client->next) {
-> -            monitor_printf(mon, "Client:\n");
-> -            monitor_printf(mon, "     address: %s:%s\n",
-> -                           client->value->host,
-> -                           client->value->service);
-> -            monitor_printf(mon, "  x509_dname: %s\n",
-> -                           client->value->x509_dname ?
-> -                           client->value->x509_dname : "none");
-> -            monitor_printf(mon, "    username: %s\n",
-> -                           client->value->has_sasl_username ?
-> -                           client->value->sasl_username : "none");
-> +    while (info2l) {
-> +        VncInfo2 *info = info2l->value;
-> +        monitor_printf(mon, "%s:\n", info->id);
-> +        hmp_info_vnc_servers(mon, info->server);
-> +        hmp_info_vnc_clients(mon, info->clients);
-> +        hmp_info_vnc_authcrypt(mon, "  ", info->auth,
-> +                          info->has_vencrypt ? &info->vencrypt : NULL);
-> +        if (info->has_display) {
-> +            monitor_printf(mon, "  Display: %s\n", info->display);
->          }
-> +        info2l = info2l->next;
 
-Looks like you've squashed two things together: factoring out helpers
-(without changing output), and extending output.  I'd keep them
-separate.  You decide.
+> 3) Since these checks are done at realize time, we can provide nice
+> friendly messages back to the developer to tell them what needs to be fixed
+error_set(error_abort, ...) should work nice for fwcfg usecase,
+you get error message and a stack trace in core file pointing to a place
+of the error.
 
->      }
->  
-> -out:
-> -    qapi_free_VncInfo(info);
-> +    qapi_free_VncInfo2List(info2l);
-> +
->  }
->  
->  #ifdef CONFIG_SPICE
+
+> Finally for reference here is the current version of the code in my
+> outstanding sun4u patchset which wires up the fw_cfg device behind a PCI
+> bridge in hw/sparc64/sun4u:
+> 
+>   dev = qdev_create(NULL, TYPE_FW_CFG_IO);
+>   qdev_prop_set_bit(dev, "dma_enabled", false);
+>   object_property_add_child(OBJECT(ebus), TYPE_FW_CFG, OBJECT(dev),
+>                             NULL);
+>   qdev_init_nofail(dev);
+>   memory_region_add_subregion(pci_address_space_io(ebus),
+>                               BIOS_CFG_IOPORT,
+>                               &FW_CFG_IO(dev)->comb_iomem);
+looks fine,
+
+so what I'd do is:
+ * drop 4/6
+ * make fw_cfg_find() use ambiguous argument and error_abort if ambiguous == true
+ * from fw_cfg_common_realize() just call
+
+     // if fw_cfg_find() returns NULL it means that device isn't in QOM tree
+     // which shouldn't ever happen, fw_cfg_find() will abort itself if
+     // another instance of device present in QOM tree.
+     assert(fw_cfg_find());
+
+
+> ATB,
+> 
+> Mark.
+> 
