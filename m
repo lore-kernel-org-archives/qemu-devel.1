@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmK-0006Ob-Cm
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmL-0006Pn-J4
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmF-0000dF-Ro
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmK-0000ig-Du
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:53 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:27 +0200
-Message-Id: <1499447335-6125-73-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:29 +0200
+Message-Id: <1499447335-6125-75-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 072/100] block/dirty-bitmap: add readonly field
- to BdrvDirtyBitmap
+Subject: [Qemu-devel] [PULL 074/100] block: refactor bdrv_reopen_commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,177 +24,51 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-It will be needed in following commits for persistent bitmaps.
-If bitmap is loaded from read-only storage (and we can't mark it
-"in use" in this storage) corresponding BdrvDirtyBitmap should be
-read-only.
+Add bs local variable to simplify code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20170628120530.31251-11-vsementsov@virtuozzo.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20170628120530.31251-13-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/dirty-bitmap.c         | 36 ++++++++++++++++++++++++++++++++++++
- block/io.c                   |  8 ++++++++
- blockdev.c                   |  6 ++++++
- include/block/dirty-bitmap.h |  4 ++++
- 4 files changed, 54 insertions(+)
+ block.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index a8fe149..17d3068 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -46,6 +46,12 @@ struct BdrvDirtyBitmap {
-     bool disabled;              /* Bitmap is disabled. It ignores all writes to
-                                    the device */
-     int active_iterators;       /* How many iterators are active */
-+    bool readonly;              /* Bitmap is read-only. This field also
-+                                   prevents the respective image from being
-+                                   modified (i.e. blocks writes and discards).
-+                                   Such operations must fail and both the image
-+                                   and this bitmap must remain unchanged while
-+                                   this flag is set. */
-     QLIST_ENTRY(BdrvDirtyBitmap) list;
- };
+diff --git a/block.c b/block.c
+index b9e5114..15a4e75 100644
+--- a/block.c
++++ b/block.c
+@@ -2982,9 +2982,11 @@ error:
+ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+ {
+     BlockDriver *drv;
++    BlockDriverState *bs;
  
-@@ -505,6 +511,7 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t cur_sector, int64_t nr_sectors)
- {
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-+    assert(!bdrv_dirty_bitmap_readonly(bitmap));
-     hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
- }
+     assert(reopen_state != NULL);
+-    drv = reopen_state->bs->drv;
++    bs = reopen_state->bs;
++    drv = bs->drv;
+     assert(drv != NULL);
  
-@@ -521,6 +528,7 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t cur_sector, int64_t nr_sectors)
- {
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-+    assert(!bdrv_dirty_bitmap_readonly(bitmap));
-     hbitmap_reset(bitmap->bitmap, cur_sector, nr_sectors);
- }
- 
-@@ -535,6 +543,7 @@ void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
- void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
- {
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-+    assert(!bdrv_dirty_bitmap_readonly(bitmap));
-     bdrv_dirty_bitmap_lock(bitmap);
-     if (!out) {
-         hbitmap_reset_all(bitmap->bitmap);
-@@ -551,6 +560,7 @@ void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
- {
-     HBitmap *tmp = bitmap->bitmap;
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-+    assert(!bdrv_dirty_bitmap_readonly(bitmap));
-     bitmap->bitmap = in;
-     hbitmap_free(tmp);
- }
-@@ -613,6 +623,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t cur_sector,
-         if (!bdrv_dirty_bitmap_enabled(bitmap)) {
-             continue;
-         }
-+        assert(!bdrv_dirty_bitmap_readonly(bitmap));
-         hbitmap_set(bitmap->bitmap, cur_sector, nr_sectors);
-     }
-     bdrv_dirty_bitmaps_unlock(bs);
-@@ -635,3 +646,28 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
- {
-     return hbitmap_count(bitmap->meta);
- }
-+
-+bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap)
-+{
-+    return bitmap->readonly;
-+}
-+
-+/* Called with BQL taken. */
-+void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value)
-+{
-+    qemu_mutex_lock(bitmap->mutex);
-+    bitmap->readonly = value;
-+    qemu_mutex_unlock(bitmap->mutex);
-+}
-+
-+bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
-+{
-+    BdrvDirtyBitmap *bm;
-+    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
-+        if (bm->readonly) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-diff --git a/block/io.c b/block/io.c
-index 23170a5..b413727 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1315,6 +1315,10 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
-     uint64_t bytes_remaining = bytes;
-     int max_transfer;
- 
-+    if (bdrv_has_readonly_bitmaps(bs)) {
-+        return -EPERM;
-+    }
-+
-     assert(is_power_of_2(align));
-     assert((offset & (align - 1)) == 0);
-     assert((bytes & (align - 1)) == 0);
-@@ -2287,6 +2291,10 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
-         return -ENOMEDIUM;
+     /* If there are any driver level actions to take */
+@@ -2993,13 +2995,13 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
      }
  
-+    if (bdrv_has_readonly_bitmaps(bs)) {
-+        return -EPERM;
-+    }
-+
-     ret = bdrv_check_byte_request(bs, offset, bytes);
-     if (ret < 0) {
-         return ret;
-diff --git a/blockdev.c b/blockdev.c
-index 92c5991..edeb36b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2033,6 +2033,9 @@ static void block_dirty_bitmap_clear_prepare(BlkActionState *common,
-     } else if (!bdrv_dirty_bitmap_enabled(state->bitmap)) {
-         error_setg(errp, "Cannot clear a disabled bitmap");
-         return;
-+    } else if (bdrv_dirty_bitmap_readonly(state->bitmap)) {
-+        error_setg(errp, "Cannot clear a readonly bitmap");
-+        return;
-     }
+     /* set BDS specific flags now */
+-    QDECREF(reopen_state->bs->explicit_options);
++    QDECREF(bs->explicit_options);
  
-     bdrv_clear_dirty_bitmap(state->bitmap, &state->backup);
-@@ -2779,6 +2782,9 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-                    "Bitmap '%s' is currently disabled and cannot be cleared",
-                    name);
-         return;
-+    } else if (bdrv_dirty_bitmap_readonly(bitmap)) {
-+        error_setg(errp, "Bitmap '%s' is readonly and cannot be cleared", name);
-+        return;
-     }
+-    reopen_state->bs->explicit_options   = reopen_state->explicit_options;
+-    reopen_state->bs->open_flags         = reopen_state->flags;
+-    reopen_state->bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
++    bs->explicit_options   = reopen_state->explicit_options;
++    bs->open_flags         = reopen_state->flags;
++    bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
  
-     bdrv_clear_dirty_bitmap(bitmap, NULL);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 05451c7..cb43fa3 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -71,6 +71,8 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-                                         bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
+-    bdrv_refresh_limits(reopen_state->bs, NULL);
++    bdrv_refresh_limits(bs, NULL);
+ }
  
-+void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
-+
- /* Functions that require manual locking.  */
- void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap);
-@@ -85,5 +87,7 @@ void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
-+bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
-+bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
- 
- #endif
+ /*
 -- 
 1.8.3.1
