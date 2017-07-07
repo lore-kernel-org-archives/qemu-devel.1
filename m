@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWkz-0004mH-Ph
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWl5-0004sX-A5
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWky-0007hV-MB
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWl0-0007j3-Ty
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:35 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:28 +0200
-Message-Id: <1499447335-6125-14-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:30 +0200
+Message-Id: <1499447335-6125-16-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 013/100] vvfat: correctly create base short
- names for non-ASCII filenames
+Subject: [Qemu-devel] [PULL 015/100] vvfat: limit number of entries in root
+ directory in FAT12/FAT16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,158 +28,105 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-More specifically, create short name from filename and change blacklist o=
-f
-invalid chars to whitelist of valid chars.
+FAT12/FAT16 root directory is two sectors in size, which allows only 512 =
+directory entries.
+Prevent QEMU startup if too much files exist, instead of overflowing root=
+ directory.
 
-Windows 9x also now correctly see long file names of filenames containing=
- a space,
-but Scandisk still complains about mismatch between SFN and LFN.
+Also introduce variable root_entries, which will be required for FAT32.
 
-[kwolf: Build fix for this intermediate patch (it included declarations
- for variables that are only used in the next patch) ]
-
-Specification: "FAT: General overview of on-disk format" v1.03, pages 30-=
-31
+Fixes: https://bugs.launchpad.net/qemu/+bug/1599539/comments/4
 Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vvfat.c | 104 ++++++++++++++++++++++++++++++++++++++++++----------=
-------
- 1 file changed, 76 insertions(+), 28 deletions(-)
+ block/vvfat.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
 diff --git a/block/vvfat.c b/block/vvfat.c
-index c52c9ba..2125ddb 100644
+index 62f411b..dc9af01 100644
 --- a/block/vvfat.c
 +++ b/block/vvfat.c
-@@ -515,6 +515,80 @@ static void set_begin_of_direntry(direntry_t* dirent=
-ry, uint32_t begin)
-     direntry->begin_hi =3D cpu_to_le16((begin >> 16) & 0xffff);
- }
+@@ -337,8 +337,9 @@ typedef struct BDRVVVFATState {
+     unsigned int cluster_size;
+     unsigned int sectors_per_cluster;
+     unsigned int sectors_per_fat;
+-    unsigned int sectors_of_root_directory;
+     uint32_t last_cluster_of_root_directory;
++    /* how many entries are available in root directory (0 for FAT32) */
++    uint16_t root_entries;
+     uint32_t sector_count; /* total number of sectors of the partition *=
+/
+     uint32_t cluster_count; /* total number of clusters of this partitio=
+n */
+     uint32_t max_fat_value;
+@@ -785,6 +786,12 @@ static int read_directory(BDRVVVFATState* s, int map=
+ping_index)
+         int is_dot=3D!strcmp(entry->d_name,".");
+         int is_dotdot=3D!strcmp(entry->d_name,"..");
 =20
-+static uint8_t to_valid_short_char(gunichar c)
-+{
-+    c =3D g_unichar_toupper(c);
-+    if ((c >=3D '0' && c <=3D '9') ||
-+        (c >=3D 'A' && c <=3D 'Z') ||
-+        strchr("$%'-_@~`!(){}^#&", c) !=3D 0) {
-+        return c;
-+    } else {
-+        return 0;
-+    }
-+}
-+
-+static direntry_t *create_short_filename(BDRVVVFATState *s,
-+                                         const char *filename)
-+{
-+    int j =3D 0;
-+    direntry_t *entry =3D array_get_next(&(s->directory));
-+    const gchar *p, *last_dot =3D NULL;
-+    gunichar c;
-+    bool lossy_conversion =3D false;
-+
-+    if (!entry) {
-+        return NULL;
-+    }
-+    memset(entry->name, 0x20, sizeof(entry->name));
-+
-+    /* copy filename and search last dot */
-+    for (p =3D filename; ; p =3D g_utf8_next_char(p)) {
-+        c =3D g_utf8_get_char(p);
-+        if (c =3D=3D '\0') {
-+            break;
-+        } else if (c =3D=3D '.') {
-+            if (j =3D=3D 0) {
-+                /* '.' at start of filename */
-+                lossy_conversion =3D true;
-+            } else {
-+                if (last_dot) {
-+                    lossy_conversion =3D true;
-+                }
-+                last_dot =3D p;
-+            }
-+        } else if (!last_dot) {
-+            /* first part of the name; copy it */
-+            uint8_t v =3D to_valid_short_char(c);
-+            if (j < 8 && v) {
-+                entry->name[j++] =3D v;
-+            } else {
-+                lossy_conversion =3D true;
-+            }
++        if (first_cluster =3D=3D 0 && s->directory.next >=3D s->root_ent=
+ries - 1) {
++            fprintf(stderr, "Too many entries in root directory\n");
++            closedir(dir);
++            return -2;
 +        }
-+    }
 +
-+    /* copy extension (if any) */
-+    if (last_dot) {
-+        j =3D 0;
-+        for (p =3D g_utf8_next_char(last_dot); ; p =3D g_utf8_next_char(=
-p)) {
-+            c =3D g_utf8_get_char(p);
-+            if (c =3D=3D '\0') {
-+                break;
-+            } else {
-+                /* extension; copy it */
-+                uint8_t v =3D to_valid_short_char(c);
-+                if (j < 3 && v) {
-+                    entry->name[8 + (j++)] =3D v;
-+                } else {
-+                    lossy_conversion =3D true;
-+                }
-+            }
-+        }
-+    }
-+    (void)lossy_conversion;
-+    return entry;
-+}
-+
- /* fat functions */
+         if(first_cluster =3D=3D 0 && (is_dotdot || is_dot))
+             continue;
 =20
- static inline uint8_t fat_chksum(const direntry_t* entry)
-@@ -613,7 +687,7 @@ static inline void init_fat(BDRVVVFATState* s)
- static inline direntry_t* create_short_and_long_name(BDRVVVFATState* s,
-         unsigned int directory_start, const char* filename, int is_dot)
- {
--    int i,j,long_index=3Ds->directory.next;
-+    int long_index =3D s->directory.next;
-     direntry_t* entry =3D NULL;
-     direntry_t* entry_long =3D NULL;
-=20
-@@ -625,33 +699,7 @@ static inline direntry_t* create_short_and_long_name=
-(BDRVVVFATState* s,
+@@ -858,15 +865,15 @@ static int read_directory(BDRVVVFATState* s, int ma=
+pping_index)
+         memset(direntry,0,sizeof(direntry_t));
      }
 =20
-     entry_long=3Dcreate_long_filename(s,filename);
--
--    i =3D strlen(filename);
--    for(j =3D i - 1; j>0  && filename[j]!=3D'.';j--);
--    if (j > 0)
--        i =3D (j > 8 ? 8 : j);
--    else if (i > 8)
--        i =3D 8;
--
--    entry=3Darray_get_next(&(s->directory));
--    memset(entry->name, 0x20, sizeof(entry->name));
--    memcpy(entry->name, filename, i);
--
--    if (j > 0) {
--        for (i =3D 0; i < 3 && filename[j + 1 + i]; i++) {
--            entry->name[8 + i] =3D filename[j + 1 + i];
--        }
--    }
--
--    /* upcase & remove unwanted characters */
--    for(i=3D10;i>=3D0;i--) {
--        if(i=3D=3D10 || i=3D=3D7) for(;i>0 && entry->name[i]=3D=3D' ';i-=
--);
--        if(entry->name[i]<=3D' ' || entry->name[i]>0x7f
--                || strchr(".*?<>|\":/\\[];,+=3D'",entry->name[i]))
--            entry->name[i]=3D'_';
--        else if(entry->name[i]>=3D'a' && entry->name[i]<=3D'z')
--            entry->name[i]+=3D'A'-'a';
--    }
-+    entry =3D create_short_filename(s, filename);
+-/* TODO: if there are more entries, bootsector has to be adjusted! */
+-#define ROOT_ENTRIES (0x02 * 0x10 * s->sectors_per_cluster)
+-    if (mapping_index =3D=3D 0 && s->directory.next < ROOT_ENTRIES) {
++    if (s->fat_type !=3D 32 &&
++        mapping_index =3D=3D 0 &&
++        s->directory.next < s->root_entries) {
+         /* root directory */
+         int cur =3D s->directory.next;
+-        array_ensure_allocated(&(s->directory), ROOT_ENTRIES - 1);
+-        s->directory.next =3D ROOT_ENTRIES;
++        array_ensure_allocated(&(s->directory), s->root_entries - 1);
++        s->directory.next =3D s->root_entries;
+         memset(array_get(&(s->directory), cur), 0,
+-                (ROOT_ENTRIES - cur) * sizeof(direntry_t));
++                (s->root_entries - cur) * sizeof(direntry_t));
+     }
 =20
-     /* mangle duplicates */
-     while(1) {
+     /* re-get the mapping, since s->mapping was possibly realloc()ed */
+@@ -931,6 +938,8 @@ static int init_directories(BDRVVVFATState* s,
+     /* Now build FAT, and write back information into directory */
+     init_fat(s);
+=20
++    /* TODO: if there are more entries, bootsector has to be adjusted! *=
+/
++    s->root_entries =3D 0x02 * 0x10 * s->sectors_per_cluster;
+     s->cluster_count=3Dsector2cluster(s, s->sector_count);
+=20
+     mapping =3D array_get_next(&(s->mapping));
+@@ -999,7 +1008,6 @@ static int init_directories(BDRVVVFATState* s,
+     }
+=20
+     mapping =3D array_get(&(s->mapping), 0);
+-    s->sectors_of_root_directory =3D mapping->end * s->sectors_per_clust=
+er;
+     s->last_cluster_of_root_directory =3D mapping->end;
+=20
+     /* the FAT signature */
+@@ -1018,7 +1026,7 @@ static int init_directories(BDRVVVFATState* s,
+     bootsector->sectors_per_cluster=3Ds->sectors_per_cluster;
+     bootsector->reserved_sectors=3Dcpu_to_le16(1);
+     bootsector->number_of_fats=3D0x2; /* number of FATs */
+-    bootsector->root_entries=3Dcpu_to_le16(s->sectors_of_root_directory*=
+0x10);
++    bootsector->root_entries =3D cpu_to_le16(s->root_entries);
+     bootsector->total_sectors16=3Ds->sector_count>0xffff?0:cpu_to_le16(s=
+->sector_count);
+     /* media descriptor: hard disk=3D0xf8, floppy=3D0xf0 */
+     bootsector->media_type =3D (s->offset_to_bootsector > 0 ? 0xf8 : 0xf=
+0);
 --=20
 1.8.3.1
