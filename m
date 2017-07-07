@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWlg-0005ay-2e
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlr-0005qL-PL
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWld-0008SP-Q1
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWlq-00008R-Bt
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:23 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:56 +0200
-Message-Id: <1499447335-6125-42-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:07 +0200
+Message-Id: <1499447335-6125-53-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 041/100] block: expose crypto option names /
- defs to other drivers
+Subject: [Qemu-devel] [PULL 052/100] qcow2: extend specification to cover
+ LUKS encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,294 +25,147 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The block/crypto.c defines a set of QemuOpts that provide
-parameters for encryption. This will also be needed by
-the qcow/qcow2 integration, so expose the relevant pieces
-in a new block/crypto.h header. Some helper methods taking
-QemuOpts are changed to take QDict to simplify usage in
-other places.
+Update the qcow2 specification to describe how the LUKS header is
+placed inside a qcow2 file, when using LUKS encryption for the
+qcow2 payload instead of the legacy AES-CBC encryption
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170623162419.26068-2-berrange@redhat.com
+Message-id: 20170623162419.26068-13-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/crypto.c | 82 +++++++++++++++++-----------------------------------
- block/crypto.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 117 insertions(+), 56 deletions(-)
- create mode 100644 block/crypto.h
+ docs/interop/qcow2.txt | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 103 insertions(+)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index 10e5ddc..ea40ba4 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -24,16 +24,10 @@
- #include "sysemu/block-backend.h"
- #include "crypto/block.h"
- #include "qapi/opts-visitor.h"
-+#include "qapi/qobject-input-visitor.h"
- #include "qapi-visit.h"
- #include "qapi/error.h"
--
--#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
--#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
--#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
--#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
-+#include "block/crypto.h"
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 80cdfd0..886a546 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -45,6 +45,7 @@ The first cluster of a qcow2 image contains the file header:
+          32 - 35:   crypt_method
+                     0 for no encryption
+                     1 for AES encryption
++                    2 for LUKS encryption
  
- typedef struct BlockCrypto BlockCrypto;
+          36 - 39:   l1_size
+                     Number of entries in the active L1 table
+@@ -135,6 +136,7 @@ be stored. Each extension has a structure like the following:
+                         0xE2792ACA - Backing file format name
+                         0x6803f857 - Feature name table
+                         0x23852875 - Bitmaps extension
++                        0x0537be77 - Full disk encryption header pointer
+                         other      - Unknown header extension, can be safely
+                                      ignored
  
-@@ -135,11 +129,7 @@ static QemuOptsList block_crypto_runtime_opts_luks = {
-     .name = "crypto",
-     .head = QTAILQ_HEAD_INITIALIZER(block_crypto_runtime_opts_luks.head),
-     .desc = {
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
--            .type = QEMU_OPT_STRING,
--            .help = "ID of the secret that provides the encryption key",
--        },
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
-         { /* end of list */ }
-     },
- };
-@@ -154,49 +144,21 @@ static QemuOptsList block_crypto_create_opts_luks = {
-             .type = QEMU_OPT_SIZE,
-             .help = "Virtual disk size"
-         },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
--            .type = QEMU_OPT_STRING,
--            .help = "ID of the secret that provides the encryption key",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of encryption cipher algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of encryption cipher mode",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of IV generator algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of IV generator hash algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,
--            .type = QEMU_OPT_STRING,
--            .help = "Name of encryption hash algorithm",
--        },
--        {
--            .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,
--            .type = QEMU_OPT_NUMBER,
--            .help = "Time to spend in PBKDF in milliseconds",
--        },
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG,
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME,
-         { /* end of list */ }
-     },
- };
+@@ -207,6 +209,107 @@ The fields of the bitmaps extension are:
+                    Offset into the image file at which the bitmap directory
+                    starts. Must be aligned to a cluster boundary.
  
- 
--static QCryptoBlockOpenOptions *
-+QCryptoBlockOpenOptions *
- block_crypto_open_opts_init(QCryptoBlockFormat format,
--                            QemuOpts *opts,
-+                            QDict *opts,
-                             Error **errp)
- {
-     Visitor *v;
-@@ -206,7 +168,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
-     ret = g_new0(QCryptoBlockOpenOptions, 1);
-     ret->format = format;
- 
--    v = opts_visitor_new(opts);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
- 
-     visit_start_struct(v, NULL, NULL, 0, &local_err);
-     if (local_err) {
-@@ -240,9 +202,9 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
- }
- 
- 
--static QCryptoBlockCreateOptions *
-+QCryptoBlockCreateOptions *
- block_crypto_create_opts_init(QCryptoBlockFormat format,
--                              QemuOpts *opts,
-+                              QDict *opts,
-                               Error **errp)
- {
-     Visitor *v;
-@@ -252,7 +214,7 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
-     ret = g_new0(QCryptoBlockCreateOptions, 1);
-     ret->format = format;
- 
--    v = opts_visitor_new(opts);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
- 
-     visit_start_struct(v, NULL, NULL, 0, &local_err);
-     if (local_err) {
-@@ -299,6 +261,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
-     int ret = -EINVAL;
-     QCryptoBlockOpenOptions *open_opts = NULL;
-     unsigned int cflags = 0;
-+    QDict *cryptoopts = NULL;
- 
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-@@ -313,7 +276,9 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
-         goto cleanup;
-     }
- 
--    open_opts = block_crypto_open_opts_init(format, opts, errp);
-+    cryptoopts = qemu_opts_to_qdict(opts, NULL);
++== Full disk encryption header pointer ==
 +
-+    open_opts = block_crypto_open_opts_init(format, cryptoopts, errp);
-     if (!open_opts) {
-         goto cleanup;
-     }
-@@ -337,6 +302,7 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
++The full disk encryption header must be present if, and only if, the
++'crypt_method' header requires metadata. Currently this is only true
++of the 'LUKS' crypt method. The header extension must be absent for
++other methods.
++
++This header provides the offset at which the crypt method can store
++its additional data, as well as the length of such data.
++
++    Byte  0 -  7:   Offset into the image file at which the encryption
++                    header starts in bytes. Must be aligned to a cluster
++                    boundary.
++    Byte  8 - 15:   Length of the written encryption header in bytes.
++                    Note actual space allocated in the qcow2 file may
++                    be larger than this value, since it will be rounded
++                    to the nearest multiple of the cluster size. Any
++                    unused bytes in the allocated space will be initialized
++                    to 0.
++
++For the LUKS crypt method, the encryption header works as follows.
++
++The first 592 bytes of the header clusters will contain the LUKS
++partition header. This is then followed by the key material data areas.
++The size of the key material data areas is determined by the number of
++stripes in the key slot and key size. Refer to the LUKS format
++specification ('docs/on-disk-format.pdf' in the cryptsetup source
++package) for details of the LUKS partition header format.
++
++In the LUKS partition header, the "payload-offset" field will be
++calculated as normal for the LUKS spec. ie the size of the LUKS
++header, plus key material regions, plus padding, relative to the
++start of the LUKS header. This offset value is not required to be
++qcow2 cluster aligned. Its value is currently never used in the
++context of qcow2, since the qcow2 file format itself defines where
++the real payload offset is, but none the less a valid payload offset
++should always be present.
++
++In the LUKS key slots header, the "key-material-offset" is relative
++to the start of the LUKS header clusters in the qcow2 container,
++not the start of the qcow2 file.
++
++Logically the layout looks like
++
++  +-----------------------------+
++  | QCow2 header                |
++  | QCow2 header extension X    |
++  | QCow2 header extension FDE  |
++  | QCow2 header extension ...  |
++  | QCow2 header extension Z    |
++  +-----------------------------+
++  | ....other QCow2 tables....  |
++  .                             .
++  .                             .
++  +-----------------------------+
++  | +-------------------------+ |
++  | | LUKS partition header   | |
++  | +-------------------------+ |
++  | | LUKS key material 1     | |
++  | +-------------------------+ |
++  | | LUKS key material 2     | |
++  | +-------------------------+ |
++  | | LUKS key material ...   | |
++  | +-------------------------+ |
++  | | LUKS key material 8     | |
++  | +-------------------------+ |
++  +-----------------------------+
++  | QCow2 cluster payload       |
++  .                             .
++  .                             .
++  .                             .
++  |                             |
++  +-----------------------------+
++
++== Data encryption ==
++
++When an encryption method is requested in the header, the image payload
++data must be encrypted/decrypted on every write/read. The image headers
++and metadata are never encrypted.
++
++The algorithms used for encryption vary depending on the method
++
++ - AES:
++
++   The AES cipher, in CBC mode, with 256 bit keys.
++
++   Initialization vectors generated using plain64 method, with
++   the virtual disk sector as the input tweak.
++
++   This format is no longer supported in QEMU system emulators, due
++   to a number of design flaws affecting its security. It is only
++   supported in the command line tools for the sake of back compatibility
++   and data liberation.
++
++ - LUKS:
++
++   The algorithms are specified in the LUKS header.
++
++   Initialization vectors generated using the method specified
++   in the LUKS header, with the physical disk sector as the
++   input tweak.
  
-     ret = 0;
-  cleanup:
-+    QDECREF(cryptoopts);
-     qapi_free_QCryptoBlockOpenOptions(open_opts);
-     return ret;
- }
-@@ -356,8 +322,11 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
-         .opts = opts,
-         .filename = filename,
-     };
-+    QDict *cryptoopts;
-+
-+    cryptoopts = qemu_opts_to_qdict(opts, NULL);
+ == Host cluster management ==
  
--    create_opts = block_crypto_create_opts_init(format, opts, errp);
-+    create_opts = block_crypto_create_opts_init(format, cryptoopts, errp);
-     if (!create_opts) {
-         return -1;
-     }
-@@ -375,6 +344,7 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
- 
-     ret = 0;
-  cleanup:
-+    QDECREF(cryptoopts);
-     qcrypto_block_free(crypto);
-     blk_unref(data.blk);
-     qapi_free_QCryptoBlockCreateOptions(create_opts);
-diff --git a/block/crypto.h b/block/crypto.h
-new file mode 100644
-index 0000000..c0e9b54
---- /dev/null
-+++ b/block/crypto.h
-@@ -0,0 +1,91 @@
-+/*
-+ * QEMU block full disk encryption
-+ *
-+ * Copyright (c) 2015-2017 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef BLOCK_CRYPTO_H__
-+#define BLOCK_CRYPTO_H__
-+
-+#define BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET "key-secret"
-+#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG "cipher-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE "cipher-mode"
-+#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG "ivgen-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG "ivgen-hash-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_HASH_ALG "hash-alg"
-+#define BLOCK_CRYPTO_OPT_LUKS_ITER_TIME "iter-time"
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_KEY_SECRET                            \
-+    {                                                                   \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,                       \
-+        .type = QEMU_OPT_STRING,                                        \
-+        .help = "ID of the secret that provides the keyslot passphrase", \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG               \
-+    {                                                      \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_ALG,          \
-+        .type = QEMU_OPT_STRING,                           \
-+        .help = "Name of encryption cipher algorithm",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE         \
-+    {                                                 \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_CIPHER_MODE,    \
-+        .type = QEMU_OPT_STRING,                      \
-+        .help = "Name of encryption cipher mode",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG           \
-+    {                                                 \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_ALG,      \
-+        .type = QEMU_OPT_STRING,                      \
-+        .help = "Name of IV generator algorithm",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG                \
-+    {                                                           \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_IVGEN_HASH_ALG,           \
-+        .type = QEMU_OPT_STRING,                                \
-+        .help = "Name of IV generator hash algorithm",          \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG               \
-+    {                                                    \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_HASH_ALG,          \
-+        .type = QEMU_OPT_STRING,                         \
-+        .help = "Name of encryption hash algorithm",     \
-+    }
-+
-+#define BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME                   \
-+    {                                                         \
-+        .name = BLOCK_CRYPTO_OPT_LUKS_ITER_TIME,              \
-+        .type = QEMU_OPT_NUMBER,                              \
-+        .help = "Time to spend in PBKDF in milliseconds",     \
-+    }
-+
-+QCryptoBlockCreateOptions *
-+block_crypto_create_opts_init(QCryptoBlockFormat format,
-+                              QDict *opts,
-+                              Error **errp);
-+
-+QCryptoBlockOpenOptions *
-+block_crypto_open_opts_init(QCryptoBlockFormat format,
-+                            QDict *opts,
-+                            Error **errp);
-+
-+#endif /* BLOCK_CRYPTO_H__ */
 -- 
 1.8.3.1
