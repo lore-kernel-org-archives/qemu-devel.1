@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTIxg-0004Ea-PH
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:25:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1dTJPP-0003Au-FL
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTIxg-0001jH-2T
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:25:40 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34507)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTIxf-0001j6-R7
-	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:25:39 -0400
-Received: by mail-qt0-x241.google.com with SMTP id m54so2718357qtb.1
-	for <qemu-devel@nongnu.org>; Thu, 06 Jul 2017 19:25:39 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  6 Jul 2017 16:21:11 -1000
-Message-Id: <20170707022111.21836-28-rth@twiddle.net>
-In-Reply-To: <20170707022111.21836-1-rth@twiddle.net>
-References: <20170707022111.21836-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v2 27/27] target/sh4: Use
- tcg_gen_lookup_and_goto_ptr
+	(envelope-from <peterx@redhat.com>) id 1dTJPM-0005Ac-DO
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:54:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dTJPM-0005A8-6k
+	for qemu-devel@nongnu.org; Thu, 06 Jul 2017 22:54:16 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Fri,  7 Jul 2017 10:54:08 +0800
+Message-Id: <1499396048-21657-1-git-send-email-peterx@redhat.com>
+In-Reply-To: <20170706183014.GH12152@localhost.localdomain>
+Subject: [Qemu-devel] [PATCH v2.2 3/4] doc: add item for "-M
+ enforce-config-section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +24,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
+Cc: armbru@redhat.com, lvivier@redhat.com, ehabkost@redhat.com, quintela@redhat.com, groug@kaod.org, dgilbert@redhat.com, peterx@redhat.com
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+It's never documented, and now we have one more parameter for it (which
+obsoletes this one). Document it properly.
+
+Although now when enforce-config-section is set, it'll override the
+other "-global" parameter, that is not necessarily a rule. Forbid that
+usage in the document.
+
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- target/sh4/translate.c | 30 ++++++++++++++++++++----------
- 1 file changed, 20 insertions(+), 10 deletions(-)
+v2.1 -> v2.2
+- remove the last two lines of document [Eduardo]
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 5fae872..7e80e10 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -235,12 +235,15 @@ static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
-     }
- }
+ qemu-options.hx | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 297bd8a..cd95516 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -85,6 +85,12 @@ Enables or disables NVDIMM support. The default is off.
+ @item s390-squash-mcss=on|off
+ Enables or disables squashing subchannels into the default css.
+ The default is off.
++@item enforce-config-section=on|off
++If @option{enforce-config-section} is set to @var{on}, force migration
++code to send configuration section even if the machine-type sets the
++@option{migration.send-configuration} property to @var{off}.
++NOTE: this parameter is deprecated. Please use @option{-global}
++@option{migration.send-configuration}=@var{on|off} instead.
+ @end table
+ ETEXI
  
-+static inline bool use_exit_tb(DisasContext *ctx)
-+{
-+    return (ctx->tbflags & GUSA_EXCLUSIVE) != 0;
-+}
-+
- static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
- {
--    if (unlikely(ctx->singlestep_enabled)) {
--        return false;
--    }
--    if (ctx->tbflags & GUSA_EXCLUSIVE) {
-+    /* Use a direct jump if in same page and singlestep not enabled */
-+    if (unlikely(ctx->singlestep_enabled || use_exit_tb(ctx))) {
-         return false;
-     }
- #ifndef CONFIG_USER_ONLY
-@@ -253,28 +256,35 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
- static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
- {
-     if (use_goto_tb(ctx, dest)) {
--	/* Use a direct jump if in same page and singlestep not enabled */
-         tcg_gen_goto_tb(n);
-         tcg_gen_movi_i32(cpu_pc, dest);
-         tcg_gen_exit_tb((uintptr_t)ctx->tb + n);
-     } else {
-         tcg_gen_movi_i32(cpu_pc, dest);
--        if (ctx->singlestep_enabled)
-+        if (ctx->singlestep_enabled) {
-             gen_helper_debug(cpu_env);
--        tcg_gen_exit_tb(0);
-+        } else if (use_exit_tb(ctx)) {
-+            tcg_gen_exit_tb(0);
-+        } else {
-+            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+        }
-     }
- }
- 
- static void gen_jump(DisasContext * ctx)
- {
--    if (ctx->delayed_pc == (uint32_t) - 1) {
-+    if (ctx->delayed_pc == -1) {
- 	/* Target is not statically known, it comes necessarily from a
- 	   delayed jump as immediate jump are conditinal jumps */
- 	tcg_gen_mov_i32(cpu_pc, cpu_delayed_pc);
-         tcg_gen_discard_i32(cpu_delayed_pc);
--	if (ctx->singlestep_enabled)
-+	if (ctx->singlestep_enabled) {
-             gen_helper_debug(cpu_env);
--	tcg_gen_exit_tb(0);
-+        } else if (use_exit_tb(ctx)) {
-+            tcg_gen_exit_tb(0);
-+        } else {
-+            tcg_gen_lookup_and_goto_ptr(cpu_pc);
-+        }
-     } else {
- 	gen_goto_tb(ctx, 0, ctx->delayed_pc);
-     }
 -- 
-2.9.4
+2.7.4
