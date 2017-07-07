@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dTVIg-0006Cl-C7
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:36:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTVP5-0000vY-8z
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dTVId-0004oJ-5N
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:36:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50686)
+	(envelope-from <eblake@redhat.com>) id 1dTVP1-0008LJ-Vk
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:42:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dTVIc-0004mX-Sq
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:36:07 -0400
-Date: Fri, 7 Jul 2017 18:35:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170707182830-mutt-send-email-mst@kernel.org>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170703205127-mutt-send-email-mst@kernel.org>
-	<20170707120155.GE2451@work-vm>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTVP1-0008Ke-Mg
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:42:43 -0400
+References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
+	<20170707152918.23086-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a85d5193-e500-d798-7048-d35701d4caa6@redhat.com>
+Date: Fri, 7 Jul 2017 10:42:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707120155.GE2451@work-vm>
-Subject: Re: [Qemu-devel] [RFC 00/29] postcopy+vhost-user/shared ram
+In-Reply-To: <20170707152918.23086-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo"
+Subject: Re: [Qemu-devel] [PATCH v3 02/10] nbd/server: refactor nbd_negotiate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com, den@openvz.org
 
-On Fri, Jul 07, 2017 at 01:01:56PM +0100, Dr. David Alan Gilbert wrote:
-> > >    Take care of deadlocking; any thread in the client that
-> > >    accesses a userfault protected page can stall.
-> > 
-> > And it can happen under a lock quite easily.
-> > What exactly is proposed here?
-> > Maybe we want to reuse the new channel that the IOMMU uses.
-> 
-> There's no fundamental reason to get deadlocks as long as you
-> get it right; the qemu thread that processes the user-fault's
-> is a separate independent thread, so once it's going the client
-> can do whatever it likes and it will get woken up without
-> intervention.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
+ den@openvz.org
+Message-ID: <a85d5193-e500-d798-7048-d35701d4caa6@redhat.com>
+Subject: Re: [PATCH v3 02/10] nbd/server: refactor nbd_negotiate
+References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
+ <20170707152918.23086-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170707152918.23086-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You take a lock for the channel, then access guest memory.
-Then the thread that gets messages from qemu can't get
-on the channel to mark range as populated.
+On 07/07/2017 10:29 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Combine two successive "if (oldStyle) {...} else {...}" into one.
+>=20
+> Block "if (client->tlscreds)" under "if (oldStyle)" is unreachable,
+> as we have "oldStyle =3D client->exp !=3D NULL && !client->tlscreds;".
+> So, delete this block.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  nbd/server.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
 
-> Some care is needed around the postcopy-end; reception of the
-> message that tells you to drop the userfault enables (which
-> frees anything that hasn't been woken) must be allowed to happen
-> for the postcopy complete;  we take care that QEMUs fault
-> thread lives on until that message is acknowledged.
->
-> I'm more worried about how this will work in a full packet switch
-> when one vhost-user client for an incoming migration stalls
-> the whole switch unless care is taken about the design.
-> How do we figure out whether this is going to fly on a full stack?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-It's performance though. Client could run in a separate
-thread for a while until migration finishes.
-We need to make sure there's explicit documentation
-that tells clients at what point they might block.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> That's my main reason for getting this WIP set out here to
-> get comments.
 
-What will happen if QEMU dies? Is there a way to unblock the client?
+--s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> > >    There's a nasty hack of a lock around the set_mem_table message.
-> > 
-> > Yes.
-> > 
-> > >    I've not looked at the recent IOMMU code.
-> > > 
-> > >    Some cleanup and a lot of corner cases need thinking about.
-> > > 
-> > >    There are probably plenty of unknown issues as well.
-> > 
-> > At the protocol level, I'd like to rename the feature to
-> > USER_PAGEFAULT. Client does not really know anything about
-> > copies, it's all internal to qemu.
-> > Spec can document that it's used by qemu for postcopy.
-> 
-> OK, tbh I suspect that using it for anything else would be tricky
-> without adding more protocol features for that other use case.
-> 
-> Dave
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Why exactly? How does client have to know it's migration?
+iQEcBAEBCAAGBQJZX6vRAAoJEKeha0olJ0NqsKwH/i3V6czvoONZYqFlwDZNJfP7
+zLliTuZ1tpbsqFaQi+NyJcmRlkmEuLrHxo2CfkL/PKgvm6p03lNV9OykcRjS7648
+6h7G46zUQ29rUhdJ4+xpLATzGIHxU3dWSQCBnITjG+Xg6EjRzz8Zaxkp278nG7L8
+xCU0FUVLkYEoFNvFmdsFTUetWFH1Dg1oPCMIgWBGyWWt/y8LsO9plamFn12cLY38
+GTO44gI4ZWIRDv4DFUZfPBGhx4kwWggRLWkO1dm7G+FJACjOyZ17pUS3FfkTLZxy
+q4bHvZFnSQZVn5JXkXjvcX209fnbZXTeYgdR1BT77ifigI1mJ2kXPEPTiqauI30=
+=z+60
+-----END PGP SIGNATURE-----
 
--- 
-MST
+--s52G3eDKb9Hb0qvNGw6nWHI93kSHtdBIo--
