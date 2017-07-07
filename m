@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWkx-0004jV-Of
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWky-0004kC-9j
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWkw-0007fw-Pa
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWkw-0007g6-T9
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:28 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:25 +0200
-Message-Id: <1499447335-6125-11-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:26 +0200
+Message-Id: <1499447335-6125-12-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 010/100] vvfat: fix field names in FAT12/FAT16
- and FAT32 boot sectors
+Subject: [Qemu-devel] [PULL 011/100] vvfat: always create . and .. entries
+ at first and in that order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +28,54 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
-Specification: "FAT: General overview of on-disk format" v1.03, pages 11-=
-13
+readdir() doesn't always return . and .. entries at first and in that ord=
+er.
+This leads to not creating them at first in the directory, which raises s=
+ome
+errors on file system checking utilities like MS-DOS Scandisk.
+
+Specification: "FAT: General overview of on-disk format" v1.03, page 25
+
+Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
 Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vvfat.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ block/vvfat.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/block/vvfat.c b/block/vvfat.c
-index 88d1879..676cacb 100644
+index 676cacb..0c6d0f4 100644
 --- a/block/vvfat.c
 +++ b/block/vvfat.c
-@@ -217,23 +217,30 @@ typedef struct bootsector_t {
-     union {
-         struct {
-             uint8_t drive_number;
--            uint8_t current_head;
-+            uint8_t reserved1;
-             uint8_t signature;
-             uint32_t id;
-             uint8_t volume_label[11];
-+            uint8_t fat_type[8];
-+            uint8_t ignored[0x1c0];
-         } QEMU_PACKED fat16;
-         struct {
-             uint32_t sectors_per_fat;
-             uint16_t flags;
-             uint8_t major,minor;
--            uint32_t first_cluster_of_root_directory;
-+            uint32_t first_cluster_of_root_dir;
-             uint16_t info_sector;
-             uint16_t backup_boot_sector;
--            uint16_t ignored;
-+            uint8_t reserved[12];
-+            uint8_t drive_number;
-+            uint8_t reserved1;
-+            uint8_t signature;
-+            uint32_t id;
-+            uint8_t volume_label[11];
-+            uint8_t fat_type[8];
-+            uint8_t ignored[0x1a4];
-         } QEMU_PACKED fat32;
-     } u;
--    uint8_t fat_type[8];
--    uint8_t ignored[0x1c0];
-     uint8_t magic[2];
- } QEMU_PACKED bootsector_t;
+@@ -727,6 +727,12 @@ static int read_directory(BDRVVVFATState* s, int map=
+ping_index)
+     i =3D mapping->info.dir.first_dir_index =3D
+             first_cluster =3D=3D 0 ? 0 : s->directory.next;
 =20
-@@ -973,13 +980,13 @@ static int init_directories(BDRVVVFATState* s,
-     /* LATER TODO: if FAT32, this is wrong */
-     /* drive_number: fda=3D0, hda=3D0x80 */
-     bootsector->u.fat16.drive_number =3D s->offset_to_bootsector =3D=3D =
-0 ? 0 : 0x80;
--    bootsector->u.fat16.current_head=3D0;
-     bootsector->u.fat16.signature=3D0x29;
-     bootsector->u.fat16.id=3Dcpu_to_le32(0xfabe1afd);
++    if (first_cluster !=3D 0) {
++        /* create the top entries of a subdirectory */
++        (void)create_short_and_long_name(s, i, ".", 1);
++        (void)create_short_and_long_name(s, i, "..", 1);
++    }
++
+     /* actually read the directory, and allocate the mappings */
+     while((entry=3Dreaddir(dir))) {
+         unsigned int length=3Dstrlen(dirname)+2+strlen(entry->d_name);
+@@ -748,8 +754,11 @@ static int read_directory(BDRVVVFATState* s, int map=
+ping_index)
+         }
 =20
-     memcpy(bootsector->u.fat16.volume_label, s->volume_label,
-            sizeof(bootsector->u.fat16.volume_label));
--    memcpy(bootsector->fat_type,(s->fat_type=3D=3D12?"FAT12   ":s->fat_t=
-ype=3D=3D16?"FAT16   ":"FAT32   "),8);
-+    memcpy(bootsector->u.fat16.fat_type,
-+           s->fat_type =3D=3D 12 ? "FAT12   " : "FAT16   ", 8);
-     bootsector->magic[0]=3D0x55; bootsector->magic[1]=3D0xaa;
-=20
-     return 0;
+         /* create directory entry for this file */
+-        direntry=3Dcreate_short_and_long_name(s, i, entry->d_name,
+-                is_dot || is_dotdot);
++        if (!is_dot && !is_dotdot) {
++            direntry =3D create_short_and_long_name(s, i, entry->d_name,=
+ 0);
++        } else {
++            direntry =3D array_get(&(s->directory), is_dot ? i : i + 1);
++        }
+         direntry->attributes=3D(S_ISDIR(st.st_mode)?0x10:0x20);
+         direntry->reserved[0]=3Ddirentry->reserved[1]=3D0;
+         direntry->ctime=3Dfat_datetime(st.st_ctime,1);
 --=20
 1.8.3.1
