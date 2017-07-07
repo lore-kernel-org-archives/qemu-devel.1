@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmN-0006Rh-61
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmU-0006bm-VS
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmM-0000ly-10
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmQ-0000v1-CP
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:11:02 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:31 +0200
-Message-Id: <1499447335-6125-77-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:37 +0200
+Message-Id: <1499447335-6125-83-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 076/100] qcow2: support .bdrv_reopen_bitmaps_rw
+Subject: [Qemu-devel] [PULL 082/100] qcow2: store bitmaps on reopening image
+ as read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +25,73 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Realize bdrv_reopen_bitmaps_rw interface.
+Store bitmaps and mark them read-only on reopening image as read-only.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170628120530.31251-15-vsementsov@virtuozzo.com
+Message-id: 20170628120530.31251-21-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-bitmap.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c        |  2 ++
+ block/qcow2-bitmap.c | 22 ++++++++++++++++++++++
+ block/qcow2.c        |  5 +++++
  block/qcow2.h        |  1 +
- 3 files changed, 64 insertions(+)
+ 3 files changed, 28 insertions(+)
 
 diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 2c7b057..a21fab8 100644
+index 5f53486..7912a82 100644
 --- a/block/qcow2-bitmap.c
 +++ b/block/qcow2-bitmap.c
-@@ -826,3 +826,64 @@ fail:
+@@ -1365,3 +1365,25 @@ fail:
  
-     return false;
+     bitmap_list_free(bm_list);
  }
 +
-+int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
++int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
 +{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+    Qcow2Bitmap *bm;
-+    GSList *ro_dirty_bitmaps = NULL;
-+    int ret = 0;
++    BdrvDirtyBitmap *bitmap;
++    Error *local_err = NULL;
 +
-+    if (s->nb_bitmaps == 0) {
-+        /* No bitmaps - nothing to do */
-+        return 0;
-+    }
-+
-+    if (!can_write(bs)) {
-+        error_setg(errp, "Can't write to the image on reopening bitmaps rw");
++    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
 +        return -EINVAL;
 +    }
 +
-+    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-+                               s->bitmap_directory_size, errp);
-+    if (bm_list == NULL) {
-+        return -EINVAL;
-+    }
-+
-+    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-+        if (!(bm->flags & BME_FLAG_IN_USE)) {
-+            BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
-+            if (bitmap == NULL) {
-+                continue;
-+            }
-+
-+            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
-+                error_setg(errp, "Bitmap %s is not readonly but not marked"
-+                                 "'IN_USE' in the image. Something went wrong,"
-+                                 "all the bitmaps may be corrupted", bm->name);
-+                ret = -EINVAL;
-+                goto out;
-+            }
-+
-+            bm->flags |= BME_FLAG_IN_USE;
-+            ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
++    for (bitmap = bdrv_dirty_bitmap_next(bs, NULL); bitmap != NULL;
++         bitmap = bdrv_dirty_bitmap_next(bs, bitmap))
++    {
++        if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
++            bdrv_dirty_bitmap_set_readonly(bitmap, true);
 +        }
 +    }
 +
-+    if (ro_dirty_bitmaps != NULL) {
-+        /* in_use flags must be updated */
-+        ret = update_ext_header_and_dir_in_place(bs, bm_list);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Can't update bitmap directory");
-+            goto out;
-+        }
-+        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-+    }
-+
-+out:
-+    g_slist_free(ro_dirty_bitmaps);
-+    bitmap_list_free(bm_list);
-+
-+    return ret;
++    return 0;
 +}
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 8645b08..19cc49a 100644
+index 790b5b1..1a31f1d 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -3973,6 +3973,8 @@ BlockDriver bdrv_qcow2 = {
+@@ -1555,6 +1555,11 @@ static int qcow2_reopen_prepare(BDRVReopenState *state,
  
-     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
-     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
+     /* We need to write out any unwritten data if we reopen read-only. */
+     if ((state->flags & BDRV_O_RDWR) == 0) {
++        ret = qcow2_reopen_bitmaps_ro(state->bs, errp);
++        if (ret < 0) {
++            goto fail;
++        }
 +
-+    .bdrv_reopen_bitmaps_rw = qcow2_reopen_bitmaps_rw,
- };
- 
- static void bdrv_qcow2_init(void)
+         ret = bdrv_flush(state->bs);
+         if (ret < 0) {
+             goto fail;
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 886480b..633bd43 100644
+index 308cefd..1f80b5d 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -646,5 +646,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size);
+@@ -648,5 +648,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
  bool qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-+int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
  
  #endif
 -- 
