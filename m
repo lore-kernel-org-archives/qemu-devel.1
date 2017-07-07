@@ -1,41 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dTTaw-0007S0-Id
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:46:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dTTdl-0000DT-Ps
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dTTat-0002w9-Ee
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:46:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45883
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dTTat-0002vv-7P
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:46:51 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v67DiKo4175978
-	for <qemu-devel@nongnu.org>; Fri, 7 Jul 2017 09:46:50 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bj3v7166c-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 09:46:50 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 7 Jul 2017 07:46:48 -0600
-References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-	<1499423224-23060-2-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 7 Jul 2017 15:46:41 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dTTdk-00040X-Ol
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:49:49 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dTTdk-00040B-H8
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:49:48 -0400
+Received: by mail-wr0-x233.google.com with SMTP id 77so47973563wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 06:49:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1499423224-23060-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <67f92ccb-0bb4-7092-46f7-17adfc097800@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/8] pc-bios/s390-ccw: Move libc
- functions to separate header
+In-Reply-To: <20170707151829.017c9eb2@nial.brq.redhat.com>
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+	<CAFEAcA-xkd94VTVOuOvXeowb92TPose4y8LKB5o56UyRMNXsfw@mail.gmail.com>
+	<8ebbc85e-5b44-1f49-296f-4be51405d521@redhat.com>
+	<CAFEAcA-G6=FfgXrHVE+eUP0YLd9Bp0b26n_0pTiW-joF++BcBg@mail.gmail.com>
+	<20170707151829.017c9eb2@nial.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Jul 2017 14:49:26 +0100
+Message-ID: <CAFEAcA8AF7JZLHwYge7QaG+mJFfqg9tSaDj1yYRHzJ+71Eioow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,45 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
-On 07/07/2017 12:26 PM, Thomas Huth wrote:
-> The upcoming netboot code will use the libc from SLOF. To be able
-> to still use s390-ccw.h there, the libc related functions in this
-> header have to be moved to a different location.
-> And while we're at it, remove the duplicate memcpy() function from
-> sclp.c.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 7 July 2017 at 14:18, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 6 Jul 2017 17:26:10 +0100
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>  * globally rename memory_region_init_ram to memory_region_init_ram_nomigrate
+>>    (and document that it is the caller's job to arrange to migrate the RAM)
+> it would be a bit weird when MR created as _nomigrate()
+> is then registered with vmstate_register_ram() and being migrated.
+>
+> maybe other way around, places that don't wanna to use explicit
+> vmstate_register_ram() could replace 2 calls with helper memory_region_init_ram_automigrate()
 
-one suggestion below, but 
+I think this is the wrong way round, because it leads to lots of
+bugs. Basically it's really not obvious that you (as the author
+of board or device code) need to also call a second function
+to not just create a RAM region but also make it work correctly
+under migration, and migration is often not tested. Working
+through the automatic renames here I've found a small pile of
+cases where the memory region was just not registered for
+migration at all, or where it was registered using _global()
+rather than passing the device as owner (which means the device
+can only be created once).
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Conversely, the cases which really really want to handle the
+migration of the contents of the RAM MemoryRegion themselves
+are very few in number, the authors of that code generally
+know what they're doing, and the fact that they call a function
+named foo_nomigrate() provides them with a helpful clue that
+they need to think about and handle migration themselves.
 
-for change and no change
+This falls I think under item 7 ("the obvious use is (probably)
+the correct one") in Rusty Russell's set of hard-to-misuse API
+design guidelines:
+http://ozlabs.org/~rusty/index.cgi/tech/2008-03-30.html
 
-[...]
-> +static inline void *memcpy(void *s1, const void *s2, size_t n)
-> +{
-> +    uint8_t *p1 = s1;
-> +    const uint8_t *p2 = s2;
-> +
-> +    while (n--) {
-> +        p1[n] = p2[n];
-> +    }
-> +    return s1;
-> +}
-
-Not that it matters, and no idea if moving forward like in the for loop below
-might allow gcc to generate better code, but a for loop like below will be the 
-same direction as the MVC instruction. Can you double check if this generates
-better code?
-
-> -static void _memcpy(char *dest, const char *src, int len)
-> -{
-> -   int i;
-> -     for (i = 0; i < len; i++)
-> -        dest[i] = src[i];
-> -}
-> - 
+thanks
+-- PMM
