@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUI1-0001HD-Ns
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:27 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUI6-0001Lw-B1
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUI0-0007nX-9M
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:25 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUI4-0007pF-Ud
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:30 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri,  7 Jul 2017 17:30:27 +0300
-Message-Id: <20170707143028.692-4-pbutsykin@virtuozzo.com>
+Date: Fri,  7 Jul 2017 17:30:28 +0300
+Message-Id: <20170707143028.692-5-pbutsykin@virtuozzo.com>
 In-Reply-To: <20170707143028.692-1-pbutsykin@virtuozzo.com>
 References: <20170707143028.692-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/4] qcow2: add shrink image support
+Subject: [Qemu-devel] [PATCH v3 4/4] qemu-iotests: add shrinking image test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,299 +24,213 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-This patch add shrinking of the image file for qcow2. As a result, this allows
-us to reduce the virtual image size and free up space on the disk without
-copying the image. Image can be fragmented and shrink is done by punching holes
-in the image file.
-
 Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 ---
- block/qcow2-cluster.c  |  40 +++++++++++++++++++
- block/qcow2-refcount.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c          |  42 +++++++++++++++-----
- block/qcow2.h          |  14 +++++++
- qapi/block-core.json   |   3 +-
- 5 files changed, 191 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/163.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 176 insertions(+)
+ create mode 100644 tests/qemu-iotests/163
+ create mode 100644 tests/qemu-iotests/163.out
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 3d341fd9cb..04d48878af 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -32,6 +32,46 @@
- #include "qemu/bswap.h"
- #include "trace.h"
- 
-+int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t exact_size)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int new_l1_size, i, ret;
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+new file mode 100644
+index 0000000000..403842354e
+--- /dev/null
++++ b/tests/qemu-iotests/163
+@@ -0,0 +1,170 @@
++#!/usr/bin/env python
++#
++# Tests for shrinking images
++#
++# Copyright (c) 2016-2017 Parallels International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+    if (exact_size >= s->l1_size) {
-+        return 0;
++import os, random, iotests, struct, qcow2
++from iotests import qemu_img, qemu_io, image_size
++
++test_img = os.path.join(iotests.test_dir, 'test.img')
++check_img = os.path.join(iotests.test_dir, 'check.img')
++
++def size_to_int(str):
++    suff = ['B', 'K', 'M', 'G', 'T']
++    return int(str[:-1]) * 1024**suff.index(str[-1:])
++
++class ShrinkBaseClass(iotests.QMPTestCase):
++    image_len = '128M'
++    shrink_size = '10M'
++    chunk_size = '16M'
++    refcount_bits = '16'
++
++    def __qcow2_check(self, filename):
++        entry_bits = 3
++        entry_size = 1 << entry_bits
++        l1_mask = 0x00fffffffffffe00
++        div_roundup = lambda n, d: (n + d - 1) / d
++
++        def split_by_n(data, n):
++            for x in xrange(0, len(data), n):
++                yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
++
++        def check_l1_table(h, l1_data):
++            l1_list = list(split_by_n(l1_data, entry_size))
++            real_l1_size = div_roundup(h.size,
++                                       1 << (h.cluster_bits*2 - entry_size))
++            used, unused = l1_list[:real_l1_size], l1_list[real_l1_size:]
++
++            self.assertTrue(len(used) != 0, "Verifying l1 table content")
++            self.assertFalse(any(unused), "Verifying l1 table content")
++
++        def check_reftable(fd, h, reftable):
++            for offset in split_by_n(reftable, entry_size):
++                if offset != 0:
++                    fd.seek(offset)
++                    cluster = fd.read(1 << h.cluster_bits)
++                    self.assertTrue(any(cluster), "Verifying reftable content")
++
++        with open(filename, "rb") as fd:
++            h = qcow2.QcowHeader(fd)
++
++            fd.seek(h.l1_table_offset)
++            l1_table = fd.read(h.l1_size << entry_bits)
++
++            fd.seek(h.refcount_table_offset)
++            reftable = fd.read(h.refcount_table_clusters << h.cluster_bits)
++
++            check_l1_table(h, l1_table)
++            check_reftable(fd, h, reftable)
++
++    def __raw_check(self, filename):
++        pass
++
++    image_check = {
++        'qcow2' : __qcow2_check,
++        'raw' : __raw_check
 +    }
 +
-+    new_l1_size = exact_size;
++    def setUp(self):
++        if iotests.imgfmt == 'raw':
++            qemu_img('create', '-f', iotests.imgfmt, test_img, self.image_len)
++            qemu_img('create', '-f', iotests.imgfmt, check_img,
++                     self.shrink_size)
++        else:
++            qemu_img('create', '-f', iotests.imgfmt,
++                     '-o', 'cluster_size=' + self.cluster_size +
++                     ',refcount_bits=' + self.refcount_bits,
++                     test_img, self.image_len)
++            qemu_img('create', '-f', iotests.imgfmt,
++                     '-o', 'cluster_size=%s'% self.cluster_size,
++                     check_img, self.shrink_size)
++        qemu_io('-c', 'write -P 0xff 0 ' + self.shrink_size, check_img)
 +
-+#ifdef DEBUG_ALLOC2
-+    fprintf(stderr, "shrink l1_table from %d to %d\n", s->l1_size, new_l1_size);
-+#endif
++    def tearDown(self):
++        os.remove(test_img)
++        os.remove(check_img)
 +
-+    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
-+    ret = bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
-+                                       sizeof(uint64_t) * new_l1_size,
-+                             (s->l1_size - new_l1_size) * sizeof(uint64_t), 0);
-+    if (ret < 0) {
-+        return ret;
-+    }
++    def image_verify(self):
++        self.assertEqual(image_size(test_img), image_size(check_img),
++                         "Verifying image size")
++        self.image_check[iotests.imgfmt](self, test_img)
 +
-+    ret = bdrv_flush(bs->file->bs);
-+    if (ret < 0) {
-+        return ret;
-+    }
++        if iotests.imgfmt == 'raw':
++            return
++        self.assertEqual(qemu_img('check', test_img), 0,
++                         "Verifying image corruption")
 +
-+    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
-+    for (i = s->l1_size - 1; i > new_l1_size - 1; i--) {
-+        if ((s->l1_table[i] & L1E_OFFSET_MASK) == 0) {
-+            continue;
-+        }
-+        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
-+                            s->cluster_size, QCOW2_DISCARD_ALWAYS);
-+        s->l1_table[i] = 0;
-+    }
-+    return 0;
-+}
++    def test_empty_image(self):
++        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
++                 self.shrink_size)
 +
- int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
-                         bool exact_size)
- {
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 0141c9cbe7..443fca6a98 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -29,6 +29,7 @@
- #include "block/qcow2.h"
- #include "qemu/range.h"
- #include "qemu/bswap.h"
-+#include "qemu/cutils.h"
- 
- static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size);
- static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-@@ -2945,3 +2946,105 @@ done:
-     qemu_vfree(new_refblock);
-     return ret;
- }
++        self.assertEqual(
++            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, test_img),
++            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, check_img),
++            "Verifying image content")
 +
-+int qcow2_shrink_reftable(BlockDriverState *bs)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    uint64_t *reftable_tmp =
-+        g_try_malloc(sizeof(uint64_t) * s->refcount_table_size);
-+    int i, ret;
++        self.image_verify()
 +
-+    if (s->refcount_table_size && reftable_tmp == NULL) {
-+        return -ENOMEM;
-+    }
++    def test_sequential_write(self):
++        for offs in range(0, size_to_int(self.image_len),
++                          size_to_int(self.chunk_size)):
++            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
++                    test_img)
 +
-+    for (i = 0; i < s->refcount_table_size; i++) {
-+        int64_t refblock_offs = s->refcount_table[i] & REFT_OFFSET_MASK;
-+        void *refblock;
-+        bool unused_block;
++        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
++                 self.shrink_size)
 +
-+        if (refblock_offs == 0) {
-+            reftable_tmp[i] = 0;
-+            continue;
-+        }
-+        ret = qcow2_cache_get(bs, s->refcount_block_cache, refblock_offs,
-+                              &refblock);
-+        if (ret < 0) {
-+            goto out;
-+        }
++        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
++                         "Verifying image content")
 +
-+        /* the refblock has own reference */
-+        if (i == offset_to_reftable_index(s, refblock_offs)) {
-+            uint64_t block_index = (refblock_offs >> s->cluster_bits) &
-+                                   (s->refcount_block_size - 1);
-+            uint64_t refcount = s->get_refcount(refblock, block_index);
++        self.image_verify()
 +
-+            s->set_refcount(refblock, block_index, 0);
++    def test_random_write(self):
++        offs_list = range(0, size_to_int(self.image_len),
++                          size_to_int(self.chunk_size))
++        random.shuffle(offs_list)
++        for offs in offs_list:
++            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
++                    test_img)
 +
-+            unused_block = buffer_is_zero(refblock, s->cluster_size);
++        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
++                 self.shrink_size)
 +
-+            s->set_refcount(refblock, block_index, refcount);
-+        } else {
-+            unused_block = buffer_is_zero(refblock, s->cluster_size);
-+        }
-+        qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
++        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
++                         "Verifying image content")
 +
-+        reftable_tmp[i] = unused_block ? 0 : cpu_to_be64(s->refcount_table[i]);
-+    }
++        self.image_verify()
 +
-+    ret = bdrv_pwrite_sync(bs->file, s->refcount_table_offset, reftable_tmp,
-+                           sizeof(uint64_t) * s->refcount_table_size);
-+    if (ret < 0) {
-+        goto out;
-+    }
++class TestShrink512(ShrinkBaseClass):
++    image_len = '3M'
++    shrink_size = '1M'
++    chunk_size = '256K'
++    cluster_size = '512'
++    refcount_bits = '64'
 +
-+    for (i = 0; i < s->refcount_table_size; i++) {
-+        if (s->refcount_table[i] && !reftable_tmp[i]) {
-+            uint64_t discard_offs = s->refcount_table[i] & REFT_OFFSET_MASK;
-+            uint64_t refblock_offs = get_refblock_offset(s, discard_offs);
-+            uint64_t cluster_index = discard_offs >> s->cluster_bits;
-+            uint32_t block_index = cluster_index & (s->refcount_block_size - 1);
-+            void *refblock;
++class TestShrink64K(ShrinkBaseClass):
++    cluster_size = '64K'
 +
-+            assert(discard_offs != 0);
++class TestShrink1M(ShrinkBaseClass):
++    cluster_size = '1M'
++    refcount_bits = '1'
 +
-+            ret = qcow2_cache_get(bs, s->refcount_block_cache, refblock_offs,
-+                                  &refblock);
-+            if (ret < 0) {
-+                goto out;
-+            }
++ShrinkBaseClass = None
 +
-+            if (s->get_refcount(refblock, block_index) != 1) {
-+                qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
-+                ret = -EINVAL;
-+                goto out;
-+            }
-+            s->set_refcount(refblock, block_index, 0);
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['raw', 'qcow2'])
+diff --git a/tests/qemu-iotests/163.out b/tests/qemu-iotests/163.out
+new file mode 100644
+index 0000000000..dae404e278
+--- /dev/null
++++ b/tests/qemu-iotests/163.out
+@@ -0,0 +1,5 @@
++.........
++----------------------------------------------------------------------
++Ran 9 tests
 +
-+            qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, refblock);
-+
-+            qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
-+
-+            if (cluster_index < s->free_cluster_index) {
-+                s->free_cluster_index = cluster_index;
-+            }
-+
-+            refblock = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
-+                                                   discard_offs);
-+            if (refblock) {
-+                /* discard refblock from the cache if refblock is cached */
-+                qcow2_cache_discard(bs, s->refcount_block_cache, refblock);
-+            }
-+            update_refcount_discard(bs, discard_offs, s->cluster_size);
-+            s->refcount_table[i] = 0;
-+        }
-+    }
-+
-+    if (!s->cache_discards) {
-+        qcow2_process_discards(bs, ret);
-+    }
-+
-+out:
-+    g_free(reftable_tmp);
-+    return ret;
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2f94f0326e..c7506ed971 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2589,6 +2589,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int64_t new_l1_size;
-+    uint64_t total_size;
-     int ret;
- 
-     if (offset & 511) {
-@@ -2602,17 +2603,38 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-         return -ENOTSUP;
-     }
- 
--    /* shrinking is currently not supported */
--    if (offset < bs->total_sectors * 512) {
--        error_setg(errp, "qcow2 doesn't support shrinking images yet");
--        return -ENOTSUP;
--    }
--
-     new_l1_size = size_to_l1(s, offset);
--    ret = qcow2_grow_l1_table(bs, new_l1_size, true);
--    if (ret < 0) {
--        error_setg_errno(errp, -ret, "Failed to grow the L1 table");
--        return ret;
-+    total_size = bs->total_sectors << BDRV_SECTOR_BITS;
-+
-+    if (offset < total_size) {
-+        ret = qcow2_cluster_discard(bs, ROUND_UP(offset, s->cluster_size),
-+                                    total_size - ROUND_UP(offset,
-+                                                          s->cluster_size),
-+                                    QCOW2_DISCARD_ALWAYS, true);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Failed to discard cropped clusters");
-+            return ret;
-+        }
-+
-+        ret = qcow2_shrink_l1_table(bs, new_l1_size);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret,
-+                             "Failed to reduce the number of L2 tables");
-+            return ret;
-+        }
-+
-+        ret = qcow2_shrink_reftable(bs);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret,
-+                             "Failed to discard unused refblocks");
-+            return ret;
-+        }
-+    } else {
-+        ret = qcow2_grow_l1_table(bs, new_l1_size, true);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Failed to grow the L1 table");
-+            return ret;
-+        }
-     }
- 
-     /* write updated header.size */
-diff --git a/block/qcow2.h b/block/qcow2.h
-index bf6691dbd0..82e83dc0d5 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -488,6 +488,18 @@ static inline uint64_t refcount_diff(uint64_t r1, uint64_t r2)
-     return r1 > r2 ? r1 - r2 : r2 - r1;
- }
- 
-+static inline
-+uint32_t offset_to_reftable_index(BDRVQcow2State *s, uint64_t offset)
-+{
-+    return offset >> (s->refcount_block_bits + s->cluster_bits);
-+}
-+
-+static inline uint64_t get_refblock_offset(BDRVQcow2State *s, uint64_t offset)
-+{
-+    uint32_t index = offset_to_reftable_index(s, offset);
-+    return s->refcount_table[index] & REFT_OFFSET_MASK;
-+}
-+
- /* qcow2.c functions */
- int qcow2_backing_read1(BlockDriverState *bs, QEMUIOVector *qiov,
-                   int64_t sector_num, int nb_sectors);
-@@ -538,10 +550,12 @@ int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t offset,
- int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-                                 BlockDriverAmendStatusCB *status_cb,
-                                 void *cb_opaque, Error **errp);
-+int qcow2_shrink_reftable(BlockDriverState *bs);
- 
- /* qcow2-cluster.c functions */
- int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
-                         bool exact_size);
-+int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t max_size);
- int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
- int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
- int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index f85c2235c7..bcbffa3339 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2372,7 +2372,8 @@
-             'cluster_alloc_bytes', 'cluster_free', 'flush_to_os',
-             'flush_to_disk', 'pwritev_rmw_head', 'pwritev_rmw_after_head',
-             'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
--            'pwritev_zero', 'pwritev_done', 'empty_image_prepare' ] }
-+            'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
-+            'l1_shrink_write_table', 'l1_shrink_free_l2_clusters' ] }
- 
- ##
- # @BlkdebugInjectErrorOptions:
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 318ae74b10..542947eeba 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -163,6 +163,7 @@
+ 159 rw auto quick
+ 160 rw auto quick
+ 162 auto quick
++163 rw auto quick
+ 170 rw auto quick
+ 171 rw auto quick
+ 172 auto
 -- 
 2.13.0
