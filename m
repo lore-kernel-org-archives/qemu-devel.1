@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTVkc-0006jP-Uw
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:05:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dTVm4-0007pD-8a
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTVkb-0002ez-Vs
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:05:02 -0400
-Date: Fri, 7 Jul 2017 18:04:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170707160451.GD5027@noname.redhat.com>
-References: <20170707124459.10269-1-eblake@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dTVlz-0003Xy-7l
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:06:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43408)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dTVly-0003Xd-Ua
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 12:06:27 -0400
+References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5b1660d6-5329-7578-3f00-ac22b7552c91@redhat.com>
+Date: Fri, 7 Jul 2017 18:06:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707124459.10269-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 00/21] make bdrv_is_allocated[_above]
- byte-based
+In-Reply-To: <20170707152918.23086-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 00/10] nbd refactoring part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, eblake@redhat.com, berrange@redhat.com, den@openvz.org
 
-Am 07.07.2017 um 14:44 hat Eric Blake geschrieben:
-> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-> but NBD wants to report status on byte granularity (even if the
-> reporting will probably be naturally aligned to sectors or even
-> much higher levels).  I've therefore started the task of
-> converting our block status code to report at a byte granularity
-> rather than sectors.
-> 
-> The overall conversion currently looks like:
-> part 1: bdrv_is_allocated (this series, v4 was at [1])
-> part 2: dirty-bitmap (v4 is posted [2]; needs reviews)
-> part 3: bdrv_get_block_status (v2 is posted [3] and is mostly reviewed)
-> part 4: upcoming series, for .bdrv_co_block_status (second half of v1 [4])
-> 
-> Available as a tag at:
-> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-allocated-v5
-> 
-> Depends on Max's block branch (which in turn includes Kevin's)
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01151.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00269.html
-> [3] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00427.html
-> [4] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
-> 
-> Changes since v4:
-> - patches 8, 11: formatting tweak [Kevin], R-b kept
-> - patches 12, 19, 21: fix/add assertions [Kevin], R-b dropped
-> - patch 16: tweak parameter naming [Kevin], R-b kept
-> - patch 20: kill confusing comment [Kevin], R-b kept
 
-Thanks, applied to the block branch.
 
-Kevin
+On 07/07/2017 17:29, Vladimir Sementsov-Ogievskiy wrote:
+> This is last part of "nbd errors and traces refactoring".
+> 
+> Patches 01-10 from "nbd errors and traces refactoring" are already merged.
+> Patches 11-13 from it are rejected - do not regret them.
+> So, these series is update of 14-19 patches from "nbd errors and traces
+> refactoring"
+
+Looks good---Eric, want to send a pull request yourself?
+
+Paolo
+
+> v3:
+> 01: reword commit message
+>     add Eric's r-b
+>     s/legal/value/
+> 02: new patch (proposed by Eric)
+> 03: rebased on 02
+> 04,05: add Eric's r-b
+> 06: do not remove extra empty line
+>     do not add additional var nbd_magic (reuse existent magic)
+>     use ldq_be_p to reduce memory copying
+> 07,08: new patches
+> 09: new patch, split out 'behavior changing' part of 09, apply most of 
+>     comments by Eric and Max, some other changes
+> 10: rebased on 08, now more 'mechanical', may be some changes in text 
+>     messages of traces are left here.
+> 
+> 
+> v2:
+> 01: EPIPE not handled
+>     imporve comments
+> 02: rebased on absence of old patch 13, errors are not saved into
+>     separate ret variable
+>     TRACE on fail of sending NBD_REP_ACK reply to NBD_OPT_ABORT
+>     instead of error propagating and EPIPE handling
+> 03: fix error_prepend
+> 04: just remove this TRACE
+> 05: just trace nbd magic as 64bit number
+> 06: improve commit message
+>     simplify trace_nbd_receive_negotiate_server_flags - do not trace
+>     separate flags
+>     add trace_nbd_opt_abort_reply_failed
+>     remove tail periods from traces
+> 
+> 
+> Vladimir Sementsov-Ogievskiy (10):
+>   nbd/server: nbd_negotiate: return 1 on NBD_OPT_ABORT
+>   nbd/server: refactor nbd_negotiate
+>   nbd/server: use errp instead of LOG
+>   nbd/server: add errp to nbd_send_reply()
+>   nbd/common: nbd_tls_handshake: remove extra TRACE
+>   nbd/client: refactor TRACE of NBD_MAGIC
+>   nbd/server: fix TRACE in nbd_negotiate_send_rep_len
+>   nbd/server: rename clientflags var in nbd_negotiate_options
+>   nbd: refactor tracing
+>   nbd: use generic trace subsystem instead of TRACE macro
+> 
+>  Makefile.objs      |   1 +
+>  nbd/client.c       |  82 +++++------
+>  nbd/common.c       |   4 +-
+>  nbd/nbd-internal.h |  19 ---
+>  nbd/server.c       | 398 +++++++++++++++++++++++++++++------------------------
+>  nbd/trace-events   |  58 ++++++++
+>  6 files changed, 312 insertions(+), 250 deletions(-)
+>  create mode 100644 nbd/trace-events
+> 
