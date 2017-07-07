@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTSW2-0004OY-8C
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:37:47 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTSWL-0004c0-Rh
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTSVz-0005nt-26
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:37:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSVy-0005na-PX
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:37:42 -0400
-Date: Fri, 7 Jul 2017 14:37:36 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170707143736.08062610@dhcp-192-215.str.redhat.com>
-In-Reply-To: <1499423224-23060-8-git-send-email-thuth@redhat.com>
-References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-	<1499423224-23060-8-git-send-email-thuth@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTSWI-0005v5-Lv
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:38:05 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 14:37:46 +0200
+Message-Id: <149943106604.8972.10208441394697288474.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 7/8] pc-bios/s390-ccw: Add
- virtio-net driver code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 14/27] target/arm: [tcg] Port to
+ init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,259 +23,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Fri,  7 Jul 2017 12:27:03 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-> The driver provides the recv() and send() functions which will
-> be required by SLOF's libnet code for receiving and sending
-> packets.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/arm/translate.c |   86 +++++++++++++++++++++++++++---------------=
+------
+ 1 file changed, 48 insertions(+), 38 deletions(-)
 
-No thorough review yet, only some things I noticed.
-
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/netboot.mak  |   2 +-
->  pc-bios/s390-ccw/virtio-net.c | 130 ++++++++++++++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/virtio.c     |   9 ++-
->  pc-bios/s390-ccw/virtio.h     |  13 ++++-
->  4 files changed, 149 insertions(+), 5 deletions(-)
->  create mode 100644 pc-bios/s390-ccw/virtio-net.c
-> 
-
-> diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-net.c
-> new file mode 100644
-> index 0000000..290b018
-> --- /dev/null
-> +++ b/pc-bios/s390-ccw/virtio-net.c
-> @@ -0,0 +1,130 @@
-> +/*
-> + * Virtio-net driver for the s390-ccw firmware
-> + *
-> + * Copyright 2017 Thomas Huth, Red Hat Inc.
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License as published by the
-> + * Free Software Foundation; either version 2 of the License, or (at your
-> + * option) any later version.
-> + */
-> +
-> +#include <stdint.h>
-> +#include <stdbool.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <sys/socket.h>
-> +#include <ethernet.h>
-> +#include "s390-ccw.h"
-> +#include "virtio.h"
-> +
-> +#ifndef DEBUG_VIRTIO_NET
-> +#define DEBUG_VIRTIO_NET 0
-> +#endif
-> +
-> +#define VQ_RX 0         /* Receive queue */
-> +#define VQ_TX 1         /* Transmit queue */
-> +
-> +struct VirtioNetHdr {
-> +    uint8_t flags;
-> +    uint8_t gso_type;
-> +    uint16_t hdr_len;
-> +    uint16_t gso_size;
-> +    uint16_t csum_start;
-> +    uint16_t csum_offset;
-> +    /*uint16_t num_buffers;*/ /* Only with VIRTIO_NET_F_MRG_RXBUF or VIRTIO1 */
-> +};
-> +typedef struct VirtioNetHdr VirtioNetHdr;
-> +
-> +static uint16_t rx_last_idx;  /* Last index in receive queue "used" ring */
-> +
-> +int virtio_net_init(void *mac_addr)
-> +{
-> +    VDev *vdev = virtio_get_device();
-> +    VRing *rxvq = &vdev->vrings[VQ_RX];
-> +    void *buf;
-> +    int i;
-> +
-> +    virtio_setup_ccw(vdev);
-> +
-> +    memcpy(mac_addr, vdev->config.net.mac, ETH_ALEN);
-
-The mac address in the config space is only valid if the mac feature
-flag has been negotiated (although the field always exists).
-
-> +
-> +    for (i = 0; i < 64; i++) {
-> +        buf = malloc(ETH_MTU_SIZE + sizeof(VirtioNetHdr));
-> +        IPL_assert(buf != NULL, "Can not allocate memory for receive buffers");
-> +        vring_send_buf(rxvq, buf, ETH_MTU_SIZE + sizeof(VirtioNetHdr),
-> +                       VRING_DESC_F_WRITE);
-> +    }
-> +    vring_notify(rxvq);
-> +
-> +    return 0;
-> +}
-> +
-> +int send(int fd, const void *buf, int len, int flags)
-> +{
-> +    VirtioNetHdr tx_hdr;
-> +    VDev *vdev = virtio_get_device();
-> +    VRing *txvq = &vdev->vrings[VQ_TX];
-> +
-> +    /* Set up header - we do not use anything special, so simply clear it */
-> +    memset(&tx_hdr, 0, sizeof(tx_hdr));
-> +
-> +    vring_send_buf(txvq, &tx_hdr, sizeof(tx_hdr), VRING_DESC_F_NEXT);
-> +    vring_send_buf(txvq, (void *)buf, len, VRING_HIDDEN_IS_CHAIN);
-> +    while (!vr_poll(txvq)) {
-> +        yield();
-> +    }
-> +    if (drain_irqs(txvq->schid)) {
-> +        puts("send: drain irqs failed");
-> +        return -1;
-
-Does the caller try again later? drain_irqs() errors may be transient.
-
-> +    }
-> +
-> +    return len;
-> +}
-> +
-> +int recv(int fd, void *buf, int maxlen, int flags)
-> +{
-> +    VDev *vdev = virtio_get_device();
-> +    VRing *rxvq = &vdev->vrings[VQ_RX];
-> +    int len, id;
-> +    uint8_t *pkt;
-> +
-> +    if (rx_last_idx == rxvq->used->idx) {
-> +        return 0;
-> +    }
-> +
-> +    len = rxvq->used->ring[rx_last_idx % rxvq->num].len - sizeof(VirtioNetHdr);
-> +    if (len > maxlen) {
-> +        puts("virtio-net: Receive buffer too small");
-> +        len = maxlen;
-> +    }
-> +    id = rxvq->used->ring[rx_last_idx % rxvq->num].id % rxvq->num;
-> +    pkt = (uint8_t *)(rxvq->desc[id].addr + sizeof(VirtioNetHdr));
-> +
-> +#if DEBUG_VIRTIO_NET   /* Dump packet */
-> +    int i;
-> +    printf("\nbuf %p: len=%i\n", (void *)rxvq->desc[id].addr, len);
-> +    for (i = 0; i < 64; i++) {
-> +        printf(" %02x", pkt[i]);
-> +        if ((i % 16) == 15) {
-> +            printf("\n");
-> +        }
-> +    }
-> +    printf("\n");
-> +#endif
-> +
-> +    /* Copy data to destination buffer */
-> +    memcpy(buf, pkt, len);
-> +
-> +    /* Mark buffer as available to the host again */
-> +    rxvq->avail->ring[rxvq->avail->idx % rxvq->num] = id;
-> +    rxvq->avail->idx = rxvq->avail->idx + 1;
-> +    vring_notify(rxvq);
-> +
-> +    /* Move index to next entry */
-> +    rx_last_idx = rx_last_idx + 1;
-> +
-> +    return len;
-> +}
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index 09ab291..729d926 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -149,7 +149,7 @@ static void vring_init(VRing *vr, VqInfo *info)
->      debug_print_addr("init vr", vr);
->  }
->  
-> -static bool vring_notify(VRing *vr)
-> +bool vring_notify(VRing *vr)
->  {
->      vr->cookie = virtio_notify(vr->schid, vr->id, vr->cookie);
->      return vr->cookie >= 0;
-> @@ -188,7 +188,7 @@ ulong get_second(void)
->      return (get_clock() >> 12) / 1000000;
->  }
->  
-> -static int vr_poll(VRing *vr)
-> +int vr_poll(VRing *vr)
->  {
->      if (vr->used->idx == vr->used_idx) {
->          vring_notify(vr);
-> @@ -261,6 +261,11 @@ void virtio_setup_ccw(VDev *vdev)
->      run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
->  
->      switch (vdev->senseid.cu_model) {
-> +    case VIRTIO_ID_NET:
-> +        vdev->nr_vqs = 3;
-
-I think this should be 2, as you don't negotiate for the control vq.
-
-> +        vdev->cmd_vr_idx = 0;
-> +        cfg_size = sizeof(vdev->config.net);
-> +        break;
->      case VIRTIO_ID_BLOCK:
->          vdev->nr_vqs = 1;
->          vdev->cmd_vr_idx = 0;
-> diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
-> index d743919..d6af022 100644
-> --- a/pc-bios/s390-ccw/virtio.h
-> +++ b/pc-bios/s390-ccw/virtio.h
-> @@ -11,8 +11,6 @@
->  #ifndef VIRTIO_H
->  #define VIRTIO_H
->  
-> -#include "s390-ccw.h"
-> -
->  /* Status byte for guest to report progress, and synchronize features. */
->  /* We have seen device and processed generic fields (VIRTIO_CONFIG_F_VIRTIO) */
->  #define VIRTIO_CONFIG_S_ACKNOWLEDGE     1
-> @@ -254,6 +252,12 @@ struct ScsiDevice {
->  };
->  typedef struct ScsiDevice ScsiDevice;
->  
-> +struct VirtioNetConfig {
-> +    uint8_t mac[6];
-> +    uint16_t status;
-
-I don't think status exists if you don't negotiate the respective
-feature bit.
-
-> +};
-> +typedef struct VirtioNetConfig VirtioNetConfig;
-> +
->  struct VDev {
->      int nr_vqs;
->      VRing *vrings;
-> @@ -266,6 +270,7 @@ struct VDev {
->      union {
->          VirtioBlkConfig blk;
->          VirtioScsiConfig scsi;
-> +        VirtioNetConfig net;
->      } config;
->      ScsiDevice *scsi_device;
->      bool is_cdrom;
-> @@ -291,10 +296,14 @@ struct VirtioCmd {
->  };
->  typedef struct VirtioCmd VirtioCmd;
->  
-> +bool vring_notify(VRing *vr);
->  int drain_irqs(SubChannelId schid);
->  void vring_send_buf(VRing *vr, void *p, int len, int flags);
-> +int vr_poll(VRing *vr);
->  int vring_wait_reply(void);
->  int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
->  void virtio_setup_ccw(VDev *vdev);
->  
-> +int virtio_net_init(void *mac_addr);
-> +
->  #endif /* VIRTIO_H */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 15b4fcb417..0179b1ce79 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11786,32 +11786,12 @@ static bool insn_crosses_page(CPUARMState *env,=
+ DisasContext *s)
+     return false;
+ }
+=20
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++static void arm_tr_init_disas_context(DisasContextBase *dcbase,
++                                           CPUState *cs)
+ {
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+     CPUARMState *env =3D cs->env_ptr;
+     ARMCPU *cpu =3D arm_env_get_cpu(env);
+-    DisasContext dc1, *dc =3D &dc1;
+-    target_ulong next_page_start;
+-    int max_insns;
+-    bool end_of_page;
+-
+-    /* generate intermediate code */
+-
+-    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
+-     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
+-     */
+-    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+-        gen_intermediate_code_a64(&dc->base, cs, tb);
+-        return;
+-    }
+-
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+=20
+     dc->pc =3D dc->base.pc_first;
+     dc->condjmp =3D 0;
+@@ -11822,23 +11802,23 @@ void gen_intermediate_code(CPUState *cs, Transl=
+ationBlock *tb)
+      */
+     dc->secure_routed_to_el3 =3D arm_feature(env, ARM_FEATURE_EL3) &&
+                                !arm_el_is_aa64(env, 3);
+-    dc->thumb =3D ARM_TBFLAG_THUMB(tb->flags);
+-    dc->sctlr_b =3D ARM_TBFLAG_SCTLR_B(tb->flags);
+-    dc->be_data =3D ARM_TBFLAG_BE_DATA(tb->flags) ? MO_BE : MO_LE;
+-    dc->condexec_mask =3D (ARM_TBFLAG_CONDEXEC(tb->flags) & 0xf) << 1;
+-    dc->condexec_cond =3D ARM_TBFLAG_CONDEXEC(tb->flags) >> 4;
+-    dc->mmu_idx =3D core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(tb->flags=
+));
++    dc->thumb =3D ARM_TBFLAG_THUMB(dc->base.tb->flags);
++    dc->sctlr_b =3D ARM_TBFLAG_SCTLR_B(dc->base.tb->flags);
++    dc->be_data =3D ARM_TBFLAG_BE_DATA(dc->base.tb->flags) ? MO_BE : MO_=
+LE;
++    dc->condexec_mask =3D (ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) & 0xf=
+) << 1;
++    dc->condexec_cond =3D ARM_TBFLAG_CONDEXEC(dc->base.tb->flags) >> 4;
++    dc->mmu_idx =3D core_to_arm_mmu_idx(env, ARM_TBFLAG_MMUIDX(dc->base.=
+tb->flags));
+     dc->current_el =3D arm_mmu_idx_to_el(dc->mmu_idx);
+ #if !defined(CONFIG_USER_ONLY)
+     dc->user =3D (dc->current_el =3D=3D 0);
+ #endif
+-    dc->ns =3D ARM_TBFLAG_NS(tb->flags);
+-    dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(tb->flags);
+-    dc->vfp_enabled =3D ARM_TBFLAG_VFPEN(tb->flags);
+-    dc->vec_len =3D ARM_TBFLAG_VECLEN(tb->flags);
+-    dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(tb->flags);
+-    dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(tb->flags);
+-    dc->v7m_handler_mode =3D ARM_TBFLAG_HANDLER(tb->flags);
++    dc->ns =3D ARM_TBFLAG_NS(dc->base.tb->flags);
++    dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
++    dc->vfp_enabled =3D ARM_TBFLAG_VFPEN(dc->base.tb->flags);
++    dc->vec_len =3D ARM_TBFLAG_VECLEN(dc->base.tb->flags);
++    dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(dc->base.tb->flags);
++    dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(dc->base.tb->flags);
++    dc->v7m_handler_mode =3D ARM_TBFLAG_HANDLER(dc->base.tb->flags);
+     dc->cp_regs =3D cpu->cp_regs;
+     dc->features =3D env->features;
+=20
+@@ -11857,11 +11837,12 @@ void gen_intermediate_code(CPUState *cs, Transl=
+ationBlock *tb)
+      *   emit code to generate a software step exception
+      *   end the TB
+      */
+-    dc->ss_active =3D ARM_TBFLAG_SS_ACTIVE(tb->flags);
+-    dc->pstate_ss =3D ARM_TBFLAG_PSTATE_SS(tb->flags);
++    dc->ss_active =3D ARM_TBFLAG_SS_ACTIVE(dc->base.tb->flags);
++    dc->pstate_ss =3D ARM_TBFLAG_PSTATE_SS(dc->base.tb->flags);
+     dc->is_ldex =3D false;
+     dc->ss_same_el =3D false; /* Can't be true since EL_d must be AArch6=
+4 */
+=20
++
+     cpu_F0s =3D tcg_temp_new_i32();
+     cpu_F1s =3D tcg_temp_new_i32();
+     cpu_F0d =3D tcg_temp_new_i64();
+@@ -11870,6 +11851,35 @@ void gen_intermediate_code(CPUState *cs, Transla=
+tionBlock *tb)
+     cpu_V1 =3D cpu_F1d;
+     /* FIXME: cpu_M0 can probably be the same as cpu_V0.  */
+     cpu_M0 =3D tcg_temp_new_i64();
++}
++
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++{
++    CPUARMState *env =3D cs->env_ptr;
++    DisasContext dc1, *dc =3D &dc1;
++    target_ulong next_page_start;
++    int max_insns;
++    bool end_of_page;
++
++    /* generate intermediate code */
++
++    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
++     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
++     */
++    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
++        gen_intermediate_code_a64(&dc->base, cs, tb);
++        return;
++    }
++
++    dc->base.tb =3D tb;
++    dc->base.pc_first =3D dc->base.tb->pc;
++    dc->base.pc_next =3D dc->base.pc_first;
++    dc->base.is_jmp =3D DISAS_NEXT;
++    dc->base.num_insns =3D 0;
++    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
++    arm_tr_init_disas_context(&dc->base, cs);
++
+     next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_=
+PAGE_SIZE;
+     max_insns =3D tb->cflags & CF_COUNT_MASK;
+     if (max_insns =3D=3D 0) {
