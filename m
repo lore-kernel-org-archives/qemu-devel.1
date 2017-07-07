@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTOjI-0002Kz-CV
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:35:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dTOsy-00054i-3N
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dTOjF-000753-8l
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:35:12 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:57443)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dTOsv-0002n9-2B
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:45:12 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:6432 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1dTOjF-00072v-0y
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:35:09 -0400
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-References: <20170707022111.21836-1-rth@twiddle.net>
-	<20170707022111.21836-9-rth@twiddle.net>
-	<9645bafa-2c7e-96e8-5f3c-9cf7a9415285@physik.fu-berlin.de>
-	<51a3a21f-6145-d721-170f-b8cf20cbc2d9@twiddle.net>
-	<313d3f03-f487-4881-5f0a-6dd150f1ebdc@physik.fu-berlin.de>
-Message-ID: <3349c01e-1f1a-2111-28c2-70fb5cc077cd@physik.fu-berlin.de>
-Date: Fri, 7 Jul 2017 10:35:02 +0200
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dTOsu-0002jC-M6
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:45:08 -0400
+References: <20170703151051.31327-1-eblake@redhat.com>
+	<20170703151051.31327-5-eblake@redhat.com>
+	<c9ed6265-d0d4-49cf-8f0f-c859a1f02171@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <499c217c-01bc-5ad5-cead-12a9ffcb4096@virtuozzo.com>
+Date: Fri, 7 Jul 2017 11:44:57 +0300
 MIME-Version: 1.0
-In-Reply-To: <313d3f03-f487-4881-5f0a-6dd150f1ebdc@physik.fu-berlin.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <c9ed6265-d0d4-49cf-8f0f-c859a1f02171@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/27] linux-user/sh4: Notice gUSA
- regions during signal delivery
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v4 04/17] dirty-bitmap: Drop unused
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
+To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 07/07/2017 10:30 AM, John Paul Adrian Glaubitz wrote:
-> The scripts which are run here can be found as /var/lib/dpkg/info/tzdata.{config,postinst).
-> I don't know yet which command in particular triggers the crash.
-Interesting. It crashes for me immediately after resizing the terminal window with:
+07.07.2017 02:43, John Snow wrote:
+>
+> On 07/03/2017 11:10 AM, Eric Blake wrote:
+>> We had several functions that no one is currently using, and which
+>> use sector-based interfaces.  I'm trying to convert towards byte-based
+>> interfaces, so it's easier to just drop the unused functions:
+>>
+>> bdrv_dirty_bitmap_get_meta
+>> bdrv_dirty_bitmap_get_meta_locked
+>> bdrv_dirty_bitmap_reset_meta
+>> bdrv_dirty_bitmap_meta_granularity
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+> Admittedly I forget entirely why some of these are here, or to be more
+> precise I forget entirely why they are unused as I remember exactly why
+> we needed them -- but I forget why we merged them without a caller.
+>
+> Oh well. If they're unused, they're unused, and can be re-added,
+> especially if we're changing the underpinnings.
+>
+> I bet my last review on this email used nearly identical wordings.
+>
+> I'm CCing Vladimir so he has a chance to see that we're removing
+> functions that he may have wanted to use for his migration series.
+>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>
 
-(sid-sh4-sbuild)root@nofan:/# Unhandled trap: 0x180
-pc=0xf6ffe9fa sr=0x00000101 pr=0x004a73c2 fpscr=0x00080000
-spc=0x00000000 ssr=0x00000000 gbr=0xf6646470 vbr=0x00000000
-sgr=0x00000000 dbr=0x00000000 delayed_pc=0xf6ffea14 fpul=0x00000000
-r0=0xfffffffc r1=0xf6ffea1c r2=0x00000000 r3=0x00000134
-r4=0x00000001 r5=0xf6ffeac0 r6=0x00000000 r7=0x00000000
-r8=0x00000000 r9=0x0041a050 r10=0xf677e4b8 r11=0xf6ffea40
-r12=0xf677ec54 r13=0x00000000 r14=0x0041a0a4 r15=0xf6ffea1c
-r16=0x00000000 r17=0x00000000 r18=0x00000000 r19=0x00000000
-r20=0x00000000 r21=0x00000000 r22=0x00000000 r23=0x00000000
-root@nofan:~>
+Meta bitmaps was first approach of my dirty-bitmap migration 
+realization, and their first realization was in early bitmap-migration 
+series. However, now my series are based on postcopy approach and meta 
+bitmaps are not needed.
 
-I did not enter any commands. Just chrooting into the chroot, the resizing the
-terminal window was enough.
+Current realization of meta bitmaps was started by Fam, he wanted to use 
+them not only for my migration, but also for persistent bitmap 
+optimization (to reduce amount of dirt-bitmap data to be saved, to save 
+only changed parts).
 
-Adrian
+This is still true: we can try to make persistent bitmaps storing more 
+efficient, using meta bitmaps, but I'm not sure that it is worth doing 
+and I have no plans on it for now.
+
+
 
 -- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+Best regards,
+Vladimir
