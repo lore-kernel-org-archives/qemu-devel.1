@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTP5w-0007T9-Cl
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:58:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1dTP7k-0008Ml-RJ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:00:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTP5t-0007jM-BK
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:58:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53364)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTP5t-0007he-2b
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:58:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1dTP7k-0000Sc-2A
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 05:00:28 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170630133139.7907-1-vadim.galitsyn@profitbricks.com>
-	<20170630133139.7907-2-vadim.galitsyn@profitbricks.com>
-	<87lgo0900x.fsf@dusky.pond.sub.org> <20170707080646.GA2101@work-vm>
-Date: Fri, 07 Jul 2017 10:58:29 +0200
-In-Reply-To: <20170707080646.GA2101@work-vm> (David Alan Gilbert's message of
-	"Fri, 7 Jul 2017 09:06:47 +0100")
-Message-ID: <87k23k39oq.fsf@dusky.pond.sub.org>
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-26-vsementsov@virtuozzo.com>
+	<87r2xs65a5.fsf@dusky.pond.sub.org>
+	<20170707081305.GA15945@redhat.com>
+Date: Fri, 07 Jul 2017 11:00:02 +0200
+In-Reply-To: <20170707081305.GA15945@redhat.com> (Daniel P. Berrange's message
+	of "Fri, 7 Jul 2017 09:13:05 +0100")
+Message-ID: <87fue839m5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4] hmp,
- qmp: introduce memory-size-summary commands
+Subject: Re: [Qemu-devel] [PATCH v22 25/30] qmp: add
+ x-debug-block-dirty-bitmap-sha256
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Mohammed Gamal <mohammed.gamal@profitbricks.com>, Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Sorry for the late review, got a bit overwhelmed...
+> On Fri, Jul 07, 2017 at 10:05:22AM +0200, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 >> 
->> Vadim Galitsyn <vadim.galitsyn@profitbricks.com> writes:
+>> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> > ---
+>> >  block/dirty-bitmap.c         |  5 +++++
+>> >  blockdev.c                   | 25 +++++++++++++++++++++++++
+>> >  include/block/dirty-bitmap.h |  1 +
+>> >  include/qemu/hbitmap.h       |  8 ++++++++
+>> >  qapi/block-core.json         | 27 +++++++++++++++++++++++++++
+>> >  tests/Makefile.include       |  2 +-
+>> >  util/hbitmap.c               | 11 +++++++++++
+>> >  7 files changed, 78 insertions(+), 1 deletion(-)
+>> [...]
+>> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> > index 5c42cc7790..6ad8585400 100644
+>> > --- a/qapi/block-core.json
+>> > +++ b/qapi/block-core.json
+>> > @@ -1644,6 +1644,33 @@
+>> >    'data': 'BlockDirtyBitmap' }
+>> >  
+>> >  ##
+>> > +# @BlockDirtyBitmapSha256:
+>> > +#
+>> > +# SHA256 hash of dirty bitmap data
+>> > +#
+>> > +# @sha256: ASCII representation of SHA256 bitmap hash
 >> 
->> > Commands above provide the following memory information in bytes:
->> >
->> >   * base-memory - amount of unremovable memory specified
->> >     with '-m' option at the start of the QEMU process.
->> >
->> >   * hotpluggable-memory - amount of memory that was hot-plugged.
->> >     If target does not have CONFIG_MEM_HOTPLUG enabled, no
->> >     value is reported.
->> >
->> >   * balloon-actual-memory - size of the memory that remains
->> >     available to the guest after ballooning, as reported by the
->> >     guest. If the guest has not reported its memory, this value
->> >     equals to @base-memory + @hot-plug-memory. If ballooning
->> >     is not enabled, no value is reported.
->> >
->> > NOTE:
->> >
->> >     Parameter @balloon-actual-memory reports the same as
->> >     "info balloon" command when ballooning is enabled. The idea
->> >     to have it in scope of this command(s) comes from
->> >     https://lists.gnu.org/archive/html/qemu-devel/2012-07/msg01472.html.
-[...]
->> >  hmp-commands-info.hx                               | 17 ++++++++++++
->> >  hmp.c                                              | 23 ++++++++++++++++
->> >  hmp.h                                              |  1 +
->> >  hw/mem/pc-dimm.c                                   |  6 +++++
->> >  include/hw/mem/pc-dimm.h                           |  1 +
->> >  qapi-schema.json                                   | 28 +++++++++++++++++++
->> >  qmp.c                                              | 31 ++++++++++++++++++++++
->> >  stubs/Makefile.objs                                |  2 +-
->> >  stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} |  5 ++++
->> >  9 files changed, 113 insertions(+), 1 deletion(-)
->> >  rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (60%)
+>> Spell it SHA-256, please.  The member name @sha256 can stay.
 >> 
->> No test coverage?
->> 
->> I prefer to add pairs of QMP / HMP commands in separate patches, QMP
->> first, for easier review.  This patch seems small enough to tolerate
->> adding them in a single patch.  But do consider splitting if you have to
->> respin.
+>> SHA-256 is 256 binary bits.  Please specify how they are represented in
+>> ASCII.  It better be base64 (RFC 4648), because we use that elsewhere.
 >
-> The HMP tester scans all 'info' commands so it's not needed for the HMP
-> side.
+> It is filled later in this patch using qcrypto_hash_digest, so it is just
+> a hex string representing the hash, not base64. For the latter you can
+> use qcrypto_hash_base64
 
-Correct.  I want a similar test for QMP, but I'm not asking Vadim to
-provide it :)
+I got two points:
+
+1. Whatever encoding we use, it needs to be documented.
+
+2. The fewer binary -> ASCII encodings we use, the better.  We already
+use base64.
