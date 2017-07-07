@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTVcE-0000aG-Uj
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:56:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTVd0-00016J-Al
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTVcA-0006o9-QV
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:56:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dTVcA-0006nF-Gm
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:56:18 -0400
-References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
-	<20170707152918.23086-10-vsementsov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1dTVcv-0007JT-PE
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:57:10 -0400
+References: <20170707154646.22230-1-pbonzini@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dc454972-cd5e-73f0-d411-b4bb66e949a2@redhat.com>
-Date: Fri, 7 Jul 2017 10:56:08 -0500
+Message-ID: <badd5084-8374-46e9-2e28-f973e7922e3f@redhat.com>
+Date: Fri, 7 Jul 2017 10:56:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170707152918.23086-10-vsementsov@virtuozzo.com>
+In-Reply-To: <20170707154646.22230-1-pbonzini@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="cH7TjJkWiiN3mIukAoVtVvq9l8SVMkk8O"
-Subject: Re: [Qemu-devel] [PATCH v3 09/10] nbd: refactor tracing
+	boundary="4AD5WsCcattd17hODXx44qmo20r7q6jvw"
+Subject: Re: [Qemu-devel] [PATCH] hxtool: remove dead -q option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com, den@openvz.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cH7TjJkWiiN3mIukAoVtVvq9l8SVMkk8O
+--4AD5WsCcattd17hODXx44qmo20r7q6jvw
 From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
- den@openvz.org
-Message-ID: <dc454972-cd5e-73f0-d411-b4bb66e949a2@redhat.com>
-Subject: Re: [PATCH v3 09/10] nbd: refactor tracing
-References: <20170707152918.23086-1-vsementsov@virtuozzo.com>
- <20170707152918.23086-10-vsementsov@virtuozzo.com>
-In-Reply-To: <20170707152918.23086-10-vsementsov@virtuozzo.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
+Message-ID: <badd5084-8374-46e9-2e28-f973e7922e3f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hxtool: remove dead -q option
+References: <20170707154646.22230-1-pbonzini@redhat.com>
+In-Reply-To: <20170707154646.22230-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/07/2017 10:29 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Reorganize traces: move, reword, add information, drop extra ones.
+On 07/07/2017 10:46 AM, Paolo Bonzini wrote:
+> This was used to extract .txt documentation for QMP.  This was
+> changed to use the QAPI schema instead, so zap it.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  nbd/client.c |  3 ---
->  nbd/server.c | 30 +++++++++---------------------
->  2 files changed, 9 insertions(+), 24 deletions(-)
->=20
+>  scripts/hxtool | 46 +---------------------------------------------
+>  1 file changed, 1 insertion(+), 45 deletions(-)
 
-> +++ b/nbd/server.c
-
-> @@ -1039,7 +1043,8 @@ static int nbd_co_receive_request(NBDRequestData =
-*req, NBDRequest *request,
->          return -EIO;
->      }
-> =20
-> -    TRACE("Decoding type");
-> +    TRACE("Decoding type: handle =3D %" PRIu64 ", type =3D %" PRIu16,
-> +          request->handle, request->type);
-
-Now just prints a number,
-
-> =20
->      if (request->type !=3D NBD_CMD_WRITE) {
->          /* No payload, we are ready to read the next request.  */
-> @@ -1049,7 +1054,6 @@ static int nbd_co_receive_request(NBDRequestData =
-*req, NBDRequest *request,
->      if (request->type =3D=3D NBD_CMD_DISC) {
->          /* Special case: we're going to disconnect without a reply,
->           * whether or not flags, from, or len are bogus */
-> -        TRACE("Request type is DISCONNECT");
-
-where we used to print a name. But for debugging purposes, we can still
-figure things out, so not a show-stopper.
+Fun diffstat!
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -90,7 +57,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---cH7TjJkWiiN3mIukAoVtVvq9l8SVMkk8O
+--4AD5WsCcattd17hODXx44qmo20r7q6jvw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -100,13 +67,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZX68YAAoJEKeha0olJ0NqtXcH/iz12z6i7rc7xJczzem0o4PE
-PKKsYFM+2+jC4QLp/IxCt1Th3RrkHcohIwugqMsVmH3YmAJh0IUCN0sxv/jmaEOu
-tRwyeMVg5eNKNiyBT3ti0OULYeygyM6CDqQfR5HIUkL8LLx5MHd04oSJrarkvVu/
-hzdX4eTAu4INZ6TmzqtcWPa1ZuNrUOYmRFEb4BkDzWdb7/AVXVV7PULfzI4Q3Tgh
-elnhF1LkobM835IhYxcqhoE4HzP++bZLSUrNc7Ou0V+4M0w5h2s/+3XuRgPNmKSL
-2X5NPlpVjbOQLGCKIAKU2mtEBp4ysyDuPbjLt408EKum4DZmmL7jpFzWDPwXWMk=
-=HyEQ
+iQEcBAEBCAAGBQJZX69LAAoJEKeha0olJ0NqZOsH/jbhOknXN5CPJHpPvhod83Bp
+LCQF9hT2EwSAyorcg7BgtVMgLEsRndYqYG3YCBB9bqcgFRtTsEHJpC0NxDgLL699
+uoPDygaQRBvB1z1kreog3Yop1SVxXF3SZTQ9uYPNDuOvT8GTYm/1RXKLCe25EzrT
+fnkAohwDDqOfSnxOjj5Mnfu9pEUWu8iBYAYvGwZngInRgLPBU2dP3vVf76LhXw8F
+ksFEC8JJvQGLBpNN+j7E3dUvXdqjlpOi49HIneOFOK+5ydaBH9kuya8RSu+elNnT
+UEO4PSIPrjkAlyJeIRr2TWS4JFJ46uR7b7pDryF3iICbPpFlsAY+2ge/cWka9dU=
+=7av+
 -----END PGP SIGNATURE-----
 
---cH7TjJkWiiN3mIukAoVtVvq9l8SVMkk8O--
+--4AD5WsCcattd17hODXx44qmo20r7q6jvw--
