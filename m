@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dTUtU-000537-77
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dTUu4-0005Z2-Vr
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dTUtT-0007aD-3f
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52046)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dTUu0-0007xU-Tz
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:44 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:45182 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dTUtS-0007Yh-Qb
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C8E29550CC
-	for <qemu-devel@nongnu.org>; Fri,  7 Jul 2017 15:10:05 +0000 (UTC)
-Received: from [10.33.200.180] (dhcp-200-180.str.redhat.com [10.33.200.180])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 312DD7F569
-	for <qemu-devel@nongnu.org>; Fri,  7 Jul 2017 15:10:05 +0000 (UTC)
-References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-	<1499423224-23060-2-git-send-email-thuth@redhat.com>
-	<67f92ccb-0bb4-7092-46f7-17adfc097800@de.ibm.com>
-	<e141899c-12d3-9144-d0ed-370dbb108111@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1ca2e32e-7f4c-9f16-fbf0-f03e1d33fcbb@redhat.com>
-Date: Fri, 7 Jul 2017 17:10:04 +0200
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dTUu0-0007uy-GM
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:10:40 -0400
+References: <20170621153424.16690-1-vsementsov@virtuozzo.com>
+	<20170621153424.16690-3-vsementsov@virtuozzo.com>
+	<b8174b0b-1782-48ae-6bef-3f2a6a08f025@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0c0712e3-3136-5a62-3c5b-90c9e861c469@virtuozzo.com>
+Date: Fri, 7 Jul 2017 18:10:37 +0300
 MIME-Version: 1.0
-In-Reply-To: <e141899c-12d3-9144-d0ed-370dbb108111@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <b8174b0b-1782-48ae-6bef-3f2a6a08f025@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/8] pc-bios/s390-ccw: Move libc
- functions to separate header
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd/server: use errp instead of LOG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,69 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 07.07.2017 17:05, Thomas Huth wrote:
-> On 07.07.2017 15:46, Christian Borntraeger wrote:
->> On 07/07/2017 12:26 PM, Thomas Huth wrote:
->>> The upcoming netboot code will use the libc from SLOF. To be able
->>> to still use s390-ccw.h there, the libc related functions in this
->>> header have to be moved to a different location.
->>> And while we're at it, remove the duplicate memcpy() function from
->>> sclp.c.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+07.07.2017 17:40, Eric Blake wrote:
+> On 06/21/2017 10:34 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Move to modern errp scheme from just LOGging errors.
 >>
->> one suggestion below, but 
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   nbd/server.c | 268 +++++++++++++++++++++++++++++++++++------------------------
+>>   1 file changed, 161 insertions(+), 107 deletions(-)
+>> -static coroutine_fn int nbd_negotiate(NBDClient *client)
+>> +static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+>>   {
+>>       char buf[8 + 8 + 8 + 128];
+>>       int ret;
+> Now that you have this,
+>
+>>      qio_channel_set_blocking(client->ioc, false, NULL);
 >>
->> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>
->> for change and no change
->>
->> [...]
->>> +static inline void *memcpy(void *s1, const void *s2, size_t n)
->>> +{
->>> +    uint8_t *p1 = s1;
->>> +    const uint8_t *p2 = s2;
->>> +
->>> +    while (n--) {
->>> +        p1[n] = p2[n];
->>> +    }
->>> +    return s1;
->>> +}
->>
->> Not that it matters, and no idea if moving forward like in the for loop below
->> might allow gcc to generate better code, but a for loop like below will be the 
->> same direction as the MVC instruction. Can you double check if this generates
->> better code?
-> 
-> At least with my compiler version (old 4.8.1), the code looks pretty
-> similar. Backward loop:
-> 
->  1d8:   a7 19 04 d1             lghi    %r1,1233
->  1dc:   e3 40 50 00 00 04       lg      %r4,0(%r5)
->  1e2:   e3 30 70 00 00 04       lg      %r3,0(%r7)
->  1e8:   a7 29 04 d2             lghi    %r2,1234
->  1ec:   43 01 30 00             ic      %r0,0(%r1,%r3)
->  1f0:   a7 1b ff ff             aghi    %r1,-1
->  1f4:   42 01 40 01             stc     %r0,1(%r1,%r4)
->  1f8:   a7 27 ff fa             brctg   %r2,1ec <main+0x1ec>
-> 
-> Forward loop:
-> 
->  238:   a7 19 00 00             lghi    %r1,0
->  23c:   e3 40 50 00 00 04       lg      %r4,0(%r5)
->  242:   e3 30 70 00 00 04       lg      %r3,0(%r7)
->  248:   a7 29 04 d2             lghi    %r2,1234
->  24c:   43 01 30 00             ic      %r0,0(%r1,%r3)
->  250:   42 01 40 00             stc     %r0,0(%r1,%r4)
->  254:   a7 1b 00 01             aghi    %r1,1
->  258:   a7 27 ff fa             brctg   %r2,24c <main+0x24c>
-> 
-> But I can switch to the for-loop version in my patch anyway, if you
-> prefer that.
+> you should probably pass errp through to qio_channel_set_blocking and
+> return early if that fails (either here or in one of the followup
+> patches) [hmm, I note that most callers of qio_channel_set_blocking()
+> ignore errors - outside of NBD, so that's a separate cleanup series]
 
-FWIW, if I define memcpy() via  __builtin_memcpy() instead, I get a MVC
-in the disassembly... should we use maybe that macro instead?
+I've looked through realizations of ioc_klass->io_set_blocking - looks 
+like they all are returning zero always.
 
- Thomas
+>
+>
+>> @@ -591,21 +617,23 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
+>>   
+>>       if (oldStyle) {
+>>           if (client->tlscreds) {
+>> -            TRACE("TLS cannot be enabled with oldstyle protocol");
+>> +            error_setg(errp, "TLS cannot be enabled with oldstyle protocol");
+>>               return -EINVAL;
+> This code is unreachable, since earlier we have:
+>
+>>      oldStyle = client->exp != NULL && !client->tlscreds;
+> You could just as easily delete the conditional.  In fact, our code has:
+>
+> if (oldStyle) {
+>      do stuff
+> } else {
+>      do stuff
+> }
+>
+> if (oldStyle) {
+>      do stuff
+> } else {
+>      do stuff
+> }
+>
+> and it would be simple to merge that into a single if statement.
+>
+
+-- 
+Best regards,
+Vladimir
