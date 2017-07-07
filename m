@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWkv-0004gx-GD
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWkw-0004hx-E9
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWkq-0007cI-Oz
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWkv-0007ek-JF
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:09:26 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:07:22 +0200
-Message-Id: <1499447335-6125-8-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:07:23 +0200
+Message-Id: <1499447335-6125-9-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 007/100] vvfat: fix typos
+Subject: [Qemu-devel] [PULL 008/100] vvfat: rename useless enumeration values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +27,45 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 
+MODE_FAKED and MODE_RENAMED are not and were never used.
+
 Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vvfat.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/vvfat.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/block/vvfat.c b/block/vvfat.c
-index e83b8ba..07a111f 100644
+index 07a111f..18d9559 100644
 --- a/block/vvfat.c
 +++ b/block/vvfat.c
-@@ -403,9 +403,9 @@ static void init_mbr(BDRVVVFATState *s, int cyls, int=
- heads, int secs)
-     /* FAT12/FAT16/FAT32 */
-     /* DOS uses different types when partition is LBA,
-        probably to prevent older versions from using CHS on them */
--    partition->fs_type=3D s->fat_type=3D=3D12 ? 0x1:
--                        s->fat_type=3D=3D16 ? (lba?0xe:0x06):
--                         /*fat_tyoe=3D=3D32*/ (lba?0xc:0x0b);
-+    partition->fs_type =3D s->fat_type =3D=3D 12 ? 0x1 :
-+                         s->fat_type =3D=3D 16 ? (lba ? 0xe : 0x06) :
-+                       /*s->fat_type =3D=3D 32*/ (lba ? 0xc : 0x0b);
+@@ -286,8 +286,7 @@ typedef struct mapping_t {
+     union {
+         /* offset is
+          * - the offset in the file (in clusters) for a file, or
+-         * - the next cluster of the directory for a directory, and
+-         * - the address of the buffer for a faked entry
++         * - the next cluster of the directory for a directory
+          */
+         struct {
+             uint32_t offset;
+@@ -300,9 +299,13 @@ typedef struct mapping_t {
+     /* path contains the full path, i.e. it always starts with s->path *=
+/
+     char* path;
 =20
-     real_mbr->magic[0]=3D0x55; real_mbr->magic[1]=3D0xaa;
- }
-@@ -805,7 +805,7 @@ static int read_directory(BDRVVVFATState* s, int mapp=
-ing_index)
-                 (ROOT_ENTRIES - cur) * sizeof(direntry_t));
-     }
+-    enum { MODE_UNDEFINED =3D 0, MODE_NORMAL =3D 1, MODE_MODIFIED =3D 2,
+-        MODE_DIRECTORY =3D 4, MODE_FAKED =3D 8,
+-        MODE_DELETED =3D 16, MODE_RENAMED =3D 32 } mode;
++    enum {
++        MODE_UNDEFINED =3D 0,
++        MODE_NORMAL =3D 1,
++        MODE_MODIFIED =3D 2,
++        MODE_DIRECTORY =3D 4,
++        MODE_DELETED =3D 8,
++    } mode;
+     int read_only;
+ } mapping_t;
 =20
--     /* reget the mapping, since s->mapping was possibly realloc()ed */
-+    /* re-get the mapping, since s->mapping was possibly realloc()ed */
-     mapping =3D array_get(&(s->mapping), mapping_index);
-     first_cluster +=3D (s->directory.next - mapping->info.dir.first_dir_=
-index)
-         * 0x20 / s->cluster_size;
 --=20
 1.8.3.1
