@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWm5-00064a-8c
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:41 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWm3-0000KY-G8
+	(envelope-from <kwolf@redhat.com>) id 1dTWm3-00062D-0q
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:36 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1dTWm1-0000Hk-FY
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:34 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:17 +0200
-Message-Id: <1499447335-6125-63-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:16 +0200
+Message-Id: <1499447335-6125-62-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 062/100] mirror: Fix inconsistent backing
- AioContext for after mirroring
+Subject: [Qemu-devel] [PULL 061/100] iotests: 181 does not work for all
+ formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +23,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: "sochin.jiang" <sochin.jiang@huawei.com>
+From: Max Reitz <mreitz@redhat.com>
 
-mirror_complete opens the backing chain, which should have the same
-AioContext as the top when using iothreads. Make the code guarantee
-this, which fixes a failed assertion in bdrv_attach_child.
+Test 181 only works for formats which support live migration (naturally,
+as it is a live migration test). Disable it for all formats which do
+not.
 
-Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
-Message-id: 1498475064-39816-1-git-send-email-sochin.jiang@huawei.com
-[mreitz: Reworded commit message]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20170621131157.16584-1-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qemu-iotests/181 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block.c b/block.c
-index edfa6b7..b9e5114 100644
---- a/block.c
-+++ b/block.c
-@@ -2185,6 +2185,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-         ret = -EINVAL;
-         goto free_exit;
-     }
-+    bdrv_set_aio_context(backing_hd, bdrv_get_aio_context(bs));
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index e969a2a..f73ad5a 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -43,6 +43,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ . ./common.qemu
  
-     /* Hook up the backing file link; drop our reference, bs owns the
-      * backing_hd reference now */
+ _supported_fmt generic
++# Formats that do not support live migration
++_unsupported_fmt qcow vdi vhdx vmdk vpc vvfat
+ _supported_proto generic
+ _supported_os Linux
+ 
 -- 
 1.8.3.1
