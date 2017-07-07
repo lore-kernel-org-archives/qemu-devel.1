@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dTQTo-0002ai-LG
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1dTQTs-0002iy-J9
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dTQTn-0001qQ-TS
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53720)
+	(envelope-from <thuth@redhat.com>) id 1dTQTq-0001se-Uq
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dTQTn-0001q0-Mr
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:19 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dTQTq-0001sB-LB
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 06:27:22 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  7 Jul 2017 12:27:00 +0200
-Message-Id: <1499423224-23060-5-git-send-email-thuth@redhat.com>
+Date: Fri,  7 Jul 2017 12:27:02 +0200
+Message-Id: <1499423224-23060-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1499423224-23060-1-git-send-email-thuth@redhat.com>
 References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH v2 4/8] pc-bios/s390-ccw: Add a write()
- function for stdio
+Subject: [Qemu-devel] [RFC PATCH v2 6/8] pc-bios/s390-ccw: Add core files
+ for the network bootloading program
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-The stdio functions from the SLOF libc need a write() function for
-printing text to stdout/stderr. Let's implement this function by
-refactoring the code from sclp_print().
+This is just a preparation for the next steps: Add a makefile and a
+stripped down copy of pc-bios/s390-ccw/main.c as a basis for the network
+bootloader program, linked against the libc from SLOF already (which we
+will need for SLOF's libnet). The networking code is not included yet.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/sclp.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ pc-bios/s390-ccw/Makefile    |  11 +++-
+ pc-bios/s390-ccw/netboot.mak |  41 +++++++++++++
+ pc-bios/s390-ccw/netmain.c   | 140 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 190 insertions(+), 2 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/netboot.mak
+ create mode 100644 pc-bios/s390-ccw/netmain.c
 
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index 2ee204a..f6466db 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -12,6 +12,8 @@
- #include "s390-ccw.h"
- #include "sclp.h"
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 4abe7d3..4e11026 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -16,7 +16,7 @@ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+ QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
+ LDFLAGS += -Wl,-pie -nostdlib
  
-+long write(int fd, const void *buf, size_t len);
+-build-all: s390-ccw.img
++build-all: s390-ccw.img s390-netboot.img
+ 
+ s390-ccw.elf: $(OBJECTS)
+ 	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
+@@ -28,5 +28,12 @@ s390-ccw.img: s390-ccw.elf
+ 
+ $(OBJECTS): Makefile
+ 
++ifneq ($(wildcard $(SRC_PATH)/roms/SLOF/lib/libnet),)
++include $(SRC_PATH)/pc-bios/s390-ccw/netboot.mak
++else
++s390-netboot.img:
++	@echo "s390-netboot.img not built since roms/SLOF/ is not available."
++endif
 +
- static char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
- 
- const unsigned char ebc2asc[256] =
-@@ -71,11 +73,14 @@ static int _strlen(const char *str)
-     return i;
- }
- 
--void sclp_print(const char *str)
-+long write(int fd, const void *str, size_t len)
- {
--    int len = _strlen(str);
-     WriteEventData *sccb = (void *)_sccb;
- 
-+    if (fd != 1 && fd != 2) {
-+        return -EIO;
-+    }
+ clean:
+-	rm -f *.o *.d *.img *.elf *~
++	$(RM) *.o *.d *.img *.elf *~ *.a
+diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+new file mode 100644
+index 0000000..1eaa0d8
+--- /dev/null
++++ b/pc-bios/s390-ccw/netboot.mak
+@@ -0,0 +1,41 @@
 +
-     sccb->h.length = sizeof(WriteEventData) + len;
-     sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-     sccb->ebh.length = sizeof(EventBufferHeader) + len;
-@@ -84,6 +89,13 @@ void sclp_print(const char *str)
-     memcpy(sccb->data, str, len);
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
++SLOF_DIR := $(SRC_PATH)/roms/SLOF
 +
-+    return len;
++NETOBJS := start.o sclp.o virtio.o netmain.o sbrk.o libc.a
++
++LIBC_INC := -I$(SLOF_DIR)/lib/libc/include
++LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
++
++NETLDFLAGS := $(LDFLAGS) -Ttext=0x7800000
++
++$(NETOBJS): CFLAGS += $(LIBC_INC) $(LIBNET_INC)
++
++s390-netboot.elf: $(NETOBJS)
++	$(call quiet-command,$(CC) $(NETLDFLAGS) -o $@ $(NETOBJS),"BUILD","$(TARGET_DIR)$@")
++
++s390-netboot.img: s390-netboot.elf
++	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
++
++
++LIBCCMNDIR = $(SLOF_DIR)/lib/libc
++STRINGCMNDIR = $(LIBCCMNDIR)/string
++CTYPECMNDIR = $(LIBCCMNDIR)/ctype
++STDLIBCMNDIR = $(LIBCCMNDIR)/stdlib
++STDIOCMNDIR = $(LIBCCMNDIR)/stdio
++
++include $(STRINGCMNDIR)/Makefile.inc
++include $(CTYPECMNDIR)/Makefile.inc
++include $(STDLIBCMNDIR)/Makefile.inc
++include $(STDIOCMNDIR)/Makefile.inc
++
++STDIO_OBJS = sprintf.o vfprintf.o vsnprintf.o vsprintf.o fprintf.o \
++	     printf.o putc.o puts.o putchar.o stdchnls.o fileno.o
++
++LIBCOBJS := $(STRING_OBJS) $(CTYPE_OBJS) $(STDLIB_OBJS) $(STDIO_OBJS)
++$(LIBCOBJS): CFLAGS += $(LIBC_INC) $(QEMU_CFLAGS)
++
++libc.a: $(LIBCOBJS)
++	$(call quiet-command,$(AR) -rc $@ $^,"AR","$(TARGET_DIR)$@")
++
++sbrk.o: $(SLOF_DIR)/slof/sbrk.c
++	$(call quiet-command,$(CC) $(QEMU_CFLAGS) $(LIBC_INC) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+new file mode 100644
+index 0000000..fcdd7a1
+--- /dev/null
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -0,0 +1,140 @@
++/*
++ * S390 virtio-ccw network boot loading program
++ *
++ * Copyright 2017 Thomas Huth, Red Hat Inc.
++ *
++ * Based on the S390 virtio-ccw loading program (main.c)
++ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
++
++#include <stdint.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++
++#include "s390-ccw.h"
++#include "virtio.h"
++
++extern char _start[];
++
++char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
++IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
++
++static SubChannelId blk_schid = { .one = 1 };
++static uint64_t dest_timer;
++
++static uint64_t get_timer_ms(void)
++{
++    uint64_t clk;
++
++    asm volatile(" stck %0 " : : "Q"(clk) : "memory");
++
++    /* Bit 51 is incrememented each microsecond */
++    return (clk >> (63 - 51)) / 1000;
 +}
 +
-+void sclp_print(const char *str)
++void set_timer(int val)
 +{
-+    write(1, str, _strlen(str));
- }
- 
- void sclp_get_loadparm_ascii(char *loadparm)
++    dest_timer = get_timer_ms() + val;
++}
++
++int get_timer(void)
++{
++    return dest_timer - get_timer_ms();
++}
++
++int get_sec_ticks(void)
++{
++    return 1000;    /* number of ticks in 1 second */
++}
++
++void panic(const char *string)
++{
++    sclp_print(string);
++    for (;;) {
++        disabled_wait();
++    }
++}
++
++static bool find_dev(Schib *schib, int dev_no)
++{
++    int i, r;
++
++    for (i = 0; i < 0x10000; i++) {
++        blk_schid.sch_no = i;
++        r = stsch_err(blk_schid, schib);
++        if (r == 3 || r == -EIO) {
++            break;
++        }
++        if (!schib->pmcw.dnv) {
++            continue;
++        }
++        if (!virtio_is_supported(blk_schid)) {
++            continue;
++        }
++        /* Skip net devices since no IPLB is created and therefore no
++         * no network bootloader has been loaded
++         */
++        if (virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
++            continue;
++        }
++        if (dev_no < 0 || schib->pmcw.dev == dev_no) {
++            return true;
++        }
++    }
++
++    return false;
++}
++
++static void virtio_setup(void)
++{
++    Schib schib;
++    int ssid;
++    bool found = false;
++    uint16_t dev_no;
++
++    /*
++     * We unconditionally enable mss support. In every sane configuration,
++     * this will succeed; and even if it doesn't, stsch_err() can deal
++     * with the consequences.
++     */
++    enable_mss_facility();
++
++    if (store_iplb(&iplb)) {
++        IPL_assert(iplb.pbt == S390_IPL_TYPE_CCW, "IPL_TYPE_CCW expected");
++        dev_no = iplb.ccw.devno;
++        debug_print_int("device no. ", dev_no);
++        blk_schid.ssid = iplb.ccw.ssid & 0x3;
++        debug_print_int("ssid ", blk_schid.ssid);
++        found = find_dev(&schib, dev_no);
++    } else {
++        for (ssid = 0; ssid < 0x3; ssid++) {
++            blk_schid.ssid = ssid;
++            found = find_dev(&schib, -1);
++            if (found) {
++                break;
++            }
++        }
++    }
++
++    IPL_assert(found && virtio_get_device_type() == VIRTIO_ID_NET,
++               "No virtio net device found");
++}
++
++void main(void)
++{
++    sclp_setup();
++    sclp_print("Network boot starting...\n");
++
++    virtio_setup();
++
++    panic("Failed to load OS from network\n");
++}
 -- 
 1.8.3.1
