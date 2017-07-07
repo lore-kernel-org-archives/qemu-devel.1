@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dTNk3-0004Nl-G2
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:31:56 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTNmr-0006Ex-Ga
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dTNjy-0001dI-JF
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:31:55 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:54653
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dTNjy-0001Yt-BZ
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:31:50 -0400
-References: <74424b67-f20b-27c1-6c96-e2ee54bf5bd6@ilande.co.uk>
-	<8760f7fnot.fsf@dusky.pond.sub.org>
-	<54df7dce-5108-40d4-e765-03137af3ad73@ilande.co.uk>
-	<87fueanaxt.fsf@dusky.pond.sub.org>
-	<70968a58-f3be-4fa1-aa4e-bbfd39520e09@ilande.co.uk>
-	<87lgo2hi7u.fsf@dusky.pond.sub.org>
-	<7c78b873-1d97-f7ef-395b-21d6f7e8634a@redhat.com>
-	<87podd4xjc.fsf@dusky.pond.sub.org>
-	<b54c8d3c-bfb5-1a85-ef35-8a33e4893464@redhat.com>
-	<87d19diqd1.fsf@dusky.pond.sub.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <03541a3c-d1b5-39b7-67cf-3ba6936ce64a@ilande.co.uk>
-Date: Fri, 7 Jul 2017 08:31:27 +0100
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTNmq-0002XI-SN
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:34:49 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149915701334.6295.1724301929524364123.stgit@frigg.lan>
+	<149915849243.6295.4484103824675839071.stgit@frigg.lan>
+	<d1a9d3b0-96a3-60e0-270b-3e9ef82cafac@redhat.com>
+Date: Fri, 07 Jul 2017 09:34:24 +0200
+In-Reply-To: <d1a9d3b0-96a3-60e0-270b-3e9ef82cafac@redhat.com> (Eric Blake's
+	message of "Wed, 5 Jul 2017 16:14:10 -0500")
+Message-ID: <87tw2og0ov.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <87d19diqd1.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Managing architectural restrictions with -device
- and libvirt
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 6/6] trace: [trivial] Statically enable
+ all guest events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,36 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, "open list:Trivial patches" <qemu-trivial@nongnu.org>
 
-On 06/07/17 15:36, Markus Armbruster wrote:
+Eric Blake writes:
 
->>>> I see two ways to continue:
->>>>   1. A new kind of pci-bridge should be created with a "special"
->>>>      secondary bus that has less slots. (harder to implement)
->>>>   2. Add the limitation of the number of slots to the PCIBus class,
->>>>      (simpler to implement, but since is not a widely used case maybe
->>>>      is not the best way to go.
->>>
->>> I suspect (2) would be trivial.  I like trivial.
->>
->> I also like trivial, what might not be trivial is to convince Michael
->> a base PCIBus class needs a property that limits the number of slots.
->> But since the device registration code is generic, we may need that
->> property anyway.
->>
->> Taking the idea a little farther, instead of limiting the slots number,
->> we can have a slot-available flag for each slot. In this way we can
->> cover more future requirements like "slot #5 is not never used".
-> 
-> That's strictly more general, and should still be trivial.
+> On 07/04/2017 03:54 AM, Llu=C3=ADs Vilanova wrote:
+>> The existing optimizations makes it feasible to have them available on a=
+ll
+>> builds.
 
-Indeed, having a bitmask is exactly what I suggested at the end of my
-last email. I've quickly put something together which I'll send along
-shortly...
+> While this change may feel trivial, I think it is a misnomer to include
+> "[trivial]" in the subject line, and I also think it should not go in
+> through qemu-trivial.  The ideal trivial patch is one that can be
+> applied in isolation, but your patch can only be applied as part of a
+> series that includes the earlier optimizations that made this one possibl=
+e.
+
+Ok. Does this mean I should send a new series without the trivial tag?
 
 
-ATB,
-
-Mark.
+Cheers,
+  Lluis
