@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTXbw-00046j-5i
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:04:13 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dTXpn-0008J9-Rw
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTXbr-0006t1-58
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:04:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44170)
+	(envelope-from <imammedo@redhat.com>) id 1dTXpj-0006iD-Px
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:18:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTXbq-0006sX-T3
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:04:07 -0400
-Date: Fri, 7 Jul 2017 15:03:58 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170707180358.GA12152@localhost.localdomain>
-References: <1499237876.3041.4.camel@linux.intel.com>
-	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
-	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
-	<20170707133949.GH10776@localhost.localdomain>
-	<20170707181642-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dTXpj-0006hQ-Jz
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 14:18:27 -0400
+Date: Fri, 7 Jul 2017 20:18:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170707201820.5db54aa1@Igors-MacBook-Pro.local>
+In-Reply-To: <20170707150956.GZ12152@localhost.localdomain>
+References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170703113940.0e0415a2@nial.brq.redhat.com>
+	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
+	<20170707133320.2e0d741d@nial.brq.redhat.com>
+	<20170707131300.GG10776@localhost.localdomain>
+	<20170707165817.1a0103c1@nial.brq.redhat.com>
+	<20170707150956.GZ12152@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707181642-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +34,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On Fri, Jul 07, 2017 at 06:17:57PM +0300, Michael S. Tsirkin wrote:
-> On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
-> > On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
-> > > On 05/07/2017 11:14, Thomas Huth wrote:
-> > > >   Hi,
-> > > > 
+On Fri, 7 Jul 2017 12:09:56 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Fri, Jul 07, 2017 at 04:58:17PM +0200, Igor Mammedov wrote:
+> > On Fri, 7 Jul 2017 10:13:00 -0300
+> > "Eduardo Habkost" <ehabkost@redhat.com> wrote:
+> [...]
+> > > I don't disagree with adding the assert(), but it looks like
+> > > making fw_cfg_find() return NULL if there are multiple devices
+> > > can be useful for realize.
 > > > 
-> > > Hi,
-> > > 
-> > > > On 05.07.2017 08:57, Chao Peng wrote:
-> > > > > 
-> > > > > Q35 has been in QEMU for quite a while. Compared to the current default
-> > > > > i440FX, Q35 is probably not that mature and not widely used, however in
-> > > > > some case, Q35 has advantages, for example, in supporting new features.
-> > > > > For instance, we have some features require PCI-e support which is only
-> > > > > available on Q35 and some others need it for EFI support. It is of
-> > > > > course not necessary to change it as the default but if more and more
-> > > > > features have dependencies on Q35 because of requiring much more modern
-> > > > > features then I think it may be worth to do so. In such case we can have
-> > > > > more people to use it and find problems we may know or not know.
-> > > > 
-> > > 
-> > > Agreed
-> > > 
-> > > > Yes, IMHO at one point in time, we should switch the default machine
-> > > > type to q35.
-> > > 
-> > > +1
-> > > 
-> > > > The i440FX is really quite old...
-> > > > 
-> > > > > There are certainly some drawbacks:
-> > > > > -        Compatibility: current code or script may need adjustment
-> > > > 
-> > > > That might be a real concern ...
-> > > 
-> > > I am not so sure about that. Developers working on upstream projects
-> > > should expect such changes and, for our case,
-> > > modifying the command line by adding "-M pc" should not be a big deal.
+> > > In this case, it looks like Mark is relying on that in
+> > > fw_cfg_common_realize(): if multiple devices are created,
+> > > fw_cfg_find() will return NULL, and realize will fail.  This
+> > > sounds like a more graceful way to handle multiple-device
+> > > creation than crashing on fw_cfg_find().  This is the solution
+> > > used by find_vmgenid_dev()/vmgenid_realize(), BTW.
 > > 
-> > We could print a warning for 1 or 2 releases when users don't add
-> > a explicit "-M pc" or "-M q35" argument to qemu-system-x86_64,
-> > but:
-> > 
-> > > 
-> > > The upper layers should manage the defaults by themselves so
-> > > are not supposed to be affected.
-> > 
-> > But they would be.  libvirt uses the default machine-type from
-> > QEMU.
+> > I suspect that find_vmgenid_dev() works by luck as it could be
+> > placed only as /machine/peripheral-anon/foo1 or /machine/peripheral/foo2
+> >   object_resolve_partial_path() : machine
+> >            object_resolve_partial_path() : peripheral-anon => foo1
+> >            object_resolve_partial_path() : peripheral => foo2
+> >            if (found /* foo2 */) {
+> >                if (obj /* foo1 */) {
+> >                    return NULL;
 > 
-> How about extending the command for supported machines with a
-> recommended machine type, and teaching libvirt to use that?
+> I don't think this is luck: object_resolve_partial_path() is
+> explicitly documented to always return NULL if multiple matches
+> are found, and I don't see any bug in its implementation that
+> would break that functionality.
 
-I don't think QEMU has enough information to decide if it should
-recommend "q35" or "pc".
+Maybe I'm reading it wrong, but consider following:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg460692.html
 
--- 
-Eduardo
+it looks to me that using ambiguous argument is necessary for duplicate detection to work correctly.
+
+> 
