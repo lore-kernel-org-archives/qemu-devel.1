@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dTUwf-0007gf-Gh
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:13:26 -0400
+	(envelope-from <berrange@redhat.com>) id 1dTUzA-0001NQ-MP
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dTUwb-00018g-GD
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:13:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47399 helo=mx1.suse.de)
+	(envelope-from <berrange@redhat.com>) id 1dTUz6-0002OL-HL
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:16:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1dTUwb-000188-8f
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:13:21 -0400
-References: <1499429683-73361-1-git-send-email-agraf@suse.de>
-	<20170707150011.GH2451@work-vm>
-	<1b6bf5d1-8477-1697-16e9-091c1b762bd4@suse.de>
-	<20170707150611.GJ2451@work-vm>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <1c4e75bd-1d55-a43c-0e54-5e697a4a167f@suse.de>
-Date: Fri, 7 Jul 2017 17:13:18 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dTUz6-0002NB-8m
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:15:56 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri,  7 Jul 2017 16:15:41 +0100
+Message-Id: <20170707151546.7893-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707150611.GJ2451@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration: Make analyze-migration script
- target-page-size aware
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/5] Fix handling of IPv4/IPv6 dual stack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+This is a followup to:
 
+  v1: https://lists.nongnu.org/archive/html/qemu-devel/2017-04/msg05659.h=
+tml
+  v2: https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg04706.h=
+tml
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00027.html
+  v4: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03819.html
 
-On 07.07.17 17:06, Dr. David Alan Gilbert wrote:
-> * Alexander Graf (agraf@suse.de) wrote:
->>
->>
->> On 07.07.17 17:00, Dr. David Alan Gilbert wrote:
->>> * Alexander Graf (agraf@suse.de) wrote:
->>>> The configuration section has a new subsection to transmit the target page
->>>> size along with the migration stream. The analyze migration script needs
->>>> to learn about that to read configuration streams that were triggering
->>>> this subsection to get transmitted.
->>>>
->>>> With this patch applied, I can successfully analyze migration streams
->>>> on AArch64 again.
->>>>
->>>> Signed-off-by: Alexander Graf <agraf@suse.de>
->>>> ---
->>>>    scripts/analyze-migration.py | 13 +++++++++++++
->>>>    1 file changed, 13 insertions(+)
->>>>
->>>> diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration.py
->>>> index 1455387..02784f2 100755
->>>> --- a/scripts/analyze-migration.py
->>>> +++ b/scripts/analyze-migration.py
->>>> @@ -254,12 +254,25 @@ class HTABSection(object):
->>>
->>> (Note I'm not a particularly python person, so take lightly)
->>>
->>>>    class ConfigurationSection(object):
->>>> +    QEMU_VM_SUBSECTION    = 0x05
->>>> +
->>>
->>> It's odd, you already have this constant defined twice in this script.
->>
->> Yes, it lives once per class. I am not sure how to easily make it a global.
->>
->>>
->>>>        def __init__(self, file):
->>>>            self.file = file
->>>>        def read(self):
->>>>            name_len = self.file.read32()
->>>>            name = self.file.readstr(len = name_len)
->>>> +        oldpos = self.file.tell()
->>>> +        if self.file.read8() == self.QEMU_VM_SUBSECTION:
->>>> +            name = self.file.readstr()
->>>> +            version_id = self.file.read32()
->>>> +            if name == "configuration/target-page-bits":
->>>> +                target_page_size = self.file.read32()
->>>
->>> All of your other references to target_page_size in the script
->>> are self.TARGET_PAGE_SIZE.
->>
->> Well, all other ones are actual page sizes :). This variable is never used
->> anywhere - we just want to stash it somewhere.
-> 
-> oh, so you're not actually using the value read here to influence the
-> parsing later?
+This was posted as a pull request here:
 
-Exactly. As far as I can tell it doesn't have any impact on the 
-migration format, so there's no need to use it.
+  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01940.html
 
+However, the fixes to patch 5 were non-trivial, so I need to get review
+on patch 5 before I send a second pull request.
 
-Alex
+This series aims to fix a lot of bugs related to handling of IPv4 / IPv6
+dual stack.
+
+ - The VNC server mistakenly listened on two separate ports 5900+5901
+   when the to=3D parameter was given
+ - IPv6 sockets are accepting IPv4 clients even when IPv4 is set to
+   be disabled
+ - IPv6 sockets are failing to accept IPv4 clients when IPv4 is not set
+   to be disabled
+ - The VNC server was loosing the ipv4=3D/ipv6=3D settings due to a bug
+   in the DNS resolver
+
+The behaviour of all this is really subtle and hard to get working correc=
+tly
+across all the different network backends. Thus, the most important part =
+of
+this patch series is the last patch which adds a test case covering the
+backends for -vnc, -chardev tcp, -net socket, and -incoming socket, with
+a 120 entry matrix.
+
+IOW, if you think any of the first 4 patches are applying the wrong logic=
+,
+then take a look at the last patch and indicate which test matrix entries
+are believed to be defining wrong behaviour :-)
+
+Changed in v4:
+
+ - Change test suite so that it copes with differing getaddrinfo()
+   ordering for IPv4 vs IPv6 results for hostname=3D=3DNULL
+ - List test suite for all qtest arches, not only i386/ppc64
+ - Use -machine none so test suite passes on aarch64 and other
+   arches with no default machine type.
+
+Changed in v3:
+
+ - Clarified error message in commit message
+ - Replace assert with exit (Eric)
+ - Fix typo in test comment (Eric)
+ - Fix wierd copyright line (Eric)
+
+Daniel P. Berrange (5):
+  sockets: ensure we can bind to both ipv4 & ipv6 separately
+  sockets: don't block IPv4 clients when listening on "::"
+  sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
+  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
+  tests: add functional test validating ipv4/ipv6 address flag handling
+
+ io/dns-resolver.c          |   6 +-
+ tests/.gitignore           |   1 +
+ tests/Makefile.include     |   3 +
+ tests/test-sockets-proto.c | 924 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ util/qemu-sockets.c        |  71 +++-
+ 5 files changed, 984 insertions(+), 21 deletions(-)
+ create mode 100644 tests/test-sockets-proto.c
+
+--=20
+2.9.4
