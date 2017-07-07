@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTTKy-0006WQ-T0
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:30:25 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTTM7-0007PF-Jh
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:31:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTTKy-0003Xt-5K
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:30:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60693)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTTKx-0003XW-VB
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:30:24 -0400
-Date: Fri, 7 Jul 2017 10:30:16 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170707133016.GU12152@localhost.localdomain>
-References: <1499242883-2184-1-git-send-email-peterx@redhat.com>
-	<1499242883-2184-5-git-send-email-peterx@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTTM3-0004S0-Il
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 09:31:35 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 15:31:15 +0200
+Message-Id: <149943427534.8972.12180811037907145821.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499242883-2184-5-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] doc: update TYPE_MIGRATION documents
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 27/27] target/arm: [tcg] Port to generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +23,354 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, haoqf@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Wed, Jul 05, 2017 at 04:21:23PM +0800, Peter Xu wrote:
-> [Peter collected Eduardo's patch comment and formatted into patch]
-> 
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ target/arm/translate-a64.c |  120 ++++++--------------------------------=
+-----
+ target/arm/translate.c     |  124 +++++++-------------------------------=
+------
+ target/arm/translate.h     |    8 ---
+ 3 files changed, 37 insertions(+), 215 deletions(-)
 
-In case it was not merged yet:
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
--- 
-Eduardo
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index ea60d43a95..b569144ed9 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11250,6 +11250,10 @@ static void aarch64_tr_init_disas_context(DisasC=
+ontextBase *dcbase,
+     init_tmp_a64_array(dc);
+ }
+=20
++static void aarch64_tr_tb_start(DisasContextBase *db, CPUState *cpu)
++{
++}
++
+ static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cp=
+u)
+ {
+     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+@@ -11377,6 +11381,9 @@ static void aarch64_tr_tb_stop(DisasContextBase *=
+dcbase, CPUState *cpu)
+             break;
+         }
+     }
++
++    /* Functions above can change dc->pc, so re-align db->pc_next */
++    dc->base.pc_next =3D dc->pc;
+ }
+=20
+ static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
+@@ -11389,107 +11396,12 @@ static void aarch64_tr_disas_log(const DisasCo=
+ntextBase *dcbase,
+                      4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
+ }
+=20
+-void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+-                               TranslationBlock *tb)
+-{
+-    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+-    int max_insns;
+-
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D dc->base.tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+-    aarch64_tr_init_disas_context(&dc->base, cs);
+-
+-    max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
+-    if (max_insns =3D=3D 0) {
+-        max_insns =3D CF_COUNT_MASK;
+-    }
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns =3D TCG_MAX_INSNS;
+-    }
+-
+-    gen_tb_start(tb);
+-
+-    tcg_clear_temp_count();
+-
+-    do {
+-        dc->base.num_insns++;
+-        aarch64_tr_insn_start(&dc->base, cs);
+-
+-        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+-            CPUBreakpoint *bp;
+-            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+-                if (bp->pc =3D=3D dc->base.pc_next) {
+-                    BreakpointCheckType bp_check =3D
+-                        aarch64_tr_breakpoint_check(&dc->base, cs, bp);
+-                    switch (bp_check) {
+-                    case BC_MISS:
+-                        /* Target ignored this breakpoint, go to next */
+-                        break;
+-                    case BC_HIT_INSN:
+-                        /* Hit, keep translating */
+-                        /*
+-                         * TODO: if we're never going to have more than =
+one
+-                         *       BP in a single address, we can simply u=
+se a
+-                         *       bool here.
+-                         */
+-                        goto done_breakpoints;
+-                    case BC_HIT_TB:
+-                        /* Hit, end TB */
+-                        goto done_generating;
+-                    default:
+-                        g_assert_not_reached();
+-                    }
+-                }
+-            }
+-        }
+-    done_breakpoints:
+-
+-        if (dc->base.num_insns =3D=3D max_insns && (dc->base.tb->cflags =
+& CF_LAST_IO)) {
+-            gen_io_start();
+-        }
+-
+-        dc->base.pc_next =3D aarch64_tr_translate_insn(&dc->base, cs);
+-
+-        if (tcg_check_temp_count()) {
+-            fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
+-                    dc->pc);
+-        }
+-
+-        if (!dc->base.is_jmp && (tcg_op_buf_full() || cs->singlestep_ena=
+bled ||
+-                            singlestep || dc->base.num_insns >=3D max_in=
+sns)) {
+-            dc->base.is_jmp =3D DISAS_TOO_MANY;
+-        }
+-
+-        /* Translation stops when a conditional branch is encountered.
+-         * Otherwise the subsequent code could get translated several ti=
+mes.
+-         * Also stop translation when a page boundary is reached.  This
+-         * ensures prefetch aborts occur at the right place.
+-         */
+-    } while (!dc->base.is_jmp);
+-
+-    aarch64_tr_tb_stop(&dc->base, cs);
+-
+-    if (dc->base.tb->cflags & CF_LAST_IO) {
+-        gen_io_end();
+-    }
+-
+-done_generating:
+-    gen_tb_end(tb, dc->base.num_insns);
+-
+-#ifdef DEBUG_DISAS
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) &&
+-        qemu_log_in_addr_range(dc->base.pc_first)) {
+-        qemu_log_lock();
+-        qemu_log("----------------\n");
+-        aarch64_tr_disas_log(&dc->base, cs);
+-        qemu_log("\n");
+-        qemu_log_unlock();
+-    }
+-#endif
+-    dc->base.tb->size =3D dc->pc - dc->base.pc_first;
+-    dc->base.tb->icount =3D dc->base.num_insns;
+-}
++const TranslatorOps aarch64_translator_ops =3D {
++    .init_disas_context =3D aarch64_tr_init_disas_context,
++    .tb_start =3D aarch64_tr_tb_start,
++    .insn_start =3D aarch64_tr_insn_start,
++    .breakpoint_check =3D aarch64_tr_breakpoint_check,
++    .translate_insn =3D aarch64_tr_translate_insn,
++    .tb_stop =3D aarch64_tr_tb_stop,
++    .disas_log =3D aarch64_tr_disas_log,
++};
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 5db381491f..bb6be76696 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12131,6 +12131,9 @@ static void arm_tr_tb_stop(DisasContextBase *dcba=
+se, CPUState *cpu)
+             gen_goto_tb(dc, 1, dc->pc);
+         }
+     }
++
++    /* Functions above can change dc->pc, so re-align db->pc_next */
++    dc->base.pc_next =3D dc->pc;
+ }
+=20
+ static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *c=
+pu)
+@@ -12142,116 +12145,29 @@ static void arm_tr_disas_log(const DisasContex=
+tBase *dcbase, CPUState *cpu)
+                      dc->thumb | (dc->sctlr_b << 1));
+ }
+=20
++static const TranslatorOps arm_translator_ops =3D {
++    .init_disas_context =3D arm_tr_init_disas_context,
++    .tb_start =3D arm_tr_tb_start,
++    .insn_start =3D arm_tr_insn_start,
++    .breakpoint_check =3D arm_tr_breakpoint_check,
++    .translate_insn =3D arm_tr_translate_insn,
++    .tb_stop =3D arm_tr_tb_stop,
++    .disas_log =3D arm_tr_disas_log,
++};
++
+ /* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
+ {
+-    DisasContext dc1, *dc =3D &dc1;
+-    int max_insns;
++    DisasContext dc;
++    const TranslatorOps *ops =3D &arm_translator_ops;
+=20
+-    /* generate intermediate code */
+-
+-    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
+-     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
+-     */
++#ifdef TARGET_AARCH64
+     if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+-        gen_intermediate_code_a64(&dc->base, cs, tb);
+-        return;
+-    }
+-
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D dc->base.tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+-    arm_tr_init_disas_context(&dc->base, cs);
+-
+-
+-    arm_tr_init_globals(&dc->base, cs);
+-    max_insns =3D tb->cflags & CF_COUNT_MASK;
+-    if (max_insns =3D=3D 0) {
+-        max_insns =3D CF_COUNT_MASK;
+-    }
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns =3D TCG_MAX_INSNS;
+-    }
+-
+-    gen_tb_start(tb);
+-
+-    tcg_clear_temp_count();
+-    arm_tr_tb_start(&dc->base, cs);
+-
+-    do {
+-        dc->base.num_insns++;
+-        arm_tr_insn_start(&dc->base, cs);
+-
+-        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+-            CPUBreakpoint *bp;
+-            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+-                if (bp->pc =3D=3D dc->base.pc_next) {
+-                    BreakpointCheckType bp_check =3D
+-                        arm_tr_breakpoint_check(&dc->base, cs, bp);
+-                    switch (bp_check) {
+-                    case BC_MISS:
+-                        /* Target ignored this breakpoint, go to next */
+-                        break;
+-                    case BC_HIT_INSN:
+-                        /* Hit, keep translating */
+-                        /*
+-                         * TODO: if we're never going to have more than =
+one
+-                         *       BP in a single address, we can simply u=
+se a
+-                         *       bool here.
+-                         */
+-                        goto done_breakpoints;
+-                    case BC_HIT_TB:
+-                        /* Hit, end TB */
+-                        goto done_generating;
+-                    default:
+-                        g_assert_not_reached();
+-                    }
+-                }
+-            }
+-        }
+-    done_breakpoints:
+-
+-        if (dc->base.num_insns =3D=3D max_insns && (tb->cflags & CF_LAST=
+_IO)) {
+-            gen_io_start();
+-        }
+-
+-        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
+-
+-        if (tcg_check_temp_count()) {
+-            fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
+-                    dc->pc);
+-        }
+-
+-        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
+-                            dc->base.num_insns >=3D max_insns)) {
+-            dc->base.is_jmp =3D DISAS_TOO_MANY;
+-        }
+-    } while (!dc->base.is_jmp);
+-
+-    arm_tr_tb_stop(&dc->base, cs);
+-
+-    if (dc->base.tb->cflags & CF_LAST_IO) {
+-        gen_io_end();
+-    }
+-
+-done_generating:
+-    gen_tb_end(tb, dc->base.num_insns);
+-
+-#ifdef DEBUG_DISAS
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) &&
+-        qemu_log_in_addr_range(dc->base.pc_first)) {
+-        qemu_log_lock();
+-        qemu_log("----------------\n");
+-        arm_tr_disas_log(&dc->base, cs);
+-        qemu_log("\n");
+-        qemu_log_unlock();
++        ops =3D &aarch64_translator_ops;
+     }
+ #endif
+-    tb->size =3D dc->pc - dc->base.pc_first;
+-    tb->icount =3D dc->base.num_insns;
++
++    translator_loop(ops, &dc.base, cpu, tb);
+ }
+=20
+ static const char *cpu_mode_names[16] =3D {
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 83e56dcb08..69d4b2f082 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -153,21 +153,15 @@ static void disas_set_insn_syndrome(DisasContext *s=
+, uint32_t syn)
+=20
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
+-void gen_intermediate_code_a64(DisasContextBase *db, CPUState *cpu,
+-                               TranslationBlock *tb);
+ void gen_a64_set_pc_im(uint64_t val);
+ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
+                             fprintf_function cpu_fprintf, int flags);
++extern const TranslatorOps aarch64_translator_ops;
+ #else
+ static inline void a64_translate_init(void)
+ {
+ }
+=20
+-static inline void gen_intermediate_code_a64(DisasContextBase *db, CPUSt=
+ate *cpu,
+-                                             TranslationBlock *tb)
+-{
+-}
+-
+ static inline void gen_a64_set_pc_im(uint64_t val)
+ {
+ }
