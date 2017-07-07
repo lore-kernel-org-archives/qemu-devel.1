@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTV1l-0003Vy-0W
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:41 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTV94-00083d-EF
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dTV1h-0003eo-1M
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:40 -0400
-Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:36329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTV1g-0003ef-Sd
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:18:36 -0400
-Received: by mail-qt0-x232.google.com with SMTP id i2so29584968qta.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 08:18:36 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dTV93-0007zv-LN
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 11:26:14 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865462073.17063.17488435214703164893.stgit@frigg.lan>
-	<20170630004134.GJ13979@flamenco> <87h8yofvka.fsf@frigg.lan>
+	<149865776960.17063.4875279139522061160.stgit@frigg.lan>
+	<2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net>
+	<87podcebyi.fsf@frigg.lan>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <9104ecbc-fe41-e318-d35f-d59d618acbf4@twiddle.net>
-Date: Fri, 7 Jul 2017 05:18:30 -1000
+Message-ID: <3745ae02-3fb0-1503-9c99-98dce369f697@twiddle.net>
+Date: Fri, 7 Jul 2017 05:26:03 -1000
 MIME-Version: 1.0
-In-Reply-To: <87h8yofvka.fsf@frigg.lan>
+In-Reply-To: <87podcebyi.fsf@frigg.lan>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 10/29] target/i386: [tcg] Refactor
+Subject: Re: [Qemu-devel] [PATCH v11 23/29] target/arm: [tcg] Port to
  translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,31 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 07/06/2017 11:25 PM, Lluís Vilanova wrote:
->>> /* convert one instruction. s->base.is_jmp is set if the translation must
->>> be stopped. Return the next pc value */
->>> -static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
->>> -                               target_ulong pc_start)
->>> +static target_ulong disas_insn(DisasContextBase *dcbase, CPUState *cpu)
->>> {
->>> +    DisasContext *s = container_of(dcbase, DisasContext, base);
->>> +    CPUX86State *env = cpu->env_ptr;
+On 07/07/2017 01:13 AM, Lluís Vilanova wrote:
+>>> +    if (dc->ss_active && !dc->pstate_ss) {
+>>> +        /* Singlestep state is Active-pending.
+>>> +         * If we're in this state at the start of a TB then either
+>>> +         *  a) we just took an exception to an EL which is being debugged
+>>> +         *     and this is the first insn in the exception handler
+>>> +         *  b) debug exceptions were masked and we just unmasked them
+>>> +         *     without changing EL (eg by clearing PSTATE.D)
+>>> +         * In either case we're going to take a swstep exception in the
+>>> +         * "did not step an insn" case, and so the syndrome ISV and EX
+>>> +         * bits should be zero.
+>>> +         */
+>>> +        assert(dc->base.num_insns == 1);
+>>> +        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+>>> +                      default_exception_el(dc));
+>>> +        dc->base.is_jmp = DISAS_SKIP;
 > 
->> Minor nit: you can pass dc (*s) here directly, no need for container_of
-> [...]
+>> This is surely DISAS_EXC -- see gen_step_complete_exception.
+>> Why introduce a new name?
 > 
-> I prefer not to so that the code will work in the future (i.e., not assuming the
-> location of base inside disascontext).
+> The original code goes straight to done_generating here, and that's the purpose
+> of DISAS_SKIP (skip the code executed between the end of the loop and the
+> done_generating label).
 
-There's clearly a misunderstanding here.
-
-Emilio is saying that disas_insn is not a hook and private to the front-end. 
-Therefore the argument to the function should be "DisasContet *s" and not 
-"DisasContextBase *dcbase".
-
-And I agree.  Passing DisasContext should be preferred where possible.
+That is the purpose of DISAS_EXC too.  We've called a noreturn helper to raise 
+an exception and all following code is unreached.  If there *was* any code 
+being emitted afterward, that is arguably a bug.
 
 
 r~
