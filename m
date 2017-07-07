@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dTX5O-0007Uf-BV
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:30:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dTX6v-0000KF-Db
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dTX5N-00043K-8X
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:30:34 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:36152)
+	(envelope-from <alex.bennee@linaro.org>) id 1dTX6r-0004a6-Em
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:09 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33567)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dTX5N-000426-1e
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:30:33 -0400
-Received: by mail-wr0-x244.google.com with SMTP id 77so9028454wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 10:30:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dTX6r-0004Z6-76
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:32:05 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id r103so56172818wrb.0
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 10:32:05 -0700 (PDT)
+References: <20170707161822.29659-1-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170707161822.29659-1-alex.bennee@linaro.org>
+Date: Fri, 07 Jul 2017 18:32:02 +0100
+Message-ID: <87inj49mr1.fsf@linaro.org>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <8737a8za43.fsf@dusky.pond.sub.org>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
-	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-	<8737a8za43.fsf@dusky.pond.sub.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 7 Jul 2017 10:30:00 -0700
-Message-ID: <CAKmqyKPuH3t2VgF59EMLOj1US05-nUc6UYpN6b7ZiMo=M-v7DA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
- warn_report()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the
+ run-loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, philippe@mathieu-daude.net, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Peter Chubb <peter.chubb@nicta.com.au>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jul 7, 2017 at 5:48 AM, Markus Armbruster <armbru@redhat.com> wrote:
-> Alistair Francis <alistair.francis@xilinx.com> writes:
->
->> Convert all uses of error_report("[Ww]arning:"... to use warn_report()
->> instead. This helps standardise on a single method of printing warnings
->> to the user.
->>
->> All of the warnings were found using this regex expression:
->>     error_report.*[Ww]arning:
->> and replaced with:
->>     warn_report("
->>
->> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
->> Suggested-by: Thomas Huth <thuth@redhat.com>
->
-> Doesn't compile.  Moreover, you obviously changed more than just lines
-> matching the regexp you quoted.
->
-> To ease review, I please split the patch as follows:
->
-> * First patch:
->
->       sed -i 's/error_report("warning: \([^"]*"\)/warn_report("\1/i' ...
->
->   plus indentation fixups.  Put exact sed command (or whatever else you
->   use) in the commit message.
->
-> * Second patch with additional conversions.
 
-The only additional conversion is fixing the test cases, which I
-really don't want to have in a separate patch because then this patch
-fails make check.
+Alex Bennée <alex.bennee@linaro.org> writes:
 
-Thanks,
-Alistair
-
+> Previously DISAS_JUMP did ensure this but with the optimisation of
+> 8a6b28c7 (optimize indirect branches) we might not leave the loop.
+> This means if any pending interrupts are cleared by changing IRQ flags
+> we might never get around to servicing them. You usually notice this
+> by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
+> while cpu->interrupt_request remains high and the exit_request has not
+> been set.
 >
-> This way the bulk of the changes is mechanical, and the non-mechanical
-> changes don't get lost in the sea of mechanical ones.
+> This breaks amongst other things the OPTEE test suite which executes
+> an eret from the secure world after a non-secure world IRQ has gone
+> pending which then never gets serviced.
+>
+> An alternate approach might be for the exception helpers to ensure the
+> exit request flag is set if an IRQ is now unmasked.
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> CC: Etienne Carriere <etienne.carriere@linaro.org>
+> CC: Joakim Bech <joakim.bech@linaro.org>
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> CC: Emilio G. Cota <cota@braap.org>
+> CC: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/arm/translate-a64.c | 3 ++-
+>  target/arm/translate.c     | 6 ++++--
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index e55547d95d..3ee88b2590 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1788,7 +1788,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+>              return;
+>          }
+>          gen_helper_exception_return(cpu_env);
+> -        s->is_jmp = DISAS_JUMP;
+> +        /* Must exit loop to check un-masked IRQs */
+> +        s->is_jmp = DISAS_EXIT;
+
+Given the wording of:
+
+/* is_jmp field values */
+#define DISAS_NEXT    0 /* next instruction can be analyzed */
+#define DISAS_JUMP    1 /* only pc was modified dynamically */
+#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
+#define DISAS_TB_JUMP 3 /* only pc was modified statically */
+
+I'm thinking that really these DISAS_JUMP's should be DISAS_UPDATEs and
+we need to disable the TB chaining optimisations for this. I'll prepare
+a more comprehensive series next week. However testing this patch for
+known failure modes will be useful.
+
+
+>          return;
+>      case 5: /* DRPS */
+>          if (rn != 0x1f) {
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 0862f9e4aa..920fb41395 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -4475,7 +4475,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
+>       */
+>      gen_helper_cpsr_write_eret(cpu_env, cpsr);
+>      tcg_temp_free_i32(cpsr);
+> -    s->is_jmp = DISAS_JUMP;
+> +    /* Must exit loop to check un-masked IRQs */
+> +    s->is_jmp = DISAS_EXIT;
+>  }
+>
+>  /* Generate an old-style exception return. Marks pc as dead. */
+> @@ -9519,7 +9520,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>                      tmp = load_cpu_field(spsr);
+>                      gen_helper_cpsr_write_eret(cpu_env, tmp);
+>                      tcg_temp_free_i32(tmp);
+> -                    s->is_jmp = DISAS_JUMP;
+> +                    /* Must exit loop to check un-masked IRQs */
+> +                    s->is_jmp = DISAS_EXIT;
+>                  }
+>              }
+>              break;
+
+
+--
+Alex Bennée
