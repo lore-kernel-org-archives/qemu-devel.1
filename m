@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTSdP-0000WO-ES
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:45:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTSdQ-0000XV-JC
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTSdM-0000Se-8H
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:45:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTSdP-0000Y1-JF
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:45:24 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  7 Jul 2017 07:44:42 -0500
-Message-Id: <20170707124459.10269-5-eblake@redhat.com>
+Date: Fri,  7 Jul 2017 07:44:43 -0500
+Message-Id: <20170707124459.10269-6-eblake@redhat.com>
 In-Reply-To: <20170707124459.10269-1-eblake@redhat.com>
 References: <20170707124459.10269-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 04/21] stream: Drop reached_end for
- stream_complete()
+Subject: [Qemu-devel] [PATCH v5 05/21] stream: Switch stream_run() to
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +23,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-stream_complete() skips the work of rewriting the backing file if
-the job was cancelled, if data->reached_end is false, or if there
-was an error detected (non-zero data->ret) during the streaming.
-But note that in stream_run(), data->reached_end is only set if the
-loop ran to completion, and data->ret is only 0 in two cases:
-either the loop ran to completion (possibly by cancellation, but
-stream_complete checks for that), or we took an early goto out
-because there is no bs->backing.  Thus, we can preserve the same
-semantics without the use of reached_end, by merely checking for
-bs->backing (and logically, if there was no backing file, streaming
-is a no-op, so there is no backing file to rewrite).
+We are gradually converting to byte-based interfaces, as they are
+easier to reason about than sector-based.  Change the internal
+loop iteration of streaming to track by bytes instead of sectors
+(although we are still guaranteed that we iterate by steps that
+are sector-aligned).
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
 ---
 v5: no change
-v4: new patch
+v4: avoid reached_end change by rebasing to earlier changes [Kevin], R-b kept
+v2-v3: no change
 ---
- block/stream.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/stream.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
 diff --git a/block/stream.c b/block/stream.c
-index 746d525..12f1659 100644
+index 12f1659..e3dd2ac 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -59,7 +59,6 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
-
- typedef struct {
-     int ret;
--    bool reached_end;
- } StreamCompleteData;
-
- static void stream_complete(BlockJob *job, void *opaque)
-@@ -70,7 +69,7 @@ static void stream_complete(BlockJob *job, void *opaque)
+@@ -107,12 +107,11 @@ static void coroutine_fn stream_run(void *opaque)
+     BlockBackend *blk = s->common.blk;
+     BlockDriverState *bs = blk_bs(blk);
      BlockDriverState *base = s->base;
-     Error *local_err = NULL;
+-    int64_t sector_num = 0;
+-    int64_t end = -1;
++    int64_t offset = 0;
+     uint64_t delay_ns = 0;
+     int error = 0;
+     int ret = 0;
+-    int n = 0;
++    int n = 0; /* sectors */
+     void *buf;
 
--    if (!block_job_is_cancelled(&s->common) && data->reached_end &&
-+    if (!block_job_is_cancelled(&s->common) && bs->backing &&
-         data->ret == 0) {
-         const char *base_id = NULL, *base_fmt = NULL;
-         if (base) {
-@@ -211,7 +210,6 @@ out:
-     /* Modify backing chain and close BDSes in main loop */
-     data = g_malloc(sizeof(*data));
-     data->ret = ret;
--    data->reached_end = sector_num == end;
-     block_job_defer_to_main_loop(&s->common, stream_complete, data);
- }
+     if (!bs->backing) {
+@@ -125,7 +124,6 @@ static void coroutine_fn stream_run(void *opaque)
+         goto out;
+     }
 
+-    end = s->common.len >> BDRV_SECTOR_BITS;
+     buf = qemu_blockalign(bs, STREAM_BUFFER_SIZE);
+
+     /* Turn on copy-on-read for the whole block device so that guest read
+@@ -137,7 +135,7 @@ static void coroutine_fn stream_run(void *opaque)
+         bdrv_enable_copy_on_read(bs);
+     }
+
+-    for (sector_num = 0; sector_num < end; sector_num += n) {
++    for ( ; offset < s->common.len; offset += n * BDRV_SECTOR_SIZE) {
+         bool copy;
+
+         /* Note that even when no rate limit is applied we need to yield
+@@ -150,28 +148,26 @@ static void coroutine_fn stream_run(void *opaque)
+
+         copy = false;
+
+-        ret = bdrv_is_allocated(bs, sector_num,
++        ret = bdrv_is_allocated(bs, offset / BDRV_SECTOR_SIZE,
+                                 STREAM_BUFFER_SIZE / BDRV_SECTOR_SIZE, &n);
+         if (ret == 1) {
+             /* Allocated in the top, no need to copy.  */
+         } else if (ret >= 0) {
+             /* Copy if allocated in the intermediate images.  Limit to the
+-             * known-unallocated area [sector_num, sector_num+n).  */
++             * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
+             ret = bdrv_is_allocated_above(backing_bs(bs), base,
+-                                          sector_num, n, &n);
++                                          offset / BDRV_SECTOR_SIZE, n, &n);
+
+             /* Finish early if end of backing file has been reached */
+             if (ret == 0 && n == 0) {
+-                n = end - sector_num;
++                n = (s->common.len - offset) / BDRV_SECTOR_SIZE;
+             }
+
+             copy = (ret == 1);
+         }
+-        trace_stream_one_iteration(s, sector_num * BDRV_SECTOR_SIZE,
+-                                   n * BDRV_SECTOR_SIZE, ret);
++        trace_stream_one_iteration(s, offset, n * BDRV_SECTOR_SIZE, ret);
+         if (copy) {
+-            ret = stream_populate(blk, sector_num * BDRV_SECTOR_SIZE,
+-                                  n * BDRV_SECTOR_SIZE, buf);
++            ret = stream_populate(blk, offset, n * BDRV_SECTOR_SIZE, buf);
+         }
+         if (ret < 0) {
+             BlockErrorAction action =
 -- 
 2.9.4
