@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuL-00034m-Vc
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuN-00036c-FO
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuK-00042Q-9l
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuL-00043b-Uu
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:23 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  7 Jul 2017 15:30:46 -0500
-Message-Id: <20170707203049.534-7-eblake@redhat.com>
+Date: Fri,  7 Jul 2017 15:30:49 -0500
+Message-Id: <20170707203049.534-10-eblake@redhat.com>
 In-Reply-To: <20170707203049.534-1-eblake@redhat.com>
 References: <20170707203049.534-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 6/9] nbd: Implement NBD_OPT_GO on server
+Subject: [Qemu-devel] [PATCH v5 9/9] nbd: Implement NBD_INFO_BLOCK_SIZE on
+ client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,279 +21,264 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-NBD_OPT_EXPORT_NAME is lousy: per the NBD protocol, any failure
-requires us to close the connection rather than report an error.
-Therefore, upstream NBD recently added NBD_OPT_GO as the improved
-version of the option that does what we want [1], along with
-NBD_OPT_INFO that returns the same information but does not
-transition to transmission phase.
+The upstream NBD Protocol has defined a new extension to allow
+the server to advertise block sizes to the client, as well as
+a way for the client to inform the server whether it intends to
+obey block sizes.
 
-[1] https://github.com/NetworkBlockDevice/nbd/blob/extension-info/doc/proto.md
+When using the block layer as the client, we will obey block
+sizes; but when used as 'qemu-nbd -c' to hand off to the
+kernel nbd module as the client, we are still waiting for the
+kernel to implement a way for us to learn if it will honor
+block sizes (perhaps by an addition to sysfs, rather than an
+ioctl), as well as any way to tell the kernel what additional
+block sizes to obey (NBD_SET_BLKSIZE appears to be accurate
+for the minimum size, but preferred and maximum sizes would
+probably be new ioctl()s), so until then, we need to make our
+request for block sizes conditional.
 
-This is a first cut at the information types, and only passes the
-same information already available through NBD_OPT_LIST and
-NBD_OPT_EXPORT_NAME; items like NBD_INFO_BLOCK_SIZE (and thus any
-use of NBD_REP_ERR_BLOCK_SIZE_REQD) are intentionally left for
-later patches.
+When using ioctl(NBD_SET_BLKSIZE) to hand off to the kernel,
+use the minimum block size as the sector size if it is larger
+than 512, which also has the nice effect of cooperating with
+(non-qemu) servers that don't do read-modify-write when
+exposing a block device with 4k sectors; it might also allow
+us to visit a file larger than 2T on a 32-bit kernel.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v5: update to master, R-b dropped
-v4: revamp to another round of NBD protocol changes
-v3: revamp to match latest version of NBD protocol
+v5: rebase to master
+v4: new patch
 ---
- nbd/server.c     | 179 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- nbd/trace-events |   3 +
- 2 files changed, 179 insertions(+), 3 deletions(-)
+ include/block/nbd.h |  6 ++++
+ block/nbd-client.c  |  4 +++
+ block/nbd.c         | 14 +++++++--
+ nbd/client.c        | 81 +++++++++++++++++++++++++++++++++++++++++++++--------
+ qemu-nbd.c          |  2 +-
+ nbd/trace-events    |  1 +
+ 6 files changed, 92 insertions(+), 16 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 841986d..e84d012 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -141,6 +141,7 @@ static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
-     trace_nbd_negotiate_send_rep_len(opt, nbd_opt_lookup(opt),
-                                      type, nbd_rep_lookup(type), len);
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 4a22eca..9c3d0a5 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -144,8 +144,14 @@ enum {
 
-+    assert(len < NBD_MAX_BUFFER_SIZE);
-     magic = cpu_to_be64(NBD_REP_MAGIC);
-     if (nbd_write(ioc, &magic, sizeof(magic), errp) < 0) {
-         error_prepend(errp, "write failed (rep magic): ");
-@@ -275,6 +276,8 @@ static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length,
-     return nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, NBD_OPT_LIST, errp);
+ /* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */
+ struct NBDExportInfo {
++    /* Set by client before nbd_receive_negotiate() */
++    bool request_sizes;
++    /* Set by server results during nbd_receive_negotiate() */
+     uint64_t size;
+     uint16_t flags;
++    uint32_t min_block;
++    uint32_t opt_block;
++    uint32_t max_block;
+ };
+ typedef struct NBDExportInfo NBDExportInfo;
+
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index aab1e32..25dd284 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -384,6 +384,7 @@ int nbd_client_init(BlockDriverState *bs,
+     logout("session init %s\n", export);
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
+
++    client->info.request_sizes = true;
+     ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), export,
+                                 tlscreds, hostname,
+                                 &client->ioc, &client->info, errp);
+@@ -398,6 +399,9 @@ int nbd_client_init(BlockDriverState *bs,
+     if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
+         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
+     }
++    if (client->info.min_block > bs->bl.request_alignment) {
++        bs->bl.request_alignment = client->info.min_block;
++    }
+
+     qemu_co_mutex_init(&client->send_mutex);
+     qemu_co_queue_init(&client->free_sema);
+diff --git a/block/nbd.c b/block/nbd.c
+index 4a9048c..a50d24b 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -472,9 +472,17 @@ static int nbd_co_flush(BlockDriverState *bs)
+
+ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+-    bs->bl.max_pdiscard = NBD_MAX_BUFFER_SIZE;
+-    bs->bl.max_pwrite_zeroes = NBD_MAX_BUFFER_SIZE;
+-    bs->bl.max_transfer = NBD_MAX_BUFFER_SIZE;
++    NBDClientSession *s = nbd_get_client_session(bs);
++    uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
++
++    bs->bl.max_pdiscard = max;
++    bs->bl.max_pwrite_zeroes = max;
++    bs->bl.max_transfer = max;
++
++    if (s->info.opt_block &&
++        s->info.opt_block > bs->bl.opt_transfer) {
++        bs->bl.opt_transfer = s->info.opt_block;
++    }
  }
 
-+/* Send a reply to NBD_OPT_EXPORT_NAME.
-+ * Return -errno on error, 0 on success. */
- static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
-                                             uint16_t myflags, bool no_zeroes,
-                                             Error **errp)
-@@ -323,6 +326,162 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
-     return 0;
- }
+ static void nbd_close(BlockDriverState *bs)
+diff --git a/nbd/client.c b/nbd/client.c
+index cb55f3d..af2b46d 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -369,12 +369,17 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+     info->flags = 0;
 
-+/* Send a single NBD_REP_INFO, with a buffer @buf of @length bytes.
-+ * The buffer does NOT include the info type prefix.
-+ * Return -errno on error, 0 if ready to send more. */
-+static int nbd_negotiate_send_info(NBDClient *client, uint32_t opt,
-+                                   uint16_t info, uint32_t length, void *buf,
-+                                   Error **errp)
-+{
-+    int rc;
-+
-+    trace_nbd_negotiate_send_info(info, nbd_info_lookup(info), length);
-+    rc = nbd_negotiate_send_rep_len(client->ioc, NBD_REP_INFO, opt,
-+                                    sizeof(info) + length, errp);
-+    if (rc < 0) {
-+        return rc;
+     trace_nbd_opt_go_start(wantname);
+-    buf = g_malloc(4 + len + 2 + 1);
++    buf = g_malloc(4 + len + 2 + 2 * info->request_sizes + 1);
+     stl_be_p(buf, len);
+     memcpy(buf + 4, wantname, len);
+-    /* No requests, live with whatever server sends */
+-    stw_be_p(buf + 4 + len, 0);
+-    if (nbd_send_option_request(ioc, NBD_OPT_GO, len + 6, buf, errp) < 0) {
++    /* At most one request, everything else up to server */
++    stw_be_p(buf + 4 + len, info->request_sizes);
++    if (info->request_sizes) {
++        stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
 +    }
-+    cpu_to_be16s(&info);
-+    if (nbd_write(client->ioc, &info, sizeof(info), errp) < 0) {
-+        return -EIO;
-+    }
-+    if (nbd_write(client->ioc, buf, length, errp) < 0) {
-+        return -EIO;
-+    }
-+    return 0;
-+}
-+
-+/* Handle NBD_OPT_INFO and NBD_OPT_GO.
-+ * Return -errno on error, 0 if ready for next option, and 1 to move
-+ * into transmission phase.  */
-+static int nbd_negotiate_handle_info(NBDClient *client, uint32_t length,
-+                                     uint32_t opt, uint16_t myflags,
-+                                     Error **errp)
-+{
-+    int rc;
-+    char name[NBD_MAX_NAME_SIZE + 1];
-+    NBDExport *exp;
-+    uint16_t requests;
-+    uint16_t request;
-+    uint32_t namelen;
-+    bool sendname = false;
-+    char buf[sizeof(uint64_t) + sizeof(uint16_t)];
-+    const char *msg;
-+
-+    /* Client sends:
-+        4 bytes: L, name length (can be 0)
-+        L bytes: export name
-+        2 bytes: N, number of requests (can be 0)
-+        N * 2 bytes: N requests
-+    */
-+    if (length < sizeof(namelen) + sizeof(requests)) {
-+        msg = "overall request too short";
-+        goto invalid;
-+    }
-+    if (nbd_read(client->ioc, &namelen, sizeof(namelen), errp) < 0) {
-+        return -EIO;
-+    }
-+    be32_to_cpus(&namelen);
-+    length -= sizeof(namelen);
-+    if (namelen > length - sizeof(requests) || (length - namelen) % 2) {
-+        msg = "name length is incorrect";
-+        goto invalid;
-+    }
-+    if (nbd_read(client->ioc, name, namelen, errp) < 0) {
-+        return -EIO;
-+    }
-+    name[namelen] = '\0';
-+    length -= namelen;
-+    trace_nbd_negotiate_handle_export_name_request(name);
-+
-+    if (nbd_read(client->ioc, &requests, sizeof(requests), errp) < 0) {
-+        return -EIO;
-+    }
-+    be16_to_cpus(&requests);
-+    length -= sizeof(requests);
-+    trace_nbd_negotiate_handle_info_requests(requests);
-+    if (requests != length / sizeof(request)) {
-+        msg = "incorrect number of  requests for overall length";
-+        goto invalid;
-+    }
-+    while (requests--) {
-+        if (nbd_read(client->ioc, &request, sizeof(request), errp) < 0) {
-+            return -EIO;
-+        }
-+        be16_to_cpus(&request);
-+        length -= sizeof(request);
-+        trace_nbd_negotiate_handle_info_request(request,
-+                                                nbd_info_lookup(request));
-+        /* For now, we only care about NBD_INFO_NAME; everything else
-+         * is either a request we don't know or something we send
-+         * regardless of request. */
-+        if (request == NBD_INFO_NAME) {
-+            sendname = true;
-+        }
-+    }
-+
-+    exp = nbd_export_find(name);
-+    if (!exp) {
-+        return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_UNKNOWN,
-+                                          opt, errp, "export '%s' not present",
-+                                          name);
-+    }
-+
-+    /* Don't bother sending NBD_INFO_NAME unless client requested it */
-+    if (sendname) {
-+        rc = nbd_negotiate_send_info(client, opt, NBD_INFO_NAME, length, name,
-+                                     errp);
-+        if (rc < 0) {
-+            return rc;
-+        }
-+    }
-+
-+    /* Send NBD_INFO_DESCRIPTION only if available, regardless of
-+     * client request */
-+    if (exp->description) {
-+        size_t len = strlen(exp->description);
-+
-+        rc = nbd_negotiate_send_info(client, opt, NBD_INFO_DESCRIPTION,
-+                                     len, exp->description, errp);
-+        if (rc < 0) {
-+            return rc;
-+        }
-+    }
-+
-+    /* Send NBD_INFO_EXPORT always */
-+    trace_nbd_negotiate_new_style_size_flags(exp->size,
-+                                             exp->nbdflags | myflags);
-+    stq_be_p(buf, exp->size);
-+    stw_be_p(buf + 8, exp->nbdflags | myflags);
-+    rc = nbd_negotiate_send_info(client, opt, NBD_INFO_EXPORT,
-+                                 sizeof(buf), buf, errp);
-+    if (rc < 0) {
-+        return rc;
-+    }
-+
-+    /* Final reply */
-+    rc = nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, opt, errp);
-+    if (rc < 0) {
-+        return rc;
-+    }
-+
-+    if (opt == NBD_OPT_GO) {
-+        client->exp = exp;
-+        QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
-+        nbd_export_get(client->exp);
-+        rc = 1;
-+    }
-+    return rc;
-+
-+ invalid:
-+    if (nbd_drop(client->ioc, length, errp) < 0) {
-+        return -EIO;
-+    }
-+    return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID, opt,
-+                                      errp, "%s", msg);
-+}
-+
-+
- /* Handle NBD_OPT_STARTTLS. Return NULL to drop connection, or else the
-  * new channel for all further (now-encrypted) communication. */
- static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
-@@ -380,7 +539,8 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
- }
++    if (nbd_send_option_request(ioc, NBD_OPT_GO,
++                                4 + len + 2 + 2 * info->request_sizes, buf,
++                                errp) < 0) {
+         return -1;
+     }
 
- /* nbd_negotiate_options
-- * Process all NBD_OPT_* client option commands.
-+ * Process all NBD_OPT_* client option commands, during fixed newstyle
-+ * negotiation.
-  * Return:
-  * -errno  on error, errp is set
-  * 0       on successful negotiation, errp is not set
-@@ -397,7 +557,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-     /* Client sends:
-         [ 0 ..   3]   client flags
+@@ -405,8 +410,9 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             return 1;
+         }
+         if (reply.type != NBD_REP_INFO) {
+-            error_setg(errp, "unexpected reply type %" PRIx32 ", expected %x",
+-                       reply.type, NBD_REP_INFO);
++            error_setg(errp, "unexpected reply type %" PRIx32
++                       " (%s), expected %x",
++                       reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
+             nbd_send_opt_abort(ioc);
+             return -1;
+         }
+@@ -446,6 +452,51 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
+             trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
+             break;
 
--       Then we loop until NBD_OPT_EXPORT_NAME:
-+       Then we loop until NBD_OPT_EXPORT_NAME or NBD_OPT_GO:
-         [ 0 ..   7]   NBD_OPTS_MAGIC
-         [ 8 ..  11]   NBD option
-         [12 ..  15]   Data length
-@@ -524,6 +684,19 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
-                                                         myflags, no_zeroes,
-                                                         errp);
-
-+            case NBD_OPT_INFO:
-+            case NBD_OPT_GO:
-+                ret = nbd_negotiate_handle_info(client, length, option,
-+                                                myflags, errp);
-+                if (ret == 1) {
-+                    assert(option == NBD_OPT_GO);
-+                    return 0;
-+                }
-+                if (ret) {
-+                    return ret;
-+                }
-+                break;
++        case NBD_INFO_BLOCK_SIZE:
++            if (len != sizeof(info->min_block) * 3) {
++                error_setg(errp, "remaining export info len %" PRIu32
++                           " is unexpected size", len);
++                nbd_send_opt_abort(ioc);
++                return -1;
++            }
++            if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
++                         errp) < 0) {
++                error_prepend(errp, "failed to read info minimum block size");
++                nbd_send_opt_abort(ioc);
++                return -1;
++            }
++            be32_to_cpus(&info->min_block);
++            if (!is_power_of_2(info->min_block)) {
++                error_setg(errp, "server minimum block size %" PRId32
++                           "is not a power of two", info->min_block);
++                nbd_send_opt_abort(ioc);
++                return -1;
++            }
++            if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
++                         errp) < 0) {
++                error_prepend(errp, "failed to read info preferred block size");
++                nbd_send_opt_abort(ioc);
++                return -1;
++            }
++            be32_to_cpus(&info->opt_block);
++            if (!is_power_of_2(info->opt_block) ||
++                info->opt_block < info->min_block) {
++                error_setg(errp, "server preferred block size %" PRId32
++                           "is not valid", info->opt_block);
++                nbd_send_opt_abort(ioc);
++                return -1;
++            }
++            if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
++                         errp) < 0) {
++                error_prepend(errp, "failed to read info maximum block size");
++                nbd_send_opt_abort(ioc);
++                return -1;
++            }
++            be32_to_cpus(&info->max_block);
++            trace_nbd_opt_go_info_block_size(info->min_block, info->opt_block,
++                                             info->max_block);
++            break;
 +
-             case NBD_OPT_STARTTLS:
-                 if (nbd_drop(client->ioc, length, errp) < 0) {
-                     return -EIO;
-@@ -606,7 +779,7 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
-         [ 0 ..   7]   passwd       ("NBDMAGIC")
-         [ 8 ..  15]   magic        (NBD_OPTS_MAGIC)
-         [16 ..  17]   server flags (0)
--        ....options sent, ending in NBD_OPT_EXPORT_NAME....
-+        ....options sent, ending in NBD_OPT_EXPORT_NAME or NBD_OPT_GO....
-      */
+         default:
+             trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
+             if (nbd_drop(ioc, len, errp) < 0) {
+@@ -729,8 +780,14 @@ fail:
+ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
+              Error **errp)
+ {
+-    unsigned long sectors = info->size / BDRV_SECTOR_SIZE;
+-    if (info->size / BDRV_SECTOR_SIZE != sectors) {
++    unsigned long sector_size = MAX(BDRV_SECTOR_SIZE, info->min_block);
++    unsigned long sectors = info->size / sector_size;
++
++    /* FIXME: Once the kernel module is patched to honor block sizes,
++     * and to advertise that fact to user space, we should update the
++     * hand-off to the kernel to use any block sizes we learned. */
++    assert(!info->request_sizes);
++    if (info->size / sector_size != sectors) {
+         error_setg(errp, "Export size %" PRId64 " too large for 32-bit kernel",
+                    info->size);
+         return -E2BIG;
+@@ -744,17 +801,17 @@ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
+         return -serrno;
+     }
 
-     qio_channel_set_blocking(client->ioc, false, NULL);
+-    trace_nbd_init_set_block_size(BDRV_SECTOR_SIZE);
++    trace_nbd_init_set_block_size(sector_size);
+
+-    if (ioctl(fd, NBD_SET_BLKSIZE, (unsigned long)BDRV_SECTOR_SIZE) < 0) {
++    if (ioctl(fd, NBD_SET_BLKSIZE, sector_size) < 0) {
+         int serrno = errno;
+         error_setg(errp, "Failed setting NBD block size");
+         return -serrno;
+     }
+
+     trace_nbd_init_set_size(sectors);
+-    if (info->size % BDRV_SECTOR_SIZE) {
+-        trace_nbd_init_trailing_bytes(info->size % BDRV_SECTOR_SIZE);
++    if (info->size % sector_size) {
++        trace_nbd_init_trailing_bytes(info->size % sector_size);
+     }
+
+     if (ioctl(fd, NBD_SET_SIZE_BLOCKS, sectors) < 0) {
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index c8bd47f..78d05be 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -255,7 +255,7 @@ static void *show_parts(void *arg)
+ static void *nbd_client_thread(void *arg)
+ {
+     char *device = arg;
+-    NBDExportInfo info;
++    NBDExportInfo info = { .request_sizes = false, };
+     QIOChannelSocket *sioc;
+     int fd;
+     int ret;
 diff --git a/nbd/trace-events b/nbd/trace-events
-index 765f5f4..80c2447 100644
+index a3ba4bc..b18d051 100644
 --- a/nbd/trace-events
 +++ b/nbd/trace-events
-@@ -33,6 +33,9 @@ nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
- nbd_negotiate_send_rep_list(const char *name, const char *desc) "Advertising export name '%s' description '%s'"
- nbd_negotiate_handle_export_name(void) "Checking length"
- nbd_negotiate_handle_export_name_request(const char *name) "Client requested export '%s'"
-+nbd_negotiate_send_info(int info, const char *name, uint32_t length) "Sending NBD_REP_INFO type %d (%s) with remaining length %" PRIu32
-+nbd_negotiate_handle_info_requests(int requests) "Client requested %d items of info"
-+nbd_negotiate_handle_info_request(int request, const char *name) "Client requested info %d (%s)"
- nbd_negotiate_handle_starttls(void) "Setting up TLS"
- nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
- nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
+@@ -6,6 +6,7 @@ nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understan
+ nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
+ nbd_opt_go_success(void) "Export is good to go"
+ nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
++nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
+ nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
+ nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
+ nbd_receive_starttls_request(void) "Requesting TLS from server"
 -- 
 2.9.4
