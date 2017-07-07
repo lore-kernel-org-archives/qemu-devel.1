@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <t.lamprecht@proxmox.com>) id 1dTN2N-00012W-Jw
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:46:48 -0400
+	(envelope-from <groug@kaod.org>) id 1dTN9H-0002V6-Hg
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <t.lamprecht@proxmox.com>) id 1dTN2K-0003B5-GK
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:46:47 -0400
-Received: from proxmox.maurer-it.com ([212.186.127.180]:25935)
+	(envelope-from <groug@kaod.org>) id 1dTN9E-0007nG-Fj
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:53:55 -0400
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:50852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <t.lamprecht@proxmox.com>)
-	id 1dTN2K-0002rW-45
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:46:44 -0400
-From: Thomas Lamprecht <t.lamprecht@proxmox.com>
-References: <20170601124746.32140-1-t.lamprecht@proxmox.com>
-	<CAJ+F1C+AmJCgtrSTxzhztmBpaNB2Y07grhXvq8DV+8z0Mj6YwA@mail.gmail.com>
-Message-ID: <31b925a2-01df-695a-50d4-995a52a0820b@proxmox.com>
-Date: Fri, 7 Jul 2017 08:40:13 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dTN9E-0007mi-90
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 02:53:52 -0400
+Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 8089769996
+	for <qemu-devel@nongnu.org>; Fri,  7 Jul 2017 08:53:50 +0200 (CEST)
+Date: Fri, 7 Jul 2017 08:53:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170707085342.79d5a33a@bahia.lan>
+In-Reply-To: <1499396048-21657-1-git-send-email-peterx@redhat.com>
+References: <20170706183014.GH12152@localhost.localdomain>
+	<1499396048-21657-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+AmJCgtrSTxzhztmBpaNB2Y07grhXvq8DV+8z0Mj6YwA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC 1/1] qemu-ga: add missing libpcre to MSI build
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/lPQY6ObYRQ7B1J7cz=CIdUO";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2.2 3/4] doc: add item for "-M
+ enforce-config-section"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, lvivier@redhat.com, ehabkost@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 
-Hi,
+--Sig_/lPQY6ObYRQ7B1J7cz=CIdUO
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 06/02/2017 01:42 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->
-> On Thu, Jun 1, 2017 at 5:08 PM Thomas Lamprecht<t.lamprecht@proxmox.com=
->
-> wrote:
->
->> glib depends on libpcre which was not shipped with the MSI, thus
->> starting of the qemu-ga.exe failed with the respective error message.
->>
->> Tell WIXL to ship this library with the MSI to avoid this problem.
->>
->> Signed-off-by: Thomas Lamprecht<t.lamprecht@proxmox.com>
->> CC: Stefan Weil<sw@weilnetz.de>
->> CC: Michael Roth<mdroth@linux.vnet.ibm.com>
->>
-> It depends on your glib build, but since Fedora is one of the most
-> maintained cross mingw- distrib, it make sense to fix the build there.
+On Fri,  7 Jul 2017 10:54:08 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-But even if it isn't best to ship an unnecessary library it shouldn't
-harm either. I'd like to make it nicer but after looking at the complexit=
-y
-of possibilities to do so I rather want to avoid it, especially with my
-almost non-existing knowledge of windows builds.
+> It's never documented, and now we have one more parameter for it (which
+> obsoletes this one). Document it properly.
+>=20
+> Although now when enforce-config-section is set, it'll override the
+> other "-global" parameter, that is not necessarily a rule. Forbid that
+> usage in the document.
+>=20
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-> Other solutions would involve either using wixl-specific require
-> preprocessor directive (which comes with a bunch of unused files since
-> those are mostly generated from mingw*- packages), or coming up with so=
-me
-> kind of dynamic dependency resolution (approach similar to Richard W.M.=
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> Jones nsiswrapper). However this last approach is quite limited, since =
-it
-> doesn't reach to data files etc.
-> In the meantime:
->   Reviewed-by: Marc-Andr=C3=A9 Lureau<marcandre.lureau@redhat.com>
->
+> ---
+> v2.1 -> v2.2
+> - remove the last two lines of document [Eduardo]
+>=20
+>  qemu-options.hx | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 297bd8a..cd95516 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -85,6 +85,12 @@ Enables or disables NVDIMM support. The default is off.
+>  @item s390-squash-mcss=3Don|off
+>  Enables or disables squashing subchannels into the default css.
+>  The default is off.
+> +@item enforce-config-section=3Don|off
+> +If @option{enforce-config-section} is set to @var{on}, force migration
+> +code to send configuration section even if the machine-type sets the
+> +@option{migration.send-configuration} property to @var{off}.
+> +NOTE: this parameter is deprecated. Please use @option{-global}
+> +@option{migration.send-configuration}=3D@var{on|off} instead.
+>  @end table
+>  ETEXI
+> =20
 
-Thank you for the review!Has this any chance to still get into qemu 2.10?=
 
-Would be nice.
+--Sig_/lPQY6ObYRQ7B1J7cz=CIdUO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-cheers,
-Thomas
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
->> I haven't done much with the qga or WIXL, so I send this as a RFC.
->> I hope that I guessed the right people to get CC'ed from MAINTAINERS.
->>
->> This fixes a current qemu-ga MSI build, I tested it successfully with
->> Windows 7
->> and Windows 10 as guest OS.
->>
->> I cross built from a Fedora 25 LXC container.
->>
->> The Guid for the libpcre was generated byhttps://www.guidgen.com/  as
->> suggested
->> by:
->>
->> http://wixtoolset.org/documentation/manual/v3/howtos/general/generate_=
-guids.html
->>
->>   qga/installer/qemu-ga.wxs | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
->> index fa2260cafa..5af11627f8 100644
->> --- a/qga/installer/qemu-ga.wxs
->> +++ b/qga/installer/qemu-ga.wxs
->> @@ -125,6 +125,9 @@
->>             <Component Id=3D"libwinpthread"
->> Guid=3D"{6C117C78-0F47-4B07-8F34-6BEE11643829}">
->>               <File Id=3D"libwinpthread_1.dll" Name=3D"libwinpthread-1=
-=2Edll"
->> Source=3D"$(var.Mingw_bin)/libwinpthread-1.dll" KeyPath=3D"yes" DiskId=
-=3D"1"/>
->>             </Component>
->> +          <Component Id=3D"libpcre"
->> Guid=3D"{7A86B45E-A009-489A-A849-CE3BACF03CD0}">
->> +            <File Id=3D"libpcre_1.dll" Name=3D"libpcre-1.dll"
->> Source=3D"$(var.Mingw_bin)/libpcre-1.dll" KeyPath=3D"yes" DiskId=3D"1"=
-/>
->> +          </Component>
->>             <Component Id=3D"registry_entries"
->> Guid=3D"{D075D109-51CA-11E3-9F8B-000C29858960}">
->>               <RegistryKey Root=3D"HKLM"
->>
->> Key=3D"Software\$(env.QEMU_GA_MANUFACTURER)\$(env.QEMU_GA_DISTRO)\Tool=
-s\QemuGA">
->> @@ -173,6 +176,7 @@
->>         <ComponentRef Id=3D"libssp" />
->>         <ComponentRef Id=3D"libwinpthread" />
->>         <ComponentRef Id=3D"registry_entries" />
->> +      <ComponentRef Id=3D"libpcre" />
->>       </Feature>
->>
->>       <InstallExecuteSequence>
->> --
->> 2.11.0
->>
->>
->>
->> --
-> Marc-Andr=C3=A9 Lureau
->
+iEYEARECAAYFAllfL/YACgkQAvw66wEB28KBTgCfWmVOkur+/1GR//Ey7MErWaHI
+lh4An3nkFSEe01ooInoswtkMNdh8KGqn
+=5r48
+-----END PGP SIGNATURE-----
+
+--Sig_/lPQY6ObYRQ7B1J7cz=CIdUO--
