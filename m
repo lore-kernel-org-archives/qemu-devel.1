@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTSGt-0008Go-Th
+	(envelope-from <cohuck@redhat.com>) id 1dTSGu-0008Gq-El
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dTSGp-0005os-G7
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32794)
+	(envelope-from <cohuck@redhat.com>) id 1dTSGt-0005q1-BZ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSGp-0005oT-Ae
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:03 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dTSGt-0005pa-55
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:22:07 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri,  7 Jul 2017 14:21:52 +0200
-Message-Id: <20170707122159.24714-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 0/7] s390x: zPCI detangling
+Date: Fri,  7 Jul 2017 14:21:54 +0200
+Message-Id: <20170707122159.24714-3-cohuck@redhat.com>
+In-Reply-To: <20170707122159.24714-1-cohuck@redhat.com>
+References: <20170707122159.24714-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 2/7] s390x: chsc nt2 events are pci-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +26,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Current support of zPCI in qemu is still a bit sketchy. For example,
-we're not actually advertising the pci cpu facilities to the guest,
-and therefore a Linux guest will not even try to use any pci devices.
-We're also still missing a proper SIC implementation.
+The nt2 event class is pci-only and therefore implemented in
+the s390x pci code. Properly stub it out for non-pci builds.
 
-This can lead to a situation where pci devices are configured for an
-instance but the guest user is not able to make proper use of them.
-In order to avoid such surprises, it makes sense to be able to configure
-out pci support for s390x so that no pci devices show up in the list
-of available devices.
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c |  4 ++--
+ hw/s390x/s390-pci-bus.h |  4 ++--
+ target/s390x/ioinst.c   | 18 ++++++++++++++++++
+ 3 files changed, 22 insertions(+), 4 deletions(-)
 
-This RFC patch set (also available at github.com/cohuck/qemu no-zpci) tries
-to clean up some of the s390x pci intertwinings so that we can do a non-pci
-build by simply removing 'CONFIG_PCI=y' from the default config. It also
-removes a dependency on pci by kvm code, which is probably unintended (it
-seems all kvm platforms also support pci).
-
-Patch set is RFC as:
-- I'm not sure whether my fencing is architecturally correct, as I don't
-  have access to the respective documentation,
-- I don't really like the #ifdeffery too much.
-
-Cornelia Huck (7):
-  kvm: remove hard dependency on pci
-  s390x: chsc nt2 events are pci-only
-  s390x/sclp: properly guard pci-specific functions
-  s390x/ccw: create s390 phb conditionally
-  s390x/pci: fence off instructions for non-pci
-  s390x/kvm: msi route fixup for non-pci
-  s390x: refine pci dependencies
-
- default-configs/s390x-softmmu.mak |  2 +-
- hw/pci/pci-stub.c                 | 12 ++++++++++++
- hw/s390x/Makefile.objs            |  2 +-
- hw/s390x/s390-pci-bus.c           |  4 ++--
- hw/s390x/s390-pci-bus.h           |  4 ++--
- hw/s390x/s390-virtio-ccw.c        |  9 +++++----
- hw/s390x/sclp.c                   | 17 ++++++++++++++---
- target/s390x/ioinst.c             | 18 ++++++++++++++++++
- target/s390x/kvm.c                | 28 ++++++++++++++++++++++++++++
- 9 files changed, 83 insertions(+), 13 deletions(-)
-
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 5651483781..eee9a04eac 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -47,7 +47,7 @@ S390pciState *s390_get_phb(void)
+     return phb;
+ }
+ 
+-int chsc_sei_nt2_get_event(void *res)
++int pci_chsc_sei_nt2_get_event(void *res)
+ {
+     ChscSeiNt2Res *nt2_res = (ChscSeiNt2Res *)res;
+     PciCcdfAvail *accdf;
+@@ -87,7 +87,7 @@ int chsc_sei_nt2_get_event(void *res)
+     return rc;
+ }
+ 
+-int chsc_sei_nt2_have_event(void)
++int pci_chsc_sei_nt2_have_event(void)
+ {
+     S390pciState *s = s390_get_phb();
+ 
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index cf142a3e68..29d3da10f6 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -318,8 +318,8 @@ typedef struct S390pciState {
+ } S390pciState;
+ 
+ S390pciState *s390_get_phb(void);
+-int chsc_sei_nt2_get_event(void *res);
+-int chsc_sei_nt2_have_event(void);
++int pci_chsc_sei_nt2_get_event(void *res);
++int pci_chsc_sei_nt2_have_event(void);
+ void s390_pci_sclp_configure(SCCB *sccb);
+ void s390_pci_sclp_deconfigure(SCCB *sccb);
+ void s390_pci_iommu_enable(S390PCIIOMMU *iommu);
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index d5e6b8066b..a552f53167 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -599,6 +599,24 @@ static int chsc_sei_nt0_have_event(void)
+     return 0;
+ }
+ 
++static int chsc_sei_nt2_get_event(void *res)
++{
++#ifdef CONFIG_PCI
++    return pci_chsc_sei_nt2_get_event(res);
++#else
++    return 1;
++#endif
++}
++
++static int chsc_sei_nt2_have_event(void)
++{
++#ifdef CONFIG_PCI
++    return pci_chsc_sei_nt2_have_event();
++#else
++    return 0;
++#endif
++}
++
+ #define CHSC_SEI_NT0    (1ULL << 63)
+ #define CHSC_SEI_NT2    (1ULL << 61)
+ static void ioinst_handle_chsc_sei(ChscReq *req, ChscResp *res)
 -- 
 2.13.0
