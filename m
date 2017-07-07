@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dTOOB-0001mW-6A
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:13:24 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTOV9-0003gU-Ep
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dTOOA-0005YP-5y
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:13:23 -0400
-Date: Fri, 7 Jul 2017 09:13:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170707081305.GA15945@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
-	<20170628120530.31251-26-vsementsov@virtuozzo.com>
-	<87r2xs65a5.fsf@dusky.pond.sub.org>
+	(envelope-from <rth7680@gmail.com>) id 1dTOV4-00081h-GH
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:20:35 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dTOV4-00080x-BQ
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 04:20:30 -0400
+Received: by mail-qk0-x241.google.com with SMTP id 16so3429101qkg.2
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 01:20:30 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-9-rth@twiddle.net>
+	<9645bafa-2c7e-96e8-5f3c-9cf7a9415285@physik.fu-berlin.de>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <51a3a21f-6145-d721-170f-b8cf20cbc2d9@twiddle.net>
+Date: Thu, 6 Jul 2017 22:20:24 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87r2xs65a5.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v22 25/30] qmp: add
- x-debug-block-dirty-bitmap-sha256
+In-Reply-To: <9645bafa-2c7e-96e8-5f3c-9cf7a9415285@physik.fu-berlin.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/27] linux-user/sh4: Notice gUSA
+ regions during signal delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-On Fri, Jul 07, 2017 at 10:05:22AM +0200, Markus Armbruster wrote:
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+On 07/06/2017 09:25 PM, John Paul Adrian Glaubitz wrote:
+> On 07/07/2017 04:20 AM, Richard Henderson wrote:
+>> We translate gUSA regions atomically in a parallel context.
+>> But in a serial context a gUSA region may be interrupted.
+>> In that case, restart the region as the kernel would.
 > 
-> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > ---
-> >  block/dirty-bitmap.c         |  5 +++++
-> >  blockdev.c                   | 25 +++++++++++++++++++++++++
-> >  include/block/dirty-bitmap.h |  1 +
-> >  include/qemu/hbitmap.h       |  8 ++++++++
-> >  qapi/block-core.json         | 27 +++++++++++++++++++++++++++
-> >  tests/Makefile.include       |  2 +-
-> >  util/hbitmap.c               | 11 +++++++++++
-> >  7 files changed, 78 insertions(+), 1 deletion(-)
-> [...]
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 5c42cc7790..6ad8585400 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -1644,6 +1644,33 @@
-> >    'data': 'BlockDirtyBitmap' }
-> >  
-> >  ##
-> > +# @BlockDirtyBitmapSha256:
-> > +#
-> > +# SHA256 hash of dirty bitmap data
-> > +#
-> > +# @sha256: ASCII representation of SHA256 bitmap hash
+> This patch is still causing random segfaults, unfortunately:
 > 
-> Spell it SHA-256, please.  The member name @sha256 can stay.
+> Setting up dpkg (1.18.24+b1) ...
+> Setting up perl-base (5.24.1-5) ...
+> Setting up grep (2.27-2) ...
+> Setting up debconf (1.5.62) ...
+> Setting up tzdata (2017b-2) ...
 > 
-> SHA-256 is 256 binary bits.  Please specify how they are represented in
-> ASCII.  It better be base64 (RFC 4648), because we use that elsewhere.
+> Current default time zone: 'Etc/UTC'
+> Local time is now:      Fri Jul  7 07:17:20 UTC 2017.
+> Universal Time is now:  Fri Jul  7 07:17:20 UTC 2017.
+> Run 'dpkg-reconfigure tzdata' if you wish to change it.
+> 
+> qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+> dpkg: error processing package tzdata (--configure):
+>   subprocess installed post-installation script was killed by signal (Segmentation fault)
+> Setting up gzip (1.6-5) ...
+> Setting up dash (0.5.8-2.4) ...
+> Setting up init-system-helpers (1.48) ...
+> Setting up libpam0g:sh4 (1.1.8-3.6) ...
+> Setting up libpam-modules-bin (1.1.8-3.6) ...
+> Setting up bash (4.4-5) ...
 
-It is filled later in this patch using qcrypto_hash_digest, so it is just
-a hex string representing the hash, not base64. For the latter you can
-use qcrypto_hash_base64
+How do I reproduce this from the filesystem image you linked earlier?
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+r~
