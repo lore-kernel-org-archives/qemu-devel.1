@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTNvT-0008Rt-DD
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:43:44 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dTNw1-0000Jk-3C
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTNvQ-0007LF-Bb
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:43:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTNvQ-0007Jb-64
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:43:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170630133139.7907-1-vadim.galitsyn@profitbricks.com>
-	<20170630133139.7907-2-vadim.galitsyn@profitbricks.com>
-	<87lgo0900x.fsf@dusky.pond.sub.org>
-Date: Fri, 07 Jul 2017 09:43:36 +0200
-In-Reply-To: <87lgo0900x.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 07 Jul 2017 09:30:38 +0200")
-Message-ID: <877ezk7kuv.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4] hmp,
- qmp: introduce memory-size-summary commands
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dTNvy-0008Pq-G9
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:44:17 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:54682
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dTNvy-0008P6-92
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 03:44:14 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri,  7 Jul 2017 08:44:00 +0100
+Message-Id: <1499413442-5053-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 1/3] pci: move check for existing devfn into
+ new pci_bus_devfn_available() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Mohammed Gamal <mohammed.gamal@profitbricks.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, marcel@redhat.com
 
-Markus Armbruster <armbru@redhat.com> writes:
+Also touch up the logic in do_pci_register_device() accordingly.
 
-> Sorry for the late review, got a bit overwhelmed...
->
-> Vadim Galitsyn <vadim.galitsyn@profitbricks.com> writes:
->
->> Commands above provide the following memory information in bytes:
->>
->>   * base-memory - amount of unremovable memory specified
->>     with '-m' option at the start of the QEMU process.
->>
->>   * hotpluggable-memory - amount of memory that was hot-plugged.
->>     If target does not have CONFIG_MEM_HOTPLUG enabled, no
->>     value is reported.
->>
->>   * balloon-actual-memory - size of the memory that remains
->>     available to the guest after ballooning, as reported by the
->>     guest. If the guest has not reported its memory, this value
->>     equals to @base-memory + @hot-plug-memory. If ballooning
->>     is not enabled, no value is reported.
->>
->> NOTE:
->>
->>     Parameter @balloon-actual-memory reports the same as
->>     "info balloon" command when ballooning is enabled. The idea
->>     to have it in scope of this command(s) comes from
->>     https://lists.gnu.org/archive/html/qemu-devel/2012-07/msg01472.html.
-[...]
->>  9 files changed, 113 insertions(+), 1 deletion(-)
->>  rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (60%)
->
-> No test coverage?
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/pci/pci.c |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-Maybe no need, because ...
-
-[...]
-> query-memory-size-summary combines three queries:
->
-> (1) base-memory (query can't fail)
->
-> (2) hotpluggable-memory (query must not fail, i.e. &error_abort)
->
-> (3) balloon-actual-memory (query can fail, and we throw away the error
->     then)
->
-> Including (3) adds a failure mode.  The fact that we sweep the failure
-> under the rug doesn't change that.
->
-> Why is this a good idea?
-
-... with (3) and its failure mode removed, there's less need for
-specific tests.  The (future, hopefully near future) generic smoke test
-of queries that can't fail should do.
-
-[...]
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 0c6f74a..04e6edb 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -951,6 +951,15 @@ uint16_t pci_requester_id(PCIDevice *dev)
+     return pci_req_id_cache_extract(&dev->requester_id_cache);
+ }
+ 
++static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
++{
++    if (bus->devices[devfn]) {
++        return false;
++    } else {
++        return true;
++    }
++}
++
+ /* -1 for devfn means auto assign */
+ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+                                          const char *name, int devfn,
+@@ -974,14 +983,15 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+     if (devfn < 0) {
+         for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
+             devfn += PCI_FUNC_MAX) {
+-            if (!bus->devices[devfn])
++            if (pci_bus_devfn_available(bus, devfn)) {
+                 goto found;
++            }
+         }
+         error_setg(errp, "PCI: no slot/function available for %s, all in use",
+                    name);
+         return NULL;
+     found: ;
+-    } else if (bus->devices[devfn]) {
++    } else if (!pci_bus_devfn_available(bus, devfn)) {
+         error_setg(errp, "PCI: slot %d function %d not available for %s,"
+                    " in use by %s",
+                    PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+-- 
+1.7.10.4
