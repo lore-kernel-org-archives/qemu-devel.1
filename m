@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuN-00036c-FO
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTa5b-00020w-J1
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:43:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuL-00043b-Uu
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:23 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Fri,  7 Jul 2017 15:30:49 -0500
-Message-Id: <20170707203049.534-10-eblake@redhat.com>
-In-Reply-To: <20170707203049.534-1-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dTa5a-0002sL-OR
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:42:59 -0400
 References: <20170707203049.534-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 9/9] nbd: Implement NBD_INFO_BLOCK_SIZE on
- client
+	<20170707203049.534-7-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <606ef9a2-3f54-86f4-b07e-ceed58ff4ac6@redhat.com>
+Date: Fri, 7 Jul 2017 15:42:48 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170707203049.534-7-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7eM3hJWpoUN2ptla8BVWN9PuI4Omo5PNK"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/9] nbd: Implement
+ NBD_OPT_GO on server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,264 +26,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org, marcandre.lureau@redhat.com
 
-The upstream NBD Protocol has defined a new extension to allow
-the server to advertise block sizes to the client, as well as
-a way for the client to inform the server whether it intends to
-obey block sizes.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7eM3hJWpoUN2ptla8BVWN9PuI4Omo5PNK
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-block@nongnu.org, marcandre.lureau@redhat.com
+Message-ID: <606ef9a2-3f54-86f4-b07e-ceed58ff4ac6@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v5 6/9] nbd: Implement NBD_OPT_GO on server
+References: <20170707203049.534-1-eblake@redhat.com>
+ <20170707203049.534-7-eblake@redhat.com>
+In-Reply-To: <20170707203049.534-7-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-When using the block layer as the client, we will obey block
-sizes; but when used as 'qemu-nbd -c' to hand off to the
-kernel nbd module as the client, we are still waiting for the
-kernel to implement a way for us to learn if it will honor
-block sizes (perhaps by an addition to sysfs, rather than an
-ioctl), as well as any way to tell the kernel what additional
-block sizes to obey (NBD_SET_BLKSIZE appears to be accurate
-for the minimum size, but preferred and maximum sizes would
-probably be new ioctl()s), so until then, we need to make our
-request for block sizes conditional.
+On 07/07/2017 03:30 PM, Eric Blake wrote:
+> NBD_OPT_EXPORT_NAME is lousy: per the NBD protocol, any failure
+> requires us to close the connection rather than report an error.
+> Therefore, upstream NBD recently added NBD_OPT_GO as the improved
+> version of the option that does what we want [1], along with
+> NBD_OPT_INFO that returns the same information but does not
+> transition to transmission phase.
+>=20
+> [1] https://github.com/NetworkBlockDevice/nbd/blob/extension-info/doc/p=
+roto.md
 
-When using ioctl(NBD_SET_BLKSIZE) to hand off to the kernel,
-use the minimum block size as the sector size if it is larger
-than 512, which also has the nice effect of cooperating with
-(non-qemu) servers that don't do read-modify-write when
-exposing a block device with 4k sectors; it might also allow
-us to visit a file larger than 2T on a 32-bit kernel.
+Unless review turns up a reason for me to respin, I will update this URL
+to the point where the extension was merged into mainline NBD:
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+https://github.com/NetworkBlockDevice/nbd/commit/e6b56c12f8
 
----
-v5: rebase to master
-v4: new patch
----
- include/block/nbd.h |  6 ++++
- block/nbd-client.c  |  4 +++
- block/nbd.c         | 14 +++++++--
- nbd/client.c        | 81 +++++++++++++++++++++++++++++++++++++++++++++--------
- qemu-nbd.c          |  2 +-
- nbd/trace-events    |  1 +
- 6 files changed, 92 insertions(+), 16 deletions(-)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 4a22eca..9c3d0a5 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -144,8 +144,14 @@ enum {
 
- /* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */
- struct NBDExportInfo {
-+    /* Set by client before nbd_receive_negotiate() */
-+    bool request_sizes;
-+    /* Set by server results during nbd_receive_negotiate() */
-     uint64_t size;
-     uint16_t flags;
-+    uint32_t min_block;
-+    uint32_t opt_block;
-+    uint32_t max_block;
- };
- typedef struct NBDExportInfo NBDExportInfo;
+--7eM3hJWpoUN2ptla8BVWN9PuI4Omo5PNK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index aab1e32..25dd284 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -384,6 +384,7 @@ int nbd_client_init(BlockDriverState *bs,
-     logout("session init %s\n", export);
-     qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-+    client->info.request_sizes = true;
-     ret = nbd_receive_negotiate(QIO_CHANNEL(sioc), export,
-                                 tlscreds, hostname,
-                                 &client->ioc, &client->info, errp);
-@@ -398,6 +399,9 @@ int nbd_client_init(BlockDriverState *bs,
-     if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
-         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
-     }
-+    if (client->info.min_block > bs->bl.request_alignment) {
-+        bs->bl.request_alignment = client->info.min_block;
-+    }
+iQEcBAEBCAAGBQJZX/JIAAoJEKeha0olJ0NqlfAH/i52yZm/D3I0kSnjkhJ4Gq9Y
+wUKli15CcCyt9cdSvjxsQ6p5OqiQ7rqiOcjV3J3zfyLJzHoXXjk9ZDOl/P9TerNw
+0Ln/0jf7q6J/HbB58NaCPBXyzuxfO1q1YHUCxocE/nK3LCg8i09jJXjQyEP2aJi8
+agyAWqGRL+TImKywKZTRu2qJsplZcUnIBKEE/u7nLgOoh4kBAEDt5gnXu+AcBUqG
+KS0P297Uk0CbhtjijbFbXrmSkTVs+c8AOjsT176Vp5MexIgwRfZSpKRf2YMV0AXa
+9iYvpkwZw/s1AOx9GWf7zgaN/OGf5Sb/ysS4/OOk8yxSOj5weiKv/q47qkfXeGM=
+=7/Ag
+-----END PGP SIGNATURE-----
 
-     qemu_co_mutex_init(&client->send_mutex);
-     qemu_co_queue_init(&client->free_sema);
-diff --git a/block/nbd.c b/block/nbd.c
-index 4a9048c..a50d24b 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -472,9 +472,17 @@ static int nbd_co_flush(BlockDriverState *bs)
-
- static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
- {
--    bs->bl.max_pdiscard = NBD_MAX_BUFFER_SIZE;
--    bs->bl.max_pwrite_zeroes = NBD_MAX_BUFFER_SIZE;
--    bs->bl.max_transfer = NBD_MAX_BUFFER_SIZE;
-+    NBDClientSession *s = nbd_get_client_session(bs);
-+    uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
-+
-+    bs->bl.max_pdiscard = max;
-+    bs->bl.max_pwrite_zeroes = max;
-+    bs->bl.max_transfer = max;
-+
-+    if (s->info.opt_block &&
-+        s->info.opt_block > bs->bl.opt_transfer) {
-+        bs->bl.opt_transfer = s->info.opt_block;
-+    }
- }
-
- static void nbd_close(BlockDriverState *bs)
-diff --git a/nbd/client.c b/nbd/client.c
-index cb55f3d..af2b46d 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -369,12 +369,17 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-     info->flags = 0;
-
-     trace_nbd_opt_go_start(wantname);
--    buf = g_malloc(4 + len + 2 + 1);
-+    buf = g_malloc(4 + len + 2 + 2 * info->request_sizes + 1);
-     stl_be_p(buf, len);
-     memcpy(buf + 4, wantname, len);
--    /* No requests, live with whatever server sends */
--    stw_be_p(buf + 4 + len, 0);
--    if (nbd_send_option_request(ioc, NBD_OPT_GO, len + 6, buf, errp) < 0) {
-+    /* At most one request, everything else up to server */
-+    stw_be_p(buf + 4 + len, info->request_sizes);
-+    if (info->request_sizes) {
-+        stw_be_p(buf + 4 + len + 2, NBD_INFO_BLOCK_SIZE);
-+    }
-+    if (nbd_send_option_request(ioc, NBD_OPT_GO,
-+                                4 + len + 2 + 2 * info->request_sizes, buf,
-+                                errp) < 0) {
-         return -1;
-     }
-
-@@ -405,8 +410,9 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             return 1;
-         }
-         if (reply.type != NBD_REP_INFO) {
--            error_setg(errp, "unexpected reply type %" PRIx32 ", expected %x",
--                       reply.type, NBD_REP_INFO);
-+            error_setg(errp, "unexpected reply type %" PRIx32
-+                       " (%s), expected %x",
-+                       reply.type, nbd_rep_lookup(reply.type), NBD_REP_INFO);
-             nbd_send_opt_abort(ioc);
-             return -1;
-         }
-@@ -446,6 +452,51 @@ static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-             trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
-             break;
-
-+        case NBD_INFO_BLOCK_SIZE:
-+            if (len != sizeof(info->min_block) * 3) {
-+                error_setg(errp, "remaining export info len %" PRIu32
-+                           " is unexpected size", len);
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            if (nbd_read(ioc, &info->min_block, sizeof(info->min_block),
-+                         errp) < 0) {
-+                error_prepend(errp, "failed to read info minimum block size");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            be32_to_cpus(&info->min_block);
-+            if (!is_power_of_2(info->min_block)) {
-+                error_setg(errp, "server minimum block size %" PRId32
-+                           "is not a power of two", info->min_block);
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            if (nbd_read(ioc, &info->opt_block, sizeof(info->opt_block),
-+                         errp) < 0) {
-+                error_prepend(errp, "failed to read info preferred block size");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            be32_to_cpus(&info->opt_block);
-+            if (!is_power_of_2(info->opt_block) ||
-+                info->opt_block < info->min_block) {
-+                error_setg(errp, "server preferred block size %" PRId32
-+                           "is not valid", info->opt_block);
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            if (nbd_read(ioc, &info->max_block, sizeof(info->max_block),
-+                         errp) < 0) {
-+                error_prepend(errp, "failed to read info maximum block size");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            be32_to_cpus(&info->max_block);
-+            trace_nbd_opt_go_info_block_size(info->min_block, info->opt_block,
-+                                             info->max_block);
-+            break;
-+
-         default:
-             trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
-             if (nbd_drop(ioc, len, errp) < 0) {
-@@ -729,8 +780,14 @@ fail:
- int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
-              Error **errp)
- {
--    unsigned long sectors = info->size / BDRV_SECTOR_SIZE;
--    if (info->size / BDRV_SECTOR_SIZE != sectors) {
-+    unsigned long sector_size = MAX(BDRV_SECTOR_SIZE, info->min_block);
-+    unsigned long sectors = info->size / sector_size;
-+
-+    /* FIXME: Once the kernel module is patched to honor block sizes,
-+     * and to advertise that fact to user space, we should update the
-+     * hand-off to the kernel to use any block sizes we learned. */
-+    assert(!info->request_sizes);
-+    if (info->size / sector_size != sectors) {
-         error_setg(errp, "Export size %" PRId64 " too large for 32-bit kernel",
-                    info->size);
-         return -E2BIG;
-@@ -744,17 +801,17 @@ int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
-         return -serrno;
-     }
-
--    trace_nbd_init_set_block_size(BDRV_SECTOR_SIZE);
-+    trace_nbd_init_set_block_size(sector_size);
-
--    if (ioctl(fd, NBD_SET_BLKSIZE, (unsigned long)BDRV_SECTOR_SIZE) < 0) {
-+    if (ioctl(fd, NBD_SET_BLKSIZE, sector_size) < 0) {
-         int serrno = errno;
-         error_setg(errp, "Failed setting NBD block size");
-         return -serrno;
-     }
-
-     trace_nbd_init_set_size(sectors);
--    if (info->size % BDRV_SECTOR_SIZE) {
--        trace_nbd_init_trailing_bytes(info->size % BDRV_SECTOR_SIZE);
-+    if (info->size % sector_size) {
-+        trace_nbd_init_trailing_bytes(info->size % sector_size);
-     }
-
-     if (ioctl(fd, NBD_SET_SIZE_BLOCKS, sectors) < 0) {
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index c8bd47f..78d05be 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -255,7 +255,7 @@ static void *show_parts(void *arg)
- static void *nbd_client_thread(void *arg)
- {
-     char *device = arg;
--    NBDExportInfo info;
-+    NBDExportInfo info = { .request_sizes = false, };
-     QIOChannelSocket *sioc;
-     int fd;
-     int ret;
-diff --git a/nbd/trace-events b/nbd/trace-events
-index a3ba4bc..b18d051 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -6,6 +6,7 @@ nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understan
- nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
- nbd_opt_go_success(void) "Export is good to go"
- nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
-+nbd_opt_go_info_block_size(uint32_t minimum, uint32_t preferred, uint32_t maximum) "Block sizes are 0x%" PRIx32 ", 0x%" PRIx32 ", 0x%" PRIx32
- nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
- nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
- nbd_receive_starttls_request(void) "Requesting TLS from server"
--- 
-2.9.4
+--7eM3hJWpoUN2ptla8BVWN9PuI4Omo5PNK--
