@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTRcc-0004qm-D6
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dTRe1-0005bm-ET
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTRcZ-0002zF-8R
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:30 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:33974 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dTRcY-0002yo-NS
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:40:27 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri,  7 Jul 2017 13:40:08 +0200
-Message-Id: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dTRdy-0003yj-Ae
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:41:57 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dTRdy-0003yA-4y
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:41:54 -0400
+Received: by mail-qk0-x241.google.com with SMTP id 91so3917952qkq.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Jul 2017 04:41:54 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1499381754.git.alistair.francis@xilinx.com>
+	<9d26b170ca9768d20b4e7b70ce5d93d8063818c3.1499381754.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9fbdbe04-075b-97f7-6bb4-36bfa5f2c500@amsat.org>
+Date: Fri, 7 Jul 2017 08:41:49 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v12 00/27] translate: [tcg] Generic translation
- framework
+In-Reply-To: <9d26b170ca9768d20b4e7b70ce5d93d8063818c3.1499381754.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 6/6] Convert error_report*_err() to
+ warn_report*_err()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,216 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This series proposes a generic (target-agnostic) instruction translation
-framework.
+Hi Francis,
 
-It basically provides a generic main loop for instruction disassembly, wh=
-ich
-calls target-specific functions when necessary. This generalization makes
-inserting new code in the main loop easier, and helps in keeping all targ=
-ets in
-synch as to the contents of it.
+On 07/06/2017 08:49 PM, Alistair Francis wrote:
+> Convert all uses of error_report*_err("[Ww]arning:"... to use
 
-This series also paves the way towards adding events to trace guest code
-execution (BBLs and instructions).
+this is not the regex you used, maybe just use "Warning:"...
 
-I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
-in the
-current organization, but will port the rest when this series gets merged.
+> warn_report*_err() instead. This helps standardise on a single
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
+standardize? "Enforce single method ..."?
 
-Changes in v12
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> method of printing warnings to the user.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 
-* Do not rename cs -> cpu when using CPUState arg in gen_intermediate_cod=
-e().
-* Avoid merge conflicts with queued patches.
-* Fix documentation typos.
-* Rename translate_block -> translator_loop.
-* Fix misplaced changes (wrong patch).
-* Rename _trblock_ -> _tr_.
-* Drop DISAS_SS and DISAS_PAGE_CROSS from arm targets.
-* Refactor calculation of TranslatorOps in arm targets.
-* Merge init_globals() into init_disas_context().
-* Minor cosmetic changes.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-
-Changes in v11
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Convert gen_intermediate_code_a64 [Emilio G. Cota].
-* Replace "cpu_env" argument in icount functions with "tcg_ctx.cpu_env"
-  [Emilio G. Cota].
-* Drop QTAILQ_FOREACH_CONTINUE and cpu_breakpoint_get in favour of an exp=
-licit
-  breakpoint traversal [Richard Henderson].
-* Rename translate-block.[ch] into translator.[ch] [Emilio G. Cota].
-* Revert DJ_* names into DISAS_*, and provide generic DISAS_TARGET_* enum=
- values
-  instead of defining them as integers on each target.
-* Do not use DisasContextBase directly in target code (helps the compiler=
-'s
-  alias analysis) [Richard Henderson].
-* Make all generic translator hooks mandatory [Richard Henderson].
-* Rename TranslatorOps::disas_insn as TranslatorOps::translate_insn
-  [Richard Henderson].
-* Generalize TranslatorOps::disas_flags into TranslatorOps::disas_log to =
-support
-  future targets [Richard Henderson].
-* Split arm and aarch64 changes in different patches [Emilio G. Cota].
-* Make translator op structs constant [Richard Henderson].
-* Write a single entry point for both arm and aarch64 translation
-  [Richard Henderson].
-* Change format of commit titles [Emilio G. Cota].
-* Remove cross-page check from generic code (it's already embedded in mor=
-e
-  complex, and mandatory, checks in most targets).
-
-
-Changes in v10
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 931892e8a6.
-* Fix build errors for hppa, nios2 and openrisc.
-
-
-Changes in v9
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Further increase inter-mail sleep time during sending.
-
-
-Changes in v8
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Increase inter-mail sleep time during sending (list keeps refusing some=
- emails
-  due to an excessive send rate).
-
-
-Changes in v7
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Change BreakpointHitType (BH_*) for BreakpointCheckType (BC_*).
-* Move target-specific translation functions to a struct (TranslatorOps).
-* Split target-specific changes into multiple patches.
-* Rebase on edf8bc9842.
-
-
-Changes in v6
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on upstream master (64175afc69).
-* Reorder fields in DisasContextBase to minimize padding [Richard Henders=
-on].
-
-
-Changes in v5
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Remove stray uses of "restrict" keyword.
-
-
-Changes in v4
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
-* Fix coding style errors reported by checkpatch.
-* Remove use of "restrict" in added functions; it makes older gcc version=
-s barf
-  about compilation errors.
-
-
-Changes in v3
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 0737f32daf.
-
-
-Changes in v2
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Port ARM and AARCH64 targets.
-* Fold single-stepping checks into "max_insns" [Richard Henderson].
-* Move instruction start marks to target code [Richard Henderson].
-* Add target hook for TB start.
-* Check for TCG temporary leaks.
-* Move instruction disassembly into a target hook.
-* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
-
-
-Llu=C3=ADs Vilanova (27):
-      Pass generic CPUState to gen_intermediate_code()
-      cpu-exec: Avoid global variables in icount-related functions
-      target: [tcg] Use a generic enum for DISAS_ values
-      target: [tcg] Add generic translation framework
-      target/i386: [tcg] Port to DisasContextBase
-      target/i386: [tcg] Port to init_disas_context
-      target/i386: [tcg] Port to insn_start
-      target/i386: [tcg] Port to breakpoint_check
-      target/i386: [tcg] Port to translate_insn
-      target/i386: [tcg] Port to tb_stop
-      target/i386: [tcg] Port to disas_log
-      target/i386: [tcg] Port to generic translation framework
-      target/arm: [tcg] Port to DisasContextBase
-      target/arm: [tcg] Port to init_disas_context
-      target/arm: [tcg,a64] Port to init_disas_context
-      target/arm: [tcg] Port to tb_start
-      target/arm: [tcg] Port to insn_start
-      target/arm: [tcg,a64] Port to insn_start
-      target/arm: [tcg] Port to breakpoint_check
-      target/arm: [tcg,a64] Port to breakpoint_check
-      target/arm: [tcg] Port to translate_insn
-      target/arm: [tcg,a64] Port to translate_insn
-      target/arm: [tcg] Port to tb_stop
-      target/arm: [tcg,a64] Port to tb_stop
-      target/arm: [tcg] Port to disas_log
-      target/arm: [tcg,a64] Port to disas_log
-      target/arm: [tcg] Port to generic translation framework
-
-
- accel/tcg/Makefile.objs       |    1=20
- accel/tcg/translate-all.c     |    2=20
- accel/tcg/translator.c        |  152 +++++++++++++++
- include/exec/exec-all.h       |    8 -
- include/exec/gen-icount.h     |   12 +
- include/exec/translator.h     |  138 +++++++++++++
- target/alpha/translate.c      |    5=20
- target/arm/translate-a64.c    |  275 +++++++++++++--------------
- target/arm/translate.c        |  420 +++++++++++++++++++++--------------=
-------
- target/arm/translate.h        |   39 ++--
- target/cris/translate.c       |   14 +
- target/hppa/translate.c       |    5=20
- target/i386/translate.c       |  300 +++++++++++++++--------------
- target/lm32/translate.c       |   10 +
- target/m68k/translate.c       |   12 +
- target/microblaze/translate.c |   10 +
- target/mips/translate.c       |    5=20
- target/moxie/translate.c      |    4=20
- target/nios2/translate.c      |   11 +
- target/openrisc/translate.c   |   10 +
- target/ppc/translate.c        |    5=20
- target/s390x/translate.c      |    8 -
- target/sh4/translate.c        |    5=20
- target/sparc/translate.c      |    5=20
- target/tilegx/translate.c     |    5=20
- target/tricore/translate.c    |    5=20
- target/unicore32/translate.c  |   12 +
- target/xtensa/translate.c     |    9 +
- 28 files changed, 899 insertions(+), 588 deletions(-)
- create mode 100644 accel/tcg/translator.c
- create mode 100644 include/exec/translator.h
-
-
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Cc: Emilio G. Cota <cota@braap.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> ---
+> 
+>   hw/core/qdev-properties.c | 2 +-
+>   hw/i386/pc.c              | 3 +--
+>   2 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index f5983c83da..3d0bba21a2 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1169,7 +1169,7 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
+>                   error_propagate(prop->errp, err);
+>               } else {
+>                   assert(prop->user_provided);
+> -                error_reportf_err(err, "Warning: ");
+> +                warn_report_err(err);
+>               }
+>           }
+>       }
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 58f8a4f4a5..5c2cc3f836 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1320,8 +1320,7 @@ void pc_acpi_init(const char *default_dsdt)
+>   
+>           acpi_table_add_builtin(opts, &err);
+>           if (err) {
+> -            error_reportf_err(err, "WARNING: failed to load %s: ",
+> -                              filename);
+> +            warn_reportf_err(err, "failed to load %s: ", filename);
+>           }
+>           g_free(filename);
+>       }
+> 
