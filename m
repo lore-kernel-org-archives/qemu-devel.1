@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUHq-00016y-03
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:15 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUHq-00017m-VI
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUHo-0007h6-LM
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dTUHq-0007hg-2H
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 10:31:14 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri,  7 Jul 2017 17:30:25 +0300
-Message-Id: <20170707143028.692-2-pbutsykin@virtuozzo.com>
+Date: Fri,  7 Jul 2017 17:30:26 +0300
+Message-Id: <20170707143028.692-3-pbutsykin@virtuozzo.com>
 In-Reply-To: <20170707143028.692-1-pbutsykin@virtuozzo.com>
 References: <20170707143028.692-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 1/4] qemu-img: add --shrink flag for resize
+Subject: [Qemu-devel] [PATCH v3 2/4] qcow2: add qcow2_cache_discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +24,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-The flag as additional precaution of data loss. Perhaps in the future the
-operation shrink without this flag will be blocked for all formats, but while
-we need to maintain compatibility with raw.
+Whenever l2/refcount table clusters are discarded from the file we can
+automatically drop unnecessary content of the cache tables. This reduces
+the chance of eviction useful cache data and eliminates inconsistent data
+in the cache with the data in the file.
 
 Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 ---
- qemu-img-cmds.hx       |  4 ++--
- qemu-img.c             | 23 +++++++++++++++++++++++
- qemu-img.texi          |  7 ++++++-
- tests/qemu-iotests/102 |  4 ++--
- 4 files changed, 33 insertions(+), 5 deletions(-)
+ block/qcow2-cache.c    | 26 ++++++++++++++++++++++++++
+ block/qcow2-refcount.c | 14 ++++++++++++++
+ block/qcow2.h          |  3 +++
+ 3 files changed, 43 insertions(+)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index a39fcdba71..3b2eab9d20 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -76,9 +76,9 @@ STEXI
- ETEXI
- 
- DEF("resize", img_resize,
--    "resize [--object objectdef] [--image-opts] [-q] filename [+ | -]size")
-+    "resize [--object objectdef] [--image-opts] [-q] [--shrink] filename [+ | -]size")
- STEXI
--@item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
-+@item resize [--object @var{objectdef}] [--image-opts] [-q] [--shrink] @var{filename} [+ | -]@var{size}
- ETEXI
- 
- DEF("amend", img_amend,
-diff --git a/qemu-img.c b/qemu-img.c
-index 91ad6bebbf..9773e835e4 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -61,6 +61,7 @@ enum {
-     OPTION_FLUSH_INTERVAL = 261,
-     OPTION_NO_DRAIN = 262,
-     OPTION_TARGET_IMAGE_OPTS = 263,
-+    OPTION_SHRINK = 264,
- };
- 
- typedef enum OutputFormat {
-@@ -3458,6 +3459,7 @@ static int img_resize(int argc, char **argv)
-         },
-     };
-     bool image_opts = false;
-+    bool shrink = false;
- 
-     /* Remove size from argv manually so that negative numbers are not treated
-      * as options by getopt. */
-@@ -3475,6 +3477,7 @@ static int img_resize(int argc, char **argv)
-             {"help", no_argument, 0, 'h'},
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"shrink", no_argument, 0, OPTION_SHRINK},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":f:hq",
-@@ -3509,6 +3512,9 @@ static int img_resize(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-+        case OPTION_SHRINK:
-+            shrink = true;
-+            break;
-         }
-     }
-     if (optind != argc - 1) {
-@@ -3568,6 +3574,23 @@ static int img_resize(int argc, char **argv)
-         goto out;
-     }
- 
-+    if (total_size < blk_getlength(blk) && !shrink) {
-+        error_report("Warning: Shrinking an image will delete all data beyond"
-+                     "the shrunken image's end. Before performing such an"
-+                     "operation, make sure there is no important data there.");
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 1d25147392..75746a7f43 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -411,3 +411,29 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
+     assert(c->entries[i].offset != 0);
+     c->entries[i].dirty = true;
+ }
 +
-+        if (g_strcmp0(bdrv_get_format_name(blk_bs(blk)), "raw") != 0) {
-+            error_report(
-+              "Use the --shrink option to perform a shrink operation.");
-+            ret = -1;
-+            goto out;
-+        } else {
-+            error_report("Using the --shrink option will suppress this message."
-+                         "Note that future versions of qemu-img may refuse to "
-+                         "shrink images without this option!");
++void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
++                                  uint64_t offset)
++{
++    int i;
++
++    for (i = 0; i < c->size; i++) {
++        if (c->entries[i].offset == offset) {
++            return qcow2_cache_get_table_addr(bs, c, i);
 +        }
 +    }
++    return NULL;
++}
 +
-     ret = blk_truncate(blk, total_size, &err);
-     if (!ret) {
-         qprintf(quiet, "Image resized.\n");
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 5b925ecf41..6324abef48 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -499,7 +499,7 @@ qemu-img rebase -b base.img diff.qcow2
- At this point, @code{modified.img} can be discarded, since
- @code{base.img + diff.qcow2} contains the same information.
- 
--@item resize @var{filename} [+ | -]@var{size}
-+@item resize [--shrink] @var{filename} [+ | -]@var{size}
- 
- Change the disk image as if it had been created with @var{size}.
- 
-@@ -507,6 +507,11 @@ Before using this command to shrink a disk image, you MUST use file system and
- partitioning tools inside the VM to reduce allocated file systems and partition
- sizes accordingly.  Failure to do so will result in data loss!
- 
-+@code{--shrink} informs qemu-img that the user is certain about wanting
-+to shrink an image and is aware that any data beyond the truncated
-+image's end will be lost. Trying to shrink an image without this option
-+results in a warning; future versions may make it an error.
++void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
++{
++    int i = qcow2_cache_get_table_idx(bs, c, table);
 +
- After using this command to grow a disk image, you must use file system and
- partitioning tools inside the VM to actually begin using the new space on the
- device.
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 87db1bb1bf..d7ad8d9840 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -54,7 +54,7 @@ _make_test_img $IMG_SIZE
- $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
- # Remove data cluster from image (first cluster: image header, second: reftable,
- # third: refblock, fourth: L1 table, fifth: L2 table)
--$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
-+$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
++    assert(c->entries[i].ref == 0);
++
++    c->entries[i].offset = 0;
++    c->entries[i].lru_counter = 0;
++    c->entries[i].dirty = false;
++
++    qcow2_cache_table_release(bs, c, i, 1);
++}
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 7c06061aae..0141c9cbe7 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -767,6 +767,20 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+         s->set_refcount(refcount_block, block_index, refcount);
  
- $QEMU_IO -c map "$TEST_IMG"
- $QEMU_IMG map "$TEST_IMG"
-@@ -69,7 +69,7 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
+         if (refcount == 0 && s->discard_passthrough[type]) {
++            void *table;
++
++            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
++                                                offset);
++            if (table != NULL) {
++                qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
++                qcow2_cache_discard(bs, s->refcount_block_cache, table);
++            }
++
++            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
++            if (table != NULL) {
++                qcow2_cache_discard(bs, s->l2_table_cache, table);
++            }
++
+             update_refcount_discard(bs, cluster_offset, s->cluster_size);
+         }
+     }
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 87b15eb4aa..bf6691dbd0 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -604,5 +604,8 @@ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+     void **table);
+ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
++void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
++                                  uint64_t offset);
++void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
  
- qemu_comm_method=monitor _launch_qemu -drive if=none,file="$TEST_IMG",id=drv0
- 
--$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
-+$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
- 
- _send_qemu_cmd $QEMU_HANDLE 'qemu-io drv0 map' 'allocated' \
-     | sed -e 's/^(qemu).*qemu-io drv0 map...$/(qemu) qemu-io drv0 map/'
+ #endif
 -- 
 2.13.0
