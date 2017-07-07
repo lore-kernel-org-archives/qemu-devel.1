@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmD-0006Fm-Rf
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmG-0006JP-8J
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmC-0000XI-75
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:45 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmB-0000WO-JR
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:48 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:24 +0200
-Message-Id: <1499447335-6125-70-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:20 +0200
+Message-Id: <1499447335-6125-66-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 069/100] qcow2-refcount: rename inc_refcounts()
- and make it public
+Subject: [Qemu-devel] [PULL 065/100] hbitmap: improve dirty iter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,177 +24,103 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This is needed for the following patch, which will introduce refcounts
-checking for qcow2 bitmaps.
+Make dirty iter resistant to resetting bits in corresponding HBitmap.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170628120530.31251-8-vsementsov@virtuozzo.com
-[mreitz: s/inc_refcounts/qcow2_inc_refcounts_imrt/ in one more (new)
-         place]
+Message-id: 20170628120530.31251-4-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-refcount.c | 59 ++++++++++++++++++++++++++------------------------
- block/qcow2.h          |  4 ++++
- 2 files changed, 35 insertions(+), 28 deletions(-)
+ include/qemu/hbitmap.h | 26 ++++----------------------
+ util/hbitmap.c         | 23 ++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 23 deletions(-)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 81c22e6..8add3d5 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1323,11 +1323,10 @@ static int realloc_refcount_array(BDRVQcow2State *s, void **array,
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 9239fe5..6b04391 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -256,10 +256,9 @@ void hbitmap_free(HBitmap *hb);
+  * the lowest-numbered bit that is set in @hb, starting at @first.
   *
-  * Modifies the number of errors in res.
+  * Concurrent setting of bits is acceptable, and will at worst cause the
+- * iteration to miss some of those bits.  Resetting bits before the current
+- * position of the iterator is also okay.  However, concurrent resetting of
+- * bits can lead to unexpected behavior if the iterator has not yet reached
+- * those bits.
++ * iteration to miss some of those bits.
++ *
++ * The concurrent resetting of bits is OK.
   */
--static int inc_refcounts(BlockDriverState *bs,
--                         BdrvCheckResult *res,
--                         void **refcount_table,
--                         int64_t *refcount_table_size,
--                         int64_t offset, int64_t size)
-+int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
-+                             void **refcount_table,
-+                             int64_t *refcount_table_size,
-+                             int64_t offset, int64_t size)
+ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
+ 
+@@ -298,24 +297,7 @@ void hbitmap_free_meta(HBitmap *hb);
+  * Return the next bit that is set in @hbi's associated HBitmap,
+  * or -1 if all remaining bits are zero.
+  */
+-static inline int64_t hbitmap_iter_next(HBitmapIter *hbi)
+-{
+-    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1];
+-    int64_t item;
+-
+-    if (cur == 0) {
+-        cur = hbitmap_iter_skip_words(hbi);
+-        if (cur == 0) {
+-            return -1;
+-        }
+-    }
+-
+-    /* The next call will resume work from the next bit.  */
+-    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
+-    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+-
+-    return item << hbi->granularity;
+-}
++int64_t hbitmap_iter_next(HBitmapIter *hbi);
+ 
+ /**
+  * hbitmap_iter_next_word:
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 35088e1..0b38817 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -106,8 +106,9 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+ 
+     unsigned long cur;
+     do {
+-        cur = hbi->cur[--i];
++        i--;
+         pos >>= BITS_PER_LEVEL;
++        cur = hbi->cur[i] & hb->levels[i][pos];
+     } while (cur == 0);
+ 
+     /* Check for end of iteration.  We always use fewer than BITS_PER_LONG
+@@ -139,6 +140,26 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+     return cur;
+ }
+ 
++int64_t hbitmap_iter_next(HBitmapIter *hbi)
++{
++    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
++            hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
++    int64_t item;
++
++    if (cur == 0) {
++        cur = hbitmap_iter_skip_words(hbi);
++        if (cur == 0) {
++            return -1;
++        }
++    }
++
++    /* The next call will resume work from the next bit.  */
++    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
++    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
++
++    return item << hbi->granularity;
++}
++
+ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
  {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t start, last, cluster_offset, k, refcount;
-@@ -1420,8 +1419,9 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             nb_csectors = ((l2_entry >> s->csize_shift) &
-                            s->csize_mask) + 1;
-             l2_entry &= s->cluster_offset_mask;
--            ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
--                                l2_entry & ~511, nb_csectors * 512);
-+            ret = qcow2_inc_refcounts_imrt(bs, res,
-+                                           refcount_table, refcount_table_size,
-+                                           l2_entry & ~511, nb_csectors * 512);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -1454,8 +1454,9 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             }
- 
-             /* Mark cluster as used */
--            ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
--                                offset, s->cluster_size);
-+            ret = qcow2_inc_refcounts_imrt(bs, res,
-+                                           refcount_table, refcount_table_size,
-+                                           offset, s->cluster_size);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -1508,8 +1509,8 @@ static int check_refcounts_l1(BlockDriverState *bs,
-     l1_size2 = l1_size * sizeof(uint64_t);
- 
-     /* Mark L1 table as used */
--    ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
--                        l1_table_offset, l1_size2);
-+    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
-+                                   l1_table_offset, l1_size2);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -1538,8 +1539,9 @@ static int check_refcounts_l1(BlockDriverState *bs,
-         if (l2_offset) {
-             /* Mark L2 table as used */
-             l2_offset &= L1E_OFFSET_MASK;
--            ret = inc_refcounts(bs, res, refcount_table, refcount_table_size,
--                                l2_offset, s->cluster_size);
-+            ret = qcow2_inc_refcounts_imrt(bs, res,
-+                                           refcount_table, refcount_table_size,
-+                                           l2_offset, s->cluster_size);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -1757,14 +1759,15 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
-                 }
- 
-                 res->corruptions_fixed++;
--                ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
--                                    offset, s->cluster_size);
-+                ret = qcow2_inc_refcounts_imrt(bs, res,
-+                                               refcount_table, nb_clusters,
-+                                               offset, s->cluster_size);
-                 if (ret < 0) {
-                     return ret;
-                 }
-                 /* No need to check whether the refcount is now greater than 1:
-                  * This area was just allocated and zeroed, so it can only be
--                 * exactly 1 after inc_refcounts() */
-+                 * exactly 1 after qcow2_inc_refcounts_imrt() */
-                 continue;
- 
- resize_fail:
-@@ -1779,8 +1782,8 @@ resize_fail:
-         }
- 
-         if (offset != 0) {
--            ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
--                                offset, s->cluster_size);
-+            ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-+                                           offset, s->cluster_size);
-             if (ret < 0) {
-                 return ret;
-             }
-@@ -1820,8 +1823,8 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     }
- 
-     /* header */
--    ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
--                        0, s->cluster_size);
-+    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-+                                   0, s->cluster_size);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -1842,25 +1845,25 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-             return ret;
-         }
-     }
--    ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
--                        s->snapshots_offset, s->snapshots_size);
-+    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-+                                   s->snapshots_offset, s->snapshots_size);
-     if (ret < 0) {
-         return ret;
-     }
- 
-     /* refcount data */
--    ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
--                        s->refcount_table_offset,
--                        s->refcount_table_size * sizeof(uint64_t));
-+    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-+                                   s->refcount_table_offset,
-+                                   s->refcount_table_size * sizeof(uint64_t));
-     if (ret < 0) {
-         return ret;
-     }
- 
-     /* encryption */
-     if (s->crypto_header.length) {
--        ret = inc_refcounts(bs, res, refcount_table, nb_clusters,
--                            s->crypto_header.offset,
--                            s->crypto_header.length);
-+        ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-+                                       s->crypto_header.offset,
-+                                       s->crypto_header.length);
-         if (ret < 0) {
-             return ret;
-         }
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 84c9853..a272a39 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -544,6 +544,10 @@ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t offset,
-                                  int64_t size);
- int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t offset,
-                                   int64_t size);
-+int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
-+                             void **refcount_table,
-+                             int64_t *refcount_table_size,
-+                             int64_t offset, int64_t size);
- 
- int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-                                 BlockDriverAmendStatusCB *status_cb,
+     unsigned i, bit;
 -- 
 1.8.3.1
