@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTSgM-0003DA-4W
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:48:27 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTSiI-00059Z-US
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:50:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dTSgI-0001wX-Vp
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:48:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dTSgI-0001wI-Ow
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:48:22 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
-	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-Date: Fri, 07 Jul 2017 14:48:12 +0200
-In-Reply-To: <0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-	(Alistair Francis's message of "Thu, 6 Jul 2017 16:49:44 -0700")
-Message-ID: <8737a8za43.fsf@dusky.pond.sub.org>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTSiF-0002di-QY
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 08:50:27 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri,  7 Jul 2017 14:50:07 +0200
+Message-Id: <149943180765.8972.18399158340352150851.stgit@frigg.lan>
+In-Reply-To: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
- warn_report()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v12 17/27] target/arm: [tcg] Port to insn_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +22,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, philippe@mathieu-daude.net, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Peter Chubb <peter.chubb@nicta.com.au>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, alistair23@gmail.com, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-> Convert all uses of error_report("[Ww]arning:"... to use warn_report()
-> instead. This helps standardise on a single method of printing warnings
-> to the user.
->
-> All of the warnings were found using this regex expression:
->     error_report.*[Ww]arning:
-> and replaced with:
->     warn_report("
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Suggested-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+---
+ target/arm/translate.c |   36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
 
-Doesn't compile.  Moreover, you obviously changed more than just lines
-matching the regexp you quoted.
-
-To ease review, I please split the patch as follows:
-
-* First patch:
-
-      sed -i 's/error_report("warning: \([^"]*"\)/warn_report("\1/i' ...
-
-  plus indentation fixups.  Put exact sed command (or whatever else you
-  use) in the commit message.
-
-* Second patch with additional conversions.
-
-This way the bulk of the changes is mechanical, and the non-mechanical
-changes don't get lost in the sea of mechanical ones.
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 22af4e372a..7a1935d4d7 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11896,6 +11896,26 @@ static void arm_tr_tb_start(DisasContextBase *dc=
+base, CPUState *cpu)
+     }
+ }
+=20
++static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++
++    dc->insn_start_idx =3D tcg_op_buf_count();
++    tcg_gen_insn_start(dc->pc,
++                       (dc->condexec_cond << 4) | (dc->condexec_mask >> =
+1),
++                       0);
++
++#ifdef CONFIG_USER_ONLY
++    /* Intercept jump to the magic kernel page.  */
++    if (dc->pc >=3D 0xffff0000) {
++        /* We always get here via a jump, so know we are not in a
++           conditional execution block.  */
++        gen_exception_internal(EXCP_KERNEL_TRAP);
++        dc->base.is_jmp =3D DISAS_EXC;
++    }
++#endif
++}
++
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ {
+@@ -11939,21 +11959,7 @@ void gen_intermediate_code(CPUState *cs, Transla=
+tionBlock *tb)
+=20
+     do {
+         dc->base.num_insns++;
+-        dc->insn_start_idx =3D tcg_op_buf_count();
+-        tcg_gen_insn_start(dc->pc,
+-                           (dc->condexec_cond << 4) | (dc->condexec_mask=
+ >> 1),
+-                           0);
+-
+-#ifdef CONFIG_USER_ONLY
+-        /* Intercept jump to the magic kernel page.  */
+-        if (dc->pc >=3D 0xffff0000) {
+-            /* We always get here via a jump, so know we are not in a
+-               conditional execution block.  */
+-            gen_exception_internal(EXCP_KERNEL_TRAP);
+-            dc->base.is_jmp =3D DISAS_EXC;
+-            break;
+-        }
+-#endif
++        arm_tr_insn_start(&dc->base, cs);
+=20
+         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+             CPUBreakpoint *bp;
