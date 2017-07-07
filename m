@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dTR0z-00026z-Ba
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:01:39 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTRDQ-0004gO-8A
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:14:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dTR0w-0002Aj-8a
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:01:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dTR0v-0002AD-Uw
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:01:34 -0400
-Date: Fri, 7 Jul 2017 12:01:24 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170707110124.GB15945@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499368127-19855-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dTRDL-0000De-2L
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 07:14:27 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865776960.17063.4875279139522061160.stgit@frigg.lan>
+	<2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net>
+Date: Fri, 07 Jul 2017 13:13:57 +0200
+In-Reply-To: <2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net> (Richard
+	Henderson's message of "Sat, 1 Jul 2017 18:34:17 -0700")
+Message-ID: <87podcebyi.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1499368127-19855-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: Re: [Qemu-devel] [PATCH v2] Python3 Support for qmp.py
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 23/29] target/arm: [tcg] Port to
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,237 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Fri, Jul 07, 2017 at 12:38:47AM +0530, Ishani Chugh wrote:
-> This patch intends to make qmp.py compatible with both python2 and python3.
-> 
->  * Python 3 does not have dict.has_key(key), use key in dict instead
->  * Avoid line-based I/O since Python 2/3 have different character
->    encoding behavior.  Explicitly encode/decode JSON UTF-8.
->  * Replace print by print function.
+Richard Henderson writes:
 
-If you're going todo this, then you need to actually import the python3
-compatible print function - not just call the python2 print statement
-with brackets, as the semantics are different:
+> On 06/28/2017 06:49 AM, Llu=C3=ADs Vilanova wrote:
+>> +        /* We want to stop the TB if the next insn starts in a new page,
+>> +         * or if it spans between this page and the next. This means th=
+at
+>> +         * if we're looking at the last halfword in the page we need to
+>> +         * see if it's a 16-bit Thumb insn (which will fit in this TB)
+>> +         * or a 32-bit Thumb insn (which won't).
+>> +         * This is to avoid generating a silly TB with a single 16-bit =
+insn
+>> +         * in it at the end of this page (which would execute correctly
+>> +         * but isn't very efficient).
+>> +         */
+>> +        return DISAS_PAGE_CROSS;
 
-  $ python2
-  >>> print("foo", "bar")
-  ('foo', 'bar')
-  >>> from __future__ import print_function
-  >>> print("foo", "bar")
-  foo bar
+> Any reason to introduce a new name as opposed to TOO_MANY?  As far as I c=
+an tell
+> they're the same....
 
-Only the latter matches python3 semantics
-
-> 
-> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> ---
->  scripts/qmp/qmp.py | 58 ++++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 37 insertions(+), 21 deletions(-)
-> 
-> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-> index 62d3651..58fb7d1 100644
-> --- a/scripts/qmp/qmp.py
-> +++ b/scripts/qmp/qmp.py
-> @@ -42,6 +42,7 @@ class QEMUMonitorProtocol:
->          self.__address = address
->          self._debug = debug
->          self.__sock = self.__get_sock()
-> +        self.__data = b""
->          if server:
->              self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
->              self.__sock.bind(self.__address)
-> @@ -56,7 +57,7 @@ class QEMUMonitorProtocol:
->  
->      def __negotiate_capabilities(self):
->          greeting = self.__json_read()
-> -        if greeting is None or not greeting.has_key('QMP'):
-> +        if greeting is None or 'QMP' not in greeting:
->              raise QMPConnectError
->          # Greeting seems ok, negotiate capabilities
->          resp = self.cmd('qmp_capabilities')
-> @@ -64,15 +65,28 @@ class QEMUMonitorProtocol:
->              return greeting
->          raise QMPCapabilitiesError
->  
-> +    def __sock_readline(self):
-> +        while True:
-> +            ch = self.__sock.recv(1)
-> +            if ch is None:
-> +                if self.__data:
-> +                    raise ValueError('socket closed mid-line')
-> +                return None
-> +            self.__data += ch
-> +            if ch == b'\n':
-> +                line = self.__data.decode('utf-8')
-> +                self.__data = b""
-> +                return line
-> +
->      def __json_read(self, only_event=False):
->          while True:
-> -            data = self.__sockfile.readline()
-> +            data = self.__sock_readline()
-
-So originally we could get back a "str" on python2, but now
-we get a "str" (which is unicode) on python2, but "unicode"
-on python2.
-
->              if not data:
->                  return
->              resp = json.loads(data)
-
-This means the 'resp' now contains "unicode" data too on
-python2 instead of 'str'.
-
-This hopefully isn't a problem, but we certainly need to
-make sure the iotests still pass on py2, as it could well
-have a ripple effect in this respect.  Have you run the
-iotests with this change applied ?
-
->              if 'event' in resp:
->                  if self._debug:
-> -                    print >>sys.stderr, "QMP:<<< %s" % resp
-> +                    print("QMP:<<< %s" % resp)
-
-This is changing from printing to stderr, to printing to stdout
-which is not desirable. Likewise all the similar changes below.
-
->                  self.__events.append(resp)
->                  if not only_event:
->                      continue
-> @@ -87,10 +101,10 @@ class QEMUMonitorProtocol:
->          @param wait (bool): block until an event is available.
->          @param wait (float): If wait is a float, treat it as a timeout value.
->  
-> -        @raise QMPTimeoutError: If a timeout float is provided and the timeout
-> -                                period elapses.
-> -        @raise QMPConnectError: If wait is True but no events could be retrieved
-> -                                or if some other error occurred.
-> +        @raise QMPTimeoutError: If a timeout float is provided and the
-> +                                timeout period elapses.
-> +        @raise QMPConnectError: If wait is True but no events could be
-> +                                retrieved or if some other error occurred.
->          """
-
-Don't mix whitespace changes in with other functional changes.
+Yes, DISAS_SS and DISAS_PAGE_CROSS turned out to be remnants of previous se=
+ries.
 
 
->  
->          # Check for new events regardless and pull them into the cache:
-> @@ -98,9 +112,11 @@ class QEMUMonitorProtocol:
->          try:
->              self.__json_read()
->          except socket.error as err:
-> -            if err[0] == errno.EAGAIN:
-> +            if err.errno == errno.EAGAIN:
->                  # No data available
->                  pass
-> +            else:
-> +                raise
->          self.__sock.setblocking(1)
->  
->          # Wait for new events, if needed.
-> @@ -128,7 +144,6 @@ class QEMUMonitorProtocol:
->          @raise QMPCapabilitiesError if fails to negotiate capabilities
->          """
->          self.__sock.connect(self.__address)
-> -        self.__sockfile = self.__sock.makefile()
->          if negotiate:
->              return self.__negotiate_capabilities()
->  
-> @@ -143,7 +158,6 @@ class QEMUMonitorProtocol:
->          """
->          self.__sock.settimeout(15)
->          self.__sock, _ = self.__sock.accept()
-> -        self.__sockfile = self.__sock.makefile()
->          return self.__negotiate_capabilities()
->  
->      def cmd_obj(self, qmp_cmd):
-> @@ -155,16 +169,17 @@ class QEMUMonitorProtocol:
->                  been closed
->          """
->          if self._debug:
-> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
-> +            print("QMP:>>> %s" % qmp_cmd)
->          try:
-> -            self.__sock.sendall(json.dumps(qmp_cmd))
-> +            command = json.dumps(qmp_cmd)
-> +            self.__sock.sendall(command.encode('UTF-8'))
->          except socket.error as err:
-> -            if err[0] == errno.EPIPE:
-> +            if err.errno == errno.EPIPE:
->                  return
-> -            raise socket.error(err)
-> +            raise
->          resp = self.__json_read()
->          if self._debug:
-> -            print >>sys.stderr, "QMP:<<< %s" % resp
-> +            print("QMP:<<< %s" % resp)
->          return resp
->  
->      def cmd(self, name, args=None, id=None):
-> @@ -175,7 +190,7 @@ class QEMUMonitorProtocol:
->          @param args: command arguments (dict)
->          @param id: command id (dict, list, string or int)
->          """
-> -        qmp_cmd = { 'execute': name }
-> +        qmp_cmd = {'execute': name}
+>> +    if (dc->ss_active && !dc->pstate_ss) {
+>> +        /* Singlestep state is Active-pending.
+>> +         * If we're in this state at the start of a TB then either
+>> +         *  a) we just took an exception to an EL which is being debugg=
+ed
+>> +         *     and this is the first insn in the exception handler
+>> +         *  b) debug exceptions were masked and we just unmasked them
+>> +         *     without changing EL (eg by clearing PSTATE.D)
+>> +         * In either case we're going to take a swstep exception in the
+>> +         * "did not step an insn" case, and so the syndrome ISV and EX
+>> +         * bits should be zero.
+>> +         */
+>> +        assert(dc->base.num_insns =3D=3D 1);
+>> +        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+>> +                      default_exception_el(dc));
+>> +        dc->base.is_jmp =3D DISAS_SKIP;
 
-Again bogus whitespace changes
+> This is surely DISAS_EXC -- see gen_step_complete_exception.
+> Why introduce a new name?
 
->          if args:
->              qmp_cmd['arguments'] = args
->          if id:
-> @@ -184,7 +199,7 @@ class QEMUMonitorProtocol:
->  
->      def command(self, cmd, **kwds):
->          ret = self.cmd(cmd, kwds)
-> -        if ret.has_key('error'):
-> +        if 'error' in ret:
->              raise Exception(ret['error']['desc'])
->          return ret['return']
->  
-> @@ -197,8 +212,8 @@ class QEMUMonitorProtocol:
->  
->          @raise QMPTimeoutError: If a timeout float is provided and the timeout
->                                  period elapses.
-> -        @raise QMPConnectError: If wait is True but no events could be retrieved
-> -                                or if some other error occurred.
-> +        @raise QMPConnectError: If wait is True but no events could be
-> +                                retrieved or if some other error occurred.
+The original code goes straight to done_generating here, and that's the pur=
+pose
+of DISAS_SKIP (skip the code executed between the end of the loop and the
+done_generating label).
 
-And again
 
->  
->          @return The first available QMP event, or None.
->          """
-> @@ -217,8 +232,8 @@ class QEMUMonitorProtocol:
->  
->          @raise QMPTimeoutError: If a timeout float is provided and the timeout
->                                  period elapses.
-> -        @raise QMPConnectError: If wait is True but no events could be retrieved
-> -                                or if some other error occurred.
-> +        @raise QMPConnectError: If wait is True but no events could be
-> +                                retrieved or if some other error occurred.
-
-Same
-
->  
->          @return The list of available QMP events.
->          """
-> @@ -245,3 +260,4 @@ class QEMUMonitorProtocol:
->  
->      def is_scm_available(self):
->          return self.__sock.family == socket.AF_UNIX
-> +
-
-Adding trailing blank line to the file is bad.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks,
+  Lluis
