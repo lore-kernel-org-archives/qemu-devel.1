@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWmA-0006AZ-1b
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWmB-0006CW-IU
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dTWm5-0000MP-2O
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dTWm9-0000TO-Ul
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 13:10:43 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Jul 2017 19:08:18 +0200
-Message-Id: <1499447335-6125-64-git-send-email-kwolf@redhat.com>
+Date: Fri,  7 Jul 2017 19:08:19 +0200
+Message-Id: <1499447335-6125-65-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
 References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 063/100] specs/qcow2: fix bitmap granularity
- qemu-specific note
+Subject: [Qemu-devel] [PULL 064/100] specs/qcow2: do not use wording 'bitmap
+ header'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +25,42 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+A bitmap directory entry is sometimes called a 'bitmap header'. This
+patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
+header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
+header extension' (which is extension of qcow2 header)
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170628120530.31251-2-vsementsov@virtuozzo.com
+Message-id: 20170628120530.31251-3-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- docs/interop/qcow2.txt | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ docs/interop/qcow2.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 886a546..aee3553 100644
+index aee3553..d7fdb1f 100644
 --- a/docs/interop/qcow2.txt
 +++ b/docs/interop/qcow2.txt
-@@ -575,8 +575,7 @@ Structure of a bitmap directory entry:
-              17:    granularity_bits
-                     Granularity bits. Valid values: 0 - 63.
+@@ -203,7 +203,7 @@ The fields of the bitmaps extension are:
  
--                    Note: Qemu currently doesn't support granularity_bits
--                    greater than 31.
-+                    Note: Qemu currently supports only values 9 - 31.
+           8 - 15:  bitmap_directory_size
+                    Size of the bitmap directory in bytes. It is the cumulative
+-                   size of all (nb_bitmaps) bitmap headers.
++                   size of all (nb_bitmaps) bitmap directory entries.
  
-                     Granularity is calculated as
-                         granularity = 1 << granularity_bits
+          16 - 23:  bitmap_directory_offset
+                    Offset into the image file at which the bitmap directory
+@@ -529,8 +529,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
+ bitmap directory is a contiguous area in the image file, whose starting offset
+ and length are given by the header extension fields bitmap_directory_offset and
+ bitmap_directory_size. The entries of the bitmap directory have variable
+-length, depending on the lengths of the bitmap name and extra data. These
+-entries are also called bitmap headers.
++length, depending on the lengths of the bitmap name and extra data.
+ 
+ Structure of a bitmap directory entry:
+ 
 -- 
 1.8.3.1
