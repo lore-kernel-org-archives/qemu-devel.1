@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTaq6-0007uH-Tw
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:31:03 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dTb1I-0003Qw-7T
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dTaq5-0000eC-Q2
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:31:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dTaq5-0000di-H2
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:31:01 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  7 Jul 2017 18:30:52 -0300
-Message-Id: <20170707213052.13087-3-ehabkost@redhat.com>
-In-Reply-To: <20170707213052.13087-1-ehabkost@redhat.com>
-References: <20170707213052.13087-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] qom: Fix ambiguous path detection when
- ambiguous=NULL
+	(envelope-from <aurelien@aurel32.net>) id 1dTb1H-0001hI-30
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:42:36 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:60520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dTb1G-0001ac-TG
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 17:42:35 -0400
+Date: Fri, 7 Jul 2017 23:42:20 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170707214220.36zdjjclygfin2pp@aurel32.net>
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-3-rth@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170707022111.21836-3-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 02/27] target/sh4: Consolidate end-of-TB
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-object_resolve_path*() ambiguous path detection breaks when
-ambiguous==NULL and the object tree have 3 objects of the same type and
-only 2 of them are under the same parent.  e.g.:
+On 2017-07-06 16:20, Richard Henderson wrote:
+> We can fold 3 different tests within the decode loop
+> into a more accurate computation of max_insns to start.
+> 
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/sh4/translate.c | 29 +++++++++++++++++------------
+>  1 file changed, 17 insertions(+), 12 deletions(-)
+> 
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index 82d4d69..663b5c0 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
+> @@ -1848,7 +1848,6 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>      ctx.features = env->features;
+>      ctx.has_movcal = (ctx.tbflags & TB_FLAG_PENDING_MOVCA);
+>  
+> -    num_insns = 0;
+>      max_insns = tb->cflags & CF_COUNT_MASK;
+>      if (max_insns == 0) {
+>          max_insns = CF_COUNT_MASK;
+> @@ -1856,9 +1855,23 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>      if (max_insns > TCG_MAX_INSNS) {
+>          max_insns = TCG_MAX_INSNS;
+>      }
+> +    /* Since the ISA is fixed-width, we can bound by the number
+> +       of instructions remaining on the page.  */
+> +    num_insns = (TARGET_PAGE_SIZE - (ctx.pc & (TARGET_PAGE_SIZE - 1))) / 2;
 
- /container/obj1 (TYPE_FOO)
- /container/obj2 (TYPE_FOO)
- /obj2 (TYPE_FOO)
+This could be written as num_insn = -(ctx.pc | TARGET_PAGE_MASK) / 2;
 
-With the above tree, object_resolve_path_type("", TYPE_FOO, NULL) will
-incorrectly return /obj2, because the search inside "/container" will
-return NULL, and the match at "/obj2" won't be detected as ambiguous.
+> +    if (max_insns > num_insns) {
+> +        max_insns = num_insns;
+> +    }
 
-Fix that by always calling object_resolve_partial_path() with a non-NULL
-ambiguous parameter.
+You are following the existing pattern, so I can really blame you, but
+maybe it's the moment to change the existing code into something like:
 
-Test case included.
+    max_insns = MIN(max_insn, ...)
 
-Reported-by: Igor Mammedov <imammedo@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- qom/object.c               | 17 ++++++++---------
- tests/check-qom-proplist.c |  3 +++
- 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 5f6fdfa..0cdddcb 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1712,15 +1712,13 @@ static Object *object_resolve_partial_path(Object *parent,
-                                             typename, ambiguous);
-         if (found) {
-             if (obj) {
--                if (ambiguous) {
--                    *ambiguous = true;
--                }
-+                *ambiguous = true;
-                 return NULL;
-             }
-             obj = found;
-         }
- 
--        if (ambiguous && *ambiguous) {
-+        if (*ambiguous) {
-             return NULL;
-         }
-     }
-@@ -1729,7 +1727,7 @@ static Object *object_resolve_partial_path(Object *parent,
- }
- 
- Object *object_resolve_path_type(const char *path, const char *typename,
--                                 bool *ambiguous)
-+                                 bool *ambiguousp)
- {
-     Object *obj;
-     gchar **parts;
-@@ -1738,11 +1736,12 @@ Object *object_resolve_path_type(const char *path, const char *typename,
-     assert(parts);
- 
-     if (parts[0] == NULL || strcmp(parts[0], "") != 0) {
--        if (ambiguous) {
--            *ambiguous = false;
--        }
-+        bool ambiguous = false;
-         obj = object_resolve_partial_path(object_get_root(), parts,
--                                          typename, ambiguous);
-+                                          typename, &ambiguous);
-+        if (ambiguousp) {
-+            *ambiguousp = ambiguous;
-+        }
-     } else {
-         obj = object_resolve_abs_path(object_get_root(), parts, typename, 1);
-     }
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index abafbd7..381532c 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -593,14 +593,17 @@ static void test_qom_partial_path(void)
-     ambiguous = false;
-     g_assert(!object_resolve_path_type("", TYPE_DUMMY, &ambiguous));
-     g_assert(ambiguous);
-+    g_assert(!object_resolve_path_type("", TYPE_DUMMY, NULL));
- 
-     ambiguous = false;
-     g_assert(!object_resolve_path("obj2", &ambiguous));
-     g_assert(ambiguous);
-+    g_assert(!object_resolve_path("obj2", NULL));
- 
-     ambiguous = false;
-     g_assert(object_resolve_path("obj1", &ambiguous) == obj1);
-     g_assert(!ambiguous);
-+    g_assert(object_resolve_path("obj1", NULL) == obj1);
- 
-     object_unparent(obj1);
-     object_unparent(obj2a);
+> +    /* Single stepping means just that.  */
+> +    if (ctx.singlestep_enabled || singlestep) {
+> +        max_insns = 1;
+> +    }
+>  
+>      gen_tb_start(tb);
+> -    while (ctx.bstate == BS_NONE && !tcg_op_buf_full()) {
+> +    num_insns = 0;
+> +
+> +    while (ctx.bstate == BS_NONE
+> +           && num_insns < max_insns
+> +           && !tcg_op_buf_full()) {
+>          tcg_gen_insn_start(ctx.pc, ctx.envflags);
+>          num_insns++;
+>  
+> @@ -1882,18 +1895,10 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>          ctx.opcode = cpu_lduw_code(env, ctx.pc);
+>  	decode_opc(&ctx);
+>  	ctx.pc += 2;
+> -	if ((ctx.pc & (TARGET_PAGE_SIZE - 1)) == 0)
+> -	    break;
+> -        if (cs->singlestep_enabled) {
+> -	    break;
+> -        }
+> -        if (num_insns >= max_insns)
+> -            break;
+> -        if (singlestep)
+> -            break;
+>      }
+> -    if (tb->cflags & CF_LAST_IO)
+> +    if (tb->cflags & CF_LAST_IO) {
+>          gen_io_end();
+> +    }
+>      if (cs->singlestep_enabled) {
+>          gen_save_cpu_state(&ctx, true);
+>          gen_helper_debug(cpu_env);
+
+Besides the minor nitpicks above:
+
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+
 -- 
-2.9.4
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
