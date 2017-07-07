@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuL-00034l-V5
+	(envelope-from <eblake@redhat.com>) id 1dTZuL-00034m-Vc
 	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dTZuK-00042O-9f
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dTZuK-00042Q-9l
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 16:31:22 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  7 Jul 2017 15:30:47 -0500
-Message-Id: <20170707203049.534-8-eblake@redhat.com>
+Date: Fri,  7 Jul 2017 15:30:46 -0500
+Message-Id: <20170707203049.534-7-eblake@redhat.com>
 In-Reply-To: <20170707203049.534-1-eblake@redhat.com>
 References: <20170707203049.534-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 7/9] nbd: Implement NBD_OPT_GO on client
+Subject: [Qemu-devel] [PATCH v5 6/9] nbd: Implement NBD_OPT_GO on server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,213 +23,276 @@ To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org
 
 NBD_OPT_EXPORT_NAME is lousy: per the NBD protocol, any failure
-requires the server to close the connection rather than report an
-error to us.  Therefore, upstream NBD recently added NBD_OPT_GO as
-the improved version of the option that does what we want [1]: it
-reports sane errors on failures, and on success provides at least
-as much info as NBD_OPT_EXPORT_NAME.
+requires us to close the connection rather than report an error.
+Therefore, upstream NBD recently added NBD_OPT_GO as the improved
+version of the option that does what we want [1], along with
+NBD_OPT_INFO that returns the same information but does not
+transition to transmission phase.
 
 [1] https://github.com/NetworkBlockDevice/nbd/blob/extension-info/doc/proto.md
 
-This is a first cut at use of the information types.  Note that we
-do not need to use NBD_OPT_INFO, and that use of NBD_OPT_GO means
-we no longer have to use NBD_OPT_LIST to learn whether a server
-requires TLS (this requires servers that gracefully handle unknown
-NBD_OPT, many servers prior to qemu 2.5 were buggy, but I have patched
-qemu, upstream nbd, and nbdkit in the meantime, in part because of
-interoperability testing with this patch).  We still fall back to
-NBD_OPT_LIST when NBD_OPT_GO is not supported on the server, as it
-is still one last chance for a nicer error message.  Later patches
-will use further info, like NBD_INFO_BLOCK_SIZE.
+This is a first cut at the information types, and only passes the
+same information already available through NBD_OPT_LIST and
+NBD_OPT_EXPORT_NAME; items like NBD_INFO_BLOCK_SIZE (and thus any
+use of NBD_REP_ERR_BLOCK_SIZE_REQD) are intentionally left for
+later patches.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v5: rebase to master; enough changes to drop R-b
-v4: NBD protocol changes, again
+v5: update to master, R-b dropped
+v4: revamp to another round of NBD protocol changes
 v3: revamp to match latest version of NBD protocol
 ---
- nbd/nbd-internal.h |   3 ++
- nbd/client.c       | 126 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- nbd/trace-events   |   3 ++
- 3 files changed, 130 insertions(+), 2 deletions(-)
+ nbd/server.c     | 179 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ nbd/trace-events |   3 +
+ 2 files changed, 179 insertions(+), 3 deletions(-)
 
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index bf95601..4065bc6 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -37,8 +37,11 @@
-  * https://github.com/yoe/nbd/blob/master/doc/proto.md
-  */
+diff --git a/nbd/server.c b/nbd/server.c
+index 841986d..e84d012 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -141,6 +141,7 @@ static int nbd_negotiate_send_rep_len(QIOChannel *ioc, uint32_t type,
+     trace_nbd_negotiate_send_rep_len(opt, nbd_opt_lookup(opt),
+                                      type, nbd_rep_lookup(type), len);
 
-+/* Size of all NBD_OPT_*, without payload */
- #define NBD_REQUEST_SIZE        (4 + 2 + 2 + 8 + 8 + 4)
-+/* Size of all NBD_REP_* sent in answer to most NBD_OPT_*, without payload */
- #define NBD_REPLY_SIZE          (4 + 4 + 8)
-+
- #define NBD_REQUEST_MAGIC       0x25609513
- #define NBD_REPLY_MAGIC         0x67446698
- #define NBD_OPTS_MAGIC          0x49484156454F5054LL
-diff --git a/nbd/client.c b/nbd/client.c
-index 011960b..cb55f3d 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -350,6 +350,114 @@ static int nbd_receive_list(QIOChannel *ioc, const char *want, bool *match,
++    assert(len < NBD_MAX_BUFFER_SIZE);
+     magic = cpu_to_be64(NBD_REP_MAGIC);
+     if (nbd_write(ioc, &magic, sizeof(magic), errp) < 0) {
+         error_prepend(errp, "write failed (rep magic): ");
+@@ -275,6 +276,8 @@ static int nbd_negotiate_handle_list(NBDClient *client, uint32_t length,
+     return nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, NBD_OPT_LIST, errp);
  }
 
++/* Send a reply to NBD_OPT_EXPORT_NAME.
++ * Return -errno on error, 0 on success. */
+ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
+                                             uint16_t myflags, bool no_zeroes,
+                                             Error **errp)
+@@ -323,6 +326,162 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
+     return 0;
+ }
 
-+/* Returns -1 if NBD_OPT_GO proves the export @wantname cannot be
-+ * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
-+ * NBD_OPT_EXPORT_NAME in that case), and > 0 if the export is good to
-+ * go (with @info populated). */
-+static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-+                      NBDExportInfo *info, Error **errp)
++/* Send a single NBD_REP_INFO, with a buffer @buf of @length bytes.
++ * The buffer does NOT include the info type prefix.
++ * Return -errno on error, 0 if ready to send more. */
++static int nbd_negotiate_send_info(NBDClient *client, uint32_t opt,
++                                   uint16_t info, uint32_t length, void *buf,
++                                   Error **errp)
 +{
-+    nbd_opt_reply reply;
-+    uint32_t len = strlen(wantname);
-+    uint16_t type;
-+    int error;
-+    char *buf;
++    int rc;
 +
-+    /* The protocol requires that the server send NBD_INFO_EXPORT with
-+     * a non-zero flags (at least NBD_FLAG_HAS_FLAGS must be set); so
-+     * flags still 0 is a witness of a broken server. */
-+    info->flags = 0;
-+
-+    trace_nbd_opt_go_start(wantname);
-+    buf = g_malloc(4 + len + 2 + 1);
-+    stl_be_p(buf, len);
-+    memcpy(buf + 4, wantname, len);
-+    /* No requests, live with whatever server sends */
-+    stw_be_p(buf + 4 + len, 0);
-+    if (nbd_send_option_request(ioc, NBD_OPT_GO, len + 6, buf, errp) < 0) {
-+        return -1;
++    trace_nbd_negotiate_send_info(info, nbd_info_lookup(info), length);
++    rc = nbd_negotiate_send_rep_len(client->ioc, NBD_REP_INFO, opt,
++                                    sizeof(info) + length, errp);
++    if (rc < 0) {
++        return rc;
 +    }
-+
-+    while (1) {
-+        if (nbd_receive_option_reply(ioc, NBD_OPT_GO, &reply, errp) < 0) {
-+            return -1;
-+        }
-+        error = nbd_handle_reply_err(ioc, &reply, errp);
-+        if (error <= 0) {
-+            return error;
-+        }
-+        len = reply.length;
-+
-+        if (reply.type == NBD_REP_ACK) {
-+            /* Server is done sending info and moved into transmission
-+               phase, but make sure it sent flags */
-+            if (len) {
-+                error_setg(errp, "server sent invalid NBD_REP_ACK");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            if (!info->flags) {
-+                error_setg(errp, "broken server omitted NBD_INFO_EXPORT");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            trace_nbd_opt_go_success();
-+            return 1;
-+        }
-+        if (reply.type != NBD_REP_INFO) {
-+            error_setg(errp, "unexpected reply type %" PRIx32 ", expected %x",
-+                       reply.type, NBD_REP_INFO);
-+            nbd_send_opt_abort(ioc);
-+            return -1;
-+        }
-+        if (len < sizeof(type)) {
-+            error_setg(errp, "NBD_REP_INFO length %" PRIu32 " is too short",
-+                       len);
-+            nbd_send_opt_abort(ioc);
-+            return -1;
-+        }
-+        if (nbd_read(ioc, &type, sizeof(type), errp) < 0) {
-+            error_prepend(errp, "failed to read info type");
-+            nbd_send_opt_abort(ioc);
-+            return -1;
-+        }
-+        len -= sizeof(type);
-+        be16_to_cpus(&type);
-+        switch (type) {
-+        case NBD_INFO_EXPORT:
-+            if (len != sizeof(info->size) + sizeof(info->flags)) {
-+                error_setg(errp, "remaining export info len %" PRIu32
-+                           " is unexpected size", len);
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            if (nbd_read(ioc, &info->size, sizeof(info->size), errp) < 0) {
-+                error_prepend(errp, "failed to read info size");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            be64_to_cpus(&info->size);
-+            if (nbd_read(ioc, &info->flags, sizeof(info->flags), errp) < 0) {
-+                error_prepend(errp, "failed to read info flags");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            be16_to_cpus(&info->flags);
-+            trace_nbd_receive_negotiate_size_flags(info->size, info->flags);
-+            break;
-+
-+        default:
-+            trace_nbd_opt_go_info_unknown(type, nbd_info_lookup(type));
-+            if (nbd_drop(ioc, len, errp) < 0) {
-+                error_prepend(errp, "Failed to read info payload");
-+                nbd_send_opt_abort(ioc);
-+                return -1;
-+            }
-+            break;
-+        }
++    cpu_to_be16s(&info);
++    if (nbd_write(client->ioc, &info, sizeof(info), errp) < 0) {
++        return -EIO;
 +    }
++    if (nbd_write(client->ioc, buf, length, errp) < 0) {
++        return -EIO;
++    }
++    return 0;
 +}
 +
- /* Return -1 on failure, 0 if wantname is an available export. */
- static int nbd_receive_query_exports(QIOChannel *ioc,
-                                      const char *wantname,
-@@ -531,11 +639,25 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-             name = "";
-         }
-         if (fixedNewStyle) {
-+            int result;
++/* Handle NBD_OPT_INFO and NBD_OPT_GO.
++ * Return -errno on error, 0 if ready for next option, and 1 to move
++ * into transmission phase.  */
++static int nbd_negotiate_handle_info(NBDClient *client, uint32_t length,
++                                     uint32_t opt, uint16_t myflags,
++                                     Error **errp)
++{
++    int rc;
++    char name[NBD_MAX_NAME_SIZE + 1];
++    NBDExport *exp;
++    uint16_t requests;
++    uint16_t request;
++    uint32_t namelen;
++    bool sendname = false;
++    char buf[sizeof(uint64_t) + sizeof(uint16_t)];
++    const char *msg;
 +
-+            /* Try NBD_OPT_GO first - if it works, we are done (it
-+             * also gives us a good message if the server requires
-+             * TLS).  If it is not available, fall back to
-+             * NBD_OPT_LIST for nicer error messages about a missing
-+             * export, then use NBD_OPT_EXPORT_NAME.  */
-+            result = nbd_opt_go(ioc, name, info, errp);
-+            if (result < 0) {
-+                goto fail;
-+            }
-+            if (result > 0) {
-+                return 0;
-+            }
-             /* Check our desired export is present in the
-              * server export list. Since NBD_OPT_EXPORT_NAME
-              * cannot return an error message, running this
--             * query gives us good error reporting if the
--             * server required TLS
-+             * query gives us better error reporting if the
-+             * export name is not available.
-              */
-             if (nbd_receive_query_exports(ioc, name, errp) < 0) {
-                 goto fail;
++    /* Client sends:
++        4 bytes: L, name length (can be 0)
++        L bytes: export name
++        2 bytes: N, number of requests (can be 0)
++        N * 2 bytes: N requests
++    */
++    if (length < sizeof(namelen) + sizeof(requests)) {
++        msg = "overall request too short";
++        goto invalid;
++    }
++    if (nbd_read(client->ioc, &namelen, sizeof(namelen), errp) < 0) {
++        return -EIO;
++    }
++    be32_to_cpus(&namelen);
++    length -= sizeof(namelen);
++    if (namelen > length - sizeof(requests) || (length - namelen) % 2) {
++        msg = "name length is incorrect";
++        goto invalid;
++    }
++    if (nbd_read(client->ioc, name, namelen, errp) < 0) {
++        return -EIO;
++    }
++    name[namelen] = '\0';
++    length -= namelen;
++    trace_nbd_negotiate_handle_export_name_request(name);
++
++    if (nbd_read(client->ioc, &requests, sizeof(requests), errp) < 0) {
++        return -EIO;
++    }
++    be16_to_cpus(&requests);
++    length -= sizeof(requests);
++    trace_nbd_negotiate_handle_info_requests(requests);
++    if (requests != length / sizeof(request)) {
++        msg = "incorrect number of  requests for overall length";
++        goto invalid;
++    }
++    while (requests--) {
++        if (nbd_read(client->ioc, &request, sizeof(request), errp) < 0) {
++            return -EIO;
++        }
++        be16_to_cpus(&request);
++        length -= sizeof(request);
++        trace_nbd_negotiate_handle_info_request(request,
++                                                nbd_info_lookup(request));
++        /* For now, we only care about NBD_INFO_NAME; everything else
++         * is either a request we don't know or something we send
++         * regardless of request. */
++        if (request == NBD_INFO_NAME) {
++            sendname = true;
++        }
++    }
++
++    exp = nbd_export_find(name);
++    if (!exp) {
++        return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_UNKNOWN,
++                                          opt, errp, "export '%s' not present",
++                                          name);
++    }
++
++    /* Don't bother sending NBD_INFO_NAME unless client requested it */
++    if (sendname) {
++        rc = nbd_negotiate_send_info(client, opt, NBD_INFO_NAME, length, name,
++                                     errp);
++        if (rc < 0) {
++            return rc;
++        }
++    }
++
++    /* Send NBD_INFO_DESCRIPTION only if available, regardless of
++     * client request */
++    if (exp->description) {
++        size_t len = strlen(exp->description);
++
++        rc = nbd_negotiate_send_info(client, opt, NBD_INFO_DESCRIPTION,
++                                     len, exp->description, errp);
++        if (rc < 0) {
++            return rc;
++        }
++    }
++
++    /* Send NBD_INFO_EXPORT always */
++    trace_nbd_negotiate_new_style_size_flags(exp->size,
++                                             exp->nbdflags | myflags);
++    stq_be_p(buf, exp->size);
++    stw_be_p(buf + 8, exp->nbdflags | myflags);
++    rc = nbd_negotiate_send_info(client, opt, NBD_INFO_EXPORT,
++                                 sizeof(buf), buf, errp);
++    if (rc < 0) {
++        return rc;
++    }
++
++    /* Final reply */
++    rc = nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, opt, errp);
++    if (rc < 0) {
++        return rc;
++    }
++
++    if (opt == NBD_OPT_GO) {
++        client->exp = exp;
++        QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
++        nbd_export_get(client->exp);
++        rc = 1;
++    }
++    return rc;
++
++ invalid:
++    if (nbd_drop(client->ioc, length, errp) < 0) {
++        return -EIO;
++    }
++    return nbd_negotiate_send_rep_err(client->ioc, NBD_REP_ERR_INVALID, opt,
++                                      errp, "%s", msg);
++}
++
++
+ /* Handle NBD_OPT_STARTTLS. Return NULL to drop connection, or else the
+  * new channel for all further (now-encrypted) communication. */
+ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+@@ -380,7 +539,8 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+ }
+
+ /* nbd_negotiate_options
+- * Process all NBD_OPT_* client option commands.
++ * Process all NBD_OPT_* client option commands, during fixed newstyle
++ * negotiation.
+  * Return:
+  * -errno  on error, errp is set
+  * 0       on successful negotiation, errp is not set
+@@ -397,7 +557,7 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+     /* Client sends:
+         [ 0 ..   3]   client flags
+
+-       Then we loop until NBD_OPT_EXPORT_NAME:
++       Then we loop until NBD_OPT_EXPORT_NAME or NBD_OPT_GO:
+         [ 0 ..   7]   NBD_OPTS_MAGIC
+         [ 8 ..  11]   NBD option
+         [12 ..  15]   Data length
+@@ -524,6 +684,19 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+                                                         myflags, no_zeroes,
+                                                         errp);
+
++            case NBD_OPT_INFO:
++            case NBD_OPT_GO:
++                ret = nbd_negotiate_handle_info(client, length, option,
++                                                myflags, errp);
++                if (ret == 1) {
++                    assert(option == NBD_OPT_GO);
++                    return 0;
++                }
++                if (ret) {
++                    return ret;
++                }
++                break;
++
+             case NBD_OPT_STARTTLS:
+                 if (nbd_drop(client->ioc, length, errp) < 0) {
+                     return -EIO;
+@@ -606,7 +779,7 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+         [ 0 ..   7]   passwd       ("NBDMAGIC")
+         [ 8 ..  15]   magic        (NBD_OPTS_MAGIC)
+         [16 ..  17]   server flags (0)
+-        ....options sent, ending in NBD_OPT_EXPORT_NAME....
++        ....options sent, ending in NBD_OPT_EXPORT_NAME or NBD_OPT_GO....
+      */
+
+     qio_channel_set_blocking(client->ioc, false, NULL);
 diff --git a/nbd/trace-events b/nbd/trace-events
-index 80c2447..4969047 100644
+index 765f5f4..80c2447 100644
 --- a/nbd/trace-events
 +++ b/nbd/trace-events
-@@ -3,6 +3,9 @@ nbd_unknown_error(int err) "Squashing unexpected error %d to EINVAL"
- nbd_send_option_request(uint32_t opt, const char *name, uint32_t len) "Sending option request %" PRIu32" (%s), len %" PRIu32
- nbd_receive_option_reply(uint32_t option, const char *optname, uint32_t type, const char *typename, uint32_t length) "Received option reply %" PRIx32" (%s), type %" PRIx32" (%s), len %" PRIu32
- nbd_reply_err_unsup(uint32_t option, const char *name) "server doesn't understand request %" PRIx32 " (%s), attempting fallback"
-+nbd_opt_go_start(const char *name) "Attempting NBD_OPT_GO for export '%s'"
-+nbd_opt_go_success(void) "Export is good to go"
-+nbd_opt_go_info_unknown(int info, const char *name) "Ignoring unknown info %d (%s)"
- nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
- nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
- nbd_receive_starttls_request(void) "Requesting TLS from server"
+@@ -33,6 +33,9 @@ nbd_negotiate_send_rep_err(const char *msg) "sending error message \"%s\""
+ nbd_negotiate_send_rep_list(const char *name, const char *desc) "Advertising export name '%s' description '%s'"
+ nbd_negotiate_handle_export_name(void) "Checking length"
+ nbd_negotiate_handle_export_name_request(const char *name) "Client requested export '%s'"
++nbd_negotiate_send_info(int info, const char *name, uint32_t length) "Sending NBD_REP_INFO type %d (%s) with remaining length %" PRIu32
++nbd_negotiate_handle_info_requests(int requests) "Client requested %d items of info"
++nbd_negotiate_handle_info_request(int request, const char *name) "Client requested info %d (%s)"
+ nbd_negotiate_handle_starttls(void) "Setting up TLS"
+ nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
+ nbd_negotiate_options_flags(uint32_t flags) "Received client flags 0x%" PRIx32
 -- 
 2.9.4
