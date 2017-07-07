@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dTbOy-0004Ge-Ss
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 18:07:06 -0400
+	(envelope-from <Ashish.Kalra@cavium.com>) id 1dTbTK-00067N-RL
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 18:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dTbOx-0000ec-20
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 18:07:04 -0400
-Date: Fri, 7 Jul 2017 15:06:53 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <3b55bff7d41d4b37b52a8ec96d88677a@AMSPEX02CL01.citrite.net>
-Message-ID: <alpine.DEB.2.10.1707071452400.2919@sstabellini-ThinkPad-X260>
-References: <20170621125249.8805-1-paul.durrant@citrix.com>
-	<20170621125249.8805-4-paul.durrant@citrix.com>
-	<alpine.DEB.2.10.1706221410580.12819@sstabellini-ThinkPad-X260>
-	<3b55bff7d41d4b37b52a8ec96d88677a@AMSPEX02CL01.citrite.net>
+	(envelope-from <Ashish.Kalra@cavium.com>) id 1dTbTJ-00033R-MW
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 18:11:34 -0400
+From: "Kalra, Ashish" <Ashish.Kalra@cavium.com>
+Date: Fri, 7 Jul 2017 22:11:25 +0000
+Message-ID: <BN4PR07MB21615F830FCA5445EF4B7974E3AA0@BN4PR07MB2161.namprd07.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
+	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
+	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
+	<AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
+	<BN4PR07MB2161B5CCE84496804B848326E3D50@BN4PR07MB2161.namprd07.prod.outlook.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D28807@SHSMSX101.ccr.corp.intel.com>
+	<67cb3a84-9aa7-2b4f-43b6-be6dea15b66f@arm.com>
+In-Reply-To: <67cb3a84-9aa7-2b4f-43b6-be6dea15b66f@arm.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-ID: <alpine.DEB.2.10.1707071453550.2919@sstabellini-ThinkPad-X260>
-Content-Type: TEXT/PLAIN; CHARSET=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] xen-disk: use an IOThread per
- instance
+Subject: Re: [Qemu-devel] [Qemu-arm]  [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,343 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>
-Cc: 'Stefano Stabellini' <sstabellini@kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "afaerber@suse.de" <afaerber@suse.de>, armbru@redhat.com
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Tian, Kevin" <kevin.tian@intel.com>, Auger Eric <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-On Fri, 7 Jul 2017, Paul Durrant wrote:
-> > -----Original Message-----
-> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > Sent: 22 June 2017 23:15
-> > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; qemu-
-> > block@nongnu.org; Stefano Stabellini <sstabellini@kernel.org>; Anthon=
-y
-> > Perard <anthony.perard@citrix.com>; Kevin Wolf <kwolf@redhat.com>;
-> > Max Reitz <mreitz@redhat.com>; afaerber@suse.de
-> > Subject: Re: [PATCH v2 3/3] xen-disk: use an IOThread per instance
-> >=20
-> > CC'ing Andreas F=C3=A4rber. Could you please give a quick look below =
-at the
-> > way the iothread object is instantiate and destroyed? I am no object
-> > model expert and would appreaciate a second opinion.
-> >=20
->=20
-> I have not seen any response so far.
->=20
-> >=20
-> > On Wed, 21 Jun 2017, Paul Durrant wrote:
-> > > This patch allocates an IOThread object for each xen_disk instance =
-and
-> > > sets the AIO context appropriately on connect. This allows processi=
-ng
-> > > of I/O to proceed in parallel.
-> > >
-> > > The patch also adds tracepoints into xen_disk to make it possible t=
-o
-> > > follow the state transtions of an instance in the log.
-> > >
-> > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > > ---
-> > > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > > Cc: Kevin Wolf <kwolf@redhat.com>
-> > > Cc: Max Reitz <mreitz@redhat.com>
-> > >
-> > > v2:
-> > >  - explicitly acquire and release AIO context in qemu_aio_complete(=
-) and
-> > >    blk_bh()
-> > > ---
-> > >  hw/block/trace-events |  7 ++++++
-> > >  hw/block/xen_disk.c   | 69
-> > ++++++++++++++++++++++++++++++++++++++++++++-------
-> > >  2 files changed, 67 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/hw/block/trace-events b/hw/block/trace-events
-> > > index 65e83dc258..608b24ba66 100644
-> > > --- a/hw/block/trace-events
-> > > +++ b/hw/block/trace-events
-> > > @@ -10,3 +10,10 @@ virtio_blk_submit_multireq(void *mrb, int start,=
- int
-> > num_reqs, uint64_t offset,
-> > >  # hw/block/hd-geometry.c
-> > >  hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "=
-blk %p
-> > LCHS %d %d %d"
-> > >  hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32=
-_t
-> > secs, int trans) "blk %p CHS %u %u %u trans %d"
-> > > +
-> > > +# hw/block/xen_disk.c
-> > > +xen_disk_alloc(char *name) "%s"
-> > > +xen_disk_init(char *name) "%s"
-> > > +xen_disk_connect(char *name) "%s"
-> > > +xen_disk_disconnect(char *name) "%s"
-> > > +xen_disk_free(char *name) "%s"
-> > > diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-> > > index 0e6513708e..8548195195 100644
-> > > --- a/hw/block/xen_disk.c
-> > > +++ b/hw/block/xen_disk.c
-> > > @@ -27,10 +27,13 @@
-> > >  #include "hw/xen/xen_backend.h"
-> > >  #include "xen_blkif.h"
-> > >  #include "sysemu/blockdev.h"
-> > > +#include "sysemu/iothread.h"
-> > >  #include "sysemu/block-backend.h"
-> > >  #include "qapi/error.h"
-> > >  #include "qapi/qmp/qdict.h"
-> > >  #include "qapi/qmp/qstring.h"
-> > > +#include "qom/object_interfaces.h"
-> > > +#include "trace.h"
-> > >
-> > >  /* ------------------------------------------------------------- *=
-/
-> > >
-> > > @@ -128,6 +131,9 @@ struct XenBlkDev {
-> > >      DriveInfo           *dinfo;
-> > >      BlockBackend        *blk;
-> > >      QEMUBH              *bh;
-> > > +
-> > > +    IOThread            *iothread;
-> > > +    AioContext          *ctx;
-> > >  };
-> > >
-> > >  /* ------------------------------------------------------------- *=
-/
-> > > @@ -599,9 +605,12 @@ static int ioreq_runio_qemu_aio(struct ioreq
-> > *ioreq);
-> > >  static void qemu_aio_complete(void *opaque, int ret)
-> > >  {
-> > >      struct ioreq *ioreq =3D opaque;
-> > > +    struct XenBlkDev *blkdev =3D ioreq->blkdev;
-> > > +
-> > > +    aio_context_acquire(blkdev->ctx);
-> >=20
-> > I think that Paolo was right that we need a aio_context_acquire here,
-> > however the issue is that with the current code:
-> >=20
-> >   blk_handle_requests -> ioreq_runio_qemu_aio -> qemu_aio_complete
-> >=20
-> > leading to aio_context_acquire being called twice on the same lock,
-> > which I don't think is allowed?
->=20
-> It resolves to a qemu_rec_mutex_lock() which I believed is a recursive =
-lock, so I think that's ok.
-
-On Linux it becomes pthread_mutex_lock. The lock is created by
-qemu_rec_mutex_init which specifies PTHREAD_MUTEX_RECURSIVE, so yes, it
-should be recursive. Good.
-
-
-> >=20
-> > I think we need to get rid of the qemu_aio_complete call from
-> > ioreq_runio_qemu_aio, but to do that we need to be careful with the
-> > accounting of aio_inflight (today it's incremented unconditionally at
-> > the beginning of ioreq_runio_qemu_aio, I think we would have to chang=
-e
-> > that to increment it only if presync).
-> >=20
->=20
-> If the lock is indeed recursive then I think we can avoid this complica=
-tion.
-
-OK
-
-
-> >=20
-> > >      if (ret !=3D 0) {
-> > > -        xen_pv_printf(&ioreq->blkdev->xendev, 0, "%s I/O error\n",
-> > > +        xen_pv_printf(&blkdev->xendev, 0, "%s I/O error\n",
-> > >                        ioreq->req.operation =3D=3D BLKIF_OP_READ ? =
-"read" : "write");
-> > >          ioreq->aio_errors++;
-> > >      }
-> > > @@ -610,13 +619,13 @@ static void qemu_aio_complete(void *opaque, i=
-nt
-> > ret)
-> > >      if (ioreq->presync) {
-> > >          ioreq->presync =3D 0;
-> > >          ioreq_runio_qemu_aio(ioreq);
-> > > -        return;
-> > > +        goto done;
-> > >      }
-> > >      if (ioreq->aio_inflight > 0) {
-> > > -        return;
-> > > +        goto done;
-> > >      }
-> > >
-> > > -    if (ioreq->blkdev->feature_grant_copy) {
-> > > +    if (blkdev->feature_grant_copy) {
-> > >          switch (ioreq->req.operation) {
-> > >          case BLKIF_OP_READ:
-> > >              /* in case of failure ioreq->aio_errors is increased *=
-/
-> > > @@ -638,7 +647,7 @@ static void qemu_aio_complete(void *opaque, int
-> > ret)
-> > >      }
-> > >
-> > >      ioreq->status =3D ioreq->aio_errors ? BLKIF_RSP_ERROR :
-> > BLKIF_RSP_OKAY;
-> > > -    if (!ioreq->blkdev->feature_grant_copy) {
-> > > +    if (!blkdev->feature_grant_copy) {
-> > >          ioreq_unmap(ioreq);
-> > >      }
-> > >      ioreq_finish(ioreq);
-> > > @@ -650,16 +659,19 @@ static void qemu_aio_complete(void *opaque, i=
-nt
-> > ret)
-> > >          }
-> > >      case BLKIF_OP_READ:
-> > >          if (ioreq->status =3D=3D BLKIF_RSP_OKAY) {
-> > > -            block_acct_done(blk_get_stats(ioreq->blkdev->blk), &io=
-req->acct);
-> > > +            block_acct_done(blk_get_stats(blkdev->blk), &ioreq->ac=
-ct);
-> > >          } else {
-> > > -            block_acct_failed(blk_get_stats(ioreq->blkdev->blk), &=
-ioreq->acct);
-> > > +            block_acct_failed(blk_get_stats(blkdev->blk), &ioreq->=
-acct);
-> > >          }
-> > >          break;
-> > >      case BLKIF_OP_DISCARD:
-> > >      default:
-> > >          break;
-> > >      }
-> > > -    qemu_bh_schedule(ioreq->blkdev->bh);
-> > > +    qemu_bh_schedule(blkdev->bh);
-> > > +
-> > > +done:
-> > > +    aio_context_release(blkdev->ctx);
-> > >  }
-> > >
-> > >  static bool blk_split_discard(struct ioreq *ioreq, blkif_sector_t
-> > sector_number,
-> > > @@ -917,17 +929,40 @@ static void blk_handle_requests(struct XenBlk=
-Dev
-> > *blkdev)
-> > >  static void blk_bh(void *opaque)
-> > >  {
-> > >      struct XenBlkDev *blkdev =3D opaque;
-> > > +
-> > > +    aio_context_acquire(blkdev->ctx);
-> > >      blk_handle_requests(blkdev);
-> > > +    aio_context_release(blkdev->ctx);
-> > >  }
-> > >
-> > >  static void blk_alloc(struct XenDevice *xendev)
-> > >  {
-> > >      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBl=
-kDev,
-> > xendev);
-> > > +    Object *obj;
-> > > +    char *name;
-> > > +    Error *err =3D NULL;
-> > > +
-> > > +    trace_xen_disk_alloc(xendev->name);
-> > >
-> > >      QLIST_INIT(&blkdev->inflight);
-> > >      QLIST_INIT(&blkdev->finished);
-> > >      QLIST_INIT(&blkdev->freelist);
-> > > -    blkdev->bh =3D qemu_bh_new(blk_bh, blkdev);
-> > > +
-> > > +    obj =3D object_new(TYPE_IOTHREAD);
-> > > +    name =3D g_strdup_printf("iothread-%s", xendev->name);
-> > > +
-> > > +    object_property_add_child(object_get_objects_root(), name, obj=
-,
-> > &err);
-> > > +    assert(!err);
-> >=20
-> > Would it be enough to call object_ref?
-> >=20
->=20
-> You mean to avoid the assert? I guess so but I think any failure here w=
-ould be indicative of a larger problem.
-
-No, I meant calling object_ref instead of object_property_add_child.
-
-
-> >=20
-> > > +    g_free(name);
-> > > +
-> > > +    user_creatable_complete(obj, &err);
-> >=20
-> > Why do we need to call this?
-> >=20
->=20
-> I'm not entirely sure but looking around the object code it seemed to b=
-e a necessary part of instantiation. Maybe it is not required for iothrea=
-d objects, but I could not figure that out from looking at the code and c=
-omments in the header suggest it is harmless if it is not required.
->
-> > > +    assert(!err);
-> > > +
-> > > +    blkdev->iothread =3D (IOThread *)object_dynamic_cast(obj,
-> > TYPE_IOTHREAD);
-> > > +    blkdev->ctx =3D iothread_get_aio_context(blkdev->iothread);
-> > > +    blkdev->bh =3D aio_bh_new(blkdev->ctx, blk_bh, blkdev);
-> > > +
-> > >      if (xen_mode !=3D XEN_EMULATE) {
-> > >          batch_maps =3D 1;
-> > >      }
-> > > @@ -1288,6 +1327,8 @@ static int blk_connect(struct XenDevice *xend=
-ev)
-> > >          blkdev->persistent_gnt_count =3D 0;
-> > >      }
-> > >
-> > > +    blk_set_aio_context(blkdev->blk, blkdev->ctx);
-> > > +
-> > >      xen_be_bind_evtchn(&blkdev->xendev);
-> > >
-> > >      xen_pv_printf(&blkdev->xendev, 1, "ok: proto %s, nr-ring-ref %=
-u, "
-> > > @@ -1301,13 +1342,20 @@ static void blk_disconnect(struct XenDevice
-> > *xendev)
-> > >  {
-> > >      struct XenBlkDev *blkdev =3D container_of(xendev, struct XenBl=
-kDev,
-> > xendev);
-> > >
-> > > +    trace_xen_disk_disconnect(xendev->name);
-> > > +
-> > > +    aio_context_acquire(blkdev->ctx);
-> > > +
-> > >      if (blkdev->blk) {
-> > > +        blk_set_aio_context(blkdev->blk, qemu_get_aio_context());
-> > >          blk_detach_dev(blkdev->blk, blkdev);
-> > >          blk_unref(blkdev->blk);
-> > >          blkdev->blk =3D NULL;
-> > >      }
-> > >      xen_pv_unbind_evtchn(&blkdev->xendev);
-> > >
-> > > +    aio_context_release(blkdev->ctx);
-> > > +
-> > >      if (blkdev->sring) {
-> > >          xengnttab_unmap(blkdev->xendev.gnttabdev, blkdev->sring,
-> > >                          blkdev->nr_ring_ref);
-> > > @@ -1358,6 +1408,7 @@ static int blk_free(struct XenDevice *xendev)
-> > >      g_free(blkdev->dev);
-> > >      g_free(blkdev->devtype);
-> > >      qemu_bh_delete(blkdev->bh);
-> > > +    object_unparent(OBJECT(blkdev->iothread));
-> >=20
-> > Shouldn't this be object_unref?
-> >=20
->=20
-> I don't think so. I think this is required to undo what was done by cal=
-ling object_property_add_child() on the root object.
-
-Right, so if object_property_add_child is not actually required, then
-you might be able to turn object_unparent into object_unref.
-
-Unfortunately I don't know enough about QOM to be able to tell which is
-the right way of doing things, but looking at
-hw/block/dataplane/virtio-blk.c, it would seem that only object_ref and
-object_unref are required?
-
-
-> Looking at other code such as object_new_with_propv() it looks like the=
- right thing to do is to call object_unref() after calling object_propert=
-y_add_child() to drop the implicit ref taken by object_new() so I'd need =
-to add the call in blk_alloc().
+SGVsbG8gSmVhbiwNCg0KVGhhbmtzIGZvciB0aGUgaW5mb3JtYXRpb24uDQoNCklzIHNvbWVvbmUg
+YWxyZWFkeSB3b3JraW5nIG9uIGltcGxlbWVudGluZyB0aGlzLCBvciBpcyB0aGlzIHNvbWV0aGlu
+ZyBJIGNhbiBsb29rIGludG8gYW5kIGltcGxlbWVudGluZyA/DQoNCkFsc28sIGFzIE1pY2hhZWwg
+bWVudGlvbmVkIGFuZCBJIGxvb2tlZCBpbiB0aGUgdmZpbyBpb21tdSAodHlwZTEpIGRyaXZlciBp
+bXBsZW1lbnRhdGlvbiB0aGF0IGl0IHN1cHBvcnRzIG1haW5seQ0Kc3RhdGljIG1hcHBpbmdzIG9m
+IHVzZXItc3BhY2UgcHJvY2Vzc2VzIHdpdGggIHVzZXItc3BhY2UgcGFnZXMgcGlubmVkL2xvY2tl
+ZCBpbiBtZW1vcnksIHNvIGEgZ2VuZXJpYyBzdXBwb3J0DQpmb3IgQVRTL1BSSSBleHRlbnNpb25z
+IG5lZWRzIHRvIGJlIGFkZGVkIGluIFZGSU8gdG9vLg0KDQpUaGFua3MsDQpBc2hpc2gNCg0KLS0t
+LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEplYW4tUGhpbGlwcGUgQnJ1Y2tlciBbbWFp
+bHRvOmplYW4tcGhpbGlwcGUuYnJ1Y2tlckBhcm0uY29tXSANClNlbnQ6IEZyaWRheSwgSnVseSAw
+NywgMjAxNyA4OjQ1IFBNDQpUbzogVGlhbiwgS2V2aW47IEthbHJhLCBBc2hpc2g7IEF1Z2VyIEVy
+aWM7IEJoYXJhdCBCaHVzaGFuOyBlcmljLmF1Z2VyLnByb0BnbWFpbC5jb207IHBldGVyLm1heWRl
+bGxAbGluYXJvLm9yZzsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IG1zdEByZWRoYXQuY29t
+OyBxZW11LWFybUBub25nbnUub3JnOyBxZW11LWRldmVsQG5vbmdudS5vcmcNCkNjOiBtYXJjLnp5
+bmdpZXJAYXJtLmNvbTsgdG5Ac2VtaWhhbGYuY29tOyB3aWxsLmRlYWNvbkBhcm0uY29tOyBkcmpv
+bmVzQHJlZGhhdC5jb207IHJvYmluLm11cnBoeUBhcm0uY29tOyBjaHJpc3RvZmZlci5kYWxsQGxp
+bmFyby5vcmcNClN1YmplY3Q6IFJlOiBbUWVtdS1hcm1dIFtRZW11LWRldmVsXSBbUkZDIHYyIDAv
+OF0gVklSVElPLUlPTU1VIGRldmljZQ0KDQpIaSBBc2hpc2gsDQoNCk9uIDA3LzA3LzE3IDAwOjMz
+LCBUaWFuLCBLZXZpbiB3cm90ZToNCj4+IEZyb206IEthbHJhLCBBc2hpc2ggW21haWx0bzpBc2hp
+c2guS2FscmFAY2F2aXVtLmNvbV0NCj4+IFNlbnQ6IEZyaWRheSwgSnVseSA3LCAyMDE3IDc6MjQg
+QU0NCj4+DQo+PiBJIGhhdmUgYSBnZW5lcmljIHF1ZXN0aW9uIG9uIHZJT01NVSBzdXBwb3J0LCBp
+cyB0aGVyZSBhbnkgDQo+PiBwcm9wb3NhbC9wbGFuIHRvIGFkZCBBVFMvUFJJIGV4dGVuc2lvbiBz
+dXBwb3J0IHRvIHZJT01NVXMgYW5kIGFsbG93IA0KPj4gaGFuZGxpbmcgZm9yIGVuZCB0byBlbmQg
+KHYpSU9NTVUgUGFnZSBmYXVsdHMgKHcvdCB0aGUgZGV2aWNlIHNpZGUgDQo+PiBpbXBsZW1lbnRh
+dGlvbiBvbiBWaG9zdCkgPw0KPj4NCj4+IEFnYWluLCB0aGUgbW90aXZhdGlvbiB3aWxsIGJlIHRv
+IGRvIERNQSBvbiBwYWdlZCBndWVzdCBtZW1vcnkgYW5kIA0KPj4gcG90ZW50aWFsbHkgYXZvaWRp
+bmcgdGhlIHJlcXVpcmVtZW50IG9mIHBpbm5lZC9sb2NrZWQgZ3Vlc3QgcGh5c2ljYWwgDQo+PiBt
+ZW1vcnkgZm9yIERNQS4NCj4gDQo+IHllcywgdGhhdCdzIGEgbmVjZXNzYXJ5IHBhcnQgdG8gc3Vw
+cG9ydCBTVk0gaW4gYm90aCB2aXJ0aW8taW9tbXUgDQo+IGFwcHJvYWNoIGFuZCBmdWxseSBlbXVs
+YXRlZCBhcHByb2FjaCAoZS5nLiBmb3IgSW50ZWwgVlRkKS4gVGhlcmUgYXJlIA0KPiBhbHJlYWR5
+IHBhdGNoZXMgYW5kIGRpc2N1c3Npb25zIGluIG90aGVyIHRocmVhZCBhYm91dCBob3cgdG8gcHJv
+cGFnYXRlIA0KPiBJT01NVSBwYWdlIGZhdWx0IHRvIHZJT01NVS4gVGhlbiBhZnRlciBpdCBpcyBk
+b25lIHZJT01NVSBwYWdlIGZhdWx0IA0KPiBlbXVsYXRpb24gd2lsbCBiZSBmdXJ0aGVyIGFkZGVk
+Lg0KPiANCj4gaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMTcvNi8yNy85NjQNCg0KRm9yIHZpcnRp
+by1pb21tdSwgSSdkIGxpa2UgdG8gYWRkIGFuIGV2ZW50IHZpcnRxdWV1ZSBmb3IgdGhlIGRldmlj
+ZSB0byBzZW5kIHBhZ2UgZmF1bHRzIHRvIHRoZSBkcml2ZXIsIGluIGEgZm9ybWF0IHNpbWlsYXIg
+dG8gYSBQUkkgUGFnZSBSZXF1ZXN0Lg0KVGhlIGRyaXZlciB3b3VsZCB0aGVuIHNlbmQgYSByZXBs
+eSB2aWEgdGhlIHJlcXVlc3QgdmlydHF1ZXVlIGluIGEgZm9ybWF0IHNpbWlsYXIgdG8gYSBQUkcg
+UmVzcG9uc2UuDQoNCkluIFFlbXUgdGhlIGRldmljZSBpbXBsZW1lbnRhdGlvbiB3b3VsZCBob3Bl
+ZnVsbHkgYmUgYmFzZWQgb24gdGhlIHNhbWUgbWVjaGFuaXNtIGFzIFZUZC4gVGhlIHZob3N0IGlt
+cGxlbWVudGF0aW9uIHdvdWxkIHJlY2VpdmUgSU8gUGFnZSBGYXVsdHMgZnJvbSBWRklPIGFuZCBm
+b3J3YXJkIHRoZW0gb24gdGhlIGV2ZW50IHZpcnRxdWV1ZSBzaW1pbGFybHkgdG8gdGhlIHVzZXJz
+cGFjZSBpbXBsZW1lbnRhdGlvbi4NCg0KVGhhbmtzLA0KSmVhbg0K
