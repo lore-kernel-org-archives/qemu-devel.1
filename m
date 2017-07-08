@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dTtIE-0007iM-SX
-	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 13:13:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1dTxEY-0005HR-2P
+	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 17:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dTtID-0007aO-RM
-	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 13:13:18 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170708025030.15845-1-rth@twiddle.net>
-	<20170708025030.15845-4-rth@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f2ea7f49-10f3-520c-4a0e-456a11934410@amsat.org>
-Date: Sat, 8 Jul 2017 14:12:08 -0300
+	(envelope-from <bounces@canonical.com>) id 1dTxEU-0007Zx-R7
+	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 17:25:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dTxEU-0007Zl-KF
+	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 17:25:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dTxET-00083I-Ev
+	for <qemu-devel@nongnu.org>; Sat, 08 Jul 2017 21:25:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5D7DE2E8190
+	for <qemu-devel@nongnu.org>; Sat,  8 Jul 2017 21:25:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170708025030.15845-4-rth@twiddle.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] linux-user/sh4: Reduce
- TARGET_VIRT_ADDR_SPACE_BITS to 31
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 08 Jul 2017 21:19:03 -0000
+From: Duane Voth <duanev@gmail.com>
+Reply-To: Bug 1703147 <1703147@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <149954874338.15421.5827897782818416258.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703147] [NEW] Xfer:features:read truncating xml
+ sent to gdb frontends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +36,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, riku.voipio@iki.fi, laurent@vivier.eu, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 07/07/2017 11:50 PM, Richard Henderson wrote:
-> The real kernel has TASK_SIZE as 0x7c000000, due to quirks with
-> a couple of SH parts.  But nominally user-space is limited to 2GB.
-> 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+Public bug reported:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Around line 1326 in gdbstub.c:
 
-> ---
->   target/sh4/cpu.h | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-> index e3abb6a..3121d1e 100644
-> --- a/target/sh4/cpu.h
-> +++ b/target/sh4/cpu.h
-> @@ -45,7 +45,11 @@
->   #define TARGET_PAGE_BITS 12	/* 4k XXXXX */
->   
->   #define TARGET_PHYS_ADDR_SPACE_BITS 32
-> -#define TARGET_VIRT_ADDR_SPACE_BITS 32
-> +#ifdef CONFIG_USER_ONLY
-> +# define TARGET_VIRT_ADDR_SPACE_BITS 31
-> +#else
-> +# define TARGET_VIRT_ADDR_SPACE_BITS 32
-> +#endif
->   
->   #define SR_MD 30
->   #define SR_RB 29
-> 
+            if (len > (MAX_PACKET_LENGTH - 5) / 2)
+                len =3D (MAX_PACKET_LENGTH - 5) / 2;
+
+is truncating processor reg description xml files longer than 2045
+bytes.  Deleting these lines works for my immediate need, but they seem
+to be trying to fix some buffer overrun condition so I won't offer a
+patch until we understand their purpose.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703147
+
+Title:
+  Xfer:features:read truncating xml sent to gdb frontends
+
+Status in QEMU:
+  New
+
+Bug description:
+  Around line 1326 in gdbstub.c:
+
+              if (len > (MAX_PACKET_LENGTH - 5) / 2)
+                  len =3D (MAX_PACKET_LENGTH - 5) / 2;
+
+  is truncating processor reg description xml files longer than 2045
+  bytes.  Deleting these lines works for my immediate need, but they
+  seem to be trying to fix some buffer overrun condition so I won't
+  offer a patch until we understand their purpose.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703147/+subscriptions
