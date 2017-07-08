@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dThXo-00047G-TZ
-	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 00:40:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dTsTw-0000rD-Kt
+	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 12:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dThXi-00034w-Pe
-	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 00:40:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dThXi-00034B-JV
-	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 00:40:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dThXh-0001aj-LH
-	for <qemu-devel@nongnu.org>; Sat, 08 Jul 2017 04:40:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9FEE52E8196
-	for <qemu-devel@nongnu.org>; Sat,  8 Jul 2017 04:40:29 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dTsTv-0003yN-OW
+	for qemu-devel@nongnu.org; Sat, 08 Jul 2017 12:21:20 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170707161822.29659-1-alex.bennee@linaro.org>
+	<87inj49mr1.fsf@linaro.org>
+	<CAFEAcA_YvS8OQVTPnvRtWyVuAKO2bccyNALOs1Oq7snTO1WwkA@mail.gmail.com>
+	<a391e7e5-0be9-0863-bfb7-88d9168484f3@twiddle.net>
+	<87h8yo9k2n.fsf@linaro.org>
+	<638cda88-5bd8-2a86-d720-04005fa1c1c8@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <dfd89c2b-8ed6-0a78-93df-51fb442f0adb@amsat.org>
+Date: Sat, 8 Jul 2017 13:21:08 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 08 Jul 2017 04:21:39 -0000
-From: Launchpad Bug Tracker <822408@bugs.launchpad.net>
-Reply-To: Bug 822408 <822408@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110807201009.28795.63294.malonedeb@chaenomeles.canonical.com>
-Message-Id: <149948769971.21585.7316461160923768992.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 822408] Re: Unable to access disk image on mipsel
- host
+In-Reply-To: <638cda88-5bd8-2a86-d720-04005fa1c1c8@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [RFC PATCH] target/arm: ensure eret
+ exits the run-loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,79 +33,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Emilio G . Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joakim Bech <joakim.bech@linaro.org>, Etienne Carriere <etienne.carriere@linaro.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Hi Alex,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+On 07/07/2017 03:52 PM, Richard Henderson wrote:
+> On 07/07/2017 08:29 AM, Alex Bennée wrote:
+>>> Naming all of these different exit conditions is certainly
+>>> non-trivial.
+>>
+>> Given the variation of usage this is something that should probably be
+>> done after Lluís common run loop goes in and we can beef up the
+>> semantics of the various exit conditions.
+> 
+> Definitely.
+> 
+>> One thing I have noticed in the ARM translator is DISAS_UPDATE does a:
+>>
+>>      gen_a64_set_pc_im(dc->pc);
+>>
+>> I think this is to deal with handling exceptions either side of various
+>> instructions. Am I right in thinking this is superfluous now as we can
+>> derive the PC from the translated code address?
+> 
+> Yes and no.
+> 
+> We have typically distinguished between two kinds of exceptions: those 
+> that are dynamic (fp state, page permissions) and those that are static 
+> (illegal opcodes).
+> 
+> For the dynamic, we used to pessimistically save state, but now use the 
+> unwinder to restore it.  The unwinding is expensive but is used 
+> infrequently (especially compared to the number of load/store insns 
+> executed).
+> 
+> For the static, we know the exception must be raised, and we know the 
+> state that must be saved.  By doing that, we save the expense of the 
+> unwinding.
+> 
+> So, for the static case you're talking about, we could get the PC (and 
+> other state) back, and remove the explicit stores, but we shouldn't.
 
--- =
+While doing changes in this file, can you add a comment around 
+DISAS_UPDATE about Richard explanation?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/822408
-
-Title:
-  Unable to access disk image on mipsel host
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Something is wrong with hard disk images on MIPSel host.
-
-  The host system is mips64el (Loongson cpu, Linux 2.6.39, eglibc 2.13)
-  Tried Qemu 0.14.1 and 0.15.0-rc2, both compiled with GCC 4.6.0.
-
-  First I was trying to install WinXP (i386-softmmu).
-  Starting install, create partition, format (either quick and full), seems=
- to complete, boom the error:
-
-  "
-  Setup was unable to format the partition.  The disk may be damaged.  Make=
- sure the drive is switched on and properly connected to your computer.  If=
- the disk is a SCSI disk, make sure your SCSI devices are properly terminat=
-ed.  Consult your computer manual or SCSI adapter documentation for more in=
-formation.
-
-  You must select a different partition for Windows XP.
-  To continue, press ENTER.
-  "
-
-  This happens with both raw and qcow2 image format.
-  Tried 10Gb image, tried 16Gb one - no difference.
-
-  On a x86 host, that formatting makes the image (qcow2) grow to about
-  81 Mb by the time it reaches 100% formatted (quick), but on mipsel it
-  grows to 0.8Mb at the same time and the error appears.
-
-  I tried the same installing of Windows in Qemu on x86 host and copied ove=
-r the completed image.
-  In that case it starts loading, but in the middle of the animation there =
-is an error:
-
-  "
-  STOP: c0000221 Unknown Hard Error
-  \Systemroot\System32\ntdll.dll
-  "
-  (or HAL.dll)
-
-  So, i tried linux-0.2.img.bz2 from the Qemu site, and that fails too.
-  Thus it's the minimal bug reproduction thing.
-
-  During boot there are multiple errors like:
-  "
-  hda: dma_intr: status=3D0x41 { DriveReady Error }
-  hda: dma_intr: error=3D0x04 { DriveStatusError }
-  hda: Failed opcode was: unknown
-  "
-
-  It booted and kind of worked, there were weird glitches in every program.
-  Unusable.
-
-  Summarily, that suggest some error in hard disk emulation or back
-  storage, specific either to MIPSel or non-x86 hosts.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/822408/+subscriptions
+> 
+> 
+> r~
+> 
