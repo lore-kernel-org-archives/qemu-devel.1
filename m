@@ -1,31 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=3559f609a=Peter.Chubb@data61.csiro.au>)
-	id 1dTeDr-0003Q1-Ej
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 21:07:48 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dTfpf-0001SY-0f
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 22:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=3559f609a=Peter.Chubb@data61.csiro.au>)
-	id 1dTeDo-0007SI-9Q
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 21:07:47 -0400
-Received: from vic-mtaout1.csiro.au ([2405:b000:b00:220::64:37]:6888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=3559f609a=Peter.Chubb@data61.csiro.au>)
-	id 1dTeDn-00075g-7v
-	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 21:07:44 -0400
-From: <Peter.Chubb@data61.csiro.au>
-Date: Fri, 7 Jul 2017 23:35:00 +0000
-Message-ID: <84tw2nbz31.wl-Peter.Chubb@data61.csiro.au>
-References: <cover.1499453787.git.alistair.francis@xilinx.com>
-	<125868e788f5705e31c0326bed02bc75f9fb173e.1499453788.git.alistair.francis@xilinx.com>
-In-Reply-To: <125868e788f5705e31c0326bed02bc75f9fb173e.1499453788.git.alistair.francis@xilinx.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <BB5DF0EDD28946499FB55FA9B0990574@csiro.au>
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] Convert error_report() to
- warn_report()
+	(envelope-from <rth7680@gmail.com>) id 1dTfpb-0004w5-Vv
+	for qemu-devel@nongnu.org; Fri, 07 Jul 2017 22:50:55 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Fri,  7 Jul 2017 16:50:27 -1000
+Message-Id: <20170708025030.15845-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH 0/3] linux-user fixes for va mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +18,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair.francis@xilinx.com
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com, jcody@redhat.com, kwolf@redhat.com, mreitz@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, pl@kamp.de, jdurgin@redhat.com, rjones@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org, robh@kernel.org, peter.maydell@linaro.org, peter.chubb@nicta.com.au, ehabkost@redhat.com, marcel@redhat.com, mst@redhat.com, imammedo@redhat.com, david@gibson.dropbear.id.au, agraf@suse.de, kraxel@redhat.com, jasowang@redhat.com, mtosatti@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, qemu-arm@nongnu.org, aurelien@aurel32.net
 
->>>>> "Alistair" =3D=3D Alistair Francis <alistair.francis@xilinx.com> writ=
-es:
+At first I was simply going to add TARGET_SH to the existing
+set of defines that trigger a 31-bit address space.  But then
+I realized that one could create non-working va configurations
+from the command-line.
 
-Alistair> Convert all uses of error_report("[Ww]arning:"... to use
-Alistair> warn_report() instead. This helps standardise on a single
-Alistair> method of printing warnings to the user.
 
-Alistair> All of the warnings were changed using this command: find
-Alistair> ./* -type f -exec sed -i \ 's|error_report.*[Ww]arning:
-Alistair> |warn_report("|g' {} +
+r~
 
-Alistair> Then the white space changes where manually fixed
-Alistair> afterwards.
 
-s/where/were/
+Richard Henderson (3):
+  tcg: Fix off-by-one in assert in page_set_flags
+  linux-user: Tidy and enforce reserved_va initialization
+  linux-user/sh4: Reduce TARGET_VIRT_ADDR_SPACE_BITS to 31
 
-Otherwise,
-	Reviewed by: Peter Chubb <peter.chubb@data61.csiro.au>
-(for KZM and i.mx25 parts; I did look at the other bits but didn't see
-	anything obviously crazy.)
+ linux-user/arm/target_cpu.h |  4 ++++
+ target/mips/mips-defs.h     |  6 +++++-
+ target/nios2/cpu.h          |  6 +++++-
+ target/sh4/cpu.h            |  6 +++++-
+ accel/tcg/translate-all.c   |  2 +-
+ linux-user/main.c           | 38 +++++++++++++++++++++++++-------------
+ 6 files changed, 45 insertions(+), 17 deletions(-)
 
---=20
-Dr Peter Chubb         Tel: +61 2 9490 5852      http://ts.data61.csiro.au/
-Trustworthy Systems Group                           Data61 (formerly NICTA)=
+-- 
+2.9.4
