@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dU6zJ-0004R1-3r
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:43 -0400
+	(envelope-from <cota@braap.org>) id 1dU6zK-0004RD-Mz
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dU6zD-0002zI-VK
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:40 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:53155)
+	(envelope-from <cota@braap.org>) id 1dU6zF-00031X-B9
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:42 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:35749)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dU6zD-0002vK-Nz
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:35 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dU6zE-000300-P1
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:36 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun,  9 Jul 2017 03:49:52 -0400
-Message-Id: <1499586614-20507-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 00/22] tcg: per-thread TCG
+Date: Sun,  9 Jul 2017 03:50:10 -0400
+Message-Id: <1499586614-20507-19-git-send-email-cota@braap.org>
+In-Reply-To: <1499586614-20507-1-git-send-email-cota@braap.org>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 18/22] tcg: define TCG_HIGHWATER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +26,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Original RFC here:
-  https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg06874.html
+Will come in handy very soon.
 
-I included Richard's feedback (Thanks!) from the original RFC, and
-added quite a few things. This is now a proper PATCHset since it is
-a lot more mature.
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ tcg/tcg.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Highlights:
-- It works! I tested single/multi-threaded arm, aarch64 and alpha softmmu
-  with various -smp's (up to 120 on aarch64) and -tb-size's.
-  Also tested x86_64-linux-user with multi-threaded code. valgrind's
-  drd shows no obvious issues (it doesn't swallow C11 atomics, so it
-  spits out a lot of false positives though). Have not tested on a
-  non-x86 host, but given the audit I did of global non-const variables
-  (see commit message in patch 21), it should be OK.
-
-- Region-based allocation to maximize code_gen_buffer utilization.
-  See patch 20.
-
-- Patches 1-8 are unrelated fixes, but I'm keeping them as part of this
-  series to avoid merge headaches later on.
-
-- Performance-wise we get a 20% improvement when booting+shutting down
-  debian-arm with MTTCG and -smp 8 (see patch 22). Not bad! This is due
-  to not holding tb_lock during code translation, although the fact that
-  we still have to take it after every translation remains a scalability
-  issue. But before focusing on that, I'd like to get this reviewed.
-
-I broke down features as much as possible, so that we do not end up
-with a "per-thread TCG" megapatch.
-
-The series applies on top of the current master (b11365867568).
-
-Thanks,
-
-		Emilio
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index c19c473..2f003a0 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -115,6 +115,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ static void tcg_out_tb_init(TCGContext *s);
+ static bool tcg_out_tb_finalize(TCGContext *s);
+ 
++#define TCG_HIGHWATER 1024
++
+ static QemuMutex tcg_lock;
+ 
+ /*
+@@ -453,7 +455,7 @@ void tcg_prologue_init(TCGContext *s)
+     /* Compute a high-water mark, at which we voluntarily flush the buffer
+        and start over.  The size here is arbitrary, significantly larger
+        than we expect the code generation for any one opcode to require.  */
+-    s->code_gen_highwater = s->code_gen_buffer + (total_size - 1024);
++    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
+ 
+     tcg_register_jit(s->code_gen_buffer, total_size);
+ 
+-- 
+2.7.4
