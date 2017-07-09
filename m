@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dUJC1-0001zZ-Lt
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:52:38 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dUJCB-00027C-HD
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dUJC0-0005xM-Md
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:52:37 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dUJCA-00061h-9g
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:52:47 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Sun,  9 Jul 2017 22:51:29 +0200
-Message-Id: <1499633493-19865-5-git-send-email-eric.auger@redhat.com>
+Date: Sun,  9 Jul 2017 22:51:30 +0200
+Message-Id: <1499633493-19865-6-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
 References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v5 4/8] hw/arm/virt: Add 2.10 machine type
+Subject: [Qemu-devel] [RFC v5 5/8] hw/arm/virt-acpi-build: Add smmuv3 node
+ in IORT table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,119 +23,154 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com
 Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, tcain@qti.qualcomm.com, bharat.bhushan@nxp.com, tn@semihalf.com, mst@redhat.com, will.deacon@arm.com, jean-philippe.brucker@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com
 
-The new machine type allows smmuv3 instantiation. A new option
-is introduced to turn the feature on/off (off by default).
+From: Prem Mallappa <prem.mallappa@broadcom.com>
 
+This patch builds the smmuv3 node in the ACPI IORT table.
+
+The RID space of the root complex, which spans 0x0-0x10000
+maps to streamid space 0x0-0x10000 in smmuv3, which in turn
+maps to deviceid space 0x0-0x10000 in the ITS group.
+
+The guest must feature the IOMMU probe deferral series
+(https://lkml.org/lkml/2017/4/10/214) wich fixes streamid
+multiple lookup. This bug is not related to the SMMU emulation.
+
+Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-Another alternative would be to use the -device option as
-done on x86. As the smmu is a sysbus device, we would need to
-use the platform bus framework. This would work fine
-for the dt generation. However the feasibility needs to be
-studied for ACPI table generation.
-
-a Veuillez saisir le message de validation pour vos modifications. Les lignes
+v2 -> v3:
+- integrate into the existing IORT table made up of ITS, RC nodes
+- take into account vms->smmu
+- match linux actbl2.h acpi_iort_smmu_v3 field names
 ---
- hw/arm/virt.c         | 51 +++++++++++++++++++++++++++++++++++++++++++++++++--
- include/hw/arm/virt.h |  1 +
- 2 files changed, 50 insertions(+), 2 deletions(-)
+ hw/arm/virt-acpi-build.c    | 56 +++++++++++++++++++++++++++++++++++++++------
+ include/hw/acpi/acpi-defs.h | 15 ++++++++++++
+ 2 files changed, 64 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index d3848ae..3651e41 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1543,6 +1543,20 @@ static void machvirt_init(MachineState *machine)
-     create_platform_bus(vms, pic);
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 3d78ff6..ac2cd3e 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -393,19 +393,26 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned xsdt_tbl_offset)
  }
  
-+static bool virt_get_smmu(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    return vms->smmu;
-+}
-+
-+static void virt_set_smmu(Object *obj, bool value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    vms->smmu = value;
-+}
-+
- static bool virt_get_secure(Object *obj, Error **errp)
+ static void
+-build_iort(GArray *table_data, BIOSLinker *linker)
++build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-@@ -1698,7 +1712,7 @@ static void machvirt_machine_init(void)
- }
- type_init(machvirt_machine_init);
+-    int iort_start = table_data->len;
++    int nb_nodes, iort_start = table_data->len;
+     AcpiIortIdMapping *idmap;
+     AcpiIortItsGroup *its;
+     AcpiIortTable *iort;
+-    size_t node_size, iort_length;
++    AcpiIortSmmu3 *smmu;
++    size_t node_size, iort_length, smmu_offset = 0;
+     AcpiIortRC *rc;
  
--static void virt_2_9_instance_init(Object *obj)
-+static void virt_2_10_instance_init(Object *obj)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-@@ -1754,14 +1768,47 @@ static void virt_2_9_instance_init(Object *obj)
-                                         NULL);
-     }
+     iort = acpi_data_push(table_data, sizeof(*iort));
  
-+    if (vmc->no_smmu) {
-+        vms->smmu = false;
++    if (vms->smmu) {
++        nb_nodes = 3; /* RC, ITS, SMMUv3 */
 +    } else {
-+        /* Default disallows smmu instantiation */
-+        vms->smmu = false;
-+        object_property_add_bool(obj, "smmu", virt_get_smmu,
-+                                 virt_set_smmu, NULL);
-+        object_property_set_description(obj, "smmu",
-+                                        "Set on/off to enable/disable "
-+                                        "smmu instantiation (default off)",
-+                                        NULL);
++        nb_nodes = 2; /* RC, ITS */
 +    }
 +
-     vms->memmap = a15memmap;
-     vms->irqmap = a15irqmap;
- }
+     iort_length = sizeof(*iort);
+-    iort->node_count = cpu_to_le32(2); /* RC and ITS nodes */
++    iort->node_count = cpu_to_le32(nb_nodes);
+     iort->node_offset = cpu_to_le32(sizeof(*iort));
  
-+static void virt_machine_2_10_options(MachineClass *mc)
-+{
-+}
-+DEFINE_VIRT_MACHINE_AS_LATEST(2, 10)
-+
-+#define VIRT_COMPAT_2_9 \
-+    HW_COMPAT_2_9
-+
-+static void virt_2_9_instance_init(Object *obj)
-+{
-+    virt_2_10_instance_init(obj);
-+}
-+
- static void virt_machine_2_9_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-+    virt_machine_2_10_options(mc);
-+    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_9);
-+
-+    vmc->no_smmu = true;
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(2, 9)
-+DEFINE_VIRT_MACHINE(2, 9)
-+
+     /* ITS group node */
+@@ -418,6 +425,35 @@ build_iort(GArray *table_data, BIOSLinker *linker)
+     its->its_count = cpu_to_le32(1);
+     its->identifiers[0] = 0; /* MADT translation_id */
  
- #define VIRT_COMPAT_2_8 \
-     HW_COMPAT_2_8
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 164a531..cd2c82e 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -86,6 +86,7 @@ typedef struct {
-     bool disallow_affinity_adjustment;
-     bool no_its;
-     bool no_pmu;
-+    bool no_smmu;
-     bool claim_edge_triggered_timers;
- } VirtMachineClass;
++    if (vms->smmu) {
++        int irq =  vms->irqmap[VIRT_SMMU];
++
++        /* SMMUv3 node */
++        smmu_offset = cpu_to_le32(iort->node_offset + node_size);
++        node_size = sizeof(*smmu) + sizeof(*idmap);
++        iort_length += node_size;
++        smmu = acpi_data_push(table_data, node_size);
++
++
++        smmu->type = ACPI_IORT_NODE_SMMU_V3;
++        smmu->length = cpu_to_le16(node_size);
++        smmu->mapping_count = cpu_to_le32(1);
++        smmu->mapping_offset = cpu_to_le32(sizeof(*smmu));
++        smmu->base_address = cpu_to_le64(vms->memmap[VIRT_SMMU].base);
++        smmu->event_gsiv = cpu_to_le32(irq);
++        smmu->pri_gsiv = cpu_to_le32(irq + 1);
++        smmu->gerr_gsiv = cpu_to_le32(irq + 2);
++        smmu->sync_gsiv = cpu_to_le32(irq + 3);
++
++        /* Identity RID mapping covering the whole input RID range */
++        idmap = &smmu->id_mapping_array[0];
++        idmap->input_base = 0;
++        idmap->id_count = cpu_to_le32(0xFFFF);
++        idmap->output_base = 0;
++        /* output IORT node is the ITS group node (the first node) */
++        idmap->output_reference = cpu_to_le32(iort->node_offset);
++    }
++
+     /* Root Complex Node */
+     node_size = sizeof(*rc) + sizeof(*idmap);
+     iort_length += node_size;
+@@ -438,8 +474,14 @@ build_iort(GArray *table_data, BIOSLinker *linker)
+     idmap->input_base = 0;
+     idmap->id_count = cpu_to_le32(0xFFFF);
+     idmap->output_base = 0;
+-    /* output IORT node is the ITS group node (the first node) */
+-    idmap->output_reference = cpu_to_le32(iort->node_offset);
++
++    if (vms->smmu) {
++        /* output IORT node is the smmuv3 node */
++        idmap->output_reference = cpu_to_le32(smmu_offset);
++    } else {
++        /* output IORT node is the ITS group node (the first node) */
++        idmap->output_reference = cpu_to_le32(iort->node_offset);
++    }
  
+     iort->length = cpu_to_le32(iort_length);
+ 
+@@ -782,7 +824,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ 
+     if (its_class_name() && !vmc->no_its) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_iort(tables_blob, tables->linker);
++        build_iort(tables_blob, tables->linker, vms);
+     }
+ 
+     /* XSDT is pointed to by RSDP */
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 72be675..69307b7 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -697,6 +697,21 @@ struct AcpiIortItsGroup {
+ } QEMU_PACKED;
+ typedef struct AcpiIortItsGroup AcpiIortItsGroup;
+ 
++struct AcpiIortSmmu3 {
++    ACPI_IORT_NODE_HEADER_DEF
++    uint64_t base_address;
++    uint32_t flags;
++    uint32_t reserved2;
++    uint64_t vatos_address;
++    uint32_t model;
++    uint32_t event_gsiv;
++    uint32_t pri_gsiv;
++    uint32_t gerr_gsiv;
++    uint32_t sync_gsiv;
++    AcpiIortIdMapping id_mapping_array[0];
++} QEMU_PACKED;
++typedef struct AcpiIortSmmu3 AcpiIortSmmu3;
++
+ struct AcpiIortRC {
+     ACPI_IORT_NODE_HEADER_DEF
+     AcpiIortMemoryAccess memory_properties;
 -- 
 2.5.5
