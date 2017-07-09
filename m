@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUJFj-0005NE-Qf
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:56:28 -0400
+	(envelope-from <cota@braap.org>) id 1dUJKe-0008Pf-Mv
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUJFg-0000AI-QJ
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:56:27 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:48249)
+	(envelope-from <cota@braap.org>) id 1dUJKb-0004DF-Mj
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:01:32 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34841)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUJFg-00008z-GC
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 16:56:24 -0400
-Date: Sun, 9 Jul 2017 16:56:23 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUJKb-0004DB-IL
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:01:29 -0400
+Date: Sun, 9 Jul 2017 17:01:28 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170709205623.GA32582@flamenco>
+Message-ID: <20170709210128.GB32582@flamenco>
 References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-4-git-send-email-cota@braap.org>
-	<7eacd6bc-88e3-84de-30df-5c30bd2b8fe8@twiddle.net>
+	<1499586614-20507-12-git-send-email-cota@braap.org>
+	<5c33bb26-0f55-3362-525b-bed041e163b9@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7eacd6bc-88e3-84de-30df-5c30bd2b8fe8@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 03/22] cputlb: bring back tlb_flush_count
- under !TLB_DEBUG
+In-Reply-To: <5c33bb26-0f55-3362-525b-bed041e163b9@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 11/22] translate-all: use a binary search
+ tree to track TBs in TBContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +32,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org
 
-On Sun, Jul 09, 2017 at 10:00:01 -1000, Richard Henderson wrote:
-> On 07/08/2017 09:49 PM, Emilio G. Cota wrote:
-> >+    atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
+On Sun, Jul 09, 2017 at 10:33:41 -1000, Richard Henderson wrote:
+> On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
+> > #if defined(DEBUG_TB_FLUSH)
+> >+    nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
+> >     printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%ld\n",
+> >            (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
+> >-           tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
+> >+           nb_tbs, nb_tbs > 0 ?
+> >            ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)) /
+> >-           tcg_ctx.tb_ctx.nb_tbs : 0);
+> >+           nb_tbs : 0);
+> > #endif
 > 
-> Want atomic_read here, so they're all the same.
+> Variable declaration within braces within the ifdef.  Better as size_t or
+> unsigned long.  Using int to count thing on 64-bit hosts always seems like a
+> bug.
 
-It's not needed. Note that this thread is the only one ever writing
-to env->tlb_flush_count, so the thread can read this value without
-atomic accesses.
+g_tree_nnodes returns a gint, which is documented to be a typedef for 'int'.
+So I went with that.
 
-You'll see this pattern all across the patchset.
-
-Thanks,
+But yes, a size_t here is better.
 
 		E.
