@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dU6zK-0004RD-Mz
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:44 -0400
+	(envelope-from <cota@braap.org>) id 1dU6zM-0004SH-R8
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dU6zF-00031X-B9
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:42 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:35749)
+	(envelope-from <cota@braap.org>) id 1dU6zE-00030x-Ot
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:44 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:48999)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dU6zE-000300-P1
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dU6zE-0002zD-5X
 	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:36 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun,  9 Jul 2017 03:50:10 -0400
-Message-Id: <1499586614-20507-19-git-send-email-cota@braap.org>
+Date: Sun,  9 Jul 2017 03:50:05 -0400
+Message-Id: <1499586614-20507-14-git-send-email-cota@braap.org>
 In-Reply-To: <1499586614-20507-1-git-send-email-cota@braap.org>
 References: <1499586614-20507-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 18/22] tcg: define TCG_HIGHWATER
+Subject: [Qemu-devel] [PATCH 13/22] tcg: take tb_ctx out of TCGContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +26,287 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Will come in handy very soon.
+Before TCGContext is made thread-local.
 
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/tcg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/exec/tb-context.h |  2 ++
+ tcg/tcg.h                 |  2 --
+ accel/tcg/cpu-exec.c      |  2 +-
+ accel/tcg/translate-all.c | 57 +++++++++++++++++++++++------------------------
+ linux-user/main.c         |  6 ++---
+ 5 files changed, 34 insertions(+), 35 deletions(-)
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index c19c473..2f003a0 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -115,6 +115,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- static void tcg_out_tb_init(TCGContext *s);
- static bool tcg_out_tb_finalize(TCGContext *s);
+diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
+index 1fa8dcc..1d41202 100644
+--- a/include/exec/tb-context.h
++++ b/include/exec/tb-context.h
+@@ -41,4 +41,6 @@ struct TBContext {
+     int tb_phys_invalidate_count;
+ };
  
-+#define TCG_HIGHWATER 1024
++extern TBContext tb_ctx;
 +
- static QemuMutex tcg_lock;
+ #endif
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index da78721..ad2d959 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -706,8 +706,6 @@ struct TCGContext {
+     /* Threshold to flush the translated code buffer.  */
+     void *code_gen_highwater;
  
- /*
-@@ -453,7 +455,7 @@ void tcg_prologue_init(TCGContext *s)
-     /* Compute a high-water mark, at which we voluntarily flush the buffer
-        and start over.  The size here is arbitrary, significantly larger
-        than we expect the code generation for any one opcode to require.  */
--    s->code_gen_highwater = s->code_gen_buffer + (total_size - 1024);
-+    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
+-    TBContext tb_ctx;
+-
+     /* Track which vCPU triggers events */
+     CPUState *cpu;                      /* *_trans */
+     TCGv_env tcg_env;                   /* *_exec  */
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 3581618..54ecae2 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -323,7 +323,7 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+     phys_pc = get_page_addr_code(desc.env, pc);
+     desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+     h = tb_hash_func(phys_pc, pc, flags);
+-    return qht_lookup(&tcg_ctx.tb_ctx.htable, tb_cmp, &desc, h);
++    return qht_lookup(&tb_ctx.htable, tb_cmp, &desc, h);
+ }
  
-     tcg_register_jit(s->code_gen_buffer, total_size);
+ static inline TranslationBlock *tb_find(CPUState *cpu,
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index aa71292..84e19d9 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -130,6 +130,7 @@ static void *l1_map[V_L1_MAX_SIZE];
  
+ /* code generation context */
+ TCGContext tcg_ctx;
++TBContext tb_ctx;
+ bool parallel_cpus;
+ 
+ /* translation block context */
+@@ -161,7 +162,7 @@ static void page_table_config_init(void)
+ void tb_lock(void)
+ {
+     assert_tb_unlocked();
+-    qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
++    qemu_mutex_lock(&tb_ctx.tb_lock);
+     have_tb_lock++;
+ }
+ 
+@@ -169,13 +170,13 @@ void tb_unlock(void)
+ {
+     assert_tb_locked();
+     have_tb_lock--;
+-    qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
++    qemu_mutex_unlock(&tb_ctx.tb_lock);
+ }
+ 
+ void tb_lock_reset(void)
+ {
+     if (have_tb_lock) {
+-        qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
++        qemu_mutex_unlock(&tb_ctx.tb_lock);
+         have_tb_lock = 0;
+     }
+ }
+@@ -801,15 +802,15 @@ static inline void code_gen_alloc(size_t tb_size)
+         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
+         exit(1);
+     }
+-    tcg_ctx.tb_ctx.tb_tree = g_tree_new(tc_ptr_cmp);
+-    qemu_mutex_init(&tcg_ctx.tb_ctx.tb_lock);
++    tb_ctx.tb_tree = g_tree_new(tc_ptr_cmp);
++    qemu_mutex_init(&tb_ctx.tb_lock);
+ }
+ 
+ static void tb_htable_init(void)
+ {
+     unsigned int mode = QHT_MODE_AUTO_RESIZE;
+ 
+-    qht_init(&tcg_ctx.tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
++    qht_init(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
+ }
+ 
+ /* Must be called before using the QEMU cpus. 'tb_size' is the size
+@@ -853,7 +854,7 @@ void tb_free(TranslationBlock *tb)
+ {
+     assert_tb_locked();
+ 
+-    g_tree_remove(tcg_ctx.tb_ctx.tb_tree, &tb->tc_ptr);
++    g_tree_remove(tb_ctx.tb_tree, &tb->tc_ptr);
+ }
+ 
+ static inline void invalidate_page_bitmap(PageDesc *p)
+@@ -919,13 +920,13 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     /* If it is already been done on request of another CPU,
+      * just retry.
+      */
+-    if (tcg_ctx.tb_ctx.tb_flush_count != tb_flush_count.host_int) {
++    if (tb_ctx.tb_flush_count != tb_flush_count.host_int) {
+         goto done;
+     }
+ 
+ #if defined(DEBUG_TB_FLUSH)
+-    g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_host_size_iter, &host_size);
+-    nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
++    g_tree_foreach(tb_ctx.tb_tree, tb_host_size_iter, &host_size);
++    nb_tbs = g_tree_nnodes(tb_ctx.tb_tree);
+     printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%zu\n",
+            (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
+            nb_tbs, nb_tbs > 0 ? host_size / nb_tbs : 0);
+@@ -940,17 +941,16 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     }
+ 
+     /* Increment the refcount first so that destroy acts as a reset */
+-    g_tree_ref(tcg_ctx.tb_ctx.tb_tree);
+-    g_tree_destroy(tcg_ctx.tb_ctx.tb_tree);
++    g_tree_ref(tb_ctx.tb_tree);
++    g_tree_destroy(tb_ctx.tb_tree);
+ 
+-    qht_reset_size(&tcg_ctx.tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
++    qht_reset_size(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
+     page_flush_tb();
+ 
+     tcg_ctx.code_gen_ptr = tcg_ctx.code_gen_buffer;
+     /* XXX: flush processor icache at this point if cache flush is
+        expensive */
+-    atomic_mb_set(&tcg_ctx.tb_ctx.tb_flush_count,
+-                  tcg_ctx.tb_ctx.tb_flush_count + 1);
++    atomic_mb_set(&tb_ctx.tb_flush_count, tb_ctx.tb_flush_count + 1);
+ 
+ done:
+     tb_unlock();
+@@ -959,7 +959,7 @@ done:
+ void tb_flush(CPUState *cpu)
+ {
+     if (tcg_enabled()) {
+-        unsigned tb_flush_count = atomic_mb_read(&tcg_ctx.tb_ctx.tb_flush_count);
++        unsigned tb_flush_count = atomic_mb_read(&tb_ctx.tb_flush_count);
+         async_safe_run_on_cpu(cpu, do_tb_flush,
+                               RUN_ON_CPU_HOST_INT(tb_flush_count));
+     }
+@@ -986,7 +986,7 @@ do_tb_invalidate_check(struct qht *ht, void *p, uint32_t hash, void *userp)
+ static void tb_invalidate_check(target_ulong address)
+ {
+     address &= TARGET_PAGE_MASK;
+-    qht_iter(&tcg_ctx.tb_ctx.htable, do_tb_invalidate_check, &address);
++    qht_iter(&tb_ctx.htable, do_tb_invalidate_check, &address);
+ }
+ 
+ static void
+@@ -1006,7 +1006,7 @@ do_tb_page_check(struct qht *ht, void *p, uint32_t hash, void *userp)
+ /* verify that all the pages have correct rights for code */
+ static void tb_page_check(void)
+ {
+-    qht_iter(&tcg_ctx.tb_ctx.htable, do_tb_page_check, NULL);
++    qht_iter(&tb_ctx.htable, do_tb_page_check, NULL);
+ }
+ 
+ #endif
+@@ -1105,7 +1105,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+     /* remove the TB from the hash list */
+     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+     h = tb_hash_func(phys_pc, tb->pc, tb->flags);
+-    qht_remove(&tcg_ctx.tb_ctx.htable, tb, h);
++    qht_remove(&tb_ctx.htable, tb, h);
+ 
+     /* remove the TB from the page list */
+     if (tb->page_addr[0] != page_addr) {
+@@ -1134,7 +1134,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+     /* suppress any remaining jumps to this TB */
+     tb_jmp_unlink(tb);
+ 
+-    tcg_ctx.tb_ctx.tb_phys_invalidate_count++;
++    tb_ctx.tb_phys_invalidate_count++;
+ }
+ 
+ #ifdef CONFIG_SOFTMMU
+@@ -1250,7 +1250,7 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+ 
+     /* add in the hash table */
+     h = tb_hash_func(phys_pc, tb->pc, tb->flags);
+-    qht_insert(&tcg_ctx.tb_ctx.htable, tb, h);
++    qht_insert(&tb_ctx.htable, tb, h);
+ 
+ #ifdef DEBUG_TB_CHECK
+     tb_page_check();
+@@ -1393,7 +1393,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+      * through the physical hash table and physical page list.
+      */
+     tb_link_page(tb, phys_pc, phys_page2);
+-    g_tree_insert(tcg_ctx.tb_ctx.tb_tree, &tb->tc_ptr, tb);
++    g_tree_insert(tb_ctx.tb_tree, &tb->tc_ptr, tb);
+     return tb;
+ }
+ 
+@@ -1671,7 +1671,7 @@ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
+ {
+     struct ptr_size s = { .ptr = (void *)tc_ptr };
+ 
+-    return g_tree_lookup(tcg_ctx.tb_ctx.tb_tree, &s);
++    return g_tree_lookup(tb_ctx.tb_tree, &s);
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -1895,8 +1895,8 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+ 
+     tb_lock();
+ 
+-    nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
+-    g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
++    nb_tbs = g_tree_nnodes(tb_ctx.tb_tree);
++    g_tree_foreach(tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
+     /* XXX: avoid using doubles ? */
+     cpu_fprintf(f, "Translation buffer state:\n");
+     /*
+@@ -1922,15 +1922,14 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+                 tst.direct_jmp2_count,
+                 nb_tbs ? (tst.direct_jmp2_count * 100) / nb_tbs : 0);
+ 
+-    qht_statistics_init(&tcg_ctx.tb_ctx.htable, &hst);
++    qht_statistics_init(&tb_ctx.htable, &hst);
+     print_qht_statistics(f, cpu_fprintf, hst);
+     qht_statistics_destroy(&hst);
+ 
+     cpu_fprintf(f, "\nStatistics:\n");
+     cpu_fprintf(f, "TB flush count      %u\n",
+-            atomic_read(&tcg_ctx.tb_ctx.tb_flush_count));
+-    cpu_fprintf(f, "TB invalidate count %d\n",
+-            tcg_ctx.tb_ctx.tb_phys_invalidate_count);
++                atomic_read(&tb_ctx.tb_flush_count));
++    cpu_fprintf(f, "TB invalidate count %d\n", tb_ctx.tb_phys_invalidate_count);
+     cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
+     tcg_dump_info(f, cpu_fprintf);
+ 
+diff --git a/linux-user/main.c b/linux-user/main.c
+index ad03c9e..630c73d 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -114,7 +114,7 @@ int cpu_get_pic_interrupt(CPUX86State *env)
+ void fork_start(void)
+ {
+     cpu_list_lock();
+-    qemu_mutex_lock(&tcg_ctx.tb_ctx.tb_lock);
++    qemu_mutex_lock(&tb_ctx.tb_lock);
+     mmap_fork_start();
+ }
+ 
+@@ -130,11 +130,11 @@ void fork_end(int child)
+                 QTAILQ_REMOVE(&cpus, cpu, node);
+             }
+         }
+-        qemu_mutex_init(&tcg_ctx.tb_ctx.tb_lock);
++        qemu_mutex_init(&tb_ctx.tb_lock);
+         qemu_init_cpu_list();
+         gdbserver_fork(thread_cpu);
+     } else {
+-        qemu_mutex_unlock(&tcg_ctx.tb_ctx.tb_lock);
++        qemu_mutex_unlock(&tb_ctx.tb_lock);
+         cpu_list_unlock();
+     }
+ }
 -- 
 2.7.4
