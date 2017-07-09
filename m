@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dU6zK-0004RE-Pw
+	(envelope-from <cota@braap.org>) id 1dU6zL-0004RI-8K
 	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dU6zE-00030p-OF
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:42 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:60363)
+	(envelope-from <cota@braap.org>) id 1dU6zF-00031K-8j
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:43 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:42783)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dU6zE-0002zB-7h
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dU6zE-0002zo-Qw
 	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 03:50:36 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun,  9 Jul 2017 03:50:04 -0400
-Message-Id: <1499586614-20507-13-git-send-email-cota@braap.org>
+Date: Sun,  9 Jul 2017 03:50:08 -0400
+Message-Id: <1499586614-20507-17-git-send-email-cota@braap.org>
 In-Reply-To: <1499586614-20507-1-git-send-email-cota@braap.org>
 References: <1499586614-20507-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 12/22] translate-all: report correct avg host
- TB size
+Subject: [Qemu-devel] [PATCH 16/22] tcg: keep a list of TCGContext's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,113 +26,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Since commit 6e3b2bfd6 ("tcg: allocate TB structs before the
-corresponding translated code") we are not fully utilizing
-code_gen_buffer for translated code, and therefore are
-incorrectly reporting the amount of translated code as well as
-the average host TB size. Address this by:
+Before we make TCGContext thread-local. Once that is done, iterating
+over all TCG contexts will be quite useful; for instance we
+will need it to gather profiling info from each TCGContext.
 
-- Making the conscious choice of misreporting the total translated code;
-  doing otherwise would mislead users into thinking "-tb-size" is not
-  honoured.
+A possible alternative would be to keep an array of TCGContext pointers.
+However this option however is not that trivial, because vCPUs are spawned in
+parallel. So let's just keep it simple and use a list protected by a lock.
 
-- Expanding tb_tree_stats to accurately count the bytes of translated code on
-  the host, and using this for reporting the average tb host size,
-  as well as the expansion ratio.
-
-In the future we might want to consider reporting the accurate numbers for
-the total translated code, together with a "bookkeeping/overhead" field to
-account for the TB structs.
+Note that this lock will soon be used for other purposes, hence the
+generic "tcg_lock" name.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ tcg/tcg.h |  3 +++
+ tcg/tcg.c | 23 +++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index aa3a08b..aa71292 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -898,9 +898,20 @@ static void page_flush_tb(void)
-     }
- }
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 534ead5..8e1cd45 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -725,6 +725,8 @@ struct TCGContext {
  
-+static __attribute__((unused))
-+gboolean tb_host_size_iter(gpointer key, gpointer value, gpointer data)
-+{
-+    const TranslationBlock *tb = value;
-+    size_t *size = data;
+     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
+     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
 +
-+    *size += tb->tc_size;
-+    return false;
++    QSIMPLEQ_ENTRY(TCGContext) entry;
+ };
+ 
+ extern TCGContext tcg_ctx;
+@@ -773,6 +775,7 @@ static inline void *tcg_malloc(int size)
+ 
+ void tcg_context_init(TCGContext *s);
+ void tcg_prologue_init(TCGContext *s);
++void tcg_register_thread(void);
+ void tcg_func_start(TCGContext *s);
+ 
+ int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index d9b083a..0da7c61 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -115,7 +115,16 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ static void tcg_out_tb_init(TCGContext *s);
+ static bool tcg_out_tb_finalize(TCGContext *s);
+ 
++static QemuMutex tcg_lock;
+ 
++/*
++ * List of TCGContext's in the system. Protected by tcg_lock.
++ * Once vcpu threads have been inited, there will be no further modifications
++ * to the list (vcpu threads never return) so we can safely traverse the list
++ * without synchronization.
++ */
++static QSIMPLEQ_HEAD(, TCGContext) ctx_list =
++    QSIMPLEQ_HEAD_INITIALIZER(ctx_list);
+ 
+ static TCGRegSet tcg_target_available_regs[2];
+ static TCGRegSet tcg_target_call_clobber_regs;
+@@ -324,6 +333,17 @@ static GHashTable *helper_table;
+ static int indirect_reg_alloc_order[ARRAY_SIZE(tcg_target_reg_alloc_order)];
+ static void process_op_defs(TCGContext *s);
+ 
++/*
++ * Child TCG threads, i.e. the ones that do not call tcg_context_init, must call
++ * this function before initiating translation.
++ */
++void tcg_register_thread(void)
++{
++    qemu_mutex_lock(&tcg_lock);
++    QSIMPLEQ_INSERT_TAIL(&ctx_list, &tcg_ctx, entry);
++    qemu_mutex_unlock(&tcg_lock);
 +}
 +
- /* flush all the translation blocks */
- static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+ void tcg_context_init(TCGContext *s)
  {
-+    size_t host_size __attribute__((unused)) = 0;
-     int nb_tbs __attribute__((unused));
- 
-     tb_lock();
-@@ -913,12 +924,11 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
+     int op, total_args, n, i;
+@@ -381,6 +401,9 @@ void tcg_context_init(TCGContext *s)
+     for (; i < ARRAY_SIZE(tcg_target_reg_alloc_order); ++i) {
+         indirect_reg_alloc_order[i] = tcg_target_reg_alloc_order[i];
      }
- 
- #if defined(DEBUG_TB_FLUSH)
-+    g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_host_size_iter, &host_size);
-     nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
--    printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%ld\n",
-+    printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%zu\n",
-            (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
--           nb_tbs, nb_tbs > 0 ?
--           ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)) /
--           nb_tbs : 0);
-+           nb_tbs, nb_tbs > 0 ? host_size / nb_tbs : 0);
- #endif
-     if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
-         > tcg_ctx.code_gen_buffer_size) {
-@@ -1847,6 +1857,7 @@ static void print_qht_statistics(FILE *f, fprintf_function cpu_fprintf,
++
++    qemu_mutex_init(&tcg_lock);
++    tcg_register_thread();
  }
  
- struct tb_tree_stats {
-+    size_t host_size;
-     size_t target_size;
-     size_t max_target_size;
-     size_t direct_jmp_count;
-@@ -1859,6 +1870,7 @@ static gboolean tb_tree_stats_iter(gpointer key, gpointer value, gpointer data)
-     const TranslationBlock *tb = value;
-     struct tb_tree_stats *tst = data;
- 
-+    tst->host_size += tb->tc_size;
-     tst->target_size += tb->size;
-     if (tb->size > tst->max_target_size) {
-         tst->max_target_size = tb->size;
-@@ -1887,6 +1899,11 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     g_tree_foreach(tcg_ctx.tb_ctx.tb_tree, tb_tree_stats_iter, &tst);
-     /* XXX: avoid using doubles ? */
-     cpu_fprintf(f, "Translation buffer state:\n");
-+    /*
-+     * Report total code size including the padding and TB structs;
-+     * otherwise users might think "-tb-size" is not honoured.
-+     * For avg host size we use the precise numbers from tb_tree_stats though.
-+     */
-     cpu_fprintf(f, "gen code size       %td/%zd\n",
-                 tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
-                 tcg_ctx.code_gen_highwater - tcg_ctx.code_gen_buffer);
-@@ -1894,12 +1911,9 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-     cpu_fprintf(f, "TB avg target size  %zu max=%zu bytes\n",
-                 nb_tbs ? tst.target_size / nb_tbs : 0,
-                 tst.max_target_size);
--    cpu_fprintf(f, "TB avg host size    %td bytes (expansion ratio: %0.1f)\n",
--                nb_tbs ? (tcg_ctx.code_gen_ptr -
--                          tcg_ctx.code_gen_buffer) / nb_tbs : 0,
--                tst.target_size ? (double) (tcg_ctx.code_gen_ptr -
--                                            tcg_ctx.code_gen_buffer) /
--                                            tst.target_size : 0);
-+    cpu_fprintf(f, "TB avg host size    %zu bytes (expansion ratio: %0.1f)\n",
-+                nb_tbs ? tst.host_size / nb_tbs : 0,
-+                tst.target_size ? (double)tst.host_size / tst.target_size : 0);
-     cpu_fprintf(f, "cross page TB count %zu (%zu%%)\n", tst.cross_page,
-             nb_tbs ? (tst.cross_page * 100) / nb_tbs : 0);
-     cpu_fprintf(f, "direct jump count   %zu (%zu%%) (2 jumps=%zu %zu%%)\n",
+ /*
 -- 
 2.7.4
