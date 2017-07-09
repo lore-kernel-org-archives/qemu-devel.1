@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUJlT-0003UL-1W
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:29:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUJqH-0004FK-Bp
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUJlP-0004xV-UF
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:29:15 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:45941)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUJlP-0004xC-In
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:29:11 -0400
-Date: Sun, 9 Jul 2017 17:29:10 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170709212910.GA3027@flamenco>
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-22-git-send-email-cota@braap.org>
-	<3fabc9d4-86b5-9d01-9499-3468bd2f2e5e@twiddle.net>
+	(envelope-from <mreitz@redhat.com>) id 1dUJqG-0006ie-KR
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:34:13 -0400
+References: <20170707143028.692-1-pbutsykin@virtuozzo.com>
+	<20170707143028.692-3-pbutsykin@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ff06c980-331d-4845-761a-14e43c6cf901@redhat.com>
+Date: Sun, 9 Jul 2017 23:34:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3fabc9d4-86b5-9d01-9499-3468bd2f2e5e@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 21/22] tcg: enable per-thread TCG for
- softmmu
+In-Reply-To: <20170707143028.692-3-pbutsykin@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XsCpnFBxjGlHHWtxxvEOj7gDiDToGmSiQ"
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] qcow2: add qcow2_cache_discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-On Sun, Jul 09, 2017 at 11:19:37 -1000, Richard Henderson wrote:
-> On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
-> >This allows us to generate TCG code in parallel. MTTCG already uses
-> >it, although the next commit pushes down a lock to actually
-> >perform parallel generation.
-> >
-> >User-mode is kept out of this: contention due to concurrent translation
-> >is more commonly found in full-system mode.
-> 
-> Um, why do you believe that?  Are you suggesting that a multi-threaded
-> user-only guest is much more likely to share TBs and do much less code
-> generation total?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XsCpnFBxjGlHHWtxxvEOj7gDiDToGmSiQ
+From: Max Reitz <mreitz@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+Message-ID: <ff06c980-331d-4845-761a-14e43c6cf901@redhat.com>
+Subject: Re: [PATCH v3 2/4] qcow2: add qcow2_cache_discard
+References: <20170707143028.692-1-pbutsykin@virtuozzo.com>
+ <20170707143028.692-3-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170707143028.692-3-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Exactly. Also, in user-mode "vCPU threads" (i.e. host threads) come and
-go all the time, so this doesn't work well with having a single
-code_gen_buffer, which I assumed was non-negotiable.
+On 2017-07-07 16:30, Pavel Butsykin wrote:
+> Whenever l2/refcount table clusters are discarded from the file we can
+> automatically drop unnecessary content of the cache tables. This reduce=
+s
+> the chance of eviction useful cache data and eliminates inconsistent da=
+ta
+> in the cache with the data in the file.
+>=20
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> ---
+>  block/qcow2-cache.c    | 26 ++++++++++++++++++++++++++
+>  block/qcow2-refcount.c | 14 ++++++++++++++
+>  block/qcow2.h          |  3 +++
+>  3 files changed, 43 insertions(+)
 
-> At the moment I think it's just a confusing distinction.  As proven by some
-> of the comment adjustments you made.
-> 
-> >-TCGContext tcg_ctx;
-> >+TCG_THREAD TCGContext tcg_ctx;
-> 
-> This is a really large structure, and it's not needed by any of the I/O
-> threads.  We're probably better off dynamically allocating this ourselves
-> and do something like
-(snip)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Agreed, will look into this.
 
-		E.
+--XsCpnFBxjGlHHWtxxvEOj7gDiDToGmSiQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZYqFKEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOrf
+CACFb+WbZ7vlr3Pfae8bhyIaNwIWLzzpEDdUOaAGDiLAKTnNzaC6LCesLku0P9xi
+piizWps3960qxPW93B0MYVWBYWgfR8c3n5xYdwswVxQTiqXZImiZqjhmwhwaU1zS
+cjKnbNzcNEpku6mzj5WQxDA2xBpOXUk9NQx9E7EdgaQYjzqGdwDHQYvTjQ7XEiz6
+lNYL/gydl7xacWZhxU+wxizD6yZykJRh8cAIA/EmDeGorwXd+SVSoHSHskorcJ45
+UZYedwj1LcxT1/nqZHLw+8Op7vTVtUKUqEZT78nQp8knuGpWoFqO0ZpW0u8ImVVJ
+eQhZQNSjtK7cePIAKQqfEibC
+=u3+0
+-----END PGP SIGNATURE-----
+
+--XsCpnFBxjGlHHWtxxvEOj7gDiDToGmSiQ--
