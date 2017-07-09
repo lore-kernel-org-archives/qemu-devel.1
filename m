@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUJeu-0000vm-9w
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:22:29 -0400
+	(envelope-from <cota@braap.org>) id 1dUJlT-0003UL-1W
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:29:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUJep-0002Lj-HS
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:22:28 -0400
-Received: from mail-wr0-f175.google.com ([209.85.128.175]:36675)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUJep-0002LV-7c
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:22:23 -0400
-Received: by mail-wr0-f175.google.com with SMTP id c11so113772615wrc.3
-	for <qemu-devel@nongnu.org>; Sun, 09 Jul 2017 14:22:23 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1dUJlP-0004xV-UF
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:29:15 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:45941)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUJlP-0004xC-In
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:29:11 -0400
+Date: Sun, 9 Jul 2017 17:29:10 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170709212910.GA3027@flamenco>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-22-git-send-email-cota@braap.org>
+	<3fabc9d4-86b5-9d01-9499-3468bd2f2e5e@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_qAkYYnZpUoXR_9w-d428GYer9RiT5Uv0yaq31xakRpw@mail.gmail.com>
-References: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
-	<CAFEAcA_qAkYYnZpUoXR_9w-d428GYer9RiT5Uv0yaq31xakRpw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 9 Jul 2017 22:21:01 +0100
-Message-ID: <CAFEAcA9QLFrvv1uXz3vg8koG-F-KBaC0TWU8f8Tb44UMixVLqw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] slirp: handle errors in sosendoob()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3fabc9d4-86b5-9d01-9499-3468bd2f2e5e@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 21/22] tcg: enable per-thread TCG for
+ softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, "patches@linaro.org" <patches@linaro.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-Ping^2 ?
+On Sun, Jul 09, 2017 at 11:19:37 -1000, Richard Henderson wrote:
+> On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
+> >This allows us to generate TCG code in parallel. MTTCG already uses
+> >it, although the next commit pushes down a lock to actually
+> >perform parallel generation.
+> >
+> >User-mode is kept out of this: contention due to concurrent translation
+> >is more commonly found in full-system mode.
+> 
+> Um, why do you believe that?  Are you suggesting that a multi-threaded
+> user-only guest is much more likely to share TBs and do much less code
+> generation total?
 
-thanks
--- PMM
+Exactly. Also, in user-mode "vCPU threads" (i.e. host threads) come and
+go all the time, so this doesn't work well with having a single
+code_gen_buffer, which I assumed was non-negotiable.
 
-On 26 June 2017 at 13:24, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Ping for review?
->
-> thanks
-> -- PMM
->
-> On 5 June 2017 at 17:19, Peter Maydell <peter.maydell@linaro.org> wrote:
->> At the moment the slirp sosendoob() function doesn't properly
->> handle errors from slirp_send(), and its callers don't do
->> anything with its return value either. (Coverity spots the
->> latter as CID 1005633.)
->>
->> This patchset attempts to fix that. In the first patch we
->> fix sosendoob() itself so that we return errors to the caller
->> and treat short writes as reducing the amount of urgent data
->> to be sent. In the second patch we make the call in sowrite()
->> treat any return form sosendoob() which didn't transfer all
->> the urgent data as a "disconnect the socket" error in the
->> same way that it already handles errors for writes of
->> non-urgent data. The call to sosendoob() in sbappend() can
->> safely ignore any failures as in this case sowrite() will be
->> called shortly and will deal with them.
->>
->> Coding style: I've opted to stick with the tab-indent
->> that the slirp code uses rather than reindent to QEMU standard.
->> Happy to go the other way if the maintainer prefers.
->>
->> Disclaimer: I have not tested these patches very hard and
->> in particular they deal with error paths and with urgent
->> data, neither of which I have any test case for...
->>
->> thanks
->> -- PMM
->>
->> Peter Maydell (2):
->>   slirp: Handle error returns from slirp_send() in sosendoob()
->>   slirp: Handle error returns from sosendoob()
->>
->>  slirp/sbuf.c   |  2 +-
->>  slirp/socket.c | 51 ++++++++++++++++++++++++++++++++++-----------------
->>  2 files changed, 35 insertions(+), 18 deletions(-)
+> At the moment I think it's just a confusing distinction.  As proven by some
+> of the comment adjustments you made.
+> 
+> >-TCGContext tcg_ctx;
+> >+TCG_THREAD TCGContext tcg_ctx;
+> 
+> This is a really large structure, and it's not needed by any of the I/O
+> threads.  We're probably better off dynamically allocating this ourselves
+> and do something like
+(snip)
+
+Agreed, will look into this.
+
+		E.
