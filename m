@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUJKe-0008Pf-Mv
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:01:33 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dUJLp-0000Xi-3o
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUJKb-0004DF-Mj
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:01:32 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34841)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUJKb-0004DB-IL
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:01:29 -0400
-Date: Sun, 9 Jul 2017 17:01:28 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170709210128.GB32582@flamenco>
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-12-git-send-email-cota@braap.org>
-	<5c33bb26-0f55-3362-525b-bed041e163b9@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5c33bb26-0f55-3362-525b-bed041e163b9@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 11/22] translate-all: use a binary search
- tree to track TBs in TBContext
+	(envelope-from <eric.auger@redhat.com>) id 1dUJLo-0004kF-8g
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 17:02:45 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Sun,  9 Jul 2017 23:02:16 +0200
+Message-Id: <1499634139-20399-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH RESEND v3 0/3] Generic PCIe host bridge INTx
+ determination for INTx routing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +18,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, alex.williamson@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: christoffer.dall@linaro.org, agraf@suse.de, pranavkumar@linaro.org, drjones@redhat.com, wei@redhat.com
 
-On Sun, Jul 09, 2017 at 10:33:41 -1000, Richard Henderson wrote:
-> On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
-> > #if defined(DEBUG_TB_FLUSH)
-> >+    nb_tbs = g_tree_nnodes(tcg_ctx.tb_ctx.tb_tree);
-> >     printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%ld\n",
-> >            (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
-> >-           tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
-> >+           nb_tbs, nb_tbs > 0 ?
-> >            ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)) /
-> >-           tcg_ctx.tb_ctx.nb_tbs : 0);
-> >+           nb_tbs : 0);
-> > #endif
-> 
-> Variable declaration within braces within the ifdef.  Better as size_t or
-> unsigned long.  Using int to count thing on 64-bit hosts always seems like a
-> bug.
+This series implements INTx to gsi routing for ARM VIRT/Gpex. This is
+a respin of [1] which was lost in limbo.
 
-g_tree_nnodes returns a gint, which is documented to be a typedef for 'int'.
-So I went with that.
+ARM virt uses GPEX PCIe bridge. This latter does not implement INTx
+to GSI routing. PCIe/INTx assignment works but the consequence is
+irqfd is not used along with INTx interrupts and VFIO INTx handlers
+are executed on userspace leading to an important performance degradation.
 
-But yes, a size_t here is better.
+This issue is witnessed by the following messages;
 
-		E.
+qemu-system-aarch64: -device vfio-pci,host=0006:90:00.0: PCI: Bug -
+unimplemented PCI INTx routing (gpex-pcihost)
+qemu-system-aarch64: PCI: Bug - unimplemented PCI INTx routing (gpex-pcihost)
+qemu-system-aarch64: PCI: Bug - unimplemented PCI INTx routing (gpex-pcihost)
+
+So with this series, irqfd is set up for PCIe/INTx passthrough and we get
+the optimal performance. Also we get rid of the above messages.
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/v2.9-gpex-intx-v3
+
+References:
+[1] Generic PCIe host bridge INTx determination for INTx routing
+   https://lists.gnu.org/archive/html/qemu-devel/2015-09/msg04975.html
+
+
+Pranavkumar Sawargaonkar (3):
+  hw/pci-host/gpex: Set INTx index/gsi mapping
+  hw/arm/virt: Set INTx/gsi mapping
+  hw/pci-host/gpex: Implement PCI INTx routing
+
+ hw/arm/virt.c              |  4 ++++
+ hw/pci-host/gpex.c         | 22 ++++++++++++++++++++++
+ include/hw/pci-host/gpex.h |  3 +++
+ 3 files changed, 29 insertions(+)
+
+-- 
+2.5.5
