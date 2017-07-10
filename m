@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUaF4-0000bT-IK
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:04:55 -0400
+	(envelope-from <den@openvz.org>) id 1dUaGK-0001Ow-Kv
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUaF3-000873-Du
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:04:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dUaF3-00086l-77
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:04:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3CB707F6A6
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 15:04:52 +0000 (UTC)
-Received: from red.redhat.com (ovpn-121-60.rdu2.redhat.com [10.10.121.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D959D7D51D
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 15:04:51 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Jul 2017 10:04:30 -0500
-Message-Id: <20170710150440.11303-2-eblake@redhat.com>
-In-Reply-To: <20170710150440.11303-1-eblake@redhat.com>
-References: <20170710150440.11303-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL v2 01/11] MAINTAINERS: Promote NBD to supported,
- with new maintainer
+	(envelope-from <den@openvz.org>) id 1dUaGJ-0000QA-PK
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:06:12 -0400
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Mon, 10 Jul 2017 18:05:59 +0300
+Message-Id: <20170710150559.30163-1-den@openvz.org>
+Subject: [Qemu-devel] [PATCH v2 1/1] block: fix shadowed variable in
+ bdrv_co_pdiscard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +19,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-We are promising more than just odd fixes, and Paolo is hoping
-to offload the pull requests to me.  Also, enough of NBD is related
-to the block layer that it is worth including qemu-block on patches.
+We've had a shadowed 'ret' variable, which risks returning the wrong
+value, introduced in commit b9c64947.
 
-While at it, include blockdev-nbd.c and qemu-nbd.texi in the set
-of maintained files.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170707182151.29872-1-eblake@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
 ---
- MAINTAINERS | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ block/io.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4e17216..9529c94 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1348,15 +1348,6 @@ W: http://info.iet.unipi.it/~luigi/netmap/
- S: Maintained
- F: net/netmap.c
-
--Network Block Device (NBD)
--M: Paolo Bonzini <pbonzini@redhat.com>
--S: Odd Fixes
--F: block/nbd*
--F: nbd/
--F: include/block/nbd*
--F: qemu-nbd.c
--T: git git://github.com/bonzini/qemu.git nbd-next
--
- NUMA
- M: Eduardo Habkost <ehabkost@redhat.com>
- S: Maintained
-@@ -1710,6 +1701,18 @@ S: Supported
- F: block/iscsi.c
- F: block/iscsi-opts.c
-
-+Network Block Device (NBD)
-+M: Eric Blake <eblake@redhat.com>
-+M: Paolo Bonzini <pbonzini@redhat.com>
-+L: qemu-block@nongnu.org
-+S: Maintained
-+F: block/nbd*
-+F: nbd/
-+F: include/block/nbd*
-+F: qemu-nbd.*
-+F: blockdev-nbd.c
-+T: git git://repo.or.cz/qemu/ericb.git nbd
-+
- NFS
- M: Jeff Cody <jcody@redhat.com>
- M: Peter Lieven <pl@kamp.de>
+diff --git a/block/io.c b/block/io.c
+index 23170a57ee..87208990c4 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2327,7 +2327,6 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
+     assert(max_pdiscard >= bs->bl.request_alignment);
+ 
+     while (bytes > 0) {
+-        int ret;
+         int num = bytes;
+ 
+         if (head) {
 -- 
-2.9.4
+2.11.0
