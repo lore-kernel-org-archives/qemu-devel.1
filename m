@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1dUfnj-00023D-1C
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:01:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUfqL-0003n0-De
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:03:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1dUfne-0001d4-2l
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:01:03 -0400
-Message-ID: <1499720443.2865.15.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Tue, 11 Jul 2017 07:00:43 +1000
-In-Reply-To: <9a7a16a0-f14f-bc65-d503-e2aee028633f@kaod.org>
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-4-git-send-email-clg@kaod.org>
-	<20170710102655.GE4083@umbus.fritz.box>
-	<9a7a16a0-f14f-bc65-d503-e2aee028633f@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 03/26] target/ppc/POWER9: add
- POWERPC_EXCP_POWER9
+	(envelope-from <eblake@redhat.com>) id 1dUfqK-0002je-HU
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:03:45 -0400
+References: <20170710163029.129912-1-vsementsov@virtuozzo.com>
+	<20170710163029.129912-7-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3af32ef6-6957-c24b-a8f7-b2068365b5b1@redhat.com>
+Date: Mon, 10 Jul 2017 16:03:26 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170710163029.129912-7-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="E9LvVmW8QVvNVACB8lnAgLXoJ43fGgeKS"
+Subject: Re: [Qemu-devel] [PATCH v7 06/16] qapi: add dirty-bitmaps migration
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,133 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On Mon, 2017-07-10 at 14:49 +0200, C=C3=A9dric Le Goater wrote:
-> On 07/10/2017 12:26 PM, David Gibson wrote:
-> > On Wed, Jul 05, 2017 at 07:13:16PM +0200, C=C3=A9dric Le Goater wrote=
-:
-> > > Prepare ground for the new exception model XIVE of POWER9.
-> >=20
-> > I'm a bit confused by this.  The excp_model is about the CPU core's
-> > irq model, not the external irq controller's.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E9LvVmW8QVvNVACB8lnAgLXoJ43fGgeKS
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, famz@redhat.com,
+ stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com,
+ mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org,
+ dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+Message-ID: <3af32ef6-6957-c24b-a8f7-b2068365b5b1@redhat.com>
+Subject: Re: [PATCH v7 06/16] qapi: add dirty-bitmaps migration capability
+References: <20170710163029.129912-1-vsementsov@virtuozzo.com>
+ <20170710163029.129912-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20170710163029.129912-7-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/10/2017 11:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/migration.c | 9 +++++++++
+>  migration/migration.h | 1 +
+>  qapi-schema.json      | 4 +++-
+>  3 files changed, 13 insertions(+), 1 deletion(-)
 >=20
-> yes this is true, but the POWER9 CPU is the only criteria we have=20
-> to distinguish a machine supporting XIVE and XICS from one only=20
-> supporting XICS.
 
-Why ? I don't understand.
+> +++ b/qapi-schema.json
+> @@ -903,12 +903,14 @@
+>  # @return-path: If enabled, migration will use the return path even
+>  #               for precopy. (since 2.10)
+>  #
+> +# @dirty-bitmaps: If enabled, QEMU will migrate named dirty bitmaps. (=
+since 2.9)
 
-We do want an EXCP_POWER9 for other things, like the fact that we have
-a separate interrupt input for hypervisor, with associated vectors
-etc...  but that still doesn't relate to what interrupt controller is
-there.
+We've missed 2.9; this should be 2.10.
 
-> My idea was to use this flag to activate the OV5_XIVE_EXPLOIT bit=20
-> in ibm,arch-vec-5-platform-support ov5_platform, like this is done
-> for the MMU. See spapr_dt_ov5_platform_support()
-
-I disagree, the MMU is in the core, the XIVE isn't. It would be
-possibly to make a P9 core if a XICS in theory :-)
-
-> > Now.. I could imagine the POWER9 having a different core model that
-> > came along with XIVE, but I can't see this new model being used for
-> > anything anywhere in the rest of the series.
+> +#
+>  # Since: 1.2
+>  ##
+>  { 'enum': 'MigrationCapability',
+>    'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+>             'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ra=
+m',
+> -           'block', 'return-path' ] }
+> +           'block', 'return-path', 'dirty-bitmaps' ] }
+> =20
+>  ##
+>  # @MigrationCapabilityStatus:
 >=20
-> See patch 26. But, maybe, I am taking a shortcut and we need another
-> family of flags.=20
 
-Or just some kind of enum for the interrupt controller, how do we do
-with OpenPIC vs. XICS already ? Old POWER3 had OpenPIC.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> Thanks,
->=20
-> C.=20
->=20
-> > >=20
-> > > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > > ---
-> > >  target/ppc/cpu-qom.h        | 2 ++
-> > >  target/ppc/excp_helper.c    | 9 ++++++---
-> > >  target/ppc/translate.c      | 3 ++-
-> > >  target/ppc/translate_init.c | 2 +-
-> > >  4 files changed, 11 insertions(+), 5 deletions(-)
-> > >=20
-> > > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> > > index d0cf6ca2a971..d7b78cf3f71c 100644
-> > > --- a/target/ppc/cpu-qom.h
-> > > +++ b/target/ppc/cpu-qom.h
-> > > @@ -132,6 +132,8 @@ enum powerpc_excp_t {
-> > >      POWERPC_EXCP_POWER7,
-> > >      /* POWER8 exception model           */
-> > >      POWERPC_EXCP_POWER8,
-> > > +    /* POWER9 exception model           */
-> > > +    POWERPC_EXCP_POWER9,
-> > >  };
-> > > =20
-> > >  /*****************************************************************=
-************/
-> > > diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> > > index 3a9f0861e773..dc7dff36a580 100644
-> > > --- a/target/ppc/excp_helper.c
-> > > +++ b/target/ppc/excp_helper.c
-> > > @@ -148,9 +148,11 @@ static inline void powerpc_excp(PowerPCCPU *cp=
-u, int excp_model, int excp)
-> > >       */
-> > >  #if defined(TARGET_PPC64)
-> > >      if (excp_model =3D=3D POWERPC_EXCP_POWER7 ||
-> > > -        excp_model =3D=3D POWERPC_EXCP_POWER8) {
-> > > +        excp_model =3D=3D POWERPC_EXCP_POWER8 ||
-> > > +        excp_model =3D=3D POWERPC_EXCP_POWER9) {
-> > >          lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
-> > > -        if (excp_model =3D=3D POWERPC_EXCP_POWER8) {
-> > > +        if (excp_model =3D=3D POWERPC_EXCP_POWER8 ||
-> > > +            excp_model =3D=3D POWERPC_EXCP_POWER9) {
-> > >              ail =3D (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SH=
-IFT;
-> > >          } else {
-> > >              ail =3D 0;
-> > > @@ -651,7 +653,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu=
-, int excp_model, int excp)
-> > >          if (!(new_msr & MSR_HVB) && (env->spr[SPR_LPCR] & LPCR_ILE=
-)) {
-> > >              new_msr |=3D (target_ulong)1 << MSR_LE;
-> > >          }
-> > > -    } else if (excp_model =3D=3D POWERPC_EXCP_POWER8) {
-> > > +    } else if (excp_model =3D=3D POWERPC_EXCP_POWER8 ||
-> > > +               excp_model =3D=3D POWERPC_EXCP_POWER9) {
-> > >          if (new_msr & MSR_HVB) {
-> > >              if (env->spr[SPR_HID0] & HID0_HILE) {
-> > >                  new_msr |=3D (target_ulong)1 << MSR_LE;
-> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > > index c0cd64d927c2..2d8c1b9e6836 100644
-> > > --- a/target/ppc/translate.c
-> > > +++ b/target/ppc/translate.c
-> > > @@ -7064,7 +7064,8 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f=
-, fprintf_function cpu_fprintf,
-> > > =20
-> > >  #if defined(TARGET_PPC64)
-> > >      if (env->excp_model =3D=3D POWERPC_EXCP_POWER7 ||
-> > > -        env->excp_model =3D=3D POWERPC_EXCP_POWER8) {
-> > > +        env->excp_model =3D=3D POWERPC_EXCP_POWER8 ||
-> > > +        env->excp_model =3D=3D POWERPC_EXCP_POWER9) {
-> > >          cpu_fprintf(f, "HSRR0 " TARGET_FMT_lx " HSRR1 " TARGET_FMT=
-_lx "\n",
-> > >                      env->spr[SPR_HSRR0], env->spr[SPR_HSRR1]);
-> > >      }
-> > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_ini=
-t.c
-> > > index 53aff5a7b734..b8c7b8150318 100644
-> > > --- a/target/ppc/translate_init.c
-> > > +++ b/target/ppc/translate_init.c
-> > > @@ -8962,7 +8962,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void =
-*data)
-> > >      pcc->sps =3D &POWER7_POWER8_sps;
-> > >      pcc->radix_page_info =3D &POWER9_radix_page_info;
-> > >  #endif
-> > > -    pcc->excp_model =3D POWERPC_EXCP_POWER8;
-> > > +    pcc->excp_model =3D POWERPC_EXCP_POWER9;
-> > >      pcc->bus_model =3D PPC_FLAGS_INPUT_POWER7;
-> > >      pcc->bfd_mach =3D bfd_mach_ppc64;
-> > >      pcc->flags =3D POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
+
+--E9LvVmW8QVvNVACB8lnAgLXoJ43fGgeKS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZY+ueAAoJEKeha0olJ0NqkuwH+gPNoWrDarW0P7Cv+YiEMWuc
+CQK3Uck5jI7GlkeCl57+5U4v+L9IAuhsOCWIllpjSLoq/aQYRLmo506bEDqcCOZv
+UCfyBg5K+LXRaL10D1l5r5lYsMtqRB26MGaJf3fElKTtk/96G5wbw7yy0dQVpdhY
++zo1nz7T+K6N8XcM+oaPuMJ2/DNNYSbdQtH5ADgZiOdqRr9DDTB86YVlfpL9u0rs
+PQRm1rxRDvQQalrnHOTQvHr5JwaSghSWJnAqO3yUVfMVxNJMAeGSoqGNLoZCvux3
+pbqVYtgu0kxLpgfFQcToKJVaGH3e5NypRrPzM0PrW8dfuC/nNt8ZP1Vasx1ED2g=
+=jgOe
+-----END PGP SIGNATURE-----
+
+--E9LvVmW8QVvNVACB8lnAgLXoJ43fGgeKS--
