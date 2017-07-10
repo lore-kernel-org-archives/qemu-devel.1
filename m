@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUeFT-0007bY-S7
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:21:36 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUeGQ-00086e-GJ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUeFR-0006aD-OE
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:21:35 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35480)
+	(envelope-from <alex.bennee@linaro.org>) id 1dUeGN-000760-DA
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:22:34 -0400
+Received: from mail-wr0-f170.google.com ([209.85.128.170]:35194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUeFR-0006a1-Hg
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:21:33 -0400
-Received: by mail-wr0-x235.google.com with SMTP id k67so151272813wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 12:21:33 -0700 (PDT)
+	id 1dUeGN-00075o-5r
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:22:31 -0400
+Received: by mail-wr0-f170.google.com with SMTP id k67so151271253wrc.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 12:22:31 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Jul 2017 20:21:24 +0100
-Message-Id: <20170710192128.9048-2-alex.bennee@linaro.org>
-In-Reply-To: <20170710192128.9048-1-alex.bennee@linaro.org>
-References: <20170710192128.9048-1-alex.bennee@linaro.org>
+Date: Mon, 10 Jul 2017 20:21:23 +0100
+Message-Id: <20170710192128.9048-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/5] include/exec/exec-all: document common
- exit conditions
+Subject: [Qemu-devel] [PATCH v2 0/5] arm: fixes for eret,
+ isb and DISAS_UPDATE handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +29,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-As a precursor to later patches attempt to come up with a more
-concrete wording for what each of the common exit cases would be.
+Hi,
 
-CC: Emilio G. Cota <cota@braap.org>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Lluís Vilanova <vilanova@ac.upc.edu>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- include/exec/exec-all.h | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+This is a quick iteration from the previous series:
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 8096d64a1d..a23894f687 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -35,11 +35,34 @@ typedef abi_ulong tb_page_addr_t;
- typedef ram_addr_t tb_page_addr_t;
- #endif
- 
--/* is_jmp field values */
-+/* DisasContext is_jmp field values
-+ *
-+ * is_jmp starts as DISAS_NEXT. The translator will keep processing
-+ * instructions until an exit condition is reached. If we reach the
-+ * exit condition and is_jmp is still DISAS_NEXT (because of some
-+ * other condition) we simply "jump" to the next address.
-+ * The remaining exit cases are:
-+ *
-+ *   DISAS_JUMP    - Only the PC was modified dynamically (e.g computed)
-+ *   DISAS_TB_JUMP - Only the PC was modified statically (e.g. branch)
-+ *
-+ * In these cases as long as the PC is updated we can chain to the
-+ * next TB either by exiting the loop or looking up the next TB via
-+ * the loookup helper.
-+ *
-+ *   DISAS_UPDATE  - CPU State was modified dynamically
-+ *
-+ * This covers any other CPU state which necessities us exiting the
-+ * TCG code to the main run-loop. Typically this includes anything
-+ * that might change the interrupt state.
-+ *
-+ * Individual translators may define additional exit cases to deal
-+ * with per-target special conditions.
-+ */
- #define DISAS_NEXT    0 /* next instruction can be analyzed */
- #define DISAS_JUMP    1 /* only pc was modified dynamically */
--#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
--#define DISAS_TB_JUMP 3 /* only pc was modified statically */
-+#define DISAS_TB_JUMP 2 /* only pc was modified statically */
-+#define DISAS_UPDATE  3 /* cpu state was modified dynamically */
- 
- #include "qemu/log.h"
- 
+  https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg02371.html
+
+Which was born out of the fix:
+
+  https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg01831.html
+
+Following feedback I reverted the attempt to use DISAS_UPDATE for
+everything and just made it match the semantics of not-chaining. So
+patches 1 & 3 are purely documentation.
+
+Patch 2 should prevent any system change prompted by writing to a
+system register not exiting the loop.
+
+Patch 4 is a minor optimisation to ISB handling
+Patch 5 fixes the eret regression from the DISAS_JUMP optimisation
+
+I think now all users of DISAS_JUMP should be safe with respect to TB
+chaining.
+
+Please review.
+
+Alex Bennée (5):
+  include/exec/exec-all: document common exit conditions
+  target/arm/translate: make DISAS_UPDATE match declared semantics
+  target/arm/translate.h: expand comment on DISAS_EXIT
+  target/arm: use DISAS_JUMP for ISB handling
+  target/arm: use DISAS_EXIT for eret handling
+
+ include/exec/exec-all.h    | 29 ++++++++++++++++++++++++++---
+ target/arm/translate-a64.c | 20 +++++++++++---------
+ target/arm/translate.c     | 24 +++++++++++++++++-------
+ target/arm/translate.h     |  5 ++++-
+ 4 files changed, 58 insertions(+), 20 deletions(-)
+
 -- 
 2.13.0
