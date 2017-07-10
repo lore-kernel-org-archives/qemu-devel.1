@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dUVji-00034T-8Y
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:16 -0400
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dUVkQ-0003Pn-GU
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dUVjh-0008J3-7J
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:14 -0400
-Date: Mon, 10 Jul 2017 18:16:04 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170710101604.GA19707@lemon.lan>
-References: <20170707182151.29872-1-eblake@redhat.com>
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dUVkL-0000Ox-SM
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:58 -0400
+Received: from ikerlan-12.ikerlan.es ([193.145.247.1]:16463)
+	by eggs.gnu.org with smtp (Exim 4.71)
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dUVkL-0000L3-FM
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:53 -0400
+From: Ormaetxea Xabier <xormaetxea@ikerlan.es>
+Date: Mon, 10 Jul 2017 10:16:39 +0000
+Message-ID: <B1DA44315104F94D9F3F23C74275EA9D729B61@Ikerlan-12.ikerlan.es>
+References: <B1DA44315104F94D9F3F23C74275EA9D729B34@Ikerlan-12.ikerlan.es>
+	<CAFEAcA853fSo86JXF0E=yt+Dfu8gVjcdpycx+z5OMX7z_mPKXg@mail.gmail.com>
+	<B1DA44315104F94D9F3F23C74275EA9D729B4B@Ikerlan-12.ikerlan.es>
+	<CAFEAcA_CF7KVq2MAhR3twsXfio3RNFRJ-SiK2pO7g1ZEzGvpGg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_CF7KVq2MAhR3twsXfio3RNFRJ-SiK2pO7g1ZEzGvpGg@mail.gmail.com>
+Content-Language: es-ES
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707182151.29872-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Promote NBD to supported,
- with new maintainer
+Subject: Re: [Qemu-devel] Code source modifying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Fri, 07/07 13:21, Eric Blake wrote:
-> We are promising more than just odd fixes, and Paolo is hoping
-> to offload the pull requests to me.  Also, enough of NBD is related
-> to the block layer that it is worth including qemu-block on patches.
-
-Cool!
-
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
-> 
-> If there are no objections, I'll include this patch and Vladimir's
-> series in my first NBD pull request.
-> 
->  MAINTAINERS | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4e17216..beaba51 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1348,15 +1348,6 @@ W: http://info.iet.unipi.it/~luigi/netmap/
->  S: Maintained
->  F: net/netmap.c
-> 
-> -Network Block Device (NBD)
-> -M: Paolo Bonzini <pbonzini@redhat.com>
-> -S: Odd Fixes
-> -F: block/nbd*
-> -F: nbd/
-> -F: include/block/nbd*
-> -F: qemu-nbd.c
-> -T: git git://github.com/bonzini/qemu.git nbd-next
-> -
->  NUMA
->  M: Eduardo Habkost <ehabkost@redhat.com>
->  S: Maintained
-> @@ -1710,6 +1701,17 @@ S: Supported
->  F: block/iscsi.c
->  F: block/iscsi-opts.c
-> 
-> +Network Block Device (NBD)
-> +M: Eric Blake <eblake@redhat.com>
-> +M: Paolo Bonzini <pbonzini@redhat.com>
-> +L: qemu-block@nongnu.org
-> +S: Maintained
-> +F: block/nbd*
-> +F: nbd/
-> +F: include/block/nbd*
-> +F: qemu-nbd.c
-
-While we are at it, add qemu-nbd.texi when you send pull request, if you don't
-respin?
-
-> +T: git git://repo.or.cz/qemu/ericb.git nbd
-
-Out of curiosity: Paolo is still in "M:", but his "T:" is gone.  Intended?
-
-> +
->  NFS
->  M: Jeff Cody <jcody@redhat.com>
->  M: Peter Lieven <pl@kamp.de>
-> -- 
-> 2.9.4
-> 
-> 
-
-Fam
+SGkgUGV0ZXIhDQoNCkFoIHNvcnJ5LCBJIHRob3VnaHQgdGhhdCByZXBseWluZyB0byB5b3VyIG1l
+c3NhZ2UgaXQgd2FzIHNvbWVob3cgcmVkaXJlY3RlZCB0byB0aGUgbWFpbGluZyBsaXN0LiBTbywg
+ZXZlcnktdGltZSBJIHJlc3BvbmQsIEkgaGF2ZSB0byBkbyBpdCB0byBxZW11LWRldmVsQG5vbmdu
+dS5vcmc/IE9yIGEgQ0MgaXQncyBlbm91Z2g/IFNvcnJ5IGZvciBteSBpZ25vcmFuY2UuLi4NCg0K
+QW55d2F5LCBkbyB5b3UgaW1hZ2luZSBob3cgY2FuIEkgbWFrZSB0aGlzICJ2aXJ0dWFsIHdvcmxk
+Ii0icmVhbCB3b3JsZCIgY29ubmVjdGlvbj8gSSBtZWFuLCBpcyB0aGVyZSBhbiBlYXN5IHdheSBv
+ZiBjb25uZWN0aW5nIGFuIGV4ZWN1dGlvbiBmcm9tIHRoZSBzdGFuZGFsb25lIHdpdGggdGhlIHNv
+dXJjZSBjb2RlPw0KDQpUaGFuayB5b3UgZm9yIHlvdXIgd29yayENCg0KWGFiaQ0KDQotLS0tLU1l
+bnNhamUgb3JpZ2luYWwtLS0tLQ0KRGU6IFBldGVyIE1heWRlbGwgW21haWx0bzpwZXRlci5tYXlk
+ZWxsQGxpbmFyby5vcmddIA0KRW52aWFkbyBlbDogbHVuZXMsIDEwIGRlIGp1bGlvIGRlIDIwMTcg
+MTE6NTgNClBhcmE6IE9ybWFldHhlYSBYYWJpZXINCkFzdW50bzogUmU6IFtRZW11LWRldmVsXSBD
+b2RlIHNvdXJjZSBtb2RpZnlpbmcNCg0KSXQncyByZWFsbHkgYmV0dGVyIHRvIGtlZXAgdGhyZWFk
+cyBvbiB0aGUgcHVibGljIG1haWxpbmcgbGlzdHMsDQp0aGF0IHdheSB0aGUgYW5zd2VycyBoZWxw
+IGV2ZXJ5Ym9keSAoYW5kIGFueWJvZHkgd2hvIGtub3dzIHRoZQ0KYW5zd2VyIGNhbiByZXBseSku
+Li4NCg0KQW55d2F5LCB5b3UgY2Fubm90IGRvIHdoYXQgeW91J3JlIHRyeWluZyB0byBkbyB0aGUg
+d2F5IHlvdSdyZQ0KdHJ5aW5nIHRvIGRvIGl0Lg0KDQp0aGFua3MNCi0tIFBNTQ0KDQpPbiAxMCBK
+dWx5IDIwMTcgYXQgMTA6NDAsIE9ybWFldHhlYSBYYWJpZXIgPHhvcm1hZXR4ZWFAaWtlcmxhbi5l
+cz4gd3JvdGU6DQo+IEhlbGxvIFBldGVyIQ0KPg0KPiBJIHdpbGwgdXNlIHRoZSAicmVhZCBldmVy
+eSBsb29wIiBpbiBjcHVfZXhlYygpLCBJIHN1cHBvc2UgaXTigJlzIHRoZSAiYmVzdCIgcGxhY2Ug
+dG8gZG8gaXQuDQo+DQo+IEFuZCB5ZXMsIEkgcmVhbGx5IG1lYW4gdmlydHVhbCBhZGRyZXNzLi4u
+IExldCdzIHNlZSBpZiBJIGNhbiBleHBsYWluIHdlbGwgbXlzZWxmIChub3QgdGhlIGJlc3QgYXQg
+ZW5nbGlzaCkuDQo+IFRoZSBzdGFuZGFsb25lIHByb2dyYW0gd29ya3Mgb3ZlciB0aGUgdmlydHVh
+bCBwbGF0Zm9ybSwgc28gd2hlbiBJIHdhbnQgdGhlIGV4dGVyaW9yIHRpbWVyIHRvIHN0YXJ0IGNv
+dW50aW5nIEkgd2lsbCB1c2UgYToNCj4NCj4gMHg5NTAwMDAwMCo9MHhmZmZmZmZmZg0KPg0KPiBB
+bmQgd2hlbiBJIHdhbnQgdG8gZmluaXNoIGl0Og0KPg0KPiAweDk1MDAwMDAwKj0weDAwMDAwMDAw
+DQo+DQo+IE5vdywgZnJvbSB0aGUgY29kZSBzb3VyY2UsIEkgbmVlZCB0byByZWFkIGluIGV2ZXJ5
+IHN0ZXAgKGxldCdzIHNheSBldmVyeSBjcHVfZXhlYygpIGxvb3ApIHRoYXQgdmlydHVhbCBwb3Np
+dGlvbi4gTGlrZSBjb25uZWN0aW5nIHRoZSB2aXJ0dWFsIGFuZCByZWFsIGFkZHJlc3Nlcy4NCj4N
+Cj4gU29tZXRoaW5nIGp1c3QgbGlrZToNCj4NCj4gaWYgKDB4OTUwMDAwMDAqPT0weGZmZmZmZmZm
+KXsNCj4gICAgICAgICBzeXN0ZW0oImVjaG8gMSA+IC9zeXMvY2xhc3MvZ3Bpby9ncGlvOTEzL3Zh
+bHVlIik7DQo+IH0NCj4gZWxzZXsNCj4gICAgICAgICBzeXN0ZW0oImVjaG8gMCA+IC9zeXMvY2xh
+c3MvZ3Bpby9ncGlvOTEzL3ZhbHVlIik7DQo+IH0NCj4NCj4gQnV0IEkgZG9uJ3Qga25vdyB3aGVy
+ZSBpdCBtYXBzIG15IHZpcnR1YWwgKDB4OTUwMDAwMDApIG1lbW9yeS4gU28uLi4gY2FuJ3QgZG8g
+MHg5NTAwMDAwMCo9PTB4ZmZmZmZmZmYuDQo+DQo+IFRoYW5rIHlvdSBmb3IgeW91ciBoZWxwIQ0K
+Pg0KPiBYYWJpDQo+DQo+DQo+DQo+IC0tLS0tTWVuc2FqZSBvcmlnaW5hbC0tLS0tDQo+IERlOiBQ
+ZXRlciBNYXlkZWxsIFttYWlsdG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXQ0KPiBFbnZpYWRv
+IGVsOiBsdW5lcywgMTAgZGUganVsaW8gZGUgMjAxNyAxMToyNg0KPiBQYXJhOiBPcm1hZXR4ZWEg
+WGFiaWVyDQo+IENDOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQXN1bnRvOiBSZTogW1FlbXUt
+ZGV2ZWxdIENvZGUgc291cmNlIG1vZGlmeWluZw0KPg0KPiBPbiAxMCBKdWx5IDIwMTcgYXQgMTA6
+MTQsIE9ybWFldHhlYSBYYWJpZXIgPHhvcm1hZXR4ZWFAaWtlcmxhbi5lcz4gd3JvdGU6DQo+PiBN
+eSBzdGFuZGFsb25lIHByb2dyYW0gd3JpdGVzICIweGZmZmZmZmZmIiBpbiB0aGUgcG9zaXRpb24g
+MHg5NTAwMDAwMA0KPj4gd2hlbiB0aGUgdGltZXIgc2hvdWxkIHN0YXJ0LCBhbmQgIjB4MDAwMDAw
+MDAiIHdoZW4gaXQgaGF2ZSB0byBmaW5pc2guDQo+PiBJIHdhbnQgdG8gbW9kaWZ5IHRoZSBjb2Rl
+IHNvIGV2ZXJ5IHNpbmdsZSAoc3RhbmRhbG9uZSkgcHJvZ3JhbSBzdGVwDQo+PiByZWFkcyB0aGUg
+dmlydHVhbCAweDk1MDAwMDAwIGFuZCBjaGFuZ2VzIHRoZSB2YWx1ZSBvZiBhIGdwaW8uIEJ1dCBJ
+DQo+PiBjYW4ndCBmaW5kIGhvdyBJIGNhbiByZWFkIGZyb20gdGhlIHNvdXJjZSBjb2RlIHRoZSB2
+aXJ0dWFsIG1lbW9yeSwNCj4+IGFuZCBJIGNhbid0IGZpbmQgbmVpdGhlciB3aGVyZS9ob3cgZG9l
+cyB0aGUgcHJvZ3JhbSBwcm9jZXNzIChzdGVwDQo+PiBieSBzdGVwKSB0aGUgc3RhbmRhbG9uZSBw
+cm9ncmFtLg0KPg0KPiBRRU1VIGRvZXNuJ3QgcmVhbGx5IHdvcmsgdGhhdCB3YXkuIFdoYXQgd2Ug
+ZG8gaXMgdGFrZSBibG9ja3Mgb2YgdGhlDQo+IGd1ZXN0IGJpbmFyeSAodXN1YWxseSB1cCB0byB0
+aGUgbmV4dCBicmFuY2ggaW5zdHJ1Y3Rpb24pLCB0cmFuc2xhdGUNCj4gdGhlIHdob2xlIGJsb2Nr
+IHRvIG5hdGl2ZSBob3N0IGJpbmFyeSBjb2RlLCBhbmQgdGhlbiBleGVjdXRlIHRob3NlDQo+IHRy
+YW5zbGF0ZWQgYmxvY2tzLiBTbyBvdXIgbWFpbiBleGVjdXRpb24gbG9vcCAoY3B1X2V4ZWMoKSkg
+aXMNCj4gYmFzaWNhbGx5IGEgbG9vcCB0aGF0IGRvZXM6DQo+ICAqIGhhbmRsZSBhbnkgcGVuZGlu
+ZyBpbnRlcnJ1cHQgb3IgZXhjZXB0aW9uIHdvcmsNCj4gICogZmluZCBwcmV2aW91c2x5IHRyYW5z
+bGF0ZWQgYmxvY2sgZm9yIHRoaXMgUEMNCj4gICAgKGFuZCB0cmFuc2xhdGUgaXQgaWYgaXQgZGlk
+bid0IGFscmVhZHkgZXhpc3QpDQo+ICAqIGV4ZWN1dGUgdGhhdCBUQiAod2hpY2ggd2lsbCBleGVj
+dXRlIG11bHRpcGxlIGd1ZXN0IGluc25zDQo+ICAgIGFuZCBtYXkganVtcCBkaXJlY3RseSB0byBh
+bm90aGVyIFRCIHdpdGhvdXQgY29taW5nIGJhY2sgdG8gQyBjb2RlKQ0KPg0KPiBEbyB5b3UgcmVh
+bGx5IG1lYW4gdmlydHVhbCBhZGRyZXNzZXMgaGVyZT8gVGhhdCBpcyB2ZXJ5IHdlaXJkOg0KPiBo
+YXJkd2FyZSBkb2Vzbid0IGRvIHRoYXQgLS0gdGltZXIgZGV2aWNlcyBhcmUgYXQgZml4ZWQgcGh5
+c2ljYWwNCj4gYWRkcmVzc2VzIHdoaWNoIHRoZSBndWVzdCBjYW4gdGhlbiBjaG9vc2UgdG8gbWFw
+IHdoZXJlIHRoZXkgbGlrZQ0KPiBpbiB0aGUgdmlydHVhbCBhZGRyZXNzIHNwYWNlIHVzaW5nIHRo
+ZSBNTVUuDQo+DQo+IHRoYW5rcw0KPiAtLSBQTU0NCg==
