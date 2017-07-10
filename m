@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUacQ-0002jE-9Y
+	(envelope-from <peter.maydell@linaro.org>) id 1dUacQ-0002jG-NT
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dUacL-0007dz-Bw
+	(envelope-from <peter.maydell@linaro.org>) id 1dUacL-0007eO-VG
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:29:02 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:50601)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUacL-0007ap-2A
+Received: from mail-wr0-f175.google.com ([209.85.128.175]:36532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dUacL-0007d0-OW
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:28:57 -0400
-Date: Mon, 10 Jul 2017 11:28:54 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170710152854.GA1216@flamenco>
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-23-git-send-email-cota@braap.org>
-	<5b3531bf-5e06-f5d3-6ba0-6a0baa810cee@twiddle.net>
-	<20170710035128.GA25231@flamenco>
-	<4173f39f-a236-c64f-3ae4-497b4bff363c@twiddle.net>
+Received: by mail-wr0-f175.google.com with SMTP id c11so143370898wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 08:28:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4173f39f-a236-c64f-3ae4-497b4bff363c@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 22/22] translate-all: do not hold tb_lock
- during code generation in softmmu
+In-Reply-To: <1498927637-14496-3-git-send-email-drjones@redhat.com>
+References: <1498927637-14496-1-git-send-email-drjones@redhat.com>
+	<1498927637-14496-3-git-send-email-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Jul 2017 16:27:35 +0100
+Message-ID: <CAFEAcA-CQm1FuF7eyveSbSchRD1PkB-PDVNyMQhVny+bmWWAvg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/3] target/arm/kvm: split pmu init from
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alexander Graf <agraf@suse.de>
 
-On Sun, Jul 09, 2017 at 19:59:47 -1000, Richard Henderson wrote:
-> On 07/09/2017 05:51 PM, Emilio G. Cota wrote:
-> >On Sun, Jul 09, 2017 at 11:38:50 -1000, Richard Henderson wrote:
-> >>On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
-> >(snip)
-> >>I think it would be better to have a tb_htable_lookup_or_insert function,
-> >>which performs the insert iff a matching object isn't already there,
-> >>returning the entry which *is* there in either case.
-> >
-> >qht_insert behaves exactly like this, except that it returns a bool.
-> >But we could make it return a void *.
-> 
-> Err.. no it doesn't.  It returns false if the *exact same object* is
-> inserted twice.  That's not the same as being passed a qht_lookup_func_t to
-> see if two different objects compare equal.
+On 1 July 2017 at 17:47, Andrew Jones <drjones@redhat.com> wrote:
+> When adding a PMU with a userspace irqchip we only do the INIT
+> stage of the device creation.
 
-True, I misremembered. My original implementation worked like that though,
-then I figured for our use case we could skip calling the comparison function.
+Can you explain why? My assumption would be that either
+(a) we don't need the kernel's PMU, in which case don't
+create it at all, or
+(b) we do need the kernel's PMU, so we should both create
+and INIT it.
 
-		E.
+If we do one but not the other then we've left a half
+created and unusable PMU device in the kernel, haven't we?
+
+thanks
+-- PMM
