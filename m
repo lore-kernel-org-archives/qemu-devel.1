@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUXWS-0007d7-QL
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:10:41 -0400
+	(envelope-from <prvs=357003226=Paul.Durrant@citrix.com>)
+	id 1dUXXK-00084a-8V
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUXWP-0008Br-Kd
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:10:40 -0400
-Received: from mail-wr0-f182.google.com ([209.85.128.182]:34994)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUXWP-0008Ab-8v
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:10:37 -0400
-Received: by mail-wr0-f182.google.com with SMTP id k67so135625033wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:10:37 -0700 (PDT)
+	(envelope-from <prvs=357003226=Paul.Durrant@citrix.com>)
+	id 1dUXXH-0000bp-47
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:11:34 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Mon, 10 Jul 2017 12:11:27 +0000
+Message-ID: <e531a9398dfe453097999300e41db31f@AMSPEX02CL01.citrite.net>
+References: <20170621125249.8805-1-paul.durrant@citrix.com>
+	<20170621125249.8805-4-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1706221410580.12819@sstabellini-ThinkPad-X260>
+	<3b55bff7d41d4b37b52a8ec96d88677a@AMSPEX02CL01.citrite.net>
+	<alpine.DEB.2.10.1707071452400.2919@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1707071452400.2919@sstabellini-ThinkPad-X260>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1499687125-22948-1-git-send-email-kwolf@redhat.com>
-References: <1499687125-22948-1-git-send-email-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Jul 2017 13:09:15 +0100
-Message-ID: <CAFEAcA_2dB3rN6mJcwrxShPaEO8dEzoNU27dTkWC3jjnjRPC6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] commit: Add NULL check for overlay_bs
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] xen-disk: use an IOThread per
+ instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin
+	Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "afaerber@suse.de" <afaerber@suse.de>, "armbru@redhat.com" <armbru@redhat.com>
 
-On 10 July 2017 at 12:45, Kevin Wolf <kwolf@redhat.com> wrote:
-> I can't see how overlay_bs could become NULL with the current code, but
-> other code in this function already checks it and we can make Coverity
-> happy with this check, so let's add it.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/commit.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/block/commit.c b/block/commit.c
-> index 774a8a5..50e7950 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -90,7 +90,9 @@ static void commit_complete(BlockJob *job, void *opaque)
->
->      /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
->      bdrv_ref(top);
-> -    bdrv_ref(overlay_bs);
-> +    if (overlay_bs) {
-> +        bdrv_ref(overlay_bs);
-> +    }
->
->      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
->       * the normal backing chain can be restored. */
-> --
-> 1.8.3.1
-
-Commit 19ebd13ed45ad5d5f2 which added the bdrv_ref() call
-was cc qemu-stable; should we cc this fix too, or are you
-happy that it's definitely not actually triggerable in stable?
-
-thanks
--- PMM
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KW3NuaXBdDQo+ID4gPiA+ICsgICAgb2JqZWN0
+X3VucGFyZW50KE9CSkVDVChibGtkZXYtPmlvdGhyZWFkKSk7DQo+ID4gPg0KPiA+ID4gU2hvdWxk
+bid0IHRoaXMgYmUgb2JqZWN0X3VucmVmPw0KPiA+ID4NCj4gPg0KPiA+IEkgZG9uJ3QgdGhpbmsg
+c28uIEkgdGhpbmsgdGhpcyBpcyByZXF1aXJlZCB0byB1bmRvIHdoYXQgd2FzIGRvbmUgYnkgY2Fs
+bGluZw0KPiBvYmplY3RfcHJvcGVydHlfYWRkX2NoaWxkKCkgb24gdGhlIHJvb3Qgb2JqZWN0Lg0K
+PiANCj4gUmlnaHQsIHNvIGlmIG9iamVjdF9wcm9wZXJ0eV9hZGRfY2hpbGQgaXMgbm90IGFjdHVh
+bGx5IHJlcXVpcmVkLCB0aGVuDQo+IHlvdSBtaWdodCBiZSBhYmxlIHRvIHR1cm4gb2JqZWN0X3Vu
+cGFyZW50IGludG8gb2JqZWN0X3VucmVmLg0KPiANCj4gVW5mb3J0dW5hdGVseSBJIGRvbid0IGtu
+b3cgZW5vdWdoIGFib3V0IFFPTSB0byBiZSBhYmxlIHRvIHRlbGwgd2hpY2ggaXMNCj4gdGhlIHJp
+Z2h0IHdheSBvZiBkb2luZyB0aGluZ3MsIGJ1dCBsb29raW5nIGF0DQo+IGh3L2Jsb2NrL2RhdGFw
+bGFuZS92aXJ0aW8tYmxrLmMsIGl0IHdvdWxkIHNlZW0gdGhhdCBvbmx5IG9iamVjdF9yZWYgYW5k
+DQo+IG9iamVjdF91bnJlZiBhcmUgcmVxdWlyZWQ/DQo+IA0KDQpJIGd1ZXNzIEkgY2FuIGdpdmUg
+aXQgYSB0cnkuIEkgd2FzIHdvcmtpbmcgb24gdGhlIGFzc3VtcHRpb24gdGhhdCBhbGwgb2JqZWN0
+cyB3ZXJlIHJlcXVpcmVkIHRvIGhhdmUgYSBwYXJlbnQsIGJ1dCBtYXliZSB0aGF0J3Mgbm90IHRy
+dWUuIENhbiBzb21lb25lIG1vcmUgZmFtaWxpYXIgd2l0aCBRT00gY29tbWVudD8NCg0KQ2hlZXJz
+LA0KDQogIFBhdWwNCg0KPiANCj4gPiBMb29raW5nIGF0IG90aGVyIGNvZGUgc3VjaCBhcyBvYmpl
+Y3RfbmV3X3dpdGhfcHJvcHYoKSBpdCBsb29rcyBsaWtlIHRoZQ0KPiByaWdodCB0aGluZyB0byBk
+byBpcyB0byBjYWxsIG9iamVjdF91bnJlZigpIGFmdGVyIGNhbGxpbmcNCj4gb2JqZWN0X3Byb3Bl
+cnR5X2FkZF9jaGlsZCgpIHRvIGRyb3AgdGhlIGltcGxpY2l0IHJlZiB0YWtlbiBieSBvYmplY3Rf
+bmV3KCkNCj4gc28gSSdkIG5lZWQgdG8gYWRkIHRoZSBjYWxsIGluIGJsa19hbGxvYygpLg0K
