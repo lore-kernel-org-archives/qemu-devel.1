@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUcdi-0008Aa-Ps
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:38:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dUcmh-0002Kd-Ho
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUcdf-0007NO-Lv
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:38:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33522)
+	(envelope-from <ehabkost@redhat.com>) id 1dUcmc-0002Yn-MF
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:47:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUcdf-0007NA-Cf
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:38:27 -0400
-Date: Mon, 10 Jul 2017 14:38:21 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUcmc-0002YR-C2
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:47:42 -0400
+Date: Mon, 10 Jul 2017 14:47:30 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170710173821.GD5167@localhost.localdomain>
-References: <20170703113940.0e0415a2@nial.brq.redhat.com>
-	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
-	<20170707133320.2e0d741d@nial.brq.redhat.com>
-	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
-	<20170707164453.4ba325fd@nial.brq.redhat.com>
-	<20170707150707.GJ10776@localhost.localdomain>
-	<58f2d98e-ae7e-e2e7-e7f3-68e937b0b79f@ilande.co.uk>
-	<20170710100147.0a7339e4@nial.brq.redhat.com>
-	<20170710145331.GJ12152@localhost.localdomain>
-	<20170710172336.33c64f86@nial.brq.redhat.com>
+Message-ID: <20170710174730.GL12152@localhost.localdomain>
+References: <1499237876.3041.4.camel@linux.intel.com>
+	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
+	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
+	<20170707133949.GH10776@localhost.localdomain>
+	<20170707181642-mutt-send-email-mst@kernel.org>
+	<20170707180358.GA12152@localhost.localdomain>
+	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
+	<20170710135943.GG12152@localhost.localdomain>
+	<20170710194345-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170710172336.33c64f86@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
- fw_cfg_init1() to callers
+In-Reply-To: <20170710194345-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +34,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>, libvir-list@redhat.com
 
-On Mon, Jul 10, 2017 at 05:23:36PM +0200, Igor Mammedov wrote:
-> On Mon, 10 Jul 2017 11:53:31 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Mon, Jul 10, 2017 at 10:01:47AM +0200, Igor Mammedov wrote:
-> > > On Fri, 7 Jul 2017 17:20:25 +0100
-> > > Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
-> > >   
-> > > > On 07/07/17 16:07, Eduardo Habkost wrote:
-> > > >   
-> > > > >> looks fine,
-> > > > >>
-> > > > >> so what I'd do is:
-> > > > >>  * drop 4/6    
+(CCing libvir-list)
+
+On Mon, Jul 10, 2017 at 07:45:54PM +0300, Michael S. Tsirkin wrote:
+> On Mon, Jul 10, 2017 at 10:59:43AM -0300, Eduardo Habkost wrote:
+> > On Mon, Jul 10, 2017 at 10:42:26AM +0300, Marcel Apfelbaum wrote:
+> > > On 07/07/2017 21:03, Eduardo Habkost wrote:
+> > > > On Fri, Jul 07, 2017 at 06:17:57PM +0300, Michael S. Tsirkin wrote:
+> > > > > On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
+> > > > > > On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
+> > [...]
+> > > > > > > 
+> > > > > > > The upper layers should manage the defaults by themselves so
+> > > > > > > are not supposed to be affected.
+> > > > > > 
+> > > > > > But they would be.  libvirt uses the default machine-type from
+> > > > > > QEMU.
+> > > > > 
+> > > > > How about extending the command for supported machines with a
+> > > > > recommended machine type, and teaching libvirt to use that?
 > > > > 
-> > > > Yes.
-> > > >   
-> > > > > Agreed on this point.  But:
-> > > > >     
-> > > > >>  * make fw_cfg_find() use ambiguous argument and error_abort if ambiguous == true    
-> > > > 
-> > > > During my latest tests I've found that everything works fine without the
-> > > > ambiguous argument.
-> > > > 
-> > > > Do we still want to keep it? And I don't think error_abort() is the
-> > > > right thing to do here, I'd much rather return NULL and add a suitable
-> > > > comment.  
-> > > I'd still use ambiguous argument and since you prefer not to assert
-> > > I'd add errp argument to fw_cfg_find() and handle error at callsites.
+> > > > I don't think QEMU has enough information to decide if it should
+> > > > recommend "q35" or "pc".
 > > > 
-> > > Just returning NULL isn't sufficient if you need to distinguish
-> > > 'not found' vs 'duplicate' usecases, additionally  'not found'
-> > > in most cases isn't even error but 'duplicate' definitely is.
+> > > We don't really need a complicated rule set, we would just recommend q35
+> > > by default. Libvirt will try to create the default machine and if fails
+> > > for some reason (what would it be?) it can switch to PC.
 > > > 
-> > > Aborting on diplicate in fw_cfg_find() is fine and would
-> > > help to avoid touching current callers if you wish to limit
-> > > patches scope, but you can go with proper error propagating
-> > > route if you wish.  
+> > > The advanced logic would be "old systems should use PC", where old
+> > > means Windows XP and before and so on. But this logic should appear
+> > > in management layers above.
 > > 
-> > Just making realize refuse to create two devices sounds much
-> > simpler to me.  No need to make fw_cfg_find() more complex (if we
-> > add errp argument to it) or less useful (if we add
-> > assert(!ambiguous) to it).
-> the problem here was a error message to print if fw_cfg_find()
-> returns NULL for missing or duplicate, if we need to print
-> precise error we would need proper error handling.
-
-I don't see where we would need a precise error message, except
-for realizefn (where the only case fw_cfg_find() would return
-NULL is for duplicate devices).
-
+> > In this case, is there any difference between "changing the
+> > default to q35" and "recommending q35", for libvirt users?
+> > 
+> > -- 
+> > Eduardo
 > 
-> Considering to fw_cfg is builtin device I'd prefer just
-> assert in fw_cfg_find() on duplicate (all the callers consider it as error)
-> and let developer to deal with assert if it is triggered.
+> No but libvirt users do not manage e.g. pci slots manually.
+> They do not use the -cdrom flag.
+> Etc.
+> So changing the default is unlikely to break things for them.
+> 
 
-Except that it would make it more difficult for realizefn to
-return a proper error message.
+I see.  If this part is really true (can libvirt developers
+confirm that?), then the proposed end result makes sense (not
+having a default for running QEMU directly, but changing default
+to "q35" for people using libvirt).
 
-Anyway, I am not completely against adding assert(!ambiguous) to
-fw_cfg_find() if Mark wants to follow your advice.  I just think
-it's not necessary.  I will only continue discussing this if I
-see issues in the next version of the series.
+But I don't see why we would need a new mechanism to make QEMU
+recommend a machine-type for libvirt, if libvirt could simply
+choose its own default (or maybe also refuse to pick a default,
+if libvirt developers decide that's the best solution).
+
+
+> People not using libvirt use some or all of this
+> and other such functionality,
+> and changing the default might break things for them.
 
 -- 
 Eduardo
