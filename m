@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUa21-00031q-JD
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:51:26 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dUa4D-0003ta-FU
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:53:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUa1w-00015q-Pg
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:51:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55914)
+	(envelope-from <ehabkost@redhat.com>) id 1dUa48-0002Vf-Mg
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:53:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUa1w-00015b-GB
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:51:20 -0400
-Date: Mon, 10 Jul 2017 11:51:15 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUa48-0002VH-G6
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:53:36 -0400
+Date: Mon, 10 Jul 2017 11:53:31 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170710145115.GI12152@localhost.localdomain>
+Message-ID: <20170710145331.GJ12152@localhost.localdomain>
 References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 	<20170703113940.0e0415a2@nial.brq.redhat.com>
@@ -20,11 +20,12 @@ References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
 	<20170707164453.4ba325fd@nial.brq.redhat.com>
 	<20170707150707.GJ10776@localhost.localdomain>
-	<20170710094938.5d525300@nial.brq.redhat.com>
+	<58f2d98e-ae7e-e2e7-e7f3-68e937b0b79f@ilande.co.uk>
+	<20170710100147.0a7339e4@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170710094938.5d525300@nial.brq.redhat.com>
+In-Reply-To: <20170710100147.0a7339e4@nial.brq.redhat.com>
 Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
  fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
@@ -36,60 +37,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On Mon, Jul 10, 2017 at 09:49:38AM +0200, Igor Mammedov wrote:
-> On Fri, 7 Jul 2017 12:07:07 -0300
-> "Eduardo Habkost" <ehabkost@redhat.com> wrote:
+On Mon, Jul 10, 2017 at 10:01:47AM +0200, Igor Mammedov wrote:
+> On Fri, 7 Jul 2017 17:20:25 +0100
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 > 
-> > On Fri, Jul 07, 2017 at 04:44:53PM +0200, Igor Mammedov wrote:
-> > [...]
-> > > > > taking in account that fwcfg in not user creatable device how about:
-> > > > > 
-> > > > > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> > > > > index 316fca9..8f6eef8 100644
-> > > > > --- a/hw/nvram/fw_cfg.c
-> > > > > +++ b/hw/nvram/fw_cfg.c
-> > > > > @@ -1014,7 +1014,10 @@ FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
-> > > > >  
-> > > > >  FWCfgState *fw_cfg_find(void)
-> > > > >  {
-> > > > > -    return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
-> > > > > +    bool ambig = false;
-> > > > > +    FWCfgState *f = FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, &ambig));
-> > > > > +    assert(!ambig);
-> > > > > +    return f;
-> > > > >  }
-> > > > > 
-> > > > > or if we must to print user friendly error and fail realize gracefully
-> > > > > (not sure why) just add errp argument to function so it could report
-> > > > > error back to caller, then places that do not care much about graceful
-> > > > > exit would use error_abort as argument and realize would use
-> > > > > its local_error/errp argument.    
-> > > > 
-> > > > My understanding from the thread was that we should only use assert()s
-> > > > where there is no other choice so that any failures can be handled in a
-> > > > more friendly manner.  
-> > > the rule I use to decide assert vs nice error handling:
-> > > 1: try to avoid crash on hotplug path
-> > > 2: if error could be induced by end user on startup, try to print nice error
-> > >    before dying
-> > > 3: when error should not happen just assert or use error_abort
-> > >    which would print nice error message before dying.  
+> > On 07/07/17 16:07, Eduardo Habkost wrote:
 > > 
-> > I would add this to the list:
+> > >> looks fine,
+> > >>
+> > >> so what I'd do is:
+> > >>  * drop 4/6  
 > > 
-> > If returning error instead of aborting is easy, return an error
-> > and let the caller decide if it should use &error_abort or not.
-> agreed, there aren't that many callers of fw_cfg_find()
-> so I'd just add error argument to it and handle error at call sites.
+> > Yes.
+> > 
+> > > Agreed on this point.  But:
+> > >   
+> > >>  * make fw_cfg_find() use ambiguous argument and error_abort if ambiguous == true  
+> > 
+> > During my latest tests I've found that everything works fine without the
+> > ambiguous argument.
+> > 
+> > Do we still want to keep it? And I don't think error_abort() is the
+> > right thing to do here, I'd much rather return NULL and add a suitable
+> > comment.
+> I'd still use ambiguous argument and since you prefer not to assert
+> I'd add errp argument to fw_cfg_find() and handle error at callsites.
+> 
+> Just returning NULL isn't sufficient if you need to distinguish
+> 'not found' vs 'duplicate' usecases, additionally  'not found'
+> in most cases isn't even error but 'duplicate' definitely is.
+> 
+> Aborting on diplicate in fw_cfg_find() is fine and would
+> help to avoid touching current callers if you wish to limit
+> patches scope, but you can go with proper error propagating
+> route if you wish.
 
-I was talking about realizefn, which already has a errp
-parameter.  IMO a errp parameter to fw_cfg_find() would be
-overkill.
-
-(And an assert(!ambiguous) would make fw_cfg_find() less useful
-because then it won't be usable by realizefn).
+Just making realize refuse to create two devices sounds much
+simpler to me.  No need to make fw_cfg_find() more complex (if we
+add errp argument to it) or less useful (if we add
+assert(!ambiguous) to it).
 
 -- 
 Eduardo
