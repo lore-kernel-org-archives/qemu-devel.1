@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUdLE-0001CK-Ky
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:23:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUdQG-0002x7-Fo
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUdLB-000104-EY
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:23:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUdLB-0000zT-8P
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:23:25 -0400
-Date: Mon, 10 Jul 2017 15:23:22 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170710182322.GE5167@localhost.localdomain>
-References: <20170707213052.13087-1-ehabkost@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dUdQD-0002aa-9m
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:28:40 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:34914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dUdQD-0002aJ-1U
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:28:37 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id k67so149394265wrc.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 11:28:36 -0700 (PDT)
+References: <20170710142850.10468-1-alex.bennee@linaro.org>
+	<1e34d387-753b-14ff-dcc0-226515ff0124@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1e34d387-753b-14ff-dcc0-226515ff0124@twiddle.net>
+Date: Mon, 10 Jul 2017 19:28:34 +0100
+Message-ID: <87o9ss9mel.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707213052.13087-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] qom: Fix ambiguous path detection when
- ambiguous=NULL
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] include/exec/cpu-defs.h: try and make
+ SoftMMU page size match target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, bobby.prani@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Fri, Jul 07, 2017 at 06:30:50PM -0300, Eduardo Habkost wrote:
-> object_resolve_path*() ambiguous path detection breaks when
-> ambiguous==NULL and the object tree have 3 objects of the same type and
-> only 2 of them are under the same parent.  e.g.:
-> 
->  /container/obj1 (TYPE_FOO)
->  /container/obj2 (TYPE_FOO)
->  /obj2 (TYPE_FOO)
-> 
-> With the above tree, object_resolve_path_type("", TYPE_FOO, NULL) will
-> incorrectly return /obj2, because the search inside "/container" will
-> return NULL, and the match at "/obj2" won't be detected as ambiguous.
-> 
-> Fix that by always calling object_resolve_partial_path() with a non-NULL
-> ambiguous parameter.
-> 
-> Test case included.
-> 
-> Reported-by: Igor Mammedov <imammedo@redhat.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
-> Eduardo Habkost (2):
->   tests: Test case for object_resolve_path*()
 
-I'm queueing patch 1/2 on my machine-next tree.  I will wait a
-little longer for additional feedback on patch 2/2 before merging
-it.
+Richard Henderson <rth@twiddle.net> writes:
 
->   qom: Fix ambiguous path detection when ambiguous=NULL
-> 
->  qom/object.c               | 17 ++++++++---------
->  tests/check-qom-proplist.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 52 insertions(+), 9 deletions(-)
-> 
-> -- 
-> 2.9.4
-> 
-> 
+> On 07/10/2017 04:28 AM, Alex Bennée wrote:
+>> While the SoftMMU is not emulating the target MMU of a system there is
+>> a relationship between its page size and that of the target. If the
+>> target MMU is full featured the functions called to re-fill the
+>> entries in the SoftMMU entries start moving up the perf profiles. If
+>> we can we should try and prevent too much thrashing around by having
+>> the page sizes the same.
+>
+> What you are changing has absolutely nothing to do with page size.
+> Mentioning page sizes just confuses the issue.
+>
+> What you're changing is the number of entries in the TLB, and the
+> mapping between pages and TLB entries.  And I'm quite certain that you
+> saw a performance increase by increasing the size of the TLB.
 
--- 
-Eduardo
+You are quite right, I'm going to claim Monday brain on the commit text.
+
+There is some relationship though as the index into the SoftMMU TLB is a
+product of the target page number masked by the total number of SoftMMU
+TLB entries we have. By increasing the SoftMMU TLB size we reduce the
+number of aliased target pages for any given SoftMMU entry.
+
+I guess to have a better understanding of the slow-path fill patterns we
+would want to have an idea of which entries are getting re-filled more
+often and if there is an even distribution over the TLB?
+
+>
+>
+>>   #define CPU_TLB_BITS                                             \
+>> -    MIN(8,                                                       \
+>> +    MIN(10,                                                      \
+>
+> You will find this has broken tcg/arm, because the operand to an armv6
+> AND (immediate) instruction is only 8 bits.
+>
+> I will grant you that we could do a better job of configuring this
+> across the tcg backends.
+>
+> It also possibly warrants some work in the tcg/arm backend so that
+> armv7 makes use of UBFX so that not-ancient arm is not so constrained.
+
+I think Pranith is going to take this forward with a patch set to expand
+the SoftMMU TLB to the maximum supported by whichever the backend can
+do.
+
+--
+Alex Bennée
