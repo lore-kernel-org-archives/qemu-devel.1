@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dUXvR-0005SB-8Q
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:36:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dUXzM-0006zP-7N
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:40:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dUXvN-0007yr-A6
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:36:29 -0400
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:50211)
+	(envelope-from <stefanha@redhat.com>) id 1dUXzI-0001vn-AJ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:40:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dUXvN-0007wq-3S
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:36:25 -0400
-Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id EBE006B08E
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 14:36:20 +0200 (CEST)
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<20170710102433.GD4083@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <574cac90-bbc1-ee49-c38e-aaf275fcfad5@kaod.org>
-Date: Mon, 10 Jul 2017 14:36:06 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dUXzI-0001vQ-3e
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:40:28 -0400
+Date: Mon, 10 Jul 2017 13:40:25 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170710124025.GE14195@stefanha-x1.localdomain>
+References: <f7206d1d-addb-1f69-1a77-dc83c1b50e36@linux.vnet.ibm.com>
+	<f462bb68-fc63-baec-235c-726066e25d44@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170710102433.GD4083@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 00/26] guest exploitation of the XIVE
- interrupt controller (POWER9)
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FN+gV9K+162wdwwF"
+Content-Disposition: inline
+In-Reply-To: <f462bb68-fc63-baec-235c-726066e25d44@gmail.com>
+Subject: Re: [Qemu-devel] About the trace framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Xie Changlong <xiechanglong.d@gmail.com>
+Cc: Wang Dong <dongdwdw@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 07/10/2017 12:24 PM, David Gibson wrote:
-> On Wed, Jul 05, 2017 at 07:13:13PM +0200, C=E9dric Le Goater wrote:
->> On a POWER9 sPAPR machine, the Client Architecture Support (CAS)
->> negotiation process determines whether the guest operates with an
->> interrupt controller using the XICS legacy model, as found on POWER8,
->> or in XIVE exploitation mode, the newer POWER9 interrupt model. This
->> patchset is a first proposal to add XIVE support in the sPAPR machine.
->>
->> The first patches introduce the XIVE exploitation mode in CAS.
->>
->> Follow models for the XIVE interrupt controller, source and presenter.
->> We try to reuse the ICS and ICP models of XICS because the sPAPR
->> machine is tied to the XICSFabric interface and should be using a
->> common framework to be able to switch from one controller model to
->> another. To be discussed of course.
->>
->> Then comes support for the Hypervisor's call which are used to
->> configure the interrupt sources and the event/notification queues of
->> the guest.
->>
->> Finally, the last patches try to integrate the XIVE interrupt model in
->> the sPAPR machine and this not without a couple of serious hacks to
->> have something to test. See 'Caveats' below for more details.
->>
->> This is a first draft and I expect a lot of rewrite before it reaches
->> mainline QEMU. Nevertheless, it compiles, boots and can be used for
->> some testing.
+
+--FN+gV9K+162wdwwF
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jul 10, 2017 at 01:24:23PM +0800, Xie Changlong wrote:
+> =E5=9C=A8 7/9/2017 5:57 PM, Wang Dong =E5=86=99=E9=81=93:
+> > Hi,
+> >=20
+> > I am new to QEMU. But I got some problem so that  I want to figure it o=
+ut.
+> >=20
+> > So I try to debug qemu to see what happened.
+> >=20
+> > And I found trace framework. I think this will help me understand the
+> > point.
+> >=20
+> > So I compiled qemu with option:
+> >=20
+> > ## *--enable-trace-backends=3Dsimple*
+> >=20
+> > And did as the docs/tracing.txt tell. But when I execute the example
+> > command in it, nothing just happens.
+> >=20
+> > *./scripts/simpletrace.py trace-events-all trace-xxxxxx(my trace file
+> > produced by qemu)
+> > I am not sure what happened. Just ask this.
+> > Any clue will be appreciated. Thanks in advance.
+> > *
+> >=20
 >=20
-> 1 & 2 are straightforward enough that I've applied them already.  The
-> rest will take longer to review, obviously.
+> Did you set *trace-event*? I've encountered this issue in the past :)
+> (qemu) help trace-event
+> trace-event name on|off -- changes status of a specific trace event
+> (qemu) info trace-events
 
-For sure ... I don't expect anything soon. This is really a first=20
-draft to show the differences with XICS in the overall mechanics.=20
-The guest boots and perf are OK but the integration with the sPAPR=20
-machine is a mess. I also think the IRQ allocator is too complex=20
-for the sPAPR need and the Xive ICP object is useless. The changelogs=20
-are too short.=20
+Yes, you need to enable specific trace events that you are interested
+in.  'trace-event' does that from the QEMU monitor at runtime.  If you'd
+rather keep a file with a list of events to enable:
 
-I have continued working on CAS support and have found a solution
-which allows a guest to switch interrupt controller: XICS <-> XIVE,=20
-under TCG and under KVM,kernel_irqchip=3Doff.=20
+  $ echo bdrv_aio_readv   > /tmp/events
+  $ echo bdrv_aio_writev >> /tmp/events
+  $ qemu -trace events=3D/tmp/events ... # your normal QEMU invocation
 
-The XIVE ICP lives under ICPState for ease of use. As for the ICS,=20
-two different objects, XIVE and XICS, are maintained under the=20
-sPAPR machine in which the 'irqs' array needs to be synced when=20
-changing model. It's not too much of a hack I think and it is=20
-migration friendly. We will see when discussed.
+It's hard to know what is missing without seeing your QEMU command-line
+and monitor commands you used.
 
-I have pushed on github these changes and I am now exploring the=20
-abyssal zone of migration and cpu hot-plugging.
+Stefan
 
-Cheers,
+--FN+gV9K+162wdwwF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-C.
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZY3W4AAoJEJykq7OBq3PICG8H/3SBajfeJAo2gMjPRn7OLRXo
+3jaWDsnlPmGRlUBsDtaXSf22YtYYMeIkO6f1/6Pa2r1JIvUWdYFr1JTrrrFIEoJF
+yWTOs9kGxVYnl6ajBGp/mcZwgdoECIsCNJsq/ucyN3VPAOSGUikC0wHWRSx0ZsSE
+xvEU+4zZp7ZHaDLXBF+YaxPXE/Cl3jV8i0FLyGlvQtwz4ooojcCdMlgpxjHATm94
+D56toAk0wzC3x9zTpMY1IVTgfFyfpzWR+4SraefMbEzv1oFx1xGBNWnFsbn3zobG
+fwcdfmi5W2rZ5II6YB7lBumQhF6EevdK2gnhnt2KXWv1g4KcTLautdxIY3RG8iQ=
+=0VrU
+-----END PGP SIGNATURE-----
+
+--FN+gV9K+162wdwwF--
