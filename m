@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xormaetxea@ikerlan.es>) id 1dUVkQ-0003Pn-GU
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:59 -0400
+	(envelope-from <peterx@redhat.com>) id 1dUVnN-0004mA-JN
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xormaetxea@ikerlan.es>) id 1dUVkL-0000Ox-SM
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:58 -0400
-Received: from ikerlan-12.ikerlan.es ([193.145.247.1]:16463)
-	by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <xormaetxea@ikerlan.es>) id 1dUVkL-0000L3-FM
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:16:53 -0400
-From: Ormaetxea Xabier <xormaetxea@ikerlan.es>
-Date: Mon, 10 Jul 2017 10:16:39 +0000
-Message-ID: <B1DA44315104F94D9F3F23C74275EA9D729B61@Ikerlan-12.ikerlan.es>
-References: <B1DA44315104F94D9F3F23C74275EA9D729B34@Ikerlan-12.ikerlan.es>
-	<CAFEAcA853fSo86JXF0E=yt+Dfu8gVjcdpycx+z5OMX7z_mPKXg@mail.gmail.com>
-	<B1DA44315104F94D9F3F23C74275EA9D729B4B@Ikerlan-12.ikerlan.es>
-	<CAFEAcA_CF7KVq2MAhR3twsXfio3RNFRJ-SiK2pO7g1ZEzGvpGg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_CF7KVq2MAhR3twsXfio3RNFRJ-SiK2pO7g1ZEzGvpGg@mail.gmail.com>
-Content-Language: es-ES
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peterx@redhat.com>) id 1dUVnI-00037s-KB
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:20:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47774)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dUVnI-00037M-BX
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:19:56 -0400
+Date: Mon, 10 Jul 2017 18:19:42 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170710101942.GB21344@pxdev.xzpeter.org>
+References: <20170628190047.26159-1-dgilbert@redhat.com>
+	<20170628190047.26159-6-dgilbert@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Code source modifying
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170628190047.26159-6-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 05/29] postcopy: use UFFDIO_ZEROPAGE only
+ when available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com
 
-SGkgUGV0ZXIhDQoNCkFoIHNvcnJ5LCBJIHRob3VnaHQgdGhhdCByZXBseWluZyB0byB5b3VyIG1l
-c3NhZ2UgaXQgd2FzIHNvbWVob3cgcmVkaXJlY3RlZCB0byB0aGUgbWFpbGluZyBsaXN0LiBTbywg
-ZXZlcnktdGltZSBJIHJlc3BvbmQsIEkgaGF2ZSB0byBkbyBpdCB0byBxZW11LWRldmVsQG5vbmdu
-dS5vcmc/IE9yIGEgQ0MgaXQncyBlbm91Z2g/IFNvcnJ5IGZvciBteSBpZ25vcmFuY2UuLi4NCg0K
-QW55d2F5LCBkbyB5b3UgaW1hZ2luZSBob3cgY2FuIEkgbWFrZSB0aGlzICJ2aXJ0dWFsIHdvcmxk
-Ii0icmVhbCB3b3JsZCIgY29ubmVjdGlvbj8gSSBtZWFuLCBpcyB0aGVyZSBhbiBlYXN5IHdheSBv
-ZiBjb25uZWN0aW5nIGFuIGV4ZWN1dGlvbiBmcm9tIHRoZSBzdGFuZGFsb25lIHdpdGggdGhlIHNv
-dXJjZSBjb2RlPw0KDQpUaGFuayB5b3UgZm9yIHlvdXIgd29yayENCg0KWGFiaQ0KDQotLS0tLU1l
-bnNhamUgb3JpZ2luYWwtLS0tLQ0KRGU6IFBldGVyIE1heWRlbGwgW21haWx0bzpwZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmddIA0KRW52aWFkbyBlbDogbHVuZXMsIDEwIGRlIGp1bGlvIGRlIDIwMTcg
-MTE6NTgNClBhcmE6IE9ybWFldHhlYSBYYWJpZXINCkFzdW50bzogUmU6IFtRZW11LWRldmVsXSBD
-b2RlIHNvdXJjZSBtb2RpZnlpbmcNCg0KSXQncyByZWFsbHkgYmV0dGVyIHRvIGtlZXAgdGhyZWFk
-cyBvbiB0aGUgcHVibGljIG1haWxpbmcgbGlzdHMsDQp0aGF0IHdheSB0aGUgYW5zd2VycyBoZWxw
-IGV2ZXJ5Ym9keSAoYW5kIGFueWJvZHkgd2hvIGtub3dzIHRoZQ0KYW5zd2VyIGNhbiByZXBseSku
-Li4NCg0KQW55d2F5LCB5b3UgY2Fubm90IGRvIHdoYXQgeW91J3JlIHRyeWluZyB0byBkbyB0aGUg
-d2F5IHlvdSdyZQ0KdHJ5aW5nIHRvIGRvIGl0Lg0KDQp0aGFua3MNCi0tIFBNTQ0KDQpPbiAxMCBK
-dWx5IDIwMTcgYXQgMTA6NDAsIE9ybWFldHhlYSBYYWJpZXIgPHhvcm1hZXR4ZWFAaWtlcmxhbi5l
-cz4gd3JvdGU6DQo+IEhlbGxvIFBldGVyIQ0KPg0KPiBJIHdpbGwgdXNlIHRoZSAicmVhZCBldmVy
-eSBsb29wIiBpbiBjcHVfZXhlYygpLCBJIHN1cHBvc2UgaXTigJlzIHRoZSAiYmVzdCIgcGxhY2Ug
-dG8gZG8gaXQuDQo+DQo+IEFuZCB5ZXMsIEkgcmVhbGx5IG1lYW4gdmlydHVhbCBhZGRyZXNzLi4u
-IExldCdzIHNlZSBpZiBJIGNhbiBleHBsYWluIHdlbGwgbXlzZWxmIChub3QgdGhlIGJlc3QgYXQg
-ZW5nbGlzaCkuDQo+IFRoZSBzdGFuZGFsb25lIHByb2dyYW0gd29ya3Mgb3ZlciB0aGUgdmlydHVh
-bCBwbGF0Zm9ybSwgc28gd2hlbiBJIHdhbnQgdGhlIGV4dGVyaW9yIHRpbWVyIHRvIHN0YXJ0IGNv
-dW50aW5nIEkgd2lsbCB1c2UgYToNCj4NCj4gMHg5NTAwMDAwMCo9MHhmZmZmZmZmZg0KPg0KPiBB
-bmQgd2hlbiBJIHdhbnQgdG8gZmluaXNoIGl0Og0KPg0KPiAweDk1MDAwMDAwKj0weDAwMDAwMDAw
-DQo+DQo+IE5vdywgZnJvbSB0aGUgY29kZSBzb3VyY2UsIEkgbmVlZCB0byByZWFkIGluIGV2ZXJ5
-IHN0ZXAgKGxldCdzIHNheSBldmVyeSBjcHVfZXhlYygpIGxvb3ApIHRoYXQgdmlydHVhbCBwb3Np
-dGlvbi4gTGlrZSBjb25uZWN0aW5nIHRoZSB2aXJ0dWFsIGFuZCByZWFsIGFkZHJlc3Nlcy4NCj4N
-Cj4gU29tZXRoaW5nIGp1c3QgbGlrZToNCj4NCj4gaWYgKDB4OTUwMDAwMDAqPT0weGZmZmZmZmZm
-KXsNCj4gICAgICAgICBzeXN0ZW0oImVjaG8gMSA+IC9zeXMvY2xhc3MvZ3Bpby9ncGlvOTEzL3Zh
-bHVlIik7DQo+IH0NCj4gZWxzZXsNCj4gICAgICAgICBzeXN0ZW0oImVjaG8gMCA+IC9zeXMvY2xh
-c3MvZ3Bpby9ncGlvOTEzL3ZhbHVlIik7DQo+IH0NCj4NCj4gQnV0IEkgZG9uJ3Qga25vdyB3aGVy
-ZSBpdCBtYXBzIG15IHZpcnR1YWwgKDB4OTUwMDAwMDApIG1lbW9yeS4gU28uLi4gY2FuJ3QgZG8g
-MHg5NTAwMDAwMCo9PTB4ZmZmZmZmZmYuDQo+DQo+IFRoYW5rIHlvdSBmb3IgeW91ciBoZWxwIQ0K
-Pg0KPiBYYWJpDQo+DQo+DQo+DQo+IC0tLS0tTWVuc2FqZSBvcmlnaW5hbC0tLS0tDQo+IERlOiBQ
-ZXRlciBNYXlkZWxsIFttYWlsdG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnXQ0KPiBFbnZpYWRv
-IGVsOiBsdW5lcywgMTAgZGUganVsaW8gZGUgMjAxNyAxMToyNg0KPiBQYXJhOiBPcm1hZXR4ZWEg
-WGFiaWVyDQo+IENDOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQXN1bnRvOiBSZTogW1FlbXUt
-ZGV2ZWxdIENvZGUgc291cmNlIG1vZGlmeWluZw0KPg0KPiBPbiAxMCBKdWx5IDIwMTcgYXQgMTA6
-MTQsIE9ybWFldHhlYSBYYWJpZXIgPHhvcm1hZXR4ZWFAaWtlcmxhbi5lcz4gd3JvdGU6DQo+PiBN
-eSBzdGFuZGFsb25lIHByb2dyYW0gd3JpdGVzICIweGZmZmZmZmZmIiBpbiB0aGUgcG9zaXRpb24g
-MHg5NTAwMDAwMA0KPj4gd2hlbiB0aGUgdGltZXIgc2hvdWxkIHN0YXJ0LCBhbmQgIjB4MDAwMDAw
-MDAiIHdoZW4gaXQgaGF2ZSB0byBmaW5pc2guDQo+PiBJIHdhbnQgdG8gbW9kaWZ5IHRoZSBjb2Rl
-IHNvIGV2ZXJ5IHNpbmdsZSAoc3RhbmRhbG9uZSkgcHJvZ3JhbSBzdGVwDQo+PiByZWFkcyB0aGUg
-dmlydHVhbCAweDk1MDAwMDAwIGFuZCBjaGFuZ2VzIHRoZSB2YWx1ZSBvZiBhIGdwaW8uIEJ1dCBJ
-DQo+PiBjYW4ndCBmaW5kIGhvdyBJIGNhbiByZWFkIGZyb20gdGhlIHNvdXJjZSBjb2RlIHRoZSB2
-aXJ0dWFsIG1lbW9yeSwNCj4+IGFuZCBJIGNhbid0IGZpbmQgbmVpdGhlciB3aGVyZS9ob3cgZG9l
-cyB0aGUgcHJvZ3JhbSBwcm9jZXNzIChzdGVwDQo+PiBieSBzdGVwKSB0aGUgc3RhbmRhbG9uZSBw
-cm9ncmFtLg0KPg0KPiBRRU1VIGRvZXNuJ3QgcmVhbGx5IHdvcmsgdGhhdCB3YXkuIFdoYXQgd2Ug
-ZG8gaXMgdGFrZSBibG9ja3Mgb2YgdGhlDQo+IGd1ZXN0IGJpbmFyeSAodXN1YWxseSB1cCB0byB0
-aGUgbmV4dCBicmFuY2ggaW5zdHJ1Y3Rpb24pLCB0cmFuc2xhdGUNCj4gdGhlIHdob2xlIGJsb2Nr
-IHRvIG5hdGl2ZSBob3N0IGJpbmFyeSBjb2RlLCBhbmQgdGhlbiBleGVjdXRlIHRob3NlDQo+IHRy
-YW5zbGF0ZWQgYmxvY2tzLiBTbyBvdXIgbWFpbiBleGVjdXRpb24gbG9vcCAoY3B1X2V4ZWMoKSkg
-aXMNCj4gYmFzaWNhbGx5IGEgbG9vcCB0aGF0IGRvZXM6DQo+ICAqIGhhbmRsZSBhbnkgcGVuZGlu
-ZyBpbnRlcnJ1cHQgb3IgZXhjZXB0aW9uIHdvcmsNCj4gICogZmluZCBwcmV2aW91c2x5IHRyYW5z
-bGF0ZWQgYmxvY2sgZm9yIHRoaXMgUEMNCj4gICAgKGFuZCB0cmFuc2xhdGUgaXQgaWYgaXQgZGlk
-bid0IGFscmVhZHkgZXhpc3QpDQo+ICAqIGV4ZWN1dGUgdGhhdCBUQiAod2hpY2ggd2lsbCBleGVj
-dXRlIG11bHRpcGxlIGd1ZXN0IGluc25zDQo+ICAgIGFuZCBtYXkganVtcCBkaXJlY3RseSB0byBh
-bm90aGVyIFRCIHdpdGhvdXQgY29taW5nIGJhY2sgdG8gQyBjb2RlKQ0KPg0KPiBEbyB5b3UgcmVh
-bGx5IG1lYW4gdmlydHVhbCBhZGRyZXNzZXMgaGVyZT8gVGhhdCBpcyB2ZXJ5IHdlaXJkOg0KPiBo
-YXJkd2FyZSBkb2Vzbid0IGRvIHRoYXQgLS0gdGltZXIgZGV2aWNlcyBhcmUgYXQgZml4ZWQgcGh5
-c2ljYWwNCj4gYWRkcmVzc2VzIHdoaWNoIHRoZSBndWVzdCBjYW4gdGhlbiBjaG9vc2UgdG8gbWFw
-IHdoZXJlIHRoZXkgbGlrZQ0KPiBpbiB0aGUgdmlydHVhbCBhZGRyZXNzIHNwYWNlIHVzaW5nIHRo
-ZSBNTVUuDQo+DQo+IHRoYW5rcw0KPiAtLSBQTU0NCg==
+On Wed, Jun 28, 2017 at 08:00:23PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Use the recently added migration flag to hold whether
+> each RAMBlock has the UFFDIO_ZEROPAGE capability, use it
+> when it's available.
+> 
+> This allows the use of postcopy on tmpfs as well as hugepage
+> backed files.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/migration.h    |  4 ++++
+>  migration/postcopy-ram.c | 12 +++++++++---
+>  2 files changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/migration/migration.h b/migration/migration.h
+> index d9a268a3af..d109635d08 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -20,6 +20,10 @@
+>  #include "exec/cpu-common.h"
+>  #include "qemu/coroutine_int.h"
+>  
+> +/* Migration flags to be set using qemu_ram_set_migration_flags */
+> +/* Postcopy can atomically zero pages in this RAMBlock */
+> +#define QEMU_MIGFLAG_POSTCOPY_ZERO   0x00000001
+> +
+>  /* State for the incoming migration */
+>  struct MigrationIncomingState {
+>      QEMUFile *from_src_file;
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index be2a8f8e02..96338a8070 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -408,6 +408,12 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+>          error_report("%s userfault: Region doesn't support COPY", __func__);
+>          return -1;
+>      }
+> +    if (reg_struct.ioctls & ((__u64)1 << _UFFDIO_ZEROPAGE)) {
+> +        RAMBlock *rb = qemu_ram_block_by_name(block_name);
+> +        qemu_ram_set_migration_flags(rb, qemu_ram_get_migration_flags(rb) |
+> +                                         QEMU_MIGFLAG_POSTCOPY_ZERO);
+
+Shall we use atomic_or() inside qemu_ram_set_migration_flags()? Then
+no need to fetch, and we'll be thread safe as well?
+
+> +    }
+> +
+>  
+>      return 0;
+>  }
+> @@ -620,11 +626,11 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+>  int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+>                               RAMBlock *rb)
+>  {
+> +    size_t pagesize = qemu_ram_pagesize(rb);
+>      trace_postcopy_place_page_zero(host);
+>  
+> -    if (qemu_ram_pagesize(rb) == getpagesize()) {
+> -        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, getpagesize(),
+> -                                rb)) {
+> +    if (qemu_ram_get_migration_flags(rb) & QEMU_MIGFLAG_POSTCOPY_ZERO) {
+
+IIUC, _UFFDIO_ZEROPAGE is not supported on huge pages. If so, would
+here worth a comment?
+
+> +        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
+>              int e = errno;
+>              error_report("%s: %s zero host: %p",
+>                           __func__, strerror(e), host);
+> -- 
+> 2.13.0
+> 
+
+Thanks,
+
+-- 
+Peter Xu
