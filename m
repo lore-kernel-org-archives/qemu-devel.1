@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXag-0001og-T9
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:15:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUXai-0001q7-7E
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXac-0002hH-2L
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:15:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUXag-0002jw-UU
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:15:04 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Jul 2017 07:14:32 -0500
-Message-Id: <20170710121434.5047-10-eblake@redhat.com>
+Date: Mon, 10 Jul 2017 07:14:33 -0500
+Message-Id: <20170710121434.5047-11-eblake@redhat.com>
 In-Reply-To: <20170710121434.5047-1-eblake@redhat.com>
 References: <20170710121434.5047-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 09/11] nbd/server: rename clientflags var in
- nbd_negotiate_options
+Subject: [Qemu-devel] [PULL 10/11] nbd: refactor tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,151 +24,163 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbon
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Rename 'clientflags' to just 'option'. This variable has nothing to do
-with flags, but is a single integer representing the option requested
-by the client.
+Reorganize traces: move, reword, add information, drop extra ones.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170707152918.23086-9-vsementsov@virtuozzo.com>
+Message-Id: <20170707152918.23086-10-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ nbd/client.c |  3 ---
+ nbd/server.c | 30 +++++++++---------------------
+ 2 files changed, 9 insertions(+), 24 deletions(-)
 
+diff --git a/nbd/client.c b/nbd/client.c
+index 2125321..1ae4ff8 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -489,12 +489,10 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+         TRACE("Global flags are %" PRIx32, globalflags);
+         if (globalflags & NBD_FLAG_FIXED_NEWSTYLE) {
+             fixedNewStyle = true;
+-            TRACE("Server supports fixed new style");
+             clientflags |= NBD_FLAG_C_FIXED_NEWSTYLE;
+         }
+         if (globalflags & NBD_FLAG_NO_ZEROES) {
+             zeroes = false;
+-            TRACE("Server supports no zeroes");
+             clientflags |= NBD_FLAG_C_NO_ZEROES;
+         }
+         /* client requested flags */
+@@ -565,7 +563,6 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+             goto fail;
+         }
+         *size = be64_to_cpu(s);
+-        TRACE("Size is %" PRIu64, *size);
+
+         if (nbd_read(ioc, &oldflags, sizeof(oldflags), errp) < 0) {
+             error_prepend(errp, "Failed to read export flags");
 diff --git a/nbd/server.c b/nbd/server.c
-index 1eeafcc..c4d64fb 100644
+index c4d64fb..4bbce5f 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -415,7 +415,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+@@ -1000,6 +1000,10 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
+     int ret;
 
-     while (1) {
-         int ret;
--        uint32_t clientflags, length;
-+        uint32_t option, length;
-         uint64_t magic;
+     g_assert(qemu_in_coroutine());
++
++    TRACE("Send reply: handle = %" PRIu64 ", error = %" PRIu32 ", len = %d",
++          reply->handle, reply->error, len);
++
+     qemu_co_mutex_lock(&client->send_lock);
+     client->send_coroutine = qemu_coroutine_self();
 
-         if (nbd_read(client->ioc, &magic, sizeof(magic), errp) < 0) {
-@@ -428,12 +428,12 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-             return -EINVAL;
+@@ -1039,7 +1043,8 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         return -EIO;
+     }
+
+-    TRACE("Decoding type");
++    TRACE("Decoding type: handle = %" PRIu64 ", type = %" PRIu16,
++          request->handle, request->type);
+
+     if (request->type != NBD_CMD_WRITE) {
+         /* No payload, we are ready to read the next request.  */
+@@ -1049,7 +1054,6 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+     if (request->type == NBD_CMD_DISC) {
+         /* Special case: we're going to disconnect without a reply,
+          * whether or not flags, from, or len are bogus */
+-        TRACE("Request type is DISCONNECT");
+         return -EIO;
+     }
+
+@@ -1076,13 +1080,14 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         }
+     }
+     if (request->type == NBD_CMD_WRITE) {
+-        TRACE("Reading %" PRIu32 " byte(s)", request->len);
+-
+         if (nbd_read(client->ioc, req->data, request->len, errp) < 0) {
+             error_prepend(errp, "reading from socket failed: ");
+             return -EIO;
+         }
+         req->complete = true;
++
++        TRACE("Payload received: handle = %" PRIu64 ", len = %" PRIu32,
++              request->handle, request->len);
+     }
+
+     /* Sanity checks, part 2. */
+@@ -1150,8 +1155,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+     switch (request.type) {
+     case NBD_CMD_READ:
+-        TRACE("Request type is READ");
+-
+         /* XXX: NBD Protocol only documents use of FUA with WRITE */
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             ret = blk_co_flush(exp->blk);
+@@ -1171,20 +1174,14 @@ static coroutine_fn void nbd_trip(void *opaque)
          }
 
--        if (nbd_read(client->ioc, &clientflags,
--                     sizeof(clientflags), errp) < 0) {
-+        if (nbd_read(client->ioc, &option,
-+                     sizeof(option), errp) < 0) {
-             error_prepend(errp, "read failed: ");
-             return -EINVAL;
+         reply_data_len = request.len;
+-        TRACE("Read %" PRIu32" byte(s)", request.len);
+
+         break;
+     case NBD_CMD_WRITE:
+-        TRACE("Request type is WRITE");
+-
+         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+-            TRACE("Server is read-only, return error");
+             reply.error = EROFS;
+             break;
          }
--        clientflags = be32_to_cpu(clientflags);
-+        option = be32_to_cpu(option);
 
-         if (nbd_read(client->ioc, &length, sizeof(length), errp) < 0) {
-             error_prepend(errp, "read failed: ");
-@@ -441,15 +441,15 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+-        TRACE("Writing to device");
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+@@ -1198,16 +1195,12 @@ static coroutine_fn void nbd_trip(void *opaque)
+
+         break;
+     case NBD_CMD_WRITE_ZEROES:
+-        TRACE("Request type is WRITE_ZEROES");
+-
+         if (exp->nbdflags & NBD_FLAG_READ_ONLY) {
+             error_setg(&local_err, "Server is read-only, return error");
+             reply.error = EROFS;
+             break;
          }
-         length = be32_to_cpu(length);
 
--        TRACE("Checking option 0x%" PRIx32, clientflags);
-+        TRACE("Checking option 0x%" PRIx32, option);
-         if (client->tlscreds &&
-             client->ioc == (QIOChannel *)client->sioc) {
-             QIOChannel *tioc;
-             if (!fixedNewstyle) {
--                error_setg(errp, "Unsupported option 0x%" PRIx32, clientflags);
-+                error_setg(errp, "Unsupported option 0x%" PRIx32, option);
-                 return -EINVAL;
-             }
--            switch (clientflags) {
-+            switch (option) {
-             case NBD_OPT_STARTTLS:
-                 tioc = nbd_negotiate_handle_starttls(client, length, errp);
-                 if (!tioc) {
-@@ -462,7 +462,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-             case NBD_OPT_EXPORT_NAME:
-                 /* No way to return an error to client, so drop connection */
-                 error_setg(errp, "Option 0x%x not permitted before TLS",
--                           clientflags);
-+                           option);
-                 return -EINVAL;
+-        TRACE("Writing to device");
+-
+         flags = 0;
+         if (request.flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+@@ -1228,8 +1221,6 @@ static coroutine_fn void nbd_trip(void *opaque)
+         abort();
 
-             default:
-@@ -471,21 +471,21 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-                 }
-                 ret = nbd_negotiate_send_rep_err(client->ioc,
-                                                  NBD_REP_ERR_TLS_REQD,
--                                                 clientflags, errp,
-+                                                 option, errp,
-                                                  "Option 0x%" PRIx32
-                                                  "not permitted before TLS",
--                                                 clientflags);
-+                                                 option);
-                 if (ret < 0) {
-                     return ret;
-                 }
-                 /* Let the client keep trying, unless they asked to quit */
--                if (clientflags == NBD_OPT_ABORT) {
-+                if (option == NBD_OPT_ABORT) {
-                     return 1;
-                 }
-                 break;
-             }
-         } else if (fixedNewstyle) {
--            switch (clientflags) {
-+            switch (option) {
-             case NBD_OPT_LIST:
-                 ret = nbd_negotiate_handle_list(client, length, errp);
-                 if (ret < 0) {
-@@ -497,7 +497,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-                 /* NBD spec says we must try to reply before
-                  * disconnecting, but that we must also tolerate
-                  * guests that don't wait for our reply. */
--                nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, clientflags,
-+                nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, option,
-                                        &local_err);
+     case NBD_CMD_FLUSH:
+-        TRACE("Request type is FLUSH");
+-
+         ret = blk_co_flush(exp->blk);
+         if (ret < 0) {
+             error_setg_errno(&local_err, -ret, "flush failed");
+@@ -1238,7 +1229,6 @@ static coroutine_fn void nbd_trip(void *opaque)
 
-                 if (local_err != NULL) {
-@@ -518,12 +518,12 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-                 if (client->tlscreds) {
-                     ret = nbd_negotiate_send_rep_err(client->ioc,
-                                                      NBD_REP_ERR_INVALID,
--                                                     clientflags, errp,
-+                                                     option, errp,
-                                                      "TLS already enabled");
-                 } else {
-                     ret = nbd_negotiate_send_rep_err(client->ioc,
-                                                      NBD_REP_ERR_POLICY,
--                                                     clientflags, errp,
-+                                                     option, errp,
-                                                      "TLS not configured");
-                 }
-                 if (ret < 0) {
-@@ -536,10 +536,10 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-                 }
-                 ret = nbd_negotiate_send_rep_err(client->ioc,
-                                                  NBD_REP_ERR_UNSUP,
--                                                 clientflags, errp,
-+                                                 option, errp,
-                                                  "Unsupported option 0x%"
-                                                  PRIx32,
--                                                 clientflags);
-+                                                 option);
-                 if (ret < 0) {
-                     return ret;
-                 }
-@@ -550,12 +550,12 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-              * If broken new-style we should drop the connection
-              * for anything except NBD_OPT_EXPORT_NAME
-              */
--            switch (clientflags) {
-+            switch (option) {
-             case NBD_OPT_EXPORT_NAME:
-                 return nbd_negotiate_handle_export_name(client, length, errp);
+         break;
+     case NBD_CMD_TRIM:
+-        TRACE("Request type is TRIM");
+         ret = blk_co_pdiscard(exp->blk, request.from + exp->dev_offset,
+                               request.len);
+         if (ret < 0) {
+@@ -1274,8 +1264,6 @@ reply:
+         goto disconnect;
+     }
 
-             default:
--                error_setg(errp, "Unsupported option 0x%" PRIx32, clientflags);
-+                error_setg(errp, "Unsupported option 0x%" PRIx32, option);
-                 return -EINVAL;
-             }
-         }
+-    TRACE("Request/Reply complete");
+-
+ done:
+     nbd_request_put(req);
+     nbd_client_put(client);
 -- 
 2.9.4
