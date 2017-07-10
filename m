@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUXR5-0005A0-Lb
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:11 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUXRL-0005J6-Q5
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUXR2-0004kf-Gv
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:07 -0400
-Received: from mail-wr0-f171.google.com ([209.85.128.171]:34318)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUXRI-0004xZ-Ma
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:23 -0400
+Received: from mail-it0-f42.google.com ([209.85.214.42]:38134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUXR2-0004kJ-Ax
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:04 -0400
-Received: by mail-wr0-f171.google.com with SMTP id 77so135799128wrb.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:05:04 -0700 (PDT)
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-22-git-send-email-cota@braap.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e69fe832-f4e8-f59d-e0dd-3472f498c04e@redhat.com>
-Date: Mon, 10 Jul 2017 14:05:01 +0200
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUXRI-0004x9-Hr
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:20 -0400
+Received: by mail-it0-f42.google.com with SMTP id k192so35925617ith.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:05:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1499586614-20507-22-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 21/22] tcg: enable per-thread TCG for
- softmmu
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <CAAdtpL6tLfG1dUO8nmGvb2vAtX-OTkoFKWQt=MdxUULyonE8AA@mail.gmail.com>
+References: <20170621144814.15324-1-alex.bennee@linaro.org>
+	<CAFEAcA91jcDezunfEKwB+DBdzrEAFYWHKRyFmPyCNYSs_4N4JA@mail.gmail.com>
+	<6152fff6-f4db-b0c2-bf20-181364544412@amsat.org>
+	<87wp84rr6h.fsf@linaro.org>
+	<CAAdtpL6tLfG1dUO8nmGvb2vAtX-OTkoFKWQt=MdxUULyonE8AA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 10 Jul 2017 09:04:19 -0300
+Message-ID: <CAAdtpL7kaQSm_Kbn+DrD9Kkzj3JH47pM+-RxXYB=_fyEb+7NxQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/21] Docker and shippable updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 09/07/2017 09:50, Emilio G. Cota wrote:
-> User-mode is kept out of this: contention due to concurrent translation
-> is more commonly found in full-system mode.
+On Thu, Jun 22, 2017 at 12:42 PM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> On Thu, Jun 22, 2017 at 12:13 PM, Alex Benn=C3=A9e <alex.bennee@linaro.or=
+g> wrote:
+>> Now we've been running shippable for a while is it worth turning on the
+>> IRC notifications?
+>
+> What about moving such bot/scripts notifications in another channel
+> like #QEMU-notifications?
 
-Out of curiosity, is it harder or you just didn't try?  It would be nice
-if the commit message mentioned the problems (if any) in addition to the
-reason why you didn't do it.
+ping?
 
-Having similar policies for user and softmmu emulation is much more
-maintainable (for an earlier example, see the unification of user mode
-emulation's start/end_exclusive logic with softmmu's "safe work").
-
-Paolo
+> It is often hard to follow 3 concurrent topics while the travis-ci bot
+> disrupts entering/broadcasting/leaving...
+> I'd also like to see here checkpatch/patchew stripped output, and
+> eventually gcov/gprof reports.
+> I don't think full patchew reports are useful in a mailbox.
