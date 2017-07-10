@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tblodt@icloud.com>) id 1dUfkD-0007uf-75
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 16:57:26 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1dUfnj-00023D-1C
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tblodt@icloud.com>) id 1dUfkA-0000QQ-3E
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 16:57:25 -0400
-Received: from st13p21im-asmtp003.me.com ([17.164.152.25]:64874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tblodt@icloud.com>) id 1dUfk9-0000Q0-U0
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 16:57:22 -0400
-Received: from process-dkim-sign-daemon.st13p21im-asmtp003.me.com by
-	st13p21im-asmtp003.me.com
-	(Oracle Communications Messaging Server 7.0.5.38.0 64bit (built Feb 26
-	2016)) id <0OSW0100076FTB00@st13p21im-asmtp003.me.com> for
-	qemu-devel@nongnu.org; Mon, 10 Jul 2017 20:57:19 +0000 (GMT)
-Received: from icloud.com ([127.0.0.1]) by st13p21im-asmtp003.me.com
-	(Oracle Communications Messaging Server 7.0.5.38.0 64bit (built Feb 26
-	2016))
-	with ESMTPSA id <0OSW00RJS7JGGY30@st13p21im-asmtp003.me.com> for
-	qemu-devel@nongnu.org; Mon, 10 Jul 2017 20:57:19 +0000 (GMT)
-From: Theodore Dubois <tblodt@icloud.com>
-Content-type: text/plain; charset=us-ascii
-Content-transfer-encoding: 7bit
-MIME-version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Message-id: <D5741445-7EFD-4AF1-8DB2-E4AFA93CBB1A@icloud.com>
-Date: Mon, 10 Jul 2017 13:57:12 -0700
-Subject: [Qemu-devel] [PATCH] test-i386: Make x86 test program compile on
- clang
+	(envelope-from <benh@kernel.crashing.org>) id 1dUfne-0001d4-2l
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:01:03 -0400
+Message-ID: <1499720443.2865.15.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Tue, 11 Jul 2017 07:00:43 +1000
+In-Reply-To: <9a7a16a0-f14f-bc65-d503-e2aee028633f@kaod.org>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-4-git-send-email-clg@kaod.org>
+	<20170710102655.GE4083@umbus.fritz.box>
+	<9a7a16a0-f14f-bc65-d503-e2aee028633f@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 03/26] target/ppc/POWER9: add
+ POWERPC_EXCP_POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,102 +26,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Clang's assembler is slightly incompatible with GCC's assembler, which
-caused the program to not compile on Clang for these reasons:
+On Mon, 2017-07-10 at 14:49 +0200, C=C3=A9dric Le Goater wrote:
+> On 07/10/2017 12:26 PM, David Gibson wrote:
+> > On Wed, Jul 05, 2017 at 07:13:16PM +0200, C=C3=A9dric Le Goater wrote=
+:
+> > > Prepare ground for the new exception model XIVE of POWER9.
+> >=20
+> > I'm a bit confused by this.  The excp_model is about the CPU core's
+> > irq model, not the external irq controller's.
+>=20
+> yes this is true, but the POWER9 CPU is the only criteria we have=20
+> to distinguish a machine supporting XIVE and XICS from one only=20
+> supporting XICS.
 
-  - The "q" constraint was specified for an argument to the set
-    instruction, which didn't work because Clang chose the esi register,
-    which has no 8-bit form on i386.
-  - Clang doesn't support size suffixes on the loop instructions.
-  - Clang requires a size suffix on the fist instruction.
-  - Clang doesn't support specifying segment prefixes before the
-    instruction, and requires specifying them on the address.
-  - The arguments to the bound instruction are in the wrong order on
-    Clang. https://bugs.llvm.org/show_bug.cgi?id=27653
+Why ? I don't understand.
 
-Signed-off-by: Theodore Dubois <tblodt@icloud.com>
----
- tests/tcg/test-i386.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+We do want an EXCP_POWER9 for other things, like the fact that we have
+a separate interrupt input for hypervisor, with associated vectors
+etc...  but that still doesn't relate to what interrupt controller is
+there.
 
-diff --git a/tests/tcg/test-i386.c b/tests/tcg/test-i386.c
-index 0f7b943b0c..dcb8e4876e 100644
---- a/tests/tcg/test-i386.c
-+++ b/tests/tcg/test-i386.c
-@@ -369,7 +369,7 @@ void test_lea(void)
-     asm("movl $0, %0\n\t"\
-         "cmpl %2, %1\n\t"\
-         "set" JCC " %b0\n\t"\
--        : "=r" (res)\
-+        : "=q" (res)\
-         : "r" (v1), "r" (v2));\
-     printf("%-10s %d\n", "set" JCC, res);\
-  if (TEST_CMOV) {\
-@@ -491,15 +491,23 @@ void test_loop(void)
- 
- #if !defined(__x86_64__)
-     TEST_LOOP("jcxz");
-+#if !defined(__clang__)
-     TEST_LOOP("loopw");
-     TEST_LOOP("loopzw");
-     TEST_LOOP("loopnzw");
- #endif
-+#endif
- 
-     TEST_LOOP("jecxz");
-+#if !defined(__clang__)
-     TEST_LOOP("loopl");
-     TEST_LOOP("loopzl");
-     TEST_LOOP("loopnzl");
-+#else
-+    TEST_LOOP("loop");
-+    TEST_LOOP("loopz");
-+    TEST_LOOP("loopnz");
-+#endif
- }
- 
- #undef CC_MASK
-@@ -867,7 +875,7 @@ void test_fcvt(double a)
-         uint16_t val16;
-         val16 = (fpuc & ~0x0c00) | (i << 10);
-         asm volatile ("fldcw %0" : : "m" (val16));
--        asm volatile ("fist %0" : "=m" (wa) : "t" (a));
-+        asm volatile ("fists %0" : "=m" (wa) : "t" (a));
-         asm volatile ("fistl %0" : "=m" (ia) : "t" (a));
-         asm volatile ("fistpll %0" : "=m" (lla) : "t" (a) : "st");
-         asm volatile ("frndint ; fstl %0" : "=m" (ra) : "t" (a));
-@@ -1318,12 +1326,12 @@ void test_segs(void)
-     seg_data1[1] = 0xaa;
-     seg_data2[1] = 0x55;
- 
--    asm volatile ("fs movzbl 0x1, %0" : "=r" (res));
-+    asm volatile ("movzbl %%fs:0x1, %0" : "=r" (res));
-     printf("FS[1] = %02x\n", res);
- 
-     asm volatile ("pushl %%gs\n"
-                   "movl %1, %%gs\n"
--                  "gs movzbl 0x1, %0\n"
-+                  "movzbl %%gs:0x1, %0\n"
-                   "popl %%gs\n"
-                   : "=r" (res)
-                   : "r" (MK_SEL(2)));
-@@ -1764,7 +1772,11 @@ void test_exceptions(void)
-         /* bound exception */
-         tab[0] = 1;
-         tab[1] = 10;
-+#if defined(__clang__)
-+        asm volatile ("bound %1, %0" : : "r" (11), "m" (tab[0]));
-+#else
-         asm volatile ("bound %0, %1" : : "r" (11), "m" (tab[0]));
-+#endif
-     }
- #endif
- 
--- 
-2.13.2
+> My idea was to use this flag to activate the OV5_XIVE_EXPLOIT bit=20
+> in ibm,arch-vec-5-platform-support ov5_platform, like this is done
+> for the MMU. See spapr_dt_ov5_platform_support()
 
+I disagree, the MMU is in the core, the XIVE isn't. It would be
+possibly to make a P9 core if a XICS in theory :-)
 
+> > Now.. I could imagine the POWER9 having a different core model that
+> > came along with XIVE, but I can't see this new model being used for
+> > anything anywhere in the rest of the series.
+>=20
+> See patch 26. But, maybe, I am taking a shortcut and we need another
+> family of flags.=20
 
-~Theodore
+Or just some kind of enum for the interrupt controller, how do we do
+with OpenPIC vs. XICS already ? Old POWER3 had OpenPIC.
+
+> Thanks,
+>=20
+> C.=20
+>=20
+> > >=20
+> > > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > > ---
+> > >  target/ppc/cpu-qom.h        | 2 ++
+> > >  target/ppc/excp_helper.c    | 9 ++++++---
+> > >  target/ppc/translate.c      | 3 ++-
+> > >  target/ppc/translate_init.c | 2 +-
+> > >  4 files changed, 11 insertions(+), 5 deletions(-)
+> > >=20
+> > > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> > > index d0cf6ca2a971..d7b78cf3f71c 100644
+> > > --- a/target/ppc/cpu-qom.h
+> > > +++ b/target/ppc/cpu-qom.h
+> > > @@ -132,6 +132,8 @@ enum powerpc_excp_t {
+> > >      POWERPC_EXCP_POWER7,
+> > >      /* POWER8 exception model           */
+> > >      POWERPC_EXCP_POWER8,
+> > > +    /* POWER9 exception model           */
+> > > +    POWERPC_EXCP_POWER9,
+> > >  };
+> > > =20
+> > >  /*****************************************************************=
+************/
+> > > diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> > > index 3a9f0861e773..dc7dff36a580 100644
+> > > --- a/target/ppc/excp_helper.c
+> > > +++ b/target/ppc/excp_helper.c
+> > > @@ -148,9 +148,11 @@ static inline void powerpc_excp(PowerPCCPU *cp=
+u, int excp_model, int excp)
+> > >       */
+> > >  #if defined(TARGET_PPC64)
+> > >      if (excp_model =3D=3D POWERPC_EXCP_POWER7 ||
+> > > -        excp_model =3D=3D POWERPC_EXCP_POWER8) {
+> > > +        excp_model =3D=3D POWERPC_EXCP_POWER8 ||
+> > > +        excp_model =3D=3D POWERPC_EXCP_POWER9) {
+> > >          lpes0 =3D !!(env->spr[SPR_LPCR] & LPCR_LPES0);
+> > > -        if (excp_model =3D=3D POWERPC_EXCP_POWER8) {
+> > > +        if (excp_model =3D=3D POWERPC_EXCP_POWER8 ||
+> > > +            excp_model =3D=3D POWERPC_EXCP_POWER9) {
+> > >              ail =3D (env->spr[SPR_LPCR] & LPCR_AIL) >> LPCR_AIL_SH=
+IFT;
+> > >          } else {
+> > >              ail =3D 0;
+> > > @@ -651,7 +653,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu=
+, int excp_model, int excp)
+> > >          if (!(new_msr & MSR_HVB) && (env->spr[SPR_LPCR] & LPCR_ILE=
+)) {
+> > >              new_msr |=3D (target_ulong)1 << MSR_LE;
+> > >          }
+> > > -    } else if (excp_model =3D=3D POWERPC_EXCP_POWER8) {
+> > > +    } else if (excp_model =3D=3D POWERPC_EXCP_POWER8 ||
+> > > +               excp_model =3D=3D POWERPC_EXCP_POWER9) {
+> > >          if (new_msr & MSR_HVB) {
+> > >              if (env->spr[SPR_HID0] & HID0_HILE) {
+> > >                  new_msr |=3D (target_ulong)1 << MSR_LE;
+> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> > > index c0cd64d927c2..2d8c1b9e6836 100644
+> > > --- a/target/ppc/translate.c
+> > > +++ b/target/ppc/translate.c
+> > > @@ -7064,7 +7064,8 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f=
+, fprintf_function cpu_fprintf,
+> > > =20
+> > >  #if defined(TARGET_PPC64)
+> > >      if (env->excp_model =3D=3D POWERPC_EXCP_POWER7 ||
+> > > -        env->excp_model =3D=3D POWERPC_EXCP_POWER8) {
+> > > +        env->excp_model =3D=3D POWERPC_EXCP_POWER8 ||
+> > > +        env->excp_model =3D=3D POWERPC_EXCP_POWER9) {
+> > >          cpu_fprintf(f, "HSRR0 " TARGET_FMT_lx " HSRR1 " TARGET_FMT=
+_lx "\n",
+> > >                      env->spr[SPR_HSRR0], env->spr[SPR_HSRR1]);
+> > >      }
+> > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_ini=
+t.c
+> > > index 53aff5a7b734..b8c7b8150318 100644
+> > > --- a/target/ppc/translate_init.c
+> > > +++ b/target/ppc/translate_init.c
+> > > @@ -8962,7 +8962,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void =
+*data)
+> > >      pcc->sps =3D &POWER7_POWER8_sps;
+> > >      pcc->radix_page_info =3D &POWER9_radix_page_info;
+> > >  #endif
+> > > -    pcc->excp_model =3D POWERPC_EXCP_POWER8;
+> > > +    pcc->excp_model =3D POWERPC_EXCP_POWER9;
+> > >      pcc->bus_model =3D PPC_FLAGS_INPUT_POWER7;
+> > >      pcc->bfd_mach =3D bfd_mach_ppc64;
+> > >      pcc->flags =3D POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
