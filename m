@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50014)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dUZ1G-0006Pp-L5
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:46:35 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50370)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dUZ2c-00076N-T8
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dUZ1B-00020V-KO
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:46:34 -0400
-Received: from mx01.kamp.de ([82.141.2.16]:45985)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dUZ1B-0001zl-B4
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:46:29 -0400
-References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-6-git-send-email-pl@kamp.de>
-	<20170710132546.GG5772@noname.redhat.com>
-	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
-	<20170710133459.GI5772@noname.redhat.com>
-	<20170710134436.GB6770@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <b1f2b8aa-219e-27f5-7e97-3b6ea6b7b2d0@kamp.de>
-Date: Mon, 10 Jul 2017 15:46:21 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dUZ2X-0002eL-S3
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:47:58 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
+	<149865776960.17063.4875279139522061160.stgit@frigg.lan>
+	<2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net>
+	<87podcebyi.fsf@frigg.lan>
+	<3745ae02-3fb0-1503-9c99-98dce369f697@twiddle.net>
+	<87lgo0cgij.fsf@frigg.lan>
+	<260addd5-45fe-ad10-5208-35906fd3f197@twiddle.net>
+Date: Mon, 10 Jul 2017 16:47:38 +0300
+In-Reply-To: <260addd5-45fe-ad10-5208-35906fd3f197@twiddle.net> (Richard
+	Henderson's message of "Fri, 7 Jul 2017 07:38:26 -1000")
+Message-ID: <87k23gl7yd.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170710134436.GB6770@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 23/29] target/arm: [tcg] Port to
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Am 10.07.2017 um 15:44 schrieb Daniel P. Berrange:
-> On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
->> Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
->>> Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
->>>> Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
->>>>> we now read the extension on open and write it on update, but
->>>>> do not yet use it.
->>>>>
->>>>> Signed-off-by: Peter Lieven <pl@kamp.de>
->>>>> ---
->>>>>   block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
->>>>>   block/qcow2.h |  23 +++++++++++---
->>>>>   2 files changed, 104 insertions(+), 19 deletions(-)
->>>>>
->>>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>>> index 308121a..39a8afc 100644
->>>>> --- a/block/qcow2.c
->>>>> +++ b/block/qcow2.c
->>>>> @@ -63,6 +63,7 @@ typedef struct {
->>>>>   #define  QCOW2_EXT_MAGIC_END 0
->>>>>   #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
->>>>>   #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
->>>>> +#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
->>>>>   static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
->>>>>   {
->>>>> @@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
->>>>>           return 0;
->>>>>   }
->>>>> +static int qcow2_compress_format_from_name(char *fmt)
->>>>> +{
->>>>> +    if (!fmt || !fmt[0]) {
->>>>> +        return QCOW2_COMPRESS_ZLIB_COMPAT;
->>>>> +    } else if (g_str_equal(fmt, "zlib")) {
->>>>> +        return QCOW2_COMPRESS_ZLIB;
->>>>> +    } else {
->>>>> +        return -EINVAL;
->>>>> +    }
->>>>> +}
->>>> It might make sense to allow specifying the old compression format in
->>>> the compression header. But I'm not so sure about using the empty string
->>>> rather than a proper name for it, and even less about not documenting
->>>> it.
->>> The old format is used if and only if the compression header is absent.
->>> It makes no sense to write a header and use the old format. The old
->>> settings are suboptimal and old versions can't open a qcow2 with a
->>> compression header anyway.
->> Your code allows an empty string in the header extension. If you don't
->> want it there, you need to reject it.
-> This is a good reason to use the QAPI schema to parse the create options
-> instead of doing it using qemu_opts - the QAPI schema will generate correct
-> code to parse & validate enum values
+Richard Henderson writes:
 
-Can you then please advise where to add the schematas and which functions
-to use for parsing it? You wrote that it is a bit hackish at the moment as not
-everything is available in qcow2_create path.
+> On 07/07/2017 07:18 AM, Llu=C3=ADs Vilanova wrote:
+>> There was no code being generated after this specific case, but I haven't
+>> checked if DISAS_EXC is set in any other place that is not immediately f=
+ollowed
+>> by a "goto done_generating".
 
-Thank you,
-Peter
+> Typically we haven't actually done a goto, but simply exit the loop and e=
+mit
+> nothing within the final cleanup (tb_stop?).
+
+The case handled by DISAS_SKIP ignores tb_stop() (the target code can simply
+return when DISAS_EXC is found instead of DISAS_SKIP) *and* gen_io_end(); t=
+his
+last one is never omitted when DISAS_EXC is found now, and theoretically
+DISAS_EXC can be set by any target-specific hook. Thus my question if the
+generic call to gen_io_end() should check for DISAS_EXC too (I have no idea=
+ if
+it would be an error to call it with DISAS_EXC set, or whether it makes sen=
+se to
+for a target to set it so that gen_io_start() is called but gen_io_end() is=
+ then
+skipped by a DISAS_EXC set in ops->translate_insn()).
+
+
+>> Does this mean DISAS_EXC should be on the generic code and do a "goto
+>> done_generating" whenever it is found? And if so, what are the correct p=
+laces to
+>> check for this? After ops->insn_start, ops->translate_insn, ops->tb_stop?
+
+> Yes, this should be handled generically, since all targets need it.
+
+> That said, I would prefer a better name like DISAS_NORETURN, which does n=
+ot
+> imply that an actual exception has been raised, but explicitly says that =
+all
+> following code is dead.
+
+I can use that name.
+
+And in fact, generalizing DISAS_NORETURN will allow dropping the enum resul=
+t of
+breakpoint_check(), and instead simply return a bool (whether a breakpoint =
+did
+hit). Targets can then set DISAS_NORETURN and return true instead of return=
+ing
+BC_HIT_TB (simply returning true is equivalent to the previous BC_HIT_INSN).
+
+
+Cheers,
+  Lluis
