@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dUUov-0003JL-Hh
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:17:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1dUUpN-0003bQ-4g
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dUUou-0006V7-53
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:17:33 -0400
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
-	<20170216130409.GA28784@lemon.lan>
-	<d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
-	<15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
-	<66e7f481-06f4-2a7e-77fb-1a5c9fc1f301@virtuozzo.com>
-	<255b6c77-48e4-217d-f1da-d2544db5b646@redhat.com>
-	<53adc05a-03a5-6621-8be1-026003938162@virtuozzo.com>
-	<12de589a-5349-b974-3e3b-b2213d84d742@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <05b4f069-34f5-e35f-9ba1-ee108b685e38@virtuozzo.com>
-Date: Mon, 10 Jul 2017 12:17:17 +0300
+	(envelope-from <armbru@redhat.com>) id 1dUUpL-0006eW-6j
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:18:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170705190404.22449-1-mreitz@redhat.com>
+	<20170705190404.22449-3-mreitz@redhat.com>
+	<87poddk583.fsf@dusky.pond.sub.org>
+	<6a1740fd-2a8c-f338-6ce1-e0f4bbade407@redhat.com>
+Date: Mon, 10 Jul 2017 11:17:49 +0200
+In-Reply-To: <6a1740fd-2a8c-f338-6ce1-e0f4bbade407@redhat.com> (Max Reitz's
+	message of "Sun, 9 Jul 2017 19:36:12 +0200")
+Message-ID: <87a84c6476.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <12de589a-5349-b974-3e3b-b2213d84d742@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
- dirty bitmaps
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 2/5] qapi: Add qobject_is_equal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,161 +25,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-08.07.2017 02:32, John Snow wrote:
->
-> On 07/07/2017 05:13 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 06.07.2017 20:53, John Snow wrote:
->>> On 07/06/2017 04:05 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 06.07.2017 00:46, John Snow wrote:
->>>>> On 07/05/2017 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> 16.02.2017 16:04, Fam Zheng wrote:
->>>>>>>> +            dbms->node_name = bdrv_get_node_name(bs);
->>>>>>>> +            if (!dbms->node_name || dbms->node_name[0] == '\0') {
->>>>>>>> +                dbms->node_name = bdrv_get_device_name(bs);
->>>>>>>> +            }
->>>>>>>> +            dbms->bitmap = bitmap;
->>>>>>> What protects the case that the bitmap is released before migration
->>>>>>> completes?
->>>>>>>
->>>>>> What is the source of such deletion? qmp command? Theoretically
->>>>>> possible.
->>>>>>
->>>>>> I see the following variants:
->>>>>>
->>>>>> 1. additional variable BdrvDirtyBItmap.migration, which forbids bitmap
->>>>>> deletion
->>>>>>
->>>>>> 2. make bitmap anonymous (bdrv_dirty_bitmap_make_anon) - it will
->>>>>> not be
->>>>>> available through qmp
->>>>>>
->>>>> Making the bitmap anonymous would forbid us to query the bitmap, which
->>>>> there is no general reason to do, excepting the idea that a third party
->>>>> attempting to use the bitmap during a migration is probably a bad idea.
->>>>> I don't really like the idea of "hiding" information from the user,
->>>>> though, because then we'd have to worry about name collisions when we
->>>>> de-anonymized the bitmap again. That's not so palatable.
->>>>>
->>>>>> what do you think?
->>>>>>
->>>>> The modes for bitmaps are getting messy.
->>>>>
->>>>> As a reminder, the officially exposed "modes" of a bitmap are
->>>>> currently:
->>>>>
->>>>> FROZEN: Cannot be reset/deleted. Implication is that the bitmap is
->>>>> otherwise "ACTIVE."
->>>>> DISABLED: Not recording any writes (by choice.)
->>>>> ACTIVE: Actively recording writes.
->>>>>
->>>>> These are documented in the public API as possibilities for
->>>>> DirtyBitmapStatus in block-core.json. We didn't add a new condition for
->>>>> "readonly" either, which I think is actually required:
->>>>>
->>>>> READONLY: Not recording any writes (by necessity.)
->>>>>
->>>>>
->>>>> Your new use case here sounds like Frozen to me, but it simply does not
->>>>> have an anonymous successor to force it to be recognized as
->>>>> "frozen." We
->>>>> can add a `bool protected` or `bool frozen` field to force recognition
->>>>> of this status and adjust the json documentation accordingly.
->>>> Bitmaps are selected for migration when source is running, so we should
->>>> protect them (from deletion (or frozing or disabling), not from chaning
->>>> bits) before source stop, so that is not like frozen. Bitmaps may be
->>>> changed in this state.
->>>> It is more like ACTIVE.
->>>>
->>> Right, it's not exactly like frozen's _implementation_ today, but...
+Max Reitz <mreitz@redhat.com> writes:
+
+> On 2017-07-06 16:30, Markus Armbruster wrote:
+>> Max Reitz <mreitz@redhat.com> writes:
+>> 
+>>> This generic function (along with its implementations for different
+>>> types) determines whether two QObjects are equal.
 >>>
->>>> We can move bitmap selection on the point after precopy migration, after
->>>> source stop, but I'm not sure that it would be good.
->>>>
->>>>> I think then we'd have four recognized states:
->>>>>
->>>>> FROZEN: Cannot be reset/deleted. Bitmap is in-use by a block job or
->>>>> other internal process. Bitmap is otherwise ACTIVE.
->>>> ? Frozen means that all writes goes to the successor and frozen bitmap
->>>> itself is unchanged, no?
->>>>
->>> I was thinking from the point of view of the API. Of course internally,
->>> you're correct; a "frozen bitmap" is one that is actually disabled and
->>> has an anonymous successor, and that successor records IO.
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>> Markus also proposed just reporting two values as unequal if they have a
+>>> different internal representation (i.e. a different QNum kind).
 >>>
->>>   From the point of view of the API, a frozen bitmap is just "one bitmap"
->>> that is still recording reads/writes, but is protected from being edited
->>> from QMP.
->>>
->>> It depends on if you're looking at bitmaps as opaque API objects or if
->>> you're looking at the implementation.
->>>
->>>   From an API point of view, protecting an Active bitmap from being
->>> renamed/cleared/deleted is functionally identical to the existing case
->>> of protecting a bitmap-and-successor pair during a backup job.
->> then, this should be described in API ref..
->>
->> for now I see here:
->> # @frozen: The bitmap is currently in-use by a backup operation or block
->> job,
->> #          and is immutable.
->>
->> Which looks more like the bitmap is unchanged at all.
->>
-> You're right, this is a bad wording. It's technically true of course,
-> but in truth the bitmap is effectively recording writes if you consider
-> the bitmap and the anonymous successor as "one object."
+>>> I don't like this very much, because I feel like QInt and QFloat have
+>>> been unified for a reason: Outside of these classes, nobody should care
+>>> about the exact internal representation.  In JSON, there is no
+>>> difference anyway.  We probably want to use integers as long as we can
+>>> and doubles whenever we cannot.
+>> 
+>> You're right in that JSON has no notion of integer and floating-point,
+>> only "number".  RFC 4627 is famously useless[1] on what exactly a number
+>> ought to be, and its successor RFC 7159 could then (due to wildly
+>> varying existing practice) merely state that a number is what the
+>> implementation makes it to be, and advises "good interoperability can be
+>> achieved" by making it double".  Pffft.
+>> 
+>> For us, being able to represent 64 bit integers is more important than
+>> interoperating with crappy JSON implementations, so we made it the union
+>> of int64_t, uint64_t and double[2].
+>> 
+>> You make a fair point when you say that nothing outside QNum should care
+>> about the exact internal representation.  Trouble is that unless I'm
+>> mistaken, your idea of "care" doesn't match the existing code's idea.
 >
-> What's really immutable here from the API POV is any user-modifiable
-> properties.
-
-Can we document this somehow?
-
-In this terminology, what happens with frozen bitmap (which in fact is 
-like "active" for the user) on successful backup finish? It turns into a 
-difference between current-state and what-was-backed-up? It is not very 
-transparent.. May be bitmap part, related to the backup is substituted 
-from the bitmap?
-
-// it's hard for me to believe that 'frozen' doesn't mean 'can not 
-move', but if it is already established idea then ok.
-
+> I disagree that it doesn't match the existing code's idea.  I think the
+> existing code doesn't match its idea, but mine does.
 >
->> ---
->>
->> Do not we want in future allow user to create successors through qmp?
->>
-> I am not sure if I want to expose this functionality *DIRECTLY* but yes,
-> this use case will necessitate the creation of successors. I just don't
-> really want to give the user direct control of them via QMP. They're an
-> implementation detail, nothing more.
+>> Let i42 = qnum_from_int(42)
+>>     u42 = qnum_from_uint(42)
+>>     d42 = qnum_from_double(42)
+>> 
+>> Then
+>> 
+>>     qnum_is_equal(i42, u42) yields true, I think.
+>>     qnum_is_equal(i42, d42) yields true, I think.
+>>     qnum_get_int(i42) yields 42.
+>>     qnum_get_int(u42) yields 42.
+>>     qnum_get_int(d42) fails its assertion.
+>> 
+>> Failing an assertion qualifies as "care", doesn't it?
 >
->> We have the following case: exteranal backup.
->>
->> Backup should be done through image fleecing (temporary image, online
->> drive is backing for temp, start backup with sync=none from online drive
->> to temp, export temp through nbd).
->> To make this backup incremental here is BLOCK_STATUS nbd extension,
->> which allows dirty bitmap export.
->> But we need also frozen-bitmap mechanism like with normal incremental
->> backup.. Should we create qmp_create_bitmap_successor and friends for it?
->> Or we will add separate mechanism like qmp_start_external_backup,
->> qmp_finish_external_backup(success = true/false) ?
->>
-> That was my thought at least, yes. Some kind of job mechanism that
-> allowed us to have start/stop/cancel mechanics that made it clear to
-> QEMU if it should roll back the bitmap or promote the successor.
+> It doesn't convert the value?  That's definitely not what I would have
+> thought and it doesn't make a lot of sense to me.  I call that a bug. :-)
+
+It's the existing code's idea, going back all the way to the dawn of
+QMP: integers and floating point numbers are distinct.
+
+Yes, they aren't distinct in the JSON grammar.  So sue the designers of
+QMP.
+
+Yes, they are less distinct in QMP than say integers and strings,
+because there's an automatic conversion from integer to floating point.
+Doesn't make them non-distinct; there is no conversion from floating
+point to integer.
+
+Yes, we recently changed the code to use the same C type for both.  That
+was done to keep the code simple, not to change the semantics of QMP.
+
+> From the other side we see that qnum_get_double() on all of this would
+> yield 42.0 without failing.  So why is it that qnum_get_int() doesn't?
+> Because there are doubles you cannot reasonably convert to integers, I
+> presume, whereas the other way around the worst that can happen is that
+> you lose some precision.
 >
->>
->>>>> DISABLED: Not recording any writes (by choice.)
->>>>> READONLY: Not able to record any writes (by necessity.)
->>>>> ACTIVE: Normal bitmap status.
->>>>>
->>>>> Sound right?
+> But that has no implication on qnum_is_equal().  If the double cannot be
+> converted to an integer because it is out of bounds, the values just are
+> not equal.  Simple.
+>
+> So since qnum_get_double() does a conversion, I very much think that the
+> reason qnum_get_int() doesn't is mostly "because sometimes it's not
+> reasonably possible" and very much not because it is not intended to.
 
+It doesn't because the whole shebang is for QMP, and QMP does not ever
+treat floating point numbers (numbers with decimal point or exponent) as
+integers.
 
--- 
-Best regards,
-Vladimir
+Yes, there are users other than QMP.  They adopted it because it was
+convenient.  They thus adopted its oddities due to QMP's requirements,
+too.
+
+>>> In any case, I feel like the class should hide the different internal
+>>> representations from the user.  This necessitates being able to compare
+>>> floating point values against integers.  Since apparently the main use
+>>> of QObject is to parse and emit JSON (and represent such objects
+>>> internally), we also have to agree that JSON doesn't make a difference:
+>>> 42 is just the same as 42.0.
+>> 
+>> The JSON RFC is mum on that.
+>> 
+>> In *our* implementation of JSON, 42 and 42.0 have always been very much
+>> *not* the same.  Proof:
+>> 
+>>     -> { "execute": "migrate_set_speed", "arguments": { "value": 42 } }
+>>     <- {"return": {}}
+>>     -> { "execute": "migrate_set_speed", "arguments": { "value": 42.0 } }
+>>     <- {"error": {"class": "GenericError", "desc": "Invalid parameter type for 'value', expected: integer"}}
+>> 
+>> This is because migrate_set_speed argument value is 'int', and 42.0 is
+>> not a valid 'int' value.
+>
+> Well, that's a bug, too.  It's nice that we accept things that aren't
+> quite valid JSON (I'm looking at you, single quote), but we should
+> accept things that are valid JSON.
+
+The fact that an expression is valid JSON does not oblige the
+application to accept it!
+
+Of all the valid JSON strings, the parser accepts only the ones shorter
+than MAX_TOKEN_SIZE.  Command block-job-set-speed then rejects all but
+the ones that happen to be valid job IDs.
+
+Similarly, of all the valid JSON numbers, the parser accepts only the
+integers (no decimal point, no exponent) that fit into int64_t, uint64_t
+or double, and the floating point numbers (decimal point or exponent)
+that fit into double.  Command migrate_set_speed then rejects all but
+the integers (again, no decimal point, no exponent) between 0 and
+SIZE_MAX.
+
+JSON defines *syntax*.  Once again, the JSON RFC is mum on whether 42
+and 42.0 are identical or distinct.  That's *semantics*, and semantics
+are up to the application.  Ours has always treated them as distinct.
+It is how QMP works.  We can like it or we can hate it.  I certainly
+find plenty of things to dislike there myself.  What we can't do is deny
+that it's ABI.
+
+We can of course make ABI more accepting.  However, messing with the QMP
+ABI is *hairy*, and we should therefore mess with it only when we have a
+damn good practical reason.  "It's not nice" ain't.
+
+>> Note that 42 *is* a valid 'number' value.  migrate_set_downtime argument
+>> value is 'number':
+>> 
+>>     -> { "execute": "migrate_set_downtime", "arguments": { "value": 42 } }
+>>     <- {"return": {}}
+>>     -> { "execute": "migrate_set_downtime", "arguments": { "value": 42.0 } }
+>>     <- {"return": {}}
+>> 
+>> Don't blame me for the parts of QMP I inherited :)
+>
+> I sure don't.  But I am willing to start a discussion by calling that a
+> bug. ;-)
+>
+> QNum has only been introduced recently.  Before, we had a hard split of
+> QInt and QFloat.  So I'm not surprised that we haven't fixed everything yet.
+>
+> OTOH the introduction of QNum to me signals that we do want to fix this
+> eventually.
+
+QNum was introduced to get us unsigned numbers with the least possible
+notational overhead.  It wasn't introduced to signal intent to redesign
+QMP numbers.
+
+>>> Finally, I think it's rather pointless not to consider 42u and 42 the
+>>> same value.  But since unsigned/signed are two different kinds of QNums
+>>> already, we cannot consider them equal without considering 42.0 equal,
+>>> too.
+>> 
+>> Non sequitur.
+>> 
+>>> Because of this, I have decided to continue to compare QNum values even
+>>> if they are of a different kind.
+>> 
+>> I think comparing signed and unsigned integer QNums is fair and
+>> consistent with how the rest of our code works.
+>
+> I don't see how. doubles can represent different numbers than integers
+> can. Signed integers can represent different numbers than unsigned can.
+
+The only way to add unsigned integers without breaking QMP compatibility
+is to make them interchangeable with signed integers.  That doesn't mean
+you get to make floating-point numbers interchangeable with integers
+now.
+
+> Sure, signed/unsigned makes less of a difference than having an exponent
+> does.  But I don't agree we should make a difference when the only
+> reason not to seems to be "qemu currently likes to make a difference in
+> its interface, for historical reasons mainly" and "Do you really want to
+> write this equality function?  It seems hard to get right".
+
+"Because this is an interesting puzzle I'd love to solve" is wholly
+insufficient reason to mess with QMP ABI.  It's also an insufficient
+reason to add "interesting" code for me to maintain.
+
+> For the record, I could have lived with the old separation into QInt and
+> QFloat.  But now we do have a common QNum and I think the idea behind is
+> is to have a uniform opaque interface.
+
+Nope, the idea is to get unsigned integers through QMP with the least
+notational overhead.
+
+>> Comparing integer and floating QNums isn't.  It's also a can of worms.
+>> Are you sure we *need* to open that can *now*?
+>
+> Sure?  No.  Do I want to?  I guess so.
+>
+>> Are you sure a simple, stupid eql-like comparison won't do *for now*?
+>> YAGNI!
+>
+> But I want it.  I think the current behavior your demonstrated above is
+> a bug and I don't really want to continue to follow it.
+
+Feel free to call the current behavior a bug.  But it's a design bug
+then.  Fixing design bugs in ABIs is somewhere between hard and
+impractical.  I do not think this one is worth your while or mine.
+
+> All you have really convinced me to do is to add another patch which
+> smacks a warning on qnum_get_int(), and maybe even a TODO that it should
+> convert doubles to integers *if possible*.
+>
+> (And the "if possible" just means that you cannot convert values which
+> are out of bounds or NaN.  Fractional parts may not even matter much --
+> I mean, we do happily convert integers to doubles and rounding that way
+> is implementation-defined.)
+
+Always try the stupidest solution that could possibly work first.
+Unless I misunderstand your use case, a simple & stupid
+qobject_is_equal() would do.  So let's try that first.
+
+Adding capability to compare signed and unsigned integers should still
+be fairly simple.  I'd be willing to consider it.
+
+>> [1] Standard reply to criticism of JSON: could be worse, could be XML.
+>> 
+>> [2] Union of int64_t and double until recently, plus bugs that could be
+>> abused to "tunnel" uint64_t values.  Some of the bugs have to remain for
+>> backward compatibility.
