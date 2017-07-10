@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUZV6-0003cb-Tu
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:17:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dUZa7-0004ww-1N
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUZV3-0000nD-NA
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:17:24 -0400
-Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:36273)
+	(envelope-from <peter.maydell@linaro.org>) id 1dUZa6-0002YI-3v
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:22:35 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36751)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUZV3-0000mi-Dj
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:17:21 -0400
-Received: by mail-lf0-x22c.google.com with SMTP id h22so62283515lfk.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 07:17:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dUZa5-0002Xf-SW
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:22:34 -0400
+Received: by mail-wr0-x229.google.com with SMTP id c11so140961630wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 07:22:33 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <87r2xo9y1e.fsf@linaro.org>
 References: <20170621144814.15324-1-alex.bennee@linaro.org>
 	<CAFEAcA91jcDezunfEKwB+DBdzrEAFYWHKRyFmPyCNYSs_4N4JA@mail.gmail.com>
 	<6152fff6-f4db-b0c2-bf20-181364544412@amsat.org>
 	<87wp84rr6h.fsf@linaro.org>
 	<CAAdtpL6tLfG1dUO8nmGvb2vAtX-OTkoFKWQt=MdxUULyonE8AA@mail.gmail.com>
 	<CAAdtpL7kaQSm_Kbn+DrD9Kkzj3JH47pM+-RxXYB=_fyEb+7NxQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAAdtpL7kaQSm_Kbn+DrD9Kkzj3JH47pM+-RxXYB=_fyEb+7NxQ@mail.gmail.com>
-Date: Mon, 10 Jul 2017 15:17:17 +0100
-Message-ID: <87r2xo9y1e.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+	<87r2xo9y1e.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Jul 2017 15:22:11 +0100
+Message-ID: <CAFEAcA_g1116nDH3E3s=ZKFABgN8pXPAA1bc7r9hbqDaZq3a1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PULL 00/21] Docker and shippable updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,39 +35,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-
-> On Thu, Jun 22, 2017 at 12:42 PM, Philippe Mathieu-Daudé
-> <f4bug@amsat.org> wrote:
->> On Thu, Jun 22, 2017 at 12:13 PM, Alex Bennée <alex.bennee@linaro.org> wrote:
->>> Now we've been running shippable for a while is it worth turning on the
->>> IRC notifications?
->>
->> What about moving such bot/scripts notifications in another channel
->> like #QEMU-notifications?
+On 10 July 2017 at 15:17, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>> I don't think full patchew reports are useful in a mailbox.
 >
-> ping?
+> I disagree. They could certainly be made terser but I think the general
+> workflow of posting automated testing reports to patch series is a
+> useful one.
 
-I'm in two minds so I suspect this is something that needs to be taken
-to the users of #qemu.
+Agreed. What we want is a mode for the makefile where
+it doesn't even print the "   CC foo.o" lines (except
+perhaps for the case where it's going to print an error
+message, if possible, but that might not be doable), and
+then we can use that for patchew emails and also maybe
+for the Travis builds, whose logs are currently too long
+for the web viewer to cope with (might run into issues with
+travis thinking the build has stalled though.)
 
->> It is often hard to follow 3 concurrent topics while the travis-ci bot
->> disrupts entering/broadcasting/leaving...
+Is there a standard-ish convention for a really-silent
+build we can borrow from the linux kernel or somewhere?
 
-I find it useful as its somewhere I look at a lot. That said it is not
-exactly a trial to sub to yet another IRC channel.
-
->> I'd also like to see here checkpatch/patchew stripped output, and
->> eventually gcov/gprof reports.
->> I don't think full patchew reports are useful in a mailbox.
-
-I disagree. They could certainly be made terser but I think the general
-workflow of posting automated testing reports to patch series is a
-useful one.
-
---
-Alex Bennée
+thanks
+-- PMM
