@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUavi-0006g9-Sh
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:49:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUavl-0006iy-9H
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUavf-00048d-QB
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:48:58 -0400
-Received: from mail-wr0-f170.google.com ([209.85.128.170]:33143)
+	(envelope-from <alex.bennee@linaro.org>) id 1dUavk-0004BX-6r
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:49:01 -0400
+Received: from mail-wr0-f170.google.com ([209.85.128.170]:33200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUavf-00048A-Jo
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:48:55 -0400
-Received: by mail-wr0-f170.google.com with SMTP id r103so144219685wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 08:48:55 -0700 (PDT)
+	id 1dUavk-0004BB-0C
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:49:00 -0400
+Received: by mail-wr0-f170.google.com with SMTP id r103so144222511wrb.0
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 08:48:59 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Jul 2017 16:47:45 +0100
-Message-Id: <20170710154749.13624-3-alex.bennee@linaro.org>
+Date: Mon, 10 Jul 2017 16:47:49 +0100
+Message-Id: <20170710154749.13624-7-alex.bennee@linaro.org>
 In-Reply-To: <20170710154749.13624-1-alex.bennee@linaro.org>
 References: <20170710154749.13624-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 2/6] target/arm/translate.c: make
- DISAS_UPDATE match declared semantics
+Subject: [Qemu-devel] [PATCH v1 6/6] target/arm: ensure eret exits the
+ run-loop via DISAS_UPDATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +31,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-DISAS_UPDATE should be used when the wider CPU state other than just
-the PC has been updated and we should therefor exit the TCG runtime
-and return to the main execution loop rather assuming DISAS_JUMP would
-do that.
+Previously DISAS_JUMP did ensure this but with the optimisation of
+8a6b28c7 (optimize indirect branches) we might not leave the loop.
+This means if any pending interrupts are cleared by changing IRQ flags
+we might never get around to servicing them. You usually notice this
+by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
+while cpu->interrupt_request remains high and the exit_request has not
+been set.
 
-As some DISAS_UPDATE users may update the PC dynamically via a helper
-we also push the updating to the PC to hhe call sites which set
-->is_jmp to DISAS_UPDATE.
+This breaks amongst other things the OPTEE test suite which executes
+an eret from the secure world after a non-secure world IRQ has gone
+pending which then never gets serviced.
+
+Instead of using the previously implied semantics of DISAS_JUMP we use
+DISAS_UPDATE which (now) clearly states that the run-loop should be
+exited as wider CPU State other than just the PC has changed.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+CC: Etienne Carriere <etienne.carriere@linaro.org>
+CC: Joakim Bech <joakim.bech@linaro.org>
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Emilio G. Cota <cota@braap.org>
+CC: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ target/arm/translate-a64.c | 3 ++-
+ target/arm/translate.c     | 6 ++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fd9724b890..9efcba49d6 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1791,7 +1791,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+             return;
+         }
+         gen_helper_exception_return(cpu_env);
+-        s->is_jmp = DISAS_JUMP;
++        /* Must exit loop to check un-masked IRQs */
++        s->is_jmp = DISAS_UPDATE;
+         return;
+     case 5: /* DRPS */
+         if (rn != 0x1f) {
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 0862f9e4aa..f9c4aee1b6 100644
+index f7f5f917c7..75bdc6c7dd 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -4430,6 +4430,7 @@ static void gen_msr_banked(DisasContext *s, int r, int sysm, int rn)
-     tcg_temp_free_i32(tcg_tgtmode);
-     tcg_temp_free_i32(tcg_regno);
-     tcg_temp_free_i32(tcg_reg);
-+    gen_set_pc_im(s, s->pc);
-     s->is_jmp = DISAS_UPDATE;
+@@ -4488,7 +4488,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
+      */
+     gen_helper_cpsr_write_eret(cpu_env, cpsr);
+     tcg_temp_free_i32(cpsr);
+-    s->is_jmp = DISAS_JUMP;
++    /* Must exit loop to check un-masked IRQs */
++    s->is_jmp = DISAS_UPDATE;
  }
  
-@@ -4452,6 +4453,7 @@ static void gen_mrs_banked(DisasContext *s, int r, int sysm, int rn)
-     tcg_temp_free_i32(tcg_tgtmode);
-     tcg_temp_free_i32(tcg_regno);
-     store_reg(s, rn, tcg_reg);
-+    gen_set_pc_im(s, s->pc);
-     s->is_jmp = DISAS_UPDATE;
- }
- 
-@@ -8058,6 +8060,7 @@ static void gen_srs(DisasContext *s,
-         tcg_temp_free_i32(tmp);
-     }
-     tcg_temp_free_i32(addr);
-+    gen_set_pc_im(s, s->pc);
-     s->is_jmp = DISAS_UPDATE;
- }
- 
-@@ -8146,6 +8149,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             /* setend */
-             if (((insn >> 9) & 1) != !!(s->be_data == MO_BE)) {
-                 gen_helper_setend(cpu_env);
-+                gen_set_pc_im(s, s->pc);
-                 s->is_jmp = DISAS_UPDATE;
-             }
-             return;
-@@ -11619,6 +11623,7 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
-                 ARCH(6);
-                 if (((insn >> 3) & 1) != !!(s->be_data == MO_BE)) {
-                     gen_helper_setend(cpu_env);
-+                    gen_set_pc_im(s, s->pc);
-                     s->is_jmp = DISAS_UPDATE;
+ /* Generate an old-style exception return. Marks pc as dead. */
+@@ -9534,7 +9535,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                     tmp = load_cpu_field(spsr);
+                     gen_helper_cpsr_write_eret(cpu_env, tmp);
+                     tcg_temp_free_i32(tmp);
+-                    s->is_jmp = DISAS_JUMP;
++                    /* Must exit loop to check un-masked IRQs */
++                    s->is_jmp = DISAS_UPDATE;
                  }
-                 break;
-@@ -12076,7 +12081,6 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
+             }
              break;
-         case DISAS_NEXT:
-         case DISAS_UPDATE:
--            gen_set_pc_im(dc, dc->pc);
-             /* fall through */
-         default:
-             /* FIXME: Single stepping a WFI insn will not halt the CPU. */
-@@ -12095,12 +12099,11 @@ void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-         case DISAS_NEXT:
-             gen_goto_tb(dc, 1, dc->pc);
-             break;
--        case DISAS_UPDATE:
--            gen_set_pc_im(dc, dc->pc);
--            /* fall through */
-         case DISAS_JUMP:
-             gen_goto_ptr();
-             break;
-+        case DISAS_UPDATE:
-+            /* fall through */
-         default:
-             /* indicate that the hash table must be used to find the next TB */
-             tcg_gen_exit_tb(0);
 -- 
 2.13.0
