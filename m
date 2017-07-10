@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUeGX-0008BK-5Y
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:22:44 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dUeQ0-0004X0-HS
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:32:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUeGT-00078U-Qb
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:22:41 -0400
-Received: from mail-wr0-f179.google.com ([209.85.128.179]:33527)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUeGT-00078B-KJ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:22:37 -0400
-Received: by mail-wr0-f179.google.com with SMTP id r103so151966375wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 12:22:37 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Jul 2017 20:21:28 +0100
-Message-Id: <20170710192128.9048-6-alex.bennee@linaro.org>
-In-Reply-To: <20170710192128.9048-1-alex.bennee@linaro.org>
-References: <20170710192128.9048-1-alex.bennee@linaro.org>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dUePz-0002ht-4i
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:32:28 -0400
+Received: from smtp1.ntua.gr ([147.102.222.183]:10348)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dUePy-0002cm-N4
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:32:27 -0400
+Date: Mon, 10 Jul 2017 22:30:47 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170710193047.z2t6eww7nhckgg3z@postretch>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 5/5] target/arm: use DISAS_EXIT for eret
- handling
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="un5miyfz4v3gquss"
+Content-Disposition: inline
+In-Reply-To: <1475246744-29302-16-git-send-email-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v14 15/21] qom: support non-scalar
+ properties with -object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, afaerber@suse.de, berrange@redhat.com
 
-Previously DISAS_JUMP did ensure this but with the optimisation of
-8a6b28c7 (optimize indirect branches) we might not leave the loop.
-This means if any pending interrupts are cleared by changing IRQ flags
-we might never get around to servicing them. You usually notice this
-by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
-while cpu->interrupt_request remains high and the exit_request has not
-been set.
 
-This breaks amongst other things the OPTEE test suite which executes
-an eret from the secure world after a non-secure world IRQ has gone
-pending which then never gets serviced.
+--un5miyfz4v3gquss
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Instead of using the previously implied semantics of DISAS_JUMP we use
-DISAS_EXIT which will always exit the run-loop.
+Is there a specific reason this patch wasn't finished? If I'm not wrong=20
+using non-scalar properties with -object is still not possible, yet=20
+would be a very useful feature for drivers with UserCreatable objects.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-CC: Etienne Carriere <etienne.carriere@linaro.org>
-CC: Joakim Bech <joakim.bech@linaro.org>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Emilio G. Cota <cota@braap.org>
-CC: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate-a64.c | 3 ++-
- target/arm/translate.c     | 6 ++++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+Archive link since this is an old patch:=20
+https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg08252.html
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index ad46d84efb..48825f5722 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1789,7 +1789,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-             return;
-         }
-         gen_helper_exception_return(cpu_env);
--        s->is_jmp = DISAS_JUMP;
-+        /* Must exit loop to check un-masked IRQs */
-+        s->is_jmp = DISAS_EXIT;
-         return;
-     case 5: /* DRPS */
-         if (rn != 0x1f) {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 94aa4bbb4d..c67a4f90d4 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4484,7 +4484,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
-      */
-     gen_helper_cpsr_write_eret(cpu_env, cpsr);
-     tcg_temp_free_i32(cpsr);
--    s->is_jmp = DISAS_JUMP;
-+    /* Must exit loop to check un-masked IRQs */
-+    s->is_jmp = DISAS_EXIT;
- }
- 
- /* Generate an old-style exception return. Marks pc as dead. */
-@@ -9528,7 +9529,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                     tmp = load_cpu_field(spsr);
-                     gen_helper_cpsr_write_eret(cpu_env, tmp);
-                     tcg_temp_free_i32(tmp);
--                    s->is_jmp = DISAS_JUMP;
-+                    /* Must exit loop to check un-masked IRQs */
-+                    s->is_jmp = DISAS_EXIT;
-                 }
-             }
-             break;
--- 
-2.13.0
+--un5miyfz4v3gquss
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllj1ecACgkQc2J8L2kN
+9xDiGw/9HrL8l00hfTpuC/t0n9V9qVOqBUCd/Bq4Iu6LOfXyshlFDC+ia/ohZbMS
+eC5JcfpwTB7t9Z0RVCEKLxG3HfcmnMPOcGDTzaTBGz443E8aSzQ0aoYKNnku3f8r
+DT6hPJtMC60tV6NX6TlPnjdMjUWrjcmCXjQwfvZ+u+ITGytwZW/I4iSnkCtuOvXb
+NMzLa+tE2Eo0cYHhBTE5dqE4LsKPgC9Q1RrP2n5mHhVIocs+ujR6ASvjUt40COcP
+YonJCI+iA0REgAXDiDSksboUEYwjDSvhtLRFQLNuGQujHAtYClPGKYsy95OtJElm
+xuEaB92weqbLmkQXe9rYUEpCniNOdCiVUdwOjBiauW59clyHVO1J0VDDM96RIZrm
+Za871tOhkz6uTUkGh/yE5NttKWoBHMQs3fy+TeBGgwZOeA+9uDxP0HU2rzcLol2I
+3a7/zORDbA8EJwpMXaTvmQTbmQehg7TkiZ8VjJWIusuCsKLtINm+slVwAOVMRDCA
+Gl98fdkwsS/0wFSpY8F+t205eM4Y0YqHvHlg7+CYSKrWJmvQ744QNOOW+/mY/GQn
+EUfTSRzNw1e+YZDPCLKn1OY4iG/+BLRt0UaMVK9i4Z+G7GHfHdDC3WOr5UBeKyj0
+Ocnc60374n+hJaQWZU9IeIVMoC7iAkqfXL7tZ06pfZWUdZBIE0s=
+=GSDy
+-----END PGP SIGNATURE-----
+
+--un5miyfz4v3gquss--
