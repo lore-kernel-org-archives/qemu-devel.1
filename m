@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaY-0001ef-HS
+	(envelope-from <eblake@redhat.com>) id 1dUXaY-0001fH-Td
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaX-0002c4-Mt
+	(envelope-from <eblake@redhat.com>) id 1dUXaX-0002cE-TV
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:54 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Jul 2017 07:14:25 -0500
-Message-Id: <20170710121434.5047-3-eblake@redhat.com>
+Date: Mon, 10 Jul 2017 07:14:28 -0500
+Message-Id: <20170710121434.5047-6-eblake@redhat.com>
 In-Reply-To: <20170710121434.5047-1-eblake@redhat.com>
 References: <20170710121434.5047-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 02/11] nbd/server: nbd_negotiate: return 1 on
- NBD_OPT_ABORT
+Subject: [Qemu-devel] [PULL 05/11] nbd/server: add errp to nbd_send_reply()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +24,72 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbon
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Separate the case when a client sends NBD_OPT_ABORT from all other
-errors. It will be needed for the following patch, where errors will be
-reported.
-This particular case is not actually an error - it honestly follows the
-NBD protocol. Therefore it should not be reported like an error.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170707152918.23086-2-vsementsov@virtuozzo.com>
+Message-Id: <20170707152918.23086-5-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ nbd/server.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/nbd/server.c b/nbd/server.c
-index 8a70c05..3963972 100644
+index 00a7c60..e3fd0ca 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -349,9 +349,13 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
-     return QIO_CHANNEL(tioc);
+@@ -687,7 +687,7 @@ static int nbd_receive_request(QIOChannel *ioc, NBDRequest *request,
+     return 0;
  }
 
--
--/* Process all NBD_OPT_* client option commands.
-- * Return -errno on error, 0 on success. */
-+/* nbd_negotiate_options
-+ * Process all NBD_OPT_* client option commands.
-+ * Return:
-+ * -errno  on error
-+ * 0       on successful negotiation
-+ * 1       if client sent NBD_OPT_ABORT, i.e. on valid disconnect
-+ */
- static int nbd_negotiate_options(NBDClient *client)
+-static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
++static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
  {
-     uint32_t flags;
-@@ -459,7 +463,7 @@ static int nbd_negotiate_options(NBDClient *client)
-                 }
-                 /* Let the client keep trying, unless they asked to quit */
-                 if (clientflags == NBD_OPT_ABORT) {
--                    return -EINVAL;
-+                    return 1;
-                 }
-                 break;
-             }
-@@ -477,7 +481,7 @@ static int nbd_negotiate_options(NBDClient *client)
-                  * disconnecting, but that we must also tolerate
-                  * guests that don't wait for our reply. */
-                 nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, clientflags);
--                return -EINVAL;
-+                return 1;
+     uint8_t buf[NBD_REPLY_SIZE];
 
-             case NBD_OPT_EXPORT_NAME:
-                 return nbd_negotiate_handle_export_name(client, length);
-@@ -533,6 +537,12 @@ static int nbd_negotiate_options(NBDClient *client)
+@@ -706,7 +706,7 @@ static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
+     stl_be_p(buf + 4, reply->error);
+     stq_be_p(buf + 8, reply->handle);
+
+-    return nbd_write(ioc, buf, sizeof(buf), NULL);
++    return nbd_write(ioc, buf, sizeof(buf), errp);
+ }
+
+ #define MAX_NBD_REQUESTS 16
+@@ -993,7 +993,8 @@ void nbd_export_close_all(void)
      }
  }
 
-+/* nbd_negotiate
-+ * Return:
-+ * -errno  on error
-+ * 0       on successful negotiation
-+ * 1       if client sent NBD_OPT_ABORT, i.e. on valid disconnect
-+ */
- static coroutine_fn int nbd_negotiate(NBDClient *client)
+-static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
++static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
++                             Error **errp)
  {
-     char buf[8 + 8 + 8 + 128];
+     NBDClient *client = req->client;
+     int ret;
+@@ -1003,12 +1004,12 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
+     client->send_coroutine = qemu_coroutine_self();
+
+     if (!len) {
+-        ret = nbd_send_reply(client->ioc, reply);
++        ret = nbd_send_reply(client->ioc, reply, errp);
+     } else {
+         qio_channel_set_cork(client->ioc, true);
+-        ret = nbd_send_reply(client->ioc, reply);
++        ret = nbd_send_reply(client->ioc, reply, errp);
+         if (ret == 0) {
+-            ret = nbd_write(client->ioc, req->data, len, NULL);
++            ret = nbd_write(client->ioc, req->data, len, errp);
+             if (ret < 0) {
+                 ret = -EIO;
+             }
+@@ -1260,8 +1261,8 @@ reply:
+         local_err = NULL;
+     }
+
+-    if (nbd_co_send_reply(req, &reply, reply_data_len) < 0) {
+-        error_setg(&local_err, "Failed to send reply");
++    if (nbd_co_send_reply(req, &reply, reply_data_len, &local_err) < 0) {
++        error_prepend(&local_err, "Failed to send reply: ");
+         goto disconnect;
+     }
+
 -- 
 2.9.4
