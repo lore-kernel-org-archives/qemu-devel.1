@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dUYFO-0006e2-5q
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:57:07 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dUYHL-0007xU-JX
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dUYFL-0003hq-2L
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:57:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dUYFK-0003hZ-Oq
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:57:02 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1499453787.git.alistair.francis@xilinx.com>
-	<96f42a10eea7c311f6a50391042c373ffb4247d1.1499453788.git.alistair.francis@xilinx.com>
-Date: Mon, 10 Jul 2017 14:56:59 +0200
-In-Reply-To: <96f42a10eea7c311f6a50391042c373ffb4247d1.1499453788.git.alistair.francis@xilinx.com>
-	(Alistair Francis's message of "Fri, 7 Jul 2017 16:21:02 -0700")
-Message-ID: <87inj030x0.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1dUYHK-0004Kb-OA
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:59:07 -0400
+Date: Mon, 10 Jul 2017 14:58:57 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170710125857.GD5772@noname.redhat.com>
+References: <1498733831-15254-1-git-send-email-pl@kamp.de>
+	<1498733831-15254-2-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] error: Functions to report warnings
- and informational messages
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1498733831-15254-2-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V2 1/8] docs: add compress format extension
+ to qcow2 spec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,228 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
-
-> Add warn_report(), warn_vreport() for reporting warnings, and
-> info_report(), info_vreport() for informational messages.
->
-> These are implemented them with a helper function factored out of
-> error_vreport(), suitably generalized. This patch makes no changes
-> to the output of the original error_report() function.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
+> Signed-off-by: Peter Lieven <pl@kamp.de>
 > ---
-> v2:
->  - Don't add *vreport() functions to checkpatch
->  - Maintain original comments for the reporting functions
->  - Don't change the error report output in this patch
-> v1:
->  - Don't expose the generic report and vreport() functions
->  - Prefix error messages
->  - Use vreport instead of qmsg_vreport()
-> RFC V3:
->  - Change the function and enum names to be more descriptive
->  - Add wrapper functions for *_report() and *_vreport()
->
->  include/qemu/error-report.h |  7 ++++
->  scripts/checkpatch.pl       |  5 ++-
->  util/qemu-error.c           | 97 ++++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 102 insertions(+), 7 deletions(-)
->
-> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> index 3001865896..e1c8ae1a52 100644
-> --- a/include/qemu/error-report.h
-> +++ b/include/qemu/error-report.h
-> @@ -35,8 +35,15 @@ void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
->  void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->  void error_set_progname(const char *argv0);
-> +
->  void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
-> +void warn_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
-> +void info_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
-> +
->  void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> +void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> +void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> +
->  const char *error_get_progname(void);
->  extern bool enable_timestamp_msg;
+>  docs/interop/qcow2.txt | 43 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 42 insertions(+), 1 deletion(-)
+> 
+> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+> index 80cdfd0..c01daf3 100644
+> --- a/docs/interop/qcow2.txt
+> +++ b/docs/interop/qcow2.txt
+> @@ -85,7 +85,12 @@ in the description of a field.
+>                                  be written to (unless for regaining
+>                                  consistency).
 >  
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 73efc927a9..b76fe30ad3 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -2534,8 +2534,9 @@ sub process {
->  				error_set|
->  				error_prepend|
->  				error_reportf_err|
-> -				error_vreport|
-> -				error_report}x;
-> +				error_report|
-> +				warn_report|
-> +				info_report}x;
-
-This check is about newlines in format strings.  Both the FOO_report()
-and the FOO_vreport() take format strings.  Therefore, keep
-error_vreport() and add warn_vreport(), info_vreport().
-
+> -                    Bits 2-63:  Reserved (set to 0)
+> +                    Bit 2:      Compress format bit.  If and only if this bit
+> +                                is set then the compress format extension
+> +                                MUST be present and MUST be parsed and checked
+> +                                for compatibility.
+> +
+> +                    Bits 3-63:  Reserved (set to 0)
 >  
->  	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
->  		ERROR("Error messages should not contain newlines\n" . $herecurr);
-> diff --git a/util/qemu-error.c b/util/qemu-error.c
-> index 1c5e35ecdb..b555247e24 100644
-> --- a/util/qemu-error.c
-> +++ b/util/qemu-error.c
-> @@ -14,6 +14,16 @@
->  #include "monitor/monitor.h"
->  #include "qemu/error-report.h"
+>           80 -  87:  compatible_features
+>                      Bitmask of compatible features. An implementation can
+> @@ -135,6 +140,7 @@ be stored. Each extension has a structure like the following:
+>                          0xE2792ACA - Backing file format name
+>                          0x6803f857 - Feature name table
+>                          0x23852875 - Bitmaps extension
+> +                        0xC03183A3 - Compress format extension
+>                          other      - Unknown header extension, can be safely
+>                                       ignored
 >  
-> +/*
-> + * @report_type is the type of message: error, warning or
-> + * informational.
-> + */
-> +typedef enum {
-> +    REPORT_TYPE_ERROR,
-> +    REPORT_TYPE_WARNING,
-> +    REPORT_TYPE_INFO,
-> +} report_type;
-> +
->  void error_printf(const char *fmt, ...)
->  {
->      va_list ap;
-> @@ -179,17 +189,28 @@ static void print_loc(void)
+> @@ -208,6 +214,41 @@ The fields of the bitmaps extension are:
+>                     starts. Must be aligned to a cluster boundary.
 >  
->  bool enable_timestamp_msg;
->  /*
-> - * Print an error message to current monitor if we have one, else to stderr.
-> + * Print a message to current monitor if we have one, else to stderr.
-
-Need a sentence on @report_type right here.  Perhaps
-
-    * @report_type is the type of message: error, warning or
-    * informational.
-
->   * Format arguments like vsprintf().  The resulting message should be
->   * a single phrase, with no newline or trailing punctuation.
->   * Prepend the current location and append a newline.
->   * It's wrong to call this in a QMP monitor.  Use error_setg() there.
->   */
-> -void error_vreport(const char *fmt, va_list ap)
-> +static void vreport(report_type type, const char *fmt, va_list ap)
->  {
->      GTimeVal tv;
->      gchar *timestr;
 >  
-> +    switch (type) {
-> +    case REPORT_TYPE_ERROR:
-> +        break;
-> +    case REPORT_TYPE_WARNING:
-> +        error_printf("warning: ");
-> +        break;
-> +    case REPORT_TYPE_INFO:
-> +        error_printf("info: ");
-> +        break;
-> +    }
+> +== Compress format extension ==
 > +
->      if (enable_timestamp_msg && !cur_mon) {
->          g_get_current_time(&tv);
->          timestr = g_time_val_to_iso8601(&tv);
-> @@ -204,8 +225,41 @@ void error_vreport(const char *fmt, va_list ap)
->  
->  /*
->   * Print an error message to current monitor if we have one, else to stderr.
-> - * Format arguments like sprintf().  The resulting message should be a
-> - * single phrase, with no newline or trailing punctuation.
-> + * Format arguments like vsprintf().  The resulting message should be
-> + * a single phrase, with no newline or trailing punctuation.
-> + * Prepend the current location and append a newline.
-> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-> + */
-> +void error_vreport(const char *fmt, va_list ap)
-> +{
-> +    vreport(REPORT_TYPE_ERROR, fmt, ap);
-> +}
-> +
-> +/*
-> + * Print a warning message to current monitor if we have one, else to stderr.
-> + */
+> +The compress format extension is an optional header extension. It provides
+> +the ability to specify the compress algorithm and compress parameters
+> +that are used for compressed clusters. This new header MUST be present if
+> +the incompatible-feature bit "compress format bit" is set and MUST be absent
+> +otherwise.
 
-You missed one :)
+Okay. Only one header extension type for all compression formats. I
+think this does work because we have a variable header extension size.
 
-> +void warn_vreport(const char *fmt, va_list ap)
-> +{
-> +    vreport(REPORT_TYPE_WARNING, fmt, ap);
-> +}
+> +The fields of the compress format extension are:
 > +
-> +/*
-> + * Print an information message to current monitor if we have one, else to
-> + * stderr.
-> + * Format arguments like vsprintf().  The resulting message should be
-> + * a single phrase, with no newline or trailing punctuation.
-> + * Prepend the current location and append a newline.
-> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-> + */
-> +void info_vreport(const char *fmt, va_list ap)
-> +{
-> +    vreport(REPORT_TYPE_INFO, fmt, ap);
-> +}
-> +
-> +/*
-> + * Print an error message to current monitor if we have one, else to stderr.
-> + * Format arguments like vsprintf().  The resulting message should be
+> +    Byte  0 - 15:  compress_format_name (padded with zeros, but not
+> +                   necessarily null terminated if it has full length)
 
-like sprintf()
+We absolutely need to define the valid names and their meaning here.
 
-> + * a single phrase, with no newline or trailing punctuation.
->   * Prepend the current location and append a newline.
->   * It's wrong to call this in a QMP monitor.  Use error_setg() there.
->   */
-   void error_report(const char *fmt, ...)
-> @@ -214,6 +268,39 @@ void error_report(const char *fmt, ...)
->      va_list ap;
->  
->      va_start(ap, fmt);
-> -    error_vreport(fmt, ap);
-> +    vreport(REPORT_TYPE_ERROR, fmt, ap);
-> +    va_end(ap);
-> +}
-> +
-> +/*
-> + * Print a warning message to current monitor if we have one, else to stderr.
-> + * Format arguments like sprintf(). The resulting message should be a
-> + * single phrase, with no newline or trailing punctuation.
-> + * Prepend the current location and append a newline.
-> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-> + */
-> +void warn_report(const char *fmt, ...)
-> +{
-> +    va_list ap;
-> +
-> +    va_start(ap, fmt);
-> +    vreport(REPORT_TYPE_WARNING, fmt, ap);
-> +    va_end(ap);
-> +}
-> +
-> +/*
-> + * Print an information message to current monitor if we have one, else to
-> + * stderr.
-> + * Format arguments like sprintf(). The resulting message should be a
-> + * single phrase, with no newline or trailing punctuation.
-> + * Prepend the current location and append a newline.
-> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-> + */
-> +void info_report(const char *fmt, ...)
-> +{
-> +    va_list ap;
-> +
-> +    va_start(ap, fmt);
-> +    vreport(REPORT_TYPE_INFO, fmt, ap);
->      va_end(ap);
->  }
+> +              16:  compress_level (uint8_t)
+> +                   0 = default compress level
+> +                   1 = lowest compress level
+> +                   x = highest compress level (the highest compress
+> +                       level may vary for different compress formats)
 
-With these nits touched up:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Let's be explicit about the compression formats that this field is valid
+for (i.e. make this already part of the format specific fields).
+
+Then we can also be specific instead of writing "may vary", which is not
+a very good thing to have in a specification.
+
+> +         17 - 19:  Reserved for future use, must be zero.
+
+We don't need this for now because byte 16 will be the final one in this
+struct.
+
+> +         20 - 23:  extra_data_size
+> +                   Size of compress format specific extra data.
+> +                   For now, as no format specifies extra data,
+> +                   extra_data_size is reserved and should be zero.
+> +
+> +        variable:  extra_data
+> +                   Extra data with additional parameters for the compress
+> +                   format, occupying extra_data_size bytes.
+
+extra_data_size isn't necessary because we already have the length of
+the header extension, so we know how long the whole thing is.
+extra_data isn't necessary because we'll just add new fields at the end
+if we want to add something.
+
+> +        variable:  Padding to round up the size of compress format extension
+> +                   to the next multiple of 8. All bytes of the padding must be
+> +                   zero.
+
+This is already contained in the description of header extensions in
+general, so we don't have to repeat it here.
+
+Kevin
