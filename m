@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaY-0001fH-Td
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUXaa-0001h8-AG
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaX-0002cE-TV
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUXaZ-0002eJ-Hp
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:56 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Jul 2017 07:14:28 -0500
-Message-Id: <20170710121434.5047-6-eblake@redhat.com>
+Date: Mon, 10 Jul 2017 07:14:30 -0500
+Message-Id: <20170710121434.5047-8-eblake@redhat.com>
 In-Reply-To: <20170710121434.5047-1-eblake@redhat.com>
 References: <20170710121434.5047-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 05/11] nbd/server: add errp to nbd_send_reply()
+Subject: [Qemu-devel] [PULL 07/11] nbd/client: refactor TRACE of NBD_MAGIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +24,37 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbon
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+We are going to switch from TRACE macro to trace points,
+this TRACE complicates things, this patch simplifies it.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170707152918.23086-5-vsementsov@virtuozzo.com>
+Message-Id: <20170707152918.23086-7-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ nbd/client.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 00a7c60..e3fd0ca 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -687,7 +687,7 @@ static int nbd_receive_request(QIOChannel *ioc, NBDRequest *request,
-     return 0;
- }
-
--static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-+static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
- {
-     uint8_t buf[NBD_REPLY_SIZE];
-
-@@ -706,7 +706,7 @@ static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply)
-     stl_be_p(buf + 4, reply->error);
-     stq_be_p(buf + 8, reply->handle);
-
--    return nbd_write(ioc, buf, sizeof(buf), NULL);
-+    return nbd_write(ioc, buf, sizeof(buf), errp);
- }
-
- #define MAX_NBD_REQUESTS 16
-@@ -993,7 +993,8 @@ void nbd_export_close_all(void)
-     }
- }
-
--static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
-+static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len,
-+                             Error **errp)
- {
-     NBDClient *client = req->client;
-     int ret;
-@@ -1003,12 +1004,12 @@ static int nbd_co_send_reply(NBDRequestData *req, NBDReply *reply, int len)
-     client->send_coroutine = qemu_coroutine_self();
-
-     if (!len) {
--        ret = nbd_send_reply(client->ioc, reply);
-+        ret = nbd_send_reply(client->ioc, reply, errp);
-     } else {
-         qio_channel_set_cork(client->ioc, true);
--        ret = nbd_send_reply(client->ioc, reply);
-+        ret = nbd_send_reply(client->ioc, reply, errp);
-         if (ret == 0) {
--            ret = nbd_write(client->ioc, req->data, len, NULL);
-+            ret = nbd_write(client->ioc, req->data, len, errp);
-             if (ret < 0) {
-                 ret = -EIO;
-             }
-@@ -1260,8 +1261,8 @@ reply:
-         local_err = NULL;
+diff --git a/nbd/client.c b/nbd/client.c
+index b97143f..2125321 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -461,15 +461,8 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
+         goto fail;
      }
 
--    if (nbd_co_send_reply(req, &reply, reply_data_len) < 0) {
--        error_setg(&local_err, "Failed to send reply");
-+    if (nbd_co_send_reply(req, &reply, reply_data_len, &local_err) < 0) {
-+        error_prepend(&local_err, "Failed to send reply: ");
-         goto disconnect;
-     }
+-    TRACE("Magic is %c%c%c%c%c%c%c%c",
+-          qemu_isprint(buf[0]) ? buf[0] : '.',
+-          qemu_isprint(buf[1]) ? buf[1] : '.',
+-          qemu_isprint(buf[2]) ? buf[2] : '.',
+-          qemu_isprint(buf[3]) ? buf[3] : '.',
+-          qemu_isprint(buf[4]) ? buf[4] : '.',
+-          qemu_isprint(buf[5]) ? buf[5] : '.',
+-          qemu_isprint(buf[6]) ? buf[6] : '.',
+-          qemu_isprint(buf[7]) ? buf[7] : '.');
++    magic = ldq_be_p(buf);
++    TRACE("Magic is 0x%" PRIx64, magic);
 
+     if (memcmp(buf, "NBDMAGIC", 8) != 0) {
+         error_setg(errp, "Invalid magic received");
 -- 
 2.9.4
