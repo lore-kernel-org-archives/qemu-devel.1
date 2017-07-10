@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUTFV-0007y5-Ja
+	(envelope-from <rth7680@gmail.com>) id 1dUTFV-0007y6-Jx
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUTFS-0007g6-JC
+	(envelope-from <rth7680@gmail.com>) id 1dUTFQ-0007fe-Ln
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:53 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36161)
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35891)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUTFS-0007fu-D3
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:50 -0400
-Received: by mail-pf0-x241.google.com with SMTP id z6so13400774pfk.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:36:50 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUTFQ-0007fX-FZ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:48 -0400
+Received: by mail-pg0-f68.google.com with SMTP id u36so11708966pgn.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:36:48 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun,  9 Jul 2017 21:35:01 -1000
-Message-Id: <20170710073501.5207-6-rth@twiddle.net>
+Date: Sun,  9 Jul 2017 21:34:57 -1000
+Message-Id: <20170710073501.5207-2-rth@twiddle.net>
 In-Reply-To: <20170710073501.5207-1-rth@twiddle.net>
 References: <20170710073501.5207-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 5/5] tcg/mips: Bugfix for crash when running
- program with qemu-i386.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 1/5] tcg/aarch64: Introduce and use long branch
+ to register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +31,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Jiang Biao <jiang.biao2@zte.com.cn>
+Cc: peter.maydell@linaro.org, Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Jiang Biao <jiang.biao2@zte.com.cn>
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-When running a helloworld program with qemu-i386 in linux-user
-mode on Loongson 3A3000, it will crash. This patch fix the bug.
+We can use a branch to register instruction for exit_tb for offsets
+greater than 128MB.
 
-Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
-Message-Id: <1499669979-25904-1-git-send-email-jiang.biao2@zte.com.cn>
+CC: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+Message-Id: <20170630143614.31059-1-bobby.prani@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/mips/tcg-target.inc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 8cff9a6..85756b8 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -1547,8 +1547,8 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is_64)
-     } else if (guest_base == (int16_t)guest_base) {
-         tcg_out_opc_imm(s, ALIAS_PADDI, base, addr_regl, guest_base);
-     } else {
--        tcg_out_movi(s, TCG_TYPE_PTR, base, guest_base);
--        tcg_out_opc_reg(s, ALIAS_PADD, base, base, addr_regl);
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_TMP0, guest_base);
-+        tcg_out_opc_reg(s, ALIAS_PADD, base, TCG_TMP0, addr_regl);
-     }
-     tcg_out_qemu_ld_direct(s, data_regl, data_regh, base, opc, is_64);
- #endif
-@@ -1652,8 +1652,8 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is_64)
-     } else if (guest_base == (int16_t)guest_base) {
-         tcg_out_opc_imm(s, ALIAS_PADDI, base, addr_regl, guest_base);
-     } else {
--        tcg_out_movi(s, TCG_TYPE_PTR, base, guest_base);
--        tcg_out_opc_reg(s, ALIAS_PADD, base, base, addr_regl);
-+        tcg_out_movi(s, TCG_TYPE_PTR, TCG_TMP0, guest_base);
-+        tcg_out_opc_reg(s, ALIAS_PADD, base, TCG_TMP0, addr_regl);
-     }
-     tcg_out_qemu_st_direct(s, data_regl, data_regh, base, opc);
- #endif
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 1fa3bcc..8fce11a 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -819,6 +819,17 @@ static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
+     tcg_out_insn(s, 3206, B, offset);
+ }
+ 
++static inline void tcg_out_goto_long(TCGContext *s, tcg_insn_unit *target)
++{
++    ptrdiff_t offset = target - s->code_ptr;
++    if (offset == sextract64(offset, 0, 26)) {
++        tcg_out_insn(s, 3206, BL, offset);
++    } else {
++        tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_TMP, (intptr_t)target);
++        tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
++    }
++}
++
+ static inline void tcg_out_goto_noaddr(TCGContext *s)
+ {
+     /* We pay attention here to not modify the branch target by reading from
+@@ -1364,10 +1375,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_exit_tb:
+         /* Reuse the zeroing that exists for goto_ptr.  */
+         if (a0 == 0) {
+-            tcg_out_goto(s, s->code_gen_epilogue);
++            tcg_out_goto_long(s, s->code_gen_epilogue);
+         } else {
+             tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_X0, a0);
+-            tcg_out_goto(s, tb_ret_addr);
++            tcg_out_goto_long(s, tb_ret_addr);
+         }
+         break;
+ 
 -- 
 2.9.4
