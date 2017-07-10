@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUXgq-0007Fh-K0
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:21:25 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUXju-0001Ks-4p
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:24:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUXgl-00060p-Rh
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:21:24 -0400
-Received: from mail-wr0-f180.google.com ([209.85.128.180]:35546)
+	(envelope-from <pbonzini@redhat.com>) id 1dUXjp-0007Tu-8L
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:24:34 -0400
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:34745)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUXgl-00060D-MG
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:21:19 -0400
-Received: by mail-wr0-f180.google.com with SMTP id k67so136014076wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:21:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUXjp-0007TX-1Q
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:24:29 -0400
+Received: by mail-wr0-f180.google.com with SMTP id 77so136505865wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:24:28 -0700 (PDT)
+References: <20170628050003.1809-1-bobby.prani@gmail.com>
+	<20170628050003.1809-3-bobby.prani@gmail.com>
+	<87van0a9t6.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1363d99f-efc5-027b-95cb-2405db45bc8a@redhat.com>
+Date: Mon, 10 Jul 2017 14:24:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <87tw2ka3p1.fsf@linaro.org>
-References: <20170707161822.29659-1-alex.bennee@linaro.org>
-	<87inj49mr1.fsf@linaro.org>
-	<CAFEAcA_YvS8OQVTPnvRtWyVuAKO2bccyNALOs1Oq7snTO1WwkA@mail.gmail.com>
-	<a391e7e5-0be9-0863-bfb7-88d9168484f3@twiddle.net>
-	<87h8yo9k2n.fsf@linaro.org>
-	<638cda88-5bd8-2a86-d720-04005fa1c1c8@twiddle.net>
-	<87tw2ka3p1.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Jul 2017 13:19:57 +0100
-Message-ID: <CAFEAcA_+q-bgKwSRq-rmZ190vVEcq+DXWt-WohJm3=RoJc_99A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] target/arm: ensure eret exits the
- run-loop
+In-Reply-To: <87van0a9t6.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] [TEST] Collect TLB and victim TLB
+ hit/miss stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "Emilio G . Cota" <cota@braap.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On 10 July 2017 at 13:15, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Looking at translate.c (32 bit arm), we have:
->
->   gen_srs
->   gen_mrs_banked
->   gen_msr_banked
->
-> These all manually set:
->
->   gen_set_pc_im(s, s->pc - 4);
->
-> before their respective helpers. I think setting the PC after the helper
-> is superfluous given we are will at that point be exiting the block.
+On 10/07/2017 12:03, Alex Bennée wrote:
+>> +extern bool enable_instrumentation;
+>> +
+> Is there a better place for this than a static global? I was pondering
+> tcg_ctx but that's not really visible to the runtime. Making it part of
+> the TB flags might be useful for only instrumenting certain segments of
+> the code but I suspect I'm bike-shedding at this point.
 
-No, you need both. We do
-  gen_set_pc_im(s, s->pc - 4);
-before calling the helper because the helper might throw an
-exception, in which case the PC needs to point to that insn.
-We then call
- gen_set_pc_im(dc, dc->pc);
-before exiting the block because if we leave execution by
-falling off the end of the block then the PC should point to
-the insn that comes next (ie just after the last one in the block)
+Why not use tracepoints?  This seems to be a natural candidate for
+systemtap-like tracing scripts.
 
-thanks
--- PMM
+Paolo
