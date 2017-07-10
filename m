@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUbbo-00029t-Hd
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:32:29 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUbh4-0006Ze-6Z
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:37:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUbbn-0002D9-Q5
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:32:28 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34394)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUbbn-0002Cv-I2
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:32:27 -0400
-Received: by mail-wr0-x231.google.com with SMTP id 77so145679269wrb.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 09:32:27 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dUbh3-000631-Cc
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:37:54 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170710154749.13624-1-alex.bennee@linaro.org>
+	<20170710154749.13624-5-alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <1e6a695b-92b1-578d-5467-569ec28b6a30@twiddle.net>
+Date: Mon, 10 Jul 2017 06:37:11 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170710150440.11303-1-eblake@redhat.com>
-References: <20170710150440.11303-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Jul 2017 17:32:05 +0100
-Message-ID: <CAFEAcA9KQa_GmXOpgbFyjPPg-8_pdX4+djXkotWM42GyPvVpRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/11] NBD patches
+In-Reply-To: <20170710154749.13624-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/6] target/arm/translate-a64: get rid
+ of DISAS_EXIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org
+Cc: qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 10 July 2017 at 16:04, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 94c56652b9079cfb9d560a6dde7ecb15eb9ef9c7:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-07-10 14:06:49 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-07-10-v2
->
-> for you to fetch changes up to 9588463e747706ffbaf6f4600b5efea2779bc26f:
->
->   nbd: use generic trace subsystem instead of TRACE macro (2017-07-10 09:57:24 -0500)
->
-> ----------------------------------------------------------------
-> nbd patches for 2017-07-10
->
-> - Eric Blake: MAINTAINERS: Promote NBD to supported, with new maintainer
-> - Vladimir Sementsov-Ogievskiy: [00/10] nbd refactoring part 2
->
-> ----------------------------------------------------------------
->
+On 07/10/2017 05:47 AM, Alex Bennée wrote:
+> We already have an exit condition that declares we should exit to the
+> run-loop because wider CPU state changes have been made. Use
+> DISAS_UPDATE and kill the architecture specific DISAS_EXIT.
+> 
+> Signed-off-by: Alex Bennée<alex.bennee@linaro.org>
+> ---
+>   target/arm/translate-a64.c | 3 +--
+>   target/arm/translate.c     | 6 ++++--
+>   target/arm/translate.h     | 4 ----
+>   3 files changed, 5 insertions(+), 8 deletions(-)
 
-Applied, thanks.
+I really thought it was clearer the other way around.
 
--- PMM
+
+r~
