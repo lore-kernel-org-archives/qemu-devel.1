@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUcD6-0004x9-O6
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:11:02 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUcPf-0004DW-41
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUcD5-0008Vs-Fq
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:11:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40841)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dUcD5-0008UC-65
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:10:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 471BA7F6A6
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 17:10:58 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 10 Jul 2017 18:10:40 +0100
-Message-Id: <20170710171040.21021-10-dgilbert@redhat.com>
-In-Reply-To: <20170710171040.21021-1-dgilbert@redhat.com>
-References: <20170710171040.21021-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 9/9] migration: Make compression_threads use
- save/load_setup/cleanup()
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUcPb-0006y9-Qe
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:23:59 -0400
+Received: from mail-he1eur01on0126.outbound.protection.outlook.com
+	([104.47.0.126]:32319
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1dUcPa-0006ws-T0
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:23:55 -0400
+References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
+	<0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <94284c08-ba36-73ba-88be-246ed5c84eb4@virtuozzo.com>
+Date: Mon, 10 Jul 2017 20:23:26 +0300
+MIME-Version: 1.0
+In-Reply-To: <0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,154 +31,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, dgilbert@redhat.com, amit@kernel.org, pbonzini@redhat.com, den@openvz.org
 
-From: Juan Quintela <quintela@redhat.com>
+On 10.07.2017 17:13, Laurent Vivier wrote:
+> On 07/07/2017 16:21, Pavel Butsykin wrote:
+>> We should guarantee that RAM will not be modified while VM has a stopped
+>> state, otherwise it can lead to negative consequences during post-copy
+>> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
+>> source side will not be modified as this could lead to non-consistent vm state
+>> on the destination side. Also RAM access during postcopy-ram migration with
+>> enabled release-ram capability can lead to sad consequences.
+>>
+>> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
+>> in the guest memory.
+>>
+>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+>> ---
+>>   hw/char/virtio-console.c          | 21 +++++++++++++++++++++
+>>   hw/char/virtio-serial-bus.c       |  7 +++++++
+>>   include/hw/virtio/virtio-serial.h |  3 +++
+>>   3 files changed, 31 insertions(+)
+>>
+>> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+>> index 0cb1668c8a..b55905892e 100644
+>> --- a/hw/char/virtio-console.c
+>> +++ b/hw/char/virtio-console.c
+>> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
+>>       }
+>>   }
+>>   
+>> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
+>> +{
+>> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
+>> +
+>> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (enable) {
+>> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
+>> +
+>> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+>> +                                 k->is_console ? NULL : chr_event,
+>> +                                 vcon, NULL, false);
+>> +    } else {
+>> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
+>> +                                 NULL, NULL, NULL, false);
+>> +    }
+>> +}
+> 
+> I think you can also factorize the code in virtconsole_realize() to call
+> this new function.
+> 
+>>   static void virtconsole_realize(DeviceState *dev, Error **errp)
+>>   {
+>>       VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+>> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
+>>       k->unrealize = virtconsole_unrealize;
+>>       k->have_data = flush_buf;
+>>       k->set_guest_connected = set_guest_connected;
+>> +    k->enable_backend = virtconsole_enable_backend;
+> 
+> Why don't you register a  vm_state change handler to change the state of
+> the virtconsole according to the state of the machine instead of adding
+> a new function in the VirtIOSerialPortClass?
+> 
+> See a23a6d1 ("virtio-rng: stop virtqueue while the CPU is stopped")
 
-Once there, be consistent and use
-compress_thread_{save,load}_{setup,cleanup}.
+I tried to follow the existing approach. Look at vhost_net or
+virtio-input. This is similar to the hierarchical structure, we have the
+root device which notifies the virtio devices at the levels above
+(virtio-device -> virtio-bus -> virtio_*_device ). It ensures the
+state of devices will be modified consistently, the first is a bus, then
+the device on that bus. I'm not sure that following this order during
+the device state changes is absolute necessity. But it looks nicer
+than the registration of notifications for each device.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20170628095228.4661-6-quintela@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c |  5 -----
- migration/ram.c       | 12 ++++++++----
- migration/ram.h       |  5 -----
- 3 files changed, 8 insertions(+), 14 deletions(-)
+Although this is just a guess, I have no clear idea of how to do it
+right, so I'm waiting for comments :)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 7e5dbd9b92..a0db40d364 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -286,7 +286,6 @@ static void process_incoming_migration_bh(void *opaque)
-     } else {
-         runstate_set(global_state_get_runstate());
-     }
--    migrate_decompress_threads_join();
-     /*
-      * This must happen after any state changes since as soon as an external
-      * observer sees this event they might start to prod at the VM assuming
-@@ -349,7 +348,6 @@ static void process_incoming_migration_co(void *opaque)
-         migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
-                           MIGRATION_STATUS_FAILED);
-         error_report("load of migration failed: %s", strerror(-ret));
--        migrate_decompress_threads_join();
-         exit(EXIT_FAILURE);
-     }
-     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
-@@ -360,7 +358,6 @@ void migration_fd_process_incoming(QEMUFile *f)
- {
-     Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
- 
--    migrate_decompress_threads_create();
-     qemu_file_set_blocking(f, false);
-     qemu_coroutine_enter(co);
- }
-@@ -827,7 +824,6 @@ static void migrate_fd_cleanup(void *opaque)
-         }
-         qemu_mutex_lock_iothread();
- 
--        migrate_compress_threads_join();
-         qemu_fclose(s->to_dst_file);
-         s->to_dst_file = NULL;
-     }
-@@ -1990,7 +1986,6 @@ void migrate_fd_connect(MigrationState *s)
-         }
-     }
- 
--    migrate_compress_threads_create();
-     qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
-                        QEMU_THREAD_JOINABLE);
-     s->migration_thread_running = true;
-diff --git a/migration/ram.c b/migration/ram.c
-index 73aec34161..1b08296d1b 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -306,7 +306,7 @@ static inline void terminate_compression_threads(void)
-     }
- }
- 
--void migrate_compress_threads_join(void)
-+static void compress_threads_save_cleanup(void)
- {
-     int i, thread_count;
- 
-@@ -329,7 +329,7 @@ void migrate_compress_threads_join(void)
-     comp_param = NULL;
- }
- 
--void migrate_compress_threads_create(void)
-+static void compress_threads_save_setup(void)
- {
-     int i, thread_count;
- 
-@@ -1390,6 +1390,7 @@ static void ram_save_cleanup(void *opaque)
-     }
-     XBZRLE_cache_unlock();
-     migration_page_queue_free(*rsp);
-+    compress_threads_save_cleanup();
-     g_free(*rsp);
-     *rsp = NULL;
- }
-@@ -1923,6 +1924,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-     }
- 
-     rcu_read_unlock();
-+    compress_threads_save_setup();
- 
-     ram_control_before_iterate(f, RAM_CONTROL_SETUP);
-     ram_control_after_iterate(f, RAM_CONTROL_SETUP);
-@@ -2231,7 +2233,7 @@ static void wait_for_decompress_done(void)
-     qemu_mutex_unlock(&decomp_done_lock);
- }
- 
--void migrate_decompress_threads_create(void)
-+static void compress_threads_load_setup(void)
- {
-     int i, thread_count;
- 
-@@ -2255,7 +2257,7 @@ void migrate_decompress_threads_create(void)
-     }
- }
- 
--void migrate_decompress_threads_join(void)
-+static void compress_threads_load_cleanup(void)
- {
-     int i, thread_count;
- 
-@@ -2321,12 +2323,14 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
-     xbzrle_load_setup();
-+    compress_threads_load_setup();
-     return 0;
- }
- 
- static int ram_load_cleanup(void *opaque)
- {
-     xbzrle_load_cleanup();
-+    compress_threads_load_cleanup();
-     return 0;
- }
- 
-diff --git a/migration/ram.h b/migration/ram.h
-index a8b79a4d4c..c081fde86c 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -39,11 +39,6 @@ int64_t xbzrle_cache_resize(int64_t new_size);
- uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
- 
--void migrate_compress_threads_create(void);
--void migrate_compress_threads_join(void);
--void migrate_decompress_threads_create(void);
--void migrate_decompress_threads_join(void);
--
- uint64_t ram_pagesize_summary(void);
- int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
- void acct_update_position(QEMUFile *f, size_t size, bool zero);
--- 
-2.13.0
+> Thanks,
+> Laurent
+> 
