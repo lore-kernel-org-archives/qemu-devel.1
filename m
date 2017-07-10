@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dUTVt-00076Y-Ce
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:53:50 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dUTdp-0000Vw-Je
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dUTVs-0007zn-5j
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:53:49 -0400
-Date: Mon, 10 Jul 2017 09:53:35 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170710075335.pnfpixfeyhoyiioj@eukaryote>
-References: <1499351806-3359-1-git-send-email-kchamart@redhat.com>
-	<1499351806-3359-3-git-send-email-kchamart@redhat.com>
-	<bf8b230f-15be-9468-20d2-09f8f9ae12fa@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1dUTdm-0003o4-Ik
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:02:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55930)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dUTdm-0003n7-C2
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:01:58 -0400
+Date: Mon, 10 Jul 2017 10:01:47 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170710100147.0a7339e4@nial.brq.redhat.com>
+In-Reply-To: <58f2d98e-ae7e-e2e7-e7f3-68e937b0b79f@ilande.co.uk>
+References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170703113940.0e0415a2@nial.brq.redhat.com>
+	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
+	<20170707133320.2e0d741d@nial.brq.redhat.com>
+	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
+	<20170707164453.4ba325fd@nial.brq.redhat.com>
+	<20170707150707.GJ10776@localhost.localdomain>
+	<58f2d98e-ae7e-e2e7-e7f3-68e937b0b79f@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bf8b230f-15be-9468-20d2-09f8f9ae12fa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] live-block-ops.txt: Rename, rewrite,
- and improve it
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,225 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On Fri, Jul 07, 2017 at 06:25:24PM -0400, John Snow wrote:
-> Last time, on DRAGON BALL Q:
+On Fri, 7 Jul 2017 17:20:25 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-Didn't know of this before; just learnt the reference.
-
-> On 07/06/2017 10:36 AM, Kashyap Chamarthy wrote:
+> On 07/07/17 16:07, Eduardo Habkost wrote:
 > 
-> [A lot of good documentation]
+> >> looks fine,
+> >>
+> >> so what I'd do is:
+> >>  * drop 4/6  
 > 
-> > +
-> > +So, the following is the flow for `block-commit_Case-3`_ -- to convert a
-> > +disk image chain such as this::
-> > +
+> Yes.
 > 
-> Maybe drop the "So, "
->
-> "The following is the flow for 'Block Commit Case 3' to convert a disk
-> image chain such as this:"
-
-Fixed in v6.
-
-> > +    [A] <-- [B] <-- [C] <-- [D]
-> > +
-> > +Into (where content from all the subsequent overlays, [B], and [C],
-> > +including the active layer, [D], is committed back to [A] -- which is
-> > +where live QEMU is performing all its current writes)::
-> > +
+> > Agreed on this point.  But:
+> >   
+> >>  * make fw_cfg_find() use ambiguous argument and error_abort if ambiguous == true  
 > 
-> "Into: "
+> During my latest tests I've found that everything works fine without the
+> ambiguous argument.
 > 
-> > +    [A]
-> > +
-> 
-> "Where content from all [...] its current writes."
+> Do we still want to keep it? And I don't think error_abort() is the
+> right thing to do here, I'd much rather return NULL and add a suitable
+> comment.
+I'd still use ambiguous argument and since you prefer not to assert
+I'd add errp argument to fw_cfg_find() and handle error at callsites.
 
-Fixed in v6.
+Just returning NULL isn't sufficient if you need to distinguish
+'not found' vs 'duplicate' usecases, additionally  'not found'
+in most cases isn't even error but 'duplicate' definitely is.
 
-[...]
-
-> > +Then, (optionally) query for the status of the active block operations
-> > +(we can see the 'commit' job is now ready to be completed, as indicated
-> > +by the line *"ready": true*)::
-> > +
-> 
-> Then, optionally query for the status of the active block operations. We
-> can see the 'commit' job is now ready to be completed, as indicated by
-> the line *"ready": true*.
-
-Fixed in v6.
-
-[...]
-
-> > +.. note::
-> > +    The invocation for rest of the cases (2, 4, and 5), discussed in the
-> > +    previous section, is omitted for brevity.
-> > +
-> 
-> As a joke I almost want to write "The invocation for cases 2, 4, and 5
-> are left as an exercise to the reader."
-
-Heh, I considered that, too.  Maybe I should do it.  But somehow I can't
-bring myself to. :-)
-
-> > +(1) Issuing the command ``block-job-cancel``, after it emits the event
-> 
-> nix the comma
-
-Nixed in v6.
-
-[...]
-
-> > +(2) Issuing the command ``block-job-complete``, after it emits the event
-> 
-> nix the comma
-
-In v6.
-
-[...]
-
-> > +A note on synchronization modes -- determines *what* part of the disk
-> > +image chain must be copied to the target.  Currently, there are four
-> > +different kinds:
-> > +
-> 
-> You've got a note here, followed by a note box. Maybe just:
-> 
-> "About synchronization modes: The synchronization mode determines
-> *which* part of the disk image chain will be copied to the target.
-> Currently, there are four different kinds:"
-
-Yep, fixed as such in v6.  (And I also see that two occurences of
-"synchronization mode" is OK in this instance.)
-
-[...]
-
-> > +    .. note:: In the case of ``drive-backup`` (or ``blockdev-backup``),
-> > +              the behavior of ``none`` sychronization mode is different.
-> > +              Normally, a ``backup`` job consists of two parts: Anything
-> > +              that is overwritten by the guest is first copied out to
-> > +              the backup, and in the background the whole image is
-> > +              copied from start to end. With ``sync=none``, it's only
-> > +              the first part.
-
-[...]
-
-> > +(5) Gracefully complete the 'mirror' block device job, and observe for
-> > +    the event ``BLOCK_JOB_COMPLETED``
-> > +
-> 
-> "observe for the event" is slightly awkward
-
-Replaced it with "notice the event" (fixed 5 occurences throughout
-the doc).
-
-> > +(6) Shutdown the guest, by issuing the QMP ``quit`` command, so that
-> > +    caches are flushed
-> > +
-> 
-> nix both commas
-
-Nixed in v6.
-
-[...]
-
-> > +QMP invocation for ``blockdev-backup``
-> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +
-> > +Given, a disk image chain of depth 1, where image [B] is the active
-> > +overlay (live QEMU is writing to it)::
-> > +
-> 
-> Given a disk image chain of depth 1 where image [B] is the active
-> overlay (live QEMU is writing it)
-
-Fixed in v6.
- 
-> > +    [A] <-- [B]
-> > +
-> > +The following is the procedure to copy the content from the entire chain
-> > +to a target image (say, [E]), which has the full content from [A] and
-> > +[B].
-> > +
-> > +Create the overlay, [B]::
-> 
-> the overlay [B]
-
-Likewise :-)
-
-> > +Create a target image, that will contain the copy::
-> 
-> sans comma
-
-Yep.
-
-> > +
-> > +    $ qemu-img create -f qcow2 e.qcow2 39M
-> > +
-> > +Then, add it to QEMU via ``blockdev-add``::
-> > +
-> 
-> and one more time
-
-Sure. </embarassed>
-
-> > +
-> > +Then, invoke ``blockdev-backup``, to copy the contents from the entire
-> > +image chain, consisting of images [A], and [B], to the target image
-> > +'e.qcow2'::
-> > +
-> 
-> Then invoke bd-b to copy the contents from the entire image chain,
-> consisting of images [A] and [B] to the target image e.qcow2:
-
-Comma-wildness again.  Fixed in v6.
-
-> > +Once the above 'backup' operation has completed, an event,
-> > +``BLOCK_JOB_COMPLETED``, will be emitted, signalling successful
-> > +completion.
-> > +
-> 
-> "the event BLOCK_JOB_COMPLETED will be emitted, signalling"
-
-Fixed in v6.
-
-[...]
-
-> > +The end result will be, the image 'e.qcow2' containing a
-> 
-> Goodbye sweet comma, savor the void
-
-:-)  Yep, v6 savors a lot of void.
-
-> > +point-in-time backup of the disk image chain -- i.e. contents from
-> > +images [A], and [B] at the time the ``blockdev-backup`` command was
-> > +initiated.
-> > +
-> 
-> images [A] and [B]
-
-Yep.
-
-> > +One way to confirm the backup disk image contains the identical content
-> > +with the disk image chain is to compare the backup, and the contents of
-> 
-> Could kill this comma too.
-
-Killed in v6.
-
-[...]
-
-> That's all I got for now. It's looking very good, thank you for your
-> time. Please consider all of my suggestions are just that. There is a
-> reason I am not an English professor :)
-
-They are useful suggestions. :-)  I'm a stickler for English, and I like
-to get it right.  Appreciate the patience!
-
--- 
-/kashyap
+Aborting on diplicate in fw_cfg_find() is fine and would
+help to avoid touching current callers if you wish to limit
+patches scope, but you can go with proper error propagating
+route if you wish.
