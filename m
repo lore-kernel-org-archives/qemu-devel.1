@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dUZzv-0001lY-UT
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:49:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dUa21-00031q-JD
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dUZzl-0008Pr-HV
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:49:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53608)
+	(envelope-from <ehabkost@redhat.com>) id 1dUa1w-00015q-Pg
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:51:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dUZzl-0008OT-5k
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:49:05 -0400
-Date: Mon, 10 Jul 2017 16:48:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170710164857.4d356a22@nial.brq.redhat.com>
-In-Reply-To: <20170710144557.GH12152@localhost.localdomain>
-References: <20170707213052.13087-1-ehabkost@redhat.com>
-	<20170707213052.13087-2-ehabkost@redhat.com>
-	<20170710101041.553a792a@nial.brq.redhat.com>
-	<20170710144557.GH12152@localhost.localdomain>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUa1w-00015b-GB
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:51:20 -0400
+Date: Mon, 10 Jul 2017 11:51:15 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170710145115.GI12152@localhost.localdomain>
+References: <1498745240-30658-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1498745240-30658-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170703113940.0e0415a2@nial.brq.redhat.com>
+	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
+	<20170707133320.2e0d741d@nial.brq.redhat.com>
+	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
+	<20170707164453.4ba325fd@nial.brq.redhat.com>
+	<20170707150707.GJ10776@localhost.localdomain>
+	<20170710094938.5d525300@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: Test case for
- object_resolve_path*()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170710094938.5d525300@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +35,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On Mon, 10 Jul 2017 11:45:57 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Mon, Jul 10, 2017 at 10:10:41AM +0200, Igor Mammedov wrote:
-> > On Fri,  7 Jul 2017 18:30:51 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > Test for partial path lookup using object_resolve_path*().
-> > > 
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  tests/check-qom-proplist.c | 41 +++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 41 insertions(+)
-> > > 
-> > > diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-> > > index 8e432e9..abafbd7 100644
-> > > --- a/tests/check-qom-proplist.c
-> > > +++ b/tests/check-qom-proplist.c
-> > > @@ -568,6 +568,46 @@ static void test_dummy_delchild(void)
-> > >      object_unparent(OBJECT(dev));
-> > >  }
-> > >  
-> > > +static void test_qom_partial_path(void)
-> > > +{
-> > > +    Object *root  = object_get_objects_root();
-> > > +    Object *cont1 = container_get(root, "/cont1");
-> > > +    Object *obj1  = object_new(TYPE_DUMMY);
-> > > +    Object *obj2a = object_new(TYPE_DUMMY);
-> > > +    Object *obj2b = object_new(TYPE_DUMMY);
-> > > +    bool ambiguous;
-> > > +
-> > > +    /* Objects created:
-> > > +     * /cont1
-> > > +     * /cont1/obj1
-> > > +     * /cont1/obj2 (obj2a)
-> > > +     * /obj2 (obj2b)
-> > > +     */
-> > > +    object_property_add_child(cont1, "obj1", obj1, &error_abort);
-> > > +    object_unref(obj1);
-> > > +    object_property_add_child(cont1, "obj2", obj2a, &error_abort);
-> > > +    object_unref(obj2a);
-> > > +    object_property_add_child(root,  "obj2", obj2b, &error_abort);
-> > > +    object_unref(obj2b);
-> > > +
-> > > +    ambiguous = false;
-> > > +    g_assert(!object_resolve_path_type("", TYPE_DUMMY, &ambiguous));
-> > > +    g_assert(ambiguous);
-> > > +
-> > > +    ambiguous = false;
-> > > +    g_assert(!object_resolve_path("obj2", &ambiguous));
-> > > +    g_assert(ambiguous);
-> > > +
-> > > +    ambiguous = false;
-> > > +    g_assert(object_resolve_path("obj1", &ambiguous) == obj1);
-> > > +    g_assert(!ambiguous);  
+On Mon, Jul 10, 2017 at 09:49:38AM +0200, Igor Mammedov wrote:
+> On Fri, 7 Jul 2017 12:07:07 -0300
+> "Eduardo Habkost" <ehabkost@redhat.com> wrote:
+> 
+> > On Fri, Jul 07, 2017 at 04:44:53PM +0200, Igor Mammedov wrote:
+> > [...]
+> > > > > taking in account that fwcfg in not user creatable device how about:
+> > > > > 
+> > > > > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> > > > > index 316fca9..8f6eef8 100644
+> > > > > --- a/hw/nvram/fw_cfg.c
+> > > > > +++ b/hw/nvram/fw_cfg.c
+> > > > > @@ -1014,7 +1014,10 @@ FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
+> > > > >  
+> > > > >  FWCfgState *fw_cfg_find(void)
+> > > > >  {
+> > > > > -    return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+> > > > > +    bool ambig = false;
+> > > > > +    FWCfgState *f = FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, &ambig));
+> > > > > +    assert(!ambig);
+> > > > > +    return f;
+> > > > >  }
+> > > > > 
+> > > > > or if we must to print user friendly error and fail realize gracefully
+> > > > > (not sure why) just add errp argument to function so it could report
+> > > > > error back to caller, then places that do not care much about graceful
+> > > > > exit would use error_abort as argument and realize would use
+> > > > > its local_error/errp argument.    
+> > > > 
+> > > > My understanding from the thread was that we should only use assert()s
+> > > > where there is no other choice so that any failures can be handled in a
+> > > > more friendly manner.  
+> > > the rule I use to decide assert vs nice error handling:
+> > > 1: try to avoid crash on hotplug path
+> > > 2: if error could be induced by end user on startup, try to print nice error
+> > >    before dying
+> > > 3: when error should not happen just assert or use error_abort
+> > >    which would print nice error message before dying.  
 > > 
-> > I'd also add test case for
-> >   object_resolve_path(..., NULL)  
-> 
-> They are added by patch 2/2, after the bug is fixed.
-> 
-> >   
-> > > +
-> > > +    object_unparent(obj1);
-> > > +    object_unparent(obj2a);
-> > > +    object_unparent(obj2b);  
-> > Are above unparenting is necessary?
-> >   
-> > > +    object_unparent(cont1);  
-> > Wouldn't parent destruction sufficient to trigger
-> > implicit destruction of children?  
-> 
-> Probably it is.  I will test it.
+> > I would add this to the list:
+> > 
+> > If returning error instead of aborting is easy, return an error
+> > and let the caller decide if it should use &error_abort or not.
+> agreed, there aren't that many callers of fw_cfg_find()
+> so I'd just add error argument to it and handle error at call sites.
 
-It would be better to avoid not necessary calls if it works,
-but either way:
+I was talking about realizefn, which already has a errp
+parameter.  IMO a errp parameter to fw_cfg_find() would be
+overkill.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+(And an assert(!ambiguous) would make fw_cfg_find() less useful
+because then it won't be usable by realizefn).
+
+-- 
+Eduardo
