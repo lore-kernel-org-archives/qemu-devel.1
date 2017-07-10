@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUZ73-0001gT-Aj
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:52:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUZ7b-0001yH-E4
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUZ72-00063e-8z
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:52:33 -0400
-Date: Mon, 10 Jul 2017 15:52:18 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170710135218.GK5772@noname.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dUZ7X-0006PU-9l
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:53:07 -0400
+Date: Mon, 10 Jul 2017 14:52:42 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170710135242.GC6770@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-6-git-send-email-pl@kamp.de>
-	<20170710132546.GG5772@noname.redhat.com>
-	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
-	<20170710133459.GI5772@noname.redhat.com>
-	<20170710134436.GB6770@redhat.com>
+	<1498733831-15254-4-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170710134436.GB6770@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+In-Reply-To: <1498733831-15254-4-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V2 3/8] block/qcow2: parse compress create
+ options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +25,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
 
-Am 10.07.2017 um 15:44 hat Daniel P. Berrange geschrieben:
-> On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
-> > Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
-> > > Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
-> > > >Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
-> > > >>we now read the extension on open and write it on update, but
-> > > >>do not yet use it.
-> > > >>
-> > > >>Signed-off-by: Peter Lieven <pl@kamp.de>
-> > > >>---
-> > > >>  block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
-> > > >>  block/qcow2.h |  23 +++++++++++---
-> > > >>  2 files changed, 104 insertions(+), 19 deletions(-)
-> > > >>
-> > > >>diff --git a/block/qcow2.c b/block/qcow2.c
-> > > >>index 308121a..39a8afc 100644
-> > > >>--- a/block/qcow2.c
-> > > >>+++ b/block/qcow2.c
-> > > >>@@ -63,6 +63,7 @@ typedef struct {
-> > > >>  #define  QCOW2_EXT_MAGIC_END 0
-> > > >>  #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
-> > > >>  #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
-> > > >>+#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
-> > > >>  static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
-> > > >>  {
-> > > >>@@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
-> > > >>          return 0;
-> > > >>  }
-> > > >>+static int qcow2_compress_format_from_name(char *fmt)
-> > > >>+{
-> > > >>+    if (!fmt || !fmt[0]) {
-> > > >>+        return QCOW2_COMPRESS_ZLIB_COMPAT;
-> > > >>+    } else if (g_str_equal(fmt, "zlib")) {
-> > > >>+        return QCOW2_COMPRESS_ZLIB;
-> > > >>+    } else {
-> > > >>+        return -EINVAL;
-> > > >>+    }
-> > > >>+}
-> > > >It might make sense to allow specifying the old compression format in
-> > > >the compression header. But I'm not so sure about using the empty string
-> > > >rather than a proper name for it, and even less about not documenting
-> > > >it.
-> > > 
-> > > The old format is used if and only if the compression header is absent.
-> > > It makes no sense to write a header and use the old format. The old
-> > > settings are suboptimal and old versions can't open a qcow2 with a
-> > > compression header anyway.
-> > 
-> > Your code allows an empty string in the header extension. If you don't
-> > want it there, you need to reject it.
+On Thu, Jun 29, 2017 at 12:57:06PM +0200, Peter Lieven wrote:
+> this adds parsing and validation for the compress create
+> options. They are only validated but not yet used.
 > 
-> This is a good reason to use the QAPI schema to parse the create options
-> instead of doing it using qemu_opts - the QAPI schema will generate correct
-> code to parse & validate enum values 
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  block/qcow2.c             | 56 +++++++++++++++++++++++++++++++++++++++++++++--
+>  block/qcow2.h             |  9 ++++++++
+>  include/block/block_int.h |  2 ++
+>  3 files changed, 65 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2f94f03..308121a 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2144,7 +2144,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+>                           const char *backing_file, const char *backing_format,
+>                           int flags, size_t cluster_size, PreallocMode prealloc,
+>                           QemuOpts *opts, int version, int refcount_order,
+> -                         Error **errp)
+> +                         const char *compress_format_name,
+> +                         uint8_t compress_level, Error **errp)
+>  {
+>      int cluster_bits;
+>      QDict *options;
+> @@ -2390,11 +2391,24 @@ out:
+>      return ret;
+>  }
+>  
+> +static int qcow2_compress_format_from_name(char *fmt)
+> +{
+> +    if (!fmt || !fmt[0]) {
+> +        return QCOW2_COMPRESS_ZLIB_COMPAT;
+> +    } else if (g_str_equal(fmt, "zlib")) {
+> +        return QCOW2_COMPRESS_ZLIB;
+> +    } else {
+> +        return -EINVAL;
+> +    }
+> +}
+> +
+>  static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+>  {
+>      char *backing_file = NULL;
+>      char *backing_fmt = NULL;
+>      char *buf = NULL;
+> +    char *compress_format_name = NULL;
+> +    uint64_t compress_level = 0;
+>      uint64_t size = 0;
+>      int flags = 0;
+>      size_t cluster_size = DEFAULT_CLUSTER_SIZE;
+> @@ -2475,15 +2489,40 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
+>  
+>      refcount_order = ctz32(refcount_bits);
+>  
+> +    compress_format_name = qemu_opt_get_del(opts,
+> +                                            BLOCK_OPT_COMPRESS_FORMAT);
+> +    ret = qcow2_compress_format_from_name(compress_format_name);
+> +    if (ret < 0) {
+> +        error_setg(errp, "Compress format '%s' is not supported",
+> +                   compress_format_name);
+> +        goto finish;
+> +    }
+> +    compress_level = qemu_opt_get_number_del(opts, BLOCK_OPT_COMPRESS_LEVEL,
+> +                                             compress_level);
+> +    if (ret == QCOW2_COMPRESS_ZLIB_COMPAT && compress_level > 0) {
+> +        error_setg(errp, "Compress level can only be defined in conjunction"
+> +                   " with compress format");
+> +        ret = -EINVAL;
+> +        goto finish;
+> +    }
+> +    if ((ret == QCOW2_COMPRESS_ZLIB && compress_level > 9) ||
+> +        compress_level > 0xff) {
+> +        error_setg(errp, "Compress level %" PRIu64 " is not supported for"
+> +                   " format '%s'", compress_level, compress_format_name);
+> +        ret = -EINVAL;
+> +        goto finish;
+> +    }
 
-I'd really like to see QAPI used for bdrv_create(), but here we're in
-the bdrv_open() path and parsing qcow2 headers. So either way this one
-specifically wouldn't be fixed.
+This is where the QAPI schema bits would fit in. eg instead of calling the
+various qemu_opts_get* functions, do something like this:
 
-Kevin
+    QDict *options, *compressopts = NULL;
+    Qcow2Compress *compress = NULL;
+
+    options = qemu_opts_to_qdict(opts, NULL);
+    qdict_extract_subqdict(options, &compressopts, "compress.");
+
+    v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
+    
+    visit_type_Qcow2Compress(v, &compress, &local_err);
+    if (local_err) {
+        ret= -EINVAL;
+	goto finish;
+    }
+
+
+    ..do whatever you need with the 'compress' object now...
+
+    visit_free(v);
+    QDECREF(encryptopts);
+    QDECREF(options);
+
+
+Eventually the entire of the qcow2 create codepath will be qemu opts based,
+so all the subdict/visitor steps will be able to go away, leaving you to
+just use the Qcow2Compress struct immediately.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
