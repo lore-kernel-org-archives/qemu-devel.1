@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUcPf-0004DW-41
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:24:00 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dUcdi-0008Aa-Ps
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:38:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUcPb-0006y9-Qe
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:23:59 -0400
-Received: from mail-he1eur01on0126.outbound.protection.outlook.com
-	([104.47.0.126]:32319
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
-	id 1dUcPa-0006ws-T0
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:23:55 -0400
-References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-	<0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <94284c08-ba36-73ba-88be-246ed5c84eb4@virtuozzo.com>
-Date: Mon, 10 Jul 2017 20:23:26 +0300
+	(envelope-from <ehabkost@redhat.com>) id 1dUcdf-0007NO-Lv
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:38:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33522)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUcdf-0007NA-Cf
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:38:27 -0400
+Date: Mon, 10 Jul 2017 14:38:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170710173821.GD5167@localhost.localdomain>
+References: <20170703113940.0e0415a2@nial.brq.redhat.com>
+	<0efc917e-16d3-f01b-6fd8-a3bb71580bf4@ilande.co.uk>
+	<20170707133320.2e0d741d@nial.brq.redhat.com>
+	<1b4f1872-2ea2-8c10-593f-e2adf013b234@ilande.co.uk>
+	<20170707164453.4ba325fd@nial.brq.redhat.com>
+	<20170707150707.GJ10776@localhost.localdomain>
+	<58f2d98e-ae7e-e2e7-e7f3-68e937b0b79f@ilande.co.uk>
+	<20170710100147.0a7339e4@nial.brq.redhat.com>
+	<20170710145331.GJ12152@localhost.localdomain>
+	<20170710172336.33c64f86@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170710172336.33c64f86@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCHv7 5/6] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, dgilbert@redhat.com, amit@kernel.org, pbonzini@redhat.com, den@openvz.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-On 10.07.2017 17:13, Laurent Vivier wrote:
-> On 07/07/2017 16:21, Pavel Butsykin wrote:
->> We should guarantee that RAM will not be modified while VM has a stopped
->> state, otherwise it can lead to negative consequences during post-copy
->> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
->> source side will not be modified as this could lead to non-consistent vm state
->> on the destination side. Also RAM access during postcopy-ram migration with
->> enabled release-ram capability can lead to sad consequences.
->>
->> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
->> in the guest memory.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->> ---
->>   hw/char/virtio-console.c          | 21 +++++++++++++++++++++
->>   hw/char/virtio-serial-bus.c       |  7 +++++++
->>   include/hw/virtio/virtio-serial.h |  3 +++
->>   3 files changed, 31 insertions(+)
->>
->> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
->> index 0cb1668c8a..b55905892e 100644
->> --- a/hw/char/virtio-console.c
->> +++ b/hw/char/virtio-console.c
->> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
->>       }
->>   }
->>   
->> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
->> +{
->> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
->> +
->> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
->> +        return;
->> +    }
->> +
->> +    if (enable) {
->> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
->> +
->> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
->> +                                 k->is_console ? NULL : chr_event,
->> +                                 vcon, NULL, false);
->> +    } else {
->> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
->> +                                 NULL, NULL, NULL, false);
->> +    }
->> +}
+On Mon, Jul 10, 2017 at 05:23:36PM +0200, Igor Mammedov wrote:
+> On Mon, 10 Jul 2017 11:53:31 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> I think you can also factorize the code in virtconsole_realize() to call
-> this new function.
-> 
->>   static void virtconsole_realize(DeviceState *dev, Error **errp)
->>   {
->>       VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
->> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
->>       k->unrealize = virtconsole_unrealize;
->>       k->have_data = flush_buf;
->>       k->set_guest_connected = set_guest_connected;
->> +    k->enable_backend = virtconsole_enable_backend;
-> 
-> Why don't you register a  vm_state change handler to change the state of
-> the virtconsole according to the state of the machine instead of adding
-> a new function in the VirtIOSerialPortClass?
-> 
-> See a23a6d1 ("virtio-rng: stop virtqueue while the CPU is stopped")
+> > On Mon, Jul 10, 2017 at 10:01:47AM +0200, Igor Mammedov wrote:
+> > > On Fri, 7 Jul 2017 17:20:25 +0100
+> > > Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+> > >   
+> > > > On 07/07/17 16:07, Eduardo Habkost wrote:
+> > > >   
+> > > > >> looks fine,
+> > > > >>
+> > > > >> so what I'd do is:
+> > > > >>  * drop 4/6    
+> > > > 
+> > > > Yes.
+> > > >   
+> > > > > Agreed on this point.  But:
+> > > > >     
+> > > > >>  * make fw_cfg_find() use ambiguous argument and error_abort if ambiguous == true    
+> > > > 
+> > > > During my latest tests I've found that everything works fine without the
+> > > > ambiguous argument.
+> > > > 
+> > > > Do we still want to keep it? And I don't think error_abort() is the
+> > > > right thing to do here, I'd much rather return NULL and add a suitable
+> > > > comment.  
+> > > I'd still use ambiguous argument and since you prefer not to assert
+> > > I'd add errp argument to fw_cfg_find() and handle error at callsites.
+> > > 
+> > > Just returning NULL isn't sufficient if you need to distinguish
+> > > 'not found' vs 'duplicate' usecases, additionally  'not found'
+> > > in most cases isn't even error but 'duplicate' definitely is.
+> > > 
+> > > Aborting on diplicate in fw_cfg_find() is fine and would
+> > > help to avoid touching current callers if you wish to limit
+> > > patches scope, but you can go with proper error propagating
+> > > route if you wish.  
+> > 
+> > Just making realize refuse to create two devices sounds much
+> > simpler to me.  No need to make fw_cfg_find() more complex (if we
+> > add errp argument to it) or less useful (if we add
+> > assert(!ambiguous) to it).
+> the problem here was a error message to print if fw_cfg_find()
+> returns NULL for missing or duplicate, if we need to print
+> precise error we would need proper error handling.
 
-I tried to follow the existing approach. Look at vhost_net or
-virtio-input. This is similar to the hierarchical structure, we have the
-root device which notifies the virtio devices at the levels above
-(virtio-device -> virtio-bus -> virtio_*_device ). It ensures the
-state of devices will be modified consistently, the first is a bus, then
-the device on that bus. I'm not sure that following this order during
-the device state changes is absolute necessity. But it looks nicer
-than the registration of notifications for each device.
+I don't see where we would need a precise error message, except
+for realizefn (where the only case fw_cfg_find() would return
+NULL is for duplicate devices).
 
-Although this is just a guess, I have no clear idea of how to do it
-right, so I'm waiting for comments :)
-
-> Thanks,
-> Laurent
 > 
+> Considering to fw_cfg is builtin device I'd prefer just
+> assert in fw_cfg_find() on duplicate (all the callers consider it as error)
+> and let developer to deal with assert if it is triggered.
+
+Except that it would make it more difficult for realizefn to
+return a proper error message.
+
+Anyway, I am not completely against adding assert(!ambiguous) to
+fw_cfg_find() if Mark wants to follow your advice.  I just think
+it's not necessary.  I will only continue discussing this if I
+see issues in the next version of the series.
+
+-- 
+Eduardo
