@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dUgVv-000777-Np
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:46:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUgYB-0007sH-VH
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dUgVu-0003B1-Vg
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:46:43 -0400
-References: <20170703151051.31327-1-eblake@redhat.com>
-	<20170703151051.31327-7-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ae073841-dda4-e15e-cc2b-cb88a221f83a@redhat.com>
-Date: Mon, 10 Jul 2017 17:46:29 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUgY7-0003mO-5m
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:49:04 -0400
+Received: from mail-wr0-f174.google.com ([209.85.128.174]:36504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUgY6-0003m1-VN
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 17:48:59 -0400
+Received: by mail-wr0-f174.google.com with SMTP id c11so156937456wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 14:48:58 -0700 (PDT)
+References: <D5741445-7EFD-4AF1-8DB2-E4AFA93CBB1A@icloud.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d2f285a7-4bba-5ece-f327-fc4c5e61296e@redhat.com>
+Date: Mon, 10 Jul 2017 23:48:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170703151051.31327-7-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <D5741445-7EFD-4AF1-8DB2-E4AFA93CBB1A@icloud.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 06/17] dirty-bitmap: Change
- bdrv_dirty_bitmap_*serialize*() to take bytes
+Subject: Re: [Qemu-devel] [PATCH] test-i386: Make x86 test program compile
+ on clang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +30,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Theodore Dubois <tblodt@icloud.com>, qemu-devel@nongnu.org
 
+On 10/07/2017 22:57, Theodore Dubois wrote:
+>   - Clang doesn't support size suffixes on the loop instructions.
 
+Has this bug been reported?
 
-On 07/03/2017 11:10 AM, Eric Blake wrote:
-> Right now, the dirty-bitmap code exposes the fact that we use
-> a scale of sector granularity in the underlying hbitmap to anything
-> that wants to serialize a dirty bitmap.  It's nicer to uniformly
-> expose bytes as our dirty-bitmap interface, matching the previous
-> change to bitmap size.  The only caller to serialization is currently
-> qcow2-cluster.c, which becomes a bit more verbose because it is still
-> tracking sectors for other reasons, but a later patch will fix that
-> to more uniformly use byte offsets everywhere.  Likewise, within
-> dirty-bitmap, we have to add more assertions that we are not
-> truncating incorrectly, which can go away once the internal hbitmap
-> is byte-based rather than sector-based.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+Paolo
