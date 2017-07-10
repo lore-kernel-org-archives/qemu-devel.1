@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUapW-00043R-EM
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:42:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUauj-00061N-0c
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:47:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUapV-0000OH-LD
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:42:34 -0400
-Date: Mon, 10 Jul 2017 16:42:20 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170710154220.GL14195@stefanha-x1.localdomain>
-References: <20170706163828.24082-1-pbonzini@redhat.com>
-	<20170706163828.24082-3-pbonzini@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dUauf-0003WS-RM
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:47:57 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dUauf-0003W7-Ie
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:47:53 -0400
+Received: by mail-wr0-x236.google.com with SMTP id 77so144029784wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 08:47:53 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 10 Jul 2017 16:47:44 +0100
+Message-Id: <20170710154749.13624-2-alex.bennee@linaro.org>
+In-Reply-To: <20170710154749.13624-1-alex.bennee@linaro.org>
+References: <20170710154749.13624-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="L1EIGrW/+75u5Nmw"
-Content-Disposition: inline
-In-Reply-To: <20170706163828.24082-3-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/11] block: make write-threshold
- thread-safe
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 1/6] include/exec/exec-all: document common
+ exit conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
+As a precursor to later patches attempt to come up with a more
+concrete wording for what each of the common exit cases would be.
 
---L1EIGrW/+75u5Nmw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+CC: Emilio G. Cota <cota@braap.org>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Lluís Vilanova <vilanova@ac.upc.edu>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/exec/exec-all.h | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-On Thu, Jul 06, 2017 at 06:38:19PM +0200, Paolo Bonzini wrote:
-> For simplicity, use bdrv_drained_begin/end to avoid concurrent
-> writes to the write threshold, or reading it while it is being set.
-> qmp_block_set_write_threshold is protected by the BQL.
-
-I find the commit message misleading: the write threshold code is not
-being made thread-safe.
-
-The commit description helps to clear this up, but we need to avoid
-thinking "write threshold is thread-safe" because that would lead to
-races between bdrv_write_threshold_set() callers.
-
-Perhaps:
-
-  block: protect write threshold qmp cmd from concurrent requests
-
-Anyway:
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---L1EIGrW/+75u5Nmw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZY6BcAAoJEJykq7OBq3PIRHIH/31kCxJaK/Bark8USxLBVjwU
-aa9I+eRAe01xtpJS6rwnGovajgOvFiPvXEnVp3g9osC3uaKFo/3xWhQAiCqNZ+lI
-XFeQKvHHYh1F6eUxAXkoTNJnp8X0izQDXXbeGD2XrcrNRqv7i/JzvAs1RBjpTzbk
-cERW05GIQ5z7qy9607hs+f9VMt5rq3CbylefyRcGCJm6FpVFxpY00kuBT91Zc2sY
-Yy2qKNr2vnCvzoyNAmfomOkVu+sFxE8aludz1C4sQAZbR3aPeSXkvcHfoZYLN2PJ
-yKTfZhVMSGExa2dtcr+Q9s6x3dpCEopPXO/yr/N8+M2owBAMepUb4K4VOSIQDYg=
-=KMnF
------END PGP SIGNATURE-----
-
---L1EIGrW/+75u5Nmw--
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 8096d64a1d..a23894f687 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -35,11 +35,34 @@ typedef abi_ulong tb_page_addr_t;
+ typedef ram_addr_t tb_page_addr_t;
+ #endif
+ 
+-/* is_jmp field values */
++/* DisasContext is_jmp field values
++ *
++ * is_jmp starts as DISAS_NEXT. The translator will keep processing
++ * instructions until an exit condition is reached. If we reach the
++ * exit condition and is_jmp is still DISAS_NEXT (because of some
++ * other condition) we simply "jump" to the next address.
++ * The remaining exit cases are:
++ *
++ *   DISAS_JUMP    - Only the PC was modified dynamically (e.g computed)
++ *   DISAS_TB_JUMP - Only the PC was modified statically (e.g. branch)
++ *
++ * In these cases as long as the PC is updated we can chain to the
++ * next TB either by exiting the loop or looking up the next TB via
++ * the loookup helper.
++ *
++ *   DISAS_UPDATE  - CPU State was modified dynamically
++ *
++ * This covers any other CPU state which necessities us exiting the
++ * TCG code to the main run-loop. Typically this includes anything
++ * that might change the interrupt state.
++ *
++ * Individual translators may define additional exit cases to deal
++ * with per-target special conditions.
++ */
+ #define DISAS_NEXT    0 /* next instruction can be analyzed */
+ #define DISAS_JUMP    1 /* only pc was modified dynamically */
+-#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
+-#define DISAS_TB_JUMP 3 /* only pc was modified statically */
++#define DISAS_TB_JUMP 2 /* only pc was modified statically */
++#define DISAS_UPDATE  3 /* cpu state was modified dynamically */
+ 
+ #include "qemu/log.h"
+ 
+-- 
+2.13.0
