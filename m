@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUb9K-0002Bm-5C
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:03:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUbD3-0005Tn-Rc
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:06:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUb9F-0004uP-Dn
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:03:02 -0400
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:35051)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUb9F-0004tx-7y
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:02:57 -0400
-Received: by mail-qk0-f193.google.com with SMTP id 16so13381084qkg.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 09:02:57 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1499677934-2249-1-git-send-email-jiang.biao2@zte.com.cn>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d6583a64-dbc4-f557-7688-b3d3081c382c@twiddle.net>
-Date: Mon, 10 Jul 2017 06:01:49 -1000
+	(envelope-from <pbonzini@redhat.com>) id 1dUbD2-00070P-WF
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:06:53 -0400
+References: <20170706163828.24082-1-pbonzini@redhat.com>
+	<20170706163828.24082-4-pbonzini@redhat.com>
+	<20170710155206.GN14195@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <10cf08ad-d751-71bd-a8fb-017c806584bc@redhat.com>
+Date: Mon, 10 Jul 2017 18:06:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <1499677934-2249-1-git-send-email-jiang.biao2@zte.com.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/mips: reserve a register for the
- guest_base.
+In-Reply-To: <20170710155206.GN14195@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1SCiXrIcSuvllwG03vM9flN89kfBGF8tp"
+Subject: Re: [Qemu-devel] [PATCH 03/11] util: use RCU accessors for notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiang Biao <jiang.biao2@zte.com.cn>, qemu-devel@nongnu.org
-Cc: jinguojie@loongson.cn, james.hogan@imgtec.com, jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, zhong.weidong@zte.com.cn
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-On 07/09/2017 11:12 PM, Jiang Biao wrote:
-> Reserve a register for the guest_base using ppc code for reference.
-> By doing so, we do not have to recompute it for every memory load.
-> 
-> Signed-off-by: Jiang Biao<jiang.biao2@zte.com.cn>
-> Signed-off-by: Richard Henderson<rth@twiddle.net>
-> ---
->   tcg/mips/tcg-target.inc.c | 17 +++++++++++++----
->   1 file changed, 13 insertions(+), 4 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1SCiXrIcSuvllwG03vM9flN89kfBGF8tp
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+Message-ID: <10cf08ad-d751-71bd-a8fb-017c806584bc@redhat.com>
+Subject: Re: [PATCH 03/11] util: use RCU accessors for notifiers
+References: <20170706163828.24082-1-pbonzini@redhat.com>
+ <20170706163828.24082-4-pbonzini@redhat.com>
+ <20170710155206.GN14195@stefanha-x1.localdomain>
+In-Reply-To: <20170710155206.GN14195@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-For future reference, you should not add a Signed-off-by for someone else. 
-That is like writing someone else's signature.
+On 10/07/2017 17:52, Stefan Hajnoczi wrote:
+> On Thu, Jul 06, 2017 at 06:38:20PM +0200, Paolo Bonzini wrote:
+>>  void notifier_list_notify(NotifierList *list, void *data)
+>>  {
+>>      Notifier *notifier, *next;
+>> =20
+>> -    QLIST_FOREACH_SAFE(notifier, &list->notifiers, node, next) {
+>> +    QLIST_FOREACH_SAFE_RCU(notifier, &list->notifiers, node, next) {
+>>          notifier->notify(notifier, data);
+>>      }
+>>  }
+>=20
+> Who calls rcu_read_lock() or is it unnecessary?
 
-You may acknowledge my suggestion with a Suggested-by tag.
+It depends.
 
-QEMU uses the same rules for this as does the linux kernel.  Please read
+If the notifier is really only used within the BQL, it's unnecessary.
 
-> https://github.com/torvalds/linux/blob/master/Documentation/process/submitting-patches.rst
+If the notifier's readers want to protect the notifier with RCU, it's up
+to the callers indeed.
 
-or at least section 11 from
+However, RCU accessors can also be used with any API that has the same
+contract as synchronize_rcu, i.e. it stops until all concurrent readers
+complete, no matter how "readers" are defined.
 
-> https://github.com/torvalds/linux/blob/master/Documentation/translations/zh_CN/SubmittingPatches
+In the next patch, for example, synchronize_rcu's role is taken by
+bdrv_drain (which is a superset of synchronize_rcu, since it also blocks
+new incoming readers).
 
-(The translation may be be out of date.  I don't see any of the other tags, 
-like Suggested-by, within the Chinese text.)
+For a similar example in Linux, see drivers/vhost/net.c.  It replaces
+rcu_read_lock/unlock with "always run readers for a workqueue", and
+synchronize_rcu with vhost_poll_flush (which calls vhost_work_flush).
 
-That said, applied to tcg-next.
+Paolo
 
 
-r~
+--1SCiXrIcSuvllwG03vM9flN89kfBGF8tp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlljpggACgkQv/vSX3jH
+roNsvQf+JJ5nAvLPQiifyoVMNbQODmniiKHcmIburpUzT93lIa62T0dwfumGnhBB
+ny5HjBU0L4Fp7awhrVek5FRmu8/2q/tnq5AGRyO7DnUkwnnKGAb9UUMPBi6Jg2K7
+Bi5/BoFtDlUgDA9FoHAKajnrBGY/od9G48IZ3XQ3ds32L2DxPOj5GMjrsxsE+c75
+I5DFmS1celWcoQX4G9rXKslz1y0ZAcmcrTMc8N/4iF10CTUzf5YgHMF2KSx+lbNM
+x2ON8R7htnJxpBtk2vvu0L22Q6KCsr0YUDGCsAxIiKrV8u+bKbVEIQf2brIWc0HB
+oEsJD+o7H56Ay5oZ2vgqUxqq5E/PrA==
+=FiYV
+-----END PGP SIGNATURE-----
+
+--1SCiXrIcSuvllwG03vM9flN89kfBGF8tp--
