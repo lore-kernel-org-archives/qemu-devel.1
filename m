@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dUX11-00044G-97
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:38:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dUX3h-0005O9-Vy
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dUX0x-0003q7-8w
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:38:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dUX0w-0003pb-VU
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:38:07 -0400
-Date: Mon, 10 Jul 2017 13:38:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170710133800.339857f2@dhcp-192-215.str.redhat.com>
-In-Reply-To: <946e7983-15ad-08fe-41c5-6913113a3cd3@redhat.com>
-References: <1499423224-23060-1-git-send-email-thuth@redhat.com>
-	<1499423224-23060-8-git-send-email-thuth@redhat.com>
-	<20170707143736.08062610@dhcp-192-215.str.redhat.com>
-	<946e7983-15ad-08fe-41c5-6913113a3cd3@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dUX3e-0006Bd-18
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:40:58 -0400
+Date: Mon, 10 Jul 2017 13:40:48 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170710114048.GC5772@noname.redhat.com>
+References: <1496857819-12466-1-git-send-email-kwolf@redhat.com>
+	<1496857819-12466-6-git-send-email-kwolf@redhat.com>
+	<CAFEAcA-zObhNAR7iuQZ0MH7-ng86m2XEik8bie3o4THEbLwcVA@mail.gmail.com>
+	<20170613164628.GG4383@noname.redhat.com>
+	<CAFEAcA-GcwUz0UMJE-chqewQ3X6=ZD6NygywF6w-3J7sG7QzbA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 7/8] pc-bios/s390-ccw: Add
- virtio-net driver code
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-GcwUz0UMJE-chqewQ3X6=ZD6NygywF6w-3J7sG7QzbA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 5/8] commit: Fix use after free in completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 10 Jul 2017 13:23:07 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 07.07.2017 14:37, Cornelia Huck wrote:
-> > On Fri,  7 Jul 2017 12:27:03 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> The driver provides the recv() and send() functions which will
-> >> be required by SLOF's libnet code for receiving and sending
-> >> packets.  
-> [...]
-> >> +int virtio_net_init(void *mac_addr)
-> >> +{
-> >> +    VDev *vdev = virtio_get_device();
-> >> +    VRing *rxvq = &vdev->vrings[VQ_RX];
-> >> +    void *buf;
-> >> +    int i;
-> >> +
-> >> +    virtio_setup_ccw(vdev);
-> >> +
-> >> +    memcpy(mac_addr, vdev->config.net.mac, ETH_ALEN);  
-> > 
-> > The mac address in the config space is only valid if the mac feature
-> > flag has been negotiated (although the field always exists).  
+Am 09.07.2017 um 19:09 hat Peter Maydell geschrieben:
+> On 13 June 2017 at 17:46, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 13.06.2017 um 18:12 hat Peter Maydell geschrieben:
+> >> On 7 June 2017 at 18:50, Kevin Wolf <kwolf@redhat.com> wrote:
+> >> > diff --git a/block/commit.c b/block/commit.c
+> >> > index a3028b2..af6fa68 100644
+> >> > --- a/block/commit.c
+> >> > +++ b/block/commit.c
+> >> > @@ -89,6 +89,10 @@ static void commit_complete(BlockJob *job, void *opaque)
+> >> >      int ret = data->ret;
+> >> >      bool remove_commit_top_bs = false;
+> >> >
+> >> > +    /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
+> >> > +    bdrv_ref(top);
+> >> > +    bdrv_ref(overlay_bs);
+> >> > +
+> >> >      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+> >> >       * the normal backing chain can be restored. */
+> >> >      blk_unref(s->base);
+> >>
+> >> Hi -- coverity complains about this change, because bdrv_ref()
+> >> assumes that its argument is not NULL, but later on in commit_complete()
+> >> we have a check
+> >>     "if (overlay_bs && ...)"
+> >> which assumes its argument might be NULL. (CID 1376205)
+> >>
+> >> Which is correct?
+> >
+> > I saw the Coverity report and am looking into it. It's not completely
+> > clear to me yet which is correct, but I suspect it can be NULL.
 > 
-> QEMU seems to always set it ... but yes, let's better negotiate
-> VIRTIO_NET_F_MAC here.
-
-Ah, feature negotiation in the bios, nice :)
-
+> Just a nudge on this one -- I don't think there's been a patch sent
+> to the list for this check-after-use ?
 > 
-> >> +
-> >> +    for (i = 0; i < 64; i++) {
-> >> +        buf = malloc(ETH_MTU_SIZE + sizeof(VirtioNetHdr));
-> >> +        IPL_assert(buf != NULL, "Can not allocate memory for receive buffers");
-> >> +        vring_send_buf(rxvq, buf, ETH_MTU_SIZE + sizeof(VirtioNetHdr),
-> >> +                       VRING_DESC_F_WRITE);
-> >> +    }
-> >> +    vring_notify(rxvq);
-> >> +
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +int send(int fd, const void *buf, int len, int flags)
-> >> +{
-> >> +    VirtioNetHdr tx_hdr;
-> >> +    VDev *vdev = virtio_get_device();
-> >> +    VRing *txvq = &vdev->vrings[VQ_TX];
-> >> +
-> >> +    /* Set up header - we do not use anything special, so simply clear it */
-> >> +    memset(&tx_hdr, 0, sizeof(tx_hdr));
-> >> +
-> >> +    vring_send_buf(txvq, &tx_hdr, sizeof(tx_hdr), VRING_DESC_F_NEXT);
-> >> +    vring_send_buf(txvq, (void *)buf, len, VRING_HIDDEN_IS_CHAIN);
-> >> +    while (!vr_poll(txvq)) {
-> >> +        yield();
-> >> +    }
-> >> +    if (drain_irqs(txvq->schid)) {
-> >> +        puts("send: drain irqs failed");
-> >> +        return -1;  
-> > 
-> > Does the caller try again later? drain_irqs() errors may be transient.  
-> 
-> Yes, the TFTP code retries to send packets after a certain amount of
-> time (since the packets could also be lost in the network somewhere).
+> (It's one of just 7 coverity issues left which haven't had at least
+> a patch sent to the list now...)
 
-Sounds good. (Not that I expect many errors in drain_irqs()...)
+As far as I can tell, this can't currently be triggered. I intended to
+fix it with some work on the commit block job that I need to do anyway,
+and which would potentially enable a way to trigger it. But it turned
+out that this is a bit more complicated than I thought.
+
+So maybe I'd better just post a very small patch that silences Coverity
+(without making a practical difference) until I can finish the real
+thing.
+
+Kevin
