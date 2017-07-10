@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUaCA-00082M-TC
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:01:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUaF3-0000bR-TY
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:04:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUaCA-0006m2-8r
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:01:54 -0400
-Date: Mon, 10 Jul 2017 16:01:42 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170710150142.GJ14195@stefanha-x1.localdomain>
-References: <20170705133635.11850-1-famz@redhat.com>
-	<20170705133635.11850-7-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="P6YfpwaDcfcOCJkJ"
-Content-Disposition: inline
-In-Reply-To: <20170705133635.11850-7-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] block: Move NVMe spec definitions
- to a separate header
+	(envelope-from <eblake@redhat.com>) id 1dUaF0-00086C-OI
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:04:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dUaF0-00085p-FO
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:04:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A78A769E0
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 15:04:49 +0000 (UTC)
+Received: from red.redhat.com (ovpn-121-60.rdu2.redhat.com [10.10.121.60])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E458E7D50C
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 15:04:48 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 10 Jul 2017 10:04:29 -0500
+Message-Id: <20170710150440.11303-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL v2 00/11] NBD patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Karl Rister <krister@redhat.com>
+To: qemu-devel@nongnu.org
 
+The following changes since commit 94c56652b9079cfb9d560a6dde7ecb15eb9ef9c7:
 
---P6YfpwaDcfcOCJkJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-07-10 14:06:49 +0100)
 
-On Wed, Jul 05, 2017 at 09:36:35PM +0800, Fam Zheng wrote:
-> diff --git a/block/nvme.h b/block/nvme.h
-> new file mode 100644
-> index 0000000..ed18091
-> --- /dev/null
-> +++ b/block/nvme.h
-> @@ -0,0 +1,700 @@
-> +#ifndef BLOCK_NVME_H
-> +#define BLOC_NVMEK_H
+are available in the git repository at:
 
-s/BLOC_NVMEK_H/BLOCK_NVME_H/
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-07-10-v2
 
---P6YfpwaDcfcOCJkJ
-Content-Type: application/pgp-signature; name="signature.asc"
+for you to fetch changes up to 9588463e747706ffbaf6f4600b5efea2779bc26f:
 
------BEGIN PGP SIGNATURE-----
+  nbd: use generic trace subsystem instead of TRACE macro (2017-07-10 09:57:24 -0500)
 
-iQEcBAEBAgAGBQJZY5bWAAoJEJykq7OBq3PIk6MH/irnWhOGh1/2CUYE1NNyXsJz
-d60+RKfZPYDdZk1AtxFeDA127snqok3XiO64MhJbID2dAy0UofFgBVgWGCxq0+Qo
-C9T20oUKJw3BhYWQnB6bPmZHpqTr9ZjrPcCkxkH2ti1Yv9yjXrdfO4lZZA9zQiOR
-s3Xsy9z2E2UwC6P+lrYMTtavOSn6Bc3ijyrD8jpIc+yLBROxiRH+9QfW328Lz3yX
-Psh2qzuQYlq4H9qnAkAbxVSeacp6JXdCryqZD+4nXuI44b2FyHe1KtvDwlEzvjxy
-YacbhFRu9RJrK8QAtnr+6mBIyJvanaLntqp555eDsQxOmKTEaAqoLuvo1tnFYv0=
-=IW6a
------END PGP SIGNATURE-----
+----------------------------------------------------------------
+nbd patches for 2017-07-10
 
---P6YfpwaDcfcOCJkJ--
+- Eric Blake: MAINTAINERS: Promote NBD to supported, with new maintainer
+- Vladimir Sementsov-Ogievskiy: [00/10] nbd refactoring part 2
+
+----------------------------------------------------------------
+
+v2: fixed cover letter, drop Paolo's unused T: in MAINTAINERS
+[only sending the modified patch]
+
+Eric Blake (1):
+      MAINTAINERS: Promote NBD to supported, with new maintainer
+
+Vladimir Sementsov-Ogievskiy (10):
+      nbd/server: nbd_negotiate: return 1 on NBD_OPT_ABORT
+      nbd/server: refactor nbd_negotiate
+      nbd/server: use errp instead of LOG
+      nbd/server: add errp to nbd_send_reply()
+      nbd/common: nbd_tls_handshake: remove extra TRACE
+      nbd/client: refactor TRACE of NBD_MAGIC
+      nbd/server: fix TRACE in nbd_negotiate_send_rep_len
+      nbd/server: rename clientflags var in nbd_negotiate_options
+      nbd: refactor tracing
+      nbd: use generic trace subsystem instead of TRACE macro
+
+ nbd/nbd-internal.h |  19 ---
+ nbd/client.c       |  81 +++++------
+ nbd/common.c       |   4 +-
+ nbd/server.c       | 401 +++++++++++++++++++++++++++++------------------------
+ MAINTAINERS        |  21 +--
+ Makefile.objs      |   1 +
+ nbd/trace-events   |  56 ++++++++
+ 7 files changed, 323 insertions(+), 260 deletions(-)
+ create mode 100644 nbd/trace-events
+
+Eric Blake (1):
+  MAINTAINERS: Promote NBD to supported, with new maintainer
+
+Vladimir Sementsov-Ogievskiy (10):
+  nbd/server: nbd_negotiate: return 1 on NBD_OPT_ABORT
+  nbd/server: refactor nbd_negotiate
+  nbd/server: use errp instead of LOG
+  nbd/server: add errp to nbd_send_reply()
+  nbd/common: nbd_tls_handshake: remove extra TRACE
+  nbd/client: refactor TRACE of NBD_MAGIC
+  nbd/server: fix TRACE in nbd_negotiate_send_rep_len
+  nbd/server: rename clientflags var in nbd_negotiate_options
+  nbd: refactor tracing
+  nbd: use generic trace subsystem instead of TRACE macro
+
+ nbd/nbd-internal.h |  19 ---
+ nbd/client.c       |  81 +++++------
+ nbd/common.c       |   4 +-
+ nbd/server.c       | 401 +++++++++++++++++++++++++++++------------------------
+ MAINTAINERS        |  21 +--
+ Makefile.objs      |   1 +
+ nbd/trace-events   |  56 ++++++++
+ 7 files changed, 323 insertions(+), 260 deletions(-)
+ create mode 100644 nbd/trace-events
+
+-- 
+2.9.4
