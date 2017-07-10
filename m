@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dUi66-0006ak-Kr
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 19:28:11 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dUiKF-0003gs-Ss
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 19:42:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dUi65-0004RS-TN
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 19:28:10 -0400
-References: <1486979689-230770-1-git-send-email-vsementsov@virtuozzo.com>
-	<1486979689-230770-13-git-send-email-vsementsov@virtuozzo.com>
-	<20170216130409.GA28784@lemon.lan>
-	<d94f4e26-0979-f530-6a88-9ee655843d68@virtuozzo.com>
-	<15ffeebf-075d-f540-ac82-0513f367b37b@redhat.com>
-	<66e7f481-06f4-2a7e-77fb-1a5c9fc1f301@virtuozzo.com>
-	<255b6c77-48e4-217d-f1da-d2544db5b646@redhat.com>
-	<53adc05a-03a5-6621-8be1-026003938162@virtuozzo.com>
-	<12de589a-5349-b974-3e3b-b2213d84d742@redhat.com>
-	<05b4f069-34f5-e35f-9ba1-ee108b685e38@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3222d144-0b65-cb66-c4b9-b3f10dbb2bda@redhat.com>
-Date: Mon, 10 Jul 2017 19:27:56 -0400
-MIME-Version: 1.0
-In-Reply-To: <05b4f069-34f5-e35f-9ba1-ee108b685e38@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/17] migration: add postcopy migration of
- dirty bitmaps
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dUiKC-0003dI-Qa
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 19:42:47 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:36190)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dUiKB-0003XC-V9
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 19:42:44 -0400
+Date: Tue, 11 Jul 2017 07:42:31 +0800 (CST)
+Message-ID: <201707110742311381804@zte.com.cn>
+References: 1499677934-2249-1-git-send-email-jiang.biao2@zte.com.cn,
+	d6583a64-dbc4-f557-7688-b3d3081c382c@twiddle.net
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIXSB0Y2cvbWlwczog?=
+ =?utf-8?q?reserve_a_register_for_the_guest=5Fbase=2E?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
+To: rth@twiddle.net
+Cc: qemu-devel@nongnu.org, jinguojie@loongson.cn, james.hogan@imgtec.com, jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, zhong.weidong@zte.com.cn
 
-
-
-On 07/10/2017 05:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> Can we document this somehow?
-> 
-> In this terminology, what happens with frozen bitmap (which in fact is 
-> like "active" for the user) on successful backup finish? It turns into a 
-> difference between current-state and what-was-backed-up? It is not very 
-> transparent.. May be bitmap part, related to the backup is substituted 
-> from the bitmap?
-> 
-> // it's hard for me to believe that 'frozen' doesn't mean 'can not 
-> move', but if it is already established idea then ok.
-
-Admittedly a mistake on my part, mixing up implementation detail and 
-exposed interface. It's not necessarily an established idea...
-
-To the end-user, a bitmap that is "frozen" is still indeed recording new 
-writes from a certain point of view, because once the backup completes, 
-the bitmap (secretly: the promoted successor) will contain writes that 
-occurred during that frozen period of time. How could this happen unless 
-our "frozen" bitmap was recording writes?
-
-Oops, that's not very frozen at all, is it.
-
-That's an unfortunate bit of design that I didn't take into account when 
-I named the "Frozen" property and exposed it via the JSON API. I was 
-only thinking about it from the implementation point of view, like you 
-are -- the bitmap _is_ well and truly frozen: it cannot be modified and 
-does not record any writes. (Only the successor does, as you know.)
-
-So as it stands we have a discrepancy in the code between internal and 
-external usage over what exactly "frozen" implies. It's a poor name.
-
-I should have named the QAPI-facing portion of it "locked" or 
-"protected" or something that helped imply that it could continue to 
-change, but it was off-limits.
+PiBPbiAwNy8wOS8yMDE3IDExOjEyIFBNLCBKaWFuZyBCaWFvIHdyb3RlOg0KPiA+IFJlc2VydmUg
+YSByZWdpc3RlciBmb3IgdGhlIGd1ZXN0X2Jhc2UgdXNpbmcgcHBjIGNvZGUgZm9yIHJlZmVyZW5j
+ZS4NCj4gPiBCeSBkb2luZyBzbywgd2UgZG8gbm90IGhhdmUgdG8gcmVjb21wdXRlIGl0IGZvciBl
+dmVyeSBtZW1vcnkgbG9hZC4NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBKaWFuZyBCaWFvPGpp
+YW5nLmJpYW8yQHp0ZS5jb20uY24+DQo+ID4gU2lnbmVkLW9mZi1ieTogUmljaGFyZCBIZW5kZXJz
+b248cnRoQHR3aWRkbGUubmV0Pg0KPiA+IC0tLQ0KPiA+ICAgdGNnL21pcHMvdGNnLXRhcmdldC5p
+bmMuYyB8IDE3ICsrKysrKysrKysrKystLS0tDQo+ID4gICAxIGZpbGUgY2hhbmdlZCwgMTMgaW5z
+ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IEZvciBmdXR1cmUgcmVmZXJlbmNlLCB5
+b3Ugc2hvdWxkIG5vdCBhZGQgYSBTaWduZWQtb2ZmLWJ5IGZvciBzb21lb25lIGVsc2UuIA0KPiBU
+aGF0IGlzIGxpa2Ugd3JpdGluZyBzb21lb25lIGVsc2UncyBzaWduYXR1cmUuDQo+IA0KPiBZb3Ug
+bWF5IGFja25vd2xlZGdlIG15IHN1Z2dlc3Rpb24gd2l0aCBhIFN1Z2dlc3RlZC1ieSB0YWcuDQo+
+IA0KPiBRRU1VIHVzZXMgdGhlIHNhbWUgcnVsZXMgZm9yIHRoaXMgYXMgZG9lcyB0aGUgbGludXgg
+a2VybmVsLiAgUGxlYXNlIHJlYWQNCj4gDQo+ID4gaHR0cHM6Ly9naXRodWIuY29tL3RvcnZhbGRz
+L2xpbnV4L2Jsb2IvbWFzdGVyL0RvY3VtZW50YXRpb24vcHJvY2Vzcy9zdWJtaXR0aW5nLXBhdGNo
+ZXMucnN0DQo+IA0KPiBvciBhdCBsZWFzdCBzZWN0aW9uIDExIGZyb20NCj4gDQo+PiBodHRwczov
+L2dpdGh1Yi5jb20vdG9ydmFsZHMvbGludXgvYmxvYi9tYXN0ZXIvRG9jdW1lbnRhdGlvbi90cmFu
+c2xhdGlvbnMvemhfQ04vU3VibWl0dGluZ1BhdGNoZXMNCg0KPiAoVGhlIHRyYW5zbGF0aW9uIG1h
+eSBiZSBiZSBvdXQgb2YgZGF0ZS4gIEkgZG9uJ3Qgc2VlIGFueSBvZiB0aGUgb3RoZXIgdGFncywg
+DQo+IGxpa2UgU3VnZ2VzdGVkLWJ5LCB3aXRoaW4gdGhlIENoaW5lc2UgdGV4dC4pDQo+IA0KPiBU
+aGF0IHNhaWQsIGFwcGxpZWQgdG8gdGNnLW5leHQuDQpHb3QgdGhhdDotKS4gVGhhbmtzIGZvciB5
+b3VyIGFkdmljZS4=
