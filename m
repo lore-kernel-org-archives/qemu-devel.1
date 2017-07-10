@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUZ8v-0002ii-7z
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:54:30 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUZAI-0003om-Uo
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUZ8u-00073y-Aj
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:54:29 -0400
-References: <1499678755-5633-1-git-send-email-gengdongjiu@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <df74267a-3f6f-b6f5-432f-40f8c04ab1f1@redhat.com>
-Date: Mon, 10 Jul 2017 08:54:07 -0500
+	(envelope-from <berrange@redhat.com>) id 1dUZAH-0007bU-Cw
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:55:55 -0400
+Date: Mon, 10 Jul 2017 14:55:39 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170710135539.GD6770@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1498733831-15254-1-git-send-email-pl@kamp.de>
+	<1498733831-15254-6-git-send-email-pl@kamp.de>
+	<20170710132546.GG5772@noname.redhat.com>
+	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
+	<20170710133459.GI5772@noname.redhat.com>
+	<20170710134436.GB6770@redhat.com>
+	<20170710135218.GK5772@noname.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1499678755-5633-1-git-send-email-gengdongjiu@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nSRXmSWLuCdkvscAGtpPira2xBW0Wgg3L"
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] ACPI: Add new ACPI structures and
- macros
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170710135218.GK5772@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
+ compress format extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>, lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhihui.gao@huawei.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nSRXmSWLuCdkvscAGtpPira2xBW0Wgg3L
-From: Eric Blake <eblake@redhat.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>, lersek@redhat.com, mst@redhat.com,
- imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
- zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com,
- zhihui.gao@huawei.com
-Message-ID: <df74267a-3f6f-b6f5-432f-40f8c04ab1f1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] ACPI: Add new ACPI structures and
- macros
-References: <1499678755-5633-1-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1499678755-5633-1-git-send-email-gengdongjiu@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jul 10, 2017 at 03:52:18PM +0200, Kevin Wolf wrote:
+> Am 10.07.2017 um 15:44 hat Daniel P. Berrange geschrieben:
+> > On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
+> > > Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
+> > > > Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
+> > > > >Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
+> > > > >>we now read the extension on open and write it on update, but
+> > > > >>do not yet use it.
+> > > > >>
+> > > > >>Signed-off-by: Peter Lieven <pl@kamp.de>
+> > > > >>---
+> > > > >>  block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
+> > > > >>  block/qcow2.h |  23 +++++++++++---
+> > > > >>  2 files changed, 104 insertions(+), 19 deletions(-)
+> > > > >>
+> > > > >>diff --git a/block/qcow2.c b/block/qcow2.c
+> > > > >>index 308121a..39a8afc 100644
+> > > > >>--- a/block/qcow2.c
+> > > > >>+++ b/block/qcow2.c
+> > > > >>@@ -63,6 +63,7 @@ typedef struct {
+> > > > >>  #define  QCOW2_EXT_MAGIC_END 0
+> > > > >>  #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
+> > > > >>  #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
+> > > > >>+#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
+> > > > >>  static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+> > > > >>  {
+> > > > >>@@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+> > > > >>          return 0;
+> > > > >>  }
+> > > > >>+static int qcow2_compress_format_from_name(char *fmt)
+> > > > >>+{
+> > > > >>+    if (!fmt || !fmt[0]) {
+> > > > >>+        return QCOW2_COMPRESS_ZLIB_COMPAT;
+> > > > >>+    } else if (g_str_equal(fmt, "zlib")) {
+> > > > >>+        return QCOW2_COMPRESS_ZLIB;
+> > > > >>+    } else {
+> > > > >>+        return -EINVAL;
+> > > > >>+    }
+> > > > >>+}
+> > > > >It might make sense to allow specifying the old compression format in
+> > > > >the compression header. But I'm not so sure about using the empty string
+> > > > >rather than a proper name for it, and even less about not documenting
+> > > > >it.
+> > > > 
+> > > > The old format is used if and only if the compression header is absent.
+> > > > It makes no sense to write a header and use the old format. The old
+> > > > settings are suboptimal and old versions can't open a qcow2 with a
+> > > > compression header anyway.
+> > > 
+> > > Your code allows an empty string in the header extension. If you don't
+> > > want it there, you need to reject it.
+> > 
+> > This is a good reason to use the QAPI schema to parse the create options
+> > instead of doing it using qemu_opts - the QAPI schema will generate correct
+> > code to parse & validate enum values 
+> 
+> I'd really like to see QAPI used for bdrv_create(), but here we're in
+> the bdrv_open() path and parsing qcow2 headers. So either way this one
+> specifically wouldn't be fixed.
 
-On 07/10/2017 04:25 AM, Dongjiu Geng wrote:
-> (1) Add related APEI/HEST table structures and  macros, these
->     definition refer to ACPI 6.1 and UEFI 2.6 spec.
+Sorry, yes, I was getting mixed up in the two different patches with
+similar bits of code.
 
-Your mail is missing In-Reply-To: and References: headers, which makes
-it appear as a new top-level thread for each patch.  You'll want to
-figure out why you didn't properly link back to your 0/3 cover letter
-with Message-ID: <1499678736-5244-1-git-send-email-gengdongjiu@huawei.com=
->
+We could still replace the qcow2_compress_format_from_name() method
+though with a call to the qapi_enum_parse() passing in the
+'QcowCompressFormat_lookup' table.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---nSRXmSWLuCdkvscAGtpPira2xBW0Wgg3L
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZY4b/AAoJEKeha0olJ0NqWPIH/2JbCVFv1B+pecf/vB2+xpoU
-/zckPX5LTHmCqyy9Q6ygPLuBZvwNZAS0c8vOxOQzM2a/lRVrU5gd1edik8QZctUH
-PGN7yulnpA0TpdB7XwV5WjjRJ5OqizGvso1wSsBED9hTtmpr5BcN4lcm4KsqQlxK
-vrHk08en3vxysN60+lgxE/EmnNEMlpp3IOzpWOzVokskBpVGvsjFIym5UzXgfJB8
-XW6QqmcYomVKvUjd6VOALjJqIqCvV88Ip/2qjJtasN56aYv8+OCvGbMBPHwrAa9s
-1qYu2VHUKgL6EQtPPidLwokWNDtLNboF2izi2dbG9fu8k1aNtWg37pk9bDoCnTY=
-=z3js
------END PGP SIGNATURE-----
-
---nSRXmSWLuCdkvscAGtpPira2xBW0Wgg3L--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
