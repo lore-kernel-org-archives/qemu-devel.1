@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUafg-0004ZI-Bt
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1dUag6-0004rW-Jc
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUaff-0002An-BL
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:24 -0400
-References: <20170710150559.30163-1-den@openvz.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0d456c94-180c-089a-8379-e50e4482901a@redhat.com>
-Date: Mon, 10 Jul 2017 10:32:05 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170710150559.30163-1-den@openvz.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I"
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] block: fix shadowed variable in
- bdrv_co_pdiscard
+	(envelope-from <thuth@redhat.com>) id 1dUag5-0002Tr-0e
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45556)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dUag4-0002Sk-OE
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:48 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 10 Jul 2017 17:32:31 +0200
+Message-Id: <1499700760-4777-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1499700760-4777-1-git-send-email-thuth@redhat.com>
+References: <1499700760-4777-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/10] pc-bios/s390-ccw: Move libc functions
+ to separate header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +24,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I
-From: Eric Blake <eblake@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <0d456c94-180c-089a-8379-e50e4482901a@redhat.com>
-Subject: Re: [PATCH v2 1/1] block: fix shadowed variable in bdrv_co_pdiscard
-References: <20170710150559.30163-1-den@openvz.org>
-In-Reply-To: <20170710150559.30163-1-den@openvz.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The upcoming netboot code will use the libc from SLOF. To be able
+to still use s390-ccw.h there, the libc related functions in this
+header have to be moved to a different location.
+And while we're at it, remove the duplicate memcpy() function from
+sclp.c.
 
-On 07/10/2017 10:05 AM, Denis V. Lunev wrote:
-> We've had a shadowed 'ret' variable, which risks returning the wrong
-> value, introduced in commit b9c64947.
->=20
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> ---
->  block/io.c | 1 -
->  1 file changed, 1 deletion(-)
->=20
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/bootmap.c     |  1 +
+ pc-bios/s390-ccw/libc.h        | 45 ++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/main.c        |  1 +
+ pc-bios/s390-ccw/s390-ccw.h    | 29 ---------------------------
+ pc-bios/s390-ccw/sclp.c        | 10 ++--------
+ pc-bios/s390-ccw/virtio-scsi.c |  1 +
+ pc-bios/s390-ccw/virtio.c      |  1 +
+ 7 files changed, 51 insertions(+), 37 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/libc.h
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/block/io.c b/block/io.c
-> index 23170a57ee..87208990c4 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2327,7 +2327,6 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverStat=
-e *bs, int64_t offset,
->      assert(max_pdiscard >=3D bs->bl.request_alignment);
-> =20
->      while (bytes > 0) {
-> -        int ret;
->          int num =3D bytes;
-> =20
->          if (head) {
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZY532AAoJEKeha0olJ0NqAGwH/0/wJDmUUYKx4G8NXzloaTeA
-KqzcpcVlISTU5bZxueFMPi5k+5el9vd370lwXD10UFgJ73A41bpjuz5AufFLT5HV
-2d2EdAoTaWg9cH0GbUR0TLPU6pQRTbd9Cyq00ZU8PEO+zu+7ZVjtt6SSL/MXFuyL
-OKvQiw5tsC8ClszpiYAXUBwF7Kwtdi/cxlVtA+T/+oUctwRTjCWt5V8exjSrGYuH
-AS0vmPjnCLK9w/TplIEuqtKKzrhmHVmwzdu4HGyvxtFPZ4lHZToUv5Pcf7gqT+hq
-XgQ64OCIYEJQo0K7QlDMDbpC0Qw6nWoLumKfVyOfZZkOUL9irLnTrrDsB+rtmto=
-=jiUi
------END PGP SIGNATURE-----
-
---wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I--
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 523fa78..458d3da 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "bootmap.h"
+ #include "virtio.h"
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+new file mode 100644
+index 0000000..6397d67
+--- /dev/null
++++ b/pc-bios/s390-ccw/libc.h
+@@ -0,0 +1,45 @@
++/*
++ * libc-style definitions and functions
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
++
++#ifndef S390_CCW_LIBC_H
++#define S390_CCW_LIBC_H
++
++typedef long               size_t;
++typedef int                bool;
++typedef unsigned char      uint8_t;
++typedef unsigned short     uint16_t;
++typedef unsigned int       uint32_t;
++typedef unsigned long long uint64_t;
++
++static inline void *memset(void *s, int c, size_t n)
++{
++    int i;
++    unsigned char *p = s;
++
++    for (i = 0; i < n; i++) {
++        p[i] = c;
++    }
++
++    return s;
++}
++
++static inline void *memcpy(void *s1, const void *s2, size_t len)
++{
++    uint8_t *dest = s1;
++    const uint8_t *src = s2;
++    int i;
++
++    for (i = 0; i < len; i++) {
++        dest[i] = src[i];
++    }
++
++    return s1;
++}
++
++#endif
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 1cacc1b..40cba8d 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ 
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 2089274..43e2d42 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -18,12 +18,6 @@ typedef unsigned short     u16;
+ typedef unsigned int       u32;
+ typedef unsigned long long u64;
+ typedef unsigned long      ulong;
+-typedef long               size_t;
+-typedef int                bool;
+-typedef unsigned char      uint8_t;
+-typedef unsigned short     uint16_t;
+-typedef unsigned int       uint32_t;
+-typedef unsigned long long uint64_t;
+ typedef unsigned char      __u8;
+ typedef unsigned short     __u16;
+ typedef unsigned int       __u32;
+@@ -88,18 +82,6 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
+ 
+-static inline void *memset(void *s, int c, size_t n)
+-{
+-    int i;
+-    unsigned char *p = s;
+-
+-    for (i = 0; i < n; i++) {
+-        p[i] = c;
+-    }
+-
+-    return s;
+-}
+-
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
+@@ -169,17 +151,6 @@ static inline void sleep(unsigned int seconds)
+     }
+ }
+ 
+-static inline void *memcpy(void *s1, const void *s2, size_t n)
+-{
+-    uint8_t *p1 = s1;
+-    const uint8_t *p2 = s2;
+-
+-    while (n--) {
+-        p1[n] = p2[n];
+-    }
+-    return s1;
+-}
+-
+ static inline void IPL_assert(bool term, const char *message)
+ {
+     if (!term) {
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index a1639ba..aa1c862 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "sclp.h"
+ 
+@@ -59,13 +60,6 @@ static int _strlen(const char *str)
+     return i;
+ }
+ 
+-static void _memcpy(char *dest, const char *src, int len)
+-{
+-    int i;
+-    for (i = 0; i < len; i++)
+-        dest[i] = src[i];
+-}
+-
+ void sclp_print(const char *str)
+ {
+     int len = _strlen(str);
+@@ -76,7 +70,7 @@ void sclp_print(const char *str)
+     sccb->ebh.length = sizeof(EventBufferHeader) + len;
+     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
+     sccb->ebh.flags = 0;
+-    _memcpy(sccb->data, str, len);
++    memcpy(sccb->data, str, len);
+ 
+     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+ }
+diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+index f61ecf0..c92f5d3 100644
+--- a/pc-bios/s390-ccw/virtio-scsi.c
++++ b/pc-bios/s390-ccw/virtio-scsi.c
+@@ -9,6 +9,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "scsi.h"
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index 6ee93d5..8768331 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "virtio-scsi.h"
+-- 
+1.8.3.1
