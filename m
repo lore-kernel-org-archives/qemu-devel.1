@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dUTL7-0003Zs-EL
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:42:42 -0400
+	(envelope-from <famz@redhat.com>) id 1dUTP2-0004Tk-2D
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dUTL2-0001pb-Gm
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:42:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33270)
+	(envelope-from <famz@redhat.com>) id 1dUTOy-0003V6-58
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:46:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dUTL2-0001pS-6t
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:42:36 -0400
-References: <1499237876.3041.4.camel@linux.intel.com>
-	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
-	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
-	<20170707133949.GH10776@localhost.localdomain>
-	<20170707181642-mutt-send-email-mst@kernel.org>
-	<20170707180358.GA12152@localhost.localdomain>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
-Date: Mon, 10 Jul 2017 10:42:26 +0300
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dUTOx-0003Us-UZ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:46:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 86EC1267C9
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 07:46:38 +0000 (UTC)
+Date: Mon, 10 Jul 2017 15:46:33 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170710074633.GA8951@lemon.lan>
+References: <20170710072027.7948-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707180358.GA12152@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170710072027.7948-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/5] Introduce "-object iothread-group"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 07/07/2017 21:03, Eduardo Habkost wrote:
-> On Fri, Jul 07, 2017 at 06:17:57PM +0300, Michael S. Tsirkin wrote:
->> On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
->>> On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
->>>> On 05/07/2017 11:14, Thomas Huth wrote:
->>>>>    Hi,
->>>>>
->>>>
->>>> Hi,
->>>>
->>>>> On 05.07.2017 08:57, Chao Peng wrote:
->>>>>>
->>>>>> Q35 has been in QEMU for quite a while. Compared to the current default
->>>>>> i440FX, Q35 is probably not that mature and not widely used, however in
->>>>>> some case, Q35 has advantages, for example, in supporting new features.
->>>>>> For instance, we have some features require PCI-e support which is only
->>>>>> available on Q35 and some others need it for EFI support. It is of
->>>>>> course not necessary to change it as the default but if more and more
->>>>>> features have dependencies on Q35 because of requiring much more modern
->>>>>> features then I think it may be worth to do so. In such case we can have
->>>>>> more people to use it and find problems we may know or not know.
->>>>>
->>>>
->>>> Agreed
->>>>
->>>>> Yes, IMHO at one point in time, we should switch the default machine
->>>>> type to q35.
->>>>
->>>> +1
->>>>
->>>>> The i440FX is really quite old...
->>>>>
->>>>>> There are certainly some drawbacks:
->>>>>> -        Compatibility: current code or script may need adjustment
->>>>>
->>>>> That might be a real concern ...
->>>>
->>>> I am not so sure about that. Developers working on upstream projects
->>>> should expect such changes and, for our case,
->>>> modifying the command line by adding "-M pc" should not be a big deal.
->>>
->>> We could print a warning for 1 or 2 releases when users don't add
->>> a explicit "-M pc" or "-M q35" argument to qemu-system-x86_64,
->>> but:
->>>
-
-Hi Eduardo,
-
->>>>
->>>> The upper layers should manage the defaults by themselves so
->>>> are not supposed to be affected.
->>>
->>> But they would be.  libvirt uses the default machine-type from
->>> QEMU.
->>
->> How about extending the command for supported machines with a
->> recommended machine type, and teaching libvirt to use that?
+On Mon, 07/10 15:20, Fam Zheng wrote:
+> Last time we've looked at "-object iothread,spawns=N" but it was a bit abusive.
+> A dedicated "iothread-group" class is cleaner from the interface point of view.
+> This series does that.
 > 
-> I don't think QEMU has enough information to decide if it should
-> recommend "q35" or "pc".
-
-We don't really need a complicated rule set, we would just recommend q35
-by default. Libvirt will try to create the default machine and if fails
-for some reason (what would it be?) it can switch to PC.
-
-The advanced logic would be "old systems should use PC", where old
-means Windows XP and before and so on. But this logic should appear
-in management layers above.
-
-Thanks,
-Marcel
-
-
-
-
+> It has the same set of poll parameters as the existing "iothread" object, plus
+> a "size" option to specify how many threads to start. Using iothread-group
+> doesn't require the user to explicitly create the contained IOThreads. The
+> IOThreads are created by the group object.
 > 
+> Internally, IOThreads share one AioContext.  This is to make it easier to adapt
+> this to the current data plane code (see the last patch). But it is an
+> implementation detail, and will change depending on the block layer multiqueue
+> needs.
+
+I forgot to mention that the last patch depends on
+
+    [PATCH v3 00/20] qdev: Introduce DEFINE_PROP_LINK
+
+Fam
