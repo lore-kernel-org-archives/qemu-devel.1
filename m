@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUYEG-00063x-CC
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:55:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1dUYFO-0006e2-5q
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUYEC-0002KT-UV
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:55:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60558)
+	(envelope-from <armbru@redhat.com>) id 1dUYFL-0003hq-2L
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:57:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dUYEC-0002K6-Oa
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:55:52 -0400
-Date: Mon, 10 Jul 2017 13:55:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170710125543.GA16073@work-vm>
-References: <1499242883-2184-1-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dUYFK-0003hZ-Oq
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:57:02 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1499453787.git.alistair.francis@xilinx.com>
+	<96f42a10eea7c311f6a50391042c373ffb4247d1.1499453788.git.alistair.francis@xilinx.com>
+Date: Mon, 10 Jul 2017 14:56:59 +0200
+In-Reply-To: <96f42a10eea7c311f6a50391042c373ffb4247d1.1499453788.git.alistair.francis@xilinx.com>
+	(Alistair Francis's message of "Fri, 7 Jul 2017 16:21:02 -0700")
+Message-ID: <87inj030x0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499242883-2184-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] migration: fix iotest 055,
- only-migratable break
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] error: Functions to report warnings
+ and informational messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +28,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, haoqf@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net
 
-* Peter Xu (peterx@redhat.com) wrote:
+Alistair Francis <alistair.francis@xilinx.com> writes:
+
+> Add warn_report(), warn_vreport() for reporting warnings, and
+> info_report(), info_vreport() for informational messages.
+>
+> These are implemented them with a helper function factored out of
+> error_vreport(), suitably generalized. This patch makes no changes
+> to the output of the original error_report() function.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
 > v2:
-> - patch 1: add r-b for Eduardo/Juan
-> - patch 2: add r-b for Eduardo (Markus's suggestion is a todo), and
->   t-b for Qingfeng
-> - patch 3: rewrite the doc up, merging both Eduardo/Markus's
->   suggestion [Eduardo, Markus]
-> - patch 4: added a TODO [Markus]
-> 
-> Two breakage introduced during the migration objectify series: one for
-> --only-migratable, another one for iotest 055.
-> 
-> First two patches fixes the breakages. Latter two are documentation
-> updates suggested by Eduardo. Please review. Thanks.
+>  - Don't add *vreport() functions to checkpatch
+>  - Maintain original comments for the reporting functions
+>  - Don't change the error report output in this patch
+> v1:
+>  - Don't expose the generic report and vreport() functions
+>  - Prefix error messages
+>  - Use vreport instead of qmsg_vreport()
+> RFC V3:
+>  - Change the function and enum names to be more descriptive
+>  - Add wrapper functions for *_report() and *_vreport()
+>
+>  include/qemu/error-report.h |  7 ++++
+>  scripts/checkpatch.pl       |  5 ++-
+>  util/qemu-error.c           | 97 ++++++++++++++++++++++++++++++++++++++++++---
+>  3 files changed, 102 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+> index 3001865896..e1c8ae1a52 100644
+> --- a/include/qemu/error-report.h
+> +++ b/include/qemu/error-report.h
+> @@ -35,8 +35,15 @@ void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>  void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+>  void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>  void error_set_progname(const char *argv0);
+> +
+>  void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +void warn_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +void info_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+> +
+>  void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> +void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> +void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> +
+>  const char *error_get_progname(void);
+>  extern bool enable_timestamp_msg;
+>  
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 73efc927a9..b76fe30ad3 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2534,8 +2534,9 @@ sub process {
+>  				error_set|
+>  				error_prepend|
+>  				error_reportf_err|
+> -				error_vreport|
+> -				error_report}x;
+> +				error_report|
+> +				warn_report|
+> +				info_report}x;
 
-Queued (with commit message tweak from Eduardo in 3)
+This check is about newlines in format strings.  Both the FOO_report()
+and the FOO_vreport() take format strings.  Therefore, keep
+error_vreport() and add warn_vreport(), info_vreport().
 
-Dave
+>  
+>  	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
+>  		ERROR("Error messages should not contain newlines\n" . $herecurr);
+> diff --git a/util/qemu-error.c b/util/qemu-error.c
+> index 1c5e35ecdb..b555247e24 100644
+> --- a/util/qemu-error.c
+> +++ b/util/qemu-error.c
+> @@ -14,6 +14,16 @@
+>  #include "monitor/monitor.h"
+>  #include "qemu/error-report.h"
+>  
+> +/*
+> + * @report_type is the type of message: error, warning or
+> + * informational.
+> + */
+> +typedef enum {
+> +    REPORT_TYPE_ERROR,
+> +    REPORT_TYPE_WARNING,
+> +    REPORT_TYPE_INFO,
+> +} report_type;
+> +
+>  void error_printf(const char *fmt, ...)
+>  {
+>      va_list ap;
+> @@ -179,17 +189,28 @@ static void print_loc(void)
+>  
+>  bool enable_timestamp_msg;
+>  /*
+> - * Print an error message to current monitor if we have one, else to stderr.
+> + * Print a message to current monitor if we have one, else to stderr.
 
-> Peter Xu (4):
->   migration: fix handling for --only-migratable
->   vl: move global property, migrate init earlier
->   doc: add item for "-M enforce-config-section"
->   doc: update TYPE_MIGRATION documents
-> 
->  include/migration/misc.h |  1 -
->  migration/migration.c    | 17 ++++++-----------
->  qemu-options.hx          | 11 +++++++++++
->  vl.c                     | 26 +++++++++++++-------------
->  4 files changed, 30 insertions(+), 25 deletions(-)
-> 
-> -- 
-> 2.7.4
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Need a sentence on @report_type right here.  Perhaps
+
+    * @report_type is the type of message: error, warning or
+    * informational.
+
+>   * Format arguments like vsprintf().  The resulting message should be
+>   * a single phrase, with no newline or trailing punctuation.
+>   * Prepend the current location and append a newline.
+>   * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+>   */
+> -void error_vreport(const char *fmt, va_list ap)
+> +static void vreport(report_type type, const char *fmt, va_list ap)
+>  {
+>      GTimeVal tv;
+>      gchar *timestr;
+>  
+> +    switch (type) {
+> +    case REPORT_TYPE_ERROR:
+> +        break;
+> +    case REPORT_TYPE_WARNING:
+> +        error_printf("warning: ");
+> +        break;
+> +    case REPORT_TYPE_INFO:
+> +        error_printf("info: ");
+> +        break;
+> +    }
+> +
+>      if (enable_timestamp_msg && !cur_mon) {
+>          g_get_current_time(&tv);
+>          timestr = g_time_val_to_iso8601(&tv);
+> @@ -204,8 +225,41 @@ void error_vreport(const char *fmt, va_list ap)
+>  
+>  /*
+>   * Print an error message to current monitor if we have one, else to stderr.
+> - * Format arguments like sprintf().  The resulting message should be a
+> - * single phrase, with no newline or trailing punctuation.
+> + * Format arguments like vsprintf().  The resulting message should be
+> + * a single phrase, with no newline or trailing punctuation.
+> + * Prepend the current location and append a newline.
+> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+> + */
+> +void error_vreport(const char *fmt, va_list ap)
+> +{
+> +    vreport(REPORT_TYPE_ERROR, fmt, ap);
+> +}
+> +
+> +/*
+> + * Print a warning message to current monitor if we have one, else to stderr.
+> + */
+
+You missed one :)
+
+> +void warn_vreport(const char *fmt, va_list ap)
+> +{
+> +    vreport(REPORT_TYPE_WARNING, fmt, ap);
+> +}
+> +
+> +/*
+> + * Print an information message to current monitor if we have one, else to
+> + * stderr.
+> + * Format arguments like vsprintf().  The resulting message should be
+> + * a single phrase, with no newline or trailing punctuation.
+> + * Prepend the current location and append a newline.
+> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+> + */
+> +void info_vreport(const char *fmt, va_list ap)
+> +{
+> +    vreport(REPORT_TYPE_INFO, fmt, ap);
+> +}
+> +
+> +/*
+> + * Print an error message to current monitor if we have one, else to stderr.
+> + * Format arguments like vsprintf().  The resulting message should be
+
+like sprintf()
+
+> + * a single phrase, with no newline or trailing punctuation.
+>   * Prepend the current location and append a newline.
+>   * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+>   */
+   void error_report(const char *fmt, ...)
+> @@ -214,6 +268,39 @@ void error_report(const char *fmt, ...)
+>      va_list ap;
+>  
+>      va_start(ap, fmt);
+> -    error_vreport(fmt, ap);
+> +    vreport(REPORT_TYPE_ERROR, fmt, ap);
+> +    va_end(ap);
+> +}
+> +
+> +/*
+> + * Print a warning message to current monitor if we have one, else to stderr.
+> + * Format arguments like sprintf(). The resulting message should be a
+> + * single phrase, with no newline or trailing punctuation.
+> + * Prepend the current location and append a newline.
+> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+> + */
+> +void warn_report(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +
+> +    va_start(ap, fmt);
+> +    vreport(REPORT_TYPE_WARNING, fmt, ap);
+> +    va_end(ap);
+> +}
+> +
+> +/*
+> + * Print an information message to current monitor if we have one, else to
+> + * stderr.
+> + * Format arguments like sprintf(). The resulting message should be a
+> + * single phrase, with no newline or trailing punctuation.
+> + * Prepend the current location and append a newline.
+> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+> + */
+> +void info_report(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +
+> +    va_start(ap, fmt);
+> +    vreport(REPORT_TYPE_INFO, fmt, ap);
+>      va_end(ap);
+>  }
+
+With these nits touched up:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
