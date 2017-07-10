@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dUTDx-0006xH-BF
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:35:18 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUTEh-0007PZ-A1
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dUTDs-000711-DI
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:35:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dUTDs-00070V-3V
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:35:12 -0400
-References: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1499413442-5053-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f0b5fca6-172d-d75b-7ade-2906601ed6ee@redhat.com>
-Date: Mon, 10 Jul 2017 10:35:03 +0300
+	(envelope-from <rth7680@gmail.com>) id 1dUTEc-0007Ui-Iz
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:03 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUTEc-0007UG-CA
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:35:58 -0400
+Received: by mail-pf0-x244.google.com with SMTP id c24so13381587pfe.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:35:58 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Sun,  9 Jul 2017 21:34:58 -1000
+Message-Id: <20170710073501.5207-3-rth@twiddle.net>
+In-Reply-To: <20170710073501.5207-1-rth@twiddle.net>
+References: <20170710073501.5207-1-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1499413442-5053-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/3] pci: add reserved slot check to
- do_pci_register_device()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 2/5] tcg/aarch64: Use ADRP+ADD to compute target
+ address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +30,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 07/07/2017 10:44, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   hw/pci/pci.c |   21 ++++++++++++++++++---
->   1 file changed, 18 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 239161e..9dece2a 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -961,6 +961,15 @@ static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
->       }
->   }
->  
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-Hi Mark,
+We use ADRP+ADD to compute the target address for goto_tb. This patch
+introduces the NOP instruction which is used to align the above
+instruction pair so that we can use one atomic instruction to patch
+the destination offsets.
 
+CC: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+Message-Id: <20170630143614.31059-2-bobby.prani@gmail.com>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ accel/tcg/translate-all.c    |  2 +-
+ tcg/aarch64/tcg-target.inc.c | 36 ++++++++++++++++++++++++++++++------
+ 2 files changed, 31 insertions(+), 7 deletions(-)
 
-> +static bool pci_bus_devfn_reserved(PCIBus *bus, int devfn)
-> +{
-> +    if (bus->dev_reserved_mask & (1UL << PCI_SLOT(devfn))) {
-
-Looking at this code maybe we should rename the field to
-"slot_mask"? Only a suggestion.
-
-> +        return true;
-> +    } else {
-> +        return false;
-> +    }
-> +}
-> + >   /* -1 for devfn means auto assign */
->   static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->                                            const char *name, int devfn,
-> @@ -984,14 +993,20 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->       if (devfn < 0) {
->           for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
->               devfn += PCI_FUNC_MAX) {
-> -            if (pci_bus_devfn_available(bus, devfn)) {
-> +            if (pci_bus_devfn_available(bus, devfn) &&
-> +                   !pci_bus_devfn_reserved(bus, devfn)) {
->                   goto found;
->               }
->           }
-> -        error_setg(errp, "PCI: no slot/function available for %s, all in use",
-> -                   name);
-> +        error_setg(errp, "PCI: no slot/function available for %s, all in use "
-> +                   "or reserved", name);
-
-I wouldn't combine slot available/reserved, maybe check for reserved
-before "available"?
-
->           return NULL;
->       found: ;
-> +    } else if (pci_bus_devfn_reserved(bus, devfn)) {
-> +        error_setg(errp, "PCI: slot %d function %d not available for %s,"
-> +                   " reserved",
-> +                   PCI_SLOT(devfn), PCI_FUNC(devfn), name);
-> +        return NULL;
->       } else if (!pci_bus_devfn_available(bus, devfn)) {
->           error_setg(errp, "PCI: slot %d function %d not available for %s,"
->                      " in use by %s",
-> 
-
-Thanks for the patches!
-Marcel
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index dfb9f0d..0caf80d 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -504,7 +504,7 @@ static inline PageDesc *page_find(tb_page_addr_t index)
+ #elif defined(__powerpc__)
+ # define MAX_CODE_GEN_BUFFER_SIZE  (32u * 1024 * 1024)
+ #elif defined(__aarch64__)
+-# define MAX_CODE_GEN_BUFFER_SIZE  (128ul * 1024 * 1024)
++# define MAX_CODE_GEN_BUFFER_SIZE  (2ul * 1024 * 1024 * 1024)
+ #elif defined(__s390x__)
+   /* We have a +- 4GB range on the branches; leave some slop.  */
+ # define MAX_CODE_GEN_BUFFER_SIZE  (3ul * 1024 * 1024 * 1024)
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 8fce11a..a84422d 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -372,6 +372,7 @@ typedef enum {
+     I3510_EON       = 0x4a200000,
+     I3510_ANDS      = 0x6a000000,
+ 
++    NOP             = 0xd503201f,
+     /* System instructions.  */
+     DMB_ISH         = 0xd50338bf,
+     DMB_LD          = 0x00000100,
+@@ -865,11 +866,27 @@ static inline void tcg_out_call(TCGContext *s, tcg_insn_unit *target)
+ 
+ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
+ {
+-    tcg_insn_unit *code_ptr = (tcg_insn_unit *)jmp_addr;
+-    tcg_insn_unit *target = (tcg_insn_unit *)addr;
++    tcg_insn_unit i1, i2;
++    TCGType rt = TCG_TYPE_I64;
++    TCGReg  rd = TCG_REG_TMP;
++    uint64_t pair;
+ 
+-    reloc_pc26_atomic(code_ptr, target);
+-    flush_icache_range(jmp_addr, jmp_addr + 4);
++    ptrdiff_t offset = addr - jmp_addr;
++
++    if (offset == sextract64(offset, 0, 26)) {
++        i1 = I3206_B | ((offset >> 2) & 0x3ffffff);
++        i2 = NOP;
++    } else {
++        offset = (addr >> 12) - (jmp_addr >> 12);
++
++        /* patch ADRP */
++        i1 = I3406_ADRP | (offset & 3) << 29 | (offset & 0x1ffffc) << (5 - 2) | rd;
++        /* patch ADDI */
++        i2 = I3401_ADDI | rt << 31 | (addr & 0xfff) << 10 | rd << 5 | rd;
++    }
++    pair = (uint64_t)i2 << 32 | i1;
++    atomic_set((uint64_t *)jmp_addr, pair);
++    flush_icache_range(jmp_addr, jmp_addr + 8);
+ }
+ 
+ static inline void tcg_out_goto_label(TCGContext *s, TCGLabel *l)
+@@ -1388,10 +1405,17 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+ #endif
+         /* consistency for USE_DIRECT_JUMP */
+         tcg_debug_assert(s->tb_jmp_insn_offset != NULL);
++        /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
++           write can be used to patch the target address. */
++        if ((uintptr_t)s->code_ptr & 7) {
++            tcg_out32(s, NOP);
++        }
+         s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
+         /* actual branch destination will be patched by
+-           aarch64_tb_set_jmp_target later, beware retranslation. */
+-        tcg_out_goto_noaddr(s);
++           aarch64_tb_set_jmp_target later. */
++        tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
++        tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
++        tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+         break;
+ 
+-- 
+2.9.4
