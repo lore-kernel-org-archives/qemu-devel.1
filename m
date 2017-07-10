@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUago-0005R6-SZ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:35 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dUapW-00043R-EM
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUago-0003V6-2y
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUagn-0003UW-T5
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:34 -0400
-Date: Mon, 10 Jul 2017 12:33:31 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170710153331.GC5167@localhost.localdomain>
-References: <20170707213052.13087-1-ehabkost@redhat.com>
-	<20170707213052.13087-2-ehabkost@redhat.com>
-	<20170710101041.553a792a@nial.brq.redhat.com>
-	<20170710144557.GH12152@localhost.localdomain>
+	(envelope-from <stefanha@redhat.com>) id 1dUapV-0000OH-LD
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:42:34 -0400
+Date: Mon, 10 Jul 2017 16:42:20 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170710154220.GL14195@stefanha-x1.localdomain>
+References: <20170706163828.24082-1-pbonzini@redhat.com>
+	<20170706163828.24082-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="L1EIGrW/+75u5Nmw"
 Content-Disposition: inline
-In-Reply-To: <20170710144557.GH12152@localhost.localdomain>
-Subject: [Qemu-devel] [PATCH] fixup! qom: Fix ambiguous path detection when
- ambiguous=NULL
+In-Reply-To: <20170706163828.24082-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/11] block: make write-threshold
+ thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-On Mon, Jul 10, 2017 at 11:45:57AM -0300, Eduardo Habkost wrote:
-> On Mon, Jul 10, 2017 at 10:10:41AM +0200, Igor Mammedov wrote:
-> > On Fri,  7 Jul 2017 18:30:51 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-[...]
-> > > +
-> > > +    object_unparent(obj1);
-> > > +    object_unparent(obj2a);
-> > > +    object_unparent(obj2b);
-> > Are above unparenting is necessary?
-> > 
-> > > +    object_unparent(cont1);
-> > Wouldn't parent destruction sufficient to trigger
-> > implicit destruction of children?
-> 
-> Probably it is.  I will test it.
 
-The obj1 and obj2a object_unparent() calls are really
-unnecessary.  object_unparent(obj2b) is still necessary because
-it is attached direcly to root.
+--L1EIGrW/+75u5Nmw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- tests/check-qom-proplist.c | 2 --
- 1 file changed, 2 deletions(-)
+On Thu, Jul 06, 2017 at 06:38:19PM +0200, Paolo Bonzini wrote:
+> For simplicity, use bdrv_drained_begin/end to avoid concurrent
+> writes to the write threshold, or reading it while it is being set.
+> qmp_block_set_write_threshold is protected by the BQL.
 
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index 381532c..432b665 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -605,8 +605,6 @@ static void test_qom_partial_path(void)
-     g_assert(!ambiguous);
-     g_assert(object_resolve_path("obj1", NULL) == obj1);
- 
--    object_unparent(obj1);
--    object_unparent(obj2a);
-     object_unparent(obj2b);
-     object_unparent(cont1);
- }
--- 
-2.9.4
+I find the commit message misleading: the write threshold code is not
+being made thread-safe.
 
--- 
-Eduardo
+The commit description helps to clear this up, but we need to avoid
+thinking "write threshold is thread-safe" because that would lead to
+races between bdrv_write_threshold_set() callers.
+
+Perhaps:
+
+  block: protect write threshold qmp cmd from concurrent requests
+
+Anyway:
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--L1EIGrW/+75u5Nmw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZY6BcAAoJEJykq7OBq3PIRHIH/31kCxJaK/Bark8USxLBVjwU
+aa9I+eRAe01xtpJS6rwnGovajgOvFiPvXEnVp3g9osC3uaKFo/3xWhQAiCqNZ+lI
+XFeQKvHHYh1F6eUxAXkoTNJnp8X0izQDXXbeGD2XrcrNRqv7i/JzvAs1RBjpTzbk
+cERW05GIQ5z7qy9607hs+f9VMt5rq3CbylefyRcGCJm6FpVFxpY00kuBT91Zc2sY
+Yy2qKNr2vnCvzoyNAmfomOkVu+sFxE8aludz1C4sQAZbR3aPeSXkvcHfoZYLN2PJ
+yKTfZhVMSGExa2dtcr+Q9s6x3dpCEopPXO/yr/N8+M2owBAMepUb4K4VOSIQDYg=
+=KMnF
+-----END PGP SIGNATURE-----
+
+--L1EIGrW/+75u5Nmw--
