@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUcmh-0002Kd-Ho
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:47:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dUdLE-0001CK-Ky
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUcmc-0002Yn-MF
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:47:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58078)
+	(envelope-from <ehabkost@redhat.com>) id 1dUdLB-000104-EY
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:23:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUcmc-0002YR-C2
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:47:42 -0400
-Date: Mon, 10 Jul 2017 14:47:30 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUdLB-0000zT-8P
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 14:23:25 -0400
+Date: Mon, 10 Jul 2017 15:23:22 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170710174730.GL12152@localhost.localdomain>
-References: <1499237876.3041.4.camel@linux.intel.com>
-	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
-	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
-	<20170707133949.GH10776@localhost.localdomain>
-	<20170707181642-mutt-send-email-mst@kernel.org>
-	<20170707180358.GA12152@localhost.localdomain>
-	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
-	<20170710135943.GG12152@localhost.localdomain>
-	<20170710194345-mutt-send-email-mst@kernel.org>
+Message-ID: <20170710182322.GE5167@localhost.localdomain>
+References: <20170707213052.13087-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170710194345-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+In-Reply-To: <20170707213052.13087-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] qom: Fix ambiguous path detection when
+ ambiguous=NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>, libvir-list@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>
 
-(CCing libvir-list)
-
-On Mon, Jul 10, 2017 at 07:45:54PM +0300, Michael S. Tsirkin wrote:
-> On Mon, Jul 10, 2017 at 10:59:43AM -0300, Eduardo Habkost wrote:
-> > On Mon, Jul 10, 2017 at 10:42:26AM +0300, Marcel Apfelbaum wrote:
-> > > On 07/07/2017 21:03, Eduardo Habkost wrote:
-> > > > On Fri, Jul 07, 2017 at 06:17:57PM +0300, Michael S. Tsirkin wrote:
-> > > > > On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
-> > > > > > On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
-> > [...]
-> > > > > > > 
-> > > > > > > The upper layers should manage the defaults by themselves so
-> > > > > > > are not supposed to be affected.
-> > > > > > 
-> > > > > > But they would be.  libvirt uses the default machine-type from
-> > > > > > QEMU.
-> > > > > 
-> > > > > How about extending the command for supported machines with a
-> > > > > recommended machine type, and teaching libvirt to use that?
-> > > > 
-> > > > I don't think QEMU has enough information to decide if it should
-> > > > recommend "q35" or "pc".
-> > > 
-> > > We don't really need a complicated rule set, we would just recommend q35
-> > > by default. Libvirt will try to create the default machine and if fails
-> > > for some reason (what would it be?) it can switch to PC.
-> > > 
-> > > The advanced logic would be "old systems should use PC", where old
-> > > means Windows XP and before and so on. But this logic should appear
-> > > in management layers above.
-> > 
-> > In this case, is there any difference between "changing the
-> > default to q35" and "recommending q35", for libvirt users?
-> > 
-> > -- 
-> > Eduardo
+On Fri, Jul 07, 2017 at 06:30:50PM -0300, Eduardo Habkost wrote:
+> object_resolve_path*() ambiguous path detection breaks when
+> ambiguous==NULL and the object tree have 3 objects of the same type and
+> only 2 of them are under the same parent.  e.g.:
 > 
-> No but libvirt users do not manage e.g. pci slots manually.
-> They do not use the -cdrom flag.
-> Etc.
-> So changing the default is unlikely to break things for them.
+>  /container/obj1 (TYPE_FOO)
+>  /container/obj2 (TYPE_FOO)
+>  /obj2 (TYPE_FOO)
 > 
+> With the above tree, object_resolve_path_type("", TYPE_FOO, NULL) will
+> incorrectly return /obj2, because the search inside "/container" will
+> return NULL, and the match at "/obj2" won't be detected as ambiguous.
+> 
+> Fix that by always calling object_resolve_partial_path() with a non-NULL
+> ambiguous parameter.
+> 
+> Test case included.
+> 
+> Reported-by: Igor Mammedov <imammedo@redhat.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> Eduardo Habkost (2):
+>   tests: Test case for object_resolve_path*()
 
-I see.  If this part is really true (can libvirt developers
-confirm that?), then the proposed end result makes sense (not
-having a default for running QEMU directly, but changing default
-to "q35" for people using libvirt).
+I'm queueing patch 1/2 on my machine-next tree.  I will wait a
+little longer for additional feedback on patch 2/2 before merging
+it.
 
-But I don't see why we would need a new mechanism to make QEMU
-recommend a machine-type for libvirt, if libvirt could simply
-choose its own default (or maybe also refuse to pick a default,
-if libvirt developers decide that's the best solution).
-
-
-> People not using libvirt use some or all of this
-> and other such functionality,
-> and changing the default might break things for them.
+>   qom: Fix ambiguous path detection when ambiguous=NULL
+> 
+>  qom/object.c               | 17 ++++++++---------
+>  tests/check-qom-proplist.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 52 insertions(+), 9 deletions(-)
+> 
+> -- 
+> 2.9.4
+> 
+> 
 
 -- 
 Eduardo
