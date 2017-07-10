@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUb4i-0006VI-F7
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:58:17 -0400
+	(envelope-from <cota@braap.org>) id 1dUb6c-0008GV-IJ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:00:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUb4h-0001nv-MJ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:58:16 -0400
-Date: Mon, 10 Jul 2017 16:58:08 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170710155808.GQ14195@stefanha-x1.localdomain>
-References: <20170706163828.24082-1-pbonzini@redhat.com>
-	<20170706163828.24082-8-pbonzini@redhat.com>
+	(envelope-from <cota@braap.org>) id 1dUb6X-0002wU-NF
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:00:14 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56651)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUb6X-0002w0-Ha
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:00:09 -0400
+Date: Mon, 10 Jul 2017 12:00:08 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170710160008.GB1216@flamenco>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-18-git-send-email-cota@braap.org>
+	<7e81eceb-2a5e-b5cf-6385-4aff70ecc1b2@twiddle.net>
+	<20170709211423.GD32582@flamenco>
+	<fe6e3d5b-3856-5c6b-301b-1334cf673434@twiddle.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="UJEqbsikIZBgizPR"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170706163828.24082-8-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/11] block: do not acquire AioContext in
- check_to_replace_node
+In-Reply-To: <fe6e3d5b-3856-5c6b-301b-1334cf673434@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 17/22] tcg: distribute profiling counters
+ across TCGContext's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
+On Sun, Jul 09, 2017 at 11:44:10 -1000, Richard Henderson wrote:
+> On 07/09/2017 11:14 AM, Emilio G. Cota wrote:
+> >On Sun, Jul 09, 2017 at 10:45:55 -1000, Richard Henderson wrote:
+> >>On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
+> >>>+    /* includes aborted translations because of exceptions */
+> >>>+    atomic_set(&prof->tb_count1, prof->tb_count1 + 1);
+> >>
+> >>Again, atomic_set without atomic_read is pointless.
+> >>Either you're trying to give the compiler extra information, or you aren't.
+> >
+> >See my comment to patch 3.
+> 
+> I still disagree.  It's Just Plain Confusing.
 
---UJEqbsikIZBgizPR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+To me,
+  atomic_set(&foo, foo + 1)
+and
+  atomic_set(&foo, atomic_read(&foo) + 1)
+read differently.
 
-On Thu, Jul 06, 2017 at 06:38:24PM +0200, Paolo Bonzini wrote:
-> The only caller does it already.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block.c | 13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
+The former tells me that no other thread can update the value.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The latter makes me presume that other threads *can* update the value,
+which makes me wonder whether this is a bug and we should use atomic_inc(),
+or perhaps we are OK with missing counts.
 
---UJEqbsikIZBgizPR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZY6QQAAoJEJykq7OBq3PIU9MH/2Q+AlWhs1tXkWIdcF6QYsRF
-LQZKusCDFDJX5mtH738JQ/r5F/95J/99lnCLvUrRjGG3ruGELPZLEJzilvybeizQ
-KY+FBib9eeMOUE90rg1q4dfQP8LIdQIDfQAQN6T9rPqTqF9nPFWGMLUh0LQTYqb/
-OheNwY/49Hmqu4DO18QH3e8WgOk5yWoHAhAcXpL+quBeE6K6bHWdPmKJy87wyTjG
-/ckbfTG25SVhwMxw+KrZNwhEdpYe7JGN8t+TxNun/wLqR3ihzI3aCNNHjTUTZQiN
-f+blLvRChw2/0vU4aqIFqdLb4Dwd9EcEZC7jDILLQmdvY8YOG/HqJOvTuHIRZ/c=
-=dD/X
------END PGP SIGNATURE-----
-
---UJEqbsikIZBgizPR--
+		Emilio
