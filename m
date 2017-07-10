@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUbYM-0007dt-Fp
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:28:55 -0400
+	(envelope-from <prvs=357b4a82f=anthony.perard@citrix.com>)
+	id 1dUbZO-0008RR-JZ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUbYL-0000Xd-Mp
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:28:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44994)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUbYL-0000XF-HE
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:28:53 -0400
+	(envelope-from <prvs=357b4a82f=anthony.perard@citrix.com>)
+	id 1dUbZK-0000wG-Rh
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:29:58 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:36870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=357b4a82f=anthony.perard@citrix.com>)
+	id 1dUbZK-0000vz-GZ
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:29:54 -0400
+Date: Mon, 10 Jul 2017 17:29:49 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170710162949.GC1587@perard.uk.xensource.com>
 References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
 	<1499238885-26161-23-git-send-email-pbonzini@redhat.com>
 	<CAFEAcA-B+aChqZBSnGws7RXheEyg+cutaqvXP8qVgNoUgzQAJA@mail.gmail.com>
-	<4f304a14-572d-2835-cb0e-9d93c1c6dece@redhat.com>
-	<CAFEAcA-vuPxc0GZc4Her1Trtak-RL9wcMR1L9SGRhzGg3wUGEA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <55c62a5d-2ac5-4a89-f20a-100b19f8b0e9@redhat.com>
-Date: Mon, 10 Jul 2017 18:28:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-vuPxc0GZc4Her1Trtak-RL9wcMR1L9SGRhzGg3wUGEA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-B+aChqZBSnGws7RXheEyg+cutaqvXP8qVgNoUgzQAJA@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PULL 22/42] configure: factor out list of
  supported Xen/KVM/HAX targets
 List-Id: <qemu-devel.nongnu.org>
@@ -33,46 +33,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
 
-On 10/07/2017 18:24, Peter Maydell wrote:
-> On 10 July 2017 at 17:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 10/07/2017 17:49, Peter Maydell wrote:
->>> On 5 July 2017 at 08:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> This will be useful when the functions are called, early in the configure
->>>> process, to filter out targets that do not support hardware acceleration.
->>>>
->>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>>
->>>> +supported_xen_target() {
->>>> +    test "$xen" = "yes" || return 1
->>>> +    glob "$1" "*-softmmu" || return 1
->>>> +    case "${1%-softmmu}:$cpu" in
->>>> +        arm:arm | aarch64:aarch64 | \
->>>> +        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
->>>> +            return 0
->>>> +        ;;
->>>
->>> This says that arm-on-arm and aarch64-on-aarch64 are supported
->>> Xen targets...
->>
->> Hmm, this comes from my old patches.  IIRC the reason for the change,
->> when it wasn't a change (many conflicts ago) was that Xen folks were
->> using --disable-tcg because their device model for Xen PV on ARM was
->> actually an x86_64 QEMU.
->>
->> Stefano and Anthony, is this still true?  If so, would it make sense to
->> add the Xen PV machine type to qemu-system-arm---that is, is it
->> something you can whip up easily, or should I just remove that line?
+On Mon, Jul 10, 2017 at 04:49:18PM +0100, Peter Maydell wrote:
+> On 5 July 2017 at 08:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > This will be useful when the functions are called, early in the configure
+> > process, to filter out targets that do not support hardware acceleration.
+> >
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> I think you should just fix configure for the moment, because
-> this patch wasn't supposed to change anything about what we
-> build (AIUI). We can think about changing the Xen PV on ARM
-> build setup as a separate thing if we want to, I suspect it
-> is more invasive than a couple of lines changing in configure.
+> > +supported_xen_target() {
+> > +    test "$xen" = "yes" || return 1
+> > +    glob "$1" "*-softmmu" || return 1
+> > +    case "${1%-softmmu}:$cpu" in
+> > +        arm:arm | aarch64:aarch64 | \
+> > +        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
+> > +            return 0
+> > +        ;;
+> 
+> This says that arm-on-arm and aarch64-on-aarch64 are supported
+> Xen targets...
+> 
+> > +    esac
+> > +    return 1
+> > +}
+> > +
+> 
+> 
+> >  if [ "$HOST_VARIANT_DIR" != "" ]; then
+> >      echo "HOST_VARIANT_DIR=$HOST_VARIANT_DIR" >> $config_target_mak
+> >  fi
+> > -case "$target_name" in
+> > -  i386|x86_64)
+> > -    if test "$xen" = "yes" -a "$target_softmmu" = "yes" ; then
+> > -      echo "CONFIG_XEN=y" >> $config_target_mak
+> > -      if test "$xen_pci_passthrough" = yes; then
+> > +
+> > +if supported_xen_target $target; then
+> > +    echo "CONFIG_XEN=y" >> $config_target_mak
+> > +    if test "$xen_pci_passthrough" = yes; then
+> 
+> ...but previously we only enabled CONFIG_XEN on i386 or x86_64
+> targets.
+> 
+> Alex points out that the shippable builds now fail for aarch64
+> and arm. (I think that my test machines for aarch64 and arm
+> don't fail like this because they happen not to have the Xen
+> headers installed, so the overall "does Xen work on this host"
+> check fails; the shippable configs do pass that test so they
+> try to build the Xen code.)
+> 
+> https://app.shippable.com/github/qemu/qemu/runs/267/2/console
+> 
+> exec.o: In function `reclaim_ramblock':
+> /root/src/github.com/qemu/qemu/exec.c:2071: undefined reference to
+> `xen_invalidate_map_cache_entry'
+> exec.o: In function `qemu_map_ram_ptr':
+> /root/src/github.com/qemu/qemu/exec.c:2177: undefined reference to
+> `xen_map_cache'
+> /root/src/github.com/qemu/qemu/exec.c:2174: undefined reference to
+> `xen_map_cache'
+> exec.o: In function `qemu_ram_block_from_host':
+> /root/src/github.com/qemu/qemu/exec.c:2242: undefined reference to
+> `xen_ram_addr_from_mapcache'
+> /root/src/github.com/qemu/qemu/exec.c:2242: undefined reference to
+> `xen_ram_addr_from_mapcache'
+> exec.o: In function `qemu_ram_ptr_length':
+> /root/src/github.com/qemu/qemu/exec.c:2210: undefined reference to
+> `xen_map_cache'
+> /root/src/github.com/qemu/qemu/exec.c:2207: undefined reference to
+> `xen_map_cache'
+> exec.o: In function `address_space_unmap':
+> /root/src/github.com/qemu/qemu/exec.c:3357: undefined reference to
+> `xen_invalidate_map_cache_entry'
+> hw/xen/xen_pt.o: In function `xen_pt_pci_read_config':
+> /root/src/github.com/qemu/qemu/hw/xen/xen_pt.c:206: undefined
+> reference to `xen_shutdown_fatal_error'
+> hw/xen/xen_pt.o: In function `xen_igd_passthrough_isa_bridge_create':
+> /root/src/github.com/qemu/qemu/hw/xen/xen_pt.c:698: undefined
+> reference to `igd_passthrough_isa_bridge_create'
+> hw/xen/xen_pt.o: In function `xen_pt_pci_write_config':
+> /root/src/github.com/qemu/qemu/hw/xen/xen_pt.c:355: undefined
+> reference to `xen_shutdown_fatal_error'
+> hw/xen/xen_pt_config_init.o: In function `xen_pt_status_reg_init':
+> /root/src/github.com/qemu/qemu/hw/xen/xen_pt_config_init.c:281:
+> undefined reference to `xen_shutdown_fatal_error'
+> /root/src/github.com/qemu/qemu/hw/xen/xen_pt_config_init.c:275:
+> undefined reference to `xen_shutdown_fatal_error'
+> hw/xen/xen_pt_graphics.o: In function `get_vgabios':
+> /root/src/github.com/qemu/qemu/hw/xen/xen_pt_graphics.c:135: undefined
+> reference to `pci_assign_dev_load_option_rom'
+> collect2: error: ld returned 1 exit status
 
-Yes, definitely more invasive.
+Our CI also fail on this merge, QEMU build fine, be it can't be use.
+Error message (on arm*):
+qemu-system-i386: -xen-domid 1: Option not supported for this target
 
-I'll prepare a fix.
+Full log: http://logs.test-lab.xenproject.org/osstest/logs/111601/
 
-Paolo
+-- 
+Anthony PERARD
