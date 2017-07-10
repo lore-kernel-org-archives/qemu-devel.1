@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUUci-0004Tg-KJ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:04:57 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dUUcp-0004Xv-7K
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUUce-0000ea-M0
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:04:56 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35331)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUUce-0000c9-Bp
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:04:52 -0400
-Received: by mail-wr0-x233.google.com with SMTP id k67so129121090wrc.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 02:04:50 -0700 (PDT)
-References: <CACbE=3qTtR39sbOcvDhTmVPxOSY+ORjMCKOQcAwDQEX2VbB1YQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CACbE=3qTtR39sbOcvDhTmVPxOSY+ORjMCKOQcAwDQEX2VbB1YQ@mail.gmail.com>
-Date: Mon, 10 Jul 2017 10:04:47 +0100
-Message-ID: <87y3rwaci8.fsf@linaro.org>
+	(envelope-from <gengdongjiu@huawei.com>) id 1dUUcl-0000kH-4i
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 05:05:03 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Mon, 10 Jul 2017 17:25:36 +0800
+Message-ID: <1499678736-5244-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] HTTPS on qemu.org
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 0/3] Generate APEI GHES table and
+ dynamically record CPER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +20,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Martin Rys <spleefer90@gmail.com>
-Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhihui.gao@huawei.com
+Cc: gengdongjiu@huawei.com
 
 
-Martin Rys <spleefer90@gmail.com> writes:
+how to test:
+1. In the guest OS, use this command to dump the APEI table: 
+	"iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST"
+2. And find the address for the generic error status block
+   according to the notification type
+3. then find the CPER record through the generic error status block.
 
-> Hi, I don't know which mailing list to use for website things, so I'm
-> just using devel, hopefully reaching the correct people.
->
-> https://www.ssllabs.com/ssltest/analyze.html?d=qemu.org
->
-> Qemu.org still uses HTTP (it should redirect from HTTP to HTTPS
-> instead) and HTTPS is broken, only because the TLS certificate seems
-> to be self-generated.
+For example(notification type is SEA):
 
-The https URL also takes you to the Apache default pages (if you skip
-the dire warnings). Anyway CC'ing the relevant names as per:
+(1) root@genericarmv8:~# iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
+(2) root@genericarmv8:~# cat HEST.dsl
+	/*
+	 * Intel ACPI Component Architecture
+	 * AML/ASL+ Disassembler version 20170303 (64-bit version)
+	 * Copyright (c) 2000 - 2017 Intel Corporation
+	 *
+	 * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Dec 12 07:19:43 2016
+	 *
+	 * ACPI Data Table [HEST]
+	 *
+	 * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
+	 */
+    ..................................................................................
+    [228h 0552   2]                Subtable Type : 0009 [Generic Hardware Error Source]
+	[22Ah 0554   2]                    Source Id : 0008
+	[22Ch 0556   2]            Related Source Id : FFFF
+	[22Eh 0558   1]                     Reserved : 00
+	[22Fh 0559   1]                      Enabled : 01
+	[230h 0560   4]       Records To Preallocate : 00000001
+	[234h 0564   4]      Max Sections Per Record : 00000001
+	[238h 0568   4]          Max Raw Data Length : 00001000
 
-  http://wiki.qemu.org/AdminContacts
+	[23Ch 0572  12]         Error Status Address : [Generic Address Structure]
+	[23Ch 0572   1]                     Space ID : 00 [SystemMemory]
+	[23Dh 0573   1]                    Bit Width : 40
+	[23Eh 0574   1]                   Bit Offset : 00
+	[23Fh 0575   1]         Encoded Access Width : 04 [QWord Access:64]
+	[240h 0576   8]                      Address : 00000000785D0040
 
->
-> You can easily get a free non-wildcard certificate from Let's Encrypt
-> via certbot and automate certificate renewing with something as easy
-> as a cron job that calls certbot.
->
-> https://letsencrypt.org/
->
-> Hopefully I'll see you switch to HTTPS in the future!
->
-> Thanks, Martin.
+	[248h 0584  28]                       Notify : [Hardware Error Notification Structure]
+	[248h 0584   1]                  Notify Type : 08 [SEA]
+	[249h 0585   1]                Notify Length : 1C
+	[24Ah 0586   2]   Configuration Write Enable : 0000
+	[24Ch 0588   4]                 PollInterval : 00000000
+	[250h 0592   4]                       Vector : 00000000
+	[254h 0596   4]      Polling Threshold Value : 00000000
+	[258h 0600   4]     Polling Threshold Window : 00000000
+	[25Ch 0604   4]        Error Threshold Value : 00000000
+	[260h 0608   4]       Error Threshold Window : 00000000
+
+	[264h 0612   4]    Error Status Block Length : 00001000
+    .....................................................................................
+(3) according to above table, the address that contains the physical address of a block
+    of memory that holds the error status data for SEA notification error source is 0x00000000785D0040
+(4) the address for SEA notification error source is 0x785d8058
+	(qemu) xp /2x 0x00000000785D0040
+	00000000785d0040: 0x785d8058 0x00000000
+(5) check the content of generic error status block and generic error data entry
+    (qemu) xp /100x 0x785d8058
+    00000000785d8058: 0x00000001 0x00000000 0x00000000 0x00000098
+    00000000785d8068: 0x00000001 0xa5bc1114 0x4ede6f64 0x833e63b8
+	00000000785d8078: 0xb1837ced 0x00000000 0x00000000 0x00000050
+	00000000785d8088: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8098: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80a8: 0x00000000 0x00000000 0x00000000 0x00004002
+	00000000785d80b8: 0x00000000 0x00000000 0x00000000 0x00001111
+	00000000785d80c8: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80d8: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80e8: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80f8: 0x00000000 0x00000003 0x00000000 0x00000000
+	00000000785d8108: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8118: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8128: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8138: 0x00000000 0x00000000 0x00000000 0x00000000
 
 
---
-Alex Bennée
+
+*** BLURB HERE ***
+
+Dongjiu Geng (3):
+  ACPI: Add new ACPI structures and macros
+  ACPI: Add APEI GHES Table Generation support 1
+  ACPI: build and enable APEI GHES in the Makefile and configuration
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/acpi/Makefile.objs           |   1 +
+ hw/acpi/aml-build.c             |   2 +
+ hw/acpi/hest_ghes.c             | 219 ++++++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c        |   6 ++
+ include/hw/acpi/acpi-defs.h     | 194 +++++++++++++++++++++++++++++++++++
+ include/hw/acpi/aml-build.h     |   1 +
+ include/hw/acpi/hest_ghes.h     |  47 +++++++++
+ include/qemu/uuid.h             |  11 ++
+ 9 files changed, 482 insertions(+)
+ create mode 100644 hw/acpi/hest_ghes.c
+ create mode 100644 include/hw/acpi/hest_ghes.h
+
+-- 
+2.10.1
