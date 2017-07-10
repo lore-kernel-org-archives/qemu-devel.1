@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUTFV-0007y6-Jx
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:54 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUTFt-0008GX-Bx
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUTFQ-0007fe-Ln
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:53 -0400
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:35891)
+	(envelope-from <rth7680@gmail.com>) id 1dUTFp-0007p1-36
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:37:17 -0400
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:35315)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUTFQ-0007fX-FZ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:36:48 -0400
-Received: by mail-pg0-f68.google.com with SMTP id u36so11708966pgn.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:36:48 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUTFo-0007op-SI
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:37:13 -0400
+Received: by mail-pg0-f52.google.com with SMTP id j186so45164317pge.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:37:12 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Sun,  9 Jul 2017 21:34:57 -1000
-Message-Id: <20170710073501.5207-2-rth@twiddle.net>
+Date: Sun,  9 Jul 2017 21:34:59 -1000
+Message-Id: <20170710073501.5207-4-rth@twiddle.net>
 In-Reply-To: <20170710073501.5207-1-rth@twiddle.net>
 References: <20170710073501.5207-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/5] tcg/aarch64: Introduce and use long branch
- to register
+Subject: [Qemu-devel] [PULL 3/5] tcg/aarch64: Enable indirect jump path
+ using LDR (literal)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,52 +35,100 @@ Cc: peter.maydell@linaro.org, Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?q?A
 
 From: Pranith Kumar <bobby.prani@gmail.com>
 
-We can use a branch to register instruction for exit_tb for offsets
-greater than 128MB.
+This patch enables the indirect jump path using an LDR (literal)
+instruction. It will be interesting to test and see which performs
+better among the two paths.
 
 CC: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-Message-Id: <20170630143614.31059-1-bobby.prani@gmail.com>
+Message-Id: <20170630143614.31059-3-bobby.prani@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/aarch64/tcg-target.inc.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 42 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 28 insertions(+), 14 deletions(-)
 
 diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 1fa3bcc..8fce11a 100644
+index a84422d..04bc369 100644
 --- a/tcg/aarch64/tcg-target.inc.c
 +++ b/tcg/aarch64/tcg-target.inc.c
-@@ -819,6 +819,17 @@ static inline void tcg_out_goto(TCGContext *s, tcg_insn_unit *target)
-     tcg_out_insn(s, 3206, B, offset);
- }
+@@ -269,6 +269,8 @@ typedef enum {
+     I3207_BLR       = 0xd63f0000,
+     I3207_RET       = 0xd65f0000,
  
-+static inline void tcg_out_goto_long(TCGContext *s, tcg_insn_unit *target)
++    /* Load literal for loading the address at pc-relative offset */
++    I3305_LDR       = 0x58000000,
+     /* Load/store register.  Described here as 3.3.12, but the helper
+        that emits them can transform to 3.3.10 or 3.3.13.  */
+     I3312_STRB      = 0x38000000 | LDST_ST << 22 | MO_8 << 30,
+@@ -389,6 +391,11 @@ static inline uint32_t tcg_in32(TCGContext *s)
+ #define tcg_out_insn(S, FMT, OP, ...) \
+     glue(tcg_out_insn_,FMT)(S, glue(glue(glue(I,FMT),_),OP), ## __VA_ARGS__)
+ 
++static void tcg_out_insn_3305(TCGContext *s, AArch64Insn insn, int imm19, TCGReg rt)
 +{
-+    ptrdiff_t offset = target - s->code_ptr;
-+    if (offset == sextract64(offset, 0, 26)) {
-+        tcg_out_insn(s, 3206, BL, offset);
-+    } else {
-+        tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_TMP, (intptr_t)target);
-+        tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
-+    }
++    tcg_out32(s, insn | (imm19 & 0x7ffff) << 5 | rt);
 +}
 +
- static inline void tcg_out_goto_noaddr(TCGContext *s)
+ static void tcg_out_insn_3201(TCGContext *s, AArch64Insn insn, TCGType ext,
+                               TCGReg rt, int imm19)
  {
-     /* We pay attention here to not modify the branch target by reading from
-@@ -1364,10 +1375,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     case INDEX_op_exit_tb:
-         /* Reuse the zeroing that exists for goto_ptr.  */
-         if (a0 == 0) {
--            tcg_out_goto(s, s->code_gen_epilogue);
-+            tcg_out_goto_long(s, s->code_gen_epilogue);
-         } else {
-             tcg_out_movi(s, TCG_TYPE_I64, TCG_REG_X0, a0);
--            tcg_out_goto(s, tb_ret_addr);
-+            tcg_out_goto_long(s, tb_ret_addr);
-         }
+@@ -864,6 +871,8 @@ static inline void tcg_out_call(TCGContext *s, tcg_insn_unit *target)
+     }
+ }
+ 
++#ifdef USE_DIRECT_JUMP
++
+ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
+ {
+     tcg_insn_unit i1, i2;
+@@ -889,6 +898,8 @@ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
+     flush_icache_range(jmp_addr, jmp_addr + 8);
+ }
+ 
++#endif
++
+ static inline void tcg_out_goto_label(TCGContext *s, TCGLabel *l)
+ {
+     if (!l->has_value) {
+@@ -1400,21 +1411,24 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
          break;
  
+     case INDEX_op_goto_tb:
+-#ifndef USE_DIRECT_JUMP
+-#error "USE_DIRECT_JUMP required for aarch64"
+-#endif
+-        /* consistency for USE_DIRECT_JUMP */
+-        tcg_debug_assert(s->tb_jmp_insn_offset != NULL);
+-        /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
+-           write can be used to patch the target address. */
+-        if ((uintptr_t)s->code_ptr & 7) {
+-            tcg_out32(s, NOP);
++        if (s->tb_jmp_insn_offset != NULL) {
++            /* USE_DIRECT_JUMP */
++            /* Ensure that ADRP+ADD are 8-byte aligned so that an atomic
++               write can be used to patch the target address. */
++            if ((uintptr_t)s->code_ptr & 7) {
++                tcg_out32(s, NOP);
++            }
++            s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
++            /* actual branch destination will be patched by
++               aarch64_tb_set_jmp_target later. */
++            tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
++            tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
++        } else {
++            /* !USE_DIRECT_JUMP */
++            tcg_debug_assert(s->tb_jmp_target_addr != NULL);
++            intptr_t offset = tcg_pcrel_diff(s, (s->tb_jmp_target_addr + a0)) >> 2;
++            tcg_out_insn(s, 3305, LDR, offset, TCG_REG_TMP);
+         }
+-        s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
+-        /* actual branch destination will be patched by
+-           aarch64_tb_set_jmp_target later. */
+-        tcg_out_insn(s, 3406, ADRP, TCG_REG_TMP, 0);
+-        tcg_out_insn(s, 3401, ADDI, TCG_TYPE_I64, TCG_REG_TMP, TCG_REG_TMP, 0);
+         tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
+         s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
+         break;
 -- 
 2.9.4
