@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dUURs-0007pt-I9
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:53:45 -0400
+	(envelope-from <famz@redhat.com>) id 1dUUUr-0000Fd-Iv
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dUURn-0004VE-N1
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:53:44 -0400
-References: <514bf953-81b7-d379-db20-0cb2af29094b@redhat.com>
-	<20170707190919.31246-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <7ba1f197-2ef3-7a26-7605-3962d35ef117@virtuozzo.com>
-Date: Mon, 10 Jul 2017 11:53:32 +0300
+	(envelope-from <famz@redhat.com>) id 1dUUUq-0005jb-Pq
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:56:49 -0400
+Date: Mon, 10 Jul 2017 16:56:36 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170710085636.GB8951@lemon.lan>
+References: <20170710083553.6167-1-den@openvz.org>
 MIME-Version: 1.0
-In-Reply-To: <20170707190919.31246-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] fixup! nbd: use generic trace subsystem
- instead of TRACE macro
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170710083553.6167-1-den@openvz.org>
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: fix possible return code
+ clobbering in bdrv_co_pdiscard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: den@openvz.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 
-07.07.2017 22:09, Eric Blake wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->
-> [eblake minor tweaks to a couple of traces]
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On Mon, 07/10 11:35, Denis V. Lunev wrote:
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Stefan Hajnoczi <stefanha@redhat.com> (supporter:Block I/O path)
+> CC: Fam Zheng <famz@redhat.com> (supporter:Block I/O path)
+
+Maybe use "--noroles"?  The parenthesis part is not really useful.
+
 > ---
->
-> If you are okay with this, I plan to squash this into your patch 10
-> when I send my pull request
+>  block/io.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index ed31810c0a..e5c6dc77d3 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2464,7 +2464,6 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
+>      assert(max_pdiscard >= bs->bl.request_alignment);
+>  
+>      while (count > 0) {
+> -        int ret;
+>          int num = count;
+>  
+>          if (head) {
+> -- 
+> 2.11.0
+> 
+> 
 
-Ok.
-
->
->   nbd/client.c     | 3 +--
->   nbd/server.c     | 5 +++--
->   nbd/trace-events | 4 +---
->   3 files changed, 5 insertions(+), 7 deletions(-)
->
-> diff --git a/nbd/client.c b/nbd/client.c
-> index ab46653..9c52b9b 100644
-> --- a/nbd/client.c
-> +++ b/nbd/client.c
-> @@ -346,7 +346,6 @@ static int nbd_receive_query_exports(QIOChannel *ioc,
->           return -1;
->       }
->
-> -    trace_nbd_receive_query_exports_loop();
->       while (1) {
->           int ret = nbd_receive_list(ioc, wantname, &foundExport, errp);
->
-> @@ -472,7 +471,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
->           goto fail;
->       }
->       magic = be64_to_cpu(magic);
-> -    trace_nbd_receive_negotiate_magic2(magic);
-> +    trace_nbd_receive_negotiate_magic(magic);
->
->       if (magic == NBD_OPTS_MAGIC) {
->           uint32_t clientflags = 0;
-> diff --git a/nbd/server.c b/nbd/server.c
-> index ca95f43..9b0c588 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -422,8 +422,9 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
->               error_prepend(errp, "read failed: ");
->               return -EINVAL;
->           }
-> -        trace_nbd_negotiate_options_check_magic();
-> -        if (magic != be64_to_cpu(NBD_OPTS_MAGIC)) {
-> +        magic = be64_to_cpu(magic);
-> +        trace_nbd_negotiate_options_check_magic(magic);
-> +        if (magic != NBD_OPTS_MAGIC) {
->               error_setg(errp, "Bad magic received");
->               return -EINVAL;
->           }
-> diff --git a/nbd/trace-events b/nbd/trace-events
-> index b20165a..4b233b8 100644
-> --- a/nbd/trace-events
-> +++ b/nbd/trace-events
-> @@ -4,7 +4,6 @@ nbd_send_option_request(uint32_t opt, uint32_t len) "Sending option request %" P
->   nbd_receive_option_reply(uint32_t option, uint32_t type, uint32_t length) "Received option reply %" PRIx32", type %" PRIx32", len %" PRIu32
->   nbd_reply_err_unsup(uint32_t option) "server doesn't understand request %" PRIx32 ", attempting fallback"
->   nbd_receive_query_exports_start(const char *wantname) "Querying export list for '%s'"
-> -nbd_receive_query_exports_loop(void) "Reading available export names"
->   nbd_receive_query_exports_success(const char *wantname) "Found desired export name '%s'"
->   nbd_receive_starttls_request(void) "Requesting TLS from server"
->   nbd_receive_starttls_reply(void) "Getting TLS reply from server"
-> @@ -12,7 +11,6 @@ nbd_receive_starttls_new_client(void) "TLS request approved, setting up TLS"
->   nbd_receive_starttls_tls_handshake(void) "Starting TLS handshake"
->   nbd_receive_negotiate(void *tlscreds, const char *hostname) "Receiving negotiation tlscreds=%p hostname=%s"
->   nbd_receive_negotiate_magic(uint64_t magic) "Magic is 0x%" PRIx64
-> -nbd_receive_negotiate_magic2(uint64_t magic) "Magic is 0x%" PRIx64
->   nbd_receive_negotiate_server_flags(uint32_t globalflags) "Global flags are %" PRIx32
->   nbd_receive_negotiate_default_name(void) "Using default NBD export name \"\""
->   nbd_receive_negotiate_size_flags(uint64_t size, uint16_t flags) "Size is %" PRIu64 ", export flags %" PRIx16
-> @@ -40,7 +38,7 @@ nbd_negotiate_handle_starttls_handshake(void) "Starting TLS handshake"
->   nbd_negotiate_options_flags(void) "Checking client flags"
->   nbd_negotiate_options_newstyle(void) "Client supports fixed newstyle handshake"
->   nbd_negotiate_options_no_zeroes(void) "Client supports no zeroes at handshake end"
-> -nbd_negotiate_options_check_magic(void) "Checking opts magic"
-> +nbd_negotiate_options_check_magic(uint64_t magic) "Checking opts magic 0x%" PRIx64
->   nbd_negotiate_options_check_option(uint32_t option) "Checking option 0x%" PRIx32
->   nbd_opt_abort_reply_failed(const char *error) "Reply to NBD_OPT_ABORT request failed: %s"
->   nbd_negotiate_begin(void) "Beginning negotiation"
-
-
--- 
-Best regards,
-Vladimir
+Reviewed-by: Fam Zheng <famz@redhat.com>
