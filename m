@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUZho-0008KW-J8
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:30:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUZiS-0000J6-NI
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUZhl-0006cN-HR
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:30:32 -0400
-Received: from mail-wr0-f180.google.com ([209.85.128.180]:32937)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUZhl-0006br-AR
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:30:29 -0400
-Received: by mail-wr0-f180.google.com with SMTP id r103so141347350wrb.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 07:30:29 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 10 Jul 2017 15:28:49 +0100
-Message-Id: <20170710142850.10468-1-alex.bennee@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1dUZiR-00075k-Ml
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:31:12 -0400
+References: <1498733831-15254-1-git-send-email-pl@kamp.de>
+	<1498733831-15254-2-git-send-email-pl@kamp.de>
+	<20170710125857.GD5772@noname.redhat.com>
+	<11427303-a0cd-ee7b-edb4-1cdf9b90c0af@kamp.de>
+	<20170710135021.GJ5772@noname.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c435ac9c-6076-aed0-feb9-2eca465df1de@redhat.com>
+Date: Mon, 10 Jul 2017 09:31:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] include/exec/cpu-defs.h: try and make
- SoftMMU page size match target
+In-Reply-To: <20170710135021.GJ5772@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3MT77N7fMUFW8CKWU7OmwRpCNkiLCa4Uf"
+Subject: Re: [Qemu-devel] [PATCH V2 1/8] docs: add compress format extension
+ to qcow2 spec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +28,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, bobby.prani@gmail.com
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
-While the SoftMMU is not emulating the target MMU of a system there is
-a relationship between its page size and that of the target. If the
-target MMU is full featured the functions called to re-fill the
-entries in the SoftMMU entries start moving up the perf profiles. If
-we can we should try and prevent too much thrashing around by having
-the page sizes the same.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3MT77N7fMUFW8CKWU7OmwRpCNkiLCa4Uf
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com,
+ den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+Message-ID: <c435ac9c-6076-aed0-feb9-2eca465df1de@redhat.com>
+Subject: Re: [PATCH V2 1/8] docs: add compress format extension to qcow2 spec
+References: <1498733831-15254-1-git-send-email-pl@kamp.de>
+ <1498733831-15254-2-git-send-email-pl@kamp.de>
+ <20170710125857.GD5772@noname.redhat.com>
+ <11427303-a0cd-ee7b-edb4-1cdf9b90c0af@kamp.de>
+ <20170710135021.GJ5772@noname.redhat.com>
+In-Reply-To: <20170710135021.GJ5772@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ideally we should use TARGET_PAGE_BITS_MIN but that potentially
-involves a fair bit of #include re-jigging so I went for 10 bits (1k
-pages) which I think is the smallest of all our emulated systems.
+On 07/10/2017 08:50 AM, Kevin Wolf wrote:
 
-Some quick numbers show a reasonable performance win on an x86_64
-host:
+> We have regretted enough things that were defined a bit sloppily just
+> for convenience that I'd rather not make this mistake again when we can=
 
- ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt \
-   -display none -m 16384 -cpu cortex-a57 -serial mon:stdio \
-   -drive file=../jessie-arm64.qcow2,id=myblock,index=0,if=none \
-   -device virtio-blk-device,drive=myblock \
-   -append "console=ttyAMA0 root=/dev/vda1 systemd.unit=benchmark-build.service" \
-   -kernel ../aarch64-current-linux-kernel-only.img -machine gic-version=3 -smp 4
+> avoid it.
 
-8 bit TLB:
-  run 1: ret=0 (PASS), time=425.202797 (1/1)
-  run 2: ret=0 (PASS), time=410.421742 (2/2)
-  run 3: ret=0 (PASS), time=417.666752 (3/3)
-  run 4: ret=0 (PASS), time=411.158793 (4/4)
-  run 5: ret=0 (PASS), time=417.133068 (5/5)
-  Results summary:
-  0: 5 times (100.00%), avg time 416.317 (35.70 varience/5.98 deviation)
+Agreed.  Another consideration: defining redundant information is
+trickier to maintain because correct implementations have to check that
+both points are consistent with one another.
 
-10 bit TLB
-  run 1: ret=0 (PASS), time=359.310380 (1/1)
-  run 2: ret=0 (PASS), time=387.826981 (2/2)
-  run 3: ret=0 (PASS), time=381.097123 (3/3)
-  run 4: ret=0 (PASS), time=393.826197 (4/4)
-  run 5: ret=0 (PASS), time=384.340781 (5/5)
-  Results summary:
-  0: 5 times (100.00%), avg time 381.280 (173.08 varience/13.16 deviation)
+>=20
+>>>> +         17 - 19:  Reserved for future use, must be zero.
+>>> We don't need this for now because byte 16 will be the final one in t=
+his
+>>> struct.
+>>>
+>>>> +         20 - 23:  extra_data_size
+>>>> +                   Size of compress format specific extra data.
+>>>> +                   For now, as no format specifies extra data,
+>>>> +                   extra_data_size is reserved and should be zero.
+>>>> +
+>>>> +        variable:  extra_data
+>>>> +                   Extra data with additional parameters for the co=
+mpress
+>>>> +                   format, occupying extra_data_size bytes.
+>>> extra_data_size isn't necessary because we already have the length of=
 
-CC: Pranith Kumar <bobby.prani@gmail.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- include/exec/cpu-defs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>>> the header extension, so we know how long the whole thing is.
+>>> extra_data isn't necessary because we'll just add new fields at the e=
+nd
+>>> if we want to add something.
+>>
+>> I was asked to add it altough it is redundant.
+>=20
+> Who asked this, and did they have a good reason for it?
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index bc8e7f848d..a0f9249752 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -89,7 +89,7 @@ typedef uint64_t target_ulong;
-  * of tlb_table inside env (which is non-trivial but not huge).
-  */
- #define CPU_TLB_BITS                                             \
--    MIN(8,                                                       \
-+    MIN(10,                                                      \
-         TCG_TARGET_TLB_DISPLACEMENT_BITS - CPU_TLB_ENTRY_BITS -  \
-         (NB_MMU_MODES <= 1 ? 0 :                                 \
-          NB_MMU_MODES <= 2 ? 1 :                                 \
--- 
-2.13.0
+May have been me, or may have been implied by my comments, but I agree
+that the overall extension header covers this, so we don't need a
+redundant form.  So as long as the overall extension header length is
+good enough, I'm okay avoiding redundancies.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--3MT77N7fMUFW8CKWU7OmwRpCNkiLCa4Uf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZY4+mAAoJEKeha0olJ0NqmmIIAJur4GIASmYIInu8cUGIX7cZ
+Btdj3lkakTcgGPf2RGrMVlclRu/32KlYWoRjDlQ7R+SiSgii8mMGBpXZwZwHEq9P
+Ah4hrN9WlSEKyc4Bx7J0Iuz6RoPdyCE3tQ7jB2ZOGKxx7mMt95DB0IJOIbpDdhPR
+EHvR4vaI8PbYFEobgZxg7suubrCoaalsN4mg4mF9whgStiJbfh5wAABEUcuHY2iL
+0yqIA+b2n7TQkI24H8g9aaRDCla5j4wPYUe5x2N226Z7e3phKYk/C3FuMLb9+5WU
+VCUY0za1YROyazBlZRwyOZjrm99Qt4HT36fRV5kx5VWkZSCt6BtFkLR+ofLBlYs=
+=LIFh
+-----END PGP SIGNATURE-----
+
+--3MT77N7fMUFW8CKWU7OmwRpCNkiLCa4Uf--
