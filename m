@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUbya-00039j-Bb
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:56:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dUc14-00041H-6b
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:58:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUbyZ-0001mS-JV
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:56:00 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170710142850.10468-1-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <1e34d387-753b-14ff-dcc0-226515ff0124@twiddle.net>
-Date: Mon, 10 Jul 2017 06:55:42 -1000
+	(envelope-from <peter.maydell@linaro.org>) id 1dUc0z-0002x1-Jo
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:58:34 -0400
+Received: from mail-wr0-f179.google.com ([209.85.128.179]:36000)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dUc0z-0002we-Az
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:58:29 -0400
+Received: by mail-wr0-f179.google.com with SMTP id c11so146668131wrc.3
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 09:58:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170710142850.10468-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] include/exec/cpu-defs.h: try and make
- SoftMMU page size match target
+In-Reply-To: <20170704144859.17644-1-alex.bennee@linaro.org>
+References: <20170704144859.17644-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Jul 2017 17:57:07 +0100
+Message-ID: <CAFEAcA-HtfOXe-w74YOGD51-Cso9U5uXHm8==_3QpjxqY79X1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH 00/11] Misc fixes,
+ documentation and patterns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, bobby.prani@gmail.com
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 07/10/2017 04:28 AM, Alex Bennée wrote:
-> While the SoftMMU is not emulating the target MMU of a system there is
-> a relationship between its page size and that of the target. If the
-> target MMU is full featured the functions called to re-fill the
-> entries in the SoftMMU entries start moving up the perf profiles. If
-> we can we should try and prevent too much thrashing around by having
-> the page sizes the same.
+On 4 July 2017 at 15:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Hi Peter,
+>
+> A bit of a mixed set of patches here for you to pick from as you
+> will. The first 2 are additional tracing fixes including a fix for
+> segfaulting when generating a trace.
+>
+> The next two are documentation patches as requested.
+>
+> Then two minor tweaks, one to risu.el and a indent failure of risugen.
+>
+> While I've been working through the half-precision stuff I've been
+> finding the --pattern approach a bit inflexible as you basically end
+> up eyeballing the risu file to build up the regexs. I've added a
+> little syntactic suger to the risu file to enable grouping. This makes
+> slicing a subset a lot easier, e.g.:
+>
+>   ./risugen --group AdvSIMDAcrossVector --not-pattern ".*_RES" aarch64.ri=
+su
+>
+> You can specify multiple groups in the risu file as the matching is
+> string based, e.g.:
+>
+>   @Integer,Logic,Immediate
+>
+> And then:
+>
+>   ./risugen --group Logic aarch64.risu foo.bin
+>
+> What do you think?
+>
+> Alex Benn=C3=A9e (11):
+>   risu: make match status take tracing into account
+>   reginfo.c: always return 1 on OP_TESTEND
+>   README: document --static builds
+>   README: document record/replay support
+>   risu.el: derive from text-mode
+>   risugen: fix bad indent
 
-What you are changing has absolutely nothing to do with page size.  Mentioning 
-page sizes just confuses the issue.
+I've pushed these first six to risu master.
 
-What you're changing is the number of entries in the TLB, and the mapping 
-between pages and TLB entries.  And I'm quite certain that you saw a 
-performance increase by increasing the size of the TLB.
+>   risugen: support @GroupName in risu files
 
+I think this is OK, but can we document the change in
+risu file syntax in the readme, please?
 
->   #define CPU_TLB_BITS                                             \
-> -    MIN(8,                                                       \
-> +    MIN(10,                                                      \
+>   aarch64.risu: document naming conventions
+>   aarch64.risu: remove duplicate AdvSIMD Scalar 3 same block
+>   aarch64.risu: remove duplicate AdvSIMD scalar 2 reg misc block
+>   aarch64.risu: update AdvancedSIMD across lanes
 
-You will find this has broken tcg/arm, because the operand to an armv6 AND 
-(immediate) instruction is only 8 bits.
+Some of these seem to be doing multiple things at once,
+which in some cases makes them a bit confusing (eg the
+first one says it's removing a duplicate block, but it's
+also adding a group name.)
 
-I will grant you that we could do a better job of configuring this across the 
-tcg backends.
-
-It also possibly warrants some work in the tcg/arm backend so that armv7 makes 
-use of UBFX so that not-ancient arm is not so constrained.
-
-
-r~
+thanks
+-- PMM
