@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaW-0001dn-9R
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUXaY-0001ef-HS
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaR-0002XT-BR
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dUXaR-0002Wd-4q
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4868C624B3
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 12:14:45 +0000 (UTC)
-Received: from red.redhat.com (ovpn-121-60.rdu2.redhat.com [10.10.121.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DE29578DE1
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 12:14:44 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dUXaX-0002c4-Mt
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:54 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Jul 2017 07:14:23 -0500
-Message-Id: <20170710121434.5047-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 00/11] NBD patches
+Date: Mon, 10 Jul 2017 07:14:25 -0500
+Message-Id: <20170710121434.5047-3-eblake@redhat.com>
+In-Reply-To: <20170710121434.5047-1-eblake@redhat.com>
+References: <20170710121434.5047-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 02/11] nbd/server: nbd_negotiate: return 1 on
+ NBD_OPT_ABORT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +21,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The following changes since commit 77d472291812cf04f97974dadbda767e59e31fde:
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-  Merge remote-tracking branch 'remotes/sstabellini/tags/xen-20170707-tag' into staging (2017-07-10 10:29:11 +0100)
+Separate the case when a client sends NBD_OPT_ABORT from all other
+errors. It will be needed for the following patch, where errors will be
+reported.
+This particular case is not actually an error - it honestly follows the
+NBD protocol. Therefore it should not be reported like an error.
 
-are available in the git repository at:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20170707152918.23086-2-vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-  ericb@repo.or.cz:/srv/git/qemu/ericb.git tags/pull-nbd-2017-07-10
+diff --git a/nbd/server.c b/nbd/server.c
+index 8a70c05..3963972 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -349,9 +349,13 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+     return QIO_CHANNEL(tioc);
+ }
 
-for you to fetch changes up to 167e16f91e706fde23fee3e1aaf58a97163357be:
+-
+-/* Process all NBD_OPT_* client option commands.
+- * Return -errno on error, 0 on success. */
++/* nbd_negotiate_options
++ * Process all NBD_OPT_* client option commands.
++ * Return:
++ * -errno  on error
++ * 0       on successful negotiation
++ * 1       if client sent NBD_OPT_ABORT, i.e. on valid disconnect
++ */
+ static int nbd_negotiate_options(NBDClient *client)
+ {
+     uint32_t flags;
+@@ -459,7 +463,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                 }
+                 /* Let the client keep trying, unless they asked to quit */
+                 if (clientflags == NBD_OPT_ABORT) {
+-                    return -EINVAL;
++                    return 1;
+                 }
+                 break;
+             }
+@@ -477,7 +481,7 @@ static int nbd_negotiate_options(NBDClient *client)
+                  * disconnecting, but that we must also tolerate
+                  * guests that don't wait for our reply. */
+                 nbd_negotiate_send_rep(client->ioc, NBD_REP_ACK, clientflags);
+-                return -EINVAL;
++                return 1;
 
-  nbd: use generic trace subsystem instead of TRACE macro (2017-07-10 06:52:38 -0500)
+             case NBD_OPT_EXPORT_NAME:
+                 return nbd_negotiate_handle_export_name(client, length);
+@@ -533,6 +537,12 @@ static int nbd_negotiate_options(NBDClient *client)
+     }
+ }
 
-----------------------------------------------------------------
-nbd patches for 2017-07-10
-
-- Eric Blake: MAINTAINERS: Promote NBD to supported, with new maintainer
-- Vladimir Sementsov-Ogievskiy: [00/10] nbd refactoring part 2
-
-----------------------------------------------------------------
-Eric Blake (1):
-      MAINTAINERS: Promote NBD to supported, with new maintainer
-
-Vladimir Sementsov-Ogievskiy (10):
-      nbd/server: nbd_negotiate: return 1 on NBD_OPT_ABORT
-      nbd/server: refactor nbd_negotiate
-      nbd/server: use errp instead of LOG
-      nbd/server: add errp to nbd_send_reply()
-      nbd/common: nbd_tls_handshake: remove extra TRACE
-      nbd/client: refactor TRACE of NBD_MAGIC
-      nbd/server: fix TRACE in nbd_negotiate_send_rep_len
-      nbd/server: rename clientflags var in nbd_negotiate_options
-      nbd: refactor tracing
-      nbd: use generic trace subsystem instead of TRACE macro
-
- nbd/nbd-internal.h |  19 ---
- nbd/client.c       |  81 +++++------
- nbd/common.c       |   4 +-
- nbd/server.c       | 401 +++++++++++++++++++++++++++++------------------------
- MAINTAINERS        |  22 +--
- Makefile.objs      |   1 +
- nbd/trace-events   |  56 ++++++++
- 7 files changed, 324 insertions(+), 260 deletions(-)
- create mode 100644 nbd/trace-events
-
-Eric Blake (1):
-  MAINTAINERS: Promote NBD to supported, with new maintainer
-
-Vladimir Sementsov-Ogievskiy (10):
-  nbd/server: nbd_negotiate: return 1 on NBD_OPT_ABORT
-  nbd/server: refactor nbd_negotiate
-  nbd/server: use errp instead of LOG
-  nbd/server: add errp to nbd_send_reply()
-  nbd/common: nbd_tls_handshake: remove extra TRACE
-  nbd/client: refactor TRACE of NBD_MAGIC
-  nbd/server: fix TRACE in nbd_negotiate_send_rep_len
-  nbd/server: rename clientflags var in nbd_negotiate_options
-  nbd: refactor tracing
-  nbd: use generic trace subsystem instead of TRACE macro
-
- nbd/nbd-internal.h |  19 ---
- nbd/client.c       |  81 +++++------
- nbd/common.c       |   4 +-
- nbd/server.c       | 401 +++++++++++++++++++++++++++++------------------------
- MAINTAINERS        |  22 +--
- Makefile.objs      |   1 +
- nbd/trace-events   |  56 ++++++++
- 7 files changed, 324 insertions(+), 260 deletions(-)
- create mode 100644 nbd/trace-events
-
++/* nbd_negotiate
++ * Return:
++ * -errno  on error
++ * 0       on successful negotiation
++ * 1       if client sent NBD_OPT_ABORT, i.e. on valid disconnect
++ */
+ static coroutine_fn int nbd_negotiate(NBDClient *client)
+ {
+     char buf[8 + 8 + 8 + 128];
 -- 
 2.9.4
