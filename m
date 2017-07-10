@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUcD6-0004wS-0g
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:11:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dUcD6-0004x9-O6
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUcD2-0008R8-F7
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:10:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37302)
+	(envelope-from <dgilbert@redhat.com>) id 1dUcD5-0008Vs-Fq
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:11:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40841)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dUcD2-0008PD-5Q
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:10:56 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dUcD5-0008UC-65
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 13:10:59 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E046D80F96
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 17:10:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 471BA7F6A6
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 17:10:58 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 10 Jul 2017 18:10:38 +0100
-Message-Id: <20170710171040.21021-8-dgilbert@redhat.com>
+Date: Mon, 10 Jul 2017 18:10:40 +0100
+Message-Id: <20170710171040.21021-10-dgilbert@redhat.com>
 In-Reply-To: <20170710171040.21021-1-dgilbert@redhat.com>
 References: <20170710171040.21021-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 7/9] migration: Create load_setup()/cleanup()
- methods
+Subject: [Qemu-devel] [PULL 9/9] migration: Make compression_threads use
+ save/load_setup/cleanup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,138 +35,149 @@ Cc: quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: Juan Quintela <quintela@redhat.com>
 
-We need to do things at load time and at cleanup time.
+Once there, be consistent and use
+compress_thread_{save,load}_{setup,cleanup}.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-
---
-
-Move the printing of the error message so we can print the device
-giving the error.
-Add call to postcopy stuff
-Message-Id: <20170628095228.4661-4-quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20170628095228.4661-6-quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/register.h |  2 ++
- migration/savevm.c           | 45 +++++++++++++++++++++++++++++++++++++++++++-
- migration/savevm.h           |  1 +
- migration/trace-events       |  2 ++
- 4 files changed, 49 insertions(+), 1 deletion(-)
+ migration/migration.c |  5 -----
+ migration/ram.c       | 12 ++++++++----
+ migration/ram.h       |  5 -----
+ 3 files changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/include/migration/register.h b/include/migration/register.h
-index 938ea2bc3d..a0f1edd8c7 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -39,6 +39,8 @@ typedef struct SaveVMHandlers {
-                               uint64_t *non_postcopiable_pending,
-                               uint64_t *postcopiable_pending);
-     LoadStateHandler *load_state;
-+    int (*load_setup)(QEMUFile *f, void *opaque);
-+    int (*load_cleanup)(void *opaque);
- } SaveVMHandlers;
- 
- int register_savevm_live(DeviceState *dev,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index fee11c5d28..fdd15fa0a7 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1541,7 +1541,7 @@ static void *postcopy_ram_listen_thread(void *opaque)
-      * got a bad migration state).
-      */
-     migration_incoming_state_destroy();
--
-+    qemu_loadvm_state_cleanup();
- 
-     return NULL;
- }
-@@ -1901,6 +1901,44 @@ qemu_loadvm_section_part_end(QEMUFile *f, MigrationIncomingState *mis)
-     return 0;
- }
- 
-+static int qemu_loadvm_state_setup(QEMUFile *f)
-+{
-+    SaveStateEntry *se;
-+    int ret;
-+
-+    trace_loadvm_state_setup();
-+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-+        if (!se->ops || !se->ops->load_setup) {
-+            continue;
-+        }
-+        if (se->ops && se->ops->is_active) {
-+            if (!se->ops->is_active(se->opaque)) {
-+                continue;
-+            }
-+        }
-+
-+        ret = se->ops->load_setup(f, se->opaque);
-+        if (ret < 0) {
-+            qemu_file_set_error(f, ret);
-+            error_report("Load state of device %s failed", se->idstr);
-+            return ret;
-+        }
-+    }
-+    return 0;
-+}
-+
-+void qemu_loadvm_state_cleanup(void)
-+{
-+    SaveStateEntry *se;
-+
-+    trace_loadvm_state_cleanup();
-+    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-+        if (se->ops && se->ops->load_cleanup) {
-+            se->ops->load_cleanup(se->opaque);
-+        }
-+    }
-+}
-+
- static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
- {
-     uint8_t section_type;
-@@ -1973,6 +2011,10 @@ int qemu_loadvm_state(QEMUFile *f)
-         return -ENOTSUP;
+diff --git a/migration/migration.c b/migration/migration.c
+index 7e5dbd9b92..a0db40d364 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -286,7 +286,6 @@ static void process_incoming_migration_bh(void *opaque)
+     } else {
+         runstate_set(global_state_get_runstate());
      }
+-    migrate_decompress_threads_join();
+     /*
+      * This must happen after any state changes since as soon as an external
+      * observer sees this event they might start to prod at the VM assuming
+@@ -349,7 +348,6 @@ static void process_incoming_migration_co(void *opaque)
+         migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                           MIGRATION_STATUS_FAILED);
+         error_report("load of migration failed: %s", strerror(-ret));
+-        migrate_decompress_threads_join();
+         exit(EXIT_FAILURE);
+     }
+     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
+@@ -360,7 +358,6 @@ void migration_fd_process_incoming(QEMUFile *f)
+ {
+     Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
  
-+    if (qemu_loadvm_state_setup(f) != 0) {
-+        return -EINVAL;
-+    }
-+
-     if (migrate_get_current()->send_configuration) {
-         if (qemu_get_byte(f) != QEMU_VM_CONFIGURATION) {
-             error_report("Configuration section missing");
-@@ -2036,6 +2078,7 @@ int qemu_loadvm_state(QEMUFile *f)
+-    migrate_decompress_threads_create();
+     qemu_file_set_blocking(f, false);
+     qemu_coroutine_enter(co);
+ }
+@@ -827,7 +824,6 @@ static void migrate_fd_cleanup(void *opaque)
+         }
+         qemu_mutex_lock_iothread();
+ 
+-        migrate_compress_threads_join();
+         qemu_fclose(s->to_dst_file);
+         s->to_dst_file = NULL;
+     }
+@@ -1990,7 +1986,6 @@ void migrate_fd_connect(MigrationState *s)
          }
      }
  
-+    qemu_loadvm_state_cleanup();
-     cpu_synchronize_all_post_init();
+-    migrate_compress_threads_create();
+     qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+                        QEMU_THREAD_JOINABLE);
+     s->migration_thread_running = true;
+diff --git a/migration/ram.c b/migration/ram.c
+index 73aec34161..1b08296d1b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -306,7 +306,7 @@ static inline void terminate_compression_threads(void)
+     }
+ }
  
-     return ret;
-diff --git a/migration/savevm.h b/migration/savevm.h
-index 6babc6221a..295c4a1f2c 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -53,5 +53,6 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile *f, const char *name,
-                                            uint64_t *length_list);
+-void migrate_compress_threads_join(void)
++static void compress_threads_save_cleanup(void)
+ {
+     int i, thread_count;
  
- int qemu_loadvm_state(QEMUFile *f);
-+void qemu_loadvm_state_cleanup(void);
+@@ -329,7 +329,7 @@ void migrate_compress_threads_join(void)
+     comp_param = NULL;
+ }
  
- #endif
-diff --git a/migration/trace-events b/migration/trace-events
-index 9669e94ddc..cb2c4b5b40 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -7,6 +7,8 @@ qemu_loadvm_state_section_partend(uint32_t section_id) "%u"
- qemu_loadvm_state_post_main(int ret) "%d"
- qemu_loadvm_state_section_startfull(uint32_t section_id, const char *idstr, uint32_t instance_id, uint32_t version_id) "%u(%s) %u %u"
- qemu_savevm_send_packaged(void) ""
-+loadvm_state_setup(void) ""
-+loadvm_state_cleanup(void) ""
- loadvm_handle_cmd_packaged(unsigned int length) "%u"
- loadvm_handle_cmd_packaged_main(int ret) "%d"
- loadvm_handle_cmd_packaged_received(int ret) "%d"
+-void migrate_compress_threads_create(void)
++static void compress_threads_save_setup(void)
+ {
+     int i, thread_count;
+ 
+@@ -1390,6 +1390,7 @@ static void ram_save_cleanup(void *opaque)
+     }
+     XBZRLE_cache_unlock();
+     migration_page_queue_free(*rsp);
++    compress_threads_save_cleanup();
+     g_free(*rsp);
+     *rsp = NULL;
+ }
+@@ -1923,6 +1924,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+     }
+ 
+     rcu_read_unlock();
++    compress_threads_save_setup();
+ 
+     ram_control_before_iterate(f, RAM_CONTROL_SETUP);
+     ram_control_after_iterate(f, RAM_CONTROL_SETUP);
+@@ -2231,7 +2233,7 @@ static void wait_for_decompress_done(void)
+     qemu_mutex_unlock(&decomp_done_lock);
+ }
+ 
+-void migrate_decompress_threads_create(void)
++static void compress_threads_load_setup(void)
+ {
+     int i, thread_count;
+ 
+@@ -2255,7 +2257,7 @@ void migrate_decompress_threads_create(void)
+     }
+ }
+ 
+-void migrate_decompress_threads_join(void)
++static void compress_threads_load_cleanup(void)
+ {
+     int i, thread_count;
+ 
+@@ -2321,12 +2323,14 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
+ static int ram_load_setup(QEMUFile *f, void *opaque)
+ {
+     xbzrle_load_setup();
++    compress_threads_load_setup();
+     return 0;
+ }
+ 
+ static int ram_load_cleanup(void *opaque)
+ {
+     xbzrle_load_cleanup();
++    compress_threads_load_cleanup();
+     return 0;
+ }
+ 
+diff --git a/migration/ram.h b/migration/ram.h
+index a8b79a4d4c..c081fde86c 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -39,11 +39,6 @@ int64_t xbzrle_cache_resize(int64_t new_size);
+ uint64_t ram_bytes_remaining(void);
+ uint64_t ram_bytes_total(void);
+ 
+-void migrate_compress_threads_create(void);
+-void migrate_compress_threads_join(void);
+-void migrate_decompress_threads_create(void);
+-void migrate_decompress_threads_join(void);
+-
+ uint64_t ram_pagesize_summary(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
+ void acct_update_position(QEMUFile *f, size_t size, bool zero);
 -- 
 2.13.0
