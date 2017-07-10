@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=357b4a82f=anthony.perard@citrix.com>)
-	id 1dUbZO-0008RR-JZ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:30:00 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dUbZh-0000Ij-2M
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=357b4a82f=anthony.perard@citrix.com>)
-	id 1dUbZK-0000wG-Rh
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:29:58 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:36870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=357b4a82f=anthony.perard@citrix.com>)
-	id 1dUbZK-0000vz-GZ
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:29:54 -0400
-Date: Mon, 10 Jul 2017 17:29:49 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170710162949.GC1587@perard.uk.xensource.com>
-References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-	<1499238885-26161-23-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA-B+aChqZBSnGws7RXheEyg+cutaqvXP8qVgNoUgzQAJA@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1dUbZb-00017t-Dk
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:30:12 -0400
+References: <20170628120530.31251-1-vsementsov@virtuozzo.com>
+	<20170628120530.31251-26-vsementsov@virtuozzo.com>
+	<87r2xs65a5.fsf@dusky.pond.sub.org> <20170707081305.GA15945@redhat.com>
+	<87fue839m5.fsf@dusky.pond.sub.org>
+	<5f9bd366-4bf0-6463-3de9-a60afffab7e0@virtuozzo.com>
+	<87r2xstkt1.fsf@dusky.pond.sub.org>
+	<66974ef4-b61f-821f-7969-24cfc89b4609@redhat.com>
+	<87k23g7pnk.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <0a94709f-60fd-ac16-08ca-8e87364bdadc@redhat.com>
+Date: Mon, 10 Jul 2017 12:29:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-B+aChqZBSnGws7RXheEyg+cutaqvXP8qVgNoUgzQAJA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 22/42] configure: factor out list of
- supported Xen/KVM/HAX targets
+In-Reply-To: <87k23g7pnk.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v22 25/30] qmp: add
+ x-debug-block-dirty-bitmap-sha256
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +31,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, den@openvz.org
 
-On Mon, Jul 10, 2017 at 04:49:18PM +0100, Peter Maydell wrote:
-> On 5 July 2017 at 08:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > This will be useful when the functions are called, early in the configure
-> > process, to filter out targets that do not support hardware acceleration.
-> >
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> > +supported_xen_target() {
-> > +    test "$xen" = "yes" || return 1
-> > +    glob "$1" "*-softmmu" || return 1
-> > +    case "${1%-softmmu}:$cpu" in
-> > +        arm:arm | aarch64:aarch64 | \
-> > +        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
-> > +            return 0
-> > +        ;;
-> 
-> This says that arm-on-arm and aarch64-on-aarch64 are supported
-> Xen targets...
-> 
-> > +    esac
-> > +    return 1
-> > +}
-> > +
-> 
-> 
-> >  if [ "$HOST_VARIANT_DIR" != "" ]; then
-> >      echo "HOST_VARIANT_DIR=$HOST_VARIANT_DIR" >> $config_target_mak
-> >  fi
-> > -case "$target_name" in
-> > -  i386|x86_64)
-> > -    if test "$xen" = "yes" -a "$target_softmmu" = "yes" ; then
-> > -      echo "CONFIG_XEN=y" >> $config_target_mak
-> > -      if test "$xen_pci_passthrough" = yes; then
-> > +
-> > +if supported_xen_target $target; then
-> > +    echo "CONFIG_XEN=y" >> $config_target_mak
-> > +    if test "$xen_pci_passthrough" = yes; then
-> 
-> ...but previously we only enabled CONFIG_XEN on i386 or x86_64
-> targets.
-> 
-> Alex points out that the shippable builds now fail for aarch64
-> and arm. (I think that my test machines for aarch64 and arm
-> don't fail like this because they happen not to have the Xen
-> headers installed, so the overall "does Xen work on this host"
-> check fails; the shippable configs do pass that test so they
-> try to build the Xen code.)
-> 
-> https://app.shippable.com/github/qemu/qemu/runs/267/2/console
-> 
-> exec.o: In function `reclaim_ramblock':
-> /root/src/github.com/qemu/qemu/exec.c:2071: undefined reference to
-> `xen_invalidate_map_cache_entry'
-> exec.o: In function `qemu_map_ram_ptr':
-> /root/src/github.com/qemu/qemu/exec.c:2177: undefined reference to
-> `xen_map_cache'
-> /root/src/github.com/qemu/qemu/exec.c:2174: undefined reference to
-> `xen_map_cache'
-> exec.o: In function `qemu_ram_block_from_host':
-> /root/src/github.com/qemu/qemu/exec.c:2242: undefined reference to
-> `xen_ram_addr_from_mapcache'
-> /root/src/github.com/qemu/qemu/exec.c:2242: undefined reference to
-> `xen_ram_addr_from_mapcache'
-> exec.o: In function `qemu_ram_ptr_length':
-> /root/src/github.com/qemu/qemu/exec.c:2210: undefined reference to
-> `xen_map_cache'
-> /root/src/github.com/qemu/qemu/exec.c:2207: undefined reference to
-> `xen_map_cache'
-> exec.o: In function `address_space_unmap':
-> /root/src/github.com/qemu/qemu/exec.c:3357: undefined reference to
-> `xen_invalidate_map_cache_entry'
-> hw/xen/xen_pt.o: In function `xen_pt_pci_read_config':
-> /root/src/github.com/qemu/qemu/hw/xen/xen_pt.c:206: undefined
-> reference to `xen_shutdown_fatal_error'
-> hw/xen/xen_pt.o: In function `xen_igd_passthrough_isa_bridge_create':
-> /root/src/github.com/qemu/qemu/hw/xen/xen_pt.c:698: undefined
-> reference to `igd_passthrough_isa_bridge_create'
-> hw/xen/xen_pt.o: In function `xen_pt_pci_write_config':
-> /root/src/github.com/qemu/qemu/hw/xen/xen_pt.c:355: undefined
-> reference to `xen_shutdown_fatal_error'
-> hw/xen/xen_pt_config_init.o: In function `xen_pt_status_reg_init':
-> /root/src/github.com/qemu/qemu/hw/xen/xen_pt_config_init.c:281:
-> undefined reference to `xen_shutdown_fatal_error'
-> /root/src/github.com/qemu/qemu/hw/xen/xen_pt_config_init.c:275:
-> undefined reference to `xen_shutdown_fatal_error'
-> hw/xen/xen_pt_graphics.o: In function `get_vgabios':
-> /root/src/github.com/qemu/qemu/hw/xen/xen_pt_graphics.c:135: undefined
-> reference to `pci_assign_dev_load_option_rom'
-> collect2: error: ld returned 1 exit status
 
-Our CI also fail on this merge, QEMU build fine, be it can't be use.
-Error message (on arm*):
-qemu-system-i386: -xen-domid 1: Option not supported for this target
 
-Full log: http://logs.test-lab.xenproject.org/osstest/logs/111601/
+On 07/10/2017 02:49 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+>=20
+>> On 07/07/2017 09:53 AM, Markus Armbruster wrote:
+>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>
+>>>> 07.07.2017 12:00, Markus Armbruster wrote:
+>>>>> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>>>>>
+>>>>>> On Fri, Jul 07, 2017 at 10:05:22AM +0200, Markus Armbruster wrote:
+>>>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>>>>
+>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozz=
+o.com>
+>>>>>>>> ---
+>>>>>>>>   block/dirty-bitmap.c         |  5 +++++
+>>>>>>>>   blockdev.c                   | 25 +++++++++++++++++++++++++
+>>>>>>>>   include/block/dirty-bitmap.h |  1 +
+>>>>>>>>   include/qemu/hbitmap.h       |  8 ++++++++
+>>>>>>>>   qapi/block-core.json         | 27 +++++++++++++++++++++++++++
+>>>>>>>>   tests/Makefile.include       |  2 +-
+>>>>>>>>   util/hbitmap.c               | 11 +++++++++++
+>>>>>>>>   7 files changed, 78 insertions(+), 1 deletion(-)
+>>>>>>> [...]
+>>>>>>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>>>>>>>> index 5c42cc7790..6ad8585400 100644
+>>>>>>>> --- a/qapi/block-core.json
+>>>>>>>> +++ b/qapi/block-core.json
+>>>>>>>> @@ -1644,6 +1644,33 @@
+>>>>>>>>     'data': 'BlockDirtyBitmap' }
+>>>>>>>>     ##
+>>>>>>>> +# @BlockDirtyBitmapSha256:
+>>>>>>>> +#
+>>>>>>>> +# SHA256 hash of dirty bitmap data
+>>>>>>>> +#
+>>>>>>>> +# @sha256: ASCII representation of SHA256 bitmap hash
+>>>>>>> Spell it SHA-256, please.  The member name @sha256 can stay.
+>>>>>>>
+>>>>>>> SHA-256 is 256 binary bits.  Please specify how they are represen=
+ted in
+>>>>>>> ASCII.  It better be base64 (RFC 4648), because we use that elsew=
+here.
+>>>>>> It is filled later in this patch using qcrypto_hash_digest, so it =
+is just
+>>>>>> a hex string representing the hash, not base64. For the latter you=
+ can
+>>>>>> use qcrypto_hash_base64
+>>>>> I got two points:
+>>>>>
+>>>>> 1. Whatever encoding we use, it needs to be documented.
+>>>>>
+>>>>> 2. The fewer binary -> ASCII encodings we use, the better.  We alre=
+ady
+>>>>> use base64.
+>>>>
+>>>>
+>>>> ASCII format for check sum is more common as it is more readable. It
+>>>> is used in the internet to check downloads, it is used by standard
+>>>> utility sha256sum. So, it may be better for the monitor.
+>>>>
+>>>> However, if it is needed, I can make a follow-up patch, it is very
+>>>> easy, just s/qcrypto_hash_digest/qcrypto_hash_base64/ in
+>>>> util/hbitmap.c. iotest 165 - the only user of the feature - doesn't
+>>>> need any changes.
+>>>
+>>> If the is a standard way to represent SHA-256 in ASCII, use it.
+>>>
+>>> Whatever you use, document it clearly in the QAPI schema.
+>>>
+>>
+>> I... should we, though? It's a debug interface for testing only,
+>> basically. Couldn't think of a better way to test it, and people
+>> demanded tests.
+>>
+>> How's this for documentation:
+>>
+>> "The hash will be in an arbitrary format that changes every time you
+>> look away from this specification. Any similarity, real or imagined, t=
+o
+>> a canonical SHA-256 ASCII string is purely coincidental."
+>>
+>> Basically, I would actually rather go out of my way to obfuscate this
+>> command, not document it...
+>>
+>> Maybe that's wrong-headed of me, but I still maintain that it's not
+>> terribly important because I'd rather people never, ever try to use th=
+is
+>> in production.
+>=20
+> It is wrong-headed of you :)
+>=20
 
--- 
-Anthony PERARD
+I figured so, but I wanted to be very facetiously clear that we didn't
+really intend for this to be used outside of our own testing suite. I'd
+love to not even have it be a real QMP interface available in
+non-testing binaries at all, but that gets weird quickly.
+
+Sorry for being a wise-ass.
+
+> We mark stuff not covered by QMP's compatibility promise with x-
+> prefixes, not with incomplete documentation, and not by obsfuscating it=
+.
+> People trying to use this in non-production need to know how it works,
+> too.
+>=20
+> If you think people need to be scared away some more, feel free to writ=
+e
+> something like "currently SHA-256 ASCII".  If that's not enough of a
+> hint for you, you might add "but you shouldn't rely on that".
+>=20
+
+I'd still like to decorate it with some little emoji skulls, too. =E2=98=A0=
+=E2=98=A0=F0=9F=92=80=F0=9F=92=80
+Make sure people know it's a very bad idea to use it. Maybe QEMU can do
+some wall text whenever it gets used that says "Someone is doing
+something very naughty when we asked very nicely for them not to."
+
+Kidding again, of course, but just trying to emphasize that this command
+literally serves no purpose other than for testing and is not expected
+to be used apart from that.
+
+The format could be changed if you desired, but as this has been on the
+list for over a year, I'd have to unfortunately request that you make
+that change if it was important to you.
+
+--js
