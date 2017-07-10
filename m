@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUZDg-00063L-Qr
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:59:25 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dUZEH-0006Z6-3X
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:00:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUZDg-0000jn-1P
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:59:24 -0400
-Date: Mon, 10 Jul 2017 15:59:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170710135902.GL5772@noname.redhat.com>
-References: <20170710083553.6167-1-den@openvz.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dUZED-00011v-5s
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 10:00:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46006)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUZED-000116-03
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:59:57 -0400
+Date: Mon, 10 Jul 2017 10:59:43 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170710135943.GG12152@localhost.localdomain>
+References: <1499237876.3041.4.camel@linux.intel.com>
+	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
+	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
+	<20170707133949.GH10776@localhost.localdomain>
+	<20170707181642-mutt-send-email-mst@kernel.org>
+	<20170707180358.GA12152@localhost.localdomain>
+	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170710083553.6167-1-den@openvz.org>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/1] block: fix possible
- return code clobbering in bdrv_co_pdiscard
+In-Reply-To: <626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,33 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, Laszlo Ersek <lersek@redhat.com>
 
-Am 10.07.2017 um 10:35 hat Denis V. Lunev geschrieben:
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Stefan Hajnoczi <stefanha@redhat.com> (supporter:Block I/O path)
-> CC: Fam Zheng <famz@redhat.com> (supporter:Block I/O path)
-> ---
->  block/io.c | 1 -
->  1 file changed, 1 deletion(-)
+On Mon, Jul 10, 2017 at 10:42:26AM +0300, Marcel Apfelbaum wrote:
+> On 07/07/2017 21:03, Eduardo Habkost wrote:
+> > On Fri, Jul 07, 2017 at 06:17:57PM +0300, Michael S. Tsirkin wrote:
+> > > On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
+> > > > On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
+[...]
+> > > > > 
+> > > > > The upper layers should manage the defaults by themselves so
+> > > > > are not supposed to be affected.
+> > > > 
+> > > > But they would be.  libvirt uses the default machine-type from
+> > > > QEMU.
+> > > 
+> > > How about extending the command for supported machines with a
+> > > recommended machine type, and teaching libvirt to use that?
+> > 
+> > I don't think QEMU has enough information to decide if it should
+> > recommend "q35" or "pc".
 > 
-> diff --git a/block/io.c b/block/io.c
-> index ed31810c0a..e5c6dc77d3 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -2464,7 +2464,6 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverState *bs, int64_t offset,
->      assert(max_pdiscard >= bs->bl.request_alignment);
->  
->      while (count > 0) {
-> -        int ret;
->          int num = count;
->  
->          if (head) {
+> We don't really need a complicated rule set, we would just recommend q35
+> by default. Libvirt will try to create the default machine and if fails
+> for some reason (what would it be?) it can switch to PC.
+> 
+> The advanced logic would be "old systems should use PC", where old
+> means Windows XP and before and so on. But this logic should appear
+> in management layers above.
 
-Good catch, and the fix looks fine.
+In this case, is there any difference between "changing the
+default to q35" and "recommending q35", for libvirt users?
 
-This needs rebasing, though (conflicts with commit f5a5ca7 'block:
-change variable names in BlockDriverState').
-
-Kevin
+-- 
+Eduardo
