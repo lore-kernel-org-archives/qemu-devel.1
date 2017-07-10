@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dUSkO-0001pU-Os
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:04:45 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUStE-0006Du-Ou
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dUSkK-00037k-2o
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:04:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dUSkJ-00037N-Sb
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:04:40 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 10 Jul 2017 09:04:32 +0200
-Message-Id: <20170710070432.856-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio-gpu: skip update cursor in post_load if
- we don't have one
+	(envelope-from <rth7680@gmail.com>) id 1dUStB-0006oa-FX
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:13:52 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:34742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUStB-0006oM-9C
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:13:49 -0400
+Received: by mail-it0-x242.google.com with SMTP id o202so11933739itc.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:13:49 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1499669979-25904-1-git-send-email-jiang.biao2@zte.com.cn>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <0eddd3b6-c05b-8b8f-f0d8-5745bde073e9@twiddle.net>
+Date: Sun, 9 Jul 2017 21:13:25 -1000
+MIME-Version: 1.0
+In-Reply-To: <1499669979-25904-1-git-send-email-jiang.biao2@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] tcg/mips: Bugfix for crash when running
+ program with qemu-i386.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +31,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: wanghaibin.wang@huawei.com, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiang Biao <jiang.biao2@zte.com.cn>, qemu-devel@nongnu.org
+Cc: jinguojie@loongson.cn, james.hogan@imgtec.com, jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, zhong.weidong@zte.com.cn
 
-If the cursor resource id isn't set the guest didn't define a cursor.
-Skip the cursor update in post_load in that that case.
+On 07/09/2017 08:59 PM, Jiang Biao wrote:
+> When running a helloworld program with qemu-i386 in linux-user
+> mode on Loongson 3A3000, it will crash. This patch fix the bug.
+> 
+> Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
 
-Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/virtio-gpu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks, applied to tcg-next.
 
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 58dc0b2737..eef11083d7 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1092,7 +1092,9 @@ static int virtio_gpu_load(QEMUFile *f, void *opaque, size_t size,
- 
-         dpy_gfx_replace_surface(scanout->con, scanout->ds);
-         dpy_gfx_update(scanout->con, 0, 0, scanout->width, scanout->height);
--        update_cursor(g, &scanout->cursor);
-+        if (scanout->cursor.resource_id) {
-+            update_cursor(g, &scanout->cursor);
-+        }
-         res->scanout_bitmask |= (1 << i);
-     }
- 
--- 
-2.9.3
+
+r~
