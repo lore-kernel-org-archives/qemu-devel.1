@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUacu-0002z9-QM
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:29:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dUafg-0004ZI-Bt
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUact-0007tL-Tw
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:29:32 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <149865219962.17063.10630533069463266646.stgit@frigg.lan>
-	<149865776960.17063.4875279139522061160.stgit@frigg.lan>
-	<2bfdb883-f19b-7fcf-c28b-7ce39115937e@twiddle.net>
-	<87podcebyi.fsf@frigg.lan>
-	<3745ae02-3fb0-1503-9c99-98dce369f697@twiddle.net>
-	<87lgo0cgij.fsf@frigg.lan>
-	<260addd5-45fe-ad10-5208-35906fd3f197@twiddle.net>
-	<87k23gl7yd.fsf@frigg.lan>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a464e904-4080-319b-62e2-e3090ac9af9d@twiddle.net>
-Date: Mon, 10 Jul 2017 05:28:16 -1000
+	(envelope-from <eblake@redhat.com>) id 1dUaff-0002An-BL
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:32:24 -0400
+References: <20170710150559.30163-1-den@openvz.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0d456c94-180c-089a-8379-e50e4482901a@redhat.com>
+Date: Mon, 10 Jul 2017 10:32:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <87k23gl7yd.fsf@frigg.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v11 23/29] target/arm: [tcg] Port to
- translate_insn
+In-Reply-To: <20170710150559.30163-1-den@openvz.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I"
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] block: fix shadowed variable in
+ bdrv_co_pdiscard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 07/10/2017 03:47 AM, Lluís Vilanova wrote:
-> Richard Henderson writes:
-> 
->> On 07/07/2017 07:18 AM, Lluís Vilanova wrote:
->>> There was no code being generated after this specific case, but I haven't
->>> checked if DISAS_EXC is set in any other place that is not immediately followed
->>> by a "goto done_generating".
-> 
->> Typically we haven't actually done a goto, but simply exit the loop and emit
->> nothing within the final cleanup (tb_stop?).
-> 
-> The case handled by DISAS_SKIP ignores tb_stop() (the target code can simply
-> return when DISAS_EXC is found instead of DISAS_SKIP) *and* gen_io_end(); this
-> last one is never omitted when DISAS_EXC is found now, and theoretically
-> DISAS_EXC can be set by any target-specific hook. Thus my question if the
-> generic call to gen_io_end() should check for DISAS_EXC too (I have no idea if
-> it would be an error to call it with DISAS_EXC set, or whether it makes sense to
-> for a target to set it so that gen_io_start() is called but gen_io_end() is then
-> skipped by a DISAS_EXC set in ops->translate_insn()).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I
+From: Eric Blake <eblake@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <0d456c94-180c-089a-8379-e50e4482901a@redhat.com>
+Subject: Re: [PATCH v2 1/1] block: fix shadowed variable in bdrv_co_pdiscard
+References: <20170710150559.30163-1-den@openvz.org>
+In-Reply-To: <20170710150559.30163-1-den@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It is not an error to call gen_io_start when gen_io_end isn't called (or isn't 
-reached).  There are many ways that can happen.
+On 07/10/2017 10:05 AM, Denis V. Lunev wrote:
+> We've had a shadowed 'ret' variable, which risks returning the wrong
+> value, introduced in commit b9c64947.
+>=20
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> CC: Stefan Hajnoczi <stefanha@redhat.com>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> CC: Eric Blake <eblake@redhat.com>
+> ---
+>  block/io.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
 
-The reason that arm does the goto after the gen_exception for single-stepping 
-was simply convenience.  Nothing would have gone wrong if it had used
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-	dc->is_jmp = DISAS_EXC;
-	break;
+> diff --git a/block/io.c b/block/io.c
+> index 23170a57ee..87208990c4 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2327,7 +2327,6 @@ int coroutine_fn bdrv_co_pdiscard(BlockDriverStat=
+e *bs, int64_t offset,
+>      assert(max_pdiscard >=3D bs->bl.request_alignment);
+> =20
+>      while (bytes > 0) {
+> -        int ret;
+>          int num =3D bytes;
+> =20
+>          if (head) {
+>=20
 
-instead.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZY532AAoJEKeha0olJ0NqAGwH/0/wJDmUUYKx4G8NXzloaTeA
+KqzcpcVlISTU5bZxueFMPi5k+5el9vd370lwXD10UFgJ73A41bpjuz5AufFLT5HV
+2d2EdAoTaWg9cH0GbUR0TLPU6pQRTbd9Cyq00ZU8PEO+zu+7ZVjtt6SSL/MXFuyL
+OKvQiw5tsC8ClszpiYAXUBwF7Kwtdi/cxlVtA+T/+oUctwRTjCWt5V8exjSrGYuH
+AS0vmPjnCLK9w/TplIEuqtKKzrhmHVmwzdu4HGyvxtFPZ4lHZToUv5Pcf7gqT+hq
+XgQ64OCIYEJQo0K7QlDMDbpC0Qw6nWoLumKfVyOfZZkOUL9irLnTrrDsB+rtmto=
+=jiUi
+-----END PGP SIGNATURE-----
+
+--wEeokI3Gh4LEdlg6Cx1uRuJ6D8J0VBG9I--
