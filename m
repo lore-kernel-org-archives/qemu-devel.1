@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUStE-0006Du-Ou
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:13:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dUSzI-0008Ox-Nn
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:20:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUStB-0006oa-FX
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:13:52 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:34742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUStB-0006oM-9C
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:13:49 -0400
-Received: by mail-it0-x242.google.com with SMTP id o202so11933739itc.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 00:13:49 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1499669979-25904-1-git-send-email-jiang.biao2@zte.com.cn>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0eddd3b6-c05b-8b8f-f0d8-5745bde073e9@twiddle.net>
-Date: Sun, 9 Jul 2017 21:13:25 -1000
-MIME-Version: 1.0
-In-Reply-To: <1499669979-25904-1-git-send-email-jiang.biao2@zte.com.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+	(envelope-from <kraxel@redhat.com>) id 1dUSzF-0000RO-Ib
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:20:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dUSzF-0000R2-BN
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 03:20:05 -0400
+Message-ID: <1499671202.23551.10.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 10 Jul 2017 09:20:02 +0200
+In-Reply-To: <a58a7cf7-a079-2799-ac99-696b85ecc654@suse.de>
+References: <1499234355-138591-1-git-send-email-agraf@suse.de>
+	<87bmozb7hj.fsf@dusky.pond.sub.org>
+	<a58a7cf7-a079-2799-ac99-696b85ecc654@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] tcg/mips: Bugfix for crash when running
- program with qemu-i386.
+Subject: Re: [Qemu-devel] [PATCH] vnc: Set default kbd delay to 10ms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiang Biao <jiang.biao2@zte.com.cn>, qemu-devel@nongnu.org
-Cc: jinguojie@loongson.cn, james.hogan@imgtec.com, jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, zhong.weidong@zte.com.cn
+To: Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 07/09/2017 08:59 PM, Jiang Biao wrote:
-> When running a helloworld program with qemu-i386 in linux-user
-> mode on Loongson 3A3000, it will crash. This patch fix the bug.
+On Thu, 2017-07-06 at 09:08 +0200, Alexander Graf wrote:
 > 
-> Signed-off-by: Jiang Biao <jiang.biao2@zte.com.cn>
+> On 05.07.17 10:42, Markus Armbruster wrote:
+> > Alexander Graf <agraf@suse.de> writes:
+> > 
+> > > The default keyboard delay time in the input layer is 10ms. I
+> > > don't know
+> > 
+> > Do you mean "is 1ms"?
+> 
+> Yes, of course :). Sorry.
 
-Thanks, applied to tcg-next.
+Given the last paragraph of the commit message 10ms looks correct.  If
+you change it to 1ms you also want to change "input layer" to "vnc
+server" ...
 
+Or, better, move the last paragraph (which points out the inconsistency
+ between input layer and vnc server defaults) to the top, then it's
+easier to read I guess.
 
-r~
+cheers,
+  Gerd
+
+> 
+> Alex
+> 
+> > 
+> > > how that number came to be, but empirical tests on some OpenQA
+> > > driven ARM
+> > > systems show that 10ms really is a reasonable default number for
+> > > the delay.
+> > > 
+> > > With the current 1ms we're constantly typing faster than the
+> > > guest receives
+> > > keyboard events from our XHCI attached USB HID device.
+> > > 
+> > > This patch moves the delay to 10ms. That way our default is much
+> > > safer (good!)
+> > > and also consistent with the input layer default (also good!).
+> > > 
+> > > Signed-off-by: Alexander Graf <agraf@suse.de>
