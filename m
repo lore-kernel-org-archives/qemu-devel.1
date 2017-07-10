@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUbh4-0006Ze-6Z
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:37:55 -0400
+	(envelope-from <mst@redhat.com>) id 1dUbio-0007zh-J3
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUbh3-000631-Cc
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:37:54 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170710154749.13624-1-alex.bennee@linaro.org>
-	<20170710154749.13624-5-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <1e6a695b-92b1-578d-5467-569ec28b6a30@twiddle.net>
-Date: Mon, 10 Jul 2017 06:37:11 -1000
+	(envelope-from <mst@redhat.com>) id 1dUbil-00075l-Fx
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:39:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dUbil-000749-9e
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:39:39 -0400
+Date: Mon, 10 Jul 2017 19:39:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170710193708-mutt-send-email-mst@kernel.org>
+References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
+	<0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170710154749.13624-5-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/6] target/arm/translate-a64: get rid
- of DISAS_EXIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,22 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org
-Cc: qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, amit@kernel.org, pbonzini@redhat.com, den@openvz.org
 
-On 07/10/2017 05:47 AM, Alex Bennée wrote:
-> We already have an exit condition that declares we should exit to the
-> run-loop because wider CPU state changes have been made. Use
-> DISAS_UPDATE and kill the architecture specific DISAS_EXIT.
+On Mon, Jul 10, 2017 at 04:13:54PM +0200, Laurent Vivier wrote:
+> >  static void virtconsole_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+> > @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
+> >      k->unrealize = virtconsole_unrealize;
+> >      k->have_data = flush_buf;
+> >      k->set_guest_connected = set_guest_connected;
+> > +    k->enable_backend = virtconsole_enable_backend;
 > 
-> Signed-off-by: Alex Bennée<alex.bennee@linaro.org>
-> ---
->   target/arm/translate-a64.c | 3 +--
->   target/arm/translate.c     | 6 ++++--
->   target/arm/translate.h     | 4 ----
->   3 files changed, 5 insertions(+), 8 deletions(-)
+> Why don't you register a  vm_state change handler to change the state of
+> the virtconsole according to the state of the machine instead of adding
+> a new function in the VirtIOSerialPortClass?
+> 
+> See a23a6d1 ("virtio-rng: stop virtqueue while the CPU is stopped")
+> 
+> Thanks,
+> Laurent
 
-I really thought it was clearer the other way around.
 
+In fact that commit does it the wrong way IMHO.
 
-r~
+The order of this call wrt other virtio calls is not
+guaranteed.
+
+IMHO the right way is to set a vm state change handler in VirtioBusClass
+or status change handler in VirtioDeviceClass.
+
+-- 
+MST
