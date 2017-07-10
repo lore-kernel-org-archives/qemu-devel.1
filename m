@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dUagS-00057O-7e
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1dUagV-0005Ag-N4
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dUagO-0002wK-9U
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57700)
+	(envelope-from <thuth@redhat.com>) id 1dUagU-000371-Bc
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dUagO-0002uZ-10
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:08 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dUagU-00035Y-2s
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 11:33:14 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 10 Jul 2017 17:32:36 +0200
-Message-Id: <1499700760-4777-7-git-send-email-thuth@redhat.com>
+Date: Mon, 10 Jul 2017 17:32:38 +0200
+Message-Id: <1499700760-4777-9-git-send-email-thuth@redhat.com>
 In-Reply-To: <1499700760-4777-1-git-send-email-thuth@redhat.com>
 References: <1499700760-4777-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 06/10] pc-bios/s390-ccw: Add code for virtio
- feature negotiation
+Subject: [Qemu-devel] [PATCH v3 08/10] pc-bios/s390-ccw: Add core files for
+ the network bootloading program
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +27,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-The upcoming virtio-net driver needs to negotiate some features,
-so we need the possibility to do this in the core virtio code.
+This is just a preparation for the next steps: Add a makefile and a
+stripped down copy of pc-bios/s390-ccw/main.c as a basis for the network
+bootloader program, linked against the libc from SLOF already (which we
+will need for SLOF's libnet). The networking code is not included yet.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/s390-ccw.h      |  2 ++
- pc-bios/s390-ccw/virtio-blkdev.c |  3 ++-
- pc-bios/s390-ccw/virtio.c        | 25 ++++++++++++++++++-------
- pc-bios/s390-ccw/virtio.h        |  2 +-
- 4 files changed, 23 insertions(+), 9 deletions(-)
+ pc-bios/s390-ccw/Makefile    |  11 +++-
+ pc-bios/s390-ccw/netboot.mak |  41 +++++++++++++
+ pc-bios/s390-ccw/netmain.c   | 140 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 190 insertions(+), 2 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/netboot.mak
+ create mode 100644 pc-bios/s390-ccw/netmain.c
 
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 6fdc858..25d4d21 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -44,6 +44,8 @@ typedef unsigned long long __u64;
-                             ((b) == 0 ? (a) : (MIN(a, b))))
- #endif
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 82b41ef..cbae745 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -16,7 +16,7 @@ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+ QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
+ LDFLAGS += -Wl,-pie -nostdlib
  
-+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+-build-all: s390-ccw.img
++build-all: s390-ccw.img s390-netboot.img
+ 
+ s390-ccw.elf: $(OBJECTS)
+ 	$(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(OBJECTS),"BUILD","$(TARGET_DIR)$@")
+@@ -28,5 +28,12 @@ s390-ccw.img: s390-ccw.elf
+ 
+ $(OBJECTS): Makefile
+ 
++ifneq ($(wildcard $(SRC_PATH)/roms/SLOF/lib/libnet),)
++include $(SRC_PATH)/pc-bios/s390-ccw/netboot.mak
++else
++s390-netboot.img:
++	@echo "s390-netboot.img not built since roms/SLOF/ is not available."
++endif
 +
- #include "cio.h"
- #include "iplb.h"
- 
-diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
-index 6cb77bc..ed4026f 100644
---- a/pc-bios/s390-ccw/virtio-blkdev.c
-+++ b/pc-bios/s390-ccw/virtio-blkdev.c
-@@ -266,9 +266,10 @@ uint64_t virtio_get_blocks(void)
- void virtio_blk_setup_device(SubChannelId schid)
- {
-     VDev *vdev = virtio_get_device();
-+    uint32_t guestfeats[2] = { 0, 0 };
- 
-     vdev->schid = schid;
--    virtio_setup_ccw(vdev);
-+    virtio_setup_ccw(vdev, guestfeats);
- 
-     switch (vdev->senseid.cu_model) {
-     case VIRTIO_ID_BLOCK:
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index 09ab291..e3dcfd3 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -12,6 +12,7 @@
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "virtio-scsi.h"
-+#include "bswap.h"
- 
- #define VRING_WAIT_REPLY_TIMEOUT 3
- 
-@@ -247,10 +248,14 @@ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd)
-     return 0;
- }
- 
--void virtio_setup_ccw(VDev *vdev)
-+void virtio_setup_ccw(VDev *vdev, uint32_t guestfeats[2])
- {
--    int i, cfg_size = 0;
-+    int i, rc, cfg_size = 0;
-     unsigned char status = VIRTIO_CONFIG_S_DRIVER_OK;
-+    struct VirtioFeatureDesc {
-+        uint32_t features;
-+        uint8_t index;
-+    } __attribute__((packed)) feats;
- 
-     IPL_assert(virtio_is_supported(vdev->schid), "PE");
-     /* device ID has been established now */
-@@ -277,11 +282,17 @@ void virtio_setup_ccw(VDev *vdev)
-     IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size) == 0,
-                "Could not get block device configuration");
- 
--    /*
--     * Skipping CCW_CMD_READ_FEAT. We're not doing anything fancy, and
--     * we'll just stop dead anyway if anything does not work like we
--     * expect it.
--     */
-+    /* Feature negotiation */
-+    for (i = 0; i < ARRAY_SIZE(guestfeats); i++) {
-+        feats.features = 0;
-+        feats.index = i;
-+        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
-+        IPL_assert(rc == 0, "Could not get features bits");
-+        guestfeats[i] &= bswap32(feats.features);
-+        feats.features = bswap32(guestfeats[i]);
-+        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
-+        IPL_assert(rc == 0, "Could not set features bits");
+ clean:
+-	rm -f *.o *.d *.img *.elf *~
++	$(RM) *.o *.d *.img *.elf *~ *.a
+diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+new file mode 100644
+index 0000000..1eaa0d8
+--- /dev/null
++++ b/pc-bios/s390-ccw/netboot.mak
+@@ -0,0 +1,41 @@
++
++SLOF_DIR := $(SRC_PATH)/roms/SLOF
++
++NETOBJS := start.o sclp.o virtio.o netmain.o sbrk.o libc.a
++
++LIBC_INC := -I$(SLOF_DIR)/lib/libc/include
++LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
++
++NETLDFLAGS := $(LDFLAGS) -Ttext=0x7800000
++
++$(NETOBJS): CFLAGS += $(LIBC_INC) $(LIBNET_INC)
++
++s390-netboot.elf: $(NETOBJS)
++	$(call quiet-command,$(CC) $(NETLDFLAGS) -o $@ $(NETOBJS),"BUILD","$(TARGET_DIR)$@")
++
++s390-netboot.img: s390-netboot.elf
++	$(call quiet-command,$(STRIP) --strip-unneeded $< -o $@,"STRIP","$(TARGET_DIR)$@")
++
++
++LIBCCMNDIR = $(SLOF_DIR)/lib/libc
++STRINGCMNDIR = $(LIBCCMNDIR)/string
++CTYPECMNDIR = $(LIBCCMNDIR)/ctype
++STDLIBCMNDIR = $(LIBCCMNDIR)/stdlib
++STDIOCMNDIR = $(LIBCCMNDIR)/stdio
++
++include $(STRINGCMNDIR)/Makefile.inc
++include $(CTYPECMNDIR)/Makefile.inc
++include $(STDLIBCMNDIR)/Makefile.inc
++include $(STDIOCMNDIR)/Makefile.inc
++
++STDIO_OBJS = sprintf.o vfprintf.o vsnprintf.o vsprintf.o fprintf.o \
++	     printf.o putc.o puts.o putchar.o stdchnls.o fileno.o
++
++LIBCOBJS := $(STRING_OBJS) $(CTYPE_OBJS) $(STDLIB_OBJS) $(STDIO_OBJS)
++$(LIBCOBJS): CFLAGS += $(LIBC_INC) $(QEMU_CFLAGS)
++
++libc.a: $(LIBCOBJS)
++	$(call quiet-command,$(AR) -rc $@ $^,"AR","$(TARGET_DIR)$@")
++
++sbrk.o: $(SLOF_DIR)/slof/sbrk.c
++	$(call quiet-command,$(CC) $(QEMU_CFLAGS) $(LIBC_INC) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+new file mode 100644
+index 0000000..fcdd7a1
+--- /dev/null
++++ b/pc-bios/s390-ccw/netmain.c
+@@ -0,0 +1,140 @@
++/*
++ * S390 virtio-ccw network boot loading program
++ *
++ * Copyright 2017 Thomas Huth, Red Hat Inc.
++ *
++ * Based on the S390 virtio-ccw loading program (main.c)
++ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
++
++#include <stdint.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <time.h>
++
++#include "s390-ccw.h"
++#include "virtio.h"
++
++extern char _start[];
++
++char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
++IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
++
++static SubChannelId blk_schid = { .one = 1 };
++static uint64_t dest_timer;
++
++static uint64_t get_timer_ms(void)
++{
++    uint64_t clk;
++
++    asm volatile(" stck %0 " : : "Q"(clk) : "memory");
++
++    /* Bit 51 is incrememented each microsecond */
++    return (clk >> (63 - 51)) / 1000;
++}
++
++void set_timer(int val)
++{
++    dest_timer = get_timer_ms() + val;
++}
++
++int get_timer(void)
++{
++    return dest_timer - get_timer_ms();
++}
++
++int get_sec_ticks(void)
++{
++    return 1000;    /* number of ticks in 1 second */
++}
++
++void panic(const char *string)
++{
++    sclp_print(string);
++    for (;;) {
++        disabled_wait();
 +    }
- 
-     for (i = 0; i < vdev->nr_vqs; i++) {
-         VqInfo info = {
-diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
-index d743919..e3d7150 100644
---- a/pc-bios/s390-ccw/virtio.h
-+++ b/pc-bios/s390-ccw/virtio.h
-@@ -295,6 +295,6 @@ int drain_irqs(SubChannelId schid);
- void vring_send_buf(VRing *vr, void *p, int len, int flags);
- int vring_wait_reply(void);
- int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
--void virtio_setup_ccw(VDev *vdev);
-+void virtio_setup_ccw(VDev *vdev, uint32_t guestfeats[2]);
- 
- #endif /* VIRTIO_H */
++}
++
++static bool find_dev(Schib *schib, int dev_no)
++{
++    int i, r;
++
++    for (i = 0; i < 0x10000; i++) {
++        blk_schid.sch_no = i;
++        r = stsch_err(blk_schid, schib);
++        if (r == 3 || r == -EIO) {
++            break;
++        }
++        if (!schib->pmcw.dnv) {
++            continue;
++        }
++        if (!virtio_is_supported(blk_schid)) {
++            continue;
++        }
++        /* Skip net devices since no IPLB is created and therefore no
++         * no network bootloader has been loaded
++         */
++        if (virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
++            continue;
++        }
++        if (dev_no < 0 || schib->pmcw.dev == dev_no) {
++            return true;
++        }
++    }
++
++    return false;
++}
++
++static void virtio_setup(void)
++{
++    Schib schib;
++    int ssid;
++    bool found = false;
++    uint16_t dev_no;
++
++    /*
++     * We unconditionally enable mss support. In every sane configuration,
++     * this will succeed; and even if it doesn't, stsch_err() can deal
++     * with the consequences.
++     */
++    enable_mss_facility();
++
++    if (store_iplb(&iplb)) {
++        IPL_assert(iplb.pbt == S390_IPL_TYPE_CCW, "IPL_TYPE_CCW expected");
++        dev_no = iplb.ccw.devno;
++        debug_print_int("device no. ", dev_no);
++        blk_schid.ssid = iplb.ccw.ssid & 0x3;
++        debug_print_int("ssid ", blk_schid.ssid);
++        found = find_dev(&schib, dev_no);
++    } else {
++        for (ssid = 0; ssid < 0x3; ssid++) {
++            blk_schid.ssid = ssid;
++            found = find_dev(&schib, -1);
++            if (found) {
++                break;
++            }
++        }
++    }
++
++    IPL_assert(found && virtio_get_device_type() == VIRTIO_ID_NET,
++               "No virtio net device found");
++}
++
++void main(void)
++{
++    sclp_setup();
++    sclp_print("Network boot starting...\n");
++
++    virtio_setup();
++
++    panic("Failed to load OS from network\n");
++}
 -- 
 1.8.3.1
