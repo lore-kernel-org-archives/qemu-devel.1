@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUWLz-0003O4-5k
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:55:48 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dUWUY-0005KZ-GT
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUWLv-0005vp-OO
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:55:46 -0400
-Received: from mail-wr0-f177.google.com ([209.85.128.177]:36028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUWLv-0005vc-Gw
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 06:55:43 -0400
-Received: by mail-wr0-f177.google.com with SMTP id c11so133372458wrc.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 03:55:42 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dUWUV-0000iS-Cy
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:04:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dUWUV-0000hm-6a
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:04:35 -0400
+Date: Mon, 10 Jul 2017 13:04:29 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170710130429.2ba605a4@dhcp-192-215.str.redhat.com>
+In-Reply-To: <20170707150452.1f12890b@dhcp-192-215.str.redhat.com>
+References: <20170707122159.24714-1-cohuck@redhat.com>
+	<20170707122159.24714-6-cohuck@redhat.com>
+	<7e4e8d2d-66f6-8884-96a1-83f285171c13@de.ibm.com>
+	<20170707150452.1f12890b@dhcp-192-215.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <B1DA44315104F94D9F3F23C74275EA9D729B61@Ikerlan-12.ikerlan.es>
-References: <B1DA44315104F94D9F3F23C74275EA9D729B34@Ikerlan-12.ikerlan.es>
-	<CAFEAcA853fSo86JXF0E=yt+Dfu8gVjcdpycx+z5OMX7z_mPKXg@mail.gmail.com>
-	<B1DA44315104F94D9F3F23C74275EA9D729B4B@Ikerlan-12.ikerlan.es>
-	<CAFEAcA_CF7KVq2MAhR3twsXfio3RNFRJ-SiK2pO7g1ZEzGvpGg@mail.gmail.com>
-	<B1DA44315104F94D9F3F23C74275EA9D729B61@Ikerlan-12.ikerlan.es>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Jul 2017 11:54:21 +0100
-Message-ID: <CAFEAcA9bt_wwd4LzCppcqeUJs229cOM4G+mnTBkfw05zBN31CQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Code source modifying
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 5/7] s390x/pci: fence off instructions
+ for non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ormaetxea Xabier <xormaetxea@ikerlan.es>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-On 10 July 2017 at 11:16, Ormaetxea Xabier <xormaetxea@ikerlan.es> wrote:
-> Ah sorry, I thought that replying to your message it was somehow
-> redirected to the mailing list. So, every-time I respond, I have
-> to do it to qemu-devel@nongnu.org? Or a CC it's enough? Sorry for
-> my ignorance...
+On Fri, 7 Jul 2017 15:04:52 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Yes, you just have to send mail to: or cc: the qemu-devel
-address.
+> On Fri, 7 Jul 2017 14:55:23 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+> > On 07/07/2017 02:21 PM, Cornelia Huck wrote:  
+> > > If a guest running on a non-pci build issues a pci instruction,
+> > > throw them an exception.
+> > > 
+> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > > ---
+> > >  target/s390x/kvm.c | 24 ++++++++++++++++++++++++
+> > >  1 file changed, 24 insertions(+)
+> > > 
+> > > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> > > index a3d00196f4..c5c7c27a21 100644
+> > > --- a/target/s390x/kvm.c
+> > > +++ b/target/s390x/kvm.c
+> > > @@ -1160,6 +1160,9 @@ static int kvm_clp_service_call(S390CPU *cpu, struct kvm_run *run)
+> > >  {
+> > >      uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
+> > > 
+> > > +#ifndef CONFIG_PCI
+> > > +    return -1;
+> > > +#endif    
+> > 
+> > Instead of this ifdefing, can you use the cpu model to decide if the instruction
+> > should be available? We need to do this anyway for proper handling.
+> > 
+> > You can then fence off the PCI bits in the CPU model for
+> > CONFIG_PCI == off.  
+> 
+> Sounds like a good idea, I'll give it a try.
+> 
+> We'll probably also want to fence off the sclp facility bit via that
+> mechanism.
 
-> Anyway, do you imagine how can I make this "virtual world"-"real world"
-> connection? I mean, is there an easy way of connecting an execution
-> from the standalone with the source code?
+Slight problem here... we don't have the relevant facilities defined
+yet, and they are not in the POP (other than "Assigned to IBM internal
+use").
 
-Two things:
-
-(1) you should try to make your interface with the emulator
-map more closely to what existing examples do. "Write to
-a virtual address in RAM that is monitored" is really weird and
-will be a pain to implement.
-
-What makes more sense depends a bit on whether you're using
-qemu-system-* (a full-system emulator of cpu and devices) or
-qemu-* (which just emulate a single Linux process by intercepting
-system calls). For full-system, you can for instance provide
-a device model that sits at a known physical address. Or you
-can use the kind of interface that OSes might use to talk to
-firmware (like an SMC instruction on ARM -- our PSCI
-implementation works this way).
-
-For linux-user the simplest thing is obviously just to
-implement a syscall (or to use the existing timer ones!)
-
-(2) you don't want to do this by "check something every
-time round an execution loop" because this will make the
-performance very bad. What you need to do is arrange that
-when the guest does some action (write to physical address,
-make SMC call, make system call) you get control and can
-implement your behaviour there. (This is another reason
-why write-to-virtual-address is a suboptimal choice: it's
-harder to get control for that.)
-
-thanks
--- PMM
+While I'm pretty sure that the magic number is 69 (judging from the
+Linux code), I think they should be introduced in a patch by someone
+who has access to the documentation including the proper names.
