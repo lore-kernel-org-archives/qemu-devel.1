@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUX54-0005yB-VS
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:42:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUX5m-0006LE-PC
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUX54-0007ed-1H
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:42:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUX5m-000801-3z
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:43:06 -0400
 References: <20170707182151.29872-1-eblake@redhat.com>
 	<20170710101604.GA19707@lemon.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <94f33acf-57b4-62b7-7121-4e1e27048224@redhat.com>
-Date: Mon, 10 Jul 2017 06:42:13 -0500
+	<94f33acf-57b4-62b7-7121-4e1e27048224@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5ce2324f-f634-8b00-132e-b36e5f6bce5b@redhat.com>
+Date: Mon, 10 Jul 2017 13:42:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170710101604.GA19707@lemon.lan>
+In-Reply-To: <94f33acf-57b4-62b7-7121-4e1e27048224@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="whkVu9iV0i4A0uVP2rHmObXrWqQwaDLLc"
+	boundary="LBjlCqMPmAhCGqGNOc8tmE3Xjj3Dv7J6L"
 Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Promote NBD to supported,
  with new maintainer
 List-Id: <qemu-devel.nongnu.org>
@@ -25,81 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---whkVu9iV0i4A0uVP2rHmObXrWqQwaDLLc
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org
-Message-ID: <94f33acf-57b4-62b7-7121-4e1e27048224@redhat.com>
+--LBjlCqMPmAhCGqGNOc8tmE3Xjj3Dv7J6L
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <5ce2324f-f634-8b00-132e-b36e5f6bce5b@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Promote NBD to supported, with
  new maintainer
 References: <20170707182151.29872-1-eblake@redhat.com>
  <20170710101604.GA19707@lemon.lan>
-In-Reply-To: <20170710101604.GA19707@lemon.lan>
+ <94f33acf-57b4-62b7-7121-4e1e27048224@redhat.com>
+In-Reply-To: <94f33acf-57b4-62b7-7121-4e1e27048224@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/10/2017 05:16 AM, Fam Zheng wrote:
-> On Fri, 07/07 13:21, Eric Blake wrote:
->> We are promising more than just odd fixes, and Paolo is hoping
->> to offload the pull requests to me.  Also, enough of NBD is related
->> to the block layer that it is worth including qemu-block on patches.
->=20
-> Cool!
->=20
+On 10/07/2017 13:42, Eric Blake wrote:
+>>> +T: git git://repo.or.cz/qemu/ericb.git nbd
+>> Out of curiosity: Paolo is still in "M:", but his "T:" is gone.  Inten=
+ded?
+> Hmm, I didn't realize you could list two T: entries, but a quick check
+> shows that is the case for several co-maintained areas.  Paolo, any
+> preference?
 
->> +Network Block Device (NBD)
->> +M: Eric Blake <eblake@redhat.com>
->> +M: Paolo Bonzini <pbonzini@redhat.com>
->> +L: qemu-block@nongnu.org
->> +S: Maintained
->> +F: block/nbd*
->> +F: nbd/
->> +F: include/block/nbd*
->> +F: qemu-nbd.c
->=20
-> While we are at it, add qemu-nbd.texi when you send pull request, if yo=
-u don't
-> respin?
+My "T:" has been obsolete since I've started doing the "gather random
+patches" work, so it's okay to remove it.
 
-Will do.
-
->=20
->> +T: git git://repo.or.cz/qemu/ericb.git nbd
->=20
-> Out of curiosity: Paolo is still in "M:", but his "T:" is gone.  Intend=
-ed?
-
-Hmm, I didn't realize you could list two T: entries, but a quick check
-shows that is the case for several co-maintained areas.  Paolo, any
-preference?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Paolo
 
 
---whkVu9iV0i4A0uVP2rHmObXrWqQwaDLLc
+--LBjlCqMPmAhCGqGNOc8tmE3Xjj3Dv7J6L
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZY2gVAAoJEKeha0olJ0Nqh/sH+weF3UQkH4XcUQeD9NIV6IVf
-d7ACo+erMRqMq176CEGzYXqRZO44h/LYohA2PPf+/Pzq2vNc2jasP8cTE2kKV8AW
-/pLRfH5jc/zrzeTKHzoSR7kpkSg5is4z8xlYdsksTJwrkqUX4JI62SfnlFQ5cI5C
-R70ZJZfJcb3gscbEyGTSwjrWps5lZcSy/CI7B9SXooQSd1VUmC8wc6jJtGoW9OSf
-9TNAamCM7NXIiJgYBo4khN1QTIMc+xn67WSL7hoO2wlUAl69oumMsLRT8znQSDjK
-NMinRIfd/JyqakEBCatL6xDK8i++oSXk/1SDwH0CPw8k2/5J1c6wvDpaZP004tI=
-=xGCZ
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlljaD0ACgkQv/vSX3jH
+roOC4wgAp7pMKU5KFOkdDofALKHv4oxo04i/ZJwLbwoZgQdARUFNYPf+9Ar7JHLg
+KPkuUxxxR8c1PDMWx80GIeHdaVzDeW5vCVOD9G2oDOWSzkiGGvooAHic5buwVvQY
+jnVrSWRQU4JCbdc5B6kTLd3Ru6HARVH4ouMUrvkKWqiEOkkSEQHdVrkhxwGPbBGa
+ohfsWjLSpd4UmSc2TcOKd1QJX6EPyLnN1ZmLiIlhyH5b2JfW5GtleHdJVgVYhy/p
+HDJW8U/LHwxLXY764LUTonMpuZl2lzcaVZ4yn2v63UAARIPVmksxt6U7dJVrejaa
+gacrP8cCSRhhY1qw0zKPbWxqWW8Zdg==
+=IDQs
 -----END PGP SIGNATURE-----
 
---whkVu9iV0i4A0uVP2rHmObXrWqQwaDLLc--
+--LBjlCqMPmAhCGqGNOc8tmE3Xjj3Dv7J6L--
