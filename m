@@ -1,51 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dUThn-0001W3-LN
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:06:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1dUTiG-0001im-Na
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dUThk-0006dB-9O
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:06:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55037
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dUThk-0006cE-2V
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:06:04 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6A842DV061122
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 04:06:02 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bjvs2jej6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 04:06:02 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 10 Jul 2017 04:06:02 -0400
-References: <75a4c5ff-385e-31ac-5f86-883b082cd94e@de.ibm.com>
-	<20170424143516.GD2075@work-vm>
-	<5c0608dd-ba22-dc09-71a1-bb95c977f77d@de.ibm.com>
-	<20170424191202.GQ2362@work-vm>
-	<097a5085-1128-cf2d-abc4-54660a608f36@de.ibm.com>
-	<20170426110144.GF2098@work-vm>
-	<cbf8c55d-9473-9f6f-eb89-779afe7c1fd2@de.ibm.com>
-	<cec279c5-9900-ca28-103b-b95c36d9d989@de.ibm.com>
-	<20170630163139.GC2437@work-vm>
-	<20170703192353-mutt-send-email-mst@kernel.org>
-	<20170703190728.GE2206@work-vm>
-	<55708cff-cdda-9b1d-2106-1c6d2774f890@de.ibm.com>
-	<20170704101643.3c20f745@mschwideX1>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 10 Jul 2017 10:05:55 +0200
+	(envelope-from <armbru@redhat.com>) id 1dUTiD-0006vq-J0
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:06:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dUTiD-0006uw-9f
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 04:06:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1499381754.git.alistair.francis@xilinx.com>
+	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
+	<84wp7layt8.wl-Peter.Chubb@data61.csiro.au>
+	<CAKmqyKMBiWcauXq3RayRYrhgcL+D2y4522h8to7KsRuUw+a2Ew@mail.gmail.com>
+Date: Mon, 10 Jul 2017 10:06:18 +0200
+In-Reply-To: <CAKmqyKMBiWcauXq3RayRYrhgcL+D2y4522h8to7KsRuUw+a2Ew@mail.gmail.com>
+	(Alistair Francis's message of "Fri, 7 Jul 2017 10:19:20 -0700")
+Message-ID: <87d1987m2t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170704101643.3c20f745@mschwideX1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 8bit
-Message-Id: <45954ce5-fae8-5709-da3c-045ff74f740c@de.ibm.com>
-Subject: Re: [Qemu-devel] postcopy migration hangs while loading virtio state
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,122 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Martin Schwidefsky <schwidefsky@de.ibm.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, thuth@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter.Chubb@data61.csiro.au, Peter Maydell <peter.maydell@linaro.org>, cohuck@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, jcody@redhat.com, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Rob Herring <robh@kernel.org>, jdurgin@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, philippe@mathieu-daude.net, pl@kamp.de, groug@kaod.org, Peter Chubb <peter.chubb@nicta.com.au>, ronniesahlberg@gmail.com, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, aneesh.kumar@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On 07/04/2017 10:16 AM, Martin Schwidefsky wrote:
-> On Tue, 4 Jul 2017 09:48:11 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 07/03/2017 09:07 PM, Dr. David Alan Gilbert wrote:
->>> * Michael S. Tsirkin (mst@redhat.com) wrote:  
->>>> On Fri, Jun 30, 2017 at 05:31:39PM +0100, Dr. David Alan Gilbert wrote:  
->>>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:  
->>>>>> On 04/26/2017 01:45 PM, Christian Borntraeger wrote:
->>>>>>  
->>>>>>>> Hmm, I have a theory, if the flags field has bit 1 set, i.e. RAM_SAVE_FLAG_COMPRESS
->>>>>>>> then try changing ram_handle_compressed to always do the memset.  
->>>>>>>
->>>>>>> FWIW, changing ram_handle_compressed to always memset makes the problem go away.  
->>>>>>
->>>>>> It is still running fine now with the "always memset change"  
->>>>>
->>>>> Did we ever nail down a fix for this; as I remember Andrea said
->>>>> we shouldn't need to do that memset, but we came to the conclusion
->>>>> it was something specific to how s390 protection keys worked.
->>>>>
->>>>> Dave  
->>>>
->>>> No we didn't. Let's merge that for now, with a comment that
->>>> we don't really understand what's going on?  
->>>
->>> Hmm no, I don't really want to change the !s390 behaviour, especially
->>> since it causes allocation that we otherwise avoid and Andrea's
->>> reply tothe original post pointed out it's not necessary.  
+Alistair Francis <alistair.francis@xilinx.com> writes:
+
+> On Thu, Jul 6, 2017 at 5:14 PM,  <Peter.Chubb@data61.csiro.au> wrote:
+>>>>>>> "Alistair" == Alistair Francis <alistair.francis@xilinx.com> writes:
 >>
+>> Alistair> Convert all uses of error_report("[Ww]arning:"... to use
+>> Alistair> warn_report() instead. This helps standardise on a single
+>> Alistair> method of printing warnings to the user.
 >>
->> Since storage keys are per physical page we must not have shared pages.
->> Therefore in s390_enable_skey we already do a break_ksm (via ksm_madvise),
->> in other words we already allocate pages on the keyless->keyed switch.
->>
->> So why not do the same for zero pages - instead of invalidating the page
->> table entry, lets just do a proper COW.
->>
->> Something like this maybe (Andrea, Martin any better way to do that?)
->>
->>
->> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
->> index 4fb3d3c..11475c7 100644
->> --- a/arch/s390/mm/gmap.c
->> +++ b/arch/s390/mm/gmap.c
->> @@ -2149,13 +2149,18 @@ EXPORT_SYMBOL_GPL(s390_enable_sie);
->>  static int __s390_enable_skey(pte_t *pte, unsigned long addr,
->>                               unsigned long next, struct mm_walk *walk)
->>  {
->> +       struct page *page;
->>         /*
->> -        * Remove all zero page mappings,
->> +        * Remove all zero page mappings with a COW
->>          * after establishing a policy to forbid zero page mappings
->>          * following faults for that page will get fresh anonymous pages
->>          */
->> -       if (is_zero_pfn(pte_pfn(*pte)))
->> -               ptep_xchg_direct(walk->mm, addr, pte, __pte(_PAGE_INVALID));
->> +       if (is_zero_pfn(pte_pfn(*pte))) {
->> +               if (get_user_pages(addr, 1, FOLL_WRITE, &page, NULL) == 1)
->> +                       put_page(page);
->> +               else
->> +                       return -ENOMEM;
->> +       }
->>         /* Clear storage key */
->>         ptep_zap_key(walk->mm, addr, pte);
->>         return 0;
-> 
-> I do not quite get the problem here. The zero-page mappings are always
-> marked as _PAGE_SPECIAL. These should be safe to replace with an empty
-> pte. We do mark all VMAs as unmergeable prior to the page table walk
-> that replaces all zero-page mappings. What is the get_user_pages() call
-> supposed to do?
-> 
+>> In a number of cases the initial double quote has been removed as
+>> well.  This will have to be fixed.
+>> e.g.,
+>> -        error_report("Warning: 'filename' option specified. "
+>> +        warn_report('filename' option specified. "
+>
+> Yeah, I thought I saw this when I was doing it, but then everything
+> compiled so I figured it was fine.
+>
+> It must not all be included with the default ./configure, because I
+> just tried again and it all compiles for me.
 
+The result of ./configure depends on the packages you got installed.
+You need quite a few development packages to get anywhere near a full
+compile.  For a first step, you could do worse than installing your
+distribution's QEMU package's build dependencies.
 
-After talking to Martin, we decided that it might be a good trial to simply
-not use the empty zero page at all for KVM guests. Something like this
-
-
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index 57057fb..65ab11d 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -505,7 +505,7 @@ static inline int mm_alloc_pgste(struct mm_struct *mm)
-  * In the case that a guest uses storage keys
-  * faults should no longer be backed by zero pages
-  */
--#define mm_forbids_zeropage mm_use_skey
-+#define mm_forbids_zeropage mm_has_pgste
- static inline int mm_use_skey(struct mm_struct *mm)
- {
- #ifdef CONFIG_PGSTE
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 4fb3d3c..88f502a 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2149,13 +2149,6 @@ EXPORT_SYMBOL_GPL(s390_enable_sie);
- static int __s390_enable_skey(pte_t *pte, unsigned long addr,
-                              unsigned long next, struct mm_walk *walk)
- {
--       /*
--        * Remove all zero page mappings,
--        * after establishing a policy to forbid zero page mappings
--        * following faults for that page will get fresh anonymous pages
--        */
--       if (is_zero_pfn(pte_pfn(*pte)))
--               ptep_xchg_direct(walk->mm, addr, pte, __pte(_PAGE_INVALID));
-        /* Clear storage key */
-        ptep_zap_key(walk->mm, addr, pte);
-        return 0;
-
-
-
-seems to do the trick. Will have a look what that means for the memory usage for
-the usual cases.
+[...]
