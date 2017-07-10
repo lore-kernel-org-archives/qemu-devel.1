@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUYHL-0007xU-JX
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:59:08 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dUYNp-0001iP-DG
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUYHK-0004Kb-OA
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:59:07 -0400
-Date: Mon, 10 Jul 2017 14:58:57 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170710125857.GD5772@noname.redhat.com>
-References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-2-git-send-email-pl@kamp.de>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dUYNk-0007BX-E6
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:05:49 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:59676
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dUYNj-0007Ao-V8
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:05:44 -0400
+References: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1499413442-5053-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<f0b5fca6-172d-d75b-7ade-2906601ed6ee@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <93f86c66-e189-ab1e-b055-27f040d497c6@ilande.co.uk>
+Date: Mon, 10 Jul 2017 14:05:27 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1498733831-15254-2-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 1/8] docs: add compress format extension
- to qcow2 spec
+In-Reply-To: <f0b5fca6-172d-d75b-7ade-2906601ed6ee@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] pci: add reserved slot check to
+ do_pci_register_device()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
 
-Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  docs/interop/qcow2.txt | 43 ++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 42 insertions(+), 1 deletion(-)
+On 10/07/17 08:35, Marcel Apfelbaum wrote:
+
+> On 07/07/2017 10:44, Mark Cave-Ayland wrote:
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>   hw/pci/pci.c |   21 ++++++++++++++++++---
+>>   1 file changed, 18 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>> index 239161e..9dece2a 100644
+>> --- a/hw/pci/pci.c
+>> +++ b/hw/pci/pci.c
+>> @@ -961,6 +961,15 @@ static bool pci_bus_devfn_available(PCIBus *bus,
+>> int devfn)
+>>       }
+>>   }
+>>  
 > 
-> diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-> index 80cdfd0..c01daf3 100644
-> --- a/docs/interop/qcow2.txt
-> +++ b/docs/interop/qcow2.txt
-> @@ -85,7 +85,12 @@ in the description of a field.
->                                  be written to (unless for regaining
->                                  consistency).
->  
-> -                    Bits 2-63:  Reserved (set to 0)
-> +                    Bit 2:      Compress format bit.  If and only if this bit
-> +                                is set then the compress format extension
-> +                                MUST be present and MUST be parsed and checked
-> +                                for compatibility.
-> +
-> +                    Bits 3-63:  Reserved (set to 0)
->  
->           80 -  87:  compatible_features
->                      Bitmask of compatible features. An implementation can
-> @@ -135,6 +140,7 @@ be stored. Each extension has a structure like the following:
->                          0xE2792ACA - Backing file format name
->                          0x6803f857 - Feature name table
->                          0x23852875 - Bitmaps extension
-> +                        0xC03183A3 - Compress format extension
->                          other      - Unknown header extension, can be safely
->                                       ignored
->  
-> @@ -208,6 +214,41 @@ The fields of the bitmaps extension are:
->                     starts. Must be aligned to a cluster boundary.
->  
->  
-> +== Compress format extension ==
-> +
-> +The compress format extension is an optional header extension. It provides
-> +the ability to specify the compress algorithm and compress parameters
-> +that are used for compressed clusters. This new header MUST be present if
-> +the incompatible-feature bit "compress format bit" is set and MUST be absent
-> +otherwise.
+> Hi Mark,
+> 
+> 
+>> +static bool pci_bus_devfn_reserved(PCIBus *bus, int devfn)
+>> +{
+>> +    if (bus->dev_reserved_mask & (1UL << PCI_SLOT(devfn))) {
+> 
+> Looking at this code maybe we should rename the field to
+> "slot_mask"? Only a suggestion.
 
-Okay. Only one header extension type for all compression formats. I
-think this does work because we have a variable header extension size.
+Interestingly enough, I did start with that initially but then
+discovered that "slot_mask" is ambiguous - does the bit in the mask tell
+you whether the slot is free, or whether the slot is available?
 
-> +The fields of the compress format extension are:
-> +
-> +    Byte  0 - 15:  compress_format_name (padded with zeros, but not
-> +                   necessarily null terminated if it has full length)
+The use of the "dev" prefix was to match the use of the devfn parameter,
+however if you're happy with just a "slot" prefix then would you be okay
+with "slot_reserved_mask"?
 
-We absolutely need to define the valid names and their meaning here.
+>> +        return true;
+>> +    } else {
+>> +        return false;
+>> +    }
+>> +}
+>> + >   /* -1 for devfn means auto assign */
+>>   static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus
+>> *bus,
+>>                                            const char *name, int devfn,
+>> @@ -984,14 +993,20 @@ static PCIDevice
+>> *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+>>       if (devfn < 0) {
+>>           for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
+>>               devfn += PCI_FUNC_MAX) {
+>> -            if (pci_bus_devfn_available(bus, devfn)) {
+>> +            if (pci_bus_devfn_available(bus, devfn) &&
+>> +                   !pci_bus_devfn_reserved(bus, devfn)) {
+>>                   goto found;
+>>               }
+>>           }
+>> -        error_setg(errp, "PCI: no slot/function available for %s, all
+>> in use",
+>> -                   name);
+>> +        error_setg(errp, "PCI: no slot/function available for %s, all
+>> in use "
+>> +                   "or reserved", name);
+> 
+> I wouldn't combine slot available/reserved, maybe check for reserved
+> before "available"?
 
-> +              16:  compress_level (uint8_t)
-> +                   0 = default compress level
-> +                   1 = lowest compress level
-> +                   x = highest compress level (the highest compress
-> +                       level may vary for different compress formats)
+I did think about doing separate reserved/available checks, but it
+doesn't seem to make sense in the code above.
 
-Let's be explicit about the compression formats that this field is valid
-for (i.e. make this already part of the format specific fields).
+By passing devfn == -1 the caller is asking for the next free slot, if
+there is one available. Whether the slot is reserved or occupied makes
+no difference to the fact that the slot is itself unavailable. All the
+change does here is alter the error message to provide hint that while
+no slot was available, it could be because all slots were in use or
+reserved.
 
-Then we can also be specific instead of writing "may vary", which is not
-a very good thing to have in a specification.
+When you mention to check for reserved before available, do you mean to
+swap the order of the arguments in the if() statement?
 
-> +         17 - 19:  Reserved for future use, must be zero.
+> 
+>>           return NULL;
+>>       found: ;
+>> +    } else if (pci_bus_devfn_reserved(bus, devfn)) {
+>> +        error_setg(errp, "PCI: slot %d function %d not available for
+>> %s,"
+>> +                   " reserved",
+>> +                   PCI_SLOT(devfn), PCI_FUNC(devfn), name);
+>> +        return NULL;
+>>       } else if (!pci_bus_devfn_available(bus, devfn)) {
+>>           error_setg(errp, "PCI: slot %d function %d not available for
+>> %s,"
+>>                      " in use by %s",
+>>
+> 
+> Thanks for the patches!
+> Marcel
 
-We don't need this for now because byte 16 will be the final one in this
-struct.
 
-> +         20 - 23:  extra_data_size
-> +                   Size of compress format specific extra data.
-> +                   For now, as no format specifies extra data,
-> +                   extra_data_size is reserved and should be zero.
-> +
-> +        variable:  extra_data
-> +                   Extra data with additional parameters for the compress
-> +                   format, occupying extra_data_size bytes.
+ATB,
 
-extra_data_size isn't necessary because we already have the length of
-the header extension, so we know how long the whole thing is.
-extra_data isn't necessary because we'll just add new fields at the end
-if we want to add something.
-
-> +        variable:  Padding to round up the size of compress format extension
-> +                   to the next multiple of 8. All bytes of the padding must be
-> +                   zero.
-
-This is already contained in the description of header extensions in
-general, so we don't have to repeat it here.
-
-Kevin
+Mark.
