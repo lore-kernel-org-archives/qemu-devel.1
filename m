@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUYcp-0007Vd-L9
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:21:20 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dUYdB-0007lz-UY
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:21:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUYco-0005fU-Le
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:21:19 -0400
-Date: Mon, 10 Jul 2017 15:21:06 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170710132106.GF5772@noname.redhat.com>
-References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-5-git-send-email-pl@kamp.de>
+	(envelope-from <stefanha@redhat.com>) id 1dUYdB-00068Y-49
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 09:21:41 -0400
+Date: Mon, 10 Jul 2017 14:21:21 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170710132121.GF14195@stefanha-x1.localdomain>
+References: <20170706163828.24082-1-pbonzini@redhat.com>
+	<20170706163828.24082-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Il7n/DHsA0sMLmDu"
 Content-Disposition: inline
-In-Reply-To: <1498733831-15254-5-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 4/8] qemu-img: add documentation for
- compress settings
+In-Reply-To: <20170706163828.24082-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/11] block: prepare write threshold code
+ for thread safety
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+
+--Il7n/DHsA0sMLmDu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jul 06, 2017 at 06:38:18PM +0200, Paolo Bonzini wrote:
+> Code refactoring only.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  qemu-img.texi | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> 
-> diff --git a/qemu-img.texi b/qemu-img.texi
-> index 5b925ec..430f0b9 100644
-> --- a/qemu-img.texi
-> +++ b/qemu-img.texi
-> @@ -621,6 +621,27 @@ file which is COW and has data blocks already, it couldn't be changed to NOCOW
->  by setting @code{nocow=on}. One can issue @code{lsattr filename} to check if
->  the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
->  
-> +@item compress.format
-> +Defines which compression algorithm is should be used for compressed clusters.
-> +The following options are available if support for the respective libraries
-> +has been enabled at compile time:
-> +
-> +   zlib            Uses standard zlib compression
-> +
-> +The compression algorithm can only be defined at image create time and cannot
-> +be changed later.
-> +
-> +Note: defining a compression format will result in the compression format
-> +      extension being written to the Qcow2 image. Older versions of QEMU will
-> +      not be able to open images with this extension.
+>  block/write-threshold.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/block/write-threshold.c b/block/write-threshold.c
+> index 0bd1a01c86..c8ebc32b4d 100644
+> --- a/block/write-threshold.c
+> +++ b/block/write-threshold.c
+> @@ -37,18 +37,22 @@ static void write_threshold_disable(BlockDriverState =
+*bs)
+>      }
+>  }
+> =20
+> +static uint64_t exceeded_amount(const BdrvTrackedRequest *req,
+> +                                uint64_t thres)
 
-Why not more specifically "QEMU versions before 2.10"?
+Not a reason to respin, but I would prefer a more specific name so the
+intent of the code is easier to understand: exceeded_threshold() instead
+of exceeded_amount().
 
-> +@item compress.level
-> +Defines which compression level is used for the selected compression format.
-> +The default of @code{compress.level=0} will use the default compression level
-> +for the format. Alternate values range from 1 for fastest compression to
-> +x for the best compression (x max vary between compression formats). This is
-> +always a trade in of compression speed against compressed size.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Start with something like "valid for compress.format=zlib" and then give
-the exact range of valid values for zlib.
+--Il7n/DHsA0sMLmDu
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Kevin
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZY39RAAoJEJykq7OBq3PIQoMH/iR2w445OJKvPpUQQ2e0c8XB
+uCkQORSTPZq/z1HUxe60TTBzIkZQRmXhrDjsS2T0xHAAphUguMie+wqLkC87Ld3b
+q1wVQfWigRhG9YCHoUKYVsfOhT+DvmwwYlN9FizubJpsjJnWqSl+NrlRS8pO2iQU
+JGfJM9OkE8DOBZebscq1GOEMbji2+pm1GAkSV2e4Mu9IYZW85Tn2CG6PkXxlLbv/
+taE4yvERKU8XWtAUHMEpmaZRhSxrd7tfUOO9BzxMowtTGGVf065NoIj9P4eCsutB
+bPMoc1oe9wkNOk0Uec+5qlCJyLL2ESDnKcFb/OyUsHgWOUu4W9aN3Ae1GteTIKU=
+=wdIP
+-----END PGP SIGNATURE-----
+
+--Il7n/DHsA0sMLmDu--
