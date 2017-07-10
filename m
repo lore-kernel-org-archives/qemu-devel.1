@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dURjt-00031G-C1
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 02:00:10 -0400
+	(envelope-from <thuth@redhat.com>) id 1dURz7-0007hL-KD
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 02:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dURjo-0002DT-TK
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 02:00:09 -0400
-Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:37769)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dURjo-0002DD-NK
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 02:00:04 -0400
-Received: by mail-it0-x229.google.com with SMTP id m84so27953530ita.0
-	for <qemu-devel@nongnu.org>; Sun, 09 Jul 2017 23:00:04 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1dURz2-00034W-Vv
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 02:15:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dURz2-00034J-PD
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 02:15:48 -0400
 References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-23-git-send-email-cota@braap.org>
-	<5b3531bf-5e06-f5d3-6ba0-6a0baa810cee@twiddle.net>
-	<20170710035128.GA25231@flamenco>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <4173f39f-a236-c64f-3ae4-497b4bff363c@twiddle.net>
-Date: Sun, 9 Jul 2017 19:59:47 -1000
+	<1499586614-20507-3-git-send-email-cota@braap.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a51cb905-62dc-a286-4d6a-53db3232ef24@redhat.com>
+Date: Mon, 10 Jul 2017 08:15:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170710035128.GA25231@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1499586614-20507-3-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 22/22] translate-all: do not hold tb_lock
- during code generation in softmmu
+Subject: Re: [Qemu-devel] [PATCH 02/22] translate-all: remove redundant
+ !tcg_enabled check in dump_exec_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On 07/09/2017 05:51 PM, Emilio G. Cota wrote:
-> On Sun, Jul 09, 2017 at 11:38:50 -1000, Richard Henderson wrote:
->> On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
-> (snip)
->> I think it would be better to have a tb_htable_lookup_or_insert function,
->> which performs the insert iff a matching object isn't already there,
->> returning the entry which *is* there in either case.
+On 09.07.2017 09:49, Emilio G. Cota wrote:
+> This check is redundant because it is already performed by the only
+> caller of dump_exec_info -- the caller was updated by b7da97eef
+> ("monitor: Check whether TCG is enabled before running the "info jit"
+> code").
 > 
-> qht_insert behaves exactly like this, except that it returns a bool.
-> But we could make it return a void *.
+> Checking twice wouldn't necessarily be too bad, but here the check also
+> returns with tb_lock held. So we can either do the check before tb_lock is
+> acquired, or just get rid of it. Given that it is redundant, I am going
+> for the latter option.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  accel/tcg/translate-all.c | 5 -----
+>  1 file changed, 5 deletions(-)
+> 
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index dfb9f0d..f768681 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1851,11 +1851,6 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+>  
+>      tb_lock();
+>  
+> -    if (!tcg_enabled()) {
+> -        cpu_fprintf(f, "TCG not enabled\n");
+> -        return;
+> -    }
+> -
+>      target_code_size = 0;
+>      max_target_code_size = 0;
+>      cross_page = 0;
+> 
 
-Err.. no it doesn't.  It returns false if the *exact same object* is inserted 
-twice.  That's not the same as being passed a qht_lookup_func_t to see if two 
-different objects compare equal.
-
-
-r~
+Reviewed-by: Thomas Huth <thuth@redhat.com>
