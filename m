@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUXP3-0004DZ-F5
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:03:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUXR5-0005A0-Lb
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUXOy-0003LL-K1
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:03:01 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33410)
+	(envelope-from <pbonzini@redhat.com>) id 1dUXR2-0004kf-Gv
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:07 -0400
+Received: from mail-wr0-f171.google.com ([209.85.128.171]:34318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUXOy-00038a-DP
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:02:56 -0400
-Received: by mail-qt0-x242.google.com with SMTP id c20so12284335qte.0
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:02:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1499381754.git.alistair.francis@xilinx.com>
-	<0a1d5638543965d532284bdc6fce391cf9f509d0.1499381754.git.alistair.francis@xilinx.com>
-	<84wp7layt8.wl-Peter.Chubb@data61.csiro.au>
-	<CAKmqyKMBiWcauXq3RayRYrhgcL+D2y4522h8to7KsRuUw+a2Ew@mail.gmail.com>
-	<87d1987m2t.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7cb7b756-7d28-0470-9e02-c8e2a24f79c9@amsat.org>
-Date: Mon, 10 Jul 2017 09:02:23 -0300
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUXR2-0004kJ-Ax
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:05:04 -0400
+Received: by mail-wr0-f171.google.com with SMTP id 77so135799128wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 05:05:04 -0700 (PDT)
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-22-git-send-email-cota@braap.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e69fe832-f4e8-f59d-e0dd-3472f498c04e@redhat.com>
+Date: Mon, 10 Jul 2017 14:05:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <87d1987m2t.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1499586614-20507-22-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/6] Convert error_report() to
- warn_report()
+Subject: Re: [Qemu-devel] [PATCH 21/22] tcg: enable per-thread TCG for
+ softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,83 +31,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter.Chubb@data61.csiro.au, Peter Maydell <peter.maydell@linaro.org>, cohuck@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, jcody@redhat.com, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Rob Herring <robh@kernel.org>, jdurgin@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>, philippe@mathieu-daude.net, pl@kamp.de, groug@kaod.org, Peter Chubb <peter.chubb@nicta.com.au>, ronniesahlberg@gmail.com, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, rjones@redhat.com, Max Reitz <mreitz@redhat.com>, aneesh.kumar@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-Hi Alistair,
+On 09/07/2017 09:50, Emilio G. Cota wrote:
+> User-mode is kept out of this: contention due to concurrent translation
+> is more commonly found in full-system mode.
 
-On 07/10/2017 05:06 AM, Markus Armbruster wrote:
-> Alistair Francis <alistair.francis@xilinx.com> writes:
->> Yeah, I thought I saw this when I was doing it, but then everything
->> compiled so I figured it was fine.
->>
->> It must not all be included with the default ./configure, because I
->> just tried again and it all compiles for me.
-> 
-> The result of ./configure depends on the packages you got installed.
-> You need quite a few development packages to get anywhere near a full
-> compile.  For a first step, you could do worse than installing your
-> distribution's QEMU package's build dependencies.
+Out of curiosity, is it harder or you just didn't try?  It would be nice
+if the commit message mentioned the problems (if any) in addition to the
+reason why you didn't do it.
 
-To avoid to install development packages on your host you can build 
-using docker images which intend to cover the whole code base installing 
-many dependencies.
+Having similar policies for user and softmmu emulation is much more
+maintainable (for an earlier example, see the unification of user mode
+emulation's start/end_exclusive logic with softmmu's "safe work").
 
-For example (I don't have libiscsi installed on my workstation):
-
-$ make docker-test-quick@debian-mipsel-cross
-   BUILD   debian
-   BUILD   debian-mipsel-cross
-...
-Configure options:
---enable-werror --target-list=x86_64-softmmu,aarch64-softmmu 
---prefix=/var/tmp/qemu-build/install --cross-prefix=mipsel-linux-gnu-
-...
-libiscsi support  yes
-libnfs support    yes
-build guest agent yes
-...
-   CC      nbd/server.o
-   CC      nbd/client.o
-   CC      nbd/common.o
-   CC      block/iscsi.o
-/tmp/qemu-test/src/block/iscsi.c: In function 'iscsi_open':
-/tmp/qemu-test/src/block/iscsi.c:1764:21: error: character constant too 
-long for its type [-Werror]
-          warn_report('filename' option specified. "
-                      ^
-/tmp/qemu-test/src/block/iscsi.c:1764:32: error: expected ')' before 
-'option'
-          warn_report('filename' option specified. "
-                                 ^
-/tmp/qemu-test/src/block/iscsi.c:1764:50: error: missing terminating " 
-character [-Werror]
-          warn_report('filename' option specified. "
-                                                   ^
-/tmp/qemu-test/src/block/iscsi.c:1764:32: error: missing terminating " 
-character
-          warn_report('filename' option specified. "
-                                 ^
-/tmp/qemu-test/src/block/iscsi.c:1764:21: error: passing argument 1 of 
-'warn_report' makes pointer from integer without a cast [-Werror]
-          warn_report('filename' option specified. "
-                      ^
-In file included from /tmp/qemu-test/src/block/iscsi.c:33:0:
-/tmp/qemu-test/src/include/qemu/error-report.h:44:6: note: expected 
-'const char *' but argument is of type 'int'
-  void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-       ^
-/tmp/qemu-test/src/block/iscsi.c:1766:23: error: format not a string 
-literal and no format arguments [-Werror=format-security]
-                        "in the future");
-                        ^
-cc1: all warnings being treated as errors
-/tmp/qemu-test/src/rules.mak:66: recipe for target 'block/iscsi.o' failed
-make: *** [block/iscsi.o] Error 1
-tests/docker/Makefile.include:122: recipe for target 'docker-run' failed
-make[1]: *** [docker-run] Error 2
-make: *** [docker-run-test-quick@debian-mipsel-cross] Error 2
-
-Regards,
-
-Phil.
+Paolo
