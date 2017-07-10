@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dUe51-0004RA-CA
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:10:48 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUeFT-0007bY-S7
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dUe4y-0001rx-7n
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:10:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52789)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dUe4x-0001rl-Ts
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:10:44 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDBD64E4CA
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 19:10:42 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Mon, 10 Jul 2017 13:10:42 -0600
-Message-ID: <20170710191038.32728.34984.stgit@gimli.home>
-In-Reply-To: <20170710190904.32728.74078.stgit@gimli.home>
-References: <20170710190904.32728.74078.stgit@gimli.home>
+	(envelope-from <alex.bennee@linaro.org>) id 1dUeFR-0006aD-OE
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:21:35 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35480)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dUeFR-0006a1-Hg
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 15:21:33 -0400
+Received: by mail-wr0-x235.google.com with SMTP id k67so151272813wrc.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 12:21:33 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 10 Jul 2017 20:21:24 +0100
+Message-Id: <20170710192128.9048-2-alex.bennee@linaro.org>
+In-Reply-To: <20170710192128.9048-1-alex.bennee@linaro.org>
+References: <20170710192128.9048-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 2/2] vfio/pci: Fixup v0 PCIe capabilities
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 1/5] include/exec/exec-all: document common
+ exit conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Intel 82599 VFs report a PCIe capability version of 0, which is
-invalid.  The earliest version of the PCIe spec used version 1.  This
-causes Windows to fail startup on the device and it will be disabled
-with error code 10.  Our choices are either to drop the PCIe cap on
-such devices, which has the side effect of likely preventing the guest
-from discovering any extended capabilities, or performing a fixup to
-update the capability to the earliest valid version.  This implements
-the latter.
+As a precursor to later patches attempt to come up with a more
+concrete wording for what each of the common exit cases would be.
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+CC: Emilio G. Cota <cota@braap.org>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Lluís Vilanova <vilanova@ac.upc.edu>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/vfio/pci.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ include/exec/exec-all.h | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index ccdb6e1d632a..d4051cb9513d 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1743,6 +1743,18 @@ static int vfio_setup_pcie_cap(VFIOPCIDevice *vdev, int pos, uint8_t size,
-                                PCI_EXP_LNKCAP_MLW | PCI_EXP_LNKCAP_SLS);
-     }
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 8096d64a1d..a23894f687 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -35,11 +35,34 @@ typedef abi_ulong tb_page_addr_t;
+ typedef ram_addr_t tb_page_addr_t;
+ #endif
  
-+    /*
-+     * Intel 82599 SR-IOV VFs report an invalid PCIe capability version 0
-+     * (Niantic errate #35) causing Windows to error with a Code 10 for the
-+     * device on Q35.  Fixup any such devices to report version 1.  If we
-+     * were to remove the capability entirely the guest would lose extended
-+     * config space.
-+     */
-+    if ((flags & PCI_EXP_FLAGS_VERS) == 0) {
-+        vfio_add_emulated_word(vdev, pos + PCI_CAP_FLAGS,
-+                               1, PCI_EXP_FLAGS_VERS);
-+    }
-+
-     pos = pci_add_capability(&vdev->pdev, PCI_CAP_ID_EXP, pos, size,
-                              errp);
-     if (pos < 0) {
+-/* is_jmp field values */
++/* DisasContext is_jmp field values
++ *
++ * is_jmp starts as DISAS_NEXT. The translator will keep processing
++ * instructions until an exit condition is reached. If we reach the
++ * exit condition and is_jmp is still DISAS_NEXT (because of some
++ * other condition) we simply "jump" to the next address.
++ * The remaining exit cases are:
++ *
++ *   DISAS_JUMP    - Only the PC was modified dynamically (e.g computed)
++ *   DISAS_TB_JUMP - Only the PC was modified statically (e.g. branch)
++ *
++ * In these cases as long as the PC is updated we can chain to the
++ * next TB either by exiting the loop or looking up the next TB via
++ * the loookup helper.
++ *
++ *   DISAS_UPDATE  - CPU State was modified dynamically
++ *
++ * This covers any other CPU state which necessities us exiting the
++ * TCG code to the main run-loop. Typically this includes anything
++ * that might change the interrupt state.
++ *
++ * Individual translators may define additional exit cases to deal
++ * with per-target special conditions.
++ */
+ #define DISAS_NEXT    0 /* next instruction can be analyzed */
+ #define DISAS_JUMP    1 /* only pc was modified dynamically */
+-#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
+-#define DISAS_TB_JUMP 3 /* only pc was modified statically */
++#define DISAS_TB_JUMP 2 /* only pc was modified statically */
++#define DISAS_UPDATE  3 /* cpu state was modified dynamically */
+ 
+ #include "qemu/log.h"
+ 
+-- 
+2.13.0
