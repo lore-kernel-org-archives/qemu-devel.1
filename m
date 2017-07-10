@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dUX9f-00086r-IE
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:47:08 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dUXDU-0000kU-E8
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dUX9c-00021M-Ek
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:47:07 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:56992)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dUX9W-0001xA-TW
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:47:04 -0400
-Date: Mon, 10 Jul 2017 19:46:38 +0800 (CST)
-Message-ID: <201707101946388515595@zte.com.cn>
-References: 1499705121-71730-1-git-send-email-peng.hao2@zte.com.cn,
-	CAJ+F1CJqKTj4ChAy6C94EJFOjXU3Bmu=bWGvfTEBVA2AXhYTgQ@mail.gmail.com
+	(envelope-from <kraxel@redhat.com>) id 1dUXDR-0004NM-DM
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:51:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54348)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dUXDR-0004Mf-7f
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 07:51:01 -0400
+Message-ID: <1499687456.23551.17.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 10 Jul 2017 13:50:56 +0200
+In-Reply-To: <CAJ+F1C+LVOXDevrxXLvg0MPeUrZZpS1UF5k0MtF7gvc1gRbPNQ@mail.gmail.com>
+References: <20170710070432.856-1-kraxel@redhat.com>
+	<CAJ+F1C+LVOXDevrxXLvg0MPeUrZZpS1UF5k0MtF7gvc1gRbPNQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gY2hhcmRldjog?=
- =?utf-8?q?fix_parallel_device_can=27t_be_reconnect=2E?=
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: skip update cursor in
+ post_load if we don't have one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@gmail.com, pbonzini@redhat.com
-Cc: wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
+To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+Cc: wanghaibin.wang@huawei.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hku7bkurrvvJogPG1hcmNhbmRyZS5sdXJlYXVAZ21haWwu
-Y29tPg0K5pS25Lu25Lq677ya5b2t5rWpMTAwOTY3NDIgPHBib256aW5pQHJlZGhhdC5jb20+DQrm
-ioTpgIHkurrvvJrnjovkuJrotoUxMDE1NDQyNSA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0K5pel
-IOacnyDvvJoyMDE35bm0MDfmnIgxMOaXpSAxNzoxNw0K5Li7IOmimCDvvJpSZTogW1FlbXUtZGV2
-ZWxdIFtQQVRDSF0gY2hhcmRldjogZml4IHBhcmFsbGVsIGRldmljZSBjYW4ndCBiZSByZWNvbm5l
-Y3QuDQoNCg0KDQoNCg0KDQpIaQ0KDQoNCg0KT24gTW9uLCBKdWwgMTAsIDIwMTcgYXQgMTA6MzYg
-QU0gUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNuPiB3cm90ZToNCg0KUGFyYWxsZWwgZGV2
-aWNlIGRvbid0IHJlZ2lzdGVyIGJlLT5jaHJfY2FuX3JlYWQgZnVuY3Rpb24sIGJ1dCByZW1vdGUg
-ZGlzY29ubmVjdCBldmVudCBpcyBoYW5kbGVkIGluIGNocl9yZWFkLg0KIFNvIGNvbm5lY3RlZCBw
-YXJhbGxlbCBkZXZpY2UgY2FuIG5vdCBkZXRlY3QgcmVtb3RlIGRpc2Nvbm5lY3QgZXZlbnQuDQog
-DQoNCldoYXQgaXMgaXQgdGhhdCB5b3UgY2FsbCBhIHBhcmFsbGVsIGRldmljZT8geW91IGFyZSBt
-b2RpZnlpbmcgdGhlIHNvY2tldCBjb2RlIGhlcmUuIENvdWxkIHlvdSBkZXNjcmliZSBhIHRlc3Qg
-c2V0dXA/IGV2ZW4gYmV0dGVyIHdvdWxkIGJlIHRvIHdyaXRlIGEgdGVzdCBpbiB0ZXN0LWNoYXIu
-Yy4NCiANCg0KU2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHBlbmcuaGFvMkB6dGUuY29tLmNuPg0K
-IFJldmlld2VkLWJ5OiBXYW5nIFllY2hhbyA8d2FuZy55ZWNoYW8yNTVAenRlLmNvbS5jbj4NCiAt
-LS0NCiAgY2hhcmRldi9jaGFyLXNvY2tldC5jIHwgMTkgKysrKysrKysrKysrKysrKysrKw0KICAx
-IGZpbGUgY2hhbmdlZCwgMTkgaW5zZXJ0aW9ucygrKQ0KIA0KIGRpZmYgLS1naXQgYS9jaGFyZGV2
-L2NoYXItc29ja2V0LmMgYi9jaGFyZGV2L2NoYXItc29ja2V0LmMNCiBpbmRleCBjY2M0OTljLi41
-OTUwOWQ0IDEwMDY0NA0KIC0tLSBhL2NoYXJkZXYvY2hhci1zb2NrZXQuYw0KICsrKyBiL2NoYXJk
-ZXYvY2hhci1zb2NrZXQuYw0KIEBAIC0xMzEsNiArMTMxLDE0IEBAIHN0YXRpYyBpbnQgdGNwX2No
-cl93cml0ZShDaGFyZGV2ICpjaHIsIGNvbnN0IHVpbnQ4X3QgKmJ1ZiwgaW50IGxlbikNCiAgICAg
-IH0NCiAgfQ0KIA0KICtzdGF0aWMgZ2Jvb2xlYW4gaXNfcGFyYWxsZWxfZGV2aWNlKENoYXJkZXYg
-KmNocikNCiArew0KICsgICAgaWYgKGNociAmJiBjaHItPmxhYmVsICYmIHN0cnN0cihjaHItPmxh
-YmVsLCAiY2hhcnBhcmFsbGVsIikpIHsNCiArICAgICAgICByZXR1cm4gVFJVRQ0KDQpXaGF0IGd1
-YXJhbnRlZXMgdGhhdCBhIHBhcmFsbGVsIGRldmljZSB3aWxsIGhhdmUgImNoYXJwYXJhbGxlbCIg
-aW4gaXRzIGxhYmVsPw0KDQovLy8vL0kgdXNlIGxpYnZpcnQgY29tbWFuZCB0byBjcmVhdGUgdm0g
-LHNvIGNoYXJwYXJhbGxlbCBpcyBmcm9tIGxpYnZpcnQudGhpcyBpcyBhIHByb2JsZW0uDQoNCiAN
-Cg0KKyAgICB9DQogKyAgICByZXR1cm4gRkFMU0UNCiArfQ0KICsNCiAgc3RhdGljIGludCB0Y3Bf
-Y2hyX3JlYWRfcG9sbCh2b2lkICpvcGFxdWUpDQogIHsNCiAgICAgIENoYXJkZXYgKmNociA9IENI
-QVJERVYob3BhcXVlKQ0KIEBAIC0xMzgsNiArMTQ2LDggQEAgc3RhdGljIGludCB0Y3BfY2hyX3Jl
-YWRfcG9sbCh2b2lkICpvcGFxdWUpDQogICAgICBpZiAoIXMtPmNvbm5lY3RlZCkgew0KICAgICAg
-ICAgIHJldHVybiAwDQogICAgICB9DQogKyAgICBpZiAoaXNfcGFyYWxsZWxfZGV2aWNlKGNocikp
-IHsNCiArICAgICAgICByZXR1cm4gMQ0KDQpUaGF0IG1lYW5zIDEgYnl0ZSBjYW4gYmUgcmVhZCwg
-YnV0IHMtPm1heF9zaXplIGlzbid0IHVwZGF0ZWQsIHRoaXMgd2lsbCBjb25mdXNlIHRjcF9jaHJf
-cmVhZCgpLg0KLy8vLy8vZm9yIHBhcmFsbGVsIGRldmljZSBzLT5tYXhfc2l6ZSBpcyBhbHdheXMg
-MCxiZWNhdXNlICBzLT5tYXhfc2l6ZSA9IHFlbXVfY2hyX2JlX2Nhbl93cml0ZShjaHIpIGJ1dCAg
-cWVtdV9jaHJfYmVfY2FuX3dyaXRlDQoNCm5lZWQgYmUtPmNocl9jYW5fcmVhZCBhbmQgcGFyYWxs
-ZWwgZGV2aWNlIGhhcyBubyBiZS0+Y2hyX2Nhbl9yZWFkLiB0Y3BfY2hyX3JlYWRfcG9sbCBhcyAg
-ZmRfY2FuX3JlYWQgZnVuY3Rpb24gLHJldXJuIDEganVzdCBtZWFucyBjYW5fcmVhZC4NCg0KDQor
-ICAgIH0NCiAgICAgIHMtPm1heF9zaXplID0gcWVtdV9jaHJfYmVfY2FuX3dyaXRlKGNocikNCiAg
-ICAgIHJldHVybiBzLT5tYXhfc2l6ZQ0KICB9DQogQEAgLTQyMiw2ICs0MzIsMTUgQEAgc3RhdGlj
-IGdib29sZWFuIHRjcF9jaHJfcmVhZChRSU9DaGFubmVsICpjaGFuLCBHSU9Db25kaXRpb24gY29u
-ZCwgdm9pZCAqb3BhcXVlKQ0KICAgICAgdWludDhfdCBidWZbQ0hSX1JFQURfQlVGX0xFTl0NCiAg
-ICAgIGludCBsZW4sIHNpemUNCiANCiArICAgIC8qIGZvciBwYXJhbGxlbC1kZXZpY2UgaGFuZGxl
-IHRoZSBzb2NrZXQgY2xvc2UgZXZlbnQgaGVyZSovDQogKyAgICBpZiAoIXMtPm1heF9zaXplICYm
-IGlzX3BhcmFsbGVsX2RldmljZShjaHIpKSB7DQogKyAgICAgICAgc2l6ZSA9IHRjcF9jaHJfcmVj
-dihjaHIsICh2b2lkICopYnVmLCBDSFJfUkVBRF9CVUZfTEVOKQ0KICsgICAgICAgIGlmIChzaXpl
-ID09IDAgfHwgc2l6ZSA9PSAtMSkgew0KICsgICAgICAgICAgICB0Y3BfY2hyX2Rpc2Nvbm5lY3Qo
-Y2hyKQ0KIA0KSSBkb24ndCB1bmRlcnN0YW5kIHdoeSB0aGF0IGNvbmRpdGlvbiB3b3VsZG4ndCBi
-ZSByZWFjaGVkIGJ5IHRoZSBmb2xsb3dpbmcgdGNwX2Nocl9yZWN2KCkgaGFuZGxpbmcuIEZ1cnRo
-ZXJtb3JlLCB5b3UgbWF5IHJlYWQgbW9yZSB0aGF0IHMtPm1heF9zaXplLCB3aGljaCB3aWxsIGxp
-a2VseSBicmVhayBxZW11X2Nocl9iZV93cml0ZSgpIGluIHZhcmlvdXMgY2FzZXMuDQovLy8vLy8v
-Zm9yIHBhcmFsbGVsIGRldmljZSBzLT5tYXhfc2l6ZSBpcyBhbHdheXMgMC4NCiANCisgICAgICAg
-IH0NCiArICAgICAgICByZXR1cm4gVFJVRQ0KICsgICAgfQ0KICsNCiAgICAgIGlmICghcy0+Y29u
-bmVjdGVkIHx8IHMtPm1heF9zaXplIDw9IDApIHsNCiAgICAgICAgICByZXR1cm4gVFJVRQ0KICAg
-ICAgfQ0KIC0tDQogMS44LjMuMQ0KIA0KcWVtdSBjb21tYW5kIDogLWNoYXJkZXYgc29ja2V0LGlk
-PWNoYXJwYXJhbGxlbDAsaG9zdD0wLjAuMC4wLHBvcnQ9NTkwMCxzZXJ2ZXIsbm93YWl0IC1kZXZp
-Y2UgaXNhLXBhcmFsbGVsLGNoYXJkZXY9Y2hhcnBhcmFsbGVsMCxpZD1wYXJhbGxlbDBndXNldDpm
-cm9udCAgIDwtLS0tPnFlbXU6YmFja2VuZCA8LS0tLS0+cmVtb3RlIHRjcCBzb2NrZXQgLiAgICAg
-IHdoZW4gcmVtb3RlIHRjcCBzb2NrZXQgZGlzY29uZWN0ZWQscWVtdSBjYW4gbm90IGRldGVjdCB0
-aGUgZGlzY29ubmV0IGZyb20gcmVtb3RlLkkgdGhpbmsgYWxsIHRoZSBjaGFyZGV2cyB3aXRob3V0
-IENoYXJCYWNrZW5kLT5jaHJfY2FuX3JlYWQgaGFzIHRoZSBzYW1lIHByb2JsZW0uDQpyZXByb2R1
-Y2UgdGhlIHByb2JsZW06Y3JlYXRlIHZtIHdpdGggYSBwYXJhbGxlbCBwb3J0ICxhbmQgY29ubmVj
-dCB0aGUgcGFyYWxsZWwgcG9ydCAsdGhlbiBkaXNjb25uZWN0ICBhdCB0aGUgcmVtb3RlLlRyeSB0
-byByZWNvbm5lY3QgdGhlIHBhcmFsbGVsIHBvcnQseW91IGNhbiBmaW5kIHRoYXQgeW91IGNhbid0
-IGNvbm5lY3QgYWdhaW4uDQoNCg0KDQoNCg0KTWFyYy1BbmRyw6kgTHVyZWF1
+On Mon, 2017-07-10 at 09:05 +0000, Marc-Andr=C3=A9 Lureau wrote:
+>=20
+>=20
+> On Mon, Jul 10, 2017 at 9:06 AM Gerd Hoffmann <kraxel@redhat.com>
+> wrote:
+> > If the cursor resource id isn't set the guest didn't define a
+> > cursor.
+> > Skip the cursor update in post_load in that that case.
+>=20
+> update_cursor() deals with resource_id =3D=3D 0 already, but it also
+> update the cursor position. What's the issue calling update_cursor()
+> here?
+
+Calling set_cursor(), then vnc client being confused by rich cursor.
+
+>=20
+> > Reported-by: wanghaibin <wanghaibin.wang@huawei.com>
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> > =C2=A0hw/display/virtio-gpu.c | 4 +++-
+> > =C2=A01 file changed, 3 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> > index 58dc0b2737..eef11083d7 100644
+> > --- a/hw/display/virtio-gpu.c
+> > +++ b/hw/display/virtio-gpu.c
+> > @@ -1092,7 +1092,9 @@ static int virtio_gpu_load(QEMUFile *f, void
+> > *opaque, size_t size,
+> >=20
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dpy_gfx_replace_surface(scanout->co=
+n, scanout->ds);
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dpy_gfx_update(scanout->con, 0, 0, =
+scanout->width,
+> > scanout->height);
+> > -=C2=A0 =C2=A0 =C2=A0 =C2=A0 update_cursor(g, &scanout->cursor);
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (scanout->cursor.resource_id) {
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 update_cursor(g, &scanout-=
+>cursor);
+> > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0res->scanout_bitmask |=3D (1 << i);
+> > =C2=A0 =C2=A0 =C2=A0}
+> >=20
+> > --
+> > 2.9.3
+> >=20
+> >=20
+> >=20
+>=20
+> --=C2=A0
+> Marc-Andr=C3=A9 Lureau
