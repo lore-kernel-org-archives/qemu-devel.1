@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUbUr-0004gr-Dh
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:25:18 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dUbWC-0005zy-UD
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:26:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUbUq-0007ff-MN
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:25:17 -0400
-Date: Mon, 10 Jul 2017 17:25:05 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170710162505.GT14195@stefanha-x1.localdomain>
-References: <20170706163828.24082-1-pbonzini@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1dUbWC-00089R-8F
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:26:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58352)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dUbWC-00089A-24
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 12:26:40 -0400
+Date: Mon, 10 Jul 2017 18:26:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170710182636.3269e9d8@nial.brq.redhat.com>
+In-Reply-To: <20170710153331.GC5167@localhost.localdomain>
+References: <20170707213052.13087-1-ehabkost@redhat.com>
+	<20170707213052.13087-2-ehabkost@redhat.com>
+	<20170710101041.553a792a@nial.brq.redhat.com>
+	<20170710144557.GH12152@localhost.localdomain>
+	<20170710153331.GC5167@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="zpd1bWBxfrI+71+6"
-Content-Disposition: inline
-In-Reply-To: <20170706163828.24082-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 00/11] Block layer thread-safety,
- next part
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fixup! qom: Fix ambiguous path detection
+ when ambiguous=NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
 
+On Mon, 10 Jul 2017 12:33:31 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
---zpd1bWBxfrI+71+6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Mon, Jul 10, 2017 at 11:45:57AM -0300, Eduardo Habkost wrote:
+> > On Mon, Jul 10, 2017 at 10:10:41AM +0200, Igor Mammedov wrote:  
+> > > On Fri,  7 Jul 2017 18:30:51 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:  
+> [...]
+> > > > +
+> > > > +    object_unparent(obj1);
+> > > > +    object_unparent(obj2a);
+> > > > +    object_unparent(obj2b);  
+> > > Are above unparenting is necessary?
+> > >   
+> > > > +    object_unparent(cont1);  
+> > > Wouldn't parent destruction sufficient to trigger
+> > > implicit destruction of children?  
+> > 
+> > Probably it is.  I will test it.  
+> 
+> The obj1 and obj2a object_unparent() calls are really
+> unnecessary.  object_unparent(obj2b) is still necessary because
+> it is attached direcly to root.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-On Thu, Jul 06, 2017 at 06:38:17PM +0200, Paolo Bonzini wrote:
-> Here, patches 1-6 make the remaining part of the block layer thread safe.
-> Patches 7-11 start removing aio_context_acquire/release, so the line
-> count goes down instead of up.
->=20
-> This is the penultimate series.  The remaining part makes virtio-blk,
-> virtio-scsi and block jobs thread safe, so that the AioContext lock
-> can go away altogether.
-
-Looks promising.  I replied to the last patch with my overall concern
-about this series.
-
-Stefan
-
---zpd1bWBxfrI+71+6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZY6phAAoJEJykq7OBq3PI1EQH/jDMJdIlOsp4wHaoUSBDhWF4
-0Ra596SMD9ZDmwLkJzrLBaEZfdkiwaKdyT2RbiUPpee8vDfMNFl792KiqYk0HiQ8
-oWXeYLuQA2ppGjRJmUYjNe56WbZq8zUN4aihRSEyinWT67Ef3of6W+CrfPuZPMNT
-tGJP7Q/eH1LjHoTrCE2tOsNNZ7VP9DWn6wRbOgbGr9wlcpn5NGUdQW6j5dkichhD
-JvSouCjKiX0KMfCIyOjETCGDvRwhX6aDKeocA6363q60C+t1LT2aL41p74Lj4evG
-GJpC9x8ILkDIxZYA04dRDk2kgzbWxuNW5+RsATOJ0WRTreVugTbNy2m8cNBJhQM=
-=M3ga
------END PGP SIGNATURE-----
-
---zpd1bWBxfrI+71+6--
+> ---
+>  tests/check-qom-proplist.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+> index 381532c..432b665 100644
+> --- a/tests/check-qom-proplist.c
+> +++ b/tests/check-qom-proplist.c
+> @@ -605,8 +605,6 @@ static void test_qom_partial_path(void)
+>      g_assert(!ambiguous);
+>      g_assert(object_resolve_path("obj1", NULL) == obj1);
+>  
+> -    object_unparent(obj1);
+> -    object_unparent(obj2a);
+>      object_unparent(obj2b);
+>      object_unparent(cont1);
+>  }
