@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaa-0001h8-AG
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:57 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUXaZ-0002eJ-Hp
+	(envelope-from <eblake@redhat.com>) id 1dUXaZ-0001fQ-4r
 	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:56 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1dUXaY-0002cR-6L
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 08:14:55 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 10 Jul 2017 07:14:30 -0500
-Message-Id: <20170710121434.5047-8-eblake@redhat.com>
+Date: Mon, 10 Jul 2017 07:14:26 -0500
+Message-Id: <20170710121434.5047-4-eblake@redhat.com>
 In-Reply-To: <20170710121434.5047-1-eblake@redhat.com>
 References: <20170710121434.5047-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 07/11] nbd/client: refactor TRACE of NBD_MAGIC
+Subject: [Qemu-devel] [PULL 03/11] nbd/server: refactor nbd_negotiate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +24,49 @@ Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbon
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-We are going to switch from TRACE macro to trace points,
-this TRACE complicates things, this patch simplifies it.
+Combine two successive "if (oldStyle) {...} else {...}" into one.
+
+Block "if (client->tlscreds)" under "if (oldStyle)" is unreachable,
+as we have "oldStyle = client->exp != NULL && !client->tlscreds;".
+So, delete this block.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170707152918.23086-7-vsementsov@virtuozzo.com>
+Message-Id: <20170707152918.23086-3-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/client.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ nbd/server.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index b97143f..2125321 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -461,15 +461,8 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name, uint16_t *flags,
-         goto fail;
-     }
+diff --git a/nbd/server.c b/nbd/server.c
+index 3963972..a6a57ce 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -584,21 +584,15 @@ static coroutine_fn int nbd_negotiate(NBDClient *client)
+         stq_be_p(buf + 8, NBD_CLIENT_MAGIC);
+         stq_be_p(buf + 16, client->exp->size);
+         stw_be_p(buf + 26, client->exp->nbdflags | myflags);
++
++        if (nbd_write(client->ioc, buf, sizeof(buf), NULL) < 0) {
++            LOG("write failed");
++            return -EINVAL;
++        }
+     } else {
+         stq_be_p(buf + 8, NBD_OPTS_MAGIC);
+         stw_be_p(buf + 16, NBD_FLAG_FIXED_NEWSTYLE | NBD_FLAG_NO_ZEROES);
+-    }
 
--    TRACE("Magic is %c%c%c%c%c%c%c%c",
--          qemu_isprint(buf[0]) ? buf[0] : '.',
--          qemu_isprint(buf[1]) ? buf[1] : '.',
--          qemu_isprint(buf[2]) ? buf[2] : '.',
--          qemu_isprint(buf[3]) ? buf[3] : '.',
--          qemu_isprint(buf[4]) ? buf[4] : '.',
--          qemu_isprint(buf[5]) ? buf[5] : '.',
--          qemu_isprint(buf[6]) ? buf[6] : '.',
--          qemu_isprint(buf[7]) ? buf[7] : '.');
-+    magic = ldq_be_p(buf);
-+    TRACE("Magic is 0x%" PRIx64, magic);
-
-     if (memcmp(buf, "NBDMAGIC", 8) != 0) {
-         error_setg(errp, "Invalid magic received");
+-    if (oldStyle) {
+-        if (client->tlscreds) {
+-            TRACE("TLS cannot be enabled with oldstyle protocol");
+-            return -EINVAL;
+-        }
+-        if (nbd_write(client->ioc, buf, sizeof(buf), NULL) < 0) {
+-            LOG("write failed");
+-            return -EINVAL;
+-        }
+-    } else {
+         if (nbd_write(client->ioc, buf, 18, NULL) < 0) {
+             LOG("write failed");
+             return -EINVAL;
 -- 
 2.9.4
