@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dUPAn-0003EE-Bn
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 23:15:46 -0400
+	(envelope-from <cota@braap.org>) id 1dUPjR-0000Nl-7E
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 23:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dUPAi-0006aW-Gz
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 23:15:45 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:45888)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dUPAh-0006Yq-4i
-	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 23:15:40 -0400
-Date: Mon, 10 Jul 2017 11:15:00 +0800 (CST)
-Message-ID: <201707101115005493498@zte.com.cn>
-Mime-Version: 1.0
-From: <jiang.biao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH=5D_tcg/mips=3A_Bugfix_for_crash_?=
- =?utf-8?q?whenrunningprogram_with_qemu-i386=2E?=
+	(envelope-from <cota@braap.org>) id 1dUPjO-0002kv-0U
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 23:51:33 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:50663)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dUPjN-0002kj-OF
+	for qemu-devel@nongnu.org; Sun, 09 Jul 2017 23:51:29 -0400
+Date: Sun, 9 Jul 2017 23:51:28 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170710035128.GA25231@flamenco>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-23-git-send-email-cota@braap.org>
+	<5b3531bf-5e06-f5d3-6ba0-6a0baa810cee@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b3531bf-5e06-f5d3-6ba0-6a0baa810cee@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH 22/22] translate-all: do not hold tb_lock
+ during code generation in softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: qemu-devel@nongnu.org, james.hogan@imgtec.com, zhong.weidong@zte.com.cn, wang.liang82@zte.com.cn, shi.zhongbing@zte.com.cn, jinguojie@loongson.cn, jiang.yong5@zte.com.cn
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-PiBPbiAwNy8wOS8yMDE3IDA0OjA0IFBNLCBqaWFuZy5iaWFvMkB6dGUuY29tLmNuIHdyb3RlOg0K
-PiA+ICA+PiAgICAgICBpZiAoVENHX1RBUkdFVF9SRUdfQklUUyA+IFRBUkdFVF9MT05HX0JJVFMp
-IHsNCj4gPiAgPj4gICAgICAgICAgIHRjZ19vdXRfZXh0MzJ1KHMsIGJhc2UsIGFkZHJfcmVnbCkN
-Cj4gPiAgPj4gLSAgICAgICAgYWRkcl9yZWdsID0gYmFzZQ0KPiA+ICA+PiArICAgICAgICB0Y2df
-b3V0X21vdihzLCBUQ0dfVFlQRV9QVFIsIGFkZHJfcmVnbCwgYmFzZSkNCj4gPiAgPj4gICAgICAg
-fQ0KPiA+ICA+PiAgICAgICBpZiAoZ3Vlc3RfYmFzZSA9PSAwICYmIGRhdGFfcmVnbCAhPSBhZGRy
-X3JlZ2wpIHsNCj4gPiAgPj4gICAgICAgICAgIGJhc2UgPSBhZGRyX3JlZ2wNCj4gPiAgPg0KPiA+
-ICA+IFRoaXMgaXMgd3JvbmcsIGJlY2F1c2UgeW91J3JlIG5vdCBhbGxvd2VkIHRvIG1vZGlmeSB0
-aGUgaW5wdXQgb3BlcmFuZHMuDQo+ID4gID4NCj4gPiAgPiBUcnkgdGhpcywganVzdCBhIGZldyBs
-aW5lcyBsb3dlciBpbiB0aGUgZnVuY3Rpb246DQo+ID4gDQo+ID4gID4gLSAgICAgICAgdGNnX291
-dF9tb3ZpKHMsIFRDR19UWVBFX1BUUiwgYmFzZSwgZ3Vlc3RfYmFzZSkNCj4gPiAgPiAtICAgICAg
-ICB0Y2dfb3V0X29wY19yZWcocywgQUxJQVNfUEFERCwgYmFzZSwgYmFzZSwgYWRkcl9yZWdsKQ0K
-PiA+ICA+ICsgICAgICAgIHRjZ19vdXRfbW92aShzLCBUQ0dfVFlQRV9QVFIsIFRDR19UTVAwLCBn
-dWVzdF9iYXNlKQ0KPiA+ICA+ICsgICAgICAgIHRjZ19vdXRfb3BjX3JlZyhzLCBBTElBU19QQURE
-LCBiYXNlLCBUQ0dfVE1QMCwgYWRkcl9yZWdsKQ0KPiA+IA0KPiA+ICA+DQo+ID4gDQo+ID4gR290
-IGl0LCBidXQgdGhlIHJlYWwgcHJvYmxlbSBpcyBmb3IgYWRkcl9yZWdsIGluc3RlYWQgb2YgZ3Vl
-c3RfYmFzZS4NCj4gDQo+IEd1ZXN0IGJhc2UgaXMgYSBwcm9ibGVtIHNpbXBseSBiZWNhdXNlIHdl
-IHJlcXVpcmUgYSB0ZW1wb3JhcnkgZm9yIGl0LCBhbmQgd2UgDQo+IHdlcmUgdHJ5aW5nIHRvIHB1
-dCB0d28gdGVtcG9yYXJpZXMgaW50byB0aGUgc2FtZSByZWdpc3Rlci4NCj4gDQo+IElmIHdlIHJl
-dGFpbiBndWVzdF9iYXNlIGluIGEgcmVnaXN0ZXIgYWxsIG9mIHRoZSB0aW1lLCB0aGVuICgxKSB3
-ZSBkbyBub3QgaGF2ZSANCj4gdG8gcmVjb21wdXRlIGl0IGZvciBldmVyeSBtZW1vcnkgbG9hZCBh
-bmQgKDIpIHdlIGRvIG5vdCBuZWVkIGEgdGVtcG9yYXJ5IGZvciBpdC4NCj4gDQoNCg0KPiA+ID4g
-ID4gQmV0dGVyIHdvdWxkIGJlIHRvIHJlc2VydmUgYSByZWdpc3RlciBmb3IgdGhlIGd1ZXN0X2Jh
-c2UsIGxpa2Ugd2UgZG8gZm9yIHBwYy4NCj4gPiAgPiBTZWUgYWxsIG9mIHRoZSB1c2VzIG9mIFRD
-R19HVUVTVF9CQVNFX1JFRyBpbiB0Y2cvcHBjL3RjZy10YXJnZXQuaW5jLmMuDQo+ID4gDQo+ID4g
-SXQgdXNlcyBiYXNlKFRDR19SRUdfQTApIGZvciB0ZW1wZXJhcnkgdXNlIGZvciBndWVzdF9iYXNl
-IGluIHRoaXMgY2FzZS4NCj4gDQo+IE5vIGl0IGRvZXNuJ3QuICBJdCBjb21wdXRlcyBndWVzdF9i
-YXNlIGludG8gYSByZWdpc3RlciBpbiB0aGUgcHJvbG9ndWU6DQo+IA0KPiA+ICNpZm5kZWYgQ09O
-RklHX1NPRlRNTVUNCj4gPiAgICAgaWYgKGd1ZXN0X2Jhc2UpIHsNCj4gPiAgICAgICAgIHRjZ19v
-dXRfbW92aShzLCBUQ0dfVFlQRV9QVFIsIFRDR19HVUVTVF9CQVNFX1JFRywgZ3Vlc3RfYmFzZSkN
-Cj4gPiAgICAgICAgIHRjZ19yZWdzZXRfc2V0X3JlZyhzLT5yZXNlcnZlZF9yZWdzLCBUQ0dfR1VF
-U1RfQkFTRV9SRUcpDQo+ID4gICAgIH0NCj4gPiAjZW5kaWYNCj4gDQo+IGFuZCB0aGVuIGl0IHVz
-ZXMgYSByZWcrcmVnIGFkZHJlc3NpbmcgbW9kZSBkdXJpbmcgcWVtdV9sZC9zdDoNCj4gDQo+ID4g
-ICAgIHJiYXNlID0gZ3Vlc3RfYmFzZSA/IFRDR19HVUVTVF9CQVNFX1JFRyA6IDANCj4gLi4uLg0K
-PiA+ICAgICAgICAgICAgIGluc24gPSBxZW11X2xkeF9vcGNbb3BjICYgKE1PX1NJWkUgfCBNT19C
-U1dBUCldDQo+ID4gICAgICAgICAgICAgdGNnX291dDMyKHMsIGluc24gfCBUQUIoZGF0YWxvLCBy
-YmFzZSwgYWRkcmxvKSkNCj4gDQo+IE9idmlvdXNseSBtaXBzIGRvZXNuJ3QgaGF2ZSBhIHJlZyty
-ZWcgYWRkcmVzc2luZyBtb2RlLCBzbyBhIFBBREQgaW5zdHJ1Y3Rpb24gaXMgDQo+IHJlcXVpcmVk
-LCBidXQgb3RoZXJ3aXNlIHlvdSBjYW4gdXNlIHRoZSBzYW1lIHNjaGVtZS4gIFVzaW5nIFRDR19S
-RUdfUzEgb24gbWlwcyANCj4gZm9yIFRDR19HVUVTVF9CQVNFX1JFRyB3b3VsZCBiZSBmaW5lLg0K
-DQoNCg0KVW5kZXJzdG9vZC4gZ3Vlc3RfYmFzZSBpcyBhIHByb2JsZW0gaW5kZWVkLCBhbmQgaXQg
-d291bGQgYmUgYmV0dGVyIHRvIGJlIGxpa2UgdGhhdC4NCg0KSG93ZXZlciwgdGhlIGJ1ZyBJIG1l
-bnRpb25lZCBoZXJlIHNlZW1zIHRvIGhhdmUgbm8gZGlyZWN0IGNvbm5lY3Qgd2l0aCB0aGUgDQoN
-Cg0KZ3Vlc3RfYmFzZSBwcm9ibGVtLiBJdCBsaWVzIGluIHRoZSBmb2xsb3dpbmcgY29kZSwgDQoN
-Cg0KPiAgICAgaWYgKFRDR19UQVJHRVRfUkVHX0JJVFMgPiBUQVJHRVRfTE9OR19CSVRTKSB7DQo+
-ICAgICAgICAgdGNnX291dF9leHQzMnUocywgYmFzZSwgYWRkcl9yZWdsKQ0KPiAgICAgICAgYWRk
-cl9yZWdsID0gYmFzZSAvL3Byb2JsZW0gaXMgaGVyZS4gDQo+ICAgIH0NCg0KdGhpcyBzZWN0aW9u
-IG9mIGNvZGUgaXMgdG8gZXh0ZW5kIHRoZSBhZGRyX3JlZ2wgdG8gNjRiaXQsIGFuZCB1c2UgKmJh
-c2UqIGFzIHRlbXAgDQoNCg0KaW50ZXJtZWRpYS4gVGhlIHJlYWwgaW50ZW50aW9uIGNvdWxkIGJl
-IHRvIGV4dGVuZCBhZGRyX3JlZ2wgaW50byBiYXNlLCBhbmQgdGhlbiANCg0KDQptb3ZlIGJhc2Ug
-YmFjayB0byBhZGRyX3JlZ2wgZm9yIGxhdGVyIHVzZSwgYnV0IGl0IHdyb25nbHkgYXNzaWduaW5n
-ICBiYXNlIHRvIA0KDQoNCmFkZHJfcmVnbCBkaXJlY3RseSwgd2hpY2ggd2lsbCBjYXVzZSBjcmFz
-aCBmb3IgZXZlcnkgdXNlIG9mIHRjZ19vdXRfcWVtdV9zdC4NCg0KTXkgaW50ZW50aW9uIGlzIHRv
-IGZpeCB0aGlzIGJ1ZywgYW5kIGludGVuZCB0byB1c2UgVENHX1RNUDAgZm9yIHRlbXBvcmFyeSB1
-c2UgDQoNCg0KZm9yIGFkZHJfcmVnbC4NCg0KDQoNCg0KQXMgZm9yIHRoZSBndWVzdF9iYXNlIHBy
-b2JsZW0sIEknbGwgdHJ5IHRvIG9wdGltaXplIGl0IGxhdGVyLCB0YWtpbmcgcHBjIGNvZGUgZm9y
-IA0KDQoNCnJlZmVyZW5jZS4NCg0KDQoNCg0KDQp0aGFua3MgZm9yIHlvdXIgYWR2aXNlIGFuZCBo
-ZWxwLg==
+On Sun, Jul 09, 2017 at 11:38:50 -1000, Richard Henderson wrote:
+> On 07/08/2017 09:50 PM, Emilio G. Cota wrote:
+(snip)
+> I think it would be better to have a tb_htable_lookup_or_insert function,
+> which performs the insert iff a matching object isn't already there,
+> returning the entry which *is* there in either case.
+
+qht_insert behaves exactly like this, except that it returns a bool.
+But we could make it return a void *.
+
+> The hash table already has per-bucket locking.  So here you're taking 3
+> locks (tb_lock, bucket lock for lookup, bucket lock for insert) instead of
+> just taking the bucket lock once.  And, recall, the htable is designed such
+> that the buckets do not contend often, so you ought to be eliminating most
+> of the contention that you're seeing on tb_lock.
+
+Minor nit: the lookup is just a seqlock_read, so it's not really a lock.
+
+Your point is correct though. Performing a lookup here (that qht_insert
+will do anyway) is wasteful. I didn't look further into this because I
+thought getting rid of tb_lock here (due to tb_link_page) wasn't trivial.
+But I'll look into it; if we manage to just have the lock in qht_insert,
+we'll get great scalability.
+
+		E.
