@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1dUsZZ-0005tD-V1
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:39:22 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dUsip-0000dw-Di
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1dUsZY-0001Hv-Rp
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:39:17 -0400
-Date: Tue, 11 Jul 2017 12:38:59 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20170711103859.GC25504@toto>
-References: <1498830302-19274-1-git-send-email-edgar.iglesias@gmail.com>
-	<1498830302-19274-3-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
-	<20170711100334.GA25504@toto>
-	<CAFEAcA_XTrkAN1ATpp6DLZqGh4aL1gECzQGyubJmoGjtw_pPbA@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1dUsil-0004qL-PK
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:48:51 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34980)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dUsil-0004q1-CN
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:48:47 -0400
+Received: by mail-lf0-x241.google.com with SMTP id z78so13857731lff.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 03:48:47 -0700 (PDT)
+Date: Tue, 11 Jul 2017 11:48:42 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170711104842.GP17792@stefanha-x1.localdomain>
+References: <149915701334.6295.1724301929524364123.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Zfao1/4IORAeFOVj"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_XTrkAN1ATpp6DLZqGh4aL1gECzQGyubJmoGjtw_pPbA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] target-arm: Extend PAR format
- determination
+In-Reply-To: <149915701334.6295.1724301929524364123.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v11 0/6] trace: [tcg] Optimize per-vCPU
+ tracing states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +30,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, Jul 11, 2017 at 11:14:04AM +0100, Peter Maydell wrote:
-> On 11 July 2017 at 11:03, Edgar E. Iglesias <edgar.iglesias@xilinx.com> wrote:
-> > On Mon, Jul 10, 2017 at 04:11:29PM +0100, Peter Maydell wrote:
-> >> So this kind of worries me, because what it's coded as is "determine
-> >> whether architecturally we should be returning a 64-bit or 32-bit
-> >> PAR format", but what the code below it uses the format64 flag for is
-> >> "manipulate whatever PAR we got handed back by get_phys_addr()".
-> >> So we have two separate bits of code that are both choosing
-> >> 32 vs 64 bit PAR (the code in this patch, and the logic inside
-> >> get_phys_addr()), and they have to come to the same conclusion
-> >> or we'll silently mangle the PAR. It seems like it would be
-> >> better to either have get_phys_addr() explicitly tell us what kind
-> >> of format it is returning to us, or to have the caller tell it
-> >> what kind of PAR it needs.
-> >
-> > Yes, I see your point and that's exactly what's happenning before the patch.
-> > Some of these new checks are generic in the sense that they check for LPAE/64bitness
-> > but others are I guess ATS specific for lack of a better term.
-> > It feels a bit weird to put the ATS specific PAR format logic into get_phys_addr.
-> >
-> > The basic idea here is that we never downgrade to the 32bit format, we only uprgade.
-> > The following line was meant to get the initial format I think you are requesting:
-> > format64 = regime_using_lpae_format(env, mmu_idx);
-> >
-> > After that, we apply possible ATS specfic upgrades to 64bit PAR format if needed.
-> >
-> > For clarity, perhaps we could make get_phys_addr return this same initial format, and then
-> > we can follow up with the ATS specific upgrades. E.g:
-> >
-> >     ret = get_phys_addr(env, value, access_type, mmu_idx,
-> >                         &phys_addr, &attrs, &prot, &page_size, &fsr, &fi,
-> >                         &format64);
-> >
-> >     /* Apply possible ATS/PAR 64bit upgrades if format64 is false.  */
-> >     if (is_a64(env)) {
-> >         format64 = true;
-> >     } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
-> >         if (arm_feature(env, ARM_FEATURE_EL2)) {
-> >             if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> >                 format64 |= env->cp15.hcr_el2 & HCR_VM;
-> >             } else {
-> >                 format64 |= arm_current_el(env) == 2;
-> >             }
-> >         }
-> >     }
-> 
-> This still has the same problem, doesn't it? If get_phys_addr()
-> has given you back a short-descriptor format PAR then you cannot
-> simply "upgrade" it to a long-descriptor format PAR -- the
-> fault status codes are all different. I think the "short desc
-> vs long desc" condition used to be simple but the various
-> upgrades to get_phys_addr() to handle EL2 have made it much
-> more complicated, and so we'll be much better off just handing
-> get_phys_addr() a flag to say how we want the status reported,
-> if it's really dependent on ATS vs not-ATS.
->
 
-Another way could also be to have get_phys_addr() fill in generic
-fields in the FaultInfo struct and then have a faultinfo_to_fsr
-mapping function to populate FSR/PAR. Do you see any issues with that?
+--Zfao1/4IORAeFOVj
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Perhaps that's better, not sure.
+On Tue, Jul 04, 2017 at 10:30:13AM +0200, Llu=EDs Vilanova wrote:
+> Optimizes tracing of events with the 'tcg' and 'vcpu' properties (e.g., m=
+emory
+> accesses), making it feasible to statically enable them by default on all=
+ QEMU
+> builds. Last patch shows that overheads are completely eliminated in vari=
+ous
+> types of benchmarks for linux-user and softmmu (overheads where up to 2x
+> before).
+>=20
+>=20
+> Right now, events with the 'tcg' property always generate TCG code to tra=
+ce that
+> event at guest code execution time, where the event's dynamic state is ch=
+ecked.
+>=20
+> This series adds a performance optimization where TCG code for events wit=
+h the
+> 'tcg' and 'vcpu' properties is not generated if the event is dynamically
+> disabled. This optimization raises two issues:
+>=20
+> * An event can be dynamically disabled/enabled after the corresponding TC=
+G code
+>   has been generated (i.e., a new TB with the corresponding code should be
+>   used).
+>=20
+> * Each vCPU can have a different dynamic state for the same event (i.e., =
+tracing
+>   the memory accesses of only one process pinned to a vCPU).
+>=20
+> To handle both issues, this series integrates the dynamic tracing event s=
+tate
+> into the TB hashing function, so that vCPUs tracing different events will=
+ use
+> separate TBs. Note that only events with the 'vcpu' property are used for
+> hashing (as stored in the bitmap of #CPUState::trace_dstate).
+>=20
+> This makes dynamic event state changes on vCPUs very efficient, since the=
+y can
+> use TBs produced by other vCPUs while on the same event state combination=
+ (or
+> produced by the same vCPU, earlier).
+>=20
+> Discarded alternatives:
+>=20
+> * Emitting TCG code to check if an event needs tracing, where we should s=
+till
+>   move the tracing call code to either a cold path (making tracing perfor=
+mance
+>   worse), or leave it inlined (making non-tracing performance worse).
+>=20
+> * Eliding TCG code only when *zero* vCPUs are tracing an event, since ena=
+bling
+>   it on a single vCPU will impact the performance of all other vCPUs that=
+ are
+>   not tracing that event.
+>=20
+> Signed-off-by: Llu=EDs Vilanova <address@hidden>
+> ---
+>=20
+> Changes in v11
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Rebase on 931892e8a6.
+> * Drop patch for flushing per-CPU virtual TB cache.
+> * Fix typo in comments.
+> * Change documentation format in TranslationBlock.
+>=20
+>=20
+> Changes in v10
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Replace lingering trace_get_vcpu_event_count() with
+>   CPU_TRACE_DSTATE_MAX_EVENTS [Emilio G. Cota].
+> * Add performance results for dbt-bench [Emilio G. Cota].
+>=20
+>=20
+> Changes in v9
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Rebase on 931892e8a6.
+> * Undo renaming of tb->trace_vcpu_dstate to the shorter tb->trace_ds.
+> * Add measurements to commit enabling all guest events.
+>=20
+>=20
+> Changes in v8
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> [Emilio G. Cota]
+>=20
+> * Ported to current dev tree.
+>=20
+> * Allocate cpu->trace_dstate statically. This
+>   * allows us to drop the event_count inline patch.
+>   * simplifies and improves the performance of accessing cpu->trace_dstat=
+e:
+>     we just need to dereference, instead of going through bitmap_copy and
+>     an intermediate unsigned long.
+>=20
+> * If we try to register more CPU events than the max we support (there's a
+>   constant for it), drop the event and tell the user with error_report. B=
+ut
+>   really this is a bug, since we control what CPU events are traceable. S=
+hould
+>   we abort() as well?
+>=20
+> * Added rth's R-b tag
+>=20
+> * Addressed my own comments:
+>   * rename tb->trace_vcpu_dstate to the shorter tb->trace_ds
+>   * use uint32_t for tb->trace_ds instead of a typedef
+>   * add BUILD_BUG_ON check to make sure tb->trace_ds is big enough
+>   * fix xxhash
+>=20
+> * Do not add trace_dstate to tb_htable_lookup, since we can grab it from
+>   cpu->trace_dstate.
+>=20
+> This patchset applies cleanly on top of rth's tcg-next (a01792e1e).
+>=20
+>=20
+> Changes in v7
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Fix delayed dstate changes (now uses async_run_on_cpu() as suggested by=
+ Paolo
+>   Bonzini).
+>=20
+> * Note to Richard: patch 4 has been adapted to the new patch 3 async call=
+back,
+>   but is essentially the same.
+>=20
+>=20
+> Changes in v6
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Check hashing size error with QEMU_BUILD_BUG_ON [Richard Henderson].
+>=20
+>=20
+> Changes in v5
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Move define into "qemu-common.h" to allow compilation of tests.
+>=20
+>=20
+> Changes in v4
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Incorporate trace_dstate into the TB hashing function instead of using
+>   multiple physical TB caches [suggested by Richard Henderson].
+>=20
+>=20
+> Changes in v3
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Rebase on 0737f32daf.
+> * Do not use reserved symbol prefixes ("__") [Stefan Hajnoczi].
+> * Refactor trace_get_vcpu_event_count() to be inlinable.
+> * Optimize cpu_tb_cache_set_requested() (hottest path).
+>=20
+>=20
+> Changes in v2
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> * Fix bitmap copy in cpu_tb_cache_set_apply().
+> * Split generated code re-alignment into a separate patch [Daniel P. Berr=
+ange].
+>=20
+> Llu=EDs Vilanova (6):
+>       trace: Allocate cpu->trace_dstate in place
+>       trace: [tcg] Delay changes to dynamic state when translating
+>       exec: [tcg] Use different TBs according to the vCPU's dynamic traci=
+ng state
+>       trace: [tcg] Do not generate TCG code to trace dynamically-disabled=
+ events
+>       trace: [tcg,trivial] Re-align generated code
+>       trace: [trivial] Statically enable all guest events
+>=20
+>=20
+>  accel/tcg/cpu-exec.c                     |    8 ++++++--
+>  accel/tcg/translate-all.c                |   11 +++++++++--
+>  include/exec/exec-all.h                  |    3 +++
+>  include/exec/tb-hash-xx.h                |    7 +++++--
+>  include/exec/tb-hash.h                   |    5 +++--
+>  include/qom/cpu.h                        |   12 ++++++------
+>  qom/cpu.c                                |    8 --------
+>  scripts/tracetool/__init__.py            |    3 ++-
+>  scripts/tracetool/backend/dtrace.py      |    4 ++--
+>  scripts/tracetool/backend/ftrace.py      |   20 ++++++++++----------
+>  scripts/tracetool/backend/log.py         |   19 ++++++++++---------
+>  scripts/tracetool/backend/simple.py      |    4 ++--
+>  scripts/tracetool/backend/syslog.py      |    6 +++---
+>  scripts/tracetool/backend/ust.py         |    4 ++--
+>  scripts/tracetool/format/h.py            |   26 +++++++++++++++++++-----=
+--
+>  scripts/tracetool/format/tcg_h.py        |   21 +++++++++++++++++----
+>  scripts/tracetool/format/tcg_helper_c.py |    5 +++--
+>  tcg/tcg-runtime.c                        |    3 ++-
+>  tests/qht-bench.c                        |    2 +-
+>  trace-events                             |    6 +++---
+>  trace/control-target.c                   |   21 ++++++++++++++++++---
+>  trace/control.c                          |    9 ++++++++-
+>  trace/control.h                          |    3 +++
+>  23 files changed, 137 insertions(+), 73 deletions(-)
+>=20
+>=20
+> To: qemu-devel@nongnu.org
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Emilio G. Cota <cota@braap.org>
+>=20
 
-Best regards,
-Edgar 
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
+
+Stefan
+
+--Zfao1/4IORAeFOVj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZZK0KAAoJEJykq7OBq3PI1WgH/ApZ5botdY97poZ5eoK3TeKo
+/I3etMVKS4eJDW93mnX3tCE4aZMpHpjSnQ/1/buf7nCEDtS6My+M210VfrjVoUOu
+bMHeOsbXfkr7m3cdviMFzHL0Bv5rL8QoF8p97nmzjE8JAmzRwtGUQHDMmgOgrTA3
+BW/Kbi0HYIFo+bUD6h8bObCud2xkBz+us6bR4tJmEi9/IuFOrKlGGDrSxZPPJluf
+donUb49MFCLhLB++ZfVicY06ewJpBYwQb5wpDBUK2obiPlAwakEi7LOevcutYoEJ
+pdJgWL9rOHIUB3CwRcKu493M9ejZ37GO2JLGV+H3AnjkgTQgukvCQLWd6IZqoiM=
+=GblX
+-----END PGP SIGNATURE-----
+
+--Zfao1/4IORAeFOVj--
