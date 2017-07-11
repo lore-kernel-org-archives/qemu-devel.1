@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dV4W1-0002kQ-4P
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 19:24:25 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dV4XI-0003Mv-Kb
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 19:25:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dV4W0-0006Jp-CI
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 19:24:25 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:43021)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dV4XD-0006mn-Rt
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 19:25:44 -0400
+Received: from hera.aquilenet.fr ([141.255.128.1]:39137)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dV4W0-0006JO-5v
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 19:24:24 -0400
-Date: Wed, 12 Jul 2017 01:24:21 +0200
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dV4XD-0006mg-Ir
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 19:25:39 -0400
+Date: Wed, 12 Jul 2017 01:24:52 +0200
 From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170711232421.twevmetqym67t3ye@var.youpi.perso.aquilenet.fr>
-References: <1496679576-14336-3-git-send-email-peter.maydell@linaro.org>
+Message-ID: <20170711232452.hqcpcbubep7iyjwf@var.youpi.perso.aquilenet.fr>
+References: <1496679576-14336-2-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1496679576-14336-3-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [2/2] slirp: Handle error returns from sosendoob()
+In-Reply-To: <1496679576-14336-2-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [1/2] slirp: Handle error returns from
+ slirp_send() in sosendoob()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +30,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, patches@linaro.org
 
-Peter Maydell, on lun. 05 juin 2017 17:19:36 +0100, wrote:
-> diff --git a/slirp/socket.c b/slirp/socket.c
-> index a17caa9..84cf13a 100644
-> --- a/slirp/socket.c
-> +++ b/slirp/socket.c
-> @@ -404,7 +404,14 @@ sowrite(struct socket *so)
->  	DEBUG_ARG("so = %p", so);
->  
->  	if (so->so_urgc) {
-> -		sosendoob(so);
-> +		if (sosendoob(so) < so->so_urgc) {
+Peter Maydell, on lun. 05 juin 2017 17:19:35 +0100, wrote:
+> The code in sosendoob() assumes that slirp_send() always
+> succeeds, but it might return an OS error code (for instance
+> if the other end has disconnected). Catch these and return
+> the caller either -1 on error or the number of urgent bytes
+> actually written. (None of the callers check this return
+> value currently, though.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Mmm, I believe one needs to use a copy of so->so_urgc, since sosendoob()
-modifies it in the success case?
-
-Samuel
+Applied to my tree, thanks!
