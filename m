@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dUocc-0006Iz-68
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:26:11 -0400
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dUpGn-0005q9-Lf
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:07:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dUocY-0001qw-7z
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:26:10 -0400
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Tue, 11 Jul 2017 14:47:00 +0800
-Message-ID: <1499755620-31804-1-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dUpGj-00076t-HJ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:07:41 -0400
+Received: from ikerlan-12.ikerlan.es ([193.145.247.1]:18611)
+	by eggs.gnu.org with smtp (Exim 4.71)
+	(envelope-from <xormaetxea@ikerlan.es>) id 1dUpGj-00075C-59
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:07:37 -0400
+From: Ormaetxea Xabier <xormaetxea@ikerlan.es>
+Date: Tue, 11 Jul 2017 07:07:32 +0000
+Message-ID: <B1DA44315104F94D9F3F23C74275EA9D72ABFF@Ikerlan-12.ikerlan.es>
+References: <B1DA44315104F94D9F3F23C74275EA9D729B34@Ikerlan-12.ikerlan.es>
+	<CAFEAcA853fSo86JXF0E=yt+Dfu8gVjcdpycx+z5OMX7z_mPKXg@mail.gmail.com>
+In-Reply-To: <CAFEAcA853fSo86JXF0E=yt+Dfu8gVjcdpycx+z5OMX7z_mPKXg@mail.gmail.com>
+Content-Language: es-ES
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH resend v4 3/3] ACPI: build and enable APEI GHES
- in the Makefile and configuration
+Subject: Re: [Qemu-devel] Code source modifying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,44 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhihui.gao@huawei.com
-Cc: gengdongjiu@huawei.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Add CONFIG_ACPI_APEI configuration in the Makefile and
-enable it in the arm-softmmu.mak
-
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
-thanks a lot Laszlo's review and comments: 
-
-change since v3:
-(1) change name to "CONFIG_ACPI_APEI" from CONFIG_ACPI_APEI_GENERATION
-
----
- default-configs/arm-softmmu.mak | 1 +
- hw/acpi/Makefile.objs           | 1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 1e3bd2b..ee6f5fc 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -121,3 +121,4 @@ CONFIG_ACPI=y
- CONFIG_SMBIOS=y
- CONFIG_ASPEED_SOC=y
- CONFIG_GPIO_KEY=y
-+CONFIG_ACPI_APEI=y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 11c35bc..bafb148 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-+common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- 
- common-obj-y += acpi_interface.o
--- 
-2.10.1
+SGkgUGV0ZXIsDQoNCk9uZSBsYXN0IHF1ZXN0aW9uIGlmIHBvc3NpYmxlIDopDQoNCkkndmUgY2hh
+bmdlZCB0aGUgaWRlYSBvZiAiY29ubmVjdGluZyB0aGUgdmlydHVhbCBhbmQgcmVhbCB3b3JsZHMi
+IHRvIGFuIGVhc3kgKGFuZCB1Z2x5KSB3YXkuIEkgd2lsbCB1c2UgdGhlIGRlY29kZSBmdW5jdGlv
+biwgd2hlcmUgZXZlcnkgc2luZ2xlIGV4ZWN1dGlvbiBpcyB0cmFuc2xhdGVkIGZyb20gYXNzZW1i
+bHkgbGFuZ3VhZ2UgdG8gYmluYXJ5IGNvZGUuIFRoZXJlLCBjb21wYXJpbmcgZWFjaCBhc3NlbWJs
+eSBjb2RlIHdpdGggdGhlIG9uZXMgSSBrbm93IGZyb20gdGhlIC5lbGYgSSBjYW4gbW9kaWZ5IHRo
+ZSB2YWx1ZSBvZiBteSBncGlvLg0KDQpCdXQsIHRoZSBwcm9ibGVtIGlzIHRoYXQgdGhpcyB3YXkg
+d291bGQgb25seSBiZSByZWxpYWJsZSBpZiB0aGUgc3RhcnRpbmcgYW5kIGZpbmlzaGluZyBhc3Nl
+bWJseSBjb2RlcyB3aGVyZSBpbiBpc29sYXRlZCAiVHJhbnNsYXRpb24gYmxvY2tzIi4gU28sIGlu
+IHRoaXMgd2F5LCB0aGUgdGltZSBiZXR3ZWVuIHRob3NlIHR3byBleGVjdXRpb25zIGlzIHRoZSBv
+bmUgSSByZWFsbHkgd2FudCB0byBtZWFzdXJlICh0cmFuc2xhdGluZyBhbmQgZXhlY3V0aW5nIG15
+IGFwcCkuDQoNCllvdSB0b2xkIG1lIHRob3NlIHRyYW5zbGF0ZWQgYmxvY2tzIGFyZSB1c3VhbGx5
+ICJzZXBhcmF0ZWQiIGJ5IGJyYW5jaGVzLiBJIHRyaWVkIHRvIGludHJvZHVjZSBsaXR0bGUgYnJh
+bmNoZXMgaW4gbXkgc3RhbmRhbG9uZSBjb2RlLCAobGl0dGxlICJpZiItcyksIGJ1dCBkaWRuJ3Qg
+Z2V0IGFueXRoaW5nLiBIb3cgY2FuIEkgc2VwYXJhdGUgbXkgdHJhbnNsYXRpb24gYmxvY2tzIGZy
+b20gdGhlIHN0YW5kYWxvbmU/IElzIHRoZXJlIGEgd2F5LCBvciBhbSBJIGFnYWluIGluIGEgd3Jv
+bmcgZGlyZWN0aW9uPw0KDQpUaGFuayB5b3UgaW4gYWR2YW5jZSENCg0KWGFiaQ0KDQotLS0tLU1l
+bnNhamUgb3JpZ2luYWwtLS0tLQ0KRGU6IFBldGVyIE1heWRlbGwgW21haWx0bzpwZXRlci5tYXlk
+ZWxsQGxpbmFyby5vcmddIA0KRW52aWFkbyBlbDogbHVuZXMsIDEwIGRlIGp1bGlvIGRlIDIwMTcg
+MTE6MjYNClBhcmE6IE9ybWFldHhlYSBYYWJpZXINCkNDOiBxZW11LWRldmVsQG5vbmdudS5vcmcN
+CkFzdW50bzogUmU6IFtRZW11LWRldmVsXSBDb2RlIHNvdXJjZSBtb2RpZnlpbmcNCg0KT24gMTAg
+SnVseSAyMDE3IGF0IDEwOjE0LCBPcm1hZXR4ZWEgWGFiaWVyIDx4b3JtYWV0eGVhQGlrZXJsYW4u
+ZXM+IHdyb3RlOg0KPiBNeSBzdGFuZGFsb25lIHByb2dyYW0gd3JpdGVzICIweGZmZmZmZmZmIiBp
+biB0aGUgcG9zaXRpb24gMHg5NTAwMDAwMA0KPiB3aGVuIHRoZSB0aW1lciBzaG91bGQgc3RhcnQs
+IGFuZCAiMHgwMDAwMDAwMCIgd2hlbiBpdCBoYXZlIHRvIGZpbmlzaC4NCj4gSSB3YW50IHRvIG1v
+ZGlmeSB0aGUgY29kZSBzbyBldmVyeSBzaW5nbGUgKHN0YW5kYWxvbmUpIHByb2dyYW0gc3RlcA0K
+PiByZWFkcyB0aGUgdmlydHVhbCAweDk1MDAwMDAwIGFuZCBjaGFuZ2VzIHRoZSB2YWx1ZSBvZiBh
+IGdwaW8uIEJ1dCBJDQo+IGNhbid0IGZpbmQgaG93IEkgY2FuIHJlYWQgZnJvbSB0aGUgc291cmNl
+IGNvZGUgdGhlIHZpcnR1YWwgbWVtb3J5LA0KPiBhbmQgSSBjYW4ndCBmaW5kIG5laXRoZXIgd2hl
+cmUvaG93IGRvZXMgdGhlIHByb2dyYW0gcHJvY2VzcyAoc3RlcA0KPiBieSBzdGVwKSB0aGUgc3Rh
+bmRhbG9uZSBwcm9ncmFtLg0KDQpRRU1VIGRvZXNuJ3QgcmVhbGx5IHdvcmsgdGhhdCB3YXkuIFdo
+YXQgd2UgZG8gaXMgdGFrZSBibG9ja3Mgb2YgdGhlDQpndWVzdCBiaW5hcnkgKHVzdWFsbHkgdXAg
+dG8gdGhlIG5leHQgYnJhbmNoIGluc3RydWN0aW9uKSwgdHJhbnNsYXRlDQp0aGUgd2hvbGUgYmxv
+Y2sgdG8gbmF0aXZlIGhvc3QgYmluYXJ5IGNvZGUsIGFuZCB0aGVuIGV4ZWN1dGUgdGhvc2UNCnRy
+YW5zbGF0ZWQgYmxvY2tzLiBTbyBvdXIgbWFpbiBleGVjdXRpb24gbG9vcCAoY3B1X2V4ZWMoKSkg
+aXMNCmJhc2ljYWxseSBhIGxvb3AgdGhhdCBkb2VzOg0KICogaGFuZGxlIGFueSBwZW5kaW5nIGlu
+dGVycnVwdCBvciBleGNlcHRpb24gd29yaw0KICogZmluZCBwcmV2aW91c2x5IHRyYW5zbGF0ZWQg
+YmxvY2sgZm9yIHRoaXMgUEMNCiAgIChhbmQgdHJhbnNsYXRlIGl0IGlmIGl0IGRpZG4ndCBhbHJl
+YWR5IGV4aXN0KQ0KICogZXhlY3V0ZSB0aGF0IFRCICh3aGljaCB3aWxsIGV4ZWN1dGUgbXVsdGlw
+bGUgZ3Vlc3QgaW5zbnMNCiAgIGFuZCBtYXkganVtcCBkaXJlY3RseSB0byBhbm90aGVyIFRCIHdp
+dGhvdXQgY29taW5nIGJhY2sgdG8gQyBjb2RlKQ0KDQpEbyB5b3UgcmVhbGx5IG1lYW4gdmlydHVh
+bCBhZGRyZXNzZXMgaGVyZT8gVGhhdCBpcyB2ZXJ5IHdlaXJkOg0KaGFyZHdhcmUgZG9lc24ndCBk
+byB0aGF0IC0tIHRpbWVyIGRldmljZXMgYXJlIGF0IGZpeGVkIHBoeXNpY2FsDQphZGRyZXNzZXMg
+d2hpY2ggdGhlIGd1ZXN0IGNhbiB0aGVuIGNob29zZSB0byBtYXAgd2hlcmUgdGhleSBsaWtlDQpp
+biB0aGUgdmlydHVhbCBhZGRyZXNzIHNwYWNlIHVzaW5nIHRoZSBNTVUuDQoNCnRoYW5rcw0KLS0g
+UE1NDQo=
