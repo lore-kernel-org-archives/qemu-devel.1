@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dUrYA-0005Mr-Kp
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:33:48 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dUrZj-0006gh-CJ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:35:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dUrY7-0000NK-Gd
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:33:46 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:43949)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dUrY6-0000Hl-6W
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:33:43 -0400
-Date: Tue, 11 Jul 2017 17:33:23 +0800 (CST)
-Message-ID: <201707111733232926663@zte.com.cn>
-References: 1499773645-120137-1-git-send-email-peng.hao2@zte.com.cn,
-	d97e3209-e1d0-1c00-ae8b-7bb22eb198e2@redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIIFYyXSBjaGFyZGV2?=
- =?utf-8?q?=3A_fix_parallel_device_can=27t_be_reconnect?=
+	(envelope-from <lvivier@redhat.com>) id 1dUrZg-0000vI-AN
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:35:23 -0400
+References: <1499765477-10541-1-git-send-email-thuth@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <37126d01-f5bb-653f-66dc-541b6e0f1d6f@redhat.com>
+Date: Tue, 11 Jul 2017 11:35:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <1499765477-10541-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] trivial: Move
+ softmmu_template.h to the accel/tcg/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, wang.yechao255@zte.com.cn, berrange@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-5Y+R5Lu25Lq677yaIDxwYm9uemluaUByZWRoYXQuY29tPg0K5pS25Lu25Lq677ya5b2t5rWpMTAw
-OTY3NDIgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT4NCuaKhOmAgeS6uu+8miA8cWVtdS1k
-ZXZlbEBub25nbnUub3JnPueOi+S4mui2hTEwMTU0NDI1IDxiZXJyYW5nZUByZWRoYXQuY29tPg0K
-5pelIOacnyDvvJoyMDE35bm0MDfmnIgxMeaXpSAxNjozMQ0K5Li7IOmimCDvvJpSZTogW1BBVENI
-IFYyXSBjaGFyZGV2OiBmaXggcGFyYWxsZWwgZGV2aWNlIGNhbid0IGJlIHJlY29ubmVjdA0KDQoN
-Cg0KDQoNCk9uIDExLzA3LzIwMTcgMTM6NDcsIFBlbmcgSGFvIHdyb3RlOg0KPiBQYXJhbGxlbCBk
-ZXZpY2UgZG9uJ3QgcmVnaXN0ZXIgYmUtPmNocl9jYW5fcmVhZCBmdW5jdGlvbiwgYnV0IHJlbW90
-ZQ0KPiBkaXNjb25uZWN0IGV2ZW50IGlzIGhhbmRsZWQgaW4gY2hyX3JlYWQuU28gY29ubmVjdGVk
-IHBhcmFsbGVsIGRldmljZQ0KPiBjYW4gbm90IGRldGVjdCByZW1vdGUgZGlzY29ubmVjdCBldmVu
-dC4gVGhlIGNoYXJkZXZzIHdpdGggY2hyX2Nhbl9yZWFkPU5VTEwNCj4gaGFzIHRoZSBzYW1lIHBy
-b2JsZW0uDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20u
-Y24+DQo+IFJldmlld2VkLWJ5OiBXYW5nIFllY2hhbyA8d2FuZy55ZWNoYW8yNTVAenRlLmNvbS5j
-bj4NCj4gLS0tDQo+ICBjaGFyZGV2L2NoYXItc29ja2V0LmMgIHwgMTEgKysrKysrKysrKysNCj4g
-IGNoYXJkZXYvY2hhci5jICAgICAgICAgfCAxMCArKysrKysrKysrDQo+ICBpbmNsdWRlL2NoYXJk
-ZXYvY2hhci5oIHwgIDkgKysrKysrKysrDQo+ICAzIGZpbGVzIGNoYW5nZWQsIDMwIGluc2VydGlv
-bnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9jaGFyZGV2L2NoYXItc29ja2V0LmMgYi9jaGFyZGV2
-L2NoYXItc29ja2V0LmMNCj4gaW5kZXggY2NjNDk5Yy4uYWE0NGY4ZiAxMDA2NDQNCj4gLS0tIGEv
-Y2hhcmRldi9jaGFyLXNvY2tldC5jDQo+ICsrKyBiL2NoYXJkZXYvY2hhci1zb2NrZXQuYw0KPiBA
-QCAtMTM5LDYgKzEzOSw5IEBAIHN0YXRpYyBpbnQgdGNwX2Nocl9yZWFkX3BvbGwodm9pZCAqb3Bh
-cXVlKQ0KPiAgICAgICAgICByZXR1cm4gMA0KPiAgICAgIH0NCj4gICAgICBzLT5tYXhfc2l6ZSA9
-IHFlbXVfY2hyX2JlX2Nhbl93cml0ZShjaHIpDQo+ICsgICAgaWYgKHFlbXVfY2hyX251bGxfYmVf
-Y2FuX3JlYWQoY2hyKSkgew0KPiArICAgICAgICByZXR1cm4gMQ0KPiArICAgIH0NCj4gICAgICBy
-ZXR1cm4gcy0+bWF4X3NpemUNCj4gIH0NCj4gIA0KPiBAQCAtNDIyLDYgKzQyNSwxNCBAQCBzdGF0
-aWMgZ2Jvb2xlYW4gdGNwX2Nocl9yZWFkKFFJT0NoYW5uZWwgKmNoYW4sIEdJT0NvbmRpdGlvbiBj
-b25kLCB2b2lkICpvcGFxdWUpDQo+ICAgICAgdWludDhfdCBidWZbQ0hSX1JFQURfQlVGX0xFTl0N
-Cj4gICAgICBpbnQgbGVuLCBzaXplDQo+ICANCj4gKyAgICBpZiAocWVtdV9jaHJfbnVsbF9iZV9j
-YW5fcmVhZChjaHIpKSB7DQo+ICsgICAgICAgIHNpemUgPSB0Y3BfY2hyX3JlY3YoY2hyLCAodm9p
-ZCAqKWJ1ZiwgQ0hSX1JFQURfQlVGX0xFTikNCg0KSXQgd291bGQgYmUgYmV0dGVyIG5vdCB0byBk
-ZXN0cm95IGRhdGEgaW4gdGhlIGNoYW5uZWwsIGJlY2F1c2UgdGhlDQpkZXZpY2UgY291bGQgc2V0
-IGhhbmRsZXJzIGxhdGVyLg0KLS0tLS0tVGhpcyBkZXZpY2UgZG8gbm90IHJlZ2lzdGVyIGEgY2hy
-X3JlYWQgZnVuY3Rpb24sc28gaXQncyBzYWZlIHRvIGRlc3Ryb3kgZGF0YShubyByZWFkIGhhbmRs
-ZXIpLg0KDQoNCg0KDQpEYW5pZWwsIG1heWJlIFFJT0NoYW5uZWwgY291bGQgaGF2ZSBhIGZ1bmN0
-aW9uIHRvIGNoZWNrIGZvciBodW5nLXVwDQpjaGFubmVscyBhbmQgcmV0dXJuIGEgYm9vbD8gIEZv
-ciBmaWxlIGRlc2NyaXB0b3JzIGl0IHdvdWxkIHBvbGwgdGhlIGZpbGUNCmRlc2NyaXB0b3IgYW5k
-IGNoZWNrIGZvciBQT0xMSFVQLCB3aGlsZSBvdGhlciBjaGFubmVscyB3b3VsZCBoYXZlIGEgbW9y
-ZQ0Kb3IgbGVzcyBvYnZpb3VzIGltcGxlbWVudGF0aW9uLg0KDQo+ICsgICAgICAgIGlmIChzaXpl
-ID09IDAgfHwgc2l6ZSA9PSAtMSkgew0KPiArICAgICAgICAgICAgdGNwX2Nocl9kaXNjb25uZWN0
-KGNocikNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICByZXR1cm4gVFJVRQ0KPiArICAgIH0NCj4g
-Kw0KPiAgICAgIGlmICghcy0+Y29ubmVjdGVkIHx8IHMtPm1heF9zaXplIDw9IDApIHsNCj4gICAg
-ICAgICAgcmV0dXJuIFRSVUUNCj4gICAgICB9DQo+IGRpZmYgLS1naXQgYS9jaGFyZGV2L2NoYXIu
-YyBiL2NoYXJkZXYvY2hhci5jDQo+IGluZGV4IDJiNjc5YTIuLjdmN2Y0ODYgMTAwNjQ0DQo+IC0t
-LSBhL2NoYXJkZXYvY2hhci5jDQo+ICsrKyBiL2NoYXJkZXYvY2hhci5jDQo+IEBAIC0xNDgsNiAr
-MTQ4LDE2IEBAIGludCBxZW11X2Nocl93cml0ZShDaGFyZGV2ICpzLCBjb25zdCB1aW50OF90ICpi
-dWYsIGludCBsZW4sIGJvb2wgd3JpdGVfYWxsKQ0KPiAgICAgIHJldHVybiBvZmZzZXQNCj4gIH0N
-Cj4gIA0KPiAraW50IHFlbXVfY2hyX251bGxfYmVfY2FuX3JlYWQoQ2hhcmRldiAqcykNCj4gK3sN
-Cj4gKyAgICBDaGFyQmFja2VuZCAqYmUgPSBzLT5iZQ0KPiArDQo+ICsgICAgaWYgKCFiZSB8fCAh
-YmUtPmNocl9jYW5fcmVhZCkgew0KDQpJIHRoaW5rIGl0J3MgcmVhbGx5IGNocl9yZWFkIHRoYXQg
-eW91IHdhbnQgdG8gY29uc2lkZXIgaGVyZS4NCg0KLS0tLWlmIGNocl9jYW5fcmVhZCBpcyBudWxs
-LHRoZW4gY2hyX3JlYWQgaXMgbnVsbCB0b28uDQoNCg0KVGhhbmtzLA0KDQpQYW9sbw0KDQo+ICsg
-ICAgICAgIHJldHVybiAxDQo+ICsgICAgfQ0KPiArICAgIHJldHVybiAwDQo+ICt9DQo+ICsNCj4g
-IGludCBxZW11X2Nocl9iZV9jYW5fd3JpdGUoQ2hhcmRldiAqcykNCj4gIHsNCj4gICAgICBDaGFy
-QmFja2VuZCAqYmUgPSBzLT5iZQ0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9jaGFyZGV2L2NoYXIu
-aCBiL2luY2x1ZGUvY2hhcmRldi9jaGFyLmgNCj4gaW5kZXggOGE5YWRlNC4uOGRkMjhhOCAxMDA2
-NDQNCj4gLS0tIGEvaW5jbHVkZS9jaGFyZGV2L2NoYXIuaA0KPiArKysgYi9pbmNsdWRlL2NoYXJk
-ZXYvY2hhci5oDQo+IEBAIC0xMTQsNiArMTE0LDE1IEBAIHZvaWQgcWVtdV9jaHJfY2xlYW51cCh2
-b2lkKQ0KPiAgQ2hhcmRldiAqcWVtdV9jaHJfbmV3X25vcmVwbGF5KGNvbnN0IGNoYXIgKmxhYmVs
-LCBjb25zdCBjaGFyICpmaWxlbmFtZSkNCj4gIA0KPiAgLyoqDQo+ICsgKiBAcWVtdV9jaHJfbnVs
-bF9iZV9jYW5fcmVhZDoNCj4gKyAqDQo+ICsgKiBDaGVjayBpZiBDaGFyZGV2J3MgY2hyX2Nhbl9y
-ZWFkIGlzIHJlZ2lzdGVyZWQuDQo+ICsgKg0KPiArICogUmV0dXJuczogMSBpZiBDaGFyZGV2J3Mg
-Y2hyX2Nhbl9yZWFkIGlzIG51bGwuDQo+ICsgKi8NCj4gK2ludCBxZW11X2Nocl9udWxsX2JlX2Nh
-bl9yZWFkKENoYXJkZXYgKnMpDQo+ICsNCj4gKy8qKg0KPiAgICogQHFlbXVfY2hyX2JlX2Nhbl93
-cml0ZToNCj4gICAqDQo+ICAgKiBEZXRlcm1pbmUgaG93IG11Y2ggZGF0YSB0aGUgZnJvbnQgZW5k
-IGNhbiBjdXJyZW50bHkgYWNjZXB0LiAgVGhpcyBmdW5jdGlvbg0KPg==
+On 11/07/2017 11:31, Thomas Huth wrote:
+> The header is only used by accel/tcg/cputlb.c so we can
+> move it to the accel/tcg/ folder, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  Note: This patch should be applied after Philippe's "MAINTAINERS:
+>  update TCG entries" patch here:
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06529.html
+> 
+>  MAINTAINERS                                        | 1 -
+>  softmmu_template.h => accel/tcg/softmmu_template.h | 0
+>  2 files changed, 1 deletion(-)
+>  rename softmmu_template.h => accel/tcg/softmmu_template.h (100%)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 74b3956..993b12e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -86,7 +86,6 @@ M: Richard Henderson <rth@twiddle.net>
+>  S: Maintained
+>  F: cpus.c
+>  F: exec.c
+> -F: softmmu_template.h
+>  F: accel/tcg/
+>  F: include/exec/cpu*.h
+>  F: include/exec/exec-all.h
+> diff --git a/softmmu_template.h b/accel/tcg/softmmu_template.h
+> similarity index 100%
+> rename from softmmu_template.h
+> rename to accel/tcg/softmmu_template.h
+> 
+
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
