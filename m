@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUuss-0005cI-H0
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:07:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dUuw0-00070k-EY
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dUusm-0007Zr-7J
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:07:22 -0400
-Date: Tue, 11 Jul 2017 14:06:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170711130650.GD2223@work-vm>
-References: <20170710163029.129912-1-vsementsov@virtuozzo.com>
-	<20170710163029.129912-4-vsementsov@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dUuvv-00010v-Ol
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:10:36 -0400
+Received: from mail-wr0-f181.google.com ([209.85.128.181]:33395)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dUuvv-00010N-He
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:10:31 -0400
+Received: by mail-wr0-f181.google.com with SMTP id r103so183028316wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 06:10:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170710163029.129912-4-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v7 03/16] migration: split common postcopy
- out of ram postcopy
+In-Reply-To: <b3cd94f2-8a32-9b09-54b1-0cfa6eff0c36@amsat.org>
+References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
+	<1499771839-32518-7-git-send-email-peter.maydell@linaro.org>
+	<b3cd94f2-8a32-9b09-54b1-0cfa6eff0c36@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 14:09:09 +0100
+Message-ID: <CAFEAcA8cxuj04T5qDE7xPjTEXOcGZdhnZvaGOdmb08KjyjsE3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 6/7] hw/misc/mps2_scc: Implement
+ MPS2 Serial Communication Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,240 +32,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> Split common postcopy staff from ram postcopy staff.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 11 July 2017 at 13:53, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> I Peter,
+>
+> On 07/11/2017 08:17 AM, Peter Maydell wrote:
+>>
+>> Implement a model of the Serial Communication Controller (SCC) found
+>> in MPS2 FPGA images.
+>>
+>> The primary purpose of this device is to communicate with the
+>> Motherboard Configuration Controller (MCC) which is located on
+>> the MPS board itself, outside the FPGA image. This is used
+>> for programming the MPS clock generators. The SCC also has
+>> some basic ID registers and an output for the board LEDs.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>   hw/misc/Makefile.objs           |   1 +
+>>   include/hw/misc/mps2-scc.h      |  43 ++++++
+>>   hw/misc/mps2-scc.c              | 310
+>> ++++++++++++++++++++++++++++++++++++++++
+>
+>
+> Hmm I understand hw/ssi is for Synchronous Serial Interface, this interfa=
+ce
+> doesn't belong there?
 
-I'm OK with this; I'm not sure I'd have bothered making the ping's
-dependent on it being RAM.
+No, it's not an SSI bus -- that's a standardized clocked
+point-to-point serial interface. This is just a fairly
+ad-hoc communication channel.
 
-(These first few are pretty much a separable series).
+>> +++ b/include/hw/misc/mps2-scc.h
+>> @@ -0,0 +1,43 @@
+>> +/*
+>> + * ARM CMSDK APB timer emulation
+>
+>
+> ARM MPS2 SCC emulation
 
-Note a few things below I'd prefer if you reroll:
+Oops; fixed.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> +static uint64_t mps2_scc_read(void *opaque, hwaddr offset, unsigned siz=
+e)
+>> +{
+>> +    MPS2SCC *s =3D MPS2_SCC(opaque);
+>> +    uint64_t r;
+>> +
+>> +    switch (offset) {
+>> +    case A_CFG0:
+>> +        r =3D s->cfg0;
+>> +        break;
+>> +    case A_CFG1:
+>> +        r =3D s->cfg1;
+>> +        break;
+>> +    case A_CFG3:
+>> +        /* These are user-settable DIP switches on the board. We don't
+>> +         * model that, so just return zeroes.
+>> +         */
+>
+>
+> Shouldn't be hard to have a property (thinking about having multiple boar=
+ds
+> and using those switches to have some board unique ID, not switches one
+> might toggle at runtime).
 
-> ---
->  migration/migration.c | 39 ++++++++++++++++++++++++++-------------
->  migration/migration.h |  2 ++
->  migration/savevm.c    | 48 +++++++++++++++++++++++++++++++++++++++---------
->  3 files changed, 67 insertions(+), 22 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 51ccd1a4c5..d3a2fd405a 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1221,6 +1221,11 @@ bool migrate_postcopy_ram(void)
->      return s->enabled_capabilities[MIGRATION_CAPABILITY_POSTCOPY_RAM];
->  }
->  
-> +bool migrate_postcopy(void)
-> +{
-> +    return migrate_postcopy_ram();
-> +}
-> +
->  bool migrate_auto_converge(void)
->  {
->      MigrationState *s;
-> @@ -1577,9 +1582,11 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->       * need to tell the destination to throw any pages it's already received
->       * that are dirty
->       */
-> -    if (ram_postcopy_send_discard_bitmap(ms)) {
-> -        error_report("postcopy send discard bitmap failed");
-> -        goto fail;
-> +    if (migrate_postcopy_ram()) {
-> +        if (ram_postcopy_send_discard_bitmap(ms)) {
+No, on the board these are wired up to user-toggled switches.
+Board ID information is in the ID/AID/CFG4 registers, which we have
+properties for.
 
-I'd rather:
-       if (migrate_postcopy_ram() &&
-           ram_postcopy_send_discard_bitmap(ms)) {
 
-avoiding one extra layer of {}'s
+>> +    case A_CFG1:
+>> +        /* CFG1 bits [7:0] control the board LEDs. We don't currently
+>> have
+>> +         * a mechanism for displaying this graphically, so use a trace
+>> event.
+>> +         */
+>
+>
+> Well MIPS Jazz uses hw/display/jazz_led.c which is kinda nice :)
+>
+> Now than there is interest in simulating IoT boards and so, we might thin=
+k
+> about a generic LED display.
 
-Dave
+Yeah, if we do this at all we should have generic support (and
+ideally you might want to see both the LED output and the
+LCD screen output at the same time). This tracepoint is a
+low-effort placeholder because I don't want to get into trying
+to define and implement a generic LED-and-switches kind of UI.
 
-> +            error_report("postcopy send discard bitmap failed");
-> +            goto fail;
-> +        }
->      }
->  
->      /*
-> @@ -1588,8 +1595,10 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->       * wrap their state up here
->       */
->      qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
-> -    /* Ping just for debugging, helps line traces up */
-> -    qemu_savevm_send_ping(ms->to_dst_file, 2);
-> +    if (migrate_postcopy_ram()) {
-> +        /* Ping just for debugging, helps line traces up */
-> +        qemu_savevm_send_ping(ms->to_dst_file, 2);
-> +    }
->  
->      /*
->       * While loading the device state we may trigger page transfer
-> @@ -1614,7 +1623,9 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->      qemu_savevm_send_postcopy_listen(fb);
->  
->      qemu_savevm_state_complete_precopy(fb, false, false);
-> -    qemu_savevm_send_ping(fb, 3);
-> +    if (migrate_postcopy_ram()) {
-> +        qemu_savevm_send_ping(fb, 3);
-> +    }
->  
->      qemu_savevm_send_postcopy_run(fb);
->  
-> @@ -1649,11 +1660,13 @@ static int postcopy_start(MigrationState *ms, bool *old_vm_running)
->  
->      qemu_mutex_unlock_iothread();
->  
-> -    /*
-> -     * Although this ping is just for debug, it could potentially be
-> -     * used for getting a better measurement of downtime at the source.
-> -     */
-> -    qemu_savevm_send_ping(ms->to_dst_file, 4);
-> +    if (migrate_postcopy_ram()) {
-> +        /*
-> +         * Although this ping is just for debug, it could potentially be
-> +         * used for getting a better measurement of downtime at the source.
-> +         */
-> +        qemu_savevm_send_ping(ms->to_dst_file, 4);
-> +    }
->  
->      if (migrate_release_ram()) {
->          ram_postcopy_migrated_memory_release(ms);
-> @@ -1831,7 +1844,7 @@ static void *migration_thread(void *opaque)
->          qemu_savevm_send_ping(s->to_dst_file, 1);
->      }
->  
-> -    if (migrate_postcopy_ram()) {
-> +    if (migrate_postcopy()) {
->          /*
->           * Tell the destination that we *might* want to do postcopy later;
->           * if the other end can't do postcopy it should fail now, nice and
-> @@ -1864,7 +1877,7 @@ static void *migration_thread(void *opaque)
->              if (pending_size && pending_size >= threshold_size) {
->                  /* Still a significant amount to transfer */
->  
-> -                if (migrate_postcopy_ram() &&
-> +                if (migrate_postcopy() &&
->                      s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE &&
->                      pend_nonpost <= threshold_size &&
->                      atomic_read(&s->start_postcopy)) {
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 148c9facbc..1d974bacce 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -165,6 +165,8 @@ bool migration_is_blocked(Error **errp);
->  bool migration_in_postcopy(void);
->  MigrationState *migrate_get_current(void);
->  
-> +bool migrate_postcopy(void);
-> +
->  bool migrate_release_ram(void);
->  bool migrate_postcopy_ram(void);
->  bool migrate_zero_blocks(void);
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 37da83509f..cf79e1d3ac 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -89,7 +89,7 @@ static struct mig_cmd_args {
->      [MIG_CMD_INVALID]          = { .len = -1, .name = "INVALID" },
->      [MIG_CMD_OPEN_RETURN_PATH] = { .len =  0, .name = "OPEN_RETURN_PATH" },
->      [MIG_CMD_PING]             = { .len = sizeof(uint32_t), .name = "PING" },
-> -    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = 16, .name = "POSTCOPY_ADVISE" },
-> +    [MIG_CMD_POSTCOPY_ADVISE]  = { .len = -1, .name = "POSTCOPY_ADVISE" },
->      [MIG_CMD_POSTCOPY_LISTEN]  = { .len =  0, .name = "POSTCOPY_LISTEN" },
->      [MIG_CMD_POSTCOPY_RUN]     = { .len =  0, .name = "POSTCOPY_RUN" },
->      [MIG_CMD_POSTCOPY_RAM_DISCARD] = {
-> @@ -98,6 +98,23 @@ static struct mig_cmd_args {
->      [MIG_CMD_MAX]              = { .len = -1, .name = "MAX" },
->  };
->  
-> +/* Note for MIG_CMD_POSTCOPY_ADVISE:
-> + * The format of arguments is depending on postcopy mode:
-> + * - postcopy RAM only
-> + *   uint64_t host page size
-> + *   uint64_t taget page size
-> + *
-> + * - postcopy RAM and postcopy dirty bitmaps
-> + *   format is the same as for postcopy RAM only
-> + *
-> + * - postcopy dirty bitmaps only
-> + *   Nothing. Command length field is 0.
-> + *
-> + * Be careful: adding a new postcopy entity with some other parameters should
-> + * not break format self-description ability. Good way is to introduce some
-> + * generic extendable format with an exception for two old entities.
-> + */
-> +
->  static int announce_self_create(uint8_t *buf,
->                                  uint8_t *mac_addr)
->  {
-> @@ -861,12 +878,17 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
->  /* Send prior to any postcopy transfer */
->  void qemu_savevm_send_postcopy_advise(QEMUFile *f)
->  {
-> -    uint64_t tmp[2];
-> -    tmp[0] = cpu_to_be64(ram_pagesize_summary());
-> -    tmp[1] = cpu_to_be64(qemu_target_page_size());
-> +    if (migrate_postcopy_ram()) {
-> +        uint64_t tmp[2];
-> +        tmp[0] = cpu_to_be64(ram_pagesize_summary());
-> +        tmp[1] = cpu_to_be64(qemu_target_page_size());
->  
-> -    trace_qemu_savevm_send_postcopy_advise();
-> -    qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 16, (uint8_t *)tmp);
-> +        trace_qemu_savevm_send_postcopy_advise();
-> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE,
-> +                                 16, (uint8_t *)tmp);
-> +    } else {
-> +        qemu_savevm_command_send(f, MIG_CMD_POSTCOPY_ADVISE, 0, NULL);
-> +    }
->  }
->  
->  /* Sent prior to starting the destination running in postcopy, discard pages
-> @@ -1352,6 +1374,10 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
->          return -1;
->      }
->  
-> +    if (!migrate_postcopy_ram()) {
-> +        return 0;
-> +    }
-> +
->      if (!postcopy_ram_supported_by_host()) {
->          postcopy_state_set(POSTCOPY_INCOMING_NONE);
->          return -1;
-> @@ -1562,7 +1588,9 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
->           * A rare case, we entered listen without having to do any discards,
->           * so do the setup that's normally done at the time of the 1st discard.
->           */
-> -        postcopy_ram_prepare_discard(mis);
-> +        if (migrate_postcopy_ram()) {
-> +            postcopy_ram_prepare_discard(mis);
-> +        }
->      }
->  
->      /*
-> @@ -1570,8 +1598,10 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
->       * However, at this point the CPU shouldn't be running, and the IO
->       * shouldn't be doing anything yet so don't actually expect requests
->       */
-> -    if (postcopy_ram_enable_notify(mis)) {
-> -        return -1;
-> +    if (migrate_postcopy_ram()) {
-> +        if (postcopy_ram_enable_notify(mis)) {
-> +            return -1;
-> +        }
->      }
->  
->      if (mis->have_listen_thread) {
-> -- 
-> 2.11.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+thanks
+-- PMM
