@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxlT-0001H1-Q3
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:11:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxla-0001Nz-8c
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxlP-0006oy-36
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:11:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxlW-0006vW-Ey
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:02 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:07:43 +0200
-Message-Id: <20170711160814.20941-55-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:44 +0200
+Message-Id: <20170711160814.20941-56-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 54/85] iotests: fix remainining tests to work
- with LUKS
+Subject: [Qemu-devel] [PULL 55/85] iotests: reduce PBKDF iterations when
+ testing LUKS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,272 +25,478 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The tests 033, 140, 145 and 157 were all broken
-when run with LUKS, since they did not correctly use
-the required image opts args syntax to specify the
-decryption secret. Further, the 120 test simply does
-not make sense to run with luks, as the scenario
-exercised is not relevant.
+By default the PBKDF algorithm used with LUKS is tuned
+based on the number of iterations to produce 1 second
+of running time. This makes running the I/O test with
+the LUKS format orders of magnitude slower than with
+qcow2/raw formats.
 
-The test 181 was broken when run with LUKS because
-it didn't take account of fact that $TEST_IMG was
-already in image opts syntax. The launch_qemu
-helper also didn't register the secret object
-providing the LUKS password.
+When creating LUKS images, set the iteration time to
+a 10ms to reduce the time overhead for LUKS, since
+security does not matter in I/O tests.
+
+Previously a full 'check -luks' would take
+
+  $ time ./check -luks
+  Passed all 22 tests
+
+  real  23m9.988s
+  user  21m46.223s
+  sys   0m22.841s
+
+Now it takes
+
+  $ time ./check -luks
+  Passed all 22 tests
+
+  real  4m39.235s
+  user  3m29.590s
+  sys   0m24.234s
+
+Still slow compared to qcow2/raw, but much improved
+none the less.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170626123510.20134-3-berrange@redhat.com
+Message-id: 20170626123510.20134-4-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/033         | 12 ++++++++++--
- tests/qemu-iotests/120         |  1 +
- tests/qemu-iotests/140         |  9 ++++++++-
- tests/qemu-iotests/145         | 19 +++++++++++++++++--
- tests/qemu-iotests/157         | 17 ++++++++++++++---
- tests/qemu-iotests/157.out     | 16 ++++++++--------
- tests/qemu-iotests/174         |  2 +-
- tests/qemu-iotests/181         | 21 ++++++++++++++++-----
- tests/qemu-iotests/common.qemu |  9 +++++++--
- 9 files changed, 82 insertions(+), 24 deletions(-)
+ tests/qemu-iotests/149           |   3 +
+ tests/qemu-iotests/149.out       | 118 +++++++++++++++++++--------------------
+ tests/qemu-iotests/common.filter |   3 +-
+ tests/qemu-iotests/common.rc     |   3 +
+ 4 files changed, 67 insertions(+), 60 deletions(-)
 
-diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index 16edcf2..2cdfd13 100755
---- a/tests/qemu-iotests/033
-+++ b/tests/qemu-iotests/033
-@@ -50,10 +50,18 @@ do_test()
- 	local align=$1
- 	local iocmd=$2
- 	local img=$3
-+	if [ "$IMGOPTSSYNTAX" = "true" ]
-+	then
-+	    IO_OPEN_ARG="$img"
-+	    IO_EXTRA_ARGS="--image-opts"
-+	else
-+	    IO_OPEN_ARG="-o driver=$IMGFMT,file.align=$align blkdebug::$img"
-+	    IO_EXTRA_ARGS=""
-+	fi
- 	{
--		echo "open -o driver=$IMGFMT,file.align=$align blkdebug::$img"
-+		echo "open $IO_OPEN_ARG"
- 		echo $iocmd
--	} | $QEMU_IO
-+	} | $QEMU_IO $IO_EXTRA_ARGS
+diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+index 8407251..f62e618 100755
+--- a/tests/qemu-iotests/149
++++ b/tests/qemu-iotests/149
+@@ -136,6 +136,7 @@ def cryptsetup_add_password(config, slot):
+         args = ["luksAddKey", config.image_path(),
+                 "--key-slot", slot,
+                 "--key-file", "-",
++                "--iter-time", "10",
+                 pwfile]
+ 
+         cryptsetup(args, password)
+@@ -164,6 +165,7 @@ def cryptsetup_format(config):
+         args.extend(["--hash", config.hash])
+     args.extend(["--key-slot", slot])
+     args.extend(["--key-file", "-"])
++    args.extend(["--iter-time", "10"])
+     args.append(config.image_path())
+ 
+     cryptsetup(args, password)
+@@ -230,6 +232,7 @@ def qemu_img_create(config, size_mb):
+ 
+     opts = [
+         "key-secret=sec0",
++        "iter-time=10",
+         "cipher-alg=%s-%d" % (config.cipher, config.keylen),
+         "cipher-mode=%s" % config.mode,
+         "ivgen-alg=%s" % config.ivgen,
+diff --git a/tests/qemu-iotests/149.out b/tests/qemu-iotests/149.out
+index 90b5b55..b18c4e4 100644
+--- a/tests/qemu-iotests/149.out
++++ b/tests/qemu-iotests/149.out
+@@ -2,7 +2,7 @@
+ # Create image
+ truncate TEST_DIR/luks-aes-256-xts-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-xts-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha1.img qiotest-145-aes-256-xts-plain64-sha1
+ # Set dev owner
+@@ -60,8 +60,8 @@ unlink TEST_DIR/luks-aes-256-xts-plain64-sha1.img
+ 
+ # ================= qemu-img aes-256-xts-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-256-xts-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-256-xts-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha1.img qiotest-145-aes-256-xts-plain64-sha1
+@@ -122,7 +122,7 @@ unlink TEST_DIR/luks-aes-256-xts-plain64-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-twofish-256-xts-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher twofish-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-twofish-256-xts-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher twofish-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-twofish-256-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-256-xts-plain64-sha1.img qiotest-145-twofish-256-xts-plain64-sha1
+ # Set dev owner
+@@ -180,8 +180,8 @@ unlink TEST_DIR/luks-twofish-256-xts-plain64-sha1.img
+ 
+ # ================= qemu-img twofish-256-xts-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=twofish-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-twofish-256-xts-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-twofish-256-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=twofish-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=twofish-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-twofish-256-xts-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-twofish-256-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=twofish-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-256-xts-plain64-sha1.img qiotest-145-twofish-256-xts-plain64-sha1
+@@ -242,7 +242,7 @@ unlink TEST_DIR/luks-twofish-256-xts-plain64-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-serpent-256-xts-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-serpent-256-xts-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-serpent-256-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-256-xts-plain64-sha1.img qiotest-145-serpent-256-xts-plain64-sha1
+ # Set dev owner
+@@ -300,8 +300,8 @@ unlink TEST_DIR/luks-serpent-256-xts-plain64-sha1.img
+ 
+ # ================= qemu-img serpent-256-xts-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=serpent-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-serpent-256-xts-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-serpent-256-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=serpent-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=serpent-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-serpent-256-xts-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-serpent-256-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=serpent-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-256-xts-plain64-sha1.img qiotest-145-serpent-256-xts-plain64-sha1
+@@ -362,7 +362,7 @@ unlink TEST_DIR/luks-serpent-256-xts-plain64-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher cast5-cbc-plain64 --key-size 128 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher cast5-cbc-plain64 --key-size 128 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img qiotest-145-cast5-128-cbc-plain64-sha1
+ # Set dev owner
+@@ -420,8 +420,8 @@ unlink TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img
+ 
+ # ================= qemu-img cast5-128-cbc-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=cast5-128,cipher-mode=cbc,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=cast5-128 cipher-mode=cbc ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=cast5-128,cipher-mode=cbc,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=cast5-128 cipher-mode=cbc ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-cast5-128-cbc-plain64-sha1.img qiotest-145-cast5-128-cbc-plain64-sha1
+@@ -483,7 +483,7 @@ Skipping cast6-256-xts-plain64-sha1 in blacklist
+ # Create image
+ truncate TEST_DIR/luks-aes-256-cbc-plain-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-cbc-plain-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-plain-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain-sha1.img qiotest-145-aes-256-cbc-plain-sha1
+ # Set dev owner
+@@ -541,8 +541,8 @@ unlink TEST_DIR/luks-aes-256-cbc-plain-sha1.img
+ 
+ # ================= qemu-img aes-256-cbc-plain-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=plain,hash-alg=sha1 TEST_DIR/luks-aes-256-cbc-plain-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-cbc-plain-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=plain hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=plain,hash-alg=sha1 TEST_DIR/luks-aes-256-cbc-plain-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-cbc-plain-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=plain hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain-sha1.img qiotest-145-aes-256-cbc-plain-sha1
+@@ -603,7 +603,7 @@ unlink TEST_DIR/luks-aes-256-cbc-plain-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-aes-256-cbc-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-cbc-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha1.img qiotest-145-aes-256-cbc-plain64-sha1
+ # Set dev owner
+@@ -661,8 +661,8 @@ unlink TEST_DIR/luks-aes-256-cbc-plain64-sha1.img
+ 
+ # ================= qemu-img aes-256-cbc-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-256-cbc-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-cbc-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-256-cbc-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-cbc-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha1.img qiotest-145-aes-256-cbc-plain64-sha1
+@@ -723,7 +723,7 @@ unlink TEST_DIR/luks-aes-256-cbc-plain64-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-cbc-essiv:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-cbc-essiv:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img qiotest-145-aes-256-cbc-essiv-sha256-sha1
+ # Set dev owner
+@@ -781,8 +781,8 @@ unlink TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img
+ 
+ # ================= qemu-img aes-256-cbc-essiv-sha256-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=essiv,hash-alg=sha1,ivgen-hash-alg=sha256 TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=essiv ivgen-hash-alg=sha256 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=essiv,hash-alg=sha1,ivgen-hash-alg=sha256 TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=essiv ivgen-hash-alg=sha256 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img qiotest-145-aes-256-cbc-essiv-sha256-sha1
+@@ -843,7 +843,7 @@ unlink TEST_DIR/luks-aes-256-cbc-essiv-sha256-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-essiv:sha256 --key-size 512 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-essiv:sha256 --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img qiotest-145-aes-256-xts-essiv-sha256-sha1
+ # Set dev owner
+@@ -901,8 +901,8 @@ unlink TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img
+ 
+ # ================= qemu-img aes-256-xts-essiv-sha256-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=essiv,hash-alg=sha1,ivgen-hash-alg=sha256 TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=essiv ivgen-hash-alg=sha256 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=essiv,hash-alg=sha1,ivgen-hash-alg=sha256 TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=essiv ivgen-hash-alg=sha256 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img qiotest-145-aes-256-xts-essiv-sha256-sha1
+@@ -963,7 +963,7 @@ unlink TEST_DIR/luks-aes-256-xts-essiv-sha256-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img qiotest-145-aes-128-xts-plain64-sha256-sha1
+ # Set dev owner
+@@ -1021,8 +1021,8 @@ unlink TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img
+ 
+ # ================= qemu-img aes-128-xts-plain64-sha256-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-128,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-128 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-128,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-128 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img qiotest-145-aes-128-xts-plain64-sha256-sha1
+@@ -1083,7 +1083,7 @@ unlink TEST_DIR/luks-aes-128-xts-plain64-sha256-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 384 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 384 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img qiotest-145-aes-192-xts-plain64-sha256-sha1
+ # Set dev owner
+@@ -1141,8 +1141,8 @@ unlink TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img
+ 
+ # ================= qemu-img aes-192-xts-plain64-sha256-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-192,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-192 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-192,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-192 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img qiotest-145-aes-192-xts-plain64-sha256-sha1
+@@ -1203,7 +1203,7 @@ unlink TEST_DIR/luks-aes-192-xts-plain64-sha256-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-twofish-128-xts-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher twofish-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-twofish-128-xts-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher twofish-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-twofish-128-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-128-xts-plain64-sha1.img qiotest-145-twofish-128-xts-plain64-sha1
+ # Set dev owner
+@@ -1261,8 +1261,8 @@ unlink TEST_DIR/luks-twofish-128-xts-plain64-sha1.img
+ 
+ # ================= qemu-img twofish-128-xts-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=twofish-128,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-twofish-128-xts-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-twofish-128-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=twofish-128 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=twofish-128,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-twofish-128-xts-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-twofish-128-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=twofish-128 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-twofish-128-xts-plain64-sha1.img qiotest-145-twofish-128-xts-plain64-sha1
+@@ -1324,7 +1324,7 @@ Skipping twofish-192-xts-plain64-sha1 in blacklist
+ # Create image
+ truncate TEST_DIR/luks-serpent-128-xts-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-serpent-128-xts-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-serpent-128-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-128-xts-plain64-sha1.img qiotest-145-serpent-128-xts-plain64-sha1
+ # Set dev owner
+@@ -1382,8 +1382,8 @@ unlink TEST_DIR/luks-serpent-128-xts-plain64-sha1.img
+ 
+ # ================= qemu-img serpent-128-xts-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=serpent-128,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-serpent-128-xts-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-serpent-128-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=serpent-128 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=serpent-128,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-serpent-128-xts-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-serpent-128-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=serpent-128 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-128-xts-plain64-sha1.img qiotest-145-serpent-128-xts-plain64-sha1
+@@ -1444,7 +1444,7 @@ unlink TEST_DIR/luks-serpent-128-xts-plain64-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-serpent-192-xts-plain64-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 384 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-serpent-192-xts-plain64-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher serpent-xts-plain64 --key-size 384 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-serpent-192-xts-plain64-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-192-xts-plain64-sha1.img qiotest-145-serpent-192-xts-plain64-sha1
+ # Set dev owner
+@@ -1502,8 +1502,8 @@ unlink TEST_DIR/luks-serpent-192-xts-plain64-sha1.img
+ 
+ # ================= qemu-img serpent-192-xts-plain64-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=serpent-192,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-serpent-192-xts-plain64-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-serpent-192-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=serpent-192 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=serpent-192,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha1 TEST_DIR/luks-serpent-192-xts-plain64-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-serpent-192-xts-plain64-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=serpent-192 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-serpent-192-xts-plain64-sha1.img qiotest-145-serpent-192-xts-plain64-sha1
+@@ -1566,7 +1566,7 @@ Skipping cast6-192-xts-plain64-sha1 in blacklist
+ # Create image
+ truncate TEST_DIR/luks-aes-256-xts-plain64-sha256.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha256 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-xts-plain64-sha256.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain64 --key-size 512 --hash sha256 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain64-sha256.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha256.img qiotest-145-aes-256-xts-plain64-sha256
+ # Set dev owner
+@@ -1624,8 +1624,8 @@ unlink TEST_DIR/luks-aes-256-xts-plain64-sha256.img
+ 
+ # ================= qemu-img aes-256-xts-plain64-sha256 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha256 TEST_DIR/luks-aes-256-xts-plain64-sha256.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha256.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha256
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=plain64,hash-alg=sha256 TEST_DIR/luks-aes-256-xts-plain64-sha256.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-xts-plain64-sha256.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=plain64 hash-alg=sha256 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain64-sha256.img qiotest-145-aes-256-xts-plain64-sha256
+@@ -1688,7 +1688,7 @@ Skipping aes-256-xts-plain64-ripemd160 in blacklist
+ # Create image
+ truncate TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain --key-size 512 --hash sha1 --key-slot 3 --key-file - TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain --key-size 512 --hash sha1 --key-slot 3 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img qiotest-145-aes-256-xts-plain-sha1-pwslot3
+ # Set dev owner
+@@ -1748,21 +1748,21 @@ unlink TEST_DIR/luks-aes-256-xts-plain-sha1-pwslot3.img
+ # Create image
+ truncate TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain --key-size 512 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img
++sudo cryptsetup -q -v luksFormat --cipher aes-xts-plain --key-size 512 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img
+ # Add password slot 1
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 1 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 1 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Add password slot 2
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 2 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 2 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Add password slot 3
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 3 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 3 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Add password slot 4
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 4 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 4 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Add password slot 5
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 5 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 5 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Add password slot 6
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 6 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 6 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Add password slot 7
+-sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 7 --key-file - TEST_DIR/passwd.txt
++sudo cryptsetup -q -v luksAddKey TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img --key-slot 7 --key-file - --iter-time 10 TEST_DIR/passwd.txt
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img qiotest-145-aes-256-xts-plain-sha1-pwallslots
+ # Set dev owner
+@@ -1820,8 +1820,8 @@ unlink TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img
+ 
+ # ================= qemu-img aes-256-xts-plain-sha1-pwallslots =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=c2xvdDE=,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=plain,hash-alg=sha1 TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=plain hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=c2xvdDE=,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=xts,ivgen-alg=plain,hash-alg=sha1 TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=xts ivgen-alg=plain hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img qiotest-145-aes-256-xts-plain-sha1-pwallslots
+@@ -1882,7 +1882,7 @@ unlink TEST_DIR/luks-aes-256-xts-plain-sha1-pwallslots.img
+ # Create image
+ truncate TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-cbc-essiv:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-cbc-essiv:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img qiotest-145-aes-256-cbc-essiv-auto-sha1
+ # Set dev owner
+@@ -1940,8 +1940,8 @@ unlink TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img
+ 
+ # ================= qemu-img aes-256-cbc-essiv-auto-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=essiv,hash-alg=sha1 TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=essiv hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=essiv,hash-alg=sha1 TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=essiv hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img qiotest-145-aes-256-cbc-essiv-auto-sha1
+@@ -2002,7 +2002,7 @@ unlink TEST_DIR/luks-aes-256-cbc-essiv-auto-sha1.img
+ # Create image
+ truncate TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img --size 4194304MB
+ # Format image
+-sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain64:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img
++sudo cryptsetup -q -v luksFormat --cipher aes-cbc-plain64:sha256 --key-size 256 --hash sha1 --key-slot 0 --key-file - --iter-time 10 TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img qiotest-145-aes-256-cbc-plain64-sha256-sha1
+ # Set dev owner
+@@ -2060,8 +2060,8 @@ unlink TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img
+ 
+ # ================= qemu-img aes-256-cbc-plain64-sha256-sha1 =================
+ # Create image
+-qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=plain64,hash-alg=sha1,ivgen-hash-alg=sha256 TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img 4194304M
+-Formatting 'TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=plain64 ivgen-hash-alg=sha256 hash-alg=sha1
++qemu-img create -f luks --object secret,id=sec0,data=MTIzNDU2,format=base64 -o key-secret=sec0,iter-time=10,cipher-alg=aes-256,cipher-mode=cbc,ivgen-alg=plain64,hash-alg=sha1,ivgen-hash-alg=sha256 TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img 4194304M
++Formatting 'TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img', fmt=luks size=4398046511104 key-secret=sec0 cipher-alg=aes-256 cipher-mode=cbc ivgen-alg=plain64 ivgen-hash-alg=sha256 hash-alg=sha1 iter-time=10
+ 
+ # Open dev
+ sudo cryptsetup -q -v luksOpen TEST_DIR/luks-aes-256-cbc-plain64-sha256-sha1.img qiotest-145-aes-256-cbc-plain64-sha256-sha1
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 2f595b2..7a58e57 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -126,7 +126,8 @@ _filter_img_create()
+         -e "s# block_state_zero=\\(on\\|off\\)##g" \
+         -e "s# log_size=[0-9]\\+##g" \
+         -e "s# refcount_bits=[0-9]\\+##g" \
+-        -e "s# key-secret=[a-zA-Z0-9]\\+##g"
++        -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
++        -e "s# iter-time=[0-9]\\+##g"
  }
  
- for write_zero_cmd in "write -z" "aio_write -z"; do
-diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-index 4f88a67..f40b97d 100755
---- a/tests/qemu-iotests/120
-+++ b/tests/qemu-iotests/120
-@@ -41,6 +41,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt generic
- _supported_proto file
- _supported_os Linux
-+_unsupported_fmt luks
- 
- _make_test_img 64M
- 
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 8c80a5a..f89d0d6 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -52,8 +52,15 @@ _make_test_img 64k
- 
- $QEMU_IO -c 'write -P 42 0 64k' "$TEST_IMG" | _filter_qemu_io
- 
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    SYSEMU_DRIVE_ARG=if=none,media=cdrom,id=drv,"$TEST_IMG"
-+else
-+    SYSEMU_DRIVE_ARG=if=none,media=cdrom,id=drv,file="$TEST_IMG",driver=$IMGFMT
-+fi
-+
- keep_stderr=y \
--_launch_qemu -drive if=none,media=cdrom,id=drv,file="$TEST_IMG",format=$IMGFMT \
-+_launch_qemu -drive $SYSEMU_DRIVE_ARG \
-     2> >(_filter_nbd)
- 
- _send_qemu_cmd $QEMU_HANDLE \
-diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-index e6c6bc4..c371b3c 100755
---- a/tests/qemu-iotests/145
-+++ b/tests/qemu-iotests/145
-@@ -43,8 +43,23 @@ _supported_proto generic
- _supported_os Linux
- 
- _make_test_img 1M
--echo quit | $QEMU -nographic -hda "$TEST_IMG" -incoming 'exec:true' -snapshot -serial none -monitor stdio |
--    _filter_qemu | _filter_hmp
-+
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    SYSEMU_DRIVE_ARG=if=none,$TEST_IMG
-+    SYSEMU_EXTRA_ARGS=""
-+    if [ -n "$IMGKEYSECRET" ]; then
-+        SECRET_ARG="secret,id=keysec0,data=$IMGKEYSECRET"
-+        SYSEMU_EXTRA_ARGS="-object $SECRET_ARG"
+ _filter_img_info()
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 9fd3130..2548e58 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -107,6 +107,9 @@ _set_default_imgopts()
+     if [ "$IMGFMT" == "qcow2" ] && ! (echo "$IMGOPTS" | grep "compat=" > /dev/null); then
+         IMGOPTS=$(_optstr_add "$IMGOPTS" "compat=1.1")
+     fi
++    if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null); then
++        IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
 +    fi
-+else
-+    SYSEMU_DRIVE_ARG=if=none,file="$TEST_IMG",driver=$IMGFMT
-+    SYSEMU_EXTRA_ARGS=""
-+fi
-+
-+echo quit | $QEMU -nographic $SYSEMU_EXTRA_ARGS -drive $SYSEMU_DRIVE_ARG \
-+                  -incoming 'exec:true' -snapshot -serial none -monitor stdio \
-+          | _filter_qemu | _filter_hmp
+ }
  
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-index 8d939cb..2bf02be 100755
---- a/tests/qemu-iotests/157
-+++ b/tests/qemu-iotests/157
-@@ -43,7 +43,6 @@ _supported_os Linux
- 
- function do_run_qemu()
- {
--    echo Testing: "$@"
-     (
-         if ! test -t 0; then
-             while read cmd; do
-@@ -63,7 +62,18 @@ function run_qemu()
- 
- 
- size=128M
--drive="if=none,file=$TEST_IMG,driver=$IMGFMT"
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    SYSEMU_DRIVE_ARG=if=none,$TEST_IMG
-+    SYSEMU_EXTRA_ARGS=""
-+    if [ -n "$IMGKEYSECRET" ]; then
-+        SECRET_ARG="secret,id=keysec0,data=$IMGKEYSECRET"
-+        SYSEMU_EXTRA_ARGS="-object $SECRET_ARG"
-+    fi
-+else
-+    SYSEMU_DRIVE_ARG=if=none,file="$TEST_IMG",driver=$IMGFMT
-+    SYSEMU_EXTRA_ARGS=""
-+fi
- 
- _make_test_img $size
- 
-@@ -76,8 +86,9 @@ echo
- 
- for cache in "writeback" "writethrough"; do
-     for wce in "" ",write-cache=auto" ",write-cache=on" ",write-cache=off"; do
-+        echo "Testing: cache='$cache' wce='$wce'"
-         echo "info block" \
--            | run_qemu -drive "$drive,cache=$cache" \
-+            | run_qemu $SYSEMU_EXTRA_ARGS -drive "$SYSEMU_DRIVE_ARG,cache=$cache" \
-                        -device "virtio-blk,drive=none0$wce" \
-             | grep -e "Testing" -e "Cache mode"
-     done
-diff --git a/tests/qemu-iotests/157.out b/tests/qemu-iotests/157.out
-index 77a9c03..fdc807f 100644
---- a/tests/qemu-iotests/157.out
-+++ b/tests/qemu-iotests/157.out
-@@ -3,20 +3,20 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- 
- === Setting WCE with qdev and with manually created BB ===
- 
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0
-+Testing: cache='writeback' wce=''
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0,write-cache=auto
-+Testing: cache='writeback' wce=',write-cache=auto'
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0,write-cache=on
-+Testing: cache='writeback' wce=',write-cache=on'
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writeback -device virtio-blk,drive=none0,write-cache=off
-+Testing: cache='writeback' wce=',write-cache=off'
-     Cache mode:       writethrough
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0
-+Testing: cache='writethrough' wce=''
-     Cache mode:       writethrough
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0,write-cache=auto
-+Testing: cache='writethrough' wce=',write-cache=auto'
-     Cache mode:       writethrough
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0,write-cache=on
-+Testing: cache='writethrough' wce=',write-cache=on'
-     Cache mode:       writeback
--Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,driver=IMGFMT,cache=writethrough -device virtio-blk,drive=none0,write-cache=off
-+Testing: cache='writethrough' wce=',write-cache=off'
-     Cache mode:       writethrough
- *** done
-diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-index c1c20a1a..552879d 100755
---- a/tests/qemu-iotests/174
-+++ b/tests/qemu-iotests/174
-@@ -41,7 +41,7 @@ _unsupported_fmt raw
- 
- 
- size=256K
--IMGFMT=raw IMGOPTS= _make_test_img $size | _filter_imgfmt
-+IMGFMT=raw IMGKEYSECRET= IMGOPTS= _make_test_img $size | _filter_imgfmt
- 
- echo
- echo "== reading wrong format should fail =="
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index f73ad5a..0333dda 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -57,13 +57,24 @@ echo
- 
- qemu_comm_method="monitor"
- 
--_launch_qemu \
--    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+fi
- src=$QEMU_HANDLE
- 
--_launch_qemu \
--    -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
--    -incoming "unix:${MIG_SOCKET}"
-+if [ "$IMGOPTSSYNTAX" = "true" ]; then
-+    _launch_qemu \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+else
-+    _launch_qemu \
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
-+        -incoming "unix:${MIG_SOCKET}"
-+fi
- dest=$QEMU_HANDLE
- 
- echo
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index 76ef298..7645f1d 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -153,14 +153,19 @@ function _launch_qemu()
-     mkfifo "${fifo_out}"
-     mkfifo "${fifo_in}"
- 
-+    object_options=
-+    if [ -n "$IMGKEYSECRET" ]; then
-+        object_options="--object secret,id=keysec0,data=$IMGKEYSECRET"
-+    fi
-+
-     if [ -z "$keep_stderr" ]; then
-         QEMU_NEED_PID='y'\
--        ${QEMU} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-+        ${QEMU} ${object_options} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-                                                        2>&1 \
-                                                        <"${fifo_in}" &
-     elif [ "$keep_stderr" = "y" ]; then
-         QEMU_NEED_PID='y'\
--        ${QEMU} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-+        ${QEMU} ${object_options} -nographic -serial none ${comm} "${@}" >"${fifo_out}" \
-                                                        <"${fifo_in}" &
-     else
-         exit 1
+ _use_sample_img()
 -- 
 2.9.4
