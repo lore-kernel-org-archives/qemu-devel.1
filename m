@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsS7-0007eW-DG
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:37 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUsS8-0007fi-N1
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsS5-0006Fs-K5
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUsS7-0006Gb-GC
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:36 -0400
 Received: from orth.archaic.org.uk ([81.2.115.148]:48421)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dUsS5-000683-8O
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:33 -0400
+	id 1dUsS7-000683-6D
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:35 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsPp-0002xf-Hu
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:29:13 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dUsPq-0002y1-Fp
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:29:14 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 11:29:09 +0100
-Message-Id: <1499768952-24990-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 11:29:11 +0100
+Message-Id: <1499768952-24990-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
 References: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 1/4] hw/misc: Add Exynos4210 Pseudo Random
- Number Generator
+Subject: [Qemu-devel] [PULL 3/4] ARM: KVM: Enable in-kernel timers with user
+ space gic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,351 +30,190 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Krzysztof Kozlowski <krzk@kernel.org>
+From: Alexander Graf <agraf@suse.de>
 
-Add emulation for Exynos4210 Pseudo Random Number Generator which could
-work on fixed seeds or with seeds provided by True Random Number
-Generator block inside the SoC.
+When running with KVM enabled, you can choose between emulating the
+gic in kernel or user space. If the kernel supports in-kernel virtualization
+of the interrupt controller, it will default to that. If not, if will
+default to user space emulation.
 
-Implement only the fixed seeds part of it in polling mode (no
-interrupts).
+Unfortunately when running in user mode gic emulation, we miss out on
+interrupt events which are only available from kernel space, such as the timer.
+This patch leverages the new kernel/user space pending line synchronization for
+timer events. It does not handle PMU events yet.
 
-Emulation tested with two independent Linux kernel exynos-rng drivers:
-1. New kcapi-rng interface (targeting Linux v4.12),
-2. Old hwrng inteface
-   # echo "exynos" > /sys/class/misc/hw_random/rng_current
-   # dd if=/dev/hwrng of=/dev/null bs=1 count=16
-
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Message-id: 20170425180609.11004-1-krzk@kernel.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: wrapped a few overlong lines; more efficient implementation
- of exynos4210_rng_seed_ready()]
+Signed-off-by: Alexander Graf <agraf@suse.de>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Message-id: 1498577737-130264-1-git-send-email-agraf@suse.de
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/Makefile.objs    |   2 +-
- hw/arm/exynos4210.c      |   4 +
- hw/misc/exynos4210_rng.c | 277 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 282 insertions(+), 1 deletion(-)
- create mode 100644 hw/misc/exynos4210_rng.c
+ include/sysemu/kvm.h   | 11 +++++++++++
+ target/arm/cpu.h       |  3 +++
+ accel/kvm/kvm-all.c    |  5 +++++
+ accel/stubs/kvm-stub.c |  5 +++++
+ hw/intc/arm_gic.c      |  7 +++++++
+ target/arm/kvm.c       | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 82 insertions(+)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 44e0e79..7e373db 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -28,7 +28,7 @@ obj-$(CONFIG_IVSHMEM) += ivshmem.o
- obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- obj-$(CONFIG_NSERIES) += cbus.o
- obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
--obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o
-+obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
- obj-$(CONFIG_IMX) += imx_ccm.o
- obj-$(CONFIG_IMX) += imx31_ccm.o
- obj-$(CONFIG_IMX) += imx25_ccm.o
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 0050626..ee851e3 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -87,6 +87,9 @@
- /* Clock controller SFR base address */
- #define EXYNOS4210_CLK_BASE_ADDR            0x10030000
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 052e11f..91fc07e 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -220,6 +220,17 @@ int kvm_init_vcpu(CPUState *cpu);
+ int kvm_cpu_exec(CPUState *cpu);
+ int kvm_destroy_vcpu(CPUState *cpu);
  
-+/* PRNG/HASH SFR base address */
-+#define EXYNOS4210_RNG_BASE_ADDR            0x10830400
-+
- /* Display controllers (FIMD) */
- #define EXYNOS4210_FIMD0_BASE_ADDR          0x11C00000
- 
-@@ -305,6 +308,7 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
-     sysbus_create_simple("exynos4210.pmu", EXYNOS4210_PMU_BASE_ADDR, NULL);
- 
-     sysbus_create_simple("exynos4210.clk", EXYNOS4210_CLK_BASE_ADDR, NULL);
-+    sysbus_create_simple("exynos4210.rng", EXYNOS4210_RNG_BASE_ADDR, NULL);
- 
-     /* PWM */
-     sysbus_create_varargs("exynos4210.pwm", EXYNOS4210_PWM_BASE_ADDR,
-diff --git a/hw/misc/exynos4210_rng.c b/hw/misc/exynos4210_rng.c
-new file mode 100644
-index 0000000..31ebe38
---- /dev/null
-+++ b/hw/misc/exynos4210_rng.c
-@@ -0,0 +1,277 @@
-+/*
-+ *  Exynos4210 Pseudo Random Nubmer Generator Emulation
++/**
++ * kvm_arm_supports_user_irq
 + *
-+ *  Copyright (c) 2017 Krzysztof Kozlowski <krzk@kernel.org>
++ * Not all KVM implementations support notifications for kernel generated
++ * interrupt events to user space. This function indicates whether the current
++ * KVM implementation does support them.
 + *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
++ * Returns: true if KVM supports using kernel generated IRQs from user space
 + */
++bool kvm_arm_supports_user_irq(void);
 +
-+#include "qemu/osdep.h"
-+#include "crypto/random.h"
-+#include "hw/sysbus.h"
-+#include "qemu/log.h"
+ #ifdef NEED_CPU_H
+ #include "cpu.h"
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 16a1e59..102c58a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -706,6 +706,9 @@ struct ARMCPU {
+     void *el_change_hook_opaque;
+ 
+     int32_t node_id; /* NUMA node this CPU belongs to */
 +
-+#define DEBUG_EXYNOS_RNG 0
-+
-+#define DPRINTF(fmt, ...) \
-+    do { \
-+        if (DEBUG_EXYNOS_RNG) { \
-+            printf("exynos4210_rng: " fmt, ## __VA_ARGS__); \
-+        } \
-+    } while (0)
-+
-+#define TYPE_EXYNOS4210_RNG             "exynos4210.rng"
-+#define EXYNOS4210_RNG(obj) \
-+    OBJECT_CHECK(Exynos4210RngState, (obj), TYPE_EXYNOS4210_RNG)
-+
-+/*
-+ * Exynos4220, PRNG, only polling mode is supported.
-+ */
-+
-+/* RNG_CONTROL_1 register bitfields, reset value: 0x0 */
-+#define EXYNOS4210_RNG_CONTROL_1_PRNG           0x8
-+#define EXYNOS4210_RNG_CONTROL_1_START_INIT     BIT(4)
-+/* RNG_STATUS register bitfields, reset value: 0x1 */
-+#define EXYNOS4210_RNG_STATUS_PRNG_ERROR        BIT(7)
-+#define EXYNOS4210_RNG_STATUS_PRNG_DONE         BIT(5)
-+#define EXYNOS4210_RNG_STATUS_MSG_DONE          BIT(4)
-+#define EXYNOS4210_RNG_STATUS_PARTIAL_DONE      BIT(3)
-+#define EXYNOS4210_RNG_STATUS_PRNG_BUSY         BIT(2)
-+#define EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE BIT(1)
-+#define EXYNOS4210_RNG_STATUS_BUFFER_READY      BIT(0)
-+#define EXYNOS4210_RNG_STATUS_WRITE_MASK   (EXYNOS4210_RNG_STATUS_PRNG_DONE \
-+                                           | EXYNOS4210_RNG_STATUS_MSG_DONE \
-+                                           | EXYNOS4210_RNG_STATUS_PARTIAL_DONE)
-+
-+#define EXYNOS4210_RNG_CONTROL_1                  0x0
-+#define EXYNOS4210_RNG_STATUS                    0x10
-+#define EXYNOS4210_RNG_SEED_IN                  0x140
-+#define EXYNOS4210_RNG_SEED_IN_OFFSET(n)   (EXYNOS4210_RNG_SEED_IN + (n * 0x4))
-+#define EXYNOS4210_RNG_PRNG                     0x160
-+#define EXYNOS4210_RNG_PRNG_OFFSET(n)      (EXYNOS4210_RNG_PRNG + (n * 0x4))
-+
-+#define EXYNOS4210_RNG_PRNG_NUM                 5
-+
-+#define EXYNOS4210_RNG_REGS_MEM_SIZE            0x200
-+
-+typedef struct Exynos4210RngState {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+
-+    int32_t randr_value[EXYNOS4210_RNG_PRNG_NUM];
-+    /* bits from 0 to EXYNOS4210_RNG_PRNG_NUM if given seed register was set */
-+    uint32_t seed_set;
-+
-+    /* Register values */
-+    uint32_t reg_control;
-+    uint32_t reg_status;
-+} Exynos4210RngState;
-+
-+static bool exynos4210_rng_seed_ready(const Exynos4210RngState *s)
++    /* Used to synchronize KVM and QEMU in-kernel device levels */
++    uint8_t device_irq_level;
+ };
+ 
+ static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 2eef7da..46ce479 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2274,6 +2274,11 @@ int kvm_has_intx_set_mask(void)
+     return kvm_state->intx_set_mask;
+ }
+ 
++bool kvm_arm_supports_user_irq(void)
 +{
-+    uint32_t mask = MAKE_64BIT_MASK(0, EXYNOS4210_RNG_PRNG_NUM);
-+
-+    /* Return true if all the seed-set bits are set. */
-+    return (s->seed_set & mask) == mask;
++    return kvm_check_extension(kvm_state, KVM_CAP_ARM_USER_IRQ);
 +}
 +
-+static void exynos4210_rng_set_seed(Exynos4210RngState *s, unsigned int i,
-+                                    uint64_t val)
+ #ifdef KVM_CAP_SET_GUEST_DEBUG
+ struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
+                                                  target_ulong pc)
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index ef0c734..3965c52 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -155,4 +155,9 @@ void kvm_init_cpu_signals(CPUState *cpu)
+ {
+     abort();
+ }
++
++bool kvm_arm_supports_user_irq(void)
 +{
++    return false;
++}
+ #endif
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index b305d90..5a0e2a3 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -25,6 +25,7 @@
+ #include "qom/cpu.h"
+ #include "qemu/log.h"
+ #include "trace.h"
++#include "sysemu/kvm.h"
+ 
+ /* #define DEBUG_GIC */
+ 
+@@ -1412,6 +1413,12 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    if (kvm_enabled() && !kvm_arm_supports_user_irq()) {
++        error_setg(errp, "KVM with user space irqchip only works when the "
++                         "host kernel supports KVM_CAP_ARM_USER_IRQ");
++        return;
++    }
++
+     /* This creates distributor and main CPU interface (s->cpuiomem[0]) */
+     gic_init_irqs_and_mmio(s, gic_set_irq, gic_ops);
+ 
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 4555468..7c17f0d 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -174,6 +174,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+      */
+     kvm_async_interrupts_allowed = true;
+ 
 +    /*
-+     * We actually ignore the seed and always generate true random numbers.
-+     * Theoretically this should not match the device as Exynos has
-+     * a Pseudo Random Number Generator but testing shown that it always
-+     * generates random numbers regardless of the seed value.
++     * PSCI wakes up secondary cores, so we always need to
++     * have vCPUs waiting in kernel space
 +     */
-+    s->seed_set |= BIT(i);
++    kvm_halt_in_kernel_allowed = true;
 +
-+    /* If all seeds were written, update the status to reflect it */
-+    if (exynos4210_rng_seed_ready(s)) {
-+        s->reg_status |= EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE;
-+    } else {
-+        s->reg_status &= ~EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE;
-+    }
-+}
+     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+ 
+     type_register_static(&host_arm_cpu_type_info);
+@@ -528,6 +534,51 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+ 
+ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+ {
++    ARMCPU *cpu;
++    uint32_t switched_level;
 +
-+static void exynos4210_rng_run_engine(Exynos4210RngState *s)
-+{
-+    Error *err = NULL;
-+    int ret;
-+
-+    /* Seed set? */
-+    if ((s->reg_status & EXYNOS4210_RNG_STATUS_SEED_SETTING_DONE) == 0) {
-+        goto out;
-+    }
-+
-+    /* PRNG engine chosen? */
-+    if ((s->reg_control & EXYNOS4210_RNG_CONTROL_1_PRNG) == 0) {
-+        goto out;
++    if (kvm_irqchip_in_kernel()) {
++        /*
++         * We only need to sync timer states with user-space interrupt
++         * controllers, so return early and save cycles if we don't.
++         */
++        return MEMTXATTRS_UNSPECIFIED;
 +    }
 +
-+    /* PRNG engine started? */
-+    if ((s->reg_control & EXYNOS4210_RNG_CONTROL_1_START_INIT) == 0) {
-+        goto out;
++    cpu = ARM_CPU(cs);
++
++    /* Synchronize our shadowed in-kernel device irq lines with the kvm ones */
++    if (run->s.regs.device_irq_level != cpu->device_irq_level) {
++        switched_level = cpu->device_irq_level ^ run->s.regs.device_irq_level;
++
++        qemu_mutex_lock_iothread();
++
++        if (switched_level & KVM_ARM_DEV_EL1_VTIMER) {
++            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_VIRT],
++                         !!(run->s.regs.device_irq_level &
++                            KVM_ARM_DEV_EL1_VTIMER));
++            switched_level &= ~KVM_ARM_DEV_EL1_VTIMER;
++        }
++
++        if (switched_level & KVM_ARM_DEV_EL1_PTIMER) {
++            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_PHYS],
++                         !!(run->s.regs.device_irq_level &
++                            KVM_ARM_DEV_EL1_PTIMER));
++            switched_level &= ~KVM_ARM_DEV_EL1_PTIMER;
++        }
++
++        /* XXX PMU IRQ is missing */
++
++        if (switched_level) {
++            qemu_log_mask(LOG_UNIMP, "%s: unhandled in-kernel device IRQ %x\n",
++                          __func__, switched_level);
++        }
++
++        /* We also mark unknown levels as processed to not waste cycles */
++        cpu->device_irq_level = run->s.regs.device_irq_level;
++        qemu_mutex_unlock_iothread();
 +    }
 +
-+    /* Get randoms */
-+    ret = qcrypto_random_bytes((uint8_t *)s->randr_value,
-+                               sizeof(s->randr_value), &err);
-+    if (!ret) {
-+        /* Notify that PRNG is ready */
-+        s->reg_status |= EXYNOS4210_RNG_STATUS_PRNG_DONE;
-+    } else {
-+        error_report_err(err);
-+    }
-+
-+out:
-+    /* Always clear start engine bit */
-+    s->reg_control &= ~EXYNOS4210_RNG_CONTROL_1_START_INIT;
-+}
-+
-+static uint64_t exynos4210_rng_read(void *opaque, hwaddr offset,
-+                                    unsigned size)
-+{
-+    Exynos4210RngState *s = (Exynos4210RngState *)opaque;
-+    uint32_t val = 0;
-+
-+    assert(size == 4);
-+
-+    switch (offset) {
-+    case EXYNOS4210_RNG_CONTROL_1:
-+        val = s->reg_control;
-+        break;
-+
-+    case EXYNOS4210_RNG_STATUS:
-+        val = s->reg_status;
-+        break;
-+
-+    case EXYNOS4210_RNG_PRNG_OFFSET(0):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(1):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(2):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(3):
-+    case EXYNOS4210_RNG_PRNG_OFFSET(4):
-+        val = s->randr_value[(offset - EXYNOS4210_RNG_PRNG_OFFSET(0)) / 4];
-+        DPRINTF("returning random @0x%" HWADDR_PRIx ": 0x%" PRIx32 "\n",
-+                offset, val);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad read offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+
-+    return val;
-+}
-+
-+static void exynos4210_rng_write(void *opaque, hwaddr offset,
-+                                 uint64_t val, unsigned size)
-+{
-+    Exynos4210RngState *s = (Exynos4210RngState *)opaque;
-+
-+    assert(size == 4);
-+
-+    switch (offset) {
-+    case EXYNOS4210_RNG_CONTROL_1:
-+        DPRINTF("RNG_CONTROL_1 = 0x%" PRIx64 "\n", val);
-+        s->reg_control = val;
-+        exynos4210_rng_run_engine(s);
-+        break;
-+
-+    case EXYNOS4210_RNG_STATUS:
-+        /* For clearing status fields */
-+        s->reg_status &= ~EXYNOS4210_RNG_STATUS_WRITE_MASK;
-+        s->reg_status |= val & EXYNOS4210_RNG_STATUS_WRITE_MASK;
-+        break;
-+
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(0):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(1):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(2):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(3):
-+    case EXYNOS4210_RNG_SEED_IN_OFFSET(4):
-+        exynos4210_rng_set_seed(s,
-+                                (offset - EXYNOS4210_RNG_SEED_IN_OFFSET(0)) / 4,
-+                                val);
-+        break;
-+
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: bad write offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+    }
-+}
-+
-+static const MemoryRegionOps exynos4210_rng_ops = {
-+    .read = exynos4210_rng_read,
-+    .write = exynos4210_rng_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void exynos4210_rng_reset(DeviceState *dev)
-+{
-+    Exynos4210RngState *s = EXYNOS4210_RNG(dev);
-+
-+    s->reg_control = 0;
-+    s->reg_status = EXYNOS4210_RNG_STATUS_BUFFER_READY;
-+    memset(s->randr_value, 0, sizeof(s->randr_value));
-+    s->seed_set = 0;
-+}
-+
-+static void exynos4210_rng_init(Object *obj)
-+{
-+    Exynos4210RngState *s = EXYNOS4210_RNG(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &exynos4210_rng_ops, s,
-+                          TYPE_EXYNOS4210_RNG, EXYNOS4210_RNG_REGS_MEM_SIZE);
-+    sysbus_init_mmio(dev, &s->iomem);
-+}
-+
-+static const VMStateDescription exynos4210_rng_vmstate = {
-+    .name = TYPE_EXYNOS4210_RNG,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_INT32_ARRAY(randr_value, Exynos4210RngState,
-+                            EXYNOS4210_RNG_PRNG_NUM),
-+        VMSTATE_UINT32(seed_set, Exynos4210RngState),
-+        VMSTATE_UINT32(reg_status, Exynos4210RngState),
-+        VMSTATE_UINT32(reg_control, Exynos4210RngState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void exynos4210_rng_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = exynos4210_rng_reset;
-+    dc->vmsd = &exynos4210_rng_vmstate;
-+}
-+
-+static const TypeInfo exynos4210_rng_info = {
-+    .name          = TYPE_EXYNOS4210_RNG,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(Exynos4210RngState),
-+    .instance_init = exynos4210_rng_init,
-+    .class_init    = exynos4210_rng_class_init,
-+};
-+
-+static void exynos4210_rng_register(void)
-+{
-+    type_register_static(&exynos4210_rng_info);
-+}
-+
-+type_init(exynos4210_rng_register)
+     return MEMTXATTRS_UNSPECIFIED;
+ }
+ 
 -- 
 2.7.4
