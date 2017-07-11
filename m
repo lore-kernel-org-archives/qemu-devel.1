@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dUqSM-0002LQ-GP
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:23:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dUqTb-0003D3-Ql
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dUqSJ-0003Bq-DH
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:23:42 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:34728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dUqSJ-0003BT-4F
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:23:39 -0400
-Received: by mail-lf0-x243.google.com with SMTP id g21so13299000lfk.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 01:23:37 -0700 (PDT)
-Received: from donizetti.redhat.com (94-39-191-51.adsl-ull.clienti.tiscali.it.
-	[94.39.191.51]) by smtp.gmail.com with ESMTPSA id
-	j137sm13033322wmd.18.2017.07.11.01.23.34 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 11 Jul 2017 01:23:35 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 11 Jul 2017 10:23:26 +0200
-Message-Id: <20170711082326.12990-1-pbonzini@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dUqTY-0003Sj-Nm
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:24:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dUqTY-0003RJ-Gs
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:24:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6955F3DE3E
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 08:24:55 +0000 (UTC)
+Date: Tue, 11 Jul 2017 10:24:51 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170711082451.GA4335@noname.str.redhat.com>
+References: <20170710165827.4250-1-pbonzini@redhat.com>
+	<20170710165827.4250-4-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] build: disable Xen on ARM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170710165827.4250-4-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] block: convert bdrv_invalidate_cache
+ callback to coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
 
-While ARM could present the xenpv machine, it does not and trying to enable
-it breaks compilation.
+Am 10.07.2017 um 18:58 hat Paolo Bonzini geschrieben:
+> QED's bdrv_invalidate_cache implementation would like to reuse functions
+> that acquire/release the metadata locks.  Call it from coroutine context
+> to simplify the logic.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Fixes: 3b6b75506de44c5070639943c30a0ad5850f5d02
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- configure | 1 -
- 1 file changed, 1 deletion(-)
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index b5de67d113..4ff7e89009 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1854,7 +1854,8 @@ static void qcow2_close(BlockDriverState *bs)
+>      qcow2_free_snapshots(bs);
+>  }
+>  
+> -static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
+> +static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+> +                                                   Error **errp)
+>  {
+>      BDRVQcow2State *s = bs->opaque;
+>      int flags = s->flags;
+> @@ -1877,7 +1878,9 @@ static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
+>      options = qdict_clone_shallow(bs->options);
+>  
+>      flags &= ~BDRV_O_INACTIVE;
+> +    qemu_co_mutex_lock(&s->lock);
+>      ret = qcow2_do_open(bs, options, flags, &local_err);
+> +    qemu_co_mutex_unlock(&s->lock);
+>      QDECREF(options);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
 
-diff --git a/configure b/configure
-index a2bec60a97..97b02244fe 100755
---- a/configure
-+++ b/configure
-@@ -203,7 +203,6 @@ supported_xen_target() {
-     test "$xen" = "yes" || return 1
-     glob "$1" "*-softmmu" || return 1
-     case "${1%-softmmu}:$cpu" in
--        arm:arm | aarch64:aarch64 | \
-         i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
-             return 0
-         ;;
--- 
-2.13.0
+How useful is this lock really? If we expect any requests while this
+function is running (we don't, it would break horribly), it should
+probably cover qcow2_close(), too.
+
+Or maybe the cleaner way would be bdrv_drained_begin/end() around
+everything directly in bdrv_co_invalidate_cache().
+
+Kevin
