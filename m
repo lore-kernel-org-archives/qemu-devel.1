@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dV29W-0005B8-12
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:53:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dV2FC-0006jg-DR
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dV29S-0001u4-5z
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:53:02 -0400
-Received: from mail-wr0-f175.google.com ([209.85.128.175]:33804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dV29S-0001tj-03
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:52:58 -0400
-Received: by mail-wr0-f175.google.com with SMTP id 77so5630369wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 13:52:57 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1dV2F8-0003nf-IL
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:58:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dV2F8-0003nP-BZ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:58:50 -0400
+Date: Tue, 11 Jul 2017 17:58:42 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170711205842.GD6020@localhost.localdomain>
+References: <1499803333-9052-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1499803333-9052-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170711201059.GA6020@localhost.localdomain>
+	<20170711231709-mutt-send-email-mst@kernel.org>
+	<d9870097-46dc-40bf-49e9-7cf3276017f2@ilande.co.uk>
+	<CAFEAcA_e6BjeLXdv=54yzqSvD_XdDKRiLYJeQS4NZY-Zr4vK4A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <6cee176b-a624-4f1d-aba6-e1c9fa011209@amsat.org>
-References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
-	<1499771839-32518-3-git-send-email-peter.maydell@linaro.org>
-	<6cee176b-a624-4f1d-aba6-e1c9fa011209@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 21:51:36 +0100
-Message-ID: <CAFEAcA-S7Dr2PuuaReiT0jRps-L=1Zc0uHB87yq8Z5EkR6+pzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/7] hw/char/cmsdk-apb-uart.c: Implement
- CMSDK APB UART
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_e6BjeLXdv=54yzqSvD_XdDKRiLYJeQS4NZY-Zr4vK4A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCHv8 1/3] fw_cfg: switch fw_cfg_find() to
+ locate the fw_cfg device by type rather than path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, "Gabriel L. Somlo" <somlo@cmu.edu>, Paolo Bonzini <pbonzini@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 11 July 2017 at 21:42, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Hi Peter,
->
-> There is probably no need yet, but we could model a generic APB slave wit=
-h
-> this code, as an overlapping subregion (device top 0x30 bytes).
->
-> For now only PID0 differs, but since all ID are 8bit the device could eve=
-n
-> instantiate the subregion with some u64 PID, 32 CID args.
->
-> (thinking about watchdog and dualtimers).
+On Tue, Jul 11, 2017 at 09:49:30PM +0100, Peter Maydell wrote:
+> On 11 July 2017 at 21:26, Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+> > On 11/07/17 21:18, Michael S. Tsirkin wrote:
+> >
+> >> Multi-line comments also should formatted
+> >>
+> >> /*
+> >>  * like
+> >>  * this
+> >>  */
+> >>
+> >> not
+> >>
+> >> /* like
+> >>  * this */
+> >>
+> >
+> > Interesting, I never knew there was a preferred format for comments (I
+> > see both styles throughout the codebase).
+> 
+> It's basically GNU coding standard style vs Linux kernel style;
+> there's a mix because some contributors are more used to working
+> on the kernel, and some more used to working with gcc, glibc,
+> etc, and we haven't made a firm "comments must be like this"
+> statement (and of course historical practice in the codebase
+> is all over the place).
+> 
+> We also have both of the flavours the kernel style guide
+> documents:
+> https://www.kernel.org/doc/html/v4.10/process/coding-style.html#commenting
+> (I usually use the style the kernel has for net/ personally.)
+> 
+> So I don't think that "we" the project have a preferred
+> format; but "we" individual contributors probably
+> have individual preferences ;-)
 
-If you look at the pl* primecell devices you'll see that's not
-historically how we've done them. I think it would be more
-code in each device to instantiate a generic device to
-handle the ID register section and a container to put it
-in than just to deal with the IDs by hand...
+Thanks for the info.  Please forget when I said I was going to
+send a CODING_STYLE patch for that.  :)
 
-thanks
--- PMM
+-- 
+Eduardo
