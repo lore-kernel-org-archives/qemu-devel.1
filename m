@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52007)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUlMk-0005fq-O2
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:57:35 -0400
+	id 1dUlNa-00064K-2y
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUlMh-0000Bh-Lj
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:57:34 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUlMh-0000BX-HO
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:57:31 -0400
-Received: by mail-qt0-x241.google.com with SMTP id w12so15105220qta.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 19:57:31 -0700 (PDT)
+	id 1dUlNX-0000Pl-0H
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:58:26 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 10 Jul 2017 23:57:03 -0300
-Message-Id: <20170711025703.24194-4-f4bug@amsat.org>
+Date: Mon, 10 Jul 2017 23:57:01 -0300
+Message-Id: <20170711025703.24194-2-f4bug@amsat.org>
 In-Reply-To: <20170711025703.24194-1-f4bug@amsat.org>
 References: <20170711025703.24194-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 3/3] xen/pt: add comments about !x86 archs
+Subject: [Qemu-devel] [RFC PATCH 1/3] configure: disable Xen PCI Passthrough
+ on !x86 archs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Anthony Perard <anthony.perard@citrix.com>, Marcelo Tosatti <mtosatti@redhat.com>, Anoob Soman <anoob.soman@citrix.com>, Juergen Gross <jgross@suse.com>, Anthony Xu <anthony.xu@intel.com>, Paul Durrant <paul.durrant@citrix.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Anthony Perard <anthony.perard@citrix.com>, Marcelo Tosatti <mtosatti@redhat.com>, xen-arm@lists.xen.org, Anoob Soman <anoob.soman@citrix.com>, Juergen Gross <jgross@suse.com>, Anthony Xu <anthony.xu@intel.com>, Paul Durrant <paul.durrant@citrix.com>
+
+linking on Linux debian/stretch/arm64 with libxen-4.8:
+
+    hw/xen/xen_pt.o: In function `xen_pt_pci_read_config':
+    qemu/hw/xen/xen_pt.c:206: undefined reference to `xen_shutdown_fatal_error'
+    hw/xen/xen_pt.o: In function `xen_igd_passthrough_isa_bridge_create':
+    qemu/hw/xen/xen_pt.c:698: undefined reference to `igd_passthrough_isa_bridge_create'
+    hw/xen/xen_pt.o: In function `xen_pt_pci_write_config':
+    qemu/hw/xen/xen_pt.c:355: undefined reference to `xen_shutdown_fatal_error'
+    hw/xen/xen_pt_config_init.o: In function `xen_pt_status_reg_init':
+    qemu/hw/xen/xen_pt_config_init.c:281: undefined reference to `xen_shutdown_fatal_error'
+    qemu/hw/xen/xen_pt_config_init.c:275: undefined reference to `xen_shutdown_fatal_error'
+    hw/xen/xen_pt_graphics.o: In function `get_vgabios':
+    qemu/hw/xen/xen_pt_graphics.c:135: undefined reference to `pci_assign_dev_load_option_rom'
+    collect2: error: ld returned 1 exit status
+    Makefile:197: recipe for target 'qemu-system-aarch64' failed
+    make[1]: *** [qemu-system-aarch64] Error 1
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/xen/xen_pt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-index 375efa68f6..21c32b0991 100644
---- a/hw/xen/xen_pt.c
-+++ b/hw/xen/xen_pt.c
-@@ -58,7 +58,7 @@
+diff --git a/configure b/configure
+index 806658c98b..e4b173405a 100755
+--- a/configure
++++ b/configure
+@@ -2344,8 +2344,15 @@ EOF
+ fi
  
- #include "hw/pci/pci.h"
- #include "hw/xen/xen.h"
--#include "hw/i386/pc.h"
-+#include "hw/i386/pc.h" /* TODO check !x86 */
- #include "hw/xen/xen_backend.h"
- #include "xen_pt.h"
- #include "qemu/range.h"
-@@ -687,7 +687,7 @@ static const MemoryListener xen_pt_io_listener = {
-     .priority = 10,
- };
- 
--static void
-+static void /* TODO check !x86 */
- xen_igd_passthrough_isa_bridge_create(XenPCIPassthroughState *s,
-                                       XenHostPCIDevice *dev)
- {
+ if test "$xen_pci_passthrough" != "no"; then
+-  if test "$xen" = "yes" && test "$linux" = "yes"; then
+-    xen_pci_passthrough=yes
++  if test "$xen" = "yes"; then
++    case "$cpu" in
++    i386|x32|x86_64)
++        if test "$linux" = "yes"; then
++            xen_pci_passthrough=yes
++        fi ;;
++    *)  echo "Disabling Xen PCI Passthrough (not implemented on $cpu)"
++        xen_pci_passthrough=no ;;
++    esac
+   else
+     if test "$xen_pci_passthrough" = "yes"; then
+       error_exit "User requested feature Xen PCI Passthrough" \
 -- 
 2.13.2
