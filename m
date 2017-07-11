@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dV2OH-00036M-M9
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:08:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dV2SB-0004bU-V1
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:12:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dV2OG-0008M3-OB
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:08:17 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170711175937.23140-1-alex.bennee@linaro.org>
-	<20170711175937.23140-5-alex.bennee@linaro.org>
-	<d0d0750b-127e-79e8-4307-57e187cd302f@twiddle.net>
-	<87fue2aigw.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <99791611-a047-4884-6abc-a84a0183c532@twiddle.net>
-Date: Tue, 11 Jul 2017 11:08:01 -1000
+	(envelope-from <ehabkost@redhat.com>) id 1dV2SA-0001N2-S3
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:12:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57754)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dV2SA-0001Lo-It
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:12:18 -0400
+Date: Tue, 11 Jul 2017 18:12:13 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170711211213.GE6020@localhost.localdomain>
+References: <1499803333-9052-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1499803333-9052-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <87fue2aigw.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] target/arm/translate: ensure
- gen_goto_tb sets exit flags
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499803333-9052-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCHv8 2/3] fw_cfg: move qdev_init_nofail() from
+ fw_cfg_init1() to callers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, cota@braap.org, qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
 
-On 07/11/2017 09:20 AM, Alex Bennée wrote:
+On Tue, Jul 11, 2017 at 09:02:12PM +0100, Mark Cave-Ayland wrote:
+> When looking to instantiate a TYPE_FW_CFG_MEM or TYPE_FW_CFG_IO device to be
+> able to wire it up differently, it is much more convenient for the caller to
+> instantiate the device and have the fw_cfg default files already preloaded
+> during realize.
 > 
-> Richard Henderson <rth@twiddle.net> writes:
+> Move fw_cfg_init1() to the end of both the fw_cfg_mem_realize() and
+> fw_cfg_io_realize() functions so it no longer needs to be called manually
+> when instantiating the device, and also rename it to fw_cfg_common_realize()
+> which better describes its new purpose.
 > 
->> On 07/11/2017 07:59 AM, Alex Bennée wrote:
->>>        if (use_goto_tb(s, dest)) {
->>>            tcg_gen_goto_tb(n);
->>>            gen_set_pc_im(s, dest);
->>>            tcg_gen_exit_tb((uintptr_t)s->tb + n);
->>> +        s->is_jmp = DISAS_TB_JUMP;
->>>        } else {
->>>            gen_set_pc_im(s, dest);
->>>            gen_goto_ptr();
->>> +        s->is_jmp = DISAS_JUMP;
->>>        }
->>
->> I think DISAS_TB_JUMP is appropriate for both cases.  When not using
->> goto_tb, the jump is still static and we still chain to the next TB
->> via goto_ptr.
+> Since it is now the responsibility of the machine to wire up the fw_cfg device
+> it is necessary to introduce a object_property_add_child() call into
+> fw_cfg_init_io() and fw_cfg_init_mem() to link the fw_cfg device to the root
+> machine object as before.
 > 
-> OK - I guess we need to nail down what the essential difference is
-> between the two. I understood DISAS_TB_JUMP as a static known PC which
-> can be patched in the generated code because we know the two addresses
-> are in the same page - whereas DISAS_JUMP is a "computed" jump although
-> in this case the PC is already known.
+> Finally with the previous change to fw_cfg_find() we can now remove the
+> assert() preventing multiple fw_cfg devices being instantiated and replace
+> them with a simple call to fw_cfg_find() at realize time instead. This allows
+> us to remove FW_CFG_NAME and FW_CFG_PATH since they are no longer required.
 > 
-> Does making a distinction between computed and non-computer inter-page
-> jumps make any sense anyway?
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+[...]
+> @@ -1096,6 +1097,12 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+>                                &fw_cfg_dma_mem_ops, FW_CFG(s), "fwcfg.dma",
+>                                sizeof(dma_addr_t));
+>      }
+> +
+> +    fw_cfg_common_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  }
 
-*shrug* probably not.
+"if (local_err)" is redundant, as error_propagate() does nothing
+if local_err is NULL.  "return" is also unnecessary here.  You
+also don't need local_err/error_propagate() if you are not
+looking at the value of local_err at all.  This means those 5
+lines can be simply written as:
 
-Honestly, the only thing that's really interesting here is that is_jmp indicate 
-that we have already exited the TB and that all following code is dead.
+    fw_cfg_common_realize(dev, errp);
 
-As a response to one of Lluis' threads, I suggested that the generic term for 
-this be DISAS_NORETURN.  Which also covers exiting the TB via calling a helper 
-that does not return, e.g. throwing an illegal opcode exception, aka DISAS_EXC 
-in the current target/arm sources.
+(Sorry for not noticing that in v7)
+
+>  
+>  static void fw_cfg_io_class_init(ObjectClass *klass, void *data)
+> @@ -1162,6 +1169,12 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+>                                sizeof(dma_addr_t));
+>          sysbus_init_mmio(sbd, &FW_CFG(s)->dma_iomem);
+>      }
+> +
+> +    fw_cfg_common_realize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+
+Same as above.
 
 
-r~
+>  }
+>  
+>  static void fw_cfg_mem_class_init(ObjectClass *klass, void *data)
+> -- 
+> 1.7.10.4
+> 
+
+-- 
+Eduardo
