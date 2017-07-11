@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dUrzH-0003QD-0z
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:01:52 -0400
+	(envelope-from <edgari@xilinx.com>) id 1dUs1F-0004nM-8A
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dUrzC-00031m-5g
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:01:47 -0400
-Received: from mail-lf0-f42.google.com ([209.85.215.42]:32931)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dUrzB-00031I-Ts
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:01:42 -0400
-Received: by mail-lf0-f42.google.com with SMTP id z78so80586075lff.0
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 03:01:41 -0700 (PDT)
-Date: Tue, 11 Jul 2017 11:00:37 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170711100037.GK17792@stefanha-x1.localdomain>
-References: <CAFSh4Uw0bH=a18C0s0k9FReSTebihesfEuwT+PV2Vp50LsX8sA@mail.gmail.com>
+	(envelope-from <edgari@xilinx.com>) id 1dUs1B-0003xv-8f
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:03:49 -0400
+Date: Tue, 11 Jul 2017 12:03:34 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20170711100334.GA25504@toto>
+References: <1498830302-19274-1-git-send-email-edgar.iglesias@gmail.com>
+	<1498830302-19274-3-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fUvfsPTz/SzOZDdw"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <CAFSh4Uw0bH=a18C0s0k9FReSTebihesfEuwT+PV2Vp50LsX8sA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Modular hardware emulation
+In-Reply-To: <CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] target-arm: Extend PAR format
+ determination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +25,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tom Cook <tom.k.cook@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+
+On Mon, Jul 10, 2017 at 04:11:29PM +0100, Peter Maydell wrote:
+> On 30 June 2017 at 14:45, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> >
+> > Extend PAR format determination to handle more cases.
+> >
+> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > ---
+> >  target/arm/helper.c | 30 +++++++++++++++++++++++++++++-
+> >  1 file changed, 29 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/arm/helper.c b/target/arm/helper.c
+> > index fd1027e..6a1fffe 100644
+> > --- a/target/arm/helper.c
+> > +++ b/target/arm/helper.c
+> > @@ -2345,12 +2345,40 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+> >      uint32_t fsr;
+> >      bool ret;
+> >      uint64_t par64;
+> > +    bool format64 = false;
+> >      MemTxAttrs attrs = {};
+> >      ARMMMUFaultInfo fi = {};
+> >
+> >      ret = get_phys_addr(env, value, access_type, mmu_idx,
+> >                          &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
+> > -    if (extended_addresses_enabled(env)) {
+> > +
+> > +    if (is_a64(env)) {
+> > +        format64 = true;
+> > +    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
+> > +        /*
+> > +         * ATS1Cxx:
+> > +         * * TTBCR.EAE determines whether the result is returned using the
+> > +         *   32-bit or the 64-bit PAR format
+> > +         * * Instructions executed in Hyp mode always use the 64bit format
+> > +         *
+> > +         * ATS1S2NSOxx uses the 64bit format if any of the following is true:
+> > +         * * The Non-secure TTBCR.EAE bit is set to 1
+> > +         * * The implementation includes EL2, and the value of HCR.VM is 1
+> > +         *
+> > +         * ATS1Hx always uses the 64bit format (not supported yet).
+> > +         */
+> > +        format64 = regime_using_lpae_format(env, mmu_idx);
+> > +
+> > +        if (arm_feature(env, ARM_FEATURE_EL2)) {
+> > +            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
+> > +                format64 |= env->cp15.hcr_el2 & HCR_VM;
+> > +            } else {
+> > +                format64 |= arm_current_el(env) == 2;
+> > +            }
+> > +        }
+> > +    }
+> 
+> So this kind of worries me, because what it's coded as is "determine
+> whether architecturally we should be returning a 64-bit or 32-bit
+> PAR format", but what the code below it uses the format64 flag for is
+> "manipulate whatever PAR we got handed back by get_phys_addr()".
+> So we have two separate bits of code that are both choosing
+> 32 vs 64 bit PAR (the code in this patch, and the logic inside
+> get_phys_addr()), and they have to come to the same conclusion
+> or we'll silently mangle the PAR. It seems like it would be
+> better to either have get_phys_addr() explicitly tell us what kind
+> of format it is returning to us, or to have the caller tell it
+> what kind of PAR it needs.
+
+Yes, I see your point and that's exactly what's happenning before the patch.
+Some of these new checks are generic in the sense that they check for LPAE/64bitness
+but others are I guess ATS specific for lack of a better term.
+It feels a bit weird to put the ATS specific PAR format logic into get_phys_addr.
+
+The basic idea here is that we never downgrade to the 32bit format, we only uprgade.
+The following line was meant to get the initial format I think you are requesting:
+format64 = regime_using_lpae_format(env, mmu_idx);
+
+After that, we apply possible ATS specfic upgrades to 64bit PAR format if needed.
+
+For clarity, perhaps we could make get_phys_addr return this same initial format, and then
+we can follow up with the ATS specific upgrades. E.g:
+
+    ret = get_phys_addr(env, value, access_type, mmu_idx,
+                        &phys_addr, &attrs, &prot, &page_size, &fsr, &fi,
+                        &format64);
+
+    /* Apply possible ATS/PAR 64bit upgrades if format64 is false.  */
+    if (is_a64(env)) {
+        format64 = true;
+    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
+        if (arm_feature(env, ARM_FEATURE_EL2)) {
+            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
+                format64 |= env->cp15.hcr_el2 & HCR_VM;
+            } else {
+                format64 |= arm_current_el(env) == 2;
+            }
+        }
+    }
 
 
---fUvfsPTz/SzOZDdw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Does something like that sound OK?
 
-On Wed, Jul 05, 2017 at 05:56:51PM +0000, Tom Cook wrote:
-> I'm using qemu to emulate a certain fruit-flavoured single-board computer=
- -
-> which is fantastic for testing changes configuration, by the way.
->=20
-> We have a bit of custom hardware attached to that single-board computer -
-> essentially an SPI-slave 8-channel ADC with some analog electronics
-> attached.
->=20
-> I'm trying to get a feel for the level of effort involved in writing an
-> emulation of this custom hardware that will work with qemu.  I can see two
-> extremes:  At one end of the scale, there might be a nice Python interface
-> already in place for writing SPI device emulations and all I need to do is
-> point a command-line parameter at a suitable script and away it goes.  At
-> the other end, I need to hack around in the qemu source, understand about
-> 3/4 of it and create a custom build of the whole emulator.
->=20
-> Can someone give me some sort of idea what level of effort is involved, a=
-nd
-> perhaps a pointer in the right direction, please?
+Cheers,
+Edgar
 
-Emulated devices are part of the QEMU codebase.  They live in hw/.  You
-would have to learn about QEMU internals to add a custom device.
 
-I'm not an ARM expert or familiar with SPI, but the starting point would
-be looking at the machine type (board) you are using and locating the
-SPI controller (BCM2835 SPI0?).  See if that is emulated in QEMU and if
-there are any existing devices for you to study.
+> >      ret = get_phys_addr(env, value, access_type, mmu_idx,
+> >                          &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
+> > -    if (extended_addresses_enabled(env)) {
+> > +
+> > +    if (is_a64(env)) {
+> > +        format64 = true;
+> > +    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
+> > +        /*
+> > +         * ATS1Cxx:
+> > +         * * TTBCR.EAE determines whether the result is returned using the
+> > +         *   32-bit or the 64-bit PAR format
+> > +         * * Instructions executed in Hyp mode always use the 64bit format
+> > +         *
+> > +         * ATS1S2NSOxx uses the 64bit format if any of the following is true:
+> > +         * * The Non-secure TTBCR.EAE bit is set to 1
+> > +         * * The implementation includes EL2, and the value of HCR.VM is 1
+> > +         *
+> > +         * ATS1Hx always uses the 64bit format (not supported yet).
+> > +         */
+> > +        format64 = regime_using_lpae_format(env, mmu_idx);
+> > +
+> > +        if (arm_feature(env, ARM_FEATURE_EL2)) {
+> > +            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
+> > +                format64 |= env->cp15.hcr_el2 & HCR_VM;
+> > +            } else {
+> > +                format64 |= arm_current_el(env) == 2;
+> > +            }
+>
 
-git grep -i '\<spi\>' doesn't show much evidence of true SPI support.
-There is SSI and I2C support though, so at least those would give you an
-idea of how to add SPI.
-
-Stefan
-
---fUvfsPTz/SzOZDdw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZZKHFAAoJEJykq7OBq3PIXC4H/207xFIiZvgQgG6ZiWyVWRa2
-ksbL1olzEms8uEypIRcC5eg5vBqnBrIcf2W1wq9YIWSxTukT89RvJnBgK4cOt0cz
-n/AX7OIN5IoDpc/d8LpJJrqvZ7/+X4vi490lMm7Wrf+ifEAacVfccf8DzUgaD4V4
-4Bu5GXzxJBig1T9eOIhw7ki53IBa7x+32T3Tlkw3N/Yx4a+oPGG7QG+6Vjl4B/kZ
-kCTAOZrTPAe9ctguPW/dfJkmP3NimmirEyWO6zHW1leoGFuuYN/hRNU9jsfkHnwC
-Ppoexv/5HXOUdL0eiqVUKORGWyxJf6u88rQrut9NHlUMrYj4jEtBgHpE9hB6rGw=
-=SwPh
------END PGP SIGNATURE-----
-
---fUvfsPTz/SzOZDdw--
+> 
+> PS: on the subject of virtualization, I notice there's a comment
+> a bit later on in do_ats_write() that says
+>     /* Note that S2WLK and FSTAGE are always zero, because we don't
+>      * implement virtualization and therefore there can't be a stage 2
+>      * fault.
+>      */
+> so we'll need to address that too at some point...
+> 
+> thanks
+> -- PMM
