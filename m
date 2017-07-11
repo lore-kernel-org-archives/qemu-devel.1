@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxjr-00083g-1K
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxjt-00086d-KC
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxjm-00065D-4c
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxjs-00067g-Cf
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:17 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:07:13 +0200
-Message-Id: <20170711160814.20941-25-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:14 +0200
+Message-Id: <20170711160814.20941-26-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 24/85] specs/qcow2: do not use wording 'bitmap
- header'
+Subject: [Qemu-devel] [PULL 25/85] hbitmap: improve dirty iter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +24,103 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-A bitmap directory entry is sometimes called a 'bitmap header'. This
-patch leaves only one name - 'bitmap directory entry'. The name 'bitmap
-header' creates misunderstandings with 'qcow2 header' and 'qcow2 bitmap
-header extension' (which is extension of qcow2 header)
+Make dirty iter resistant to resetting bits in corresponding HBitmap.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170628120530.31251-3-vsementsov@virtuozzo.com
+Message-id: 20170628120530.31251-4-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- docs/interop/qcow2.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ include/qemu/hbitmap.h | 26 ++++----------------------
+ util/hbitmap.c         | 23 ++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 23 deletions(-)
 
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index aee3553..d7fdb1f 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -203,7 +203,7 @@ The fields of the bitmaps extension are:
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 9239fe5..6b04391 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -256,10 +256,9 @@ void hbitmap_free(HBitmap *hb);
+  * the lowest-numbered bit that is set in @hb, starting at @first.
+  *
+  * Concurrent setting of bits is acceptable, and will at worst cause the
+- * iteration to miss some of those bits.  Resetting bits before the current
+- * position of the iterator is also okay.  However, concurrent resetting of
+- * bits can lead to unexpected behavior if the iterator has not yet reached
+- * those bits.
++ * iteration to miss some of those bits.
++ *
++ * The concurrent resetting of bits is OK.
+  */
+ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
  
-           8 - 15:  bitmap_directory_size
-                    Size of the bitmap directory in bytes. It is the cumulative
--                   size of all (nb_bitmaps) bitmap headers.
-+                   size of all (nb_bitmaps) bitmap directory entries.
+@@ -298,24 +297,7 @@ void hbitmap_free_meta(HBitmap *hb);
+  * Return the next bit that is set in @hbi's associated HBitmap,
+  * or -1 if all remaining bits are zero.
+  */
+-static inline int64_t hbitmap_iter_next(HBitmapIter *hbi)
+-{
+-    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1];
+-    int64_t item;
+-
+-    if (cur == 0) {
+-        cur = hbitmap_iter_skip_words(hbi);
+-        if (cur == 0) {
+-            return -1;
+-        }
+-    }
+-
+-    /* The next call will resume work from the next bit.  */
+-    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
+-    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+-
+-    return item << hbi->granularity;
+-}
++int64_t hbitmap_iter_next(HBitmapIter *hbi);
  
-          16 - 23:  bitmap_directory_offset
-                    Offset into the image file at which the bitmap directory
-@@ -529,8 +529,7 @@ Each bitmap saved in the image is described in a bitmap directory entry. The
- bitmap directory is a contiguous area in the image file, whose starting offset
- and length are given by the header extension fields bitmap_directory_offset and
- bitmap_directory_size. The entries of the bitmap directory have variable
--length, depending on the lengths of the bitmap name and extra data. These
--entries are also called bitmap headers.
-+length, depending on the lengths of the bitmap name and extra data.
+ /**
+  * hbitmap_iter_next_word:
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 35088e1..0b38817 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -106,8 +106,9 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
  
- Structure of a bitmap directory entry:
+     unsigned long cur;
+     do {
+-        cur = hbi->cur[--i];
++        i--;
+         pos >>= BITS_PER_LEVEL;
++        cur = hbi->cur[i] & hb->levels[i][pos];
+     } while (cur == 0);
  
+     /* Check for end of iteration.  We always use fewer than BITS_PER_LONG
+@@ -139,6 +140,26 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+     return cur;
+ }
+ 
++int64_t hbitmap_iter_next(HBitmapIter *hbi)
++{
++    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
++            hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
++    int64_t item;
++
++    if (cur == 0) {
++        cur = hbitmap_iter_skip_words(hbi);
++        if (cur == 0) {
++            return -1;
++        }
++    }
++
++    /* The next call will resume work from the next bit.  */
++    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
++    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
++
++    return item << hbi->granularity;
++}
++
+ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+ {
+     unsigned i, bit;
 -- 
 2.9.4
