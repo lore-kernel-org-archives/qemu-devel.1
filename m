@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUrAp-0004a0-Br
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:09:40 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dUrDB-0005Hc-0h
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:12:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUrAo-0006np-J2
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:09:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUrAo-0006nR-Ca
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:09:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DDB480F6C
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 09:09:37 +0000 (UTC)
-References: <20170710165827.4250-1-pbonzini@redhat.com>
-	<20170710165827.4250-2-pbonzini@redhat.com>
-	<20170711082836.GB4335@noname.str.redhat.com>
-	<fcbd4204-3604-b562-0cde-af697344f2a6@redhat.com>
-	<20170711090721.GE4335@noname.str.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <23f084a3-af42-f493-6c43-f09c8b71b517@redhat.com>
-Date: Tue, 11 Jul 2017 11:09:30 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dUrD6-00081q-3l
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:12:05 -0400
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:33057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dUrD5-00081B-SB
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:12:00 -0400
+Received: by mail-lf0-f66.google.com with SMTP id t72so13520327lff.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 02:11:59 -0700 (PDT)
+Date: Tue, 11 Jul 2017 10:10:55 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170711091055.GD17792@stefanha-x1.localdomain>
+References: <20170711081033.12399-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170711090721.GE4335@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] qcow2: make qcow2_do_open a
- coroutine_fn
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2iBwrppp/7QCDedR"
+Content-Disposition: inline
+In-Reply-To: <20170711081033.12399-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] build: add -Wexpansion-to-defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,33 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-On 11/07/2017 11:07, Kevin Wolf wrote:
-> Am 11.07.2017 um 10:34 hat Paolo Bonzini geschrieben:
->> On 11/07/2017 10:28, Kevin Wolf wrote:
->>> Am 10.07.2017 um 18:58 hat Paolo Bonzini geschrieben:
->>>> It is called from qcow2_invalidate_cache in coroutine context, so always
->>>> load metadata from a coroutine.
->>>> ---
->>>>  block/qcow2.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
->>>>  1 file changed, 40 insertions(+), 5 deletions(-)
->>>
->>> Missing S-o-b on patches 1 and 2?
->>
->> Oops, yes.  Though I don't think these patches are for 2.10.  They are
->> on top of Stefan's bdrv_co_create series, by the way.
-> 
-> Why not for 2.10?
+--2iBwrppp/7QCDedR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Because soft freeze is next Monday? :)  But I can certainly send a v2
-today or tomorrow.
+On Tue, Jul 11, 2017 at 10:10:33AM +0200, Paolo Bonzini wrote:
+> This warning is included in -Wall by clang, but not by GCC (which only
+> enables it for -Wextra).  Include it in the list of warnings we enable
+> to minimize the differences between the compilers:
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> They look simple and self-contained. I haven't looked
-> at bdrv_co_create yet, but it shouldn't be much more complicated either.
+For anyone interested in what this warning does:
+https://gcc.gnu.org/onlinedocs/gcc-7.1.0/gcc/Warning-Options.html#index-Wex=
+pansion-to-defined
 
-It's simpler, as it's only renaming the callback.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Paolo
+--2iBwrppp/7QCDedR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZZJYfAAoJEJykq7OBq3PIZ5QH/26nL6Iy0GXLNWfJEg3PutQW
++wCHCxPlh/82v3yak94m3bBorYknzKGMZTiU2nZjLpjxH00Eeqg8IWaAIkJUvu4x
+J/MLAT9VPPUTsOV0qcrcieiRIicznRWdS5slLUVmfDjsOsoHdceFpMorURSyvQ8k
+DYn8GBGjMYx8qMWHEwVU9azyyI9FAzw43YzbgzCZClCgNmFKVOQstpRZ9I8fbqkr
+yvjHdO7kv26qQALtcj8plKiUJ90I8WICkFFNq0Cn++EJiMvpL65PlvEimV7WebqU
+bjNM6JJqr8VW1EdixiCD2UyStrBaUtZS+15PhoaCxTshK/lWNm2sBxlGcw4pFQs=
+=oGYR
+-----END PGP SIGNATURE-----
+
+--2iBwrppp/7QCDedR--
