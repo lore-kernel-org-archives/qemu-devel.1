@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUy0W-0007L5-4S
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:27:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dUy2q-0001Xw-Lf
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:29:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUy0S-00057p-71
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:27:28 -0400
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:35551)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUy0S-00057W-0h
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:27:24 -0400
-Received: by mail-wr0-f181.google.com with SMTP id k67so5991826wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 09:27:23 -0700 (PDT)
-References: <20170711025703.24194-1-f4bug@amsat.org>
-	<20170711025703.24194-2-f4bug@amsat.org>
-	<446cc0e3-dd49-e088-85f1-0caf1d42fbf8@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <446cc0e3-dd49-e088-85f1-0caf1d42fbf8@amsat.org>
-Date: Tue, 11 Jul 2017 17:26:21 +0100
-Message-ID: <87iniz9byq.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1dUy2m-0006GQ-Ol
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:29:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51840)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dUy2m-0006Fz-IQ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:29:48 -0400
+Date: Tue, 11 Jul 2017 17:29:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170711162943.GF2223@work-vm>
+References: <20170709175422.30185-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/3] configure: disable Xen PCI
- Passthrough on !x86 archs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170709175422.30185-1-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a
+ negative number in fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Marcelo Tosatti <mtosatti@redhat.com>, xen-arm@lists.xen.org, Anoob Soman <anoob.soman@citrix.com>, Juergen Gross <jgross@suse.com>, Anthony Xu <anthony.xu@intel.com>, Paul Durrant <paul.durrant@citrix.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
+
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> In a fork_exec() error path we try to closesocket(s) when s might
+> be a negative number because the thing that failed was the
+> qemu_socket() call. Add a guard so we don't do this.
+> 
+> (Spotted by Coverity: CID 1005727 issue 1 of 2.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Issue 2 of 2 in CID 1005727 is trickier -- we need to move as
+> much as possible of the client-end connect/accept out of the
+> child process and into the parent as possible. I'm not sure
+> if it's safe to do it all in the parent without deadlocking...
+
+or just bail earlier?   The bit that worries me there
+is the dup2(s, [012]); which is called unchecked, if that fails
+then your telnetd or whatever probably ends up connected to whatever
+your 0..2 were originally.
+
+>  slirp/misc.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/slirp/misc.c b/slirp/misc.c
+> index 88e9d94197..260187b6b6 100644
+> --- a/slirp/misc.c
+> +++ b/slirp/misc.c
+> @@ -112,7 +112,9 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
+>  		    bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
+>  		    listen(s, 1) < 0) {
+>  			error_report("Error: inet socket: %s", strerror(errno));
+> -			closesocket(s);
+> +			if (s >= 0) {
+> +			    closesocket(s);
+> +			}
 
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> It seems our minds crossed at the same time since Alex/Pablo fixed it
-> and got merged in master as b5ed2e11ef39 "build: disable Xen on ARM"
-> so this patch is no more necessary.
->
-> Alex/Pablo, any thought on patch 2 regarding xen-mapcache.h?
+(I'm not convinced this would ever do anything bad, at least on a *nix
+system, the -ve value is always going to be an invalid fd so the close
+will just fail).
 
-Pass, I know little of Xen on ARM other than I think it doesn't need
-QEMU for device emulation. IIRC the use of QEMU on x86 is to handle the
-weird set of devices you can get on a PC without bloating the
-hypervisor. ARM is a lot simpler in that regard.
+Dave
 
->
-> Phil.
->
-> On 07/10/2017 11:57 PM, Philippe Mathieu-Daudé wrote:
->> linking on Linux debian/stretch/arm64 with libxen-4.8:
->>
->>      hw/xen/xen_pt.o: In function `xen_pt_pci_read_config':
->>      qemu/hw/xen/xen_pt.c:206: undefined reference to `xen_shutdown_fatal_error'
->>      hw/xen/xen_pt.o: In function `xen_igd_passthrough_isa_bridge_create':
->>      qemu/hw/xen/xen_pt.c:698: undefined reference to `igd_passthrough_isa_bridge_create'
->>      hw/xen/xen_pt.o: In function `xen_pt_pci_write_config':
->>      qemu/hw/xen/xen_pt.c:355: undefined reference to `xen_shutdown_fatal_error'
->>      hw/xen/xen_pt_config_init.o: In function `xen_pt_status_reg_init':
->>      qemu/hw/xen/xen_pt_config_init.c:281: undefined reference to `xen_shutdown_fatal_error'
->>      qemu/hw/xen/xen_pt_config_init.c:275: undefined reference to `xen_shutdown_fatal_error'
->>      hw/xen/xen_pt_graphics.o: In function `get_vgabios':
->>      qemu/hw/xen/xen_pt_graphics.c:135: undefined reference to `pci_assign_dev_load_option_rom'
->>      collect2: error: ld returned 1 exit status
->>      Makefile:197: recipe for target 'qemu-system-aarch64' failed
->>      make[1]: *** [qemu-system-aarch64] Error 1
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   configure | 11 +++++++++--
->>   1 file changed, 9 insertions(+), 2 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 806658c98b..e4b173405a 100755
->> --- a/configure
->> +++ b/configure
->> @@ -2344,8 +2344,15 @@ EOF
->>   fi
->>     if test "$xen_pci_passthrough" != "no"; then
->> -  if test "$xen" = "yes" && test "$linux" = "yes"; then
->> -    xen_pci_passthrough=yes
->> +  if test "$xen" = "yes"; then
->> +    case "$cpu" in
->> +    i386|x32|x86_64)
->> +        if test "$linux" = "yes"; then
->> +            xen_pci_passthrough=yes
->> +        fi ;;
->> +    *)  echo "Disabling Xen PCI Passthrough (not implemented on $cpu)"
->> +        xen_pci_passthrough=no ;;
->> +    esac
->>     else
->>       if test "$xen_pci_passthrough" = "yes"; then
->>         error_exit "User requested feature Xen PCI Passthrough" \
->>
-
-
+>  			return 0;
+>  		}
+> -- 
+> 2.11.0
+> 
+> 
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
