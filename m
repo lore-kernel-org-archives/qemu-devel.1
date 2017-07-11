@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dUqzZ-0007K6-IF
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:58:02 -0400
+	(envelope-from <clg@kaod.org>) id 1dUr2u-0008Q2-EN
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:01:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dUqzW-0001to-H6
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:58:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57760)
+	(envelope-from <clg@kaod.org>) id 1dUr2r-0003Ux-5a
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:01:28 -0400
+Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:48140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dUqzW-0001tZ-7O
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:57:58 -0400
-Date: Tue, 11 Jul 2017 10:57:53 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170711105753.2f7f2625@dhcp-192-215.str.redhat.com>
-In-Reply-To: <1499700760-4777-10-git-send-email-thuth@redhat.com>
-References: <1499700760-4777-1-git-send-email-thuth@redhat.com>
-	<1499700760-4777-10-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dUr2q-0003T1-VB
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:01:25 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 0A4F66B7CE
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 11:01:21 +0200 (CEST)
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-4-git-send-email-clg@kaod.org>
+	<20170710102655.GE4083@umbus.fritz.box>
+	<9a7a16a0-f14f-bc65-d503-e2aee028633f@kaod.org>
+	<1499720443.2865.15.camel@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <57c22926-8ac9-1251-aba9-590b344673c6@kaod.org>
+Date: Tue, 11 Jul 2017 11:01:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 09/10] pc-bios/s390-ccw: Add virtio-net
- driver code
+In-Reply-To: <1499720443.2865.15.camel@kernel.crashing.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 03/26] target/ppc/POWER9: add
+ POWERPC_EXCP_POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 10 Jul 2017 17:32:39 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On 07/10/2017 11:00 PM, Benjamin Herrenschmidt wrote:
+> On Mon, 2017-07-10 at 14:49 +0200, C=C3=A9dric Le Goater wrote:
+>> On 07/10/2017 12:26 PM, David Gibson wrote:
+>>> On Wed, Jul 05, 2017 at 07:13:16PM +0200, C=C3=A9dric Le Goater wrote=
+:
+>>>> Prepare ground for the new exception model XIVE of POWER9.
+>>>
+>>> I'm a bit confused by this.  The excp_model is about the CPU core's
+>>> irq model, not the external irq controller's.
+>>
+>> yes this is true, but the POWER9 CPU is the only criteria we have=20
+>> to distinguish a machine supporting XIVE and XICS from one only=20
+>> supporting XICS.
+>=20
+> Why ? I don't understand.
+>=20
+> We do want an EXCP_POWER9 for other things, like the fact that we have
+> a separate interrupt input for hypervisor, with associated vectors
+> etc...  but that still doesn't relate to what interrupt controller is
+> there.
+>=20
+>> My idea was to use this flag to activate the OV5_XIVE_EXPLOIT bit=20
+>> in ibm,arch-vec-5-platform-support ov5_platform, like this is done
+>> for the MMU. See spapr_dt_ov5_platform_support()
+>=20
+> I disagree, the MMU is in the core, the XIVE isn't. It would be
+> possibly to make a P9 core if a XICS in theory :-)
 
-> The driver provides the recv() and send() functions which will
-> be required by SLOF's libnet code for receiving and sending
-> packets.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/netboot.mak  |   2 +-
->  pc-bios/s390-ccw/virtio-net.c | 133 ++++++++++++++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/virtio.c     |   9 ++-
->  pc-bios/s390-ccw/virtio.h     |  14 ++++-
->  4 files changed, 153 insertions(+), 5 deletions(-)
->  create mode 100644 pc-bios/s390-ccw/virtio-net.c
-> 
+ok. I understand. We could even "build" one in QEMU. HW would be=20
+another story ...=20
 
-> diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-net.c
-> new file mode 100644
-> index 0000000..804e7af
-> --- /dev/null
-> +++ b/pc-bios/s390-ccw/virtio-net.c
-> @@ -0,0 +1,133 @@
-> +/*
-> + * Virtio-net driver for the s390-ccw firmware
-> + *
-> + * Copyright 2017 Thomas Huth, Red Hat Inc.
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License as published by the
-> + * Free Software Foundation; either version 2 of the License, or (at your
-> + * option) any later version.
-> + */
-> +
-> +#include <stdint.h>
-> +#include <stdbool.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <sys/socket.h>
-> +#include <ethernet.h>
-> +#include "s390-ccw.h"
-> +#include "virtio.h"
-> +
-> +#ifndef DEBUG_VIRTIO_NET
-> +#define DEBUG_VIRTIO_NET 0
-> +#endif
-> +
-> +#define VIRTIO_NET_F_MAC_BIT  (1 << 5)
-> +
-> +#define VQ_RX 0         /* Receive queue */
-> +#define VQ_TX 1         /* Transmit queue */
-> +
-> +struct VirtioNetHdr {
-> +    uint8_t flags;
-> +    uint8_t gso_type;
-> +    uint16_t hdr_len;
-> +    uint16_t gso_size;
-> +    uint16_t csum_start;
-> +    uint16_t csum_offset;
-> +    /*uint16_t num_buffers;*/ /* Only with VIRTIO_NET_F_MRG_RXBUF or VIRTIO1 */
-> +};
-> +typedef struct VirtioNetHdr VirtioNetHdr;
-> +
-> +static uint16_t rx_last_idx;  /* Last index in receive queue "used" ring */
-> +
-> +int virtio_net_init(void *mac_addr)
-> +{
-> +    VDev *vdev = virtio_get_device();
-> +    VRing *rxvq = &vdev->vrings[VQ_RX];
-> +    uint32_t guestfeats[2] = { VIRTIO_NET_F_MAC_BIT, 0 };
-> +    void *buf;
-> +    int i;
-> +
-> +    virtio_setup_ccw(vdev, guestfeats);
+So should XIVE support be a sPAPR machine property only enabled if=20
+'cpu_model' matches "POWER9.*" ? The XICS/XIVE initialization is done=20
+quite early in the machine init so this needs some checks.
 
-I'd assert here that the mac feature bit was actually set. That should
-be the case anyway, but let's make it sure.
+>>> Now.. I could imagine the POWER9 having a different core model that
+>>> came along with XIVE, but I can't see this new model being used for
+>>> anything anywhere in the rest of the series.
+>>
+>> See patch 26. But, maybe, I am taking a shortcut and we need another
+>> family of flags.=20
+>=20
+> Or just some kind of enum for the interrupt controller, how do we do
+> with OpenPIC vs. XICS already ? Old POWER3 had OpenPIC.
 
-> +
-> +    memcpy(mac_addr, vdev->config.net.mac, ETH_ALEN);
-> +
-> +    for (i = 0; i < 64; i++) {
-> +        buf = malloc(ETH_MTU_SIZE + sizeof(VirtioNetHdr));
-> +        IPL_assert(buf != NULL, "Can not allocate memory for receive buffers");
-> +        vring_send_buf(rxvq, buf, ETH_MTU_SIZE + sizeof(VirtioNetHdr),
-> +                       VRING_DESC_F_WRITE);
-> +    }
-> +    vring_notify(rxvq);
-> +
-> +    return 0;
-> +}
+AFAICT, we don't have such a CPU in QEMU/ppc.=20
 
-> diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-> index e3dcfd3..4cd70df 100644
-> --- a/pc-bios/s390-ccw/virtio.c
-> +++ b/pc-bios/s390-ccw/virtio.c
-> @@ -150,7 +150,7 @@ static void vring_init(VRing *vr, VqInfo *info)
->      debug_print_addr("init vr", vr);
->  }
->  
-> -static bool vring_notify(VRing *vr)
-> +bool vring_notify(VRing *vr)
->  {
->      vr->cookie = virtio_notify(vr->schid, vr->id, vr->cookie);
->      return vr->cookie >= 0;
-> @@ -189,7 +189,7 @@ ulong get_second(void)
->      return (get_clock() >> 12) / 1000000;
->  }
->  
-> -static int vr_poll(VRing *vr)
-> +int vr_poll(VRing *vr)
->  {
->      if (vr->used->idx == vr->used_idx) {
->          vring_notify(vr);
 
-If you're going to do a re-spin, I'd prefer to move exporting the
-interfaces into one of the prep patches, if that makes sense.
+We could use some extra flag to change the ICS behavior. The path I am
+taking duplicates the ICS code but in real, we only need to change the
+irq handlers.=20
 
-But generally looks good to me.
+Thanks,
+
+C.=20
