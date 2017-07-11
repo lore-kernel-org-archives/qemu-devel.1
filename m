@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUypG-0006tY-Pw
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:19:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUyrz-0000pT-CS
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUypD-00073B-H1
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:19:54 -0400
-Received: from mail-wr0-f169.google.com ([209.85.128.169]:35699)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUypD-00072M-7t
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:19:51 -0400
-Received: by mail-wr0-f169.google.com with SMTP id k67so7948402wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:19:51 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1dUyry-00026V-Br
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:22:43 -0400
+References: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
+	<20170711124024.1396-4-pbutsykin@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <003c6002-c8b2-a4be-c1ef-3225e170190f@redhat.com>
+Date: Tue, 11 Jul 2017 19:22:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170711162943.GF2223@work-vm>
-References: <20170709175422.30185-1-peter.maydell@linaro.org>
-	<20170711162943.GF2223@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 18:18:29 +0100
-Message-ID: <CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a
- negative number in fork_exec()
+In-Reply-To: <20170711124024.1396-4-pbutsykin@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RQs7fpJaKH9MpolvcQhIICnoE4an8tqf3"
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-[cc'd Eric as the sort of person
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RQs7fpJaKH9MpolvcQhIICnoE4an8tqf3
+From: Max Reitz <mreitz@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+Message-ID: <003c6002-c8b2-a4be-c1ef-3225e170190f@redhat.com>
+Subject: Re: [PATCH v4 3/4] qcow2: add shrink image support
+References: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
+ <20170711124024.1396-4-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170711124024.1396-4-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 11 July 2017 at 17:29, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> In a fork_exec() error path we try to closesocket(s) when s might
->> be a negative number because the thing that failed was the
->> qemu_socket() call. Add a guard so we don't do this.
->>
->> (Spotted by Coverity: CID 1005727 issue 1 of 2.)
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> Issue 2 of 2 in CID 1005727 is trickier -- we need to move as
->> much as possible of the client-end connect/accept out of the
->> child process and into the parent as possible. I'm not sure
->> if it's safe to do it all in the parent without deadlocking...
->
-> or just bail earlier?
+On 2017-07-11 14:40, Pavel Butsykin wrote:
+> This patch add shrinking of the image file for qcow2. As a result, this=
+ allows
+> us to reduce the virtual image size and free up space on the disk witho=
+ut
+> copying the image. Image can be fragmented and shrink is done by punchi=
+ng holes
+> in the image file.
+>=20
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2-cluster.c  |  40 ++++++++++++++++++
+>  block/qcow2-refcount.c | 110 +++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/qcow2.c          |  42 ++++++++++++++-----
+>  block/qcow2.h          |  14 +++++++
+>  qapi/block-core.json   |   3 +-
+>  5 files changed, 198 insertions(+), 11 deletions(-)
 
-The problem is you can only bail while you're in the parent
-before forking. Once you've started the child there's no
-mechanism for dealing with failure.
+[...]
 
->   The bit that worries me there
-> is the dup2(s, [012]); which is called unchecked, if that fails
-> then your telnetd or whatever probably ends up connected to whatever
-> your 0..2 were originally.
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 0141c9cbe7..e52d1698b5 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
 
-dup2() in a child is actually pretty safe -- the only ways
-it can fail are:
- * fd2 isn't actually an open file descriptor (can't happen)
- * fd1 is negative or bigger than OPEN_MAX (can't happen)
- * EINTR (just retry, I guess)
+[...]
 
-The awkward part is POSIX says that dup2() may fail with EIO if
-the close() of newfd failed, in which case I dunno what the
-child is supposed to do about it -- do a manual close(), ignore
-the error from close() and then dup2() again??
-Linux specifically says it doesn't do this, and BSD/OSX don't
-document EIO as possible so I assume they have sane behaviour.
+> +    for (i =3D 0; i < s->refcount_table_size; i++) {
+> +        if (s->refcount_table[i] && !reftable_tmp[i]) {
+> +            uint64_t discard_offs =3D s->refcount_table[i] & REFT_OFFS=
+ET_MASK;
+> +            uint64_t refblock_offs =3D get_refblock_offset(s, discard_=
+offs);
+> +            uint64_t cluster_index =3D discard_offs >> s->cluster_bits=
+;
+> +            uint32_t block_index =3D cluster_index & (s->refcount_bloc=
+k_size - 1);
+> +            void *refblock;
+> +
+> +            assert(discard_offs !=3D 0);
+> +
+> +            ret =3D qcow2_cache_get(bs, s->refcount_block_cache, refbl=
+ock_offs,
+> +                                  &refblock);
+> +            if (ret < 0) {
+> +                goto out;
+> +            }
+> +
+> +            if (s->get_refcount(refblock, block_index) !=3D 1) {
+> +                qcow2_signal_corruption(bs, true, -1, -1, "Invalid ref=
+count:"
+> +                                        " refblock offset %#" PRIx64
+> +                                        ", reftable index %d"
+> +                                        ", block offset %#" PRIx64
+> +                                        ", refcount %#" PRIx64,
+> +                                        refblock_offs, i, discard_offs=
+,
+> +                                        s->get_refcount(refblock, bloc=
+k_index));
 
-In any case, ignoring the possibility that dup2(s, [012]) in a child
-process could fail is AFAIK very very widespread standard
-behaviour for unix daemons. (We have another example in
-os_setup_post() in os-posix.c, for instance.)
+Nice, thanks!
 
-Random extra: Linux dup2() manpage has a mysterious remark about
-EBUSY -- does anybody know what that's all about? It's not
-sanctioned by POSIX...
+Max
 
-What I would like to do and think should be safe is:
 
-    s = qemu_socket(...);
-    bind(s);
-    listen(s, 1);
-    cs = qemu_socket(...);
-    connect(cs, ...);
-    switch (fork ()) {
-        child:
-           dup2
-           close fds
-           execvp(...);
-        parent:
-           break;
-    }
-    close(cs);
-    ss = accept(s, ...);
-    close(s);
-    etc;
+--RQs7fpJaKH9MpolvcQhIICnoE4an8tqf3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-ie push the bind/listen/create client socket/connect up into
-before the fork(), to give the behaviour of "like socketpair()
-but for AF_INET".
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-(I believe this will work and not deadlock because connect()
-doesn't block until accept(), it only needs the tcp handshake.)
+iQEvBAEBCAAZBQJZZQlXEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQL4h
+B/wPUxTLiqktsq4fowU0LV8Gc0ArN7pxUlDQFL6q8Jjnh5eF2xuR5RmiD6f3MPRT
+r9eyLvdwCDvG3DiVjJOq1IfaypTUPnJqDdZJGxjNhlYdEi6NizCobXyuJkAwH2Jt
+AwTklGmdH/w6wyvgmRdA8DmfJnCEmmze6jj4iK9vjPdYjeiCvBTIG9ZejkAfq15G
+uiDWiTxUdgsKsudVw/dvxWRR4SWSijUX5GDs86ewBjCmD+BV0RWXtpCdfEDaDhE8
+f5gaIsTQkDaiECGqUv+J8fntErJAjkdzY+rBLmX4gG4EjuvWPj44VuSYOT4zOvDJ
+iIBk3M58eZ5GLsZFri0xuKgT
+=Z7op
+-----END PGP SIGNATURE-----
 
->>  slirp/misc.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/slirp/misc.c b/slirp/misc.c
->> index 88e9d94197..260187b6b6 100644
->> --- a/slirp/misc.c
->> +++ b/slirp/misc.c
->> @@ -112,7 +112,9 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
->>                   bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
->>                   listen(s, 1) < 0) {
->>                       error_report("Error: inet socket: %s", strerror(errno));
->> -                     closesocket(s);
->> +                     if (s >= 0) {
->> +                         closesocket(s);
->> +                     }
->
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
-> (I'm not convinced this would ever do anything bad, at least on a *nix
-> system, the -ve value is always going to be an invalid fd so the close
-> will just fail).
-
-Indeed. But it keeps Coverity happy.
-
-thanks
--- PMM
+--RQs7fpJaKH9MpolvcQhIICnoE4an8tqf3--
