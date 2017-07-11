@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36J-0001JQ-Dx
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:48 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36M-0001Kk-7y
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36G-0005M8-Tp
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:47 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:35123
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36L-0005Or-IM
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:50 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:35135
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dV36G-0005LT-MH
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:44 -0400
+	id 1dV36L-0005OG-BG
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:49 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue, 11 Jul 2017 22:53:22 +0100
-Message-Id: <1499810007-28613-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 11 Jul 2017 22:53:26 +0100
+Message-Id: <1499810007-28613-8-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1499810007-28613-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1499810007-28613-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 3/8] sun4u: expose fw_cfg and NVRAM on ebus PCI
- IO address space
+Subject: [Qemu-devel] [PATCH 7/8] sun4u: create single default onboard
+ ne2k_pci NIC for machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +28,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-To allow future changes to the sun4u PCI topology.
+As we move towards a real Ultra 5 machine, allow only a single NIC
+to be instantiated with the legacy net options. More devices can
+be added with the new -netdev and -device options if required.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-By: Artyom Tarasenko <atar4qemu@gmail.com>
 ---
- hw/sparc64/sun4u.c |    9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ hw/sparc64/sun4u.c |    8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 8932be9..4f96d97 100644
+index 5ddd30f..3bb3bf2 100644
 --- a/hw/sparc64/sun4u.c
 +++ b/hw/sparc64/sun4u.c
-@@ -450,7 +450,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-                            &pci_bus3, &pbm_irqs);
-     pci_vga_init(pci_bus);
+@@ -427,7 +427,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     unsigned int i;
+     uint64_t initrd_addr, initrd_size, kernel_addr, kernel_size, kernel_entry;
+     PCIBus *pci_bus, *pci_busA, *pci_busB;
+-    PCIDevice *ebus;
++    PCIDevice *ebus, *pci_dev;
+     ISABus *isa_bus;
+     SysBusDevice *s;
+     qemu_irq *ivec_irqs, *pbm_irqs;
+@@ -464,8 +464,10 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     serial_hds_isa_init(isa_bus, i, MAX_SERIAL_PORTS);
+     parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
  
--    // XXX Should be pci_bus3
-+    /* XXX Should be pci_bus3 */
-     ebus = pci_create_simple(pci_bus, -1, "ebus");
-     isa_bus = pci_ebus_init(ebus, pbm_irqs);
+-    for(i = 0; i < nb_nics; i++)
+-        pci_nic_init_nofail(&nd_table[i], pci_bus, "ne2k_pci", NULL);
++    pci_dev = pci_create(pci_bus, -1, "ne2k_pci");
++    dev = &pci_dev->qdev;
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_init_nofail(dev);
  
-@@ -492,7 +492,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     /* Map NVRAM into I/O (ebus) space */
-     nvram = m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
-     s = SYS_BUS_DEVICE(nvram);
--    memory_region_add_subregion(get_system_io(), 0x2000,
-+    memory_region_add_subregion(pci_address_space_io(ebus), 0x2000,
-                                 sysbus_mmio_get_region(s, 0));
-  
-     initrd_size = 0;
-@@ -514,10 +514,9 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     ide_drive_get(hd, ARRAY_SIZE(hd));
  
-     dev = qdev_create(NULL, TYPE_FW_CFG_IO);
-     qdev_prop_set_bit(dev, "dma_enabled", false);
--    object_property_add_child(OBJECT(qdev_get_machine()), TYPE_FW_CFG,
--                              OBJECT(dev), NULL);
-+    object_property_add_child(OBJECT(ebus), TYPE_FW_CFG, OBJECT(dev), NULL);
-     qdev_init_nofail(dev);
--    memory_region_add_subregion(get_system_io(), BIOS_CFG_IOPORT,
-+    memory_region_add_subregion(pci_address_space_io(ebus), BIOS_CFG_IOPORT,
-                                 &FW_CFG_IO(dev)->comb_iomem);
- 
-     fw_cfg = FW_CFG(dev);
 -- 
 1.7.10.4
