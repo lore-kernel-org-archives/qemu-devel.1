@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dUvor-00059e-HT
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:07:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUvpu-000630-2U
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:08:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dUvoo-0000fm-Cs
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:07:17 -0400
-Resent-Message-Id: <E1dUvoo-0000fm-Cs@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dUvoo-0000fU-3g
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:07:14 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149978200382.30.5657181547682533568@5d477a5b5989>
-In-Reply-To: <1499726403-10129-1-git-send-email-igor.druzhinin@citrix.com>
+	(envelope-from <berrange@redhat.com>) id 1dUvpp-00019m-26
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:08:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUvpo-00017h-Q4
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:08:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DBBE5AFD9
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 14:08:15 +0000 (UTC)
+Date: Tue, 11 Jul 2017 15:08:12 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170711140812.GA26934@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1496132443.git.mprivozn@redhat.com>
+	<f8c84196122adc32f9067680e54a9de32a571756.1496132443.git.mprivozn@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 11 Jul 2017 07:06:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] xen: don't save/restore the physmap
- on VM save/restore
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f8c84196122adc32f9067680e54a9de32a571756.1496132443.git.mprivozn@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-bridge-helper: Take ACL file gid
+ into account
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: igor.druzhinin@citrix.com
-Cc: famz@redhat.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, anthony.perard@citrix.com, sstabellini@kernel.org, paul.durrant@citrix.com, pbonzini@redhat.com
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-OTcyNjQwMy0xMDEyOS0xLWdpdC1zZW5kLWVtYWlsLWlnb3IuZHJ1emhpbmluQGNpdHJpeC5jb20K
-VHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC80XSB4ZW46IGRv
-bid0IHNhdmUvcmVzdG9yZSB0aGUgcGh5c21hcCBvbiBWTSBzYXZlL3Jlc3RvcmUKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCjg5MzA2OGIgeGVuOiBkb24ndCB1c2UgeGVuc3RvcmUgdG8gc2F2ZS9yZXN0b3JlIHBo
-eXNtYXAgYW55bW9yZQpiYWI3Yjc4IHhlbi9tYXBjYWNoZTogaW50cm9kdWNlIHhlbl9yZXBsYWNl
-X2NhY2hlX2VudHJ5KCkKYjFlZDg1NyB4ZW4vbWFwY2FjaGU6IGFkZCBhbiBhYmlsaXR5IHRvIGNy
-ZWF0ZSBkdW1teSBtYXBwaW5ncwpmMDY4OGU5IHhlbjogbW92ZSBwaHlzbWFwIHNhdmluZyBpbnRv
-IGEgc2VwYXJhdGUgZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvNDogeGVuOiBtb3ZlIHBoeXNtYXAgc2F2aW5nIGludG8gYSBzZXBhcmF0ZSBmdW5jdGlvbi4u
-LgpDaGVja2luZyBQQVRDSCAyLzQ6IHhlbi9tYXBjYWNoZTogYWRkIGFuIGFiaWxpdHkgdG8gY3Jl
-YXRlIGR1bW15IG1hcHBpbmdzLi4uCkNoZWNraW5nIFBBVENIIDMvNDogeGVuL21hcGNhY2hlOiBp
-bnRyb2R1Y2UgeGVuX3JlcGxhY2VfY2FjaGVfZW50cnkoKS4uLgpFUlJPUjogc3BhY2UgcmVxdWly
-ZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTgwOiBGSUxFOiBody9pMzg2L3hl
-bi94ZW4tbWFwY2FjaGUuYzo1NDE6CisgICAgaWYoIXRlc3RfYml0cyhhZGRyZXNzX29mZnNldCA+
-PiBYQ19QQUdFX1NISUZULAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMDUgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcg
-UEFUQ0ggNC80OiB4ZW46IGRvbid0IHVzZSB4ZW5zdG9yZSB0byBzYXZlL3Jlc3RvcmUgcGh5c21h
-cCBhbnltb3JlLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFt
-ZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzQ4OiBGSUxFOiBody9pMzg2L3hlbi94ZW4taHZt
-LmM6MzgwOgorICAgIHBoeXNtYXAgPSBnX21hbGxvYyhzaXplb2YgKFhlblBoeXNtYXApKTsKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTIwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
-bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Tue, May 30, 2017 at 10:23:35AM +0200, Michal Privoznik wrote:
+> There's a problem with the way we currently parse ACL files. The
+> problem is, the bridge helper has usually SUID flag set and thus
+> runs as root in which case all the ACL files are parsed
+> (/etc/qemu/bridge.conf and all other files it includes).
+> Therefore, if there's say bob.conf owned by root:bob and I run
+> the bridge helper, it doesn't really matter whether I'm in the
+> bob group or not. Everything that is allowed to bob group is
+> allowed to me too.
+
+Ok so the ACL feature relies on the qemu-bridge-helper not having
+privileges to read the files included from the master bridge.conf
+file.
+
+The easy way for this to work is if the qemu-bridge-helper binary
+is given a filesystem capability eg
+
+   setcap cap_net_admin=ep qemu-bridge-helper
+
+in this mode, the bridge helper always runs with uid=500, gid=500,
+so does not have permission to read included files which are group
+owned by a different user.
+
+If using SUID mode, the bridge helper would be given a custom
+group and SUID privs
+
+   chown root.qemu qemu-bridge-helper
+   chmod ug+s qemu-bridge-helper
+
+when it runs, it initially has effective uid=0 and effective gid=qemu
+
+It then uses libcapng to drop privileges and change user ID, so that
+it ends up with only cap_net_admin, and effective uid=500 and
+effective gid=500 again.
+
+So once again, it will be unable to read the included files which
+are group owned by a different user.
+
+IOW, I think everything is working normally.
+
+The only scenario in which you can run SUID, and permissions do
+not work would be if you compiled QEMU with libcapng support
+disabled.
+
+It would be wise to change the bridge helper to refuse to read
+any included files with uid != 0 or gid != 0, if libcapng
+support is disabled, so make it clear that permission checking
+is inoperative.
+
+Or better yet, just make libcapng mandatory when using the
+bridge helper.
+
+> The way this problem is fixed is whenever an ACL file is parsed,
+> the group owner of the file is stored among with the rules so
+> that it can be compared when evaluating.
+> 
+> There is one exception though. If an ACL file is owned by root
+> group the rules within apply to all groups. This is because
+> that's the usual setup currently (the bridge.conf is usually
+> owned by root:root) and anybody from root group can plug the
+> interface themselves anyway.
+> 
+> This idea of groups was introduced in bdef79a2994d6f0383 but got
+> broken by ditros setting SUID onto the binary.
+
+I don't believe it did, unless distros left out libcapng support
+when building it.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
