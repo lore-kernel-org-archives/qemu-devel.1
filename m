@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxlk-0001YO-Tf
+	(envelope-from <mreitz@redhat.com>) id 1dUxll-0001ZL-Pa
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxlj-0006z0-Nn
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxlj-0006ys-BA
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:13 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:07:50 +0200
-Message-Id: <20170711160814.20941-62-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:49 +0200
+Message-Id: <20170711160814.20941-61-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 61/85] block: add bdrv_measure() API
+Subject: [Qemu-devel] [PULL 60/85] tests: Avoid non-portable 'echo -ARG'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,130 +22,402 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-bdrv_measure() provides a conservative maximum for the size of a new
-image.  This information is handy if storage needs to be allocated (e.g.
-a SAN or an LVM volume) ahead of time.
+POSIX says that backslashes in the arguments to 'echo', as well as
+any use of 'echo -n' and 'echo -e', are non-portable; it recommends
+people should favor 'printf' instead.  This is definitely true where
+we do not control which shell is running (such as in makefile snippets
+or in documentation examples).  But even for scripts where we
+require bash (and therefore, where echo does what we want by default),
+it is still possible to use 'shopt -s xpg_echo' to change bash's
+behavior of echo.  And setting a good example never hurts when we are
+not sure if a snippet will be copied from a bash-only script to a
+general shell script (although I don't change the use of non-portable
+\e for ESC when we know the running shell is bash).
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20170705125738.8777-2-stefanha@redhat.com
+Replace 'echo -n "..."' with 'printf %s "..."', and 'echo -e "..."'
+with 'printf %b "...\n"', with the optimization that the %s/%b
+argument can be omitted if the string being printed is a strict
+literal with no '%', '$', or '`' (we could technically also make
+this optimization when there are $ or `` substitutions but where
+we can prove their results will not be problematic, but proving
+that such substitutions are safe makes the patch less trivial
+compared to just being consistent).
+
+In the qemu-iotests check script, fix unusual shell quoting
+that would result in word-splitting if 'date' outputs a space.
+
+In test 051, take an opportunity to shorten the line.
+
+In test 068, get rid of a pointless second invocation of bash.
+
+CC: qemu-trivial@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-id: 20170703180950.9895-1-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json      | 25 +++++++++++++++++++++++++
- include/block/block.h     |  2 ++
- include/block/block_int.h |  2 ++
- block.c                   | 35 +++++++++++++++++++++++++++++++++++
- 4 files changed, 64 insertions(+)
+ tests/tcg/cris/Makefile     |  8 ++++----
+ qemu-options.hx             |  4 ++--
+ tests/multiboot/run_test.sh | 10 +++++-----
+ tests/qemu-iotests/051      |  7 ++++---
+ tests/qemu-iotests/068      |  2 +-
+ tests/qemu-iotests/142      | 48 ++++++++++++++++++++++-----------------------
+ tests/qemu-iotests/171      | 14 ++++++-------
+ tests/qemu-iotests/check    | 18 ++++++++---------
+ tests/rocker/all            | 10 +++++-----
+ 9 files changed, 61 insertions(+), 60 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 4bf11e8..c437aa5 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -488,6 +488,31 @@
-            '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+diff --git a/tests/tcg/cris/Makefile b/tests/tcg/cris/Makefile
+index 6b3dba4..664b30c 100644
+--- a/tests/tcg/cris/Makefile
++++ b/tests/tcg/cris/Makefile
+@@ -150,17 +150,17 @@ check_addcv17.tst: crtv10.o sysv10.o
+ build: $(CRT) $(SYS) $(TESTCASES)
  
- ##
-+# @BlockMeasureInfo:
-+#
-+# Image file size calculation information.  This structure describes the size
-+# requirements for creating a new image file.
-+#
-+# The size requirements depend on the new image file format.  File size always
-+# equals virtual disk size for the 'raw' format, even for sparse POSIX files.
-+# Compact formats such as 'qcow2' represent unallocated and zero regions
-+# efficiently so file size may be smaller than virtual disk size.
-+#
-+# The values are upper bounds that are guaranteed to fit the new image file.
-+# Subsequent modification, such as internal snapshot or bitmap creation, may
-+# require additional space and is not covered here.
-+#
-+# @required: Size required for a new image file, in bytes.
-+#
-+# @fully-allocated: Image file size, in bytes, once data has been written
-+#                   to all sectors.
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'BlockMeasureInfo',
-+  'data': {'required': 'int', 'fully-allocated': 'int'} }
-+
-+##
- # @query-block:
- #
- # Get a list of BlockInfo for all virtual block devices.
-diff --git a/include/block/block.h b/include/block/block.h
-index f0fdbe8..96edc85 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -306,6 +306,8 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp);
- int64_t bdrv_nb_sectors(BlockDriverState *bs);
- int64_t bdrv_getlength(BlockDriverState *bs);
- int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
-+BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
-+                               BlockDriverState *in_bs, Error **errp);
- void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
- void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
- int bdrv_commit(BlockDriverState *bs);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 58d4ffd..d0cd8a3 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -209,6 +209,8 @@ struct BlockDriver {
-     int64_t (*bdrv_getlength)(BlockDriverState *bs);
-     bool has_variable_length;
-     int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
-+    BlockMeasureInfo *(*bdrv_measure)(QemuOpts *opts, BlockDriverState *in_bs,
-+                                      Error **errp);
+ check: $(CRT) $(SYS) $(TESTCASES)
+-	@echo -e "\nQEMU simulator."
++	@printf "\nQEMU simulator.\n"
+ 	for case in $(TESTCASES); do \
+-		echo -n "$$case "; \
++		printf %s "$$case "; \
+ 		SIMARGS=; \
+ 		case $$case in *v17*) SIMARGS="-cpu crisv17";; esac; \
+ 		$(SIM) $$SIMARGS ./$$case; \
+ 	done
+ check-g: $(CRT) $(SYS) $(TESTCASES)
+-	@echo -e "\nGDB simulator."
++	@printf "\nGDB simulator.\n"
+ 	@for case in $(TESTCASES); do \
+-		echo -n "$$case "; \
++		printf %s "$$case "; \
+ 		$(SIMG) $$case; \
+ 	done
  
-     int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
-         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
-diff --git a/block.c b/block.c
-index 913bb43..162e9d9 100644
---- a/block.c
-+++ b/block.c
-@@ -3463,6 +3463,41 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
-     return -ENOTSUP;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 76b1c67..2cc70b9 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4374,7 +4374,7 @@ The simplest (insecure) usage is to provide the secret inline
+ 
+ The simplest secure usage is to provide the secret via a file
+ 
+- # echo -n "letmein" > mypasswd.txt
++ # printf "letmein" > mypasswd.txt
+  # $QEMU -object secret,id=sec0,file=mypasswd.txt,format=raw
+ 
+ For greater security, AES-256-CBC should be used. To illustrate usage,
+@@ -4402,7 +4402,7 @@ telling openssl to base64 encode the result, but it could be left
+ as raw bytes if desired.
+ 
+ @example
+- # SECRET=$(echo -n "letmein" |
++ # SECRET=$(printf "letmein" |
+             openssl enc -aes-256-cbc -a -K $KEY -iv $IV)
+ @end example
+ 
+diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
+index 78d7edf..c8f3da8 100755
+--- a/tests/multiboot/run_test.sh
++++ b/tests/multiboot/run_test.sh
+@@ -26,7 +26,7 @@ run_qemu() {
+     local kernel=$1
+     shift
+ 
+-    echo -e "\n\n=== Running test case: $kernel $@ ===\n" >> test.log
++    printf %b "\n\n=== Running test case: $kernel $@ ===\n\n" >> test.log
+ 
+     $QEMU \
+         -kernel $kernel \
+@@ -68,21 +68,21 @@ for t in mmap modules; do
+     pass=1
+ 
+     if [ $debugexit != 1 ]; then
+-        echo -e "\e[31m ?? \e[0m $t (no debugexit used, exit code $ret)"
++        printf %b "\e[31m ?? \e[0m $t (no debugexit used, exit code $ret)\n"
+         pass=0
+     elif [ $ret != 0 ]; then
+-        echo -e "\e[31mFAIL\e[0m $t (exit code $ret)"
++        printf %b "\e[31mFAIL\e[0m $t (exit code $ret)\n"
+         pass=0
+     fi
+ 
+     if ! diff $t.out test.log > /dev/null 2>&1; then
+-        echo -e "\e[31mFAIL\e[0m $t (output difference)"
++        printf %b "\e[31mFAIL\e[0m $t (output difference)\n"
+         diff -u $t.out test.log
+         pass=0
+     fi
+ 
+     if [ $pass == 1 ]; then
+-        echo -e "\e[32mPASS\e[0m $t"
++        printf %b "\e[32mPASS\e[0m $t\n"
+     fi
+ 
+ done
+diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
+index 26c29de..c8cfc76 100755
+--- a/tests/qemu-iotests/051
++++ b/tests/qemu-iotests/051
+@@ -217,7 +217,7 @@ run_qemu -drive driver=null-co,cache=invalid_value
+ # Test 142 checks the direct=on cases
+ 
+ for cache in writeback writethrough unsafe invalid_value; do
+-    echo -e "info block\ninfo block file\ninfo block backing\ninfo block backing-file" | \
++    printf "info block %s\n" '' file backing backing-file | \
+     run_qemu -drive file="$TEST_IMG",cache=$cache,backing.file.filename="$TEST_IMG.base",backing.cache.no-flush=on,backing.node-name=backing,backing.file.node-name=backing-file,file.node-name=file,if=none,id=$device_id -nodefaults
+ done
+ 
+@@ -325,8 +325,9 @@ echo "qemu-io $device_id \"write -P 0x22 0 4k\"" | run_qemu -drive file="$TEST_I
+ 
+ $QEMU_IO -c "read -P 0x22 0 4k" "$TEST_IMG" | _filter_qemu_io
+ 
+-echo -e "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id" | run_qemu -drive file="$TEST_IMG",snapshot=on,if=none,id=$device_id\
+-                                                                       | _filter_qemu_io
++printf %b "qemu-io $device_id \"write -P 0x33 0 4k\"\ncommit $device_id\n" |
++    run_qemu -drive file="$TEST_IMG",snapshot=on,if=none,id=$device_id |
++    _filter_qemu_io
+ 
+ $QEMU_IO -c "read -P 0x33 0 4k" "$TEST_IMG" | _filter_qemu_io
+ 
+diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
+index 3801b65..cfa0f2a 100755
+--- a/tests/qemu-iotests/068
++++ b/tests/qemu-iotests/068
+@@ -76,7 +76,7 @@ for extra_args in \
+     _make_test_img $IMG_SIZE
+ 
+     # Give qemu some time to boot before saving the VM state
+-    bash -c 'sleep 1; echo -e "savevm 0\nquit"' | _qemu $extra_args
++    { sleep 1; printf "savevm 0\nquit\n"; } | _qemu $extra_args
+     # Now try to continue from that VM state (this should just work)
+     echo quit | _qemu $extra_args -loadvm 0
+ done
+diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
+index 9a5b713..1639c83 100755
+--- a/tests/qemu-iotests/142
++++ b/tests/qemu-iotests/142
+@@ -94,36 +94,36 @@ function check_cache_all()
+     # cache.direct is supposed to be inherited by both bs->file and
+     # bs->backing
+ 
+-    echo -e "cache.direct=on on none0"
++    printf "cache.direct=on on none0\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
+-    echo -e "\ncache.direct=on on file"
++    printf "\ncache.direct=on on file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",file.cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
+-    echo -e "\ncache.direct=on on backing"
++    printf "\ncache.direct=on on backing\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
+-    echo -e "\ncache.direct=on on backing-file"
++    printf "\ncache.direct=on on backing-file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.file.cache.direct=on | grep -e "Cache" -e "[Cc]annot|[Cc]ould not|[Cc]an't"
+ 
+     # cache.writeback is supposed to be inherited by bs->backing; bs->file
+     # always gets cache.writeback=on
+ 
+-    echo -e "\n\ncache.writeback=off on none0"
++    printf "\n\ncache.writeback=off on none0\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",cache.writeback=off | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.writeback=off on file"
++    printf "\ncache.writeback=off on file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",file.cache.writeback=off | grep -e "doesn't" -e "does not"
+-    echo -e "\ncache.writeback=off on backing"
++    printf "\ncache.writeback=off on backing\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.cache.writeback=off | grep -e "doesn't" -e "does not"
+-    echo -e "\ncache.writeback=off on backing-file"
++    printf "\ncache.writeback=off on backing-file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.file.cache.writeback=off | grep -e "doesn't" -e "does not"
+ 
+     # cache.no-flush is supposed to be inherited by both bs->file and bs->backing
+ 
+-    echo -e "\n\ncache.no-flush=on on none0"
++    printf "\n\ncache.no-flush=on on none0\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.no-flush=on on file"
++    printf "\ncache.no-flush=on on file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",file.cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.no-flush=on on backing"
++    printf "\ncache.no-flush=on on backing\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.no-flush=on on backing-file"
++    printf "\ncache.no-flush=on on backing-file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$files","$ids",backing.file.cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
  }
  
-+/*
-+ * bdrv_measure:
-+ * @drv: Format driver
-+ * @opts: Creation options for new image
-+ * @in_bs: Existing image containing data for new image (may be NULL)
-+ * @errp: Error object
-+ * Returns: A #BlockMeasureInfo (free using qapi_free_BlockMeasureInfo())
-+ *          or NULL on error
-+ *
-+ * Calculate file size required to create a new image.
-+ *
-+ * If @in_bs is given then space for allocated clusters and zero clusters
-+ * from that image are included in the calculation.  If @opts contains a
-+ * backing file that is shared by @in_bs then backing clusters may be omitted
-+ * from the calculation.
-+ *
-+ * If @in_bs is NULL then the calculation includes no allocated clusters
-+ * unless a preallocation option is given in @opts.
-+ *
-+ * Note that @in_bs may use a different BlockDriver from @drv.
-+ *
-+ * If an error occurs the @errp pointer is set.
-+ */
-+BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
-+                               BlockDriverState *in_bs, Error **errp)
-+{
-+    if (!drv->bdrv_measure) {
-+        error_setg(errp, "Block driver '%s' does not support size measurement",
-+                   drv->format_name);
-+        return NULL;
-+    }
-+
-+    return drv->bdrv_measure(opts, in_bs, errp);
-+}
-+
- /**
-  * Return number of sectors on success, -errno on error.
-  */
+@@ -236,35 +236,35 @@ function check_cache_all_separate()
+ {
+     # Check cache.direct
+ 
+-    echo -e "cache.direct=on on blk"
++    printf "cache.direct=on on blk\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img",cache.direct=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.direct=on on file"
++    printf "\ncache.direct=on on file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file",cache.direct=on -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.direct=on on backing"
++    printf "\ncache.direct=on on backing\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk",cache.direct=on -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.direct=on on backing-file"
++    printf "\ncache.direct=on on backing-file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile",cache.direct=on -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+ 
+     # Check cache.writeback
+ 
+-    echo -e "\n\ncache.writeback=off on blk"
++    printf "\n\ncache.writeback=off on blk\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img",cache.writeback=off | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.writeback=off on file"
++    printf "\ncache.writeback=off on file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file",cache.writeback=off -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.writeback=off on backing"
++    printf "\ncache.writeback=off on backing\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk",cache.writeback=off -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.writeback=off on backing-file"
++    printf "\ncache.writeback=off on backing-file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile",cache.writeback=off -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+ 
+     # Check cache.no-flush
+ 
+-    echo -e "\n\ncache.no-flush=on on blk"
++    printf "\n\ncache.no-flush=on on blk\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img",cache.no-flush=on | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.no-flush=on on file"
++    printf "\ncache.no-flush=on on file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk" -drive "$drv_file",cache.no-flush=on -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.no-flush=on on backing"
++    printf "\ncache.no-flush=on on backing\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile" -drive "$drv_bk",cache.no-flush=on -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+-    echo -e "\ncache.no-flush=on on backing-file"
++    printf "\ncache.no-flush=on on backing-file\n"
+     echo "$hmp_cmds" | run_qemu -drive "$drv_bkfile",cache.no-flush=on -drive "$drv_bk" -drive "$drv_file" -drive "$drv_img" | grep -e "Cache" -e "[Cc]annot\|[Cc]ould not\|[Cc]an't"
+ }
+ 
+diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
+index 257be10..bcfaaf1 100755
+--- a/tests/qemu-iotests/171
++++ b/tests/qemu-iotests/171
+@@ -45,15 +45,15 @@ _supported_os Linux
+ 
+ # Create JSON with options
+ img_json() {
+-    echo -n 'json:{"driver":"raw", '
+-    echo -n "\"offset\":\"$img_offset\", "
++    printf %s 'json:{"driver":"raw", '
++    printf %s "\"offset\":\"$img_offset\", "
+     if [ "$img_size" -ne -1 ] ; then
+-        echo -n "\"size\":\"$img_size\", "
++        printf %s "\"size\":\"$img_size\", "
+     fi
+-    echo -n '"file": {'
+-    echo -n    '"driver":"file", '
+-    echo -n    "\"filename\":\"$TEST_IMG\" "
+-    echo -n "} }"
++    printf %s '"file": {'
++    printf %s   '"driver":"file", '
++    printf %s   "\"filename\":\"$TEST_IMG\" "
++    printf %s "} }"
+ }
+ 
+ do_general_test() {
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 4b1c674..9ded37c 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -141,7 +141,7 @@ _wallclock()
+ _timestamp()
+ {
+     now=`date "+%T"`
+-    echo -n " [$now]"
++    printf %s " [$now]"
+ }
+ 
+ _wrapup()
+@@ -255,7 +255,7 @@ seq="check"
+ for seq in $list
+ do
+     err=false
+-    echo -n "$seq"
++    printf %s "$seq"
+     if [ -n "$TESTS_REMAINING_LOG" ] ; then
+         sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
+         mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
+@@ -281,9 +281,9 @@ do
+         rm -f $seq.out.bad
+         lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
+         if [ "X$lasttime" != X ]; then
+-                echo -n " ${lasttime}s ..."
++                printf %s " ${lasttime}s ..."
+         else
+-                echo -n "        "        # prettier output with timestamps.
++                printf "        "        # prettier output with timestamps.
+         fi
+         rm -f core $seq.notrun
+ 
+@@ -291,7 +291,7 @@ do
+         echo "$seq" > "${TEST_DIR}"/check.sts
+ 
+         start=`_wallclock`
+-        $timestamp && echo -n "        ["`date "+%T"`"]"
++        $timestamp && printf %s "        [$(date "+%T")]"
+ 
+         if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
+             run_command="$PYTHON $seq"
+@@ -314,21 +314,21 @@ do
+ 
+         if [ -f core ]
+         then
+-            echo -n " [dumped core]"
++            printf " [dumped core]"
+             mv core $seq.core
+             err=true
+         fi
+ 
+         if [ -f $seq.notrun ]
+         then
+-            $timestamp || echo -n " [not run] "
+-            $timestamp && echo " [not run]" && echo -n "        $seq -- "
++            $timestamp || printf " [not run] "
++            $timestamp && echo " [not run]" && printf %s "        $seq -- "
+             cat $seq.notrun
+             notrun="$notrun $seq"
+         else
+             if [ $sts -ne 0 ]
+             then
+-                echo -n " [failed, exit status $sts]"
++                printf %s " [failed, exit status $sts]"
+                 err=true
+             fi
+ 
+diff --git a/tests/rocker/all b/tests/rocker/all
+index d5ae963..3f9b786 100755
+--- a/tests/rocker/all
++++ b/tests/rocker/all
+@@ -1,19 +1,19 @@
+-echo -n "Running port test...              "
++printf "Running port test...              "
+ ./port
+ if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ 
+-echo -n "Running bridge test...            "
++printf "Running bridge test...            "
+ ./bridge
+ if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ 
+-echo -n "Running bridge STP test...        "
++printf "Running bridge STP test...        "
+ ./bridge-stp
+ if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ 
+-echo -n "Running bridge VLAN test...       "
++printf "Running bridge VLAN test...       "
+ ./bridge-vlan
+ if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
+ 
+-echo -n "Running bridge VLAN STP test...   "
++printf "Running bridge VLAN STP test...   "
+ ./bridge-vlan-stp
+ if [ $? -eq 0 ]; then echo "pass"; else echo "FAILED"; exit 1; fi
 -- 
 2.9.4
