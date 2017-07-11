@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dV1V3-0003dj-9v
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:11:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dV1Yu-0004q0-LT
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dV1V0-0003Nv-5L
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:11:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60770)
+	(envelope-from <ehabkost@redhat.com>) id 1dV1Yr-0004kT-IW
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:15:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dV1Uz-0003Mz-Ur
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:11:10 -0400
-Date: Tue, 11 Jul 2017 17:10:59 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dV1Yr-0004jo-Ci
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:15:09 -0400
+Date: Tue, 11 Jul 2017 17:14:57 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170711201059.GA6020@localhost.localdomain>
-References: <1499803333-9052-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1499803333-9052-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20170711201457.GB6020@localhost.localdomain>
+References: <20170711103011.32631-1-marcandre.lureau@redhat.com>
+	<20170711103011.32631-5-marcandre.lureau@redhat.com>
+	<2acb6eb3-26e0-9a97-34d9-016fc9d1b2ec@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1499803333-9052-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv8 1/3] fw_cfg: switch fw_cfg_find() to
- locate the fw_cfg device by type rather than path
+In-Reply-To: <2acb6eb3-26e0-9a97-34d9-016fc9d1b2ec@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] dump: add vmcoreinfo ELF note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, anderson@redhat.com, imammedo@redhat.com, Alistair Francis <alistair.francis@xilinx.com>
 
-On Tue, Jul 11, 2017 at 09:02:11PM +0100, Mark Cave-Ayland wrote:
-> This will enable the fw_cfg device to be placed anywhere within the QOM tree
-> regardless of its machine location.
-> 
-> Note that we also add a comment to document the behaviour that we return NULL to
-> indicate failure where either no fw_cfg device or multiple fw_cfg devices are
-> found.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/nvram/fw_cfg.c |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index 99bdbc2..8ef889a 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -1017,7 +1017,12 @@ FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
->  
->  FWCfgState *fw_cfg_find(void)
->  {
-> -    return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
-> +    /* Returns FWCfgState if only one fw_cfg device type exists. If zero or
-> +       more than one fw_cfg device are found then NULL is returned as per the
-> +       object_resolve_path_type() documentation. This behaviour is correct as
-> +       it ensures that we detect both missing fw_cfg devices and multiple
-> +       fw_cfg devices which could result in unpredictable behaviour. */
-> +    return FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, NULL));
->  }
+On Tue, Jul 11, 2017 at 10:04:43PM +0200, Laszlo Ersek wrote:
+[...]
+> > +    lines = g_strsplit((char *)vmci, "\n", -1);
+> > +    for (i = 0; lines[i]; i++) {
+> > +        if (g_str_has_prefix(lines[i], "NUMBER(phys_base)=")) {
+> > +            if (qemu_strtou64(lines[i] + 18, NULL, 16,
+> > +                              &phys_base) < 0) {
+> > +                error_report("warning: Failed to read NUMBER(phys_base)=");
+[...]
+> > +        } else if (size < note_head_size || size > MAX_VMCOREINFO_SIZE) {
+> > +            error_report("warning: vmcoreinfo size is invalid: %" PRIu32, size);
+[...]
+> > +                error_report("warning: Invalid vmcoreinfo header");
 
-I believe a one-line "returns NULL unless there is exactly one
-fw_cfg device" (similar to the one at find_vmgenid_dev()) would
-suffice.  :)
+You will probably want to change this to warn_report() once
+Alistair's series is merged.
 
 -- 
 Eduardo
