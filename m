@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dV0nv-0007cx-Lm
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:26:40 -0400
+	(envelope-from <lersek@redhat.com>) id 1dV0xZ-0001Qe-Qq
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dV0nr-00028z-MW
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:26:39 -0400
-Received: from mail-wr0-f177.google.com ([209.85.128.177]:35198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dV0nr-00028m-F7
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:26:35 -0400
-Received: by mail-wr0-f177.google.com with SMTP id k67so2510720wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 12:26:35 -0700 (PDT)
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-	<149942810176.8972.2271168155656858925.stgit@frigg.lan>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <149942810176.8972.2271168155656858925.stgit@frigg.lan>
-Date: Tue, 11 Jul 2017 20:25:32 +0100
-Message-ID: <87d196ai8j.fsf@linaro.org>
+	(envelope-from <lersek@redhat.com>) id 1dV0xW-0006GZ-OJ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:36:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dV0xW-0006Fv-HF
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:36:34 -0400
+References: <1499783493-15911-1-git-send-email-stefanb@linux.vnet.ibm.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <e75d34d2-9fda-b514-3c22-655bb0c4b455@redhat.com>
+Date: Tue, 11 Jul 2017 21:36:28 +0200
 MIME-Version: 1.0
+In-Reply-To: <1499783493-15911-1-git-send-email-stefanb@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v12 02/27] cpu-exec: Avoid global variables
- in icount-related functions
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] specs: Describe the TPM support in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, javierm@redhat.com
 
-
-Lluís Vilanova <vilanova@ac.upc.edu> writes:
-
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-
-I guess. I assume this is also something Emilio is targeting with his
-multi-threaded translation work.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
+On 07/11/17 16:31, Stefan Berger wrote:
+> This patch adds a description of the current TPM support in QEMU
+> to the specs.
+> 
+> Several public specs are referenced via their landing page on the
+> trustedcomputinggroup.org website.
+> 
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> 
 > ---
->  include/exec/gen-icount.h |   10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-> index 62d462e494..6c28ef59c3 100644
-> --- a/include/exec/gen-icount.h
-> +++ b/include/exec/gen-icount.h
-> @@ -19,7 +19,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
->          count = tcg_temp_new_i32();
->      }
->
-> -    tcg_gen_ld_i32(count, cpu_env,
-> +    tcg_gen_ld_i32(count, tcg_ctx.tcg_env,
->                     -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
->
->      if (tb->cflags & CF_USE_ICOUNT) {
-> @@ -37,7 +37,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
->      tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, exitreq_label);
->
->      if (tb->cflags & CF_USE_ICOUNT) {
-> -        tcg_gen_st16_i32(count, cpu_env,
-> +        tcg_gen_st16_i32(count, tcg_ctx.tcg_env,
->                           -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
->      }
->
-> @@ -62,14 +62,16 @@ static void gen_tb_end(TranslationBlock *tb, int num_insns)
->  static inline void gen_io_start(void)
->  {
->      TCGv_i32 tmp = tcg_const_i32(1);
-> -    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-> +    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env,
-> +                   -ENV_OFFSET + offsetof(CPUState, can_do_io));
->      tcg_temp_free_i32(tmp);
->  }
->
->  static inline void gen_io_end(void)
->  {
->      TCGv_i32 tmp = tcg_const_i32(0);
-> -    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-> +    tcg_gen_st_i32(tmp, tcg_ctx.tcg_env,
-> +                   -ENV_OFFSET + offsetof(CPUState, can_do_io));
->      tcg_temp_free_i32(tmp);
->  }
->
+> 
+> v1->v2:
+>   - fixed typos
+>   - added command line for starting an x86_64 VM with TPM passthrough device
+>   - added command lines for checks inside the VM
+> ---
+>  docs/specs/tpm.txt | 124 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 124 insertions(+)
+>  create mode 100644 docs/specs/tpm.txt
 
+Awesome, thank you very much!
 
---
-Alex Bennée
+I think I noticed one typo in new text:
+
+> +#> dmesg | grep TCPA
+> +[    0.000000] ACPI: TCP 0x0000000003FFD191C 000032 (v02 BOCHS  \
+> +    BXPCTCPA 0000001 BXPC 00000001)
+
+I think the prefix here should be "ACPI: TCPA"; the letter "A" probably
+fell victim to wrapping the line nicely.
+
+Not sure which maintainer will pick up the patch, but I think they can
+fix up this typo on their end (assuming no other reviewer asks for v3).
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thank you again, Stefan!
+Laszlo
