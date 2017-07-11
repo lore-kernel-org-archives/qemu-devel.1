@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dUuOZ-00020N-Nn
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:36:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUuPp-0002bf-60
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dUuOV-000297-Q7
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:36:03 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:40437)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dUuOV-00028V-E5
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:35:59 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <1498514681-3059-1-git-send-email-cota@braap.org>
-	<20170710120744.GC14195@stefanha-x1.localdomain>
-Date: Tue, 11 Jul 2017 15:35:44 +0300
-In-Reply-To: <20170710120744.GC14195@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Mon, 10 Jul 2017 13:07:44 +0100")
-Message-ID: <87a84bkv6n.fsf@frigg.lan>
+	(envelope-from <berrange@redhat.com>) id 1dUuPl-0002oe-DF
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:37:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52034)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUuPl-0002oY-3r
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:37:17 -0400
+Date: Tue, 11 Jul 2017 13:37:10 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170711123710.GP7116@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499773645-120137-1-git-send-email-peng.hao2@zte.com.cn>
+	<d97e3209-e1d0-1c00-ae8b-7bb22eb198e2@redhat.com>
+	<20170711091506.GC7116@redhat.com>
+	<4268aa00-6700-0554-10a2-451acb0baad6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 0/7] trace: Optimize per-vCPU TCG
- tracing states
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4268aa00-6700-0554-10a2-451acb0baad6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2] chardev: fix parallel device can't be
+ reconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Richard Henderson <rth@twiddle.net>, Laurent Desnogues <laurent.desnogues@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peng Hao <peng.hao2@zte.com.cn>, marcandre.lureau@redhat.com, qemu-devel@nongnu.org, wang.yechao255@zte.com.cn
 
-Stefan Hajnoczi writes:
+On Tue, Jul 11, 2017 at 02:21:08PM +0200, Paolo Bonzini wrote:
+> On 11/07/2017 11:15, Daniel P. Berrange wrote:
+> > On Tue, Jul 11, 2017 at 10:30:14AM +0200, Paolo Bonzini wrote:
+> >> On 11/07/2017 13:47, Peng Hao wrote:
+> >>> Parallel device don't register be->chr_can_read function, but remote
+> >>> disconnect event is handled in chr_read.So connected parallel device
+> >>> can not detect remote disconnect event. The chardevs with chr_can_read=NULL
+> >>> has the same problem.
+> >>>
+> >>> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> >>> Reviewed-by: Wang Yechao <wang.yechao255@zte.com.cn>
+> >>> ---
+> >>>  chardev/char-socket.c  | 11 +++++++++++
+> >>>  chardev/char.c         | 10 ++++++++++
+> >>>  include/chardev/char.h |  9 +++++++++
+> >>>  3 files changed, 30 insertions(+)
+> >>>
+> >>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> >>> index ccc499c..aa44f8f 100644
+> >>> --- a/chardev/char-socket.c
+> >>> +++ b/chardev/char-socket.c
+> >>> @@ -139,6 +139,9 @@ static int tcp_chr_read_poll(void *opaque)
+> >>>          return 0;
+> >>>      }
+> >>>      s->max_size = qemu_chr_be_can_write(chr);
+> >>> +    if (qemu_chr_null_be_can_read(chr)) {
+> >>> +        return 1;
+> >>> +    }
+> >>>      return s->max_size;
+> >>>  }
+> >>>  
+> >>> @@ -422,6 +425,14 @@ static gboolean tcp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+> >>>      uint8_t buf[CHR_READ_BUF_LEN];
+> >>>      int len, size;
+> >>>  
+> >>> +    if (qemu_chr_null_be_can_read(chr)) {
+> >>> +        size = tcp_chr_recv(chr, (void *)buf, CHR_READ_BUF_LEN);
+> >>
+> >> It would be better not to destroy data in the channel, because the
+> >> device could set handlers later.
+> >>
+> >> Daniel, maybe QIOChannel could have a function to check for hung-up
+> >> channels and return a bool?  For file descriptors it would poll the file
+> >> descriptor and check for POLLHUP, while other channels would have a more
+> >> or less obvious implementation.
+> > 
+> > IMHO the chardev code all needs to switch over to using even driven I/O
+> > using the  qio_channel_add_watch() function.
+> 
+> This is a slightly different case; qio_channel_add_watch() is for the
+> write side, while in this case we're concerned with the read side.
+> 
+> The read-side watch is managed automatically by common chardev code.
+> I'll see if we can change that code to set up a G_IO_HUP watch in
+> addition to G_IO_IN.
 
-> On Mon, Jun 26, 2017 at 06:04:34PM -0400, Emilio G. Cota wrote:
->> v8: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02335.html
->> 
->> Changes from v8:
->> 
->> - Rebased on top of the current tracing tree -- the one that includes
->> Lluis' fix (2c321e3c486).
->> - Added Lluis' R-b tag.
->> - Added perf numbers in the commit log of the last patch (tl;dr: no overhead).
->> 
->> Thanks,
->> 
->> Emilio
->> 
->> PS. How to quickly get some linux-user perf numbers:
->> 
->> I used dbt-bench[1] for a before/after comparison. I added a script to that
->> repo (breakdown.pl, see below) to make it play well with barchart[2].
->> Obtaining a comparison bar chart is quite simple:
->> 
->> 1. Generate one dbt-bench output file per QEMU checkout, e.g.:
->> $ git checkout orig && make
->> [ orig == "before"; new == "after" ]
->> $ ./dbt-bench.pl /path/to/qemu/build/qemu-x86_64 > orig.out
->> [ then do the same with orig-disabled, new, etc.]
->> [...]
->> $ ls *.out
->> new-disabled.out  new.out  orig-enabled.out  orig.out
->> 
->> 2. Call dbt-bench's breakdown.pl script with the --barchart option, then
->> pipe the output to barchart, and finally pipe to gnuplot:
->> $ ./breakdown.pl --barchart orig.out orig-enabled.out new.out new-disabled.out \
->> | ../barchart/barchart.pl --extra-gnuplot='set term dumb 140 30' \
->> --extra-gnuplot='set title "NBench score; higher is better"' \
->> | gnuplot
->> 
->> Note that barchart is just a front-end for gnuplot >=5, so any valid term will
->> work (e.g. 'set term pngcairo size 1200,500').
->> 
->> [1] https://github.com/cota/dbt-bench
->> [2] https://github.com/cota/barchart
->> 
+NB You don't ever need to use G_IO_HUP as an explicit input flag - poll()
+will always report G_IO_HUP if you asked it to monitor for G_IO_IN.
 
-> Thanks, applied to my tracing tree:
-> https://github.com/stefanha/qemu/commits/tracing
-
-Just to be sure, there's a v11 on the list (this is v9).
-
-
-Cheers,
-  Lluis
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
