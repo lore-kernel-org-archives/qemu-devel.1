@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUv2U-0002Vz-Ex
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:17:19 -0400
+	(envelope-from <groug@kaod.org>) id 1dUv2H-0002NQ-D8
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUv2T-0003h0-EI
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:17:18 -0400
-References: <20170705190404.22449-1-mreitz@redhat.com>
-	<20170705190404.22449-3-mreitz@redhat.com>
-	<87poddk583.fsf@dusky.pond.sub.org>
-	<6a1740fd-2a8c-f338-6ce1-e0f4bbade407@redhat.com>
-	<87a84c6476.fsf@dusky.pond.sub.org>
-	<704969af-283c-d22b-f0d2-e7bf0a7b609a@redhat.com>
-	<87y3rvjjip.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <27f963d3-46f3-d497-2bb6-eca05e808983@redhat.com>
-Date: Tue, 11 Jul 2017 15:17:02 +0200
+	(envelope-from <groug@kaod.org>) id 1dUv2C-0003d8-CJ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:17:05 -0400
+Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:47601)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dUv2C-0003cs-6j
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:17:00 -0400
+Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id B569B68056
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 15:16:58 +0200 (CEST)
+Date: Tue, 11 Jul 2017 15:16:53 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170711151653.62d52954@bahia.lan>
+In-Reply-To: <20170711004303.3902-4-ehabkost@redhat.com>
+References: <20170711004303.3902-1-ehabkost@redhat.com>
+	<20170711004303.3902-4-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87y3rvjjip.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8EspLBIgpWi8S6VtrBr7l90cwmqj9wpdX"
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] qapi: Add qobject_is_equal()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/.Vaq/hevITL27bqFlj/w2B4";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 3/3] Revert "machine: Convert abstract
+ typename on compat_props to subclass names"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8EspLBIgpWi8S6VtrBr7l90cwmqj9wpdX
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <27f963d3-46f3-d497-2bb6-eca05e808983@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] qapi: Add qobject_is_equal()
-References: <20170705190404.22449-1-mreitz@redhat.com>
- <20170705190404.22449-3-mreitz@redhat.com>
- <87poddk583.fsf@dusky.pond.sub.org>
- <6a1740fd-2a8c-f338-6ce1-e0f4bbade407@redhat.com>
- <87a84c6476.fsf@dusky.pond.sub.org>
- <704969af-283c-d22b-f0d2-e7bf0a7b609a@redhat.com>
- <87y3rvjjip.fsf@dusky.pond.sub.org>
-In-Reply-To: <87y3rvjjip.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+--Sig_/.Vaq/hevITL27bqFlj/w2B4
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-07-11 13:33, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
+On Mon, 10 Jul 2017 21:43:03 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> This reverts commit 0bcba41fe379e4c6834adcf1456d9099db31a5b2.
 >=20
->> First of all, OK, you don't want QNum(42.0) to equal QNum(42) at all (=
-at
->> least not right now and in the foreseeable future).
->> You're the maintainer, so you decide, so I'll go along with it. :-)
->>
->> Now, let's follow up with my therefore rather useless commentary:
->>
->> (Feel free to disregard, because honestly, I can see how replying to
->> most of the points I'm asking isn't really worth the time...)
+> The bug addressed by that commit is now fixed in a better way by the
+> commit "qdev: fix the order compat and global properties are applied".
 >=20
-> When I use the authority entrusted to maintainers, I feel obliged to at=
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
 
-> least explain my reasoning.  Besides, putting my reasoning in words
-> tends to lead me to new insights.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-And I am indeed very grateful for that. :-)
-
->> On 2017-07-10 11:17, Markus Armbruster wrote:
->>> Max Reitz <mreitz@redhat.com> writes:
->>>
->>>> On 2017-07-06 16:30, Markus Armbruster wrote:
-
-[...]
-
->>> The only way to add unsigned integers without breaking QMP compatibil=
-ity
->>> is to make them interchangeable with signed integers.  That doesn't m=
-ean
->>> you get to make floating-point numbers interchangeable with integers
->>> now.
->>
->> Again, begs the question why QNum covers floating point numbers then a=
-nd
->> why this very fact is not documented in qnum.c.
+>  hw/core/machine.c | 26 +++-----------------------
+>  1 file changed, 3 insertions(+), 23 deletions(-)
 >=20
-> What kind of documentation would you like to see?
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index ecb5552..1d10b01 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -770,18 +770,11 @@ static void machine_class_finalize(ObjectClass *kla=
+ss, void *data)
+>      g_free(mc->name);
+>  }
+> =20
+> -static void machine_register_compat_for_subclass(ObjectClass *oc, void *=
+opaque)
+> -{
+> -    GlobalProperty *p =3D opaque;
+> -    register_compat_prop(object_class_get_name(oc), p->property, p->valu=
+e);
+> -}
+> -
+>  void machine_register_compat_props(MachineState *machine)
+>  {
+>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>      int i;
+>      GlobalProperty *p;
+> -    ObjectClass *oc;
+> =20
+>      if (!mc->compat_props) {
+>          return;
+> @@ -789,22 +782,9 @@ void machine_register_compat_props(MachineState *mac=
+hine)
+> =20
+>      for (i =3D 0; i < mc->compat_props->len; i++) {
+>          p =3D g_array_index(mc->compat_props, GlobalProperty *, i);
+> -        oc =3D object_class_by_name(p->driver);
+> -        if (oc && object_class_is_abstract(oc)) {
+> -            /* temporary hack to make sure we do not override
+> -             * globals set explicitly on -global: if an abstract class
+> -             * is on compat_props, register globals for all its
+> -             * non-abstract subtypes instead.
+> -             *
+> -             * This doesn't solve the problem for cases where
+> -             * a non-abstract typename mentioned on compat_props
+> -             * has subclasses, like spapr-pci-host-bridge.
+> -             */
+> -            object_class_foreach(machine_register_compat_for_subclass,
+> -                                 p->driver, false, p);
+> -        } else {
+> -            register_compat_prop(p->driver, p->property, p->value);
+> -        }
+> +        /* Machine compat_props must never cause errors: */
+> +        p->errp =3D &error_abort;
+> +        qdev_prop_register_global(p);
+>      }
+>  }
+> =20
 
-It would be good to note that the QNum type is not meant to be a
-completely uniform way to handle JSON numbers (e.g. if the user provides
-something with a decimal point but you need an integer, QNum will not do
-that conversion for you).
 
-It is (English indirect speech is broken badly) just meant to
-encapsulate the different variants a number can be represented in, but
-you're still generally supposed to read it out the way it was put in
-(exceptions apply, see signed/unsigned and qnum_get_double()).
-
-Max
-
-
---8EspLBIgpWi8S6VtrBr7l90cwmqj9wpdX
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/.Vaq/hevITL27bqFlj/w2B4
+Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQEvBAEBCAAZBQJZZM/OEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGan
-B/43FBMymoRZB3Zq5MkDmA2uG78E2R9GijyYJAkMEpPZJIi1P/ugFMvLwtOzSGQB
-+BO73cZOj0OW1bctDCOk8YWxlKxz020RMpob8ZTzIBVb+VNaBXxjMWxgV+yX0S+l
-SL7H/7MRRUPtnd7sy51xtogZxLxtQJI1uy6AXjQpN4XLcJn2LNQxfmFFMF9YsmBQ
-KBd5qzJNS2BfvvYwsik/EEibL1AUBFu8daZjOrKewpY09s4uWsW8a9fNDw3EwrOK
-cHnGvUrPK2vngdVvaB1Djw/JCEl3ZBT1ERg6W5E34IIYJYlw+skc0/GCid1gqbLF
-3unB2pBrgsUrBKfylKa4kbRa
-=qv/F
+iEYEARECAAYFAllkz8UACgkQAvw66wEB28LYrwCfZygq6A3MF6Qcm+B5IOYMlsF5
+D1MAn05GDHZJeFJILz9Q9r8fs+gdPw6F
+=9q7P
 -----END PGP SIGNATURE-----
 
---8EspLBIgpWi8S6VtrBr7l90cwmqj9wpdX--
+--Sig_/.Vaq/hevITL27bqFlj/w2B4--
