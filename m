@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dV21E-0000zE-Im
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:44:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1dV22q-000244-La
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:46:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dV215-0006nI-Ad
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:44:24 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
-	<1499771839-32518-3-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6cee176b-a624-4f1d-aba6-e1c9fa011209@amsat.org>
-Date: Tue, 11 Jul 2017 17:42:59 -0300
+	(envelope-from <bounces@canonical.com>) id 1dV22l-0007eh-Od
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:46:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55159)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dV22l-0007da-IY
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:46:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dV22k-0002Sl-CU
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 20:46:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 58E222E8190
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 20:46:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1499771839-32518-3-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] hw/char/cmsdk-apb-uart.c: Implement
- CMSDK APB UART
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Jul 2017 20:31:35 -0000
+From: Samuel Seay <lightningth@gmail.com>
+Reply-To: Bug 1095531 <1095531@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130103052033.32036.58749.malonedeb@wampee.canonical.com>
+	<149980314207.15111.12147255722868105515.malone@wampee.canonical.com>
+Message-Id: <CADwyeC-FdPVXLN2JO=16coa2-uNEsJdMKxiFWjMcH7kgUYnbXQ@mail.gmail.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1095531] Re: sparc32plus (and others?) has
+ x86 code generation errors on 64bit hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +38,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
 
-Hi Peter,
+I no longer have a setup to test this so I can only say to close it.
 
-There is probably no need yet, but we could model a generic APB slave 
-with this code, as an overlapping subregion (device top 0x30 bytes).
+On Jul 11, 2017 4:15 PM, "Thomas Huth" <1095531@bugs.launchpad.net>
+wrote:
 
-For now only PID0 differs, but since all ID are 8bit the device could 
-even instantiate the subregion with some u64 PID, 32 CID args.
+> Can you still reproduce this problem wit the latest release of QEMU
+> (currently version 2.9.0), or could we close this bug nowadays?
+>
+> ** Changed in: qemu
+>        Status: New =3D> Incomplete
+>
+> --
+> You received this bug notification because you are subscribed to the bug
+> report.
+> https://bugs.launchpad.net/bugs/1095531
+>
+> Title:
+>   sparc32plus (and others?) has x86 code generation errors on 64bit
+>   hosts
+>
+> Status in QEMU:
+>   Incomplete
+>
+> Bug description:
+>   On 64bit hosts, the load and store functions compile improperly. The
+>   issue is the call to gen_address_mask() under the ld and st functions
+>   in target-sparc/translate.c. Below are some snips from the log file.
+>   Doing a gdb debug, this results in constant access violation errors
+>   which I do not see when debugging qemu in powerpc mode.
+>
+>   --------------
+>   IN:
+>   0x0000000040804aa8:  st  %i0, [ %fp + 0x44 ]
+>
+>   OP:
+>    ---- 0x40804aa8
+>    ld_i64 tmp1,regwptr,$0xb0
+>    mov_i64 tmp0,tmp1
+>    movi_i64 tmp2,$0x44
+>    add_i64 tmp0,tmp0,tmp2
+>    ld_i64 tmp2,regwptr,$0x80
+>    ext32u_i64 tmp0,tmp0
+>    qemu_st32 tmp2,tmp0,$0x0
+>
+>   OUT: [size=3D345]
+>   0x6032d7f0:  mov    0x40(%r14),%rbp
+>   0x6032d7f4:  mov    0xb0(%rbp),%rbx
+>   0x6032d7fb:  add    $0x44,%rbx
+>   0x6032d7ff:  mov    0x80(%rbp),%rbp
+>   0x6032d806:  mov    %ebx,%ebx                 <- bug
+>   0x6032d808:  mov    %ebp,%edi
+>   0x6032d80a:  bswap  %edi
+>   0x6032d80c:  mov    %edi,(%rbx)
+>
+>   --------------
+>   IN:
+>   0x0000000040804aec:  add  %l7, %o7, %l7
+>   0x0000000040804af0:  ld  [ %l7 ], %g2
+>
+>   OP:
+>    ---- 0x40804aec
+>    ld_i64 tmp1,regwptr,$0x78
+>    ld_i64 tmp2,regwptr,$0x38
+>    add_i64 tmp0,tmp1,tmp2
+>    st_i64 tmp0,regwptr,$0x78
+>
+>    ---- 0x40804af0
+>    ld_i64 tmp1,regwptr,$0x78
+>    mov_i64 tmp0,tmp1
+>    ext32u_i64 tmp0,tmp0
+>    qemu_ld32u g2,tmp0,$0x0
+>
+>   OUT: [size=3D395]
+>   0x6032da80:  mov    0x40(%r14),%rbp
+>   0x6032da84:  mov    0x78(%rbp),%rbx
+>   0x6032da88:  mov    0x38(%rbp),%r12
+>   0x6032da8c:  add    %r12,%rbx
+>   0x6032da8f:  mov    %rbx,0x78(%rbp)
+>   0x6032da93:  mov    0x78(%rbp),%rbx
+>   0x6032da97:  mov    %ebx,%ebx                <- bug
+>   0x6032da99:  mov    (%rbx),%ebx
+>
+>   In 64bit mode, doing a 32bit operation will result in the top 32bit's
+>   being zero'd. I attempted to simply disable the call to
+>   gen_address_mask() but that did not fix the issue and actually caused
+>   the sparc32plus I was testing to become unusable.
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1095531/+subscriptions
+>
 
-(thinking about watchdog and dualtimers).
+-- =
 
-Regards,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1095531
 
-Phil.
+Title:
+  sparc32plus (and others?) has x86 code generation errors on 64bit
+  hosts
 
-On 07/11/2017 08:17 AM, Peter Maydell wrote:
-> +REG32(PID4, 0xFD0)
-> +REG32(PID5, 0xFD4)
-> +REG32(PID6, 0xFD8)
-> +REG32(PID7, 0xFDC)
-> +REG32(PID0, 0xFE0)
-> +REG32(PID1, 0xFE4)
-> +REG32(PID2, 0xFE8)
-> +REG32(PID3, 0xFEC)
-> +REG32(CID0, 0xFF0)
-> +REG32(CID1, 0xFF4)
-> +REG32(CID2, 0xFF8)
-> +REG32(CID3, 0xFFC)
-> +
-> +/* PID/CID values */
-> +static const int uart_id[] = {
-> +    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
-> +    0x21, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
-> +    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
-> +};
-> +
-[...]
-> +static uint64_t uart_read(void *opaque, hwaddr offset, unsigned size)
-> +{
-> +    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
-> +    uint64_t r;
-> +
-> +    switch (offset) {
-[...]
-> +    case A_PID4 ... A_CID3:
-> +        r = uart_id[offset / 4 - A_PID4];
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "CMSDK APB UART read: bad offset %x\n", (int) offset);
-> +        r = 0;
-> +        break;
-> +    }
-> +    trace_cmsdk_apb_uart_read(offset, r, size);
-> +    return r;
-> +}
-> +
-[...]
-> +static void uart_write(void *opaque, hwaddr offset, uint64_t value,
-> +                       unsigned size)
-> +{
-> +    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
-> +
-> +    trace_cmsdk_apb_uart_write(offset, value, size);
-> +
-> +    switch (offset) {
-[...]
-> +    case A_PID4 ... A_CID3:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "CMSDK APB UART write: write to RO offset 0x%x\n",
-> +                      (int)offset);
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "CMSDK APB UART write: bad offset 0x%x\n", (int) offset);
-> +        break;
-> +    }
-> +}
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  On 64bit hosts, the load and store functions compile improperly. The
+  issue is the call to gen_address_mask() under the ld and st functions
+  in target-sparc/translate.c. Below are some snips from the log file.
+  Doing a gdb debug, this results in constant access violation errors
+  which I do not see when debugging qemu in powerpc mode.
+
+  --------------
+  IN: =
+
+  0x0000000040804aa8:  st  %i0, [ %fp + 0x44 ]
+
+  OP:
+   ---- 0x40804aa8
+   ld_i64 tmp1,regwptr,$0xb0
+   mov_i64 tmp0,tmp1
+   movi_i64 tmp2,$0x44
+   add_i64 tmp0,tmp0,tmp2
+   ld_i64 tmp2,regwptr,$0x80
+   ext32u_i64 tmp0,tmp0
+   qemu_st32 tmp2,tmp0,$0x0
+
+  OUT: [size=3D345]
+  0x6032d7f0:  mov    0x40(%r14),%rbp
+  0x6032d7f4:  mov    0xb0(%rbp),%rbx
+  0x6032d7fb:  add    $0x44,%rbx
+  0x6032d7ff:  mov    0x80(%rbp),%rbp
+  0x6032d806:  mov    %ebx,%ebx                 <- bug
+  0x6032d808:  mov    %ebp,%edi
+  0x6032d80a:  bswap  %edi
+  0x6032d80c:  mov    %edi,(%rbx)
+
+  --------------
+  IN: =
+
+  0x0000000040804aec:  add  %l7, %o7, %l7
+  0x0000000040804af0:  ld  [ %l7 ], %g2
+
+  OP:
+   ---- 0x40804aec
+   ld_i64 tmp1,regwptr,$0x78
+   ld_i64 tmp2,regwptr,$0x38
+   add_i64 tmp0,tmp1,tmp2
+   st_i64 tmp0,regwptr,$0x78
+
+   ---- 0x40804af0
+   ld_i64 tmp1,regwptr,$0x78
+   mov_i64 tmp0,tmp1
+   ext32u_i64 tmp0,tmp0
+   qemu_ld32u g2,tmp0,$0x0
+
+  OUT: [size=3D395]
+  0x6032da80:  mov    0x40(%r14),%rbp
+  0x6032da84:  mov    0x78(%rbp),%rbx
+  0x6032da88:  mov    0x38(%rbp),%r12
+  0x6032da8c:  add    %r12,%rbx
+  0x6032da8f:  mov    %rbx,0x78(%rbp)
+  0x6032da93:  mov    0x78(%rbp),%rbx
+  0x6032da97:  mov    %ebx,%ebx                <- bug
+  0x6032da99:  mov    (%rbx),%ebx
+
+  In 64bit mode, doing a 32bit operation will result in the top 32bit's
+  being zero'd. I attempted to simply disable the call to
+  gen_address_mask() but that did not fix the issue and actually caused
+  the sparc32plus I was testing to become unusable.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1095531/+subscriptions
