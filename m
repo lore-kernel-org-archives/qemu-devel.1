@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1dUsMN-0004uu-3o
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:25:40 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUsPB-0005fk-7w
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1dUsML-0003Tb-IQ
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:25:39 -0400
-Date: Tue, 11 Jul 2017 12:25:21 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20170711102521.GB25504@toto>
-References: <1498830302-19274-1-git-send-email-edgar.iglesias@gmail.com>
-	<1498830302-19274-3-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
-	<20170711100334.GA25504@toto>
-	<CAFEAcA_XTrkAN1ATpp6DLZqGh4aL1gECzQGyubJmoGjtw_pPbA@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dUsPA-0004lL-CI
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:28:33 -0400
+References: <20170705133635.11850-1-famz@redhat.com>
+	<20170705133635.11850-4-famz@redhat.com>
+	<20170710150707.GK14195@stefanha-x1.localdomain>
+	<61a85481-9194-d68e-2544-d80365fca83e@redhat.com>
+	<20170711100535.GM17792@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3b602080-ef8f-6642-04cb-be5c098dd9f5@redhat.com>
+Date: Tue, 11 Jul 2017 12:28:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_XTrkAN1ATpp6DLZqGh4aL1gECzQGyubJmoGjtw_pPbA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] target-arm: Extend PAR format
- determination
+In-Reply-To: <20170711100535.GM17792@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XcTv1xBAllD3v6PDn7A5g7DP7GQsrOU8b"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 3/6] block: Introduce
+ bdrv_dma_map and bdrv_dma_unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +28,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, Karl Rister <krister@redhat.com>
 
-On Tue, Jul 11, 2017 at 11:14:04AM +0100, Peter Maydell wrote:
-> On 11 July 2017 at 11:03, Edgar E. Iglesias <edgar.iglesias@xilinx.com> wrote:
-> > On Mon, Jul 10, 2017 at 04:11:29PM +0100, Peter Maydell wrote:
-> >> So this kind of worries me, because what it's coded as is "determine
-> >> whether architecturally we should be returning a 64-bit or 32-bit
-> >> PAR format", but what the code below it uses the format64 flag for is
-> >> "manipulate whatever PAR we got handed back by get_phys_addr()".
-> >> So we have two separate bits of code that are both choosing
-> >> 32 vs 64 bit PAR (the code in this patch, and the logic inside
-> >> get_phys_addr()), and they have to come to the same conclusion
-> >> or we'll silently mangle the PAR. It seems like it would be
-> >> better to either have get_phys_addr() explicitly tell us what kind
-> >> of format it is returning to us, or to have the caller tell it
-> >> what kind of PAR it needs.
-> >
-> > Yes, I see your point and that's exactly what's happenning before the patch.
-> > Some of these new checks are generic in the sense that they check for LPAE/64bitness
-> > but others are I guess ATS specific for lack of a better term.
-> > It feels a bit weird to put the ATS specific PAR format logic into get_phys_addr.
-> >
-> > The basic idea here is that we never downgrade to the 32bit format, we only uprgade.
-> > The following line was meant to get the initial format I think you are requesting:
-> > format64 = regime_using_lpae_format(env, mmu_idx);
-> >
-> > After that, we apply possible ATS specfic upgrades to 64bit PAR format if needed.
-> >
-> > For clarity, perhaps we could make get_phys_addr return this same initial format, and then
-> > we can follow up with the ATS specific upgrades. E.g:
-> >
-> >     ret = get_phys_addr(env, value, access_type, mmu_idx,
-> >                         &phys_addr, &attrs, &prot, &page_size, &fsr, &fi,
-> >                         &format64);
-> >
-> >     /* Apply possible ATS/PAR 64bit upgrades if format64 is false.  */
-> >     if (is_a64(env)) {
-> >         format64 = true;
-> >     } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
-> >         if (arm_feature(env, ARM_FEATURE_EL2)) {
-> >             if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> >                 format64 |= env->cp15.hcr_el2 & HCR_VM;
-> >             } else {
-> >                 format64 |= arm_current_el(env) == 2;
-> >             }
-> >         }
-> >     }
-> 
-> This still has the same problem, doesn't it? If get_phys_addr()
-> has given you back a short-descriptor format PAR then you cannot
-> simply "upgrade" it to a long-descriptor format PAR -- the
-> fault status codes are all different. I think the "short desc
-> vs long desc" condition used to be simple but the various
-> upgrades to get_phys_addr() to handle EL2 have made it much
-> more complicated, and so we'll be much better off just handing
-> get_phys_addr() a flag to say how we want the status reported,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XcTv1xBAllD3v6PDn7A5g7DP7GQsrOU8b
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>,
+ Karl Rister <krister@redhat.com>
+Message-ID: <3b602080-ef8f-6642-04cb-be5c098dd9f5@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v3 3/6] block: Introduce bdrv_dma_map and
+ bdrv_dma_unmap
+References: <20170705133635.11850-1-famz@redhat.com>
+ <20170705133635.11850-4-famz@redhat.com>
+ <20170710150707.GK14195@stefanha-x1.localdomain>
+ <61a85481-9194-d68e-2544-d80365fca83e@redhat.com>
+ <20170711100535.GM17792@stefanha-x1.localdomain>
+In-Reply-To: <20170711100535.GM17792@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-OK, yes, the codes will be a problem.
+On 11/07/2017 12:05, Stefan Hajnoczi wrote:
+> On Mon, Jul 10, 2017 at 05:08:56PM +0200, Paolo Bonzini wrote:
+>> On 10/07/2017 17:07, Stefan Hajnoczi wrote:
+>>> On Wed, Jul 05, 2017 at 09:36:32PM +0800, Fam Zheng wrote:
+>>>> Allow block driver to map and unmap a buffer for later I/O, as a per=
+formance
+>>>> hint.
+>>> The name blk_dma_map() is confusing since other "dma" APIs like
+>>> dma_addr_t and dma_blk_io() deal with guest physical addresses instea=
+d
+>>> of host addresses.  They are about DMA to/from guest RAM.
+>>>
+>>> Have you considered hiding this cached mapping in block/nvme.c so tha=
+t
+>>> it isn't exposed?  block/nvme.c could keep the last buffer mapped and=
 
-Telling get_phys_addr() what formatsounds good then. Will have a look.
+>>> callers would get the performance benefit without a new blk_dma_map()=
 
-Thanks,
-Edgar
+>>> API.
+>>
+>> One buffer is enough for qemu-img bench, but not for more complex case=
+s
+>> (e.g. fio).
+>=20
+> I don't see any other blk_dma_map() callers.
+
+Indeed, the fio plugin is not part of this series, but it also used
+blk_dma_map.  Without it, performance is awful.
+
+Paolo
+
+
+--XcTv1xBAllD3v6PDn7A5g7DP7GQsrOU8b
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAllkqD4ACgkQv/vSX3jH
+roO/4Af9GVj1B5u5EPqpfzX/nZvRZe0Gxq2c2HkUOvc4Nhk37SESxNYDAHE8ZB6Q
+CTU0CD8Asm0CZslSzUIDKh80TV5oDo6NS9YtpxmqsZD285wjPiCI11OSB/yloNZ/
+y9yxUXQVGvh436C2aHvCdButtjeP/l+sZXwrTgjQmRA8Cml6I5ll83ANE7GEkw8m
+5nxzUx/F8UIjk93xIQxKg2tufBxJrGy1hhtUhKDWYVYS5EgC/mgdF65SfuZbpUuM
+QWoYDM9wXEuA9b8cqNZwCTb3OqL4iu4/tIi9GUN0Gs3IQ5GHKzlKVeuYygJWIZ5T
+29YE5ZTIzNv6j+smhBmi3M37s1B4Uw==
+=VjfG
+-----END PGP SIGNATURE-----
+
+--XcTv1xBAllD3v6PDn7A5g7DP7GQsrOU8b--
