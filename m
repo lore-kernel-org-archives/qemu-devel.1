@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUzSt-0002W8-Nx
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:00:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUzSu-0002WS-0R
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dUzSq-0005Gm-GB
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:00:51 -0400
-Received: from mail-wr0-f174.google.com ([209.85.128.174]:34947)
+	(envelope-from <alex.bennee@linaro.org>) id 1dUzSq-0005HG-Q8
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:00:52 -0400
+Received: from mail-wr0-f177.google.com ([209.85.128.177]:32853)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dUzSq-0005FQ-0V
+	id 1dUzSq-0005G0-KE
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:00:48 -0400
-Received: by mail-wr0-f174.google.com with SMTP id k67so9435771wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 11:00:47 -0700 (PDT)
+Received: by mail-wr0-f177.google.com with SMTP id r103so9571833wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 11:00:48 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 11 Jul 2017 18:59:36 +0100
-Message-Id: <20170711175937.23140-6-alex.bennee@linaro.org>
+Date: Tue, 11 Jul 2017 18:59:37 +0100
+Message-Id: <20170711175937.23140-7-alex.bennee@linaro.org>
 In-Reply-To: <20170711175937.23140-1-alex.bennee@linaro.org>
 References: <20170711175937.23140-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 5/6] target/arm: use gen_goto_tb for ISB
+Subject: [Qemu-devel] [PATCH v3 6/6] target/arm: use DISAS_EXIT for eret
  handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,54 +31,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-While an ISB will ensure any raised IRQs happen on the next
-instruction it doesn't cause any to get raised by itself. We can
-therefor use a simple tb exit for ISB instructions and rely on the
-exit_request check at the top of each TB to deal with exiting if
-needed.
+Previously DISAS_JUMP did ensure this but with the optimisation of
+8a6b28c7 (optimize indirect branches) we might not leave the loop.
+This means if any pending interrupts are cleared by changing IRQ flags
+we might never get around to servicing them. You usually notice this
+by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
+while cpu->interrupt_request remains high and the exit_request has not
+been set.
 
+This breaks amongst other things the OPTEE test suite which executes
+an eret from the secure world after a non-secure world IRQ has gone
+pending which then never gets serviced.
+
+Instead of using the previously implied semantics of DISAS_JUMP we use
+DISAS_EXIT which will always exit the run-loop.
+
+CC: Etienne Carriere <etienne.carriere@linaro.org>
+CC: Joakim Bech <joakim.bech@linaro.org>
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate-a64.c | 2 +-
- target/arm/translate.c     | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ target/arm/translate-a64.c | 3 ++-
+ target/arm/translate.c     | 6 ++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 66139b6046..2ac565eb10 100644
+index 2ac565eb10..3fa39023ca 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -1393,7 +1393,7 @@ static void handle_sync(DisasContext *s, uint32_t insn,
-          * a self-modified code correctly and also to take
-          * any pending interrupts immediately.
-          */
--        s->is_jmp = DISAS_UPDATE;
-+        gen_goto_tb(s, 0, s->pc);
+@@ -1788,7 +1788,8 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+             return;
+         }
+         gen_helper_exception_return(cpu_env);
+-        s->is_jmp = DISAS_JUMP;
++        /* Must exit loop to check un-masked IRQs */
++        s->is_jmp = DISAS_EXIT;
          return;
-     default:
-         unallocated_encoding(s);
+     case 5: /* DRPS */
+         if (rn != 0x1f) {
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 82341ee709..dbf919cce3 100644
+index dbf919cce3..f1023d5263 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -8169,7 +8169,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                  * self-modifying code correctly and also to take
-                  * any pending interrupts immediately.
-                  */
--                gen_lookup_tb(s);
-+                gen_goto_tb(s, 0, s->pc & ~1);
-                 return;
-             default:
-                 goto illegal_op;
-@@ -10562,7 +10562,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-                              * and also to take any pending interrupts
-                              * immediately.
-                              */
--                            gen_lookup_tb(s);
-+                            gen_goto_tb(s, 0, s->pc & ~1);
-                             break;
-                         default:
-                             goto illegal_op;
+@@ -4479,7 +4479,8 @@ static void gen_rfe(DisasContext *s, TCGv_i32 pc, TCGv_i32 cpsr)
+      */
+     gen_helper_cpsr_write_eret(cpu_env, cpsr);
+     tcg_temp_free_i32(cpsr);
+-    s->is_jmp = DISAS_JUMP;
++    /* Must exit loop to check un-masked IRQs */
++    s->is_jmp = DISAS_EXIT;
+ }
+ 
+ /* Generate an old-style exception return. Marks pc as dead. */
+@@ -9523,7 +9524,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                     tmp = load_cpu_field(spsr);
+                     gen_helper_cpsr_write_eret(cpu_env, tmp);
+                     tcg_temp_free_i32(tmp);
+-                    s->is_jmp = DISAS_JUMP;
++                    /* Must exit loop to check un-masked IRQs */
++                    s->is_jmp = DISAS_EXIT;
+                 }
+             }
+             break;
 -- 
 2.13.0
