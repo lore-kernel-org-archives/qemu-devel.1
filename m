@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUl4K-0002ac-2q
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:38:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUlMX-0005a5-3f
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUl4G-0008J0-Sp
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:38:32 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36560)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUl4G-0008ID-Nm
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:38:28 -0400
-Received: by mail-qt0-x242.google.com with SMTP id v31so15077457qtb.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Jul 2017 19:38:28 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170711015524.22936-1-f4bug@amsat.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <12cda13a-cdba-c480-6f6c-67811135a8a1@twiddle.net>
-Date: Mon, 10 Jul 2017 16:38:21 -1000
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUlMT-00008t-Va
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:57:21 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 10 Jul 2017 23:57:00 -0300
+Message-Id: <20170711025703.24194-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20170711015524.22936-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] util/cacheinfo: add missing include
+Subject: [Qemu-devel] [RFC PATCH 0/3] disable Xen on ARM (until supported)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Geert Martin Ijewski <gm.ijewski@web.de>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Anthony Perard <anthony.perard@citrix.com>, Marcelo Tosatti <mtosatti@redhat.com>, xen-arm@lists.xen.org, Anoob Soman <anoob.soman@citrix.com>, Juergen Gross <jgross@suse.com>, Anthony Xu <anthony.xu@intel.com>, Paul Durrant <paul.durrant@citrix.com>
 
-On 07/10/2017 03:55 PM, Philippe Mathieu-Daudé wrote:
-> This include was forgotten when splitting cacheinfo.c out of
-> tcg/ppc/tcg-target.inc.c (see commit b255b2c8).
-> 
-> While compiling on powerpc:
-> 
->        CC      util/cacheinfo.o
->      qemu/util/cacheinfo.c: In function 'arch_cache_info':
->      qemu/util/cacheinfo.c:137:33: error: 'AT_ICACHEBSIZE' undeclared (first use in this function)
->               *isize = qemu_getauxval(AT_ICACHEBSIZE);
->                                       ^
->      qemu/util/cacheinfo.c:137:33: note: each undeclared identifier is reported only once for each function it appears in
->      qemu/util/cacheinfo.c:140:33: error: 'AT_DCACHEBSIZE' undeclared (first use in this function)
->               *dsize = qemu_getauxval(AT_DCACHEBSIZE);
->                                       ^
->      qemu/rules.mak:66: recipe for target 'util/cacheinfo.o' failed
->      make: *** [util/cacheinfo.o] Error 1
+Hi,
 
-For the record, what is the os version?
-Because this doesn't happen here for Centos7.
+Those errors were triggered installing libxen v4.8 on debian Stretch
+ARM (32b and 64b).
 
+It seems QEMU only support Xen on x86 host.
 
-r~
+patch 1 disable PCI Passthrough if not on x86,
+patch 2 disable xen_map_cache() on ARM, I don't think it is the correct
+way to do it, then
+patch 3 add few comments to think about spliting x86 part from arch
+agnostic Xen code.
+
+That said, I realize there is no Xen ARM entry in MAINTAINERS, I'll Cc:
+X86 maintainers although.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (3):
+  configure: disable Xen PCI Passthrough on !x86 archs
+  [XXX] xen/mapcache: disable on arm*
+  [XXX] xen/pt: comment about !x86 archs
+
+ configure                     | 11 +++++++++--
+ hw/xen/xen_pt.c               |  4 ++--
+ include/sysemu/xen-mapcache.h |  4 +++-
+ 3 files changed, 14 insertions(+), 5 deletions(-)
+
+-- 
+2.13.2
