@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUvpu-000630-2U
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:08:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dUvxG-00036T-QV
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUvpp-00019m-26
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:08:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58240)
+	(envelope-from <stefanha@redhat.com>) id 1dUvxD-0004xa-N4
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:15:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUvpo-00017h-Q4
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:08:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dUvxD-0004wK-Dv
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:15:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DBBE5AFD9
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 14:08:15 +0000 (UTC)
-Date: Tue, 11 Jul 2017 15:08:12 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170711140812.GA26934@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.1496132443.git.mprivozn@redhat.com>
-	<f8c84196122adc32f9067680e54a9de32a571756.1496132443.git.mprivozn@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 1582D5AFD9
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 14:15:54 +0000 (UTC)
+Date: Tue, 11 Jul 2017 15:15:43 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170711141543.GW17792@stefanha-x1.localdomain>
+References: <20170710072027.7948-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="f4arffV+Mc+T1KhS"
 Content-Disposition: inline
-In-Reply-To: <f8c84196122adc32f9067680e54a9de32a571756.1496132443.git.mprivozn@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-bridge-helper: Take ACL file gid
- into account
+In-Reply-To: <20170710072027.7948-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/5] Introduce "-object iothread-group"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: qemu-devel@nongnu.org
-
-On Tue, May 30, 2017 at 10:23:35AM +0200, Michal Privoznik wrote:
-> There's a problem with the way we currently parse ACL files. The
-> problem is, the bridge helper has usually SUID flag set and thus
-> runs as root in which case all the ACL files are parsed
-> (/etc/qemu/bridge.conf and all other files it includes).
-> Therefore, if there's say bob.conf owned by root:bob and I run
-> the bridge helper, it doesn't really matter whether I'm in the
-> bob group or not. Everything that is allowed to bob group is
-> allowed to me too.
-
-Ok so the ACL feature relies on the qemu-bridge-helper not having
-privileges to read the files included from the master bridge.conf
-file.
-
-The easy way for this to work is if the qemu-bridge-helper binary
-is given a filesystem capability eg
-
-   setcap cap_net_admin=ep qemu-bridge-helper
-
-in this mode, the bridge helper always runs with uid=500, gid=500,
-so does not have permission to read included files which are group
-owned by a different user.
-
-If using SUID mode, the bridge helper would be given a custom
-group and SUID privs
-
-   chown root.qemu qemu-bridge-helper
-   chmod ug+s qemu-bridge-helper
-
-when it runs, it initially has effective uid=0 and effective gid=qemu
-
-It then uses libcapng to drop privileges and change user ID, so that
-it ends up with only cap_net_admin, and effective uid=500 and
-effective gid=500 again.
-
-So once again, it will be unable to read the included files which
-are group owned by a different user.
-
-IOW, I think everything is working normally.
-
-The only scenario in which you can run SUID, and permissions do
-not work would be if you compiled QEMU with libcapng support
-disabled.
-
-It would be wise to change the bridge helper to refuse to read
-any included files with uid != 0 or gid != 0, if libcapng
-support is disabled, so make it clear that permission checking
-is inoperative.
-
-Or better yet, just make libcapng mandatory when using the
-bridge helper.
-
-> The way this problem is fixed is whenever an ACL file is parsed,
-> the group owner of the file is stored among with the rules so
-> that it can be compared when evaluating.
-> 
-> There is one exception though. If an ACL file is owned by root
-> group the rules within apply to all groups. This is because
-> that's the usual setup currently (the bridge.conf is usually
-> owned by root:root) and anybody from root group can plug the
-> interface themselves anyway.
-> 
-> This idea of groups was introduced in bdef79a2994d6f0383 but got
-> broken by ditros setting SUID onto the binary.
-
-I don't believe it did, unless distros left out libcapng support
-when building it.
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--f4arffV+Mc+T1KhS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jul 10, 2017 at 03:20:22PM +0800, Fam Zheng wrote:
+> Last time we've looked at "-object iothread,spawns=3DN" but it was a bit =
+abusive.
+> A dedicated "iothread-group" class is cleaner from the interface point of=
+ view.
+> This series does that.
+>=20
+> It has the same set of poll parameters as the existing "iothread" object,=
+ plus
+> a "size" option to specify how many threads to start. Using iothread-group
+> doesn't require the user to explicitly create the contained IOThreads. The
+> IOThreads are created by the group object.
+>=20
+> Internally, IOThreads share one AioContext.  This is to make it easier to=
+ adapt
+> this to the current data plane code (see the last patch). But it is an
+> implementation detail, and will change depending on the block layer multi=
+queue
+> needs.
+>=20
+> TODO:
+>=20
+> - qmp_query_iothread_groups, in addition to proper QOM @child property fr=
+om
+>   IOThreadGroup to its IOThread instances.
+> - Add virtio-scsi.
+> - Variant of iothread_stop_all().
+>=20
+> Fam Zheng (5):
+>   aio: Wrap poll parameters into AioContextPollParams
+>   iothread: Don't error on windows
+>   iothread: Extract iothread_start
+>   Introduce iothread-group
+>   virtio-blk: Add iothread-group property
+
+=46rom your TODO note above it looks like you plan to duplicate IOThread
+interfaces for IOThreadGroup?  This means existing query-iothreads users
+no longer see the full view of all IOThreads.
+
+I think it would be cleaner to define and query IOThreads like they are
+today but change virtio-blk/virtio-scsi to accept a list of IOThreads.
+That way existing management tool functionality can be used and the only
+tweak is that devices can now be added to multiple IOThreads.
+
+It would be nice to express the group relationship in QOM instead of
+open coding a new group object.  The majority of the RFC code creates a
+child/link list relationship that QOM should support for any type, not
+just IOThread.
+
+Adding Eric Blake so we can discuss QMP requirements further.
+
+--f4arffV+Mc+T1KhS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZZN2PAAoJEJykq7OBq3PIjjsIAIC7yOcBVC5TBp3IQ5FqbYJD
+OI1TaK1kjs/pyaEUnqRlymtWwis/loW+5EiCY3nYubfa5Kt4HE93P5bKudu0Ncma
+V8s/2CtHzMjvT4sS9cBeDOcrfudIt68iqB53/0U6dzSwVfNae3miQ+S19l8w/WbD
+TOTUlPK70xBfTD7EBekFfNK6NHHROj302uo5kwv6jVHsomkegE5Khurg6bMyAqG7
+/A37i8AUUjoAhvS46TE1PKG65VggT8g+/51uvjaxfMpKzw0SQ/cp5jLop8lCCWFp
+ddqoWQnUJ+5ATiaRUaIHizzKgRJtetYsDaANIqEYxE79bq4Y4nXsgCpE62hMYW0=
+=dgAw
+-----END PGP SIGNATURE-----
+
+--f4arffV+Mc+T1KhS--
