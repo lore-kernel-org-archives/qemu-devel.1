@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxlf-0001Sp-Il
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxlk-0001YO-Tf
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxle-0006xl-7m
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxlj-0006z0-Nn
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:12 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:07:48 +0200
-Message-Id: <20170711160814.20941-60-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:50 +0200
+Message-Id: <20170711160814.20941-62-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 59/85] iotests: Add test for colon handling
+Subject: [Qemu-devel] [PULL 61/85] block: add bdrv_measure() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,169 +22,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170702150510.23276-3-mreitz@redhat.com
+From: Stefan Hajnoczi <stefanha@redhat.com>
+
+bdrv_measure() provides a conservative maximum for the size of a new
+image.  This information is handy if storage needs to be allocated (e.g.
+a SAN or an LVM volume) ahead of time.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20170705125738.8777-2-stefanha@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/126     | 105 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/126.out |  23 ++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 129 insertions(+)
- create mode 100755 tests/qemu-iotests/126
- create mode 100644 tests/qemu-iotests/126.out
+ qapi/block-core.json      | 25 +++++++++++++++++++++++++
+ include/block/block.h     |  2 ++
+ include/block/block_int.h |  2 ++
+ block.c                   | 35 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 64 insertions(+)
 
-diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
-new file mode 100755
-index 0000000..a2d4d6c
---- /dev/null
-+++ b/tests/qemu-iotests/126
-@@ -0,0 +1,105 @@
-+#!/bin/bash
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 4bf11e8..c437aa5 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -488,6 +488,31 @@
+            '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+ 
+ ##
++# @BlockMeasureInfo:
 +#
-+# Tests handling of colons in filenames (which may be confused with protocol
-+# prefixes)
++# Image file size calculation information.  This structure describes the size
++# requirements for creating a new image file.
 +#
-+# Copyright (C) 2017 Red Hat, Inc.
++# The size requirements depend on the new image file format.  File size always
++# equals virtual disk size for the 'raw' format, even for sparse POSIX files.
++# Compact formats such as 'qcow2' represent unallocated and zero regions
++# efficiently so file size may be smaller than virtual disk size.
 +#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
++# The values are upper bounds that are guaranteed to fit the new image file.
++# Subsequent modification, such as internal snapshot or bitmap creation, may
++# require additional space and is not covered here.
 +#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
++# @required: Size required for a new image file, in bytes.
 +#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++# @fully-allocated: Image file size, in bytes, once data has been written
++#                   to all sectors.
 +#
++# Since: 2.10
++##
++{ 'struct': 'BlockMeasureInfo',
++  'data': {'required': 'int', 'fully-allocated': 'int'} }
 +
-+# creator
-+owner=mreitz@redhat.com
++##
+ # @query-block:
+ #
+ # Get a list of BlockInfo for all virtual block devices.
+diff --git a/include/block/block.h b/include/block/block.h
+index f0fdbe8..96edc85 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -306,6 +306,8 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp);
+ int64_t bdrv_nb_sectors(BlockDriverState *bs);
+ int64_t bdrv_getlength(BlockDriverState *bs);
+ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
++BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
++                               BlockDriverState *in_bs, Error **errp);
+ void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
+ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
+ int bdrv_commit(BlockDriverState *bs);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 58d4ffd..d0cd8a3 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -209,6 +209,8 @@ struct BlockDriver {
+     int64_t (*bdrv_getlength)(BlockDriverState *bs);
+     bool has_variable_length;
+     int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
++    BlockMeasureInfo *(*bdrv_measure)(QemuOpts *opts, BlockDriverState *in_bs,
++                                      Error **errp);
+ 
+     int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
+diff --git a/block.c b/block.c
+index 913bb43..162e9d9 100644
+--- a/block.c
++++ b/block.c
+@@ -3463,6 +3463,41 @@ int64_t bdrv_get_allocated_file_size(BlockDriverState *bs)
+     return -ENOTSUP;
+ }
+ 
++/*
++ * bdrv_measure:
++ * @drv: Format driver
++ * @opts: Creation options for new image
++ * @in_bs: Existing image containing data for new image (may be NULL)
++ * @errp: Error object
++ * Returns: A #BlockMeasureInfo (free using qapi_free_BlockMeasureInfo())
++ *          or NULL on error
++ *
++ * Calculate file size required to create a new image.
++ *
++ * If @in_bs is given then space for allocated clusters and zero clusters
++ * from that image are included in the calculation.  If @opts contains a
++ * backing file that is shared by @in_bs then backing clusters may be omitted
++ * from the calculation.
++ *
++ * If @in_bs is NULL then the calculation includes no allocated clusters
++ * unless a preallocation option is given in @opts.
++ *
++ * Note that @in_bs may use a different BlockDriver from @drv.
++ *
++ * If an error occurs the @errp pointer is set.
++ */
++BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOpts *opts,
++                               BlockDriverState *in_bs, Error **errp)
++{
++    if (!drv->bdrv_measure) {
++        error_setg(errp, "Block driver '%s' does not support size measurement",
++                   drv->format_name);
++        return NULL;
++    }
 +
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
++    return drv->bdrv_measure(opts, in_bs, errp);
++}
 +
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+# Needs backing file support
-+_supported_fmt qcow qcow2 qed vmdk
-+# This is the default protocol (and we want to test the difference between
-+# colons which separate a protocol prefix from the rest and colons which are
-+# just part of the filename, so we cannot test protocols which require a prefix)
-+_supported_proto file
-+_supported_os Linux
-+
-+echo
-+echo '=== Testing plain files ==='
-+echo
-+
-+# A colon after a slash is not a protocol prefix separator
-+TEST_IMG="$TEST_DIR/a:b.$IMGFMT" _make_test_img 64M
-+_rm_test_img "$TEST_DIR/a:b.$IMGFMT"
-+
-+# But if you want to be really sure, you can do this
-+TEST_IMG="file:$TEST_DIR/a:b.$IMGFMT" _make_test_img 64M
-+_rm_test_img "$TEST_DIR/a:b.$IMGFMT"
-+
-+
-+echo
-+echo '=== Testing relative backing filename resolution ==='
-+echo
-+
-+BASE_IMG="$TEST_DIR/image:base.$IMGFMT"
-+TOP_IMG="$TEST_DIR/image:top.$IMGFMT"
-+
-+TEST_IMG=$BASE_IMG _make_test_img 64M
-+TEST_IMG=$TOP_IMG _make_test_img -b ./image:base.$IMGFMT
-+
-+# The default cluster size depends on the image format
-+TEST_IMG=$TOP_IMG _img_info | grep -v 'cluster_size'
-+
-+_rm_test_img "$BASE_IMG"
-+_rm_test_img "$TOP_IMG"
-+
-+
-+# Do another test where we access both top and base without any slash in them
-+echo
-+pushd "$TEST_DIR" >/dev/null
-+
-+BASE_IMG="base.$IMGFMT"
-+TOP_IMG="file:image:top.$IMGFMT"
-+
-+TEST_IMG=$BASE_IMG _make_test_img 64M
-+TEST_IMG=$TOP_IMG _make_test_img -b "$BASE_IMG"
-+
-+TEST_IMG=$TOP_IMG _img_info | grep -v 'cluster_size'
-+
-+_rm_test_img "$BASE_IMG"
-+_rm_test_img "image:top.$IMGFMT"
-+
-+popd >/dev/null
-+
-+# Note that we could also do the same test with BASE_IMG=file:image:base.$IMGFMT
-+# -- but behavior for that case is a bit strange. Protocol-prefixed paths are
-+# in a sense always absolute paths, so such paths will never be combined with
-+# the path of the overlay. But since "image:base.$IMGFMT" is actually a
-+# relative path, it will always be evaluated relative to qemu's CWD (but not
-+# relative to the overlay!). While this is more or less intended, it is still
-+# pretty strange and thus not something that is tested here.
-+# (The root of the issue is the use of a relative path with a protocol prefix.
-+#  This may always give you weird results because in one sense, qemu considers
-+#  such paths absolute, whereas in another, they are still relative.)
-+
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/126.out b/tests/qemu-iotests/126.out
-new file mode 100644
-index 0000000..50d7308
---- /dev/null
-+++ b/tests/qemu-iotests/126.out
-@@ -0,0 +1,23 @@
-+QA output created by 126
-+
-+=== Testing plain files ===
-+
-+Formatting 'TEST_DIR/a:b.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/a:b.IMGFMT', fmt=IMGFMT size=67108864
-+
-+=== Testing relative backing filename resolution ===
-+
-+Formatting 'TEST_DIR/image:base.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'TEST_DIR/image:top.IMGFMT', fmt=IMGFMT size=67108864 backing_file=./image:base.IMGFMT
-+image: TEST_DIR/image:top.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: ./image:base.IMGFMT (actual path: TEST_DIR/./image:base.IMGFMT)
-+
-+Formatting 'base.IMGFMT', fmt=IMGFMT size=67108864
-+Formatting 'file:image:top.IMGFMT', fmt=IMGFMT size=67108864 backing_file=base.IMGFMT
-+image: ./image:top.IMGFMT
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: base.IMGFMT (actual path: ./base.IMGFMT)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 7d86715..40bef99 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -130,6 +130,7 @@
- 122 rw auto
- 123 rw auto quick
- 124 rw auto backing
-+126 rw auto backing
- 128 rw auto quick
- 129 rw auto quick
- 130 rw auto quick
+ /**
+  * Return number of sectors on success, -errno on error.
+  */
 -- 
 2.9.4
