@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dUnhg-0002oL-PQ
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:27:21 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dUnmd-00040B-A0
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dUnhd-0004pf-NI
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:27:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170609133337.31183-1-marcandre.lureau@redhat.com>
-Date: Tue, 11 Jul 2017 07:27:12 +0200
-In-Reply-To: <20170609133337.31183-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 9 Jun 2017 17:33:37 +0400")
-Message-ID: <87pod7o85r.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: check-qom-proplist: fix leak
+	(envelope-from <aik@ozlabs.ru>) id 1dUnma-0006iu-6d
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:32:27 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Tue, 11 Jul 2017 15:32:18 +1000
+Message-Id: <20170711053218.6700-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v3] vfio-pci,
+ ppc64/spapr: Reorder group-to-container attaching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +18,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-Copying qemu-trivial.
+At the moment VFIO PCI device initialization works as follows:
+vfio_realize
+	vfio_get_group
+		vfio_connect_container
+			register memory listeners (1)
+			update QEMU groups lists
+		vfio_kvm_device_add_group
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Then (example for pseries) the machine reset hook triggers region_add()
+for all regions where listeners from (1) are listening:
 
-> user_creatable_add_opts() returns a reference (the other reference is
-> for the root parent/child link).
->
-> Leak introduced in commit a1af255f065cc.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/check-qom-proplist.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-> index 8e432e9ab6..a3cd7ab29f 100644
-> --- a/tests/check-qom-proplist.c
-> +++ b/tests/check-qom-proplist.c
-> @@ -428,6 +428,8 @@ static void test_dummy_createcmdl(void)
->      g_assert(err =3D=3D NULL);
->      error_free(err);
->=20=20
-> +    object_unref(OBJECT(dobj));
-> +
->      /*
->       * cmdline-parsing via qemu_opts_parse() results in a QemuOpts entry
->       * corresponding to the Object's ID to be added to the QemuOptsList
+ppc_spapr_reset
+	spapr_phb_reset
+		spapr_tce_table_enable
+			memory_region_add_subregion
+				vfio_listener_region_add
+					vfio_spapr_create_window
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+This scheme works fine until we need to handle VFIO PCI device hotplug
+and we want to enable PPC64/sPAPR in-kernel TCE acceleration on,
+i.e. after PCI hotplug we need a place to call
+ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
+Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
+(from VFIOGroup), vfio_listener_region_add() seems to be the only place
+for this ioctl().
+
+However this only works during boot time because the machine reset
+happens strictly after all devices are finalized. When hotplug happens,
+vfio_listener_region_add() is called when a memory listener is registered
+but when this happens:
+1. new group is not added to the container->group_list yet;
+2. VFIO KVM device is unaware of the new IOMMU group.
+
+This moves bits around to have all necessary VFIO infrastructure
+in place for both initial startup and hotplug cases.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
+
+
+This is an independend part of a bigger patchset to enable in-kernel
+acceleration of TCE operations. While I stuck with IOMMU MR QOM-fication,
+let's try to parallel patchset pieces' review/acceptance.
+
+---
+Changes:
+v3:
+* rebased on current upstream
+
+v2:
+* moved container->initialized back to its correct location
+* added missing QLIST_REMOVE()
+---
+ hw/vfio/common.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 2965b68e5d..4e75dc8c56 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1107,6 +1107,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         goto free_container_exit;
+     }
+ 
++    vfio_kvm_device_add_group(group);
++
++    QLIST_INIT(&container->group_list);
++    QLIST_INSERT_HEAD(&space->containers, container, next);
++
++    group->container = container;
++    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
++
+     container->listener = vfio_memory_listener;
+ 
+     memory_listener_register(&container->listener, container->space->as);
+@@ -1120,14 +1128,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+ 
+     container->initialized = true;
+ 
+-    QLIST_INIT(&container->group_list);
+-    QLIST_INSERT_HEAD(&space->containers, container, next);
+-
+-    group->container = container;
+-    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+-
+     return 0;
+ listener_release_exit:
++    QLIST_REMOVE(group, container_next);
++    QLIST_REMOVE(container, next);
++    vfio_kvm_device_del_group(group);
+     vfio_listener_release(container);
+ 
+ free_container_exit:
+@@ -1232,8 +1237,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+ 
+     QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+ 
+-    vfio_kvm_device_add_group(group);
+-
+     return group;
+ 
+ close_fd_exit:
+-- 
+2.11.0
