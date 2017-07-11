@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUzjn-0005yj-Fx
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:18:20 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUzjq-00060Z-71
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:18:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dUzjm-0007Iq-I4
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:18:19 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUzjp-0007KG-Is
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:18:22 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:32977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dUzjp-0007K1-Eu
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:18:21 -0400
+Received: by mail-qk0-x242.google.com with SMTP id p21so26212qke.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 11:18:21 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170711175937.23140-1-alex.bennee@linaro.org>
-	<20170711175937.23140-6-alex.bennee@linaro.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6dfcb308-c3a6-ee54-baae-0686021ee48a@twiddle.net>
-Date: Tue, 11 Jul 2017 08:17:09 -1000
+Message-ID: <0ed8756e-460c-8f12-220f-1921688a8978@twiddle.net>
+Date: Tue, 11 Jul 2017 08:18:16 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170711175937.23140-6-alex.bennee@linaro.org>
+In-Reply-To: <20170711175937.23140-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] target/arm: use gen_goto_tb for ISB
- handling
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] arm: fixes for eret,
+ isb and DISAS_UPDATE handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +32,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org
-Cc: qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org
 
 On 07/11/2017 07:59 AM, Alex Bennée wrote:
-> While an ISB will ensure any raised IRQs happen on the next
-> instruction it doesn't cause any to get raised by itself. We can
-> therefor use a simple tb exit for ISB instructions and rely on the
-> exit_request check at the top of each TB to deal with exiting if
-> needed.
-> 
-> Signed-off-by: Alex Bennée<alex.bennee@linaro.org>
-> ---
->   target/arm/translate-a64.c | 2 +-
->   target/arm/translate.c     | 4 ++--
->   2 files changed, 3 insertions(+), 3 deletions(-)
+> Hopefully there isn't anything else that needs fixing so I guess the
+> next question is who's tree should this go through?
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+I'm happy with this going through the arm tree.
 
 
 r~
