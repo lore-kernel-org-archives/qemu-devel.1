@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dUzRg-0001dz-Uw
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:59:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUzRo-0001hl-9C
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:59:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dUzRd-0003Wu-S5
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:59:37 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:34591
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dUzRd-0003Kc-KZ
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:59:33 -0400
-References: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170711182954-mutt-send-email-mst@kernel.org>
-	<1fc46dca-4fc5-a7cd-986e-1e11a64642f3@redhat.com>
-	<20170711185430-mutt-send-email-mst@kernel.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ccfb0a73-d094-11a5-c89e-cee1689fe19e@ilande.co.uk>
-Date: Tue, 11 Jul 2017 18:59:10 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1dUzRm-0003kx-33
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:59:44 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36423)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dUzRl-0003jC-SB
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:59:42 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id c11so9457938wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:59:41 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 11 Jul 2017 18:59:32 +0100
+Message-Id: <20170711175937.23140-2-alex.bennee@linaro.org>
+In-Reply-To: <20170711175937.23140-1-alex.bennee@linaro.org>
+References: <20170711175937.23140-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170711185430-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] pci: allow PCI bus slots to be marked
- as reserved
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 1/6] include/exec/exec-all: document common
+ exit conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,49 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: peter.maydell@linaro.org, rth@twiddle.net, cota@braap.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 11/07/17 16:57, Michael S. Tsirkin wrote:
+As a precursor to later patches attempt to come up with a more
+concrete wording for what each of the common exit cases would be.
 
-> On Tue, Jul 11, 2017 at 06:51:50PM +0300, Marcel Apfelbaum wrote:
->> On 11/07/2017 18:31, Michael S. Tsirkin wrote:
->>> On Fri, Jul 07, 2017 at 08:43:59AM +0100, Mark Cave-Ayland wrote:
->>>> For some machines it is impossible to plug devices into a particular PCI bus
->>>> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the root
->>>> bus behind which all devices must be plugged. Ignoring this rule will cause
->>>> problems with interrupt routing since the interrupt numbers are calculated
->>>> based upon PCI bridge id and secondary PCI bus slot id.
->>>>
->>>> This patchset adds a new dev_reserved_mask property to PCIBus which is a
->>>> bitmask used to indicate whether PCI bus slots are reserved, i.e. they cannot
->>>> be used for hot or cold plugging on a particular PCI bus.
->>>>
->>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>
->>
->> Hi Michael,
->>
->>> Could you please point me at series making use of this
->>> functionality?
->>
->> There is a discussion upstream, I am not aware of patches yet.
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00771.html
->>
->> Thanks,
->> Marcel
-> 
-> It is probably a good idea to defer merging this patchset
-> until there's an agreement on how it will be used.
+CC: Emilio G. Cota <cota@braap.org>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Lluís Vilanova <vilanova@ac.upc.edu>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/exec/exec-all.h | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-I have a local patchset that uses it, but it has been held up by the
-on-going issues with the fw_cfg patchset upon which it is also dependent.
-
-I will try and find some time this evening to rebase the patchset and
-send it out as I am aware that freeze is coming up soon.
-
-
-ATB,
-
-Mark.
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 8096d64a1d..a23894f687 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -35,11 +35,34 @@ typedef abi_ulong tb_page_addr_t;
+ typedef ram_addr_t tb_page_addr_t;
+ #endif
+ 
+-/* is_jmp field values */
++/* DisasContext is_jmp field values
++ *
++ * is_jmp starts as DISAS_NEXT. The translator will keep processing
++ * instructions until an exit condition is reached. If we reach the
++ * exit condition and is_jmp is still DISAS_NEXT (because of some
++ * other condition) we simply "jump" to the next address.
++ * The remaining exit cases are:
++ *
++ *   DISAS_JUMP    - Only the PC was modified dynamically (e.g computed)
++ *   DISAS_TB_JUMP - Only the PC was modified statically (e.g. branch)
++ *
++ * In these cases as long as the PC is updated we can chain to the
++ * next TB either by exiting the loop or looking up the next TB via
++ * the loookup helper.
++ *
++ *   DISAS_UPDATE  - CPU State was modified dynamically
++ *
++ * This covers any other CPU state which necessities us exiting the
++ * TCG code to the main run-loop. Typically this includes anything
++ * that might change the interrupt state.
++ *
++ * Individual translators may define additional exit cases to deal
++ * with per-target special conditions.
++ */
+ #define DISAS_NEXT    0 /* next instruction can be analyzed */
+ #define DISAS_JUMP    1 /* only pc was modified dynamically */
+-#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
+-#define DISAS_TB_JUMP 3 /* only pc was modified statically */
++#define DISAS_TB_JUMP 2 /* only pc was modified statically */
++#define DISAS_UPDATE  3 /* cpu state was modified dynamically */
+ 
+ #include "qemu/log.h"
+ 
+-- 
+2.13.0
