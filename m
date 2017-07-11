@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dV1vn-00069o-Dm
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:38:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dV1xn-0007G5-Ir
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dV1vm-0004w5-Hr
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:38:51 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34607)
+	(envelope-from <peter.maydell@linaro.org>) id 1dV1xm-0005iN-PO
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:40:55 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36163)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dV1vm-0004vr-Bl
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:38:50 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id 77so5182180wrb.1
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 13:38:50 -0700 (PDT)
+	id 1dV1xm-0005i9-IN
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 16:40:54 -0400
+Received: by mail-wr0-x229.google.com with SMTP id c11so5126964wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 13:40:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170711184615.GH2223@work-vm>
-References: <1496679576-14336-1-git-send-email-peter.maydell@linaro.org>
-	<1496679576-14336-3-git-send-email-peter.maydell@linaro.org>
-	<20170711184615.GH2223@work-vm>
+In-Reply-To: <20170711190846.GA3138@work-vm>
+References: <20170709175422.30185-1-peter.maydell@linaro.org>
+	<20170711162943.GF2223@work-vm>
+	<CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
+	<20170711190846.GA3138@work-vm>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 21:38:28 +0100
-Message-ID: <CAFEAcA8JVfhyw7s5mfLXhTPY_5NOe-4QzrdOM-T0XexrCsWfpw@mail.gmail.com>
+Date: Tue, 11 Jul 2017 21:40:32 +0100
+Message-ID: <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] slirp: Handle error returns from
- sosendoob()
+Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a
+ negative number in fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +33,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>
 
-On 11 July 2017 at 19:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+On 11 July 2017 at 20:08, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
 > * Peter Maydell (peter.maydell@linaro.org) wrote:
->> sosendoob() can return a failure code, but all its callers ignore it.
->> This is OK in sbappend(), as the comment there states -- we will try
->> again later in sowrite(). Add a (void) cast to tell Coverity so.
->> In sowrite() we do need to check the return value -- we should handle
->> a write failure in sosendoob() the same way we handle a write failure
->> for the normal data.
+>> [cc'd Eric as the sort of person
 >>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> On 11 July 2017 at 17:29, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+>> > * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> >> In a fork_exec() error path we try to closesocket(s) when s might
+>> >> be a negative number because the thing that failed was the
+>> >> qemu_socket() call. Add a guard so we don't do this.
+>> >>
+>> >> (Spotted by Coverity: CID 1005727 issue 1 of 2.)
+>> >>
+>> >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> >> ---
+>> >> Issue 2 of 2 in CID 1005727 is trickier -- we need to move as
+>> >> much as possible of the client-end connect/accept out of the
+>> >> child process and into the parent as possible. I'm not sure
+>> >> if it's safe to do it all in the parent without deadlocking...
+>> >
+>> > or just bail earlier?
+>>
+>> The problem is you can only bail while you're in the parent
+>> before forking. Once you've started the child there's no
+>> mechanism for dealing with failure.
 >
-> I think this is OK, I do have one worry, which is perhaps there
-> were errors previously that would just loose OOB but get silently
-> ignored that perhaps we survived OK.
-> There's a comment there about seeing EAGAIN or EINTR in the normal
-> data path and not erroring;   hopefully we don't in the OOB case?
+> Well, you can always exit the child before anything worse can happen.
 
-Let's hope :-) This way round at least we'll find out if
-we ever do.
-
-> However, it generally seems to be sane, so:
->
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+You need a mechanism then for causing the parent to notice.
+The current code would leave the parent in a blocking
+accept() call forever (this is what all the XXX comments
+in the current code are about).
 
 thanks
 -- PMM
