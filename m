@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dUwYy-000069-6k
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:57 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dUwYz-00007x-GV
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dUwYv-00051s-3a
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59129
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dUwYw-00052R-D4
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33501
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dUwYu-00051X-Tq
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:53 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	id 1dUwYw-00051Y-7W
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:54 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6BEs2Hf055220
+	v6BEsT3K133795
 	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:54:51 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bn0mv0m0k-1
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bn0mv8kvc-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:54:51 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 11 Jul 2017 15:54:48 +0100
+	Tue, 11 Jul 2017 15:54:49 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 11 Jul 2017 16:54:36 +0200
+Date: Tue, 11 Jul 2017 16:54:37 +0200
 In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
 References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170711145441.33925-2-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 1/6] s390x: add helper get_machine_class
+Message-Id: <20170711145441.33925-3-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 2/6] s390x: add css_migration_enabled to
+ machine class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,86 +42,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-We will need the machine class at machine initialization time, so the
-usual way via qdev won't do. Let's cache the machine class and also use
-the default values of the base machine for capability discovery.
+Currently the migration of the channel subsystem (css) is only partial
+and is done by the virtio ccw proxies -- the only migratable css devices
+existing at the moment.
+
+With the current work on emulated and passthrough devices we need to
+decouple the migration of the channel subsystem state from virtio ccw,
+and have a separate section for it. A new section  however necessarily
+breaks the migration compatibility.
+
+So let us introduce a switch at the machine class, and put it in 'off'
+state for now. We will turn the switch 'on' for future machines once all
+preparations are met. For compatibility  machines the switch will stay
+'off'.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+ hw/s390x/s390-virtio-ccw.c         | 13 +++++++++++++
+ include/hw/s390x/s390-virtio-ccw.h |  7 +++++++
+ 2 files changed, 20 insertions(+)
 
 diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 41ca6668e2..1eb17ad184 100644
+index 1eb17ad184..751febb87a 100644
 --- a/hw/s390x/s390-virtio-ccw.c
 +++ b/hw/s390x/s390-virtio-ccw.c
-@@ -252,36 +252,35 @@ static inline void machine_set_dea_key_wrap(Object *obj, bool value,
-     ms->dea_key_wrap = value;
- }
+@@ -206,6 +206,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
  
--bool ri_allowed(void)
--{
--    if (kvm_enabled()) {
--        MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
--        if (object_class_dynamic_cast(OBJECT_CLASS(mc),
--                                      TYPE_S390_CCW_MACHINE)) {
--            S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
-+static S390CcwMachineClass *current_mc;
+     s390mc->ri_allowed = true;
+     s390mc->cpu_model_allowed = true;
++    s390mc->css_migration_enabled = false; /* TODO: set to true */
+     mc->init = ccw_init;
+     mc->reset = s390_machine_reset;
+     mc->hot_add_cpu = s390_hot_add_cpu;
+@@ -375,6 +376,11 @@ static const TypeInfo ccw_machine_info = {
+     },
+ };
  
--            return s390mc->ri_allowed;
--        }
-+static S390CcwMachineClass *get_machine_class(void)
++bool css_migration_enabled(void)
 +{
-+    if (unlikely(!current_mc)) {
-         /*
--         * Make sure the "none" machine can have ri, otherwise it won't * be
--         * unlocked in KVM and therefore the host CPU model might be wrong.
--         */
--        return true;
-+        * No s390 ccw machine was instantiated, we are likely to
-+        * be called for the 'none' machine. The properties will
-+        * have their after-initialization values.
-+        */
-+        current_mc = S390_MACHINE_CLASS(
-+                     object_class_by_name(TYPE_S390_CCW_MACHINE));
-     }
--    return 0;
-+    return current_mc;
- }
- 
--bool cpu_model_allowed(void)
-+bool ri_allowed(void)
- {
--    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
--    if (object_class_dynamic_cast(OBJECT_CLASS(mc),
--                                  TYPE_S390_CCW_MACHINE)) {
--        S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
--
--        return s390mc->cpu_model_allowed;
-+    if (!kvm_enabled()) {
-+        return false;
-     }
--    /* allow CPU model qmp queries with the "none" machine */
--    return true;
-+    /* for "none" machine this results in true */
-+    return get_machine_class()->ri_allowed;
++    return get_machine_class()->css_migration_enabled;
 +}
 +
-+bool cpu_model_allowed(void)
-+{
-+    /* for "none" machine this results in true */
-+    return get_machine_class()->cpu_model_allowed;
+ #define DEFINE_CCW_MACHINE(suffix, verstr, latest)                            \
+     static void ccw_machine_##suffix##_class_init(ObjectClass *oc,            \
+                                                   void *data)                 \
+@@ -476,6 +482,10 @@ static const TypeInfo ccw_machine_info = {
+ 
+ static void ccw_machine_2_10_instance_options(MachineState *machine)
+ {
++    /*
++     * TODO Once preparations are done register vmstate for the css if
++     * css_migration_enabled().
++     */
  }
  
- static char *machine_get_loadparm(Object *obj, Error **errp)
-@@ -391,6 +390,7 @@ static const TypeInfo ccw_machine_info = {
-     static void ccw_machine_##suffix##_instance_init(Object *obj)             \
-     {                                                                         \
-         MachineState *machine = MACHINE(obj);                                 \
-+        current_mc = S390_MACHINE_CLASS(MACHINE_GET_CLASS(machine));          \
-         ccw_machine_##suffix##_instance_options(machine);                     \
-     }                                                                         \
-     static const TypeInfo ccw_machine_##suffix##_info = {                     \
+ static void ccw_machine_2_10_class_options(MachineClass *mc)
+@@ -490,8 +500,11 @@ static void ccw_machine_2_9_instance_options(MachineState *machine)
+ 
+ static void ccw_machine_2_9_class_options(MachineClass *mc)
+ {
++    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
++
+     ccw_machine_2_10_class_options(mc);
+     SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
++    s390mc->css_migration_enabled = false;
+ }
+ DEFINE_CCW_MACHINE(2_9, "2.9", false);
+ 
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index 3027555f6d..ab88d49d10 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -39,6 +39,7 @@ typedef struct S390CcwMachineClass {
+     /*< public >*/
+     bool ri_allowed;
+     bool cpu_model_allowed;
++    bool css_migration_enabled;
+ } S390CcwMachineClass;
+ 
+ /* runtime-instrumentation allowed by the machine */
+@@ -46,4 +47,10 @@ bool ri_allowed(void);
+ /* cpu model allowed by the machine */
+ bool cpu_model_allowed(void);
+ 
++/**
++ * Returns true if (vmstate based) migration of the channel subsystem
++ * is enabled, false if it is disabled.
++ */
++bool css_migration_enabled(void);
++
+ #endif
 -- 
 2.11.2
