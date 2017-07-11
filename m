@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1dUs1F-0004nM-8A
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:03:50 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dUs2G-0005QU-5R
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1dUs1B-0003xv-8f
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:03:49 -0400
-Date: Tue, 11 Jul 2017 12:03:34 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20170711100334.GA25504@toto>
-References: <1498830302-19274-1-git-send-email-edgar.iglesias@gmail.com>
-	<1498830302-19274-3-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
+	(envelope-from <mlureau@redhat.com>) id 1dUs2C-0004Qc-4C
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:04:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dUs2B-0004Pp-Ri
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:04:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2EE180F97
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:04:45 +0000 (UTC)
+Date: Tue, 11 Jul 2017 06:04:39 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <145552423.49242900.1499767479720.JavaMail.zimbra@redhat.com>
+In-Reply-To: <c661a649-e438-e80b-baf4-b44ee6612ca3@redhat.com>
+References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
+	<20170706101611.27031-7-marcandre.lureau@redhat.com>
+	<c661a649-e438-e80b-baf4-b44ee6612ca3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] target-arm: Extend PAR format
- determination
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] scripts/dump-guest-memory.py: add
+ vmcoreinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,149 +35,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, anderson@redhat.com, imammedo@redhat.com
 
-On Mon, Jul 10, 2017 at 04:11:29PM +0100, Peter Maydell wrote:
-> On 30 June 2017 at 14:45, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> >
-> > Extend PAR format determination to handle more cases.
-> >
-> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Hi
+
+----- Original Message -----
+> On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
+> > Add vmcoreinfo ELF note if vmcoreinfo device is ready.
+> >=20
+> > To help the python script, add a little global vmcoreinfo_gdb
+> > structure, that is populated with vmcoreinfo_gdb_update().
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > > ---
-> >  target/arm/helper.c | 30 +++++++++++++++++++++++++++++-
-> >  1 file changed, 29 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> > index fd1027e..6a1fffe 100644
-> > --- a/target/arm/helper.c
-> > +++ b/target/arm/helper.c
-> > @@ -2345,12 +2345,40 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
-> >      uint32_t fsr;
-> >      bool ret;
-> >      uint64_t par64;
-> > +    bool format64 = false;
-> >      MemTxAttrs attrs = {};
-> >      ARMMMUFaultInfo fi = {};
-> >
-> >      ret = get_phys_addr(env, value, access_type, mmu_idx,
-> >                          &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
-> > -    if (extended_addresses_enabled(env)) {
+> >  scripts/dump-guest-memory.py | 40 ++++++++++++++++++++++++++++++++++++=
+++++
+> >  hw/acpi/vmcoreinfo.c         |  3 +++
+> >  2 files changed, 43 insertions(+)
+> >=20
+> > diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
+y
+> > index f7c6635f15..2dd2ed6983 100644
+> > --- a/scripts/dump-guest-memory.py
+> > +++ b/scripts/dump-guest-memory.py
+> > @@ -14,6 +14,7 @@ the COPYING file in the top-level directory.
+> >  """
+> > =20
+> >  import ctypes
+> > +import struct
+> > =20
+> >  UINTPTR_T =3D gdb.lookup_type("uintptr_t")
+> > =20
+> > @@ -120,6 +121,20 @@ class ELF(object):
+> >          self.segments[0].p_filesz +=3D ctypes.sizeof(note)
+> >          self.segments[0].p_memsz +=3D ctypes.sizeof(note)
+> > =20
 > > +
-> > +    if (is_a64(env)) {
-> > +        format64 = true;
-> > +    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
-> > +        /*
-> > +         * ATS1Cxx:
-> > +         * * TTBCR.EAE determines whether the result is returned using the
-> > +         *   32-bit or the 64-bit PAR format
-> > +         * * Instructions executed in Hyp mode always use the 64bit format
-> > +         *
-> > +         * ATS1S2NSOxx uses the 64bit format if any of the following is true:
-> > +         * * The Non-secure TTBCR.EAE bit is set to 1
-> > +         * * The implementation includes EL2, and the value of HCR.VM is 1
-> > +         *
-> > +         * ATS1Hx always uses the 64bit format (not supported yet).
-> > +         */
-> > +        format64 = regime_using_lpae_format(env, mmu_idx);
+> > +    def add_vmcoreinfo_note(self, vmcoreinfo):
+> > +        """Adds a vmcoreinfo note to the ELF dump."""
+> > +        chead =3D type(get_arch_note(self.endianness, 0, 0))
+> > +        header =3D
+> > chead.from_buffer_copy(vmcoreinfo[0:ctypes.sizeof(chead)])
+>=20
+> Maybe it's obvious to others, but I would have been helped a lot if a
+> comment had explained that you are creating a fake note (with 0 desc
+> size and 0 name size) to figure out the size of the note header. And
+> then you copy that many bytes out of the vmcoreinfo ELF note.
+>=20
+
+ok
+
+> > +        note =3D get_arch_note(self.endianness,
+> > +                             header.n_namesz - 1, header.n_descsz)
+>=20
+> Why the -1?
+
+because get_arch_note() adds + 1 (supposedly for the ending \0, see also ad=
+d_note())
+
+>=20
+> ... I think I'm giving up here for this method. My python is weak and I
+> can't follow this too well. Please add some comments.
+
+I simplified a bit the code now, I was also discovering some ctype usage.
+
+> More comments below:
+>=20
+> > +        ctypes.memmove(ctypes.pointer(note), vmcoreinfo,
+> > ctypes.sizeof(note))
+> > +        header_size =3D ctypes.sizeof(note) - header.n_descsz
 > > +
-> > +        if (arm_feature(env, ARM_FEATURE_EL2)) {
-> > +            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> > +                format64 |= env->cp15.hcr_el2 & HCR_VM;
-> > +            } else {
-> > +                format64 |= arm_current_el(env) == 2;
-> > +            }
-> > +        }
-> > +    }
-> 
-> So this kind of worries me, because what it's coded as is "determine
-> whether architecturally we should be returning a 64-bit or 32-bit
-> PAR format", but what the code below it uses the format64 flag for is
-> "manipulate whatever PAR we got handed back by get_phys_addr()".
-> So we have two separate bits of code that are both choosing
-> 32 vs 64 bit PAR (the code in this patch, and the logic inside
-> get_phys_addr()), and they have to come to the same conclusion
-> or we'll silently mangle the PAR. It seems like it would be
-> better to either have get_phys_addr() explicitly tell us what kind
-> of format it is returning to us, or to have the caller tell it
-> what kind of PAR it needs.
-
-Yes, I see your point and that's exactly what's happenning before the patch.
-Some of these new checks are generic in the sense that they check for LPAE/64bitness
-but others are I guess ATS specific for lack of a better term.
-It feels a bit weird to put the ATS specific PAR format logic into get_phys_addr.
-
-The basic idea here is that we never downgrade to the 32bit format, we only uprgade.
-The following line was meant to get the initial format I think you are requesting:
-format64 = regime_using_lpae_format(env, mmu_idx);
-
-After that, we apply possible ATS specfic upgrades to 64bit PAR format if needed.
-
-For clarity, perhaps we could make get_phys_addr return this same initial format, and then
-we can follow up with the ATS specific upgrades. E.g:
-
-    ret = get_phys_addr(env, value, access_type, mmu_idx,
-                        &phys_addr, &attrs, &prot, &page_size, &fsr, &fi,
-                        &format64);
-
-    /* Apply possible ATS/PAR 64bit upgrades if format64 is false.  */
-    if (is_a64(env)) {
-        format64 = true;
-    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
-        if (arm_feature(env, ARM_FEATURE_EL2)) {
-            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-                format64 |= env->cp15.hcr_el2 & HCR_VM;
-            } else {
-                format64 |= arm_current_el(env) == 2;
-            }
-        }
-    }
-
-
-Does something like that sound OK?
-
-Cheers,
-Edgar
-
-
-> >      ret = get_phys_addr(env, value, access_type, mmu_idx,
-> >                          &phys_addr, &attrs, &prot, &page_size, &fsr, &fi);
-> > -    if (extended_addresses_enabled(env)) {
+> > +        self.notes.append(note)
+> > +        self.segments[0].p_filesz +=3D ctypes.sizeof(note)
+> > +        self.segments[0].p_memsz +=3D ctypes.sizeof(note)
 > > +
-> > +    if (is_a64(env)) {
-> > +        format64 = true;
-> > +    } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
-> > +        /*
-> > +         * ATS1Cxx:
-> > +         * * TTBCR.EAE determines whether the result is returned using the
-> > +         *   32-bit or the 64-bit PAR format
-> > +         * * Instructions executed in Hyp mode always use the 64bit format
-> > +         *
-> > +         * ATS1S2NSOxx uses the 64bit format if any of the following is true:
-> > +         * * The Non-secure TTBCR.EAE bit is set to 1
-> > +         * * The implementation includes EL2, and the value of HCR.VM is 1
-> > +         *
-> > +         * ATS1Hx always uses the 64bit format (not supported yet).
-> > +         */
-> > +        format64 = regime_using_lpae_format(env, mmu_idx);
-> > +
-> > +        if (arm_feature(env, ARM_FEATURE_EL2)) {
-> > +            if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> > +                format64 |= env->cp15.hcr_el2 & HCR_VM;
-> > +            } else {
-> > +                format64 |= arm_current_el(env) == 2;
-> > +            }
->
+> >      def add_segment(self, p_type, p_paddr, p_size):
+> >          """Adds a segment to the elf."""
+> > =20
+> > @@ -505,6 +520,30 @@ shape and this command should mostly work."""
+> >                  cur +=3D chunk_size
+> >                  left -=3D chunk_size
+> > =20
+> > +    def phys_memory_read(self, addr, size):
+> > +        qemu_core =3D gdb.inferiors()[0]
+> > +        for block in self.guest_phys_blocks:
+> > +            if block["target_start"] <=3D addr < block["target_end"]:
+>=20
+> Although I don't expect a single read to straddle phys-blocks, I would
+> prefer if you checked (addr + size) -- and not just addr -- against
+> block["target_end"].
 
-> 
-> PS: on the subject of virtualization, I notice there's a comment
-> a bit later on in do_ats_write() that says
->     /* Note that S2WLK and FSTAGE are always zero, because we don't
->      * implement virtualization and therefore there can't be a stage 2
->      * fault.
->      */
-> so we'll need to address that too at some point...
-> 
-> thanks
-> -- PMM
+done
+
+>=20
+> > +                haddr =3D block["host_addr"] + (addr -
+> > block["target_start"])
+> > +                return qemu_core.read_memory(haddr, size)
+> > +
+> > +    def add_vmcoreinfo(self):
+> > +        if not gdb.parse_and_eval("vmcoreinfo_gdb_helper"):
+> > +            return
+> > +
+> > +        addr =3D
+> > gdb.parse_and_eval("vmcoreinfo_gdb_helper.vmcoreinfo_addr_le")
+> > +        addr =3D bytes([addr[i] for i in range(4)])
+> > +        addr =3D struct.unpack("<I", addr)[0]
+> > +
+> > +        mem =3D self.phys_memory_read(addr, 16)
+> > +        (version, addr, size) =3D struct.unpack("<IQI", mem)
+> > +        if version !=3D 0:
+> > +            return
+> > +
+> > +        vmcoreinfo =3D self.phys_memory_read(addr, size)
+> > +        if vmcoreinfo:
+> > +            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
+> > +
+> >      def invoke(self, args, from_tty):
+> >          """Handles command invocation from gdb."""
+> > =20
+> > @@ -518,6 +557,7 @@ shape and this command should mostly work."""
+> > =20
+> >          self.elf =3D ELF(argv[1])
+> >          self.guest_phys_blocks =3D get_guest_phys_blocks()
+> > +        self.add_vmcoreinfo()
+> > =20
+> >          with open(argv[0], "wb") as vmcore:
+> >              self.dump_init(vmcore)
+> > diff --git a/hw/acpi/vmcoreinfo.c b/hw/acpi/vmcoreinfo.c
+> > index 0ea41de8d9..b6bcb47506 100644
+> > --- a/hw/acpi/vmcoreinfo.c
+> > +++ b/hw/acpi/vmcoreinfo.c
+> > @@ -163,6 +163,8 @@ static void vmcoreinfo_handle_reset(void *opaque)
+> >      memset(vis->vmcoreinfo_addr_le, 0,
+> >      ARRAY_SIZE(vis->vmcoreinfo_addr_le));
+> >  }
+> > =20
+> > +static VMCoreInfoState *vmcoreinfo_gdb_helper;
+> > +
+> >  static void vmcoreinfo_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      if (!bios_linker_loader_can_write_pointer()) {
+> > @@ -181,6 +183,7 @@ static void vmcoreinfo_realize(DeviceState *dev, Er=
+ror
+> > **errp)
+> >          return;
+> >      }
+> > =20
+> > +    vmcoreinfo_gdb_helper =3D VMCOREINFO(dev);
+> >      qemu_register_reset(vmcoreinfo_handle_reset, dev);
+> >  }
+> > =20
+> >=20
+>=20
+> I guess we don't build QEMU with link-time optimization at the moment.
+>=20
+> With link-time optimization, I think gcc might reasonably optimize away
+> the assignment to "vmcoreinfo_gdb_helper", and "vmcoreinfo_gdb_helper"
+> itself. This is why I suggested "volatile":
+>=20
+> static VMCoreInfoState * volatile vmcoreinfo_gdb_helper;
+>=20
+> Do you think volatile is only superfluous, or do you actively dislike it
+> for some reason?
+
+Yeah, I am not convinced volatile is the best way, but nor is static.
+
+Let's export it?
