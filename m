@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxic-0006TF-LU
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:09:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxio-0006g1-59
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxiW-00059I-UT
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:08:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxim-0005NP-T0
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:09:10 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:06:56 +0200
-Message-Id: <20170711160814.20941-8-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:01 +0200
+Message-Id: <20170711160814.20941-13-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 07/85] block: deprecate "encryption=on" in favor
- of "encrypt.format=aes"
+Subject: [Qemu-devel] [PULL 12/85] qcow2: extend specification to cover LUKS
+ encryption
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,897 +25,147 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Historically the qcow & qcow2 image formats supported a property
-"encryption=on" to enable their built-in AES encryption. We'll
-soon be supporting LUKS for qcow2, so need a more general purpose
-way to enable encryption, with a choice of formats.
+Update the qcow2 specification to describe how the LUKS header is
+placed inside a qcow2 file, when using LUKS encryption for the
+qcow2 payload instead of the legacy AES-CBC encryption
 
-This introduces an "encrypt.format" option, which will later be
-joined by a number of other "encrypt.XXX" options. The use of
-a "encrypt." prefix instead of "encrypt-" is done to facilitate
-mapping to a nested QAPI schema at later date.
-
-e.g. the preferred syntax is now
-
-  qemu-img create -f qcow2 -o encrypt.format=aes demo.qcow2
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170623162419.26068-8-berrange@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-id: 20170623162419.26068-13-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h  |  2 +-
- block/qcow.c               | 31 ++++++++++++---
- block/qcow2.c              | 34 ++++++++++++----
- qemu-img.c                 |  4 +-
- tests/qemu-iotests/049.out | 98 +++++++++++++++++++++++-----------------------
- tests/qemu-iotests/082.out | 95 ++++++++++++++++++++++++++++----------------
- tests/qemu-iotests/085.out | 38 +++++++++---------
- tests/qemu-iotests/144.out |  4 +-
- tests/qemu-iotests/185.out |  8 ++--
- 9 files changed, 191 insertions(+), 123 deletions(-)
+ docs/interop/qcow2.txt | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 103 insertions(+)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 15fa602..701508d 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -37,11 +37,11 @@
- #include "qemu/main-loop.h"
- #include "qemu/throttle.h"
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 80cdfd0..886a546 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -45,6 +45,7 @@ The first cluster of a qcow2 image contains the file header:
+          32 - 35:   crypt_method
+                     0 for no encryption
+                     1 for AES encryption
++                    2 for LUKS encryption
+ 
+          36 - 39:   l1_size
+                     Number of entries in the active L1 table
+@@ -135,6 +136,7 @@ be stored. Each extension has a structure like the following:
+                         0xE2792ACA - Backing file format name
+                         0x6803f857 - Feature name table
+                         0x23852875 - Bitmaps extension
++                        0x0537be77 - Full disk encryption header pointer
+                         other      - Unknown header extension, can be safely
+                                      ignored
+ 
+@@ -207,6 +209,107 @@ The fields of the bitmaps extension are:
+                    Offset into the image file at which the bitmap directory
+                    starts. Must be aligned to a cluster boundary.
+ 
++== Full disk encryption header pointer ==
++
++The full disk encryption header must be present if, and only if, the
++'crypt_method' header requires metadata. Currently this is only true
++of the 'LUKS' crypt method. The header extension must be absent for
++other methods.
++
++This header provides the offset at which the crypt method can store
++its additional data, as well as the length of such data.
++
++    Byte  0 -  7:   Offset into the image file at which the encryption
++                    header starts in bytes. Must be aligned to a cluster
++                    boundary.
++    Byte  8 - 15:   Length of the written encryption header in bytes.
++                    Note actual space allocated in the qcow2 file may
++                    be larger than this value, since it will be rounded
++                    to the nearest multiple of the cluster size. Any
++                    unused bytes in the allocated space will be initialized
++                    to 0.
++
++For the LUKS crypt method, the encryption header works as follows.
++
++The first 592 bytes of the header clusters will contain the LUKS
++partition header. This is then followed by the key material data areas.
++The size of the key material data areas is determined by the number of
++stripes in the key slot and key size. Refer to the LUKS format
++specification ('docs/on-disk-format.pdf' in the cryptsetup source
++package) for details of the LUKS partition header format.
++
++In the LUKS partition header, the "payload-offset" field will be
++calculated as normal for the LUKS spec. ie the size of the LUKS
++header, plus key material regions, plus padding, relative to the
++start of the LUKS header. This offset value is not required to be
++qcow2 cluster aligned. Its value is currently never used in the
++context of qcow2, since the qcow2 file format itself defines where
++the real payload offset is, but none the less a valid payload offset
++should always be present.
++
++In the LUKS key slots header, the "key-material-offset" is relative
++to the start of the LUKS header clusters in the qcow2 container,
++not the start of the qcow2 file.
++
++Logically the layout looks like
++
++  +-----------------------------+
++  | QCow2 header                |
++  | QCow2 header extension X    |
++  | QCow2 header extension FDE  |
++  | QCow2 header extension ...  |
++  | QCow2 header extension Z    |
++  +-----------------------------+
++  | ....other QCow2 tables....  |
++  .                             .
++  .                             .
++  +-----------------------------+
++  | +-------------------------+ |
++  | | LUKS partition header   | |
++  | +-------------------------+ |
++  | | LUKS key material 1     | |
++  | +-------------------------+ |
++  | | LUKS key material 2     | |
++  | +-------------------------+ |
++  | | LUKS key material ...   | |
++  | +-------------------------+ |
++  | | LUKS key material 8     | |
++  | +-------------------------+ |
++  +-----------------------------+
++  | QCow2 cluster payload       |
++  .                             .
++  .                             .
++  .                             .
++  |                             |
++  +-----------------------------+
++
++== Data encryption ==
++
++When an encryption method is requested in the header, the image payload
++data must be encrypted/decrypted on every write/read. The image headers
++and metadata are never encrypted.
++
++The algorithms used for encryption vary depending on the method
++
++ - AES:
++
++   The AES cipher, in CBC mode, with 256 bit keys.
++
++   Initialization vectors generated using plain64 method, with
++   the virtual disk sector as the input tweak.
++
++   This format is no longer supported in QEMU system emulators, due
++   to a number of design flaws affecting its security. It is only
++   supported in the command line tools for the sake of back compatibility
++   and data liberation.
++
++ - LUKS:
++
++   The algorithms are specified in the LUKS header.
++
++   Initialization vectors generated using the method specified
++   in the LUKS header, with the physical disk sector as the
++   input tweak.
+ 
+ == Host cluster management ==
  
--#define BLOCK_FLAG_ENCRYPT          1
- #define BLOCK_FLAG_LAZY_REFCOUNTS   8
- 
- #define BLOCK_OPT_SIZE              "size"
- #define BLOCK_OPT_ENCRYPT           "encryption"
-+#define BLOCK_OPT_ENCRYPT_FORMAT    "encrypt.format"
- #define BLOCK_OPT_COMPAT6           "compat6"
- #define BLOCK_OPT_HWVERSION         "hwversion"
- #define BLOCK_OPT_BACKING_FILE      "backing_file"
-diff --git a/block/qcow.c b/block/qcow.c
-index 49871fb..a442ed7 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -803,10 +803,10 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     uint8_t *tmp;
-     int64_t total_size = 0;
-     char *backing_file = NULL;
--    int flags = 0;
-     Error *local_err = NULL;
-     int ret;
-     BlockBackend *qcow_blk;
-+    const char *encryptfmt = NULL;
- 
-     /* Read out options */
-     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-@@ -818,8 +818,16 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
--    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
--        flags |= BLOCK_FLAG_ENCRYPT;
-+    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-+    if (encryptfmt) {
-+        if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
-+            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
-+                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
-+            ret = -EINVAL;
-+            goto cleanup;
-+        }
-+    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-+        encryptfmt = "aes";
-     }
- 
-     ret = bdrv_create_file(filename, opts, &local_err);
-@@ -873,7 +881,13 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     l1_size = (total_size + (1LL << shift) - 1) >> shift;
- 
-     header.l1_table_offset = cpu_to_be64(header_size);
--    if (flags & BLOCK_FLAG_ENCRYPT) {
-+    if (encryptfmt) {
-+        if (!g_str_equal(encryptfmt, "aes")) {
-+            error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
-+                       encryptfmt);
-+            ret = -EINVAL;
-+            goto exit;
-+        }
-         header.crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
-     } else {
-         header.crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
-@@ -1047,8 +1061,13 @@ static QemuOptsList qcow_create_opts = {
-         {
-             .name = BLOCK_OPT_ENCRYPT,
-             .type = QEMU_OPT_BOOL,
--            .help = "Encrypt the image",
--            .def_value_str = "off"
-+            .help = "Encrypt the image with format 'aes'. (Deprecated "
-+                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=aes)",
-+        },
-+        {
-+            .name = BLOCK_OPT_ENCRYPT_FORMAT,
-+            .type = QEMU_OPT_STRING,
-+            .help = "Encrypt the image, format choices: 'aes'",
-         },
-         { /* end of list */ }
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2f94f03..8f1822c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2144,7 +2144,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-                          const char *backing_file, const char *backing_format,
-                          int flags, size_t cluster_size, PreallocMode prealloc,
-                          QemuOpts *opts, int version, int refcount_order,
--                         Error **errp)
-+                         const char *encryptfmt, Error **errp)
- {
-     int cluster_bits;
-     QDict *options;
-@@ -2273,7 +2273,13 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-         .header_length              = cpu_to_be32(sizeof(*header)),
-     };
- 
--    if (flags & BLOCK_FLAG_ENCRYPT) {
-+    if (encryptfmt) {
-+        if (!g_str_equal(encryptfmt, "aes")) {
-+            error_setg(errp, "Unknown encryption format '%s', expected 'aes'",
-+                       encryptfmt);
-+            ret = -EINVAL;
-+            goto out;
-+        }
-         header->crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
-     } else {
-         header->crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
-@@ -2402,6 +2408,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     int version = 3;
-     uint64_t refcount_bits = 16;
-     int refcount_order;
-+    const char *encryptfmt = NULL;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -2410,8 +2417,16 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-                     BDRV_SECTOR_SIZE);
-     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-     backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
--    if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
--        flags |= BLOCK_FLAG_ENCRYPT;
-+    encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-+    if (encryptfmt) {
-+        if (qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT)) {
-+            error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
-+                       BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
-+            ret = -EINVAL;
-+            goto finish;
-+        }
-+    } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-+        encryptfmt = "aes";
-     }
-     cluster_size = qemu_opt_get_size_del(opts, BLOCK_OPT_CLUSTER_SIZE,
-                                          DEFAULT_CLUSTER_SIZE);
-@@ -2477,7 +2492,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
- 
-     ret = qcow2_create2(filename, size, backing_file, backing_fmt, flags,
-                         cluster_size, prealloc, opts, version, refcount_order,
--                        &local_err);
-+                        encryptfmt, &local_err);
-     error_propagate(errp, local_err);
- 
- finish:
-@@ -3431,8 +3446,13 @@ static QemuOptsList qcow2_create_opts = {
-         {
-             .name = BLOCK_OPT_ENCRYPT,
-             .type = QEMU_OPT_BOOL,
--            .help = "Encrypt the image",
--            .def_value_str = "off"
-+            .help = "Encrypt the image with format 'aes'. (Deprecated "
-+                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=aes)",
-+        },
-+        {
-+            .name = BLOCK_OPT_ENCRYPT_FORMAT,
-+            .type = QEMU_OPT_STRING,
-+            .help = "Encrypt the image, format choices: 'aes'",
-         },
-         {
-             .name = BLOCK_OPT_CLUSTER_SIZE,
-diff --git a/qemu-img.c b/qemu-img.c
-index f7ffb79..ae4fe6d 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2264,6 +2264,8 @@ static int img_convert(int argc, char **argv)
-     if (s.compressed) {
-         bool encryption =
-             qemu_opt_get_bool(opts, BLOCK_OPT_ENCRYPT, false);
-+        const char *encryptfmt =
-+            qemu_opt_get(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-         const char *preallocation =
-             qemu_opt_get(opts, BLOCK_OPT_PREALLOC);
- 
-@@ -2273,7 +2275,7 @@ static int img_convert(int argc, char **argv)
-             goto out;
-         }
- 
--        if (encryption) {
-+        if (encryption || encryptfmt) {
-             error_report("Compression and encryption not supported at "
-                          "the same time");
-             ret = -1;
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index 34e66db..50e91c8 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -4,90 +4,90 @@ QA output created by 049
- == 1. Traditional size parameter ==
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024b
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1k
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1K
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1G
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1T
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0b
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5k
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5K
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5G
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5T
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- == 2. Specifying size via -o ==
- 
- qemu-img create -f qcow2 -o size=1024 TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1024b TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1k TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1K TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1M TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1G TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1T TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1024.0 TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1024.0b TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1.5k TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1.5K TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1.5M TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1.5G TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o size=1.5T TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- == 3. Invalid sizes ==
- 
-@@ -128,62 +128,62 @@ qemu-img: TEST_DIR/t.qcow2: Invalid options for file format 'qcow2'
- == Check correct interpretation of suffixes for cluster size ==
- 
- qemu-img create -f qcow2 -o cluster_size=1024 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=1024b TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=1k TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=1K TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=1M TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1048576 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1048576 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=1024.0 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=1024.0b TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=0.5k TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=512 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=0.5K TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=512 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o cluster_size=0.5M TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=524288 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=524288 lazy_refcounts=off refcount_bits=16
- 
- == Check compat level option ==
- 
- qemu-img create -f qcow2 -o compat=0.10 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=1.1 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=0.42 TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Invalid compatibility level: '0.42'
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=foobar TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Invalid compatibility level: 'foobar'
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- == Check preallocation option ==
- 
- qemu-img create -f qcow2 -o preallocation=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 preallocation=off lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=off lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o preallocation=metadata TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o preallocation=1234 TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: invalid parameter value: 1234
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16
- 
- == Check encryption option ==
- 
-@@ -196,16 +196,16 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on cluster_siz
- == Check lazy_refcounts option (only with v3) ==
- 
- qemu-img create -f qcow2 -o compat=1.1,lazy_refcounts=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=1.1,lazy_refcounts=on TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 encryption=off cluster_size=65536 lazy_refcounts=on refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=on refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=on TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use compat=1.1 or greater)
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 encryption=off cluster_size=65536 lazy_refcounts=on refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on refcount_bits=16
- 
- *** done
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index a952330..621386b 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -3,14 +3,14 @@ QA output created by 082
- === create: Options specified more than once ===
- 
- Testing: create -f foo -f qcow2 TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 128M (134217728 bytes)
- cluster_size: 65536
- 
- Testing: create -f qcow2 -o cluster_size=4k -o lazy_refcounts=on TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 encryption=off cluster_size=4096 lazy_refcounts=on refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=4096 lazy_refcounts=on refcount_bits=16
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 128M (134217728 bytes)
-@@ -22,7 +22,7 @@ Format specific information:
-     corrupt: false
- 
- Testing: create -f qcow2 -o cluster_size=4k -o lazy_refcounts=on -o cluster_size=8k TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 encryption=off cluster_size=8192 lazy_refcounts=on refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=8192 lazy_refcounts=on refcount_bits=16
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 128M (134217728 bytes)
-@@ -34,7 +34,7 @@ Format specific information:
-     corrupt: false
- 
- Testing: create -f qcow2 -o cluster_size=4k,cluster_size=8k TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 encryption=off cluster_size=8192 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=8192 lazy_refcounts=off refcount_bits=16
- image: TEST_DIR/t.IMGFMT
- file format: IMGFMT
- virtual size: 128M (134217728 bytes)
-@@ -48,7 +48,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -61,7 +62,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -74,7 +76,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -87,7 +90,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -100,7 +104,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -113,7 +118,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -126,7 +132,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -139,7 +146,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -147,10 +155,10 @@ refcount_bits    Width of a reference count entry in bits
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,help cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,? TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,? encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2,,? cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2, -o help TEST_DIR/t.qcow2 128M
- qemu-img: Invalid option list: backing_file=TEST_DIR/t.qcow2,
-@@ -167,7 +175,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -180,7 +189,7 @@ size             Virtual disk size
- === convert: Options specified more than once ===
- 
- Testing: create -f qcow2 TEST_DIR/t.qcow2 128M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
- Testing: convert -f foo -f qcow2 TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
- image: TEST_DIR/t.IMGFMT.base
-@@ -229,7 +238,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -242,7 +252,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -255,7 +266,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -268,7 +280,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -281,7 +294,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -294,7 +308,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -307,7 +322,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -320,7 +336,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -348,7 +365,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -407,7 +425,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -420,7 +439,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -433,7 +453,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -446,7 +467,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -459,7 +481,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -472,7 +495,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -485,7 +509,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -498,7 +523,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-@@ -528,7 +554,8 @@ size             Virtual disk size
- compat           Compatibility level (0.10 or 1.1)
- backing_file     File name of a base image
- backing_fmt      Image format of the base image
--encryption       Encrypt the image
-+encryption       Encrypt the image with format 'aes'. (Deprecated in favor of encrypt.format=aes)
-+encrypt.format   Encrypt the image, format choices: 'aes'
- cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index a5d4cc3..6edf107 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -11,7 +11,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
- 
- === Create a single snapshot on virtio0 ===
- 
--Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.1 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.1 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- 
- === Invalid command - missing device and nodename ===
-@@ -25,32 +25,32 @@ Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file
- 
- === Create several transactional group snapshots ===
- 
--Formatting 'TEST_DIR/2-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/1-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/2-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/2-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/1-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/2-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/t.qcow2.2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/3-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/3-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/3-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/3-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/2-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/4-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/4-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/4-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/4-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/3-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/5-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/5-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/5-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/5-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/4-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/6-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/6-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/6-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/6-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/5-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/7-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/7-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/7-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/7-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/6-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/8-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/8-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/8-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/8-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/7-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/9-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/9-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/9-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/9-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/8-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
--Formatting 'TEST_DIR/10-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v0.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
--Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v1.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/10-snapshot-v0.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v0.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=qcow2 size=134217728 backing_file=TEST_DIR/9-snapshot-v1.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- 
- === Create a couple of snapshots using blockdev-snapshot ===
-diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
-index 387855c..014b281 100644
---- a/tests/qemu-iotests/144.out
-+++ b/tests/qemu-iotests/144.out
-@@ -7,7 +7,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=536870912
- === Performing Live Snapshot 1 ===
- 
- {"return": {}}
--Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- 
- === Performing block-commit on active layer ===
-@@ -19,6 +19,6 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/
- 
- === Performing Live Snapshot 2 ===
- 
--Formatting 'TEST_DIR/tmp2.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/tmp2.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- *** done
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-index 45bc7cb..57eaf8d 100644
---- a/tests/qemu-iotests/185.out
-+++ b/tests/qemu-iotests/185.out
-@@ -7,12 +7,12 @@ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
- 
- === Creating backing chain ===
- 
--Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2.mid', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.base backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- wrote 4194304/4194304 bytes at offset 0
- 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": ""}
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.mid backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.qcow2.mid backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- 
- === Start commit job and exit qemu ===
-@@ -33,7 +33,7 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- === Start mirror job and exit qemu ===
- 
- {"return": {}}
--Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-@@ -42,7 +42,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off clust
- === Start backup job and exit qemu ===
- 
- {"return": {}}
--Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 -- 
 2.9.4
