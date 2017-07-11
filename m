@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxjt-00086d-KC
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxjv-00088o-0j
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxjs-00067g-Cf
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:17 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxju-00068b-6Y
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:19 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:07:14 +0200
-Message-Id: <20170711160814.20941-26-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:15 +0200
+Message-Id: <20170711160814.20941-27-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 25/85] hbitmap: improve dirty iter
+Subject: [Qemu-devel] [PULL 26/85] tests: add hbitmap iter test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +24,54 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Make dirty iter resistant to resetting bits in corresponding HBitmap.
+Test that hbitmap iter is resistant to bitmap resetting.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20170628120530.31251-4-vsementsov@virtuozzo.com
+Message-id: 20170628120530.31251-5-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qemu/hbitmap.h | 26 ++++----------------------
- util/hbitmap.c         | 23 ++++++++++++++++++++++-
- 2 files changed, 26 insertions(+), 23 deletions(-)
+ tests/test-hbitmap.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 9239fe5..6b04391 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -256,10 +256,9 @@ void hbitmap_free(HBitmap *hb);
-  * the lowest-numbered bit that is set in @hb, starting at @first.
-  *
-  * Concurrent setting of bits is acceptable, and will at worst cause the
-- * iteration to miss some of those bits.  Resetting bits before the current
-- * position of the iterator is also okay.  However, concurrent resetting of
-- * bits can lead to unexpected behavior if the iterator has not yet reached
-- * those bits.
-+ * iteration to miss some of those bits.
-+ *
-+ * The concurrent resetting of bits is OK.
-  */
- void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
- 
-@@ -298,24 +297,7 @@ void hbitmap_free_meta(HBitmap *hb);
-  * Return the next bit that is set in @hbi's associated HBitmap,
-  * or -1 if all remaining bits are zero.
-  */
--static inline int64_t hbitmap_iter_next(HBitmapIter *hbi)
--{
--    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1];
--    int64_t item;
--
--    if (cur == 0) {
--        cur = hbitmap_iter_skip_words(hbi);
--        if (cur == 0) {
--            return -1;
--        }
--    }
--
--    /* The next call will resume work from the next bit.  */
--    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
--    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
--
--    return item << hbi->granularity;
--}
-+int64_t hbitmap_iter_next(HBitmapIter *hbi);
- 
- /**
-  * hbitmap_iter_next_word:
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 35088e1..0b38817 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -106,8 +106,9 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
- 
-     unsigned long cur;
-     do {
--        cur = hbi->cur[--i];
-+        i--;
-         pos >>= BITS_PER_LEVEL;
-+        cur = hbi->cur[i] & hb->levels[i][pos];
-     } while (cur == 0);
- 
-     /* Check for end of iteration.  We always use fewer than BITS_PER_LONG
-@@ -139,6 +140,26 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
-     return cur;
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 23773d2..1acb353 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -909,6 +909,22 @@ static void hbitmap_test_add(const char *testpath,
+                hbitmap_test_teardown);
  }
  
-+int64_t hbitmap_iter_next(HBitmapIter *hbi)
++static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
++                                        const void *unused)
 +{
-+    unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
-+            hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
-+    int64_t item;
++    HBitmapIter hbi;
 +
-+    if (cur == 0) {
-+        cur = hbitmap_iter_skip_words(hbi);
-+        if (cur == 0) {
-+            return -1;
-+        }
-+    }
++    hbitmap_test_init(data, L1 * 2, 0);
++    hbitmap_set(data->hb, 0, data->size);
 +
-+    /* The next call will resume work from the next bit.  */
-+    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-+    item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
++    hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
 +
-+    return item << hbi->granularity;
++    hbitmap_iter_next(&hbi);
++
++    hbitmap_reset_all(data->hb);
++    hbitmap_iter_next(&hbi);
 +}
 +
- void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+ int main(int argc, char **argv)
  {
-     unsigned i, bit;
+     g_test_init(&argc, &argv, NULL);
+@@ -966,6 +982,9 @@ int main(int argc, char **argv)
+                      test_hbitmap_serialize_part);
+     hbitmap_test_add("/hbitmap/serialize/zeroes",
+                      test_hbitmap_serialize_zeroes);
++
++    hbitmap_test_add("/hbitmap/iter/iter_and_reset",
++                     test_hbitmap_iter_and_reset);
+     g_test_run();
+ 
+     return 0;
 -- 
 2.9.4
