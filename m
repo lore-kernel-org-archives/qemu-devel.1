@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dUx8b-0001MT-Ow
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:31:46 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dUxAh-0004XQ-2c
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dUx8W-00054s-6C
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:31:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55126)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dUx8V-00053k-Ul
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:31:40 -0400
-Date: Tue, 11 Jul 2017 18:31:35 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170711182954-mutt-send-email-mst@kernel.org>
-References: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <peter.maydell@linaro.org>) id 1dUxAf-0005xz-On
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:33:55 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34295)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dUxAf-0005xf-Dg
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:33:53 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id 77so4112472wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 08:33:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/3] pci: allow PCI bus slots to be marked
- as reserved
+In-Reply-To: <CAKmqyKPn+JEVWmpzypZt=8kH80aNa+aNAZLhPSWvHy+h5gyd=Q@mail.gmail.com>
+References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
+	<1499771839-32518-3-git-send-email-peter.maydell@linaro.org>
+	<CAKmqyKPn+JEVWmpzypZt=8kH80aNa+aNAZLhPSWvHy+h5gyd=Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 16:33:31 +0100
+Message-ID: <CAFEAcA_DyoTE+idUtiWOB4ptA-TMcmU2WRYWjo2Lwt7+RD8xEQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/7] hw/char/cmsdk-apb-uart.c: Implement
+ CMSDK APB UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, marcel@redhat.com
+To: Alistair Francis <alistair23@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Fri, Jul 07, 2017 at 08:43:59AM +0100, Mark Cave-Ayland wrote:
-> For some machines it is impossible to plug devices into a particular PCI bus
-> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the root
-> bus behind which all devices must be plugged. Ignoring this rule will cause
-> problems with interrupt routing since the interrupt numbers are calculated
-> based upon PCI bridge id and secondary PCI bus slot id.
-> 
-> This patchset adds a new dev_reserved_mask property to PCIBus which is a
-> bitmask used to indicate whether PCI bus slots are reserved, i.e. they cannot
-> be used for hot or cold plugging on a particular PCI bus.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On 11 July 2017 at 16:12, Alistair Francis <alistair23@gmail.com> wrote:
+> On Tue, Jul 11, 2017 at 1:17 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Implement a model of the simple "APB UART" provided in
+>> the Cortex-M System Design Kit (CMSDK).
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Could you please point me at series making use of this
-functionality?
-Thanks!
+>> +} CMSDKAPBUART;
+>
+> This should be CamelCase.
 
-> 
-> Mark Cave-Ayland (3):
->   pci: move check for existing devfn into new pci_bus_devfn_available()
->     helper
->   pci: add dev_reserved_mask property to PCIBus
->   pci: add reserved slot check to do_pci_register_device()
-> 
->  hw/pci/pci.c             |   34 ++++++++++++++++++++++++++++++----
->  include/hw/pci/pci_bus.h |    1 +
->  2 files changed, 31 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 1.7.10.4
+Yes, but CamelCase where all the words are all-uppercase
+(as with CMSDK, APB and UART) is indistinguishable from
+all-uppercase. (Compare the way we say "PCIIORegion" rather
+than "PciIoRegion".)
+
+>> +/* This is a model of the "APB UART" which is part of the Cortex-M
+>> + * System Design Kit (CMSDK) and documented in the Cortex-M System
+>> + * Design Kit Technical Reference Manual (ARM DDI0479C):
+>> + * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
+>
+> I can't find the spec from this site. Is it possible to link directly
+> to the guides? I have found a few dead links from some of these
+> marketing focused site.
+
+It's the link with the big blue button "Cortex-M System Design Kit
+TRM". I didn't want to link directly to the TRM, because that is
+(currently) an infocenter.arm.com URL which may eventually go
+away as content migrates to developer.arm.com. (The DDI document
+reference number is unique and sufficient to find the document
+in future even in the face of broken links.)
+
+>> +static void uart_update_parameters(CMSDKAPBUART *s)
+>> +{
+>> +    QEMUSerialSetParams ssp;
+>> +
+>> +    /* This UART is always 8N1 but the baud rate is programmable.
+>> +     * The minimum permitted bauddiv setting is 16, so we just ignore
+>> +     * settings below that (usually this means the device has just
+>> +     * been reset and not yet programmed).
+>> +     */
+>> +    if (s->bauddiv < 16 || s->bauddiv > s->pclk_frq) {
+>> +        return;
+>> +    }
+>
+> This seems like it should deserve a guest error print.
+
+As the comment says, that would cause us to print a spurious
+warning every time the device was reset.
+
+>> +static int uart_can_receive(void *opaque)
+>> +{
+>> +    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
+>> +
+>> +    /* We can take a char if RX is enabled and the buffer is empty */
+>> +    if (s->ctrl & R_CTRL_RX_EN_MASK && !(s->state & R_STATE_RXFULL_MASK)) {
+>> +        return 1;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> +static void uart_receive(void *opaque, const uint8_t *buf, int size)
+>> +{
+>> +    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
+>> +
+>> +    trace_cmsdk_apb_uart_receive(*buf);
+>> +
+>> +    if (!(s->ctrl & R_CTRL_RX_EN_MASK)) {
+>> +        /* Just drop the character on the floor */
+>> +        return;
+>
+> Doesn't this also deserve a guest error print.
+
+It's a can't-happen case because uart_can_receive() won't
+return 1 if the EN bit is clear. Checking again here is
+perhaps unnecessary paranoia, but it's not a guest error.
+
+>> +    }
+>> +
+>> +    if (s->state & R_STATE_RXFULL_MASK) {
+>> +        s->state |= R_STATE_RXOVERRUN_MASK;
+>> +    }
+>> +
+>> +    s->rxbuf = *buf;
+>> +    s->state |= R_STATE_RXFULL_MASK;
+>> +    if (s->ctrl & R_CTRL_RX_INTEN_MASK) {
+>> +        s->intstatus |= R_INTSTATUS_RX_MASK;
+>> +    }
+>> +    cmsdk_apb_uart_update(s);
+>> +}
+>> +
+>> +static uint64_t uart_read(void *opaque, hwaddr offset, unsigned size)
+>> +{
+>> +    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
+>> +    uint64_t r;
+>> +
+>> +    switch (offset) {
+>> +    case A_DATA:
+>> +        r = s->rxbuf;
+>> +        s->state &= ~R_STATE_RXFULL_MASK;
+>> +        cmsdk_apb_uart_update(s);
+>> +        break;
+>> +    case A_STATE:
+>> +        r = s->state;
+>> +        break;
+>> +    case A_CTRL:
+>> +        r = s->ctrl;
+>> +        break;
+>> +    case A_INTSTATUS:
+>> +        r = s->intstatus;
+>> +        break;
+>> +    case A_BAUDDIV:
+>> +        r = s->bauddiv;
+>> +        break;
+>
+> You used pasrt of the register API but not the second part. This seems
+> like a greaet device to use the register API on.
+
+I really don't like the register API. The field definition
+convenience macros are fine, but I prefer to define devices
+with read and write functions with switches, I think it's
+clearer, and it's easier to see where you want to put a breakpoint
+to be able to step through register reads and writes, and so on.
+
+>> +    case A_PID4 ... A_CID3:
+>> +        r = uart_id[offset / 4 - A_PID4];
+>
+> I think this is the one you already found in the cover letter.
+
+Yep. (Same in both timer and uart.)
+
+>> +    switch (offset) {
+>> +    case A_DATA:
+>> +    {
+>> +        s->txbuf = value;
+>> +        if (s->state & R_STATE_TXFULL_MASK) {
+>> +            /* Buffer already full -- note the overrun and let the
+>> +             * existing pending transmit callback handle the new char.
+>> +             */
+>> +            s->state |= R_STATE_TXOVERRUN_MASK;
+>> +            cmsdk_apb_uart_update(s);
+>> +        } else {
+>> +            s->state |= R_STATE_TXFULL_MASK;
+>> +            uart_transmit(NULL, G_IO_OUT, s);
+>> +        }
+>> +        break;
+>> +    }
+>
+> Why is this case inside braces?
+
+I probably had a local variable in there at one point which
+I ended up not needing. I'll delete the braces.
+
+thanks
+-- PMM
