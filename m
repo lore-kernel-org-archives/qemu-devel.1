@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUzDM-0003up-GK
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:44:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUzEA-0004V2-Td
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUzDH-0006Gk-G2
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:44:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36096)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dUzDH-0006FV-8d
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:44:43 -0400
-References: <cover.1499774331.git.alistair.francis@xilinx.com>
-	<12e6dde67e57a0ecf09fbe6103512543113ca07a.1499774331.git.alistair.francis@xilinx.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <040c4483-73f0-7f3b-d2af-b56bc83b0e53@redhat.com>
-Date: Tue, 11 Jul 2017 19:44:38 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUzE5-0007k7-Uc
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 13:45:38 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
+	<1499771839-32518-3-git-send-email-peter.maydell@linaro.org>
+	<CAKmqyKPn+JEVWmpzypZt=8kH80aNa+aNAZLhPSWvHy+h5gyd=Q@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c5d5897a-2b01-c4b3-d759-051a8edcc4d4@amsat.org>
+Date: Tue, 11 Jul 2017 14:44:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <12e6dde67e57a0ecf09fbe6103512543113ca07a.1499774331.git.alistair.francis@xilinx.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hCEUtoASNQXuXkoE1MlkmDRa2ukOBV8a9"
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] error: Add a 'error: ' prefix to
- error_report()
+In-Reply-To: <CAKmqyKPn+JEVWmpzypZt=8kH80aNa+aNAZLhPSWvHy+h5gyd=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/7] hw/char/cmsdk-apb-uart.c:
+ Implement CMSDK APB UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, philippe@mathieu-daude.net, armbru@redhat.com
+To: Alistair Francis <alistair23@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hCEUtoASNQXuXkoE1MlkmDRa2ukOBV8a9
-From: Max Reitz <mreitz@redhat.com>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, philippe@mathieu-daude.net, armbru@redhat.com
-Message-ID: <040c4483-73f0-7f3b-d2af-b56bc83b0e53@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] error: Add a 'error: ' prefix to
- error_report()
-References: <cover.1499774331.git.alistair.francis@xilinx.com>
- <12e6dde67e57a0ecf09fbe6103512543113ca07a.1499774331.git.alistair.francis@xilinx.com>
-In-Reply-To: <12e6dde67e57a0ecf09fbe6103512543113ca07a.1499774331.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 07/11/2017 12:12 PM, Alistair Francis wrote:
+> On Tue, Jul 11, 2017 at 1:17 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+[...]
+>> +#include "qemu/osdep.h"
+>> +#include "qemu/log.h"
+>> +#include "qapi/error.h"
+>> +#include "trace.h"
+>> +#include "hw/sysbus.h"
+>> +#include "hw/registerfields.h"
+[...]
+>> +REG32(DATA, 0)
+>> +REG32(STATE, 4)
+>> +    FIELD(STATE, TXFULL, 0, 1)
+>> +    FIELD(STATE, RXFULL, 1, 1)
+>> +    FIELD(STATE, TXOVERRUN, 2, 1)
+>> +    FIELD(STATE, RXOVERRUN, 3, 1)
+> 
+> You used pasrt of the register API but not the second part. This seems
+> like a greaet device to use the register API on.
 
-On 2017-07-11 14:07, Alistair Francis wrote:
-> As we don't regard error messages as a stable API the let's add a
-> 'error: ' prefix to the original error_report() messages.
->=20
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
->=20
->  util/qemu-error.c | 1 +
->  1 file changed, 1 insertion(+)
-
-This breaks quite a few qemu-iotests.
-
-Max
-
-
---hCEUtoASNQXuXkoE1MlkmDRa2ukOBV8a9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZZQ6GEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQGSt
-B/9iz1+0KO/cGEJTJ+wAi28Qn5dwTfY5ud+OqL6LuFW0Tt9EGuFx8CZFP+hjql0O
-9q2zTYapG1JjTaV0yL7LXeePrj2i48GXES+w6q/X/KfY8Lu2L3y4pmJgCijqaT44
-8UVYg+PebOhFtIZgPtjHBWSLsI2o4ju3YVmOGuZk2RdCk2OP9B4djQ+GScIhwpfr
-BDWQyGWqizrXBLQF/muPn4fR6bUjuJBhZ+YRM4tpLVkKWhLpskMCcjBl4uldyR3F
-hW3WcwJrzsT0a7BwKbZVNu55Jr1qHmc2cjvPMwUCtUKS0GERuzt7GyEkzR2JXTu5
-ieDFLH6i7KAPkSYI0zv6Ix10
-=x20+
------END PGP SIGNATURE-----
-
---hCEUtoASNQXuXkoE1MlkmDRa2ukOBV8a9--
+He did not used the Register API (declared in hw/register.h) but only 
+the Register Fields API ;)
