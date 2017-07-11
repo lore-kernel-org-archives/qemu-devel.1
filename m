@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dV2XW-0005pw-0M
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:17:50 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1dV2ak-0007LQ-GS
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:21:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dV2XS-0003Cv-Qv
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:17:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dV2XS-0003CU-HS
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:17:46 -0400
-References: <20170709175422.30185-1-peter.maydell@linaro.org>
-	<20170711162943.GF2223@work-vm>
-	<CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
-	<20170711190846.GA3138@work-vm>
-	<CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <53d067d6-b52a-a532-9f54-7d079e292a52@redhat.com>
-Date: Tue, 11 Jul 2017 16:17:42 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt"
-Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a
- negative number in fork_exec()
+	(envelope-from <benh@kernel.crashing.org>) id 1dV2ah-0004xn-C0
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:21:10 -0400
+Message-ID: <1499808035.2865.27.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Wed, 12 Jul 2017 07:20:35 +1000
+In-Reply-To: <c6d3bf29-9d5e-6b1c-f3b0-282fd16ec39f@kaod.org>
+References: <1499274819-15607-1-git-send-email-clg@kaod.org>
+	<1499274819-15607-4-git-send-email-clg@kaod.org>
+	<20170710102655.GE4083@umbus.fritz.box>
+	<9a7a16a0-f14f-bc65-d503-e2aee028633f@kaod.org>
+	<1499720443.2865.15.camel@kernel.crashing.org>
+	<57c22926-8ac9-1251-aba9-590b344673c6@kaod.org>
+	<20170711132751.GJ4083@umbus.fritz.box>
+	<c6d3bf29-9d5e-6b1c-f3b0-282fd16ec39f@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 03/26] target/ppc/POWER9: add
+ POWERPC_EXCP_POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- "patches@linaro.org" <patches@linaro.org>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <53d067d6-b52a-a532-9f54-7d079e292a52@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a negative
- number in fork_exec()
-References: <20170709175422.30185-1-peter.maydell@linaro.org>
- <20170711162943.GF2223@work-vm>
- <CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
- <20170711190846.GA3138@work-vm>
- <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/11/2017 03:40 PM, Peter Maydell wrote:
->>>
->>> The problem is you can only bail while you're in the parent
->>> before forking. Once you've started the child there's no
->>> mechanism for dealing with failure.
->>
->> Well, you can always exit the child before anything worse can happen.
+On Tue, 2017-07-11 at 15:52 +0200, C=C3=A9dric Le Goater wrote:
 >=20
-> You need a mechanism then for causing the parent to notice.
-> The current code would leave the parent in a blocking
-> accept() call forever (this is what all the XXX comments
-> in the current code are about).
+> > Just as we could build a POWER9 with XICS in qemu, we could build a=20
+> > POWER8 with XIVE.
+>=20
+> That might be the case with a POWER9 running in POWER8 compat mode.=20
+> I need to check.=20
 
-You can have the parent create a pipe before forking and does a blocking
-read, the child then manages fds and writes success (or failure) to its
-end of the pipe (or an early exit causes the parent to read EOF); when
-the parent finally gets word on the pipe, then it knows whether the
-child is dead-on-arrival due to early setup failures, or whether it is
-now safe to block on accept().  But it can easily get more and more
-complex the more you want to handle; and if the parent is
-multi-threaded, you have to be careful that you only call
-async-signal-safe functions in the child between the fork and exec.
+Yes. In "compat" mode (or more generally if the guest doesn't advertize
+support for native XIVE, whether it's in compat or native P9 mode is
+irrelevant in fact), we provide the old hcalls and effectively need to
+instantiate a XICS in qemu (KVM will exploit the XIVE under the hood
+but will make it look like a XICS to qemu ioctl's as well).
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cheers,
+Ben.
 
-
---soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZUB2AAoJEKeha0olJ0NqGfIH/jdg4rv50J4fsfgdrAudupXz
-ynLLoGFbEILilkS4Ca0jXskaOuSDD3E++B3XS/uT59y3guQaPsaCTVy+lJ5Xtfg5
-UVfagBGLOCCZuACxjwc8LDOlIgFQJz5YKmANZeRw8XLw9jnObE1JFrn8t5g1Hy0R
-qLANkX03zi5c1hSJDHOlWJzN94uARt8YGbcrFm0rlqKKt/eO3Yby9glUabMmxv+C
-3pHx5IoDnU0EZIsX7AgTinX0KTlMu9YRRa3ZSceXMSeWcpAdxroyBa9i89OIWHFy
-04ePwV8r6dKJuu/+YPlfD8IfaIrRKgZ+9sPKZa4Nc8be0cTbCL4SprFq/QSPl5E=
-=hAnI
------END PGP SIGNATURE-----
-
---soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt--
+> Thanks,
+>=20
+> C.=20
+>=20
+>=20
+> > > > > > Now.. I could imagine the POWER9 having a different core mode=
+l that
+> > > > > > came along with XIVE, but I can't see this new model being us=
+ed for
+> > > > > > anything anywhere in the rest of the series.
+> > > > >=20
+> > > > > See patch 26. But, maybe, I am taking a shortcut and we need an=
+other
+> > > > > family of flags.=20
+> > > >=20
+> > > > Or just some kind of enum for the interrupt controller, how do we=
+ do
+> > > > with OpenPIC vs. XICS already ? Old POWER3 had OpenPIC.
+> > >=20
+> > > AFAICT, we don't have such a CPU in QEMU/ppc.
+> >=20
+> > More to the point we don't have any machine type for those old POWER3
+> > setups.
+> >=20
+> > > We could use some extra flag to change the ICS behavior. The path I=
+ am
+> > > taking duplicates the ICS code but in real, we only need to change =
+the
+> > > irq handlers.=20
+> > >=20
+> > > Thanks,
+> > >=20
+> > > C.=20
+> > >=20
