@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57376)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1dUo8F-0007Sk-E1
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:54:48 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33390)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<bounce+964b3b.fcf65-qemu-devel=nongnu.org@mailtoshop.com>)
+	id 1dUoa7-00056V-HP
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1dUo8E-00081Q-78
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:54:47 -0400
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Date: Tue, 11 Jul 2017 05:54:35 +0000
-Message-ID: <AM5PR0401MB2545F60CA898D23D5E2F1E6D9AAE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
-	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
-	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
-	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
-	<AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
-	<AM5PR0401MB2545C23F66D6D0E096DCB0369AAA0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<a67cb139-e1b6-02fc-d451-4001bcbfceb3@redhat.com>
-	<AM5PR0401MB2545A78764598CD87827B14F9AAA0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<615e22ce-80b3-b000-360f-7272a867cdf9@arm.com>
-In-Reply-To: <615e22ce-80b3-b000-360f-7272a867cdf9@arm.com>
-Content-Language: en-US
+	(envelope-from
+	<bounce+964b3b.fcf65-qemu-devel=nongnu.org@mailtoshop.com>)
+	id 1dUoa3-0000zm-Gn
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:23:35 -0400
+Received: from mail-183-237.mailgun.info ([23.253.183.237]:21935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from
+	<bounce+964b3b.fcf65-qemu-devel=nongnu.org@mailtoshop.com>)
+	id 1dUoa3-0000zU-6K
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:23:31 -0400
+Sender: dem@mailtoshop.com
+Date: Tue, 11 Jul 2017 06:23:29 +0000
+From: Amazon <dem@mailtoshop.com>
+Mime-Version: 1.0
+Message-Id: <20170711062320.21180.C2EE1CE75307CD09@mailtoshop.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Prime Day: solo per oggi una giornata di promozioni
+ Amazon!
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: qemu-devel@nongnu.org
 
-SGkgSmVhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKZWFuLVBo
-aWxpcHBlIEJydWNrZXIgW21haWx0bzpqZWFuLXBoaWxpcHBlLmJydWNrZXJAYXJtLmNvbV0NCj4g
-U2VudDogRnJpZGF5LCBKdWx5IDA3LCAyMDE3IDg6NTAgUE0NCj4gVG86IEJoYXJhdCBCaHVzaGFu
-IDxiaGFyYXQuYmh1c2hhbkBueHAuY29tPjsgQXVnZXIgRXJpYw0KPiA8ZXJpYy5hdWdlckByZWRo
-YXQuY29tPjsgZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFy
-by5vcmc7IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcWVt
-dS1hcm1Abm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiB3ZWlAcmVkaGF0
-LmNvbTsga2V2aW4udGlhbkBpbnRlbC5jb207IG1hcmMuenluZ2llckBhcm0uY29tOw0KPiB0bkBz
-ZW1paGFsZi5jb207IHdpbGwuZGVhY29uQGFybS5jb207IGRyam9uZXNAcmVkaGF0LmNvbTsNCj4g
-cm9iaW4ubXVycGh5QGFybS5jb207IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZw0KPiBTdWJq
-ZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgMC84XSBWSVJUSU8tSU9NTVUgZGV2aWNlDQo+
-IA0KPiBPbiAwNy8wNy8xNyAxMjozNiwgQmhhcmF0IEJodXNoYW4gd3JvdGU6DQo+ID4+PiBJbiB0
-aGlzIHByb3Bvc2FsLCBRRU1VIHJlc2VydmVzIGEgaW92YS1yYW5nZSBmb3IgZ3Vlc3QgKG5vdCBo
-b3N0KSBhbmQNCj4gZ3Vlc3QNCj4gPj4ga2VybmVsIHdpbGwgdXNlIHRoaXMgYXMgbXNpLWlvdmEg
-dW50cmFuc2xhdGVkIChJT01NVV9SRVNWX01TSSkuIFdoaWxlDQo+IHRoaXMNCj4gPj4gZG9lcyBu
-b3QgY2hhbmdlIGhvc3QgaW50ZXJmYWNlIGFuZCBpdCB3aWxsIGNvbnRpbnVlIHRvIHVzZSBob3N0
-IHJlc2VydmVkDQo+ID4+IG1hcHBpbmcgZm9yIGFjdHVhbCBpbnRlcnJ1cHQgZ2VuZXJhdGlvbiwg
-bm8/DQo+ID4+IEJ1dCB0aGVuIHVzZXJzcGFjZSBuZWVkcyB0byBwcm92aWRlIElPTU1VX1JFU1Zf
-TVNJIHJhbmdlIHRvIGd1ZXN0DQo+ID4+IGtlcm5lbCwgcmlnaHQ/IFdoYXQgd291bGQgYmUgdGhl
-IHByb3Bvc2VkIG1hbm5lcj8NCj4gPg0KPiA+IEp1c3QgYW4gb3Bpbmlvbiwgd2UgY2FuIGRlZmlu
-ZSBmZWF0dXJlDQo+IChWSVJUSU9fSU9NTVVfRl9SRVNfTVNJX1JBTkdFKSBhbmQgcHJvdmlkZSB0
-aGlzIGluZm8gdmlhIGEgY29tbWFuZA0KPiAoVklSVElPX0lPTU1VX1RfTVNJX1JBTkdFKS4gR3Vl
-c3QgaW9tbXUtZHJpdmVyIHdpbGwgbWFrZSB0aGlzIGNhbGwNCj4gZHVyaW5nIGluaXRpYWxpemF0
-aW9uIGFuZCBzdG9yZSB0aGUgdmFsdWUuIFRoaXMgdmFsdWUgd2lsbCBqdXN0IHJlcGxhY2UNCj4g
-TVNJX0lPVkFfQkFTRSBhbmQgTVNJX0lPVkFfTEVOR0hUIGhhc2ggZGVmaW5lLiBSZXN0IHdpbGwg
-cmVtYWluIHNhbWUNCj4gaW4gdmlydGlvLWlvbW11IGRyaXZlci4NCj4gDQo+IFllcyBJIGhhZCBz
-b21ldGhpbmcgc2ltaWxhciBpbiBtaW5kLCBhbHRob3VnaCBtb3JlIGdlbmVyaWMgc2luY2Ugd2Un
-bGwNCj4gbmVlZCB0byBnZXQgb3RoZXIgYml0cyBvZiBpbmZvcm1hdGlvbiBmcm9tIHRoZSBkZXZp
-Y2UgaW4gZnV0dXJlIGV4dGVuc2lvbnMNCj4gKGZhdWx0IGhhbmRsaW5nLCBwYWdlIHRhYmxlIGZv
-cm1hdHMgYW5kIGR5bmFtaWMgcmVzZXJ2ZXMgb2YgbWVtb3J5IGZvcg0KPiBTVk0pLCBhbmQgbWF5
-YmUgYWxzbyBmb3IgZmluZGluZyBvdXQgcGVyLWFkZHJlc3Mtc3BhY2UgcGFnZSBncmFudWxhcml0
-eQ0KPiAoc2VlIG15IHJlcGx5IG9mIHBhdGNoIDMvOCkuIFRoZXNlIGFyZSBwZXItZW5kcG9pbnQg
-cHJvcGVydGllcyB0aGF0IGNhbm5vdA0KPiBiZSBhZHZlcnRpc2UgaW4gdGhlIHZpcnRpbyBjb25m
-aWcgc3BhY2UuDQo+IA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqKioNCj4g
-DQo+IFNvIEkgcHJvcG9zZSB0byBhZGQgYSBwZXItZW5kcG9pbnQgcHJvYmluZyBtZWNoYW5pc20g
-b24gdGhlIHJlcXVlc3QNCj4gcXVldWU6DQoNCldoYXQgaXMgcGVyLWVuZHBvaW50PyBJcyBpdCAi
-cGVyLXBjaS9wbGF0Zm9ybS1kZXZpY2UiPw0KDQo+IA0KPiAqIFRoZSBkZXZpY2UgYWR2ZXJ0aXNl
-cyBhIG5ldyBjb21tYW5kIFZJUlRJT19JT01NVV9UX1BST0JFIHdpdGgNCj4gZmVhdHVyZQ0KPiBi
-aXQgVklSVElPX0lPTU1VX0ZfUFJPQkUuDQo+ICogV2hlbiB0aGlzIGZlYXR1cmUgaXMgYWR2ZXJ0
-aXNlZCwgdGhlIGRldmljZSBzZXRzIHByb2JlX3NpemUgZmllbGQgaW4gdGhlDQo+IHRoZSBjb25m
-aWcgc3BhY2UuDQoNClByb2JhYmx5IEkgZGlkIG5vdCBnZXQgaG93IHZpcnRpby1pb21tdSBkZXZp
-Y2UgZW11bGF0aW9uIGRlY2lkZXMgdmFsdWUgb2YgInByb2JlX3NpemUiLCBjYW4geW91IHNoYXJl
-IG1vcmUgaW5mbz8NCg0KPiAqIFdoZW4gZGV2aWNlIG9mZmVycyBWSVJUSU9fSU9NTVVfRl9QUk9C
-RSwgdGhlIGRyaXZlciBzaG91bGQgc2VuZCBhbg0KPiBWSVJUSU9fSU9NTVVfVF9QUk9CRSByZXF1
-ZXN0IGZvciBlYWNoIG5ldyBlbmRwb2ludC4NCj4gKiBUaGUgZHJpdmVyIGFsbG9jYXRlcyBhIGRl
-dmljZS13cml0ZWFibGUgYnVmZmVyIG9mIHByb2JlX3NpemUgKHBsdXMNCj4gZnJhbWluZykgYW5k
-IHNlbmRzIGl0IGFzIGEgVklSVElPX0lPTU1VX1RfUFJPQkUgcmVxdWVzdC4NCj4gKiBUaGUgZGV2
-aWNlIGZpbGxzIHRoZSBidWZmZXIgd2l0aCB2YXJpb3VzIGluZm9ybWF0aW9uLg0KPiANCj4gc3Ry
-dWN0IHZpcnRpb19pb21tdV9yZXFfcHJvYmUgew0KPiAJLyogZGV2aWNlLXJlYWRhYmxlICovDQo+
-IAlzdHJ1Y3QgdmlydGlvX2lvbW11X3JlcV9oZWFkIGhlYWQ7DQo+IAlsZTMyIGRldmljZTsNCj4g
-CWxlMzIgZmxhZ3M7DQo+IA0KPiAJLyogbWF5YmUgYWxzbyBsZTMyIGNvbnRlbnRfc2l6ZSwgYnV0
-IGl0IG11c3QgYmUgZXF1YWwgdG8NCj4gCSAgIHByb2JlX3NpemUgKi8NCg0KQ2FuIHlvdSBwbGVh
-c2UgZGVzY3JpYmUgd2h5IHdlIG5lZWQgdG8gcGFzcyBzaXplIG9mICJwcm9iZV9zaXplIiBpbiBw
-cm9iZSByZXF1ZXN0Pw0KDQo+IA0KPiAJLyogZGV2aWNlLXdyaXRlYWJsZSAqLw0KPiAJdTggY29u
-dGVudFtdOw0KDQpJIGFzc3VtZSBjb250ZW50X3NpemUgYWJvdmUgaXMgdGhlIHNpemUgb2YgYXJy
-YXkgImNvbnRlbnRbXSIgYW5kIG1heCB2YWx1ZSBjYW4gYmUgZXF1YWwgdG8gcHJvYmVfc2l6ZSBh
-ZHZlcnRpc2VkIGJ5IGRldmljZT8NCg0KPiAJc3RydWN0IHZpcnRpb19pb21tdV9yZXFfdGFpbCB0
-YWlsOw0KPiB9Ow0KPiANCj4gSSdtIHN0aWxsIHN0cnVnZ2xpbmcgd2l0aCB0aGUgY29udGVudCBh
-bmQgbGF5b3V0IG9mIHRoZSBwcm9iZSByZXF1ZXN0LCBhbmQNCj4gd291bGQgYXBwcmVjaWF0ZSBh
-bnkgZmVlZGJhY2suIFRvIGJlIGVhc2lseSBleHRlbmRlZCwgSSB0aGluayBpdCBzaG91bGQNCj4g
-Y29udGFpbiBhIGxpc3Qgb2YgZmllbGRzIG9mIHZhcmlhYmxlIHNpemU6DQo+IA0KPiAJfDAgICAg
-ICAgICAgIDE1fDE2ICAgICAgICAgICAzMXwzMiAgICAgICAgICAgICAgIE58DQo+IAl8ICAgICB0
-eXBlICAgICB8ICAgIGxlbmd0aCAgICAgfCAgICAgIHZhbHVlcyAgICAgIHwNCj4gDQo+ICdsZW5n
-dGgnIG1pZ2h0IGJlIG1hZGUgb3B0aW9uYWwgaWYgaXQgY2FuIGJlIGRlZHVjZWQgZnJvbSB0eXBl
-LCBidXQgbWlnaHQNCj4gbWFrZSBkcml2ZXItc2lkZSBwYXJzaW5nIG1vcmUgcm9idXN0Lg0KPiAN
-Cj4gVGhlIHByb2JlIGNvdWxkIGVpdGhlciBiZSBkb25lIGZvciBlYWNoIGVuZHBvaW50LCBvciBm
-b3IgZWFjaCBhZGRyZXNzDQo+IHNwYWNlLiBJIG11Y2ggcHJlZmVyIGVuZHBvaW50IGJlY2F1c2Ug
-aXQgaXMgdGhlIHNtYWxsZXN0IGdyYW51bGFyaXR5LiBUaGUNCj4gZHJpdmVyIGNhbiB0aGVuIGRl
-Y2lkZSB3aGF0IGVuZHBvaW50cyB0byBwdXQgdG9nZXRoZXIgaW4gdGhlIHNhbWUgYWRkcmVzcw0K
-PiBzcGFjZSBiYXNlZCBvbiB0aGVpciBpbmRpdmlkdWFsIGNhcGFiaWxpdGllcy4gVGhlIHNwZWNp
-ZmljYXRpb24gd291bGQNCj4gZGVzY3JpYmVkIGhvdyBlYWNoIGVuZHBvaW50IHByb3BlcnR5IGlz
-IGNvbWJpbmVkIHdoZW4gZW5kcG9pbnRzIGFyZSBwdXQNCj4gaW4NCj4gdGhlIHNhbWUgYWRkcmVz
-cyBzcGFjZS4gRm9yIGV4YW1wbGUsIHRha2UgdGhlIG1pbmltdW0gb2YgYWxsIFBBU0lEIHNpemUs
-DQo+IHRoZSBtYXhpbXVtIG9mIGFsbCBwYWdlIGdyYW51bGFyaXRpZXMsIGNvbWJpbmUgZG9vcmJl
-bGwgYWRkcmVzc2VzLCBldGMuDQo+IA0KPiBJZiB3ZSBkaWQgdGhlIHByb2JlIG9uIGFkZHJlc3Mg
-c3BhY2VzIGluc3RlYWQsIHRoZSBkcml2ZXIgd291bGQgaGF2ZSB0bw0KPiByZS1zZW5kIGEgcHJv
-YmUgcmVxdWVzdCBlYWNoIHRpbWUgYSBuZXcgZW5kcG9pbnQgaXMgYXR0YWNoZWQgdG8gYW4NCj4g
-ZXhpc3RpbmcgYWRkcmVzcyBzcGFjZSwgdG8gc2VlIGlmIGl0IGlzIHN0aWxsIGNhcGFibGUgb2Yg
-cGFnZSB0YWJsZQ0KPiBoYW5kb3ZlciBvciBpZiB0aGUgZHJpdmVyIGp1c3QgY29tYmluZWQgYSBW
-RklPIGFuZCBhbiBlbXVsYXRlZCBlbmRwb2ludCBieQ0KPiBhY2NpZGVudC4NCj4gDQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICoqKg0KPiANCj4gVXNpbmcgdGhpcyBmcmFtZXdv
-cmssIHRoZSBkZXZpY2UgY2FuIGRlY2xhcmUgZG9vcmJlbGwgcmVnaW9ucyBieSBhZGRpbmcNCj4g
-b25lIG9yIG1vcmUgUkVTViBmaWVsZHMgaW50byB0aGUgcHJvYmUgYnVmZmVyOg0KPiANCj4gLyog
-J3R5cGUnICovDQo+ICNkZWZpbmUgVklSVElPX0lPTU1VX1BST0JFX1RfUkVTViAJMHgxDQo+IA0K
-PiAvKiAndmFsdWVzJy4gJ2xlbmd0aCcgaXMgc2l6ZW9mKHN0cnVjdCB2aXJ0aW9faW9tbXVfcHJv
-YmVfcmVzdikgKi8NCj4gc3RydWN0IHZpcnRpb19pb21tdV9wcm9iZV9yZXN2IHsNCj4gCWxlNjQg
-Z3BhOw0KPiAJbGU2NCBzaXplOw0KPiANCj4gI2RlZmluZSBWSVJUSU9fSU9NTVVfUFJPQkVfUkVT
-Vl9NU0kJMHgxDQo+IAl1OCB0eXBlOw0KDQp0eXBlIGlzIDE2IGJpdCBhYm92ZT8NCg0KPiB9Ow0K
-PiANCj4gU3VjaCBhIHJlZ2lvbiB3b3VsZCBiZSBzdWJqZWN0IHRvIHRoZSBmb2xsb3dpbmcgcnVs
-ZXM6DQo+IA0KPiAqIERyaXZlciBzaG91bGQgbm90IHVzZSBhbnkgSU9WQSBkZWNsYXJlZCBhcyBS
-RVNWX01TSSBpbiBhIG1hcHBpbmcuDQo+ICogRGV2aWNlIHNob3VsZCBsZWF2ZSBhbnkgdHJhbnNh
-Y3Rpb24gbWF0Y2hpbmcgYSBSRVNWX01TSSByZWdpb24gcGFzcw0KPiB0aHJvdWdoIHVudHJhbnNs
-YXRlZC4NCj4gKiBJZiB0aGUgZGV2aWNlIGRvZXMgbm90IGFkdmVydGlzZSBhbnkgUkVTViByZWdp
-b24sIHRoZW4gdGhlIGRyaXZlciBzaG91bGQNCj4gYXNzdW1lIHRoYXQgTVNJIGRvb3JiZWxscywg
-bGlrZSBhbnkgb3RoZXIgR1BBLCBtdXN0IGJlIG1hcHBlZCB3aXRoIGFuDQo+IGFyYml0cmFyeSBJ
-T1ZBIGluIG9yZGVyIGZvciB0aGUgZW5kcG9pbnQgdG8gYWNjZXNzIHRoZW0uDQo+ICogR2l2ZW4g
-dGhhdCB0aGUgZHJpdmVyICpzaG91bGQqIHBlcmZvcm0gYSBwcm9iZSByZXF1ZXN0IGlmIGF2YWls
-YWJsZSwgYW5kDQo+IGl0ICpzaG91bGQqIHVuZGVyc3RhbmQgdGhlIFZJUlRJT19JT01NVV9QUk9C
-RV9UX1JFU1YgZmllbGQsIHRoZW4gdGhpcw0KPiBmaWVsZCB0ZWxscyB0aGUgZ3Vlc3QgaG93IGl0
-IHNob3VsZCBoYW5kbGUgTVNJIGRvb3JiZWxscywgYW5kIHdoZXRoZXIgaXQNCj4gc2hvdWxkIG1h
-cCB0aGUgYWRkcmVzcyB2aWEgTUFQIHJlcXVlc3RzIG9yIG5vdC4NCj4gDQo+IERvZXMgdGhpcyBt
-YWtlIHNlbnNlIGFuZCBkaWQgSSBvdmVybG9vayBzb21ldGhpbmc/DQoNCk92ZXJhbGwgaXQgbG9v
-a3MgZ29vZCB0byBtZS4gRG8geW91IGhhdmUgcGxhbnMgdG8gaW1wbGVtZW50cyB0aGlzIGluIHZp
-cnRpby1pb21tdSBkcml2ZXIgYW5kIGt2bXRvb2w/DQoNClRoYW5rcw0KLUJoYXJhdA0KDQo+IA0K
-PiBUaGFua3MsDQo+IEplYW4NCg==
+<center>Se non visualizzi correttamente questa email clicca:<a href=3D"http=
+://email.mailtoshop.com/c/eJxVjsFuwyAQRL_G3IJ2lwDhwCGy3ZvVSv2AiASILRmTOqRW_=
+75EyiXSHGbe4Wm8jZeoJJssAWrQiKBIEHBCPABvqe-x7bUUoNsOTLOH5Ka55PuYb_ySExstRaOc=
+QO_kOXqBDrxH7WN0MkBFhiVLe6ONBDbbsZRbI44NfdRs28bfdRUCQEOSoOuHup6vnlDo3asO7ed=
+w-lqnFDr3d_rOsczTEu58LImt9iekx86H3zDXq0tersuD5_XKik1VT0r9A9KqRzI">qui</a>.<=
+/center>
+<center>Scopri le migliori promozioni del giorno, aggiungi dem@mailtoshop.c=
+om alla tua rubrica.</center>
+<BR>
+<BR>
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://emai=
+l.mailtoshop.com/c/eJwVjk0OgyAUhE8ju5LHQ3iyYNFYe4CmFzDgXwJiFev1S5PJTL7FZMbb=
+0Y1ascUiCAISAjRKBI5CNMBb7DrRdqQkUPsAU9UQ-yXkdMxp4y5FNlskp5VXGqhRBA56J70yYPr=
+G1SS0ZtFibcgoYMHOOW-VvFf4LLqui1-Sp30q8H4Vm3MMdcmQ0jFwnz3b7WeI580P3yGU9TWt03=
+r-KyzbWA6g1j9Kujij">
+  <head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8=
+" >
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+=3D1">
+    <title>Prime Day su Amazon.it
+    </title>
+    <style type=3D"text/css">
+      .ReadMsgBody {
+        width: 100%;
+      }
+      .ExternalClass {
+        width: 100%;
+      }
+    </style>
+  </head>=20
+ <center>
+<table style=3D"width: 610px; height: 30px;">
+<tbody>
+<tr>
+<td align=3D"left" valign=3D"top" width=3D"305"><a href=3D"http://email.mai=
+ltoshop.com/c/eJwVj7GOhDAMRL8Guo0chwQoUqxY6K67q5GBsCCRhIPsIt3Xn1cay3rjKcaTn=
+cfZ6Hy1CLKEUkowqBAESlmBaLBtZdOWWkHZPKDOCvC0bimeS9zFGH2-WKICiMpaI7pxGAaDANUI=
+OOipkG6k3Fssar5Dvtklpf3M1D3DjnVdlyBPfzGINTF_xYl4DTyHmzP1SHEP9O7PFA-XaOiZe2I=
+dR7wy1a2OMz_fXZWhCXH6kNYSsTKgJHuJnmz5T1nuekOZH_bX-ddtcm-38TMhhmd4iXg882Q9Z9=
+CYf8fLU2w"><img style=3D"display: block; border: 0;" src=3D"http://email.ma=
+iltoshop.com/c/eJwdT8tuhDAM_BpyI3IMJMshB8SyPW1XKpeqFxRIeEgkoRB66Nc3VPJ4RmPJ=
+Hms5DiMvyCIRmADBGHDMECgydgNaY9OwuhFFBqK-Q5nkYNWyBn_MfqODt2SWTOQMNZa8ZGOmRsH=
+LnvUcRQ_aZKA4sRLzUpQFkFXOIWxHklUJPmJZao1eVKqs-vXu2hfNxarJHFG8RcAttm33-hzC5R=
+1-DOvi_ufNFSVy2zIRqXpWX6_39Pm6V7RrP2P8rv1ALBKsC-jo5iayy29jz1SbH7PGV5x3kzup3=
+ycSpI3XkfM_2VxQIA" alt=3D"" width=3D"176" height=3D"auto" /></a></td>
+<td align=3D"right" valign=3D"top" width=3D"305">
+<div style=3D"font-family: Helvetica, sans-serif; font-size: 9px; line-heig=
+ht: 10px; color: #c5c5c5;">&nbsp;</div>
+<div style=3D"font-family: Helvetica, sans-serif; font-size: 9px; line-heig=
+ht: 10px; color: #c5c5c5;"><strong style=3D"font-size: 12px; line-height: 1=
+5px; color: #388de9;"><a style=3D"font-size: 12px; line-height: 15px; color=
+: #388de9; text-decoration: none;" href=3D"http://email.mailtoshop.com/c/eJ=
+wVjk1uhSAUhVcjs5LLRUAHDF58uoJ2ATxFIQGhijXt6stLTs7P4CTfotd5lYJ4jcAUKMZAIkegy=
+FgHdMBxZMOoBAc1PKFvWojGh5JOlzKdUyROd4ZzA7ZdUHGFYgHZWrFaRKHMS9oXiRrbXvUCSNCu=
+lNzwR4NT1X3f1ETzl3bqS91bruZseMd8nSVFe9S6-DMH80tdieF95JO3DX9-fU5dg9LETA79beP=
+1sdgfGyrinvZtv2g6NlJ0rJQo5T_fyUWo;nodeId=3D201050620&tag=3Dmshopcom-21">RES=
+I GRATUITI</a> </strong> <br />Soggetto a limitazioni</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table style=3D"width: 610px;">
+<tbody>
+<tr>
+<td><a href=3D"http://email.mailtoshop.com/c/eJwVjktuwyAURVcDs6DH42cPGESOvY=
+J2AWDwRzKQJqSWuvpi6U7O0R2cYJd50YruFoEbMJyDRoHAkPMO2IDjyIfRKAFmeEBPJCS3H7W8t=
+_Jkc0l0szwqjLg47b0zc9BeemX6Lmh0i5Rxpsmi7E2vgB52q_X5JuJOcGo7z5O55P5KZntt7C8t=
+pj0S8fj-mjqCOpdwkQEQvTAgeHPVrU2lq6El3JDTl_2J6XML8TcerTGXvOYPK6-VVpvaB7X-B80=
+fRAM"> <img style=3D"display: block; border: 0;" src=3D"http://email.mailto=
+shop.com/c/eJxFj8FugzAQRL8mvsVaG2zDwQcLnBaphKpEUdsLcoIhVBgokErt19f0Uml3Z_QO=
+q5laNteGM9RJCkSAIAQ4DShgSkgEOKFak0QLFoBIUoh3ITjT9eu43MYJX0eHbjIitaCsEfwaXWx=
+9MSCYDQPSxE1teUMD5CQNYxEzQL28reu07AK1owc_Djtbd2ZvnPkZh-2fh50zrV28efBLY39Urt=
+6L4_6gysesOG7UZ_XyD55firz40yzXqXrzVm9BNzR3zqbmm4hK5yp7qlRZFkmmTrqsOIHXEKDKT=
+rg6M2BhxHgQV_hjatEsP62772v7ZXtfexiHdrjjcW7RKp1PSjn_Bcr4Wzw" alt=3D"Amazon F=
+ashion;" width=3D"610" /> </a></td>
+</tr>
+</tbody>
+</table>
+</center>
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<center>Questa email ti =C3=A8 stata inviata da Mailtoshop e dai suoi partn=
+er perch=C3=A8 ti sei iscritto o hai partecipato ad una delle nostre inizia=
+tive.
+<BR>
+<BR>
+Se non vuoi pi=C3=B9 ricevere le nostre offerte, promozioni e sconti,la can=
+cellazione =C3=A8 semplice,basta un solo click <a href=3D"http://email.mail=
+toshop.com/u/eJwNzEkSwiAQAMDXyE1qZlgGDpwwD0lYklQF0Gh8v_YDOoeaqjViDwTIwIhgSR=
+FIQnQgI00TxomNAo4P8DcNbd6Pz3hv4ynTaGILGRd2BbS2S6mZqc4OE8zolS7sFhAtkPbsDYgzv=
+Eq77rl8y_Gv-uhrv-Q41x-G_iZf">qui</a>.</center>
+<BR>
+<BR>
