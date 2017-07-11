@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dUrZj-0006gh-CJ
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:35:24 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dUrbi-0007Xh-EH
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dUrZg-0000vI-AN
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:35:23 -0400
-References: <1499765477-10541-1-git-send-email-thuth@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <37126d01-f5bb-653f-66dc-541b6e0f1d6f@redhat.com>
-Date: Tue, 11 Jul 2017 11:35:16 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dUrbf-0001YA-DM
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:37:26 -0400
+Date: Tue, 11 Jul 2017 10:36:19 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170711093619.GH17792@stefanha-x1.localdomain>
+References: <20170707154646.22230-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1499765477-10541-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] trivial: Move
- softmmu_template.h to the accel/tcg/ folder
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qM81t570OJUP5TU/"
+Content-Disposition: inline
+In-Reply-To: <20170707154646.22230-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hxtool: remove dead -q option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
 
-On 11/07/2017 11:31, Thomas Huth wrote:
-> The header is only used by accel/tcg/cputlb.c so we can
-> move it to the accel/tcg/ folder, too.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+--qM81t570OJUP5TU/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jul 07, 2017 at 05:46:46PM +0200, Paolo Bonzini wrote:
+> This was used to extract .txt documentation for QMP.  This was
+> changed to use the QAPI schema instead, so zap it.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  Note: This patch should be applied after Philippe's "MAINTAINERS:
->  update TCG entries" patch here:
->  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg06529.html
-> 
->  MAINTAINERS                                        | 1 -
->  softmmu_template.h => accel/tcg/softmmu_template.h | 0
->  2 files changed, 1 deletion(-)
->  rename softmmu_template.h => accel/tcg/softmmu_template.h (100%)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 74b3956..993b12e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -86,7 +86,6 @@ M: Richard Henderson <rth@twiddle.net>
->  S: Maintained
->  F: cpus.c
->  F: exec.c
-> -F: softmmu_template.h
->  F: accel/tcg/
->  F: include/exec/cpu*.h
->  F: include/exec/exec-all.h
-> diff --git a/softmmu_template.h b/accel/tcg/softmmu_template.h
-> similarity index 100%
-> rename from softmmu_template.h
-> rename to accel/tcg/softmmu_template.h
-> 
+>  scripts/hxtool | 46 +---------------------------------------------
+>  1 file changed, 1 insertion(+), 45 deletions(-)
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--qM81t570OJUP5TU/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZZJwTAAoJEJykq7OBq3PIi84H/jP4dQFSbbttSBbvP8lDJNFH
+ALi2h5DotiLrVw/VgqY8cv9dLzQhw71d05O0NOCLOlepURPoPhWf5IVUU8cjidRu
+opuS33lQ0qEAQbs1ZnzDE37l+HpQfUwrFTgtMOC3zXe7imlCuTMPiyo+AnVI4KLX
+AJqgH1/Fxb2PBEobDEOBCSH9is4ZYuNmQk5Ex47rRRY0ZOSxm6xZJKCkyUbS0fZK
+dhLlfpoS6uX/eEau3XAto8wB0+6CiV1RiZG0OBaKuODgxAJ/3d9vhX49h33LniJy
+Xy+XPZB+fTJjyj63lmOCbrQo8EzKg9OkGxy1s0WBRVwTHb5H9DRJ3Lpdbw0kyEQ=
+=iQtW
+-----END PGP SIGNATURE-----
+
+--qM81t570OJUP5TU/--
