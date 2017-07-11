@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36N-0001LS-0H
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36O-0001Lm-Gl
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36L-0005P2-VC
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:51 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:35138
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV36N-0005Pp-CP
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:52 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:35140
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dV36L-0005OY-OG
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:49 -0400
+	id 1dV36N-0005PK-1W
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:53:51 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Tue, 11 Jul 2017 22:53:25 +0100
-Message-Id: <1499810007-28613-7-git-send-email-mark.cave-ayland@ilande.co.uk>
+Date: Tue, 11 Jul 2017 22:53:27 +0100
+Message-Id: <1499810007-28613-9-git-send-email-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <1499810007-28613-1-git-send-email-mark.cave-ayland@ilande.co.uk>
 References: <1499810007-28613-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 6/8] apb: add busA qdev property to PBM PCI
- bridge
+Subject: [Qemu-devel] [PATCH 8/8] sun4u: move in-built devices behind PCI
+ bridge A
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +28,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
-As future sun4u PCI topologies place the ebus containing the in-built devices
-behind a PCI bridge, add a busA property to the PBM PCI bridge that is then
-used to allow IO accesses by default.
+This switches the sun4u model to being much closer to a real Ultra 5.
 
-This allows early fw_cfg/NVRAM/serial access to occur even before OpenBIOS
-has had a chance to configure the PCI bridges.
+Since the existing code previously bypassed the PCI bridge interrupt
+swizzling, reorganise the interrupt mapping functions so that
+pci_pbm_map_irq() is used by the PCI bridges and pci_apb_map_irq() is
+used by the PCI host bridge.
+
+As part of this change we also combine the "onboard" NIC and the ebus into
+a single multi-function device as done on a real Ultra 5.
+
+Finally we mark the physically unavailable slots (plus slot 0 in busA) as
+reserved to ensure that users can't plug devices into non-existent slots
+which will break interrupt routing.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/apb.c |   44 +++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 37 insertions(+), 7 deletions(-)
+ hw/pci-host/apb.c  |   35 +++++++++++++++++++++++++++--------
+ hw/sparc64/sun4u.c |   25 ++++++++++++++++++++-----
+ 2 files changed, 47 insertions(+), 13 deletions(-)
 
 diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-index 5ad7678..f9badad 100644
+index f9badad..5000432 100644
 --- a/hw/pci-host/apb.c
 +++ b/hw/pci-host/apb.c
-@@ -153,6 +153,18 @@ typedef struct APBState {
-     unsigned int nr_resets;
- } APBState;
- 
-+#define TYPE_PBM_PCI_BRIDGE "pbm-bridge"
-+#define PBM_PCI_BRIDGE(obj) \
-+    OBJECT_CHECK(PBMPCIBridge, (obj), TYPE_PBM_PCI_BRIDGE)
-+
-+typedef struct PBMPCIBridge {
-+    /*< private >*/
-+    PCIBridge parent_obj;
-+
-+    /* Is this busA with in-built devices (ebus)? */
-+    bool busA;
-+} PBMPCIBridge;
-+
- static inline void pbm_set_request(APBState *s, unsigned int irq_num)
+@@ -601,16 +601,35 @@ static uint64_t apb_pci_config_read(void *opaque, hwaddr addr,
+ /* The APB host has an IRQ line for each IRQ line of each slot.  */
+ static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
  {
-     APB_DPRINTF("%s: request irq %d\n", __func__, irq_num);
-@@ -634,8 +646,6 @@ static void pci_apb_set_irq(void *opaque, int irq_num, int level)
- 
- static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
- {
--    pci_bridge_initfn(dev, TYPE_PCI_BUS);
--
-     /*
-      * command register:
-      * According to PCI bridge spec, after reset
-@@ -645,11 +655,23 @@ static void apb_pci_bridge_realize(PCIDevice *dev, Error **errp)
-      *   the reset value should be zero unless the boot pin is tied high
-      *   (which is true) and thus it should be PCI_COMMAND_MEMORY.
-      */
--    pci_set_word(dev->config + PCI_COMMAND,
--                 PCI_COMMAND_MEMORY);
-+    uint16_t cmd = PCI_COMMAND_MEMORY;
-+    PBMPCIBridge *br = PBM_PCI_BRIDGE(dev);
-+
-+    pci_bridge_initfn(dev, TYPE_PCI_BUS);
-+
-+    /* If initialising busA, ensure that we allow IO transactions so that
-+       we get the early serial console until OpenBIOS configures the bridge */
-+    if (br->busA) {
-+        cmd |= PCI_COMMAND_IO;
-+    }
-+
-+    pci_set_word(dev->config + PCI_COMMAND, cmd);
-     pci_set_word(dev->config + PCI_STATUS,
-                  PCI_STATUS_FAST_BACK | PCI_STATUS_66MHZ |
-                  PCI_STATUS_DEVSEL_MEDIUM);
-+
-+    pci_bridge_update_mappings(PCI_BRIDGE(br));
+-    return ((pci_dev->devfn & 0x18) >> 1) + irq_num;
++    /* Return the irq as swizzled by the PBM */
++    return irq_num;
  }
  
- PCIBus *pci_apb_init(hwaddr special_base,
-@@ -702,16 +724,17 @@ PCIBus *pci_apb_init(hwaddr special_base,
+ static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
++    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
++                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
++
+     int bus_offset;
+-    if (pci_dev->devfn & 1)
+-        bus_offset = 16;
+-    else
+-        bus_offset = 0;
++    if (br->busA) {
++        bus_offset = 0x0;
++
++        /* The on-board devices have fixed (legacy) OBIO intnos */
++        switch (PCI_SLOT(pci_dev->devfn)) {
++        case 1:
++            /* Onboard NIC */
++            return 0x21;
++        case 3:
++            /* Onboard IDE */
++            return 0x20;
++
++        default:
++            /* Normal intno, fall through */
++            break;
++        }
++    } else {
++        bus_offset = 0x10;
++    }
+     return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+ }
  
-     /* APB secondary busses */
+@@ -692,7 +711,7 @@ PCIBus *pci_apb_init(hwaddr special_base,
+     d = APB_DEVICE(dev);
+     phb = PCI_HOST_BRIDGE(dev);
+     phb->bus = pci_register_bus(DEVICE(phb), "pci",
+-                                pci_apb_set_irq, pci_pbm_map_irq, d,
++                                pci_apb_set_irq, pci_apb_map_irq, d,
+                                 &d->pci_mmio,
+                                 get_system_io(),
+                                 0, 32, TYPE_PCI_BUS);
+@@ -726,14 +745,14 @@ PCIBus *pci_apb_init(hwaddr special_base,
      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
--                                   "pbm-bridge");
-+                                   TYPE_PBM_PCI_BRIDGE);
+                                    TYPE_PBM_PCI_BRIDGE);
      br = PCI_BRIDGE(pci_dev);
-     pci_bridge_map_irq(br, "pciB", pci_apb_map_irq);
+-    pci_bridge_map_irq(br, "pciB", pci_apb_map_irq);
++    pci_bridge_map_irq(br, "pciB", pci_pbm_map_irq);
      qdev_init_nofail(&pci_dev->qdev);
      *busB = pci_bridge_get_sec_bus(br);
  
      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
--                                   "pbm-bridge");
-+                                   TYPE_PBM_PCI_BRIDGE);
+                                    TYPE_PBM_PCI_BRIDGE);
      br = PCI_BRIDGE(pci_dev);
-     pci_bridge_map_irq(br, "pciA", pci_apb_map_irq);
-+    qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
+-    pci_bridge_map_irq(br, "pciA", pci_apb_map_irq);
++    pci_bridge_map_irq(br, "pciA", pci_pbm_map_irq);
+     qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
      qdev_init_nofail(&pci_dev->qdev);
      *busA = pci_bridge_get_sec_bus(br);
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 3bb3bf2..b8b96be 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -27,6 +27,7 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci/pci_bus.h"
+ #include "hw/pci-host/apb.h"
+ #include "hw/i386/pc.h"
+ #include "hw/char/serial.h"
+@@ -42,6 +43,7 @@
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/sysbus.h"
+ #include "hw/ide.h"
++#include "hw/ide/pci.h"
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "qemu/cutils.h"
+@@ -448,10 +450,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     ivec_irqs = qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC_MAX);
+     pci_bus = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
+                            &pci_busB, &pbm_irqs);
+-    pci_vga_init(pci_bus);
  
-@@ -833,6 +856,11 @@ static const TypeInfo pbm_host_info = {
-     .class_init    = pbm_host_class_init,
- };
- 
-+static Property pbm_pci_properties[] = {
-+    DEFINE_PROP_BOOL("busA", PBMPCIBridge, busA, false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
+-    /* XXX Should be pci_busA */
+-    ebus = pci_create_simple(pci_bus, -1, "ebus");
++    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
++       reserved (leaving no slots free after on-board devices) leaving slots
++       0-3 are free on busB 4*/
++    pci_bus->slot_reserved_mask = 0xfffffffc;
++    pci_busA->slot_reserved_mask = 0xfffffff1;
++    pci_busB->slot_reserved_mask = 0xfffffff0;
 +
- static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -848,12 +876,14 @@ static void pbm_pci_bridge_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->reset = pci_bridge_reset;
-     dc->vmsd = &vmstate_pci_device;
-+    dc->props = pbm_pci_properties;
- }
++    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, "ebus");
++    qdev_init_nofail(DEVICE(ebus));
++
+     isa_bus = pci_ebus_init(ebus, pbm_irqs);
  
- static const TypeInfo pbm_pci_bridge_info = {
--    .name          = "pbm-bridge",
-+    .name          = TYPE_PBM_PCI_BRIDGE,
-     .parent        = TYPE_PCI_BRIDGE,
-     .class_init    = pbm_pci_bridge_class_init,
-+    .instance_size = sizeof(PBMPCIBridge),
- };
+     i = 0;
+@@ -464,14 +473,20 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     serial_hds_isa_init(isa_bus, i, MAX_SERIAL_PORTS);
+     parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
  
- static void pbm_register_types(void)
+-    pci_dev = pci_create(pci_bus, -1, "ne2k_pci");
++    pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
++
++    pci_dev = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 1), true,
++                                       "ne2k_pci");
+     dev = &pci_dev->qdev;
+     qdev_set_nic_properties(dev, &nd_table[0]);
+     qdev_init_nofail(dev);
+ 
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+ 
+-    pci_cmd646_ide_init(pci_bus, hd, 1);
++    pci_dev = pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
++    qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
++    qdev_init_nofail(&pci_dev->qdev);
++    pci_ide_create_devs(pci_dev, hd);
+ 
+     isa_create_simple(isa_bus, "i8042");
+ 
 -- 
 1.7.10.4
