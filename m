@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxmG-00023m-0x
+	(envelope-from <mreitz@redhat.com>) id 1dUxmE-00022c-MA
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxmB-0007A0-Bx
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxmA-00079h-QO
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:42 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:08:00 +0200
-Message-Id: <20170711160814.20941-72-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:58 +0200
+Message-Id: <20170711160814.20941-70-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 71/85] block: Add PreallocMode to bdrv_truncate()
+Subject: [Qemu-devel] [PULL 69/85] iotests: add test 178 for qemu-img measure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,273 +22,665 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-For block drivers that just pass a truncate request to the underlying
-protocol, we can now pass the preallocation mode instead of aborting if
-it is not PREALLOC_MODE_OFF.
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20170613202107.10125-3-mreitz@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20170705125738.8777-10-stefanha@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h  |  3 ++-
- block.c                |  5 +++--
- block/blkdebug.c       |  8 +-------
- block/block-backend.c  |  2 +-
- block/crypto.c         |  8 +-------
- block/parallels.c      | 11 +++++++----
- block/qcow.c           |  6 ++++--
- block/qcow2-refcount.c |  2 +-
- block/qcow2.c          |  4 ++--
- block/raw-format.c     |  8 +-------
- block/vhdx-log.c       |  2 +-
- block/vhdx.c           |  3 ++-
- 12 files changed, 26 insertions(+), 36 deletions(-)
+ tests/qemu-iotests/178           | 170 +++++++++++++++++++++++
+ tests/qemu-iotests/178.out.qcow2 | 286 +++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/178.out.raw   | 158 +++++++++++++++++++++
+ tests/qemu-iotests/group         |   1 +
+ 4 files changed, 615 insertions(+)
+ create mode 100755 tests/qemu-iotests/178
+ create mode 100644 tests/qemu-iotests/178.out.qcow2
+ create mode 100644 tests/qemu-iotests/178.out.raw
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 96edc85..b3e2674 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -302,7 +302,8 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-     const char *backing_file);
- int bdrv_get_backing_file_depth(BlockDriverState *bs);
- void bdrv_refresh_filename(BlockDriverState *bs);
--int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp);
-+int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
-+                  Error **errp);
- int64_t bdrv_nb_sectors(BlockDriverState *bs);
- int64_t bdrv_getlength(BlockDriverState *bs);
- int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
-diff --git a/block.c b/block.c
-index 37e7b3d..d24ae85 100644
---- a/block.c
-+++ b/block.c
-@@ -3411,7 +3411,8 @@ exit:
- /**
-  * Truncate file to 'offset' bytes (needed only for file protocols)
-  */
--int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
-+int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
-+                  Error **errp)
- {
-     BlockDriverState *bs = child->bs;
-     BlockDriver *drv = bs->drv;
-@@ -3434,7 +3435,7 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
- 
-     assert(!(bs->open_flags & BDRV_O_INACTIVE));
- 
--    ret = drv->bdrv_truncate(bs, offset, PREALLOC_MODE_OFF, errp);
-+    ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
-     if (ret == 0) {
-         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-         bdrv_dirty_bitmap_truncate(bs);
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index a9b03ff..c19ab28 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -824,13 +824,7 @@ static int64_t blkdebug_getlength(BlockDriverState *bs)
- static int blkdebug_truncate(BlockDriverState *bs, int64_t offset,
-                              PreallocMode prealloc, Error **errp)
- {
--    if (prealloc != PREALLOC_MODE_OFF) {
--        error_setg(errp, "Unsupported preallocation mode '%s'",
--                   PreallocMode_lookup[prealloc]);
--        return -ENOTSUP;
--    }
--
--    return bdrv_truncate(bs->file, offset, errp);
-+    return bdrv_truncate(bs->file, offset, prealloc, errp);
- }
- 
- static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0df3457..3c1b756 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1780,7 +1780,7 @@ int blk_truncate(BlockBackend *blk, int64_t offset, Error **errp)
-         return -ENOMEDIUM;
-     }
- 
--    return bdrv_truncate(blk->root, offset, errp);
-+    return bdrv_truncate(blk->root, offset, PREALLOC_MODE_OFF, errp);
- }
- 
- static void blk_pdiscard_entry(void *opaque)
-diff --git a/block/crypto.c b/block/crypto.c
-index 33f690f..58ef6f2 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -367,15 +367,9 @@ static int block_crypto_truncate(BlockDriverState *bs, int64_t offset,
-     size_t payload_offset =
-         qcrypto_block_get_payload_offset(crypto->block);
- 
--    if (prealloc != PREALLOC_MODE_OFF) {
--        error_setg(errp, "Unsupported preallocation mode '%s'",
--                   PreallocMode_lookup[prealloc]);
--        return -ENOTSUP;
--    }
--
-     offset += payload_offset;
- 
--    return bdrv_truncate(bs->file, offset, errp);
-+    return bdrv_truncate(bs->file, offset, prealloc, errp);
- }
- 
- static void block_crypto_close(BlockDriverState *bs)
-diff --git a/block/parallels.c b/block/parallels.c
-index 8be46a7..5a38998 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -224,7 +224,7 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
-         } else {
-             ret = bdrv_truncate(bs->file,
-                                 (s->data_end + space) << BDRV_SECTOR_BITS,
--                                NULL);
-+                                PREALLOC_MODE_OFF, NULL);
-         }
-         if (ret < 0) {
-             return ret;
-@@ -458,7 +458,8 @@ static int parallels_check(BlockDriverState *bs, BdrvCheckResult *res,
-         res->leaks += count;
-         if (fix & BDRV_FIX_LEAKS) {
-             Error *local_err = NULL;
--            ret = bdrv_truncate(bs->file, res->image_end_offset, &local_err);
-+            ret = bdrv_truncate(bs->file, res->image_end_offset,
-+                                PREALLOC_MODE_OFF, &local_err);
-             if (ret < 0) {
-                 error_report_err(local_err);
-                 res->check_errors++;
-@@ -699,7 +700,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     if (!(flags & BDRV_O_RESIZE) || !bdrv_has_zero_init(bs->file->bs) ||
--            bdrv_truncate(bs->file, bdrv_getlength(bs->file->bs), NULL) != 0) {
-+            bdrv_truncate(bs->file, bdrv_getlength(bs->file->bs),
-+                          PREALLOC_MODE_OFF, NULL) != 0) {
-         s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
-     }
- 
-@@ -742,7 +744,8 @@ static void parallels_close(BlockDriverState *bs)
-     }
- 
-     if (bs->open_flags & BDRV_O_RDWR) {
--        bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS, NULL);
-+        bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS,
-+                      PREALLOC_MODE_OFF, NULL);
-     }
- 
-     g_free(s->bat_dirty_bmap);
-diff --git a/block/qcow.c b/block/qcow.c
-index 2002c16..10c96b8 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -443,7 +443,8 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
-                 /* round to cluster size */
-                 cluster_offset = (cluster_offset + s->cluster_size - 1) &
-                     ~(s->cluster_size - 1);
--                bdrv_truncate(bs->file, cluster_offset + s->cluster_size, NULL);
-+                bdrv_truncate(bs->file, cluster_offset + s->cluster_size,
-+                              PREALLOC_MODE_OFF, NULL);
-                 /* if encrypted, we must initialize the cluster
-                    content which won't be written */
-                 if (bs->encrypted &&
-@@ -923,7 +924,8 @@ static int qcow_make_empty(BlockDriverState *bs)
-     if (bdrv_pwrite_sync(bs->file, s->l1_table_offset, s->l1_table,
-             l1_length) < 0)
-         return -1;
--    ret = bdrv_truncate(bs->file, s->l1_table_offset + l1_length, NULL);
-+    ret = bdrv_truncate(bs->file, s->l1_table_offset + l1_length,
-+                        PREALLOC_MODE_OFF, NULL);
-     if (ret < 0)
-         return ret;
- 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index ceb08bc..e82e155 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1732,7 +1732,7 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
-                 }
- 
-                 ret = bdrv_truncate(bs->file, offset + s->cluster_size,
--                                    &local_err);
-+                                    PREALLOC_MODE_OFF, &local_err);
-                 if (ret < 0) {
-                     error_report_err(local_err);
-                     goto resize_fail;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index b7c5994..7391b49 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3133,7 +3133,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-         /* align end of file to a sector boundary to ease reading with
-            sector based I/Os */
-         cluster_offset = bdrv_getlength(bs->file->bs);
--        return bdrv_truncate(bs->file, cluster_offset, NULL);
-+        return bdrv_truncate(bs->file, cluster_offset, PREALLOC_MODE_OFF, NULL);
-     }
- 
-     buf = qemu_blockalign(bs, s->cluster_size);
-@@ -3349,7 +3349,7 @@ static int make_completely_empty(BlockDriverState *bs)
-     }
- 
-     ret = bdrv_truncate(bs->file, (3 + l1_clusters) * s->cluster_size,
--                        &local_err);
-+                        PREALLOC_MODE_OFF, &local_err);
-     if (ret < 0) {
-         error_report_err(local_err);
-         goto fail;
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 721c9a0..142649e 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -357,12 +357,6 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
- {
-     BDRVRawState *s = bs->opaque;
- 
--    if (prealloc != PREALLOC_MODE_OFF) {
--        error_setg(errp, "Unsupported preallocation mode '%s'",
--                   PreallocMode_lookup[prealloc]);
--        return -ENOTSUP;
--    }
--
-     if (s->has_size) {
-         error_setg(errp, "Cannot resize fixed-size raw disks");
-         return -ENOTSUP;
-@@ -375,7 +369,7 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
- 
-     s->size = offset;
-     offset += s->offset;
--    return bdrv_truncate(bs->file, offset, errp);
-+    return bdrv_truncate(bs->file, offset, prealloc, errp);
- }
- 
- static int raw_media_changed(BlockDriverState *bs)
-diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-index 3f4c2aa..01278f3 100644
---- a/block/vhdx-log.c
-+++ b/block/vhdx-log.c
-@@ -548,7 +548,7 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHDXState *s,
-             if (new_file_size % (1024*1024)) {
-                 /* round up to nearest 1MB boundary */
-                 new_file_size = ((new_file_size >> 20) + 1) << 20;
--                bdrv_truncate(bs->file, new_file_size, NULL);
-+                bdrv_truncate(bs->file, new_file_size, PREALLOC_MODE_OFF, NULL);
-             }
-         }
-         qemu_vfree(desc_entries);
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 8b270b5..85c476a 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1171,7 +1171,8 @@ static int vhdx_allocate_block(BlockDriverState *bs, BDRVVHDXState *s,
-     /* per the spec, the address for a block is in units of 1MB */
-     *new_offset = ROUND_UP(*new_offset, 1024 * 1024);
- 
--    return bdrv_truncate(bs->file, *new_offset + s->block_size, NULL);
-+    return bdrv_truncate(bs->file, *new_offset + s->block_size,
-+                         PREALLOC_MODE_OFF, NULL);
- }
- 
- /*
+diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
+new file mode 100755
+index 0000000..6af52c6
+--- /dev/null
++++ b/tests/qemu-iotests/178
+@@ -0,0 +1,170 @@
++#!/bin/bash
++#
++# qemu-img measure sub-command tests
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=stefanha@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1    # failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$TEST_IMG.converted"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
++
++_supported_fmt raw qcow2
++_supported_proto file
++_supported_os Linux
++
++echo "== Input validation =="
++echo
++
++_make_test_img 1G
++
++$QEMU_IMG measure # missing arguments
++$QEMU_IMG measure --size 2G "$TEST_IMG" # only one allowed
++$QEMU_IMG measure "$TEST_IMG" a # only one filename allowed
++$QEMU_IMG measure --object secret,id=sec0,data=MTIzNDU2,format=base64 # missing filename
++$QEMU_IMG measure --image-opts # missing filename
++$QEMU_IMG measure -f qcow2 # missing filename
++$QEMU_IMG measure -l snap1 # missing filename
++$QEMU_IMG measure -o , # invalid option list
++$QEMU_IMG measure -l snapshot.foo # invalid snapshot option
++$QEMU_IMG measure --output foo # invalid output format
++$QEMU_IMG measure --size -1 # invalid image size
++$QEMU_IMG measure -O foo "$TEST_IMG" # unknown image file format
++
++make_test_img_with_fmt() {
++    # Shadow global variables within this function
++    local IMGFMT="$1" IMGOPTS=""
++    _make_test_img "$2"
++}
++
++qemu_io_with_fmt() {
++    # Shadow global variables within this function
++    local QEMU_IO_OPTIONS=$(echo "$QEMU_IO_OPTIONS" | sed "s/-f $IMGFMT/-f $1/")
++    shift
++    $QEMU_IO "$@"
++}
++
++# The proof is in the pudding: converted image size cannot be larger than the
++# required size.
++#
++# Note: if a change to the image format code causes the file size to change,
++# then this test fails!  This is good because it's a reminder to check that the
++# required size is still at least as big as the actual converted file size.
++convert_and_show_size() {
++    local fmt="$1"
++    shift
++    $QEMU_IMG convert -f "$fmt" -O "$IMGFMT" "$TEST_IMG" "$@" "$TEST_IMG.converted"
++    stat -c "converted image file size in bytes: %s" "$TEST_IMG.converted"
++}
++
++for ofmt in human json; do
++    echo
++    echo "== Size calculation for a new file ($ofmt) =="
++    echo
++
++    # Try a few interesting sizes
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 0
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 2G
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 64G
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 256G
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 1T
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 2P
++    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 7E
++
++    # Always test the raw input files but also IMGFMT
++    for fmt in $(echo -e "raw\n$IMGFMT\n" | sort -u); do
++        echo
++        echo "== Empty $fmt input image ($ofmt) =="
++        echo
++        make_test_img_with_fmt "$fmt" 0
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt"
++
++        echo
++        echo "== $fmt input image with data ($ofmt) =="
++        echo
++        make_test_img_with_fmt "$fmt" 1G
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        qemu_io_with_fmt "$fmt" -c "write 512 512" "$TEST_IMG" | _filter_qemu_io
++        qemu_io_with_fmt "$fmt" -c "write 64K 64K" "$TEST_IMG" | _filter_qemu_io
++        if [ "$fmt" = "qcow2" ]; then
++            $QEMU_IMG snapshot -c snapshot1 "$TEST_IMG"
++        fi
++        qemu_io_with_fmt "$fmt" -c "write 128M 63K" "$TEST_IMG" | _filter_qemu_io
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt"
++
++        if [ "$fmt" = "qcow2" ]; then
++            echo
++            echo "== $fmt input image with internal snapshot ($ofmt) =="
++            echo
++            $QEMU_IMG measure --output=$ofmt -f "$fmt" -l snapshot1 \
++                              -O "$IMGFMT" "$TEST_IMG"
++            echo
++            convert_and_show_size "$fmt" -l snapshot1
++        fi
++
++        if [ "$IMGFMT" = "qcow2" ]; then
++            echo
++            echo "== $fmt input image and a backing file ($ofmt) =="
++            echo
++            # The backing file doesn't need to exist :)
++            $QEMU_IMG measure --output=$ofmt -o backing_file=x \
++                              -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        fi
++
++        echo
++        echo "== $fmt input image and preallocation ($ofmt) =="
++        echo
++        $QEMU_IMG measure --output=$ofmt -o preallocation=full \
++                          -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt" -o preallocation=full
++
++        echo
++        echo "== Fully-allocated $fmt input image ($ofmt) =="
++        echo
++        make_test_img_with_fmt "$fmt" 8M
++        qemu_io_with_fmt "$fmt" -c "write 0 8M" "$TEST_IMG" | _filter_qemu_io
++        $QEMU_IMG measure --output=$ofmt -f "$fmt" -O "$IMGFMT" "$TEST_IMG"
++        echo
++        convert_and_show_size "$fmt"
++    done
++done
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/178.out.qcow2 b/tests/qemu-iotests/178.out.qcow2
+new file mode 100644
+index 0000000..d42d4a4
+--- /dev/null
++++ b/tests/qemu-iotests/178.out.qcow2
+@@ -0,0 +1,286 @@
++QA output created by 178
++== Input validation ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++qemu-img: Either --size N or one filename must be specified.
++qemu-img: --size N cannot be used together with a filename.
++qemu-img: At most one filename argument is allowed.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: Invalid option list: ,
++qemu-img: Invalid parameter 'snapshot.foo'
++qemu-img: Failed in parsing snapshot param 'snapshot.foo'
++qemu-img: --output must be used with human or json as argument.
++qemu-img: Image size must be less than 8 EiB!
++qemu-img: Unknown file format 'foo'
++
++== Size calculation for a new file (human) ==
++
++required size: 196608
++fully allocated size: 196608
++required size: 589824
++fully allocated size: 2148073472
++required size: 10747904
++fully allocated size: 68730224640
++required size: 42205184
++fully allocated size: 274920112128
++required size: 168034304
++fully allocated size: 1099679662080
++required size: 343650009088
++fully allocated size: 2252143463694336
++qemu-img: The image size is too large (try using a larger cluster size)
++
++== Empty qcow2 input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++required size: 196608
++fully allocated size: 196608
++
++converted image file size in bytes: 196608
++
++== qcow2 input image with data (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++required size: 393216
++fully allocated size: 1074135040
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 589824
++fully allocated size: 1074135040
++
++converted image file size in bytes: 524288
++
++== qcow2 input image with internal snapshot (human) ==
++
++required size: 524288
++fully allocated size: 1074135040
++
++converted image file size in bytes: 458752
++
++== qcow2 input image and a backing file (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++== qcow2 input image and preallocation (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated qcow2 input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 8716288
++fully allocated size: 8716288
++
++converted image file size in bytes: 8716288
++
++== Empty raw input image (human) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=0
++required size: 196608
++fully allocated size: 196608
++
++converted image file size in bytes: 196608
++
++== raw input image with data (human) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=1073741824
++required size: 393216
++fully allocated size: 1074135040
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 589824
++fully allocated size: 1074135040
++
++converted image file size in bytes: 524288
++
++== raw input image and a backing file (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++== raw input image and preallocation (human) ==
++
++required size: 1074135040
++fully allocated size: 1074135040
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated raw input image (human) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 8716288
++fully allocated size: 8716288
++
++converted image file size in bytes: 8716288
++
++== Size calculation for a new file (json) ==
++
++{
++    "required": 196608,
++    "fully-allocated": 196608
++}
++{
++    "required": 589824,
++    "fully-allocated": 2148073472
++}
++{
++    "required": 10747904,
++    "fully-allocated": 68730224640
++}
++{
++    "required": 42205184,
++    "fully-allocated": 274920112128
++}
++{
++    "required": 168034304,
++    "fully-allocated": 1099679662080
++}
++{
++    "required": 343650009088,
++    "fully-allocated": 2252143463694336
++}
++qemu-img: The image size is too large (try using a larger cluster size)
++
++== Empty qcow2 input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++{
++    "required": 196608,
++    "fully-allocated": 196608
++}
++
++converted image file size in bytes: 196608
++
++== qcow2 input image with data (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++{
++    "required": 393216,
++    "fully-allocated": 1074135040
++}
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 589824,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 524288
++
++== qcow2 input image with internal snapshot (json) ==
++
++{
++    "required": 524288,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 458752
++
++== qcow2 input image and a backing file (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++== qcow2 input image and preallocation (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated qcow2 input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 8716288,
++    "fully-allocated": 8716288
++}
++
++converted image file size in bytes: 8716288
++
++== Empty raw input image (json) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=0
++{
++    "required": 196608,
++    "fully-allocated": 196608
++}
++
++converted image file size in bytes: 196608
++
++== raw input image with data (json) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=1073741824
++{
++    "required": 393216,
++    "fully-allocated": 1074135040
++}
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 589824,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 524288
++
++== raw input image and a backing file (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++== raw input image and preallocation (json) ==
++
++{
++    "required": 1074135040,
++    "fully-allocated": 1074135040
++}
++
++converted image file size in bytes: 1074135040
++
++== Fully-allocated raw input image (json) ==
++
++Formatting 'TEST_DIR/t.qcow2', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 8716288,
++    "fully-allocated": 8716288
++}
++
++converted image file size in bytes: 8716288
++*** done
+diff --git a/tests/qemu-iotests/178.out.raw b/tests/qemu-iotests/178.out.raw
+new file mode 100644
+index 0000000..6478365
+--- /dev/null
++++ b/tests/qemu-iotests/178.out.raw
+@@ -0,0 +1,158 @@
++QA output created by 178
++== Input validation ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++qemu-img: Either --size N or one filename must be specified.
++qemu-img: --size N cannot be used together with a filename.
++qemu-img: At most one filename argument is allowed.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: --object, --image-opts, -f, and -l require a filename argument.
++qemu-img: Invalid option list: ,
++qemu-img: Invalid parameter 'snapshot.foo'
++qemu-img: Failed in parsing snapshot param 'snapshot.foo'
++qemu-img: --output must be used with human or json as argument.
++qemu-img: Image size must be less than 8 EiB!
++qemu-img: Unknown file format 'foo'
++
++== Size calculation for a new file (human) ==
++
++required size: 0
++fully allocated size: 0
++required size: 2147483648
++fully allocated size: 2147483648
++required size: 68719476736
++fully allocated size: 68719476736
++required size: 274877906944
++fully allocated size: 274877906944
++required size: 1099511627776
++fully allocated size: 1099511627776
++required size: 2251799813685248
++fully allocated size: 2251799813685248
++required size: 8070450532247928832
++fully allocated size: 8070450532247928832
++
++== Empty raw input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++required size: 0
++fully allocated size: 0
++
++converted image file size in bytes: 0
++
++== raw input image with data (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++required size: 1073741824
++fully allocated size: 1073741824
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 1073741824
++fully allocated size: 1073741824
++
++converted image file size in bytes: 1073741824
++
++== raw input image and preallocation (human) ==
++
++required size: 1073741824
++fully allocated size: 1073741824
++
++converted image file size in bytes: 1073741824
++
++== Fully-allocated raw input image (human) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 8388608
++fully allocated size: 8388608
++
++converted image file size in bytes: 8388608
++
++== Size calculation for a new file (json) ==
++
++{
++    "required": 0,
++    "fully-allocated": 0
++}
++{
++    "required": 2147483648,
++    "fully-allocated": 2147483648
++}
++{
++    "required": 68719476736,
++    "fully-allocated": 68719476736
++}
++{
++    "required": 274877906944,
++    "fully-allocated": 274877906944
++}
++{
++    "required": 1099511627776,
++    "fully-allocated": 1099511627776
++}
++{
++    "required": 2251799813685248,
++    "fully-allocated": 2251799813685248
++}
++{
++    "required": 8070450532247928832,
++    "fully-allocated": 8070450532247928832
++}
++
++== Empty raw input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=0
++{
++    "required": 0,
++    "fully-allocated": 0
++}
++
++converted image file size in bytes: 0
++
++== raw input image with data (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
++{
++    "required": 1073741824,
++    "fully-allocated": 1073741824
++}
++wrote 512/512 bytes at offset 512
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 64512/64512 bytes at offset 134217728
++63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 1073741824,
++    "fully-allocated": 1073741824
++}
++
++converted image file size in bytes: 1073741824
++
++== raw input image and preallocation (json) ==
++
++{
++    "required": 1073741824,
++    "fully-allocated": 1073741824
++}
++
++converted image file size in bytes: 1073741824
++
++== Fully-allocated raw input image (json) ==
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=8388608
++wrote 8388608/8388608 bytes at offset 0
++8 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{
++    "required": 8388608,
++    "fully-allocated": 8388608
++}
++
++converted image file size in bytes: 8388608
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 40bef99..8f883f7 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -173,6 +173,7 @@
+ 175 auto quick
+ 176 rw auto backing
+ 177 rw auto quick
++178 auto quick
+ 179 rw auto quick
+ 181 rw auto migration
+ 182 rw auto quick
 -- 
 2.9.4
