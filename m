@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUwUE-0006t8-8h
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:03 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dUwUy-0007Od-Q8
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUwUC-0003El-1E
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:01 -0400
-Date: Tue, 11 Jul 2017 15:49:50 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170711144950.GS7116@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170710193047.z2t6eww7nhckgg3z@postretch>
-	<87d197mm0f.fsf@dusky.pond.sub.org>
-	<87wp7fghi9.fsf@dusky.pond.sub.org>
+	(envelope-from <gengdongjiu@huawei.com>) id 1dUwUx-0003VT-VV
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:48 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Tue, 11 Jul 2017 14:50:11 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2014DD643@DGGEMA503-MBS.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87wp7fghi9.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v14 15/21] qom: support non-scalar
- properties with -object
+Subject: Re: [Qemu-devel] [PATCH resend v4 0/3] Generate APEI GHES table and
+ dynamically record CPER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +22,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, afaerber@suse.de, Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>
 
-On Tue, Jul 11, 2017 at 04:44:46PM +0200, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
-> > Manos Pitsidianakis <el13635@mail.ntua.gr> writes:
-> >
-> >> Is there a specific reason this patch wasn't finished? If I'm not
-> >> wrong using non-scalar properties with -object is still not possible,
-> >> yet would be a very useful feature for drivers with UserCreatable
-> >> objects.
-> >>
-> >> Archive link since this is an old patch:
-> >> https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg08252.html
-> >
-> > Yes, we want non-scalar properties with -object.
-> >
-> > This series attempts to provide them by extending QemuOpts.  The trouble
-> > is that we've already pushed QemuOpts beyond its design limits, and this
-> > series pushes it some more.  We need to stop working around the design
-> > limits of QemuOpts and start replacing them by something that serves our
-> > current needs, as I explained in:
-> >
-> >     Subject: Re: [PATCH v14 00/19] QAPI/QOM work for non-scalar object properties
-> >     Message-ID: <87vawnnjpi.fsf@dusky.pond.sub.org>
-> >     https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg04895.html
-> >
-> > I started the replacement work (merge commit 8746709).  It provides
-> > non-scalar properties for -blockdev.  I stole Dan's PATCH 07 for it,
-> > which became commit cbd8acf.  See also the design thread
-> >
-> >     Subject: Non-flat command line option argument syntax
-> >     Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
-> >     https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
-> >
-> > PATCH 02-06 have been merged separately (merge commit ede0cbe).
-> >
-> > More work is needed to apply the solution for -blockdev to -object, and
-> > I intend to work on it.  A main difficulty is backwards compatibility to
-> > all the ill-designed / accidental QemuOpts warts.  We may have to accept
-> > some incompatibility to make progress.
-> 
-> Waiting for that work to be completed may be less than ideal for you.
-> Perhaps we can crack the simple part of the problem quickly, so you can
-> play with it while I still work on the harder parts.
-> 
-> Simple part: -object argument in JSON syntax, exactly as in QMP.
-> Example:
-> 
->     -object '{ "qom-type": "memory-backend-ram", "id": "mem1", "props": { "size": 4096 } }'
-> 
-> Non-scalar members of "props" should just work there.
-> 
-> Hard part: non-scalar properties in the traditional KEY=VALUE syntax,
-> using dotted key convention.
-> 
-> Sketch appended.  If this would be useful for you, I can prepare proper
-> patches.
-
-Seems reasonable to enable the JSON syntax right now, as long as we are
-confident it'll not need changes once we do the key/val syntax change too.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+RXJpYywNCiAgVGhhbmtzIGZvciB5b3VyIGZvbGxvdyB1cC4gDQpJdCBpcyBpbmRlZWQgdGhhdCBJ
+IHNlbmQgdGhlIHBhdGNoZXMgb25lIGJ5IG9uZS4gdGhleSBzaG91bGQgYmUgc2VudCB0b2dldGhl
+ci4NCkkgd2lsbCB1c2UgYmVsb3cgY29tbWFuZHMgdG8gZml4IHRoaXMgaXNzdWUsIG5vdyB0aGUg
+Y2hpbmVzIHRpbWUgaXMgbWlkbmlnaHQsIHNvIEkgd2lsbCBoYXZlIHRvIHVwZGF0ZSBpdCB0b21v
+cnJvdy4gDQoNCj4gU28gc2VuZCB0aGUgcGF0Y2hlcyB3aXRoDQo+IA0KPiAgIGdpdCBzZW5kLWVt
+YWlsICoucGF0Y2gNCj4gDQo+IG9yIHB1dCBhbGwgdGhlIHBhdGNoZXMgaW50byBhIHRlbXBvcmFy
+eSBkaXJlY3RvcnksIGFuZCBydW4NCj4gDQo+ICAgZ2l0IHNlbmQtZW1haWwgcGF0Y2gtZGlyLw0K
+DQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujogRXJpYyBCbGFrZSBbbWFpbHRv
+OmVibGFrZUByZWRoYXQuY29tXSANCuWPkemAgeaXtumXtDogMjAxN+W5tDfmnIgxMeaXpSAyMTo1
+OA0K5pS25Lu25Lq6OiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPjsgZ2VuZ2Rvbmdq
+aXUgPGdlbmdkb25naml1QGh1YXdlaS5jb20+DQrmioTpgIE6IG1zdEByZWRoYXQuY29tOyBpbWFt
+bWVkb0ByZWRoYXQuY29tOyBmYW16QHJlZGhhdC5jb207IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsg
+Wmhhb3NoZW5nbG9uZyA8emhhb3NoZW5nbG9uZ0BodWF3ZWkuY29tPjsgcGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnOyBxZW11LWFybUBub25nbnUub3JnOyBaaGVuZ3FpYW5nICh0dXJpbmcpIDx6aGVu
+Z3FpYW5nMTBAaHVhd2VpLmNvbT47IEh1YW5nc2hhb3l1IDxodWFuZ3NoYW95dUBodWF3ZWkuY29t
+PjsgV3VxdWFubWluZyA8d3VxdWFubWluZ0BodWF3ZWkuY29tPjsgR2FvemhpaHVpIDx6aGlodWku
+Z2FvQGh1YXdlaS5jb20+DQrkuLvpopg6IFJlOiBbUEFUQ0ggcmVzZW5kIHY0IDAvM10gR2VuZXJh
+dGUgQVBFSSBHSEVTIHRhYmxlIGFuZCBkeW5hbWljYWxseSByZWNvcmQgQ1BFUg0KDQpPbiAwNy8x
+MS8yMDE3IDA4OjQzIEFNLCBMYXN6bG8gRXJzZWsgd3JvdGU6DQo+IFNvIHNlbmQgdGhlIHBhdGNo
+ZXMgd2l0aA0KPiANCj4gICBnaXQgc2VuZC1lbWFpbCAqLnBhdGNoDQo+IA0KPiBvciBwdXQgYWxs
+IHRoZSBwYXRjaGVzIGludG8gYSB0ZW1wb3JhcnkgZGlyZWN0b3J5LCBhbmQgcnVuDQo+IA0KPiAg
+IGdpdCBzZW5kLWVtYWlsIHBhdGNoLWRpci8NCg0KT3IgeW91IGNhbiBldmVuIHNraXAgcGF0Y2gg
+ZmlsZXMsIGFuZCBkaXJlY3RseSBzZW5kIHRoaW5ncyB3aXRoIG9uZSBsYXNzIGNoYW5jZSBpbiB5
+b3VyIGVkaXRvcjoNCg0KZ2l0IHNlbmQtZW1haWwgLXY1IC0zIC0tYW5ub3RhdGUgLS1jb3Zlci1s
+ZXR0ZXINCg0KW3NlbmQgdGhlIHRvcCB0aHJlZSBjb21taXRzIGluIG15IGN1cnJlbnQgZ2l0IGJy
+YW5jaCBhcyBhIHZlcnNpb24gNSBwYXRjaCBzZXJpZXMsIHdoZXJlIEkgZ2V0IHRvIHdyaXRlIHRo
+ZSBjb3ZlciBsZXR0ZXIgYW5kIHR3ZWFrIGFueSBvZiB0aGUgcGF0Y2hlcyBpbiBteSBwcmVmZXJy
+ZWQgJEVESVRPUiBiZWZvcmUgc2VuZGluZyBhbnl0aGluZ10NCg0KLS0NCkVyaWMgQmxha2UsIFBy
+aW5jaXBhbCBTb2Z0d2FyZSBFbmdpbmVlcg0KUmVkIEhhdCwgSW5jLiAgICAgICAgICAgKzEtOTE5
+LTMwMS0zMjY2DQpWaXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCg0K
