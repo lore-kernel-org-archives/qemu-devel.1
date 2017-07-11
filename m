@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxjh-0007o5-J1
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxji-0007qU-D0
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxjg-0005ye-Fn
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:05 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxjh-000606-LJ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:10:06 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:07:11 +0200
-Message-Id: <20170711160814.20941-23-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:07:12 +0200
+Message-Id: <20170711160814.20941-24-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 22/85] mirror: Fix inconsistent backing
- AioContext for after mirroring
+Subject: [Qemu-devel] [PULL 23/85] specs/qcow2: fix bitmap granularity
+ qemu-specific note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +23,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: "sochin.jiang" <sochin.jiang@huawei.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-mirror_complete opens the backing chain, which should have the same
-AioContext as the top when using iothreads. Make the code guarantee
-this, which fixes a failed assertion in bdrv_attach_child.
-
-Signed-off-by: sochin.jiang <sochin.jiang@huawei.com>
-Message-id: 1498475064-39816-1-git-send-email-sochin.jiang@huawei.com
-[mreitz: Reworded commit message]
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20170628120530.31251-2-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 1 +
- 1 file changed, 1 insertion(+)
+ docs/interop/qcow2.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block.c b/block.c
-index edfa6b7..b9e5114 100644
---- a/block.c
-+++ b/block.c
-@@ -2185,6 +2185,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-         ret = -EINVAL;
-         goto free_exit;
-     }
-+    bdrv_set_aio_context(backing_hd, bdrv_get_aio_context(bs));
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 886a546..aee3553 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -575,8 +575,7 @@ Structure of a bitmap directory entry:
+              17:    granularity_bits
+                     Granularity bits. Valid values: 0 - 63.
  
-     /* Hook up the backing file link; drop our reference, bs owns the
-      * backing_hd reference now */
+-                    Note: Qemu currently doesn't support granularity_bits
+-                    greater than 31.
++                    Note: Qemu currently supports only values 9 - 31.
+ 
+                     Granularity is calculated as
+                         granularity = 1 << granularity_bits
 -- 
 2.9.4
