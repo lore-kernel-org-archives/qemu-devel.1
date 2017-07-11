@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsS6-0007e3-Tl
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:35 -0400
+	(envelope-from <edgari@xilinx.com>) id 1dUsZZ-0005tD-V1
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsS4-0006Fa-Ik
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:34 -0400
-Received: from orth.archaic.org.uk ([81.2.115.148]:48421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dUsS4-000683-Bf
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:32 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsPq-0002yC-UY
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:29:14 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 11:29:12 +0100
-Message-Id: <1499768952-24990-5-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
-References: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <edgari@xilinx.com>) id 1dUsZY-0001Hv-Rp
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:39:17 -0400
+Date: Tue, 11 Jul 2017 12:38:59 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20170711103859.GC25504@toto>
+References: <1498830302-19274-1-git-send-email-edgar.iglesias@gmail.com>
+	<1498830302-19274-3-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-dssYnbZjuWTjBta1aK3iL3pyRKh5Qs4hFh=bPONgnTA@mail.gmail.com>
+	<20170711100334.GA25504@toto>
+	<CAFEAcA_XTrkAN1ATpp6DLZqGh4aL1gECzQGyubJmoGjtw_pPbA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 4/4] target-arm: v7M: ignore writes to
- CONTROL.SPSEL from Thread mode
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_XTrkAN1ATpp6DLZqGh4aL1gECzQGyubJmoGjtw_pPbA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] target-arm: Extend PAR format
+ determination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-arm <qemu-arm@nongnu.org>
 
-For v7M, writes to the CONTROL register are only permitted for
-privileged code. However even if the code is privileged, the
-write must not affect the SPSEL bit in the CONTROL register
-if the CPU is in Thread mode (as documented in the pseudocode
-for the MSR instruction). Implement this, instead of permitting
-SPSEL to be written in all cases.
+On Tue, Jul 11, 2017 at 11:14:04AM +0100, Peter Maydell wrote:
+> On 11 July 2017 at 11:03, Edgar E. Iglesias <edgar.iglesias@xilinx.com> wrote:
+> > On Mon, Jul 10, 2017 at 04:11:29PM +0100, Peter Maydell wrote:
+> >> So this kind of worries me, because what it's coded as is "determine
+> >> whether architecturally we should be returning a 64-bit or 32-bit
+> >> PAR format", but what the code below it uses the format64 flag for is
+> >> "manipulate whatever PAR we got handed back by get_phys_addr()".
+> >> So we have two separate bits of code that are both choosing
+> >> 32 vs 64 bit PAR (the code in this patch, and the logic inside
+> >> get_phys_addr()), and they have to come to the same conclusion
+> >> or we'll silently mangle the PAR. It seems like it would be
+> >> better to either have get_phys_addr() explicitly tell us what kind
+> >> of format it is returning to us, or to have the caller tell it
+> >> what kind of PAR it needs.
+> >
+> > Yes, I see your point and that's exactly what's happenning before the patch.
+> > Some of these new checks are generic in the sense that they check for LPAE/64bitness
+> > but others are I guess ATS specific for lack of a better term.
+> > It feels a bit weird to put the ATS specific PAR format logic into get_phys_addr.
+> >
+> > The basic idea here is that we never downgrade to the 32bit format, we only uprgade.
+> > The following line was meant to get the initial format I think you are requesting:
+> > format64 = regime_using_lpae_format(env, mmu_idx);
+> >
+> > After that, we apply possible ATS specfic upgrades to 64bit PAR format if needed.
+> >
+> > For clarity, perhaps we could make get_phys_addr return this same initial format, and then
+> > we can follow up with the ATS specific upgrades. E.g:
+> >
+> >     ret = get_phys_addr(env, value, access_type, mmu_idx,
+> >                         &phys_addr, &attrs, &prot, &page_size, &fsr, &fi,
+> >                         &format64);
+> >
+> >     /* Apply possible ATS/PAR 64bit upgrades if format64 is false.  */
+> >     if (is_a64(env)) {
+> >         format64 = true;
+> >     } else if (arm_feature(env, ARM_FEATURE_LPAE)) {
+> >         if (arm_feature(env, ARM_FEATURE_EL2)) {
+> >             if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
+> >                 format64 |= env->cp15.hcr_el2 & HCR_VM;
+> >             } else {
+> >                 format64 |= arm_current_el(env) == 2;
+> >             }
+> >         }
+> >     }
+> 
+> This still has the same problem, doesn't it? If get_phys_addr()
+> has given you back a short-descriptor format PAR then you cannot
+> simply "upgrade" it to a long-descriptor format PAR -- the
+> fault status codes are all different. I think the "short desc
+> vs long desc" condition used to be simple but the various
+> upgrades to get_phys_addr() to handle EL2 have made it much
+> more complicated, and so we'll be much better off just handing
+> get_phys_addr() a flag to say how we want the status reported,
+> if it's really dependent on ATS vs not-ATS.
+>
 
-This was causing mbed applications not to run, because the
-RTX RTOS they use relies on this behaviour.
+Another way could also be to have get_phys_addr() fill in generic
+fields in the FaultInfo struct and then have a faultinfo_to_fsr
+mapping function to populate FSR/PAR. Do you see any issues with that?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1498820791-8130-1-git-send-email-peter.maydell@linaro.org
----
- target/arm/helper.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Perhaps that's better, not sure.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2594faa..4ed32c5 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8768,9 +8768,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-         }
-         break;
-     case 20: /* CONTROL */
--        switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
--        env->v7m.control = val & (R_V7M_CONTROL_SPSEL_MASK |
--                                  R_V7M_CONTROL_NPRIV_MASK);
-+        /* Writing to the SPSEL bit only has an effect if we are in
-+         * thread mode; other bits can be updated by any privileged code.
-+         * switch_v7m_sp() deals with updating the SPSEL bit in
-+         * env->v7m.control, so we only need update the others.
-+         */
-+        if (env->v7m.exception == 0) {
-+            switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
-+        }
-+        env->v7m.control &= ~R_V7M_CONTROL_NPRIV_MASK;
-+        env->v7m.control |= val & R_V7M_CONTROL_NPRIV_MASK;
-         break;
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
--- 
-2.7.4
+Best regards,
+Edgar 
