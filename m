@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUxnU-0003Lc-SO
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:14:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dUy0W-0007L5-4S
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dUxnT-0007rS-Pp
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:14:00 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33433)
+	(envelope-from <alex.bennee@linaro.org>) id 1dUy0S-00057p-71
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:27:28 -0400
+Received: from mail-wr0-f181.google.com ([209.85.128.181]:35551)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dUxnT-0007rA-Ho
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:13:59 -0400
-Received: by mail-wr0-x234.google.com with SMTP id r103so5650691wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 09:13:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dUy0S-00057W-0h
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:27:24 -0400
+Received: by mail-wr0-f181.google.com with SMTP id k67so5991826wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 09:27:23 -0700 (PDT)
+References: <20170711025703.24194-1-f4bug@amsat.org>
+	<20170711025703.24194-2-f4bug@amsat.org>
+	<446cc0e3-dd49-e088-85f1-0caf1d42fbf8@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <446cc0e3-dd49-e088-85f1-0caf1d42fbf8@amsat.org>
+Date: Tue, 11 Jul 2017 17:26:21 +0100
+Message-ID: <87iniz9byq.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-References: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 17:13:37 +0100
-Message-ID: <CAFEAcA9nU-mYo1_3Vv=mY7+ZpcWfN3-8tw3q1Ztzc8uB9KmQTA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/17] ppc-for-2.10 queue 20170711
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/3] configure: disable Xen PCI
+ Passthrough on !x86 archs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Marcelo Tosatti <mtosatti@redhat.com>, xen-arm@lists.xen.org, Anoob Soman <anoob.soman@citrix.com>, Juergen Gross <jgross@suse.com>, Anthony Xu <anthony.xu@intel.com>, Paul Durrant <paul.durrant@citrix.com>
 
-On 11 July 2017 at 05:39, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 6b06e3e49eb8c91cc286c16d6bf3181ac296f33d:
->
->   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2017-07-10-v2' into staging (2017-07-10 16:12:47 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170711
->
-> for you to fetch changes up to b87680427e8a3ff682f66514e99a8344e7437247:
->
->   spapr: populate device tree depending on XIVE_EXPLOIT option (2017-07-11 11:04:02 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-07-11
->
->   * Several minor cleanups from Greg Kurz
->   * Fix for migration of pseries-2.7 and earlier machine types
->   * More reworking of the DRC hotplug code, fixing several problems
->     though there are still more to go
->   * Fixes for CPU family / alias handling on POWER9
->   * Preliminary patches for POWER9 XIVE (new interrupt controller)
->     support
->   * Assorted other fixes
->
 
-Applied, thanks.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
--- PMM
+> It seems our minds crossed at the same time since Alex/Pablo fixed it
+> and got merged in master as b5ed2e11ef39 "build: disable Xen on ARM"
+> so this patch is no more necessary.
+>
+> Alex/Pablo, any thought on patch 2 regarding xen-mapcache.h?
+
+Pass, I know little of Xen on ARM other than I think it doesn't need
+QEMU for device emulation. IIRC the use of QEMU on x86 is to handle the
+weird set of devices you can get on a PC without bloating the
+hypervisor. ARM is a lot simpler in that regard.
+
+>
+> Phil.
+>
+> On 07/10/2017 11:57 PM, Philippe Mathieu-Daudé wrote:
+>> linking on Linux debian/stretch/arm64 with libxen-4.8:
+>>
+>>      hw/xen/xen_pt.o: In function `xen_pt_pci_read_config':
+>>      qemu/hw/xen/xen_pt.c:206: undefined reference to `xen_shutdown_fatal_error'
+>>      hw/xen/xen_pt.o: In function `xen_igd_passthrough_isa_bridge_create':
+>>      qemu/hw/xen/xen_pt.c:698: undefined reference to `igd_passthrough_isa_bridge_create'
+>>      hw/xen/xen_pt.o: In function `xen_pt_pci_write_config':
+>>      qemu/hw/xen/xen_pt.c:355: undefined reference to `xen_shutdown_fatal_error'
+>>      hw/xen/xen_pt_config_init.o: In function `xen_pt_status_reg_init':
+>>      qemu/hw/xen/xen_pt_config_init.c:281: undefined reference to `xen_shutdown_fatal_error'
+>>      qemu/hw/xen/xen_pt_config_init.c:275: undefined reference to `xen_shutdown_fatal_error'
+>>      hw/xen/xen_pt_graphics.o: In function `get_vgabios':
+>>      qemu/hw/xen/xen_pt_graphics.c:135: undefined reference to `pci_assign_dev_load_option_rom'
+>>      collect2: error: ld returned 1 exit status
+>>      Makefile:197: recipe for target 'qemu-system-aarch64' failed
+>>      make[1]: *** [qemu-system-aarch64] Error 1
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   configure | 11 +++++++++--
+>>   1 file changed, 9 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/configure b/configure
+>> index 806658c98b..e4b173405a 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2344,8 +2344,15 @@ EOF
+>>   fi
+>>     if test "$xen_pci_passthrough" != "no"; then
+>> -  if test "$xen" = "yes" && test "$linux" = "yes"; then
+>> -    xen_pci_passthrough=yes
+>> +  if test "$xen" = "yes"; then
+>> +    case "$cpu" in
+>> +    i386|x32|x86_64)
+>> +        if test "$linux" = "yes"; then
+>> +            xen_pci_passthrough=yes
+>> +        fi ;;
+>> +    *)  echo "Disabling Xen PCI Passthrough (not implemented on $cpu)"
+>> +        xen_pci_passthrough=no ;;
+>> +    esac
+>>     else
+>>       if test "$xen_pci_passthrough" = "yes"; then
+>>         error_exit "User requested feature Xen PCI Passthrough" \
+>>
+
+
+--
+Alex Bennée
