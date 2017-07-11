@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUtAd-0007Hn-F4
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 07:17:37 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUtAf-0007Ji-C3
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 07:17:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUtAb-000888-Iy
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 07:17:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUtAa-00087Y-FZ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 07:17:37 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 12:17:13 +0100
-Message-Id: <1499771839-32518-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 12:17:16 +0100
+Message-Id: <1499771839-32518-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
 References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/7] hw/arm/mps2: Implement skeleton mps2-an385
- and mps2-an511 board models
+Subject: [Qemu-devel] [PATCH 4/7] hw/char/cmsdk-apb-timer: Implement CMSDK
+ APB timer device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +23,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Model the ARM MPS2/MPS2+ FPGA based development board.
-
-The MPS2 and MPS2+ dev boards are FPGA based (the 2+ has a bigger
-FPGA but is otherwise the same as the 2). Since the CPU itself
-and most of the devices are in the FPGA, the details of the board
-as seen by the guest depend significantly on the FPGA image.
-
-We model the following FPGA images:
- "mps2_an385" -- Cortex-M3 as documented in ARM Application Note AN385
- "mps2_an511" -- Cortex-M3 'DesignStart' as documented in AN511
-
-They are fairly similar but differ in the details for some
-peripherals.
+Implement a model of the simple timer device found in the CMSDK.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/Makefile.objs            |   1 +
- hw/arm/mps2.c                   | 273 ++++++++++++++++++++++++++++++++++++++++
- default-configs/arm-softmmu.mak |   1 +
- 3 files changed, 275 insertions(+)
- create mode 100644 hw/arm/mps2.c
+ hw/timer/Makefile.objs             |   1 +
+ include/hw/timer/cmsdk-apb-timer.h |  59 +++++++++
+ hw/timer/cmsdk-apb-timer.c         | 253 +++++++++++++++++++++++++++++++++++++
+ default-configs/arm-softmmu.mak    |   1 +
+ hw/timer/trace-events              |   5 +
+ 5 files changed, 319 insertions(+)
+ create mode 100644 include/hw/timer/cmsdk-apb-timer.h
+ create mode 100644 hw/timer/cmsdk-apb-timer.c
 
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 4c5c4ee..a2e56ec 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -18,3 +18,4 @@ obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
- obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
-+obj-$(CONFIG_MPS2) += mps2.o
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index dd6f27e..15cce1c 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -41,3 +41,4 @@ common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
+ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
+ 
+ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
++common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+diff --git a/include/hw/timer/cmsdk-apb-timer.h b/include/hw/timer/cmsdk-apb-timer.h
 new file mode 100644
-index 0000000..28838bc
+index 0000000..f21686d
 --- /dev/null
-+++ b/hw/arm/mps2.c
-@@ -0,0 +1,273 @@
++++ b/include/hw/timer/cmsdk-apb-timer.h
+@@ -0,0 +1,59 @@
 +/*
-+ * ARM V2M MPS2 board emulation.
++ * ARM CMSDK APB timer emulation
 + *
 + * Copyright (c) 2017 Linaro Limited
 + * Written by Peter Maydell
@@ -71,279 +62,337 @@ index 0000000..28838bc
 + *  (at your option) any later version.
 + */
 +
-+/* The MPS2 and MPS2+ dev boards are FPGA based (the 2+ has a bigger
-+ * FPGA but is otherwise the same as the 2). Since the CPU itself
-+ * and most of the devices are in the FPGA, the details of the board
-+ * as seen by the guest depend significantly on the FPGA image.
-+ * We model the following FPGA images:
-+ *  "mps2_an385" -- Cortex-M3 as documented in ARM Application Note AN385
-+ *  "mps2_an511" -- Cortex-M3 'DesignStart' as documented in AN511
++#ifndef CMSDK_APB_TIMER_H
++#define CMSDK_APB_TIMER_H
++
++#include "hw/sysbus.h"
++#include "hw/ptimer.h"
++
++#define TYPE_CMSDK_APB_TIMER "cmsdk-apb-timer"
++#define CMSDK_APB_TIMER(obj) OBJECT_CHECK(CMSDKAPBTIMER, (obj), \
++                                         TYPE_CMSDK_APB_TIMER)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion iomem;
++    qemu_irq timerint;
++    uint32_t pclk_frq;
++    struct ptimer_state *timer;
++
++    uint32_t ctrl;
++    uint32_t value;
++    uint32_t reload;
++    uint32_t intstatus;
++} CMSDKAPBTIMER;
++
++/**
++ * cmsdk_apb_timer_create - convenience function to create TYPE_CMSDK_APB_TIMER
++ * @addr: location in system memory to map registers
++ * @pclk_frq: frequency in Hz of the PCLK clock (used for calculating baud rate)
++ */
++static inline DeviceState *cmsdk_apb_timer_create(hwaddr addr,
++                                                 qemu_irq timerint,
++                                                 uint32_t pclk_frq)
++{
++    DeviceState *dev;
++    SysBusDevice *s;
++
++    dev = qdev_create(NULL, TYPE_CMSDK_APB_TIMER);
++    s = SYS_BUS_DEVICE(dev);
++    qdev_prop_set_uint32(dev, "pclk-frq", pclk_frq);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(s, 0, addr);
++    sysbus_connect_irq(s, 0, timerint);
++    return dev;
++}
++
++#endif
+diff --git a/hw/timer/cmsdk-apb-timer.c b/hw/timer/cmsdk-apb-timer.c
+new file mode 100644
+index 0000000..8e0339f
+--- /dev/null
++++ b/hw/timer/cmsdk-apb-timer.c
+@@ -0,0 +1,253 @@
++/*
++ * ARM CMSDK APB timer emulation
 + *
-+ * Links to the TRM for the board itself and to the various Application
-+ * Notes which document the FPGA images can be found here:
-+ *   https://developer.arm.com/products/system-design/development-boards/cortex-m-prototyping-system
++ * Copyright (c) 2017 Linaro Limited
++ * Written by Peter Maydell
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 or
++ *  (at your option) any later version.
++ */
++
++/* This is a model of the "APB timer" which is part of the Cortex-M
++ * System Design Kit (CMSDK) and documented in the Cortex-M System
++ * Design Kit Technical Reference Manual (ARM DDI0479C):
++ * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
++ *
++ * The hardware has an EXTIN input wire, which can be configured
++ * by the guest to act either as a 'timer enable' (timer does not run
++ * when EXTIN is low), or as a 'timer clock' (timer runs at frequency
++ * of EXTIN clock, not PCLK frequency). We don't model this.
++ *
++ * The documentation is not very clear about the exact behaviour;
++ * we choose to implement that the interrupt is triggered when
++ * the counter goes from 1 to 0, that the counter then holds at 0
++ * for one clock cycle before reloading from the RELOAD register,
++ * and that if the RELOAD register is 0 this does not cause an
++ * interrupt (as there is no further 1->0 transition).
 + */
 +
 +#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/main-loop.h"
 +#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "hw/arm/arm.h"
-+#include "hw/arm/armv7m.h"
-+#include "hw/boards.h"
-+#include "exec/address-spaces.h"
-+#include "hw/misc/unimp.h"
++#include "trace.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/timer/cmsdk-apb-timer.h"
 +
-+typedef enum MPS2FPGAType {
-+    FPGA_AN385,
-+    FPGA_AN511,
-+} MPS2FPGAType;
++REG32(CTRL, 0)
++    FIELD(CTRL, EN, 0, 1)
++    FIELD(CTRL, SELEXTEN, 1, 1)
++    FIELD(CTRL, SELEXTCLK, 2, 1)
++    FIELD(CTRL, IRQEN, 3, 1)
++REG32(VALUE, 4)
++REG32(RELOAD, 8)
++REG32(INTSTATUS, 0xc)
++    FIELD(INTSTATUS, IRQ, 0, 1)
++REG32(PID4, 0xFD0)
++REG32(PID5, 0xFD4)
++REG32(PID6, 0xFD8)
++REG32(PID7, 0xFDC)
++REG32(PID0, 0xFE0)
++REG32(PID1, 0xFE4)
++REG32(PID2, 0xFE8)
++REG32(PID3, 0xFEC)
++REG32(CID0, 0xFF0)
++REG32(CID1, 0xFF4)
++REG32(CID2, 0xFF8)
++REG32(CID3, 0xFFC)
 +
-+typedef struct {
-+    MachineClass parent;
-+    MPS2FPGAType fpga_type;
-+    const char *cpu_model;
-+} MPS2MachineClass;
++/* PID/CID values */
++static const int timer_id[] = {
++    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
++    0x22, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
++    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
++};
 +
-+typedef struct {
-+    MachineState parent;
-+
-+    ARMv7MState armv7m;
-+    MemoryRegion psram;
-+    MemoryRegion ssram1;
-+    MemoryRegion ssram1_m;
-+    MemoryRegion ssram23;
-+    MemoryRegion ssram23_m;
-+    MemoryRegion blockram;
-+    MemoryRegion blockram_m1;
-+    MemoryRegion blockram_m2;
-+    MemoryRegion blockram_m3;
-+    MemoryRegion sram;
-+} MPS2MachineState;
-+
-+#define TYPE_MPS2_MACHINE "mps2"
-+#define TYPE_MPS2_AN385_MACHINE MACHINE_TYPE_NAME("mps2-an385")
-+#define TYPE_MPS2_AN511_MACHINE MACHINE_TYPE_NAME("mps2-an511")
-+
-+#define MPS2_MACHINE(obj)                                       \
-+    OBJECT_CHECK(MPS2MachineState, obj, TYPE_MPS2_MACHINE)
-+#define MPS2_MACHINE_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(MPS2MachineClass, obj, TYPE_MPS2_MACHINE)
-+#define MPS2_MACHINE_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(MPS2MachineClass, klass, TYPE_MPS2_MACHINE)
-+
-+/* Main SYSCLK frequency in Hz */
-+#define SYSCLK_FRQ 25000000
-+
-+/* Initialize the auxiliary RAM region @mr and map it into
-+ * the memory map at @base.
-+ */
-+static void make_ram(MemoryRegion *mr, const char *name,
-+                     hwaddr base, hwaddr size)
++static void cmsdk_apb_timer_update(CMSDKAPBTIMER *s)
 +{
-+    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
-+    vmstate_register_ram_global(mr);
-+    memory_region_add_subregion(get_system_memory(), base, mr);
++    qemu_set_irq(s->timerint, !!(s->intstatus & R_INTSTATUS_IRQ_MASK));
 +}
 +
-+/* Create an alias of an entire original MemoryRegion @orig
-+ * located at @base in the memory map.
-+ */
-+static void make_ram_alias(MemoryRegion *mr, const char *name,
-+                           MemoryRegion *orig, hwaddr base)
++static uint64_t cmsdk_apb_timer_read(void *opaque, hwaddr offset, unsigned size)
 +{
-+    memory_region_init_alias(mr, NULL, name, orig, 0,
-+                             memory_region_size(orig));
-+    memory_region_add_subregion(get_system_memory(), base, mr);
-+}
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(opaque);
++    uint64_t r;
 +
-+static void mps2_common_init(MachineState *machine)
-+{
-+    MPS2MachineState *mms = MPS2_MACHINE(machine);
-+    MPS2MachineClass *mmc = MPS2_MACHINE_GET_CLASS(machine);
-+
-+    if (!machine->cpu_model) {
-+        machine->cpu_model = mmc->cpu_model;
-+    }
-+
-+    if (strcmp(machine->cpu_model, mmc->cpu_model) != 0) {
-+        error_report("This board can only be used with CPU %s", mmc->cpu_model);
-+        exit(1);
-+    }
-+
-+    MemoryRegion *system_memory = get_system_memory();
-+
-+    DeviceState *armv7m;
-+
-+    /* The FPGA images have an odd combination of different RAMs,
-+     * because in hardware they are different implementations and
-+     * connected to different buses, giving varying performance/size
-+     * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
-+     * call the 16MB our "system memory", as it's the largest lump.
-+     *
-+     * Common to both boards:
-+     *  0x21000000..0x21ffffff : PSRAM (16MB)
-+     * AN385 only:
-+     *  0x00000000 .. 0x003fffff : ZBT SSRAM1
-+     *  0x00400000 .. 0x007fffff : mirror of ZBT SSRAM1
-+     *  0x20000000 .. 0x203fffff : ZBT SSRAM 2&3
-+     *  0x20400000 .. 0x207fffff : mirror of ZBT SSRAM 2&3
-+     *  0x01000000 .. 0x01003fff : block RAM (16K)
-+     *  0x01004000 .. 0x01007fff : mirror of above
-+     *  0x01008000 .. 0x0100bfff : mirror of above
-+     *  0x0100c000 .. 0x0100ffff : mirror of above
-+     * AN511 only:
-+     *  0x00000000 .. 0x0003ffff : FPGA block RAM
-+     *  0x00400000 .. 0x007fffff : ZBT SSRAM1
-+     *  0x20000000 .. 0x2001ffff : SRAM
-+     *  0x20400000 .. 0x207fffff : ZBT SSRAM 2&3
-+     *
-+     * The AN385 has a feature where the lowest 16K can be mapped
-+     * either to the bottom of the ZBT SSRAM1 or to the block RAM.
-+     * This is of no use for QEMU so we don't implement it (as if
-+     * zbt_boot_ctrl is always zero).
-+     */
-+    memory_region_allocate_system_memory(&mms->psram,
-+                                         NULL, "mps.ram", 0x1000000);
-+    memory_region_add_subregion(system_memory, 0x21000000, &mms->psram);
-+
-+    switch (mmc->fpga_type) {
-+    case FPGA_AN385:
-+        make_ram(&mms->ssram1, "mps.ssram1", 0x0, 0x400000);
-+        make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x400000);
-+        make_ram(&mms->ssram23, "mps.ssram23", 0x20000000, 0x400000);
-+        make_ram_alias(&mms->ssram23_m, "mps.ssram23_m",
-+                       &mms->ssram23, 0x20400000);
-+        make_ram(&mms->blockram, "mps.blockram", 0x01000000, 0x4000);
-+        make_ram_alias(&mms->blockram_m1, "mps.blockram_m1",
-+                       &mms->blockram, 0x01004000);
-+        make_ram_alias(&mms->blockram_m2, "mps.blockram_m2",
-+                       &mms->blockram, 0x01008000);
-+        make_ram_alias(&mms->blockram_m3, "mps.blockram_m3",
-+                       &mms->blockram, 0x0100c000);
++    switch (offset) {
++    case A_CTRL:
++        r = s->ctrl;
 +        break;
-+    case FPGA_AN511:
-+        make_ram(&mms->blockram, "mps.blockram", 0x0, 0x40000);
-+        make_ram(&mms->ssram1, "mps.ssram1", 0x00400000, 0x00800000);
-+        make_ram(&mms->sram, "mps.sram", 0x20000000, 0x20000);
-+        make_ram(&mms->ssram23, "mps.ssram23", 0x20400000, 0x400000);
++    case A_VALUE:
++        r = ptimer_get_count(s->timer);
++        break;
++    case A_RELOAD:
++        r = ptimer_get_limit(s->timer);
++        break;
++    case A_INTSTATUS:
++        r = s->intstatus;
++        break;
++    case A_PID4 ... A_CID3:
++        r = timer_id[offset / 4 - A_PID4];
 +        break;
 +    default:
-+        g_assert_not_reached();
-+    }
-+
-+    object_initialize(&mms->armv7m, sizeof(mms->armv7m), TYPE_ARMV7M);
-+    armv7m = DEVICE(&mms->armv7m);
-+    qdev_set_parent_bus(armv7m, sysbus_get_default());
-+    switch (mmc->fpga_type) {
-+    case FPGA_AN385:
-+        qdev_prop_set_uint32(armv7m, "num-irq", 32);
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB timer read: bad offset %x\n", (int) offset);
++        r = 0;
 +        break;
-+    case FPGA_AN511:
-+        qdev_prop_set_uint32(armv7m, "num-irq", 64);
++    }
++    trace_cmsdk_apb_timer_read(offset, r, size);
++    return r;
++}
++
++static void cmsdk_apb_timer_write(void *opaque, hwaddr offset, uint64_t value,
++                                  unsigned size)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(opaque);
++
++    trace_cmsdk_apb_timer_write(offset, value, size);
++
++    switch (offset) {
++    case A_CTRL:
++        if (value & 6) {
++            /* Bits [1] and [2] enable using EXTIN as either clock or
++             * an enable line. We don't model this.
++             */
++            qemu_log_mask(LOG_UNIMP,
++                          "CMSDK APB timer: EXTIN input not supported\n");
++        }
++        s->ctrl = value & 0xf;
++        if (s->ctrl & R_CTRL_EN_MASK) {
++            ptimer_run(s->timer, 0);
++        } else {
++            ptimer_stop(s->timer);
++        }
++        break;
++    case A_RELOAD:
++        /* Writing to reload also sets the current timer value */
++        ptimer_set_limit(s->timer, value, 1);
++        break;
++    case A_VALUE:
++        ptimer_set_count(s->timer, value);
++        break;
++    case A_INTSTATUS:
++        /* Just one bit, which is W1C. */
++        value &= 1;
++        s->intstatus &= ~value;
++        cmsdk_apb_timer_update(s);
++        break;
++    case A_PID4 ... A_CID3:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB timer write: write to RO offset 0x%x\n",
++                      (int)offset);
 +        break;
 +    default:
-+        g_assert_not_reached();
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB timer write: bad offset 0x%x\n", (int) offset);
++        break;
 +    }
-+    qdev_prop_set_string(armv7m, "cpu-model", machine->cpu_model);
-+    object_property_set_link(OBJECT(&mms->armv7m), OBJECT(system_memory),
-+                             "memory", &error_abort);
-+    object_property_set_bool(OBJECT(&mms->armv7m), true, "realized",
-+                             &error_fatal);
-+
-+    create_unimplemented_device("zbtsmram mirror", 0x00400000, 0x00400000);
-+    create_unimplemented_device("RESERVED 1", 0x00800000, 0x00800000);
-+    create_unimplemented_device("Block RAM", 0x01000000, 0x00010000);
-+    create_unimplemented_device("RESERVED 2", 0x01010000, 0x1EFF0000);
-+    create_unimplemented_device("RESERVED 3", 0x20800000, 0x00800000);
-+    create_unimplemented_device("PSRAM", 0x21000000, 0x01000000);
-+    /* These three ranges all cover multiple devices; we may implement
-+     * some of them below (in which case the real device takes precedence
-+     * over the unimplemented-region mapping).
-+     */
-+    create_unimplemented_device("CMSDK APB peripheral region @0x40000000",
-+                                0x40000000, 0x00010000);
-+    create_unimplemented_device("CMSDK peripheral region @0x40010000",
-+                                0x40010000, 0x00010000);
-+    create_unimplemented_device("Extra peripheral region @0x40020000",
-+                                0x40020000, 0x00010000);
-+    create_unimplemented_device("RESERVED 4", 0x40030000, 0x001D0000);
-+    create_unimplemented_device("Ethernet", 0x40200000, 0x00100000);
-+    create_unimplemented_device("VGA", 0x41000000, 0x0200000);
-+
-+    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       0x400000);
 +}
 +
-+static void mps2_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->init = mps2_common_init;
-+    mc->max_cpus = 1;
-+}
-+
-+static void mps2_an385_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    MPS2MachineClass *mmc = MPS2_MACHINE_CLASS(oc);
-+
-+    mc->desc = "ARM MPS2 with AN385 FPGA image for Cortex-M3";
-+    mmc->fpga_type = FPGA_AN385;
-+    mmc->cpu_model = "cortex-m3";
-+}
-+
-+static void mps2_an511_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    MPS2MachineClass *mmc = MPS2_MACHINE_CLASS(oc);
-+
-+    mc->desc = "ARM MPS2 with AN511 DesignStart FPGA image for Cortex-M3";
-+    mmc->fpga_type = FPGA_AN511;
-+    mmc->cpu_model = "cortex-m3";
-+}
-+
-+static const TypeInfo mps2_info = {
-+    .name = TYPE_MPS2_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .abstract = true,
-+    .instance_size = sizeof(MPS2MachineState),
-+    .class_size = sizeof(MPS2MachineClass),
-+    .class_init = mps2_class_init,
++static const MemoryRegionOps cmsdk_apb_timer_ops = {
++    .read = cmsdk_apb_timer_read,
++    .write = cmsdk_apb_timer_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
 +};
 +
-+static const TypeInfo mps2_an385_info = {
-+    .name = TYPE_MPS2_AN385_MACHINE,
-+    .parent = TYPE_MPS2_MACHINE,
-+    .class_init = mps2_an385_class_init,
-+};
-+
-+static const TypeInfo mps2_an511_info = {
-+    .name = TYPE_MPS2_AN511_MACHINE,
-+    .parent = TYPE_MPS2_MACHINE,
-+    .class_init = mps2_an511_class_init,
-+};
-+
-+static void mps2_machine_init(void)
++static void cmsdk_apb_timer_tick(void *opaque)
 +{
-+    type_register_static(&mps2_info);
-+    type_register_static(&mps2_an385_info);
-+    type_register_static(&mps2_an511_info);
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(opaque);
++
++    if (s->ctrl & R_CTRL_IRQEN_MASK) {
++        s->intstatus |= R_INTSTATUS_IRQ_MASK;
++        cmsdk_apb_timer_update(s);
++    }
 +}
 +
-+type_init(mps2_machine_init);
++static void cmsdk_apb_timer_reset(DeviceState *dev)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(dev);
++
++    trace_cmsdk_apb_timer_reset();
++    s->ctrl = 0;
++    s->intstatus = 0;
++    ptimer_stop(s->timer);
++    /* Set the limit and the count */
++    ptimer_set_limit(s->timer, 0, 1);
++}
++
++static void cmsdk_apb_timer_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(obj);
++
++    memory_region_init_io(&s->iomem, obj, &cmsdk_apb_timer_ops,
++                          s, "cmsdk-apb-timer", 0x1000);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->timerint);
++}
++
++static void cmsdk_apb_timer_realize(DeviceState *dev, Error **errp)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(dev);
++    QEMUBH *bh;
++
++    if (s->pclk_frq == 0) {
++        error_setg(errp, "CMSDK APB timer: pclk-frq property must be set");
++        return;
++    }
++
++    bh = qemu_bh_new(cmsdk_apb_timer_tick, s);
++    s->timer = ptimer_init(bh,
++                           PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
++                           PTIMER_POLICY_NO_IMMEDIATE_TRIGGER |
++                           PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
++                           PTIMER_POLICY_NO_COUNTER_ROUND_DOWN);
++
++    ptimer_set_freq(s->timer, s->pclk_frq);
++}
++
++static const VMStateDescription cmsdk_apb_timer_vmstate = {
++    .name = "cmsdk-apb-timer",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PTIMER(timer, CMSDKAPBTIMER),
++        VMSTATE_UINT32(ctrl, CMSDKAPBTIMER),
++        VMSTATE_UINT32(value, CMSDKAPBTIMER),
++        VMSTATE_UINT32(reload, CMSDKAPBTIMER),
++        VMSTATE_UINT32(intstatus, CMSDKAPBTIMER),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property cmsdk_apb_timer_properties[] = {
++    DEFINE_PROP_UINT32("pclk-frq", CMSDKAPBTIMER, pclk_frq, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void cmsdk_apb_timer_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = cmsdk_apb_timer_realize;
++    dc->vmsd = &cmsdk_apb_timer_vmstate;
++    dc->reset = cmsdk_apb_timer_reset;
++    dc->props = cmsdk_apb_timer_properties;
++}
++
++static const TypeInfo cmsdk_apb_timer_info = {
++    .name = TYPE_CMSDK_APB_TIMER,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(CMSDKAPBTIMER),
++    .instance_init = cmsdk_apb_timer_init,
++    .class_init = cmsdk_apb_timer_class_init,
++};
++
++static void cmsdk_apb_timer_register_types(void)
++{
++    type_register_static(&cmsdk_apb_timer_info);
++}
++
++type_init(cmsdk_apb_timer_register_types);
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 93e995d..bfd2a88 100644
+index d128e9d..c75f52c 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -83,6 +83,7 @@ CONFIG_ONENAND=y
- CONFIG_TUSB6010=y
- CONFIG_IMX=y
- CONFIG_MAINSTONE=y
-+CONFIG_MPS2=y
- CONFIG_NSERIES=y
- CONFIG_RASPI=y
- CONFIG_REALVIEW=y
+@@ -96,6 +96,7 @@ CONFIG_STM32F2XX_ADC=y
+ CONFIG_STM32F2XX_SPI=y
+ CONFIG_STM32F205_SOC=y
+ 
++CONFIG_CMSDK_APB_TIMER=y
+ CONFIG_CMSDK_APB_UART=y
+ 
+ CONFIG_VERSATILE_PCI=y
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index d17cfe6..fd8196b 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -55,3 +55,8 @@ systick_reload(void) "systick reload"
+ systick_timer_tick(void) "systick reload"
+ systick_read(uint64_t addr, uint32_t value, unsigned size) "systick read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ systick_write(uint64_t addr, uint32_t value, unsigned size) "systick write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
++
++# hw/char/cmsdk_apb_timer.c
++cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
++cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
++cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
 -- 
 2.7.4
