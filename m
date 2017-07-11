@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUrnZ-0007DL-Aw
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dUrsz-0000mT-Jg
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUrnU-00062p-G2
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:41 -0400
-Received: from mail-wr0-f177.google.com ([209.85.128.177]:35606)
+	(envelope-from <peter.maydell@linaro.org>) id 1dUrsu-0008Oc-TH
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:55:17 -0400
+Received: from mail-wr0-f176.google.com ([209.85.128.176]:32956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUrnU-00062f-9M
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:36 -0400
-Received: by mail-wr0-f177.google.com with SMTP id k67so174987019wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 02:49:36 -0700 (PDT)
-References: <201707111733232926663@zte.com.cn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <00359765-eb19-3d00-4e9d-b3d5ba941469@redhat.com>
-Date: Tue, 11 Jul 2017 11:49:33 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dUrsu-0008Mt-Mz
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:55:12 -0400
+Received: by mail-wr0-f176.google.com with SMTP id r103so175905130wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 02:55:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <201707111733232926663@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBSZTogW1BBVENIIFYyXSBjaGFyZGV2?=
- =?utf-8?q?=3A_fix_parallel_device_can=27t_be_reconnect?=
+In-Reply-To: <20170711082326.12990-1-pbonzini@redhat.com>
+References: <20170711082326.12990-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 10:53:49 +0100
+Message-ID: <CAFEAcA_JuAm-xamF4Jc6UGqQ8YQyyJqEg8SYtoetawhVJVKq+A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] build: disable Xen on ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peng.hao2@zte.com.cn
-Cc: marcandre.lureau@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-On 11/07/2017 11:33, peng.hao2@zte.com.cn wrote:
->>> +    if (qemu_chr_null_be_can_read(chr)) {
->>> +        size = tcp_chr_recv(chr, (void *)buf, CHR_READ_BUF_LEN)
->>
->> It would be better not to destroy data in the channel, because the
->> device could set handlers later.
+On 11 July 2017 at 09:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> While ARM could present the xenpv machine, it does not and trying to enab=
+le
+> it breaks compilation.
 >
-> This device do not register a chr_read function,so it's safe to
-> destroy data(no read handler).
+> Fixes: 3b6b75506de44c5070639943c30a0ad5850f5d02
+> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  configure | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/configure b/configure
+> index a2bec60a97..97b02244fe 100755
+> --- a/configure
+> +++ b/configure
+> @@ -203,7 +203,6 @@ supported_xen_target() {
+>      test "$xen" =3D "yes" || return 1
+>      glob "$1" "*-softmmu" || return 1
+>      case "${1%-softmmu}:$cpu" in
+> -        arm:arm | aarch64:aarch64 | \
+>          i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
+>              return 0
+>          ;;
 
-I agree, but this code doesn't know that the device is not changing
-handlers later.
+Does this actually do the right thing? It's still testing
+target-cpu:guest-cpu, if I'm reading it correctly, whereas
+previously we only looked at target-cpu to decide whether
+to set CONFIG_XEN.
 
-Paolo
+In particular, I thought that for aarch64/arm Xen setups
+we would end up building an i386-softmmu target on an
+arm/aarch64 host and wanted CONFIG_XEN to be set in that
+setup ?  (I could be wrong there -- cc'ing Stefan and
+Anthony to check.)
+
+thanks
+-- PMM
