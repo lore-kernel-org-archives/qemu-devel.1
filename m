@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33390)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<bounce+964b3b.fcf65-qemu-devel=nongnu.org@mailtoshop.com>)
-	id 1dUoa7-00056V-HP
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:23:37 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33627)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <gengdongjiu@huawei.com>) id 1dUoby-0005ru-Bg
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<bounce+964b3b.fcf65-qemu-devel=nongnu.org@mailtoshop.com>)
-	id 1dUoa3-0000zm-Gn
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:23:35 -0400
-Received: from mail-183-237.mailgun.info ([23.253.183.237]:21935)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from
-	<bounce+964b3b.fcf65-qemu-devel=nongnu.org@mailtoshop.com>)
-	id 1dUoa3-0000zU-6K
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:23:31 -0400
-Sender: dem@mailtoshop.com
-Date: Tue, 11 Jul 2017 06:23:29 +0000
-From: Amazon <dem@mailtoshop.com>
-Mime-Version: 1.0
-Message-Id: <20170711062320.21180.C2EE1CE75307CD09@mailtoshop.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Prime Day: solo per oggi una giornata di promozioni
- Amazon!
+	(envelope-from <gengdongjiu@huawei.com>) id 1dUobu-0001VF-AP
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 02:25:30 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Tue, 11 Jul 2017 14:46:19 +0800
+Message-ID: <1499755579-31262-1-git-send-email-gengdongjiu@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH resend v4 0/3] Generate APEI GHES table and
+ dynamically record CPER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +20,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhihui.gao@huawei.com
+Cc: gengdongjiu@huawei.com
 
-<center>Se non visualizzi correttamente questa email clicca:<a href=3D"http=
-://email.mailtoshop.com/c/eJxVjsFuwyAQRL_G3IJ2lwDhwCGy3ZvVSv2AiASILRmTOqRW_=
-75EyiXSHGbe4Wm8jZeoJJssAWrQiKBIEHBCPABvqe-x7bUUoNsOTLOH5Ka55PuYb_ySExstRaOc=
-QO_kOXqBDrxH7WN0MkBFhiVLe6ONBDbbsZRbI44NfdRs28bfdRUCQEOSoOuHup6vnlDo3asO7ed=
-w-lqnFDr3d_rOsczTEu58LImt9iekx86H3zDXq0tersuD5_XKik1VT0r9A9KqRzI">qui</a>.<=
-/center>
-<center>Scopri le migliori promozioni del giorno, aggiungi dem@mailtoshop.c=
-om alla tua rubrica.</center>
-<BR>
-<BR>
+In the armv8 platform, the mainly hardware error source are ARMv8
+SEA/SEI/GSIV. For the ARMv8 SEA/SEI, the KVM or host kernel will signal SIGBUS
+or use other interface to notify user space, such as Qemu. After Qemu gets
+the notification, it will record the CPER and inject the SEA/SEI to KVM. this
+series of patches will generate APEI table when guest OS boot up, and dynamically
+record CPER for the guest OS about the generic hardware errors
 
+how to test:
+1. In the guest OS, use this command to dump the APEI table: 
+	"iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST"
+2. And find the address for the generic error status block
+   according to the notification type
+3. then find the CPER record through the generic error status block.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://emai=
-l.mailtoshop.com/c/eJwVjk0OgyAUhE8ju5LHQ3iyYNFYe4CmFzDgXwJiFev1S5PJTL7FZMbb=
-0Y1ascUiCAISAjRKBI5CNMBb7DrRdqQkUPsAU9UQ-yXkdMxp4y5FNlskp5VXGqhRBA56J70yYPr=
-G1SS0ZtFibcgoYMHOOW-VvFf4LLqui1-Sp30q8H4Vm3MMdcmQ0jFwnz3b7WeI580P3yGU9TWt03=
-r-KyzbWA6g1j9Kujij">
-  <head>
-    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8=
-" >
-    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
-=3D1">
-    <title>Prime Day su Amazon.it
-    </title>
-    <style type=3D"text/css">
-      .ReadMsgBody {
-        width: 100%;
-      }
-      .ExternalClass {
-        width: 100%;
-      }
-    </style>
-  </head>=20
- <center>
-<table style=3D"width: 610px; height: 30px;">
-<tbody>
-<tr>
-<td align=3D"left" valign=3D"top" width=3D"305"><a href=3D"http://email.mai=
-ltoshop.com/c/eJwVj7GOhDAMRL8Guo0chwQoUqxY6K67q5GBsCCRhIPsIt3Xn1cay3rjKcaTn=
-cfZ6Hy1CLKEUkowqBAESlmBaLBtZdOWWkHZPKDOCvC0bimeS9zFGH2-WKICiMpaI7pxGAaDANUI=
-OOipkG6k3Fssar5Dvtklpf3M1D3DjnVdlyBPfzGINTF_xYl4DTyHmzP1SHEP9O7PFA-XaOiZe2I=
-dR7wy1a2OMz_fXZWhCXH6kNYSsTKgJHuJnmz5T1nuekOZH_bX-ddtcm-38TMhhmd4iXg882Q9Z9=
-CYf8fLU2w"><img style=3D"display: block; border: 0;" src=3D"http://email.ma=
-iltoshop.com/c/eJwdT8tuhDAM_BpyI3IMJMshB8SyPW1XKpeqFxRIeEgkoRB66Nc3VPJ4RmPJ=
-Hms5DiMvyCIRmADBGHDMECgydgNaY9OwuhFFBqK-Q5nkYNWyBn_MfqODt2SWTOQMNZa8ZGOmRsH=
-LnvUcRQ_aZKA4sRLzUpQFkFXOIWxHklUJPmJZao1eVKqs-vXu2hfNxarJHFG8RcAttm33-hzC5R=
-1-DOvi_ufNFSVy2zIRqXpWX6_39Pm6V7RrP2P8rv1ALBKsC-jo5iayy29jz1SbH7PGV5x3kzup3=
-ycSpI3XkfM_2VxQIA" alt=3D"" width=3D"176" height=3D"auto" /></a></td>
-<td align=3D"right" valign=3D"top" width=3D"305">
-<div style=3D"font-family: Helvetica, sans-serif; font-size: 9px; line-heig=
-ht: 10px; color: #c5c5c5;">&nbsp;</div>
-<div style=3D"font-family: Helvetica, sans-serif; font-size: 9px; line-heig=
-ht: 10px; color: #c5c5c5;"><strong style=3D"font-size: 12px; line-height: 1=
-5px; color: #388de9;"><a style=3D"font-size: 12px; line-height: 15px; color=
-: #388de9; text-decoration: none;" href=3D"http://email.mailtoshop.com/c/eJ=
-wVjk1uhSAUhVcjs5LLRUAHDF58uoJ2ATxFIQGhijXt6stLTs7P4CTfotd5lYJ4jcAUKMZAIkegy=
-FgHdMBxZMOoBAc1PKFvWojGh5JOlzKdUyROd4ZzA7ZdUHGFYgHZWrFaRKHMS9oXiRrbXvUCSNCu=
-lNzwR4NT1X3f1ETzl3bqS91bruZseMd8nSVFe9S6-DMH80tdieF95JO3DX9-fU5dg9LETA79beP=
-1sdgfGyrinvZtv2g6NlJ0rJQo5T_fyUWo;nodeId=3D201050620&tag=3Dmshopcom-21">RES=
-I GRATUITI</a> </strong> <br />Soggetto a limitazioni</div>
-</td>
-</tr>
-</tbody>
-</table>
-<table style=3D"width: 610px;">
-<tbody>
-<tr>
-<td><a href=3D"http://email.mailtoshop.com/c/eJwVjktuwyAURVcDs6DH42cPGESOvY=
-J2AWDwRzKQJqSWuvpi6U7O0R2cYJd50YruFoEbMJyDRoHAkPMO2IDjyIfRKAFmeEBPJCS3H7W8t=
-_Jkc0l0szwqjLg47b0zc9BeemX6Lmh0i5Rxpsmi7E2vgB52q_X5JuJOcGo7z5O55P5KZntt7C8t=
-pj0S8fj-mjqCOpdwkQEQvTAgeHPVrU2lq6El3JDTl_2J6XML8TcerTGXvOYPK6-VVpvaB7X-B80=
-fRAM"> <img style=3D"display: block; border: 0;" src=3D"http://email.mailto=
-shop.com/c/eJxFj8FugzAQRL8mvsVaG2zDwQcLnBaphKpEUdsLcoIhVBgokErt19f0Uml3Z_QO=
-q5laNteGM9RJCkSAIAQ4DShgSkgEOKFak0QLFoBIUoh3ITjT9eu43MYJX0eHbjIitaCsEfwaXWx=
-9MSCYDQPSxE1teUMD5CQNYxEzQL28reu07AK1owc_Djtbd2ZvnPkZh-2fh50zrV28efBLY39Urt=
-6L4_6gysesOG7UZ_XyD55firz40yzXqXrzVm9BNzR3zqbmm4hK5yp7qlRZFkmmTrqsOIHXEKDKT=
-rg6M2BhxHgQV_hjatEsP62772v7ZXtfexiHdrjjcW7RKp1PSjn_Bcr4Wzw" alt=3D"Amazon F=
-ashion;" width=3D"610" /> </a></td>
-</tr>
-</tbody>
-</table>
-</center>
+For example(notification type is SEA):
 
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<BR>
-<center>Questa email ti =C3=A8 stata inviata da Mailtoshop e dai suoi partn=
-er perch=C3=A8 ti sei iscritto o hai partecipato ad una delle nostre inizia=
-tive.
-<BR>
-<BR>
-Se non vuoi pi=C3=B9 ricevere le nostre offerte, promozioni e sconti,la can=
-cellazione =C3=A8 semplice,basta un solo click <a href=3D"http://email.mail=
-toshop.com/u/eJwNzEkSwiAQAMDXyE1qZlgGDpwwD0lYklQF0Gh8v_YDOoeaqjViDwTIwIhgSR=
-FIQnQgI00TxomNAo4P8DcNbd6Pz3hv4ynTaGILGRd2BbS2S6mZqc4OE8zolS7sFhAtkPbsDYgzv=
-Eq77rl8y_Gv-uhrv-Q41x-G_iZf">qui</a>.</center>
-<BR>
-<BR>
+(1) root@genericarmv8:~# iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
+(2) root@genericarmv8:~# cat HEST.dsl
+	/*
+	 * Intel ACPI Component Architecture
+	 * AML/ASL+ Disassembler version 20170303 (64-bit version)
+	 * Copyright (c) 2000 - 2017 Intel Corporation
+	 *
+	 * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Dec 12 07:19:43 2016
+	 *
+	 * ACPI Data Table [HEST]
+	 *
+	 * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
+	 */
+    ..................................................................................
+    [228h 0552   2]                Subtable Type : 0009 [Generic Hardware Error Source]
+	[22Ah 0554   2]                    Source Id : 0008
+	[22Ch 0556   2]            Related Source Id : FFFF
+	[22Eh 0558   1]                     Reserved : 00
+	[22Fh 0559   1]                      Enabled : 01
+	[230h 0560   4]       Records To Preallocate : 00000001
+	[234h 0564   4]      Max Sections Per Record : 00000001
+	[238h 0568   4]          Max Raw Data Length : 00001000
+
+	[23Ch 0572  12]         Error Status Address : [Generic Address Structure]
+	[23Ch 0572   1]                     Space ID : 00 [SystemMemory]
+	[23Dh 0573   1]                    Bit Width : 40
+	[23Eh 0574   1]                   Bit Offset : 00
+	[23Fh 0575   1]         Encoded Access Width : 04 [QWord Access:64]
+	[240h 0576   8]                      Address : 00000000785D0040
+
+	[248h 0584  28]                       Notify : [Hardware Error Notification Structure]
+	[248h 0584   1]                  Notify Type : 08 [SEA]
+	[249h 0585   1]                Notify Length : 1C
+	[24Ah 0586   2]   Configuration Write Enable : 0000
+	[24Ch 0588   4]                 PollInterval : 00000000
+	[250h 0592   4]                       Vector : 00000000
+	[254h 0596   4]      Polling Threshold Value : 00000000
+	[258h 0600   4]     Polling Threshold Window : 00000000
+	[25Ch 0604   4]        Error Threshold Value : 00000000
+	[260h 0608   4]       Error Threshold Window : 00000000
+
+	[264h 0612   4]    Error Status Block Length : 00001000
+    .....................................................................................
+(3) according to above table, the address that contains the physical address of a block
+    of memory that holds the error status data for SEA notification error source is 0x00000000785D0040
+(4) the address for SEA notification error source is 0x785d8058
+	(qemu) xp /2x 0x00000000785D0040
+	00000000785d0040: 0x785d8058 0x00000000
+(5) check the content of generic error status block and generic error data entry
+    (qemu) xp /100x 0x785d8058
+    00000000785d8058: 0x00000001 0x00000000 0x00000000 0x00000098
+    00000000785d8068: 0x00000001 0xa5bc1114 0x4ede6f64 0x833e63b8
+	00000000785d8078: 0xb1837ced 0x00000000 0x00000000 0x00000050
+	00000000785d8088: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8098: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80a8: 0x00000000 0x00000000 0x00000000 0x00004002
+	00000000785d80b8: 0x00000000 0x00000000 0x00000000 0x00001111
+	00000000785d80c8: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80d8: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80e8: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d80f8: 0x00000000 0x00000003 0x00000000 0x00000000
+	00000000785d8108: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8118: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8128: 0x00000000 0x00000000 0x00000000 0x00000000
+	00000000785d8138: 0x00000000 0x00000000 0x00000000 0x00000000
+
+Dongjiu Geng (3):
+  ACPI: Add new ACPI structures and macros
+  ACPI: Add APEI GHES Table Generation support
+  ACPI: build and enable APEI GHES in the Makefile and configuration
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/acpi/Makefile.objs           |   1 +
+ hw/acpi/aml-build.c             |   2 +
+ hw/acpi/hest_ghes.c             | 219 ++++++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c        |   6 ++
+ include/hw/acpi/acpi-defs.h     | 194 +++++++++++++++++++++++++++++++++++
+ include/hw/acpi/aml-build.h     |   1 +
+ include/hw/acpi/hest_ghes.h     |  47 +++++++++
+ include/qemu/uuid.h             |  11 ++
+ 9 files changed, 482 insertions(+)
+ create mode 100644 hw/acpi/hest_ghes.c
+ create mode 100644 include/hw/acpi/hest_ghes.h
+
+-- 
+2.10.1
