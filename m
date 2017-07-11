@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUuXZ-0006O9-QV
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:45:23 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUuXY-0006Mv-DZ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUuXY-0005ms-CZ
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:45:21 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dUuXX-0005mG-DC
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:45:20 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Tue, 11 Jul 2017 15:40:24 +0300
-Message-Id: <20170711124024.1396-5-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
-References: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
+Date: Tue, 11 Jul 2017 15:40:20 +0300
+Message-Id: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 4/4] qemu-iotests: add shrinking image test
+Subject: [Qemu-devel] [PATCH v4 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,213 +22,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
----
+This patch add shrinking of the image file for qcow2. As a result, this allows
+us to reduce the virtual image size and free up space on the disk without
+copying the image. Image can be fragmented and shrink is done by punching holes
+in the image file.
+
+# ./qemu-img create -f qcow2 image.qcow2 4G
+Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+
+# ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+wrote 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
+
+# ./qemu-img resize image.qcow2 512M
+warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
+error: qemu-img: Use the --shrink option to perform a shrink operation.
+
+# ./qemu-img resize --shrink image.qcow2 128M
+Image resized.
+
+# ./qemu-img info image.qcow2
+image: image.qcow2
+file format: qcow2
+virtual size: 128M (134217728 bytes)
+disk size: 128M
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+
+# du -h image.qcow2 
+129M    image.qcow2
+
+Changes from v1:
+- add --shrink flag for qemu-img resize
+- add qcow2_cache_discard
+- simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
+- add new qemu-iotests for shrinking images
+
+Changes from v2:
+- replace qprintf() on error_report() (1)
+- rewrite warning messages (1)
+- enforce --shrink flag for all formats except raw (1)
+- split qcow2_cache_discard() (2)
+- minor fixes according to comments (3)
+- rewrite the last part of qcow2_shrink_reftable() to avoid
+  qcow2_free_clusters() calls inside (3)
+- improve test for shrinking image (4)
+
+Changes from v3:
+- rebase on "Implement a warning_report function" Alistair's patch-set (1)
+- spelling fixes (1)
+- the man page fix according to the discussion (1)
+- add call qcow2_signal_corruption() in case of image corruption (3)
+
+Pavel Butsykin (4):
+  qemu-img: add --shrink flag for resize
+  qcow2: add qcow2_cache_discard
+  qcow2: add shrink image support
+  qemu-iotests: add shrinking image test
+
+ block/qcow2-cache.c        |  26 +++++++
+ block/qcow2-cluster.c      |  40 +++++++++++
+ block/qcow2-refcount.c     | 124 +++++++++++++++++++++++++++++++++
+ block/qcow2.c              |  42 ++++++++---
+ block/qcow2.h              |  17 +++++
+ qapi/block-core.json       |   3 +-
+ qemu-img-cmds.hx           |   4 +-
+ qemu-img.c                 |  23 ++++++
+ qemu-img.texi              |   6 +-
+ tests/qemu-iotests/102     |   4 +-
  tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
  tests/qemu-iotests/163.out |   5 ++
  tests/qemu-iotests/group   |   1 +
- 3 files changed, 176 insertions(+)
+ 13 files changed, 449 insertions(+), 16 deletions(-)
  create mode 100644 tests/qemu-iotests/163
  create mode 100644 tests/qemu-iotests/163.out
 
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-new file mode 100644
-index 0000000000..403842354e
---- /dev/null
-+++ b/tests/qemu-iotests/163
-@@ -0,0 +1,170 @@
-+#!/usr/bin/env python
-+#
-+# Tests for shrinking images
-+#
-+# Copyright (c) 2016-2017 Parallels International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os, random, iotests, struct, qcow2
-+from iotests import qemu_img, qemu_io, image_size
-+
-+test_img = os.path.join(iotests.test_dir, 'test.img')
-+check_img = os.path.join(iotests.test_dir, 'check.img')
-+
-+def size_to_int(str):
-+    suff = ['B', 'K', 'M', 'G', 'T']
-+    return int(str[:-1]) * 1024**suff.index(str[-1:])
-+
-+class ShrinkBaseClass(iotests.QMPTestCase):
-+    image_len = '128M'
-+    shrink_size = '10M'
-+    chunk_size = '16M'
-+    refcount_bits = '16'
-+
-+    def __qcow2_check(self, filename):
-+        entry_bits = 3
-+        entry_size = 1 << entry_bits
-+        l1_mask = 0x00fffffffffffe00
-+        div_roundup = lambda n, d: (n + d - 1) / d
-+
-+        def split_by_n(data, n):
-+            for x in xrange(0, len(data), n):
-+                yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
-+
-+        def check_l1_table(h, l1_data):
-+            l1_list = list(split_by_n(l1_data, entry_size))
-+            real_l1_size = div_roundup(h.size,
-+                                       1 << (h.cluster_bits*2 - entry_size))
-+            used, unused = l1_list[:real_l1_size], l1_list[real_l1_size:]
-+
-+            self.assertTrue(len(used) != 0, "Verifying l1 table content")
-+            self.assertFalse(any(unused), "Verifying l1 table content")
-+
-+        def check_reftable(fd, h, reftable):
-+            for offset in split_by_n(reftable, entry_size):
-+                if offset != 0:
-+                    fd.seek(offset)
-+                    cluster = fd.read(1 << h.cluster_bits)
-+                    self.assertTrue(any(cluster), "Verifying reftable content")
-+
-+        with open(filename, "rb") as fd:
-+            h = qcow2.QcowHeader(fd)
-+
-+            fd.seek(h.l1_table_offset)
-+            l1_table = fd.read(h.l1_size << entry_bits)
-+
-+            fd.seek(h.refcount_table_offset)
-+            reftable = fd.read(h.refcount_table_clusters << h.cluster_bits)
-+
-+            check_l1_table(h, l1_table)
-+            check_reftable(fd, h, reftable)
-+
-+    def __raw_check(self, filename):
-+        pass
-+
-+    image_check = {
-+        'qcow2' : __qcow2_check,
-+        'raw' : __raw_check
-+    }
-+
-+    def setUp(self):
-+        if iotests.imgfmt == 'raw':
-+            qemu_img('create', '-f', iotests.imgfmt, test_img, self.image_len)
-+            qemu_img('create', '-f', iotests.imgfmt, check_img,
-+                     self.shrink_size)
-+        else:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     '-o', 'cluster_size=' + self.cluster_size +
-+                     ',refcount_bits=' + self.refcount_bits,
-+                     test_img, self.image_len)
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     '-o', 'cluster_size=%s'% self.cluster_size,
-+                     check_img, self.shrink_size)
-+        qemu_io('-c', 'write -P 0xff 0 ' + self.shrink_size, check_img)
-+
-+    def tearDown(self):
-+        os.remove(test_img)
-+        os.remove(check_img)
-+
-+    def image_verify(self):
-+        self.assertEqual(image_size(test_img), image_size(check_img),
-+                         "Verifying image size")
-+        self.image_check[iotests.imgfmt](self, test_img)
-+
-+        if iotests.imgfmt == 'raw':
-+            return
-+        self.assertEqual(qemu_img('check', test_img), 0,
-+                         "Verifying image corruption")
-+
-+    def test_empty_image(self):
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, test_img),
-+            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, check_img),
-+            "Verifying image content")
-+
-+        self.image_verify()
-+
-+    def test_sequential_write(self):
-+        for offs in range(0, size_to_int(self.image_len),
-+                          size_to_int(self.chunk_size)):
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
-+                         "Verifying image content")
-+
-+        self.image_verify()
-+
-+    def test_random_write(self):
-+        offs_list = range(0, size_to_int(self.image_len),
-+                          size_to_int(self.chunk_size))
-+        random.shuffle(offs_list)
-+        for offs in offs_list:
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
-+                         "Verifying image content")
-+
-+        self.image_verify()
-+
-+class TestShrink512(ShrinkBaseClass):
-+    image_len = '3M'
-+    shrink_size = '1M'
-+    chunk_size = '256K'
-+    cluster_size = '512'
-+    refcount_bits = '64'
-+
-+class TestShrink64K(ShrinkBaseClass):
-+    cluster_size = '64K'
-+
-+class TestShrink1M(ShrinkBaseClass):
-+    cluster_size = '1M'
-+    refcount_bits = '1'
-+
-+ShrinkBaseClass = None
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['raw', 'qcow2'])
-diff --git a/tests/qemu-iotests/163.out b/tests/qemu-iotests/163.out
-new file mode 100644
-index 0000000000..dae404e278
---- /dev/null
-+++ b/tests/qemu-iotests/163.out
-@@ -0,0 +1,5 @@
-+.........
-+----------------------------------------------------------------------
-+Ran 9 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 318ae74b10..542947eeba 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -163,6 +163,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+163 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
 -- 
 2.13.0
