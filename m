@@ -1,39 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dUpsV-0006A2-9P
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:46:40 -0400
+	(envelope-from <thuth@redhat.com>) id 1dUpuj-00074n-PM
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dUpsR-0005N3-BC
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:46:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54367)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dUpsR-0005Me-0h
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:46:35 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6B7YN0U123606
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 03:46:33 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bmbyxveqw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 03:46:32 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 11 Jul 2017 03:46:31 -0400
-References: <1499700760-4777-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 11 Jul 2017 09:46:25 +0200
+	(envelope-from <thuth@redhat.com>) id 1dUpug-0006UV-MP
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:48:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dUpug-0006TY-CL
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 03:48:54 -0400
+References: <1499237876.3041.4.camel@linux.intel.com>
+	<6ad73f55-c48a-c083-e0ef-b8ac162ec989@redhat.com>
+	<5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
+	<20170707133949.GH10776@localhost.localdomain>
+	<20170707181642-mutt-send-email-mst@kernel.org>
+	<20170707180358.GA12152@localhost.localdomain>
+	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
+	<20170710135943.GG12152@localhost.localdomain>
+	<20170710194345-mutt-send-email-mst@kernel.org>
+	<20170710174730.GL12152@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <063778b8-d517-dcac-3c83-95076604a16c@redhat.com>
+Date: Tue, 11 Jul 2017 09:48:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <1499700760-4777-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20170710174730.GL12152@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <a97c1b86-3e53-b080-f21b-199ae6f31235@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] Implement network booting
- directly into the s390-ccw BIOS
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,86 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: libvir-list@redhat.com, "Tian, Kevin" <kevin.tian@intel.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
 
-On 07/10/2017 05:32 PM, Thomas Huth wrote:
-> It's already possible to do a network boot of an s390x guest with an
-> external netboot image based on a Linux installation, but it would
-> be much more convenient if the s390-ccw firmware supported network
-> booting right out of the box, without the need to assemble such an
-> external image first.
+On 10.07.2017 19:47, Eduardo Habkost wrote:
+> (CCing libvir-list)
 > 
-> This patch series now introduces a s390-netboot.img that can be used
-> for network booting via DHCP and TFTP by re-using the networking stack
-> from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
-> and adds a driver for virtio-net-ccw devices.
+> On Mon, Jul 10, 2017 at 07:45:54PM +0300, Michael S. Tsirkin wrote:
+>> On Mon, Jul 10, 2017 at 10:59:43AM -0300, Eduardo Habkost wrote:
+>>> On Mon, Jul 10, 2017 at 10:42:26AM +0300, Marcel Apfelbaum wrote:
+>>>> On 07/07/2017 21:03, Eduardo Habkost wrote:
+>>>>> On Fri, Jul 07, 2017 at 06:17:57PM +0300, Michael S. Tsirkin wrote:
+>>>>>> On Fri, Jul 07, 2017 at 10:39:49AM -0300, Eduardo Habkost wrote:
+>>>>>>> On Wed, Jul 05, 2017 at 12:32:10PM +0300, Marcel Apfelbaum wrote:
+>>> [...]
+>>>>>>>>
+>>>>>>>> The upper layers should manage the defaults by themselves so
+>>>>>>>> are not supposed to be affected.
+>>>>>>>
+>>>>>>> But they would be.  libvirt uses the default machine-type from
+>>>>>>> QEMU.
+>>>>>>
+>>>>>> How about extending the command for supported machines with a
+>>>>>> recommended machine type, and teaching libvirt to use that?
+>>>>>
+>>>>> I don't think QEMU has enough information to decide if it should
+>>>>> recommend "q35" or "pc".
+>>>>
+>>>> We don't really need a complicated rule set, we would just recommend q35
+>>>> by default. Libvirt will try to create the default machine and if fails
+>>>> for some reason (what would it be?) it can switch to PC.
+>>>>
+>>>> The advanced logic would be "old systems should use PC", where old
+>>>> means Windows XP and before and so on. But this logic should appear
+>>>> in management layers above.
+>>>
+>>> In this case, is there any difference between "changing the
+>>> default to q35" and "recommending q35", for libvirt users?
+>>>
+>>> -- 
+>>> Eduardo
+>>
+>> No but libvirt users do not manage e.g. pci slots manually.
+>> They do not use the -cdrom flag.
+>> Etc.
+>> So changing the default is unlikely to break things for them.
+>>
 > 
-> The code can only be built if the roms/SLOF submodule has been checked
-> out (there is a sanity check for this in the Makefile). Once it has
-> been built, you can download a combined kernel + initrd image via TFTP
-> by starting QEMU for example with:
+> I see.  If this part is really true (can libvirt developers
+> confirm that?), then the proposed end result makes sense (not
+> having a default for running QEMU directly, but changing default
+> to "q35" for people using libvirt).
 > 
->  qemu-system-s390x ... -device virtio-net,netdev=n1,bootindex=1 \
->        -netdev user,id=n1,tftp=/path/to/tftp,bootfile=kernel.img
-> 
-> Note that this version does not support downloading via config
-> files (i.e. pxelinux config files or .INS config files) yet. This
-> will be added later.
-> 
-> v3:
->  - Adressed the review feedback from v2
->  - The last remaining SLOF patch has now been merged (big thanks to
->    Alexey!), so not sending this as RFC anymore - it is ready now for
->    integration, I think.
-> 
-> v2:
->  - Put the network boot loader into a separate s390-netboot.img
->    binary instead of linking it directly into the s390-ccw firmware.
->  - Use the SLOF sources from the roms/SLOF/ submodule instead of
->    copying them into the pc-bios/s390-ccw folder
->  - Removed the .INS config file loading code for now - only support
->    combined kernel + initrd images in this initial implementation.
-> 
-> Thomas Huth (10):
->   pc-bios/s390-ccw: Move libc functions to separate header
->   pc-bios/s390-ccw: Move ebc2asc to sclp.c
->   pc-bios/s390-ccw: Move virtio-block related functions into a separate
->     file
->   pc-bios/s390-ccw: Add a write() function for stdio
->   pc-bios/s390-ccw: Move byteswap functions to a separate header
->   pc-bios/s390-ccw: Add code for virtio feature negotiation
->   roms/SLOF: Update submodule to latest status
->   pc-bios/s390-ccw: Add core files for the network bootloading program
->   pc-bios/s390-ccw: Add virtio-net driver code
->   pc-bios/s390-ccw: Link libnet into the netboot image and do the TFTP
->     load
-> 
->  pc-bios/s390-ccw/Makefile        |  13 +-
->  pc-bios/s390-ccw/bootmap.c       |   2 +
->  pc-bios/s390-ccw/bootmap.h       |  26 ---
->  pc-bios/s390-ccw/bswap.h         |  25 +++
->  pc-bios/s390-ccw/libc.h          |  45 +++++
->  pc-bios/s390-ccw/main.c          |  14 +-
->  pc-bios/s390-ccw/netboot.mak     |  51 ++++++
->  pc-bios/s390-ccw/netmain.c       | 365 +++++++++++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/s390-ccw.h      |  33 +---
->  pc-bios/s390-ccw/sclp.c          |  37 ++--
->  pc-bios/s390-ccw/virtio-blkdev.c | 297 +++++++++++++++++++++++++++++++
->  pc-bios/s390-ccw/virtio-net.c    | 133 ++++++++++++++
->  pc-bios/s390-ccw/virtio-scsi.c   |   1 +
->  pc-bios/s390-ccw/virtio.c        | 306 ++++----------------------------
->  pc-bios/s390-ccw/virtio.h        |  18 +-
->  roms/SLOF                        |   2 +-
->  16 files changed, 1007 insertions(+), 361 deletions(-)
->  create mode 100644 pc-bios/s390-ccw/bswap.h
->  create mode 100644 pc-bios/s390-ccw/libc.h
->  create mode 100644 pc-bios/s390-ccw/netboot.mak
->  create mode 100644 pc-bios/s390-ccw/netmain.c
->  create mode 100644 pc-bios/s390-ccw/virtio-blkdev.c
->  create mode 100644 pc-bios/s390-ccw/virtio-net.c
-> 
+> But I don't see why we would need a new mechanism to make QEMU
+> recommend a machine-type for libvirt, if libvirt could simply
+> choose its own default (or maybe also refuse to pick a default,
+> if libvirt developers decide that's the best solution).
 
-Generic Ack for all patches from me. I will give it some more review on the list,
-but since this is standalone I will pick up this patch series unless review
-has some findings.
+Agreed, it does not make much sense to invent a new mechanism here. I
+guess the default should rather be switched in the the tools that create
+the XML for libvirt, i.e. virt-install and friends?
+
+Concerning QEMU, could we maybe simply emit a warning a la
+
+ "you did not specify a machine type with the -M option, so you are
+  currently running the the 'pc' machine type. Please note that future
+  versions of QEMU might use the 'q35' machine type instead. If you
+  require the 'pc' machine type for your setting, then please specify
+  it with the -M option."
+
+for a couple of releases, so that other people have a chance to update
+their scripts, and then finally switch to q35 ?
+
+ Thomas
