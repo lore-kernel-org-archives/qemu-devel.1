@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dUnmd-00040B-A0
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:32:28 -0400
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dUo8F-0007Sk-E1
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dUnma-0006iu-6d
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:32:27 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Tue, 11 Jul 2017 15:32:18 +1000
-Message-Id: <20170711053218.6700-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v3] vfio-pci,
- ppc64/spapr: Reorder group-to-container attaching
+	(envelope-from <bharat.bhushan@nxp.com>) id 1dUo8E-00081Q-78
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:54:47 -0400
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Date: Tue, 11 Jul 2017 05:54:35 +0000
+Message-ID: <AM5PR0401MB2545F60CA898D23D5E2F1E6D9AAE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<c80977c4-1955-4e9d-3fc8-4d884562fd28@redhat.com>
+	<HE1PR0401MB2556D19D91F25DCE96FE7B199AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<8a7fb667-e6c0-2412-6dca-a8233dd27836@redhat.com>
+	<HE1PR0401MB255696A487DFEB2B8972980F9AD40@HE1PR0401MB2556.eurprd04.prod.outlook.com>
+	<e9ea564a-f02b-0ed5-e700-b7b1dfd89722@arm.com>
+	<AM5PR0401MB25459345E9533FFC3BBE00289AD50@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<15b631c8-5708-1426-90a2-9be51a796614@redhat.com>
+	<AM5PR0401MB2545C23F66D6D0E096DCB0369AAA0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<a67cb139-e1b6-02fc-d451-4001bcbfceb3@redhat.com>
+	<AM5PR0401MB2545A78764598CD87827B14F9AAA0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<615e22ce-80b3-b000-360f-7272a867cdf9@arm.com>
+In-Reply-To: <615e22ce-80b3-b000-360f-7272a867cdf9@arm.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,111 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-At the moment VFIO PCI device initialization works as follows:
-vfio_realize
-	vfio_get_group
-		vfio_connect_container
-			register memory listeners (1)
-			update QEMU groups lists
-		vfio_kvm_device_add_group
-
-Then (example for pseries) the machine reset hook triggers region_add()
-for all regions where listeners from (1) are listening:
-
-ppc_spapr_reset
-	spapr_phb_reset
-		spapr_tce_table_enable
-			memory_region_add_subregion
-				vfio_listener_region_add
-					vfio_spapr_create_window
-
-This scheme works fine until we need to handle VFIO PCI device hotplug
-and we want to enable PPC64/sPAPR in-kernel TCE acceleration on,
-i.e. after PCI hotplug we need a place to call
-ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
-Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
-(from VFIOGroup), vfio_listener_region_add() seems to be the only place
-for this ioctl().
-
-However this only works during boot time because the machine reset
-happens strictly after all devices are finalized. When hotplug happens,
-vfio_listener_region_add() is called when a memory listener is registered
-but when this happens:
-1. new group is not added to the container->group_list yet;
-2. VFIO KVM device is unaware of the new IOMMU group.
-
-This moves bits around to have all necessary VFIO infrastructure
-in place for both initial startup and hotplug cases.
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
-
-
-This is an independend part of a bigger patchset to enable in-kernel
-acceleration of TCE operations. While I stuck with IOMMU MR QOM-fication,
-let's try to parallel patchset pieces' review/acceptance.
-
----
-Changes:
-v3:
-* rebased on current upstream
-
-v2:
-* moved container->initialized back to its correct location
-* added missing QLIST_REMOVE()
----
- hw/vfio/common.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 2965b68e5d..4e75dc8c56 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1107,6 +1107,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-         goto free_container_exit;
-     }
- 
-+    vfio_kvm_device_add_group(group);
-+
-+    QLIST_INIT(&container->group_list);
-+    QLIST_INSERT_HEAD(&space->containers, container, next);
-+
-+    group->container = container;
-+    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
-+
-     container->listener = vfio_memory_listener;
- 
-     memory_listener_register(&container->listener, container->space->as);
-@@ -1120,14 +1128,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
- 
-     container->initialized = true;
- 
--    QLIST_INIT(&container->group_list);
--    QLIST_INSERT_HEAD(&space->containers, container, next);
--
--    group->container = container;
--    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
--
-     return 0;
- listener_release_exit:
-+    QLIST_REMOVE(group, container_next);
-+    QLIST_REMOVE(container, next);
-+    vfio_kvm_device_del_group(group);
-     vfio_listener_release(container);
- 
- free_container_exit:
-@@ -1232,8 +1237,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
- 
-     QLIST_INSERT_HEAD(&vfio_group_list, group, next);
- 
--    vfio_kvm_device_add_group(group);
--
-     return group;
- 
- close_fd_exit:
--- 
-2.11.0
+SGkgSmVhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKZWFuLVBo
+aWxpcHBlIEJydWNrZXIgW21haWx0bzpqZWFuLXBoaWxpcHBlLmJydWNrZXJAYXJtLmNvbV0NCj4g
+U2VudDogRnJpZGF5LCBKdWx5IDA3LCAyMDE3IDg6NTAgUE0NCj4gVG86IEJoYXJhdCBCaHVzaGFu
+IDxiaGFyYXQuYmh1c2hhbkBueHAuY29tPjsgQXVnZXIgRXJpYw0KPiA8ZXJpYy5hdWdlckByZWRo
+YXQuY29tPjsgZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiBwZXRlci5tYXlkZWxsQGxpbmFy
+by5vcmc7IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcWVt
+dS1hcm1Abm9uZ251Lm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+IENjOiB3ZWlAcmVkaGF0
+LmNvbTsga2V2aW4udGlhbkBpbnRlbC5jb207IG1hcmMuenluZ2llckBhcm0uY29tOw0KPiB0bkBz
+ZW1paGFsZi5jb207IHdpbGwuZGVhY29uQGFybS5jb207IGRyam9uZXNAcmVkaGF0LmNvbTsNCj4g
+cm9iaW4ubXVycGh5QGFybS5jb207IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZw0KPiBTdWJq
+ZWN0OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgdjIgMC84XSBWSVJUSU8tSU9NTVUgZGV2aWNlDQo+
+IA0KPiBPbiAwNy8wNy8xNyAxMjozNiwgQmhhcmF0IEJodXNoYW4gd3JvdGU6DQo+ID4+PiBJbiB0
+aGlzIHByb3Bvc2FsLCBRRU1VIHJlc2VydmVzIGEgaW92YS1yYW5nZSBmb3IgZ3Vlc3QgKG5vdCBo
+b3N0KSBhbmQNCj4gZ3Vlc3QNCj4gPj4ga2VybmVsIHdpbGwgdXNlIHRoaXMgYXMgbXNpLWlvdmEg
+dW50cmFuc2xhdGVkIChJT01NVV9SRVNWX01TSSkuIFdoaWxlDQo+IHRoaXMNCj4gPj4gZG9lcyBu
+b3QgY2hhbmdlIGhvc3QgaW50ZXJmYWNlIGFuZCBpdCB3aWxsIGNvbnRpbnVlIHRvIHVzZSBob3N0
+IHJlc2VydmVkDQo+ID4+IG1hcHBpbmcgZm9yIGFjdHVhbCBpbnRlcnJ1cHQgZ2VuZXJhdGlvbiwg
+bm8/DQo+ID4+IEJ1dCB0aGVuIHVzZXJzcGFjZSBuZWVkcyB0byBwcm92aWRlIElPTU1VX1JFU1Zf
+TVNJIHJhbmdlIHRvIGd1ZXN0DQo+ID4+IGtlcm5lbCwgcmlnaHQ/IFdoYXQgd291bGQgYmUgdGhl
+IHByb3Bvc2VkIG1hbm5lcj8NCj4gPg0KPiA+IEp1c3QgYW4gb3Bpbmlvbiwgd2UgY2FuIGRlZmlu
+ZSBmZWF0dXJlDQo+IChWSVJUSU9fSU9NTVVfRl9SRVNfTVNJX1JBTkdFKSBhbmQgcHJvdmlkZSB0
+aGlzIGluZm8gdmlhIGEgY29tbWFuZA0KPiAoVklSVElPX0lPTU1VX1RfTVNJX1JBTkdFKS4gR3Vl
+c3QgaW9tbXUtZHJpdmVyIHdpbGwgbWFrZSB0aGlzIGNhbGwNCj4gZHVyaW5nIGluaXRpYWxpemF0
+aW9uIGFuZCBzdG9yZSB0aGUgdmFsdWUuIFRoaXMgdmFsdWUgd2lsbCBqdXN0IHJlcGxhY2UNCj4g
+TVNJX0lPVkFfQkFTRSBhbmQgTVNJX0lPVkFfTEVOR0hUIGhhc2ggZGVmaW5lLiBSZXN0IHdpbGwg
+cmVtYWluIHNhbWUNCj4gaW4gdmlydGlvLWlvbW11IGRyaXZlci4NCj4gDQo+IFllcyBJIGhhZCBz
+b21ldGhpbmcgc2ltaWxhciBpbiBtaW5kLCBhbHRob3VnaCBtb3JlIGdlbmVyaWMgc2luY2Ugd2Un
+bGwNCj4gbmVlZCB0byBnZXQgb3RoZXIgYml0cyBvZiBpbmZvcm1hdGlvbiBmcm9tIHRoZSBkZXZp
+Y2UgaW4gZnV0dXJlIGV4dGVuc2lvbnMNCj4gKGZhdWx0IGhhbmRsaW5nLCBwYWdlIHRhYmxlIGZv
+cm1hdHMgYW5kIGR5bmFtaWMgcmVzZXJ2ZXMgb2YgbWVtb3J5IGZvcg0KPiBTVk0pLCBhbmQgbWF5
+YmUgYWxzbyBmb3IgZmluZGluZyBvdXQgcGVyLWFkZHJlc3Mtc3BhY2UgcGFnZSBncmFudWxhcml0
+eQ0KPiAoc2VlIG15IHJlcGx5IG9mIHBhdGNoIDMvOCkuIFRoZXNlIGFyZSBwZXItZW5kcG9pbnQg
+cHJvcGVydGllcyB0aGF0IGNhbm5vdA0KPiBiZSBhZHZlcnRpc2UgaW4gdGhlIHZpcnRpbyBjb25m
+aWcgc3BhY2UuDQo+IA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqKioNCj4g
+DQo+IFNvIEkgcHJvcG9zZSB0byBhZGQgYSBwZXItZW5kcG9pbnQgcHJvYmluZyBtZWNoYW5pc20g
+b24gdGhlIHJlcXVlc3QNCj4gcXVldWU6DQoNCldoYXQgaXMgcGVyLWVuZHBvaW50PyBJcyBpdCAi
+cGVyLXBjaS9wbGF0Zm9ybS1kZXZpY2UiPw0KDQo+IA0KPiAqIFRoZSBkZXZpY2UgYWR2ZXJ0aXNl
+cyBhIG5ldyBjb21tYW5kIFZJUlRJT19JT01NVV9UX1BST0JFIHdpdGgNCj4gZmVhdHVyZQ0KPiBi
+aXQgVklSVElPX0lPTU1VX0ZfUFJPQkUuDQo+ICogV2hlbiB0aGlzIGZlYXR1cmUgaXMgYWR2ZXJ0
+aXNlZCwgdGhlIGRldmljZSBzZXRzIHByb2JlX3NpemUgZmllbGQgaW4gdGhlDQo+IHRoZSBjb25m
+aWcgc3BhY2UuDQoNClByb2JhYmx5IEkgZGlkIG5vdCBnZXQgaG93IHZpcnRpby1pb21tdSBkZXZp
+Y2UgZW11bGF0aW9uIGRlY2lkZXMgdmFsdWUgb2YgInByb2JlX3NpemUiLCBjYW4geW91IHNoYXJl
+IG1vcmUgaW5mbz8NCg0KPiAqIFdoZW4gZGV2aWNlIG9mZmVycyBWSVJUSU9fSU9NTVVfRl9QUk9C
+RSwgdGhlIGRyaXZlciBzaG91bGQgc2VuZCBhbg0KPiBWSVJUSU9fSU9NTVVfVF9QUk9CRSByZXF1
+ZXN0IGZvciBlYWNoIG5ldyBlbmRwb2ludC4NCj4gKiBUaGUgZHJpdmVyIGFsbG9jYXRlcyBhIGRl
+dmljZS13cml0ZWFibGUgYnVmZmVyIG9mIHByb2JlX3NpemUgKHBsdXMNCj4gZnJhbWluZykgYW5k
+IHNlbmRzIGl0IGFzIGEgVklSVElPX0lPTU1VX1RfUFJPQkUgcmVxdWVzdC4NCj4gKiBUaGUgZGV2
+aWNlIGZpbGxzIHRoZSBidWZmZXIgd2l0aCB2YXJpb3VzIGluZm9ybWF0aW9uLg0KPiANCj4gc3Ry
+dWN0IHZpcnRpb19pb21tdV9yZXFfcHJvYmUgew0KPiAJLyogZGV2aWNlLXJlYWRhYmxlICovDQo+
+IAlzdHJ1Y3QgdmlydGlvX2lvbW11X3JlcV9oZWFkIGhlYWQ7DQo+IAlsZTMyIGRldmljZTsNCj4g
+CWxlMzIgZmxhZ3M7DQo+IA0KPiAJLyogbWF5YmUgYWxzbyBsZTMyIGNvbnRlbnRfc2l6ZSwgYnV0
+IGl0IG11c3QgYmUgZXF1YWwgdG8NCj4gCSAgIHByb2JlX3NpemUgKi8NCg0KQ2FuIHlvdSBwbGVh
+c2UgZGVzY3JpYmUgd2h5IHdlIG5lZWQgdG8gcGFzcyBzaXplIG9mICJwcm9iZV9zaXplIiBpbiBw
+cm9iZSByZXF1ZXN0Pw0KDQo+IA0KPiAJLyogZGV2aWNlLXdyaXRlYWJsZSAqLw0KPiAJdTggY29u
+dGVudFtdOw0KDQpJIGFzc3VtZSBjb250ZW50X3NpemUgYWJvdmUgaXMgdGhlIHNpemUgb2YgYXJy
+YXkgImNvbnRlbnRbXSIgYW5kIG1heCB2YWx1ZSBjYW4gYmUgZXF1YWwgdG8gcHJvYmVfc2l6ZSBh
+ZHZlcnRpc2VkIGJ5IGRldmljZT8NCg0KPiAJc3RydWN0IHZpcnRpb19pb21tdV9yZXFfdGFpbCB0
+YWlsOw0KPiB9Ow0KPiANCj4gSSdtIHN0aWxsIHN0cnVnZ2xpbmcgd2l0aCB0aGUgY29udGVudCBh
+bmQgbGF5b3V0IG9mIHRoZSBwcm9iZSByZXF1ZXN0LCBhbmQNCj4gd291bGQgYXBwcmVjaWF0ZSBh
+bnkgZmVlZGJhY2suIFRvIGJlIGVhc2lseSBleHRlbmRlZCwgSSB0aGluayBpdCBzaG91bGQNCj4g
+Y29udGFpbiBhIGxpc3Qgb2YgZmllbGRzIG9mIHZhcmlhYmxlIHNpemU6DQo+IA0KPiAJfDAgICAg
+ICAgICAgIDE1fDE2ICAgICAgICAgICAzMXwzMiAgICAgICAgICAgICAgIE58DQo+IAl8ICAgICB0
+eXBlICAgICB8ICAgIGxlbmd0aCAgICAgfCAgICAgIHZhbHVlcyAgICAgIHwNCj4gDQo+ICdsZW5n
+dGgnIG1pZ2h0IGJlIG1hZGUgb3B0aW9uYWwgaWYgaXQgY2FuIGJlIGRlZHVjZWQgZnJvbSB0eXBl
+LCBidXQgbWlnaHQNCj4gbWFrZSBkcml2ZXItc2lkZSBwYXJzaW5nIG1vcmUgcm9idXN0Lg0KPiAN
+Cj4gVGhlIHByb2JlIGNvdWxkIGVpdGhlciBiZSBkb25lIGZvciBlYWNoIGVuZHBvaW50LCBvciBm
+b3IgZWFjaCBhZGRyZXNzDQo+IHNwYWNlLiBJIG11Y2ggcHJlZmVyIGVuZHBvaW50IGJlY2F1c2Ug
+aXQgaXMgdGhlIHNtYWxsZXN0IGdyYW51bGFyaXR5LiBUaGUNCj4gZHJpdmVyIGNhbiB0aGVuIGRl
+Y2lkZSB3aGF0IGVuZHBvaW50cyB0byBwdXQgdG9nZXRoZXIgaW4gdGhlIHNhbWUgYWRkcmVzcw0K
+PiBzcGFjZSBiYXNlZCBvbiB0aGVpciBpbmRpdmlkdWFsIGNhcGFiaWxpdGllcy4gVGhlIHNwZWNp
+ZmljYXRpb24gd291bGQNCj4gZGVzY3JpYmVkIGhvdyBlYWNoIGVuZHBvaW50IHByb3BlcnR5IGlz
+IGNvbWJpbmVkIHdoZW4gZW5kcG9pbnRzIGFyZSBwdXQNCj4gaW4NCj4gdGhlIHNhbWUgYWRkcmVz
+cyBzcGFjZS4gRm9yIGV4YW1wbGUsIHRha2UgdGhlIG1pbmltdW0gb2YgYWxsIFBBU0lEIHNpemUs
+DQo+IHRoZSBtYXhpbXVtIG9mIGFsbCBwYWdlIGdyYW51bGFyaXRpZXMsIGNvbWJpbmUgZG9vcmJl
+bGwgYWRkcmVzc2VzLCBldGMuDQo+IA0KPiBJZiB3ZSBkaWQgdGhlIHByb2JlIG9uIGFkZHJlc3Mg
+c3BhY2VzIGluc3RlYWQsIHRoZSBkcml2ZXIgd291bGQgaGF2ZSB0bw0KPiByZS1zZW5kIGEgcHJv
+YmUgcmVxdWVzdCBlYWNoIHRpbWUgYSBuZXcgZW5kcG9pbnQgaXMgYXR0YWNoZWQgdG8gYW4NCj4g
+ZXhpc3RpbmcgYWRkcmVzcyBzcGFjZSwgdG8gc2VlIGlmIGl0IGlzIHN0aWxsIGNhcGFibGUgb2Yg
+cGFnZSB0YWJsZQ0KPiBoYW5kb3ZlciBvciBpZiB0aGUgZHJpdmVyIGp1c3QgY29tYmluZWQgYSBW
+RklPIGFuZCBhbiBlbXVsYXRlZCBlbmRwb2ludCBieQ0KPiBhY2NpZGVudC4NCj4gDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICoqKg0KPiANCj4gVXNpbmcgdGhpcyBmcmFtZXdv
+cmssIHRoZSBkZXZpY2UgY2FuIGRlY2xhcmUgZG9vcmJlbGwgcmVnaW9ucyBieSBhZGRpbmcNCj4g
+b25lIG9yIG1vcmUgUkVTViBmaWVsZHMgaW50byB0aGUgcHJvYmUgYnVmZmVyOg0KPiANCj4gLyog
+J3R5cGUnICovDQo+ICNkZWZpbmUgVklSVElPX0lPTU1VX1BST0JFX1RfUkVTViAJMHgxDQo+IA0K
+PiAvKiAndmFsdWVzJy4gJ2xlbmd0aCcgaXMgc2l6ZW9mKHN0cnVjdCB2aXJ0aW9faW9tbXVfcHJv
+YmVfcmVzdikgKi8NCj4gc3RydWN0IHZpcnRpb19pb21tdV9wcm9iZV9yZXN2IHsNCj4gCWxlNjQg
+Z3BhOw0KPiAJbGU2NCBzaXplOw0KPiANCj4gI2RlZmluZSBWSVJUSU9fSU9NTVVfUFJPQkVfUkVT
+Vl9NU0kJMHgxDQo+IAl1OCB0eXBlOw0KDQp0eXBlIGlzIDE2IGJpdCBhYm92ZT8NCg0KPiB9Ow0K
+PiANCj4gU3VjaCBhIHJlZ2lvbiB3b3VsZCBiZSBzdWJqZWN0IHRvIHRoZSBmb2xsb3dpbmcgcnVs
+ZXM6DQo+IA0KPiAqIERyaXZlciBzaG91bGQgbm90IHVzZSBhbnkgSU9WQSBkZWNsYXJlZCBhcyBS
+RVNWX01TSSBpbiBhIG1hcHBpbmcuDQo+ICogRGV2aWNlIHNob3VsZCBsZWF2ZSBhbnkgdHJhbnNh
+Y3Rpb24gbWF0Y2hpbmcgYSBSRVNWX01TSSByZWdpb24gcGFzcw0KPiB0aHJvdWdoIHVudHJhbnNs
+YXRlZC4NCj4gKiBJZiB0aGUgZGV2aWNlIGRvZXMgbm90IGFkdmVydGlzZSBhbnkgUkVTViByZWdp
+b24sIHRoZW4gdGhlIGRyaXZlciBzaG91bGQNCj4gYXNzdW1lIHRoYXQgTVNJIGRvb3JiZWxscywg
+bGlrZSBhbnkgb3RoZXIgR1BBLCBtdXN0IGJlIG1hcHBlZCB3aXRoIGFuDQo+IGFyYml0cmFyeSBJ
+T1ZBIGluIG9yZGVyIGZvciB0aGUgZW5kcG9pbnQgdG8gYWNjZXNzIHRoZW0uDQo+ICogR2l2ZW4g
+dGhhdCB0aGUgZHJpdmVyICpzaG91bGQqIHBlcmZvcm0gYSBwcm9iZSByZXF1ZXN0IGlmIGF2YWls
+YWJsZSwgYW5kDQo+IGl0ICpzaG91bGQqIHVuZGVyc3RhbmQgdGhlIFZJUlRJT19JT01NVV9QUk9C
+RV9UX1JFU1YgZmllbGQsIHRoZW4gdGhpcw0KPiBmaWVsZCB0ZWxscyB0aGUgZ3Vlc3QgaG93IGl0
+IHNob3VsZCBoYW5kbGUgTVNJIGRvb3JiZWxscywgYW5kIHdoZXRoZXIgaXQNCj4gc2hvdWxkIG1h
+cCB0aGUgYWRkcmVzcyB2aWEgTUFQIHJlcXVlc3RzIG9yIG5vdC4NCj4gDQo+IERvZXMgdGhpcyBt
+YWtlIHNlbnNlIGFuZCBkaWQgSSBvdmVybG9vayBzb21ldGhpbmc/DQoNCk92ZXJhbGwgaXQgbG9v
+a3MgZ29vZCB0byBtZS4gRG8geW91IGhhdmUgcGxhbnMgdG8gaW1wbGVtZW50cyB0aGlzIGluIHZp
+cnRpby1pb21tdSBkcml2ZXIgYW5kIGt2bXRvb2w/DQoNClRoYW5rcw0KLUJoYXJhdA0KDQo+IA0K
+PiBUaGFua3MsDQo+IEplYW4NCg==
