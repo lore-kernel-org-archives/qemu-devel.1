@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dUmxo-0002nN-GN
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:57 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dUmxp-0002pn-Qb
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dUmxl-0007jL-Rt
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:56 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dUmxo-0007ly-Ob
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:57 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 11 Jul 2017 14:39:04 +1000
-Message-Id: <20170711043917.1757-5-david@gibson.dropbear.id.au>
+Date: Tue, 11 Jul 2017 14:39:05 +1000
+Message-Id: <20170711043917.1757-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20170711043917.1757-1-david@gibson.dropbear.id.au>
 References: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/17] spapr: fix migration to pseries machine <
- 2.8
+Subject: [Qemu-devel] [PULL 05/17] target-ppc: SPR_BOOKE_ESR not set on FP
+ exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,91 +21,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, bharata@linux.vnet.ibm.com, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, bharata@linux.vnet.ibm.com, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Aaron Larson <alarson@ddci.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Aaron Larson <alarson@ddci.com>
 
-since commit 5c4537bd ("spapr: Fix 2.7<->2.8 migration of PCI host bridge"),
-some migration fields are forged from the new ones in spapr_pci_pre_save().
+Properly set the book E exception syndrome register when a floating
+point exception occurs.
 
-It works well, except when the number of MSI devices is 0,
-because in this case the function exits immediately.
+Currently on a book E processor, the POWERPC_EXCP_FP exception handler
+fails to set "env->spr[SPR_BOOKE_ESR] = ESR_FP;" as required by the
+book E specification.
 
-This fix moves the migration code before the exit code.
-
-The problem can be reproduced with these commands:
-
-source qemu-2.9:
-
-    qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults -S
-
-destination qemu-2.6:
-
-    qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults \
-                      -incoming tcp:0:4444
-
-on the source:
-
-    migrate tcp:localhost:4444
-
-Destination fails with the following error:
-
-    qemu-system-ppc64: error while loading state for
-                       instance 0x0 of device 'spapr_pci'
-    qemu-system-ppc64: load of migration failed: Invalid argument
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Aaron Larson <alarson@ddci.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_pci.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ target/ppc/excp_helper.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 3b37dcd..f09b4e1 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1873,20 +1873,6 @@ static void spapr_pci_pre_save(void *opaque)
-     gpointer key, value;
-     int i;
- 
--    g_free(sphb->msi_devs);
--    sphb->msi_devs = NULL;
--    sphb->msi_devs_num = g_hash_table_size(sphb->msi);
--    if (!sphb->msi_devs_num) {
--        return;
--    }
--    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
--
--    g_hash_table_iter_init(&iter, sphb->msi);
--    for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
--        sphb->msi_devs[i].key = *(uint32_t *) key;
--        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
--    }
--
-     if (sphb->pre_2_8_migration) {
-         sphb->mig_liobn = sphb->dma_liobn[0];
-         sphb->mig_mem_win_addr = sphb->mem_win_addr;
-@@ -1900,6 +1886,20 @@ static void spapr_pci_pre_save(void *opaque)
-             sphb->mig_mem_win_size += sphb->mem64_win_size;
-         }
-     }
-+
-+    g_free(sphb->msi_devs);
-+    sphb->msi_devs = NULL;
-+    sphb->msi_devs_num = g_hash_table_size(sphb->msi);
-+    if (!sphb->msi_devs_num) {
-+        return;
-+    }
-+    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
-+
-+    g_hash_table_iter_init(&iter, sphb->msi);
-+    for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
-+        sphb->msi_devs[i].key = *(uint32_t *) key;
-+        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
-+    }
- }
- 
- static int spapr_pci_post_load(void *opaque, int version_id)
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 3a9f086..e6009e7 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -283,6 +283,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+              * precise in the MSR.
+              */
+             msr |= 0x00100000;
++            env->spr[SPR_BOOKE_ESR] = ESR_FP;
+             break;
+         case POWERPC_EXCP_INVAL:
+             LOG_EXCP("Invalid instruction at " TARGET_FMT_lx "\n", env->nip);
 -- 
 2.9.4
