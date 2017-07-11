@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUza9-00004t-11
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:08:22 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dUzix-0005Wj-3k
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUza8-0003Dd-6X
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:08:21 -0400
-References: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <4472392c-5754-5643-c8c4-d6957c897754@redhat.com>
-Date: Tue, 11 Jul 2017 20:08:10 +0200
+	(envelope-from <rth7680@gmail.com>) id 1dUziv-00075x-Q3
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 14:17:26 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170711175937.23140-1-alex.bennee@linaro.org>
+	<20170711175937.23140-5-alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <d0d0750b-127e-79e8-4307-57e187cd302f@twiddle.net>
+Date: Tue, 11 Jul 2017 08:16:12 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fIWi6ObGLhCNe6Ja7KIBDJM7qmqSs0F1b"
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] Add shrink image for qcow2
+In-Reply-To: <20170711175937.23140-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] target/arm/translate: ensure
+ gen_goto_tb sets exit flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, cota@braap.org
+Cc: qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fIWi6ObGLhCNe6Ja7KIBDJM7qmqSs0F1b
-From: Max Reitz <mreitz@redhat.com>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
-Message-ID: <4472392c-5754-5643-c8c4-d6957c897754@redhat.com>
-Subject: Re: [PATCH v4 0/4] Add shrink image for qcow2
-References: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170711124024.1396-1-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 07/11/2017 07:59 AM, Alex Bennée wrote:
+>       if (use_goto_tb(s, dest)) {
+>           tcg_gen_goto_tb(n);
+>           gen_set_pc_im(s, dest);
+>           tcg_gen_exit_tb((uintptr_t)s->tb + n);
+> +        s->is_jmp = DISAS_TB_JUMP;
+>       } else {
+>           gen_set_pc_im(s, dest);
+>           gen_goto_ptr();
+> +        s->is_jmp = DISAS_JUMP;
+>       }
 
-On 2017-07-11 14:40, Pavel Butsykin wrote:
-> This patch add shrinking of the image file for qcow2. As a result, this=
- allows
-> us to reduce the virtual image size and free up space on the disk witho=
-ut
-> copying the image. Image can be fragmented and shrink is done by punchi=
-ng holes
-> in the image file.
+I think DISAS_TB_JUMP is appropriate for both cases.  When not using goto_tb, 
+the jump is still static and we still chain to the next TB via goto_ptr.
 
-Looks good, but will need a rebase on my preallocated truncation series.
- (Should be rather simple, however; just adjusting an enum value in
-patch 1, some contextual changes, and adding a condition in patch 3 to
-return an error if you try to shrink a qcow2 image with a prealloc value
-other than PREALLOC_MODE_OFF.)
+Otherwise,
 
-Max
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
 
---fIWi6ObGLhCNe6Ja7KIBDJM7qmqSs0F1b
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZZRQKEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQOlC
-CACBqi0F2FoVkjIhtlKk8FqIg7M0PcDTFvSQ6Ng/GUep4NBi6Ds55lcVqIQu7ptX
-JkMSOesYT3niIarMqRY/5Sus0BpDAvMh6tNeszdpgyUIxQYRcGkPKFrHgor0Bieo
-RL/MbeRj+X0fs3kA4AwNpzvGtl0jbB36hSt+CLSMrU5SerOb9hq3sIYGFrKewMZb
-YGGca1cO3M4oH1XWzt/kHJLH6u0ly8cY+8W8womIcaIRW50g5AdfRbXFRhuuxv4J
-lIvQSWWaoBFw9H30NXMbCFVwbWsX7sc+5XlwAEHfYowYaI6XZ9nJcIj+lpWYKiK1
-wXsflT67EZDKrmVKVIWcnJVT
-=KiiA
------END PGP SIGNATURE-----
-
---fIWi6ObGLhCNe6Ja7KIBDJM7qmqSs0F1b--
+r~
