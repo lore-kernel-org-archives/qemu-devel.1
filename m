@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dUmxp-0002nW-0k
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1dUnID-0006rI-1j
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dUmxo-0007kY-3k
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:57 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 11 Jul 2017 14:39:06 +1000
-Message-Id: <20170711043917.1757-7-david@gibson.dropbear.id.au>
-In-Reply-To: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-References: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 06/17] spapr: Leave DR-indicator management to
- the guest
+	(envelope-from <bounces@canonical.com>) id 1dUnI9-00021Q-Ul
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:01:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56173)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dUnI9-0001ze-OY
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 01:00:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dUnI6-0007Jb-SO
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 05:00:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AB9572E8199
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 05:00:54 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Jul 2017 04:52:43 -0000
+From: A S <1703506@bugs.launchpad.net>
+Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703506] [NEW] SMT not supported by QEMU on AMD
+ Ryzen CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,65 +36,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, bharata@linux.vnet.ibm.com, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-The DR-indicator is essentially a "virtual LED" attached to a hotpluggable
-device, which the guest can set to various states for the attention of
-the operator or management layers.
+Public bug reported:
 
-It's mostly guest managed, except that we once-off set it to
-ACTIVE/INACTIVE in the attach/detach path.  While that makes certain sense,
-there's no indication in PAPR that the hypervisor should do this, and the
-drmgr code on the guest side doesn't appear to need it (it will already set
-the indicator to ACTIVE on hotplug, and INACTIVE on remove).
+HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+message when setting the topology to threads=3D2:
 
-So, leave the DR-indicator entirely to the guest; the only thing we need
-to do is ensure it's in a sane state on reset.
+qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+configure -smp options properly.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_drc.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Checking in a Windows 10 guest reveals that SMT is not enabled, and from
+what I understand, QEMU converts the topology from threads to cores
+internally on AMD CPUs. This appears to cause performance problems in
+the guest perhaps because programs are assuming that these threads are
+actual cores.
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index bd40b84..22d4d81 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -353,8 +353,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
-     }
-     g_assert(fdt || coldplug);
- 
--    drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
--
-     drc->dev = d;
-     drc->fdt = fdt;
-     drc->fdt_start_offset = fdt_start_offset;
-@@ -372,8 +370,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
- 
- static void spapr_drc_release(sPAPRDRConnector *drc)
- {
--    drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
--
-     /* Calling release callbacks based on spapr_drc_type(drc). */
-     switch (spapr_drc_type(drc)) {
-     case SPAPR_DR_CONNECTOR_TYPE_CPU:
-@@ -454,12 +450,14 @@ static void reset(DeviceState *d)
-         if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-             drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
-         }
-+        drc->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
-     } else {
-         /* Otherwise device is absent, but might be hotplugged */
-         drc->isolation_state = SPAPR_DR_ISOLATION_STATE_ISOLATED;
-         if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-             drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
-         }
-+        drc->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
-     }
- }
- 
--- 
-2.9.4
+Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+guest
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703506
+
+Title:
+  SMT not supported by QEMU on AMD Ryzen CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+  message when setting the topology to threads=3D2:
+
+  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+  configure -smp options properly.
+
+  Checking in a Windows 10 guest reveals that SMT is not enabled, and
+  from what I understand, QEMU converts the topology from threads to
+  cores internally on AMD CPUs. This appears to cause performance
+  problems in the guest perhaps because programs are assuming that these
+  threads are actual cores.
+
+  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+  guest
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
