@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dUsRE-0006wj-MA
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:30:43 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dUsR8-0006qp-BL
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dUsRD-0005ml-DM
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:30:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48048)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dUsR6-0005gS-2s
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:30:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dUsRC-0005m1-Qd
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:30:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1dUsR5-0005gC-Ph
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:30:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C599080F6D
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:30:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BF5E580476
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:30:30 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 11 Jul 2017 12:30:10 +0200
-Message-Id: <20170711103011.32631-7-marcandre.lureau@redhat.com>
+Date: Tue, 11 Jul 2017 12:30:07 +0200
+Message-Id: <20170711103011.32631-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20170711103011.32631-1-marcandre.lureau@redhat.com>
 References: <20170711103011.32631-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 6/7] scripts/dump-guest-memory.py: add
- vmcoreinfo
+Subject: [Qemu-devel] [PATCH v3 3/7] tests: add simple vmcoreinfo test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,123 +34,180 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add vmcoreinfo ELF note if vmcoreinfo device is ready.
-
-To help the python script, add a little global vmcoreinfo_gdb
-structure, that is populated with vmcoreinfo_gdb_update().
+This test is based off vmgenid test from Ben Warren
+<ben@skyportsystems.com>. It simply checks the vmcoreinfo ACPI device
+is present and that the memory region associated can be read.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/dump-guest-memory.py | 46 ++++++++++++++++++++++++++++++++++++++=
+ tests/vmcoreinfo-test.c | 127 ++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- hw/acpi/vmcoreinfo.c         |  3 +++
- 2 files changed, 49 insertions(+)
+ tests/Makefile.include  |   2 +
+ 2 files changed, 129 insertions(+)
+ create mode 100644 tests/vmcoreinfo-test.c
 
-diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index f7c6635f15..80730658ae 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -14,6 +14,7 @@ the COPYING file in the top-level directory.
- """
-=20
- import ctypes
-+import struct
-=20
- UINTPTR_T =3D gdb.lookup_type("uintptr_t")
-=20
-@@ -120,6 +121,22 @@ class ELF(object):
-         self.segments[0].p_filesz +=3D ctypes.sizeof(note)
-         self.segments[0].p_memsz +=3D ctypes.sizeof(note)
-=20
+diff --git a/tests/vmcoreinfo-test.c b/tests/vmcoreinfo-test.c
+new file mode 100644
+index 0000000000..1378b4c1fc
+--- /dev/null
++++ b/tests/vmcoreinfo-test.c
+@@ -0,0 +1,127 @@
++/*
++ * QTest testcase for VM coreinfo device
++ *
++ * Copyright (c) 2017 Red Hat, Inc.
++ * Copyright (c) 2017 Skyport Systems
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    def add_vmcoreinfo_note(self, vmcoreinfo):
-+        """Adds a vmcoreinfo note to the ELF dump."""
-+        # compute the header size, and copy that many bytes from the not=
++#include <glib.h>
++#include <string.h>
++#include <unistd.h>
++#include "qemu/osdep.h"
++#include "qemu/bitmap.h"
++#include "qemu/uuid.h"
++#include "hw/acpi/acpi-defs.h"
++#include "acpi-utils.h"
++#include "libqtest.h"
++
++#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
++#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
++#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
++
++typedef struct {
++    AcpiTableHeader header;
++    gchar name_op;
++    gchar vcia[4];
++    gchar val_op;
++    uint32_t vcia_val;
++} QEMU_PACKED VmciTable;
++
++static uint32_t acpi_find_vcia(void)
++{
++    uint32_t off;
++    AcpiRsdpDescriptor rsdp_table;
++    uint32_t rsdt;
++    AcpiRsdtDescriptorRev1 rsdt_table;
++    int tables_nr;
++    uint32_t *tables;
++    AcpiTableHeader ssdt_table;
++    VmciTable vmci_table;
++    int i;
++
++    /* Tables may take a short time to be set up by the guest */
++    for (i =3D 0; i < RSDP_TRIES_MAX; i++) {
++        off =3D acpi_find_rsdp_address();
++        if (off < RSDP_ADDR_INVALID) {
++            break;
++        }
++        g_usleep(RSDP_SLEEP_US);
++    }
++    g_assert_cmphex(off, <, RSDP_ADDR_INVALID);
++
++    acpi_parse_rsdp_table(off, &rsdp_table);
++
++    rsdt =3D rsdp_table.rsdt_physical_address;
++    /* read the header */
++    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
++    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
++
++    /* compute the table entries in rsdt */
++    tables_nr =3D (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
++                sizeof(uint32_t);
++    g_assert_cmpint(tables_nr, >, 0);
++
++    /* get the addresses of the tables pointed by rsdt */
++    tables =3D g_new0(uint32_t, tables_nr);
++    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
++
++    for (i =3D 0; i < tables_nr; i++) {
++        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
++        if (!strncmp((char *)ssdt_table.oem_table_id, "VMCOREIN", 8)) {
++            /* the first entry in the table should be VCIA
++             * That's all we need
++             */
++            ACPI_READ_FIELD(vmci_table.name_op, tables[i]);
++            g_assert(vmci_table.name_op =3D=3D 0x08);  /* name */
++            ACPI_READ_ARRAY(vmci_table.vcia, tables[i]);
++            g_assert(memcmp(vmci_table.vcia, "VCIA", 4) =3D=3D 0);
++            ACPI_READ_FIELD(vmci_table.val_op, tables[i]);
++            g_assert(vmci_table.val_op =3D=3D 0x0C);  /* dword */
++            ACPI_READ_FIELD(vmci_table.vcia_val, tables[i]);
++            /* The GUID is written at a fixed offset into the fw_cfg fil=
 e
-+        header =3D get_arch_note(self.endianness, 0, 0)
-+        ctypes.memmove(ctypes.pointer(header),
-+                       vmcoreinfo, ctypes.sizeof(header))
-+        # now get the full note
-+        note =3D get_arch_note(self.endianness,
-+                             header.n_namesz - 1, header.n_descsz)
-+        ctypes.memmove(ctypes.pointer(note), vmcoreinfo, ctypes.sizeof(n=
-ote))
++             * in order to implement the "OVMF SDT Header probe suppress=
+or"
++             * see docs/specs/vmgenid.txt for more details
++             */
++            g_free(tables);
++            return vmci_table.vcia_val;
++        }
++    }
++    g_free(tables);
++    return 0;
++}
 +
-+        self.notes.append(note)
-+        self.segments[0].p_filesz +=3D ctypes.sizeof(note)
-+        self.segments[0].p_memsz +=3D ctypes.sizeof(note)
++static void vmcoreinfo_test(void)
++{
++    gchar *cmd;
++    uint32_t vmci_addr;
++    int i;
 +
-     def add_segment(self, p_type, p_paddr, p_size):
-         """Adds a segment to the elf."""
-=20
-@@ -505,6 +522,34 @@ shape and this command should mostly work."""
-                 cur +=3D chunk_size
-                 left -=3D chunk_size
-=20
-+    def phys_memory_read(self, addr, size):
-+        qemu_core =3D gdb.inferiors()[0]
-+        for block in self.guest_phys_blocks:
-+            if block["target_start"] <=3D addr < block["target_end"] \
-+               and addr + size < block["target_end"]:
-+                haddr =3D block["host_addr"] + (addr - block["target_sta=
-rt"])
-+                return qemu_core.read_memory(haddr, size)
-+        return None
++    cmd =3D g_strdup_printf("-machine accel=3Dtcg -device vmcoreinfo,id=3D=
+vmci");
++    qtest_start(cmd);
 +
-+    def add_vmcoreinfo(self):
-+        if not gdb.parse_and_eval("vmcoreinfo_gdb_helper"):
-+            return
++    vmci_addr =3D acpi_find_vcia();
++    g_assert(vmci_addr);
 +
-+        addr =3D gdb.parse_and_eval("vmcoreinfo_gdb_helper.vmcoreinfo_ad=
-dr_le")
-+        addr =3D bytes([addr[i] for i in range(4)])
-+        addr =3D struct.unpack("<I", addr)[0]
++    for (i =3D 0; i < 4096; i++) {
++        /* check the memory region can be read */
++        readb(vmci_addr + i);
++    }
 +
-+        mem =3D self.phys_memory_read(addr, 16)
-+        if not mem:
-+            return
-+        (version, addr, size) =3D struct.unpack("<IQI", mem)
-+        if version !=3D 0:
-+            return
++    qtest_quit(global_qtest);
++    g_free(cmd);
++}
 +
-+        vmcoreinfo =3D self.phys_memory_read(addr, size)
-+        if vmcoreinfo:
-+            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
++int main(int argc, char **argv)
++{
++    int ret;
 +
-     def invoke(self, args, from_tty):
-         """Handles command invocation from gdb."""
-=20
-@@ -518,6 +563,7 @@ shape and this command should mostly work."""
-=20
-         self.elf =3D ELF(argv[1])
-         self.guest_phys_blocks =3D get_guest_phys_blocks()
-+        self.add_vmcoreinfo()
-=20
-         with open(argv[0], "wb") as vmcore:
-             self.dump_init(vmcore)
-diff --git a/hw/acpi/vmcoreinfo.c b/hw/acpi/vmcoreinfo.c
-index 0ea41de8d9..bfef211aad 100644
---- a/hw/acpi/vmcoreinfo.c
-+++ b/hw/acpi/vmcoreinfo.c
-@@ -20,6 +20,8 @@
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
-=20
-+VMCoreInfoState *vmcoreinfo_gdb_helper;
++    g_test_init(&argc, &argv, NULL);
 +
- void vmcoreinfo_build_acpi(VMCoreInfoState *vis, GArray *table_data,
-                            GArray *vmci, BIOSLinker *linker)
- {
-@@ -181,6 +183,7 @@ static void vmcoreinfo_realize(DeviceState *dev, Erro=
-r **errp)
-         return;
-     }
++    qtest_add_func("/vmcoreinfo/test", vmcoreinfo_test);
++    ret =3D g_test_run();
++
++    return ret;
++}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 18cd06a6b3..f573c1d3c8 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -251,6 +251,7 @@ gcov-files-i386-y +=3D hw/usb/hcd-xhci.c
+ check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
++check-qtest-i386-y +=3D tests/vmcoreinfo-test$(EXESUF)
+ gcov-files-i386-y +=3D hw/pci-host/q35.c
+ check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D tests/vhost-user-tes=
+t$(EXESUF)
+ ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+@@ -762,6 +763,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptim=
+er.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
+ tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
++tests/vmcoreinfo-test$(EXESUF): tests/vmcoreinfo-test.o tests/acpi-utils=
+.o
 =20
-+    vmcoreinfo_gdb_helper =3D VMCOREINFO(dev);
-     qemu_register_reset(vmcoreinfo_handle_reset, dev);
- }
-=20
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
+"LINK","$(TARGET_DIR)$@")
 --=20
 2.13.1.395.gf7b71de06
