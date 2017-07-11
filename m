@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxmL-00029x-Id
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxmU-0002KQ-Cr
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxmH-0007G9-FJ
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxmT-0007RA-Av
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:12:58 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:08:02 +0200
-Message-Id: <20170711160814.20941-74-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:08:07 +0200
+Message-Id: <20170711160814.20941-79-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 73/85] qemu-img: Expose PreallocMode for resizing
+Subject: [Qemu-devel] [PULL 78/85] block/qcow2: Generalize preallocate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,134 +22,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Add a --preallocation command line option to qemu-img resize which can
-be used to set the PreallocMode parameter of blk_truncate().
+This patch adds two new parameters to the preallocate() function so we
+will be able to use it not just for preallocating a new image but also
+for preallocated image growth.
 
-While touching this code, fix the fact that we did not handle errors
-returned by blk_getlength().
+The offset parameter allows the caller to specify a virtual offset from
+which to start preallocating. For newly created images this is always 0,
+but for preallocating growth this will be the old image length.
+
+The new_length parameter specifies the supposed new length of the image
+(basically the "end offset" for preallocation). During image truncation,
+bdrv_getlength() will return the old image length so we cannot rely on
+its return value then.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170613202107.10125-5-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20170613202107.10125-10-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c    | 33 ++++++++++++++++++++++++++++++---
- qemu-img.texi |  7 ++++++-
- 2 files changed, 36 insertions(+), 4 deletions(-)
+ block/qcow2.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 1b74195..2802214 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -24,6 +24,7 @@
- #include "qemu/osdep.h"
- #include "qemu-version.h"
- #include "qapi/error.h"
-+#include "qapi/util.h"
- #include "qapi-visit.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/qmp/qerror.h"
-@@ -62,6 +63,7 @@ enum {
-     OPTION_NO_DRAIN = 262,
-     OPTION_TARGET_IMAGE_OPTS = 263,
-     OPTION_SIZE = 264,
-+    OPTION_PREALLOCATION = 265,
- };
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 0f44780..1ee8452 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2476,17 +2476,24 @@ static int qcow2_set_up_encryption(BlockDriverState *bs, const char *encryptfmt,
+ }
  
- typedef enum OutputFormat {
-@@ -3408,9 +3410,10 @@ static int img_resize(int argc, char **argv)
-     Error *err = NULL;
-     int c, ret, relative;
-     const char *filename, *fmt, *size;
--    int64_t n, total_size;
-+    int64_t n, total_size, current_size;
-     bool quiet = false;
-     BlockBackend *blk = NULL;
-+    PreallocMode prealloc = PREALLOC_MODE_OFF;
-     QemuOpts *param;
  
-     static QemuOptsList resize_options = {
-@@ -3444,6 +3447,7 @@ static int img_resize(int argc, char **argv)
-             {"help", no_argument, 0, 'h'},
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"preallocation", required_argument, 0, OPTION_PREALLOCATION},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":f:hq",
-@@ -3478,6 +3482,15 @@ static int img_resize(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-+        case OPTION_PREALLOCATION:
-+            prealloc = qapi_enum_parse(PreallocMode_lookup, optarg,
-+                                       PREALLOC_MODE__MAX, PREALLOC_MODE__MAX,
-+                                       NULL);
-+            if (prealloc == PREALLOC_MODE__MAX) {
-+                error_report("Invalid preallocation mode '%s'", optarg);
-+                return 1;
-+            }
-+            break;
-         }
-     }
-     if (optind != argc - 1) {
-@@ -3526,8 +3539,16 @@ static int img_resize(int argc, char **argv)
-         goto out;
-     }
+-static int preallocate(BlockDriverState *bs)
++/**
++ * Preallocates metadata structures for data clusters between @offset (in the
++ * guest disk) and @new_length (which is thus generally the new guest disk
++ * size).
++ *
++ * Returns: 0 on success, -errno on failure.
++ */
++static int preallocate(BlockDriverState *bs,
++                       uint64_t offset, uint64_t new_length)
+ {
+     uint64_t bytes;
+-    uint64_t offset;
+     uint64_t host_offset = 0;
+     unsigned int cur_bytes;
+     int ret;
+     QCowL2Meta *meta;
  
-+    current_size = blk_getlength(blk);
-+    if (current_size < 0) {
-+        error_report("Failed to inquire current image length: %s",
-+                     strerror(-current_size));
-+        ret = -1;
-+        goto out;
-+    }
-+
-     if (relative) {
--        total_size = blk_getlength(blk) + n * relative;
-+        total_size = current_size + n * relative;
-     } else {
-         total_size = n;
-     }
-@@ -3537,7 +3558,13 @@ static int img_resize(int argc, char **argv)
-         goto out;
-     }
+-    bytes = bdrv_getlength(bs);
+-    offset = 0;
++    assert(offset <= new_length);
++    bytes = new_length - offset;
  
--    ret = blk_truncate(blk, total_size, PREALLOC_MODE_OFF, &err);
-+    if (total_size <= current_size && prealloc != PREALLOC_MODE_OFF) {
-+        error_report("Preallocation can only be used for growing images");
-+        ret = -1;
-+        goto out;
-+    }
-+
-+    ret = blk_truncate(blk, total_size, prealloc, &err);
-     if (!ret) {
-         qprintf(quiet, "Image resized.\n");
-     } else {
-diff --git a/qemu-img.texi b/qemu-img.texi
-index a2f4519..f11f603 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -529,7 +529,7 @@ qemu-img rebase -b base.img diff.qcow2
- At this point, @code{modified.img} can be discarded, since
- @code{base.img + diff.qcow2} contains the same information.
- 
--@item resize @var{filename} [+ | -]@var{size}
-+@item resize [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
- 
- Change the disk image as if it had been created with @var{size}.
- 
-@@ -541,6 +541,11 @@ After using this command to grow a disk image, you must use file system and
- partitioning tools inside the VM to actually begin using the new space on the
- device.
- 
-+When growing an image, the @code{--preallocation} option may be used to specify
-+how the additional image area should be allocated on the host.  See the format
-+description in the @code{NOTES} section which values are allowed.  Using this
-+option may result in slightly more data being allocated than necessary.
-+
- @item amend [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
- 
- Amends the image format specific @var{options} for the image file
+     while (bytes) {
+         cur_bytes = MIN(bytes, INT_MAX);
+@@ -2830,7 +2837,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     if (prealloc != PREALLOC_MODE_OFF) {
+         BDRVQcow2State *s = blk_bs(blk)->opaque;
+         qemu_co_mutex_lock(&s->lock);
+-        ret = preallocate(blk_bs(blk));
++        ret = preallocate(blk_bs(blk), 0, total_size);
+         qemu_co_mutex_unlock(&s->lock);
+         if (ret < 0) {
+             error_setg_errno(errp, -ret, "Could not preallocate metadata");
 -- 
 2.9.4
