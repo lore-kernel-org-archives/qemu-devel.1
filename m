@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52083)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUlNa-00064K-2y
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:58:27 -0400
+	id 1dUlNe-00065x-Lo
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dUlNX-0000Pl-0H
-	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:58:26 -0400
+	id 1dUlNb-0000SC-FE
+	for qemu-devel@nongnu.org; Mon, 10 Jul 2017 22:58:30 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 10 Jul 2017 23:57:01 -0300
-Message-Id: <20170711025703.24194-2-f4bug@amsat.org>
+Date: Mon, 10 Jul 2017 23:57:02 -0300
+Message-Id: <20170711025703.24194-3-f4bug@amsat.org>
 In-Reply-To: <20170711025703.24194-1-f4bug@amsat.org>
 References: <20170711025703.24194-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 1/3] configure: disable Xen PCI Passthrough
- on !x86 archs
+Subject: [Qemu-devel] [RFC PATCH 2/3] xen/mapcache: disable Xen on arm*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +29,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Anthony Perard <anthony.perard@citrix.com>, Marcelo Tosatti <mtosatti@redhat.com>, xen-arm@lists.xen.org, Anoob Soman <anoob.soman@citrix.com>, Juergen Gross <jgross@suse.com>, Anthony Xu <anthony.xu@intel.com>, Paul Durrant <paul.durrant@citrix.com>
 
-linking on Linux debian/stretch/arm64 with libxen-4.8:
+linking on Linux debian/stretch/arm[64] with libxen-4.8:
 
-    hw/xen/xen_pt.o: In function `xen_pt_pci_read_config':
-    qemu/hw/xen/xen_pt.c:206: undefined reference to `xen_shutdown_fatal_error'
-    hw/xen/xen_pt.o: In function `xen_igd_passthrough_isa_bridge_create':
-    qemu/hw/xen/xen_pt.c:698: undefined reference to `igd_passthrough_isa_bridge_create'
-    hw/xen/xen_pt.o: In function `xen_pt_pci_write_config':
-    qemu/hw/xen/xen_pt.c:355: undefined reference to `xen_shutdown_fatal_error'
-    hw/xen/xen_pt_config_init.o: In function `xen_pt_status_reg_init':
-    qemu/hw/xen/xen_pt_config_init.c:281: undefined reference to `xen_shutdown_fatal_error'
-    qemu/hw/xen/xen_pt_config_init.c:275: undefined reference to `xen_shutdown_fatal_error'
-    hw/xen/xen_pt_graphics.o: In function `get_vgabios':
-    qemu/hw/xen/xen_pt_graphics.c:135: undefined reference to `pci_assign_dev_load_option_rom'
+    exec.o: In function `reclaim_ramblock':
+    qemu/exec.c:2071: undefined reference to `xen_invalidate_map_cache_entry'
+    exec.o: In function `qemu_map_ram_ptr':
+    qemu/exec.c:2177: undefined reference to `xen_map_cache'
+    qemu/exec.c:2174: undefined reference to `xen_map_cache'
+    exec.o: In function `qemu_ram_block_from_host':
+    qemu/exec.c:2242: undefined reference to `xen_ram_addr_from_mapcache'
+    qemu/exec.c:2242: undefined reference to `xen_ram_addr_from_mapcache'
+    exec.o: In function `qemu_ram_ptr_length':
+    qemu/exec.c:2210: undefined reference to `xen_map_cache'
+    qemu/exec.c:2207: undefined reference to `xen_map_cache'
+    exec.o: In function `address_space_unmap':
+    qemu/exec.c:3357: undefined reference to `xen_invalidate_map_cache_entry'
     collect2: error: ld returned 1 exit status
     Makefile:197: recipe for target 'qemu-system-aarch64' failed
     make[1]: *** [qemu-system-aarch64] Error 1
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- configure | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ include/sysemu/xen-mapcache.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 806658c98b..e4b173405a 100755
---- a/configure
-+++ b/configure
-@@ -2344,8 +2344,15 @@ EOF
- fi
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index 01daaad00c..75f0988e04 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -12,7 +12,9 @@
+ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr start_addr,
+                                                      ram_addr_t size,
+                                                      void *opaque);
+-#ifdef CONFIG_XEN
++/* FIXME ARM supported since Xen 4.3? */
++#if defined(CONFIG_XEN) /* XXX supported_xen_target() wrong? */ && \
++    !defined(HOST_ARM) && !defined(HOST_AARCH64)
  
- if test "$xen_pci_passthrough" != "no"; then
--  if test "$xen" = "yes" && test "$linux" = "yes"; then
--    xen_pci_passthrough=yes
-+  if test "$xen" = "yes"; then
-+    case "$cpu" in
-+    i386|x32|x86_64)
-+        if test "$linux" = "yes"; then
-+            xen_pci_passthrough=yes
-+        fi ;;
-+    *)  echo "Disabling Xen PCI Passthrough (not implemented on $cpu)"
-+        xen_pci_passthrough=no ;;
-+    esac
-   else
-     if test "$xen_pci_passthrough" = "yes"; then
-       error_exit "User requested feature Xen PCI Passthrough" \
+ void xen_map_cache_init(phys_offset_to_gaddr_t f,
+                         void *opaque);
 -- 
 2.13.2
