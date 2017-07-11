@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dUrVs-0003mn-Ae
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:31:25 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dUrYA-0005Mr-Kp
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dUrVr-0007lH-JE
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:31:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dUrVr-0007kn-Cg
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:31:23 -0400
-References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-	<0464adf0-801b-7083-6c3c-d8dae7ddb037@redhat.com>
-	<20170710193708-mutt-send-email-mst@kernel.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <f810ff94-edaf-4919-6650-9afc0c65f6a3@redhat.com>
-Date: Tue, 11 Jul 2017 11:31:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170710193708-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dUrY7-0000NK-Gd
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:33:46 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:43949)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dUrY6-0000Hl-6W
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:33:43 -0400
+Date: Tue, 11 Jul 2017 17:33:23 +0800 (CST)
+Message-ID: <201707111733232926663@zte.com.cn>
+References: 1499773645-120137-1-git-send-email-peng.hao2@zte.com.cn,
+	d97e3209-e1d0-1c00-ae8b-7bb22eb198e2@redhat.com
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIIFYyXSBjaGFyZGV2?=
+ =?utf-8?q?=3A_fix_parallel_device_can=27t_be_reconnect?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, amit@kernel.org, pbonzini@redhat.com, den@openvz.org
+To: pbonzini@redhat.com
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, wang.yechao255@zte.com.cn, berrange@redhat.com
 
-On 10/07/2017 18:39, Michael S. Tsirkin wrote:
-> On Mon, Jul 10, 2017 at 04:13:54PM +0200, Laurent Vivier wrote:
->>>  static void virtconsole_realize(DeviceState *dev, Error **errp)
->>>  {
->>>      VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
->>> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
->>>      k->unrealize = virtconsole_unrealize;
->>>      k->have_data = flush_buf;
->>>      k->set_guest_connected = set_guest_connected;
->>> +    k->enable_backend = virtconsole_enable_backend;
->>
->> Why don't you register a  vm_state change handler to change the state of
->> the virtconsole according to the state of the machine instead of adding
->> a new function in the VirtIOSerialPortClass?
->>
->> See a23a6d1 ("virtio-rng: stop virtqueue while the CPU is stopped")
->>
->> Thanks,
->> Laurent
-> 
-> 
-> In fact that commit does it the wrong way IMHO.
-> 
-> The order of this call wrt other virtio calls is not
-> guaranteed.
-> 
-> IMHO the right way is to set a vm state change handler in VirtioBusClass
-> or status change handler in VirtioDeviceClass.
-> 
-
-OK, so I guess Pavel's solution is the good one as it calls his handler
-from virtio-serial-bus set_status() handler which is called by
-virtio_vmstate_change() function, which is registered with
-qemu_add_vm_change_state_handler() by virtio_init()...
-
-Thanks,
-Laurent
+5Y+R5Lu25Lq677yaIDxwYm9uemluaUByZWRoYXQuY29tPg0K5pS25Lu25Lq677ya5b2t5rWpMTAw
+OTY3NDIgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT4NCuaKhOmAgeS6uu+8miA8cWVtdS1k
+ZXZlbEBub25nbnUub3JnPueOi+S4mui2hTEwMTU0NDI1IDxiZXJyYW5nZUByZWRoYXQuY29tPg0K
+5pelIOacnyDvvJoyMDE35bm0MDfmnIgxMeaXpSAxNjozMQ0K5Li7IOmimCDvvJpSZTogW1BBVENI
+IFYyXSBjaGFyZGV2OiBmaXggcGFyYWxsZWwgZGV2aWNlIGNhbid0IGJlIHJlY29ubmVjdA0KDQoN
+Cg0KDQoNCk9uIDExLzA3LzIwMTcgMTM6NDcsIFBlbmcgSGFvIHdyb3RlOg0KPiBQYXJhbGxlbCBk
+ZXZpY2UgZG9uJ3QgcmVnaXN0ZXIgYmUtPmNocl9jYW5fcmVhZCBmdW5jdGlvbiwgYnV0IHJlbW90
+ZQ0KPiBkaXNjb25uZWN0IGV2ZW50IGlzIGhhbmRsZWQgaW4gY2hyX3JlYWQuU28gY29ubmVjdGVk
+IHBhcmFsbGVsIGRldmljZQ0KPiBjYW4gbm90IGRldGVjdCByZW1vdGUgZGlzY29ubmVjdCBldmVu
+dC4gVGhlIGNoYXJkZXZzIHdpdGggY2hyX2Nhbl9yZWFkPU5VTEwNCj4gaGFzIHRoZSBzYW1lIHBy
+b2JsZW0uDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20u
+Y24+DQo+IFJldmlld2VkLWJ5OiBXYW5nIFllY2hhbyA8d2FuZy55ZWNoYW8yNTVAenRlLmNvbS5j
+bj4NCj4gLS0tDQo+ICBjaGFyZGV2L2NoYXItc29ja2V0LmMgIHwgMTEgKysrKysrKysrKysNCj4g
+IGNoYXJkZXYvY2hhci5jICAgICAgICAgfCAxMCArKysrKysrKysrDQo+ICBpbmNsdWRlL2NoYXJk
+ZXYvY2hhci5oIHwgIDkgKysrKysrKysrDQo+ICAzIGZpbGVzIGNoYW5nZWQsIDMwIGluc2VydGlv
+bnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9jaGFyZGV2L2NoYXItc29ja2V0LmMgYi9jaGFyZGV2
+L2NoYXItc29ja2V0LmMNCj4gaW5kZXggY2NjNDk5Yy4uYWE0NGY4ZiAxMDA2NDQNCj4gLS0tIGEv
+Y2hhcmRldi9jaGFyLXNvY2tldC5jDQo+ICsrKyBiL2NoYXJkZXYvY2hhci1zb2NrZXQuYw0KPiBA
+QCAtMTM5LDYgKzEzOSw5IEBAIHN0YXRpYyBpbnQgdGNwX2Nocl9yZWFkX3BvbGwodm9pZCAqb3Bh
+cXVlKQ0KPiAgICAgICAgICByZXR1cm4gMA0KPiAgICAgIH0NCj4gICAgICBzLT5tYXhfc2l6ZSA9
+IHFlbXVfY2hyX2JlX2Nhbl93cml0ZShjaHIpDQo+ICsgICAgaWYgKHFlbXVfY2hyX251bGxfYmVf
+Y2FuX3JlYWQoY2hyKSkgew0KPiArICAgICAgICByZXR1cm4gMQ0KPiArICAgIH0NCj4gICAgICBy
+ZXR1cm4gcy0+bWF4X3NpemUNCj4gIH0NCj4gIA0KPiBAQCAtNDIyLDYgKzQyNSwxNCBAQCBzdGF0
+aWMgZ2Jvb2xlYW4gdGNwX2Nocl9yZWFkKFFJT0NoYW5uZWwgKmNoYW4sIEdJT0NvbmRpdGlvbiBj
+b25kLCB2b2lkICpvcGFxdWUpDQo+ICAgICAgdWludDhfdCBidWZbQ0hSX1JFQURfQlVGX0xFTl0N
+Cj4gICAgICBpbnQgbGVuLCBzaXplDQo+ICANCj4gKyAgICBpZiAocWVtdV9jaHJfbnVsbF9iZV9j
+YW5fcmVhZChjaHIpKSB7DQo+ICsgICAgICAgIHNpemUgPSB0Y3BfY2hyX3JlY3YoY2hyLCAodm9p
+ZCAqKWJ1ZiwgQ0hSX1JFQURfQlVGX0xFTikNCg0KSXQgd291bGQgYmUgYmV0dGVyIG5vdCB0byBk
+ZXN0cm95IGRhdGEgaW4gdGhlIGNoYW5uZWwsIGJlY2F1c2UgdGhlDQpkZXZpY2UgY291bGQgc2V0
+IGhhbmRsZXJzIGxhdGVyLg0KLS0tLS0tVGhpcyBkZXZpY2UgZG8gbm90IHJlZ2lzdGVyIGEgY2hy
+X3JlYWQgZnVuY3Rpb24sc28gaXQncyBzYWZlIHRvIGRlc3Ryb3kgZGF0YShubyByZWFkIGhhbmRs
+ZXIpLg0KDQoNCg0KDQpEYW5pZWwsIG1heWJlIFFJT0NoYW5uZWwgY291bGQgaGF2ZSBhIGZ1bmN0
+aW9uIHRvIGNoZWNrIGZvciBodW5nLXVwDQpjaGFubmVscyBhbmQgcmV0dXJuIGEgYm9vbD8gIEZv
+ciBmaWxlIGRlc2NyaXB0b3JzIGl0IHdvdWxkIHBvbGwgdGhlIGZpbGUNCmRlc2NyaXB0b3IgYW5k
+IGNoZWNrIGZvciBQT0xMSFVQLCB3aGlsZSBvdGhlciBjaGFubmVscyB3b3VsZCBoYXZlIGEgbW9y
+ZQ0Kb3IgbGVzcyBvYnZpb3VzIGltcGxlbWVudGF0aW9uLg0KDQo+ICsgICAgICAgIGlmIChzaXpl
+ID09IDAgfHwgc2l6ZSA9PSAtMSkgew0KPiArICAgICAgICAgICAgdGNwX2Nocl9kaXNjb25uZWN0
+KGNocikNCj4gKyAgICAgICAgfQ0KPiArICAgICAgICByZXR1cm4gVFJVRQ0KPiArICAgIH0NCj4g
+Kw0KPiAgICAgIGlmICghcy0+Y29ubmVjdGVkIHx8IHMtPm1heF9zaXplIDw9IDApIHsNCj4gICAg
+ICAgICAgcmV0dXJuIFRSVUUNCj4gICAgICB9DQo+IGRpZmYgLS1naXQgYS9jaGFyZGV2L2NoYXIu
+YyBiL2NoYXJkZXYvY2hhci5jDQo+IGluZGV4IDJiNjc5YTIuLjdmN2Y0ODYgMTAwNjQ0DQo+IC0t
+LSBhL2NoYXJkZXYvY2hhci5jDQo+ICsrKyBiL2NoYXJkZXYvY2hhci5jDQo+IEBAIC0xNDgsNiAr
+MTQ4LDE2IEBAIGludCBxZW11X2Nocl93cml0ZShDaGFyZGV2ICpzLCBjb25zdCB1aW50OF90ICpi
+dWYsIGludCBsZW4sIGJvb2wgd3JpdGVfYWxsKQ0KPiAgICAgIHJldHVybiBvZmZzZXQNCj4gIH0N
+Cj4gIA0KPiAraW50IHFlbXVfY2hyX251bGxfYmVfY2FuX3JlYWQoQ2hhcmRldiAqcykNCj4gK3sN
+Cj4gKyAgICBDaGFyQmFja2VuZCAqYmUgPSBzLT5iZQ0KPiArDQo+ICsgICAgaWYgKCFiZSB8fCAh
+YmUtPmNocl9jYW5fcmVhZCkgew0KDQpJIHRoaW5rIGl0J3MgcmVhbGx5IGNocl9yZWFkIHRoYXQg
+eW91IHdhbnQgdG8gY29uc2lkZXIgaGVyZS4NCg0KLS0tLWlmIGNocl9jYW5fcmVhZCBpcyBudWxs
+LHRoZW4gY2hyX3JlYWQgaXMgbnVsbCB0b28uDQoNCg0KVGhhbmtzLA0KDQpQYW9sbw0KDQo+ICsg
+ICAgICAgIHJldHVybiAxDQo+ICsgICAgfQ0KPiArICAgIHJldHVybiAwDQo+ICt9DQo+ICsNCj4g
+IGludCBxZW11X2Nocl9iZV9jYW5fd3JpdGUoQ2hhcmRldiAqcykNCj4gIHsNCj4gICAgICBDaGFy
+QmFja2VuZCAqYmUgPSBzLT5iZQ0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9jaGFyZGV2L2NoYXIu
+aCBiL2luY2x1ZGUvY2hhcmRldi9jaGFyLmgNCj4gaW5kZXggOGE5YWRlNC4uOGRkMjhhOCAxMDA2
+NDQNCj4gLS0tIGEvaW5jbHVkZS9jaGFyZGV2L2NoYXIuaA0KPiArKysgYi9pbmNsdWRlL2NoYXJk
+ZXYvY2hhci5oDQo+IEBAIC0xMTQsNiArMTE0LDE1IEBAIHZvaWQgcWVtdV9jaHJfY2xlYW51cCh2
+b2lkKQ0KPiAgQ2hhcmRldiAqcWVtdV9jaHJfbmV3X25vcmVwbGF5KGNvbnN0IGNoYXIgKmxhYmVs
+LCBjb25zdCBjaGFyICpmaWxlbmFtZSkNCj4gIA0KPiAgLyoqDQo+ICsgKiBAcWVtdV9jaHJfbnVs
+bF9iZV9jYW5fcmVhZDoNCj4gKyAqDQo+ICsgKiBDaGVjayBpZiBDaGFyZGV2J3MgY2hyX2Nhbl9y
+ZWFkIGlzIHJlZ2lzdGVyZWQuDQo+ICsgKg0KPiArICogUmV0dXJuczogMSBpZiBDaGFyZGV2J3Mg
+Y2hyX2Nhbl9yZWFkIGlzIG51bGwuDQo+ICsgKi8NCj4gK2ludCBxZW11X2Nocl9udWxsX2JlX2Nh
+bl9yZWFkKENoYXJkZXYgKnMpDQo+ICsNCj4gKy8qKg0KPiAgICogQHFlbXVfY2hyX2JlX2Nhbl93
+cml0ZToNCj4gICAqDQo+ICAgKiBEZXRlcm1pbmUgaG93IG11Y2ggZGF0YSB0aGUgZnJvbnQgZW5k
+IGNhbiBjdXJyZW50bHkgYWNjZXB0LiAgVGhpcyBmdW5jdGlvbg0KPg==
