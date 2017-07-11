@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dUvei-0004lh-EY
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:56:49 -0400
+	(envelope-from <thuth@redhat.com>) id 1dUvek-0004n7-Dz
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dUveh-00047E-Ar
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:56:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33182)
+	(envelope-from <thuth@redhat.com>) id 1dUvej-00047z-GA
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:56:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dUveh-000463-2g
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:56:47 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dUvej-00047X-70
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:56:49 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 11 Jul 2017 15:56:27 +0200
-Message-Id: <1499781397-19749-2-git-send-email-thuth@redhat.com>
+Date: Tue, 11 Jul 2017 15:56:28 +0200
+Message-Id: <1499781397-19749-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1499781397-19749-1-git-send-email-thuth@redhat.com>
 References: <1499781397-19749-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 01/11] pc-bios/s390-ccw: Move libc functions
- to separate header
+Subject: [Qemu-devel] [PATCH v4 02/11] pc-bios/s390-ccw: Move ebc2asc to
+ sclp.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,213 +27,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-The upcoming netboot code will use the libc from SLOF. To be able
-to still use s390-ccw.h there, the libc related functions in this
-header have to be moved to a different location.
-And while we're at it, remove the duplicate memcpy() function from
-sclp.c.
+We will later need this array in a file that we will link to the
+netboot code, too. Since there is some ebcdic conversion done
+in sclp_get_loadparm_ascii(), the sclp.c file seems to be a good
+candidate.
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c     |  1 +
- pc-bios/s390-ccw/libc.h        | 45 ++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/main.c        |  1 +
- pc-bios/s390-ccw/s390-ccw.h    | 29 ---------------------------
- pc-bios/s390-ccw/sclp.c        | 10 ++--------
- pc-bios/s390-ccw/virtio-scsi.c |  1 +
- pc-bios/s390-ccw/virtio.c      |  1 +
- 7 files changed, 51 insertions(+), 37 deletions(-)
- create mode 100644 pc-bios/s390-ccw/libc.h
+ pc-bios/s390-ccw/main.c | 11 -----------
+ pc-bios/s390-ccw/sclp.c | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 523fa78..458d3da 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "bootmap.h"
- #include "virtio.h"
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-new file mode 100644
-index 0000000..0142ea8
---- /dev/null
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -0,0 +1,45 @@
-+/*
-+ * libc-style definitions and functions
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
-+ */
-+
-+#ifndef S390_CCW_LIBC_H
-+#define S390_CCW_LIBC_H
-+
-+typedef long               size_t;
-+typedef int                bool;
-+typedef unsigned char      uint8_t;
-+typedef unsigned short     uint16_t;
-+typedef unsigned int       uint32_t;
-+typedef unsigned long long uint64_t;
-+
-+static inline void *memset(void *s, int c, size_t n)
-+{
-+    int i;
-+    unsigned char *p = s;
-+
-+    for (i = 0; i < n; i++) {
-+        p[i] = c;
-+    }
-+
-+    return s;
-+}
-+
-+static inline void *memcpy(void *s1, const void *s2, size_t n)
-+{
-+    uint8_t *dest = s1;
-+    const uint8_t *src = s2;
-+    int i;
-+
-+    for (i = 0; i < n; i++) {
-+        dest[i] = src[i];
-+    }
-+
-+    return s1;
-+}
-+
-+#endif
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 1cacc1b..40cba8d 100644
+index 40cba8d..0580eac 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
+@@ -17,17 +17,6 @@ static SubChannelId blk_schid = { .one = 1 };
+ IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+ static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
  
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- 
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 2089274..43e2d42 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -18,12 +18,6 @@ typedef unsigned short     u16;
- typedef unsigned int       u32;
- typedef unsigned long long u64;
- typedef unsigned long      ulong;
--typedef long               size_t;
--typedef int                bool;
--typedef unsigned char      uint8_t;
--typedef unsigned short     uint16_t;
--typedef unsigned int       uint32_t;
--typedef unsigned long long uint64_t;
- typedef unsigned char      __u8;
- typedef unsigned short     __u16;
- typedef unsigned int       __u32;
-@@ -88,18 +82,6 @@ ulong get_second(void);
- /* bootmap.c */
- void zipl_load(void);
- 
--static inline void *memset(void *s, int c, size_t n)
--{
--    int i;
--    unsigned char *p = s;
+-const unsigned char ebc2asc[256] =
+-      /* 0123456789abcdef0123456789abcdef */
+-        "................................" /* 1F */
+-        "................................" /* 3F */
+-        " ...........<(+|&.........!$*);." /* 5F first.chr.here.is.real.space */
+-        "-/.........,%_>?.........`:#@'=\""/* 7F */
+-        ".abcdefghi.......jklmnopqr......" /* 9F */
+-        "..stuvwxyz......................" /* BF */
+-        ".ABCDEFGHI.......JKLMNOPQR......" /* DF */
+-        "..STUVWXYZ......0123456789......";/* FF */
 -
--    for (i = 0; i < n; i++) {
--        p[i] = c;
--    }
--
--    return s;
--}
--
- static inline void fill_hex(char *out, unsigned char val)
- {
-     const char hex[] = "0123456789abcdef";
-@@ -169,17 +151,6 @@ static inline void sleep(unsigned int seconds)
-     }
- }
- 
--static inline void *memcpy(void *s1, const void *s2, size_t n)
--{
--    uint8_t *p1 = s1;
--    const uint8_t *p2 = s2;
--
--    while (n--) {
--        p1[n] = p2[n];
--    }
--    return s1;
--}
--
- static inline void IPL_assert(bool term, const char *message)
- {
-     if (!term) {
+ /*
+  * Priniciples of Operations (SA22-7832-09) chapter 17 requires that
+  * a subsystem-identification is at 184-187 and bytes 188-191 are zero
 diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index a1639ba..aa1c862 100644
+index aa1c862..2ee204a 100644
 --- a/pc-bios/s390-ccw/sclp.c
 +++ b/pc-bios/s390-ccw/sclp.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
+@@ -14,6 +14,17 @@
  
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "sclp.h"
+ static char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
  
-@@ -59,13 +60,6 @@ static int _strlen(const char *str)
-     return i;
- }
- 
--static void _memcpy(char *dest, const char *src, int len)
--{
--    int i;
--    for (i = 0; i < len; i++)
--        dest[i] = src[i];
--}
--
- void sclp_print(const char *str)
++const unsigned char ebc2asc[256] =
++      /* 0123456789abcdef0123456789abcdef */
++        "................................" /* 1F */
++        "................................" /* 3F */
++        " ...........<(+|&.........!$*);." /* 5F first.chr.here.is.real.space */
++        "-/.........,%_>?.........`:#@'=\""/* 7F */
++        ".abcdefghi.......jklmnopqr......" /* 9F */
++        "..stuvwxyz......................" /* BF */
++        ".ABCDEFGHI.......JKLMNOPQR......" /* DF */
++        "..STUVWXYZ......0123456789......";/* FF */
++
+ /* Perform service call. Return 0 on success, non-zero otherwise. */
+ static int sclp_service_call(unsigned int command, void *sccb)
  {
-     int len = _strlen(str);
-@@ -76,7 +70,7 @@ void sclp_print(const char *str)
-     sccb->ebh.length = sizeof(EventBufferHeader) + len;
-     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-     sccb->ebh.flags = 0;
--    _memcpy(sccb->data, str, len);
-+    memcpy(sccb->data, str, len);
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
- }
-diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
-index f61ecf0..c92f5d3 100644
---- a/pc-bios/s390-ccw/virtio-scsi.c
-+++ b/pc-bios/s390-ccw/virtio-scsi.c
-@@ -9,6 +9,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "scsi.h"
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index 6ee93d5..8768331 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "virtio-scsi.h"
 -- 
 1.8.3.1
