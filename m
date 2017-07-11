@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dUwtk-0005j1-2Q
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:16:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dUwtn-0005lD-Qf
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dUwth-0005xu-4a
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:16:24 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:36075)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dUwtg-0005wv-Uv
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:16:21 -0400
-Received: from HHMAIL01.hh.imgtec.org (unknown [10.100.10.19])
-	by Forcepoint Email with ESMTPS id B9BBAADA4F336
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 16:16:13 +0100 (IST)
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Tue, 11 Jul 2017 16:16:04 +0100
-Message-ID: <1499786165-9404-2-git-send-email-yongbok.kim@imgtec.com>
-In-Reply-To: <1499786165-9404-1-git-send-email-yongbok.kim@imgtec.com>
-References: <1499786165-9404-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <kwolf@redhat.com>) id 1dUwtm-0005zW-Rq
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:16:27 -0400
+Date: Tue, 11 Jul 2017 17:16:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170711151617.GK4335@noname.str.redhat.com>
+References: <20170701153906.16588-1-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 1/2] target/mips: fix msa copy_[s|u]_df rd = 0
- corner case
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170701153906.16588-1-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v2] block: fix leaks in bdrv_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +22,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Miodrag Dinic <miodrag.dinic@imgtec.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>
 
-From: Miodrag Dinic <miodrag.dinic@imgtec.com>
+Am 01.07.2017 um 17:39 hat Manos Pitsidianakis geschrieben:
+> bdrv_open_driver() is called in two places, bdrv_new_open_driver() and
+> bdrv_open_common(). In the latter, failure cleanup in is in its caller,
+> bdrv_open_inherit(), which unrefs the bs->file of the failed driver open if it
+> exists.
+> 
+> Let's move the bs->file cleanup to bdrv_open_driver() to take care of all
+> callers and do not set bs->drv to NULL unless the driver's open function
+> failed. When bs is destroyed by removing its last reference, bdrv_close()
+> checks bs->drv to perform the needed cleanups and also call the driver's close
+> function.
+> 
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> ---
+> 
+> v2:
+>  move bdrv_unref_child(bs, bs->file) to bdrv_open_driver
+>  do not set bs->drv to NULL if open succeeds 
+> 
+>  block.c | 21 +++++++++++++--------
+>  1 file changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/block.c b/block.c
+> index 694396281b..df2a46990c 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1091,6 +1091,7 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+>  {
+>      Error *local_err = NULL;
+>      int ret;
+> +    bool open_failed;
+>  
+>      bdrv_assign_node_name(bs, node_name, &local_err);
+>      if (local_err) {
+> @@ -1111,7 +1112,9 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+>          ret = 0;
+>      }
+>  
+> -    if (ret < 0) {
+> +    open_failed = ret < 0;
+> +
+> +    if (open_failed) {
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>          } else if (bs->filename[0]) {
+> @@ -1142,10 +1145,15 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+>      return 0;
+>  
+>  free_and_fail:
+> -    /* FIXME Close bs first if already opened*/
+> -    g_free(bs->opaque);
+> -    bs->opaque = NULL;
+> -    bs->drv = NULL;
+> +    if (open_failed) {
+> +        g_free(bs->opaque);
+> +        bs->opaque = NULL;
+> +        bs->drv = NULL;
+> +    }
+> +    if (bs->file != NULL) {
+> +        bdrv_unref_child(bs, bs->file);
+> +        bs->file = NULL;
+> +    }
 
-This patch fixes the msa copy_[s|u]_df instruction emulation when
-the destination register rd is zero. Without this patch the zero
-register would get clobbered, which should never happen because it
-is supposed to be hardwired to 0.
+Is this bdrv_unref_child() safe if we leave bs->drv set? Format drivers
+expect that if an image is opened, it also has a valid bs->file.
 
-Fix this corner case by explicitly checking rd = 0 and effectively
-making these instructions emulation no-op in that case.
+For example, if I add ret = -1 after refresh_total_sectors() (because I
+couldn't find an easier way to make it fail intentionally), I get an
+ugly heap corruption crash instead of a nice error message with this
+patch.
 
-Signed-off-by: Miodrag Dinic <miodrag.dinic@imgtec.com>
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-Acked-by: Aurelien Jarno <aurelien@aurel32.net>
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- target/mips/translate.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 559f8fe..befb87f 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -18712,10 +18712,14 @@ static void gen_msa_elm_df(CPUMIPSState *env, DisasContext *ctx, uint32_t df,
- #endif
-         switch (MASK_MSA_ELM(ctx->opcode)) {
-         case OPC_COPY_S_df:
--            gen_helper_msa_copy_s_df(cpu_env, tdf, twd, tws, tn);
-+            if (likely(wd != 0)) {
-+                gen_helper_msa_copy_s_df(cpu_env, tdf, twd, tws, tn);
-+            }
-             break;
-         case OPC_COPY_U_df:
--            gen_helper_msa_copy_u_df(cpu_env, tdf, twd, tws, tn);
-+            if (likely(wd != 0)) {
-+                gen_helper_msa_copy_u_df(cpu_env, tdf, twd, tws, tn);
-+            }
-             break;
-         case OPC_INSERT_df:
-             gen_helper_msa_insert_df(cpu_env, tdf, twd, tws, tn);
--- 
-2.7.4
+Kevin
