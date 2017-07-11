@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUqjW-00034l-Aw
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:41:27 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dUqpV-0004Bg-9W
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUqjV-00027W-L0
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:41:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56798)
+	(envelope-from <cohuck@redhat.com>) id 1dUqpP-00062D-8r
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:47:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUqjV-00026t-Ek
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:41:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 620CF80F6C
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 08:41:24 +0000 (UTC)
-References: <20170710165827.4250-1-pbonzini@redhat.com>
-	<20170710165827.4250-4-pbonzini@redhat.com>
-	<20170711082451.GA4335@noname.str.redhat.com>
-	<555a050c-46cb-72c3-e3c0-fb37fd23bdf4@redhat.com>
-	<20170711083911.GC4335@noname.str.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ab39bbb2-3007-6387-2bfd-315c7b6e02db@redhat.com>
-Date: Tue, 11 Jul 2017 10:41:18 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dUqpP-00061v-2O
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 04:47:31 -0400
+Date: Tue, 11 Jul 2017 10:47:24 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170711104724.1c929a76@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499700760-4777-7-git-send-email-thuth@redhat.com>
+References: <1499700760-4777-1-git-send-email-thuth@redhat.com>
+	<1499700760-4777-7-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170711083911.GC4335@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] block: convert bdrv_invalidate_cache
- callback to coroutine_fn
+Subject: Re: [Qemu-devel] [PATCH v3 06/10] pc-bios/s390-ccw: Add code for
+ virtio feature negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,20 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On 11/07/2017 10:39, Kevin Wolf wrote:
-> Can you just add a comment to this effect to qcow2/qed_do_open() then?
+On Mon, 10 Jul 2017 17:32:36 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Good point.
-
->>> Or maybe the cleaner way would be bdrv_drained_begin/end() around
->>> everything directly in bdrv_co_invalidate_cache().
+> The upcoming virtio-net driver needs to negotiate some features,
+> so we need the possibility to do this in the core virtio code.
 > 
-> Should we do this anyway? Or assert that no requests are in flight?
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/s390-ccw.h      |  2 ++
+>  pc-bios/s390-ccw/virtio-blkdev.c |  3 ++-
+>  pc-bios/s390-ccw/virtio.c        | 25 ++++++++++++++++++-------
+>  pc-bios/s390-ccw/virtio.h        |  2 +-
+>  4 files changed, 23 insertions(+), 9 deletions(-)
+> 
 
-I can certainly add assertions for clarity, but wouldn't requests have
-failed the permission checks and caused assertion failures already?
+> diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
+> index 6cb77bc..ed4026f 100644
+> --- a/pc-bios/s390-ccw/virtio-blkdev.c
+> +++ b/pc-bios/s390-ccw/virtio-blkdev.c
+> @@ -266,9 +266,10 @@ uint64_t virtio_get_blocks(void)
+>  void virtio_blk_setup_device(SubChannelId schid)
+>  {
+>      VDev *vdev = virtio_get_device();
+> +    uint32_t guestfeats[2] = { 0, 0 };
+>  
+>      vdev->schid = schid;
+> -    virtio_setup_ccw(vdev);
+> +    virtio_setup_ccw(vdev, guestfeats);
 
-Paolo
+I'd tack the feature bits onto the VDev instead. Even if you're not
+doing anything fancy right now, it makes validating the feature bits
+more straightforward.
+
+>  
+>      switch (vdev->senseid.cu_model) {
+>      case VIRTIO_ID_BLOCK:
