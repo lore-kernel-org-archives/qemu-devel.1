@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dUwdt-00044F-1b
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:00:02 -0400
+	(envelope-from <lersek@redhat.com>) id 1dUwhE-0007zG-VJ
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:03:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dUwdp-0007J2-V5
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:00:01 -0400
-Resent-Message-Id: <E1dUwdp-0007J2-V5@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21832)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dUwdp-0007Im-Lf
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:59:57 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149978518315.33.16097851590870290168@5d477a5b5989>
-In-Reply-To: <1499781397-19749-1-git-send-email-thuth@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1dUwhA-0000Qy-6e
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:03:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42650)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dUwhA-0000QZ-0w
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:03:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2BD48120FB
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 15:03:22 +0000 (UTC)
+References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
+	<20170706101611.27031-7-marcandre.lureau@redhat.com>
+	<c661a649-e438-e80b-baf4-b44ee6612ca3@redhat.com>
+	<145552423.49242900.1499767479720.JavaMail.zimbra@redhat.com>
+	<2f412e1e-88b2-9d30-db7e-0bd5e84b58e5@redhat.com>
+	<1172399972.49364035.1499780122770.JavaMail.zimbra@redhat.com>
+	<51e56450-313f-a9c1-b733-ea7ace838f8d@redhat.com>
+	<1874757733.49371845.1499781500590.JavaMail.zimbra@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <4b3a17ed-0cf5-fcf2-0938-f52f518c45e9@redhat.com>
+Date: Tue, 11 Jul 2017 17:03:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 11 Jul 2017 07:59:43 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/11] Implement network booting in the
- s390-ccw BIOS
+In-Reply-To: <1874757733.49371845.1499781500590.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] scripts/dump-guest-memory.py: add
+ vmcoreinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +41,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, aik@ozlabs.ru, mihajlov@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, agraf@suse.de, david@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, anderson@redhat.com, imammedo@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ5
-OTc4MTM5Ny0xOTc0OS0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20KVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjQgMDAvMTFdIEltcGxlbWVudCBuZXR3
-b3JrIGJvb3RpbmcgaW4gdGhlIHMzOTAtY2N3IEJJT1MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
-QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
-aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
-IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
-Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
-MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTk3ODEzOTctMTk3NDktMS1naXQt
-c2VuZC1lbWFpbC10aHV0aEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ5OTc4MTM5Ny0xOTc0OS0x
-LWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0
-Y2hldy8xNDk5NzgzNDkzLTE1OTExLTEtZ2l0LXNlbmQtZW1haWwtc3RlZmFuYkBsaW51eC52bmV0
-LmlibS5jb20gLT4gcGF0Y2hldy8xNDk5NzgzNDkzLTE1OTExLTEtZ2l0LXNlbmQtZW1haWwtc3Rl
-ZmFuYkBsaW51eC52bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpk
-ZmNiZmY3IHBjLWJpb3MvczM5MC1jY3c6IExpbmsgbGlibmV0IGludG8gdGhlIG5ldGJvb3QgaW1h
-Z2UgYW5kIGRvIHRoZSBURlRQIGxvYWQKM2QyM2I1MyBwYy1iaW9zL3MzOTAtY2N3OiBBZGQgdmly
-dGlvLW5ldCBkcml2ZXIgY29kZQplOTAyZTRkIHBjLWJpb3MvczM5MC1jY3c6IEFkZCBjb3JlIGZp
-bGVzIGZvciB0aGUgbmV0d29yayBib290bG9hZGluZyBwcm9ncmFtCmVmMzNjOWIgcm9tcy9TTE9G
-OiBVcGRhdGUgc3VibW9kdWxlIHRvIGxhdGVzdCBzdGF0dXMKYTUwYjc3NSBwYy1iaW9zL3MzOTAt
-Y2N3OiBBZGQgY29kZSBmb3IgdmlydGlvIGZlYXR1cmUgbmVnb3RpYXRpb24KMzY2MTA4MCBwYy1i
-aW9zL3MzOTAtY2N3OiBSZW1vdmUgdW51c2VkIHN0cnVjdHMgZnJvbSB2aXJ0aW8uaAo2NjgzMWUz
-IHBjLWJpb3MvczM5MC1jY3c6IE1vdmUgYnl0ZXN3YXAgZnVuY3Rpb25zIHRvIGEgc2VwYXJhdGUg
-aGVhZGVyCjc0YzUyZDkgcGMtYmlvcy9zMzkwLWNjdzogQWRkIGEgd3JpdGUoKSBmdW5jdGlvbiBm
-b3Igc3RkaW8KYmYxODYxMiBwYy1iaW9zL3MzOTAtY2N3OiBNb3ZlIHZpcnRpby1ibG9jayByZWxh
-dGVkIGZ1bmN0aW9ucyBpbnRvIGEgc2VwYXJhdGUgZmlsZQoyZTkyODJjIHBjLWJpb3MvczM5MC1j
-Y3c6IE1vdmUgZWJjMmFzYyB0byBzY2xwLmMKODQyYjY2ZiBwYy1iaW9zL3MzOTAtY2N3OiBNb3Zl
-IGxpYmMgZnVuY3Rpb25zIHRvIHNlcGFyYXRlIGhlYWRlcgoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-Q2hlY2tpbmcgUEFUQ0ggMS8xMTogcGMtYmlvcy9zMzkwLWNjdzogTW92ZSBsaWJjIGZ1bmN0aW9u
-cyB0byBzZXBhcmF0ZSBoZWFkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMTogcGMtYmlvcy9zMzkw
-LWNjdzogTW92ZSBlYmMyYXNjIHRvIHNjbHAuYy4uLgpDaGVja2luZyBQQVRDSCAzLzExOiBwYy1i
-aW9zL3MzOTAtY2N3OiBNb3ZlIHZpcnRpby1ibG9jayByZWxhdGVkIGZ1bmN0aW9ucyBpbnRvIGEg
-c2VwYXJhdGUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCA0LzExOiBwYy1iaW9zL3MzOTAtY2N3OiBB
-ZGQgYSB3cml0ZSgpIGZ1bmN0aW9uIGZvciBzdGRpby4uLgpFUlJPUjogZXh0ZXJucyBzaG91bGQg
-YmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMjM6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvc2NscC5j
-OjE1OgorbG9uZyB3cml0ZShpbnQgZmQsIGNvbnN0IHZvaWQgKnN0ciwgc2l6ZV90IGxlbik7Cgp0
-b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDM3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTE6IHBjLWJpb3Mv
-czM5MC1jY3c6IE1vdmUgYnl0ZXN3YXAgZnVuY3Rpb25zIHRvIGEgc2VwYXJhdGUgaGVhZGVyLi4u
-CkNoZWNraW5nIFBBVENIIDYvMTE6IHBjLWJpb3MvczM5MC1jY3c6IFJlbW92ZSB1bnVzZWQgc3Ry
-dWN0cyBmcm9tIHZpcnRpby5oLi4uCkNoZWNraW5nIFBBVENIIDcvMTE6IHBjLWJpb3MvczM5MC1j
-Y3c6IEFkZCBjb2RlIGZvciB2aXJ0aW8gZmVhdHVyZSBuZWdvdGlhdGlvbi4uLgpDaGVja2luZyBQ
-QVRDSCA4LzExOiByb21zL1NMT0Y6IFVwZGF0ZSBzdWJtb2R1bGUgdG8gbGF0ZXN0IHN0YXR1cy4u
-LgpDaGVja2luZyBQQVRDSCA5LzExOiBwYy1iaW9zL3MzOTAtY2N3OiBBZGQgY29yZSBmaWxlcyBm
-b3IgdGhlIG5ldHdvcmsgYm9vdGxvYWRpbmcgcHJvZ3JhbS4uLgpFUlJPUjogZXh0ZXJucyBzaG91
-bGQgYmUgYXZvaWRlZCBpbiAuYyBmaWxlcwojMTIxOiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L25l
-dG1haW4uYzoyNjoKK2V4dGVybiBjaGFyIF9zdGFydFtdOwoKRVJST1I6IGV4dGVybnMgc2hvdWxk
-IGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzEyNDogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9uZXRt
-YWluLmM6Mjk6CitJcGxQYXJhbWV0ZXJCbG9jayBpcGxiIF9fYXR0cmlidXRlX18oKGFsaWduZWQo
-UEFHRV9TSVpFKSkpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxOTkgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
-Q0ggMTAvMTE6IHBjLWJpb3MvczM5MC1jY3c6IEFkZCB2aXJ0aW8tbmV0IGRyaXZlciBjb2RlLi4u
-CkNoZWNraW5nIFBBVENIIDExLzExOiBwYy1iaW9zL3MzOTAtY2N3OiBMaW5rIGxpYm5ldCBpbnRv
-IHRoZSBuZXRib290IGltYWdlIGFuZCBkbyB0aGUgVEZUUCBsb2FkLi4uCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 07/11/17 15:58, Marc-Andr=C3=A9 Lureau wrote:
+
+>>> How do you access a static inside a function? Gdb can look it up but
+>>> complains that it's not in current context.
+>>>
+>>
+>> According to <https://sourceware.org/gdb/onlinedocs/gdb/Variables.html=
+>,
+>> the magic incantation is
+>>
+>>   function::variable
+>>
+>=20
+> Thanks that works! I'll update the patch
+
+Great!
+
+>=20
+>> If this doesn't work (in case the realize function isn't on the stack =
+at
+>> all), then I agree the variable should be made file scope.
+>>
+>=20
+> Why would it matter if realize is on the stack? It's likely not :)
+
+I agree the realize function will likely not be on the stack, and I also
+agree that it should not matter. However, the gdb docs seemed a bit
+unclear to me regarding this, so I wasn't 100% sure without trying.
+
+Thanks
+Laszlo
