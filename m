@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dV2SB-0004bU-V1
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:12:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dV2XW-0005pw-0M
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dV2SA-0001N2-S3
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:12:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57754)
+	(envelope-from <eblake@redhat.com>) id 1dV2XS-0003Cv-Qv
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:17:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dV2SA-0001Lo-It
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:12:18 -0400
-Date: Tue, 11 Jul 2017 18:12:13 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170711211213.GE6020@localhost.localdomain>
-References: <1499803333-9052-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1499803333-9052-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dV2XS-0003CU-HS
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:17:46 -0400
+References: <20170709175422.30185-1-peter.maydell@linaro.org>
+	<20170711162943.GF2223@work-vm>
+	<CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
+	<20170711190846.GA3138@work-vm>
+	<CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <53d067d6-b52a-a532-9f54-7d079e292a52@redhat.com>
+Date: Tue, 11 Jul 2017 16:17:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499803333-9052-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv8 2/3] fw_cfg: move qdev_init_nofail() from
- fw_cfg_init1() to callers
+In-Reply-To: <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt"
+Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a
+ negative number in fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +32,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>
 
-On Tue, Jul 11, 2017 at 09:02:12PM +0100, Mark Cave-Ayland wrote:
-> When looking to instantiate a TYPE_FW_CFG_MEM or TYPE_FW_CFG_IO device to be
-> able to wire it up differently, it is much more convenient for the caller to
-> instantiate the device and have the fw_cfg default files already preloaded
-> during realize.
-> 
-> Move fw_cfg_init1() to the end of both the fw_cfg_mem_realize() and
-> fw_cfg_io_realize() functions so it no longer needs to be called manually
-> when instantiating the device, and also rename it to fw_cfg_common_realize()
-> which better describes its new purpose.
-> 
-> Since it is now the responsibility of the machine to wire up the fw_cfg device
-> it is necessary to introduce a object_property_add_child() call into
-> fw_cfg_init_io() and fw_cfg_init_mem() to link the fw_cfg device to the root
-> machine object as before.
-> 
-> Finally with the previous change to fw_cfg_find() we can now remove the
-> assert() preventing multiple fw_cfg devices being instantiated and replace
-> them with a simple call to fw_cfg_find() at realize time instead. This allows
-> us to remove FW_CFG_NAME and FW_CFG_PATH since they are no longer required.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-[...]
-> @@ -1096,6 +1097,12 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
->                                &fw_cfg_dma_mem_ops, FW_CFG(s), "fwcfg.dma",
->                                sizeof(dma_addr_t));
->      }
-> +
-> +    fw_cfg_common_realize(dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->  }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "patches@linaro.org" <patches@linaro.org>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <53d067d6-b52a-a532-9f54-7d079e292a52@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a negative
+ number in fork_exec()
+References: <20170709175422.30185-1-peter.maydell@linaro.org>
+ <20170711162943.GF2223@work-vm>
+ <CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
+ <20170711190846.GA3138@work-vm>
+ <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-vXYOTm0o4V1XHf1ScuLO9RZesgM+v9FTA71qa9MeBwQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-"if (local_err)" is redundant, as error_propagate() does nothing
-if local_err is NULL.  "return" is also unnecessary here.  You
-also don't need local_err/error_propagate() if you are not
-looking at the value of local_err at all.  This means those 5
-lines can be simply written as:
+On 07/11/2017 03:40 PM, Peter Maydell wrote:
+>>>
+>>> The problem is you can only bail while you're in the parent
+>>> before forking. Once you've started the child there's no
+>>> mechanism for dealing with failure.
+>>
+>> Well, you can always exit the child before anything worse can happen.
+>=20
+> You need a mechanism then for causing the parent to notice.
+> The current code would leave the parent in a blocking
+> accept() call forever (this is what all the XXX comments
+> in the current code are about).
 
-    fw_cfg_common_realize(dev, errp);
+You can have the parent create a pipe before forking and does a blocking
+read, the child then manages fds and writes success (or failure) to its
+end of the pipe (or an early exit causes the parent to read EOF); when
+the parent finally gets word on the pipe, then it knows whether the
+child is dead-on-arrival due to early setup failures, or whether it is
+now safe to block on accept().  But it can easily get more and more
+complex the more you want to handle; and if the parent is
+multi-threaded, you have to be careful that you only call
+async-signal-safe functions in the child between the fork and exec.
 
-(Sorry for not noticing that in v7)
-
->  
->  static void fw_cfg_io_class_init(ObjectClass *klass, void *data)
-> @@ -1162,6 +1169,12 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
->                                sizeof(dma_addr_t));
->          sysbus_init_mmio(sbd, &FW_CFG(s)->dma_iomem);
->      }
-> +
-> +    fw_cfg_common_realize(dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-
-Same as above.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->  }
->  
->  static void fw_cfg_mem_class_init(ObjectClass *klass, void *data)
-> -- 
-> 1.7.10.4
-> 
+--soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZZUB2AAoJEKeha0olJ0NqGfIH/jdg4rv50J4fsfgdrAudupXz
+ynLLoGFbEILilkS4Ca0jXskaOuSDD3E++B3XS/uT59y3guQaPsaCTVy+lJ5Xtfg5
+UVfagBGLOCCZuACxjwc8LDOlIgFQJz5YKmANZeRw8XLw9jnObE1JFrn8t5g1Hy0R
+qLANkX03zi5c1hSJDHOlWJzN94uARt8YGbcrFm0rlqKKt/eO3Yby9glUabMmxv+C
+3pHx5IoDnU0EZIsX7AgTinX0KTlMu9YRRa3ZSceXMSeWcpAdxroyBa9i89OIWHFy
+04ePwV8r6dKJuu/+YPlfD8IfaIrRKgZ+9sPKZa4Nc8be0cTbCL4SprFq/QSPl5E=
+=hAnI
+-----END PGP SIGNATURE-----
+
+--soeQHUnpu2MoiFNqVfkorc1mfh2ULQkrt--
