@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dUs2L-0005V7-VV
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:05:01 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dUs44-0006jg-6y
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dUs2L-0004Uq-3L
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:04:57 -0400
-Date: Tue, 11 Jul 2017 11:04:44 +0100
+	(envelope-from <stefanha@gmail.com>) id 1dUs43-0005Ko-FY
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:06:44 -0400
+Date: Tue, 11 Jul 2017 11:05:35 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170711100444.GL17792@stefanha-x1.localdomain>
+Message-ID: <20170711100535.GM17792@stefanha-x1.localdomain>
 References: <20170705133635.11850-1-famz@redhat.com>
-	<20170705133635.11850-5-famz@redhat.com>
-	<20170710145943.GI14195@stefanha-x1.localdomain>
-	<a6ce3371-7d15-91fe-4232-bf8170c77c9d@redhat.com>
+	<20170705133635.11850-4-famz@redhat.com>
+	<20170710150707.GK14195@stefanha-x1.localdomain>
+	<61a85481-9194-d68e-2544-d80365fca83e@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="rVkomL2febZOZtGQ"
+	protocol="application/pgp-signature"; boundary="6CiRFyVmOOJ3DkBX"
 Content-Disposition: inline
-In-Reply-To: <a6ce3371-7d15-91fe-4232-bf8170c77c9d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] block/nvme: Implement .bdrv_dma_map
- and .bdrv_dma_unmap
+In-Reply-To: <61a85481-9194-d68e-2544-d80365fca83e@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 3/6] block: Introduce
+ bdrv_dma_map and bdrv_dma_unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,45 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, Karl Rister <krister@redhat.com>
 
 
---rVkomL2febZOZtGQ
+--6CiRFyVmOOJ3DkBX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 10, 2017 at 05:09:25PM +0200, Paolo Bonzini wrote:
-> On 10/07/2017 16:59, Stefan Hajnoczi wrote:
-> >> +static void nvme_dma_map(BlockDriverState *bs, void *host, size_t siz=
-e)
-> >> +{
-> >> +    BDRVNVMeState *s =3D bs->opaque;
-> >> +
-> >> +    nvme_vfio_dma_map(s->vfio, host, size, false, NULL);
-> > Since temporary=3Dfalse repeated calls to map/unmap will run out of spa=
-ce
-> > and stop working after some time?
+On Mon, Jul 10, 2017 at 05:08:56PM +0200, Paolo Bonzini wrote:
+> On 10/07/2017 17:07, Stefan Hajnoczi wrote:
+> > On Wed, Jul 05, 2017 at 09:36:32PM +0800, Fam Zheng wrote:
+> >> Allow block driver to map and unmap a buffer for later I/O, as a perfo=
+rmance
+> >> hint.
+> > The name blk_dma_map() is confusing since other "dma" APIs like
+> > dma_addr_t and dma_blk_io() deal with guest physical addresses instead
+> > of host addresses.  They are about DMA to/from guest RAM.
+> >=20
+> > Have you considered hiding this cached mapping in block/nvme.c so that
+> > it isn't exposed?  block/nvme.c could keep the last buffer mapped and
+> > callers would get the performance benefit without a new blk_dma_map()
+> > API.
 >=20
-> Yes, the point of bdrv_dma_map/unmap is to add a permanent mapping.
-> Temporary mappings are only valid inside nvme.c, because the
-> corresponding iova is not recorded anywhere.  Instead,
-> bdrv_dma_map/unmap cache the iova just like we do for RAMBlock areas
-> during system emulation.
->=20
-> The solution is simply not to do that, just like img_bench only calls
-> map/unmap once.  If it happens, things just become slower as the driver
-> falls back to temporary mappings.
+> One buffer is enough for qemu-img bench, but not for more complex cases
+> (e.g. fio).
 
-The constraints need to be documented.  Someone might try to use
-blk_dma_map() and waste time debugging poor performance in the future.
+I don't see any other blk_dma_map() callers.
 
 Stefan
 
---rVkomL2febZOZtGQ
+--6CiRFyVmOOJ3DkBX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZZKK8AAoJEJykq7OBq3PIO1EIALYIDr1SO2anajPFJ1J+o+N3
-pNxR9qZZ0NLiBJ6xDdY0kv1CeWyWnatF8bpdi1nXTn5HUC8/KdOHzST0KqVqH7kL
-egYEur3q9KBm0AP1Htt8kXQM08hXx1hY3sE22jNIqbqn3XUKUFs5nS58OzuLxYlv
-g9IIO2XerBFCUxAiHCGOqW0x/NYOdoXyxvTWCgxw6vpD14A2NjSXk+I7srOOLvpd
-S8UlBOFknJbrMOCLqF2BhxnBVpvup+VhzWaAnJKYlCIXUBY2kTdfAyG5eU7YJIBx
-usrocPV3TEo14YLf8Z7GDUxg9CnBbRM5vcM2po4zBeWNeJmTWquX0DE6mLDbbBE=
-=bo0v
+iQEcBAEBAgAGBQJZZKLvAAoJEJykq7OBq3PI0qkH/j34k6Cml4TgQf0TFfWZBHCy
+5zzpYZGLF/EZQzLISm0druXn7OuIlsTkGw05PVIqHnYKWqYl4lMQaIfm02LYGVOJ
+9cyf+rPTW93zvwnA1M5z5vxVYo+i3PpucZXTowpygzWlckd2P+Tp0Lys7lZeOuIC
+F8pyA9DAspC1TtaxlntnDjbezHWuM2q7Kt8WaFkc1bFoOKe4uhNwOZ6remOydLU6
+nEPQkRRPGFdwbS/9W352gVWQ6yuOMJ2L2rzOefuLvKFmmsfOcAgDh3LpTXHUZ7IO
+J1Mnfin9GZ+8CaleWZDdBHZS1+SV3AYqAukAskwMXo6C4hWdGCUuDJyvQt1BvLA=
+=rKtr
 -----END PGP SIGNATURE-----
 
---rVkomL2febZOZtGQ--
+--6CiRFyVmOOJ3DkBX--
