@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dUrbi-0007Xh-EH
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:37:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dUrc1-0007ii-IU
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dUrbf-0001YA-DM
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:37:26 -0400
-Date: Tue, 11 Jul 2017 10:36:19 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170711093619.GH17792@stefanha-x1.localdomain>
-References: <20170707154646.22230-1-pbonzini@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dUrbx-0001bA-Mu
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:37:45 -0400
+Date: Tue, 11 Jul 2017 11:37:34 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170711093734.GF4335@noname.str.redhat.com>
+References: <1499687125-22948-1-git-send-email-kwolf@redhat.com>
+	<CAFEAcA_2dB3rN6mJcwrxShPaEO8dEzoNU27dTkWC3jjnjRPC6g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qM81t570OJUP5TU/"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170707154646.22230-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hxtool: remove dead -q option
+In-Reply-To: <CAFEAcA_2dB3rN6mJcwrxShPaEO8dEzoNU27dTkWC3jjnjRPC6g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] commit: Add NULL check for overlay_bs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-stable@nongnu.org
 
+Am 10.07.2017 um 14:09 hat Peter Maydell geschrieben:
+> On 10 July 2017 at 12:45, Kevin Wolf <kwolf@redhat.com> wrote:
+> > I can't see how overlay_bs could become NULL with the current code, but
+> > other code in this function already checks it and we can make Coverity
+> > happy with this check, so let's add it.
+> >
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block/commit.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/block/commit.c b/block/commit.c
+> > index 774a8a5..50e7950 100644
+> > --- a/block/commit.c
+> > +++ b/block/commit.c
+> > @@ -90,7 +90,9 @@ static void commit_complete(BlockJob *job, void *opaque)
+> >
+> >      /* Make sure overlay_bs and top stay around until bdrv_set_backing_hd() */
+> >      bdrv_ref(top);
+> > -    bdrv_ref(overlay_bs);
+> > +    if (overlay_bs) {
+> > +        bdrv_ref(overlay_bs);
+> > +    }
+> >
+> >      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+> >       * the normal backing chain can be restored. */
+> 
+> Commit 19ebd13ed45ad5d5f2 which added the bdrv_ref() call
+> was cc qemu-stable; should we cc this fix too, or are you
+> happy that it's definitely not actually triggerable in stable?
 
---qM81t570OJUP5TU/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Okay, I'll add the CC, better safe than sorry.
 
-On Fri, Jul 07, 2017 at 05:46:46PM +0200, Paolo Bonzini wrote:
-> This was used to extract .txt documentation for QMP.  This was
-> changed to use the QAPI schema instead, so zap it.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/hxtool | 46 +---------------------------------------------
->  1 file changed, 1 insertion(+), 45 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---qM81t570OJUP5TU/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZZJwTAAoJEJykq7OBq3PIi84H/jP4dQFSbbttSBbvP8lDJNFH
-ALi2h5DotiLrVw/VgqY8cv9dLzQhw71d05O0NOCLOlepURPoPhWf5IVUU8cjidRu
-opuS33lQ0qEAQbs1ZnzDE37l+HpQfUwrFTgtMOC3zXe7imlCuTMPiyo+AnVI4KLX
-AJqgH1/Fxb2PBEobDEOBCSH9is4ZYuNmQk5Ex47rRRY0ZOSxm6xZJKCkyUbS0fZK
-dhLlfpoS6uX/eEau3XAto8wB0+6CiV1RiZG0OBaKuODgxAJ/3d9vhX49h33LniJy
-Xy+XPZB+fTJjyj63lmOCbrQo8EzKg9OkGxy1s0WBRVwTHb5H9DRJ3Lpdbw0kyEQ=
-=iQtW
------END PGP SIGNATURE-----
-
---qM81t570OJUP5TU/--
+Kevin
