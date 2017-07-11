@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dUxSN-0001u8-KO
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:52:12 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUxVp-0003Id-Iq
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dUxSK-0005en-29
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:52:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53732)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dUxSJ-0005ef-SO
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:52:08 -0400
-References: <1499413442-5053-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170711182954-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <1fc46dca-4fc5-a7cd-986e-1e11a64642f3@redhat.com>
-Date: Tue, 11 Jul 2017 18:51:50 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170711182954-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] pci: allow PCI bus slots to be marked
- as reserved
+	(envelope-from <pm215@archaic.org.uk>) id 1dUxVo-0007CA-Ms
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:55:45 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 16:53:28 +0100
+Message-Id: <1499788408-10096-4-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
+References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 3/3] target/arm: Make Cortex-M3 and M4 default
+ to 8 PMSA regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +20,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 11/07/2017 18:31, Michael S. Tsirkin wrote:
-> On Fri, Jul 07, 2017 at 08:43:59AM +0100, Mark Cave-Ayland wrote:
->> For some machines it is impossible to plug devices into a particular PCI bus
->> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the root
->> bus behind which all devices must be plugged. Ignoring this rule will cause
->> problems with interrupt routing since the interrupt numbers are calculated
->> based upon PCI bridge id and secondary PCI bus slot id.
->>
->> This patchset adds a new dev_reserved_mask property to PCIBus which is a
->> bitmask used to indicate whether PCI bus slots are reserved, i.e. they cannot
->> be used for hot or cold plugging on a particular PCI bus.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
+The Cortex-M3 and M4 CPUs always have 8 PMSA MPU regions (this isn't
+a configurable option for the hardware).  Make the default value of
+the pmsav7-dregion property be set per-cpu, so we don't need to have
+every user of these CPUs set it manually.  (The existing default of
+16 is correct for the other PMSAv7 core, the Cortex-R5.)
 
-Hi Michael,
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/cpu.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-> Could you please point me at series making use of this
-> functionality?
-
-There is a discussion upstream, I am not aware of patches yet.
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00771.html
-
-Thanks,
-Marcel
-
-
-> Thanks!
-> 
->>
->> Mark Cave-Ayland (3):
->>    pci: move check for existing devfn into new pci_bus_devfn_available()
->>      helper
->>    pci: add dev_reserved_mask property to PCIBus
->>    pci: add reserved slot check to do_pci_register_device()
->>
->>   hw/pci/pci.c             |   34 ++++++++++++++++++++++++++++++----
->>   include/hw/pci/pci_bus.h |    1 +
->>   2 files changed, 31 insertions(+), 4 deletions(-)
->>
->> -- 
->> 1.7.10.4
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 28a9141..96d1f84 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -543,8 +543,15 @@ static Property arm_cpu_has_pmu_property =
+ static Property arm_cpu_has_mpu_property =
+             DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
+ 
++/* This is like DEFINE_PROP_UINT32 but it doesn't set the default value,
++ * because the CPU initfn will have already set cpu->pmsav7_dregion to
++ * the right value for that particular CPU type, and we don't want
++ * to override that with an incorrect constant value.
++ */
+ static Property arm_cpu_pmsav7_dregion_property =
+-            DEFINE_PROP_UINT32("pmsav7-dregion", ARMCPU, pmsav7_dregion, 16);
++            DEFINE_PROP_UNSIGNED_NODEFAULT("pmsav7-dregion", ARMCPU,
++                                           pmsav7_dregion,
++                                           qdev_prop_uint32, uint32_t);
+ 
+ static void arm_cpu_post_init(Object *obj)
+ {
+@@ -1054,6 +1061,7 @@ static void cortex_m3_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_V7);
+     set_feature(&cpu->env, ARM_FEATURE_M);
+     cpu->midr = 0x410fc231;
++    cpu->pmsav7_dregion = 8;
+ }
+ 
+ static void cortex_m4_initfn(Object *obj)
+@@ -1064,6 +1072,7 @@ static void cortex_m4_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_M);
+     set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
+     cpu->midr = 0x410fc240; /* r0p0 */
++    cpu->pmsav7_dregion = 8;
+ }
+ static void arm_v7m_class_init(ObjectClass *oc, void *data)
+ {
+@@ -1112,6 +1121,7 @@ static void cortex_r5_initfn(Object *obj)
+     cpu->id_isar4 = 0x0010142;
+     cpu->id_isar5 = 0x0;
+     cpu->mp_is_up = true;
++    cpu->pmsav7_dregion = 16;
+     define_arm_cp_regs(cpu, cortexr5_cp_reginfo);
+ }
+ 
+-- 
+2.7.4
