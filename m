@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUvgb-0006Zx-5r
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:58:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dUvh8-0007Bt-6X
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dUvga-00059w-6c
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:58:45 -0400
-References: <1499755579-31262-1-git-send-email-gengdongjiu@huawei.com>
-	<366f019e-50e8-03f4-9b8f-946ef318ca79@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d18b0a8d-5c34-ae4a-a60c-c451c8df9872@redhat.com>
-Date: Tue, 11 Jul 2017 08:58:28 -0500
+	(envelope-from <no-reply@patchew.org>) id 1dUvh5-0005Pj-Gj
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:59:18 -0400
+Resent-Message-Id: <E1dUvh5-0005Pj-Gj@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dUvh5-0005PI-8k
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:59:15 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149978153922.30.5016349488592402277@5d477a5b5989>
+In-Reply-To: <cover.1499774331.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <366f019e-50e8-03f4-9b8f-946ef318ca79@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="X7RUiSILkwpBBk3FE2Bnfwt9vaKtIpo77"
-Subject: Re: [Qemu-devel] [PATCH resend v4 0/3] Generate APEI GHES table and
- dynamically record CPER
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 11 Jul 2017 06:58:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] Implement a warning_report function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: mst@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, zhihui.gao@huawei.com
+To: alistair.francis@xilinx.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---X7RUiSILkwpBBk3FE2Bnfwt9vaKtIpo77
-From: Eric Blake <eblake@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>, Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: mst@redhat.com, imammedo@redhat.com, famz@redhat.com,
- qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org,
- qemu-arm@nongnu.org, zhengqiang10@huawei.com, huangshaoyu@huawei.com,
- wuquanming@huawei.com, zhihui.gao@huawei.com
-Message-ID: <d18b0a8d-5c34-ae4a-a60c-c451c8df9872@redhat.com>
-Subject: Re: [PATCH resend v4 0/3] Generate APEI GHES table and dynamically
- record CPER
-References: <1499755579-31262-1-git-send-email-gengdongjiu@huawei.com>
- <366f019e-50e8-03f4-9b8f-946ef318ca79@redhat.com>
-In-Reply-To: <366f019e-50e8-03f4-9b8f-946ef318ca79@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/11/2017 08:43 AM, Laszlo Ersek wrote:
-> So send the patches with
->=20
->   git send-email *.patch
->=20
-> or put all the patches into a temporary directory, and run
->=20
->   git send-email patch-dir/
-
-Or you can even skip patch files, and directly send things with one lass
-chance in your editor:
-
-git send-email -v5 -3 --annotate --cover-letter
-
-[send the top three commits in my current git branch as a version 5
-patch series, where I get to write the cover letter and tweak any of the
-patches in my preferred $EDITOR before sending anything]
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---X7RUiSILkwpBBk3FE2Bnfwt9vaKtIpo77
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZNmEAAoJEKeha0olJ0NqhF0H/31M+z6ICVFuXEDGNaZJAYAS
-ToSGNkYIhgDTQA5QKrg3/Efm2rYR2CN8vxWDR/ax4MdF2CRUnPXCxSvTb/cSfBhe
-vC7PXDoMdaJ5uzYccQkGoNG7g97v/kUNF2cvnxeA5U6jv3FyxPUJrupJvCuUAGI7
-c1IkKQ68/5bxXM+FSHtk6A3aX0ddcEj6sUUbeiU7N3Qq9I2tWBQEMitVXbw3/LTs
-UYyoH8guyhFJlh1ZsqvrSMPDmcEn+L7y+OuVLzzET/ZZtSNWSA/4EtwHJ5gw5edc
-KlAcuaK/68i9MhlH2haBZ6UO36oegDVCAykKTX0aN5vCJVkeELUxIDLGIE7DR/E=
-=hLRO
------END PGP SIGNATURE-----
-
---X7RUiSILkwpBBk3FE2Bnfwt9vaKtIpo77--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC84XSAgSW1wbGVtZW50IGEgd2FybmluZ19y
+ZXBvcnQgZnVuY3Rpb24KTWVzc2FnZS1pZDogY292ZXIuMTQ5OTc3NDMzMS5naXQuYWxpc3RhaXIu
+ZnJhbmNpc0B4aWxpbnguY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
+KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
+dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
+Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
+Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
+cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
+CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2MDY4NmU2IGVycm9yOiBBZGQgYSAn
+ZXJyb3I6ICcgcHJlZml4IHRvIGVycm9yX3JlcG9ydCgpCjUzNjRmMjcgQ29udmVydCBlcnJvcl9y
+ZXBvcnQqX2VycigpIHRvIHdhcm5fcmVwb3J0Kl9lcnIoKQphODkzMTA0IGVycm9yOiBJbXBsZW1l
+bnQgdGhlIHdhcm4gYW5kIGZyZWUgRXJyb3IgZnVuY3Rpb25zCmFjYjNkMGUgY2hhci1zb2NrZXQ6
+IFJlcG9ydCBUQ1Agc29ja2V0IHdhaXRpbmcgYXMgaW5mb3JtYXRpb24KNDlkNjhjZCBody9pMzg2
+OiBJbXByb3ZlIHNvbWUgb2YgdGhlIHdhcm5pbmcgbWVzc2FnZXMKZWMxYTI0NiBDb252ZXJ0IGVy
+cm9yX3JlcG9ydCgpIHRvIHdhcm5fcmVwb3J0KCkKMjNmNDk3NCBlcnJvcjogRnVuY3Rpb25zIHRv
+IHJlcG9ydCB3YXJuaW5ncyBhbmQgaW5mb3JtYXRpb25hbCBtZXNzYWdlcwpmZGMzYzhhIHV0aWwv
+cWVtdS1lcnJvcjogUmVuYW1lIGVycm9yX3ByaW50X2xvYygpIHRvIGJlIG1vcmUgZ2VuZXJpYwoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS84OiB1dGlsL3FlbXUtZXJyb3I6
+IFJlbmFtZSBlcnJvcl9wcmludF9sb2MoKSB0byBiZSBtb3JlIGdlbmVyaWMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMi84OiBlcnJvcjogRnVuY3Rpb25zIHRvIHJlcG9ydCB3YXJuaW5ncyBhbmQgaW5mb3Jt
+YXRpb25hbCBtZXNzYWdlcy4uLgpDaGVja2luZyBQQVRDSCAzLzg6IENvbnZlcnQgZXJyb3JfcmVw
+b3J0KCkgdG8gd2Fybl9yZXBvcnQoKS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
+IzY5NDogRklMRTogdGVzdHMvdGVzdC1xZGV2LWdsb2JhbC1wcm9wcy5jOjIzNToKKyAgICBnX3Rl
+c3RfdHJhcF9hc3NlcnRfc3RkZXJyKCIqd2FybmluZzogZ2xvYmFsIGR5bmFtaWMtcHJvcC10eXBl
+LWJhZC5wcm9wMyBoYXMgaW52YWxpZCBjbGFzcyBuYW1lXG4qIik7CgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNjk4OiBGSUxFOiB0ZXN0cy90ZXN0LXFkZXYtZ2xvYmFsLXByb3Bz
+LmM6MjM3OgorICAgIGdfdGVzdF90cmFwX2Fzc2VydF9zdGRlcnIoIip3YXJuaW5nOiBnbG9iYWwg
+bm9ob3RwbHVnLXR5cGUucHJvcDU9MTA1IG5vdCB1c2VkXG4qIik7CgpFUlJPUjogbGluZSBvdmVy
+IDkwIGNoYXJhY3RlcnMKIzY5OTogRklMRTogdGVzdHMvdGVzdC1xZGV2LWdsb2JhbC1wcm9wcy5j
+OjIzODoKKyAgICBnX3Rlc3RfdHJhcF9hc3NlcnRfc3RkZXJyKCIqd2FybmluZzogZ2xvYmFsIG5v
+bmRldmljZS10eXBlLnByb3A2IGhhcyBpbnZhbGlkIGNsYXNzIG5hbWVcbioiKTsKCnRvdGFsOiAy
+IGVycm9ycywgMSB3YXJuaW5ncywgNTM5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvODogaHcvaTM4NjogSW1wcm92
+ZSBzb21lIG9mIHRoZSB3YXJuaW5nIG1lc3NhZ2VzLi4uCkNoZWNraW5nIFBBVENIIDUvODogY2hh
+ci1zb2NrZXQ6IFJlcG9ydCBUQ1Agc29ja2V0IHdhaXRpbmcgYXMgaW5mb3JtYXRpb24uLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNi84OiBlcnJvcjogSW1wbGVtZW50IHRoZSB3YXJuIGFuZCBmcmVlIEVycm9y
+IGZ1bmN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCA3Lzg6IENvbnZlcnQgZXJyb3JfcmVwb3J0Kl9l
+cnIoKSB0byB3YXJuX3JlcG9ydCpfZXJyKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84OiBlcnJvcjog
+QWRkIGEgJ2Vycm9yOiAnIHByZWZpeCB0byBlcnJvcl9yZXBvcnQoKS4uLgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
