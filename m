@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dV2LE-00027k-Lr
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:05:09 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dV2OH-00036M-M9
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dV2LD-0006Ql-Jx
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:05:08 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dV2LD-0006Op-E4
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:05:07 -0400
-Received: by mail-wr0-x236.google.com with SMTP id k67so5982427wrc.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 14:05:07 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dV2OG-0008M3-OB
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:08:17 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170711175937.23140-1-alex.bennee@linaro.org>
+	<20170711175937.23140-5-alex.bennee@linaro.org>
+	<d0d0750b-127e-79e8-4307-57e187cd302f@twiddle.net>
+	<87fue2aigw.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <99791611-a047-4884-6abc-a84a0183c532@twiddle.net>
+Date: Tue, 11 Jul 2017 11:08:01 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170711205842.GD6020@localhost.localdomain>
-References: <1499803333-9052-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1499803333-9052-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170711201059.GA6020@localhost.localdomain>
-	<20170711231709-mutt-send-email-mst@kernel.org>
-	<d9870097-46dc-40bf-49e9-7cf3276017f2@ilande.co.uk>
-	<CAFEAcA_e6BjeLXdv=54yzqSvD_XdDKRiLYJeQS4NZY-Zr4vK4A@mail.gmail.com>
-	<20170711205842.GD6020@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 22:04:45 +0100
-Message-ID: <CAFEAcA_wvVxN_G7rxO4Okez0mjXj0BO3vMy=-DKuHNj2uKFe2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCHv8 1/3] fw_cfg: switch fw_cfg_find() to
- locate the fw_cfg device by type rather than path
+In-Reply-To: <87fue2aigw.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/6] target/arm/translate: ensure
+ gen_goto_tb sets exit flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, "Gabriel L. Somlo" <somlo@cmu.edu>, Paolo Bonzini <pbonzini@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, cota@braap.org, qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 11 July 2017 at 21:58, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Tue, Jul 11, 2017 at 09:49:30PM +0100, Peter Maydell wrote:
->> It's basically GNU coding standard style vs Linux kernel style;
->> there's a mix because some contributors are more used to working
->> on the kernel, and some more used to working with gcc, glibc,
->> etc, and we haven't made a firm "comments must be like this"
->> statement (and of course historical practice in the codebase
->> is all over the place).
+On 07/11/2017 09:20 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <rth@twiddle.net> writes:
+> 
+>> On 07/11/2017 07:59 AM, Alex Bennée wrote:
+>>>        if (use_goto_tb(s, dest)) {
+>>>            tcg_gen_goto_tb(n);
+>>>            gen_set_pc_im(s, dest);
+>>>            tcg_gen_exit_tb((uintptr_t)s->tb + n);
+>>> +        s->is_jmp = DISAS_TB_JUMP;
+>>>        } else {
+>>>            gen_set_pc_im(s, dest);
+>>>            gen_goto_ptr();
+>>> +        s->is_jmp = DISAS_JUMP;
+>>>        }
 >>
->> We also have both of the flavours the kernel style guide
->> documents:
->> https://www.kernel.org/doc/html/v4.10/process/coding-style.html#commenting
->> (I usually use the style the kernel has for net/ personally.)
->>
->> So I don't think that "we" the project have a preferred
->> format; but "we" individual contributors probably
->> have individual preferences ;-)
->
-> Thanks for the info.  Please forget when I said I was going to
-> send a CODING_STYLE patch for that.  :)
+>> I think DISAS_TB_JUMP is appropriate for both cases.  When not using
+>> goto_tb, the jump is still static and we still chain to the next TB
+>> via goto_ptr.
+> 
+> OK - I guess we need to nail down what the essential difference is
+> between the two. I understood DISAS_TB_JUMP as a static known PC which
+> can be patched in the generated code because we know the two addresses
+> are in the same page - whereas DISAS_JUMP is a "computed" jump although
+> in this case the PC is already known.
+> 
+> Does making a distinction between computed and non-computer inter-page
+> jumps make any sense anyway?
 
-I was just giving the historical context, not necessarily
-arguing that we shouldn't try to impose a standard style
-now. (I have no strong opinion on that, beyond that style
-recommendations backed up by patches to checkpatch win
-over those without.)
+*shrug* probably not.
 
-thanks
--- PMM
+Honestly, the only thing that's really interesting here is that is_jmp indicate 
+that we have already exited the TB and that all following code is dead.
+
+As a response to one of Lluis' threads, I suggested that the generic term for 
+this be DISAS_NORETURN.  Which also covers exiting the TB via calling a helper 
+that does not return, e.g. throwing an illegal opcode exception, aka DISAS_EXC 
+in the current target/arm sources.
+
+
+r~
