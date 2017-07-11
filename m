@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsS8-0007fi-N1
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:38 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUsS6-0007e3-Tl
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsS7-0006Gb-GC
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dUsS4-0006Fa-Ik
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:34 -0400
 Received: from orth.archaic.org.uk ([81.2.115.148]:48421)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dUsS7-000683-6D
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:35 -0400
+	id 1dUsS4-000683-Bf
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:31:32 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dUsPq-0002y1-Fp
+	(envelope-from <pm215@archaic.org.uk>) id 1dUsPq-0002yC-UY
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 11:29:14 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Jul 2017 11:29:11 +0100
-Message-Id: <1499768952-24990-4-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 11 Jul 2017 11:29:12 +0100
+Message-Id: <1499768952-24990-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
 References: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 3/4] ARM: KVM: Enable in-kernel timers with user
- space gic
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 4/4] target-arm: v7M: ignore writes to
+ CONTROL.SPSEL from Thread mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,190 +33,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Alexander Graf <agraf@suse.de>
+For v7M, writes to the CONTROL register are only permitted for
+privileged code. However even if the code is privileged, the
+write must not affect the SPSEL bit in the CONTROL register
+if the CPU is in Thread mode (as documented in the pseudocode
+for the MSR instruction). Implement this, instead of permitting
+SPSEL to be written in all cases.
 
-When running with KVM enabled, you can choose between emulating the
-gic in kernel or user space. If the kernel supports in-kernel virtualization
-of the interrupt controller, it will default to that. If not, if will
-default to user space emulation.
+This was causing mbed applications not to run, because the
+RTX RTOS they use relies on this behaviour.
 
-Unfortunately when running in user mode gic emulation, we miss out on
-interrupt events which are only available from kernel space, such as the timer.
-This patch leverages the new kernel/user space pending line synchronization for
-timer events. It does not handle PMU events yet.
-
-Signed-off-by: Alexander Graf <agraf@suse.de>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Message-id: 1498577737-130264-1-git-send-email-agraf@suse.de
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 1498820791-8130-1-git-send-email-peter.maydell@linaro.org
 ---
- include/sysemu/kvm.h   | 11 +++++++++++
- target/arm/cpu.h       |  3 +++
- accel/kvm/kvm-all.c    |  5 +++++
- accel/stubs/kvm-stub.c |  5 +++++
- hw/intc/arm_gic.c      |  7 +++++++
- target/arm/kvm.c       | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 82 insertions(+)
+ target/arm/helper.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 052e11f..91fc07e 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -220,6 +220,17 @@ int kvm_init_vcpu(CPUState *cpu);
- int kvm_cpu_exec(CPUState *cpu);
- int kvm_destroy_vcpu(CPUState *cpu);
- 
-+/**
-+ * kvm_arm_supports_user_irq
-+ *
-+ * Not all KVM implementations support notifications for kernel generated
-+ * interrupt events to user space. This function indicates whether the current
-+ * KVM implementation does support them.
-+ *
-+ * Returns: true if KVM supports using kernel generated IRQs from user space
-+ */
-+bool kvm_arm_supports_user_irq(void);
-+
- #ifdef NEED_CPU_H
- #include "cpu.h"
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 16a1e59..102c58a 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -706,6 +706,9 @@ struct ARMCPU {
-     void *el_change_hook_opaque;
- 
-     int32_t node_id; /* NUMA node this CPU belongs to */
-+
-+    /* Used to synchronize KVM and QEMU in-kernel device levels */
-+    uint8_t device_irq_level;
- };
- 
- static inline ARMCPU *arm_env_get_cpu(CPUARMState *env)
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 2eef7da..46ce479 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2274,6 +2274,11 @@ int kvm_has_intx_set_mask(void)
-     return kvm_state->intx_set_mask;
- }
- 
-+bool kvm_arm_supports_user_irq(void)
-+{
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_USER_IRQ);
-+}
-+
- #ifdef KVM_CAP_SET_GUEST_DEBUG
- struct kvm_sw_breakpoint *kvm_find_sw_breakpoint(CPUState *cpu,
-                                                  target_ulong pc)
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index ef0c734..3965c52 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -155,4 +155,9 @@ void kvm_init_cpu_signals(CPUState *cpu)
- {
-     abort();
- }
-+
-+bool kvm_arm_supports_user_irq(void)
-+{
-+    return false;
-+}
- #endif
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index b305d90..5a0e2a3 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -25,6 +25,7 @@
- #include "qom/cpu.h"
- #include "qemu/log.h"
- #include "trace.h"
-+#include "sysemu/kvm.h"
- 
- /* #define DEBUG_GIC */
- 
-@@ -1412,6 +1413,12 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (kvm_enabled() && !kvm_arm_supports_user_irq()) {
-+        error_setg(errp, "KVM with user space irqchip only works when the "
-+                         "host kernel supports KVM_CAP_ARM_USER_IRQ");
-+        return;
-+    }
-+
-     /* This creates distributor and main CPU interface (s->cpuiomem[0]) */
-     gic_init_irqs_and_mmio(s, gic_set_irq, gic_ops);
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 4555468..7c17f0d 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -174,6 +174,12 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     kvm_async_interrupts_allowed = true;
- 
-+    /*
-+     * PSCI wakes up secondary cores, so we always need to
-+     * have vCPUs waiting in kernel space
-+     */
-+    kvm_halt_in_kernel_allowed = true;
-+
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
- 
-     type_register_static(&host_arm_cpu_type_info);
-@@ -528,6 +534,51 @@ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- 
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
- {
-+    ARMCPU *cpu;
-+    uint32_t switched_level;
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        /*
-+         * We only need to sync timer states with user-space interrupt
-+         * controllers, so return early and save cycles if we don't.
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 2594faa..4ed32c5 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8768,9 +8768,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         }
+         break;
+     case 20: /* CONTROL */
+-        switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+-        env->v7m.control = val & (R_V7M_CONTROL_SPSEL_MASK |
+-                                  R_V7M_CONTROL_NPRIV_MASK);
++        /* Writing to the SPSEL bit only has an effect if we are in
++         * thread mode; other bits can be updated by any privileged code.
++         * switch_v7m_sp() deals with updating the SPSEL bit in
++         * env->v7m.control, so we only need update the others.
 +         */
-+        return MEMTXATTRS_UNSPECIFIED;
-+    }
-+
-+    cpu = ARM_CPU(cs);
-+
-+    /* Synchronize our shadowed in-kernel device irq lines with the kvm ones */
-+    if (run->s.regs.device_irq_level != cpu->device_irq_level) {
-+        switched_level = cpu->device_irq_level ^ run->s.regs.device_irq_level;
-+
-+        qemu_mutex_lock_iothread();
-+
-+        if (switched_level & KVM_ARM_DEV_EL1_VTIMER) {
-+            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_VIRT],
-+                         !!(run->s.regs.device_irq_level &
-+                            KVM_ARM_DEV_EL1_VTIMER));
-+            switched_level &= ~KVM_ARM_DEV_EL1_VTIMER;
++        if (env->v7m.exception == 0) {
++            switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
 +        }
-+
-+        if (switched_level & KVM_ARM_DEV_EL1_PTIMER) {
-+            qemu_set_irq(cpu->gt_timer_outputs[GTIMER_PHYS],
-+                         !!(run->s.regs.device_irq_level &
-+                            KVM_ARM_DEV_EL1_PTIMER));
-+            switched_level &= ~KVM_ARM_DEV_EL1_PTIMER;
-+        }
-+
-+        /* XXX PMU IRQ is missing */
-+
-+        if (switched_level) {
-+            qemu_log_mask(LOG_UNIMP, "%s: unhandled in-kernel device IRQ %x\n",
-+                          __func__, switched_level);
-+        }
-+
-+        /* We also mark unknown levels as processed to not waste cycles */
-+        cpu->device_irq_level = run->s.regs.device_irq_level;
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-     return MEMTXATTRS_UNSPECIFIED;
- }
- 
++        env->v7m.control &= ~R_V7M_CONTROL_NPRIV_MASK;
++        env->v7m.control |= val & R_V7M_CONTROL_NPRIV_MASK;
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
 -- 
 2.7.4
