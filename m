@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUvWn-0001aF-5U
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:48:38 -0400
+	(envelope-from <lersek@redhat.com>) id 1dUvXQ-0001wt-Lc
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dUvWk-00089z-JL
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:48:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34218)
+	(envelope-from <lersek@redhat.com>) id 1dUvXP-0008RD-7c
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:49:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dUvWk-00089Z-Cj
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:48:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dUvXO-0008Qh-UH
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 09:49:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DDE37CE05
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 13:48:33 +0000 (UTC)
-Date: Tue, 11 Jul 2017 14:48:29 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170711134829.GV17792@stefanha-x1.localdomain>
-References: <20170710072027.7948-1-famz@redhat.com>
-	<20170710072027.7948-5-famz@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id D2E6EC049D5D
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 13:49:13 +0000 (UTC)
+References: <20170706101611.27031-1-marcandre.lureau@redhat.com>
+	<20170706101611.27031-7-marcandre.lureau@redhat.com>
+	<c661a649-e438-e80b-baf4-b44ee6612ca3@redhat.com>
+	<145552423.49242900.1499767479720.JavaMail.zimbra@redhat.com>
+	<2f412e1e-88b2-9d30-db7e-0bd5e84b58e5@redhat.com>
+	<1172399972.49364035.1499780122770.JavaMail.zimbra@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <51e56450-313f-a9c1-b733-ea7ace838f8d@redhat.com>
+Date: Tue, 11 Jul 2017 15:49:05 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="v7CWsE/Dy737oYst"
-Content-Disposition: inline
-In-Reply-To: <20170710072027.7948-5-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 4/5] Introduce iothread-group
+In-Reply-To: <1172399972.49364035.1499780122770.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] scripts/dump-guest-memory.py: add
+ vmcoreinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +39,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, anderson@redhat.com, imammedo@redhat.com
 
+On 07/11/17 15:35, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> ----- Original Message -----
+>> On 07/11/17 12:04, Marc-Andr=C3=A9 Lureau wrote:
+>>> Hi
+>>>
+>>> ----- Original Message -----
+>>>> On 07/06/17 12:16, Marc-Andr=C3=A9 Lureau wrote:
+>>>>> Add vmcoreinfo ELF note if vmcoreinfo device is ready.
+>>>>>
+>>>>> To help the python script, add a little global vmcoreinfo_gdb
+>>>>> structure, that is populated with vmcoreinfo_gdb_update().
+>>>>>
+>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>>>>> @@ -181,6 +183,7 @@ static void vmcoreinfo_realize(DeviceState *dev=
+,
+>>>>> Error
+>>>>> **errp)
+>>>>>          return;
+>>>>>      }
+>>>>>
+>>>>> +    vmcoreinfo_gdb_helper =3D VMCOREINFO(dev);
+>>>>>      qemu_register_reset(vmcoreinfo_handle_reset, dev);
+>>>>>  }
+>>>>>
+>>>>>
+>>>>
+>>>> I guess we don't build QEMU with link-time optimization at the
+>>>> moment.
+>>>>
+>>>> With link-time optimization, I think gcc might reasonably optimize
+>>>> away the assignment to "vmcoreinfo_gdb_helper", and
+>>>> "vmcoreinfo_gdb_helper" itself. This is why I suggested "volatile":
+>>>>
+>>>> static VMCoreInfoState * volatile vmcoreinfo_gdb_helper;
+>>>>
+>>>> Do you think volatile is only superfluous, or do you actively dislik=
+e
+>>>> it for some reason?
+>>>
+>>> Yeah, I am not convinced volatile is the best way, but nor is static.
+>>>
+>>> Let's export it?
+>>
+>> Volatile guarantees that the assignment will take place according to t=
+he
+>> behavior of the "abstract C machine" described by ISO C. From ISO C99,
+>>
+>>   6.7.3 Type qualifiers
+>>
+>>   6 An object that has volatile-qualified type may be modified in ways
+>>     unknown to the implementation or have other unknown side effects.
+>>     Therefore any expression referring to such an object shall be
+>>     evaluated strictly according to the rules of the abstract machine,
+>>     as described in 5.1.2.3. Furthermore, at every sequence point the
+>>     value last stored in the object shall agree with that prescribed b=
+y
+>>     the abstract machine, except as modified by the unknown factors
+>>     mentioned previously. [116] What constitutes an access to an objec=
+t
+>>     that has volatile-qualified type is implementation-defined.
+>>
+>>   Footnote 116: A volatile declaration may be used to describe an obje=
+ct
+>>                 corresponding to a memory-mapped input/output port or =
+an
+>>                 object accessed by an asynchronously interrupting
+>>                 function. Actions on objects so declared shall not be
+>>                 "optimized out" by an implementation or reordered exce=
+pt
+>>                 as permitted by the rules for evaluating expressions.
+>>
+>> So basically if you can find the symbol somehow, it will always have t=
+he
+>> right value, due to the volatile qualifier, regardless of the
+>> optimizations the compiler did.
+>>
+>> Internal vs. external linkage ("static" vs. "extern") is a different
+>> question; it might affect whether you find the symbol at all. IME,
+>> symbols for objects with internal linkage are preserved, if: (a) you
+>> don't strip the final binary, and (b) gcc doesn't optimize the variabl=
+e
+>> away.
+>>
+>> With link-time / full program optimization, gcc is entitled to optimiz=
+e
+>> away variables with external linkage too, so "extern" in itself is not
+>> bulletproof. Volatile is more important.
+>=20
+> Ok, you seem confident about this sort of things, I am not, I'll follow=
+ you :)
+>>
+>=20
+>> Given volatile, I'm sort of neutral on extern vs. static. However, if
+>> you make the variable extern, that makes abuse from other source files
+>> easier. (The variable should only be looked at with gdb.) This is also
+>> why I originally suggested to limit the scope of even the static
+>> variable to function scope -- this way abuse would completely be
+>> prevented (nothing else could access the variable even from the same
+>> translation unit), and gdb would still find the variable (IME).
+>=20
+> How do you access a static inside a function? Gdb can look it up but co=
+mplains that it's not in current context.
+>=20
 
---v7CWsE/Dy737oYst
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+According to <https://sourceware.org/gdb/onlinedocs/gdb/Variables.html>,
+the magic incantation is
 
-On Mon, Jul 10, 2017 at 03:20:26PM +0800, Fam Zheng wrote:
-> +static void iothread_group_complete(UserCreatable *obj, Error **errp)
-> +{
-> +    Error *local_err = NULL;
-> +    IOThreadGroup *group = IOTHREAD_GROUP(obj);
-> +    char *name, *thread_name;
-> +    int i;
-> +
-> +    group->ctx = aio_context_new(&local_err);
-> +    if (!group->ctx) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    aio_context_set_poll_params(group->ctx, group->poll_params,
-> +                                &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        aio_context_unref(group->ctx);
-> +        group->ctx = NULL;
-> +        return;
-> +    }
-> +
-> +    /* This assumes we are called from a thread with useful CPU affinity for us
-> +     * to inherit.
-> +     */
-> +    name = object_get_canonical_path_component(OBJECT(obj));
-> +    group->iothreads = g_new0(IOThread *, group->size);
-> +    for (i = 0; i < group->size; ++i) {
+  function::variable
 
-group->size > INT_MAX must be rejected.  The error message below is
-wrong for this property:
+If this doesn't work (in case the realize function isn't on the stack at
+all), then I agree the variable should be made file scope.
 
-  if (value < 0) {
-    error_setg(&local_err, "%s value must be in range [0, %"PRId64"]",
-               info->name, INT64_MAX);
-
---v7CWsE/Dy737oYst
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZZNctAAoJEJykq7OBq3PIRkUH/0u6YRJJUfFQB5ICFYHxP9ju
-5di4kMVyueRPp6tmi6afyPZsSSYSjsd0eiL87LYhr/l4xMBzanrsbRvPoeIdjPjI
-tkxkkAlALi8RNVN92NKh1mxglI35lVoFpg1QlgefVeU7Lt1Nndfi3qdf/C3rEPb9
-CDvQ0BpTO+F1iITK5I46J/ASE64s7enhtRlJmLLjWNdRtH3+1QC3a/L7CFhsMkhG
-0zm1hucqcg+/WkRszULnymRKBAf2Jq2xmEJiejDUMwoXf5xSzyhVY67JhxmlB2MQ
-Twe1oK3kdOeNFAO1N5n/yZHlhW2x1AvP0WgK7tIJu1FL+oV5rFJHby1i2Pctw5M=
-=oaPB
------END PGP SIGNATURE-----
-
---v7CWsE/Dy737oYst--
+Thanks
+Laszlo
