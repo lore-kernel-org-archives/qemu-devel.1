@@ -1,19 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dUwUy-0007Od-Q8
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:49 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dUwYy-000069-6k
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dUwUx-0003VT-VV
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:48 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Tue, 11 Jul 2017 14:50:11 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2014DD643@DGGEMA503-MBS.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH resend v4 0/3] Generate APEI GHES table and
- dynamically record CPER
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dUwYv-00051s-3a
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59129
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dUwYu-00051X-Tq
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:54:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6BEs2Hf055220
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:54:51 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bn0mv0m0k-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 10:54:51 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 11 Jul 2017 15:54:48 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 11 Jul 2017 16:54:36 +0200
+In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+Message-Id: <20170711145441.33925-2-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 1/6] s390x: add helper get_machine_class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +38,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-RXJpYywNCiAgVGhhbmtzIGZvciB5b3VyIGZvbGxvdyB1cC4gDQpJdCBpcyBpbmRlZWQgdGhhdCBJ
-IHNlbmQgdGhlIHBhdGNoZXMgb25lIGJ5IG9uZS4gdGhleSBzaG91bGQgYmUgc2VudCB0b2dldGhl
-ci4NCkkgd2lsbCB1c2UgYmVsb3cgY29tbWFuZHMgdG8gZml4IHRoaXMgaXNzdWUsIG5vdyB0aGUg
-Y2hpbmVzIHRpbWUgaXMgbWlkbmlnaHQsIHNvIEkgd2lsbCBoYXZlIHRvIHVwZGF0ZSBpdCB0b21v
-cnJvdy4gDQoNCj4gU28gc2VuZCB0aGUgcGF0Y2hlcyB3aXRoDQo+IA0KPiAgIGdpdCBzZW5kLWVt
-YWlsICoucGF0Y2gNCj4gDQo+IG9yIHB1dCBhbGwgdGhlIHBhdGNoZXMgaW50byBhIHRlbXBvcmFy
-eSBkaXJlY3RvcnksIGFuZCBydW4NCj4gDQo+ICAgZ2l0IHNlbmQtZW1haWwgcGF0Y2gtZGlyLw0K
-DQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujogRXJpYyBCbGFrZSBbbWFpbHRv
-OmVibGFrZUByZWRoYXQuY29tXSANCuWPkemAgeaXtumXtDogMjAxN+W5tDfmnIgxMeaXpSAyMTo1
-OA0K5pS25Lu25Lq6OiBMYXN6bG8gRXJzZWsgPGxlcnNla0ByZWRoYXQuY29tPjsgZ2VuZ2Rvbmdq
-aXUgPGdlbmdkb25naml1QGh1YXdlaS5jb20+DQrmioTpgIE6IG1zdEByZWRoYXQuY29tOyBpbWFt
-bWVkb0ByZWRoYXQuY29tOyBmYW16QHJlZGhhdC5jb207IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsg
-Wmhhb3NoZW5nbG9uZyA8emhhb3NoZW5nbG9uZ0BodWF3ZWkuY29tPjsgcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnOyBxZW11LWFybUBub25nbnUub3JnOyBaaGVuZ3FpYW5nICh0dXJpbmcpIDx6aGVu
-Z3FpYW5nMTBAaHVhd2VpLmNvbT47IEh1YW5nc2hhb3l1IDxodWFuZ3NoYW95dUBodWF3ZWkuY29t
-PjsgV3VxdWFubWluZyA8d3VxdWFubWluZ0BodWF3ZWkuY29tPjsgR2FvemhpaHVpIDx6aGlodWku
-Z2FvQGh1YXdlaS5jb20+DQrkuLvpopg6IFJlOiBbUEFUQ0ggcmVzZW5kIHY0IDAvM10gR2VuZXJh
-dGUgQVBFSSBHSEVTIHRhYmxlIGFuZCBkeW5hbWljYWxseSByZWNvcmQgQ1BFUg0KDQpPbiAwNy8x
-MS8yMDE3IDA4OjQzIEFNLCBMYXN6bG8gRXJzZWsgd3JvdGU6DQo+IFNvIHNlbmQgdGhlIHBhdGNo
-ZXMgd2l0aA0KPiANCj4gICBnaXQgc2VuZC1lbWFpbCAqLnBhdGNoDQo+IA0KPiBvciBwdXQgYWxs
-IHRoZSBwYXRjaGVzIGludG8gYSB0ZW1wb3JhcnkgZGlyZWN0b3J5LCBhbmQgcnVuDQo+IA0KPiAg
-IGdpdCBzZW5kLWVtYWlsIHBhdGNoLWRpci8NCg0KT3IgeW91IGNhbiBldmVuIHNraXAgcGF0Y2gg
-ZmlsZXMsIGFuZCBkaXJlY3RseSBzZW5kIHRoaW5ncyB3aXRoIG9uZSBsYXNzIGNoYW5jZSBpbiB5
-b3VyIGVkaXRvcjoNCg0KZ2l0IHNlbmQtZW1haWwgLXY1IC0zIC0tYW5ub3RhdGUgLS1jb3Zlci1s
-ZXR0ZXINCg0KW3NlbmQgdGhlIHRvcCB0aHJlZSBjb21taXRzIGluIG15IGN1cnJlbnQgZ2l0IGJy
-YW5jaCBhcyBhIHZlcnNpb24gNSBwYXRjaCBzZXJpZXMsIHdoZXJlIEkgZ2V0IHRvIHdyaXRlIHRo
-ZSBjb3ZlciBsZXR0ZXIgYW5kIHR3ZWFrIGFueSBvZiB0aGUgcGF0Y2hlcyBpbiBteSBwcmVmZXJy
-ZWQgJEVESVRPUiBiZWZvcmUgc2VuZGluZyBhbnl0aGluZ10NCg0KLS0NCkVyaWMgQmxha2UsIFBy
-aW5jaXBhbCBTb2Z0d2FyZSBFbmdpbmVlcg0KUmVkIEhhdCwgSW5jLiAgICAgICAgICAgKzEtOTE5
-LTMwMS0zMjY2DQpWaXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCg0K
+We will need the machine class at machine initialization time, so the
+usual way via qdev won't do. Let's cache the machine class and also use
+the default values of the base machine for capability discovery.
+
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+---
+ hw/s390x/s390-virtio-ccw.c | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 41ca6668e2..1eb17ad184 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -252,36 +252,35 @@ static inline void machine_set_dea_key_wrap(Object *obj, bool value,
+     ms->dea_key_wrap = value;
+ }
+ 
+-bool ri_allowed(void)
+-{
+-    if (kvm_enabled()) {
+-        MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+-        if (object_class_dynamic_cast(OBJECT_CLASS(mc),
+-                                      TYPE_S390_CCW_MACHINE)) {
+-            S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
++static S390CcwMachineClass *current_mc;
+ 
+-            return s390mc->ri_allowed;
+-        }
++static S390CcwMachineClass *get_machine_class(void)
++{
++    if (unlikely(!current_mc)) {
+         /*
+-         * Make sure the "none" machine can have ri, otherwise it won't * be
+-         * unlocked in KVM and therefore the host CPU model might be wrong.
+-         */
+-        return true;
++        * No s390 ccw machine was instantiated, we are likely to
++        * be called for the 'none' machine. The properties will
++        * have their after-initialization values.
++        */
++        current_mc = S390_MACHINE_CLASS(
++                     object_class_by_name(TYPE_S390_CCW_MACHINE));
+     }
+-    return 0;
++    return current_mc;
+ }
+ 
+-bool cpu_model_allowed(void)
++bool ri_allowed(void)
+ {
+-    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+-    if (object_class_dynamic_cast(OBJECT_CLASS(mc),
+-                                  TYPE_S390_CCW_MACHINE)) {
+-        S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+-
+-        return s390mc->cpu_model_allowed;
++    if (!kvm_enabled()) {
++        return false;
+     }
+-    /* allow CPU model qmp queries with the "none" machine */
+-    return true;
++    /* for "none" machine this results in true */
++    return get_machine_class()->ri_allowed;
++}
++
++bool cpu_model_allowed(void)
++{
++    /* for "none" machine this results in true */
++    return get_machine_class()->cpu_model_allowed;
+ }
+ 
+ static char *machine_get_loadparm(Object *obj, Error **errp)
+@@ -391,6 +390,7 @@ static const TypeInfo ccw_machine_info = {
+     static void ccw_machine_##suffix##_instance_init(Object *obj)             \
+     {                                                                         \
+         MachineState *machine = MACHINE(obj);                                 \
++        current_mc = S390_MACHINE_CLASS(MACHINE_GET_CLASS(machine));          \
+         ccw_machine_##suffix##_instance_options(machine);                     \
+     }                                                                         \
+     static const TypeInfo ccw_machine_##suffix##_info = {                     \
+-- 
+2.11.2
