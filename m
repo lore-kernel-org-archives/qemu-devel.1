@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dUu0M-0004l4-A2
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:11:03 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUu2G-0006K2-47
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dUu0J-0006OP-5K
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:11:02 -0400
-Received: from mail-by2nam03on0041.outbound.protection.outlook.com
-	([104.47.42.41]:59253
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dUu0I-0006Lr-Nt
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:10:59 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 11 Jul 2017 05:07:42 -0700
-Message-ID: <12e6dde67e57a0ecf09fbe6103512543113ca07a.1499774331.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1499774331.git.alistair.francis@xilinx.com>
-References: <cover.1499774331.git.alistair.francis@xilinx.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dUu2F-0007eA-01
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:13:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 8/8] error: Add a 'error: ' prefix to
- error_report()
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
+References: <1499771839-32518-1-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
+Date: Tue, 11 Jul 2017 09:11:50 -0300
+Message-ID: <CAAdtpL5_Qfy9h_Osa=tyMDMu4LhOn2mkXA-jYpmpgYwbDJq0yg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/7] ARM: implement MPS2 board (with 2 FPGA
+ flavours)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-As we don't regard error messages as a stable API the let's add a
-'error: ' prefix to the original error_report() messages.
+Hi Peter,
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+It seems you forgot to add some files to MAINTAINERS.
 
- util/qemu-error.c | 1 +
- 1 file changed, 1 insertion(+)
+That said, is there some old school perl guy motivated to add a such
+chek in checkpatch?
 
-diff --git a/util/qemu-error.c b/util/qemu-error.c
-index c557c6ae47..3a3372b68b 100644
---- a/util/qemu-error.c
-+++ b/util/qemu-error.c
-@@ -203,6 +203,7 @@ static void vreport(report_type type, const char *fmt, va_list ap)
- 
-     switch (type) {
-     case REPORT_TYPE_ERROR:
-+        error_printf("error: ");
-         break;
-     case REPORT_TYPE_WARNING:
-         error_printf("warning: ");
--- 
-2.11.0
+
+On Tue, Jul 11, 2017 at 8:17 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This patchseries adds support for the ARM MPS2/MPS2+ dev board:
+>
+> The MPS2 and MPS2+ dev boards are FPGA based (the 2+ has a bigger
+> FPGA but is otherwise the same as the 2). Since the CPU itself
+> and most of the devices are in the FPGA, the details of the board
+> as seen by the guest depend significantly on the FPGA image.
+>
+> We model the following FPGA images:
+>  "mps2_an385" -- Cortex-M3 as documented in ARM Application Note AN385
+>  "mps2_an511" -- Cortex-M3 'DesignStart' as documented in AN511
+>
+> They are fairly similar but differ in the details for some
+> peripherals.
+> Further info and links to all the documentation for the
+> board and the various FPGA images can be found here:
+>  https://developer.arm.com/products/system-design/development-boards/cortex-m-prototyping-system
+>
+> This patchset adds the boards themselves, and the UART, timer
+> and system-controller devices they need. There are a number
+> of other devices on the board which are not yet modelled
+> (notably more GPIOs, a watchdog, another different kind of timer,
+> and a display device), but this minimal set is sufficient to
+> boot the "hello world" binary of the Zephyr RTOS and the
+> "blinky" binary of the mbed RTOS.
+> [To run the zephyr binary you also need this fix:
+>   http://patchwork.ozlabs.org/patch/782811/
+>  which is in the target-arm pullreq I just sent so should
+>  get into master in a few days.]
+>
+> We can add more devices to the model later, but I figured
+> this was a sufficient place to start.
+>
+> The underlying motivation here is that the v8M work that I
+> have planned will need a board, and there is a v8M FPGA
+> image for the MPS2 that we can use. It's also perhaps a more
+> useful M profile board for general purposes than the stellaris
+> boards (64K RAM) or the Netduino2 (128K RAM), since it has
+> 16MB of RAM.
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (7):
+>   hw/arm/mps2: Implement skeleton mps2-an385 and mps2-an511 board models
+>   hw/char/cmsdk-apb-uart.c: Implement CMSDK APB UART
+>   hw/arm/mps2: Add UARTs
+>   hw/char/cmsdk-apb-timer: Implement CMSDK APB timer device
+>   hw/arm/mps2: Add timers
+>   hw/misc/mps2_scc: Implement MPS2 Serial Communication Controller
+>   hw/arm/mps2: Add SCC
+>
+>  hw/arm/Makefile.objs               |   1 +
+>  hw/char/Makefile.objs              |   1 +
+>  hw/misc/Makefile.objs              |   1 +
+>  hw/timer/Makefile.objs             |   1 +
+>  include/hw/char/cmsdk-apb-uart.h   |  78 ++++++++
+>  include/hw/misc/mps2-scc.h         |  43 ++++
+>  include/hw/timer/cmsdk-apb-timer.h |  59 ++++++
+>  hw/arm/mps2.c                      | 378 +++++++++++++++++++++++++++++++++++
+>  hw/char/cmsdk-apb-uart.c           | 390 +++++++++++++++++++++++++++++++++++++
+>  hw/misc/mps2-scc.c                 | 310 +++++++++++++++++++++++++++++
+>  hw/timer/cmsdk-apb-timer.c         | 253 ++++++++++++++++++++++++
+>  default-configs/arm-softmmu.mak    |   6 +
+>  hw/char/trace-events               |   9 +
+>  hw/misc/trace-events               |   8 +
+>  hw/timer/trace-events              |   5 +
+>  15 files changed, 1543 insertions(+)
+>  create mode 100644 include/hw/char/cmsdk-apb-uart.h
+>  create mode 100644 include/hw/misc/mps2-scc.h
+>  create mode 100644 include/hw/timer/cmsdk-apb-timer.h
+>  create mode 100644 hw/arm/mps2.c
+>  create mode 100644 hw/char/cmsdk-apb-uart.c
+>  create mode 100644 hw/misc/mps2-scc.c
+>  create mode 100644 hw/timer/cmsdk-apb-timer.c
+>
+> --
+> 2.7.4
+>
+>
