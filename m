@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dV2kI-0003E6-Ad
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:31:03 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV2xf-0006HX-Ek
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dV2kF-0001cU-64
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:31:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dV2kE-0001as-Vx
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:30:59 -0400
-References: <1499803333-9052-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1499803333-9052-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170711201059.GA6020@localhost.localdomain>
-	<20170711231709-mutt-send-email-mst@kernel.org>
-	<d9870097-46dc-40bf-49e9-7cf3276017f2@ilande.co.uk>
-	<CAFEAcA_e6BjeLXdv=54yzqSvD_XdDKRiLYJeQS4NZY-Zr4vK4A@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3488ef67-930f-a7e1-957a-eea2fe13206f@redhat.com>
-Date: Tue, 11 Jul 2017 23:30:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_e6BjeLXdv=54yzqSvD_XdDKRiLYJeQS4NZY-Zr4vK4A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv8 1/3] fw_cfg: switch fw_cfg_find() to
- locate the fw_cfg device by type rather than path
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dV2xc-00007Q-Ld
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:44:51 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:35092
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dV2xc-00006Y-ET
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 17:44:48 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Tue, 11 Jul 2017 22:44:32 +0100
+Message-Id: <1499809473-28481-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCHv2 1/2] pci: move check for existing devfn into
+ new pci_bus_devfn_available() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, Paolo Bonzini <pbonzini@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, marcel@redhat.com
 
-(off-topic)
+Also touch up the logic in do_pci_register_device() accordingly.
 
-On 07/11/17 22:49, Peter Maydell wrote:
-> On 11 July 2017 at 21:26, Mark Cave-Ayland
-> <mark.cave-ayland@ilande.co.uk> wrote:
->> On 11/07/17 21:18, Michael S. Tsirkin wrote:
->>
->>> Multi-line comments also should formatted
->>>
->>> /*
->>>  * like
->>>  * this
->>>  */
->>>
->>> not
->>>
->>> /* like
->>>  * this */
->>>
->>
->> Interesting, I never knew there was a preferred format for comments (I
->> see both styles throughout the codebase).
-> 
-> It's basically GNU coding standard style vs Linux kernel style;
-> there's a mix because some contributors are more used to working
-> on the kernel, and some more used to working with gcc, glibc,
-> etc, and we haven't made a firm "comments must be like this"
-> statement (and of course historical practice in the codebase
-> is all over the place).
-> 
-> We also have both of the flavours the kernel style guide
-> documents:
-> https://www.kernel.org/doc/html/v4.10/process/coding-style.html#commenting
-> (I usually use the style the kernel has for net/ personally.)
-> 
-> So I don't think that "we" the project have a preferred
-> format; but "we" individual contributors probably
-> have individual preferences ;-)
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/pci/pci.c |   14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-Hey I'm feeling oppressed now; can I add edk2-style comments
-
-//
-// like this
-//
-
-along with CamelCaseVariables, TYPEDEFS_FOR_STRUCTS, and
-CamelCaseEnumConstants? ;)
-
-(Just kidding! :) I should be sleeping now. Sorry.)
-
-Laszlo
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 0c6f74a..04e6edb 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -951,6 +951,15 @@ uint16_t pci_requester_id(PCIDevice *dev)
+     return pci_req_id_cache_extract(&dev->requester_id_cache);
+ }
+ 
++static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
++{
++    if (bus->devices[devfn]) {
++        return false;
++    } else {
++        return true;
++    }
++}
++
+ /* -1 for devfn means auto assign */
+ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+                                          const char *name, int devfn,
+@@ -974,14 +983,15 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+     if (devfn < 0) {
+         for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
+             devfn += PCI_FUNC_MAX) {
+-            if (!bus->devices[devfn])
++            if (pci_bus_devfn_available(bus, devfn)) {
+                 goto found;
++            }
+         }
+         error_setg(errp, "PCI: no slot/function available for %s, all in use",
+                    name);
+         return NULL;
+     found: ;
+-    } else if (bus->devices[devfn]) {
++    } else if (!pci_bus_devfn_available(bus, devfn)) {
+         error_setg(errp, "PCI: slot %d function %d not available for %s,"
+                    " in use by %s",
+                    PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+-- 
+1.7.10.4
