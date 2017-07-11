@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUwSn-0005wR-94
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:48:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUwUE-0006t8-8h
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dUwSh-0002qv-JH
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:48:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dUwSh-0002qX-Cl
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:48:27 -0400
-Date: Tue, 11 Jul 2017 11:47:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170711144752.GO12152@localhost.localdomain>
-References: <5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
-	<20170707133949.GH10776@localhost.localdomain>
-	<20170707181642-mutt-send-email-mst@kernel.org>
-	<20170707180358.GA12152@localhost.localdomain>
-	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
-	<20170710135943.GG12152@localhost.localdomain>
-	<20170710194345-mutt-send-email-mst@kernel.org>
-	<20170710174730.GL12152@localhost.localdomain>
-	<063778b8-d517-dcac-3c83-95076604a16c@redhat.com>
-	<1499760785.8257.5.camel@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dUwUC-0003El-1E
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:50:01 -0400
+Date: Tue, 11 Jul 2017 15:49:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170711144950.GS7116@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170710193047.z2t6eww7nhckgg3z@postretch>
+	<87d197mm0f.fsf@dusky.pond.sub.org>
+	<87wp7fghi9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1499760785.8257.5.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+In-Reply-To: <87wp7fghi9.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v14 15/21] qom: support non-scalar
+ properties with -object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Chao Peng <chao.p.peng@linux.intel.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Laine Stump <laine@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, afaerber@suse.de, Kevin Wolf <kwolf@redhat.com>
 
-On Tue, Jul 11, 2017 at 10:13:05AM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> >=A0Concerning QEMU, could we maybe simply emit a warning a la
-> >=20
-> > =A0"you did not specify a machine type with the -M option, so you are
-> > =A0 currently running the the 'pc' machine type. Please note that
-> > future
-> > =A0 versions of QEMU might use the 'q35' machine type instead. If you
-> > =A0 require the 'pc' machine type for your setting, then please speci=
-fy
-> > =A0 it with the -M option."
->=20
-> Warnings tend to get ignored until things are actually break, so I
-> don't think this helps much.  I think simply not having a default
-> machine type (as already suggested elsewhere in this thread) is the
-> best way to deal with this.  That way we don't silently change
-> behavior.  It also is in line with what we have on arm where we already
-> require the user to explicitly pick a machine type.
+On Tue, Jul 11, 2017 at 04:44:46PM +0200, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
+> 
+> > Manos Pitsidianakis <el13635@mail.ntua.gr> writes:
+> >
+> >> Is there a specific reason this patch wasn't finished? If I'm not
+> >> wrong using non-scalar properties with -object is still not possible,
+> >> yet would be a very useful feature for drivers with UserCreatable
+> >> objects.
+> >>
+> >> Archive link since this is an old patch:
+> >> https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg08252.html
+> >
+> > Yes, we want non-scalar properties with -object.
+> >
+> > This series attempts to provide them by extending QemuOpts.  The trouble
+> > is that we've already pushed QemuOpts beyond its design limits, and this
+> > series pushes it some more.  We need to stop working around the design
+> > limits of QemuOpts and start replacing them by something that serves our
+> > current needs, as I explained in:
+> >
+> >     Subject: Re: [PATCH v14 00/19] QAPI/QOM work for non-scalar object properties
+> >     Message-ID: <87vawnnjpi.fsf@dusky.pond.sub.org>
+> >     https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg04895.html
+> >
+> > I started the replacement work (merge commit 8746709).  It provides
+> > non-scalar properties for -blockdev.  I stole Dan's PATCH 07 for it,
+> > which became commit cbd8acf.  See also the design thread
+> >
+> >     Subject: Non-flat command line option argument syntax
+> >     Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
+> >     https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
+> >
+> > PATCH 02-06 have been merged separately (merge commit ede0cbe).
+> >
+> > More work is needed to apply the solution for -blockdev to -object, and
+> > I intend to work on it.  A main difficulty is backwards compatibility to
+> > all the ill-designed / accidental QemuOpts warts.  We may have to accept
+> > some incompatibility to make progress.
+> 
+> Waiting for that work to be completed may be less than ideal for you.
+> Perhaps we can crack the simple part of the problem quickly, so you can
+> play with it while I still work on the harder parts.
+> 
+> Simple part: -object argument in JSON syntax, exactly as in QMP.
+> Example:
+> 
+>     -object '{ "qom-type": "memory-backend-ram", "id": "mem1", "props": { "size": 4096 } }'
+> 
+> Non-scalar members of "props" should just work there.
+> 
+> Hard part: non-scalar properties in the traditional KEY=VALUE syntax,
+> using dotted key convention.
+> 
+> Sketch appended.  If this would be useful for you, I can prepare proper
+> patches.
 
-If we do that, we probably should wait for libvirt to adapt and
-choose its own default.  Current libvirt would pick an arbitrary
-machine-type (the first one in the query-machines list) as the
-default.
+Seems reasonable to enable the JSON syntax right now, as long as we are
+confident it'll not need changes once we do the key/val syntax change too.
 
---=20
-Eduardo
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
