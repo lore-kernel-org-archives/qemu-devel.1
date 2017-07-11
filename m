@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUrnS-00078S-DV
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUrnZ-0007DL-Aw
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dUrnR-00062F-Mb
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:34 -0400
-Date: Tue, 11 Jul 2017 11:49:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170711094919.GH4335@noname.str.redhat.com>
-References: <20170705102231.20711-1-stefanha@redhat.com>
-	<20170705102231.20711-3-stefanha@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dUrnU-00062p-G2
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:41 -0400
+Received: from mail-wr0-f177.google.com ([209.85.128.177]:35606)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUrnU-00062f-9M
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:49:36 -0400
+Received: by mail-wr0-f177.google.com with SMTP id k67so174987019wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 02:49:36 -0700 (PDT)
+References: <201707111733232926663@zte.com.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <00359765-eb19-3d00-4e9d-b3d5ba941469@redhat.com>
+Date: Tue, 11 Jul 2017 11:49:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170705102231.20711-3-stefanha@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: make qcow2_co_create2() a
- coroutine_fn
+In-Reply-To: <201707111733232926663@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBSZTogW1BBVENIIFYyXSBjaGFyZGV2?=
+ =?utf-8?q?=3A_fix_parallel_device_can=27t_be_reconnect?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org
+To: peng.hao2@zte.com.cn
+Cc: marcandre.lureau@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
 
-Am 05.07.2017 um 12:22 hat Stefan Hajnoczi geschrieben:
-> qcow2_create2() calls qemu_co_mutex_lock().  Only a coroutine_fn may
-> call another coroutine_fn.
->=20
-> Rename the function (the block layer API is now called
-> .bdrv_co_create()) and add coroutine_fn.  It is always called from
-> coroutine context.
->=20
-> Reported-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 11/07/2017 11:33, peng.hao2@zte.com.cn wrote:
+>>> +    if (qemu_chr_null_be_can_read(chr)) {
+>>> +        size = tcp_chr_recv(chr, (void *)buf, CHR_READ_BUF_LEN)
+>>
+>> It would be better not to destroy data in the channel, because the
+>> device could set handlers later.
+>
+> This device do not register a chr_read function,so it's safe to
+> destroy data(no read handler).
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+I agree, but this code doesn't know that the device is not changing
+handlers later.
+
+Paolo
