@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUwGd-0003Wo-J9
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:36:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dUwN4-0000jb-33
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUwGc-000510-NY
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:35:59 -0400
-References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
-	<CAFEAcA_=YZFScbOU_nBLpzGuupo6EKNcSZhJGDZQZeTu7KVq4A@mail.gmail.com>
-	<20170710111649.GB5772@noname.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e7a547a2-132d-bc4e-c249-7f802b74d249@redhat.com>
-Date: Tue, 11 Jul 2017 16:35:44 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dUwN0-00007M-6u
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:42:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37424)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dUwN0-00006r-0F
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 10:42:34 -0400
+Date: Tue, 11 Jul 2017 16:42:15 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170711144215.GI4335@noname.str.redhat.com>
+References: <5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
+	<20170707133949.GH10776@localhost.localdomain>
+	<20170707181642-mutt-send-email-mst@kernel.org>
+	<20170707180358.GA12152@localhost.localdomain>
+	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
+	<20170710135943.GG12152@localhost.localdomain>
+	<20170710194345-mutt-send-email-mst@kernel.org>
+	<20170710174730.GL12152@localhost.localdomain>
+	<063778b8-d517-dcac-3c83-95076604a16c@redhat.com>
+	<1499760785.8257.5.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170710111649.GB5772@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wsKHu5XDBWk8E41rNTIQ2NIXfIOC4BLHr"
-Subject: Re: [Qemu-devel] [Qemu-block]  [PULL 000/100] Block layer patches
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1499760785.8257.5.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,105 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wsKHu5XDBWk8E41rNTIQ2NIXfIOC4BLHr
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
-Message-ID: <e7a547a2-132d-bc4e-c249-7f802b74d249@redhat.com>
-Subject: Re: [Qemu-block] [Qemu-devel] [PULL 000/100] Block layer patches
-References: <1499447335-6125-1-git-send-email-kwolf@redhat.com>
- <CAFEAcA_=YZFScbOU_nBLpzGuupo6EKNcSZhJGDZQZeTu7KVq4A@mail.gmail.com>
- <20170710111649.GB5772@noname.redhat.com>
-In-Reply-To: <20170710111649.GB5772@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-07-10 13:16, Kevin Wolf wrote:
-> Am 10.07.2017 um 11:28 hat Peter Maydell geschrieben:
->> On 7 July 2017 at 18:07, Kevin Wolf <kwolf@redhat.com> wrote:
->>> The following changes since commit b11365867568ba954de667a0bfe0945b8f=
-78d6bd:
->>>
->>>   Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-201707=
-06' into staging (2017-07-06 11:42:59 +0100)
->>>
->>> are available in the git repository at:
->>>
->>>
->>>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->>>
->>> for you to fetch changes up to 7d982302db173616d011e07ee43be3b0aae872=
-b1:
->>>
->>>   Merge remote-tracking branch 'mreitz/tags/pull-block-2017-07-07' in=
-to queue-block (2017-07-07 18:11:41 +0200)
->>>
->>> ----------------------------------------------------------------
->>>
->>> Block layer patches
->>
->> Hi -- I'm afraid this doesn't build with clang:
+Am 11.07.2017 um 10:13 hat Gerd Hoffmann geschrieben:
+>   Hi,
 >=20
-> My clang didn't complain, unfortunately.
+> >=A0Concerning QEMU, could we maybe simply emit a warning a la
+> >=20
+> > =A0"you did not specify a machine type with the -M option, so you are
+> > =A0 currently running the the 'pc' machine type. Please note that
+> > future
+> > =A0 versions of QEMU might use the 'q35' machine type instead. If you
+> > =A0 require the 'pc' machine type for your setting, then please speci=
+fy
+> > =A0 it with the -M option."
 >=20
->>   CC      block/qcow2-bitmap.o
->> /home/petmay01/linaro/qemu-for-merges/block/qcow2-bitmap.c:1183:9:
->> error: variable 'ret' is used uninitialized whenever 'if' condition is=
+> Warnings tend to get ignored until things are actually break, so I
+> don't think this helps much.  I think simply not having a default
+> machine type (as already suggested elsewhere in this thread) is the
+> best way to deal with this.
 
->> true [-Werror,-Wsometimes-uninitialized]
->>     if (tb_offset < 0) {
->>         ^~~~~~~~~~~~~
->> /home/petmay01/linaro/qemu-for-merges/block/qcow2-bitmap.c:1222:12:
->> note: uninitialized use occurs here
->>     return ret;
->>            ^~~
->> /home/petmay01/linaro/qemu-for-merges/block/qcow2-bitmap.c:1183:5:
->> note: remove the 'if' if its condition is always false
->>     if (tb_offset < 0) {
->>     ^~~~~~~~~~~~~~~~~~~~
->> /home/petmay01/linaro/qemu-for-merges/block/qcow2-bitmap.c:1165:12:
->> note: initialize the variable 'ret' to silence this warning
->>     int ret;
->>            ^
->>             =3D 0
->> 1 error generated.
->>
->> Looking at the code, the compiler appears to be correct
->> that that error-exit path has forgotten to set ret.
->=20
-> Indeed. This is from commit 519d4789 ('qcow2: add persistent dirty
-> bitmaps support') and came through Max' tree.
->=20
-> Max, I'll split the pull request and send only my tree in v2. Please
-> submit a separate pull request for the patches in your tree once the
-> build is fixed.
+I would absolutely hate this. One of the nice things about qemu has
+always been that 'qemu disk.img' is enough to start a simple VM. You
+only need to touch any other options for things you care about. I
+wouldn't want to give this up.
 
-OK, will do.
-
-Max
-
-
---wsKHu5XDBWk8E41rNTIQ2NIXfIOC4BLHr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZZOJAEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQKLX
-B/4mmVwOK/pfERJWS7jic5dsMg9cxIMJ3fT0SZo2LyeNBlBSFQ8YBGEE3PbKXhXs
-JuaTNZkT0pmAE/cv33rVPTqMYOtJCZoFwEPdkU+5DcSn765QyZeCFMnwzxsqm/CO
-O6Yqq3Qn3w2ELRrGvvinmcA2GFHyB41wH1A/99UJ/FJOlsZ2GkQytbwMhmy4YY3G
-kDYpitlQNKdEVv0qU0ilrOGuqgCaYU6o+m0rKU7J/vjZ6eq+L/tPWdXouPj6wLbS
-GwV0MPDqFF9e9/kkkcNrmOlpUjvmjFRyoF6c0WmJ3gJcyIqzk2VwbDhGUQMwqGdB
-Rwh33qnfFx1cClpJwdmgRxRV
-=06ec
------END PGP SIGNATURE-----
-
---wsKHu5XDBWk8E41rNTIQ2NIXfIOC4BLHr--
+Kevin
