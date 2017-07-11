@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dV0SV-00086f-V0
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:04:32 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dV0Wn-0001Ic-Fg
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:08:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dV0SR-0005np-NH
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:04:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23611)
+	(envelope-from <dgilbert@redhat.com>) id 1dV0Wi-0008FK-Jw
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:08:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dV0SR-0005nC-E9
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:04:27 -0400
-References: <20170705125738.8777-1-stefanha@redhat.com>
-	<20170705125738.8777-7-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4adda7cf-6f55-c96f-2448-e662f1e7ea72@redhat.com>
-Date: Tue, 11 Jul 2017 14:04:14 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dV0Wi-0008F0-Ao
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 15:08:52 -0400
+Date: Tue, 11 Jul 2017 20:08:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170711190846.GA3138@work-vm>
+References: <20170709175422.30185-1-peter.maydell@linaro.org>
+	<20170711162943.GF2223@work-vm>
+	<CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170705125738.8777-7-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7nstbOsHejaxFfAgcSr86euRs8Pc0NSUj"
-Subject: Re: [Qemu-devel] [PATCH v9 6/9] qcow2: add bdrv_measure() support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-JXT3B0uXbxbh9oex4gngsz350Sq+P4QK=aqAS9q1dcA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] slirp: fork_exec(): Don't close() a
+ negative number in fork_exec()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +29,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7nstbOsHejaxFfAgcSr86euRs8Pc0NSUj
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
- John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <4adda7cf-6f55-c96f-2448-e662f1e7ea72@redhat.com>
-Subject: Re: [PATCH v9 6/9] qcow2: add bdrv_measure() support
-References: <20170705125738.8777-1-stefanha@redhat.com>
- <20170705125738.8777-7-stefanha@redhat.com>
-In-Reply-To: <20170705125738.8777-7-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> [cc'd Eric as the sort of person
+> 
+> On 11 July 2017 at 17:29, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> > * Peter Maydell (peter.maydell@linaro.org) wrote:
+> >> In a fork_exec() error path we try to closesocket(s) when s might
+> >> be a negative number because the thing that failed was the
+> >> qemu_socket() call. Add a guard so we don't do this.
+> >>
+> >> (Spotted by Coverity: CID 1005727 issue 1 of 2.)
+> >>
+> >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> >> ---
+> >> Issue 2 of 2 in CID 1005727 is trickier -- we need to move as
+> >> much as possible of the client-end connect/accept out of the
+> >> child process and into the parent as possible. I'm not sure
+> >> if it's safe to do it all in the parent without deadlocking...
+> >
+> > or just bail earlier?
+> 
+> The problem is you can only bail while you're in the parent
+> before forking. Once you've started the child there's no
+> mechanism for dealing with failure.
 
-On 07/05/2017 07:57 AM, Stefan Hajnoczi wrote:
-> Use qcow2_calc_prealloc_size() to get the required file size.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
+Well, you can always exit the child before anything worse can happen.
 
-> +            for (sector_num =3D 0;
-> +                 sector_num < ssize / BDRV_SECTOR_SIZE;
-> +                 sector_num +=3D pnum) {
-> +                int nb_sectors =3D MAX(ssize / BDRV_SECTOR_SIZE - sect=
-or_num,
-> +                                     INT_MAX);
-> +                BlockDriverState *file;
-> +                int64_t ret;
-> +
-> +                ret =3D bdrv_get_block_status_above(in_bs, NULL,
-> +                                                  sector_num, nb_secto=
-rs,
-> +                                                  &pnum, &file);
+> >   The bit that worries me there
+> > is the dup2(s, [012]); which is called unchecked, if that fails
+> > then your telnetd or whatever probably ends up connected to whatever
+> > your 0..2 were originally.
+> 
+> dup2() in a child is actually pretty safe -- the only ways
+> it can fail are:
+>  * fd2 isn't actually an open file descriptor (can't happen)
+>  * fd1 is negative or bigger than OPEN_MAX (can't happen)
+>  * EINTR (just retry, I guess)
 
-Shouldn't that be MIN(), not MAX(), in the computation of nb_sectors?
+True, I'd missed that fd1 was probably always a valid fd;
+so probably the rest of this is pretty academic.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> The awkward part is POSIX says that dup2() may fail with EIO if
+> the close() of newfd failed, in which case I dunno what the
+> child is supposed to do about it -- do a manual close(), ignore
+> the error from close() and then dup2() again??
 
+I wouldn't like to bet on it being legal to call close() on an
+error, what state is the fd you wanted to close in?
 
---7nstbOsHejaxFfAgcSr86euRs8Pc0NSUj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Linux specifically says it doesn't do this, and BSD/OSX don't
+> document EIO as possible so I assume they have sane behaviour.
+> 
+> In any case, ignoring the possibility that dup2(s, [012]) in a child
+> process could fail is AFAIK very very widespread standard
+> behaviour for unix daemons. (We have another example in
+> os_setup_post() in os-posix.c, for instance.)
+> 
+> Random extra: Linux dup2() manpage has a mysterious remark about
+> EBUSY -- does anybody know what that's all about? It's not
+> sanctioned by POSIX...
+> 
+> What I would like to do and think should be safe is:
+> 
+>     s = qemu_socket(...);
+>     bind(s);
+>     listen(s, 1);
+>     cs = qemu_socket(...);
+>     connect(cs, ...);
+>     switch (fork ()) {
+>         child:
+>            dup2
+>            close fds
+>            execvp(...);
+>         parent:
+>            break;
+>     }
+>     close(cs);
+>     ss = accept(s, ...);
+>     close(s);
+>     etc;
+> 
+> ie push the bind/listen/create client socket/connect up into
+> before the fork(), to give the behaviour of "like socketpair()
+> but for AF_INET".
+> 
+> (I believe this will work and not deadlock because connect()
+> doesn't block until accept(), it only needs the tcp handshake.)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+OK, I don't know the details of the blocking htere.
 
-iQEcBAEBCAAGBQJZZSEuAAoJEKeha0olJ0NqQ7kH/0ErjuR6ohV7BFB3QNnLd/W0
-oufLxZCjFoPwDgybXWj4qdgrtoHQwv7khfWwp5zUYcTHYauFh8+jfytzkQ/5tDz5
-RPDXpQlQlGqfAAd0MJ0fugTBHAce6YUxJV0ADSXjHRD4HkP8WfO6e0l8VZveXh+D
-Ab9OsmOWx7uj1j/Grnr7Kr1MyPTP5tr5jDHwL26rAOdw2SEMT4baug6APL+R0M7V
-XQmyvFS/M6olKOLplBQmWlK8Vhwb5X0o6FQSHASr7iE9ReMhZY1aB0nwEn44l+rx
-d+WKfokt8HsRe0vZJ7vPkbSSsM5Qv+px3x5/N/mKBuzovDlO+YNHL6zRk4bQVOI=
-=Vv8b
------END PGP SIGNATURE-----
+Dave
 
---7nstbOsHejaxFfAgcSr86euRs8Pc0NSUj--
+> >>  slirp/misc.c | 4 +++-
+> >>  1 file changed, 3 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/slirp/misc.c b/slirp/misc.c
+> >> index 88e9d94197..260187b6b6 100644
+> >> --- a/slirp/misc.c
+> >> +++ b/slirp/misc.c
+> >> @@ -112,7 +112,9 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
+> >>                   bind(s, (struct sockaddr *)&addr, addrlen) < 0 ||
+> >>                   listen(s, 1) < 0) {
+> >>                       error_report("Error: inet socket: %s", strerror(errno));
+> >> -                     closesocket(s);
+> >> +                     if (s >= 0) {
+> >> +                         closesocket(s);
+> >> +                     }
+> >
+> >
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >
+> > (I'm not convinced this would ever do anything bad, at least on a *nix
+> > system, the -ve value is always going to be an invalid fd so the close
+> > will just fail).
+> 
+> Indeed. But it keeps Coverity happy.
+> 
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
