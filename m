@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxiH-00069y-OG
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:08:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxiK-0006CA-F4
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dUxiG-0004tB-T2
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:08:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dUxiJ-0004vz-Mc
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 12:08:40 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Tue, 11 Jul 2017 18:06:53 +0200
-Message-Id: <20170711160814.20941-5-mreitz@redhat.com>
+Date: Tue, 11 Jul 2017 18:06:55 +0200
+Message-Id: <20170711160814.20941-7-mreitz@redhat.com>
 In-Reply-To: <20170711160814.20941-1-mreitz@redhat.com>
 References: <20170711160814.20941-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 04/85] qcow: require image size to be > 1 for
- new images
+Subject: [Qemu-devel] [PULL 06/85] iotests: skip 048 with qcow which doesn't
+ support resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,31 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The qcow driver refuses to open images which are less than
-2 bytes in size, but will happily create such images. Add
-a check in the create path to avoid this discrepancy.
+Test 048 is designed to verify data preservation during an
+image resize. The qcow (v1) format impl has never supported
+resize so always fails.
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170623162419.26068-5-berrange@redhat.com
+Message-id: 20170623162419.26068-7-berrange@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tests/qemu-iotests/048 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 7bd94dc..49871fb 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -811,6 +811,12 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     /* Read out options */
-     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-                           BDRV_SECTOR_SIZE);
-+    if (total_size == 0) {
-+        error_setg(errp, "Image size is too small, cannot be zero length");
-+        ret = -EINVAL;
-+        goto cleanup;
-+    }
-+
-     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
-     if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
-         flags |= BLOCK_FLAG_ENCRYPT;
+diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
+index 203c04f..9ed04a0 100755
+--- a/tests/qemu-iotests/048
++++ b/tests/qemu-iotests/048
+@@ -46,7 +46,7 @@ _compare()
+ . ./common.filter
+ . ./common.pattern
+ 
+-_supported_fmt raw qcow qcow2 qed luks
++_supported_fmt raw qcow2 qed luks
+ _supported_proto file
+ _supported_os Linux
+ 
 -- 
 2.9.4
