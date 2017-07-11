@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dUmxM-0002IO-0r
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dUmxN-0002J4-4K
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dUmxK-0007T1-Nn
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dUmxL-0007Tm-Sq
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 00:39:29 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 11 Jul 2017 14:39:07 +1000
-Message-Id: <20170711043917.1757-8-david@gibson.dropbear.id.au>
+Date: Tue, 11 Jul 2017 14:39:11 +1000
+Message-Id: <20170711043917.1757-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20170711043917.1757-1-david@gibson.dropbear.id.au>
 References: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/17] spapr: Uniform DRC reset paths
+Subject: [Qemu-devel] [PULL 11/17] target/ppc: Refactor tcg radix mmu code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,115 +20,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, bharata@linux.vnet.ibm.com, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, bharata@linux.vnet.ibm.com, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-DRC objects have a regular device reset method.  However, it only gets
-called in the usual way for PCI DRCs.  Because of where CPU and LMB DRCs
-are in the QOM tree, their device reset method isn't automatically called.
-So, the machine manually registers reset handlers to call device_reset().
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-This patch removes the device reset method, and instead always explicitly
-registers the reset handler from realize().  This means the callers don't
-have to worry about the two cases, and we always get proper resets.
+The mmu-radix64.c file implements functions to enable the radix mmu
+emulation in tcg mode. There is a function ppc_radix64_walk_tree() which
+performs the radix tree walk and also implicitly checks the pte
+protection.
 
+Move the protection checking of the pte from the ppc_radix64_walk_tree()
+function into the caller. This means the ppc_radix64_walk_tree() function
+can be used without protection checking which is useful for debugging.
+
+ppc_radix64_walk_tree() no longer needs to take the rwx and prot variables.
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/ppc/spapr.c     | 31 ++++---------------------------
- hw/ppc/spapr_drc.c |  6 +++---
- 2 files changed, 7 insertions(+), 30 deletions(-)
+ target/ppc/mmu-radix64.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5acfb47..4fa982d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1967,24 +1967,6 @@ static void spapr_boot_set(void *opaque, const char *boot_device,
-     machine->boot_order = g_strdup(boot_device);
- }
- 
--/*
-- * Reset routine for LMB DR devices.
-- *
-- * Unlike PCI DR devices, LMB DR devices explicitly register this reset
-- * routine. Reset for PCI DR devices will be handled by PHB reset routine
-- * when it walks all its children devices. LMB devices reset occurs
-- * as part of ppc_spapr_reset().
-- */
--static void spapr_drc_reset(void *opaque)
--{
--    sPAPRDRConnector *drc = opaque;
--    DeviceState *d = DEVICE(drc);
--
--    if (d) {
--        device_reset(d);
--    }
--}
--
- static void spapr_create_lmb_dr_connectors(sPAPRMachineState *spapr)
- {
-     MachineState *machine = MACHINE(spapr);
-@@ -1993,13 +1975,11 @@ static void spapr_create_lmb_dr_connectors(sPAPRMachineState *spapr)
-     int i;
- 
-     for (i = 0; i < nr_lmbs; i++) {
--        sPAPRDRConnector *drc;
-         uint64_t addr;
- 
-         addr = i * lmb_size + spapr->hotplug_memory.base;
--        drc = spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_LMB,
--                                     addr/lmb_size);
--        qemu_register_reset(spapr_drc_reset, drc);
-+        spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_LMB,
-+                               addr / lmb_size);
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index 69fde65..1a650fd 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -147,11 +147,10 @@ static void ppc_radix64_set_rc(PowerPCCPU *cpu, int rwx, uint64_t pte,
      }
  }
  
-@@ -2093,11 +2073,8 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-         int core_id = i * smp_threads;
- 
-         if (mc->has_hotpluggable_cpus) {
--            sPAPRDRConnector *drc =
--                spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
--                                       (core_id / smp_threads) * smt);
--
--            qemu_register_reset(spapr_drc_reset, drc);
-+            spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
-+                                   (core_id / smp_threads) * smt);
-         }
- 
-         if (i < boot_cores_nr) {
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 22d4d81..c831aa3 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -426,9 +426,9 @@ static bool release_pending(sPAPRDRConnector *drc)
-     return drc->awaiting_release;
- }
- 
--static void reset(DeviceState *d)
-+static void drc_reset(void *opaque)
+-static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, int rwx, vaddr eaddr,
++static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, vaddr eaddr,
+                                       uint64_t base_addr, uint64_t nls,
+                                       hwaddr *raddr, int *psize,
+-                                      int *fault_cause, int *prot,
+-                                      hwaddr *pte_addr)
++                                      int *fault_cause, hwaddr *pte_addr)
  {
--    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(d);
-+    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(opaque);
+     CPUState *cs = CPU(cpu);
+     uint64_t index, pde;
+@@ -177,10 +176,6 @@ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, int rwx, vaddr eaddr,
+         uint64_t rpn = pde & R_PTE_RPN;
+         uint64_t mask = (1UL << *psize) - 1;
  
-     trace_spapr_drc_reset(spapr_drc_index(drc));
+-        if (ppc_radix64_check_prot(cpu, rwx, pde, fault_cause, prot)) {
+-            return 0; /* Protection Denied Access */
+-        }
+-
+         /* Or high bits of rpn and low bits to ea to form whole real addr */
+         *raddr = (rpn & ~mask) | (eaddr & mask);
+         *pte_addr = base_addr + (index * sizeof(pde));
+@@ -188,9 +183,8 @@ static uint64_t ppc_radix64_walk_tree(PowerPCCPU *cpu, int rwx, vaddr eaddr,
+     }
  
-@@ -538,6 +538,7 @@ static void realize(DeviceState *d, Error **errp)
-     g_free(child_name);
-     vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
-                      drc);
-+    qemu_register_reset(drc_reset, drc);
-     trace_spapr_drc_realize_complete(spapr_drc_index(drc));
+     /* Next Level of Radix Tree */
+-    return ppc_radix64_walk_tree(cpu, rwx, eaddr, pde & R_PDE_NLB,
+-                                 pde & R_PDE_NLS, raddr, psize,
+-                                 fault_cause, prot, pte_addr);
++    return ppc_radix64_walk_tree(cpu, eaddr, pde & R_PDE_NLB, pde & R_PDE_NLS,
++                                 raddr, psize, fault_cause, pte_addr);
  }
  
-@@ -596,7 +597,6 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-     DeviceClass *dk = DEVICE_CLASS(k);
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
+ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+@@ -241,11 +235,11 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
  
--    dk->reset = reset;
-     dk->realize = realize;
-     dk->unrealize = unrealize;
-     drck->release_pending = release_pending;
+     /* Walk Radix Tree from Process Table Entry to Convert EA to RA */
+     page_size = PRTBE_R_GET_RTS(prtbe0);
+-    pte = ppc_radix64_walk_tree(cpu, rwx, eaddr & R_EADDR_MASK,
++    pte = ppc_radix64_walk_tree(cpu, eaddr & R_EADDR_MASK,
+                                 prtbe0 & PRTBE_R_RPDB, prtbe0 & PRTBE_R_RPDS,
+-                                &raddr, &page_size, &fault_cause, &prot,
+-                                &pte_addr);
+-    if (!pte) {
++                                &raddr, &page_size, &fault_cause, &pte_addr);
++    if (!pte || ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, &prot)) {
++        /* Couldn't get pte or access denied due to protection */
+         ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
+         return 1;
+     }
 -- 
 2.9.4
