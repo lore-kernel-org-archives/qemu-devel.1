@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUrx9-0001eF-18
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:59:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dUryU-0002hA-6D
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dUrx4-0001v5-CA
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:59:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59206)
+	(envelope-from <pbonzini@redhat.com>) id 1dUryP-0002WI-Ie
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:00:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUrx4-0001un-6E
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 05:59:30 -0400
-References: <20170711082326.12990-1-pbonzini@redhat.com>
-	<CAFEAcA_JuAm-xamF4Jc6UGqQ8YQyyJqEg8SYtoetawhVJVKq+A@mail.gmail.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dUryP-0002Vf-DL
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 06:00:53 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a94d4bc2-7c47-0bee-0c4f-bb8108e510a9@redhat.com>
-Date: Tue, 11 Jul 2017 11:59:25 +0200
+Date: Tue, 11 Jul 2017 12:00:49 +0200
+Message-Id: <20170711100049.20513-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_JuAm-xamF4Jc6UGqQ8YQyyJqEg8SYtoetawhVJVKq+A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] build: disable Xen on ARM
+Subject: [Qemu-devel] [PATCH v2] build: disable Xen on ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Anthony PERARD <anthony.perard@citrix.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sstabellini@kernel.org, anthony.perard@citrix.com
 
-On 11/07/2017 11:53, Peter Maydell wrote:
-> On 11 July 2017 at 09:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> While ARM could present the xenpv machine, it does not and trying to e=
-nable
->> it breaks compilation.
->>
->> Fixes: 3b6b75506de44c5070639943c30a0ad5850f5d02
->> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  configure | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/configure b/configure
->> index a2bec60a97..97b02244fe 100755
->> --- a/configure
->> +++ b/configure
->> @@ -203,7 +203,6 @@ supported_xen_target() {
->>      test "$xen" =3D "yes" || return 1
->>      glob "$1" "*-softmmu" || return 1
->>      case "${1%-softmmu}:$cpu" in
->> -        arm:arm | aarch64:aarch64 | \
->>          i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
->>              return 0
->>          ;;
->=20
-> Does this actually do the right thing? It's still testing
-> target-cpu:guest-cpu, if I'm reading it correctly, whereas
-> previously we only looked at target-cpu to decide whether
-> to set CONFIG_XEN.
->=20
-> In particular, I thought that for aarch64/arm Xen setups
-> we would end up building an i386-softmmu target on an
-> arm/aarch64 host and wanted CONFIG_XEN to be set in that
-> setup ?
+While ARM could present the xenpv machine, it does not and trying to enab=
+le
+it breaks compilation.  Revert to the previous test which only looked at
+$target_name, not $cpu.
 
-Yes, that's correct.
+Fixes: 3b6b75506de44c5070639943c30a0ad5850f5d02
+Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ configure | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Paolo
+diff --git a/configure b/configure
+index 806658c98b..5096cbcf14 100755
+--- a/configure
++++ b/configure
+@@ -202,9 +202,9 @@ supported_kvm_target() {
+ supported_xen_target() {
+     test "$xen" =3D "yes" || return 1
+     glob "$1" "*-softmmu" || return 1
+-    case "${1%-softmmu}:$cpu" in
+-        arm:arm | aarch64:aarch64 | \
+-        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
++    # Only i386 and x86_64 provide the xenpv machine.
++    case "${1%-softmmu}" in
++        i386|x86_64)
+             return 0
+         ;;
+     esac
+--=20
+2.13.0
