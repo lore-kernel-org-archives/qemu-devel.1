@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUuNS-0001Oz-9t
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:34:55 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dUuOZ-00020N-Nn
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUuNO-0001W3-Fq
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:34:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62398)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUuNO-0001Vm-70
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:34:50 -0400
-Date: Tue, 11 Jul 2017 13:34:45 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170711123445.GO7116@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
-	<1499158630-75260-19-git-send-email-longpeng2@huawei.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dUuOV-000297-Q7
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:36:03 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:40437)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dUuOV-00028V-E5
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:35:59 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <1498514681-3059-1-git-send-email-cota@braap.org>
+	<20170710120744.GC14195@stefanha-x1.localdomain>
+Date: Tue, 11 Jul 2017 15:35:44 +0300
+In-Reply-To: <20170710120744.GC14195@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Mon, 10 Jul 2017 13:07:44 +0100")
+Message-ID: <87a84bkv6n.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1499158630-75260-19-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4 18/18] tests: crypto: add hmac speed
- benchmark support
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v9 0/7] trace: Optimize per-vCPU TCG
+ tracing states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,158 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Richard Henderson <rth@twiddle.net>, Laurent Desnogues <laurent.desnogues@gmail.com>
 
-On Tue, Jul 04, 2017 at 04:57:10PM +0800, Longpeng(Mike) wrote:
-> This patch add a hmac speed benchmark, it helps us to
-> measure the performance by using "make check-speed" or
-> using "./tests/benchmark-crypto-hmac" directly.
-> 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  tests/Makefile.include        |  2 +
->  tests/benchmark-crypto-hmac.c | 94 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 96 insertions(+)
->  create mode 100644 tests/benchmark-crypto-hmac.c
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index e83eb6b..258bcbc 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
->  check-unit-y += tests/test-crypto-hash$(EXESUF)
->  check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
->  check-unit-y += tests/test-crypto-hmac$(EXESUF)
-> +check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
->  check-unit-y += tests/test-crypto-cipher$(EXESUF)
->  check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
->  check-unit-y += tests/test-crypto-secret$(EXESUF)
-> @@ -637,6 +638,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
->  tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
->  tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
->  tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
-> +tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
->  tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
->  tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
->  tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
-> diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
-> new file mode 100644
-> index 0000000..05b02a5
-> --- /dev/null
-> +++ b/tests/benchmark-crypto-hmac.c
-> @@ -0,0 +1,94 @@
-> +/*
-> + * QEMU Crypto hmac speed benchmark
-> + *
-> + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-> + *
-> + * Authors:
-> + *    Longpeng(Mike) <longpeng2@huawei.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * (at your option) any later version.  See the COPYING file in the
-> + * top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "crypto/init.h"
-> +#include "crypto/hmac.h"
-> +
-> +#define KEY "monkey monkey monkey monkey"
-> +
-> +static void test_hmac_speed(const void *opaque)
-> +{
-> +    size_t chunk_size = (size_t)opaque;
-> +    QCryptoHmac *hmac = NULL;
-> +    uint8_t *in = NULL, *out = NULL;
-> +    size_t out_len = 0;
-> +    double total = 0.0;
-> +    struct iovec iov;
-> +    Error *err = NULL;
-> +    int ret;
-> +
-> +    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
-> +        return;
-> +    }
-> +
-> +    hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
-> +                            strlen(KEY), &err);
-> +    g_assert(err == NULL);
-> +    g_assert(hmac != NULL);
+Stefan Hajnoczi writes:
 
-Just push these lines down into the start of the while loop
+> On Mon, Jun 26, 2017 at 06:04:34PM -0400, Emilio G. Cota wrote:
+>> v8: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02335.html
+>> 
+>> Changes from v8:
+>> 
+>> - Rebased on top of the current tracing tree -- the one that includes
+>> Lluis' fix (2c321e3c486).
+>> - Added Lluis' R-b tag.
+>> - Added perf numbers in the commit log of the last patch (tl;dr: no overhead).
+>> 
+>> Thanks,
+>> 
+>> Emilio
+>> 
+>> PS. How to quickly get some linux-user perf numbers:
+>> 
+>> I used dbt-bench[1] for a before/after comparison. I added a script to that
+>> repo (breakdown.pl, see below) to make it play well with barchart[2].
+>> Obtaining a comparison bar chart is quite simple:
+>> 
+>> 1. Generate one dbt-bench output file per QEMU checkout, e.g.:
+>> $ git checkout orig && make
+>> [ orig == "before"; new == "after" ]
+>> $ ./dbt-bench.pl /path/to/qemu/build/qemu-x86_64 > orig.out
+>> [ then do the same with orig-disabled, new, etc.]
+>> [...]
+>> $ ls *.out
+>> new-disabled.out  new.out  orig-enabled.out  orig.out
+>> 
+>> 2. Call dbt-bench's breakdown.pl script with the --barchart option, then
+>> pipe the output to barchart, and finally pipe to gnuplot:
+>> $ ./breakdown.pl --barchart orig.out orig-enabled.out new.out new-disabled.out \
+>> | ../barchart/barchart.pl --extra-gnuplot='set term dumb 140 30' \
+>> --extra-gnuplot='set title "NBench score; higher is better"' \
+>> | gnuplot
+>> 
+>> Note that barchart is just a front-end for gnuplot >=5, so any valid term will
+>> work (e.g. 'set term pngcairo size 1200,500').
+>> 
+>> [1] https://github.com/cota/dbt-bench
+>> [2] https://github.com/cota/barchart
+>> 
 
-> +
-> +    in = g_new0(uint8_t, chunk_size);
-> +    memset(in, g_test_rand_int(), chunk_size);
-> +
-> +    iov.iov_base = (char *)in;
-> +    iov.iov_len = chunk_size;
-> +
-> +    g_test_timer_start();
-> +    do {
-> +        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
-> +        g_assert(ret == 0);
-> +        g_assert(err == NULL);
-> +
-> +#if !defined(CONFIG_NETTLE) && !defined(CONFIG_GCRYPT)
-> +        /*
-> +         * qcrypto_hmac_bytesv() uses g_checksum_get_digest() to get the
-> +         * digest. Once this function has been called, the #GChecksum is
-> +         * closed and can no longer be updated with g_checksum_update().
-> +         * So...we must free glib-backend hmac object and renew one here.
-> +         */
-> +        qcrypto_hmac_free(hmac);
-> +        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
-> +                                strlen(KEY), &err);
-> +        g_assert(err == NULL);
-> +        g_assert(hmac != NULL);
-> +#endif
+> Thanks, applied to my tracing tree:
+> https://github.com/stefanha/qemu/commits/tracing
 
-And get rid of this - just have an unconditional qcrypto_hmac_free call.
+Just to be sure, there's a v11 on the list (this is v9).
 
-> +        total += chunk_size;
-> +    } while (g_test_timer_elapsed() < 5.0);
-> +
-> +    total /= 1024 * 1024; /* to MB */
-> +
-> +    g_print("hmac(sha256): ");
-> +    g_print("Testing chunk_size %ld bytes ", chunk_size);
-> +    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
-> +    g_print("%.2f MB/sec\n", total / g_test_timer_last());
-> +
-> +    qcrypto_hmac_free(hmac);
 
-So this won't be needed either.
-
-> +    g_free(out);
-> +    g_free(in);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    size_t i;
-> +    char name[64];
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +    g_assert(qcrypto_init(NULL) == 0);
-> +
-> +    for (i = 512; i <= (64 * 1204); i *= 2) {
-> +        memset(name, 0 , sizeof(name));
-> +        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
-> +        g_test_add_data_func(name, (void *)i, test_hmac_speed);
-> +    }
-> +
-> +    return g_test_run();
-> +}
-> -- 
-> 1.8.3.1
-> 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Cheers,
+  Lluis
