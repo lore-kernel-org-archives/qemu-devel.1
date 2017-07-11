@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUuLG-0000OI-CI
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:32:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUuNS-0001Oz-9t
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUuLC-0000tr-IV
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:32:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38282)
+	(envelope-from <berrange@redhat.com>) id 1dUuNO-0001W3-Fq
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:34:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUuLC-0000tV-8j
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:32:34 -0400
-Date: Tue, 11 Jul 2017 13:32:29 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUuNO-0001Vm-70
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:34:50 -0400
+Date: Tue, 11 Jul 2017 13:34:45 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170711123229.GN7116@redhat.com>
+Message-ID: <20170711123445.GO7116@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
-	<1499158630-75260-15-git-send-email-longpeng2@huawei.com>
+	<1499158630-75260-19-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1499158630-75260-15-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v4 14/18] crypto: hash: add afalg-backend
- hash support
+In-Reply-To: <1499158630-75260-19-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v4 18/18] tests: crypto: add hmac speed
+ benchmark support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +32,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Longpeng(Mike)" <longpeng2@huawei.com>
 Cc: arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, longpeng.mike@gmail.com
 
-On Tue, Jul 04, 2017 at 04:57:06PM +0800, Longpeng(Mike) wrote:
-> Adds afalg-backend hash support: introduces some private APIs
-> firstly, and then intergrates them into qcrypto_hash_afalg_driver.
+On Tue, Jul 04, 2017 at 04:57:10PM +0800, Longpeng(Mike) wrote:
+> This patch add a hmac speed benchmark, it helps us to
+> measure the performance by using "make check-speed" or
+> using "./tests/benchmark-crypto-hmac" directly.
 > 
 > Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 > ---
->  crypto/Makefile.objs |   1 +
->  crypto/afalgpriv.h   |   1 +
->  crypto/hash-afalg.c  | 139 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  crypto/hash.c        |  17 +++++++
->  crypto/hashpriv.h    |   8 +++
->  5 files changed, 166 insertions(+)
->  create mode 100644 crypto/hash-afalg.c
+>  tests/Makefile.include        |  2 +
+>  tests/benchmark-crypto-hmac.c | 94 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 96 insertions(+)
+>  create mode 100644 tests/benchmark-crypto-hmac.c
 > 
-> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-> index d2e8fa8..2b99e08 100644
-> --- a/crypto/Makefile.objs
-> +++ b/crypto/Makefile.objs
-> @@ -12,6 +12,7 @@ crypto-obj-y += desrfb.o
->  crypto-obj-y += cipher.o
->  crypto-obj-$(CONFIG_AF_ALG) += afalg.o
->  crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
-> +crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
->  crypto-obj-y += tlscreds.o
->  crypto-obj-y += tlscredsanon.o
->  crypto-obj-y += tlscredsx509.o
-> diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
-> index a4a7b97..9d42ba9 100644
-> --- a/crypto/afalgpriv.h
-> +++ b/crypto/afalgpriv.h
-> @@ -24,6 +24,7 @@
->  #endif
->  
->  #define AFALG_TYPE_CIPHER "skcipher"
-> +#define AFALG_TYPE_HASH "hash"
->  
->  #define ALG_OPTYPE_LEN 4
->  #define ALG_MSGIV_LEN(len) (sizeof(struct af_alg_iv) + (len))
-> diff --git a/crypto/hash-afalg.c b/crypto/hash-afalg.c
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index e83eb6b..258bcbc 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
+>  check-unit-y += tests/test-crypto-hash$(EXESUF)
+>  check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
+>  check-unit-y += tests/test-crypto-hmac$(EXESUF)
+> +check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
+>  check-unit-y += tests/test-crypto-cipher$(EXESUF)
+>  check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
+>  check-unit-y += tests/test-crypto-secret$(EXESUF)
+> @@ -637,6 +638,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+>  tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+>  tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
+>  tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+> +tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
+>  tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
+>  tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+>  tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
+> diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
 > new file mode 100644
-> index 0000000..a19847e
+> index 0000000..05b02a5
 > --- /dev/null
-> +++ b/crypto/hash-afalg.c
-> @@ -0,0 +1,139 @@
+> +++ b/tests/benchmark-crypto-hmac.c
+> @@ -0,0 +1,94 @@
 > +/*
-> + * QEMU Crypto af_alg-backend hash support
+> + * QEMU Crypto hmac speed benchmark
 > + *
 > + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 > + *
@@ -89,140 +83,100 @@ On Tue, Jul 04, 2017 at 04:57:06PM +0800, Longpeng(Mike) wrote:
 > + * top-level directory.
 > + */
 > +#include "qemu/osdep.h"
-> +#include "qemu/iov.h"
-> +#include "qemu/sockets.h"
-> +#include "qemu-common.h"
-> +#include "qapi/error.h"
-> +#include "crypto/hash.h"
-> +#include "hashpriv.h"
+> +#include "crypto/init.h"
+> +#include "crypto/hmac.h"
 > +
-> +static char *
-> +qcrypto_afalg_hash_format_name(QCryptoHashAlgorithm alg,
-> +                               Error **errp)
+> +#define KEY "monkey monkey monkey monkey"
+> +
+> +static void test_hmac_speed(const void *opaque)
 > +{
-> +    char *name;
-> +    const char *alg_name;
+> +    size_t chunk_size = (size_t)opaque;
+> +    QCryptoHmac *hmac = NULL;
+> +    uint8_t *in = NULL, *out = NULL;
+> +    size_t out_len = 0;
+> +    double total = 0.0;
+> +    struct iovec iov;
+> +    Error *err = NULL;
+> +    int ret;
 > +
-> +    switch (alg) {
-> +    case QCRYPTO_HASH_ALG_MD5:
-> +        alg_name = "md5";
-> +        break;
-> +    case QCRYPTO_HASH_ALG_SHA1:
-> +        alg_name = "sha1";
-> +        break;
-> +    case QCRYPTO_HASH_ALG_SHA224:
-> +        alg_name = "sha224";
-> +        break;
-> +    case QCRYPTO_HASH_ALG_SHA256:
-> +        alg_name = "sha256";
-> +        break;
-> +    case QCRYPTO_HASH_ALG_SHA384:
-> +        alg_name = "sha384";
-> +        break;
-> +    case QCRYPTO_HASH_ALG_SHA512:
-> +        alg_name = "sha512";
-> +        break;
-> +    case QCRYPTO_HASH_ALG_RIPEMD160:
-> +        alg_name = "rmd160";
-> +        break;
-> +
-> +    default:
-> +        error_setg(errp, "Unsupported hash algorithm %d", alg);
-> +        return NULL;
+> +    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
+> +        return;
 > +    }
 > +
-> +    name = g_strdup_printf("%s", alg_name);
+> +    hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
+> +                            strlen(KEY), &err);
+> +    g_assert(err == NULL);
+> +    g_assert(hmac != NULL);
+
+Just push these lines down into the start of the while loop
+
 > +
-> +    return name;
+> +    in = g_new0(uint8_t, chunk_size);
+> +    memset(in, g_test_rand_int(), chunk_size);
+> +
+> +    iov.iov_base = (char *)in;
+> +    iov.iov_len = chunk_size;
+> +
+> +    g_test_timer_start();
+> +    do {
+> +        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
+> +        g_assert(ret == 0);
+> +        g_assert(err == NULL);
+> +
+> +#if !defined(CONFIG_NETTLE) && !defined(CONFIG_GCRYPT)
+> +        /*
+> +         * qcrypto_hmac_bytesv() uses g_checksum_get_digest() to get the
+> +         * digest. Once this function has been called, the #GChecksum is
+> +         * closed and can no longer be updated with g_checksum_update().
+> +         * So...we must free glib-backend hmac object and renew one here.
+> +         */
+> +        qcrypto_hmac_free(hmac);
+> +        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256, (const uint8_t *)KEY,
+> +                                strlen(KEY), &err);
+> +        g_assert(err == NULL);
+> +        g_assert(hmac != NULL);
+> +#endif
+
+And get rid of this - just have an unconditional qcrypto_hmac_free call.
+
+> +        total += chunk_size;
+> +    } while (g_test_timer_elapsed() < 5.0);
+> +
+> +    total /= 1024 * 1024; /* to MB */
+> +
+> +    g_print("hmac(sha256): ");
+> +    g_print("Testing chunk_size %ld bytes ", chunk_size);
+> +    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
+> +    g_print("%.2f MB/sec\n", total / g_test_timer_last());
+> +
+> +    qcrypto_hmac_free(hmac);
+
+So this won't be needed either.
+
+> +    g_free(out);
+> +    g_free(in);
 > +}
 > +
-> +static QCryptoAFAlg *
-> +qcrypto_afalg_hash_ctx_new(QCryptoHashAlgorithm alg, Error **errp)
+> +int main(int argc, char **argv)
 > +{
-> +    QCryptoAFAlg *afalg;
-> +    char *name;
+> +    size_t i;
+> +    char name[64];
 > +
-> +    name = qcrypto_afalg_hash_format_name(alg, errp);
-> +    if (!name) {
-> +        return NULL;
+> +    g_test_init(&argc, &argv, NULL);
+> +    g_assert(qcrypto_init(NULL) == 0);
+> +
+> +    for (i = 512; i <= (64 * 1204); i *= 2) {
+> +        memset(name, 0 , sizeof(name));
+> +        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
+> +        g_test_add_data_func(name, (void *)i, test_hmac_speed);
 > +    }
 > +
-> +    afalg = qcrypto_afalg_comm_alloc(AFALG_TYPE_HASH, name, errp);
-> +    if (!afalg) {
-> +        g_free(name);
-> +        return NULL;
-> +    }
-> +    afalg->name = name;
-> +
-> +    /* prepare msg header */
-> +    afalg->msg = g_new0(struct msghdr, 1);
-> +
-> +    return afalg;
+> +    return g_test_run();
 > +}
-> +
-> +static int
-> +qcrypto_afalg_hash_bytesv(QCryptoHashAlgorithm alg,
-> +                          const struct iovec *iov,
-> +                          size_t niov, uint8_t **result,
-> +                          size_t *resultlen,
-> +                          Error **errp)
-> +{
-> +    QCryptoAFAlg *afalg;
-> +    struct iovec outv;
-> +    int ret = 0;
-> +    const int expect_len = qcrypto_hash_digest_len(alg);
-> +
-> +    if (*resultlen == 0) {
-> +        *resultlen = expect_len;
-> +        *result = g_new0(uint8_t, *resultlen);
-> +    } else if (*resultlen != expect_len) {
-> +        error_setg(errp,
-> +                   "Result buffer size %zu is not match hash %d",
-> +                   *resultlen, expect_len);
-> +        return -1;
-> +    }
-> +
-> +    afalg = qcrypto_afalg_hash_ctx_new(alg, errp);
-> +    if (!afalg) {
-> +        return -1;
-> +    }
-> +
-> +    /* send data to kernel's crypto core */
-> +    ret = iov_send_recv(afalg->opfd, iov, niov,
-> +                        0, iov_size(iov, niov), true);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, errno, "Send data to afalg-core failed");
-> +        goto out;
-> +    }
-> +
-> +    /* hash && get result */
-> +    outv.iov_base = *result;
-> +    outv.iov_len = *resultlen;
-> +    afalg->msg->msg_iov = &outv;
-> +    afalg->msg->msg_iovlen = 1;
-> +    ret = recvmsg(afalg->opfd, afalg->msg, 0);
-> +    if (ret != -1) {
-> +        ret = 0;
-
-Are we guaranteed that short read can't happen ?  If so, then assert
-that ret == expect_len, otherwise use iov_send_recv to loop to catch
-all output data
-
-> +    } else {
-> +        error_setg_errno(errp, errno, "Recv result from afalg-core failed");
-> +    }
-
-
-
-> +
-> +out:
-> +    qcrypto_afalg_comm_free(afalg);
-> +    return ret;
-> +}
-> +
-> +QCryptoHashDriver qcrypto_hash_afalg_driver = {
-> +    .hash_bytesv = qcrypto_afalg_hash_bytesv,
-> +};
+> -- 
+> 1.8.3.1
+> 
+> 
 
 Regards,
 Daniel
