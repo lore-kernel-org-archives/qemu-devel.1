@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUuWh-0005ZT-RS
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:44:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1dUuWh-0005ZS-RA
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dUuWd-0005P0-Uh
+	(envelope-from <berrange@redhat.com>) id 1dUuWg-0005RA-KX
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:44:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45438)
+Received: from mx1.redhat.com ([209.132.183.28]:38748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUuWd-0005OD-OU
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:44:23 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dUuWg-0005QS-BD
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 08:44:26 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 11 Jul 2017 13:44:06 +0100
-Message-Id: <20170711124411.10499-1-berrange@redhat.com>
+Date: Tue, 11 Jul 2017 13:44:09 +0100
+Message-Id: <20170711124411.10499-4-berrange@redhat.com>
+In-Reply-To: <20170711124411.10499-1-berrange@redhat.com>
+References: <20170711124411.10499-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 0/5] Merge sockets 2017/07/11
+Subject: [Qemu-devel] [PULL v1 3/5] sockets: ensure we don't accept IPv4
+ clients when IPv4 is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +30,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The following changes since commit 3d0bf8dfdfebd7f2ae41b6f220444b8047d6b1=
-ee:
+Currently if you disable listening on IPv4 addresses, via the
+CLI flag ipv4=3Doff, we still mistakenly accept IPv4 clients via
+the IPv6 listener socket due to IPV6_V6ONLY flag being unset.
 
-  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2017=
-0710a' into staging (2017-07-10 18:13:03 +0100)
+We must ensure IPV6_V6ONLY is always set if ipv4=3Doff
 
-are available in the git repository at:
+This fixes the following scenarios
 
-  git://github.com/berrange/qemu tags/pull-sockets-2017-07-11-1
+  -incoming tcp::9000,ipv6=3Don
+  -incoming tcp:[::]:9000,ipv6=3Don
+  -chardev socket,id=3Dcdev0,host=3D,port=3D9000,server,nowait,ipv4=3Doff
+  -chardev socket,id=3Dcdev0,host=3D,port=3D9000,server,nowait,ipv6=3Don
+  -chardev socket,id=3Dcdev0,host=3D::,port=3D9000,server,nowait,ipv4=3Do=
+ff
+  -chardev socket,id=3Dcdev0,host=3D::,port=3D9000,server,nowait,ipv6=3Do=
+n
 
-for you to fetch changes up to 4d1b104fb3c68ba004e82da67d684cb031722b37:
+which all mistakenly accepted IPv4 clients
 
-  tests: add functional test validating ipv4/ipv6 address flag handling (=
-2017-07-11 10:58:19 +0100)
+Acked-by: Gerd Hoffmann <kraxel@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ util/qemu-sockets.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
 
-----------------------------------------------------------------
-Merge sockets 2017/07/11 v1
-
-----------------------------------------------------------------
-
-Daniel P. Berrange (5):
-  sockets: ensure we can bind to both ipv4 & ipv6 separately
-  sockets: don't block IPv4 clients when listening on "::"
-  sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
-  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
-  tests: add functional test validating ipv4/ipv6 address flag handling
-
- io/dns-resolver.c          |   6 +-
- tests/.gitignore           |   1 +
- tests/Makefile.include     |   3 +
- tests/test-sockets-proto.c | 924 +++++++++++++++++++++++++++++++++++++++=
-++++++
- util/qemu-sockets.c        |  71 +++-
- 5 files changed, 984 insertions(+), 21 deletions(-)
- create mode 100644 tests/test-sockets-proto.c
-
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index f4ddcaf..37d386f 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -104,17 +104,16 @@ NetworkAddressFamily inet_netfamily(int family)
+  *   f     t       PF_INET6
+  *   t     -       PF_INET
+  *   t     f       PF_INET
+- *   t     t       PF_INET6
++ *   t     t       PF_INET6/PF_UNSPEC
+  *
+  * NB, this matrix is only about getting the necessary results
+  * from getaddrinfo(). Some of the cases require further work
+  * after reading results from getaddrinfo in order to fully
+- * apply the logic the end user wants. eg with the last case
+- * ipv4=3Dt + ipv6=3Dt + PF_INET6, getaddrinfo alone can only
+- * guarantee the ipv6=3Dt part of the request - we need more
+- * checks to provide ipv4=3Dt part of the guarantee. This is
+- * outside scope of this method and not currently handled by
+- * callers at all.
++ * apply the logic the end user wants.
++ *
++ * In the first and last cases, we must set IPV6_V6ONLY=3D0
++ * when binding, to allow a single listener to potentially
++ * accept both IPv4+6 addresses.
+  */
+ int inet_ai_family_from_address(InetSocketAddress *addr,
+                                 Error **errp)
+@@ -124,6 +123,23 @@ int inet_ai_family_from_address(InetSocketAddress *a=
+ddr,
+         error_setg(errp, "Cannot disable IPv4 and IPv6 at same time");
+         return PF_UNSPEC;
+     }
++    if ((addr->has_ipv6 && addr->ipv6) && (addr->has_ipv4 && addr->ipv4)=
+) {
++        /*
++         * Some backends can only do a single listener. In that case
++         * we want empty hostname to resolve to "::" and then use the
++         * flag IPV6_V6ONLY=3D=3D0 to get both protocols on 1 socket. Th=
+is
++         * doesn't work for addresses other than "", so they're just
++         * inevitably broken until multiple listeners can be used,
++         * and thus we honour getaddrinfo automatic protocol detection
++         * Once all backends do multi-listener, remove the PF_INET6
++         * branch entirely.
++         */
++        if (!addr->host || g_str_equal(addr->host, "")) {
++            return PF_INET6;
++        } else {
++            return PF_UNSPEC;
++        }
++    }
+     if ((addr->has_ipv6 && addr->ipv6) || (addr->has_ipv4 && !addr->ipv4=
+)) {
+         return PF_INET6;
+     }
+@@ -213,8 +229,14 @@ static int inet_listen_saddr(InetSocketAddress *sadd=
+r,
+         port_max =3D saddr->has_to ? saddr->to + port_offset : port_min;
+         for (p =3D port_min; p <=3D port_max; p++) {
+ #ifdef IPV6_V6ONLY
+-            /* listen on both ipv4 and ipv6 */
+-            int v6only =3D 0;
++            /*
++             * Deals with first & last cases in matrix in comment
++             * for inet_ai_family_from_address().
++             */
++            int v6only =3D
++                ((!saddr->has_ipv4 && !saddr->has_ipv6) ||
++                 (saddr->has_ipv4 && saddr->ipv4 &&
++                  saddr->has_ipv6 && saddr->ipv6)) ? 0 : 1;
+ #endif
+             inet_setport(e, p);
+ #ifdef IPV6_V6ONLY
 --=20
 2.9.4
