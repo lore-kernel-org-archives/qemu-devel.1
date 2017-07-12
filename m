@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVKLZ-0007ur-7y
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:18:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVKLb-0007wX-Nd
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:18:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVKLY-0002rF-A2
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:18:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51692)
+	(envelope-from <berrange@redhat.com>) id 1dVKLa-0002tE-Tf
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:18:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVKLY-0002qj-3t
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:18:40 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVKLa-0002sY-N4
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:18:42 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 12 Jul 2017 17:18:27 +0100
-Message-Id: <20170712161830.3621-3-berrange@redhat.com>
+Date: Wed, 12 Jul 2017 17:18:29 +0100
+Message-Id: <20170712161830.3621-5-berrange@redhat.com>
 In-Reply-To: <20170712161830.3621-1-berrange@redhat.com>
 References: <20170712161830.3621-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 2/5] sockets: don't block IPv4 clients when
- listening on "::"
+Subject: [Qemu-devel] [PULL v2 4/5] io: preserve ipv4/ipv6 flags when
+ resolving InetSocketAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +30,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-When inet_parse() parses the hostname, it is forcing the
-has_ipv6 && ipv6 flags if the address contains a ":". This
-means that if the user had set the ipv4=3Don flag, to try to
-restrict the listener to just ipv4, an error would not have
-been raised.  eg
+The original InetSocketAddress struct may have has_ipv4 and
+has_ipv6 fields set, which will control both the ai_family
+used during DNS resolution, and later use of the V6ONLY
+flag.
 
-   -incoming tcp:[::]:9000,ipv4
+Currently the standalone DNS resolver code drops the
+has_ipv4 & has_ipv6 flags after resolving, which means
+the later bind() code won't correctly set V6ONLY.
 
-should have raised an error because listening for IPv4
-on "::" is a non-sensical combination. With this removed,
-we now call getaddrinfo() on "::" passing PF_INET and
-so getaddrinfo reports an error about the hostname being
-incompatible with the requested protocol:
+This fixes the following scenarios
 
- qemu-system-x86_64: -incoming tcp:[::]:9000,ipv4: address resolution
-    failed for :::9000: Address family for hostname not supported
+  -vnc :0,ipv4=3Doff
+  -vnc :0,ipv6=3Don
+  -vnc :::0,ipv4=3Doff
+  -vnc :::0,ipv6=3Don
 
-Likewise it is explicitly setting the has_ipv4 & ipv4
-flags when the address contains only digits + '.'. This
-has no ill-effect, but also has no benefit, so is removed.
+which all mistakenly accepted IPv4 clients
 
 Acked-by: Gerd Hoffmann <kraxel@gmail.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- util/qemu-sockets.c | 4 ----
- 1 file changed, 4 deletions(-)
+ io/dns-resolver.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 4c2f84b..f4ddcaf 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -618,16 +618,12 @@ int inet_parse(InetSocketAddress *addr, const char =
-*str, Error **errp)
-             error_setg(errp, "error parsing IPv6 address '%s'", str);
-             return -1;
-         }
--        addr->ipv6 =3D addr->has_ipv6 =3D true;
-     } else {
-         /* hostname or IPv4 addr */
-         if (sscanf(str, "%64[^:]:%32[^,]%n", host, port, &pos) !=3D 2) {
-             error_setg(errp, "error parsing address '%s'", str);
-             return -1;
-         }
--        if (host[strspn(host, "0123456789.")] =3D=3D '\0') {
--            addr->ipv4 =3D addr->has_ipv4 =3D true;
--        }
-     }
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index 57a8896..c072d12 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -116,8 +116,10 @@ static int qio_dns_resolver_lookup_sync_inet(QIODNSR=
+esolver *resolver,
+             .numeric =3D true,
+             .has_to =3D iaddr->has_to,
+             .to =3D iaddr->to,
+-            .has_ipv4 =3D false,
+-            .has_ipv6 =3D false,
++            .has_ipv4 =3D iaddr->has_ipv4,
++            .ipv4 =3D iaddr->ipv4,
++            .has_ipv6 =3D iaddr->has_ipv6,
++            .ipv6 =3D iaddr->ipv6,
+         };
 =20
-     addr->host =3D g_strdup(host);
+         (*addrs)[i] =3D newaddr;
 --=20
 2.9.4
