@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVMhL-0000jG-IA
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dVMhY-0000qH-2A
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVMhI-0002zo-HZ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:19 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVMhI-0002yz-Bu
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:16 -0400
-Received: by mail-qt0-x244.google.com with SMTP id m54so3231960qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 11:49:16 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CGME20170712135227eucas1p1d5baf43182869329c6dd282e52143444@eucas1p1.samsung.com>
-	<002201d2fb16$189c1460$49d43d20$@samsung.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <69582ade-1afa-d2e0-ec06-069676d43499@amsat.org>
-Date: Wed, 12 Jul 2017 15:49:12 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1dVMhV-00035b-1M
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39034)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVMhU-00035D-OW
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A0BEF8B134
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 18:49:27 +0000 (UTC)
+Date: Wed, 12 Jul 2017 19:49:22 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170712184921.GK30658@work-vm>
+References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
+	<1499842423-21101-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <002201d2fb16$189c1460$49d43d20$@samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] tcg/tci: Remove unnecessary TODO() for
- INDEX_op_bswap16_i64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499842423-21101-3-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: export parameters to props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,59 +33,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jaroslaw Pelczar <j.pelczar@samsung.com>, qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Hi Jaroslaw,
-
-Thank for reporting this, however this fix has been reviewed:
-http://patchwork.ozlabs.org/patch/781982/
-
-On 07/12/2017 10:52 AM, Jaroslaw Pelczar wrote:
-> Running Ubuntu with systemd on AArch64 Cortex-A53 and qemu is compiled
-> with
+* Peter Xu (peterx@redhat.com) wrote:
+> Export migration parameters to qdev properties. Then we can use, for
+> example:
 > 
-> ./configure --target-list=aarch64-softmmu --enable-tcg-interpreter
+>   -global migration.cpu-throttle-initial=xxx
 > 
-> System gives the following log:
+> To specify migration parameters during init.
 > 
-> Welcome to Ubuntu 16.04.1 LTS!
+> One thing to mention is that, this usage should only be used for
+> debugging/testing purpose, and should never be used elsewhere.
+> Meanwhile, we don't guarantee the compatibility of this interface. It
+> can alter anytime in the future.
 > 
-> systemd[1]: Set hostname to <localhost.localdomain>.
-> TODO (...)/qemu/tcg/tci.c:1049: tcg_qemu_tb_exec()
-> (...)/qemu/tcg/tci.c:1049: tcg fatal error
-> Aborted (core dumped)
+> (Ok, it won't change a lot. But it'll just work like HMP - Let's just be
+>  prepare for any possible change to it)
 > 
-> After investigation it turns out that TCG generates bswap16_i64
-> opcode, which looks fine in the implementation.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Indeed while correctly implemented, "that code part was simply never 
-executed, and [Stefan] only removed the TODO() statements from tested 
-code." as explained Stefan.
-
-> Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
-
-I can add your Signed-off-by there if you mind
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->   tcg/tci.c | 1 -
->   1 file changed, 1 deletion(-)
+>  migration/migration.c | 35 +++++++++++++++++++++++++----------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
 > 
-> diff --git a/tcg/tci.c b/tcg/tci.c
-> index 4bdc645..f39bfb9 100644
-> --- a/tcg/tci.c
-> +++ b/tcg/tci.c
-> @@ -1046,7 +1046,6 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t
-> *tb_ptr)
->               break;
->   #if TCG_TARGET_HAS_bswap16_i64
->           case INDEX_op_bswap16_i64:
-> -            TODO();
->               t0 = *tb_ptr++;
->               t1 = tci_read_r16(&tb_ptr);
->               tci_write_reg64(t0, bswap16(t1));
+> diff --git a/migration/migration.c b/migration/migration.c
+> index a0db40d..fd00670 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2009,6 +2009,31 @@ static Property migration_properties[] = {
+>                       send_configuration, true),
+>      DEFINE_PROP_BOOL("send-section-footer", MigrationState,
+>                       send_section_footer, true),
+> +
+> +    /* Migration parameters */
+> +    DEFINE_PROP_INT64("compress-level", MigrationState,
+> +                      parameters.compress_level,
+> +                      DEFAULT_MIGRATE_COMPRESS_LEVEL),
+> +    DEFINE_PROP_INT64("compress-threads", MigrationState,
+> +                      parameters.compress_threads,
+> +                      DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT),
+> +    DEFINE_PROP_INT64("decompress-threads", MigrationState,
+> +                      parameters.decompress_threads,
+> +                      DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT),
+> +    DEFINE_PROP_INT64("cpu-throttle-initial", MigrationState,
+> +                      parameters.cpu_throttle_initial,
+> +                      DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL),
+> +    DEFINE_PROP_INT64("cpu-throttle-increment", MigrationState,
+> +                      parameters.cpu_throttle_increment,
+> +                      DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT),
+> +    DEFINE_PROP_INT64("max-bandwidth", MigrationState,
+> +                      parameters.max_bandwidth, MAX_THROTTLE),
+> +    DEFINE_PROP_INT64("downtime-limit", MigrationState,
+> +                      parameters.downtime_limit,
+> +                      DEFAULT_MIGRATE_SET_DOWNTIME),
+> +    DEFINE_PROP_INT64("x-checkpoint-delay", MigrationState,
+> +                      parameters.x_checkpoint_delay,
+> +                      DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> @@ -2027,16 +2052,6 @@ static void migration_instance_init(Object *obj)
+>      ms->state = MIGRATION_STATUS_NONE;
+>      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
+>      ms->mbps = -1;
+> -    ms->parameters = (MigrationParameters) {
+> -        .compress_level = DEFAULT_MIGRATE_COMPRESS_LEVEL,
+> -        .compress_threads = DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT,
+> -        .decompress_threads = DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT,
+> -        .cpu_throttle_initial = DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL,
+> -        .cpu_throttle_increment = DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT,
+> -        .max_bandwidth = MAX_THROTTLE,
+> -        .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
+> -        .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
+> -    };
+>      ms->parameters.tls_creds = g_strdup("");
+>      ms->parameters.tls_hostname = g_strdup("");
+>  }
+> -- 
+> 2.7.4
 > 
-
-Regards,
-
-Phil.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
