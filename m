@@ -1,40 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dVCz1-0007uW-WF
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:26:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVD0W-0000UL-KD
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dVCyy-00077Q-3D
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:26:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1dVCyx-000770-PK
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:26:52 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6C8OF87069976
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:26:49 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncj87sbn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:26:49 -0400
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 12 Jul 2017 18:26:46 +1000
-Date: Wed, 12 Jul 2017 13:56:37 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <20170711043917.1757-1-david@gibson.dropbear.id.au>
-	<20170711043917.1757-10-david@gibson.dropbear.id.au>
+	(envelope-from <kwolf@redhat.com>) id 1dVD0S-0007hV-Kv
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:28:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53374)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dVD0S-0007gp-Eh
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:28:24 -0400
+Date: Wed, 12 Jul 2017 10:28:13 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170712082813.GB4917@noname.str.redhat.com>
+References: <20170707181642-mutt-send-email-mst@kernel.org>
+	<20170707180358.GA12152@localhost.localdomain>
+	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
+	<20170710135943.GG12152@localhost.localdomain>
+	<20170710194345-mutt-send-email-mst@kernel.org>
+	<20170710174730.GL12152@localhost.localdomain>
+	<063778b8-d517-dcac-3c83-95076604a16c@redhat.com>
+	<1499760785.8257.5.camel@redhat.com>
+	<20170711144215.GI4335@noname.str.redhat.com>
+	<1499838706.18762.1.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170711043917.1757-10-david@gibson.dropbear.id.au>
-Message-Id: <20170712082637.GA5377@in.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 09/17] spapr: Remove unnecessary differences
- between hotplug and coldplug paths
+In-Reply-To: <1499838706.18762.1.camel@redhat.com>
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,62 +35,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: peter.maydell@linaro.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Chao Peng <chao.p.peng@linux.intel.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-On Tue, Jul 11, 2017 at 02:39:09PM +1000, David Gibson wrote:
-> spapr_drc_attach() has a 'coldplug' parameter which sets the DRC into
-> configured state initially, instead of the usual ISOLATED/UNUSABLE state.
-> It turns out this is unnecessary: although coldplugged devices do need to
-> be in CONFIGURED state once the guest starts, that will already be
-> accomplished by the reset code which will move DRCs for already plugged
-> devices into a coldplug equivalent state.
+Am 12.07.2017 um 07:51 hat Gerd Hoffmann geschrieben:
+> > > I think simply not having a default
+> > > machine type (as already suggested elsewhere in this thread) is the
+> > > best way to deal with this.
+> > 
+> > I would absolutely hate this. One of the nice things about qemu has
+> > always been that 'qemu disk.img' is enough to start a simple VM.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr.c             | 13 +++----------
->  hw/ppc/spapr_drc.c         |  5 ++---
->  hw/ppc/spapr_pci.c         |  3 +--
->  include/hw/ppc/spapr_drc.h |  2 +-
->  4 files changed, 7 insertions(+), 16 deletions(-)
+> Well, not really.  There is no "qemu" any more, and there are other
+> defaults like default memory size which need tweaks, so the minimum
+> command line isn't that short any more and looks more like this:
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 4fa982d..70b3fd3 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2611,7 +2611,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
->          fdt_offset = spapr_populate_memory_node(fdt, node, addr,
->                                                  SPAPR_MEMORY_BLOCK_SIZE);
-> 
-> -        spapr_drc_attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
-> +        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
->          addr += SPAPR_MEMORY_BLOCK_SIZE;
->      }
->      /* send hotplug notification to the
-> @@ -2956,17 +2956,10 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> 
->      g_assert(drc || !mc->has_hotpluggable_cpus);
-> 
-> -    /*
-> -     * Setup CPU DT entries only for hotplugged CPUs. For boot time or
-> -     * coldplugged CPUs DT entries are setup in spapr_build_fdt().
-> -     */
-> -    if (dev->hotplugged) {
-> -        fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
-> -    }
-> +    fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+>     qemu-system-x86_64 -enable-kvm -m 1G disk.img
 
-A harmless (but still good to get rid of) side effect of this change is
-that we are now building the CPU device tree for boot time and cold-plugged
-CPUs twice:
+Depends on what you want to do, but in the common case yes. So we have
+already moved in the wrong direction. Not a good reason to do more of
+it.
 
-first from spapr_core_plug() -> spapr_populate_hotplug_cpu_dt()
-second from spapr_build_fdt() -> spapr_populate_cpus_dt_node()
+Actually, I think changing the defaults to -m 1G and -machine
+accel=kvm:tcg would be much less problematic than -M q35, so maybe that
+should be our first step towards better defaults. (Or at least something
+to schedule for 3.0.)
 
-The first one is not used while the 2nd one acutally ends up building
-the CPUs DT entries for the boot time and cold-plugged CPUs.
+And even changing the default to -M q35, however problematic, would
+still be nicer than making -M non-optional.
 
-Regards,
-Bharata.
+Kevin
