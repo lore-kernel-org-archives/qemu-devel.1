@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVLDs-0003MR-FK
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:14:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVLGz-0004JR-84
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:18:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVLDp-0006g2-9U
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:14:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62641)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVLDp-0006ff-01
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:14:45 -0400
-Date: Wed, 12 Jul 2017 18:14:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170712171429.GI30658@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-7-dgilbert@redhat.com>
-	<20170710103114.GC21344@pxdev.xzpeter.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVLGw-0000cJ-1W
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:18:01 -0400
+Received: from mail-qt0-f181.google.com ([209.85.216.181]:35138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVLGv-0000c9-Sm
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:17:57 -0400
+Received: by mail-qt0-f181.google.com with SMTP id b40so18062439qtb.2
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 10:17:57 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170712075528.22770-1-famz@redhat.com>
+	<20170712075528.22770-3-famz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5e0b8f1b-02f7-6362-0719-525d8cca8a32@amsat.org>
+Date: Wed, 12 Jul 2017 14:16:53 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170710103114.GC21344@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 06/29] postcopy: Add notifier chain
+In-Reply-To: <20170712075528.22770-3-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] docker.py: Improve subprocess exit
+ code handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +36,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Jun 28, 2017 at 08:00:24PM +0100, Dr. David Alan Gilbert (git) wrote:
+On 07/12/2017 04:55 AM, Fam Zheng wrote:
+> A few error handlings are missing because we ignore the subprocess exit
+> code, for example "docker build" errors are currently ignored.
 > 
-> [...]
+> Introduce _do_check() aside the existing _do() method and use it in a
+> few places.
 > 
-> > diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-> > index 78a3591322..d688411674 100644
-> > --- a/migration/postcopy-ram.h
-> > +++ b/migration/postcopy-ram.h
-> > @@ -114,4 +114,30 @@ PostcopyState postcopy_state_get(void);
-> >  /* Set the state and return the old state */
-> >  PostcopyState postcopy_state_set(PostcopyState new_state);
-> >  
-> > +/*
-> > + * To be called once at the start before any device initialisation
-> 
-> initialization?
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-en_US vs en_GB :-)
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> > + */
-> > +void postcopy_infrastructure_init(void);
-> > +
-> > +/* Add a notifier to a list to be called when checking whether the devices
-> > + * can support postcopy.
-> > + * It's data is a *PostcopyNotifyData
-> > + * It should return 0 if OK, or a negative value on failure.
-> > + * On failure it must set the data->errp to an error.
-> > + *
-> > + */
-> > +enum PostcopyNotifyReason {
-> > +    POSTCOPY_NOTIFY_PROBE = 0,
-> > +};
-> > +
-> > +struct PostcopyNotifyData {
-> > +    enum PostcopyNotifyReason reason;
-> > +    Error **errp;
-> > +};
-> > +
-> > +void postcopy_add_notifier(NotifierWithReturn *nn);
-> > +void postcopy_remove_notifier(NotifierWithReturn *n);
-> > +/* Call the notifier list set by postcopy_add_start_notifier */
-> > +int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
-> > +
-> >  #endif
-> > diff --git a/vl.c b/vl.c
-> > index a2bd69f4e0..b6c660a703 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -93,8 +93,9 @@ int main(int argc, char **argv)
-> >  #include "sysemu/dma.h"
-> >  #include "hw/audio/soundhw.h"
-> >  #include "audio/audio.h"
-> > -#include "sysemu/cpus.h"
-> >  #include "migration/colo.h"
-> > +#include "migration/postcopy-ram.h"
-> > +#include "sysemu/cpus.h"
+> ---
+>   tests/docker/docker.py | 19 ++++++++++++-------
+>   1 file changed, 12 insertions(+), 7 deletions(-)
 > 
-> (just curious: is moving sysemu/cpus.h intended?)
-
-No! Removed.
-
-Dave
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index f5ac86b..ee40ca0 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -117,6 +117,11 @@ class Docker(object):
+>               kwargs["stdout"] = DEVNULL
+>           return subprocess.call(self._command + cmd, **kwargs)
+>   
+> +    def _do_check(self, cmd, quiet=True, **kwargs):
+> +        if quiet:
+> +            kwargs["stdout"] = DEVNULL
+> +        return subprocess.check_call(self._command + cmd, **kwargs)
+> +
+>       def _do_kill_instances(self, only_known, only_active=True):
+>           cmd = ["ps", "-q"]
+>           if not only_active:
+> @@ -175,14 +180,14 @@ class Docker(object):
+>                                       extra_files_cksum)))
+>           tmp_df.flush()
+>   
+> -        self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+> -                 [docker_dir],
+> -                 quiet=quiet)
+> +        self._do_check(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+> +                       [docker_dir],
+> +                       quiet=quiet)
+>   
+>       def update_image(self, tag, tarball, quiet=True):
+>           "Update a tagged image using "
+>   
+> -        self._do(["build", "-t", tag, "-"], quiet=quiet, stdin=tarball)
+> +        self._do_check(["build", "-t", tag, "-"], quiet=quiet, stdin=tarball)
+>   
+>       def image_matches_dockerfile(self, tag, dockerfile):
+>           try:
+> @@ -195,9 +200,9 @@ class Docker(object):
+>           label = uuid.uuid1().hex
+>           if not keep:
+>               self._instances.append(label)
+> -        ret = self._do(["run", "--label",
+> -                        "com.qemu.instance.uuid=" + label] + cmd,
+> -                       quiet=quiet)
+> +        ret = self._do_check(["run", "--label",
+> +                             "com.qemu.instance.uuid=" + label] + cmd,
+> +                             quiet=quiet)
+>           if not keep:
+>               self._instances.remove(label)
+>           return ret
 > 
-> >  #include "sysemu/kvm.h"
-> >  #include "sysemu/hax.h"
-> >  #include "qapi/qobject-input-visitor.h"
-> > @@ -3060,6 +3061,7 @@ int main(int argc, char **argv, char **envp)
-> >      module_call_init(MODULE_INIT_OPTS);
-> >  
-> >      runstate_init();
-> > +    postcopy_infrastructure_init();
-> >  
-> >      if (qcrypto_init(&err) < 0) {
-> >          error_reportf_err(err, "cannot initialize crypto: ");
-> > -- 
-> > 2.13.0
-> > 
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
