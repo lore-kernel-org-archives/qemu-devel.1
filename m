@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVQ6y-0003ES-6W
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:28:01 -0400
+	(envelope-from <mst@redhat.com>) id 1dVQCi-0004p5-Av
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:33:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVQ6v-0007Zc-3q
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:28:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60548)
+	(envelope-from <mst@redhat.com>) id 1dVQCf-0003lz-8X
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:33:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVQ6u-0007Z2-RT
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:27:57 -0400
-Date: Thu, 13 Jul 2017 01:27:50 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVQCe-0003lE-VX
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:33:53 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E4027D0EF
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 22:33:51 +0000 (UTC)
+Date: Thu, 13 Jul 2017 01:33:43 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170713003116-mutt-send-email-mst@kernel.org>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<20170712181652-mutt-send-email-mst@kernel.org>
-	<20170712201550.GN6020@localhost.localdomain>
-	<20170712232214-mutt-send-email-mst@kernel.org>
-	<20170712205646.GQ6020@localhost.localdomain>
+Message-ID: <20170713012811-mutt-send-email-mst@kernel.org>
+References: <20170712094149.23069-1-jfreimann@redhat.com>
+	<20170712180550-mutt-send-email-mst@kernel.org>
+	<20170712211305.ajtizorj4yq6jble@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170712205646.GQ6020@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+In-Reply-To: <20170712211305.ajtizorj4yq6jble@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] tests/pxe-testt: add testcase
+ using vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,128 +35,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com
 
-On Wed, Jul 12, 2017 at 05:56:46PM -0300, Eduardo Habkost wrote:
-> On Wed, Jul 12, 2017 at 11:31:59PM +0300, Michael S. Tsirkin wrote:
-> > On Wed, Jul 12, 2017 at 05:15:50PM -0300, Eduardo Habkost wrote:
-> > > On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
-> > > > On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
-> > > > > On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
-> > > > > > We don't want to carry along old machine types forever. If we are able to
-> > > > > > remove the pc machines up to 0.13 one day for example, this would allow
-> > > > > > us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> > > > > > BARs directly to low memory). Everything up to pc-1.2 is also known to
-> > > > > > have issues with migration.  So let's start with a deprecation message
-> > > > > > for the old machine types so that the (hopefully) few users of these old
-> > > > > > systems start switching over to newer machine types instead.
-> > > > > > 
-> > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > > > 
-> > > > > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > > 
-> > > > > I suggest changing "-machine help" too.  Today it looks like this:
-> > > > > 
-> > > > >   Supported machines are:
-> > > > >   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
-> > > > >   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
-> > > > >   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-1.3               Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-1.2               Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-1.1               Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-1.0               Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-0.15              Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-0.14              Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-0.13              Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-0.12              Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-0.11              Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-0.10              Standard PC (i440FX + PIIX, 1996)
-> > > > >   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
-> > > > >   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
-> > > > >   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
-> > > > >   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-> > > > >   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-> > > > >   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-> > > > >   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
-> > > > >   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
-> > > > >   isapc                ISA-only PC
-> > > > >   none                 empty machine
-> > > > 
-> > > > Any chance we can sort them reasonably too?
+On Wed, Jul 12, 2017 at 11:13:05PM +0200, Jens Freimann wrote:
+> On Wed, Jul 12, 2017 at 06:10:05PM +0300, Michael S. Tsirkin wrote:
+> > On Wed, Jul 12, 2017 at 11:41:46AM +0200, Jens Freimann wrote:
+> > > This implements a testcase for pxe-test using the vhost-user interface. Spawn a
+> > > vhost-user-bridge process and connect it to the qemu process.
 > > > 
-> > > If we use strverscmp(), it will be sorted in a more reasonable
-> > > way.  We could copy the gnulib version on systems without glibc.
-> > > Life is too short for writing configure checks by hand, though; I
-> > > will add this to the end of my wish-todo list.  If somebody wants
-> > > to volunteer, be my guest.
-> > > 
-> > > I'm CCing Eric in case he has suggestions that would help import
-> > > the gnulib module in an easy way.
-> > > 
-> > > -- 
-> > > Eduardo
+> > > It is send as an RFC because:
+> > >  - Patch 3/3: there must be cleaner way to do this.
+> > >  - Does Patch 1/3 make sense or should I just redirect all output to /dev/null?
+> > >  - don't hardcode port numbers in qemu cmdline, create socket and pass
+> > >     fd to -netdev (need to figure out how to do this)
 > > 
-> > As we never have leading zeroes, and input comes from QEMU so
-> > it's safe, it's probably easier to just open-code it:
+> > Doesn't this work?
 > > 
-> > /* compare string numerically: shorter strings give smaller numbers */
-> > int mstcmp(const char *s1, const char *s2)
-> > {
-> > 	int l1, l2;
-> > 
-> > 	l1 = strlen(s1);
-> > 	l2 = strlen(s2);
-> > 	return l1 == l2 ? strcmp(s1, s2) : l1 - l2;
-> > }
-> > 
+> > -netdev socket,id=str[,fd=h]
 > 
-> This doesn't work because strlen("pc-0.10") > strlen("pc-1.0").
+> It should. But I get this:
+> 
+>        dded sock 5 for watching. max_sock: 5
+>        Sock 3 removed from dispatcher watch.
+>        qemu: error: specified mcastaddr "127.0.0.1" (0x7f000001) does not contain a multicast address
+>        qemu-system-x86_64: -netdev socket,id=n1,fd=3: Device 'socket' could not be initialized
+>        Broken pipe
 
-Oh right. So you need to find dots and split at these points.
-Something like the below? Completely untested.
+Not sure what's wrong with it, should not be too hard to debug.
 
-int mstcmp(const char *s1, const char *s2)
-{
-	const char *e1, *e2;
- 	int l1, l2, c;
+Or maybe we should add unix domain socket support.
+Sounds like a reasonable feature to me.
 
-	do {
-		e1 = strchr(s1, '.');
-		e2 = strchr(s2, '.');
-
-		l1 = e1 ? e1 - s1 + 1 : strlen(s1);
-		l2 = e2 ? e2 - s2 + 1 : strlen(s2);
-
-		/* compare numerically: shorter strings give smaller numbers */
-		if (l1 != l2) {
-			break;
-		}
-		c = strncmp(s1, s2, l1);
-		if (c) {
-			return c;
-		}
-		s1 += l1;
-		s2 += l1;
-	} while (l1);
-
-	return l1 - l2;
-}
-
-
-
-> -- 
-> Eduardo
+> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+> index 5a0d182..a14c1d9 100644
+> --- a/tests/pxe-test.c
+> +++ b/tests/pxe-test.c
+> @@ -29,7 +29,7 @@
+> #define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
+>                         " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
+>                         " -netdev user,id=n0,tftp=./,bootfile=%s "\
+> -                        " -netdev socket,id=n1,udp=localhost:%d,localaddr=localhost:%d"
+> +                        " -netdev socket,id=n1,fd=%d"
+> #define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
+>                         " -device virtio-net-pci,netdev=n1 "
+> 
+> @@ -72,16 +72,42 @@ static const char *init_hugepagefs(const char *path)
+>     return path;
+> }
+> 
+> +static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
+> +{
+> +    int sock =  -1;
+> +
+> +    if (inet_aton("127.0.0.1", (struct in_addr *) &si_remote->sin_addr.s_addr) == 0) {
+> +        g_test_message("inet_aton failed\n");
+> +        return -1;
+> +    }
+> +
+> +    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+> +    if (sock == -1) {
+> +        g_test_message("socket creation failed\n");
+> +    }
+> +    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
+> +        printf("connect, %d", errno);
+> +        return -1;
+> +    }
+> +
+> +    return sock;
+> +}
+> +
+> static void test_pxe_vhost_user(void)
+> {
+>     char template[] = "/tmp/vhost-user-bridge-XXXXXX";
+>     char template2[] = "/tmp/hugepages-XXXXXX";
+>     gchar *vubr_args[] = {NULL, NULL, NULL, NULL};
+> +    struct sockaddr_in si_remote = {
+> +        .sin_family = AF_INET,
+> +        .sin_port = htons(RPORT),
+> +    };
+>     const char *hugefs;
+>     GError *error = NULL;
+>     char *vubr_binary;
+>     char *qemu_args;
+>     GPid vubr_pid;
+> +    int sock = -1;
+> 
+>     tmpfs = mkdtemp(template);
+>     if (!tmpfs) {
+> 
+>     tmpfs = mkdtemp(template);
+>     if (!tmpfs) {
+> @@ -109,9 +135,10 @@ static void test_pxe_vhost_user(void)
+>         root = tmpfs2;
+>     }
+> 
+> +    sock = vubr_create_socket(&si_remote, RPORT);
+> +
+>     qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
+> -                                "char0", vubr_args[2], "char0", disk,
+> -                                RPORT, LPORT);
+> +            "char0", vubr_args[2], "char0", disk, sock);
+> 
+> 
+> 
+> regards,
+> Jens
