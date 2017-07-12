@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVE0h-0002UM-MO
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:32:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVE21-0003e8-3i
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVE0e-0006iA-Iz
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:32:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVE0e-0006hK-AB
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:32:40 -0400
-Date: Wed, 12 Jul 2017 17:32:34 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170712093233.GI29326@pxdev.xzpeter.org>
-References: <20170704184915.31586-1-dgilbert@redhat.com>
-	<20170704184915.31586-4-dgilbert@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dVE1y-0007X5-1w
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:34:05 -0400
+Received: from mail-lf0-f42.google.com ([209.85.215.42]:32887)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dVE1x-0007WR-Rn
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:34:02 -0400
+Received: by mail-lf0-f42.google.com with SMTP id z78so11073533lff.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:34:01 -0700 (PDT)
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	<149943205430.8972.17786409962934999706.stgit@frigg.lan>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <149943205430.8972.17786409962934999706.stgit@frigg.lan>
+Date: Wed, 12 Jul 2017 10:32:59 +0100
+Message-ID: <87wp7e80fo.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170704184915.31586-4-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] migration/rdma: Allow cancelling while
- waiting for wrid
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v12 18/27] target/arm: [tcg,
+ a64] Port to insn_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, michael@hinespot.com, quintela@redhat.com, lvivier@redhat.com, berrange@redhat.com
+To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Tue, Jul 04, 2017 at 07:49:13PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> When waiting for a WRID, if the other side dies we end up waiting
-> for ever with no way to cancel the migration.
-> Cure this by poll()ing the fd first with a timeout and checking
-> error flags and migration state.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Lluís Vilanova <vilanova@ac.upc.edu> writes:
+
+> Incrementally paves the way towards using the generic instruction translation
+> loop.
+>
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  migration/rdma.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 48 insertions(+), 6 deletions(-)
-> 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index 6111e10c70..7273ae9929 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -1466,6 +1466,52 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
->      return  0;
+>  target/arm/translate-a64.c |   11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 5c04ff3d8b..dc91661df0 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -11247,6 +11247,14 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+>      init_tmp_a64_array(dc);
 >  }
->  
-> +/* Wait for activity on the completion channel.
-> + * Returns 0 on success, none-0 on error.
-> + */
-> +static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
+>
+> +static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
 > +{
-> +    /*
-> +     * Coroutine doesn't start until migration_fd_process_incoming()
-> +     * so don't yield unless we know we're running inside of a coroutine.
-> +     */
-> +    if (rdma->migration_started_on_destination) {
-> +        yield_until_fd_readable(rdma->comp_channel->fd);
-> +    } else {
-> +        /* This is the source side, we're in a separate thread
-> +         * or destination prior to migration_fd_process_incoming()
-> +         * we can't yield; so we have to poll the fd.
-> +         * But we need to be able to handle 'cancel' or an error
-> +         * without hanging forever.
-> +         */
-> +        while (!rdma->error_state && !rdma->error_reported &&
-> +               !rdma->received_error) {
-
-Should we just check rdma->error_state? Since iiuc error_reported only
-means whether error is reported (set to 1 if reported), and
-received_error means whether we got explicit error from peer (I think
-only via a RDMA_CONTROL_ERROR message), and it's 1 if received. IIUC
-either error_reported or received_error will mean that error_state be
-set already.
-
-> +            GPollFD pfds[1];
-> +            pfds[0].fd = rdma->comp_channel->fd;
-> +            pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-> +            /* 0.5s timeout, should be fine for a 'cancel' */
-> +            switch (qemu_poll_ns(pfds, 1, 500 * 1000 * 1000)) {
-
-(I would be more aggresive, say, 100ms, or even less, for better UI
- response with merely nothing lost. But 500ms is okay as well to me)
-
-> +            case 1: /* fd active */
-> +                return 0;
+> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
 > +
-> +            case 0: /* Timeout, go around again */
-> +                break;
+> +    dc->insn_start_idx = tcg_op_buf_count();
+> +    tcg_gen_insn_start(dc->pc, 0, 0);
+> +}
 > +
-> +            default: /* Error of some type */
-> +                return -1;
-> +            }
-> +
-> +            if (migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) {
-> +                /* Bail out and let the cancellation happen */
-> +                return -EPIPE;
-> +            }
-> +        }
-> +    }
-> +
-> +    return rdma->error_state || rdma->error_reported ||
-> +           rdma->received_error;
+>  void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+>                                 TranslationBlock *tb)
+>  {
+> @@ -11278,8 +11286,7 @@ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+>
+>      do {
+>          dc->base.num_insns++;
+> -        dc->insn_start_idx = tcg_op_buf_count();
+> -        tcg_gen_insn_start(dc->pc, 0, 0);
+> +        aarch64_tr_insn_start(&dc->base, cs);
+>
+>          if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+>              CPUBreakpoint *bp;
 
-Similar question here. Maybe just return rdma->error_state?
 
-Thanks,
-
--- 
-Peter Xu
+--
+Alex Bennée
