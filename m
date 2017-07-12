@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVIai-0004CT-Dq
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:26:13 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVIks-00075A-Fv
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVIae-0000bl-IE
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:26:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVIae-0000Zh-Bk
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:26:08 -0400
-References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-	<1499864265-144136-12-git-send-email-borntraeger@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <27238e54-2a92-dbb8-73b0-e3f5b0e67934@redhat.com>
-Date: Wed, 12 Jul 2017 16:26:02 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dVIkp-0003Ib-UL
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:36:42 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dVIkp-0003HW-N2
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:36:39 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id c11so36208152wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:36:39 -0700 (PDT)
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-5-git-send-email-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1499586614-20507-5-git-send-email-cota@braap.org>
+Date: Wed, 12 Jul 2017 15:36:36 +0100
+Message-ID: <87o9sp90y3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1499864265-144136-12-git-send-email-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/11] s390x/css: update
- css_adapter_interrupt
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/22] tcg: fix corruption of code_time
+ profiling counter upon tb_flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Fei Li <sherrylf@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 12.07.2017 14:57, Christian Borntraeger wrote:
-> From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->=20
-> Let's use the new inject_airq callback of flic to inject adapter
-> interrupts. For kvm case, if the kernel flic doesn't support the new
-> interface, the irq routine remains unchanged. For non-kvm case,
-> qemu-flic handles the suppression process.
->=20
-> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+Emilio G. Cota <cota@braap.org> writes:
+
+> Whenever there is an overflow in code_gen_buffer (e.g. we run out
+> of space in it and have to flush it), the code_time profiling counter
+> ends up with an invalid value (that is, code_time -= profile_getclock(),
+> without later on getting += profile_getclock() due to the goto).
+>
+> Fix it by using the ti variable, so that we only update code_time
+> when there is no overflow. Note that in case there is an overflow
+> we fail to account for the elapsed coding time, but this is quite rare
+> so we can probably live with it.
+>
+<snip>
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  hw/s390x/css.c          | 18 ++++++++++++++++--
->  hw/s390x/s390-pci-bus.c |  2 +-
->  hw/s390x/virtio-ccw.c   |  2 +-
->  include/hw/s390x/css.h  |  2 +-
->  4 files changed, 19 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 7b82176..ee4ebbf 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -547,12 +547,26 @@ out:
->      return r;
->  }
-> =20
-> -void css_adapter_interrupt(uint8_t isc)
-> +void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc)
->  {
-> +    S390FLICState *fs =3D s390_get_flic();
-> +    S390FLICStateClass *fsc =3D S390_FLIC_COMMON_GET_CLASS(fs);
->      uint32_t io_int_word =3D (isc << 27) | IO_INT_WORD_AI;
-> +    IoAdapter *adapter =3D channel_subsys.io_adapters[type][isc];
-> +
-> +    if (!adapter) {
-> +        return;
-> +    }
-> =20
->      trace_css_adapter_interrupt(isc);
-> -    s390_io_interrupt(0, 0, 0, io_int_word);
-> +    if (fs->ais_supported) {
-> +        if (fsc->inject_airq(fs, type, isc, adapter->flags)) {
-> +            fprintf(stderr, "Failed to inject airq with AIS supported\=
-n");
+>  accel/tcg/translate-all.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index a936a5f..72ce445 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1293,7 +1293,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>  #ifdef CONFIG_PROFILER
+>      tcg_ctx.tb_count++;
+>      tcg_ctx.interm_time += profile_getclock() - ti;
+> -    tcg_ctx.code_time -= profile_getclock();
+> +    ti = profile_getclock();
+>  #endif
+>
+>      /* ??? Overflow could be handled better here.  In particular, we
+> @@ -1311,7 +1311,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>      }
+>
+>  #ifdef CONFIG_PROFILER
+> -    tcg_ctx.code_time += profile_getclock();
+> +    tcg_ctx.code_time += profile_getclock() - ti;
+>      tcg_ctx.code_in_len += tb->size;
+>      tcg_ctx.code_out_len += gen_code_size;
+>      tcg_ctx.search_out_len += search_size;
 
-Use error_report() instead?
 
-> +            exit(1);
-> +        }
-> +    } else {
-> +        s390_io_interrupt(0, 0, 0, io_int_word);
-> +    }
->  }
-
- Thomas
+--
+Alex Bennée
