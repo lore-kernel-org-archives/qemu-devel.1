@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dVLIs-0005GE-9g
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:19:59 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dVLP5-0000Y5-DA
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dVLIp-0001GW-4C
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:19:58 -0400
-Received: from 2.mo69.mail-out.ovh.net ([178.33.251.80]:37543)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dVLIo-0001Fc-UG
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:19:55 -0400
-Received: from player738.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 0C4E730D8A
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 19:19:51 +0200 (CEST)
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <03821688-88ac-ca87-6cc4-85999fe4c1fc@kaod.org>
-Date: Wed, 12 Jul 2017 19:19:41 +0200
+	(envelope-from <rth7680@gmail.com>) id 1dVLP2-0004eY-9B
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:26:23 -0400
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:32954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dVLP2-0004eP-4k
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:26:20 -0400
+Received: by mail-qt0-f195.google.com with SMTP id c20so2927545qte.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 10:26:20 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-20-git-send-email-cota@braap.org>
+	<8737a18wzf.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <9d22af0e-e87f-4f6c-2369-5affe7e1d468@twiddle.net>
+Date: Wed, 12 Jul 2017 07:25:14 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] CPU hotplug on POWER9 (TCG) fails in
- ppc_radix64_handle_mmu_fault
+In-Reply-To: <8737a18wzf.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 19/22] tcg: introduce tcg_context_clone
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +32,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sjitindarsingh@gmail.com
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-Hi, 
+On 07/12/2017 06:02 AM, Alex Bennée wrote:
+> Why a copy approach as opposed to a plain tcg_context_new() with the
+> appropriate init cleanup.
 
-Today, if you try to hotplug a CPU on a POWER9 guest (TCG), it fails
-with an assert on the LPCR_UPRT bit missing in ppc_radix64_handle_mmu_fault()
+We need the globals that were set up by the target/foo/translate.c code to be 
+the same for each thread.  That's what makes it easier to copy the struct.
 
-  (qemu) device_add POWER9_v1.0-spapr-cpu-core,core-id=4,id=foo
-  (qemu) [   12.766102] pseries-hotplug-cpu: Attempting to add CPU, drc index: 10000004
-  qemu-system-ppc64: ./target/ppc/mmu-radix64.c:204: ppc_radix64_handle_mmu_fault: Assertion `ppc64_use_proc_tbl(cpu)' failed.
-  Aborted (core dumped)
 
-The LPCR SPR is incorrectly set. I have hacked my way through to make 
-it work, by changing cpu_ppc_set_papr(), but this is really ugly and 
-certainly wrong. 
-
-I would happy to cook the fix, as I need it for XIVE development. What
-would be the correct approach ?    
-
-Thanks,
-
-C.
+r~
