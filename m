@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVF60-0007s5-GJ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:42:17 -0400
+	(envelope-from <agraf@suse.de>) id 1dVF8j-0000UG-JX
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVF5z-000377-OP
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:42:16 -0400
-Date: Wed, 12 Jul 2017 11:42:02 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170712104202.GI6923@stefanha-x1.localdomain>
-References: <20170706163828.24082-1-pbonzini@redhat.com>
-	<20170706163828.24082-12-pbonzini@redhat.com>
-	<20170710162419.GS14195@stefanha-x1.localdomain>
-	<c5efa0c6-92a1-76f6-c1ba-34b36ef93cbd@redhat.com>
-	<20170711094356.GI17792@stefanha-x1.localdomain>
-	<16c674cf-0474-61e6-6f0d-cfb059d30532@redhat.com>
+	(envelope-from <agraf@suse.de>) id 1dVF8f-0005rT-N2
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:45:05 -0400
+References: <CAFEAcA_HPtBhES_9L1KZzJTDJRpxD=0Ux-OyC3BV2UDNKZg2hg@mail.gmail.com>
+	<40961524-561e-aa31-b043-7b8ae9203b7c@suse.de>
+	<7bb17d85-a21b-d890-03cc-18f56b785361@redhat.com>
+From: Alexander Graf <agraf@suse.de>
+Message-ID: <dfa89a7f-263d-c7b4-9866-7d972bed6057@suse.de>
+Date: Wed, 12 Jul 2017 12:44:49 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2xeD/fx0+7k8I/QN"
-Content-Disposition: inline
-In-Reply-To: <16c674cf-0474-61e6-6f0d-cfb059d30532@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 11/11] block/snapshot: do not
- take AioContext lock
+In-Reply-To: <7bb17d85-a21b-d890-03cc-18f56b785361@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] should we update QEMU's u-boot submodule and
+ binary?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
 
---2xeD/fx0+7k8I/QN
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 11, 2017 at 11:48:02AM +0200, Paolo Bonzini wrote:
-> On 11/07/2017 11:43, Stefan Hajnoczi wrote:
-> >>>
-> >>> 1. Must be called under BQL?
-> >>> 2. Can I/O requests be in flight?
-> >>> 3. Is it thread-safe?
-> >>>
-> >>> Otherwise it will be a nightmare to modify the code since these
-> >>> constraints are not enforced by the compiler and undocumented.
-> >> Good point.  Are (1) and (3) different ways to say the same thing or do
-> >> you have other differences in mind?
-> > There is a difference between (1) and (3).  If a function is thread-safe
-> > then callers can invoke it without any constraints.  If a function
-> > requires a specific lock to be held then that it puts a constraint on
-> > the caller.
-> >=20
-> > We do have thread-safe functions in the block layer: simple functions
-> > that fetch a BDS field atomically.  There is no need to hold the BQL for
-> > them.
->=20
-> Ok, so we are in (somewhat violent) agreement.  "It's not thread-safe"
-> pretty much means "must be called under BQL".
->=20
-> I look forward to extending Marc-Andr=E9's -Wthread-safety experiments to
-> cover bdrv_drained_begin/end!
+On 12.07.17 12:34, Thomas Huth wrote:
+> On 11.07.2017 20:22, Alexander Graf wrote:
+>>
+>> On 11.07.17 19:43, Peter Maydell wrote:
+>>> Hi; I just noticed that our u-boot submodule is still stuck on
+>>> a commit from 2014 when it was first added to QEMU. Should we
+>>> move this forward to some more recent u-boot release?
+>>>
+>>> I think we only use this for our ppc e500 rom...
+>>
+>> It probably makes sense to update the e500 rom and bump the submodule to
+>> the latest U-Boot release along the way, yes.
+>>
+>> U-Boot 2017.07 just got released, so now is quite a good point in time
+>> to do so.
+> 
+> I think we should rather update the submodule to commit 79c884d7e4 since
+> that is the level that is used for the pc-bios/u-boot.e500 binary (see
+> http://git.qemu.org/?p=qemu.git;a=commitdiff;h=d4574435a6530bbd96ae13 ).
 
-Sounds good :).
+Why not update both?
 
-Stefan
+> The problematic mv_gen_reg.h is also not part of that commit level anymore.
+> 
+> Alex, could you please send a patch for the update? Or shall I prepare one?
 
---2xeD/fx0+7k8I/QN
-Content-Type: application/pgp-signature; name="signature.asc"
+I tried to compile U-Boot from 2017.07 earlier, but don't have a working 
+ppc build environment anymore :(
 
------BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZZfz6AAoJEJykq7OBq3PIMYkIAKzF5oHMz/y3003z+ygbWKkS
-PCnxifwNWXqwDmqvvm0dlIS7uHL2q9zFIoPeufjE7qM3x1G+P2DLHWrwXglxSJe5
-JHM3SzQ0WDbnH/qFLOVT7lT9Hm7WGUrfIPVx/ovxRy+GV1wMOTtDXsfnFCRDsj1b
-W/FrsuvQ0CZcjIa29N6MQkm/eKTcaPToaIH/HSs8okB3rqSv/zYXAg1ClsogKNlV
-cRsop3BjEmPv++IO3eTVoxj6a3eLbe28XkQjmIMohEfsqZ4Q72IKuta4k/YRkUmi
-lVC5FxndJH0Vi1dx2MCzzWFAuneZempVVtl5UF3TydXsi9/18aocKJzzcQsBT6k=
-=9nBP
------END PGP SIGNATURE-----
-
---2xeD/fx0+7k8I/QN--
+Alex
