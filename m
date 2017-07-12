@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVJYE-0004M7-II
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:27:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVJYj-0004ji-8W
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:28:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVJYD-0007Kb-IF
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:27:42 -0400
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
-	<1499864249-26305-5-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7d956609-b912-77f8-dbee-bd2d0aa694b9@redhat.com>
-Date: Wed, 12 Jul 2017 10:27:29 -0500
+	(envelope-from <kwolf@redhat.com>) id 1dVJYi-0007eD-6P
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:28:13 -0400
+Date: Wed, 12 Jul 2017 17:28:01 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170712152801.GH4917@noname.str.redhat.com>
+References: <20170711163748.17817-1-el13635@mail.ntua.gr>
+	<87tw2iaydb.fsf@dusky.pond.sub.org>
+	<20170712081022.fcvchnilcfcyt23j@postretch>
 MIME-Version: 1.0
-In-Reply-To: <1499864249-26305-5-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="77v3C84n3JBxTxUIuOSwpEE3A881M0Slq"
-Subject: Re: [Qemu-devel] [PATCH 4/9] block/qapi: Use blk_all_next() for
- query-block
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="JgQwtEuHJzHdouWu"
+Content-Disposition: inline
+In-Reply-To: <20170712081022.fcvchnilcfcyt23j@postretch>
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] block: Block driver callbacks fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---77v3C84n3JBxTxUIuOSwpEE3A881M0Slq
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com,
- armbru@redhat.com, qemu-devel@nongnu.org
-Message-ID: <7d956609-b912-77f8-dbee-bd2d0aa694b9@redhat.com>
-Subject: Re: [PATCH 4/9] block/qapi: Use blk_all_next() for query-block
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
- <1499864249-26305-5-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1499864249-26305-5-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--JgQwtEuHJzHdouWu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/12/2017 07:57 AM, Kevin Wolf wrote:
-> This patch replaces the blk_next() loop in query-block by a
-> blk_all_next() one so that we also get access to BlockBackends that
-> aren't owned by the monitor. For now, the next thing we do is check
-> whether each BB has a name, so there is no semantical difference.
-
-s/semantical/semantic/
-
+Am 12.07.2017 um 10:10 hat Manos Pitsidianakis geschrieben:
+> On Wed, Jul 12, 2017 at 09:49:20AM +0200, Markus Armbruster wrote:
+> >Manos Pitsidianakis <el13635@mail.ntua.gr> writes:
+> >
+> >>This series makes implementing some of the bdrv_* callbacks easier for =
+block
+> >>filters by passing requests to bs->file if bs->drv doesn't implement it=
+ instead
+> >>of failing, and adding default bdrv_co_get_block_status() implementatio=
+ns.
+> >>
+> >>This is based against Kevin Wolf's block branch, commit
+> >>da4bd74d2450ab72a7c26bbabb10c6a287dd043e
+> >
+> >Haven't seen BlockDriver member is_filter before.  Interesting.  It's
+> >documentation
+> >
+> >   /* set to true if the BlockDriver is a block filter */
+> >   bool is_filter;
+> >
+> >is seriously lacking.  What does it *mean* to be a block filter?  Which
+> >block layer facilities are affected, and how?
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qapi.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+> Currently it is only used in bdrv_recurse_is_first_non_filter.
 >=20
+> >Observation: driver "raw" is filter-like in the sense that all it does
+> >is pass along method arguments and results.  Can't say whether that
+> >makes it a filter in the sense of is_filter, because "the sense of
+> >is_filter" is nebulous to me :)
+>=20
+> I'm not very acquainted with raw, so I can't really comment. But the
+> drivers I'm working on, throttle and before write notifier have that
+> exact semantic, ie they do something when IO is intercepted and pass
+> everything to the BDSes below. There was a mini discussion about raw
+> and filters in the previous version's thread.
+>=20
+> I might add documentation to block_int.h in the future. When I first
+> read it it felt nebulous to me too.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Not something that should stop this series, but while you're adding some
+implications of being a filter to block_int.h, we still don't have a
+definition of which block drivers qualify as filters.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+"do something when IO is intercepted and pass everything to the BDSes
+below" is probably not enough, every driver does this unless it is a
+protocol driver.
 
+We could further qualify it such that reads/writes on filter always
+result in reads/writes on the same offset in bs->file (this disqualifies
+the raw format, which you seem to want) and the block status is always
+taken from bs->file.
 
---77v3C84n3JBxTxUIuOSwpEE3A881M0Slq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+We could also add that the data read/written must be the same - it's not
+quite clear to me yet if we want to require this or can make use of the
+property.
+
+I'm open for other suggestion of what makes a filter a filter in the
+sense of this field. Ideally it would contain enough (or maybe better:
+the right) conditions that you can use it to justify why for each of the
+functions that you pass down by default, this is the right behaviour.
+
+For example, passing through bdrv_probe_geometry() makes sense because
+all I/O is passed through unmodified and the image size is the same,
+etc.
+
+Kevin
+
+--JgQwtEuHJzHdouWu
+Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQEcBAEBCAAGBQJZZj/iAAoJEKeha0olJ0NqtAwH/iGmW9iU/nRa7yTQHI9sJEVb
-I+JjEWJ8RXV3GsubkqWVOCV1OO/Grl2Z/K+Wif2AD/wZRYTZGp8J8fVY0D80cxb1
-XIq+ltpuVmy/fQ5VYDH2YvCrazc+zUA063aOP5CrOcHC6TsjU+MXb4HWkIgFEich
-snyW+ZPTmw8Yt5g+q1tsr7taTTtpK+7FhfkpgXg2ps5QgP02/THMpcJ3a8674S1s
-iNlpgdVe+AccdlnCdv6Qsy1J8NwD9ICHRHWwrzD953P0VsZGpYyM7rLspFQRIGJ/
-5pKNKtcAPXnLylNocUhAQk0ImhfFN3Et0/soDTWdVMBfEXoioFcqPilpQKUiGR4=
-=8BUd
+iQIcBAEBAgAGBQJZZkABAAoJEH8JsnLIjy/WrrIP/iSRg8QWjfQwjWRq/hr+rIgT
+AR09S70I2/Q7AAiR/sKeR88M1EZ5zDft6LYFmVk41us8o98TKlLqDO35q+Mmjsjw
++dUuM+V7BWQLd4c7/bUFj6Bz2F6/uCJLwRSqCLmyvwYyhH60KD0t71856RnPu7mt
+tj5ZxRmApOpIU4VRJdv9yQRTwqDetsuygXVaWGLBN7tc8LeYNQZoEUMms5JTHv62
+dPnkoJJqRoYKCCHXi1qgmZGl/wc0uPJfrPu13KDSn89rAnF+8iQdS8kcnXByDrdi
+Ll5ShgaWf9Mg///jYUIVLy1DULthe/ueCjDqvaW1gq5HsVA8KyV5sa64JMX9V4z0
+aRkYNGUyzvBJrnpiMGEgGjKMlPtuh7g5SJW4F3OTiZ1FfrZNvvHndHj+exWgVdUz
+zxYYq9Oxjsp/BMwZwShpazeSQYsoIzDu177aaU+Axro7HJRDUn0C6MVRCq4AjVPl
+cUwUJyr6k+WN0bDwF5wF/VtVDh22OL79J/DUa7g93DIysSvpiPn2TrDAdnIfl/bd
+RbMss59SqHQR3TdHglEDY1nmCpZ2gtktvmExXHc6gQyIDeZ78nUZUa/I5NKoikRU
+K/AqBCtZatdUUQN7kdN1vKs/tU724YNGmjrQYZHy/ySjaj/ebWAOlyfPos6hBmdy
+oes45JpR0vzlHdjQjTnd
+=D1yR
 -----END PGP SIGNATURE-----
 
---77v3C84n3JBxTxUIuOSwpEE3A881M0Slq--
+--JgQwtEuHJzHdouWu--
