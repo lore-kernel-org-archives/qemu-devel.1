@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVE21-0003e8-3i
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:34:08 -0400
+	(envelope-from <peterx@redhat.com>) id 1dVE5H-0005WQ-Dm
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:37:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVE1y-0007X5-1w
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:34:05 -0400
-Received: from mail-lf0-f42.google.com ([209.85.215.42]:32887)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dVE1x-0007WR-Rn
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:34:02 -0400
-Received: by mail-lf0-f42.google.com with SMTP id z78so11073533lff.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:34:01 -0700 (PDT)
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-	<149943205430.8972.17786409962934999706.stgit@frigg.lan>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <149943205430.8972.17786409962934999706.stgit@frigg.lan>
-Date: Wed, 12 Jul 2017 10:32:59 +0100
-Message-ID: <87wp7e80fo.fsf@linaro.org>
+	(envelope-from <peterx@redhat.com>) id 1dVE5C-0000fu-Hu
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:37:27 -0400
+Date: Wed, 12 Jul 2017 17:37:15 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170712093715.GJ29326@pxdev.xzpeter.org>
+References: <CAOE=1Z3ve+zQJbjqqfNA1iB_mNgFkoTTXRxyBikSiJ5_AZwpiA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v12 18/27] target/arm: [tcg,
- a64] Port to insn_start
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z3ve+zQJbjqqfNA1iB_mNgFkoTTXRxyBikSiJ5_AZwpiA@mail.gmail.com>
+Subject: Re: [Qemu-devel] How to stop `qemu-system-x86_64 ...` instead of
+ `kill -9`?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Sam <batmanustc@gmail.com>
+Cc: qemu-discuss@nongnu.org, qemu-devel@nongnu.org
 
+On Wed, Jul 12, 2017 at 05:24:40PM +0800, Sam wrote:
+> hi all,
+> 
+> I'm running `qemu-system-x86_64 ...` to start a guest vm. Now I want to
+> stop and destroy this vm, I found there is no `qemu-stop` related command,
+> so I have to `kill -9` this process.
+> 
+> How could I stop `qemu-system-x86_64` instead of `kill -9`? Use `virsh`
+> command or something?
 
-Lluís Vilanova <vilanova@ac.upc.edu> writes:
+"virsh destroy $name"? Or "quit" in qemu QMP/HMP?
 
-> Incrementally paves the way towards using the generic instruction translation
-> loop.
->
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+(I'd say I use kill a lot, especially when I'm using -nographic)
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  target/arm/translate-a64.c |   11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 5c04ff3d8b..dc91661df0 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -11247,6 +11247,14 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->      init_tmp_a64_array(dc);
->  }
->
-> +static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-> +{
-> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-> +
-> +    dc->insn_start_idx = tcg_op_buf_count();
-> +    tcg_gen_insn_start(dc->pc, 0, 0);
-> +}
-> +
->  void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
->                                 TranslationBlock *tb)
->  {
-> @@ -11278,8 +11286,7 @@ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
->
->      do {
->          dc->base.num_insns++;
-> -        dc->insn_start_idx = tcg_op_buf_count();
-> -        tcg_gen_insn_start(dc->pc, 0, 0);
-> +        aarch64_tr_insn_start(&dc->base, cs);
->
->          if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
->              CPUBreakpoint *bp;
-
-
---
-Alex Bennée
+-- 
+Peter Xu
