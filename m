@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dVIBf-0003nN-4V
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:00:26 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dVICU-0004SQ-F9
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dVIBZ-0002vo-8I
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:00:19 -0400
-From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Wed, 12 Jul 2017 17:00:11 +0300
-Message-Id: <cover.1499867930.git.mjt@msgid.tls.msk.ru>
+	(envelope-from <alistai@xilinx.com>) id 1dVICN-0003WM-Se
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:10 -0400
+Received: from mail-by2nam03on0049.outbound.protection.outlook.com
+	([104.47.42.49]:58656
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dVICN-0003Vi-EA
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:03 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 12 Jul 2017 06:57:36 -0700
+Message-ID: <c89e9980019f296ec9aa38d7689ac4d5c369296d.1499866456.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1499866456.git.alistair.francis@xilinx.com>
+References: <cover.1499866456.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/11] Trivial patches for 2017-07-12 (#2)
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 2/7] error: Functions to report warnings and
+ informational messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +29,213 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com
 
-The same but without two patches from Eric Blake.
-Not resending all the patches, only the cover letter.
+Add warn_report(), warn_vreport() for reporting warnings, and
+info_report(), info_vreport() for informational messages.
 
-The following changes since commit 6b06e3e49eb8c91cc286c16d6bf3181ac296f3=
-3d:
+These are implemented them with a helper function factored out of
+error_vreport(), suitably generalized. This patch makes no changes
+to the output of the original error_report() function.
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2017-07-10-v2=
-' into staging (2017-07-10 16:12:47 +0100)
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+v2:
+ - Don't add *vreport() functions to checkpatch
+ - Maintain original comments for the reporting functions
+ - Don't change the error report output in this patch
+v1:
+ - Don't expose the generic report and vreport() functions
+ - Prefix error messages
+ - Use vreport instead of qmsg_vreport()
+RFC V3:
+ - Change the function and enum names to be more descriptive
+ - Add wrapper functions for *_report() and *_vreport()
 
-are available in the git repository at:
+ include/qemu/error-report.h |   7 +++
+ scripts/checkpatch.pl       |   6 ++-
+ util/qemu-error.c           | 102 +++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 109 insertions(+), 6 deletions(-)
 
-  git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
-
-for you to fetch changes up to a7a305aee1e9a74a3f4b263aa98babed795b1f0a:
-
-  include/hw/ptimer.h: Add documentation comments (2017-07-11 17:44:27 +0=
-300)
-
-----------------------------------------------------------------
-trivial patches for 2017-07-12
-
-----------------------------------------------------------------
-Li Ping (1):
-      qga-win32: Fix memory leak of device information set
-
-Mao Zhongyi (1):
-      util/qemu-sockets: Drop unused helper socket_address_to_string()
-
-Max Filippov (1):
-      target/xtensa: gdbstub: drop dead return statement
-
-Paolo Bonzini (1):
-      hxtool: remove dead -q option
-
-Peter Maydell (2):
-      configure: Handle having no c++ compiler in FORTIFY_SOURCE check
-      include/hw/ptimer.h: Add documentation comments
-
-Philippe Mathieu-Daud=C3=A9 (4):
-      hw/misc: add missing includes
-      hw/pci: define msi_nonbroken in pci-stub
-      elf-loader: warn about invalid endianness
-      hw/core: fix missing return value in load_image_targphys_as()
-
-Thomas Huth (1):
-      configure: Fix build with pkg-config and --static --enable-sdl
-
- configure               |   8 +++-
- hw/core/loader.c        |   5 +-
- hw/pci/pci-stub.c       |   3 ++
- include/hw/misc/unimp.h |   2 +
- include/hw/ptimer.h     | 120 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- include/qemu/sockets.h  |  15 ------
- qga/commands-win32.c    |   5 +-
- scripts/hxtool          |  46 +------------------
- target/xtensa/gdbstub.c |   1 -
- util/qemu-sockets.c     |  34 --------------
- 10 files changed, 140 insertions(+), 99 deletions(-)
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index 3001865896..e1c8ae1a52 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -35,8 +35,15 @@ void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+ void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_set_progname(const char *argv0);
++
+ void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++void warn_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++void info_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++
+ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
++
+ const char *error_get_progname(void);
+ extern bool enable_timestamp_msg;
+ 
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 73efc927a9..9287cc5886 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2535,7 +2535,11 @@ sub process {
+ 				error_prepend|
+ 				error_reportf_err|
+ 				error_vreport|
+-				error_report}x;
++				warn_vreport|
++				info_vreport|
++				error_report|
++				warn_report|
++				info_report}x;
+ 
+ 	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
+ 		ERROR("Error messages should not contain newlines\n" . $herecurr);
+diff --git a/util/qemu-error.c b/util/qemu-error.c
+index 1c5e35ecdb..c557c6ae47 100644
+--- a/util/qemu-error.c
++++ b/util/qemu-error.c
+@@ -14,6 +14,16 @@
+ #include "monitor/monitor.h"
+ #include "qemu/error-report.h"
+ 
++/*
++ * @report_type is the type of message: error, warning or
++ * informational.
++ */
++typedef enum {
++    REPORT_TYPE_ERROR,
++    REPORT_TYPE_WARNING,
++    REPORT_TYPE_INFO,
++} report_type;
++
+ void error_printf(const char *fmt, ...)
+ {
+     va_list ap;
+@@ -179,17 +189,29 @@ static void print_loc(void)
+ 
+ bool enable_timestamp_msg;
+ /*
+- * Print an error message to current monitor if we have one, else to stderr.
++ * Print a message to current monitor if we have one, else to stderr.
++ * @report_type is the type of message: error, warning or informational.
+  * Format arguments like vsprintf().  The resulting message should be
+  * a single phrase, with no newline or trailing punctuation.
+  * Prepend the current location and append a newline.
+  * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+  */
+-void error_vreport(const char *fmt, va_list ap)
++static void vreport(report_type type, const char *fmt, va_list ap)
+ {
+     GTimeVal tv;
+     gchar *timestr;
+ 
++    switch (type) {
++    case REPORT_TYPE_ERROR:
++        break;
++    case REPORT_TYPE_WARNING:
++        error_printf("warning: ");
++        break;
++    case REPORT_TYPE_INFO:
++        error_printf("info: ");
++        break;
++    }
++
+     if (enable_timestamp_msg && !cur_mon) {
+         g_get_current_time(&tv);
+         timestr = g_time_val_to_iso8601(&tv);
+@@ -204,8 +226,45 @@ void error_vreport(const char *fmt, va_list ap)
+ 
+ /*
+  * Print an error message to current monitor if we have one, else to stderr.
+- * Format arguments like sprintf().  The resulting message should be a
+- * single phrase, with no newline or trailing punctuation.
++ * Format arguments like vsprintf().  The resulting message should be
++ * a single phrase, with no newline or trailing punctuation.
++ * Prepend the current location and append a newline.
++ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
++ */
++void error_vreport(const char *fmt, va_list ap)
++{
++    vreport(REPORT_TYPE_ERROR, fmt, ap);
++}
++
++/*
++ * Print a warning message to current monitor if we have one, else to stderr.
++ * Format arguments like vsprintf().  The resulting message should be
++ * a single phrase, with no newline or trailing punctuation.
++ * Prepend the current location and append a newline.
++ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
++ */
++void warn_vreport(const char *fmt, va_list ap)
++{
++    vreport(REPORT_TYPE_WARNING, fmt, ap);
++}
++
++/*
++ * Print an information message to current monitor if we have one, else to
++ * stderr.
++ * Format arguments like vsprintf().  The resulting message should be
++ * a single phrase, with no newline or trailing punctuation.
++ * Prepend the current location and append a newline.
++ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
++ */
++void info_vreport(const char *fmt, va_list ap)
++{
++    vreport(REPORT_TYPE_INFO, fmt, ap);
++}
++
++/*
++ * Print an error message to current monitor if we have one, else to stderr.
++ * Format arguments like sprintf().  The resulting message should be
++ * a single phrase, with no newline or trailing punctuation.
+  * Prepend the current location and append a newline.
+  * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+  */
+@@ -214,6 +273,39 @@ void error_report(const char *fmt, ...)
+     va_list ap;
+ 
+     va_start(ap, fmt);
+-    error_vreport(fmt, ap);
++    vreport(REPORT_TYPE_ERROR, fmt, ap);
++    va_end(ap);
++}
++
++/*
++ * Print a warning message to current monitor if we have one, else to stderr.
++ * Format arguments like sprintf(). The resulting message should be a
++ * single phrase, with no newline or trailing punctuation.
++ * Prepend the current location and append a newline.
++ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
++ */
++void warn_report(const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    vreport(REPORT_TYPE_WARNING, fmt, ap);
++    va_end(ap);
++}
++
++/*
++ * Print an information message to current monitor if we have one, else to
++ * stderr.
++ * Format arguments like sprintf(). The resulting message should be a
++ * single phrase, with no newline or trailing punctuation.
++ * Prepend the current location and append a newline.
++ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
++ */
++void info_report(const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    vreport(REPORT_TYPE_INFO, fmt, ap);
+     va_end(ap);
+ }
+-- 
+2.11.0
