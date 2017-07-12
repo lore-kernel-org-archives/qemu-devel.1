@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVJdt-00006p-VS
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:33:34 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVJem-00019U-G6
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVJdq-0003L9-SQ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:33:33 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dVJdq-0003K6-Lm
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:33:30 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id k67so38213237wrc.2
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:33:30 -0700 (PDT)
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-19-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1499586614-20507-19-git-send-email-cota@braap.org>
-Date: Wed, 12 Jul 2017 16:33:27 +0100
-Message-ID: <878tjt8ybc.fsf@linaro.org>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVJel-0004ri-Ld
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:34:28 -0400
+Date: Wed, 12 Jul 2017 18:32:58 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170712153258.ilcy44wq2onbu5ks@postretch>
+References: <20170711163748.17817-1-el13635@mail.ntua.gr>
+	<20170711163748.17817-3-el13635@mail.ntua.gr>
+	<b8bcff15-2d6c-bca9-cd44-b03ddf7d7812@redhat.com>
+	<87y3ruaypm.fsf@dusky.pond.sub.org>
+	<20170712151501.GG4917@noname.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 18/22] tcg: define TCG_HIGHWATER
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="b7bmxef45lqsd36e"
+Content-Disposition: inline
+In-Reply-To: <20170712151501.GG4917@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] block: remove bdrv_media_changed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
 
-Emilio G. Cota <cota@braap.org> writes:
+--b7bmxef45lqsd36e
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 
-> Will come in handy very soon.
+On Wed, Jul 12, 2017 at 05:15:01PM +0200, Kevin Wolf wrote:
+>Am 12.07.2017 um 09:41 hat Markus Armbruster geschrieben:
+>> Eric Blake <eblake@redhat.com> writes:
+>>
+>> > On 07/11/2017 11:37 AM, Manos Pitsidianakis wrote:
+>> >> This function is not used anywhere, so remove it.
+>> >>
+>> >
+>> > Might be interesting to figure out when it WAS last used.
+>>
+>> Yes.  When I see "remove X because it's unused" during patch review, I
+>> immediately ask "why is it unused now, and what was it used for
+>> previously?"  Ideally, the commit message answers these questions
+>> preemptively.
+>>
+>> >                                                            If I grepped
+>> > correctly, it was commit 21fcf360 back in May 2012?
+>>
+>> Yes.  "fdc: simplify media change handling".  I suspect that commit
+>> broke media change for passed-through host floppy.
+>>
+>> Its only implementation went away in commit f709623 "block: Remove host
+>> floppy support".
+>>
+>> Suggest
+>>
+>>     block: bdrv_media_changed() is unused, remove
+>>
+>>     The i82078 floppy device model used to call bdrv_media_changed() to
+>>     implement its media change bit when backed by a host floppy.  This
+>>     went away in 21fcf36 "fdc: simplify media change handling".
+>>     Probably broke host floppy media change.  Host floppy pass-through
+>>     was dropped in commit f709623.  bdrv_media_changed() has never been
+>>     used for anything else.  Remove it.
 >
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+>Manos, if you're happy with this, I can update the commit message while
+>applying the series.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Of course, no problem.
+Thanks!
 
-> ---
->  tcg/tcg.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index c19c473..2f003a0 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -115,6 +115,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
->  static void tcg_out_tb_init(TCGContext *s);
->  static bool tcg_out_tb_finalize(TCGContext *s);
->
-> +#define TCG_HIGHWATER 1024
-> +
->  static QemuMutex tcg_lock;
->
->  /*
-> @@ -453,7 +455,7 @@ void tcg_prologue_init(TCGContext *s)
->      /* Compute a high-water mark, at which we voluntarily flush the buffer
->         and start over.  The size here is arbitrary, significantly larger
->         than we expect the code generation for any one opcode to require.  */
-> -    s->code_gen_highwater = s->code_gen_buffer + (total_size - 1024);
-> +    s->code_gen_highwater = s->code_gen_buffer + (total_size - TCG_HIGHWATER);
->
->      tcg_register_jit(s->code_gen_buffer, total_size);
+--b7bmxef45lqsd36e
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
---
-Alex Bennée
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllmQSoACgkQc2J8L2kN
+9xA70A//QmHe7995XDYOQzmygwtmf1AltEtwa8EdNH7+EUIrYTWaKP1WBvpeZj4g
+TGOfC0nxrd94OmYQmGOMjr31tFJ2gY1AdqizyqNWviKcafJNlCAkui3wEI201WSL
+34EKbz+TgYKwgD7NxAlxqnIQYoiUZ6HTwTICvDIuq/BDbONlslJUcmyG7TFTbg6I
+S+dSWpZrokg30f5DEFIiu13lT3bcO+eVyZoyvi3W8/GskqfqgQT5vMzztqpc2f7+
+Vqc9EKCYVtsAiIWlLJ1pZQJf7Y3MJ/fiYnfXgehGl6VMDyllkSMHtID4g7YnGVeN
+XUY97boXtlQO+A6oopAupWvnAdUL+KuXYtAgsUFbyjKgaXq1PMaeYFuCemcpOGB6
+0mHjZkTjSBCF2AiYysrtdA8749pKtlCYW2LMkzZ+BmvW//VQ5/cmOUryzR3J9Qbc
+8UFcDlx0ug2Z7EwSoT9MrIsMKbVK+kogFYLcXhPlOo4dud2USdRIpezVt5d5u3oe
+8auTyiL6r1FXlEgffct8jKiuuDpP2NCFRE4IfuXHe10lPQ+FxozRSVS9cIXDjk2Y
+cP3kfbjeDADWwqvwcy/Y/dKCozSOoqesuwD1KKXq9dZSNsGco99WsgoX92Xe/jJZ
+55T2SB8jB4v38i9CPRE5CdK4VMpByaG4OVP7bD/nHIgy3lxAcGA=
+=Mivj
+-----END PGP SIGNATURE-----
+
+--b7bmxef45lqsd36e--
