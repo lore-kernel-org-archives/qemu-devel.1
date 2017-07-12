@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ricardo.ribalda@gmail.com>) id 1dVHhg-0000qE-B0
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:29:21 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVHk4-0002zv-LI
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ricardo.ribalda@gmail.com>) id 1dVHhf-0007mj-52
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:29:20 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:34677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ricardo.ribalda@gmail.com>)
-	id 1dVHhf-0007ll-0L
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:29:19 -0400
-Received: by mail-io0-x244.google.com with SMTP id f66so1983714iof.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 06:29:17 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dVHk1-0001Iv-EG
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:31:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVHk1-0001IQ-4e
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:31:45 -0400
+Date: Wed, 12 Jul 2017 15:31:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170712153140.6ce50e50@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
+References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <5316bcf4-63b5-5ce3-05d8-a6c5b75cff65@twiddle.net>
-References: <20170711212123.4368-1-rth@twiddle.net>
-	<5316bcf4-63b5-5ce3-05d8-a6c5b75cff65@twiddle.net>
-From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Date: Wed, 12 Jul 2017 15:28:55 +0200
-Message-ID: <CAPybu_0+enKVGf-bZHrkvWQ8reFtJnkKC=sucr2aaZ_DidaHNA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] target/i386: Implement all TBM
- instructions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/11] pending s390 patches part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-Hi Richard
+On Wed, 12 Jul 2017 14:57:34 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Thanks for your patch! I have applied it to my tree, but i still get
-SIGSEGV. I think that I might have found the problem. It seems to be
-related to the bmi instruction blsr, which seems to be not properly
-implemented.
+> here is the first bunch on patches for s390:
+> 
+> - Some more PCI changes
+> - storage attribute migration (migration of CMMA state)
+> - cpu model cleanups and preparations
+> 
+> part 2 will follow shortly (sorry for the delay - process reasons ;-)).
+> 
+> In addition to that I plan to have the migration rework from Halil
+> and Thomas network boot.
 
-On this example:
+2.10 will really be a huge update for s390x :)
 
-#include <stdio.h>
-
-int test_blsr(int val){
-
-return (val & (val - 1));
-}
-
-
-int main(int argc, char *argv) {
-volatile int val = 4096;
-
-fprintf(stdout, "%d\n", test_blsr(val));
-
-return 0;
-}
-
-When it is compiled with -march=bdver4 -static -O3 test_blsr , the
-compiler produces:
-
-0000000000400af0 <test_blsr>:
-  400af0:       c4 e2 78 f3 cf          blsr   %edi,%eax
-  400af5:       c3                      retq
-  400af6:       66 2e 0f 1f 84 00 00    nopw   %cs:0x0(%rax,%rax,1)
-  400afd:       00 00 00
-
-If I run the emulator: /tmp/qemu/x86_64-linux-user/qemu-x86_64 -cpu
-Haswell ./a.out
-
-The function prints 4096
-
-A fast look in the code shows that
-https://github.com/qemu/qemu/blob/master/target/i386/translate.c#L4028
-does not really match
-https://en.wikipedia.org/wiki/Bit_Manipulation_Instruction_Sets#BMI1_.28Bit_Manipulation_Instruction_Set_1.29
-
-It appears that case 1 and case 3 are swapped. I tried to fix it, but
-with no results :(. Anyway, the wiki could also be wrong.
-
-What is sure is that the code produces different results on qemu than
-on the target, which is not good
-
-
-Thanks again for your help!
-
-
-On Wed, Jul 12, 2017 at 6:04 AM, Richard Henderson <rth@twiddle.net> wrote:
-> On 07/11/2017 11:21 AM, Richard Henderson wrote:
->>
->> I am in the process of trying to run the gcc testsuite with -mtbm,
->> with and without the patchset, to see (1) if the new insns get used
->> and (2) that they run ok.
->
->
-> FWIW, make check-gcc RUNTESTFLAGS='--target_board=unix/-mtbm execute.exp'
-> shows 204 failures on a host that does not support TBM, so the extension is
-> being used.  A browse through exactly one of these used only bextr.  Running
-> the same tests with dejagnu using qemu-x86_64 -cpu qemu64,+tbm shows zero
-> failures.
->
->
-> r~
-
-
-
--- 
-Ricardo Ribalda
+> 
+> 
+> Christian Borntraeger (1):
+>   linux-headers: update to 4.13-rc0
+> 
+> Claudio Imbrenda (2):
+>   s390x/migration: Storage attributes device
+>   s390x/migration: Monitor commands for storage attributes
+> 
+> Fei Li (3):
+>   s390x: add flags field for registering I/O adapter
+>   s390x/flic: introduce modify_ais_mode callback
+>   s390x/sic: realize SIC handling
+> 
+> Janosch Frank (1):
+>   s390x/kvm: Rework cmma management
+> 
+> Jason J. Herne (2):
+>   s390x/cpumodel: clean up spacing and comments
+>   s390x/cpumodel: provide compat handling for new cpu features
+> 
+> Yi Min Zhao (2):
+>   s390x/flic: introduce inject_airq callback
+>   s390x/css: update css_adapter_interrupt
+> 
+>  hmp-commands-info.hx                               |  16 +
+>  hmp-commands.hx                                    |  16 +
+>  hw/intc/s390_flic.c                                |  66 +++-
+>  hw/intc/s390_flic_kvm.c                            |  57 ++-
+>  hw/intc/trace-events                               |   4 +
+>  hw/s390x/Makefile.objs                             |   2 +
+>  hw/s390x/css-bridge.c                              |   2 +-
+>  hw/s390x/css.c                                     |  52 ++-
+>  hw/s390x/s390-pci-bus.c                            |   5 +-
+>  hw/s390x/s390-stattrib-kvm.c                       | 178 +++++++++
+>  hw/s390x/s390-stattrib.c                           | 410 +++++++++++++++++++++
+>  hw/s390x/s390-virtio-ccw.c                         |  10 +-
+>  hw/s390x/trace-events                              |   1 +
+>  hw/s390x/virtio-ccw.c                              |   2 +-
+>  include/hw/s390x/css.h                             |  12 +-
+>  include/hw/s390x/s390_flic.h                       |  13 +-
+>  include/hw/s390x/storage-attributes.h              |  72 ++++
+>  include/standard-headers/asm-x86/hyperv.h          |  21 +-
+>  include/standard-headers/linux/input-event-codes.h |   1 +
+>  include/standard-headers/linux/pci_regs.h          |   1 +
+>  linux-headers/asm-arm/kvm.h                        |   8 +
+>  linux-headers/asm-arm64/kvm.h                      |   3 +
+>  linux-headers/asm-powerpc/kvm.h                    |   6 +
+>  linux-headers/asm-s390/kvm.h                       |  12 +
+>  linux-headers/linux/kvm.h                          |  35 ++
+>  monitor.c                                          |   1 +
+>  target/s390x/cpu.h                                 |   1 +
+>  target/s390x/cpu_features.c                        |   3 +
+>  target/s390x/cpu_features_def.h                    |  35 ++
+>  target/s390x/cpu_models.c                          |  26 ++
+>  target/s390x/cpu_models.h                          |   2 +
+>  target/s390x/gen-features.c                        |  58 ++-
+>  target/s390x/kvm.c                                 |  42 ++-
+>  33 files changed, 1135 insertions(+), 38 deletions(-)
+>  create mode 100644 hw/s390x/s390-stattrib-kvm.c
+>  create mode 100644 hw/s390x/s390-stattrib.c
+>  create mode 100644 include/hw/s390x/storage-attributes.h
+> 
