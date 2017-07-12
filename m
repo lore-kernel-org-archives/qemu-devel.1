@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVI0x-0000We-Di
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:16 -0400
+	(envelope-from <j.pelczar@samsung.com>) id 1dVI1I-0000u0-Gu
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVI0s-0004it-DN
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVI0s-0004hm-6q
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:10 -0400
-Date: Wed, 12 Jul 2017 15:49:03 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170712154903.12ae15f9@dhcp-192-215.str.redhat.com>
-In-Reply-To: <1499864265-144136-2-git-send-email-borntraeger@de.ibm.com>
-References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-	<1499864265-144136-2-git-send-email-borntraeger@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(envelope-from <j.pelczar@samsung.com>) id 1dVI1D-0004sY-G5
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:36 -0400
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:63942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <j.pelczar@samsung.com>)
+	id 1dVI1D-0004s4-7P
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:31 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout4.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OSZ001LGD2DAG90@mailout4.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:49:25 +0100 (BST)
+Received: from eusmges1.samsung.com (unknown [203.254.199.239])
+	by	eucas1p2.samsung.com (KnoxPortal) with ESMTP
+	id	20170712134925eucas1p2f3355358afcef3c9257cfeca82bc62d6~QmWwHspeB1005510055eucas1p2E
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 13:49:25 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180])
+	by	eucas1p1.samsung.com (KnoxPortal) with ESMTP
+	id	20170712134924eucas1p128160f1573036dd5293f9167e190e9f8~QmWvdvYKJ0189401894eucas1p1B
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 13:49:24 +0000 (GMT)
+Received: from AMDN1843 ([106.120.52.68])
+	by eusync4.samsung.com (Oracle	Communications Messaging Server
+	7.0.5.31.0 64bit (built May  5 2014))
+	with	ESMTPA id <0OSZ009APD2BQXC0@eusync4.samsung.com> for
+	qemu-devel@nongnu.org;	Wed, 12 Jul 2017 14:49:23 +0100 (BST)
+From: Jaroslaw Pelczar <j.pelczar@samsung.com>
+Date: Wed, 12 Jul 2017 15:49:22 +0200
+Message-id: <001d01d2fb15$ab737040$025a50c0$@samsung.com>
+MIME-version: 1.0
+Content-language: pl
+References: <CGME20170712134924eucas1p128160f1573036dd5293f9167e190e9f8@eucas1p1.samsung.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/11] s390x/kvm: Rework cmma management
+Subject: [Qemu-devel] [PATCH 1/1] tcg/tci: Remove unnecessary TODO() for
+ INDEX_op_bswap16_i64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +46,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 12 Jul 2017 14:57:35 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Running Ubuntu with systemd on AArch64 Cortex-A53 and qemu is compiled
 
-> From: Janosch Frank <frankja@linux.vnet.ibm.com>
-> 
-> Let's keep track of cmma enablement and move the mem_path check into
-> the actual enablement. This now also warns users that do not use
-> cpu-models about disabled cmma when using huge pages.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/cpu.h |  1 +
->  target/s390x/kvm.c | 26 +++++++++++++++++---------
->  2 files changed, 18 insertions(+), 9 deletions(-)
+with
 
-> @@ -177,6 +179,11 @@ int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit)
->      return kvm_vm_ioctl(s, KVM_SET_DEVICE_ATTR, &attr);
->  }
->  
-> +int kvm_s390_cmma_active(void)
-> +{
-> +    return active_cmma;
-> +}
+ 
 
-This is rather "has cmma ever been enabled"...
+./configure --target-list=aarch64-softmmu --enable-tcg-interpreter
 
-> +
->  static bool kvm_s390_cmma_available(void)
->  {
->      static bool initialized, value;
-> @@ -197,7 +204,7 @@ void kvm_s390_cmma_reset(void)
->          .attr = KVM_S390_VM_MEM_CLR_CMMA,
->      };
->  
-> -    if (mem_path || !kvm_s390_cmma_available()) {
-> +    if (!kvm_s390_cmma_active()) {
->          return;
->      }
+ 
 
-...as you don't clear it on reset, right?
+System gives the following log:
 
-Confused me a bit at first, but
+ 
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Welcome to Ubuntu 16.04.1 LTS!
+
+ 
+
+systemd[1]: Set hostname to <localhost.localdomain>.
+
+TODO (...)/qemu/tcg/tci.c:1049: tcg_qemu_tb_exec()
+
+(...)/qemu/tcg/tci.c:1049: tcg fatal error
+
+Aborted (core dumped)
+
+ 
+
+After investigation it turns out that TCG generates bswap16_i64
+
+opcode, which looks fine in the implementation.
+
+ 
+
+Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
+
+---
+
+tcg/tci.c | 1 -
+
+1 file changed, 1 deletion(-)
+
+ 
+
+diff --git a/tcg/tci.c b/tcg/tci.c
+
+index 4bdc645..f39bfb9 100644
+
+--- a/tcg/tci.c
+
++++ b/tcg/tci.c
+
+@@ -1046,7 +1046,6 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t
+*tb_ptr)
+
+             break;
+
+#if TCG_TARGET_HAS_bswap16_i64
+
+         case INDEX_op_bswap16_i64:
+
+-            TODO();
+
+             t0 = *tb_ptr++;
+
+             t1 = tci_read_r16(&tb_ptr);
+
+             tci_write_reg64(t0, bswap16(t1));
+
+-- 
+
+2.7.4
+
+ 
