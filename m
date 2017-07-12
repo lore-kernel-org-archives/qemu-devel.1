@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dVFVM-0007kp-0D
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:08:29 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVFXH-0001MM-T3
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1dVFVG-0000Vb-Vg
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:08:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34740)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1dVFVG-0000V8-Mq
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:08:22 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6CB3mBp137642
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:08:20 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncj4wr6c-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:08:19 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Wed, 12 Jul 2017 12:08:16 +0100
-References: <1499781397-19749-1-git-send-email-thuth@redhat.com>
-	<2efa5d82-3cb2-ef8a-53b0-54a630637d98@de.ibm.com>
-	<d81c6ea2-beb1-12bf-c19b-eb8180f26a59@redhat.com>
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Wed, 12 Jul 2017 13:08:12 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVFXC-0001D3-R0
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:10:27 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:57038 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVFXC-0001Cm-ER
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:10:22 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	<87shi27zqz.fsf@linaro.org>
+Date: Wed, 12 Jul 2017 14:10:12 +0300
+In-Reply-To: <87shi27zqz.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
+	message of "Wed, 12 Jul 2017 10:47:48 +0100")
+Message-ID: <878tjtewrv.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <d81c6ea2-beb1-12bf-c19b-eb8180f26a59@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <713b883e-05a2-9cb6-b166-e7a9d4e405a8@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/11] Implement network booting in the
- s390-ccw BIOS
+Subject: Re: [Qemu-devel] [PATCH v12 00/27] translate: [tcg] Generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,135 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 12.07.2017 12:53, Thomas Huth wrote:
-> On 12.07.2017 10:33, Christian Borntraeger wrote:
->> On 07/11/2017 03:56 PM, Thomas Huth wrote:
->>> It's already possible to do a network boot of an s390x guest with an
->>> external netboot image based on a Linux installation, but it would
->>> be much more convenient if the s390-ccw firmware supported network
->>> booting right out of the box, without the need to assemble such an
->>> external image first.
->>>
->>> This patch series now introduces a s390-netboot.img that can be used
->>> for network booting via DHCP and TFTP by re-using the networking stac=
-k
->>> from the SLOF firmware (see https://github.com/aik/SLOF/ for details)=
-,
->>> and adds a driver for virtio-net-ccw devices.
->>>
->>> The code can only be built if the roms/SLOF submodule has been checke=
-d
->>> out (there is a sanity check for this in the Makefile). Once it has
->>> been built, you can download a combined kernel + initrd image via TFT=
-P
->>> by starting QEMU for example with:
->>>
->>>  qemu-system-s390x ... -device virtio-net,netdev=3Dn1,bootindex=3D1 \
->>>        -netdev user,id=3Dn1,tftp=3D/path/to/tftp,bootfile=3Dkernel.im=
-g
->>>
->>> Note that this version does not support downloading via config
->>> files (i.e. pxelinux config files or .INS config files) yet. This
->>> will be added later.
->>>
->>> v4:
->>>  - Cosmetic clean-ups according to the review feedback from v3
->>>  - Fixed bug in the find_dev() function (spotted by Cornelia in v3)
->>>  - Added an additional patch to remove some unused structs from
->>>    virtio.h
->>>
->>> v3:
->>>  - Adressed the review feedback from v2
->>>  - The last remaining SLOF patch has now been merged (big thanks to
->>>    Alexey!), so not sending this as RFC anymore - it is ready now for
->>>    integration, I think.
->>>
->>> v2:
->>>  - Put the network boot loader into a separate s390-netboot.img
->>>    binary instead of linking it directly into the s390-ccw firmware.
->>>  - Use the SLOF sources from the roms/SLOF/ submodule instead of
->>>    copying them into the pc-bios/s390-ccw folder
->>>  - Removed the .INS config file loading code for now - only support
->>>    combined kernel + initrd images in this initial implementation.
->>>
->>> Thomas Huth (11):
->>>   pc-bios/s390-ccw: Move libc functions to separate header
->>>   pc-bios/s390-ccw: Move ebc2asc to sclp.c
->>>   pc-bios/s390-ccw: Move virtio-block related functions into a separa=
-te
->>>     file
->>>   pc-bios/s390-ccw: Add a write() function for stdio
->>>   pc-bios/s390-ccw: Move byteswap functions to a separate header
->>>   pc-bios/s390-ccw: Remove unused structs from virtio.h
->>>   pc-bios/s390-ccw: Add code for virtio feature negotiation
->>>   roms/SLOF: Update submodule to latest status
->>>   pc-bios/s390-ccw: Add core files for the network bootloading progra=
-m
->>>   pc-bios/s390-ccw: Add virtio-net driver code
->>>   pc-bios/s390-ccw: Link libnet into the netboot image and do the TFT=
-P
->>>     load
->>>
->>>  pc-bios/s390-ccw/Makefile        |  13 +-
->>>  pc-bios/s390-ccw/bootmap.c       |   2 +
->>>  pc-bios/s390-ccw/bootmap.h       |  26 ---
->>>  pc-bios/s390-ccw/bswap.h         |  30 ++++
->>>  pc-bios/s390-ccw/libc.h          |  45 +++++
->>>  pc-bios/s390-ccw/main.c          |  14 +-
->>>  pc-bios/s390-ccw/netboot.mak     |  51 ++++++
->>>  pc-bios/s390-ccw/netmain.c       | 362 +++++++++++++++++++++++++++++=
-++++++++++
->>>  pc-bios/s390-ccw/s390-ccw.h      |  33 +---
->>>  pc-bios/s390-ccw/sclp.c          |  37 ++--
->>>  pc-bios/s390-ccw/virtio-blkdev.c | 296 +++++++++++++++++++++++++++++=
-+++
->>>  pc-bios/s390-ccw/virtio-net.c    | 135 +++++++++++++++
->>>  pc-bios/s390-ccw/virtio-scsi.c   |   1 +
->>>  pc-bios/s390-ccw/virtio.c        | 306 ++++-------------------------=
-----
->>>  pc-bios/s390-ccw/virtio.h        |  46 ++---
->>>  roms/SLOF                        |   2 +-
->>>  16 files changed, 1011 insertions(+), 388 deletions(-)
->>>  create mode 100644 pc-bios/s390-ccw/bswap.h
->>>  create mode 100644 pc-bios/s390-ccw/libc.h
->>>  create mode 100644 pc-bios/s390-ccw/netboot.mak
->>>  create mode 100644 pc-bios/s390-ccw/netmain.c
->>>  create mode 100644 pc-bios/s390-ccw/virtio-blkdev.c
->>>  create mode 100644 pc-bios/s390-ccw/virtio-net.c
->>>
->>
->> Was going to apply but then I updated the slof thing but building fail=
-s. Not sure yet why.
->>
->> In file included from /home/cborntra/REPOS/qemu/roms/SLOF/lib/libc/cty=
-pe/isdigit.c:13:0:
->> /home/cborntra/REPOS/qemu/roms/SLOF/lib/libc/ctype/isdigit.c:15:17: er=
-ror: expected =E2=80=98)=E2=80=99 before =E2=80=98ch=E2=80=99
->>  int isdigit(int ch)
->=20
-> What a bummer! Sorry, I've only cross-compiled the s390-ccw BIOS so far=
-,
-> and that worked fine (since s390x machines are a little bit hard to get
-> here), but seems like there is still something ugly going on when you
-> build the code natively ... likely somethings wrong in the Makefile ...
-> I'll try to figure it out ...
->=20
->  Thomas
->=20
+Alex Benn=C3=A9e writes:
 
-I haven't tried recently, but you could consider using one of these here
-https://developer.ibm.com/linuxone/
+> Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
 
---=20
+>> This series proposes a generic (target-agnostic) instruction translation
+>> framework.
+>>=20
+>> It basically provides a generic main loop for instruction disassembly, w=
+hich
+>> calls target-specific functions when necessary. This generalization makes
+>> inserting new code in the main loop easier, and helps in keeping all tar=
+gets in
+>> synch as to the contents of it.
 
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
-   Viktor Mihajlovski
+> As has been mentioned elsewhere I think we need to spend a little time
+> making sure we have well defined common semantics for the as many of the
+> translation exit conditions as possible so the others really are just
+> special conditions for each architecture.
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+>> This series also paves the way towards adding events to trace guest code
+>> execution (BBLs and instructions).
+
+> I'm looking forward to it, it is certainly going in the right direction
+> and will make instrumentation a lot easier ;-)
+
+>> I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits=
+ in the
+>> current organization, but will port the rest when this series gets
+>> merged.
+
+> Are you confident the other architectures will be as amenable to this
+> port? I guess we want to avoid being in a position of having a partial
+> port in progress for too long.
+
+> Anyway I'm done with my review pass for now, I look forward to future
+> revisions ;-)
+
+I've only skimmed through a few other targets, but there seems to be a patt=
+ern
+that follows the same type of changes. In fact, most of them are just moving
+code around into refactored hooks. But I don't want these to be my "last fa=
+mous
+words" :)
+
+
+Thanks,
+  Lluis
