@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVHug-0003b0-Dj
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:42:47 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dVHyP-0006kk-L2
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVHub-0000iB-JQ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:42:46 -0400
-Resent-Message-Id: <E1dVHub-0000iB-JQ@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21721)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dVHub-0000d9-AS
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:42:41 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149986694731.66.826996087395978402@5d477a5b5989>
-In-Reply-To: <1499863793-18627-1-git-send-email-thuth@redhat.com>
+	(envelope-from <mjt@tls.msk.ru>) id 1dVHyL-0003Pl-IC
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:46:37 -0400
+From: Michael Tokarev <mjt@tls.msk.ru>
+Date: Wed, 12 Jul 2017 16:38:07 +0300
+Message-Id: <a7a305aee1e9a74a3f4b263aa98babed795b1f0a.1499866676.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
+References: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
+In-Reply-To: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
+References: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 12 Jul 2017 06:42:28 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 00/11] Implement network booting in the
- s390-ccw BIOS
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 11/13] include/hw/ptimer.h: Add documentation
+ comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +25,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, mihajlov@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, agraf@suse.de, david@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE0OTk4NjM3OTMtMTg2MjctMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQu
-Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMDAvMTFdIEltcGxlbWVudCBuZXR3
-b3JrIGJvb3RpbmcgaW4gdGhlIHMzOTAtY2N3IEJJT1MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
-QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
-aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
-IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
-Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
-MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmYxYjg0Yzkg
-cGMtYmlvcy9zMzkwLWNjdzogTGluayBsaWJuZXQgaW50byB0aGUgbmV0Ym9vdCBpbWFnZSBhbmQg
-ZG8gdGhlIFRGVFAgbG9hZAplNTAzMTk1IHBjLWJpb3MvczM5MC1jY3c6IEFkZCB2aXJ0aW8tbmV0
-IGRyaXZlciBjb2RlCmIxYzY0NWQgcGMtYmlvcy9zMzkwLWNjdzogQWRkIGNvcmUgZmlsZXMgZm9y
-IHRoZSBuZXR3b3JrIGJvb3Rsb2FkaW5nIHByb2dyYW0KZTczYzM4OSByb21zL1NMT0Y6IFVwZGF0
-ZSBzdWJtb2R1bGUgdG8gbGF0ZXN0IHN0YXR1cwpiNTRmYTU0IHBjLWJpb3MvczM5MC1jY3c6IEFk
-ZCBjb2RlIGZvciB2aXJ0aW8gZmVhdHVyZSBuZWdvdGlhdGlvbgpiYmQ1Njc3IHBjLWJpb3MvczM5
-MC1jY3c6IFJlbW92ZSB1bnVzZWQgc3RydWN0cyBmcm9tIHZpcnRpby5oCmE1NzY3NDcgcGMtYmlv
-cy9zMzkwLWNjdzogTW92ZSBieXRlc3dhcCBmdW5jdGlvbnMgdG8gYSBzZXBhcmF0ZSBoZWFkZXIK
-NWIwNTgyNyBwYy1iaW9zL3MzOTAtY2N3OiBBZGQgYSB3cml0ZSgpIGZ1bmN0aW9uIGZvciBzdGRp
-bwphNzFlODFmIHBjLWJpb3MvczM5MC1jY3c6IE1vdmUgdmlydGlvLWJsb2NrIHJlbGF0ZWQgZnVu
-Y3Rpb25zIGludG8gYSBzZXBhcmF0ZSBmaWxlCjZmMzY4NDQgcGMtYmlvcy9zMzkwLWNjdzogTW92
-ZSBlYmMyYXNjIHRvIHNjbHAuYwpkNjA5ZGYxIHBjLWJpb3MvczM5MC1jY3c6IE1vdmUgbGliYyBm
-dW5jdGlvbnMgdG8gc2VwYXJhdGUgaGVhZGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzExOiBwYy1iaW9zL3MzOTAtY2N3OiBNb3ZlIGxpYmMgZnVuY3Rpb25zIHRvIHNl
-cGFyYXRlIGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCAyLzExOiBwYy1iaW9zL3MzOTAtY2N3OiBN
-b3ZlIGViYzJhc2MgdG8gc2NscC5jLi4uCkNoZWNraW5nIFBBVENIIDMvMTE6IHBjLWJpb3MvczM5
-MC1jY3c6IE1vdmUgdmlydGlvLWJsb2NrIHJlbGF0ZWQgZnVuY3Rpb25zIGludG8gYSBzZXBhcmF0
-ZSBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDQvMTE6IHBjLWJpb3MvczM5MC1jY3c6IEFkZCBhIHdy
-aXRlKCkgZnVuY3Rpb24gZm9yIHN0ZGlvLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9p
-ZGVkIGluIC5jIGZpbGVzCiMyMzogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9zY2xwLmM6MTU6Cits
-b25nIHdyaXRlKGludCBmZCwgY29uc3Qgdm9pZCAqc3RyLCBzaXplX3QgbGVuKTsKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMzcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS8xMTogcGMtYmlvcy9zMzkwLWNj
-dzogTW92ZSBieXRlc3dhcCBmdW5jdGlvbnMgdG8gYSBzZXBhcmF0ZSBoZWFkZXIuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNi8xMTogcGMtYmlvcy9zMzkwLWNjdzogUmVtb3ZlIHVudXNlZCBzdHJ1Y3RzIGZy
-b20gdmlydGlvLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMTogcGMtYmlvcy9zMzkwLWNjdzogQWRk
-IGNvZGUgZm9yIHZpcnRpbyBmZWF0dXJlIG5lZ290aWF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDgv
-MTE6IHJvbXMvU0xPRjogVXBkYXRlIHN1Ym1vZHVsZSB0byBsYXRlc3Qgc3RhdHVzLi4uCkNoZWNr
-aW5nIFBBVENIIDkvMTE6IHBjLWJpb3MvczM5MC1jY3c6IEFkZCBjb3JlIGZpbGVzIGZvciB0aGUg
-bmV0d29yayBib290bG9hZGluZyBwcm9ncmFtLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBh
-dm9pZGVkIGluIC5jIGZpbGVzCiMxMjc6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvbmV0bWFpbi5j
-OjI2OgorZXh0ZXJuIGNoYXIgX3N0YXJ0W107CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
-aWRlZCBpbiAuYyBmaWxlcwojMTMwOiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L25ldG1haW4uYzoy
-OToKK0lwbFBhcmFtZXRlckJsb2NrIGlwbGIgX19hdHRyaWJ1dGVfXygoYWxpZ25lZChQQUdFX1NJ
-WkUpKSk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIwNCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMC8x
-MTogcGMtYmlvcy9zMzkwLWNjdzogQWRkIHZpcnRpby1uZXQgZHJpdmVyIGNvZGUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTEvMTE6IHBjLWJpb3MvczM5MC1jY3c6IExpbmsgbGlibmV0IGludG8gdGhlIG5l
-dGJvb3QgaW1hZ2UgYW5kIGRvIHRoZSBURlRQIGxvYWQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+From: Peter Maydell <peter.maydell@linaro.org>
+
+Add documentation comments describing the public API of the
+ptimer countdown timer.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+---
+ include/hw/ptimer.h | 120 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 120 insertions(+)
+
+diff --git a/include/hw/ptimer.h b/include/hw/ptimer.h
+index eafc3f0a86..fc4ef5cc1d 100644
+--- a/include/hw/ptimer.h
++++ b/include/hw/ptimer.h
+@@ -12,6 +12,20 @@
+ #include "qemu/timer.h"
+ #include "migration/vmstate.h"
+=20
++/* The ptimer API implements a simple periodic countdown timer.
++ * The countdown timer has a value (which can be read and written via
++ * ptimer_get_count() and ptimer_set_count()). When it is enabled
++ * using ptimer_run(), the value will count downwards at the frequency
++ * which has been configured using ptimer_set_period() or ptimer_set_fre=
+q().
++ * When it reaches zero it will trigger a QEMU bottom half handler, and
++ * can be set to either reload itself from a specified limit value
++ * and keep counting down, or to stop (as a one-shot timer).
++ *
++ * Forgetting to set the period/frequency (or setting it to zero) is a
++ * bug in the QEMU device and will cause warning messages to be printed
++ * to stderr when the guest attempts to enable the timer.
++ */
++
+ /* The default ptimer policy retains backward compatibility with the leg=
+acy
+  * timers. Custom policies are adjusting the default one. Consider provi=
+ding
+  * a correct policy for your timer.
+@@ -59,15 +73,121 @@
+ typedef struct ptimer_state ptimer_state;
+ typedef void (*ptimer_cb)(void *opaque);
+=20
++/**
++ * ptimer_init - Allocate and return a new ptimer
++ * @bh: QEMU bottom half which is run on timer expiry
++ * @policy: PTIMER_POLICY_* bits specifying behaviour
++ *
++ * The ptimer returned must be freed using ptimer_free().
++ * The ptimer takes ownership of @bh and will delete it
++ * when the ptimer is eventually freed.
++ */
+ ptimer_state *ptimer_init(QEMUBH *bh, uint8_t policy_mask);
++
++/**
++ * ptimer_free - Free a ptimer
++ * @s: timer to free
++ *
++ * Free a ptimer created using ptimer_init() (including
++ * deleting the bottom half which it is using).
++ */
+ void ptimer_free(ptimer_state *s);
++
++/**
++ * ptimer_set_period - Set counter increment interval in nanoseconds
++ * @s: ptimer to configure
++ * @period: period of the counter in nanoseconds
++ *
++ * Note that if your counter behaviour is specified as having a
++ * particular frequency rather than a period then ptimer_set_freq()
++ * may be more appropriate.
++ */
+ void ptimer_set_period(ptimer_state *s, int64_t period);
++
++/**
++ * ptimer_set_freq - Set counter frequency in Hz
++ * @s: ptimer to configure
++ * @freq: counter frequency in Hz
++ *
++ * This does the same thing as ptimer_set_period(), so you only
++ * need to call one of them. If the counter behaviour is specified
++ * as setting the frequency then this function is more appropriate,
++ * because it allows specifying an effective period which is
++ * precise to fractions of a nanosecond, avoiding rounding errors.
++ */
+ void ptimer_set_freq(ptimer_state *s, uint32_t freq);
++
++/**
++ * ptimer_get_limit - Get the configured limit of the ptimer
++ * @s: ptimer to query
++ *
++ * This function returns the current limit (reload) value
++ * of the down-counter; that is, the value which it will be
++ * reset to when it hits zero.
++ *
++ * Generally timer devices using ptimers should be able to keep
++ * their reload register state inside the ptimer using the get
++ * and set limit functions rather than needing to also track it
++ * in their own state structure.
++ */
+ uint64_t ptimer_get_limit(ptimer_state *s);
++
++/**
++ * ptimer_set_limit - Set the limit of the ptimer
++ * @s: ptimer
++ * @limit: initial countdown value
++ * @reload: if nonzero, then reset the counter to the new limit
++ *
++ * Set the limit value of the down-counter. The @reload flag can
++ * be used to emulate the behaviour of timers which immediately
++ * reload the counter when their reload register is written to.
++ */
+ void ptimer_set_limit(ptimer_state *s, uint64_t limit, int reload);
++
++/**
++ * ptimer_get_count - Get the current value of the ptimer
++ * @s: ptimer
++ *
++ * Return the current value of the down-counter. This will
++ * return the correct value whether the counter is enabled or
++ * disabled.
++ */
+ uint64_t ptimer_get_count(ptimer_state *s);
++
++/**
++ * ptimer_set_count - Set the current value of the ptimer
++ * @s: ptimer
++ * @count: count value to set
++ *
++ * Set the value of the down-counter. If the counter is currently
++ * enabled this will arrange for a timer callback at the appropriate
++ * point in the future.
++ */
+ void ptimer_set_count(ptimer_state *s, uint64_t count);
++
++/**
++ * ptimer_run - Start a ptimer counting
++ * @s: ptimer
++ * @oneshot: non-zero if this timer should only count down once
++ *
++ * Start a ptimer counting down; when it reaches zero the bottom half
++ * passed to ptimer_init() will be invoked. If the @oneshot argument is =
+zero,
++ * the counter value will then be reloaded from the limit and it will
++ * start counting down again. If @oneshot is non-zero, then the counter
++ * will disable itself when it reaches zero.
++ */
+ void ptimer_run(ptimer_state *s, int oneshot);
++
++/**
++ * ptimer_stop - Stop a ptimer counting
++ * @s: ptimer
++ *
++ * Pause a timer (the count stays at its current value until ptimer_run(=
+)
++ * is called to start it counting again).
++ *
++ * Note that this can cause it to "lose" time, even if it is immediately
++ * restarted.
++ */
+ void ptimer_stop(ptimer_state *s);
+=20
+ extern const VMStateDescription vmstate_ptimer;
+--=20
+2.11.0
