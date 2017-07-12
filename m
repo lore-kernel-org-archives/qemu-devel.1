@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1dVM9Q-00033z-8O
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:14:17 -0400
+	(envelope-from <cota@braap.org>) id 1dVMEp-0005Lf-6X
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1dVM9N-0002dP-2e
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:14:16 -0400
+	(envelope-from <cota@braap.org>) id 1dVMEm-0005DL-3z
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:19:51 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36171)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dVMEl-0005Cu-Mj
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 14:19:48 -0400
+Date: Wed, 12 Jul 2017 14:19:45 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170712181945.GA7547@flamenco>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-4-git-send-email-cota@braap.org>
+	<87pod5946r.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20170511182705.23648-1-jsnow@redhat.com>
-	<19a665be-12c2-2876-0438-08327d94473e@redhat.com>
-	<6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
-	<815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
-	<de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
-	<ea023ed7-4925-b338-8636-435103ce757b@redhat.com>
-	<20170516081703.GB4438@noname.redhat.com>
-	<48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
-	<dd12265d-e764-34ee-8d1e-504f27b78614@redhat.com>
-	<20170712145634.GF4917@noname.str.redhat.com>
-	<5b0adf36-60c4-192c-4f30-a8c1d681f50d@redhat.com>
-In-Reply-To: <5b0adf36-60c4-192c-4f30-a8c1d681f50d@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Wed, 12 Jul 2017 18:12:38 +0000
-Message-ID: <CAMr-obvid+Fhqmm+9+95Fdi8fwjYXu_nVrjysVVw22-7rDfCvw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4] qemu-img: Check for
- backing image if specified during create
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87pod5946r.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 03/22] cputlb: bring back tlb_flush_count
+ under !TLB_DEBUG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Wed, Jul 12, 2017 at 8:00 PM Max Reitz <mreitz@redhat.com> wrote:
-
-> On 2017-07-12 16:56, Kevin Wolf wrote:
-> > Am 12.07.2017 um 16:42 hat Eric Blake geschrieben:
-> >> On 05/17/2017 07:38 AM, Max Reitz wrote:
-> >>
-> >>>>>>>>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1213786
-> >>>>>>>>>>
-> >>>>>>>>>> Or, rather, force the open of a backing image if one was
-> specified
-> >>>>>>>>>> for creation. Using a similar -unsafe option as rebase, allow
-> qemu-img
-> >>>>>>>>>> to ignore the backing file validation if possible.
-> >>>>>>>>>>
-> >>>>>>>>
-> >>
-> >>>>> I suspect this is because the backing file is opened somewhere and
-> >>>>> trying to open it breaks now with the locking series applied.
-> >>>>
-> >>>> I think we can legitimately set force-shared=on for opening the
-> backing
-> >>>> file when testing whether the file exists.
-> >>>
-> >>> For testing whether the file exists, probably. I wouldn't call it
-> >>> legitimately because I don't like making that the default at all, but
-> it
-> >>> should work.
-> >>>
-> >>> But then we have to differentiate between testing whether the file
-> >>> exists and opening it to read its size; I'm even more wary regarding
-> the
-> >>> latter.
-> >>>
-> >>> All in all, I've stated my opinion on this matter on IRC: I don't know
-> >>> how much we need this patch. It's nice to have, it's convenient to know
-> >>> you have mistyped the backing filename before you try to use the image
-> >>> in qemu, but it's not critical. I don't consider the current behavior a
-> >>> bug per-se, it's just counterintuitive behavior (that will not cut your
-> >>> head off if you don't know it, though!).
-> >>>
-> >>
-> >> The fact that this topic came up on the mailing list again means we
-> >> should probably consider something along these lines for 2.10.
-> >>
-> >>> (Also, we have a lot of counterintuitive behavior. See this:
-> >>>
-> >>> $ qemu-img create -f qcow2 sub/backing.qcow2 64M
-> >>> Formatting 'sub/backing.qcow2', fmt=qcow2 size=67108864 encryption=off
-> >>> cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> >>> $ qemu-img create -f qcow2 -b sub/backing.qcow2 sub/top.qcow2
-> >>> qemu-img: sub/top.qcow2: Could not open 'sub/sub/backing.qcow2': No
-> such
-> >>> file or directory
-> >>>
-> >>> Yeah, sure, you'll know after you've done the mistake once. But the
-> same
-> >>> applies here, too, doesn't it...?)
-> >>>
-> >>> So for me, it's a question of convenience: How much does the current
-> >>> behavior annoy users? How much annoyance will changing the behavior
-> >>> bring? I'm not (or rather, no longer) convinced the former outweighs
-> the
-> >>> latter, especially since it means having to change management tools
-> >>> (which create external snapshots with qemu-img create while the backing
-> >>> image is in use by qemu).
-> >>>
-> >>> If you think otherwise, well, you're the main maintainer. :-)
-> >>>
-> >>> Max
-> >>>
-> >>>
-> >>> PS: Can there be a middle ground? Like just printing a warning if the
-> >>> backing file cannot be opened and we don't absolutely have to?
-> >>
-> >> Middle ground may be harder, but may be nicer (especially since we are
-> >> talking about tightening behavior, making things that used to work now
-> >> fail is not nice if there is not a transition period where it first just
-> >> warns).
+On Wed, Jul 12, 2017 at 14:26:36 +0100, Alex Bennée wrote:
+> Emilio G. Cota <cota@braap.org> writes:
+(snip)
+> > This patch does the latter by embedding tlb_flush_count in CPUArchState.
+> > The global count is then easily obtained by iterating over the CPU list.
 > >
-> > We can do the nowadays usual thing: Add a -u option, print a deprecation
-> > warning if we don't have -u and can't open the backing file, and put
-> > it into the list of things to remove in 3.0.
->
-> Works for me.
->
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> 
+> As it actually fixes unintentional breakage:
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> That said I'm not sure if this number alone is helpful given the range
+> of flushes we have. Really from a performance point of view we should
+> differentiate between inline per-vCPU flushes as well as the cross-vCPU
+> flushes of both asynchronus and synced varieties.
+> 
+> I had a go at this using QEMUs tracing infrastructure:
+> 
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg04076.html
+> 
+> But I guess the ideal way would be something that both keeps counters
+> and optionally enable tracepoints.
 
-Should work for oVirt.
+Yeah the counters in my patch are there to fix the breakage while
+not hurting scalability in MTTCG.
 
-When we consume the -u/--unsafe option, should we use qemu-img version,
-or maybe we need an official api for detecting capabilities?
+Having those counters always on + the tracers in your patchset
+for more detailed info seems reasonable to me.
 
-    qemu-img caps --format json
-    {
-        "unsafe-create": True,
-        ...
+Maybe it's time to push to get those tracers changes in?
 
-Nir
+		Emilio
