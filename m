@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVOIs-00021l-Dy
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:32:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVOOg-0003pc-96
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVOIp-00088f-9F
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:32:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47968)
+	(envelope-from <ehabkost@redhat.com>) id 1dVOOd-0003t6-5N
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:38:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54148)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVOIo-00087T-VZ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:32:07 -0400
-Date: Wed, 12 Jul 2017 23:31:59 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170712232214-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVOOc-0003sF-Sx
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:38:07 -0400
+Date: Wed, 12 Jul 2017 17:37:57 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170712203757.GP6020@localhost.localdomain>
 References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<20170712181652-mutt-send-email-mst@kernel.org>
-	<20170712201550.GN6020@localhost.localdomain>
+	<20170712150400.GH5237@redhat.com>
+	<9d51d348-7ad6-a98d-3f6d-89e8af5e3a16@redhat.com>
+	<20170712161254.GJ5237@redhat.com>
+	<d3c71dc9-1286-802a-b663-7d37f97daf72@redhat.com>
+	<20170712162901.GL5237@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170712201550.GN6020@localhost.localdomain>
+In-Reply-To: <20170712162901.GL5237@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
  to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
@@ -30,95 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Jul 12, 2017 at 05:15:50PM -0300, Eduardo Habkost wrote:
-> On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
-> > On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
-> > > On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
-> > > > We don't want to carry along old machine types forever. If we are able to
-> > > > remove the pc machines up to 0.13 one day for example, this would allow
-> > > > us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> > > > BARs directly to low memory). Everything up to pc-1.2 is also known to
-> > > > have issues with migration.  So let's start with a deprecation message
-> > > > for the old machine types so that the (hopefully) few users of these old
-> > > > systems start switching over to newer machine types instead.
-> > > > 
-> > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Wed, Jul 12, 2017 at 05:29:01PM +0100, Daniel P. Berrange wrote:
+> On Wed, Jul 12, 2017 at 06:23:51PM +0200, Paolo Bonzini wrote:
+> > On 12/07/2017 18:12, Daniel P. Berrange wrote:
+> > >> I'm still not 100% sure whether that auto-deprecation of machine types
+> > >> is such a good idea ... since we might need to maintain machines in
+> > >> downstream a little bit longer than specified there, it might be better
+> > >> to rather deprecate them manually from time to time.
 > > > 
-> > > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > 
-> > > I suggest changing "-machine help" too.  Today it looks like this:
-> > > 
-> > >   Supported machines are:
-> > >   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-> > >   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
-> > >   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
-> > >   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-> > >   pc-1.3               Standard PC (i440FX + PIIX, 1996)
-> > >   pc-1.2               Standard PC (i440FX + PIIX, 1996)
-> > >   pc-1.1               Standard PC (i440FX + PIIX, 1996)
-> > >   pc-1.0               Standard PC (i440FX + PIIX, 1996)
-> > >   pc-0.15              Standard PC (i440FX + PIIX, 1996)
-> > >   pc-0.14              Standard PC (i440FX + PIIX, 1996)
-> > >   pc-0.13              Standard PC (i440FX + PIIX, 1996)
-> > >   pc-0.12              Standard PC (i440FX + PIIX, 1996)
-> > >   pc-0.11              Standard PC (i440FX + PIIX, 1996)
-> > >   pc-0.10              Standard PC (i440FX + PIIX, 1996)
-> > >   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
-> > >   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
-> > >   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
-> > >   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-> > >   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-> > >   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-> > >   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
-> > >   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
-> > >   isapc                ISA-only PC
-> > >   none                 empty machine
+> > > Downstreams usually maintain custom machine types, so fact that the
+> > > upstream machine types get deleted is not a problem in itself. The problem
+> > > comes if followup internal code removal then prevents downstream from
+> > > creating their custom machine type.  I don't think we need tie these
+> > > issues together. We can remove old machine types, without immediately
+> > > removing features that our harm creation of downstream machine types.
 > > 
-> > Any chance we can sort them reasonably too?
+> > I think machine type and feature removal should be tied together.
+> > 
+> > Doing the opposite leaves around code that is more or less dead from an
+> > upstream point of view, and looks like an ad hoc rule for Red Hat.  It
+> > harms downstreams that do not participate in upstream development
+> > (though perhaps this is an intended side effect?).
 > 
-> If we use strverscmp(), it will be sorted in a more reasonable
-> way.  We could copy the gnulib version on systems without glibc.
-> Life is too short for writing configure checks by hand, though; I
-> will add this to the end of my wish-todo list.  If somebody wants
-> to volunteer, be my guest.
-> 
-> I'm CCing Eric in case he has suggestions that would help import
-> the gnulib module in an easy way.
-> 
-> -- 
-> Eduardo
+> Yep, I'm amenable to that POV too. It is entirely valid to say that if
+> downstream distros need to care about such ancient back-compat, then they
+> will just have to do the extra work to use git history to undelete any bits
+> they need that upstream has discarded.
 
-As we never have leading zeroes, and input comes from QEMU so
-it's safe, it's probably easier to just open-code it:
+If they do this, won't it be better to cooperate and let those
+bits to be maintained in the upstream tree (as long as somebody
+is willing to maintain them), instead of being kept in their own
+downstream fork?
 
-/* compare string numerically: shorter strings give smaller numbers */
-int mstcmp(const char *s1, const char *s2)
-{
-	int l1, l2;
-
-	l1 = strlen(s1);
-	l2 = strlen(s2);
-	return l1 == l2 ? strcmp(s1, s2) : l1 - l2;
-}
-
-feel free to rename and include.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(That doesn't mean we shouldn't have a deprecation policy, but
+that I would prefer to have the deprecation policy amended if
+necessary than having a diverging fork maintained by a downstream
+distro).
 
 -- 
-MST
+Eduardo
