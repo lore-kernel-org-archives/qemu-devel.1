@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVHsI-0001o5-2t
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:40:19 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dVHug-0003b0-Dj
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVHsD-0006eM-2M
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:40:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVHsC-0006dP-Pj
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:40:13 -0400
-References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-	<1499864265-144136-11-git-send-email-borntraeger@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c70ce5b2-cbf0-e0c0-0697-8ffac5446dea@redhat.com>
-Date: Wed, 12 Jul 2017 15:40:02 +0200
+	(envelope-from <no-reply@patchew.org>) id 1dVHub-0000iB-JQ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:42:46 -0400
+Resent-Message-Id: <E1dVHub-0000iB-JQ@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21721)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dVHub-0000d9-AS
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:42:41 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149986694731.66.826996087395978402@5d477a5b5989>
+In-Reply-To: <1499863793-18627-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1499864265-144136-11-git-send-email-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/11] s390x/sic: realize SIC handling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 12 Jul 2017 06:42:28 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] Implement network booting in the
+ s390-ccw BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Fei Li <sherrylf@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: thuth@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, mihajlov@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, agraf@suse.de, david@redhat.com
 
-On 12.07.2017 14:57, Christian Borntraeger wrote:
-> From: Fei Li <sherrylf@linux.vnet.ibm.com>
->=20
-> Currently, we do nothing for the SIC instruction, but we need to
-> implement it properly. Let's add proper handling in the backend code.
->=20
-> Co-authored-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  hw/s390x/css.c         | 26 ++++++++++++++++++++++++++
->  hw/s390x/trace-events  |  1 +
->  include/hw/s390x/css.h |  2 ++
->  target/s390x/kvm.c     | 16 +++++++++++++++-
->  4 files changed, 44 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 1fcbc84..7b82176 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -521,6 +521,32 @@ void css_conditional_io_interrupt(SubchDev *sch)
->      }
->  }
-> =20
-> +int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
-> +{
-> +    S390FLICState *fs =3D s390_get_flic();
-> +    S390FLICStateClass *fsc =3D S390_FLIC_COMMON_GET_CLASS(fs);
-> +    int r;
-> +
-> +    if (env->psw.mask & PSW_MASK_PSTATE) {
-> +        r =3D -PGM_PRIVILEGED;
-> +        goto out;
-
-Why not simply:
-
-           return -PGM_PRIVILEGED;
-
-?
-
-Same for the other goto below ... and then you also do not need the "r"
-variable anymore.
-
-> +    }
-> +
-> +    trace_css_do_sic(mode, isc);
-> +    switch (mode) {
-> +    case SIC_IRQ_MODE_ALL:
-> +    case SIC_IRQ_MODE_SINGLE:
-> +        break;
-> +    default:
-> +        r =3D -PGM_OPERAND;
-> +        goto out;
-> +    }
-> +
-> +    r =3D fsc->modify_ais_mode(fs, isc, mode) ? -PGM_OPERATION : 0;
-> +out:
-> +    return r;
-> +}
-> +
->  void css_adapter_interrupt(uint8_t isc)
->  {
->      uint32_t io_int_word =3D (isc << 27) | IO_INT_WORD_AI;
-> diff --git a/hw/s390x/trace-events b/hw/s390x/trace-events
-> index 84ea964..f07e974 100644
-> --- a/hw/s390x/trace-events
-> +++ b/hw/s390x/trace-events
-> @@ -8,6 +8,7 @@ css_new_image(uint8_t cssid, const char *default_cssid)=
- "CSS: add css image %02x
->  css_assign_subch(const char *do_assign, uint8_t cssid, uint8_t ssid, u=
-int16_t schid, uint16_t devno) "CSS: %s %x.%x.%04x (devno %04x)"
->  css_io_interrupt(int cssid, int ssid, int schid, uint32_t intparm, uin=
-t8_t isc, const char *conditional) "CSS: I/O interrupt on sch %x.%x.%04x =
-(intparm %08x, isc %x) %s"
->  css_adapter_interrupt(uint8_t isc) "CSS: adapter I/O interrupt (isc %x=
-)"
-> +css_do_sic(uint16_t mode, uint8_t isc) "CSS: set interruption mode %x =
-on isc %x"
-> =20
->  # hw/s390x/virtio-ccw.c
->  virtio_ccw_interpret_ccw(int cssid, int ssid, int schid, int cmd_code)=
- "VIRTIO-CCW: %x.%x.%04x: interpret command %x"
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index e028960..5ee6d52 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -12,6 +12,7 @@
->  #ifndef CSS_H
->  #define CSS_H
-> =20
-> +#include "cpu.h"
-
-Not sure, but it's a little bit strange that the channel sub-system now
-depends on the CPU ... maybe the check for problem state should rather
-be done in kvm.c instead?
-Or should css_do_sic() rather reside in s390-pci-inst.c or in ioinst.c
-instead?
-
->  #include "hw/s390x/adapter.h"
->  #include "hw/s390x/s390_flic.h"
->  #include "hw/s390x/ioinst.h"
-> @@ -165,6 +166,7 @@ typedef enum {
->      CSS_IO_ADAPTER_TYPE_NUMS,
->  } CssIoAdapterType;
-> =20
-> +int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode);
->  uint32_t css_get_adapter_id(CssIoAdapterType type, uint8_t isc);
->  void css_register_io_adapters(CssIoAdapterType type, bool swap, bool m=
-askable,
->                                uint8_t flags, Error **errp);
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 7a2a7c0..78ebe83 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1206,7 +1206,21 @@ static int kvm_stpcifc_service_call(S390CPU *cpu=
-, struct kvm_run *run)
-> =20
->  static int kvm_sic_service_call(S390CPU *cpu, struct kvm_run *run)
->  {
-> -    /* NOOP */
-> +    CPUS390XState *env =3D &cpu->env;
-> +    uint8_t r1 =3D (run->s390_sieic.ipa & 0x00f0) >> 4;
-> +    uint8_t r3 =3D run->s390_sieic.ipa & 0x000f;
-> +    uint8_t isc;
-> +    uint16_t mode;
-> +    int r;
-> +
-> +    cpu_synchronize_state(CPU(cpu));
-> +    mode =3D env->regs[r1] & 0xffff;
-> +    isc =3D (env->regs[r3] >> 27) & 0x7;
-> +    r =3D css_do_sic(env, isc, mode);
-> +    if (r) {
-> +        enter_pgmcheck(cpu, -r);
-> +    }
-> +
->      return 0;
->  }
-
- Thomas
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE0OTk4NjM3OTMtMTg2MjctMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQu
+Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMDAvMTFdIEltcGxlbWVudCBuZXR3
+b3JrIGJvb3RpbmcgaW4gdGhlIHMzOTAtY2N3IEJJT1MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
+aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
+IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
+Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
+MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmYxYjg0Yzkg
+cGMtYmlvcy9zMzkwLWNjdzogTGluayBsaWJuZXQgaW50byB0aGUgbmV0Ym9vdCBpbWFnZSBhbmQg
+ZG8gdGhlIFRGVFAgbG9hZAplNTAzMTk1IHBjLWJpb3MvczM5MC1jY3c6IEFkZCB2aXJ0aW8tbmV0
+IGRyaXZlciBjb2RlCmIxYzY0NWQgcGMtYmlvcy9zMzkwLWNjdzogQWRkIGNvcmUgZmlsZXMgZm9y
+IHRoZSBuZXR3b3JrIGJvb3Rsb2FkaW5nIHByb2dyYW0KZTczYzM4OSByb21zL1NMT0Y6IFVwZGF0
+ZSBzdWJtb2R1bGUgdG8gbGF0ZXN0IHN0YXR1cwpiNTRmYTU0IHBjLWJpb3MvczM5MC1jY3c6IEFk
+ZCBjb2RlIGZvciB2aXJ0aW8gZmVhdHVyZSBuZWdvdGlhdGlvbgpiYmQ1Njc3IHBjLWJpb3MvczM5
+MC1jY3c6IFJlbW92ZSB1bnVzZWQgc3RydWN0cyBmcm9tIHZpcnRpby5oCmE1NzY3NDcgcGMtYmlv
+cy9zMzkwLWNjdzogTW92ZSBieXRlc3dhcCBmdW5jdGlvbnMgdG8gYSBzZXBhcmF0ZSBoZWFkZXIK
+NWIwNTgyNyBwYy1iaW9zL3MzOTAtY2N3OiBBZGQgYSB3cml0ZSgpIGZ1bmN0aW9uIGZvciBzdGRp
+bwphNzFlODFmIHBjLWJpb3MvczM5MC1jY3c6IE1vdmUgdmlydGlvLWJsb2NrIHJlbGF0ZWQgZnVu
+Y3Rpb25zIGludG8gYSBzZXBhcmF0ZSBmaWxlCjZmMzY4NDQgcGMtYmlvcy9zMzkwLWNjdzogTW92
+ZSBlYmMyYXNjIHRvIHNjbHAuYwpkNjA5ZGYxIHBjLWJpb3MvczM5MC1jY3c6IE1vdmUgbGliYyBm
+dW5jdGlvbnMgdG8gc2VwYXJhdGUgaGVhZGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzExOiBwYy1iaW9zL3MzOTAtY2N3OiBNb3ZlIGxpYmMgZnVuY3Rpb25zIHRvIHNl
+cGFyYXRlIGhlYWRlci4uLgpDaGVja2luZyBQQVRDSCAyLzExOiBwYy1iaW9zL3MzOTAtY2N3OiBN
+b3ZlIGViYzJhc2MgdG8gc2NscC5jLi4uCkNoZWNraW5nIFBBVENIIDMvMTE6IHBjLWJpb3MvczM5
+MC1jY3c6IE1vdmUgdmlydGlvLWJsb2NrIHJlbGF0ZWQgZnVuY3Rpb25zIGludG8gYSBzZXBhcmF0
+ZSBmaWxlLi4uCkNoZWNraW5nIFBBVENIIDQvMTE6IHBjLWJpb3MvczM5MC1jY3c6IEFkZCBhIHdy
+aXRlKCkgZnVuY3Rpb24gZm9yIHN0ZGlvLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9p
+ZGVkIGluIC5jIGZpbGVzCiMyMzogRklMRTogcGMtYmlvcy9zMzkwLWNjdy9zY2xwLmM6MTU6Cits
+b25nIHdyaXRlKGludCBmZCwgY29uc3Qgdm9pZCAqc3RyLCBzaXplX3QgbGVuKTsKCnRvdGFsOiAx
+IGVycm9ycywgMCB3YXJuaW5ncywgMzcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS8xMTogcGMtYmlvcy9zMzkwLWNj
+dzogTW92ZSBieXRlc3dhcCBmdW5jdGlvbnMgdG8gYSBzZXBhcmF0ZSBoZWFkZXIuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNi8xMTogcGMtYmlvcy9zMzkwLWNjdzogUmVtb3ZlIHVudXNlZCBzdHJ1Y3RzIGZy
+b20gdmlydGlvLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMTogcGMtYmlvcy9zMzkwLWNjdzogQWRk
+IGNvZGUgZm9yIHZpcnRpbyBmZWF0dXJlIG5lZ290aWF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDgv
+MTE6IHJvbXMvU0xPRjogVXBkYXRlIHN1Ym1vZHVsZSB0byBsYXRlc3Qgc3RhdHVzLi4uCkNoZWNr
+aW5nIFBBVENIIDkvMTE6IHBjLWJpb3MvczM5MC1jY3c6IEFkZCBjb3JlIGZpbGVzIGZvciB0aGUg
+bmV0d29yayBib290bG9hZGluZyBwcm9ncmFtLi4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBh
+dm9pZGVkIGluIC5jIGZpbGVzCiMxMjc6IEZJTEU6IHBjLWJpb3MvczM5MC1jY3cvbmV0bWFpbi5j
+OjI2OgorZXh0ZXJuIGNoYXIgX3N0YXJ0W107CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
+aWRlZCBpbiAuYyBmaWxlcwojMTMwOiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L25ldG1haW4uYzoy
+OToKK0lwbFBhcmFtZXRlckJsb2NrIGlwbGIgX19hdHRyaWJ1dGVfXygoYWxpZ25lZChQQUdFX1NJ
+WkUpKSk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDIwNCBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMC8x
+MTogcGMtYmlvcy9zMzkwLWNjdzogQWRkIHZpcnRpby1uZXQgZHJpdmVyIGNvZGUuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTEvMTE6IHBjLWJpb3MvczM5MC1jY3c6IExpbmsgbGlibmV0IGludG8gdGhlIG5l
+dGJvb3QgaW1hZ2UgYW5kIGRvIHRoZSBURlRQIGxvYWQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
