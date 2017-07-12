@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVL4d-0006II-1z
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:05:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVL8X-0000Pr-Rb
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:09:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVL4Y-00027G-PR
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:05:15 -0400
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:59846)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVL4Y-00020a-G4
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:05:10 -0400
-Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 81CAF6C30A
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 19:05:01 +0200 (CEST)
-Date: Wed, 12 Jul 2017 19:04:49 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170712190449.3f260b2a@bahia.lan>
-In-Reply-To: <20170712132742.368db8d8@bahia.lan>
-References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-	<20170712055317.26225-3-david@gibson.dropbear.id.au>
-	<20170712120001.31d858de@bahia.lan>
-	<20170712110545.GN4083@umbus.fritz.box>
-	<20170712132742.368db8d8@bahia.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVL8U-0004Ya-Kt
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:09:17 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34554)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVL8U-0004YS-Ge
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:09:14 -0400
+Received: by mail-qt0-x243.google.com with SMTP id m54so2877608qtb.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 10:09:14 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-5-git-send-email-cota@braap.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <551e5233-c92a-dd65-e09f-8c20a139df77@amsat.org>
+Date: Wed, 12 Jul 2017 14:09:11 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/WZVQ5DRRD8D4C0ahg1ihfHC";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
- DRC flag
+In-Reply-To: <1499586614-20507-5-git-send-email-cota@braap.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/22] tcg: fix corruption of code_time
+ profiling counter upon tb_flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,211 +36,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
---Sig_/WZVQ5DRRD8D4C0ahg1ihfHC
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 07/09/2017 04:49 AM, Emilio G. Cota wrote:
+> Whenever there is an overflow in code_gen_buffer (e.g. we run out
+> of space in it and have to flush it), the code_time profiling counter
+> ends up with an invalid value (that is, code_time -= profile_getclock(),
+> without later on getting += profile_getclock() due to the goto).
+[...]
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-On Wed, 12 Jul 2017 13:27:42 +0200
-Greg Kurz <groug@kaod.org> wrote:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> On Wed, 12 Jul 2017 21:05:45 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Jul 12, 2017 at 12:00:01PM +0200, Greg Kurz wrote: =20
-> > > On Wed, 12 Jul 2017 15:53:11 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >    =20
-> > > > The awaiting_allocation flag in the DRC was introduced by aab9913
-> > > > "spapr_drc: Prevent detach racing against attach for CPU DR", alleg=
-edly to
-> > > > prevent a guest crash on racing attach and detach.  Except.. inform=
-ation
-> > > > from the BZ actually suggests a qemu crash, not a guest crash.  And=
- there   =20
-> > >=20
-> > > Can you share an url to the BZ ?   =20
-> >=20
-> > Alas, no.  I have that information second hand from.. Bharata,
-> > think.. and I believe the BZ is an IBM internal one.
-> >  =20
->=20
-> I did some digging and I could find it in our internal bugzilla. And inde=
-ed,
-> it mentions QEMU crashing because of a SEGV...
->=20
-> > >    =20
-> > > > shouldn't be a problem here anyway: if the guest has already moved =
-the DRC
-> > > > away from UNUSABLE state, the detach would already be deferred, and=
- if it
-> > > > hadn't it should be safe to detach it (the guest should fail gracef=
-ully
-> > > > when it attempts to change the allocation state).
-> > > >=20
-> > > > I think this was probably just a bandaid for some other problem in =
-the
-> > > > state management.  So, remove awaiting_allocation and associated co=
-de.
-> > > >  =20
->=20
-> ... so I tend to agree this was a bandaid.
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> I'll re-try the scenario from the BZ with this patch applied to see if we
-> hit the crash again.
->=20
-
-The crashing scenario was basically start a guest using libvirt, to add
-a bunch of vCPUs and then remove them.
-
-I've been running the addition/removal in a loop (using 'virsh setvcpus') a=
-nd
-no QEMU crash is observed, with or without this patch.
-
-But, without this patch I would quickly (ie, 8 invocations of setvcpus) rea=
-ch
-a situation where:
-- 'virsh setvcpus' would time out and fail forever from now on
-- 'lscpu' in the guest and 'virsh vcpuinfo' show different number of vCPUs
-
-With this patch applied, I could run the loop much much longer, and only
-observe a 'virsh setvcpus' timeout from time to time. But at some point,
-'virsh setvcpus' would fail consecutively 3 or 4 times with:
-
-error: internal error: qemu didn't report thread id for vcpu '8'
-
-and then fail with the following error forever:
-
-error: unsupported configuration: failed to find appropriate hotpluggable
- vcpus to reach the desired target vcpu count
-
-'lscpu' and 'virsh vcpuinfo' also produce inconsistent output.
-
-I could continue to hotplug/unplug vCPUs with the QEMU monitor though,
-so I guess there's something wrong in libvirt. I've asked Shiva (on Cc)
-to help on the investigation.
-
-Anyway, this patch seems to improve things and doesn't cause QEMU
-to crash. I thus maintain my R-b and you can add:
-
-Tested-by: Greg Kurz <groug@kaod.org>
-
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > ---
-> > > >  hw/ppc/spapr_drc.c         | 25 +++----------------------
-> > > >  include/hw/ppc/spapr_drc.h |  1 -
-> > > >  2 files changed, 3 insertions(+), 23 deletions(-)
-> > > >=20
-> > > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > > > index 9b07f80..89ba3d6 100644
-> > > > --- a/hw/ppc/spapr_drc.c
-> > > > +++ b/hw/ppc/spapr_drc.c
-> > > > @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnect=
-or *drc)
-> > > >      if (!drc->dev) {
-> > > >          return RTAS_OUT_NO_SUCH_INDICATOR;
-> > > >      }
-> > > > -    if (drc->awaiting_release && drc->awaiting_allocation) {
-> > > > -        /* kernel is acknowledging a previous hotplug event
-> > > > -         * while we are already removing it.
-> > > > -         * it's safe to ignore awaiting_allocation here since we k=
-now the
-> > > > -         * situation is predicated on the guest either already hav=
-ing done
-> > > > -         * so (boot-time hotplug), or never being able to acquire =
-in the
-> > > > -         * first place (hotplug followed by immediate unplug).
-> > > > -         */
-> > > > +    if (drc->awaiting_release) {
-> > > > +        /* Don't allow the guest to move a device away from UNUSAB=
-LE
-> > > > +         * state when we want to unplug it */
-> > > >          return RTAS_OUT_NO_SUCH_INDICATOR;
-> > > >      }
-> > > > =20
-> > > >      drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
-> > > > -    drc->awaiting_allocation =3D false;
-> > > > =20
-> > > >      return RTAS_OUT_SUCCESS;
-> > > >  }
-> > > > @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, D=
-eviceState *d, void *fdt,
-> > > >      drc->fdt =3D fdt;
-> > > >      drc->fdt_start_offset =3D fdt_start_offset;
-> > > > =20
-> > > > -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
-> > > > -        drc->awaiting_allocation =3D true;
-> > > > -    }
-> > > > -
-> > > >      object_property_add_link(OBJECT(drc), "device",
-> > > >                               object_get_typename(OBJECT(drc->dev)),
-> > > >                               (Object **)(&drc->dev),
-> > > > @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, D=
-eviceState *d, Error **errp)
-> > > >          return;
-> > > >      }
-> > > > =20
-> > > > -    if (drc->awaiting_allocation) {
-> > > > -        drc->awaiting_release =3D true;
-> > > > -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
-> > > > -        return;
-> > > > -    }
-> > > > -
-> > > >      spapr_drc_release(drc);
-> > > >  }
-> > > > =20
-> > > > @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
-> > > >          spapr_drc_release(drc);
-> > > >      }
-> > > > =20
-> > > > -    drc->awaiting_allocation =3D false;
-> > > > -
-> > > >      if (drc->dev) {
-> > > >          /* A device present at reset is coldplugged */
-> > > >          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLAT=
-ED;
-> > > > @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_d=
-rc =3D {
-> > > >          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
-> > > >          VMSTATE_BOOL(configured, sPAPRDRConnector),
-> > > >          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
-> > > > -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
-> > > >          VMSTATE_END_OF_LIST()
-> > > >      }
-> > > >  };
-> > > > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> > > > index 715016b..18a196e 100644
-> > > > --- a/include/hw/ppc/spapr_drc.h
-> > > > +++ b/include/hw/ppc/spapr_drc.h
-> > > > @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
-> > > >      sPAPRConfigureConnectorState *ccs;
-> > > > =20
-> > > >      bool awaiting_release;
-> > > > -    bool awaiting_allocation;
-> > > > =20
-> > > >      /* device pointer, via link property */
-> > > >      DeviceState *dev;   =20
-> > >    =20
-> >=20
-> >=20
-> >  =20
->=20
-
-
---Sig_/WZVQ5DRRD8D4C0ahg1ihfHC
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllmVrIACgkQAvw66wEB28JYegCfYOGURuhcuKjoJ+Z7MzTPhlRW
-QM0An0eVjRe7HIGWmwPtkI4wzegJbOOR
-=4isJ
------END PGP SIGNATURE-----
-
---Sig_/WZVQ5DRRD8D4C0ahg1ihfHC--
+> ---
+>   accel/tcg/translate-all.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index a936a5f..72ce445 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1293,7 +1293,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>   #ifdef CONFIG_PROFILER
+>       tcg_ctx.tb_count++;
+>       tcg_ctx.interm_time += profile_getclock() - ti;
+> -    tcg_ctx.code_time -= profile_getclock();
+> +    ti = profile_getclock();
+>   #endif
+>   
+>       /* ??? Overflow could be handled better here.  In particular, we
+> @@ -1311,7 +1311,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>       }
+>   
+>   #ifdef CONFIG_PROFILER
+> -    tcg_ctx.code_time += profile_getclock();
+> +    tcg_ctx.code_time += profile_getclock() - ti;
+>       tcg_ctx.code_in_len += tb->size;
+>       tcg_ctx.code_out_len += gen_code_size;
+>       tcg_ctx.search_out_len += search_size;
+> 
