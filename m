@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dVH3A-0005fz-Fp
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:47:29 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dVH3K-0005lv-5t
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dVH37-0003NF-7w
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:47:28 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dVH3J-0003S4-31
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:47:38 -0400
 Received: from mga06.intel.com ([134.134.136.31]:42654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dVH36-0003Lp-Va
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:47:25 -0400
+	id 1dVH3I-0003Lp-Ob
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:47:36 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Wed, 12 Jul 2017 20:40:13 +0800
-Message-Id: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v12 0/8] Virtio-balloon Enhancement
+Date: Wed, 12 Jul 2017 20:40:17 +0800
+Message-Id: <1499863221-16206-5-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v12 4/8] xbitmap: add xb_find_next_bit() and
+ xb_zero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +28,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com
 Cc: virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-This patch series enhances the existing virtio-balloon with the following new
-features:
-1) fast ballooning: transfer ballooned pages between the guest and host in
-chunks using sgs, instead of one by one; and
-2) cmdq: a new virtqueue to send commands between the device and driver.
-Currently, it supports commands to report memory stats (replace the old statq
-mechanism) and report guest unused pages.
+xb_find_next_bit() is added to support find the next "1" or "0" bit
+in the given range. xb_zero() is added to support zero the given range
+of bits.
 
-Change Log:
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ include/linux/xbitmap.h |  4 ++++
+ lib/radix-tree.c        | 26 ++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-v11->v12:
-1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned pages.
-2) virtio-ring: enable the driver to build up a desc chain using vring desc.
-3) virtio-ring: Add locking to the existing START_USE() and END_USE() macro
-to lock/unlock the vq when a vq operation starts/ends.
-4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async()
-5) virtio-balloon: describe chunks of ballooned pages and free pages blocks
-directly using one or more chains of desc from the vq.
-
-v10->v11:
-1) virtio_balloon: use vring_desc to describe a chunk;
-2) virtio_ring: support to add an indirect desc table to virtqueue;
-3)  virtio_balloon: use cmdq to report guest memory statistics.
-
-v9->v10:
-1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
-2) virtio-balloon: add virtballoon_validate();
-3) virtio-balloon: msg format change;
-4) virtio-balloon: move miscq handling to a task on system_freezable_wq;
-5) virtio-balloon: code cleanup.
-
-v8->v9:
-1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
-VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
-implementation;
-2) Simpler function to get the free page block.
-
-v7->v8:
-1) Use only one chunk format, instead of two.
-2) re-write the virtio-balloon implementation patch.
-3) commit changes
-4) patch re-org
-
-Liang Li (1):
-  virtio-balloon: deflate via a page list
-
-Matthew Wilcox (1):
-  Introduce xbitmap
-
-Wei Wang (6):
-  virtio-balloon: coding format cleanup
-  xbitmap: add xb_find_next_bit() and xb_zero()
-  virtio-balloon: VIRTIO_BALLOON_F_SG
-  mm: support reporting free page blocks
-  mm: export symbol of next_zone and first_online_pgdat
-  virtio-balloon: VIRTIO_BALLOON_F_CMD_VQ
-
- drivers/virtio/virtio_balloon.c     | 414 ++++++++++++++++++++++++++++++++----
- drivers/virtio/virtio_ring.c        | 224 +++++++++++++++++--
- include/linux/mm.h                  |   5 +
- include/linux/radix-tree.h          |   2 +
- include/linux/virtio.h              |  22 ++
- include/linux/xbitmap.h             |  53 +++++
- include/uapi/linux/virtio_balloon.h |  11 +
- lib/radix-tree.c                    | 164 +++++++++++++-
- mm/mmzone.c                         |   2 +
- mm/page_alloc.c                     |  96 +++++++++
- 10 files changed, 926 insertions(+), 67 deletions(-)
- create mode 100644 include/linux/xbitmap.h
-
+diff --git a/include/linux/xbitmap.h b/include/linux/xbitmap.h
+index 0b93a46..88c2045 100644
+--- a/include/linux/xbitmap.h
++++ b/include/linux/xbitmap.h
+@@ -36,6 +36,10 @@ int xb_set_bit(struct xb *xb, unsigned long bit);
+ bool xb_test_bit(const struct xb *xb, unsigned long bit);
+ int xb_clear_bit(struct xb *xb, unsigned long bit);
+ 
++void xb_zero(struct xb *xb, unsigned long start, unsigned long end);
++unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
++			       unsigned long end, bool set);
++
+ static inline bool xb_empty(const struct xb *xb)
+ {
+ 	return radix_tree_empty(&xb->xbrt);
+diff --git a/lib/radix-tree.c b/lib/radix-tree.c
+index d624914..c45b910 100644
+--- a/lib/radix-tree.c
++++ b/lib/radix-tree.c
+@@ -2271,6 +2271,32 @@ bool xb_test_bit(const struct xb *xb, unsigned long bit)
+ 	return test_bit(bit, bitmap->bitmap);
+ }
+ 
++void xb_zero(struct xb *xb, unsigned long start, unsigned long end)
++{
++	unsigned long i;
++
++	for (i = start; i <= end; i++)
++		xb_clear_bit(xb, i);
++}
++
++/*
++ * Find the next one (@set = 1) or zero (@set = 0) bit within the bit range
++ * from @start to @end in @xb. If no such bit is found in the given range,
++ * bit end + 1 will be returned.
++ */
++unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
++			       unsigned long end, bool set)
++{
++	unsigned long i;
++
++	for (i = start; i <= end; i++) {
++		if (xb_test_bit(xb, i) == set)
++			break;
++	}
++
++	return i;
++}
++
+ void __rcu **idr_get_free(struct radix_tree_root *root,
+ 			struct radix_tree_iter *iter, gfp_t gfp, int end)
+ {
 -- 
 2.7.4
