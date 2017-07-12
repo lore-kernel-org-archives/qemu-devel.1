@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVKS2-0005uw-C9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:25:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVKSg-0006Wd-Nd
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVKRz-0006U1-8B
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:25:22 -0400
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:35568)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dVKRz-0006Es-04
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:25:19 -0400
-Received: by mail-wr0-f196.google.com with SMTP id y28so2382421wrd.2
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:24:56 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712150400.GH5237@redhat.com>
-	<9d51d348-7ad6-a98d-3f6d-89e8af5e3a16@redhat.com>
-	<20170712161254.GJ5237@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d3c71dc9-1286-802a-b663-7d37f97daf72@redhat.com>
-Date: Wed, 12 Jul 2017 18:23:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170712161254.GJ5237@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+	(envelope-from <berrange@redhat.com>) id 1dVKSd-00071I-KP
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:26:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVKSd-0006zm-EW
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:25:59 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 12 Jul 2017 17:25:50 +0100
+Message-Id: <20170712162550.8061-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] Don't enable networking as a side-effect of
+ DEBUG=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +22,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 12/07/2017 18:12, Daniel P. Berrange wrote:
->> I'm still not 100% sure whether that auto-deprecation of machine types
->> is such a good idea ... since we might need to maintain machines in
->> downstream a little bit longer than specified there, it might be better
->> to rather deprecate them manually from time to time.
-> 
-> Downstreams usually maintain custom machine types, so fact that the
-> upstream machine types get deleted is not a problem in itself. The problem
-> comes if followup internal code removal then prevents downstream from
-> creating their custom machine type.  I don't think we need tie these
-> issues together. We can remove old machine types, without immediately
-> removing features that our harm creation of downstream machine types.
+When trying to debug problems with tests it is natural to set
+DEBUG=1 when starting the docker environment. Unfortunately
+this has a side-effect of enabling an eth0 network interface
+in the container, which changes the operating environment of
+the test suite. IOW tests with fail may suddenly start
+working again if DEBUG=1 is set, due to changed network setup.
 
-I think machine type and feature removal should be tied together.
+Add a separate NETWORK=1 option to allow enablement of
+networking separately from DEBUG=1, since common debugging
+tasks probably don't require networking anyway.
 
-Doing the opposite leaves around code that is more or less dead from an
-upstream point of view, and looks like an ad hoc rule for Red Hat.  It
-harms downstreams that do not participate in upstream development
-(though perhaps this is an intended side effect?).
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ tests/docker/Makefile.include | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Paolo
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 037cb9e..a8c4b82 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -106,6 +106,7 @@ docker:
+ 	@echo '                         (default is 1)'
+ 	@echo '    DEBUG=1              Stop and drop to shell in the created container'
+ 	@echo '                         before running the command.'
++	@echo '    NETWORK=1            Enable eth0 virtual network interface.'
+ 	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+ 	@echo '    NOCACHE=1            Ignore cache when build images.'
+ 	@echo '    EXECUTABLE=<path>    Include executable in image.'
+@@ -132,7 +133,8 @@ docker-run: docker-qemu-src
+ 		$(SRC_PATH)/tests/docker/docker.py run 			\
+ 			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
+ 			$(if $V,,--rm) 					\
+-			$(if $(DEBUG),-i,--net=none) 			\
++			$(if $(DEBUG),-i,)				\
++			$(if $(NETWORK),,--net=none)			\
+ 			-e TARGET_LIST=$(TARGET_LIST) 			\
+ 			-e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
+ 			-e V=$V -e J=$J -e DEBUG=$(DEBUG)		\
+-- 
+2.9.4
