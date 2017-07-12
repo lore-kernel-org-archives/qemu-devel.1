@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVGpn-0007i5-3R
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:33:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dVGsN-0000h0-7Z
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVGpj-0004mj-WB
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:33:39 -0400
-Received: from mail-wr0-f178.google.com ([209.85.128.178]:35358)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dVGpj-0004mG-PP
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:33:35 -0400
-Received: by mail-wr0-f178.google.com with SMTP id k67so31673237wrc.2
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 05:33:35 -0700 (PDT)
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-3-git-send-email-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1499586614-20507-3-git-send-email-cota@braap.org>
-Date: Wed, 12 Jul 2017 13:32:32 +0100
-Message-ID: <87r2xl96ov.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1dVGsJ-0006bz-8e
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:36:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVGsI-0006bh-VN
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:36:15 -0400
+Date: Wed, 12 Jul 2017 13:36:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170712123606.GB30658@work-vm>
+References: <20170704184915.31586-1-dgilbert@redhat.com>
+	<20170704184915.31586-4-dgilbert@redhat.com>
+	<20170712093233.GI29326@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/22] translate-all: remove redundant
- !tcg_enabled check in dump_exec_info
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170712093233.GI29326@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH 3/5] migration/rdma: Allow cancelling while
+ waiting for wrid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +29,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, michael@hinespot.com, quintela@redhat.com, lvivier@redhat.com, berrange@redhat.com
 
+* Peter Xu (peterx@redhat.com) wrote:
+> On Tue, Jul 04, 2017 at 07:49:13PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > When waiting for a WRID, if the other side dies we end up waiting
+> > for ever with no way to cancel the migration.
+> > Cure this by poll()ing the fd first with a timeout and checking
+> > error flags and migration state.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  migration/rdma.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++------
+> >  1 file changed, 48 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/migration/rdma.c b/migration/rdma.c
+> > index 6111e10c70..7273ae9929 100644
+> > --- a/migration/rdma.c
+> > +++ b/migration/rdma.c
+> > @@ -1466,6 +1466,52 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
+> >      return  0;
+> >  }
+> >  
+> > +/* Wait for activity on the completion channel.
+> > + * Returns 0 on success, none-0 on error.
+> > + */
+> > +static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
+> > +{
+> > +    /*
+> > +     * Coroutine doesn't start until migration_fd_process_incoming()
+> > +     * so don't yield unless we know we're running inside of a coroutine.
+> > +     */
+> > +    if (rdma->migration_started_on_destination) {
+> > +        yield_until_fd_readable(rdma->comp_channel->fd);
+> > +    } else {
+> > +        /* This is the source side, we're in a separate thread
+> > +         * or destination prior to migration_fd_process_incoming()
+> > +         * we can't yield; so we have to poll the fd.
+> > +         * But we need to be able to handle 'cancel' or an error
+> > +         * without hanging forever.
+> > +         */
+> > +        while (!rdma->error_state && !rdma->error_reported &&
+> > +               !rdma->received_error) {
+> 
+> Should we just check rdma->error_state? Since iiuc error_reported only
+> means whether error is reported (set to 1 if reported), and
+> received_error means whether we got explicit error from peer (I think
+> only via a RDMA_CONTROL_ERROR message), and it's 1 if received. IIUC
+> either error_reported or received_error will mean that error_state be
+> set already.
 
-Emilio G. Cota <cota@braap.org> writes:
+I think I agree we don't need to check both error_state and
+error_reported; I think it's best to check received_error since if
+the other end fails we want this end to stop waiting for anything else.
+I've not convinced myself that every path from receiving that error
+till this point would have set the error_state (although it probably
+has);  so I suggest:
+   while (!rdma->error_state && !rdma->received_error) {
 
-> This check is redundant because it is already performed by the only
-> caller of dump_exec_info -- the caller was updated by b7da97eef
-> ("monitor: Check whether TCG is enabled before running the "info jit"
-> code").
->
-> Checking twice wouldn't necessarily be too bad, but here the check also
-> returns with tb_lock held. So we can either do the check before tb_lock is
-> acquired, or just get rid of it. Given that it is redundant, I am going
-> for the latter option.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> > +            GPollFD pfds[1];
+> > +            pfds[0].fd = rdma->comp_channel->fd;
+> > +            pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
+> > +            /* 0.5s timeout, should be fine for a 'cancel' */
+> > +            switch (qemu_poll_ns(pfds, 1, 500 * 1000 * 1000)) {
+> 
+> (I would be more aggresive, say, 100ms, or even less, for better UI
+>  response with merely nothing lost. But 500ms is okay as well to me)
 
-> ---
->  accel/tcg/translate-all.c | 5 -----
->  1 file changed, 5 deletions(-)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index dfb9f0d..f768681 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1851,11 +1851,6 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
->
->      tb_lock();
->
-> -    if (!tcg_enabled()) {
-> -        cpu_fprintf(f, "TCG not enabled\n");
-> -        return;
-> -    }
-> -
->      target_code_size = 0;
->      max_target_code_size = 0;
->      cross_page = 0;
+Yes, it felt fairly arbitrary here.
 
+> > +            case 1: /* fd active */
+> > +                return 0;
+> > +
+> > +            case 0: /* Timeout, go around again */
+> > +                break;
+> > +
+> > +            default: /* Error of some type */
+> > +                return -1;
+> > +            }
+> > +
+> > +            if (migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) {
+> > +                /* Bail out and let the cancellation happen */
+> > +                return -EPIPE;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    return rdma->error_state || rdma->error_reported ||
+> > +           rdma->received_error;
+> 
+> Similar question here. Maybe just return rdma->error_state?
 
+As above, I could just drop the error_reported part.
+
+Dave
+
+> Thanks,
+> 
+> -- 
+> Peter Xu
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
