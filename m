@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVCWF-0001FR-Vl
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:57:12 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVCXk-0002br-QZ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVCWC-0001ZF-UA
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:57:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45134)
+	(envelope-from <cohuck@redhat.com>) id 1dVCXj-0002uo-Uo
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:58:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51098)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVCWC-0001YX-Ny
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:57:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1499774331.git.alistair.francis@xilinx.com>
-	<b0192a116ac0fdd125f49f257c6c6dbbc2666969.1499774331.git.alistair.francis@xilinx.com>
-Date: Wed, 12 Jul 2017 09:57:04 +0200
-In-Reply-To: <b0192a116ac0fdd125f49f257c6c6dbbc2666969.1499774331.git.alistair.francis@xilinx.com>
-	(Alistair Francis's message of "Tue, 11 Jul 2017 05:07:19 -0700")
-Message-ID: <87k23eay0f.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVCXj-0002u4-OY
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:58:43 -0400
+Date: Wed, 12 Jul 2017 09:58:37 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170712095837.69d1446f@dhcp-192-215.str.redhat.com>
+In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] error: Functions to report warnings
- and informational messages
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] migration: s390x css migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
+On Tue, 11 Jul 2017 16:54:35 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-> Add warn_report(), warn_vreport() for reporting warnings, and
-> info_report(), info_vreport() for informational messages.
->
-> These are implemented them with a helper function factored out of
-> error_vreport(), suitably generalized. This patch makes no changes
-> to the output of the original error_report() function.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> v2:
->  - Don't add *vreport() functions to checkpatch
->  - Maintain original comments for the reporting functions
->  - Don't change the error report output in this patch
-> v1:
->  - Don't expose the generic report and vreport() functions
->  - Prefix error messages
->  - Use vreport instead of qmsg_vreport()
-> RFC V3:
->  - Change the function and enum names to be more descriptive
->  - Add wrapper functions for *_report() and *_vreport()
->
->  include/qemu/error-report.h |   7 +++
->  scripts/checkpatch.pl       |   6 ++-
->  util/qemu-error.c           | 102 +++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 109 insertions(+), 6 deletions(-)
-[...]
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 73efc927a9..60b1f320a1 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -2535,7 +2535,11 @@ sub process {
->  				error_prepend|
->  				error_reportf_err|
->  				error_vreport|
-> -				error_report}x;
-> +				report_vreport|
+> Like for v2 the scope of this patch series is now limited to decoupling
+> channel subsystem migration from the migration of virtio-ccw proxies.
+> 
+> There wasn't a whole lot of criticism regarding v2, so very little
+> changed since then. All issues identified in the previous round were
+> addressed as agreed upon. I hope this series is now good for 2.10.
 
-Should be warn_vreport, oops.  I can fix this on commit.
+I did a quick readthrough again and I agree that this series is good
+for 2.10.
 
-> +				info_vreport|
-> +				error_report|
-> +				warn_report|
-> +				info_report}x;
->  
->  	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
->  		ERROR("Error messages should not contain newlines\n" . $herecurr);
-[...]
+> 
+> @Dave You helped me quite a lot with these, thanks a lot! I could not
+> find any r-b's or similar form you so if you would like to take the
+> well deserved credit for your work...
+> 
+> v2 --> v3:
+> * rebased onto current master, since 's390x: vmstatify config migration
+>   for virtio-ccw' is already there we don't need it here any more
+> * added ack's and r-b'
+> * got rid of loads of nits (thanks Connie and Thomas)
+> * added explanation why certain members are not migrated
+> 
+> v1 --> v2:
+> * Split out the vmystatify virtio-ccw part, reorganize
+> * Use WITH_TMP instead of one-shot VMStateInfo's
+> 
+> Halil Pasic (6):
+>   s390x: add helper get_machine_class
+>   s390x: add css_migration_enabled to machine class
+>   s390x/css: add missing css state conditionally
+>   s390x/css: add ORB to SubchDev
+>   s390x/css: activate ChannelSubSys migration
+>   s390x/css: use SubchDev.orb
+> 
+>  hw/intc/s390_flic.c                |  20 ++++++
+>  hw/s390x/css.c                     | 144 +++++++++++++++++++++++++++++++++----
+>  hw/s390x/s390-virtio-ccw.c         |  58 +++++++++------
+>  include/hw/s390x/css.h             |  11 ++-
+>  include/hw/s390x/s390-virtio-ccw.h |   7 ++
+>  5 files changed, 199 insertions(+), 41 deletions(-)
+> 
