@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVOgw-0000Me-2Z
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:57:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dVOkm-0001gm-VL
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVOgr-0002DM-Uv
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:57:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVOgr-0002C7-LD
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:56:57 -0400
-Date: Wed, 12 Jul 2017 17:56:46 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170712205646.GQ6020@localhost.localdomain>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<20170712181652-mutt-send-email-mst@kernel.org>
-	<20170712201550.GN6020@localhost.localdomain>
-	<20170712232214-mutt-send-email-mst@kernel.org>
+	(envelope-from <jsnow@redhat.com>) id 1dVOkm-0004jl-2i
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:01:01 -0400
+References: <20170703151051.31327-1-eblake@redhat.com>
+	<20170703151051.31327-18-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <bc598e9b-1606-ead3-30a4-d654b39994ed@redhat.com>
+Date: Wed, 12 Jul 2017 17:00:49 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170712232214-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+In-Reply-To: <20170703151051.31327-18-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 17/17] dirty-bitmap: Convert internal
+ hbitmap size/granularity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Jul 12, 2017 at 11:31:59PM +0300, Michael S. Tsirkin wrote:
-> On Wed, Jul 12, 2017 at 05:15:50PM -0300, Eduardo Habkost wrote:
-> > On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
-> > > On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
-> > > > On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
-> > > > > We don't want to carry along old machine types forever. If we are able to
-> > > > > remove the pc machines up to 0.13 one day for example, this would allow
-> > > > > us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> > > > > BARs directly to low memory). Everything up to pc-1.2 is also known to
-> > > > > have issues with migration.  So let's start with a deprecation message
-> > > > > for the old machine types so that the (hopefully) few users of these old
-> > > > > systems start switching over to newer machine types instead.
-> > > > > 
-> > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > > 
-> > > > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > 
-> > > > I suggest changing "-machine help" too.  Today it looks like this:
-> > > > 
-> > > >   Supported machines are:
-> > > >   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
-> > > >   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
-> > > >   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-1.3               Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-1.2               Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-1.1               Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-1.0               Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-0.15              Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-0.14              Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-0.13              Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-0.12              Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-0.11              Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-0.10              Standard PC (i440FX + PIIX, 1996)
-> > > >   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
-> > > >   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
-> > > >   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
-> > > >   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-> > > >   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-> > > >   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-> > > >   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
-> > > >   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
-> > > >   isapc                ISA-only PC
-> > > >   none                 empty machine
-> > > 
-> > > Any chance we can sort them reasonably too?
-> > 
-> > If we use strverscmp(), it will be sorted in a more reasonable
-> > way.  We could copy the gnulib version on systems without glibc.
-> > Life is too short for writing configure checks by hand, though; I
-> > will add this to the end of my wish-todo list.  If somebody wants
-> > to volunteer, be my guest.
-> > 
-> > I'm CCing Eric in case he has suggestions that would help import
-> > the gnulib module in an easy way.
-> > 
-> > -- 
-> > Eduardo
-> 
-> As we never have leading zeroes, and input comes from QEMU so
-> it's safe, it's probably easier to just open-code it:
-> 
-> /* compare string numerically: shorter strings give smaller numbers */
-> int mstcmp(const char *s1, const char *s2)
-> {
-> 	int l1, l2;
-> 
-> 	l1 = strlen(s1);
-> 	l2 = strlen(s2);
-> 	return l1 == l2 ? strcmp(s1, s2) : l1 - l2;
-> }
-> 
 
-This doesn't work because strlen("pc-0.10") > strlen("pc-1.0").
 
--- 
-Eduardo
+On 07/03/2017 11:10 AM, Eric Blake wrote:
+> Now that all callers are using byte-based interfaces, there's no
+> reason for our internal hbitmap to remain with sector-based
+> granularity.  It also simplifies our internal scaling, since we
+> already know that hbitmap widens requests out to granularity
+> boundaries.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v4: rebase to earlier changes, include serialization, R-b dropped
+> v3: no change
+> v2: no change
+> ---
+>  block/dirty-bitmap.c | 60 +++++++++++++++-------------------------------------
+>  1 file changed, 17 insertions(+), 43 deletions(-)
+> 
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 5bfc7bc..0b349f0 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -38,7 +38,7 @@
+>   */
+>  struct BdrvDirtyBitmap {
+>      QemuMutex *mutex;
+> -    HBitmap *bitmap;            /* Dirty sector bitmap implementation */
+> +    HBitmap *bitmap;            /* Dirty bitmap implementation */
+>      HBitmap *meta;              /* Meta dirty bitmap */
+>      BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
+>      char *name;                 /* Optional non-empty unique ID */
+> @@ -130,12 +130,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+>      }
+>      bitmap = g_new0(BdrvDirtyBitmap, 1);
+>      bitmap->mutex = &bs->dirty_bitmap_mutex;
+> -    /*
+> -     * TODO - let hbitmap track full granularity. For now, it is tracking
+> -     * only sector granularity, as a shortcut for our iterators.
+> -     */
+> -    bitmap->bitmap = hbitmap_alloc(DIV_ROUND_UP(bitmap_size, BDRV_SECTOR_SIZE),
+> -                                   ctz32(granularity) - BDRV_SECTOR_BITS);
+> +    bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(granularity));
+>      bitmap->size = bitmap_size;
+>      bitmap->name = g_strdup(name);
+>      bitmap->disabled = false;
+> @@ -310,7 +305,6 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
+>      int64_t size = bdrv_getlength(bs);
+> 
+>      assert(size >= 0);
+> -    size = DIV_ROUND_UP(size, BDRV_SECTOR_SIZE);
+
+whoops uh, were we setting bitmap->size to the *sector* size prior to
+this, even though we had already changed bitmap->size to be the byte size?
+
+--js
