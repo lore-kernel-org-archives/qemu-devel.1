@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVJ0e-0002Jp-4m
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:53:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVJ1U-0002pY-AQ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVJ0d-0004WQ-9B
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:53:00 -0400
-Date: Wed, 12 Jul 2017 16:52:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170712145251.GE4917@noname.str.redhat.com>
-References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
-	<20170712114700.20008-4-pbutsykin@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1dVJ1T-0004rn-In
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:53:52 -0400
+References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
+	<1499864249-26305-2-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fd430eb3-6998-3d88-58e9-11237e1afa82@redhat.com>
+Date: Wed, 12 Jul 2017 09:53:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170712114700.20008-4-pbutsykin@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] qcow2: add shrink image support
+In-Reply-To: <1499864249-26305-2-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="j6HMlFO6krFLtmkeCiP0mTAoJ5AEvqPJJ"
+Subject: Re: [Qemu-devel] [PATCH 1/9] block: Make blk_get_attached_dev_id()
+ public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-Am 12.07.2017 um 13:46 hat Pavel Butsykin geschrieben:
-> This patch add shrinking of the image file for qcow2. As a result, this allows
-> us to reduce the virtual image size and free up space on the disk without
-> copying the image. Image can be fragmented and shrink is done by punching holes
-> in the image file.
-> 
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--j6HMlFO6krFLtmkeCiP0mTAoJ5AEvqPJJ
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com,
+ armbru@redhat.com, qemu-devel@nongnu.org
+Message-ID: <fd430eb3-6998-3d88-58e9-11237e1afa82@redhat.com>
+Subject: Re: [PATCH 1/9] block: Make blk_get_attached_dev_id() public
+References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
+ <1499864249-26305-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1499864249-26305-2-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/12/2017 07:57 AM, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/qcow2-cluster.c  |  40 ++++++++++++++++++
->  block/qcow2-refcount.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
->  block/qcow2.c          |  43 +++++++++++++++----
->  block/qcow2.h          |  14 +++++++
->  qapi/block-core.json   |   3 +-
->  5 files changed, 200 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index f06c08f64c..518429c64b 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -32,6 +32,46 @@
->  #include "qemu/bswap.h"
->  #include "trace.h"
->  
-> +int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t exact_size)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +    int new_l1_size, i, ret;
-> +
-> +    if (exact_size >= s->l1_size) {
-> +        return 0;
-> +    }
-> +
-> +    new_l1_size = exact_size;
-> +
-> +#ifdef DEBUG_ALLOC2
-> +    fprintf(stderr, "shrink l1_table from %d to %d\n", s->l1_size, new_l1_size);
-> +#endif
-> +
-> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
-> +    ret = bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
-> +                                       sizeof(uint64_t) * new_l1_size,
-> +                             (s->l1_size - new_l1_size) * sizeof(uint64_t), 0);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    ret = bdrv_flush(bs->file->bs);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
+>  block/block-backend.c          | 3 +--
+>  include/sysemu/block-backend.h | 1 +
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
 
-If we have an error here (or after a partial bdrv_pwrite_zeroes()), we
-have entries zeroed out on disk, but in memory we still have the
-original L1 table.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Should the in-memory L1 table be zeroed first? Then we can't
-accidentally reuse stale entries, but would have to allocate new ones,
-which would get on-disk state and in-memory state back in sync again.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
-> +    for (i = s->l1_size - 1; i > new_l1_size - 1; i--) {
-> +        if ((s->l1_table[i] & L1E_OFFSET_MASK) == 0) {
-> +            continue;
-> +        }
-> +        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
-> +                            s->cluster_size, QCOW2_DISCARD_ALWAYS);
-> +        s->l1_table[i] = 0;
-> +    }
-> +    return 0;
-> +}
-> +
->  int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
->                          bool exact_size)
->  {
 
-I haven't checked qcow2_shrink_reftable() for similar kinds of problems,
-I hope Max has.
+--j6HMlFO6krFLtmkeCiP0mTAoJ5AEvqPJJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Kevin
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZZjf0AAoJEKeha0olJ0Nq7VAH/0BgQ24D/NlcJ6bahWW1Dxm1
+GahWgUUCnjROWF77EYrb8Xo2xjjVRUhddtiGFim0cXHzEviiDhfqd5rDX/E+URwg
+X37rrf9iN5SgYA1SRDewAm4Wlhifly78yyMbkN5B7cwa6VFS24ONOp5vkCu/bMJy
+2GBhC9fDlumRBTYTi5M82qp+tba8RrtEH9mD/v5dKpTbGYmlJ7gx0c1sid1Wc2Cn
+1EL0R/yfUxtwR0ui8XE6mxZfOEPniekjMDdaB7zTbcBqVs+g51ornwcLc41eQ/ZF
+C0eM+GSla5JtnGYV34sXapdeL8dCdBqPZHp6M3lnDUKivZXbdo7bipMImTTEzSg=
+=+tzP
+-----END PGP SIGNATURE-----
+
+--j6HMlFO6krFLtmkeCiP0mTAoJ5AEvqPJJ--
