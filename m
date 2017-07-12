@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVJLY-0006rE-BN
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:14:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVJM9-0007RX-S5
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVJLV-0007sX-KD
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:14:36 -0400
-Resent-Message-Id: <E1dVJLV-0007sX-KD@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21759)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dVJLV-0007sC-CW
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:14:33 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149987245162.66.9835611951770874186@5d477a5b5989>
-In-Reply-To: <cover.1499866456.git.alistair.francis@xilinx.com>
+	(envelope-from <kwolf@redhat.com>) id 1dVJM8-000881-SW
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:15:13 -0400
+Date: Wed, 12 Jul 2017 17:15:01 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170712151501.GG4917@noname.str.redhat.com>
+References: <20170711163748.17817-1-el13635@mail.ntua.gr>
+	<20170711163748.17817-3-el13635@mail.ntua.gr>
+	<b8bcff15-2d6c-bca9-cd44-b03ddf7d7812@redhat.com>
+	<87y3ruaypm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 12 Jul 2017 08:14:12 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] Implement a warning_report function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87y3ruaypm.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 2/4] block: remove bdrv_media_changed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alistair.francis@xilinx.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net, armbru@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IGNvdmVyLjE0OTk4NjY0NTYuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAeGlsaW54LmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvN10gIEltcGxlbWVudCBhIHdhcm5p
-bmdfcmVwb3J0IGZ1bmN0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
-dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
-Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
-Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
-CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3YmNmMjQ0IENvbnZlcnQgZXJyb3Jf
-cmVwb3J0Kl9lcnIoKSB0byB3YXJuX3JlcG9ydCpfZXJyKCkKYmM5MjAyOSBlcnJvcjogSW1wbGVt
-ZW50IHRoZSB3YXJuIGFuZCBmcmVlIEVycm9yIGZ1bmN0aW9ucwpjZDI5NjZjIGNoYXItc29ja2V0
-OiBSZXBvcnQgVENQIHNvY2tldCB3YWl0aW5nIGFzIGluZm9ybWF0aW9uCmQ4MDQwY2EgaHcvaTM4
-NjogSW1wcm92ZSBzb21lIG9mIHRoZSB3YXJuaW5nIG1lc3NhZ2VzCjA1NzA0MDEgQ29udmVydCBl
-cnJvcl9yZXBvcnQoKSB0byB3YXJuX3JlcG9ydCgpCmQ2NWRiNWUgZXJyb3I6IEZ1bmN0aW9ucyB0
-byByZXBvcnQgd2FybmluZ3MgYW5kIGluZm9ybWF0aW9uYWwgbWVzc2FnZXMKZTIxN2E2MCB1dGls
-L3FlbXUtZXJyb3I6IFJlbmFtZSBlcnJvcl9wcmludF9sb2MoKSB0byBiZSBtb3JlIGdlbmVyaWMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogdXRpbC9xZW11LWVycm9y
-OiBSZW5hbWUgZXJyb3JfcHJpbnRfbG9jKCkgdG8gYmUgbW9yZSBnZW5lcmljLi4uCkNoZWNraW5n
-IFBBVENIIDIvNzogZXJyb3I6IEZ1bmN0aW9ucyB0byByZXBvcnQgd2FybmluZ3MgYW5kIGluZm9y
-bWF0aW9uYWwgbWVzc2FnZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy83OiBDb252ZXJ0IGVycm9yX3Jl
-cG9ydCgpIHRvIHdhcm5fcmVwb3J0KCkuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
-CiM3MjI6IEZJTEU6IHRlc3RzL3Rlc3QtcWRldi1nbG9iYWwtcHJvcHMuYzoyMzU6CisgICAgZ190
-ZXN0X3RyYXBfYXNzZXJ0X3N0ZGVycigiKndhcm5pbmc6IGdsb2JhbCBkeW5hbWljLXByb3AtdHlw
-ZS1iYWQucHJvcDMgaGFzIGludmFsaWQgY2xhc3MgbmFtZVxuKiIpOwoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzcyNjogRklMRTogdGVzdHMvdGVzdC1xZGV2LWdsb2JhbC1wcm9w
-cy5jOjIzNzoKKyAgICBnX3Rlc3RfdHJhcF9hc3NlcnRfc3RkZXJyKCIqd2FybmluZzogZ2xvYmFs
-IG5vaG90cGx1Zy10eXBlLnByb3A1PTEwNSBub3QgdXNlZFxuKiIpOwoKRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiM3Mjc6IEZJTEU6IHRlc3RzL3Rlc3QtcWRldi1nbG9iYWwtcHJvcHMu
-YzoyMzg6CisgICAgZ190ZXN0X3RyYXBfYXNzZXJ0X3N0ZGVycigiKndhcm5pbmc6IGdsb2JhbCBu
-b25kZXZpY2UtdHlwZS5wcm9wNiBoYXMgaW52YWxpZCBjbGFzcyBuYW1lXG4qIik7Cgp0b3RhbDog
-MiBlcnJvcnMsIDEgd2FybmluZ3MsIDU3MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0Lzc6IGh3L2kzODY6IEltcHJv
-dmUgc29tZSBvZiB0aGUgd2FybmluZyBtZXNzYWdlcy4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IGNo
-YXItc29ja2V0OiBSZXBvcnQgVENQIHNvY2tldCB3YWl0aW5nIGFzIGluZm9ybWF0aW9uLi4uCkNo
-ZWNraW5nIFBBVENIIDYvNzogZXJyb3I6IEltcGxlbWVudCB0aGUgd2FybiBhbmQgZnJlZSBFcnJv
-ciBmdW5jdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBDb252ZXJ0IGVycm9yX3JlcG9ydCpf
-ZXJyKCkgdG8gd2Fybl9yZXBvcnQqX2VycigpLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Am 12.07.2017 um 09:41 hat Markus Armbruster geschrieben:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+> > On 07/11/2017 11:37 AM, Manos Pitsidianakis wrote:
+> >> This function is not used anywhere, so remove it.
+> >> 
+> >
+> > Might be interesting to figure out when it WAS last used.
+> 
+> Yes.  When I see "remove X because it's unused" during patch review, I
+> immediately ask "why is it unused now, and what was it used for
+> previously?"  Ideally, the commit message answers these questions
+> preemptively.
+> 
+> >                                                            If I grepped
+> > correctly, it was commit 21fcf360 back in May 2012?
+> 
+> Yes.  "fdc: simplify media change handling".  I suspect that commit
+> broke media change for passed-through host floppy.
+> 
+> Its only implementation went away in commit f709623 "block: Remove host
+> floppy support".
+> 
+> Suggest
+> 
+>     block: bdrv_media_changed() is unused, remove
+> 
+>     The i82078 floppy device model used to call bdrv_media_changed() to
+>     implement its media change bit when backed by a host floppy.  This
+>     went away in 21fcf36 "fdc: simplify media change handling".
+>     Probably broke host floppy media change.  Host floppy pass-through
+>     was dropped in commit f709623.  bdrv_media_changed() has never been
+>     used for anything else.  Remove it.
+
+Manos, if you're happy with this, I can update the commit message while
+applying the series.
+
+Kevin
