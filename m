@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVCCM-0001Cx-9u
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:36:39 -0400
+	(envelope-from <peterx@redhat.com>) id 1dVCCP-0001Dk-IV
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:36:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVCCK-00028D-8r
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:36:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54124)
+	(envelope-from <peterx@redhat.com>) id 1dVCCO-0002CP-KX
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:36:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVCCK-00027W-2d
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:36:36 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVCCO-0002BM-7V
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:36:40 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F1A84E4D9
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:36:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1F2FC13A68
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:36:39 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 12 Jul 2017 15:36:19 +0800
-Message-Id: <1499844982-5738-2-git-send-email-peterx@redhat.com>
+Date: Wed, 12 Jul 2017 15:36:21 +0800
+Message-Id: <1499844982-5738-4-git-send-email-peterx@redhat.com>
 In-Reply-To: <1499844982-5738-1-git-send-email-peterx@redhat.com>
 References: <1499844982-5738-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] intel_iommu: fix VTD_PAGE_MASK
+Subject: [Qemu-devel] [PATCH v2 3/4] intel_iommu: use access_flags for iotlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +32,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-IOMMUTLBEntry.iova is returned incorrectly in one PT path (though mostly
-we cannot really trigger this path, even if we do, we are mostly
-disgarding this value, so it didn't break anything). Fix it by
-converting the VTD_PAGE_MASK into normal definition (normally it should
-be pfn mask, not offset mask), then switch the other user of it.
+It was cached by read/write separately. Let's merge them.
 
-Fixes: b93130 ("intel_iommu: cleanup vtd_{do_}iommu_translate()")
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c          | 2 +-
- hw/i386/intel_iommu_internal.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/intel_iommu.c         | 15 +++++++--------
+ include/hw/i386/intel_iommu.h |  3 +--
+ 2 files changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 88dc042..392da45 100644
+index 9c36866..e17340c 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -1141,7 +1141,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-     if (vtd_ce_get_type(&ce) == VTD_CONTEXT_TT_PASS_THROUGH) {
-         entry->iova = addr & VTD_PAGE_MASK;
-         entry->translated_addr = entry->iova;
--        entry->addr_mask = VTD_PAGE_MASK;
-+        entry->addr_mask = ~VTD_PAGE_MASK;
-         entry->perm = IOMMU_RW;
-         trace_vtd_translate_pt(source_id, entry->iova);
+@@ -241,8 +241,7 @@ out:
  
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index f50ecd8..d1d6290 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -384,7 +384,7 @@ typedef struct VTDIOTLBPageInvInfo VTDIOTLBPageInvInfo;
- /* Pagesize of VTD paging structures, including root and context tables */
- #define VTD_PAGE_SHIFT              12
- #define VTD_PAGE_SIZE               (1ULL << VTD_PAGE_SHIFT)
--#define VTD_PAGE_MASK               (VTD_PAGE_SIZE - 1)
-+#define VTD_PAGE_MASK               ~(VTD_PAGE_SIZE - 1)
+ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+                              uint16_t domain_id, hwaddr addr, uint64_t slpte,
+-                             bool read_flags, bool write_flags,
+-                             uint32_t level)
++                             uint8_t access_flags, uint32_t level)
+ {
+     VTDIOTLBEntry *entry = g_malloc(sizeof(*entry));
+     uint64_t *key = g_malloc(sizeof(*key));
+@@ -261,8 +260,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+     entry->gfn = gfn;
+     entry->domain_id = domain_id;
+     entry->slpte = slpte;
+-    entry->read_flags = read_flags;
+-    entry->write_flags = write_flags;
++    entry->access_flags = access_flags;
+     entry->mask = vtd_slpt_level_page_mask(level);
+     *key = vtd_get_iotlb_key(gfn, source_id, level);
+     g_hash_table_replace(s->iotlb, key, entry);
+@@ -1095,6 +1093,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     bool is_fpd_set = false;
+     bool reads = true;
+     bool writes = true;
++    uint8_t access_flags;
+     VTDIOTLBEntry *iotlb_entry;
  
- #define VTD_PAGE_SHIFT_4K           12
- #define VTD_PAGE_MASK_4K            (~((1ULL << VTD_PAGE_SHIFT_4K) - 1))
+     /*
+@@ -1109,8 +1108,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+         trace_vtd_iotlb_page_hit(source_id, addr, iotlb_entry->slpte,
+                                  iotlb_entry->domain_id);
+         slpte = iotlb_entry->slpte;
+-        reads = iotlb_entry->read_flags;
+-        writes = iotlb_entry->write_flags;
++        access_flags = iotlb_entry->access_flags;
+         page_mask = iotlb_entry->mask;
+         goto out;
+     }
+@@ -1180,13 +1178,14 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     }
+ 
+     page_mask = vtd_slpt_level_page_mask(level);
++    access_flags = IOMMU_ACCESS_FLAG(reads, writes);
+     vtd_update_iotlb(s, source_id, VTD_CONTEXT_ENTRY_DID(ce.hi), addr, slpte,
+-                     reads, writes, level);
++                     access_flags, level);
+ out:
+     entry->iova = addr & page_mask;
+     entry->translated_addr = vtd_get_slpte_addr(slpte) & page_mask;
+     entry->addr_mask = ~page_mask;
+-    entry->perm = IOMMU_ACCESS_FLAG(reads, writes);
++    entry->perm = access_flags;
+     return true;
+ 
+ error:
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index a57f419..1b51c9f 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -101,8 +101,7 @@ struct VTDIOTLBEntry {
+     uint16_t domain_id;
+     uint64_t slpte;
+     uint64_t mask;
+-    bool read_flags;
+-    bool write_flags;
++    uint8_t access_flags;
+ };
+ 
+ /* VT-d Source-ID Qualifier types */
 -- 
 2.7.4
