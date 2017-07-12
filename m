@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVJ8Q-0006wS-B9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:01:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVJBY-00012E-FD
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVJ8K-00019e-Rs
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:01:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48390)
+	(envelope-from <berrange@redhat.com>) id 1dVJBV-0002nY-3C
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:04:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVJ8K-00018c-JR
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:00:56 -0400
-Date: Wed, 12 Jul 2017 17:00:52 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170712170052.57e975d0@dhcp-192-215.str.redhat.com>
-In-Reply-To: <1499864265-144136-8-git-send-email-borntraeger@de.ibm.com>
-References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-	<1499864265-144136-8-git-send-email-borntraeger@de.ibm.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVJBU-0002nK-TH
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:04:13 -0400
+Date: Wed, 12 Jul 2017 16:04:00 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170712150400.GH5237@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 07/11] s390x: add flags field for
- registering I/O adapter
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Fei Li <sherrylf@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 12 Jul 2017 14:57:41 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+> We don't want to carry along old machine types forever. If we are able to
+> remove the pc machines up to 0.13 one day for example, this would allow
+> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+> BARs directly to low memory). Everything up to pc-1.2 is also known to
+> have issues with migration.  So let's start with a deprecation message
+> for the old machine types so that the (hopefully) few users of these old
+> systems start switching over to newer machine types instead.
 
-> From: Fei Li <sherrylf@linux.vnet.ibm.com>
+I think we must document & agree on our support policy for machine
+types, before we start marking them as deprecated. eg please consider
+the following document before accepting this deprecation patch:
+
+ https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00652.html
+
+Note in that proposal there, I say we do *not* go through trouble of
+explicitly marking machines as deprecated. We just document upfront
+the intended lifecycle and then delete them when it is done.
+
+Just use deprecation warnings for things where there is no predictable
+lifecycle upfront.
+
 > 
-> Introduce a new 'flags' field to IoAdapter to contain further
-> characteristics of the adapter, like whether the adapter is subject to
-> adapter-interruption suppression.
-> 
-> For the kvm case, pass this value in the 'flags' field when
-> registering an adapter.
-> 
-> Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/intc/s390_flic.c          | 2 +-
->  hw/intc/s390_flic_kvm.c      | 3 ++-
->  hw/s390x/css-bridge.c        | 2 +-
->  hw/s390x/css.c               | 8 ++++++--
->  hw/s390x/s390-pci-bus.c      | 3 ++-
->  include/hw/s390x/css.h       | 8 +++++++-
->  include/hw/s390x/s390_flic.h | 2 +-
->  7 files changed, 20 insertions(+), 8 deletions(-)
+>  Note: Even if we mark all these old machines as deprecated, this ofcourse
+>  doesn't mean that we also have to remove them all at once later when we
+>  decide to finally really remove some. We could then also start by removing
+>  0.10 and 0.11 only, for example (since there should really be no users left
+>  for these), or only up to 0.13 (to be able to kill rombar=0).
+> 
+>  v3:
+>  - Use a more generic approach by introducing a "deprecation_msg" in the
+>    MachineClass instead.
+> 
+>  v2:
+>  - Deprecate machines up to pc-1.2
+> 
+>  hw/i386/pc_piix.c   | 1 +
+>  include/hw/boards.h | 1 +
+>  vl.c                | 4 ++++
+>  3 files changed, 6 insertions(+)
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
