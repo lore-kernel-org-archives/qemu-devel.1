@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVGhx-0003b3-A5
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:25:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVGlO-0005BY-La
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVGhu-0000Fp-5V
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:25:33 -0400
-Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:55082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVGht-0000De-Rp
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:25:30 -0400
-Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 0F2376C21A
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 14:25:25 +0200 (CEST)
-Date: Wed, 12 Jul 2017 14:25:17 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170712142517.5db95655@bahia.lan>
-In-Reply-To: <1499856934.13989.38.camel@redhat.com>
-References: <149910050540.26371.12575732020425703531.stgit@bahia.lan>
-	<20170704072901.GA2180@umbus.fritz.box>
-	<20170704104722.499d4e86@bahia.lan>
-	<1499856934.13989.38.camel@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dVGlL-0002NL-Gu
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:29:06 -0400
+Received: from mail-wr0-f175.google.com ([209.85.128.175]:34774)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVGlL-0002L6-97
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:29:03 -0400
+Received: by mail-wr0-f175.google.com with SMTP id 77so31741242wrb.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 05:29:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/5T=wcQUIgfYFJzLBkIMcBf1";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] spapr: make default PHB optionnal
+In-Reply-To: <87lgnt99xz.fsf@dusky.pond.sub.org>
+References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
+	<1499788408-10096-3-git-send-email-peter.maydell@linaro.org>
+	<87lgnt99xz.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 12 Jul 2017 13:27:39 +0100
+Message-ID: <CAFEAcA8JmF+8MdCGYbVr9AYx+3ybXqGbLLzZiFgoQmJPHYTsZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/3] qdev: support properties which don't
+ set a default value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,170 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, libvir-list@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "patches@linaro.org" <patches@linaro.org>
 
---Sig_/5T=wcQUIgfYFJzLBkIMcBf1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 12 July 2017 at 12:22, Markus Armbruster <armbru@redhat.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> In some situations it's useful to have a qdev property which doesn't
+>> automatically set its default value when qdev_property_add_static is
+>> called (for instance when the default value is not constant).
+>>
+>> Support this by adding a flag to the Property struct indicating
+>> whether to set the default value.  This replaces the existing test
+>> for whether the PorpertyInfo set_default_value function pointer is
+>
+> PropertyInfo
+>
+>> NULL, and we set the .set_default field to true for all those cases
+>> of struct Property which use a PropertyInfo with a non-NULL
+>> set_default_value, so behaviour remains the same as before.
+>>
+>> We define two new macros DEFINE_PROP_SIGNED_NODEFAULT and
+>> DEFINE_PROP_UNSIGNED_NODEFAULT, to cover the most plausible use cases
+>> of wanting to set an integer property with no default value.
+>
+> Your text makes me wonder what is supposed to set the default value
+> then.  Glancing ahead to PATCH 3, it looks like method instance_init()
+> is.  Can you think of a scenario where something else sets it?
 
-On Wed, 12 Jul 2017 12:55:34 +0200
-Andrea Bolognani <abologna@redhat.com> wrote:
+Yes, instance_init is the obvious place (though in fact pretty
+much anything that runs before the user of the device sets
+properties will do).
 
-> [libvir-list added to the loop]
->=20
-> On Tue, 2017-07-04 at 10:47 +0200, Greg Kurz wrote:
-> > On Tue, 4 Jul 2017 17:29:01 +1000 David Gibson <david@gibson.dropbear.i=
-d.au> wrote: =20
-> > > On Mon, Jul 03, 2017 at 06:48:25PM +0200, Greg Kurz wrote: =20
-> > > >=C2=A0
-> > > > The sPAPR machine always create a default PHB during initialization=
-, even
-> > > > if -nodefaults was passed on the command line. This forces the user=
- to
-> > > > rely on -global if she wants to set properties of the default PHB, =
-such
-> > > > as numa_node.
-> > > >=C2=A0
-> > > > This patch introduces a new machine create-default-phb property to =
-control
-> > > > whether the default PHB must be created or not. It defaults to on i=
-n order
-> > > > to preserve old setups (which is also the motivation to not alter t=
-he
-> > > > current behavior of -nodefaults).
-> > > >=C2=A0
-> > > > If create-default-phb is set to off, the default PHB isn't created,=
- nor
-> > > > any other device usually created with it. It is mandatory to provide
-> > > > a PHB on the command line to be able to use PCI devices (otherwise =
-QEMU
-> > > > won't start). For example, the following creates a PHB with the same
-> > > > mappings as the default PHB and also sets the NUMA affinity:
-> > > >=C2=A0
-> > > >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine type=3Dpseries,create-default=
--phb=3Doff \
-> > > >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-numa node,nodeid=3D0 -device spapr-pc=
-i-host-bridge,index=3D0,numa_node=3D0 =20
-> > >=C2=A0
-> > > So, I agree that the distinction between default devices that are
-> > > disabled with -nodefaults and default devices that aren't is a big
-> > > mess in qemu configuration.=C2=A0=C2=A0But on the other hand this onl=
-y addresses
-> > > one tiny aspect of that, and in the meantime means we will silently
-> > > ignore some other configuration options in some conditions.
-> > >=C2=A0
-> > > So, what's the immediate benefit / use case for this? =20
-> >=C2=A0
-> > With the current code base, the only way to set properties of the defau=
-lt
-> > PHB, is to pass -global spapr-pci-host-bridge.prop=3Dvalue for each pro=
-perty.
-> > The immediate benefit of this patch is to unify the way libvirt passes
-> > PHB description to the command line:
-> >=C2=A0
-> > ie, do:
-> >=C2=A0
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine type=3Dpseries,create-default-phb=
-=3Doff \
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device spapr-pci-host-bridge,prop1=3Da,pr=
-op2=3Db,prop3=3Dc \
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device spapr-pci-host-bridge,prop1=3Dd,pr=
-op2=3De,prop3=3Df
-> >=C2=A0
-> > instead of:
-> >=C2=A0
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-machine type=3Dpseries \
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-global spapr-pci-host-bridge.prop1=3Da \
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-global spapr-pci-host-bridge.prop2=3Db \
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-global spapr-pci-host-bridge.prop3=3Dc \
-> >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device spapr-pci-host-bridge,prop1=3Dd,pr=
-op2=3De,prop3=3Df =20
->=20
-> So, I'm thinking about this mostly in terms of NUMA nodes
-> because that's the use case I'm aware of.
->=20
+>>      union {
+>>          int64_t i;
+>>          uint64_t u;
+>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>> index 36d040c..66816a5 100644
+>> --- a/include/hw/qdev-properties.h
+>> +++ b/include/hw/qdev-properties.h
+>> @@ -43,15 +43,24 @@ extern PropertyInfo qdev_prop_arraylen;
+>>          .info      = &(_prop),                                          \
+>>          .offset    = offsetof(_state, _field)                           \
+>>              + type_check(_type,typeof_field(_state, _field)),           \
+>> +        .set_default = true,                                            \
+>>          .defval.i  = (_type)_defval,                                    \
+>>          }
+>
+> If you flip the sense of the flag, you don't need to mess with the
+> PropertyInfo, and don't need the note referring reviewers to the
+> previous patch.  However, the case "use .defval" already requires an
+> initializer, so adding one for .set_default seems fair.  Okay.
 
-This is the initial motivation behind this patch indeed.
+Having the flag this way round was your idea :-)
+Putting it the other way round might have been a smaller change
+in some sense (you'd have had to retain the check on
+set_default_value being NULL), but I do think it's nicer
+in the end...
 
-> The problem with using -global is not that it requires using
-> a different syntax to set properties for the default PHB,
-> but rather that such properties are then inherited by all
-> other PHBs unless explicitly overridden.
+> Preferably with a suitable comment on member set_default and an improved
+> commit message:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Yeah, I should have mentioned that.
-
-> Not creating the
-> default PHB at all would solve the issue.
->=20
-> On the other hand, libvirt would then need to either
->=20
-> =C2=A0 1) only allow setting NUMA nodes for PHBs if QEMU supports
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0the new option, leaving QEMU < 2.10 users b=
-ehind; or
->=20
-> =C2=A0 2) implement handling for both the new and old behavior.
->=20
-> I'm not sure we could get away with 1), and going for 2)
-> means more work both for QEMU and libvirt developers for
-> very little actual gain, so I'd be inclined to scrap this
-> and just build the libvirt glue on top of the existing
-> interface.
->=20
-
-Makes sense.
-
-> That is, of course, unless
->=20
-> =C2=A0 1) having a random selection of PHBs not assigned to any
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0NUMA node is a sensible use case. This is s=
-omething
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0we just can't do reliably with the current =
-interface:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0we can decide to set the NUMA node only for=
- say, PHBs
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A01 and 3 leaving 0 and 2 alone, but once we =
-set it for
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0the default PHB we *have* to set it for all=
- remaining
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ones as well. libvirt will by default assig=
-n emulated
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0devices to the default PHB, so I would rath=
-er expect
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0users to leave that one alone and set a NUM=
-A node for
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0all other PHBs; or
->=20
-
-I agree.
-
-> =C2=A0 2) there are other properties outside of numa_node we
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0might want to deal with; or
->=20
-
-Dunno... and anyway, since we can have several PHBs, it is
-probably easier to leave the default one alone.
-
-> =C2=A0 3) it turns out it's okay to require a recent QEMU :)
->=20
-
-I guess having a recent QEMU is always better :) but you're the one
-to say if it is okay for libvirt users.
-
-> --=C2=A0
-> Andrea Bolognani / Red Hat / Virtualization
-
-
---Sig_/5T=wcQUIgfYFJzLBkIMcBf1
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllmFS0ACgkQAvw66wEB28JCeQCeIT/vzBviOUQbxth1qfW4FCq+
-M5IAnRS3+B7biDdFsZhgC093QU+vs0Gk
-=h8/+
------END PGP SIGNATURE-----
-
---Sig_/5T=wcQUIgfYFJzLBkIMcBf1--
+thanks
+-- PMM
