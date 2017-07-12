@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVJDq-0002Kl-U0
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:06:40 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVJEX-0002hH-QI
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVJDp-0003sw-Ki
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:06:38 -0400
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
-	<1499864249-26305-3-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <793a9e5e-f782-5824-5b19-d2cf4da89d3a@redhat.com>
-Date: Wed, 12 Jul 2017 10:06:20 -0500
+	(envelope-from <cohuck@redhat.com>) id 1dVJEU-0004Pf-D7
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:07:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVJEU-0004PE-4C
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:07:18 -0400
+Date: Wed, 12 Jul 2017 17:07:13 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170712170713.1f5cf6b2@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499864265-144136-9-git-send-email-borntraeger@de.ibm.com>
+References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
+	<1499864265-144136-9-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1499864249-26305-3-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ"
-Subject: Re: [Qemu-devel] [PATCH 2/9] block/qapi: Add qdev device name to
- query-block
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 08/11] s390x/flic: introduce
+ modify_ais_mode callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,111 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Fei Li <sherrylf@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com,
- armbru@redhat.com, qemu-devel@nongnu.org
-Message-ID: <793a9e5e-f782-5824-5b19-d2cf4da89d3a@redhat.com>
-Subject: Re: [PATCH 2/9] block/qapi: Add qdev device name to query-block
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
- <1499864249-26305-3-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1499864249-26305-3-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 12 Jul 2017 14:57:42 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-On 07/12/2017 07:57 AM, Kevin Wolf wrote:
-> With -blockdev/-device, users can indirectly create anonymous
-> BlockBackends, in the state of which they are still interested. As a
-
-Reads awkwardly.  Maybe:
-
-BlockBackends, although it is still of interest to learn the state of
-such backends.
-
-> preparation for making such BBs visible in query-block, make sure that
-> they can be identified even without a name by adding the ID/QOM path of=
-
-> their qdev device to BlockInfo.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> From: Fei Li <sherrylf@linux.vnet.ibm.com>
+> 
+> In order to emulate the adapter interruption suppression (AIS)
+> facility properly, the guest needs to be able to modify the AIS mask.
+> Interrupt suppression will be handled via the flic (for kvm, via a
+> recently introduced kernel backend; for !kvm, in the flic code), so
+> let's introduce a method to change the mode via the flic interface.
+> 
+> Co-authored-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
+>  hw/intc/s390_flic.c          | 37 ++++++++++++++++++++++++++++++++++++-
+>  hw/intc/s390_flic_kvm.c      | 36 ++++++++++++++++++++++++++++++++++++
+>  include/hw/s390x/s390_flic.h |  9 ++++++++-
+>  3 files changed, 80 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> index d3938b3..ce7f355 100644
+> --- a/hw/intc/s390_flic.c
+> +++ b/hw/intc/s390_flic.c
+> @@ -79,15 +79,47 @@ static int qemu_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
+>      return -ENOSYS;
+>  }
+>  
+> +static int qemu_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
+> +                                     uint16_t mode)
+> +{
+> +    QEMUS390FLICState *flic  = QEMU_S390_FLIC(fs);
+> +
+> +    switch (mode) {
+> +    case SIC_IRQ_MODE_ALL:
+> +        flic->simm &= ~AIS_MODE_MASK(isc);
+> +        flic->nimm &= ~AIS_MODE_MASK(isc);
+> +        break;
+> +    case SIC_IRQ_MODE_SINGLE:
+> +        flic->simm |= AIS_MODE_MASK(isc);
+> +        flic->nimm &= ~AIS_MODE_MASK(isc);
 
-> +++ b/qapi/block-core.json
-> @@ -433,6 +433,9 @@
->  #
->  # @device: The device name associated with the virtual device.
->  #
-> +# @qdev: The qdev ID, or if no ID is assigned the QOM path, of the blo=
-ck
+Can we have some documentation about the meaning of simm/nimm in qemu?
+The one from the patch description of the respective kernel patch would
+be fine.
 
-s/assigned the QOM path, of/assigned, the QOM path of/
+> +        break;
+> +    default:
+> +        return -EINVAL;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>
 
-> +#        device.
+(...)
 
-Missing a (since 2.10) tag.
+> @@ -406,6 +427,7 @@ typedef struct KVMS390FLICStateClass {
+>  
+>  static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>  {
+> +    S390FLICState *fs = S390_FLIC_COMMON(dev);
+>      KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
+>      struct kvm_create_device cd = {0};
+>      struct kvm_device_attr test_attr = {0};
+> @@ -438,6 +460,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+>      flic_state->clear_io_supported = !ioctl(flic_state->fd,
+>                                              KVM_HAS_DEVICE_ATTR, test_attr);
+>  
+> +    fs->ais_supported = false;
 
-> +#
->  # @type: This field is returned only for compatibility reasons, it sho=
-uld
->  #        not be used (always returns 'unknown')
->  #
-> @@ -458,7 +461,7 @@
->  # Since:  0.14.0
->  ##
->  { 'struct': 'BlockInfo',
-> -  'data': {'device': 'str', 'type': 'str', 'removable': 'bool',
-> +  'data': {'device': 'str', '*qdev': 'str', 'type': 'str', 'removable'=
-: 'bool',
->             'locked': 'bool', '*inserted': 'BlockDeviceInfo',
->             '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
->             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+The patch actually enabling this for kvm is in the next batch of
+patches, I assume?
 
-Besides the testsuite, are there any example outputs that need to be
-adjusted?
-
-> diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
-> index 782eae2..e3c4496 100644
-> --- a/tests/qemu-iotests/067.out
-> +++ b/tests/qemu-iotests/067.out
-> @@ -57,6 +57,7 @@ Testing: -drive file=3DTEST_DIR/t.qcow2,format=3Dqcow=
-2,if=3Dnone,id=3Ddisk -device virti
->                  "file": "TEST_DIR/t.qcow2",
->                  "encryption_key_missing": false
->              },
-> +            "qdev": "/machine/peripheral/virtio0/virtio-backend",
->              "type": "unknown"
->          }
->      ]
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZjrsAAoJEKeha0olJ0NqxegH/RupGoukwshUu6Jumx8EK1Bm
-csXtKqNiyZoraMqduOvqFpkRAm1XFz5gKoKlCavVRYHU8fk8KWgGGv8WWfvNtq1F
-P/APlZrjpSHrbF6+VkA3vSh8Wy9luWdfH+hJtJxpRy48Aw5DW2+l53GtFH9C5N6M
-GbNeRzwV3/XGoNvtiRc76ZHMd/xYPxH7e0NGjWZrSdAjT5SkPLS3CYTTzv+DsQSm
-V4bE1AUiUnkpkB1Zt4LR+Zkt9GQu2aD5m6x5ZZOxPSvg+Lsrjfi+3GRFWNHM03Z2
-N4R6+rBobGzZyIGK3GrBL1RAUTUC3vF4xFHgpzX1GKTdQNJIvBPeGCavOKsoi6w=
-=GfQT
------END PGP SIGNATURE-----
-
---SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ--
+>      return;
+>  fail:
+>      error_propagate(errp, errp_local);
