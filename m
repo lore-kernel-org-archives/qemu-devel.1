@@ -1,32 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVFw4-0003Gj-Aq
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:36:05 -0400
+	(envelope-from <j.pelczar@samsung.com>) id 1dVFzT-0004vA-I1
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVFw0-0004eD-Cq
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:36:04 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33467)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVFw0-0004dQ-9I
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:36:00 -0400
-Received: by mail-qk0-x243.google.com with SMTP id a66so1976667qkb.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:36:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170712075528.22770-1-famz@redhat.com>
-	<20170712075528.22770-2-famz@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <31b414be-1ea0-acbf-38f5-d732b75b122d@amsat.org>
-Date: Wed, 12 Jul 2017 08:35:56 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170712075528.22770-2-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] docker.py: Drop infile parameter
+	(envelope-from <j.pelczar@samsung.com>) id 1dVFzQ-0006bv-D0
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:39:35 -0400
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:37673)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <j.pelczar@samsung.com>)
+	id 1dVFzQ-0006aL-6U
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:39:32 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout3.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OSZ00E4571O4K30@mailout3.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:39:26 +0100 (BST)
+Received: from eusmges3.samsung.com (unknown [203.254.199.242])
+	by	eucas1p1.samsung.com (KnoxPortal) with ESMTP
+	id	20170712113926eucas1p12d09c8575758b5dc398d4884a16f0320~QklQ8iZ900130601306eucas1p1u
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 11:39:26 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180])
+	by	eucas1p1.samsung.com (KnoxPortal) with ESMTP
+	id	20170712113922eucas1p1c6588b2e29439254cafd3d8dde5c505c~QklNOrvq93241132411eucas1p12
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 11:39:22 +0000 (GMT)
+Received: from AMDN1843 ([106.120.52.68])
+	by eusync1.samsung.com (Oracle	Communications Messaging Server
+	7.0.5.31.0 64bit (built May  5 2014))
+	with	ESMTPA id <0OSZ00DMP71LI460@eusync1.samsung.com> for
+	qemu-devel@nongnu.org;	Wed, 12 Jul 2017 12:39:21 +0100 (BST)
+From: Jaroslaw Pelczar <j.pelczar@samsung.com>
+Date: Wed, 12 Jul 2017 13:39:20 +0200
+Message-id: <001801d2fb03$811079e0$83316da0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-transfer-encoding: 7bit
+Content-language: pl
+References: <CGME20170712113922eucas1p1c6588b2e29439254cafd3d8dde5c505c@eucas1p1.samsung.com>
+Subject: [Qemu-devel] target/arm: Fix abort on exception return from AArch64
+ to AArch32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +46,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 07/12/2017 04:55 AM, Fam Zheng wrote:
-> The **kwargs can do this just well.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+Problem manifests itself when we handle the following sequence:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+1. 64-bit Secure EL3 returns to 32-bit Secure EL1
+2. 32-bit Secure EL1 performs SMC call to 64-bit Secure EL3
+3. 64-bit Secure EL3 performs return ERET to 32-bit Secure EL1]
+4. 32-bit Secure EL1 receives prefetch abort
 
-> ---
->   tests/docker/docker.py | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index e707e5b..f5ac86b 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -112,11 +112,9 @@ class Docker(object):
->           signal.signal(signal.SIGTERM, self._kill_instances)
->           signal.signal(signal.SIGHUP, self._kill_instances)
->   
-> -    def _do(self, cmd, quiet=True, infile=None, **kwargs):
-> +    def _do(self, cmd, quiet=True, **kwargs):
->           if quiet:
->               kwargs["stdout"] = DEVNULL
-> -        if infile:
-> -            kwargs["stdin"] = infile
->           return subprocess.call(self._command + cmd, **kwargs)
->   
->       def _do_kill_instances(self, only_known, only_active=True):
-> @@ -184,7 +182,7 @@ class Docker(object):
->       def update_image(self, tag, tarball, quiet=True):
->           "Update a tagged image using "
->   
-> -        self._do(["build", "-t", tag, "-"], quiet=quiet, infile=tarball)
-> +        self._do(["build", "-t", tag, "-"], quiet=quiet, stdin=tarball)
->   
->       def image_matches_dockerfile(self, tag, dockerfile):
->           try:
-> 
+If CPU's env->pc is not set to the same value as env->regs[15],
+during ERET the simulator will try to fetch instruction from EL3's
+virtual address inside 32-bit Secure EL1 virtual address space.
+This will cause Prefetch Abort in 32-bit Secure EL1.
+
+Problem occurs because of the following code generation scheme:
+
+1. disas_uncond_b_reg will decode ERET
+2. gen_helper_exception_return(cpu_env) will generate thunk to
+   helper_exception_return
+3. s->is_jmp is set to DISAS_JUMP
+4. gen_intermediate_code_a64 will see dc->is_jmp == DISAS_JUMP
+5. tcg_gen_lookup_and_goto_ptr(cpu_pc) will be called which trigger
+   access cpu->pc to fetch next opcode
+
+At this point cpu->pc will have EL3's PC value.
+
+Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
+---
+ target/arm/op_helper.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 2a85666..8222c19 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -1027,6 +1027,9 @@ void HELPER(exception_return)(CPUARMState *env)
+         } else {
+             env->regs[15] = env->elr_el[cur_el] & ~0x3;
+         }
++
++        env->pc = env->regs[15];
++
+         qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+                       "AArch32 EL%d PC 0x%" PRIx32 "\n",
+                       cur_el, new_el, env->regs[15]);
+-- 
+2.7.4
+	
