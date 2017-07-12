@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVJkw-0007QE-Lf
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:40:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVJpe-0000gr-9Y
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVJkr-0001Hn-Nw
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:40:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33452)
+	(envelope-from <armbru@redhat.com>) id 1dVJpb-0004U9-ME
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:45:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVJkr-0001Fu-Cv
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:40:45 -0400
-Date: Wed, 12 Jul 2017 17:40:40 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170712174040.5241897d@dhcp-192-215.str.redhat.com>
-In-Reply-To: <c70ce5b2-cbf0-e0c0-0697-8ffac5446dea@redhat.com>
-References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-	<1499864265-144136-11-git-send-email-borntraeger@de.ibm.com>
-	<c70ce5b2-cbf0-e0c0-0697-8ffac5446dea@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVJpb-0004TU-Ch
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:45:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
+Date: Wed, 12 Jul 2017 17:45:30 +0200
+In-Reply-To: <20170712145121.GF6020@localhost.localdomain> (Eduardo Habkost's
+	message of "Wed, 12 Jul 2017 11:51:21 -0300")
+Message-ID: <8760ex4q1x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/11] s390x/sic: realize SIC handling
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +28,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Fei Li <sherrylf@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 12 Jul 2017 15:40:02 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> On 12.07.2017 14:57, Christian Borntraeger wrote:
-> > From: Fei Li <sherrylf@linux.vnet.ibm.com>
-> > 
-> > Currently, we do nothing for the SIC instruction, but we need to
-> > implement it properly. Let's add proper handling in the backend code.
-> > 
-> > Co-authored-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> > Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> > Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
-> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > ---
-> >  hw/s390x/css.c         | 26 ++++++++++++++++++++++++++
-> >  hw/s390x/trace-events  |  1 +
-> >  include/hw/s390x/css.h |  2 ++
-> >  target/s390x/kvm.c     | 16 +++++++++++++++-
-> >  4 files changed, 44 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> > index 1fcbc84..7b82176 100644
-> > --- a/hw/s390x/css.c
-> > +++ b/hw/s390x/css.c
-> > @@ -521,6 +521,32 @@ void css_conditional_io_interrupt(SubchDev *sch)
-> >      }
-> >  }
-> >  
-> > +int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
-> > +{
-> > +    S390FLICState *fs = s390_get_flic();
-> > +    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-> > +    int r;
-> > +
-> > +    if (env->psw.mask & PSW_MASK_PSTATE) {
-> > +        r = -PGM_PRIVILEGED;
-> > +        goto out;  
-> 
-> Why not simply:
-> 
->            return -PGM_PRIVILEGED;
-> 
-> ?
-> 
-> Same for the other goto below ... and then you also do not need the "r"
-> variable anymore.
+> On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+>> We don't want to carry along old machine types forever. If we are able to
+>> remove the pc machines up to 0.13 one day for example, this would allow
+>> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+>> BARs directly to low memory). Everything up to pc-1.2 is also known to
+>> have issues with migration.  So let's start with a deprecation message
+>> for the old machine types so that the (hopefully) few users of these old
+>> systems start switching over to newer machine types instead.
+>> 
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>
+> I suggest changing "-machine help" too.  Today it looks like this:
+>
+>   Supported machines are:
+>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+>   pc-1.2               Standard PC (i440FX + PIIX, 1996)
+>   pc-1.1               Standard PC (i440FX + PIIX, 1996)
+>   pc-1.0               Standard PC (i440FX + PIIX, 1996)
+>   pc-0.15              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.14              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.13              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.12              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.11              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.10              Standard PC (i440FX + PIIX, 1996)
+>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+>   isapc                ISA-only PC
+>   none                 empty machine
+>
+>
+> It could be changed to something like this:
+>
+>   Supported machines are:
+>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+>   isapc                ISA-only PC
+>   none                 empty machine
+>
+>   Deprecated machines: pc-1.2, pc-1.1, pc-1.0, pc-0.15, pc-0.14, pc-0.13,
+>                        pc-0.12, pc-0.11, pc-0.10.
 
-I'm slightly in favour of the single exit style.
-
-> 
-> > +    }
-> > +
-> > +    trace_css_do_sic(mode, isc);
-> > +    switch (mode) {
-> > +    case SIC_IRQ_MODE_ALL:
-> > +    case SIC_IRQ_MODE_SINGLE:
-> > +        break;
-> > +    default:
-> > +        r = -PGM_OPERAND;
-> > +        goto out;
-> > +    }
-> > +
-> > +    r = fsc->modify_ais_mode(fs, isc, mode) ? -PGM_OPERATION : 0;
-> > +out:
-> > +    return r;
-> > +}
-> > +
-> >  void css_adapter_interrupt(uint8_t isc)
-> >  {
-> >      uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
-
-(...)
-
-> > diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> > index e028960..5ee6d52 100644
-> > --- a/include/hw/s390x/css.h
-> > +++ b/include/hw/s390x/css.h
-> > @@ -12,6 +12,7 @@
-> >  #ifndef CSS_H
-> >  #define CSS_H
-> >  
-> > +#include "cpu.h"  
-> 
-> Not sure, but it's a little bit strange that the channel sub-system now
-> depends on the CPU ... maybe the check for problem state should rather
-> be done in kvm.c instead?
-
-This would mean that tcg would need to duplicate those checks should we
-want to wire it up in the future. (FWIW, the sclp backend code in
-hw/s390x/sclp.c also does the respective checks, probably for exactly
-that reason.)
-
-> Or should css_do_sic() rather reside in s390-pci-inst.c or in ioinst.c
-> instead?
-
-s390-pci-inst.c is only a good choice if we are sure that sic will be
-applicable for pci only even in the future - and I don't think we can
-be. (The ais stuff is tied to the adapter, who knows which adapter
-types may arrive in the future...)
-
-I/O interrupt injection is currently triggered from the css code (where
-it belongs IMO), so I think the code should stay where it is now.
+I'd add "(deprecated)" to the existing lines instead.  Probably simpler
+to code, because it's consistent with the existing format.
