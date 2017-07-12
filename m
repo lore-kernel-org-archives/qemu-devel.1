@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dV7ex-0001qD-8r
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 22:45:52 -0400
+	(envelope-from <marcel@redhat.com>) id 1dVBJU-0008Rr-MN
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dV7es-00022F-Ce
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 22:45:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42531)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dV7es-00021h-4b
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 22:45:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dV7eq-0000VP-6j
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:45:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 310B12E80E8
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:45:44 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1dVBJR-0000F5-En
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:39:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dVBJR-0000EL-5T
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:39:53 -0400
+References: <5233eee1-a017-ccae-3458-762c9e86902c@redhat.com>
+	<20170707133949.GH10776@localhost.localdomain>
+	<20170707181642-mutt-send-email-mst@kernel.org>
+	<20170707180358.GA12152@localhost.localdomain>
+	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
+	<20170710135943.GG12152@localhost.localdomain>
+	<20170710194345-mutt-send-email-mst@kernel.org>
+	<20170710174730.GL12152@localhost.localdomain>
+	<063778b8-d517-dcac-3c83-95076604a16c@redhat.com>
+	<1499760785.8257.5.camel@redhat.com>
+	<20170711144215.GI4335@noname.str.redhat.com>
+	<1cc3488e-d40b-ac73-9087-f2bf64f2cd1c@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <8d6ed662-63e5-fe49-f41e-05f80a52bc20@redhat.com>
+Date: Wed, 12 Jul 2017 09:39:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Jul 2017 02:38:20 -0000
-From: Nick Craig-Wood <nick@craig-wood.com>
-Reply-To: Bug 1696353 <1696353@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149682692221.8383.2186201709283317126.malonedeb@gac.canonical.com>
-Message-Id: <149982710006.24380.15830373651280270501.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1696353] Re: golang binaries fail to start under
- linux-user
+In-Reply-To: <1cc3488e-d40b-ac73-9087-f2bf64f2cd1c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +38,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Chao Peng <chao.p.peng@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
 
-Note that there is a go bug about this issue too:
-https://github.com/golang/go/issues/20763
+On 11/07/2017 17:47, Paolo Bonzini wrote:
+> On 11/07/2017 16:42, Kevin Wolf wrote:
+>>>>   Concerning QEMU, could we maybe simply emit a warning a la
+>>>>
+>>>>   "you did not specify a machine type with the -M option, so you are
+>>>>    currently running the the 'pc' machine type. Please note that
+>>>> future
+>>>>    versions of QEMU might use the 'q35' machine type instead. If you
+>>>>    require the 'pc' machine type for your setting, then please specify
+>>>>    it with the -M option."
+>>> Warnings tend to get ignored until things are actually break, so I
+>>> don't think this helps much.  I think simply not having a default
+>>> machine type (as already suggested elsewhere in this thread) is the
+>>> best way to deal with this.
+>> I would absolutely hate this. One of the nice things about qemu has
+>> always been that 'qemu disk.img' is enough to start a simple VM. You
+>> only need to touch any other options for things you care about. I
+>> wouldn't want to give this up.
+> 
+> I agree.  Don't change anything, leave "-M pc" aside, and let libosinfo
+> pick q35 for newer guests.
+> 
 
--- =
+Hi Paolo,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1696353
+While I do think it would be a good step moving forward, I am not
+convinced is "enough" to get more users using it. More so, a low
+level bug in upper layers (e.g. Open stack) will lead to difficulty
+to debug and result in the same "The machine is not steady enough,
+it doesn't worth the effort, let's move back to pc", or even
+frustration of the people that really need Q35.
 
-Title:
-  golang binaries fail to start under linux-user
+IMHO we need to find a way to let more users use Q35 by default
+and make an effort to fix the possible issues before.
 
-Status in QEMU:
-  New
 
-Bug description:
-  With current master golang binaries fail when run under linux-user,
-  for example:
+Thanks,
+Marcel
 
-  [will@localhost qemu]$ ./arm-linux-user/qemu-arm glide =
 
-  runtime: failed to create new OS thread (have 2 already; errno=3D22)
-  fatal error: newosproc
-
-  runtime stack:
-  runtime.throw(0x45f879, 0x9)
-  	/usr/lib/golang/src/runtime/panic.go:566 +0x78
-  runtime.newosproc(0x1092c000, 0x1093bfe0)
-  	/usr/lib/golang/src/runtime/os_linux.go:160 +0x1b0
-  runtime.newm(0x4ae1e8, 0x0)
-  	/usr/lib/golang/src/runtime/proc.go:1572 +0x12c
-  runtime.main.func1()
-  	/usr/lib/golang/src/runtime/proc.go:126 +0x24
-  runtime.systemstack(0x5ef900)
-  	/usr/lib/golang/src/runtime/asm_arm.s:247 +0x80
-  runtime.mstart()
-  	/usr/lib/golang/src/runtime/proc.go:1079
-
-  goroutine 1 [running]:
-  runtime.systemstack_switch()
-  	/usr/lib/golang/src/runtime/asm_arm.s:192 +0x4 fp=3D0x109287ac sp=3D0x10=
-9287a8
-  runtime.main()
-  	/usr/lib/golang/src/runtime/proc.go:127 +0x5c fp=3D0x109287d4 sp=3D0x109=
-287ac
-  runtime.goexit()
-  	/usr/lib/golang/src/runtime/asm_arm.s:998 +0x4 fp=3D0x109287d4 sp=3D0x10=
-9287d4
-
-  The reason for this is that the golang runtime does not pass the
-  CLONE_SYSVMEM flag to clone so the clone flags checks fail:
-
-  https://github.com/golang/go/blob/master/src/runtime/os_linux.go#L155
-
-  The attached patch allows golang binaries to start under linux-user.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1696353/+subscriptions
+> Paolo
+> 
