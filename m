@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37366)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVPBp-00028a-6g
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:28:58 -0400
+	id 1dVPTo-0006bQ-M0
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:47:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVPBm-0007is-2q
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:28:57 -0400
-Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:35706)
+	id 1dVPTj-0004WX-Ok
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:47:32 -0400
+Received: from mail-qk0-f179.google.com ([209.85.220.179]:34490)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVPBl-0007iW-UE
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:28:53 -0400
-Received: by mail-qt0-x22f.google.com with SMTP id b40so23641770qtb.2
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 14:28:53 -0700 (PDT)
+	id 1dVPTj-0004WC-Jf
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 17:47:27 -0400
+Received: by mail-qk0-f179.google.com with SMTP id d78so36141498qkb.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 14:47:27 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170712161830.3621-1-berrange@redhat.com>
+References: <20170712162550.8061-1-berrange@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c3e1d400-40bd-1691-39db-be1dbd36b2ad@amsat.org>
-Date: Wed, 12 Jul 2017 18:28:50 -0300
+Message-ID: <bc2c99e9-3449-be02-bee1-b557e959fdb7@amsat.org>
+Date: Wed, 12 Jul 2017 18:46:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170712161830.3621-1-berrange@redhat.com>
+In-Reply-To: <20170712162550.8061-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL v2 0/5] Merge sockets 2017/07/11
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Don't enable networking as a side-effect
+ of DEBUG=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +35,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-Hi Daniel,
+Hi Alex, Fam,
 
-On 07/12/2017 01:18 PM, Daniel P. Berrange wrote:
-> The following changes since commit 3d0bf8dfdfebd7f2ae41b6f220444b8047d6b1ee:
-> 
->    Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20170710a' into staging (2017-07-10 18:13:03 +0100)
-> 
-> are available in the git repository at:
-> 
->    git://github.com/berrange/qemu tags/pull-sockets-2017-07-11-2
-> 
-> for you to fetch changes up to 4b1ac1b3abf0d07cd4d9f9011f12d62bff27154c:
-> 
->    tests: add functional test validating ipv4/ipv6 address flag handling (2017-07-12 16:49:00 +0100)
-> 
-> ----------------------------------------------------------------
-> Merge sockets 2017/07/11 v2
+I wanted to try this patch but got:
 
-$ git diff pull-sockets-2017-07-11-1..pull-sockets-2017-07-11-2
+$ make docker-test-quick@centos6 NETWORK=1
+   BUILD   centos6
+The command '/bin/sh -c yum install -y epel-release' returned a non-zero 
+code: 139
+Traceback (most recent call last):
+   File "./tests/docker/docker.py", line 382, in <module>
+     sys.exit(main())
+   File "./tests/docker/docker.py", line 379, in main
+     return args.cmdobj.run(args, argv)
+   File "./tests/docker/docker.py", line 301, in run
+     extra_files_cksum=cksum)
+   File "./tests/docker/docker.py", line 185, in build_image
+     quiet=quiet)
+   File "./tests/docker/docker.py", line 123, in _do_check
+     return subprocess.check_call(self._command + cmd, **kwargs)
+   File "/usr/lib/python2.7/subprocess.py", line 186, in check_call
+     raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t', 
+'qemu:centos6', '-f', '/tmp/docker_buildIrIR2w/tmpxMPjZu.docker', 
+'--build-arg=http_proxy=http://172.17.0.1:3142/', 
+'/tmp/docker_buildIrIR2w']' returned non-zero exit status 139
+tests/docker/Makefile.include:47: recipe for target 
+'docker-image-centos6' failed
+make: *** [docker-image-centos6] Error 1
 
-As I understand, diff since v1 is:
+looking further:
 
-- restricted sockets-proto tests to x86_64
-- run tests using INADDR_LOOPBACK instead of INADDR_ANY
+$ docker run --rm centos:6 cat /etc/redhat-release; echo $?
+CentOS release 6.9 (Final)
+0
 
-signed PR, else:
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+$ docker run --rm centos:6 sh -c "cat /etc/redhat-release"; echo $?
+139
 
-> 
-> ----------------------------------------------------------------
-> Daniel P. Berrange (5):
->    sockets: ensure we can bind to both ipv4 & ipv6 separately
->    sockets: don't block IPv4 clients when listening on "::"
->    sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
->    io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
->    tests: add functional test validating ipv4/ipv6 address flag handling
-> 
->   io/dns-resolver.c          |   6 +-
->   tests/.gitignore           |   1 +
->   tests/Makefile.include     |   3 +
->   tests/test-sockets-proto.c | 924 +++++++++++++++++++++++++++++++++++++++++++++
->   util/qemu-sockets.c        |  71 +++-
->   5 files changed, 984 insertions(+), 21 deletions(-)
->   create mode 100644 tests/test-sockets-proto.c
-> 
+uh?
+
+$ docker run --rm centos:7 sh -c "cat /etc/redhat-release"; echo $?
+CentOS Linux release 7.3.1611 (Core)
+0
+
+now trying old debian release:
+
+$ docker run --rm -it debian:wheezy sh -c "cat /etc/debian_version"; echo $?
+7.11
+0
+
+$ docker run --rm -it debian:wheezy bash -c "cat /etc/debian_version"; 
+echo $?
+139
+
+hmmm
+
+$ docker run --rm -it debian:jessie bash -c "cat /etc/debian_version"; 
+echo $?
+8.7
+0
+
+$ docker info
+Server Version: 17.05.0-ce
+Storage Driver: overlay2
+  Backing Filesystem: extfs
+Cgroup Driver: cgroupfs
+Default Runtime: runc
+Init Binary: docker-init
+containerd version: 9048e5e50717ea4497b757314bad98ea3763c145
+runc version: 9c2d8d184e5da67c95d601382adf14862e4f2228
+init version: 949e6fa
+Kernel Version: 4.11.0-1-amd64
+Operating System: Debian GNU/Linux buster/sid
+Architecture: x86_64
+
+$ sudo journalctl -kb -l -o json-pretty
+{
+         "PRIORITY" : "6",
+         "_TRANSPORT" : "kernel",
+         "SYSLOG_FACILITY" : "0",
+         "SYSLOG_IDENTIFIER" : "kernel",
+         "MESSAGE" : "sh[23389] vsyscall attempted with vsyscall=none 
+ip:ffffffffff600400 cs:33 sp:7ffcfd21a6c8 ax:ffffffffff600400 
+si:7ffcfd21af6f di:0"
+}
+{
+         "_TRANSPORT" : "kernel",
+         "SYSLOG_FACILITY" : "0",
+         "SYSLOG_IDENTIFIER" : "kernel",
+         "MESSAGE" : "sh[23389]: segfault at ffffffffff600400 ip 
+ffffffffff600400 sp 00007ffcfd21a6c8 error 15"
+}
+
+is it time to upgrade the docker image to centos:7 ?
