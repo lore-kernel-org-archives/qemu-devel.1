@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dVHyQ-0006lN-Be
+	(envelope-from <mjt@tls.msk.ru>) id 1dVHyQ-0006lK-Bd
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dVHyL-0003PQ-CU
+	(envelope-from <mjt@tls.msk.ru>) id 1dVHyM-0003QF-6c
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:46:38 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Wed, 12 Jul 2017 16:38:06 +0300
-Message-Id: <44d619beb5ac50b09ce6785add8ec637de461d6a.1499866676.git.mjt@msgid.tls.msk.ru>
+Date: Wed, 12 Jul 2017 16:38:04 +0300
+Message-Id: <32fb354b086eb8981a48c187c17fd937760cd02e.1499866676.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
 References: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
 References: <cover.1499866676.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 10/13] hxtool: remove dead -q option
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 08/13] hw/core: fix missing return value in
+ load_image_targphys_as()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,94 +26,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-This was used to extract .txt documentation for QMP.  This was
-changed to use the QAPI schema instead, so zap it.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- scripts/hxtool | 46 +---------------------------------------------
- 1 file changed, 1 insertion(+), 45 deletions(-)
+ hw/core/loader.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/hxtool b/scripts/hxtool
-index 5468cd7782..1e2c97c5e6 100644
---- a/scripts/hxtool
-+++ b/scripts/hxtool
-@@ -7,7 +7,7 @@ hxtoh()
-         case $str in
-             HXCOMM*)
-             ;;
--            STEXI*|ETEXI*|SQMP*|EQMP*) flag=$(($flag^1))
-+            STEXI*|ETEXI*) flag=$(($flag^1))
-             ;;
-             *)
-             test $flag -eq 1 && printf "%s\n" "$str"
-@@ -45,12 +45,6 @@ hxtotexi()
-             fi
-             flag=0
-             ;;
--            SQMP*|EQMP*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected ETEXI, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            ;;
-             DEFHEADING*)
-             print_texi_heading "$(expr "$str" : "DEFHEADING(\(.*\))")"
-             ;;
-@@ -65,47 +59,9 @@ hxtotexi()
-     done
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 3409cc6d1d..c17ace0a2e 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -150,7 +150,9 @@ int load_image_targphys_as(const char *filename,
+         return -1;
+     }
+     if (size > 0) {
+-        rom_add_file_fixed_as(filename, addr, -1, as);
++        if (rom_add_file_fixed_as(filename, addr, -1, as) < 0) {
++            return -1;
++        }
+     }
+     return size;
  }
- 
--hxtoqmp()
--{
--    IFS=
--    flag=0
--    line=1
--    while read -r str; do
--        case "$str" in
--            HXCOMM*)
--            ;;
--            SQMP*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected EQMP, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            flag=1
--            ;;
--            EQMP*)
--            if test $flag -ne 1 ; then
--                printf "line %d: syntax error: expected SQMP, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            flag=0
--            ;;
--            STEXI*|ETEXI*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected EQMP, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            ;;
--            *)
--            test $flag -eq 1 && printf '%s\n' "$str"
--            ;;
--        esac
--        line=$((line+1))
--    done
--}
--
- case "$1" in
- "-h") hxtoh ;;
- "-t") hxtotexi ;;
--"-q") hxtoqmp ;;
- *) exit 1 ;;
- esac
- 
--- 
+--=20
 2.11.0
