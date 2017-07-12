@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVIqG-0003RZ-G6
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:42:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVItX-0007eS-4k
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVIqF-0006Jb-FY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:42:16 -0400
-References: <20170511182705.23648-1-jsnow@redhat.com>
-	<19a665be-12c2-2876-0438-08327d94473e@redhat.com>
-	<6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
-	<815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
-	<de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
-	<ea023ed7-4925-b338-8636-435103ce757b@redhat.com>
-	<20170516081703.GB4438@noname.redhat.com>
-	<48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd12265d-e764-34ee-8d1e-504f27b78614@redhat.com>
-Date: Wed, 12 Jul 2017 09:42:04 -0500
+	(envelope-from <kwolf@redhat.com>) id 1dVItT-0000Cm-2G
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:45:39 -0400
+Date: Wed, 12 Jul 2017 16:45:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170712144519.GD4917@noname.str.redhat.com>
+References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
+	<20170712114700.20008-3-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Am6Md8Vf4Og70ksk6SPRUKLSlTtaIa8Qv"
-Subject: Re: [Qemu-devel] [PATCH v4] qemu-img: Check for backing image if
- specified during create
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170712114700.20008-3-pbutsykin@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] qcow2: add qcow2_cache_discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,132 +23,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Am6Md8Vf4Og70ksk6SPRUKLSlTtaIa8Qv
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <dd12265d-e764-34ee-8d1e-504f27b78614@redhat.com>
-Subject: Re: [PATCH v4] qemu-img: Check for backing image if specified during
- create
-References: <20170511182705.23648-1-jsnow@redhat.com>
- <19a665be-12c2-2876-0438-08327d94473e@redhat.com>
- <6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
- <815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
- <de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
- <ea023ed7-4925-b338-8636-435103ce757b@redhat.com>
- <20170516081703.GB4438@noname.redhat.com>
- <48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
-In-Reply-To: <48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 12.07.2017 um 13:46 hat Pavel Butsykin geschrieben:
+> Whenever l2/refcount table clusters are discarded from the file we can
+> automatically drop unnecessary content of the cache tables. This reduces
+> the chance of eviction useful cache data and eliminates inconsistent data
+> in the cache with the data in the file.
+> 
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2-cache.c    | 26 ++++++++++++++++++++++++++
+>  block/qcow2-refcount.c | 14 ++++++++++++++
+>  block/qcow2.h          |  3 +++
+>  3 files changed, 43 insertions(+)
+> 
+> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+> index 1d25147392..75746a7f43 100644
+> --- a/block/qcow2-cache.c
+> +++ b/block/qcow2-cache.c
+> @@ -411,3 +411,29 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
+>      assert(c->entries[i].offset != 0);
+>      c->entries[i].dirty = true;
+>  }
+> +
+> +void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
+> +                                  uint64_t offset)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < c->size; i++) {
+> +        if (c->entries[i].offset == offset) {
+> +            return qcow2_cache_get_table_addr(bs, c, i);
+> +        }
+> +    }
+> +    return NULL;
+> +}
+> +
+> +void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
+> +{
+> +    int i = qcow2_cache_get_table_idx(bs, c, table);
+> +
+> +    assert(c->entries[i].ref == 0);
+> +
+> +    c->entries[i].offset = 0;
+> +    c->entries[i].lru_counter = 0;
+> +    c->entries[i].dirty = false;
+> +
+> +    qcow2_cache_table_release(bs, c, i, 1);
+> +}
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index c9b0dcb4f3..8050db4544 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -862,6 +862,20 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+>          s->set_refcount(refcount_block, block_index, refcount);
+>  
+>          if (refcount == 0 && s->discard_passthrough[type]) {
+> +            void *table;
+> +
+> +            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
+> +                                                offset);
+> +            if (table != NULL) {
+> +                qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
+> +                qcow2_cache_discard(bs, s->refcount_block_cache, table);
+> +            }
+> +
+> +            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
+> +            if (table != NULL) {
+> +                qcow2_cache_discard(bs, s->l2_table_cache, table);
+> +            }
+> +
+>              update_refcount_discard(bs, cluster_offset, s->cluster_size);
+>          }
+>      }
 
-On 05/17/2017 07:38 AM, Max Reitz wrote:
+This is not wrong, but wouldn't actually even refcount == 0 be enough as
+a condition to evict the cluster from the cache? I don't think it really
+matters whether we actually send a discard request or not for the image
+file.
 
->>>>>>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1213786
->>>>>>>>
->>>>>>>> Or, rather, force the open of a backing image if one was specifi=
-ed
->>>>>>>> for creation. Using a similar -unsafe option as rebase, allow qe=
-mu-img
->>>>>>>> to ignore the backing file validation if possible.
->>>>>>>>
->>>>>>
-
->>> I suspect this is because the backing file is opened somewhere and
->>> trying to open it breaks now with the locking series applied.
->>
->> I think we can legitimately set force-shared=3Don for opening the back=
-ing
->> file when testing whether the file exists.
->=20
-> For testing whether the file exists, probably. I wouldn't call it
-> legitimately because I don't like making that the default at all, but i=
-t
-> should work.
->=20
-> But then we have to differentiate between testing whether the file
-> exists and opening it to read its size; I'm even more wary regarding th=
-e
-> latter.
->=20
-> All in all, I've stated my opinion on this matter on IRC: I don't know
-> how much we need this patch. It's nice to have, it's convenient to know=
-
-> you have mistyped the backing filename before you try to use the image
-> in qemu, but it's not critical. I don't consider the current behavior a=
-
-> bug per-se, it's just counterintuitive behavior (that will not cut your=
-
-> head off if you don't know it, though!).
->=20
-
-The fact that this topic came up on the mailing list again means we
-should probably consider something along these lines for 2.10.
-
-> (Also, we have a lot of counterintuitive behavior. See this:
->=20
-> $ qemu-img create -f qcow2 sub/backing.qcow2 64M
-> Formatting 'sub/backing.qcow2', fmt=3Dqcow2 size=3D67108864 encryption=3D=
-off
-> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-> $ qemu-img create -f qcow2 -b sub/backing.qcow2 sub/top.qcow2
-> qemu-img: sub/top.qcow2: Could not open 'sub/sub/backing.qcow2': No suc=
-h
-> file or directory
->=20
-> Yeah, sure, you'll know after you've done the mistake once. But the sam=
-e
-> applies here, too, doesn't it...?)
->=20
-> So for me, it's a question of convenience: How much does the current
-> behavior annoy users? How much annoyance will changing the behavior
-> bring? I'm not (or rather, no longer) convinced the former outweighs th=
-e
-> latter, especially since it means having to change management tools
-> (which create external snapshots with qemu-img create while the backing=
-
-> image is in use by qemu).
->=20
-> If you think otherwise, well, you're the main maintainer. :-)
->=20
-> Max
->=20
->=20
-> PS: Can there be a middle ground? Like just printing a warning if the
-> backing file cannot be opened and we don't absolutely have to?
-
-Middle ground may be harder, but may be nicer (especially since we are
-talking about tightening behavior, making things that used to work now
-fail is not nice if there is not a transition period where it first just
-warns).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Am6Md8Vf4Og70ksk6SPRUKLSlTtaIa8Qv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZjU8AAoJEKeha0olJ0NqEJIIAIQ5TQQsFVH68DuXRR+g0vAb
-BGe6h9B5xghXLN6SRk9X2E7IbR0vZpa59qfItREk8TKvgSB8EpFq1O/GR6RdCIYd
-0CAD1b8er7B7pBqdcz/8CX3YIzWTDZGxzs2130BXsbndKeVC8AUniBqQlzsZBOM7
-2v8hldVPORz2V/83MBYddOcqgNIQe+asAW5FU0wxDZZv3uo7lFYG+q6nJih/5IcE
-P8F6swsvUEzIgaUrW/Y0WasRX0mx04Cpa6TqypQMLWYUhiVi6IVxGm74KWv5xbmU
-13OcTDTJ3WL/U7O0LxWhthXBlWXRLlhyeINE9gnXSWtCWARI6iIRLE1TwCf8JE0=
-=6dF7
------END PGP SIGNATURE-----
-
---Am6Md8Vf4Og70ksk6SPRUKLSlTtaIa8Qv--
+Kevin
