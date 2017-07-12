@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dVE6R-00065T-QU
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:38:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVE7U-0006wu-U4
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dVE6Q-00011n-Re
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:38:39 -0400
-References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-	<20170712055317.26225-3-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <74f8e27d-ddc1-2630-c42e-2f8aac2c6472@redhat.com>
-Date: Wed, 12 Jul 2017 11:38:33 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dVE7Q-0001Uh-BH
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:39:44 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dVE7P-0001U5-VZ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:39:40 -0400
+Received: by mail-wr0-x235.google.com with SMTP id c11so25642015wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:39:39 -0700 (PDT)
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	<149943279497.8972.16033572732296843579.stgit@frigg.lan>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <149943279497.8972.16033572732296843579.stgit@frigg.lan>
+Date: Wed, 12 Jul 2017 10:39:36 +0100
+Message-ID: <87vamy804n.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170712055317.26225-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
- DRC flag
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v12 21/27] target/arm: [tcg] Port to
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +31,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, groug@kaod.org, danielhb@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
+To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 12/07/2017 07:53, David Gibson wrote:
-> The awaiting_allocation flag in the DRC was introduced by aab9913
-> "spapr_drc: Prevent detach racing against attach for CPU DR", allegedly to
-> prevent a guest crash on racing attach and detach.  Except.. information
-> from the BZ actually suggests a qemu crash, not a guest crash.  And there
-> shouldn't be a problem here anyway: if the guest has already moved the DRC
-> away from UNUSABLE state, the detach would already be deferred, and if it
-> hadn't it should be safe to detach it (the guest should fail gracefully
-> when it attempts to change the allocation state).
-> 
-> I think this was probably just a bandaid for some other problem in the
-> state management.  So, remove awaiting_allocation and associated code.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Lluís Vilanova <vilanova@ac.upc.edu> writes:
 
+> Incrementally paves the way towards using the generic instruction translation
+> loop.
+>
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
 > ---
->  hw/ppc/spapr_drc.c         | 25 +++----------------------
->  include/hw/ppc/spapr_drc.h |  1 -
->  2 files changed, 3 insertions(+), 23 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 9b07f80..89ba3d6 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
->      if (!drc->dev) {
->          return RTAS_OUT_NO_SUCH_INDICATOR;
+>  target/arm/translate.c |  148 ++++++++++++++++++++++++++++--------------------
+>  target/arm/translate.h |    2 +
+>  2 files changed, 87 insertions(+), 63 deletions(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 29428b2920..9d033f2fb7 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -11842,6 +11842,9 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase,
+>      dc->is_ldex = false;
+>      dc->ss_same_el = false; /* Can't be true since EL_d must be AArch64 */
+>
+> +    dc->next_page_start =
+> +        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+> +
+>
+>      cpu_F0s = tcg_temp_new_i32();
+>      cpu_F1s = tcg_temp_new_i32();
+> @@ -11942,14 +11945,83 @@ static BreakpointCheckType arm_tr_breakpoint_check(
 >      }
-> -    if (drc->awaiting_release && drc->awaiting_allocation) {
-> -        /* kernel is acknowledging a previous hotplug event
-> -         * while we are already removing it.
-> -         * it's safe to ignore awaiting_allocation here since we know the
-> -         * situation is predicated on the guest either already having done
-> -         * so (boot-time hotplug), or never being able to acquire in the
-> -         * first place (hotplug followed by immediate unplug).
+>  }
+>
+> +static target_ulong arm_tr_translate_insn(DisasContextBase *dcbase,
+> +                                               CPUState *cpu)
+> +{
+> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
+> +    CPUARMState *env = cpu->env_ptr;
+> +
+> +    if (dc->ss_active && !dc->pstate_ss) {
+> +        /* Singlestep state is Active-pending.
+> +         * If we're in this state at the start of a TB then either
+> +         *  a) we just took an exception to an EL which is being debugged
+> +         *     and this is the first insn in the exception handler
+> +         *  b) debug exceptions were masked and we just unmasked them
+> +         *     without changing EL (eg by clearing PSTATE.D)
+> +         * In either case we're going to take a swstep exception in the
+> +         * "did not step an insn" case, and so the syndrome ISV and EX
+> +         * bits should be zero.
+> +         */
+> +        assert(dc->base.num_insns == 1);
+> +        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+> +                      default_exception_el(dc));
+> +        dc->base.is_jmp = DISAS_SKIP;
+> +        return dc->pc;
+> +    }
+> +
+> +    if (dc->thumb) {
+> +        disas_thumb_insn(env, dc);
+> +        if (dc->condexec_mask) {
+> +            dc->condexec_cond = (dc->condexec_cond & 0xe)
+> +                | ((dc->condexec_mask >> 4) & 1);
+> +            dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
+> +            if (dc->condexec_mask == 0) {
+> +                dc->condexec_cond = 0;
+> +            }
+> +        }
+> +    } else {
+> +        unsigned int insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
+> +        dc->pc += 4;
+> +        disas_arm_insn(dc, insn);
+> +    }
+> +
+> +    if (dc->condjmp && !dc->base.is_jmp) {
+> +        gen_set_label(dc->condlabel);
+> +        dc->condjmp = 0;
+> +    }
+> +
+> +    if (dc->base.is_jmp == DISAS_NEXT) {
+> +        /* Translation stops when a conditional branch is encountered.
+> +         * Otherwise the subsequent code could get translated several times.
+> +         * Also stop translation when a page boundary is reached.  This
+> +         * ensures prefetch aborts occur at the right place.  */
+> +
+> +        if (is_singlestepping(dc)) {
+> +            dc->base.is_jmp = DISAS_TOO_MANY;
+> +        } else if ((dc->pc >= dc->next_page_start) ||
+> +                   ((dc->pc >= dc->next_page_start - 3) &&
+> +                    insn_crosses_page(env, dc))) {
+> +            /* We want to stop the TB if the next insn starts in a new page,
+> +             * or if it spans between this page and the next. This means that
+> +             * if we're looking at the last halfword in the page we need to
+> +             * see if it's a 16-bit Thumb insn (which will fit in this TB)
+> +             * or a 32-bit Thumb insn (which won't).
+> +             * This is to avoid generating a silly TB with a single 16-bit insn
+> +             * in it at the end of this page (which would execute correctly
+> +             * but isn't very efficient).
+> +             */
+> +            dc->base.is_jmp = DISAS_TOO_MANY;
+> +        }
+> +    }
+> +
+> +    return dc->pc;
+> +}
+> +
+>  /* generate intermediate code for basic block 'tb'.  */
+>  void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>  {
+> -    CPUARMState *env = cs->env_ptr;
+>      DisasContext dc1, *dc = &dc1;
+> -    target_ulong next_page_start;
+>      int max_insns;
+> -    bool end_of_page;
+>
+>      /* generate intermediate code */
+>
+> @@ -11969,7 +12041,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>      dc->base.singlestep_enabled = cs->singlestep_enabled;
+>      arm_tr_init_disas_context(&dc->base, cs);
+>
+> -    next_page_start = (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+>      max_insns = tb->cflags & CF_COUNT_MASK;
+>      if (max_insns == 0) {
+>          max_insns = CF_COUNT_MASK;
+> @@ -12020,72 +12091,20 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>              gen_io_start();
+>          }
+>
+> -        if (dc->ss_active && !dc->pstate_ss) {
+> -            /* Singlestep state is Active-pending.
+> -             * If we're in this state at the start of a TB then either
+> -             *  a) we just took an exception to an EL which is being debugged
+> -             *     and this is the first insn in the exception handler
+> -             *  b) debug exceptions were masked and we just unmasked them
+> -             *     without changing EL (eg by clearing PSTATE.D)
+> -             * In either case we're going to take a swstep exception in the
+> -             * "did not step an insn" case, and so the syndrome ISV and EX
+> -             * bits should be zero.
+> -             */
+> -            assert(dc->base.num_insns == 1);
+> -            gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+> -                          default_exception_el(dc));
+> -            goto done_generating;
+> -        }
+> -
+> -        if (dc->thumb) {
+> -            disas_thumb_insn(env, dc);
+> -            if (dc->condexec_mask) {
+> -                dc->condexec_cond = (dc->condexec_cond & 0xe)
+> -                                   | ((dc->condexec_mask >> 4) & 1);
+> -                dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
+> -                if (dc->condexec_mask == 0) {
+> -                    dc->condexec_cond = 0;
+> -                }
+> -            }
+> -        } else {
+> -            unsigned int insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
+> -            dc->pc += 4;
+> -            disas_arm_insn(dc, insn);
+> -        }
+> -
+> -        if (dc->condjmp && !dc->base.is_jmp) {
+> -            gen_set_label(dc->condlabel);
+> -            dc->condjmp = 0;
+> -        }
+> +        dc->base.pc_next = arm_tr_translate_insn(&dc->base, cs);
+>
+>          if (tcg_check_temp_count()) {
+>              fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n",
+>                      dc->pc);
+>          }
+>
+> -        /* Translation stops when a conditional branch is encountered.
+> -         * Otherwise the subsequent code could get translated several times.
+> -         * Also stop translation when a page boundary is reached.  This
+> -         * ensures prefetch aborts occur at the right place.  */
+> -
+> -        /* We want to stop the TB if the next insn starts in a new page,
+> -         * or if it spans between this page and the next. This means that
+> -         * if we're looking at the last halfword in the page we need to
+> -         * see if it's a 16-bit Thumb insn (which will fit in this TB)
+> -         * or a 32-bit Thumb insn (which won't).
+> -         * This is to avoid generating a silly TB with a single 16-bit insn
+> -         * in it at the end of this page (which would execute correctly
+> -         * but isn't very efficient).
 > -         */
-> +    if (drc->awaiting_release) {
-> +        /* Don't allow the guest to move a device away from UNUSABLE
-> +         * state when we want to unplug it */
->          return RTAS_OUT_NO_SUCH_INDICATOR;
->      }
->  
->      drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
-> -    drc->awaiting_allocation = false;
->  
->      return RTAS_OUT_SUCCESS;
->  }
-> @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
->      drc->fdt = fdt;
->      drc->fdt_start_offset = fdt_start_offset;
->  
-> -    if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
-> -        drc->awaiting_allocation = true;
-> -    }
+> -        end_of_page = (dc->pc >= next_page_start) ||
+> -            ((dc->pc >= next_page_start - 3) && insn_crosses_page(env, dc));
 > -
->      object_property_add_link(OBJECT(drc), "device",
->                               object_get_typename(OBJECT(drc->dev)),
->                               (Object **)(&drc->dev),
-> @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
->          return;
+> -    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
+> -             !is_singlestepping(dc) &&
+> -             !singlestep &&
+> -             !end_of_page &&
+> -             dc->base.num_insns < max_insns);
+> +        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
+> +                            dc->base.num_insns >= max_insns)) {
+> +            dc->base.is_jmp = DISAS_TOO_MANY;
+> +        }
+> +    } while (!dc->base.is_jmp);
+>
+> +    if (dc->base.is_jmp != DISAS_SKIP) {
+>      if (tb->cflags & CF_LAST_IO) {
+>          if (dc->condjmp) {
+>              /* FIXME:  This can theoretically happen with self-modifying
+> @@ -12123,6 +12142,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>              gen_exception(EXCP_SMC, syn_aa32_smc(), 3);
+>              break;
+>          case DISAS_NEXT:
+> +        case DISAS_TOO_MANY:
+>          case DISAS_UPDATE:
+>              gen_set_pc_im(dc, dc->pc);
+>              /* fall through */
+> @@ -12141,6 +12161,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>           */
+>          switch(dc->base.is_jmp) {
+>          case DISAS_NEXT:
+> +        case DISAS_TOO_MANY:
+>              gen_goto_tb(dc, 1, dc->pc);
+>              break;
+>          case DISAS_UPDATE:
+> @@ -12194,6 +12215,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>              gen_goto_tb(dc, 1, dc->pc);
+>          }
 >      }
->  
-> -    if (drc->awaiting_allocation) {
-> -        drc->awaiting_release = true;
-> -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
-> -        return;
-> -    }
-> -
->      spapr_drc_release(drc);
->  }
->  
-> @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
->          spapr_drc_release(drc);
->      }
->  
-> -    drc->awaiting_allocation = false;
-> -
->      if (drc->dev) {
->          /* A device present at reset is coldplugged */
->          drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
-> @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc = {
->          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
->          VMSTATE_BOOL(configured, sPAPRDRConnector),
->          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
-> -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index 715016b..18a196e 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
->      sPAPRConfigureConnectorState *ccs;
->  
->      bool awaiting_release;
-> -    bool awaiting_allocation;
->  
->      /* device pointer, via link property */
->      DeviceState *dev;
-> 
+> +    }
+>
+>  done_generating:
+>      gen_tb_end(tb, dc->base.num_insns);
+> diff --git a/target/arm/translate.h b/target/arm/translate.h
+> index 6fe40a344a..83e56dcb08 100644
+> --- a/target/arm/translate.h
+> +++ b/target/arm/translate.h
+> @@ -9,6 +9,7 @@ typedef struct DisasContext {
+>      DisasContextBase base;
+>
+>      target_ulong pc;
+> +    target_ulong next_page_start;
+>      uint32_t insn;
+>      /* Nonzero if this instruction has been conditionally skipped.  */
+>      int condjmp;
+> @@ -148,6 +149,7 @@ static void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+>   * as opposed to attempting to use lookup_and_goto_ptr.
+>   */
+>  #define DISAS_EXIT DISAS_TARGET_11
+> +#define DISAS_SKIP DISAS_TARGET_12
+
+What are the semantics of this new exit condition? This seems a case
+that should be covered a well defined common exit condition rather than
+yet-another-architecture specific one.
+
+--
+Alex Bennée
