@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVFcD-0005F4-HK
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:15:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVFiz-00073f-1X
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVFc8-0003f5-HX
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:15:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47180)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVFc8-0003eo-7J
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:15:28 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6CBEaFv010157
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:15:25 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncj5dtdw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 07:15:25 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 12 Jul 2017 07:15:20 -0400
-References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
-	<0cb95894-bd35-2814-f7ff-1c9b3fcb533b@de.ibm.com>
-	<b8637af6-63b8-0fcc-c13f-f96237a4c6bf@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 12 Jul 2017 13:15:15 +0200
+	(envelope-from <armbru@redhat.com>) id 1dVFix-0006R0-Lx
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:22:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
+	<1499788408-10096-3-git-send-email-peter.maydell@linaro.org>
+Date: Wed, 12 Jul 2017 13:22:16 +0200
+In-Reply-To: <1499788408-10096-3-git-send-email-peter.maydell@linaro.org>
+	(Peter Maydell's message of "Tue, 11 Jul 2017 16:53:27 +0100")
+Message-ID: <87lgnt99xz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <b8637af6-63b8-0fcc-c13f-f96237a4c6bf@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <769d6a27-b66a-65b9-a643-c87e2b439ab1@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] migration: s390x css migration
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/3] qdev: support properties which don't
+ set a default value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,71 +24,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@redhat.com>, patches@linaro.org
 
-On 07/12/2017 01:06 PM, Halil Pasic wrote:
-> 
-> 
-> On 07/12/2017 10:01 AM, Christian Borntraeger wrote:
->> On 07/11/2017 04:54 PM, Halil Pasic wrote:
->>> Like for v2 the scope of this patch series is now limited to decoupling
->>> channel subsystem migration from the migration of virtio-ccw proxies.
->>>
->>> There wasn't a whole lot of criticism regarding v2, so very little
->>> changed since then. All issues identified in the previous round were
->>> addressed as agreed upon. I hope this series is now good for 2.10.
->>>
->>> @Dave You helped me quite a lot with these, thanks a lot! I could not
->>> find any r-b's or similar form you so if you would like to take the
->>> well deserved credit for your work...
->>>
->>> v2 --> v3:
->>> * rebased onto current master, since 's390x: vmstatify config migration
->>>   for virtio-ccw' is already there we don't need it here any more
->>> * added ack's and r-b'
->>> * got rid of loads of nits (thanks Connie and Thomas)
->>> * added explanation why certain members are not migrated
->>>
->>> v1 --> v2:
->>> * Split out the vmystatify virtio-ccw part, reorganize
->>> * Use WITH_TMP instead of one-shot VMStateInfo's
->>>
->>> Halil Pasic (6):
->>>   s390x: add helper get_machine_class
->>>   s390x: add css_migration_enabled to machine class
->>>   s390x/css: add missing css state conditionally
->>>   s390x/css: add ORB to SubchDev
->>>   s390x/css: activate ChannelSubSys migration
->>>   s390x/css: use SubchDev.orb
->>>
->>>  hw/intc/s390_flic.c                |  20 ++++++
->>>  hw/s390x/css.c                     | 144 +++++++++++++++++++++++++++++++++----
->>>  hw/s390x/s390-virtio-ccw.c         |  58 +++++++++------
->>>  include/hw/s390x/css.h             |  11 ++-
->>>  include/hw/s390x/s390-virtio-ccw.h |   7 ++
->>>  5 files changed, 199 insertions(+), 41 deletions(-)
->>
->> Can you clarify what test you have done regarding compatibility migrations to 2.9 and earlier?
->>
-> 
-> Hi Christian!
-> 
-> Again the same. I was migrating a guests with just some virtio-blk devices
-> between my new qemu (with this patch set on top of master) and itself with
-> default machine. And then between qemu with machine virtio-ccw-2.5 and a
-> 2.5 binary with machine virtio-ccw-2.5 (2.5 the binary is some old
-> "internal driver"). The old and the new binary where tested in both (source
-> and target) roles. I've verified that the disks are still working after
-> migration.
-> 
-> Given the nature of the changes I didn't do a great number of repeated tests,
-> as was doing all the migrations within the same host via HMP command.
-> 
-> If one has an appropriate automated setup (I don't) I would welcome some
-> more testing (and be happy to add a Tested-by), but I don't think it is
-> strictly necessary.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-No thats fine. I just want to have this kind of testing done by the developer.
-Thank you for doing so. If you have done it, you can always say it in your
-cover letter
+> In some situations it's useful to have a qdev property which doesn't
+> automatically set its default value when qdev_property_add_static is
+> called (for instance when the default value is not constant).
+>
+> Support this by adding a flag to the Property struct indicating
+> whether to set the default value.  This replaces the existing test
+> for whether the PorpertyInfo set_default_value function pointer is
+
+PropertyInfo
+
+> NULL, and we set the .set_default field to true for all those cases
+> of struct Property which use a PropertyInfo with a non-NULL
+> set_default_value, so behaviour remains the same as before.
+>
+> We define two new macros DEFINE_PROP_SIGNED_NODEFAULT and
+> DEFINE_PROP_UNSIGNED_NODEFAULT, to cover the most plausible use cases
+> of wanting to set an integer property with no default value.
+
+Your text makes me wonder what is supposed to set the default value
+then.  Glancing ahead to PATCH 3, it looks like method instance_init()
+is.  Can you think of a scenario where something else sets it?
+
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Since the previous patch fixed the only case that was
+> using a default value but not explicitly setting .defval.[ui],
+> this patch is a bit easier to review: .set_default = true
+> is added in exactly the places that initialize .defval.[ui].
+> ---
+>  include/hw/qdev-core.h       |  1 +
+>  include/hw/qdev-properties.h | 20 ++++++++++++++++++++
+>  hw/core/qdev.c               |  2 +-
+>  3 files changed, 22 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 9d7c1c0..d110163 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -226,6 +226,7 @@ struct Property {
+>      PropertyInfo *info;
+>      ptrdiff_t    offset;
+>      uint8_t      bitnr;
+> +    bool         set_default;
+
+Your chance to add the very first comment to struct Property (its
+existing undocumentedness is an embarrassment, but not this patch's
+problem).  Let's write down that this flag governs where (integer)
+default values come from, either from member devfal or from method
+instance_init() or whatever.
+
+>      union {
+>          int64_t i;
+>          uint64_t u;
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 36d040c..66816a5 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -43,15 +43,24 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .info      = &(_prop),                                          \
+>          .offset    = offsetof(_state, _field)                           \
+>              + type_check(_type,typeof_field(_state, _field)),           \
+> +        .set_default = true,                                            \
+>          .defval.i  = (_type)_defval,                                    \
+>          }
+
+If you flip the sense of the flag, you don't need to mess with the
+PropertyInfo, and don't need the note referring reviewers to the
+previous patch.  However, the case "use .defval" already requires an
+initializer, so adding one for .set_default seems fair.  Okay.
+
+>  
+> +#define DEFINE_PROP_SIGNED_NODEFAULT(_name, _state, _field, _prop, _type) { \
+> +        .name      = (_name),                                           \
+> +        .info      = &(_prop),                                          \
+> +        .offset    = offsetof(_state, _field)                           \
+> +            + type_check(_type, typeof_field(_state, _field)),          \
+> +        }
+> +
+>  #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
+>          .name      = (_name),                                    \
+>          .info      = &(qdev_prop_bit),                           \
+>          .bitnr    = (_bit),                                      \
+>          .offset    = offsetof(_state, _field)                    \
+>              + type_check(uint32_t,typeof_field(_state, _field)), \
+> +        .set_default = true,                                     \
+>          .defval.u  = (bool)_defval,                              \
+>          }
+>  
+> @@ -60,15 +69,24 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .info      = &(_prop),                                          \
+>          .offset    = offsetof(_state, _field)                           \
+>              + type_check(_type, typeof_field(_state, _field)),          \
+> +        .set_default = true,                                            \
+>          .defval.u  = (_type)_defval,                                    \
+>          }
+>  
+> +#define DEFINE_PROP_UNSIGNED_NODEFAULT(_name, _state, _field, _prop, _type) { \
+> +        .name      = (_name),                                           \
+> +        .info      = &(_prop),                                          \
+> +        .offset    = offsetof(_state, _field)                           \
+> +            + type_check(_type, typeof_field(_state, _field)),          \
+> +        }
+> +
+>  #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       \
+>          .name      = (_name),                                           \
+>          .info      = &(qdev_prop_bit64),                                \
+>          .bitnr    = (_bit),                                             \
+>          .offset    = offsetof(_state, _field)                           \
+>              + type_check(uint64_t, typeof_field(_state, _field)),       \
+> +        .set_default = true,                                            \
+>          .defval.u  = (bool)_defval,                                     \
+>          }
+>  
+> @@ -77,6 +95,7 @@ extern PropertyInfo qdev_prop_arraylen;
+>          .info      = &(qdev_prop_bool),                          \
+>          .offset    = offsetof(_state, _field)                    \
+>              + type_check(bool, typeof_field(_state, _field)),    \
+> +        .set_default = true,                                     \
+>          .defval.u    = (bool)_defval,                            \
+>          }
+>  
+> @@ -110,6 +129,7 @@ extern PropertyInfo qdev_prop_arraylen;
+>                            _arrayfield, _arrayprop, _arraytype) {        \
+>          .name = (PROP_ARRAY_LEN_PREFIX _name),                          \
+>          .info = &(qdev_prop_arraylen),                                  \
+> +        .set_default = true,                                            \
+>          .defval.u = 0,                                                  \
+>          .offset = offsetof(_state, _field)                              \
+>              + type_check(uint32_t, typeof_field(_state, _field)),       \
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 849952a..96965a7 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -793,7 +793,7 @@ void qdev_property_add_static(DeviceState *dev, Property *prop,
+>                                      prop->info->description,
+>                                      &error_abort);
+>  
+> -    if (prop->info->set_default_value) {
+> +    if (prop->set_default) {
+>          prop->info->set_default_value(obj, prop);
+>      }
+>  }
+
+Preferably with a suitable comment on member set_default and an improved
+commit message:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
