@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dVICd-0004aG-II
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:20 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dVICb-0004YL-6I
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dVICX-0003l5-CZ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:19 -0400
-Received: from mail-dm3nam03on0086.outbound.protection.outlook.com
-	([104.47.41.86]:15584
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dVICX-0003kd-54
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:17 -0400
+Received: from mail-by2nam01on0055.outbound.protection.outlook.com
+	([104.47.34.55]:48566
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dVICX-0003jj-2v
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dVICW-0003jH-PN
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:01:13 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 12 Jul 2017 06:57:44 -0700
-Message-ID: <e81d6354fe83b9c870097428214f400f020f24ea.1499866456.git.alistair.francis@xilinx.com>
+Date: Wed, 12 Jul 2017 06:57:52 -0700
+Message-ID: <276ff93eadc0b01b8243cc61ffc331f77922c0d0.1499866456.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1499866456.git.alistair.francis@xilinx.com>
 References: <cover.1499866456.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 4/7] hw/i386: Improve some of the warning
- messages
+Subject: [Qemu-devel] [PATCH v4 6/7] error: Implement the warn and free
+ Error functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +31,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, philippe@mathieu-daude.net, berrange@redhat.com, armbru@redhat.com
 
+Implement warn_report_err() and warn_reportf_err() functions which
+are the same as the error_report_err() and error_reportf_err()
+functions except report a warning instead of an error.
+
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
-V3:
- - Improve the messages
 
- hw/i386/acpi-build.c | 15 ++++++++++-----
- hw/i386/pc.c         |  7 +++----
- hw/i386/pc_q35.c     |  8 +++++---
- 3 files changed, 18 insertions(+), 12 deletions(-)
+ include/qapi/error.h  | 11 +++++++++++
+ scripts/checkpatch.pl |  1 +
+ util/error.c          | 20 ++++++++++++++++++++
+ 3 files changed, 32 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 6b7bade183..7130c7409d 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2766,17 +2766,22 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-                      ACPI_BUILD_ALIGN_SIZE);
-         if (tables_blob->len > legacy_table_size) {
-             /* Should happen only with PCI bridges and -M pc-i440fx-2.0.  */
--            warn_report("migration may not work.");
-+            warn_report("ACPI table size %u exceeds %d bytes,"
-+                        " migration may not work",
-+                        tables_blob->len, legacy_table_size);
-+            error_printf("Try removing CPUs, NUMA nodes, memory slots"
-+                         " or PCI bridges.");
-         }
-         g_array_set_size(tables_blob, legacy_table_size);
-     } else {
-         /* Make sure we have a buffer in case we need to resize the tables. */
-         if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
-             /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
--            warn_report("ACPI tables are larger than 64k.");
--            warn_report("migration may not work.");
--            warn_report("please remove CPUs, NUMA nodes, "
--                        "memory slots or PCI bridges.");
-+            warn_report("ACPI table size %u exceeds %d bytes,"
-+                        " migration may not work",
-+                        tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
-+            error_printf("Try removing CPUs, NUMA nodes, memory slots"
-+                         " or PCI bridges.");
-         }
-         acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
-     }
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 465e91cc5b..36b2bb9b53 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -384,7 +384,7 @@ ISADevice *pc_find_fdc0(void)
-         warn_report("multiple floppy disk controllers with "
-                     "iobase=0x3f0 have been found");
-         error_printf("the one being picked for CMOS setup might not reflect "
--                     "your intent\n");
-+                     "your intent");
-     }
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 7e532d00e9..af53b34410 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -267,11 +267,22 @@ void error_free(Error *err);
+ void error_free_or_abort(Error **errp);
  
-     return state.floppy;
-@@ -2087,9 +2087,8 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-     }
+ /*
++ * Convenience function to warn_report() and free @err.
++ */
++void warn_report_err(Error *err);
++
++/*
+  * Convenience function to error_report() and free @err.
+  */
+ void error_report_err(Error *err);
  
-     if (value < (1ULL << 20)) {
--        warn_report("small max_ram_below_4g(%"PRIu64
--                    ") less than 1M.  BIOS may not work..",
--                    value);
-+        warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
-+                    "BIOS may not work with less than 1MiB", value);
-     }
+ /*
++ * Convenience function to error_prepend(), warn_report() and free @err.
++ */
++void warn_reportf_err(Error *err, const char *fmt, ...)
++    GCC_FMT_ATTR(2, 3);
++
++/*
+  * Convenience function to error_prepend(), error_report() and free @err.
+  */
+ void error_reportf_err(Error *err, const char *fmt, ...)
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 9287cc5886..4e91122813 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2533,6 +2533,7 @@ sub process {
+ 				error_setg_file_open|
+ 				error_set|
+ 				error_prepend|
++				warn_reportf_err|
+ 				error_reportf_err|
+ 				error_vreport|
+ 				warn_vreport|
+diff --git a/util/error.c b/util/error.c
+index 020b86b9f0..3efdd69162 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -232,6 +232,15 @@ void error_report_err(Error *err)
+     error_free(err);
+ }
  
-     pcms->max_ram_below_4g = value;
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 1653a47f0a..c915719b0c 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -101,9 +101,11 @@ static void pc_q35_init(MachineState *machine)
-         lowmem = pcms->max_ram_below_4g;
-         if (machine->ram_size - lowmem > lowmem &&
-             lowmem & ((1ULL << 30) - 1)) {
--            warn_report("Large machine and max_ram_below_4g(%"PRIu64
--                        ") not a multiple of 1G; possible bad performance.",
--                        pcms->max_ram_below_4g);
-+            warn_report("Large machine as the ram size (0x%" PRIx64 ") is more"
-+                        " then twice the size of the internal limit"
-+                        " (0x%" PRIx64 ") and max_ram_below_4g (%"PRIu64")"
-+                        " note a multiple of 1G; possible bad performance.",
-+                        machine->ram_size, lowmem, pcms->max_ram_below_4g);
-         }
-     }
++void warn_report_err(Error *err)
++{
++    warn_report("%s", error_get_pretty(err));
++    if (err->hint) {
++        error_printf_unless_qmp("%s", err->hint->str);
++    }
++    error_free(err);
++}
++
+ void error_reportf_err(Error *err, const char *fmt, ...)
+ {
+     va_list ap;
+@@ -242,6 +251,17 @@ void error_reportf_err(Error *err, const char *fmt, ...)
+     error_report_err(err);
+ }
  
++
++void warn_reportf_err(Error *err, const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    error_vprepend(&err, fmt, ap);
++    va_end(ap);
++    warn_report_err(err);
++}
++
+ void error_free(Error *err)
+ {
+     if (err) {
 -- 
 2.11.0
