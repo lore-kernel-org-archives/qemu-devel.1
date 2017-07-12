@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVFrG-0001c0-2v
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:31:07 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVFvQ-0002xv-G8
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVFrC-0001wb-A0
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:31:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVFrC-0001w1-0h
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:31:02 -0400
-Date: Wed, 12 Jul 2017 12:30:55 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170712113055.GE5237@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170711124411.10499-1-berrange@redhat.com>
-	<149978289196.30.5533219451464874880@5d477a5b5989>
-	<20170712091335.GC5237@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVFvM-0004Gx-AO
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:35:24 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAOE=1Z3ve+zQJbjqqfNA1iB_mNgFkoTTXRxyBikSiJ5_AZwpiA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c5d9a1c7-631e-19d4-0917-51f57887ca28@amsat.org>
+Date: Wed, 12 Jul 2017 08:34:15 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170712091335.GC5237@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/5] Merge sockets 2017/07/11
+In-Reply-To: <CAOE=1Z3ve+zQJbjqqfNA1iB_mNgFkoTTXRxyBikSiJ5_AZwpiA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] How to stop `qemu-system-x86_64 ...` instead of
+ `kill -9`?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, famz@redhat.com
+To: Sam <batmanustc@gmail.com>
+Cc: qemu-discuss@nongnu.org, qemu-devel@nongnu.org, Vincenzo Romano <vincenzo.romano@notorand.it>, Peter Xu <peterx@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Wed, Jul 12, 2017 at 10:13:35AM +0100, Daniel P. Berrange wrote:
-> On Tue, Jul 11, 2017 at 07:21:32AM -0700, no-reply@patchew.org wrote:
-> > Hi,
-> > 
-> > This series failed automatic build test. Please find the testing commands and
-> > their output below. If you have docker installed, you can probably reproduce it
-> > locally.
-> > 
-> > Message-id: 20170711124411.10499-1-berrange@redhat.com
-> > Type: series
-> > Subject: [Qemu-devel] [PULL v1 0/5] Merge sockets 2017/07/11
-> > 
+Hi Sam,
+
+On 07/12/2017 06:24 AM, Sam wrote:
+> I'm running `qemu-system-x86_64 ...` to start a guest vm. Now I want to
+> stop and destroy this vm, I found there is no `qemu-stop` related command,
+> so I have to `kill -9` this process.
 > 
-> [snip]
-> 
-> >   GTESTER check-qtest-x86_64
-> >   GTESTER check-qtest-aarch64
-> 
-> [snip]
-> 
-> > **
-> > ERROR:/tmp/qemu-test/src/tests/test-sockets-proto.c:849:test_listen: assertion failed: (data->ipv4 == 0)
-> 
-> The problem here is that we're running qtests for x86_64 and
-> aarch64 in parallel, and both are trying to bind to the same
-> IPv4/IPv6 ports and so one fails.
+> How could I stop `qemu-system-x86_64` instead of `kill -9`? Use `virsh`
+> command or something?
 
-A further problem was that the check for network protocol support was not
-strong enough to skip the test when docker uses --net=none.
+If you are using -nographic you can use the "^a x" keys sequence as 
+described in the man page:
 
-I'm going to squash the following into the v2 PULL request
+$ man qemu-system-x86_64
+QEMU(1)
 
+        During emulation, if you are using a character backend
+        multiplexer (which is the default if you are using -nographic)
+        then several commands are available via an escape sequence.
+        These key sequences all start with an escape character, which
+        is Ctrl-a by default, but can be changed with -echr. The list
+        below assumes you're using the default.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 77b70f2..1266ed7 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -337,7 +337,7 @@ check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
- 
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
--check-qtest-generic-y += tests/test-sockets-proto$(EXESUF)
-+check-qtest-x86_64-y += tests/test-sockets-proto$(EXESUF)
- 
- qapi-schema += alternate-any.json
- qapi-schema += alternate-array.json
-diff --git a/tests/test-sockets-proto.c b/tests/test-sockets-proto.c
-index 1d6beda..89d557f 100644
---- a/tests/test-sockets-proto.c
-+++ b/tests/test-sockets-proto.c
-@@ -656,7 +656,7 @@ static QSocketsData test_data[] = {
-       .args = "-vnc :::3100,to=9005,ipv4=off,ipv6=off" },
- };
- 
--static int check_bind(const char *hostname)
-+static int check_bind(const char *hostname, int family)
- {
-     int fd = -1;
-     struct addrinfo ai, *res = NULL;
-@@ -665,7 +665,7 @@ static int check_bind(const char *hostname)
- 
-     memset(&ai, 0, sizeof(ai));
-     ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
--    ai.ai_family = AF_UNSPEC;
-+    ai.ai_family = family;
-     ai.ai_socktype = SOCK_STREAM;
- 
-     /* lookup */
-@@ -754,10 +754,10 @@ static int check_resolve_order(void)
- 
- static int check_protocol_support(void)
- {
--    if (check_bind("0.0.0.0") < 0) {
-+    if (check_bind("127.0.0.1", AF_INET) < 0) {
-         return -1;
-     }
--    if (check_bind("::") < 0) {
-+    if (check_bind("::1", AF_INET6) < 0) {
-         return -1;
-     }
- 
+        Ctrl-a h
+            Print this help
 
+        Ctrl-a x
+            Exit emulator
+
+        Ctrl-a c
+            Rotate between the frontends connected to the multiplexer
+            (usually this switches between the monitor and the console)
+
+What I usually does when the guest supports ACPI is enter the monitor 
+with "^a c" then type "system_powerdown" so my guest gracefully 
+shutdowns, else use "^a x".
 
 Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+Phil.
