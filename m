@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dVEA4-0000XV-08
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:25 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dVEAE-0000fV-7E
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dVEA2-0002tf-RJ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45826)
+	(envelope-from <jfreimann@redhat.com>) id 1dVEAD-0002y7-F7
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1dVEA2-0002tD-HY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:22 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1dVEAD-0002xr-8V
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 783F4C0587F2
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:42:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 30E8AC0587C0
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:42:32 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
-Date: Wed, 12 Jul 2017 11:41:48 +0200
-Message-Id: <20170712094149.23069-3-jfreimann@redhat.com>
+Date: Wed, 12 Jul 2017 11:41:49 +0200
+Message-Id: <20170712094149.23069-4-jfreimann@redhat.com>
 In-Reply-To: <20170712094149.23069-1-jfreimann@redhat.com>
 References: <20170712094149.23069-1-jfreimann@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 2/3] tests/pxe-test: add testcase using
- vhost-user-bridge
+Subject: [Qemu-devel] [PATCH RFC 3/3] libvhost-user: quit when no more data
+ received
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,174 +36,70 @@ Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com, maxime.coqu
 
 From: Jens Freimann <jfreiman@redhat.com>
 
-Add a test to pxe-test using the vhost-user interface. 
-Create a vhost-user-bridge process and connect it to qemu.
+When recvmsg() returns a message size of zero and
+errno is ENOENT end processing of vhost-user messages.
 
-Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+Without this we run into a vubr_panic() call and get
+     PANIC: Error while recvmsg: No such file or directory
+     Error while dispatching.
+
+Add a switch "quit" to the vhost user device and set true to stop
+processing messages.
+
+Signed-off-by: Jens Freimann <jfreiman@redhat.com>
 ---
- tests/Makefile.include |   4 +-
- tests/pxe-test.c       | 106 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 108 insertions(+), 2 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 12 +++++++++++-
+ contrib/libvhost-user/libvhost-user.h |  1 +
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 18cd06a..eccb27e 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -698,7 +698,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
- tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
- tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
- 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
--tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
-+tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
-+    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
- tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
- tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
- tests/m25p80-test$(EXESUF): tests/m25p80-test.o
-@@ -826,6 +827,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
- 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
- 		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-+		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
- 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
- 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
- 	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
-diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index 34282d3..5a0d182 100644
---- a/tests/pxe-test.c
-+++ b/tests/pxe-test.c
-@@ -5,7 +5,8 @@
-  *
-  * Authors:
-  *  Michael S. Tsirkin <mst@redhat.com>,
-- *  Victor Kaplansky <victork@redhat.com>
-+ *  Victor Kaplansky <victork@redhat.com>,
-+ *  Jens Freimann <jfreiman@redhat.com>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-@@ -13,13 +14,115 @@
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 9efb9da..5538859 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -161,7 +161,10 @@ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+         rc = recvmsg(conn_fd, &msg, 0);
+     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
  
- #include "qemu/osdep.h"
- #include <glib/gstdio.h>
-+#include <glib.h>
- #include "qemu-common.h"
- #include "libqtest.h"
- #include "boot-sector.h"
-+#include <sys/vfs.h>
+-    if (rc <= 0) {
++    if (rc == 0 && (errno == ENOENT)) {
++        vmsg->size = 0;
++        dev->quit = true;
++    } else if (rc < 0) {
+         vu_panic(dev, "Error while recvmsg: %s", strerror(errno));
+         return false;
+     }
+@@ -755,6 +758,10 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+     DPRINT("Flags:   0x%x\n", vmsg->flags);
+     DPRINT("Size:    %d\n", vmsg->size);
  
-+#define LPORT 5555
-+#define RPORT 4444
- #define NETNAME "net0"
-+#define QEMU_CMD_MEM    "--enable-kvm -m %d -object memory-backend-file,id=mem,size=%dM,"\
-+                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
-+#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
-+#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
-+                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
-+                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
-+                        " -netdev socket,id=n1,udp=localhost:%d,localaddr=localhost:%d"
-+#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
-+                        " -device virtio-net-pci,netdev=n1 "
++    if (dev->quit) {
++        return true;
++    }
 +
-+#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
-+                        QEMU_CMD_NETDEV QEMU_CMD_NET
-+
-+#define HUGETLBFS_MAGIC       0x958458f6
-+#define VUBR_SOCK "vubr.sock"
-+#define MEMSZ 1024
+     if (vmsg->fd_num) {
+         int i;
+         DPRINT("Fds:");
+@@ -822,6 +829,9 @@ vu_dispatch(VuDev *dev)
+     bool success = false;
  
- static char disk[] = "tests/pxe-test-disk-XXXXXX";
-+static const char *root;
-+static const char *tmpfs;
-+static const char *tmpfs2;
-+
-+static const char *init_hugepagefs(const char *path)
-+{
-+    struct statfs fs;
-+    int ret;
-+
-+    if (access(path, R_OK | W_OK | X_OK)) {
-+        g_test_message("access on path (%s): %s\n", path, strerror(errno));
-+        return NULL;
-+    }
-+
-+    do {
-+        ret = statfs(path, &fs);
-+    } while (ret != 0 && errno == EINTR);
-+
-+    if (ret != 0) {
-+        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
-+        return NULL;
-+    }
-+
-+    if (fs.f_type != HUGETLBFS_MAGIC) {
-+        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
-+        return NULL;
-+    }
-+
-+    return path;
-+}
-+
-+static void test_pxe_vhost_user(void)
-+{
-+    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
-+    char template2[] = "/tmp/hugepages-XXXXXX";
-+    gchar *vubr_args[] = {NULL, NULL, NULL, NULL};
-+    const char *hugefs;
-+    GError *error = NULL;
-+    char *vubr_binary;
-+    char *qemu_args;
-+    GPid vubr_pid;
-+
-+    tmpfs = mkdtemp(template);
-+    if (!tmpfs) {
-+        g_test_message("mkdtemp on path(%s): %s\n",
-+                       template, strerror(errno));
-+    }
-+    vubr_binary = getenv("QTEST_VUBR_BINARY");
-+    g_assert(vubr_binary);
-+    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
-+    vubr_args[1] = g_strdup_printf("-u");
-+    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
-+    g_spawn_async(NULL, vubr_args, NULL,
-+                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
-+                  G_SPAWN_SEARCH_PATH,
-+                  NULL, NULL, &vubr_pid, &error);
-+    g_assert_no_error(error);
-+
-+    hugefs = getenv("QTEST_HUGETLBFS_PATH");
-+    if (hugefs) {
-+        root = init_hugepagefs(hugefs);
-+        g_assert(root);
-+    } else {
-+        tmpfs2 = mkdtemp(template2);
-+        g_assert(tmpfs2);
-+        root = tmpfs2;
-+    }
-+
-+    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
-+                                "char0", vubr_args[2], "char0", disk,
-+                                RPORT, LPORT);
-+    qtest_start(qemu_args);
-+    boot_sector_test();
-+    qtest_quit(global_qtest);
-+    g_free(qemu_args);
-+    g_free(vubr_args[0]);
-+    g_free(vubr_args[1]);
-+    g_free(vubr_args[2]);
-+    g_assert_cmpint (g_remove(g_strdup_printf("%s/%s", tmpfs,VUBR_SOCK)),
-+		     ==, 0);
-+    g_assert_cmpint(rmdir(tmpfs), ==, 0);
-+}
+     if (!vu_message_read(dev, dev->sock, &vmsg)) {
++        if (vmsg.size == 0) {
++            success = true;
++        }
+         goto end;
+     }
  
- static void test_pxe_one(const char *params, bool ipv6)
- {
-@@ -65,6 +168,7 @@ int main(int argc, char *argv[])
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-         qtest_add_func("pxe/e1000", test_pxe_e1000);
-         qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
-+        qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
-     } else if (strcmp(arch, "ppc64") == 0) {
-         qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
-         qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 53ef222..c02215a 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -217,6 +217,7 @@ struct VuDev {
+     uint64_t features;
+     uint64_t protocol_features;
+     bool broken;
++    bool quit;
+ 
+     /* @set_watch: add or update the given fd to the watch set,
+      * call cb when condition is met */
 -- 
 2.9.4
