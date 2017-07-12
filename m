@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVJhY-0004ta-Ns
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:37:21 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dVJk1-0006oy-8x
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVJhV-0006yj-J8
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:37:20 -0400
-Received: from mail-wr0-f169.google.com ([209.85.128.169]:35012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dVJhV-0006xq-BT
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:37:17 -0400
-Received: by mail-wr0-f169.google.com with SMTP id k67so38315239wrc.2
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:37:17 -0700 (PDT)
-References: <CGME20170712113922eucas1p1c6588b2e29439254cafd3d8dde5c505c@eucas1p1.samsung.com>
-	<001801d2fb03$811079e0$83316da0$@samsung.com>
-	<CAFEAcA8FAp6TvY+DBVGzYVizLw9iarPQMLRw3haNxtFeEBYjHg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8FAp6TvY+DBVGzYVizLw9iarPQMLRw3haNxtFeEBYjHg@mail.gmail.com>
-Date: Wed, 12 Jul 2017 16:36:14 +0100
-Message-ID: <877ezd8y6p.fsf@linaro.org>
+	(envelope-from <maxime.coquelin@redhat.com>) id 1dVJjw-0000V5-98
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:39:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1dVJjv-0000UQ-W7
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:39:48 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC64A3DBC1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 15:39:46 +0000 (UTC)
+References: <20170712094149.23069-1-jfreimann@redhat.com>
+	<20170712094149.23069-3-jfreimann@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <3ebcaa16-2362-4611-9b3b-3f1db172ee40@redhat.com>
+Date: Wed, 12 Jul 2017 17:39:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] target/arm: Fix abort on exception return from
- AArch64 to AArch32
+In-Reply-To: <20170712094149.23069-3-jfreimann@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 2/3] tests/pxe-test: add testcase using
+ vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +36,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jaroslaw Pelczar <j.pelczar@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 12 July 2017 at 12:39, Jaroslaw Pelczar <j.pelczar@samsung.com> wrote:
->> Problem manifests itself when we handle the following sequence:
->>
->> 1. 64-bit Secure EL3 returns to 32-bit Secure EL1
->> 2. 32-bit Secure EL1 performs SMC call to 64-bit Secure EL3
->> 3. 64-bit Secure EL3 performs return ERET to 32-bit Secure EL1]
->> 4. 32-bit Secure EL1 receives prefetch abort
->>
->> If CPU's env->pc is not set to the same value as env->regs[15],
->> during ERET the simulator will try to fetch instruction from EL3's
->> virtual address inside 32-bit Secure EL1 virtual address space.
->> This will cause Prefetch Abort in 32-bit Secure EL1.
->>
->> Problem occurs because of the following code generation scheme:
->>
->> 1. disas_uncond_b_reg will decode ERET
->> 2. gen_helper_exception_return(cpu_env) will generate thunk to
->>    helper_exception_return
->> 3. s->is_jmp is set to DISAS_JUMP
->> 4. gen_intermediate_code_a64 will see dc->is_jmp == DISAS_JUMP
->> 5. tcg_gen_lookup_and_goto_ptr(cpu_pc) will be called which trigger
->>    access cpu->pc to fetch next opcode
->>
->> At this point cpu->pc will have EL3's PC value.
->>
->> Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
->> ---
->>  target/arm/op_helper.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
->> index 2a85666..8222c19 100644
->> --- a/target/arm/op_helper.c
->> +++ b/target/arm/op_helper.c
->> @@ -1027,6 +1027,9 @@ void HELPER(exception_return)(CPUARMState *env)
->>          } else {
->>              env->regs[15] = env->elr_el[cur_el] & ~0x3;
->>          }
->> +
->> +        env->pc = env->regs[15];
->> +
->>          qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
->>                        "AArch32 EL%d PC 0x%" PRIx32 "\n",
->>                        cur_el, new_el, env->regs[15]);
->
-> Thanks for the bug report. I don't think this is the best
-> fix, though. What should happen is that for ERET we do
-> not attempt to do a lookup_and_goto_ptr(), we should just
-> go back out to the main loop and get the next TB from there.
->
-> I think this may be fixed as one of the things Alex's
-> recent patchset tackles?
+On 07/12/2017 11:41 AM, Jens Freimann wrote:
+> From: Jens Freimann <jfreiman@redhat.com>
+> 
+> Add a test to pxe-test using the vhost-user interface.
+> Create a vhost-user-bridge process and connect it to qemu.
+> 
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> ---
+>   tests/Makefile.include |   4 +-
+>   tests/pxe-test.c       | 106 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 108 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 18cd06a..eccb27e 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -698,7 +698,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
+>   tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
+>   tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
+>   	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
+> -tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
+> +tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
+> +    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
+>   tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
+>   tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
+>   tests/m25p80-test$(EXESUF): tests/m25p80-test.o
+> @@ -826,6 +827,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+>   	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+>   	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+>   		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
+> +		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
+>   		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
+>   		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
+>   	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
+> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+> index 34282d3..5a0d182 100644
+> --- a/tests/pxe-test.c
+> +++ b/tests/pxe-test.c
+> @@ -5,7 +5,8 @@
+>    *
+>    * Authors:
+>    *  Michael S. Tsirkin <mst@redhat.com>,
+> - *  Victor Kaplansky <victork@redhat.com>
+> + *  Victor Kaplansky <victork@redhat.com>,
+> + *  Jens Freimann <jfreiman@redhat.com>
+>    *
+>    * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>    * See the COPYING file in the top-level directory.
+> @@ -13,13 +14,115 @@
+>   
+>   #include "qemu/osdep.h"
+>   #include <glib/gstdio.h>
+> +#include <glib.h>
+>   #include "qemu-common.h"
+>   #include "libqtest.h"
+>   #include "boot-sector.h"
+> +#include <sys/vfs.h>
+>   
+> +#define LPORT 5555
+> +#define RPORT 4444
+>   #define NETNAME "net0"
+> +#define QEMU_CMD_MEM    "--enable-kvm -m %d -object memory-backend-file,id=mem,size=%dM,"\
+> +                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
+> +#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
+> +#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
+> +                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
+> +                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
+> +                        " -netdev socket,id=n1,udp=localhost:%d,localaddr=localhost:%d"
+> +#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
+> +                        " -device virtio-net-pci,netdev=n1 "
+> +
+> +#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
+> +                        QEMU_CMD_NETDEV QEMU_CMD_NET
+> +
+> +#define HUGETLBFS_MAGIC       0x958458f6
+> +#define VUBR_SOCK "vubr.sock"
+> +#define MEMSZ 1024
+>   
+>   static char disk[] = "tests/pxe-test-disk-XXXXXX";
+> +static const char *root;
+> +static const char *tmpfs;
+> +static const char *tmpfs2;
+Can't these be declared directly in test_pxe_vhost_user()?
 
-Yes, see:
+> +
+> +static const char *init_hugepagefs(const char *path)
+> +{
+> +    struct statfs fs;
+> +    int ret;
+> +
+> +    if (access(path, R_OK | W_OK | X_OK)) {
+> +        g_test_message("access on path (%s): %s\n", path, strerror(errno));
+> +        return NULL;
+> +    }
+> +
+> +    do {
+> +        ret = statfs(path, &fs);
+> +    } while (ret != 0 && errno == EINTR);
+> +
+> +    if (ret != 0) {
+> +        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
+> +        return NULL;
+> +    }
+> +
+> +    if (fs.f_type != HUGETLBFS_MAGIC) {
+> +        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
+> +        return NULL;
+> +    }
+> +
+> +    return path;
+> +}
+> +
+> +static void test_pxe_vhost_user(void)
+> +{
+> +    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
+> +    char template2[] = "/tmp/hugepages-XXXXXX";
+> +    gchar *vubr_args[] = {NULL, NULL, NULL, NULL};
+> +    const char *hugefs;
+> +    GError *error = NULL;
+> +    char *vubr_binary;
+> +    char *qemu_args;
+> +    GPid vubr_pid;
+> +
+> +    tmpfs = mkdtemp(template);
+> +    if (!tmpfs) {
+> +        g_test_message("mkdtemp on path(%s): %s\n",
+> +                       template, strerror(errno));
+> +    }
+> +    vubr_binary = getenv("QTEST_VUBR_BINARY");
+> +    g_assert(vubr_binary);
+> +    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
+> +    vubr_args[1] = g_strdup_printf("-u");
+> +    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
+> +    g_spawn_async(NULL, vubr_args, NULL,
+> +                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
+> +                  G_SPAWN_SEARCH_PATH,
+> +                  NULL, NULL, &vubr_pid, &error);
+> +    g_assert_no_error(error);
+> +
+> +    hugefs = getenv("QTEST_HUGETLBFS_PATH");
+> +    if (hugefs) {
+> +        root = init_hugepagefs(hugefs);
+> +        g_assert(root);
+> +    } else {
+> +        tmpfs2 = mkdtemp(template2);
+> +        g_assert(tmpfs2);
+> +        root = tmpfs2;
+> +    }
+> +
+> +    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
+> +                                "char0", vubr_args[2], "char0", disk,
+> +                                RPORT, LPORT);
+> +    qtest_start(qemu_args);
+> +    boot_sector_test();
+> +    qtest_quit(global_qtest);
+> +    g_free(qemu_args);
+> +    g_free(vubr_args[0]);
+> +    g_free(vubr_args[1]);
+> +    g_free(vubr_args[2]);
+> +    g_assert_cmpint (g_remove(g_strdup_printf("%s/%s", tmpfs,VUBR_SOCK)),
+> +		     ==, 0);
+> +    g_assert_cmpint(rmdir(tmpfs), ==, 0);
+If created, shouldn't tmpfs2 be cleaned here too?
 
-  https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg02963.html
-
-I'll probably get v4 out tomorrow at which point you can merge it ;-)
-
->
-> thanks
-> -- PMM
-
-
---
-Alex Bennée
+> +}
+>   
+>   static void test_pxe_one(const char *params, bool ipv6)
+>   {
+> @@ -65,6 +168,7 @@ int main(int argc, char *argv[])
+>       if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>           qtest_add_func("pxe/e1000", test_pxe_e1000);
+>           qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
+> +        qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
+>       } else if (strcmp(arch, "ppc64") == 0) {
+>           qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
+>           qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
+> 
