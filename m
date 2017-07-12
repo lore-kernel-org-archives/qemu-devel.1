@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dVI0c-0000DS-Q9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:48:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVI0x-0000We-Di
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dVI0X-0004ZZ-On
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:48:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53124
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dVI0X-0004ZU-Il
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:48:49 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6CDiUS8133540
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:48:48 -0400
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bncj63w4f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:48:48 -0400
-Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 12 Jul 2017 10:48:46 -0300
-References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed, 12 Jul 2017 10:48:38 -0300
+	(envelope-from <cohuck@redhat.com>) id 1dVI0s-0004it-DN
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42956)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVI0s-0004hm-6q
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:49:10 -0400
+Date: Wed, 12 Jul 2017 15:49:03 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170712154903.12ae15f9@dhcp-192-215.str.redhat.com>
+In-Reply-To: <1499864265-144136-2-git-send-email-borntraeger@de.ibm.com>
+References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
+	<1499864265-144136-2-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <8b7aefb2-66e3-bc2b-ce13-11b130c85ce4@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv2 0/8] spapr: DRC cleanups (part
- VI)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/11] s390x/kvm: Rework cmma management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,64 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, groug@kaod.org
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Janosch Frank <frankja@linux.vnet.ibm.com>
 
-The dreaded Libvirt hotplug-migrate-hotunplug scenario is working nicely.
+On Wed, 12 Jul 2017 14:57:35 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-device_add when the machine is in RUN_STATE_PRELAUNCH (-S) still doesn't
-work but it is expected - as discussed in "[RFC drcVI PATCH] spapr:=20
-reset DRCs
-on migration pre_load=E2=80=8B", this scenario can't be fixed solely by t=
-his DRC=20
-cleanup.
+> From: Janosch Frank <frankja@linux.vnet.ibm.com>
+> 
+> Let's keep track of cmma enablement and move the mem_path check into
+> the actual enablement. This now also warns users that do not use
+> cpu-models about disabled cmma when using huge pages.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/cpu.h |  1 +
+>  target/s390x/kvm.c | 26 +++++++++++++++++---------
+>  2 files changed, 18 insertions(+), 9 deletions(-)
 
-Given that we'll review the DT code sometime in the future I guess we can
-postpone the fix for device_adding in pre-launch for that time.
+> @@ -177,6 +179,11 @@ int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit)
+>      return kvm_vm_ioctl(s, KVM_SET_DEVICE_ATTR, &attr);
+>  }
+>  
+> +int kvm_s390_cmma_active(void)
+> +{
+> +    return active_cmma;
+> +}
 
+This is rather "has cmma ever been enabled"...
 
-Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+> +
+>  static bool kvm_s390_cmma_available(void)
+>  {
+>      static bool initialized, value;
+> @@ -197,7 +204,7 @@ void kvm_s390_cmma_reset(void)
+>          .attr = KVM_S390_VM_MEM_CLR_CMMA,
+>      };
+>  
+> -    if (mem_path || !kvm_s390_cmma_available()) {
+> +    if (!kvm_s390_cmma_active()) {
+>          return;
+>      }
 
-On 07/12/2017 02:53 AM, David Gibson wrote:
-> This sixth set of DRC cleanup patches is a complete rework of DRC
-> state management.  We stop tracking some unnecessary things, and
-> change the basic state representation to a simpler and more robust
-> model.
->
-> Many of the patches in this set "break" migration from earlier git
-> snapshots, but not from any released qemu version.  The previous
-> migration stream format had multiple problems, so better to fix them
-> now, before 2.10 is out.
->
-> Although there are certainly more things that can be improved in the
-> DRC system, with this series we should have a solid foundation for
-> migrating DRCs - the state trasferred is about as minimal and well
-> defined as it's possible to be.
->
-> Changes since v1:
->    * Rebased onto current tree
->    * Added cleanup to unplug path
->    * Added restriction of DR-indicator to physical DRCs
->    * Included revised version of Laurent's patch to correctly handle
->      things "hot" plugged before incoming migration
->
-> David Gibson (7):
->    spapr: Remove 'awaiting_allocation' DRC flag
->    spapr: Simplify unplug path
->    spapr: Refactor spapr_drc_detach()
->    spapr: Cleanups relating to DRC awaiting_release field
->    spapr: Consolidate DRC state variables
->    spapr: Remove sPAPRConfigureConnectorState sub-structure
->    spapr: Implement DR-indicator for physical DRCs only
->
-> Laurent Vivier (1):
->    spapr: Treat devices added before inbound migration as coldplugged
->
->   hw/ppc/spapr.c             |  89 +++-------
->   hw/ppc/spapr_drc.c         | 399 ++++++++++++++++++++++++------------=
----------
->   hw/ppc/spapr_pci.c         |  17 +-
->   hw/ppc/trace-events        |   3 +-
->   include/hw/ppc/spapr_drc.h |  74 ++++++---
->   5 files changed, 301 insertions(+), 281 deletions(-)
->
+...as you don't clear it on reset, right?
+
+Confused me a bit at first, but
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
