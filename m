@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVFiz-00073f-1X
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:22:34 -0400
+	(envelope-from <groug@kaod.org>) id 1dVFoD-0008Om-So
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVFix-0006R0-Lx
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:22:33 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
-	<1499788408-10096-3-git-send-email-peter.maydell@linaro.org>
-Date: Wed, 12 Jul 2017 13:22:16 +0200
-In-Reply-To: <1499788408-10096-3-git-send-email-peter.maydell@linaro.org>
-	(Peter Maydell's message of "Tue, 11 Jul 2017 16:53:27 +0100")
-Message-ID: <87lgnt99xz.fsf@dusky.pond.sub.org>
+	(envelope-from <groug@kaod.org>) id 1dVFo9-0000PI-TS
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:27:57 -0400
+Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:56996)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVFo9-0000Ox-Jl
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:27:53 -0400
+Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 23F726BFAD
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 13:27:52 +0200 (CEST)
+Date: Wed, 12 Jul 2017 13:27:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170712132742.368db8d8@bahia.lan>
+In-Reply-To: <20170712110545.GN4083@umbus.fritz.box>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-3-david@gibson.dropbear.id.au>
+	<20170712120001.31d858de@bahia.lan>
+	<20170712110545.GN4083@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/3] qdev: support properties which don't
- set a default value
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/fg8duMMSRFiv+k9/UYSTA+t";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
+ DRC flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +34,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@redhat.com>, patches@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--Sig_/fg8duMMSRFiv+k9/UYSTA+t
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> In some situations it's useful to have a qdev property which doesn't
-> automatically set its default value when qdev_property_add_static is
-> called (for instance when the default value is not constant).
->
-> Support this by adding a flag to the Property struct indicating
-> whether to set the default value.  This replaces the existing test
-> for whether the PorpertyInfo set_default_value function pointer is
+On Wed, 12 Jul 2017 21:05:45 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-PropertyInfo
+> On Wed, Jul 12, 2017 at 12:00:01PM +0200, Greg Kurz wrote:
+> > On Wed, 12 Jul 2017 15:53:11 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> > > The awaiting_allocation flag in the DRC was introduced by aab9913
+> > > "spapr_drc: Prevent detach racing against attach for CPU DR", alleged=
+ly to
+> > > prevent a guest crash on racing attach and detach.  Except.. informat=
+ion
+> > > from the BZ actually suggests a qemu crash, not a guest crash.  And t=
+here =20
+> >=20
+> > Can you share an url to the BZ ? =20
+>=20
+> Alas, no.  I have that information second hand from.. Bharata,
+> think.. and I believe the BZ is an IBM internal one.
+>=20
 
-> NULL, and we set the .set_default field to true for all those cases
-> of struct Property which use a PropertyInfo with a non-NULL
-> set_default_value, so behaviour remains the same as before.
->
-> We define two new macros DEFINE_PROP_SIGNED_NODEFAULT and
-> DEFINE_PROP_UNSIGNED_NODEFAULT, to cover the most plausible use cases
-> of wanting to set an integer property with no default value.
+I did some digging and I could find it in our internal bugzilla. And indeed,
+it mentions QEMU crashing because of a SEGV...
 
-Your text makes me wonder what is supposed to set the default value
-then.  Glancing ahead to PATCH 3, it looks like method instance_init()
-is.  Can you think of a scenario where something else sets it?
+> >  =20
+> > > shouldn't be a problem here anyway: if the guest has already moved th=
+e DRC
+> > > away from UNUSABLE state, the detach would already be deferred, and i=
+f it
+> > > hadn't it should be safe to detach it (the guest should fail graceful=
+ly
+> > > when it attempts to change the allocation state).
+> > >=20
+> > > I think this was probably just a bandaid for some other problem in the
+> > > state management.  So, remove awaiting_allocation and associated code.
+> > >=20
 
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Since the previous patch fixed the only case that was
-> using a default value but not explicitly setting .defval.[ui],
-> this patch is a bit easier to review: .set_default = true
-> is added in exactly the places that initialize .defval.[ui].
-> ---
->  include/hw/qdev-core.h       |  1 +
->  include/hw/qdev-properties.h | 20 ++++++++++++++++++++
->  hw/core/qdev.c               |  2 +-
->  3 files changed, 22 insertions(+), 1 deletion(-)
->
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 9d7c1c0..d110163 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -226,6 +226,7 @@ struct Property {
->      PropertyInfo *info;
->      ptrdiff_t    offset;
->      uint8_t      bitnr;
-> +    bool         set_default;
+... so I tend to agree this was a bandaid.
 
-Your chance to add the very first comment to struct Property (its
-existing undocumentedness is an embarrassment, but not this patch's
-problem).  Let's write down that this flag governs where (integer)
-default values come from, either from member devfal or from method
-instance_init() or whatever.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
->      union {
->          int64_t i;
->          uint64_t u;
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index 36d040c..66816a5 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -43,15 +43,24 @@ extern PropertyInfo qdev_prop_arraylen;
->          .info      = &(_prop),                                          \
->          .offset    = offsetof(_state, _field)                           \
->              + type_check(_type,typeof_field(_state, _field)),           \
-> +        .set_default = true,                                            \
->          .defval.i  = (_type)_defval,                                    \
->          }
+I'll re-try the scenario from the BZ with this patch applied to see if we
+hit the crash again.
 
-If you flip the sense of the flag, you don't need to mess with the
-PropertyInfo, and don't need the note referring reviewers to the
-previous patch.  However, the case "use .defval" already requires an
-initializer, so adding one for .set_default seems fair.  Okay.
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> > >  hw/ppc/spapr_drc.c         | 25 +++----------------------
+> > >  include/hw/ppc/spapr_drc.h |  1 -
+> > >  2 files changed, 3 insertions(+), 23 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > > index 9b07f80..89ba3d6 100644
+> > > --- a/hw/ppc/spapr_drc.c
+> > > +++ b/hw/ppc/spapr_drc.c
+> > > @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector=
+ *drc)
+> > >      if (!drc->dev) {
+> > >          return RTAS_OUT_NO_SUCH_INDICATOR;
+> > >      }
+> > > -    if (drc->awaiting_release && drc->awaiting_allocation) {
+> > > -        /* kernel is acknowledging a previous hotplug event
+> > > -         * while we are already removing it.
+> > > -         * it's safe to ignore awaiting_allocation here since we kno=
+w the
+> > > -         * situation is predicated on the guest either already havin=
+g done
+> > > -         * so (boot-time hotplug), or never being able to acquire in=
+ the
+> > > -         * first place (hotplug followed by immediate unplug).
+> > > -         */
+> > > +    if (drc->awaiting_release) {
+> > > +        /* Don't allow the guest to move a device away from UNUSABLE
+> > > +         * state when we want to unplug it */
+> > >          return RTAS_OUT_NO_SUCH_INDICATOR;
+> > >      }
+> > > =20
+> > >      drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
+> > > -    drc->awaiting_allocation =3D false;
+> > > =20
+> > >      return RTAS_OUT_SUCCESS;
+> > >  }
+> > > @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Dev=
+iceState *d, void *fdt,
+> > >      drc->fdt =3D fdt;
+> > >      drc->fdt_start_offset =3D fdt_start_offset;
+> > > =20
+> > > -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > > -        drc->awaiting_allocation =3D true;
+> > > -    }
+> > > -
+> > >      object_property_add_link(OBJECT(drc), "device",
+> > >                               object_get_typename(OBJECT(drc->dev)),
+> > >                               (Object **)(&drc->dev),
+> > > @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, Dev=
+iceState *d, Error **errp)
+> > >          return;
+> > >      }
+> > > =20
+> > > -    if (drc->awaiting_allocation) {
+> > > -        drc->awaiting_release =3D true;
+> > > -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+> > > -        return;
+> > > -    }
+> > > -
+> > >      spapr_drc_release(drc);
+> > >  }
+> > > =20
+> > > @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+> > >          spapr_drc_release(drc);
+> > >      }
+> > > =20
+> > > -    drc->awaiting_allocation =3D false;
+> > > -
+> > >      if (drc->dev) {
+> > >          /* A device present at reset is coldplugged */
+> > >          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+> > > @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc=
+ =3D {
+> > >          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+> > >          VMSTATE_BOOL(configured, sPAPRDRConnector),
+> > >          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+> > > -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+> > >          VMSTATE_END_OF_LIST()
+> > >      }
+> > >  };
+> > > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> > > index 715016b..18a196e 100644
+> > > --- a/include/hw/ppc/spapr_drc.h
+> > > +++ b/include/hw/ppc/spapr_drc.h
+> > > @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
+> > >      sPAPRConfigureConnectorState *ccs;
+> > > =20
+> > >      bool awaiting_release;
+> > > -    bool awaiting_allocation;
+> > > =20
+> > >      /* device pointer, via link property */
+> > >      DeviceState *dev; =20
+> >  =20
+>=20
+>=20
+>=20
 
->  
-> +#define DEFINE_PROP_SIGNED_NODEFAULT(_name, _state, _field, _prop, _type) { \
-> +        .name      = (_name),                                           \
-> +        .info      = &(_prop),                                          \
-> +        .offset    = offsetof(_state, _field)                           \
-> +            + type_check(_type, typeof_field(_state, _field)),          \
-> +        }
-> +
->  #define DEFINE_PROP_BIT(_name, _state, _field, _bit, _defval) {  \
->          .name      = (_name),                                    \
->          .info      = &(qdev_prop_bit),                           \
->          .bitnr    = (_bit),                                      \
->          .offset    = offsetof(_state, _field)                    \
->              + type_check(uint32_t,typeof_field(_state, _field)), \
-> +        .set_default = true,                                     \
->          .defval.u  = (bool)_defval,                              \
->          }
->  
-> @@ -60,15 +69,24 @@ extern PropertyInfo qdev_prop_arraylen;
->          .info      = &(_prop),                                          \
->          .offset    = offsetof(_state, _field)                           \
->              + type_check(_type, typeof_field(_state, _field)),          \
-> +        .set_default = true,                                            \
->          .defval.u  = (_type)_defval,                                    \
->          }
->  
-> +#define DEFINE_PROP_UNSIGNED_NODEFAULT(_name, _state, _field, _prop, _type) { \
-> +        .name      = (_name),                                           \
-> +        .info      = &(_prop),                                          \
-> +        .offset    = offsetof(_state, _field)                           \
-> +            + type_check(_type, typeof_field(_state, _field)),          \
-> +        }
-> +
->  #define DEFINE_PROP_BIT64(_name, _state, _field, _bit, _defval) {       \
->          .name      = (_name),                                           \
->          .info      = &(qdev_prop_bit64),                                \
->          .bitnr    = (_bit),                                             \
->          .offset    = offsetof(_state, _field)                           \
->              + type_check(uint64_t, typeof_field(_state, _field)),       \
-> +        .set_default = true,                                            \
->          .defval.u  = (bool)_defval,                                     \
->          }
->  
-> @@ -77,6 +95,7 @@ extern PropertyInfo qdev_prop_arraylen;
->          .info      = &(qdev_prop_bool),                          \
->          .offset    = offsetof(_state, _field)                    \
->              + type_check(bool, typeof_field(_state, _field)),    \
-> +        .set_default = true,                                     \
->          .defval.u    = (bool)_defval,                            \
->          }
->  
-> @@ -110,6 +129,7 @@ extern PropertyInfo qdev_prop_arraylen;
->                            _arrayfield, _arrayprop, _arraytype) {        \
->          .name = (PROP_ARRAY_LEN_PREFIX _name),                          \
->          .info = &(qdev_prop_arraylen),                                  \
-> +        .set_default = true,                                            \
->          .defval.u = 0,                                                  \
->          .offset = offsetof(_state, _field)                              \
->              + type_check(uint32_t, typeof_field(_state, _field)),       \
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 849952a..96965a7 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -793,7 +793,7 @@ void qdev_property_add_static(DeviceState *dev, Property *prop,
->                                      prop->info->description,
->                                      &error_abort);
->  
-> -    if (prop->info->set_default_value) {
-> +    if (prop->set_default) {
->          prop->info->set_default_value(obj, prop);
->      }
->  }
 
-Preferably with a suitable comment on member set_default and an improved
-commit message:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+--Sig_/fg8duMMSRFiv+k9/UYSTA+t
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAllmB64ACgkQAvw66wEB28JZbQCfVzDeR5rFCXGUDLrb0lPMvyML
+RkQAnRacw3WZUHHNz/3LbuyEcV4C4zDQ
+=eN1L
+-----END PGP SIGNATURE-----
+
+--Sig_/fg8duMMSRFiv+k9/UYSTA+t--
