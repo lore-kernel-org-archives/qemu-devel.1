@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVJem-00019U-G6
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:34:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVJhY-0004ta-Ns
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVJel-0004ri-Ld
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:34:28 -0400
-Date: Wed, 12 Jul 2017 18:32:58 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170712153258.ilcy44wq2onbu5ks@postretch>
-References: <20170711163748.17817-1-el13635@mail.ntua.gr>
-	<20170711163748.17817-3-el13635@mail.ntua.gr>
-	<b8bcff15-2d6c-bca9-cd44-b03ddf7d7812@redhat.com>
-	<87y3ruaypm.fsf@dusky.pond.sub.org>
-	<20170712151501.GG4917@noname.str.redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dVJhV-0006yj-J8
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:37:20 -0400
+Received: from mail-wr0-f169.google.com ([209.85.128.169]:35012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dVJhV-0006xq-BT
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:37:17 -0400
+Received: by mail-wr0-f169.google.com with SMTP id k67so38315239wrc.2
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:37:17 -0700 (PDT)
+References: <CGME20170712113922eucas1p1c6588b2e29439254cafd3d8dde5c505c@eucas1p1.samsung.com>
+	<001801d2fb03$811079e0$83316da0$@samsung.com>
+	<CAFEAcA8FAp6TvY+DBVGzYVizLw9iarPQMLRw3haNxtFeEBYjHg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8FAp6TvY+DBVGzYVizLw9iarPQMLRw3haNxtFeEBYjHg@mail.gmail.com>
+Date: Wed, 12 Jul 2017 16:36:14 +0100
+Message-ID: <877ezd8y6p.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="b7bmxef45lqsd36e"
-Content-Disposition: inline
-In-Reply-To: <20170712151501.GG4917@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] block: remove bdrv_media_changed
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] target/arm: Fix abort on exception return from
+ AArch64 to AArch32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jaroslaw Pelczar <j.pelczar@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>
 
 
---b7bmxef45lqsd36e
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Wed, Jul 12, 2017 at 05:15:01PM +0200, Kevin Wolf wrote:
->Am 12.07.2017 um 09:41 hat Markus Armbruster geschrieben:
->> Eric Blake <eblake@redhat.com> writes:
+> On 12 July 2017 at 12:39, Jaroslaw Pelczar <j.pelczar@samsung.com> wrote:
+>> Problem manifests itself when we handle the following sequence:
 >>
->> > On 07/11/2017 11:37 AM, Manos Pitsidianakis wrote:
->> >> This function is not used anywhere, so remove it.
->> >>
->> >
->> > Might be interesting to figure out when it WAS last used.
+>> 1. 64-bit Secure EL3 returns to 32-bit Secure EL1
+>> 2. 32-bit Secure EL1 performs SMC call to 64-bit Secure EL3
+>> 3. 64-bit Secure EL3 performs return ERET to 32-bit Secure EL1]
+>> 4. 32-bit Secure EL1 receives prefetch abort
 >>
->> Yes.  When I see "remove X because it's unused" during patch review, I
->> immediately ask "why is it unused now, and what was it used for
->> previously?"  Ideally, the commit message answers these questions
->> preemptively.
+>> If CPU's env->pc is not set to the same value as env->regs[15],
+>> during ERET the simulator will try to fetch instruction from EL3's
+>> virtual address inside 32-bit Secure EL1 virtual address space.
+>> This will cause Prefetch Abort in 32-bit Secure EL1.
 >>
->> >                                                            If I grepped
->> > correctly, it was commit 21fcf360 back in May 2012?
+>> Problem occurs because of the following code generation scheme:
 >>
->> Yes.  "fdc: simplify media change handling".  I suspect that commit
->> broke media change for passed-through host floppy.
+>> 1. disas_uncond_b_reg will decode ERET
+>> 2. gen_helper_exception_return(cpu_env) will generate thunk to
+>>    helper_exception_return
+>> 3. s->is_jmp is set to DISAS_JUMP
+>> 4. gen_intermediate_code_a64 will see dc->is_jmp == DISAS_JUMP
+>> 5. tcg_gen_lookup_and_goto_ptr(cpu_pc) will be called which trigger
+>>    access cpu->pc to fetch next opcode
 >>
->> Its only implementation went away in commit f709623 "block: Remove host
->> floppy support".
+>> At this point cpu->pc will have EL3's PC value.
 >>
->> Suggest
+>> Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
+>> ---
+>>  target/arm/op_helper.c | 3 +++
+>>  1 file changed, 3 insertions(+)
 >>
->>     block: bdrv_media_changed() is unused, remove
->>
->>     The i82078 floppy device model used to call bdrv_media_changed() to
->>     implement its media change bit when backed by a host floppy.  This
->>     went away in 21fcf36 "fdc: simplify media change handling".
->>     Probably broke host floppy media change.  Host floppy pass-through
->>     was dropped in commit f709623.  bdrv_media_changed() has never been
->>     used for anything else.  Remove it.
+>> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+>> index 2a85666..8222c19 100644
+>> --- a/target/arm/op_helper.c
+>> +++ b/target/arm/op_helper.c
+>> @@ -1027,6 +1027,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>>          } else {
+>>              env->regs[15] = env->elr_el[cur_el] & ~0x3;
+>>          }
+>> +
+>> +        env->pc = env->regs[15];
+>> +
+>>          qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+>>                        "AArch32 EL%d PC 0x%" PRIx32 "\n",
+>>                        cur_el, new_el, env->regs[15]);
 >
->Manos, if you're happy with this, I can update the commit message while
->applying the series.
+> Thanks for the bug report. I don't think this is the best
+> fix, though. What should happen is that for ERET we do
+> not attempt to do a lookup_and_goto_ptr(), we should just
+> go back out to the main loop and get the next TB from there.
+>
+> I think this may be fixed as one of the things Alex's
+> recent patchset tackles?
 
-Of course, no problem.
-Thanks!
+Yes, see:
 
---b7bmxef45lqsd36e
-Content-Type: application/pgp-signature; name="signature.asc"
+  https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg02963.html
 
------BEGIN PGP SIGNATURE-----
+I'll probably get v4 out tomorrow at which point you can merge it ;-)
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllmQSoACgkQc2J8L2kN
-9xA70A//QmHe7995XDYOQzmygwtmf1AltEtwa8EdNH7+EUIrYTWaKP1WBvpeZj4g
-TGOfC0nxrd94OmYQmGOMjr31tFJ2gY1AdqizyqNWviKcafJNlCAkui3wEI201WSL
-34EKbz+TgYKwgD7NxAlxqnIQYoiUZ6HTwTICvDIuq/BDbONlslJUcmyG7TFTbg6I
-S+dSWpZrokg30f5DEFIiu13lT3bcO+eVyZoyvi3W8/GskqfqgQT5vMzztqpc2f7+
-Vqc9EKCYVtsAiIWlLJ1pZQJf7Y3MJ/fiYnfXgehGl6VMDyllkSMHtID4g7YnGVeN
-XUY97boXtlQO+A6oopAupWvnAdUL+KuXYtAgsUFbyjKgaXq1PMaeYFuCemcpOGB6
-0mHjZkTjSBCF2AiYysrtdA8749pKtlCYW2LMkzZ+BmvW//VQ5/cmOUryzR3J9Qbc
-8UFcDlx0ug2Z7EwSoT9MrIsMKbVK+kogFYLcXhPlOo4dud2USdRIpezVt5d5u3oe
-8auTyiL6r1FXlEgffct8jKiuuDpP2NCFRE4IfuXHe10lPQ+FxozRSVS9cIXDjk2Y
-cP3kfbjeDADWwqvwcy/Y/dKCozSOoqesuwD1KKXq9dZSNsGco99WsgoX92Xe/jJZ
-55T2SB8jB4v38i9CPRE5CdK4VMpByaG4OVP7bD/nHIgy3lxAcGA=
-=Mivj
------END PGP SIGNATURE-----
+>
+> thanks
+> -- PMM
 
---b7bmxef45lqsd36e--
+
+--
+Alex Bennée
