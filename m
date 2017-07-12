@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDL-0006Vm-2R
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDK-0006VZ-W6
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDG-0000zh-8F
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDG-0000zY-6f
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:57:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32833)
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55034
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVHDF-0000ys-VB
+	id 1dVHDG-0000zD-0Q
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:57:54 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6CCs5vO063414
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:51 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6CCs6Xv131818
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:53 -0400
 Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncjassut-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bncj59qbj-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:51 -0400
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:53 -0400
 Received: from localhost
 	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 12 Jul 2017 13:57:49 +0100
+	Wed, 12 Jul 2017 13:57:51 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 12 Jul 2017 14:57:35 +0200
+Date: Wed, 12 Jul 2017 14:57:44 +0200
 In-Reply-To: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
 References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1499864265-144136-2-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 01/11] s390x/kvm: Rework cmma management
+Message-Id: <1499864265-144136-11-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 10/11] s390x/sic: realize SIC handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,105 +39,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Janosch Frank <frankja@linux.vnet.ibm.com>
+From: Fei Li <sherrylf@linux.vnet.ibm.com>
 
-Let's keep track of cmma enablement and move the mem_path check into
-the actual enablement. This now also warns users that do not use
-cpu-models about disabled cmma when using huge pages.
+Currently, we do nothing for the SIC instruction, but we need to
+implement it properly. Let's add proper handling in the backend code.
 
-Signed-off-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+Co-authored-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- target/s390x/cpu.h |  1 +
- target/s390x/kvm.c | 26 +++++++++++++++++---------
- 2 files changed, 18 insertions(+), 9 deletions(-)
+ hw/s390x/css.c         | 26 ++++++++++++++++++++++++++
+ hw/s390x/trace-events  |  1 +
+ include/hw/s390x/css.h |  2 ++
+ target/s390x/kvm.c     | 16 +++++++++++++++-
+ 4 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index bdb9bdb..8ab75c0 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -1158,6 +1158,7 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
-                                     int vq, bool assign);
- int kvm_s390_cpu_restart(S390CPU *cpu);
- int kvm_s390_get_memslot_count(KVMState *s);
-+int kvm_s390_cmma_active(void);
- void kvm_s390_cmma_reset(void);
- int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state);
- void kvm_s390_reset_vcpu(S390CPU *cpu);
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index a3d0019..7a2a7c0 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -140,6 +140,8 @@ static int cap_mem_op;
- static int cap_s390_irq;
- static int cap_ri;
- 
-+static int active_cmma;
-+
- static void *legacy_s390_alloc(size_t size, uint64_t *align);
- 
- static int kvm_s390_query_mem_limit(KVMState *s, uint64_t *memory_limit)
-@@ -177,6 +179,11 @@ int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit)
-     return kvm_vm_ioctl(s, KVM_SET_DEVICE_ATTR, &attr);
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 1fcbc84..7b82176 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -521,6 +521,32 @@ void css_conditional_io_interrupt(SubchDev *sch)
+     }
  }
  
-+int kvm_s390_cmma_active(void)
++int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
 +{
-+    return active_cmma;
++    S390FLICState *fs = s390_get_flic();
++    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
++    int r;
++
++    if (env->psw.mask & PSW_MASK_PSTATE) {
++        r = -PGM_PRIVILEGED;
++        goto out;
++    }
++
++    trace_css_do_sic(mode, isc);
++    switch (mode) {
++    case SIC_IRQ_MODE_ALL:
++    case SIC_IRQ_MODE_SINGLE:
++        break;
++    default:
++        r = -PGM_OPERAND;
++        goto out;
++    }
++
++    r = fsc->modify_ais_mode(fs, isc, mode) ? -PGM_OPERATION : 0;
++out:
++    return r;
 +}
 +
- static bool kvm_s390_cmma_available(void)
+ void css_adapter_interrupt(uint8_t isc)
  {
-     static bool initialized, value;
-@@ -197,7 +204,7 @@ void kvm_s390_cmma_reset(void)
-         .attr = KVM_S390_VM_MEM_CLR_CMMA,
-     };
+     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+diff --git a/hw/s390x/trace-events b/hw/s390x/trace-events
+index 84ea964..f07e974 100644
+--- a/hw/s390x/trace-events
++++ b/hw/s390x/trace-events
+@@ -8,6 +8,7 @@ css_new_image(uint8_t cssid, const char *default_cssid) "CSS: add css image %02x
+ css_assign_subch(const char *do_assign, uint8_t cssid, uint8_t ssid, uint16_t schid, uint16_t devno) "CSS: %s %x.%x.%04x (devno %04x)"
+ css_io_interrupt(int cssid, int ssid, int schid, uint32_t intparm, uint8_t isc, const char *conditional) "CSS: I/O interrupt on sch %x.%x.%04x (intparm %08x, isc %x) %s"
+ css_adapter_interrupt(uint8_t isc) "CSS: adapter I/O interrupt (isc %x)"
++css_do_sic(uint16_t mode, uint8_t isc) "CSS: set interruption mode %x on isc %x"
  
--    if (mem_path || !kvm_s390_cmma_available()) {
-+    if (!kvm_s390_cmma_active()) {
-         return;
-     }
+ # hw/s390x/virtio-ccw.c
+ virtio_ccw_interpret_ccw(int cssid, int ssid, int schid, int cmd_code) "VIRTIO-CCW: %x.%x.%04x: interpret command %x"
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index e028960..5ee6d52 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -12,6 +12,7 @@
+ #ifndef CSS_H
+ #define CSS_H
  
-@@ -213,7 +220,13 @@ static void kvm_s390_enable_cmma(void)
-         .attr = KVM_S390_VM_MEM_ENABLE_CMMA,
-     };
++#include "cpu.h"
+ #include "hw/s390x/adapter.h"
+ #include "hw/s390x/s390_flic.h"
+ #include "hw/s390x/ioinst.h"
+@@ -165,6 +166,7 @@ typedef enum {
+     CSS_IO_ADAPTER_TYPE_NUMS,
+ } CssIoAdapterType;
  
-+    if (mem_path) {
-+        error_report("Warning: CMM will not be enabled because it is not "
-+                     "compatible to hugetlbfs.");
-+        return;
++int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode);
+ uint32_t css_get_adapter_id(CssIoAdapterType type, uint8_t isc);
+ void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
+                               uint8_t flags, Error **errp);
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 7a2a7c0..78ebe83 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1206,7 +1206,21 @@ static int kvm_stpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
+ 
+ static int kvm_sic_service_call(S390CPU *cpu, struct kvm_run *run)
+ {
+-    /* NOOP */
++    CPUS390XState *env = &cpu->env;
++    uint8_t r1 = (run->s390_sieic.ipa & 0x00f0) >> 4;
++    uint8_t r3 = run->s390_sieic.ipa & 0x000f;
++    uint8_t isc;
++    uint16_t mode;
++    int r;
++
++    cpu_synchronize_state(CPU(cpu));
++    mode = env->regs[r1] & 0xffff;
++    isc = (env->regs[r3] >> 27) & 0x7;
++    r = css_do_sic(env, isc, mode);
++    if (r) {
++        enter_pgmcheck(cpu, -r);
 +    }
-     rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-+    active_cmma = !rc;
-     trace_kvm_enable_cmma(rc);
++
+     return 0;
  }
  
-@@ -2641,7 +2654,7 @@ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
- 
-     if (!model) {
-         /* compatibility handling if cpu models are disabled */
--        if (kvm_s390_cmma_available() && !mem_path) {
-+        if (kvm_s390_cmma_available()) {
-             kvm_s390_enable_cmma();
-         }
-         return;
-@@ -2672,13 +2685,8 @@ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
-         error_setg(errp, "KVM: Error configuring CPU subfunctions: %d", rc);
-         return;
-     }
--    /* enable CMM via CMMA - disable on hugetlbfs */
-+    /* enable CMM via CMMA */
-     if (test_bit(S390_FEAT_CMM, model->features)) {
--        if (mem_path) {
--            error_report("Warning: CMM will not be enabled because it is not "
--                         "compatible to hugetlbfs.");
--        } else {
--            kvm_s390_enable_cmma();
--        }
-+        kvm_s390_enable_cmma();
-     }
- }
 -- 
 2.7.4
