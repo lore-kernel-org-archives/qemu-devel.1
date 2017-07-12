@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVH5p-0008GX-Bj
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1dVH5q-0008HZ-BX
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVH5o-0004Ml-JT
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48154)
+	(envelope-from <thuth@redhat.com>) id 1dVH5p-0004N4-22
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVH5o-0004MB-DQ
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVH5o-0004MW-Ov
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:12 -0400
-Date: Wed, 12 Jul 2017 13:50:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170712125001.GC30658@work-vm>
-References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] migration: s390x css migration
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 12 Jul 2017 14:49:43 +0200
+Message-Id: <1499863793-18627-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <1499863793-18627-1-git-send-email-thuth@redhat.com>
+References: <1499863793-18627-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 01/11] pc-bios/s390-ccw: Move libc functions
+ to separate header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +24,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Like for v2 the scope of this patch series is now limited to decoupling
-> channel subsystem migration from the migration of virtio-ccw proxies.
-> 
-> There wasn't a whole lot of criticism regarding v2, so very little
-> changed since then. All issues identified in the previous round were
-> addressed as agreed upon. I hope this series is now good for 2.10.
-> 
-> @Dave You helped me quite a lot with these, thanks a lot! I could not
-> find any r-b's or similar form you so if you would like to take the
-> well deserved credit for your work...
+The upcoming netboot code will use the libc from SLOF. To be able
+to still use s390-ccw.h there, the libc related functions in this
+header have to be moved to a different location.
+And while we're at it, remove the duplicate memcpy() function from
+sclp.c.
 
-No problem, as long as we've got a happy migration that's enough,
-and we've finally got VMSTATE_QTAILQ used as well.
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/bootmap.c     |  1 +
+ pc-bios/s390-ccw/libc.h        | 45 ++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/main.c        |  1 +
+ pc-bios/s390-ccw/s390-ccw.h    | 29 ---------------------------
+ pc-bios/s390-ccw/sclp.c        | 10 ++--------
+ pc-bios/s390-ccw/virtio-scsi.c |  1 +
+ pc-bios/s390-ccw/virtio.c      |  1 +
+ 7 files changed, 51 insertions(+), 37 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/libc.h
 
-Dave
-
-> v2 --> v3:
-> * rebased onto current master, since 's390x: vmstatify config migration
->   for virtio-ccw' is already there we don't need it here any more
-> * added ack's and r-b'
-> * got rid of loads of nits (thanks Connie and Thomas)
-> * added explanation why certain members are not migrated
-> 
-> v1 --> v2:
-> * Split out the vmystatify virtio-ccw part, reorganize
-> * Use WITH_TMP instead of one-shot VMStateInfo's
-> 
-> Halil Pasic (6):
->   s390x: add helper get_machine_class
->   s390x: add css_migration_enabled to machine class
->   s390x/css: add missing css state conditionally
->   s390x/css: add ORB to SubchDev
->   s390x/css: activate ChannelSubSys migration
->   s390x/css: use SubchDev.orb
-> 
->  hw/intc/s390_flic.c                |  20 ++++++
->  hw/s390x/css.c                     | 144 +++++++++++++++++++++++++++++++++----
->  hw/s390x/s390-virtio-ccw.c         |  58 +++++++++------
->  include/hw/s390x/css.h             |  11 ++-
->  include/hw/s390x/s390-virtio-ccw.h |   7 ++
->  5 files changed, 199 insertions(+), 41 deletions(-)
-> 
-> -- 
-> 2.11.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 523fa78..458d3da 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "bootmap.h"
+ #include "virtio.h"
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+new file mode 100644
+index 0000000..0142ea8
+--- /dev/null
++++ b/pc-bios/s390-ccw/libc.h
+@@ -0,0 +1,45 @@
++/*
++ * libc-style definitions and functions
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
++
++#ifndef S390_CCW_LIBC_H
++#define S390_CCW_LIBC_H
++
++typedef long               size_t;
++typedef int                bool;
++typedef unsigned char      uint8_t;
++typedef unsigned short     uint16_t;
++typedef unsigned int       uint32_t;
++typedef unsigned long long uint64_t;
++
++static inline void *memset(void *s, int c, size_t n)
++{
++    int i;
++    unsigned char *p = s;
++
++    for (i = 0; i < n; i++) {
++        p[i] = c;
++    }
++
++    return s;
++}
++
++static inline void *memcpy(void *s1, const void *s2, size_t n)
++{
++    uint8_t *dest = s1;
++    const uint8_t *src = s2;
++    int i;
++
++    for (i = 0; i < n; i++) {
++        dest[i] = src[i];
++    }
++
++    return s1;
++}
++
++#endif
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 1cacc1b..40cba8d 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ 
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 2089274..43e2d42 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -18,12 +18,6 @@ typedef unsigned short     u16;
+ typedef unsigned int       u32;
+ typedef unsigned long long u64;
+ typedef unsigned long      ulong;
+-typedef long               size_t;
+-typedef int                bool;
+-typedef unsigned char      uint8_t;
+-typedef unsigned short     uint16_t;
+-typedef unsigned int       uint32_t;
+-typedef unsigned long long uint64_t;
+ typedef unsigned char      __u8;
+ typedef unsigned short     __u16;
+ typedef unsigned int       __u32;
+@@ -88,18 +82,6 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
+ 
+-static inline void *memset(void *s, int c, size_t n)
+-{
+-    int i;
+-    unsigned char *p = s;
+-
+-    for (i = 0; i < n; i++) {
+-        p[i] = c;
+-    }
+-
+-    return s;
+-}
+-
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
+@@ -169,17 +151,6 @@ static inline void sleep(unsigned int seconds)
+     }
+ }
+ 
+-static inline void *memcpy(void *s1, const void *s2, size_t n)
+-{
+-    uint8_t *p1 = s1;
+-    const uint8_t *p2 = s2;
+-
+-    while (n--) {
+-        p1[n] = p2[n];
+-    }
+-    return s1;
+-}
+-
+ static inline void IPL_assert(bool term, const char *message)
+ {
+     if (!term) {
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index a1639ba..aa1c862 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "sclp.h"
+ 
+@@ -59,13 +60,6 @@ static int _strlen(const char *str)
+     return i;
+ }
+ 
+-static void _memcpy(char *dest, const char *src, int len)
+-{
+-    int i;
+-    for (i = 0; i < len; i++)
+-        dest[i] = src[i];
+-}
+-
+ void sclp_print(const char *str)
+ {
+     int len = _strlen(str);
+@@ -76,7 +70,7 @@ void sclp_print(const char *str)
+     sccb->ebh.length = sizeof(EventBufferHeader) + len;
+     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
+     sccb->ebh.flags = 0;
+-    _memcpy(sccb->data, str, len);
++    memcpy(sccb->data, str, len);
+ 
+     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+ }
+diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+index f61ecf0..c92f5d3 100644
+--- a/pc-bios/s390-ccw/virtio-scsi.c
++++ b/pc-bios/s390-ccw/virtio-scsi.c
+@@ -9,6 +9,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "scsi.h"
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index 6ee93d5..8768331 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "virtio-scsi.h"
+-- 
+1.8.3.1
