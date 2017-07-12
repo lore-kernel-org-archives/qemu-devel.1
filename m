@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVNJz-0008Ro-0p
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 15:29:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVNZT-0003v6-9D
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 15:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVNJv-0007tl-RX
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 15:29:14 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36092)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dVNJv-0007tW-M7
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 15:29:11 -0400
-Received: by mail-qk0-x243.google.com with SMTP id v17so3050958qka.3
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 12:29:11 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 12 Jul 2017 09:29:02 -1000
-Message-Id: <20170712192902.15493-1-rth@twiddle.net>
-In-Reply-To: <CAPybu_0+enKVGf-bZHrkvWQ8reFtJnkKC=sucr2aaZ_DidaHNA@mail.gmail.com>
-References: <CAPybu_0+enKVGf-bZHrkvWQ8reFtJnkKC=sucr2aaZ_DidaHNA@mail.gmail.com>
-Subject: [Qemu-devel] [PATCH v2] target/i386: Fix BLSR and BLSI
+	(envelope-from <ehabkost@redhat.com>) id 1dVNZQ-00079u-3d
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 15:45:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVNZP-00079J-QI
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 15:45:12 -0400
+Date: Wed, 12 Jul 2017 16:45:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170712194504.GM6020@localhost.localdomain>
+References: <cover.1499774331.git.alistair.francis@xilinx.com>
+	<b80b284089ce9d4664a5014b65266c0e25e40072.1499774331.git.alistair.francis@xilinx.com>
+	<874lui9eog.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <874lui9eog.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] hw/i386: Improve some of the
+ warning messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +29,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ricardo.ribalda@gmail.com, ehabkost@redhat.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-The implementation of these two instructions was swapped.
-At the same time, unify the setup of eflags for the insn group.
+On Wed, Jul 12, 2017 at 11:39:59AM +0200, Markus Armbruster wrote:
+> Alistair Francis <alistair.francis@xilinx.com> writes:
+> 
+> > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> You forgot to cc: Eduardo.  Fixed.
+> 
+> > ---
+> >
+> >  hw/i386/acpi-build.c | 7 ++++---
+> >  hw/i386/pc.c         | 9 ++++-----
+> >  hw/i386/pc_q35.c     | 4 ++--
+> >  3 files changed, 10 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 6b7bade183..f9efb6be41 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -2766,7 +2766,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> >                       ACPI_BUILD_ALIGN_SIZE);
+> >          if (tables_blob->len > legacy_table_size) {
+> >              /* Should happen only with PCI bridges and -M pc-i440fx-2.0.  */
+> > -            warn_report("migration may not work.");
+> > +            warn_report("ACPI tables are larger than legacy_table_size");
+> > +            warn_report("migration may not work");
+> 
+> The user has no idea what legacy_table_size means, what its value might
+> be, or what he can do to reduce it.
+> 
+> Recommend
+> 
+>                warn_report("ACPI tables too large, migration may not work");
+> 
+> If the user can do something to reduce the table size, printing suitable
+> hints would be nice.  Printing both tables_blob->len and
+> legacy_table_size might also help then.
+> 
+> >          }
+> >          g_array_set_size(tables_blob, legacy_table_size);
+> >      } else {
+> > @@ -2774,9 +2775,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+> >          if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
+> >              /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
+> >              warn_report("ACPI tables are larger than 64k.");
+> 
+> The warning text hardcodes the value of ACPI_BUILD_TABLE_SIZE / 2.  Not
+> nice.  Clean up while there?
+> 
+> > -            warn_report("migration may not work.");
+> > +            warn_report("migration may not work");
+> >              warn_report("please remove CPUs, NUMA nodes, "
+> > -                        "memory slots or PCI bridges.");
+> > +                        "memory slots or PCI bridges");
+> 
+> Aha, here's what the user can do.
+> 
+> What about:
+> 
+>                warn_report("ACPI tables are large, migration may not work");
+>                error_printf("Try removing CPUs, NUMA nodes, memory slots"
+>                             " or PCI bridges.");
+> 
+> If we want to show actual size and limit, then this might do instead:
+> 
+>                warn_report("ACPI table size %u exceeds %d bytes,"
+>                            " migration may not work",
+>                            tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
+>                error_printf("Try removing CPUs, NUMA nodes, memory slots"
+>                             " or PCI bridges.");
 
-Reported-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/i386/translate.c | 26 +++++++++-----------------
- 1 file changed, 9 insertions(+), 17 deletions(-)
+Yep, this suggestion is good for both cases: the check
+(ACPI_BUILD_TABLE_SIZE / 2), and the check for legacy_table_size.
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 9d5f1c3..69d3787 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4031,34 +4031,26 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
-                 ot = mo_64_32(s->dflag);
-                 gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
- 
-+                tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
-                 switch (reg & 7) {
-                 case 1: /* blsr By,Ey */
--                    tcg_gen_neg_tl(cpu_T1, cpu_T0);
-+                    tcg_gen_subi_tl(cpu_T1, cpu_T0, 1);
-                     tcg_gen_and_tl(cpu_T0, cpu_T0, cpu_T1);
--                    gen_op_mov_reg_v(ot, s->vex_v, cpu_T0);
--                    gen_op_update2_cc();
--                    set_cc_op(s, CC_OP_BMILGB + ot);
-                     break;
--
-                 case 2: /* blsmsk By,Ey */
--                    tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
--                    tcg_gen_subi_tl(cpu_T0, cpu_T0, 1);
--                    tcg_gen_xor_tl(cpu_T0, cpu_T0, cpu_cc_src);
--                    tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
--                    set_cc_op(s, CC_OP_BMILGB + ot);
-+                    tcg_gen_subi_tl(cpu_T1, cpu_T0, 1);
-+                    tcg_gen_xor_tl(cpu_T0, cpu_T0, cpu_T1);
-                     break;
--
-                 case 3: /* blsi By, Ey */
--                    tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
--                    tcg_gen_subi_tl(cpu_T0, cpu_T0, 1);
--                    tcg_gen_and_tl(cpu_T0, cpu_T0, cpu_cc_src);
--                    tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
--                    set_cc_op(s, CC_OP_BMILGB + ot);
-+                    tcg_gen_neg_tl(cpu_T1, cpu_T0);
-+                    tcg_gen_and_tl(cpu_T0, cpu_T0, cpu_T1);
-                     break;
--
-                 default:
-                     goto unknown_op;
-                 }
-+                tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
-+                gen_op_mov_reg_v(ot, s->vex_v, cpu_T0);
-+                set_cc_op(s, CC_OP_BMILGB + ot);
-                 break;
- 
-             default:
+> 
+> >          }
+> >          acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
+> >      }
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index 465e91cc5b..084ca796c2 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -383,8 +383,8 @@ ISADevice *pc_find_fdc0(void)
+> >      if (state.multiple) {
+> >          warn_report("multiple floppy disk controllers with "
+> >                      "iobase=0x3f0 have been found");
+> > -        error_printf("the one being picked for CMOS setup might not reflect "
+> > -                     "your intent\n");
+> > +        warn_report("the one being picked for CMOS setup might not reflect "
+> > +                    "your intent");
+> 
+> Please keep error_printf() here.
+> 
+
+I think I suggested warn_report() here for consistency, because I
+have seen other cases where multiple warn_report() calls were
+used.  We probably want to change those other cases like you
+suggested above.
+
+> >      }
+> >  
+> >      return state.floppy;
+> > @@ -2087,9 +2087,8 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
+> >      }
+> >  
+> >      if (value < (1ULL << 20)) {
+> > -        warn_report("small max_ram_below_4g(%"PRIu64
+> > -                    ") less than 1M.  BIOS may not work..",
+> > -                    value);
+> > +        warn_report("max_ram_below_4g (%" PRIu64 ") is less than 1M; "
+> > +                    "BIOS may not work.", value);
+> 
+> The user has no idea what max_ram_below_4g might be.  Suggest:
+> 
+>            warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
+>                        "BIOS may not work with less than 1MiB");
+
+Actually, the user probably knows what it is, because this setter
+will be invoked only if "-M max-ram-below-4g=..." is used in the
+command-line.  We should fix the spelling to "max-ram-below-4g",
+though.
+
+> 
+> >      }
+> >  
+> >      pcms->max_ram_below_4g = value;
+> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> > index 1653a47f0a..682c576cf1 100644
+> > --- a/hw/i386/pc_q35.c
+> > +++ b/hw/i386/pc_q35.c
+> > @@ -101,8 +101,8 @@ static void pc_q35_init(MachineState *machine)
+> >          lowmem = pcms->max_ram_below_4g;
+> >          if (machine->ram_size - lowmem > lowmem &&
+> >              lowmem & ((1ULL << 30) - 1)) {
+> > -            warn_report("Large machine and max_ram_below_4g(%"PRIu64
+> > -                        ") not a multiple of 1G; possible bad performance.",
+> > +            warn_report("Large machine and max_ram_below_4g (%"PRIu64") not a "
+> > +                        "multiple of 1G; possible bad performance.",
+> 
+> Space between string literal and PRIu64, please.
+> 
+> The user has no idea what max_ram_below_4g might be, [...]
+
+Same as above: the warning should appear only if the user set
+"max-ram-below-4g" explicitly, so the user probably knows what it
+is.
+
+>                                                [...] or what makes the
+> machine "large".
+
+True.
+
+> 
+> >                          pcms->max_ram_below_4g);
+> >          }
+> >      }
+
 -- 
-2.9.4
+Eduardo
