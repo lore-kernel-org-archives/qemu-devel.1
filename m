@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dVL07-0000bc-1y
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:00:36 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dVL0K-0000l2-TS
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dVL03-0007qg-6w
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:00:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60370)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dVL03-0007qX-11
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:00:31 -0400
-References: <1499850727-50728-1-git-send-email-peng.hao2@zte.com.cn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7cdaad86-333a-4b7b-1c91-09ad6e036ecd@redhat.com>
-Date: Wed, 12 Jul 2017 19:00:26 +0200
+	(envelope-from <mreitz@redhat.com>) id 1dVL0J-00087R-GB
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:00:48 -0400
+References: <20170511182705.23648-1-jsnow@redhat.com>
+	<19a665be-12c2-2876-0438-08327d94473e@redhat.com>
+	<6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
+	<815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
+	<de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
+	<ea023ed7-4925-b338-8636-435103ce757b@redhat.com>
+	<20170516081703.GB4438@noname.redhat.com>
+	<48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
+	<dd12265d-e764-34ee-8d1e-504f27b78614@redhat.com>
+	<20170712145634.GF4917@noname.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5b0adf36-60c4-192c-4f30-a8c1d681f50d@redhat.com>
+Date: Wed, 12 Jul 2017 19:00:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <1499850727-50728-1-git-send-email-peng.hao2@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target-i386:kvm_get/put_vcpu_events don't
- handle sipi_vector
+In-Reply-To: <20170712145634.GF4917@noname.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kNEcor4M8WuDV0jO11CJCaReNdJACTnI3"
+Subject: Re: [Qemu-devel] [PATCH v4] qemu-img: Check for backing image if
+ specified during create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +33,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peng Hao <peng.hao2@zte.com.cn>, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, "J. Kiszka" <jan.kiszka@siemens.com>
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 12/07/2017 11:12, Peng Hao wrote:
-> qemu call kvm_get_vcpu_events, and kernel return sipi_vector always 0,
-> never valid when reporting to user space. But qemu call kvm_put_vcpu_ev=
-ents
-> will make sipi_vector in kernel be 0. This will accidently modify sipi_=
-vector
-> when sipi_vector in kernel is not 0.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kNEcor4M8WuDV0jO11CJCaReNdJACTnI3
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <5b0adf36-60c4-192c-4f30-a8c1d681f50d@redhat.com>
+Subject: Re: [PATCH v4] qemu-img: Check for backing image if specified during
+ create
+References: <20170511182705.23648-1-jsnow@redhat.com>
+ <19a665be-12c2-2876-0438-08327d94473e@redhat.com>
+ <6b8d6c51-d849-75fa-59c1-dd256471c0dc@redhat.com>
+ <815d2530-7767-0f1d-d9d4-3b6c8de0260b@redhat.com>
+ <de0c59c3-2516-db0e-1a02-99b3ea0a0a65@redhat.com>
+ <ea023ed7-4925-b338-8636-435103ce757b@redhat.com>
+ <20170516081703.GB4438@noname.redhat.com>
+ <48a7f2f9-5f79-f944-71ce-2a988e5d468b@redhat.com>
+ <dd12265d-e764-34ee-8d1e-504f27b78614@redhat.com>
+ <20170712145634.GF4917@noname.str.redhat.com>
+In-Reply-To: <20170712145634.GF4917@noname.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-07-12 16:56, Kevin Wolf wrote:
+> Am 12.07.2017 um 16:42 hat Eric Blake geschrieben:
+>> On 05/17/2017 07:38 AM, Max Reitz wrote:
+>>
+>>>>>>>>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1213786
+>>>>>>>>>>
+>>>>>>>>>> Or, rather, force the open of a backing image if one was speci=
+fied
+>>>>>>>>>> for creation. Using a similar -unsafe option as rebase, allow =
+qemu-img
+>>>>>>>>>> to ignore the backing file validation if possible.
+>>>>>>>>>>
+>>>>>>>>
+>>
+>>>>> I suspect this is because the backing file is opened somewhere and
+>>>>> trying to open it breaks now with the locking series applied.
+>>>>
+>>>> I think we can legitimately set force-shared=3Don for opening the ba=
+cking
+>>>> file when testing whether the file exists.
+>>>
+>>> For testing whether the file exists, probably. I wouldn't call it
+>>> legitimately because I don't like making that the default at all, but=
+ it
+>>> should work.
+>>>
+>>> But then we have to differentiate between testing whether the file
+>>> exists and opening it to read its size; I'm even more wary regarding =
+the
+>>> latter.
+>>>
+>>> All in all, I've stated my opinion on this matter on IRC: I don't kno=
+w
+>>> how much we need this patch. It's nice to have, it's convenient to kn=
+ow
+>>> you have mistyped the backing filename before you try to use the imag=
+e
+>>> in qemu, but it's not critical. I don't consider the current behavior=
+ a
+>>> bug per-se, it's just counterintuitive behavior (that will not cut yo=
+ur
+>>> head off if you don't know it, though!).
+>>>
+>>
+>> The fact that this topic came up on the mailing list again means we
+>> should probably consider something along these lines for 2.10.
+>>
+>>> (Also, we have a lot of counterintuitive behavior. See this:
+>>>
+>>> $ qemu-img create -f qcow2 sub/backing.qcow2 64M
+>>> Formatting 'sub/backing.qcow2', fmt=3Dqcow2 size=3D67108864 encryptio=
+n=3Doff
+>>> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+>>> $ qemu-img create -f qcow2 -b sub/backing.qcow2 sub/top.qcow2
+>>> qemu-img: sub/top.qcow2: Could not open 'sub/sub/backing.qcow2': No s=
+uch
+>>> file or directory
+>>>
+>>> Yeah, sure, you'll know after you've done the mistake once. But the s=
+ame
+>>> applies here, too, doesn't it...?)
+>>>
+>>> So for me, it's a question of convenience: How much does the current
+>>> behavior annoy users? How much annoyance will changing the behavior
+>>> bring? I'm not (or rather, no longer) convinced the former outweighs =
+the
+>>> latter, especially since it means having to change management tools
+>>> (which create external snapshots with qemu-img create while the backi=
+ng
+>>> image is in use by qemu).
+>>>
+>>> If you think otherwise, well, you're the main maintainer. :-)
+>>>
+>>> Max
+>>>
+>>>
+>>> PS: Can there be a middle ground? Like just printing a warning if the=
+
+>>> backing file cannot be opened and we don't absolutely have to?
+>>
+>> Middle ground may be harder, but may be nicer (especially since we are=
+
+>> talking about tightening behavior, making things that used to work now=
+
+>> fail is not nice if there is not a transition period where it first ju=
+st
+>> warns).
 >=20
-> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> Reviewed-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> ---
->  target/i386/kvm.c | 3 ---
->  1 file changed, 3 deletions(-)
->=20
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index f84a49d..bbbd696 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -2417,7 +2417,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int l=
-evel)
->      events.nmi.masked =3D !!(env->hflags2 & HF2_NMI_MASK);
->      events.nmi.pad =3D 0;
-> =20
-> -    events.sipi_vector =3D env->sipi_vector;
->      events.flags =3D 0;
-> =20
->      if (has_msr_smbase) {
+> We can do the nowadays usual thing: Add a -u option, print a deprecatio=
+n
+> warning if we don't have -u and can't open the backing file, and put
+> it into the list of things to remove in 3.0.
 
-This should clear KVM_VCPUEVENT_VALID_SIPI_VECTOR in the "if" statement
-below.  Otherwise, you're passing a random value to the kernel.
+Works for me.
 
-> @@ -2506,8 +2505,6 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
->          }
->      }
-> =20
-> -    env->sipi_vector =3D events.sipi_vector;
-> -
->      return 0;
->  }
-> =20
->=20
+Max
 
-I think what you're seeing is a race like this:
 
-	VCPU 0					VCPU 1
-	[qemu] kvm_get_mp_state
-	  [kvm] kvm_apic_accept_events
-						__apic_accept_irq
-						  set KVM_APIC_SIPI
-	[qemu] kvm_get_vcpu_events
+--kNEcor4M8WuDV0jO11CJCaReNdJACTnI3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-If this is what happens happen, the fix is to call the functions in this
-order:
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-- first kvm_get_vcpu_events
+iQEvBAEBCAAZBQJZZlWyEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQO9r
+B/4gU4r8OW2L2bTqklgPRyODQMPjRl/fkKWgIfUWzc79dg9bKi7AuySfNR7uVSc3
+bc8mZBmS350DjUrswUGM/uTw7CpIitC2m3Zog8yVpsO5sKyFZHtwlLhs/bZHMcXG
+Tct0ihQeEGrixm8h5oRa/O/KqYo6BeNUqA9Jaub717belDcZOjnON3PBlesmA4s0
+SGkMhF7hpsRrwmosXwQ51mIYva2qbnTXD5BZOSGouxQTZYmTKDmvG25Qh5rRhkXl
+y0kvJz1BucdL2abuF1ueT6p7uIOvwaErdDz+Q3CukvFU/C/WmO0MmWD2PG/LI78J
+1uNEYss3bHQc55pvRXx3USiS
+=MTSR
+-----END PGP SIGNATURE-----
 
-- then kvm_get_mp_state
-
-- then all the others.
-
-This way you have:
-
-	VCPU 0					VCPU 1
-	[qemu] kvm_get_vcpu_events
-						__apic_accept_irq
-						  set KVM_APIC_SIPI
-	[qemu] kvm_get_mp_state
-	  [kvm] kvm_apic_accept_events
-	     [kvm] kvm_vcpu_deliver_sipi_vector
-	        // this modifies CS and RIP!!!
-	[qemu] kvm_getput_regs
-	  // reads RIP
-	...
-	[qemu] kvm_getput_sregs
-	  // reads CS
-	...
-
-and the sipi_vector is never lost.
-
-Paolo
+--kNEcor4M8WuDV0jO11CJCaReNdJACTnI3--
