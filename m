@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dVG7A-00035T-Bz
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:47:35 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dVGJg-00042U-3i
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dVG77-0003kV-Oz
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:47:31 -0400
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Wed, 12 Jul 2017 14:47:00 +0300
-Message-Id: <20170712114700.20008-5-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
-References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
+	(envelope-from <no-reply@patchew.org>) id 1dVGJS-0002HA-A1
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:00:28 -0400
+Resent-Message-Id: <E1dVGJS-0002HA-A1@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21796)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dVGJS-0002FZ-1L
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:00:14 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <149986079656.66.5851167885445971279@5d477a5b5989>
+In-Reply-To: <20170712094149.23069-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v5 4/4] qemu-iotests: add shrinking image test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 12 Jul 2017 04:59:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] tests/pxe-testt: add testcase
+ using vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,217 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
+To: jfreimann@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, victork@redhat.com, mst@redhat.com
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/163.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 176 insertions(+)
- create mode 100644 tests/qemu-iotests/163
- create mode 100644 tests/qemu-iotests/163.out
-
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-new file mode 100644
-index 0000000000..403842354e
---- /dev/null
-+++ b/tests/qemu-iotests/163
-@@ -0,0 +1,170 @@
-+#!/usr/bin/env python
-+#
-+# Tests for shrinking images
-+#
-+# Copyright (c) 2016-2017 Parallels International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os, random, iotests, struct, qcow2
-+from iotests import qemu_img, qemu_io, image_size
-+
-+test_img = os.path.join(iotests.test_dir, 'test.img')
-+check_img = os.path.join(iotests.test_dir, 'check.img')
-+
-+def size_to_int(str):
-+    suff = ['B', 'K', 'M', 'G', 'T']
-+    return int(str[:-1]) * 1024**suff.index(str[-1:])
-+
-+class ShrinkBaseClass(iotests.QMPTestCase):
-+    image_len = '128M'
-+    shrink_size = '10M'
-+    chunk_size = '16M'
-+    refcount_bits = '16'
-+
-+    def __qcow2_check(self, filename):
-+        entry_bits = 3
-+        entry_size = 1 << entry_bits
-+        l1_mask = 0x00fffffffffffe00
-+        div_roundup = lambda n, d: (n + d - 1) / d
-+
-+        def split_by_n(data, n):
-+            for x in xrange(0, len(data), n):
-+                yield struct.unpack('>Q', data[x:x + n])[0] & l1_mask
-+
-+        def check_l1_table(h, l1_data):
-+            l1_list = list(split_by_n(l1_data, entry_size))
-+            real_l1_size = div_roundup(h.size,
-+                                       1 << (h.cluster_bits*2 - entry_size))
-+            used, unused = l1_list[:real_l1_size], l1_list[real_l1_size:]
-+
-+            self.assertTrue(len(used) != 0, "Verifying l1 table content")
-+            self.assertFalse(any(unused), "Verifying l1 table content")
-+
-+        def check_reftable(fd, h, reftable):
-+            for offset in split_by_n(reftable, entry_size):
-+                if offset != 0:
-+                    fd.seek(offset)
-+                    cluster = fd.read(1 << h.cluster_bits)
-+                    self.assertTrue(any(cluster), "Verifying reftable content")
-+
-+        with open(filename, "rb") as fd:
-+            h = qcow2.QcowHeader(fd)
-+
-+            fd.seek(h.l1_table_offset)
-+            l1_table = fd.read(h.l1_size << entry_bits)
-+
-+            fd.seek(h.refcount_table_offset)
-+            reftable = fd.read(h.refcount_table_clusters << h.cluster_bits)
-+
-+            check_l1_table(h, l1_table)
-+            check_reftable(fd, h, reftable)
-+
-+    def __raw_check(self, filename):
-+        pass
-+
-+    image_check = {
-+        'qcow2' : __qcow2_check,
-+        'raw' : __raw_check
-+    }
-+
-+    def setUp(self):
-+        if iotests.imgfmt == 'raw':
-+            qemu_img('create', '-f', iotests.imgfmt, test_img, self.image_len)
-+            qemu_img('create', '-f', iotests.imgfmt, check_img,
-+                     self.shrink_size)
-+        else:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     '-o', 'cluster_size=' + self.cluster_size +
-+                     ',refcount_bits=' + self.refcount_bits,
-+                     test_img, self.image_len)
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     '-o', 'cluster_size=%s'% self.cluster_size,
-+                     check_img, self.shrink_size)
-+        qemu_io('-c', 'write -P 0xff 0 ' + self.shrink_size, check_img)
-+
-+    def tearDown(self):
-+        os.remove(test_img)
-+        os.remove(check_img)
-+
-+    def image_verify(self):
-+        self.assertEqual(image_size(test_img), image_size(check_img),
-+                         "Verifying image size")
-+        self.image_check[iotests.imgfmt](self, test_img)
-+
-+        if iotests.imgfmt == 'raw':
-+            return
-+        self.assertEqual(qemu_img('check', test_img), 0,
-+                         "Verifying image corruption")
-+
-+    def test_empty_image(self):
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(
-+            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, test_img),
-+            qemu_io('-c', 'read -P 0x00 %s'%self.shrink_size, check_img),
-+            "Verifying image content")
-+
-+        self.image_verify()
-+
-+    def test_sequential_write(self):
-+        for offs in range(0, size_to_int(self.image_len),
-+                          size_to_int(self.chunk_size)):
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
-+                         "Verifying image content")
-+
-+        self.image_verify()
-+
-+    def test_random_write(self):
-+        offs_list = range(0, size_to_int(self.image_len),
-+                          size_to_int(self.chunk_size))
-+        random.shuffle(offs_list)
-+        for offs in offs_list:
-+            qemu_io('-c', 'write -P 0xff %d %s' % (offs, self.chunk_size),
-+                    test_img)
-+
-+        qemu_img('resize',  '-f', iotests.imgfmt, '--shrink', test_img,
-+                 self.shrink_size)
-+
-+        self.assertEqual(qemu_img("compare", test_img, check_img), 0,
-+                         "Verifying image content")
-+
-+        self.image_verify()
-+
-+class TestShrink512(ShrinkBaseClass):
-+    image_len = '3M'
-+    shrink_size = '1M'
-+    chunk_size = '256K'
-+    cluster_size = '512'
-+    refcount_bits = '64'
-+
-+class TestShrink64K(ShrinkBaseClass):
-+    cluster_size = '64K'
-+
-+class TestShrink1M(ShrinkBaseClass):
-+    cluster_size = '1M'
-+    refcount_bits = '1'
-+
-+ShrinkBaseClass = None
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['raw', 'qcow2'])
-diff --git a/tests/qemu-iotests/163.out b/tests/qemu-iotests/163.out
-new file mode 100644
-index 0000000000..dae404e278
---- /dev/null
-+++ b/tests/qemu-iotests/163.out
-@@ -0,0 +1,5 @@
-+.........
-+----------------------------------------------------------------------
-+Ran 9 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 2aba585287..1d985c3b45 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -166,6 +166,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+163 rw auto quick
- 165 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
--- 
-2.13.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwNzEyMDk0MTQ5LjIzMDY5LTEtamZyZWltYW5uQHJlZGhhdC5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBSRkMgMC8zXSB0ZXN0cy9weGUtdGVzdHQ6IGFkZCB0
+ZXN0Y2FzZSB1c2luZyB2aG9zdC11c2VyLWJyaWRnZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
+QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2RiYjVmOCBs
+aWJ2aG9zdC11c2VyOiBxdWl0IHdoZW4gbm8gbW9yZSBkYXRhIHJlY2VpdmVkCjg2YzRjMmIgdGVz
+dHMvcHhlLXRlc3Q6IGFkZCB0ZXN0Y2FzZSB1c2luZyB2aG9zdC11c2VyLWJyaWRnZQoxM2JlZjcx
+IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiBkaXNhYmxlIGRlYnVnIG91dHB1dCBieSBkZWZhdWx0
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IHRlc3RzL3Zob3N0LXVz
+ZXItYnJpZGdlOiBkaXNhYmxlIGRlYnVnIG91dHB1dCBieSBkZWZhdWx0Li4uCkNoZWNraW5nIFBB
+VENIIDIvMzogdGVzdHMvcHhlLXRlc3Q6IGFkZCB0ZXN0Y2FzZSB1c2luZyB2aG9zdC11c2VyLWJy
+aWRnZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjE6IEZJTEU6IHRlc3Rz
+L3B4ZS10ZXN0LmM6MjY6CisjZGVmaW5lIFFFTVVfQ01EX01FTSAgICAiLS1lbmFibGUta3ZtIC1t
+ICVkIC1vYmplY3QgbWVtb3J5LWJhY2tlbmQtZmlsZSxpZD1tZW0sc2l6ZT0lZE0sIlwKCkVSUk9S
+OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTE0OiBGSUxFOiB0
+ZXN0cy9weGUtdGVzdC5jOjc5OgorICAgIGdjaGFyICp2dWJyX2FyZ3NbXSA9IHtOVUxMLCBOVUxM
+LCBOVUxMLCBOVUxMfTsKICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
+dGhhdCAnLCcgKGN0eDpWeFYpCiMxNTc6IEZJTEU6IHRlc3RzL3B4ZS10ZXN0LmM6MTIyOgorICAg
+IGdfYXNzZXJ0X2NtcGludCAoZ19yZW1vdmUoZ19zdHJkdXBfcHJpbnRmKCIlcy8lcyIsIHRtcGZz
+LFZVQlJfU09DSykpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojMTU4OiBGSUxFOiB0ZXN0cy9weGUtdGVzdC5jOjEyMzoKK15JXkkgICAgID09LCAwKTsk
+Cgp0b3RhbDogMyBlcnJvcnMsIDEgd2FybmluZ3MsIDE0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzM6IGxpYnZo
+b3N0LXVzZXI6IHF1aXQgd2hlbiBubyBtb3JlIGRhdGEgcmVjZWl2ZWQuLi4KPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
