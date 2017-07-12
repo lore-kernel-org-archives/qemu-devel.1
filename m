@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVCXk-0002br-QZ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:58:45 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVCaj-0004nX-C2
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:01:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVCXj-0002uo-Uo
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:58:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVCXj-0002u4-OY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:58:43 -0400
-Date: Wed, 12 Jul 2017 09:58:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170712095837.69d1446f@dhcp-192-215.str.redhat.com>
-In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVCag-0005A8-9w
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:01:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55845
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dVCag-00059s-4J
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:01:46 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6C7wp7Z019003
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:01:44 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncj5euck-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:01:44 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 12 Jul 2017 04:01:43 -0400
 References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 12 Jul 2017 10:01:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
 Content-Transfer-Encoding: 7bit
+Message-Id: <0cb95894-bd35-2814-f7ff-1c9b3fcb533b@de.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH v3 0/6] migration: s390x css migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,22 +42,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 11 Jul 2017 16:54:35 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-
+On 07/11/2017 04:54 PM, Halil Pasic wrote:
 > Like for v2 the scope of this patch series is now limited to decoupling
 > channel subsystem migration from the migration of virtio-ccw proxies.
 > 
 > There wasn't a whole lot of criticism regarding v2, so very little
 > changed since then. All issues identified in the previous round were
 > addressed as agreed upon. I hope this series is now good for 2.10.
-
-I did a quick readthrough again and I agree that this series is good
-for 2.10.
-
 > 
 > @Dave You helped me quite a lot with these, thanks a lot! I could not
 > find any r-b's or similar form you so if you would like to take the
@@ -72,4 +82,5 @@ for 2.10.
 >  include/hw/s390x/css.h             |  11 ++-
 >  include/hw/s390x/s390-virtio-ccw.h |   7 ++
 >  5 files changed, 199 insertions(+), 41 deletions(-)
-> 
+
+Can you clarify what test you have done regarding compatibility migrations to 2.9 and earlier?
