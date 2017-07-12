@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dV7ex-0001qC-5h
+	(envelope-from <bounces@canonical.com>) id 1dV7ex-0001qD-8r
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 22:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dV7es-00022J-D8
+	(envelope-from <bounces@canonical.com>) id 1dV7es-00022F-Ce
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 22:45:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42532)
+Received: from indium.canonical.com ([91.189.90.7]:42531)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dV7es-00021i-4f
+	id 1dV7es-00021h-4b
 	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 22:45:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dV7ep-0000VO-Pv
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:45:43 +0000
+	id 1dV7eq-0000VP-6j
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:45:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BD53D2E80E8
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:45:43 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 310B12E80E8
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:45:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Jul 2017 02:33:31 -0000
+Date: Wed, 12 Jul 2017 02:38:20 -0000
 From: Nick Craig-Wood <nick@craig-wood.com>
 Reply-To: Bug 1696353 <1696353@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <149682692221.8383.2186201709283317126.malonedeb@gac.canonical.com>
-Message-Id: <149982681198.6717.13847187240890640368.malone@gac.canonical.com>
+Message-Id: <149982710006.24380.15830373651280270501.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1696353] Re: golang binaries fail to start under
  linux-user
@@ -39,28 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-You can also apply this patch to go - I don't have an opinion on the
-correct course of action though!
-
-diff --git a/src/runtime/os_linux.go b/src/runtime/os_linux.go
-index a6efc0e3d1..64218e3f7e 100644
---- a/src/runtime/os_linux.go
-+++ b/src/runtime/os_linux.go
-@@ -132,7 +132,8 @@ const (
- 		_CLONE_FS | /* share cwd, etc */
- 		_CLONE_FILES | /* share fd table */
- 		_CLONE_SIGHAND | /* share sig handler table */
--		_CLONE_THREAD /* revisit - okay for now */
-+		_CLONE_THREAD | /* revisit - okay for now */
-+		_CLONE_SYSVSEM
- )
- =
-
- //go:noescape
-
-
-** Bug watch added: github.com/golang/go/issues #20763
-   https://github.com/golang/go/issues/20763
+Note that there is a go bug about this issue too:
+https://github.com/golang/go/issues/20763
 
 -- =
 
