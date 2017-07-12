@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVJrl-0001tG-5D
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:47:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVJs3-00025z-S7
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVJrk-00063v-3k
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:47:53 -0400
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
-	<1499864249-26305-6-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <266aa00c-27cd-2f18-f756-844a9a321de7@redhat.com>
-Date: Wed, 12 Jul 2017 10:47:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1dVJrz-0006Eh-5x
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:48:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170609152017.7286-1-eblake@redhat.com>
+	<1298d3b1-a6d6-499b-323b-b79c6e38bc7b@msgid.tls.msk.ru>
+	<15dc487a-c340-e407-a7b0-b7159a5a49a2@redhat.com>
+Date: Wed, 12 Jul 2017 17:48:01 +0200
+In-Reply-To: <15dc487a-c340-e407-a7b0-b7159a5a49a2@redhat.com> (Eric Blake's
+	message of "Wed, 12 Jul 2017 08:56:05 -0500")
+Message-ID: <871spl4pxq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1499864249-26305-6-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SW08ENF0hA3s8p3i6K1uBDVxsHAM19pbd"
-Subject: Re: [Qemu-devel] [PATCH 5/9] block: List anonymous device BBs in
- query-block
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/2] qobject coccinelle followups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, marcandre.lureau@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SW08ENF0hA3s8p3i6K1uBDVxsHAM19pbd
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com,
- armbru@redhat.com, qemu-devel@nongnu.org
-Message-ID: <266aa00c-27cd-2f18-f756-844a9a321de7@redhat.com>
-Subject: Re: [PATCH 5/9] block: List anonymous device BBs in query-block
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
- <1499864249-26305-6-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1499864249-26305-6-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On 07/12/2017 07:57 AM, Kevin Wolf wrote:
-> Instead of listing only monitor-owned BlockBackends in query-block, als=
-o
-> add those anonymous BlockBackends that are owned by a qdev device and a=
-s
-> such under the control of the user.
->=20
-> This allows to use query-block to inspect BlockBackends for the modern
+> On 07/12/2017 08:35 AM, Michael Tokarev wrote:
+>> 09.06.2017 18:20, Eric Blake wrote:
+>>> Inspired by https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02505.html
+>>>
+>>> Surprisingly, the updated script didn't find any existing longhand
+>>> use as candidates for QDECREF() (our last such use was cleaned up
+>>> as a side effect, in commit b72fe9e), but it DID find another straggler
+>>> missed in commit 579cf1d1.
+>>>
+>>> Eric Blake (2):
+>>>   qobject: Update coccinelle script to catch Q{INC,DEC}REF
+>>>   qobject: Catch another straggler for use of qdict_put_str()
+>> 
+>> Applied to -trivial, thanks!
+>
+> Markus has taken v2 of these patches through his qapi-next tree:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg05589.html
+>
+> so you can drop this v1 from -trivial
 
-"allows to VERB" is not idiomatic; better is "allows VERBing" (as in
-"allows using query-block"); or "allows SUBJECT to VERB" (as in the
-verbose "allows the client to use query-block").  For your particular
-wording choice, it is also possible to do "allows the use of
-query-block", although that rewrite is not possible for all VERB.
-
-> configuration syntax with -blockdev and -device.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/qapi.c | 2 +-
->  hmp.c        | 8 ++++----
->  2 files changed, 5 insertions(+), 5 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---SW08ENF0hA3s8p3i6K1uBDVxsHAM19pbd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZkScAAoJEKeha0olJ0Nqo9YH/RfcztPGxk3O3+cuJ3gWQf73
-Am3aoBzE1Hpqb6YC1Gujn3CHFYORrh5lPgS4UHfr+QV2saSa+c9sekDxFhGyTlJm
-UTJw2IoSTsdNMil5P5hcHGCnuFMNp/UsPzJ81KljhHjcJ20Jl1aIH7ZnnJ6JwGfG
-wjG2nGayNksf+8nWyHj4Yzdg+EU6E1eqE1RzgC/vrysUMjkVsyYtaSduZ9mwnlKp
-1VokfVvppFc1A5Bc1MMTZhSBilTiUrafIj1LpEN6hx+wGA/x4R5MZnJD+3RSvCLh
-/nfMN/uf/iD/q0hbaHvgWjvCN8Vq48WA8xnmEz6p8bg7fv0TP/jdppn9Ybf6tys=
-=z6R4
------END PGP SIGNATURE-----
-
---SW08ENF0hA3s8p3i6K1uBDVxsHAM19pbd--
+I've dragged my feet on the pull request in the hope of still adding a
+few patches of my own.  Figure I better put them into the next one.
