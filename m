@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVAaX-0000iI-Hb
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 01:53:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVAb1-0001X3-30
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 01:54:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVAaT-0004ml-Aw
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 01:53:29 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVAaw-0004ub-HX
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 01:53:59 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 12 Jul 2017 15:53:12 +1000
-Message-Id: <20170712055317.26225-4-david@gibson.dropbear.id.au>
+Date: Wed, 12 Jul 2017 15:53:11 +1000
+Message-Id: <20170712055317.26225-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170712055317.26225-1-david@gibson.dropbear.id.au>
 References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv2 3/8] spapr: Simplify unplug path
+Subject: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation' DRC
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,120 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mdroth@linux.vnet.ibm.com, groug@kaod.org, danielhb@linux.vnet.ibm.com
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-spapr_lmb_release() and spapr_core_release() call hotplug_handler_unplug()
-which after a bunch of indirection calls spapr_memory_unplug() or
-spapr_core_unplug().  But we already know which is the appropriate thing
-to call here, so we can just fold it directly into the release function.
+The awaiting_allocation flag in the DRC was introduced by aab9913
+"spapr_drc: Prevent detach racing against attach for CPU DR", allegedly to
+prevent a guest crash on racing attach and detach.  Except.. information
+from the BZ actually suggests a qemu crash, not a guest crash.  And there
+shouldn't be a problem here anyway: if the guest has already moved the DRC
+away from UNUSABLE state, the detach would already be deferred, and if it
+hadn't it should be safe to detach it (the guest should fail gracefully
+when it attempts to change the allocation state).
 
-Once that's done, there's no need for an hc->unplug method in the spapr
-machine at all: since we also have an hc->unplug_request method, the
-hotplug core will never use ->unplug.
+I think this was probably just a bandaid for some other problem in the
+state management.  So, remove awaiting_allocation and associated code.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 54 ++++++++----------------------------------------------
- 1 file changed, 8 insertions(+), 46 deletions(-)
+ hw/ppc/spapr_drc.c         | 25 +++----------------------
+ include/hw/ppc/spapr_drc.h |  1 -
+ 2 files changed, 3 insertions(+), 23 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2a059d5..ff2aa6b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2818,6 +2818,9 @@ void spapr_lmb_release(DeviceState *dev)
- {
-     HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_ctrl);
-+    PCDIMMDevice *dimm = PC_DIMM(dev);
-+    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-+    MemoryRegion *mr = ddc->get_memory_region(dimm);
-     sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
- 
-     /* This information will get lost if a migration occurs
-@@ -2838,18 +2841,7 @@ void spapr_lmb_release(DeviceState *dev)
-      * Now that all the LMBs have been removed by the guest, call the
-      * pc-dimm unplug handler to cleanup up the pc-dimm device.
-      */
--    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
--}
--
--static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
--                                Error **errp)
--{
--    sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
--    PCDIMMDevice *dimm = PC_DIMM(dev);
--    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr = ddc->get_memory_region(dimm);
--
--    pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
-+    pc_dimm_memory_unplug(dev, &spapr->hotplug_memory, mr);
-     object_unparent(OBJECT(dev));
- }
- 
-@@ -2918,10 +2910,11 @@ static void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-     return fdt;
- }
- 
--static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              Error **errp)
-+/* Callback to be called during DRC release. */
-+void spapr_core_release(DeviceState *dev)
- {
--    MachineState *ms = MACHINE(qdev_get_machine());
-+    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-+    MachineState *ms = MACHINE(hotplug_ctrl);
-     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
-     CPUCore *cc = CPU_CORE(dev);
-     CPUArchId *core_slot = spapr_find_cpu_slot(ms, cc->core_id, NULL);
-@@ -2945,15 +2938,6 @@ static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     object_unparent(OBJECT(dev));
- }
- 
--/* Callback to be called during DRC release. */
--void spapr_core_release(DeviceState *dev)
--{
--    HotplugHandler *hotplug_ctrl;
--
--    hotplug_ctrl = qdev_get_hotplug_handler(dev);
--    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
--}
--
- static
- void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
-@@ -3159,27 +3143,6 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 9b07f80..89ba3d6 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+     if (!drc->dev) {
+         return RTAS_OUT_NO_SUCH_INDICATOR;
      }
+-    if (drc->awaiting_release && drc->awaiting_allocation) {
+-        /* kernel is acknowledging a previous hotplug event
+-         * while we are already removing it.
+-         * it's safe to ignore awaiting_allocation here since we know the
+-         * situation is predicated on the guest either already having done
+-         * so (boot-time hotplug), or never being able to acquire in the
+-         * first place (hotplug followed by immediate unplug).
+-         */
++    if (drc->awaiting_release) {
++        /* Don't allow the guest to move a device away from UNUSABLE
++         * state when we want to unplug it */
+         return RTAS_OUT_NO_SUCH_INDICATOR;
+     }
+ 
+     drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
+-    drc->awaiting_allocation = false;
+ 
+     return RTAS_OUT_SUCCESS;
+ }
+@@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+     drc->fdt = fdt;
+     drc->fdt_start_offset = fdt_start_offset;
+ 
+-    if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
+-        drc->awaiting_allocation = true;
+-    }
+-
+     object_property_add_link(OBJECT(drc), "device",
+                              object_get_typename(OBJECT(drc->dev)),
+                              (Object **)(&drc->dev),
+@@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
+         return;
+     }
+ 
+-    if (drc->awaiting_allocation) {
+-        drc->awaiting_release = true;
+-        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+-        return;
+-    }
+-
+     spapr_drc_release(drc);
  }
  
--static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
--                                      DeviceState *dev, Error **errp)
--{
--    sPAPRMachineState *sms = SPAPR_MACHINE(qdev_get_machine());
--    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+@@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+         spapr_drc_release(drc);
+     }
+ 
+-    drc->awaiting_allocation = false;
 -
--    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
--            spapr_memory_unplug(hotplug_dev, dev, errp);
--        } else {
--            error_setg(errp, "Memory hot unplug not supported for this guest");
--        }
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
--        if (!mc->has_hotpluggable_cpus) {
--            error_setg(errp, "CPU hot unplug not supported on this machine");
--            return;
--        }
--        spapr_core_unplug(hotplug_dev, dev, errp);
--    }
--}
--
- static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-                                                 DeviceState *dev, Error **errp)
- {
-@@ -3397,7 +3360,6 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_hotplug_handler = spapr_get_hotplug_handler;
-     hc->pre_plug = spapr_machine_device_pre_plug;
-     hc->plug = spapr_machine_device_plug;
--    hc->unplug = spapr_machine_device_unplug;
-     mc->cpu_index_to_instance_props = spapr_cpu_index_to_props;
-     mc->possible_cpu_arch_ids = spapr_possible_cpu_arch_ids;
-     hc->unplug_request = spapr_machine_device_unplug_request;
+     if (drc->dev) {
+         /* A device present at reset is coldplugged */
+         drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+@@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc = {
+         VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+         VMSTATE_BOOL(configured, sPAPRDRConnector),
+         VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+-        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 715016b..18a196e 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
+     sPAPRConfigureConnectorState *ccs;
+ 
+     bool awaiting_release;
+-    bool awaiting_allocation;
+ 
+     /* device pointer, via link property */
+     DeviceState *dev;
 -- 
 2.9.4
