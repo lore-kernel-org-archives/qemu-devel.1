@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVHLg-0005tk-PD
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:06:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVHQi-0001sT-Jf
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:11:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVHLb-0006co-RN
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:06:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVHLb-0006cI-KW
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:06:31 -0400
-Date: Wed, 12 Jul 2017 16:06:18 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170712160129-mutt-send-email-mst@kernel.org>
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
+	(envelope-from <dgibson@ozlabs.org>) id 1dVHQh-0001hy-DY
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:11:48 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 12 Jul 2017 23:11:35 +1000
+Message-Id: <20170712131140.18146-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv7 0/5] HPT resizing for pseries guests (qemu
+ part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +18,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: mdroth@linux.vnet.ibm.com, groug@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org, danielhb@linux.vnet.ibm.com
+Cc: aik@ozlabs.ru, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Jul 12, 2017 at 08:40:18PM +0800, Wei Wang wrote:
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index 28b0e96..9f27101 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -57,8 +57,28 @@ int virtqueue_add_sgs(struct virtqueue *vq,
->  		      void *data,
->  		      gfp_t gfp);
->  
-> +/* A desc with this init id is treated as an invalid desc */
-> +#define VIRTQUEUE_DESC_ID_INIT UINT_MAX
-> +int virtqueue_add_chain_desc(struct virtqueue *_vq,
-> +			     uint64_t addr,
-> +			     uint32_t len,
-> +			     unsigned int *head_id,
-> +			     unsigned int *prev_id,
-> +			     bool in);
-> +
-> +int virtqueue_add_chain(struct virtqueue *_vq,
-> +			unsigned int head,
-> +			bool indirect,
-> +			struct vring_desc *indirect_desc,
-> +			void *data,
-> +			void *ctx);
-> +
->  bool virtqueue_kick(struct virtqueue *vq);
->  
-> +bool virtqueue_kick_sync(struct virtqueue *vq);
-> +
-> +bool virtqueue_kick_async(struct virtqueue *vq, wait_queue_head_t wq);
-> +
->  bool virtqueue_kick_prepare(struct virtqueue *vq);
->  
->  bool virtqueue_notify(struct virtqueue *vq);
+This series implements the host side of the PAPR ACR to allow runtime
+resizing of the Hashed Page Table (HPT) for pseries guests.
+Exercising this feature requires a guest OS which is also aware of it.
+Patches to implement the guest side in Linux are upstream as of v4.11.
 
-I don't much care for this API. It does exactly what balloon needs,
-but at cost of e.g. transparently busy-waiting. Unlikely to be
-a good fit for anything else.
+Availability of the feature is controlled by a new 'resize-hpt'
+machine option: it can be set to "disabled", "enabled" or "required".
+The last means that qemu will refuse to boot a guest which is not
+aware of the HPT resizing feature (it will instead quit during feature
+negotiation).  This is potentially useful because guests which don't
+support resizing will need an HPT sized for their maximum possible
+RAM, which can be very wasteful of host resources.
 
-If you don't like my original _first/_next/_last, you will
-need to come up with something else.
+This implementation will work for both TCG and KVM guests.  HV KVM
+requires support in the host kernel which is also included in v4.11.
+
+Changes since v6:
+ * Rebase for current tree
+ * Adjustments to fail gracefully for POWER9 RPT guests
+Changes since v5:
+ * Rebase for qemu-2.10
+ * Kernel patches now merged
+ * Removed an unnecessary and possibly dangerous assert()
+Changes since v4 (misposted as v3):
+ * More minor revisions based on review comments
+ * Altered to use new simpler encoding of kernel capability
+Changes since v3:
+ * Assorted minor revisions based on review
+ * Added KVM support (PR and HV)
+Changes since v2:
+ * Some clearer comments based on review
+ * Some minor cleanups based on review
+
+David Gibson (5):
+  pseries: Stubs for HPT resizing
+  pseries: Implement HPT resizing
+  pseries: Enable HPT resizing for 2.10
+  pseries: Use smaller default hash page tables when guest can resize
+  pseries: Allow HPT resizing with KVM
+
+ hw/ppc/spapr.c              | 103 ++++++++++-
+ hw/ppc/spapr_hcall.c        | 439 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/trace-events         |   2 +
+ include/hw/ppc/spapr.h      |  19 ++
+ include/hw/ppc/spapr_ovec.h |   1 +
+ target/ppc/kvm.c            |  76 ++++++++
+ target/ppc/kvm_ppc.h        |  26 +++
+ target/ppc/mmu-hash64.h     |   4 +
+ 8 files changed, 662 insertions(+), 8 deletions(-)
 
 -- 
-MST
+2.9.4
