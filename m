@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVFDd-0002N3-Hw
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:50:10 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dVFDh-0002VF-Kp
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVFDZ-00087s-Kg
+	(envelope-from <alistair23@gmail.com>) id 1dVFDd-0008Dt-GY
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:50:13 -0400
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:34572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dVFDd-0008Cc-A1
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:50:09 -0400
-References: <CAFEAcA_HPtBhES_9L1KZzJTDJRpxD=0Ux-OyC3BV2UDNKZg2hg@mail.gmail.com>
-	<40961524-561e-aa31-b043-7b8ae9203b7c@suse.de>
-	<7bb17d85-a21b-d890-03cc-18f56b785361@redhat.com>
-	<dfa89a7f-263d-c7b4-9866-7d972bed6057@suse.de>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3d688e8e-1140-557b-d2ed-1d96e6f5831a@redhat.com>
-Date: Wed, 12 Jul 2017 12:49:59 +0200
+Received: by mail-wr0-f173.google.com with SMTP id 77so28230454wrb.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 03:50:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <dfa89a7f-263d-c7b4-9866-7d972bed6057@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] should we update QEMU's u-boot submodule and
- binary?
+Sender: alistair23@gmail.com
+In-Reply-To: <87k23eay0f.fsf@dusky.pond.sub.org>
+References: <cover.1499774331.git.alistair.francis@xilinx.com>
+	<b0192a116ac0fdd125f49f257c6c6dbbc2666969.1499774331.git.alistair.francis@xilinx.com>
+	<87k23eay0f.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 12 Jul 2017 12:48:37 +0200
+Message-ID: <CAKmqyKOQVA_zBsj5C994i8gjasg4Yw-46GDB0MysxFNow+615Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] error: Functions to report warnings
+ and informational messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, philippe@mathieu-daude.net
 
-On 12.07.2017 12:44, Alexander Graf wrote:
-> 
-> 
-> On 12.07.17 12:34, Thomas Huth wrote:
->> On 11.07.2017 20:22, Alexander Graf wrote:
->>>
->>> On 11.07.17 19:43, Peter Maydell wrote:
->>>> Hi; I just noticed that our u-boot submodule is still stuck on
->>>> a commit from 2014 when it was first added to QEMU. Should we
->>>> move this forward to some more recent u-boot release?
->>>>
->>>> I think we only use this for our ppc e500 rom...
->>>
->>> It probably makes sense to update the e500 rom and bump the submodule to
->>> the latest U-Boot release along the way, yes.
->>>
->>> U-Boot 2017.07 just got released, so now is quite a good point in time
->>> to do so.
+On Wed, Jul 12, 2017 at 9:57 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Alistair Francis <alistair.francis@xilinx.com> writes:
+>
+>> Add warn_report(), warn_vreport() for reporting warnings, and
+>> info_report(), info_vreport() for informational messages.
 >>
->> I think we should rather update the submodule to commit 79c884d7e4 since
->> that is the level that is used for the pc-bios/u-boot.e500 binary (see
->> http://git.qemu.org/?p=qemu.git;a=commitdiff;h=d4574435a6530bbd96ae13 ).
-> 
-> Why not update both?
-
-Because it needs some proper tests in that case...?
-
->> The problematic mv_gen_reg.h is also not part of that commit level
->> anymore.
+>> These are implemented them with a helper function factored out of
+>> error_vreport(), suitably generalized. This patch makes no changes
+>> to the output of the original error_report() function.
 >>
->> Alex, could you please send a patch for the update? Or shall I prepare
->> one?
-> 
-> I tried to compile U-Boot from 2017.07 earlier, but don't have a working
-> ppc build environment anymore :(
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>> v2:
+>>  - Don't add *vreport() functions to checkpatch
+>>  - Maintain original comments for the reporting functions
+>>  - Don't change the error report output in this patch
+>> v1:
+>>  - Don't expose the generic report and vreport() functions
+>>  - Prefix error messages
+>>  - Use vreport instead of qmsg_vreport()
+>> RFC V3:
+>>  - Change the function and enum names to be more descriptive
+>>  - Add wrapper functions for *_report() and *_vreport()
+>>
+>>  include/qemu/error-report.h |   7 +++
+>>  scripts/checkpatch.pl       |   6 ++-
+>>  util/qemu-error.c           | 102 +++++++++++++++++++++++++++++++++++++++++---
+>>  3 files changed, 109 insertions(+), 6 deletions(-)
+> [...]
+>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+>> index 73efc927a9..60b1f320a1 100755
+>> --- a/scripts/checkpatch.pl
+>> +++ b/scripts/checkpatch.pl
+>> @@ -2535,7 +2535,11 @@ sub process {
+>>                               error_prepend|
+>>                               error_reportf_err|
+>>                               error_vreport|
+>> -                             error_report}x;
+>> +                             report_vreport|
+>
+> Should be warn_vreport, oops.  I can fix this on commit.
 
-I've never been into that e500 stuff, so I also do not have a proper
-test environment for that embedded ppc stuff ==> let's update just the
-submodule to 79c884d7e4 and call it a day?
+I have to send a new version anyway so I'll just fix it.
 
- Thomas
+Thanks,
+Alistair
+
+>
+>> +                             info_vreport|
+>> +                             error_report|
+>> +                             warn_report|
+>> +                             info_report}x;
+>>
+>>       if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
+>>               ERROR("Error messages should not contain newlines\n" . $herecurr);
+> [...]
