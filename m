@@ -1,34 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDM-0006Xb-Qb
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:58:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVHDU-0006iG-NB
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:58:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDH-00010h-FZ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:58:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVHDH-0000zv-5d
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:57:55 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6CCs5Aj063340
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:54 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncjasswa-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:53 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 12 Jul 2017 13:57:51 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 12 Jul 2017 14:57:45 +0200
-In-Reply-To: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1499864265-144136-12-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 11/11] s390x/css: update css_adapter_interrupt
+	(envelope-from <kwolf@redhat.com>) id 1dVHDP-00016r-99
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:58:08 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 12 Jul 2017 14:57:20 +0200
+Message-Id: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/9] block: -device drive=<node-name> fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,104 +17,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Since 2.9 it is possible for a user to care only about nodes and qdev devices,
+but not about BlockBackends, by defining with -blockdev and using their node
+name in -device. Devices create an anonymous BlockBackend internally then.
 
-Let's use the new inject_airq callback of flic to inject adapter
-interrupts. For kvm case, if the kernel flic doesn't support the new
-interface, the irq routine remains unchanged. For non-kvm case,
-qemu-flic handles the suppression process.
+One of the major problems in this setup is that such devices are not listed in
+query-block or HMP 'info block' because the BBs are not monitor-owned. A recent
+discussion concluded that we really want to replace query-block and friends
+with something that matches QEMU's internals better, but there's no way to do
+that in 2.10 (and I wouldn't bet on it to be completed for 2.11). So for now,
+just make the devices appear in query-block and add the qdev ID there in order
+to make the devices identifiable (they have 'device': '' because the BB is
+anonymous).
 
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/css.c          | 18 ++++++++++++++++--
- hw/s390x/s390-pci-bus.c |  2 +-
- hw/s390x/virtio-ccw.c   |  2 +-
- include/hw/s390x/css.h  |  2 +-
- 4 files changed, 19 insertions(+), 5 deletions(-)
+With the additional qdev field, it turned out that with empty drives, ide-cd
+and scsi-cd weren't even properly attached to the BlockBackend. If you do it
+right, this even results in crashes. (Floppy already gets it right, in case you
+wondered.)
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 7b82176..ee4ebbf 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -547,12 +547,26 @@ out:
-     return r;
- }
- 
--void css_adapter_interrupt(uint8_t isc)
-+void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc)
- {
-+    S390FLICState *fs = s390_get_flic();
-+    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
-     uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
-+    IoAdapter *adapter = channel_subsys.io_adapters[type][isc];
-+
-+    if (!adapter) {
-+        return;
-+    }
- 
-     trace_css_adapter_interrupt(isc);
--    s390_io_interrupt(0, 0, 0, io_int_word);
-+    if (fs->ais_supported) {
-+        if (fsc->inject_airq(fs, type, isc, adapter->flags)) {
-+            fprintf(stderr, "Failed to inject airq with AIS supported\n");
-+            exit(1);
-+        }
-+    } else {
-+        s390_io_interrupt(0, 0, 0, io_int_word);
-+    }
- }
- 
- static void sch_handle_clear_func(SubchDev *sch)
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index b9603e7..2de4435 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -504,7 +504,7 @@ static void s390_msi_ctrl_write(void *opaque, hwaddr addr, uint64_t data,
-                    0x80 >> ((ind_bit + vec) % 8));
-     if (!set_ind_atomic(pbdev->routes.adapter.summary_addr + sum_bit / 8,
-                                        0x80 >> (sum_bit % 8))) {
--        css_adapter_interrupt(pbdev->isc);
-+        css_adapter_interrupt(CSS_IO_ADAPTER_PCI, pbdev->isc);
-     }
- }
- 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index e18fd26..5afd9bb 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1074,7 +1074,7 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-                                   0x80 >> ((ind_bit + vector) % 8));
-             if (!virtio_set_ind_atomic(sch, dev->summary_indicator->addr,
-                                        0x01)) {
--                css_adapter_interrupt(dev->thinint_isc);
-+                css_adapter_interrupt(CSS_IO_ADAPTER_VIRTIO, dev->thinint_isc);
-             }
-         } else {
-             indicators = address_space_ldq(&address_space_memory,
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 5ee6d52..dd36d39 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -155,7 +155,6 @@ void css_generate_sch_crws(uint8_t cssid, uint8_t ssid, uint16_t schid,
- void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
- void css_generate_css_crws(uint8_t cssid);
- void css_clear_sei_pending(void);
--void css_adapter_interrupt(uint8_t isc);
- int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data);
- int do_subchannel_work_virtual(SubchDev *sub, ORB *orb);
- int do_subchannel_work_passthrough(SubchDev *sub, ORB *orb);
-@@ -166,6 +165,7 @@ typedef enum {
-     CSS_IO_ADAPTER_TYPE_NUMS,
- } CssIoAdapterType;
- 
-+void css_adapter_interrupt(CssIoAdapterType type, uint8_t isc);
- int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode);
- uint32_t css_get_adapter_id(CssIoAdapterType type, uint8_t isc);
- void css_register_io_adapters(CssIoAdapterType type, bool swap, bool maskable,
+After this series, -device drive=<node-name> should be reasonably usable
+without a major loss of functionality like before.
+
+Kevin Wolf (9):
+  block: Make blk_get_attached_dev_id() public
+  block/qapi: Add qdev device name to query-block
+  block: Make blk_all_next() public
+  block/qapi: Use blk_all_next() for query-block
+  block: List anonymous device BBs in query-block
+  ide: bdrv_attach_dev() for empty CD-ROM
+  scsi-disk: bdrv_attach_dev() for empty CD-ROM
+  qemu-iotests: Test 'info block'
+  qemu-iotests: Test unplug of -device without drive
+
+ block/block-backend.c          |   5 +-
+ block/qapi.c                   |  20 +-
+ hmp.c                          |  11 +-
+ hw/ide/qdev.c                  |   3 +
+ hw/scsi/scsi-disk.c            |   5 +
+ include/sysemu/block-backend.h |   2 +
+ qapi/block-core.json           |   5 +-
+ tests/qemu-iotests/067         |  13 ++
+ tests/qemu-iotests/067.out     |  40 ++++
+ tests/qemu-iotests/186         | 147 +++++++++++++
+ tests/qemu-iotests/186.out     | 489 +++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group       |   1 +
+ 12 files changed, 731 insertions(+), 10 deletions(-)
+ create mode 100755 tests/qemu-iotests/186
+ create mode 100644 tests/qemu-iotests/186.out
+
 -- 
-2.7.4
+1.8.3.1
