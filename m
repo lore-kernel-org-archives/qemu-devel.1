@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVERQ-0007AT-47
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:25 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1dVERx-0007T7-JG
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVERM-0001eN-2H
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:20 -0400
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:50505)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVERL-0001dm-P3
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:15 -0400
-Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 20F3C6C112
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 12:00:14 +0200 (CEST)
-Date: Wed, 12 Jul 2017 12:00:01 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170712120001.31d858de@bahia.lan>
-In-Reply-To: <20170712055317.26225-3-david@gibson.dropbear.id.au>
-References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-	<20170712055317.26225-3-david@gibson.dropbear.id.au>
+	(envelope-from <atar4qemu@gmail.com>) id 1dVERu-0002AV-GY
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:53 -0400
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:33864)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1dVERu-00029T-1Z
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:50 -0400
+Received: by mail-oi0-f66.google.com with SMTP id d77so2319082oig.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 03:00:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/h1BJXztGUQmbSmNJiwXkrqA";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
- DRC flag
+In-Reply-To: <1499810007-28613-9-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1499810007-28613-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1499810007-28613-9-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 12 Jul 2017 11:59:28 +0200
+Message-ID: <CACXAS8CPyt1u3YFGLdFEF9NNtvDEE2WhuhUmzL7uEiio88ZJ7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 8/8] sun4u: move in-built devices behind
+ PCI bridge A
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,134 +29,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
---Sig_/h1BJXztGUQmbSmNJiwXkrqA
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jul 11, 2017 at 11:53 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> This switches the sun4u model to being much closer to a real Ultra 5.
+>
+> Since the existing code previously bypassed the PCI bridge interrupt
+> swizzling, reorganise the interrupt mapping functions so that
+> pci_pbm_map_irq() is used by the PCI bridges and pci_apb_map_irq() is
+> used by the PCI host bridge.
+>
+> As part of this change we also combine the "onboard" NIC and the ebus into
+> a single multi-function device as done on a real Ultra 5.
 
-On Wed, 12 Jul 2017 15:53:11 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+While they are combined on a real Ultra 5, it has a different NIC.
+Are the guest OSes smart enough to use NE2000 as an onboard device?
 
-> The awaiting_allocation flag in the DRC was introduced by aab9913
-> "spapr_drc: Prevent detach racing against attach for CPU DR", allegedly to
-> prevent a guest crash on racing attach and detach.  Except.. information
-> from the BZ actually suggests a qemu crash, not a guest crash.  And there
-
-Can you share an url to the BZ ?
-
-> shouldn't be a problem here anyway: if the guest has already moved the DRC
-> away from UNUSABLE state, the detach would already be deferred, and if it
-> hadn't it should be safe to detach it (the guest should fail gracefully
-> when it attempts to change the allocation state).
->=20
-> I think this was probably just a bandaid for some other problem in the
-> state management.  So, remove awaiting_allocation and associated code.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Finally we mark the physically unavailable slots (plus slot 0 in busA) as
+> reserved to ensure that users can't plug devices into non-existent slots
+> which will break interrupt routing.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  hw/ppc/spapr_drc.c         | 25 +++----------------------
->  include/hw/ppc/spapr_drc.h |  1 -
->  2 files changed, 3 insertions(+), 23 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 9b07f80..89ba3d6 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *dr=
-c)
->      if (!drc->dev) {
->          return RTAS_OUT_NO_SUCH_INDICATOR;
->      }
-> -    if (drc->awaiting_release && drc->awaiting_allocation) {
-> -        /* kernel is acknowledging a previous hotplug event
-> -         * while we are already removing it.
-> -         * it's safe to ignore awaiting_allocation here since we know the
-> -         * situation is predicated on the guest either already having do=
-ne
-> -         * so (boot-time hotplug), or never being able to acquire in the
-> -         * first place (hotplug followed by immediate unplug).
-> -         */
-> +    if (drc->awaiting_release) {
-> +        /* Don't allow the guest to move a device away from UNUSABLE
-> +         * state when we want to unplug it */
->          return RTAS_OUT_NO_SUCH_INDICATOR;
->      }
-> =20
->      drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
-> -    drc->awaiting_allocation =3D false;
-> =20
->      return RTAS_OUT_SUCCESS;
+>  hw/pci-host/apb.c  |   35 +++++++++++++++++++++++++++--------
+>  hw/sparc64/sun4u.c |   25 ++++++++++++++++++++-----
+>  2 files changed, 47 insertions(+), 13 deletions(-)
+>
+> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
+> index f9badad..5000432 100644
+> --- a/hw/pci-host/apb.c
+> +++ b/hw/pci-host/apb.c
+> @@ -601,16 +601,35 @@ static uint64_t apb_pci_config_read(void *opaque, hwaddr addr,
+>  /* The APB host has an IRQ line for each IRQ line of each slot.  */
+>  static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
+>  {
+> -    return ((pci_dev->devfn & 0x18) >> 1) + irq_num;
+> +    /* Return the irq as swizzled by the PBM */
+> +    return irq_num;
 >  }
-> @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceS=
-tate *d, void *fdt,
->      drc->fdt =3D fdt;
->      drc->fdt_start_offset =3D fdt_start_offset;
-> =20
-> -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
-> -        drc->awaiting_allocation =3D true;
-> -    }
-> -
->      object_property_add_link(OBJECT(drc), "device",
->                               object_get_typename(OBJECT(drc->dev)),
->                               (Object **)(&drc->dev),
-> @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceS=
-tate *d, Error **errp)
->          return;
->      }
-> =20
-> -    if (drc->awaiting_allocation) {
-> -        drc->awaiting_release =3D true;
-> -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
-> -        return;
-> -    }
-> -
->      spapr_drc_release(drc);
+>
+>  static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
+>  {
+> +    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
+> +                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
+> +
+>      int bus_offset;
+> -    if (pci_dev->devfn & 1)
+> -        bus_offset = 16;
+> -    else
+> -        bus_offset = 0;
+> +    if (br->busA) {
+> +        bus_offset = 0x0;
+> +
+> +        /* The on-board devices have fixed (legacy) OBIO intnos */
+> +        switch (PCI_SLOT(pci_dev->devfn)) {
+> +        case 1:
+> +            /* Onboard NIC */
+> +            return 0x21;
+> +        case 3:
+> +            /* Onboard IDE */
+> +            return 0x20;
+> +
+> +        default:
+> +            /* Normal intno, fall through */
+> +            break;
+> +        }
+> +    } else {
+> +        bus_offset = 0x10;
+> +    }
+>      return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
 >  }
-> =20
-> @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
->          spapr_drc_release(drc);
->      }
-> =20
-> -    drc->awaiting_allocation =3D false;
-> -
->      if (drc->dev) {
->          /* A device present at reset is coldplugged */
->          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLATED;
-> @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc =3D=
- {
->          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
->          VMSTATE_BOOL(configured, sPAPRDRConnector),
->          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
-> -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index 715016b..18a196e 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
->      sPAPRConfigureConnectorState *ccs;
-> =20
->      bool awaiting_release;
-> -    bool awaiting_allocation;
-> =20
->      /* device pointer, via link property */
->      DeviceState *dev;
+>
+> @@ -692,7 +711,7 @@ PCIBus *pci_apb_init(hwaddr special_base,
+>      d = APB_DEVICE(dev);
+>      phb = PCI_HOST_BRIDGE(dev);
+>      phb->bus = pci_register_bus(DEVICE(phb), "pci",
+> -                                pci_apb_set_irq, pci_pbm_map_irq, d,
+> +                                pci_apb_set_irq, pci_apb_map_irq, d,
+>                                  &d->pci_mmio,
+>                                  get_system_io(),
+>                                  0, 32, TYPE_PCI_BUS);
+> @@ -726,14 +745,14 @@ PCIBus *pci_apb_init(hwaddr special_base,
+>      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
+>                                     TYPE_PBM_PCI_BRIDGE);
+>      br = PCI_BRIDGE(pci_dev);
+> -    pci_bridge_map_irq(br, "pciB", pci_apb_map_irq);
+> +    pci_bridge_map_irq(br, "pciB", pci_pbm_map_irq);
+>      qdev_init_nofail(&pci_dev->qdev);
+>      *busB = pci_bridge_get_sec_bus(br);
+>
+>      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
+>                                     TYPE_PBM_PCI_BRIDGE);
+>      br = PCI_BRIDGE(pci_dev);
+> -    pci_bridge_map_irq(br, "pciA", pci_apb_map_irq);
+> +    pci_bridge_map_irq(br, "pciA", pci_pbm_map_irq);
+>      qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
+>      qdev_init_nofail(&pci_dev->qdev);
+>      *busA = pci_bridge_get_sec_bus(br);
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 3bb3bf2..b8b96be 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -27,6 +27,7 @@
+>  #include "cpu.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bus.h"
+>  #include "hw/pci-host/apb.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/char/serial.h"
+> @@ -42,6 +43,7 @@
+>  #include "hw/nvram/fw_cfg.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/ide.h"
+> +#include "hw/ide/pci.h"
+>  #include "hw/loader.h"
+>  #include "elf.h"
+>  #include "qemu/cutils.h"
+> @@ -448,10 +450,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>      ivec_irqs = qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC_MAX);
+>      pci_bus = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
+>                             &pci_busB, &pbm_irqs);
+> -    pci_vga_init(pci_bus);
+>
+> -    /* XXX Should be pci_busA */
+> -    ebus = pci_create_simple(pci_bus, -1, "ebus");
+> +    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
+> +       reserved (leaving no slots free after on-board devices) leaving slots
+> +       0-3 are free on busB 4*/
+> +    pci_bus->slot_reserved_mask = 0xfffffffc;
+> +    pci_busA->slot_reserved_mask = 0xfffffff1;
+> +    pci_busB->slot_reserved_mask = 0xfffffff0;
+> +
+> +    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, "ebus");
+> +    qdev_init_nofail(DEVICE(ebus));
+> +
+>      isa_bus = pci_ebus_init(ebus, pbm_irqs);
+>
+>      i = 0;
+> @@ -464,14 +473,20 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>      serial_hds_isa_init(isa_bus, i, MAX_SERIAL_PORTS);
+>      parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
+>
+> -    pci_dev = pci_create(pci_bus, -1, "ne2k_pci");
+> +    pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
+> +
+> +    pci_dev = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 1), true,
+> +                                       "ne2k_pci");
+>      dev = &pci_dev->qdev;
+>      qdev_set_nic_properties(dev, &nd_table[0]);
+>      qdev_init_nofail(dev);
+>
+>      ide_drive_get(hd, ARRAY_SIZE(hd));
+>
+> -    pci_cmd646_ide_init(pci_bus, hd, 1);
+> +    pci_dev = pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
+> +    qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
+> +    qdev_init_nofail(&pci_dev->qdev);
+> +    pci_ide_create_devs(pci_dev, hd);
+>
+>      isa_create_simple(isa_bus, "i8042");
+>
+> --
+> 1.7.10.4
+>
 
 
---Sig_/h1BJXztGUQmbSmNJiwXkrqA
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+-- 
+Regards,
+Artyom Tarasenko
 
-iEYEARECAAYFAlll8yEACgkQAvw66wEB28JWXgCeMK6ke+Rfv8E3u71QafPPjH6r
-MqkAnjjT7lkZuAf0e7yn6y/81yO87AGF
-=zllP
------END PGP SIGNATURE-----
-
---Sig_/h1BJXztGUQmbSmNJiwXkrqA--
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
