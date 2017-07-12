@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1dVERx-0007T7-JG
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:54 -0400
+	(envelope-from <groug@kaod.org>) id 1dVEW3-0001Kj-MV
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1dVERu-0002AV-GY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:53 -0400
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:33864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1dVERu-00029T-1Z
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:50 -0400
-Received: by mail-oi0-f66.google.com with SMTP id d77so2319082oig.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 03:00:49 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1dVEVy-0004As-Em
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:05:07 -0400
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:46947)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVEVy-0004A4-4z
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:05:02 -0400
+Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7C0836C12D
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 12:05:00 +0200 (CEST)
+Date: Wed, 12 Jul 2017 12:04:51 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170712120451.198aef60@bahia.lan>
+In-Reply-To: <20170712055317.26225-4-david@gibson.dropbear.id.au>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-4-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <1499810007-28613-9-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1499810007-28613-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1499810007-28613-9-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 12 Jul 2017 11:59:28 +0200
-Message-ID: <CACXAS8CPyt1u3YFGLdFEF9NNtvDEE2WhuhUmzL7uEiio88ZJ7g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 8/8] sun4u: move in-built devices behind
- PCI bridge A
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/oowY3Ixu1whiOdeRMSLgwdN";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCHv2 3/8] spapr: Simplify unplug path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,177 +31,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-On Tue, Jul 11, 2017 at 11:53 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> This switches the sun4u model to being much closer to a real Ultra 5.
->
-> Since the existing code previously bypassed the PCI bridge interrupt
-> swizzling, reorganise the interrupt mapping functions so that
-> pci_pbm_map_irq() is used by the PCI bridges and pci_apb_map_irq() is
-> used by the PCI host bridge.
->
-> As part of this change we also combine the "onboard" NIC and the ebus into
-> a single multi-function device as done on a real Ultra 5.
+--Sig_/oowY3Ixu1whiOdeRMSLgwdN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-While they are combined on a real Ultra 5, it has a different NIC.
-Are the guest OSes smart enough to use NE2000 as an onboard device?
+On Wed, 12 Jul 2017 15:53:12 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> Finally we mark the physically unavailable slots (plus slot 0 in busA) as
-> reserved to ensure that users can't plug devices into non-existent slots
-> which will break interrupt routing.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> spapr_lmb_release() and spapr_core_release() call hotplug_handler_unplug()
+> which after a bunch of indirection calls spapr_memory_unplug() or
+> spapr_core_unplug().  But we already know which is the appropriate thing
+> to call here, so we can just fold it directly into the release function.
+>=20
+> Once that's done, there's no need for an hc->unplug method in the spapr
+> machine at all: since we also have an hc->unplug_request method, the
+> hotplug core will never use ->unplug.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/pci-host/apb.c  |   35 +++++++++++++++++++++++++++--------
->  hw/sparc64/sun4u.c |   25 ++++++++++++++++++++-----
->  2 files changed, 47 insertions(+), 13 deletions(-)
->
-> diff --git a/hw/pci-host/apb.c b/hw/pci-host/apb.c
-> index f9badad..5000432 100644
-> --- a/hw/pci-host/apb.c
-> +++ b/hw/pci-host/apb.c
-> @@ -601,16 +601,35 @@ static uint64_t apb_pci_config_read(void *opaque, hwaddr addr,
->  /* The APB host has an IRQ line for each IRQ line of each slot.  */
->  static int pci_apb_map_irq(PCIDevice *pci_dev, int irq_num)
+
+Nice cleanup :)
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr.c | 54 ++++++++--------------------------------------------=
+--
+>  1 file changed, 8 insertions(+), 46 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2a059d5..ff2aa6b 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2818,6 +2818,9 @@ void spapr_lmb_release(DeviceState *dev)
 >  {
-> -    return ((pci_dev->devfn & 0x18) >> 1) + irq_num;
-> +    /* Return the irq as swizzled by the PBM */
-> +    return irq_num;
+>      HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(hotplug_ctrl);
+> +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
+> +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
+> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
+>      sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, PC_DIM=
+M(dev));
+> =20
+>      /* This information will get lost if a migration occurs
+> @@ -2838,18 +2841,7 @@ void spapr_lmb_release(DeviceState *dev)
+>       * Now that all the LMBs have been removed by the guest, call the
+>       * pc-dimm unplug handler to cleanup up the pc-dimm device.
+>       */
+> -    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+> -}
+> -
+> -static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState=
+ *dev,
+> -                                Error **errp)
+> -{
+> -    sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
+> -    PCDIMMDevice *dimm =3D PC_DIMM(dev);
+> -    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
+> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
+> -
+> -    pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
+> +    pc_dimm_memory_unplug(dev, &spapr->hotplug_memory, mr);
+>      object_unparent(OBJECT(dev));
 >  }
->
->  static int pci_pbm_map_irq(PCIDevice *pci_dev, int irq_num)
+> =20
+> @@ -2918,10 +2910,11 @@ static void *spapr_populate_hotplug_cpu_dt(CPUSta=
+te *cs, int *fdt_offset,
+>      return fdt;
+>  }
+> =20
+> -static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceState *=
+dev,
+> -                              Error **errp)
+> +/* Callback to be called during DRC release. */
+> +void spapr_core_release(DeviceState *dev)
 >  {
-> +    PBMPCIBridge *br = PBM_PCI_BRIDGE(pci_bridge_get_device(
-> +                           PCI_BUS(qdev_get_parent_bus(DEVICE(pci_dev)))));
-> +
->      int bus_offset;
-> -    if (pci_dev->devfn & 1)
-> -        bus_offset = 16;
-> -    else
-> -        bus_offset = 0;
-> +    if (br->busA) {
-> +        bus_offset = 0x0;
-> +
-> +        /* The on-board devices have fixed (legacy) OBIO intnos */
-> +        switch (PCI_SLOT(pci_dev->devfn)) {
-> +        case 1:
-> +            /* Onboard NIC */
-> +            return 0x21;
-> +        case 3:
-> +            /* Onboard IDE */
-> +            return 0x20;
-> +
-> +        default:
-> +            /* Normal intno, fall through */
-> +            break;
-> +        }
-> +    } else {
-> +        bus_offset = 0x10;
-> +    }
->      return (bus_offset + (PCI_SLOT(pci_dev->devfn) << 2) + irq_num) & 0x1f;
+> -    MachineState *ms =3D MACHINE(qdev_get_machine());
+> +    HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+> +    MachineState *ms =3D MACHINE(hotplug_ctrl);
+>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(ms);
+>      CPUCore *cc =3D CPU_CORE(dev);
+>      CPUArchId *core_slot =3D spapr_find_cpu_slot(ms, cc->core_id, NULL);
+> @@ -2945,15 +2938,6 @@ static void spapr_core_unplug(HotplugHandler *hotp=
+lug_dev, DeviceState *dev,
+>      object_unparent(OBJECT(dev));
 >  }
->
-> @@ -692,7 +711,7 @@ PCIBus *pci_apb_init(hwaddr special_base,
->      d = APB_DEVICE(dev);
->      phb = PCI_HOST_BRIDGE(dev);
->      phb->bus = pci_register_bus(DEVICE(phb), "pci",
-> -                                pci_apb_set_irq, pci_pbm_map_irq, d,
-> +                                pci_apb_set_irq, pci_apb_map_irq, d,
->                                  &d->pci_mmio,
->                                  get_system_io(),
->                                  0, 32, TYPE_PCI_BUS);
-> @@ -726,14 +745,14 @@ PCIBus *pci_apb_init(hwaddr special_base,
->      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 0), true,
->                                     TYPE_PBM_PCI_BRIDGE);
->      br = PCI_BRIDGE(pci_dev);
-> -    pci_bridge_map_irq(br, "pciB", pci_apb_map_irq);
-> +    pci_bridge_map_irq(br, "pciB", pci_pbm_map_irq);
->      qdev_init_nofail(&pci_dev->qdev);
->      *busB = pci_bridge_get_sec_bus(br);
->
->      pci_dev = pci_create_multifunction(phb->bus, PCI_DEVFN(1, 1), true,
->                                     TYPE_PBM_PCI_BRIDGE);
->      br = PCI_BRIDGE(pci_dev);
-> -    pci_bridge_map_irq(br, "pciA", pci_apb_map_irq);
-> +    pci_bridge_map_irq(br, "pciA", pci_pbm_map_irq);
->      qdev_prop_set_bit(DEVICE(pci_dev), "busA", true);
->      qdev_init_nofail(&pci_dev->qdev);
->      *busA = pci_bridge_get_sec_bus(br);
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 3bb3bf2..b8b96be 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -27,6 +27,7 @@
->  #include "cpu.h"
->  #include "hw/hw.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/pci/pci_bus.h"
->  #include "hw/pci-host/apb.h"
->  #include "hw/i386/pc.h"
->  #include "hw/char/serial.h"
-> @@ -42,6 +43,7 @@
->  #include "hw/nvram/fw_cfg.h"
->  #include "hw/sysbus.h"
->  #include "hw/ide.h"
-> +#include "hw/ide/pci.h"
->  #include "hw/loader.h"
->  #include "elf.h"
->  #include "qemu/cutils.h"
-> @@ -448,10 +450,17 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      ivec_irqs = qemu_allocate_irqs(sparc64_cpu_set_ivec_irq, cpu, IVEC_MAX);
->      pci_bus = pci_apb_init(APB_SPECIAL_BASE, APB_MEM_BASE, ivec_irqs, &pci_busA,
->                             &pci_busB, &pbm_irqs);
-> -    pci_vga_init(pci_bus);
->
-> -    /* XXX Should be pci_busA */
-> -    ebus = pci_create_simple(pci_bus, -1, "ebus");
-> +    /* Only in-built Simba PBMs can exist on the root bus, slot 0 on busA is
-> +       reserved (leaving no slots free after on-board devices) leaving slots
-> +       0-3 are free on busB 4*/
-> +    pci_bus->slot_reserved_mask = 0xfffffffc;
-> +    pci_busA->slot_reserved_mask = 0xfffffff1;
-> +    pci_busB->slot_reserved_mask = 0xfffffff0;
-> +
-> +    ebus = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 0), true, "ebus");
-> +    qdev_init_nofail(DEVICE(ebus));
-> +
->      isa_bus = pci_ebus_init(ebus, pbm_irqs);
->
->      i = 0;
-> @@ -464,14 +473,20 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->      serial_hds_isa_init(isa_bus, i, MAX_SERIAL_PORTS);
->      parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
->
-> -    pci_dev = pci_create(pci_bus, -1, "ne2k_pci");
-> +    pci_dev = pci_create_simple(pci_busA, PCI_DEVFN(2, 0), "VGA");
-> +
-> +    pci_dev = pci_create_multifunction(pci_busA, PCI_DEVFN(1, 1), true,
-> +                                       "ne2k_pci");
->      dev = &pci_dev->qdev;
->      qdev_set_nic_properties(dev, &nd_table[0]);
->      qdev_init_nofail(dev);
->
->      ide_drive_get(hd, ARRAY_SIZE(hd));
->
-> -    pci_cmd646_ide_init(pci_bus, hd, 1);
-> +    pci_dev = pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
-> +    qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
-> +    qdev_init_nofail(&pci_dev->qdev);
-> +    pci_ide_create_devs(pci_dev, hd);
->
->      isa_create_simple(isa_bus, "i8042");
->
-> --
-> 1.7.10.4
->
+> =20
+> -/* Callback to be called during DRC release. */
+> -void spapr_core_release(DeviceState *dev)
+> -{
+> -    HotplugHandler *hotplug_ctrl;
+> -
+> -    hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+> -    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+> -}
+> -
+>  static
+>  void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState =
+*dev,
+>                                 Error **errp)
+> @@ -3159,27 +3143,6 @@ static void spapr_machine_device_plug(HotplugHandl=
+er *hotplug_dev,
+>      }
+>  }
+> =20
+> -static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
+> -                                      DeviceState *dev, Error **errp)
+> -{
+> -    sPAPRMachineState *sms =3D SPAPR_MACHINE(qdev_get_machine());
+> -    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
+> -
+> -    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+> -            spapr_memory_unplug(hotplug_dev, dev, errp);
+> -        } else {
+> -            error_setg(errp, "Memory hot unplug not supported for this g=
+uest");
+> -        }
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> -        if (!mc->has_hotpluggable_cpus) {
+> -            error_setg(errp, "CPU hot unplug not supported on this machi=
+ne");
+> -            return;
+> -        }
+> -        spapr_core_unplug(hotplug_dev, dev, errp);
+> -    }
+> -}
+> -
+>  static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_=
+dev,
+>                                                  DeviceState *dev, Error =
+**errp)
+>  {
+> @@ -3397,7 +3360,6 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>      mc->get_hotplug_handler =3D spapr_get_hotplug_handler;
+>      hc->pre_plug =3D spapr_machine_device_pre_plug;
+>      hc->plug =3D spapr_machine_device_plug;
+> -    hc->unplug =3D spapr_machine_device_unplug;
+>      mc->cpu_index_to_instance_props =3D spapr_cpu_index_to_props;
+>      mc->possible_cpu_arch_ids =3D spapr_possible_cpu_arch_ids;
+>      hc->unplug_request =3D spapr_machine_device_unplug_request;
 
 
+--Sig_/oowY3Ixu1whiOdeRMSLgwdN
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
--- 
-Regards,
-Artyom Tarasenko
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+iEYEARECAAYFAlll9EMACgkQAvw66wEB28LuOgCgjBoT0HZubrr3a0mTGEYYr9YN
+mWkAniXzFN0HJqIvyjaWt9nL6bP1ze95
+=ozO8
+-----END PGP SIGNATURE-----
+
+--Sig_/oowY3Ixu1whiOdeRMSLgwdN--
