@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVFDA-00020d-As
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:49:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1dVFDd-0002N3-Hw
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:50:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVFD9-0007xL-I7
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:49:40 -0400
-Date: Wed, 12 Jul 2017 11:49:29 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170712104929.GJ6923@stefanha-x1.localdomain>
-References: <20170705133635.11850-1-famz@redhat.com>
-	<20170705133635.11850-3-famz@redhat.com>
-	<20170710145526.GG14195@stefanha-x1.localdomain>
-	<20170712013231.GC7449@lemon>
+	(envelope-from <thuth@redhat.com>) id 1dVFDZ-00087s-Kg
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:50:09 -0400
+References: <CAFEAcA_HPtBhES_9L1KZzJTDJRpxD=0Ux-OyC3BV2UDNKZg2hg@mail.gmail.com>
+	<40961524-561e-aa31-b043-7b8ae9203b7c@suse.de>
+	<7bb17d85-a21b-d890-03cc-18f56b785361@redhat.com>
+	<dfa89a7f-263d-c7b4-9866-7d972bed6057@suse.de>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <3d688e8e-1140-557b-d2ed-1d96e6f5831a@redhat.com>
+Date: Wed, 12 Jul 2017 12:49:59 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="QnBU6tTI9sljzm9u"
-Content-Disposition: inline
-In-Reply-To: <20170712013231.GC7449@lemon>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] block: Add VFIO based NVMe driver
+In-Reply-To: <dfa89a7f-263d-c7b4-9866-7d972bed6057@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] should we update QEMU's u-boot submodule and
+ binary?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Karl Rister <krister@redhat.com>
+To: Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
+On 12.07.2017 12:44, Alexander Graf wrote:
+> 
+> 
+> On 12.07.17 12:34, Thomas Huth wrote:
+>> On 11.07.2017 20:22, Alexander Graf wrote:
+>>>
+>>> On 11.07.17 19:43, Peter Maydell wrote:
+>>>> Hi; I just noticed that our u-boot submodule is still stuck on
+>>>> a commit from 2014 when it was first added to QEMU. Should we
+>>>> move this forward to some more recent u-boot release?
+>>>>
+>>>> I think we only use this for our ppc e500 rom...
+>>>
+>>> It probably makes sense to update the e500 rom and bump the submodule to
+>>> the latest U-Boot release along the way, yes.
+>>>
+>>> U-Boot 2017.07 just got released, so now is quite a good point in time
+>>> to do so.
+>>
+>> I think we should rather update the submodule to commit 79c884d7e4 since
+>> that is the level that is used for the pc-bios/u-boot.e500 binary (see
+>> http://git.qemu.org/?p=qemu.git;a=commitdiff;h=d4574435a6530bbd96ae13 ).
+> 
+> Why not update both?
 
---QnBU6tTI9sljzm9u
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Because it needs some proper tests in that case...?
 
-On Wed, Jul 12, 2017 at 10:14:48AM +0800, Fam Zheng wrote:
-> On Mon, 07/10 15:55, Stefan Hajnoczi wrote:
-> > On Wed, Jul 05, 2017 at 09:36:31PM +0800, Fam Zheng wrote:
-> > > +static int nvme_co_prw(BlockDriverState *bs, uint64_t offset, uint64=
-_t bytes,
-> > > +                       QEMUIOVector *qiov, bool is_write, int flags)
-> > > +{
-> > > +    BDRVNVMeState *s =3D bs->opaque;
-> > > +    int r;
-> > > +    uint8_t *buf =3D NULL;
-> > > +    QEMUIOVector local_qiov;
-> > > +
-> > > +    assert(QEMU_IS_ALIGNED(offset, s->page_size));
-> > > +    assert(QEMU_IS_ALIGNED(bytes, s->page_size));
-> > > +    assert(bytes <=3D s->max_transfer);
-> >=20
-> > Who guarantees max_transfer?  I think request alignment is enforced by
-> > block/io.c but there is no generic max_transfer handling code, so this
-> > assertion can be triggered by the guest.  Please handle it as a genuine
-> > request error instead of using an assertion.
->=20
-> There has been one since 04ed95f4843281e292d93018d56d4b14705f9f2c, see th=
-e code
-> around max_transfer in block/io.c:bdrv_aligned_*.
+>> The problematic mv_gen_reg.h is also not part of that commit level
+>> anymore.
+>>
+>> Alex, could you please send a patch for the update? Or shall I prepare
+>> one?
+> 
+> I tried to compile U-Boot from 2017.07 earlier, but don't have a working
+> ppc build environment anymore :(
 
-Thanks for pointing that out!
+I've never been into that e500 stuff, so I also do not have a proper
+test environment for that embedded ppc stuff ==> let's update just the
+submodule to 79c884d7e4 and call it a day?
 
-> >=20
-> > > +static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
-> > > +                               BlockReopenQueue *queue, Error **errp)
-> > > +{
-> > > +    return 0;
-> > > +}
-> >=20
-> > What is the purpose of this dummy .bdrv_reopen_prepare() implementation?
->=20
-> This is necessary for block jobs to work, other drivers provides dummy
-> implementations as well.
-
-Please include a comment similar to what the other drivers with dummy
-implements do.
-
---QnBU6tTI9sljzm9u
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZZf65AAoJEJykq7OBq3PIl9cIAMIeeOZjqK+g7/uzeErSbTrw
-LdvmeujuVpXW17k6/QN5g0AnJ/8MN+P7uX5E3lssaxfnUqoUyWIax9so+Oc50lDM
-hmksmsGsl0wXFXYWHVlVjAEZ6/fpZaCdKjlZviG+AT+E4L5jZp4IEyiGuGSxWuZ+
-yiOOE3rk4p6nRZpt94HkAyM5Ubnniy+Gh7NY8jQCb3/tz8VkhjxedO2nKOcdgFAi
-wVBEvwtURl+AykAt8JOOZE28dZ1RYPrdNiM+mjNIBh8vjsRftuVbs8CIbggYHt3G
-fwwbt+6d+/5u/ZDw4m5RnmLV55ZFdCob4mlgunV1jEo9gAv85TYnJuTnYpxDQeg=
-=oACp
------END PGP SIGNATURE-----
-
---QnBU6tTI9sljzm9u--
+ Thomas
