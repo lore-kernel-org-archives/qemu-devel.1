@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVH5o-0008Fk-HC
+	(envelope-from <dgilbert@redhat.com>) id 1dVH5p-0008GX-Bj
 	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVH5i-0004H1-QR
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59464)
+	(envelope-from <dgilbert@redhat.com>) id 1dVH5o-0004Ml-JT
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVH5i-0004Fe-Hn
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:06 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Jul 2017 14:49:42 +0200
-Message-Id: <1499863793-18627-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 00/11] Implement network booting in the
- s390-ccw BIOS
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVH5o-0004MB-DQ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:50:12 -0400
+Date: Wed, 12 Jul 2017 13:50:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170712125001.GC30658@work-vm>
+References: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170711145441.33925-1-pasic@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] migration: s390x css migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,96 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-It's already possible to do a network boot of an s390x guest with an
-external netboot image based on a Linux installation, but it would
-be much more convenient if the s390-ccw firmware supported network
-booting right out of the box, without the need to assemble such an
-external image first.
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> Like for v2 the scope of this patch series is now limited to decoupling
+> channel subsystem migration from the migration of virtio-ccw proxies.
+> 
+> There wasn't a whole lot of criticism regarding v2, so very little
+> changed since then. All issues identified in the previous round were
+> addressed as agreed upon. I hope this series is now good for 2.10.
+> 
+> @Dave You helped me quite a lot with these, thanks a lot! I could not
+> find any r-b's or similar form you so if you would like to take the
+> well deserved credit for your work...
 
-This patch series now introduces a s390-netboot.img that can be used
-for network booting via DHCP and TFTP by re-using the networking stack
-from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
-and adds a driver for virtio-net-ccw devices.
+No problem, as long as we've got a happy migration that's enough,
+and we've finally got VMSTATE_QTAILQ used as well.
 
-The code can only be built if the roms/SLOF submodule has been checked
-out (there is a sanity check for this in the Makefile). Once it has
-been built, you can download a combined kernel + initrd image via TFTP
-by starting QEMU for example with:
+Dave
 
- qemu-system-s390x ... -device virtio-net,netdev=n1,bootindex=1 \
-       -netdev user,id=n1,tftp=/path/to/tftp,bootfile=kernel.img
-
-Note that this version does not support downloading via config
-files (i.e. pxelinux config files or .INS config files) yet. This
-will be added later.
-
-v5:
- - Fixed problem when compiling the code natively on a s390x machine
-   (do not try to re-use the Makefile.inc files from SLOF, and define
-   our own rules instead)
- - Fixed typos that Cornelia discovered while reviewing v4
-
-v4:
- - Cosmetic clean-ups according to the review feedback from v3
- - Fixed bug in the find_dev() function (spotted by Cornelia in v3)
- - Added an additional patch to remove some unused structs from
-   virtio.h
-
-v3:
- - Adressed the review feedback from v2
- - The last remaining SLOF patch has now been merged (big thanks to
-   Alexey!), so not sending this as RFC anymore - it is ready now for
-   integration, I think.
-
-v2:
- - Put the network boot loader into a separate s390-netboot.img
-   binary instead of linking it directly into the s390-ccw firmware.
- - Use the SLOF sources from the roms/SLOF/ submodule instead of
-   copying them into the pc-bios/s390-ccw folder
- - Removed the .INS config file loading code for now - only support
-   combined kernel + initrd images in this initial implementation.
-
-Thomas Huth (11):
-  pc-bios/s390-ccw: Move libc functions to separate header
-  pc-bios/s390-ccw: Move ebc2asc to sclp.c
-  pc-bios/s390-ccw: Move virtio-block related functions into a separate
-    file
-  pc-bios/s390-ccw: Add a write() function for stdio
-  pc-bios/s390-ccw: Move byteswap functions to a separate header
-  pc-bios/s390-ccw: Remove unused structs from virtio.h
-  pc-bios/s390-ccw: Add code for virtio feature negotiation
-  roms/SLOF: Update submodule to latest status
-  pc-bios/s390-ccw: Add core files for the network bootloading program
-  pc-bios/s390-ccw: Add virtio-net driver code
-  pc-bios/s390-ccw: Link libnet into the netboot image and do the TFTP
-    load
-
- pc-bios/s390-ccw/Makefile        |  13 +-
- pc-bios/s390-ccw/bootmap.c       |   2 +
- pc-bios/s390-ccw/bootmap.h       |  26 ---
- pc-bios/s390-ccw/bswap.h         |  30 ++++
- pc-bios/s390-ccw/libc.h          |  45 +++++
- pc-bios/s390-ccw/main.c          |  14 +-
- pc-bios/s390-ccw/netboot.mak     |  59 +++++++
- pc-bios/s390-ccw/netmain.c       | 361 +++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/s390-ccw.h      |  33 +---
- pc-bios/s390-ccw/sclp.c          |  37 ++--
- pc-bios/s390-ccw/virtio-blkdev.c | 296 ++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/virtio-net.c    | 135 +++++++++++++++
- pc-bios/s390-ccw/virtio-scsi.c   |   1 +
- pc-bios/s390-ccw/virtio.c        | 306 ++++-----------------------------
- pc-bios/s390-ccw/virtio.h        |  46 ++---
- roms/SLOF                        |   2 +-
- 16 files changed, 1018 insertions(+), 388 deletions(-)
- create mode 100644 pc-bios/s390-ccw/bswap.h
- create mode 100644 pc-bios/s390-ccw/libc.h
- create mode 100644 pc-bios/s390-ccw/netboot.mak
- create mode 100644 pc-bios/s390-ccw/netmain.c
- create mode 100644 pc-bios/s390-ccw/virtio-blkdev.c
- create mode 100644 pc-bios/s390-ccw/virtio-net.c
-
--- 
-1.8.3.1
+> v2 --> v3:
+> * rebased onto current master, since 's390x: vmstatify config migration
+>   for virtio-ccw' is already there we don't need it here any more
+> * added ack's and r-b'
+> * got rid of loads of nits (thanks Connie and Thomas)
+> * added explanation why certain members are not migrated
+> 
+> v1 --> v2:
+> * Split out the vmystatify virtio-ccw part, reorganize
+> * Use WITH_TMP instead of one-shot VMStateInfo's
+> 
+> Halil Pasic (6):
+>   s390x: add helper get_machine_class
+>   s390x: add css_migration_enabled to machine class
+>   s390x/css: add missing css state conditionally
+>   s390x/css: add ORB to SubchDev
+>   s390x/css: activate ChannelSubSys migration
+>   s390x/css: use SubchDev.orb
+> 
+>  hw/intc/s390_flic.c                |  20 ++++++
+>  hw/s390x/css.c                     | 144 +++++++++++++++++++++++++++++++++----
+>  hw/s390x/s390-virtio-ccw.c         |  58 +++++++++------
+>  include/hw/s390x/css.h             |  11 ++-
+>  include/hw/s390x/s390-virtio-ccw.h |   7 ++
+>  5 files changed, 199 insertions(+), 41 deletions(-)
+> 
+> -- 
+> 2.11.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
