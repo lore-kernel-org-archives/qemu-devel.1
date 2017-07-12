@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVEyX-0003SH-SH
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:34:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1dVEyl-0003WC-JZ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVEyX-00088H-5B
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:34:33 -0400
-Date: Wed, 12 Jul 2017 11:34:23 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170712103423.GD6923@stefanha-x1.localdomain>
-References: <20170711163748.17817-1-el13635@mail.ntua.gr>
-	<20170711163748.17817-2-el13635@mail.ntua.gr>
+	(envelope-from <thuth@redhat.com>) id 1dVEyg-0008Ax-PC
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:34:47 -0400
+References: <CAFEAcA_HPtBhES_9L1KZzJTDJRpxD=0Ux-OyC3BV2UDNKZg2hg@mail.gmail.com>
+	<40961524-561e-aa31-b043-7b8ae9203b7c@suse.de>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7bb17d85-a21b-d890-03cc-18f56b785361@redhat.com>
+Date: Wed, 12 Jul 2017 12:34:35 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XvKFcGCOAo53UbWW"
-Content-Disposition: inline
-In-Reply-To: <20170711163748.17817-2-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] block: pass bdrv_* methods to
- bs->file by default in block filters
+In-Reply-To: <40961524-561e-aa31-b043-7b8ae9203b7c@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] should we update QEMU's u-boot submodule and
+ binary?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
+On 11.07.2017 20:22, Alexander Graf wrote:
+> 
+> On 11.07.17 19:43, Peter Maydell wrote:
+>> Hi; I just noticed that our u-boot submodule is still stuck on
+>> a commit from 2014 when it was first added to QEMU. Should we
+>> move this forward to some more recent u-boot release?
+>>
+>> I think we only use this for our ppc e500 rom...
+> 
+> It probably makes sense to update the e500 rom and bump the submodule to
+> the latest U-Boot release along the way, yes.
+> 
+> U-Boot 2017.07 just got released, so now is quite a good point in time
+> to do so.
 
---XvKFcGCOAo53UbWW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think we should rather update the submodule to commit 79c884d7e4 since
+that is the level that is used for the pc-bios/u-boot.e500 binary (see
+http://git.qemu.org/?p=qemu.git;a=commitdiff;h=d4574435a6530bbd96ae13 ).
 
-On Tue, Jul 11, 2017 at 07:37:45PM +0300, Manos Pitsidianakis wrote:
-> The following functions fail if bs->drv is a filter and does not
-> implement them:
->=20
-> bdrv_probe_blocksizes
-> bdrv_probe_geometry
-> bdrv_truncate
-> bdrv_has_zero_init
-> bdrv_get_info
->=20
-> Instead, the call should be passed to bs->file if it exists, to allow
-> filter drivers to support those methods without implementing them. This
-> commit makes `drv->is_filter =3D true` imply that these callbacks will be
-> forwarded to bs->file by default, so disabling support for these
-> functions must be done explicitly.
->=20
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> ---
->  block.c                   | 21 +++++++++++++++++++--
->  include/block/block_int.h |  6 +++++-
->  2 files changed, 24 insertions(+), 3 deletions(-)
+The problematic mv_gen_reg.h is also not part of that commit level anymore.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Alex, could you please send a patch for the update? Or shall I prepare one?
 
---XvKFcGCOAo53UbWW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZZfsvAAoJEJykq7OBq3PIE9IH/ROWj9xOi7JsoC3Ctox06Wy7
-NNCKVbKnNe78h/NZ3hnwmR8ZEW8VDIEbA4NjXqfFlCLTzPXarp8bONCazgecTFT5
-a5ggEbIQ33fsScXU6GEvogQ9qRFEMTaUIs37YilDSJjKnv5wcrPEUYOqZP6VqP2Z
-iTU6Ks31vFZKNERHexTpw7jEaPBOxDCPgwhKM0z6m7LujLUKwXmuoRRGKvRNvu/s
-Xza7V4p78B6tYNK3+EMNJe5IANJmirZgAaj4Mt1xW6WhH9tqOtANgFFBai9D083n
-fcmLiCWXB2NNzi8eBgp9C42l8l7QJ64wnfXt2Y0TB/+S42jj3QtOXkd8S5GTgLs=
-=m6eK
------END PGP SIGNATURE-----
-
---XvKFcGCOAo53UbWW--
+ Thomas
