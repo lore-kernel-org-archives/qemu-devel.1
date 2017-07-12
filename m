@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVPpA-0007na-Qs
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:09:37 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1dVPuh-0000oz-T4
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVPp7-0002FR-LC
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:09:36 -0400
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:36126)
+	(envelope-from <bobby.prani@gmail.com>) id 1dVPue-0005v5-NR
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:15:19 -0400
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:34404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVPp7-0002F0-Hq
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:09:33 -0400
-Received: by mail-qt0-x22d.google.com with SMTP id i2so24282739qta.3
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 15:09:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20170712162550.8061-1-berrange@redhat.com>
-	<bc2c99e9-3449-be02-bee1-b557e959fdb7@amsat.org>
-Message-ID: <1f339196-57b3-3998-66f9-4aa0ec57c30c@amsat.org>
-Date: Wed, 12 Jul 2017 19:09:29 -0300
-MIME-Version: 1.0
-In-Reply-To: <bc2c99e9-3449-be02-bee1-b557e959fdb7@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] Don't enable networking as a side-effect
- of DEBUG=1
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1dVPue-0005th-Ir
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:15:16 -0400
+Received: by mail-yw0-f196.google.com with SMTP id a12so2118619ywh.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 15:15:16 -0700 (PDT)
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Wed, 12 Jul 2017 18:14:14 -0400
+Message-Id: <20170712221414.3867-1-bobby.prani@gmail.com>
+Subject: [Qemu-devel] [PATCH] tcg/aarch64: Use ADR for shorter jumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: alex.bennee@linaro.org
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On 07/12/2017 06:46 PM, Philippe Mathieu-Daudé wrote:
-> now trying old debian release:
-> 
-> $ docker run --rm -it debian:wheezy sh -c "cat /etc/debian_version"; 
-> echo $?
-> 7.11
-> 0
-> 
-> $ docker run --rm -it debian:wheezy bash -c "cat /etc/debian_version"; 
-> echo $?
-> 139
+Use ADR instruction for shorter jumps.
 
-Indeed using debian:wheezy based dockerfile:
+I was going through rth's email and realized that I should have done
+this the first time.
 
-$ make docker-test-quick@debian7
-[...]
-Step 4/14 : RUN apt-get update
-  ---> Running in 305758a09ca4
-E: Method http has died unexpectedly!
-E: Sub-process http received a segmentation fault.
-The command '/bin/sh -c apt-get update' returned a non-zero code: 100
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ tcg/aarch64/tcg-target.inc.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-$ dmesg
-sh[25336] vsyscall attempted with vsyscall=none ip:ffffffffff600400 
-cs:33 sp:7fffa210e208 ax:ffffffffff600400 si:7fffa210ef60 di:0
-sh[25336]: segfault at ffffffffff600400 ip ffffffffff600400 sp 
-00007fffa210e208 error 15
-
-note, this does test Fam's "docker.py: Improve subprocess exit code 
-handling" :P
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 04bc369a92..5121ebc1a1 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -886,12 +886,16 @@ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
+         i1 = I3206_B | ((offset >> 2) & 0x3ffffff);
+         i2 = NOP;
+     } else {
+-        offset = (addr >> 12) - (jmp_addr >> 12);
++        if (offset == sextract64(offset, 0, 21)) {
++            i1 = I3406_ADR;
++            i2 = NOP;
++        } else {
++            offset = (addr >> 12) - (jmp_addr >> 12);
+ 
+-        /* patch ADRP */
+-        i1 = I3406_ADRP | (offset & 3) << 29 | (offset & 0x1ffffc) << (5 - 2) | rd;
+-        /* patch ADDI */
+-        i2 = I3401_ADDI | rt << 31 | (addr & 0xfff) << 10 | rd << 5 | rd;
++            i1 = I3406_ADRP;
++            i2 = I3401_ADDI | rt << 31 | (addr & 0xfff) << 10 | rd << 5 | rd;
++        }
++        i1 |= (offset & 3) << 29 | (offset & 0x1ffffc) << (5 - 2) | rd;
+     }
+     pair = (uint64_t)i2 << 32 | i1;
+     atomic_set((uint64_t *)jmp_addr, pair);
+-- 
+2.13.0
