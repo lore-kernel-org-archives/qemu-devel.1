@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVQCi-0004p5-Av
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:33:57 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dVQif-00054C-LZ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 19:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVQCf-0003lz-8X
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:33:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVQCe-0003lE-VX
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 18:33:53 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E4027D0EF
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 22:33:51 +0000 (UTC)
-Date: Thu, 13 Jul 2017 01:33:43 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170713012811-mutt-send-email-mst@kernel.org>
-References: <20170712094149.23069-1-jfreimann@redhat.com>
-	<20170712180550-mutt-send-email-mst@kernel.org>
-	<20170712211305.ajtizorj4yq6jble@localhost.localdomain>
+	(envelope-from <rth7680@gmail.com>) id 1dVQib-0007v7-Lr
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 19:06:57 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34185)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dVQib-0007gp-Gz
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 19:06:53 -0400
+Received: by mail-qk0-x244.google.com with SMTP id q66so6044103qki.1
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 16:06:30 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1499586614-20507-1-git-send-email-cota@braap.org>
+	<1499586614-20507-10-git-send-email-cota@braap.org>
+	<cb152594-248b-85fb-180a-fb83eecf4998@twiddle.net>
+	<20170710235751.GA16131@flamenco>
+	<57e5db60-7008-7c60-7139-7eb426078c0d@twiddle.net>
+	<20170712204804.GA25618@flamenco>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f7b8057b-a52a-788e-cddb-0b4ecf761fbd@twiddle.net>
+Date: Wed, 12 Jul 2017 13:06:23 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170712211305.ajtizorj4yq6jble@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/3] tests/pxe-testt: add testcase
- using vhost-user-bridge
+In-Reply-To: <20170712204804.GA25618@flamenco>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 09/22] exec-all: shrink tb->invalid to
+ uint8_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,109 +36,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, victork@redhat.com, maxime.coquelin@redhat.com
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jul 12, 2017 at 11:13:05PM +0200, Jens Freimann wrote:
-> On Wed, Jul 12, 2017 at 06:10:05PM +0300, Michael S. Tsirkin wrote:
-> > On Wed, Jul 12, 2017 at 11:41:46AM +0200, Jens Freimann wrote:
-> > > This implements a testcase for pxe-test using the vhost-user interface. Spawn a
-> > > vhost-user-bridge process and connect it to the qemu process.
-> > > 
-> > > It is send as an RFC because:
-> > >  - Patch 3/3: there must be cleaner way to do this.
-> > >  - Does Patch 1/3 make sense or should I just redirect all output to /dev/null?
-> > >  - don't hardcode port numbers in qemu cmdline, create socket and pass
-> > >     fd to -netdev (need to figure out how to do this)
-> > 
-> > Doesn't this work?
-> > 
-> > -netdev socket,id=str[,fd=h]
-> 
-> It should. But I get this:
-> 
->        dded sock 5 for watching. max_sock: 5
->        Sock 3 removed from dispatcher watch.
->        qemu: error: specified mcastaddr "127.0.0.1" (0x7f000001) does not contain a multicast address
->        qemu-system-x86_64: -netdev socket,id=n1,fd=3: Device 'socket' could not be initialized
->        Broken pipe
+On 07/12/2017 10:48 AM, Emilio G. Cota wrote:
+> Would it be OK for this series to just start with CF_PARALLEL? I'm not
+> too familiar with how icount mode recompiles code, and I'm now on
+> patch 27 of v2 and still have quite a few patches to go through.
 
-Not sure what's wrong with it, should not be too hard to debug.
+Certainly.
 
-Or maybe we should add unix domain socket support.
-Sounds like a reasonable feature to me.
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 49c1ecf..2531b73 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -224,31 +224,27 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+>   static void cpu_exec_step(CPUState *cpu)
+>   {
+>       CPUClass *cc = CPU_GET_CLASS(cpu);
+> -    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+>       TranslationBlock *tb;
+>       target_ulong cs_base, pc;
+>       uint32_t flags;
+>   
+> -    cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
+>       if (sigsetjmp(cpu->jmp_env, 0) == 0) {
+> -        mmap_lock();
+> -        tb_lock();
+> -        tb = tb_gen_code(cpu, pc, cs_base, flags,
+> -                         1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
+> -        tb->orig_tb = NULL;
+> -        tb_unlock();
+> -        mmap_unlock();
+> +        tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags);
+> +        if (tb == NULL) {
+> +            mmap_lock();
+> +            tb_lock();
+> +            tb = tb_gen_code(cpu, pc, cs_base, flags,
+> +                             1 | CF_IGNORE_ICOUNT);
 
-> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-> index 5a0d182..a14c1d9 100644
-> --- a/tests/pxe-test.c
-> +++ b/tests/pxe-test.c
-> @@ -29,7 +29,7 @@
-> #define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
->                         " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
->                         " -netdev user,id=n0,tftp=./,bootfile=%s "\
-> -                        " -netdev socket,id=n1,udp=localhost:%d,localaddr=localhost:%d"
-> +                        " -netdev socket,id=n1,fd=%d"
-> #define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
->                         " -device virtio-net-pci,netdev=n1 "
-> 
-> @@ -72,16 +72,42 @@ static const char *init_hugepagefs(const char *path)
->     return path;
-> }
-> 
-> +static int vubr_create_socket(struct sockaddr_in *si_remote, int rport)
-> +{
-> +    int sock =  -1;
-> +
-> +    if (inet_aton("127.0.0.1", (struct in_addr *) &si_remote->sin_addr.s_addr) == 0) {
-> +        g_test_message("inet_aton failed\n");
-> +        return -1;
+You've got a problem here in that you're not including CF_COUNT_MASK in the 
+hash and you dropped the flush when changing to parallel_cpus = true.  That 
+means you could find an old TB with CF_COUNT > 1.
+
+Not required for this patch set, but what I'd like to see eventually is
+
+   (1) cpu_exec_step merged into cpu_exec_step_atomic for clarity.
+   (2) callers of tb_gen_code add in CF_PARALLEL as needed; do not
+       pick it up from parallel_cpus within tb_gen_code.
+   (3) target/*/translate.c uses CF_PARALLEL instead of parallel_cpus.
+   (4) cpu_exec_step_atomic does the tb lookup and code gen outside
+       of the start_exclusive/end_exclusive lock.
+
+And to that end I think there are some slightly different choices you can make 
+now in order to reduce churn for that later.
+
+> @@ -320,11 +318,12 @@ static TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+>       desc.env = (CPUArchState *)cpu->env_ptr;
+>       desc.cs_base = cs_base;
+>       desc.flags = flags;
+> +    desc.cf_mask = curr_cf_mask();
+>       desc.trace_vcpu_dstate = *cpu->trace_dstate;
+>       desc.pc = pc;
+>       phys_pc = get_page_addr_code(desc.env, pc);
+>       desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+> -    h = tb_hash_func(phys_pc, pc, flags, *cpu->trace_dstate);
+> +    h = tb_hash_func(phys_pc, pc, flags, curr_cf_mask(), *cpu->trace_dstate);
+>       return qht_lookup(&tcg_ctx.tb_ctx.htable, tb_cmp, &desc, h);
+>   }
+
+E.g. this fundamental lookup function should have cf_mask passed in.
+
+> @@ -1254,6 +1256,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+>       if (use_icount && !(cflags & CF_IGNORE_ICOUNT)) {
+>           cflags |= CF_USE_ICOUNT;
+>       }
+> +    if (parallel_cpus) {
+> +        cflags |= CF_PARALLEL;
 > +    }
-> +
-> +    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-> +    if (sock == -1) {
-> +        g_test_message("socket creation failed\n");
-> +    }
-> +    if (connect(sock, (struct sockaddr *) si_remote, sizeof(*si_remote))) {
-> +        printf("connect, %d", errno);
-> +        return -1;
-> +    }
-> +
-> +    return sock;
-> +}
-> +
-> static void test_pxe_vhost_user(void)
-> {
->     char template[] = "/tmp/vhost-user-bridge-XXXXXX";
->     char template2[] = "/tmp/hugepages-XXXXXX";
->     gchar *vubr_args[] = {NULL, NULL, NULL, NULL};
-> +    struct sockaddr_in si_remote = {
-> +        .sin_family = AF_INET,
-> +        .sin_port = htons(RPORT),
-> +    };
->     const char *hugefs;
->     GError *error = NULL;
->     char *vubr_binary;
->     char *qemu_args;
->     GPid vubr_pid;
-> +    int sock = -1;
-> 
->     tmpfs = mkdtemp(template);
->     if (!tmpfs) {
-> 
->     tmpfs = mkdtemp(template);
->     if (!tmpfs) {
-> @@ -109,9 +135,10 @@ static void test_pxe_vhost_user(void)
->         root = tmpfs2;
->     }
-> 
-> +    sock = vubr_create_socket(&si_remote, RPORT);
-> +
->     qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
-> -                                "char0", vubr_args[2], "char0", disk,
-> -                                RPORT, LPORT);
-> +            "char0", vubr_args[2], "char0", disk, sock);
-> 
-> 
-> 
-> regards,
-> Jens
+
+E.g. pass this in.  Callers using curr_cf_mask() should suffice where it's not 
+obvious.
+
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 925ae11..fa40f6c 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -6312,11 +6312,10 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
+>           sigprocmask(SIG_BLOCK, &sigmask, &info.sigmask);
+>   
+>           /* If this is our first additional thread, we need to ensure we
+> -         * generate code for parallel execution and flush old translations.
+> +         * generate code for parallel execution.
+>            */
+>           if (!parallel_cpus) {
+>               parallel_cpus = true;
+> -            tb_flush(cpu);
+
+As per above, I think you must retain this for now.
+
+I strongly suspect that it will be worthwhile forever, since we're pretty much 
+guaranteed that none of the existing TBs will ever be used again.
+
+
+
+r~
