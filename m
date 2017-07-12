@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dVHAS-00040z-WB
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:55:02 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDI-0006T9-A2
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dVHAO-0007VL-58
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:55:01 -0400
-Received: from mga09.intel.com ([134.134.136.24]:58934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dVHAN-0007Uh-SU
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:54:56 -0400
-Message-ID: <59661CA6.5040903@intel.com>
-Date: Wed, 12 Jul 2017 20:57:10 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1497004901-30593-1-git-send-email-wei.w.wang@intel.com>
-	<1497004901-30593-7-git-send-email-wei.w.wang@intel.com>
-	<20170620190343-mutt-send-email-mst@kernel.org>
-	<5949E7C0.3050106@intel.com>
-	<20170621151922-mutt-send-email-mst@kernel.org>
-	<594B8287.6000706@intel.com>
-	<20170628175956-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170628175956-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v11 6/6] virtio-balloon:
- VIRTIO_BALLOON_F_CMD_VQ
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVHDD-0000y1-GD
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:57:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54864
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dVHDD-0000xm-9t
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 08:57:51 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6CCs6Bw131852
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:50 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bncj59q9s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:57:50 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 12 Jul 2017 13:57:48 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 12 Jul 2017 14:57:34 +0200
+Message-Id: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 00/11] pending s390 patches part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +36,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "david@redhat.com" <david@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mgorman@techsingularity.net" <mgorman@techsingularity.net>, "aarcange@redhat.com" <aarcange@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "liliang.opensource@gmail.com" <liliang.opensource@gmail.com>, "riel@redhat.com" <riel@redhat.com>, "nilal@redhat.com" <nilal@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 06/28/2017 11:01 PM, Michael S. Tsirkin wrote:
-> On Thu, Jun 22, 2017 at 04:40:39PM +0800, Wei Wang wrote:
->> On 06/21/2017 08:28 PM, Michael S. Tsirkin wrote:
->>> On Wed, Jun 21, 2017 at 11:28:00AM +0800, Wei Wang wrote:
->>>> On 06/21/2017 12:18 AM, Michael S. Tsirkin wrote:
->>>>> On Fri, Jun 09, 2017 at 06:41:41PM +0800, Wei Wang wrote:
->>>>>> -	if (!virtqueue_indirect_desc_table_add(vq, desc, num)) {
->>>>>> +	if (!virtqueue_indirect_desc_table_add(vq, desc, *num)) {
->>>>>>     		virtqueue_kick(vq);
->>>>>> -		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
->>>>>> -		vb->balloon_page_chunk.chunk_num = 0;
->>>>>> +		if (busy_wait)
->>>>>> +			while (!virtqueue_get_buf(vq, &len) &&
->>>>>> +			       !virtqueue_is_broken(vq))
->>>>>> +				cpu_relax();
->>>>>> +		else
->>>>>> +			wait_event(vb->acked, virtqueue_get_buf(vq, &len));
->>>>> This is something I didn't previously notice.
->>>>> As you always keep a single buffer in flight, you do not
->>>>> really need indirect at all. Just add all descriptors
->>>>> in the ring directly, then kick.
->>>>>
->>>>> E.g.
->>>>> 	virtqueue_add_first
->>>>> 	virtqueue_add_next
->>>>> 	virtqueue_add_last
->>>>>
->>>>> ?
->>>>>
->>>>> You also want a flag to avoid allocations but there's no need to do it
->>>>> per descriptor, set it on vq.
->>>>>
->>>> Without using the indirect table, I'm thinking about changing to use
->>>> the standard sg (i.e. struct scatterlist), instead of vring_desc, so that
->>>> we don't need to modify or add any new functions of virtqueue_add().
->>>>
->>>> In this case, we will kmalloc an array of sgs in probe(), and we can add
->>>> the sgs one by one to the vq, which won't trigger the allocation of an
->>>> indirect table inside virtqueue_add(), and then kick when all are added.
->>>>
->>>> Best,
->>>> Wei
->>> And allocate headers too? This can work. API extensions aren't
->>> necessarily a bad idea though. The API I suggest above is preferable
->>> for the simple reason that it can work without INDIRECT flag
->>> support in hypervisor.
->> OK, probably we don't need to add a desc to the vq - we can just use
->> the vq's desc, like this:
->>
->> int virtqueue_add_first(struct virtqueue *_vq,
->>                                       uint64_t addr,
->>                                       uint32_t len,
->>                                       bool in,
->>                                       unsigned int *idx) {
->>
->>      ...
->>     uint16_t desc_flags = in ? VRING_DESC_F_NEXT | VRING_DESC_F_WRITE :
->>                                               VRING_DESC_F_NEXT;
->>
->>      vq->vring.desc[vq->free_head].addr = addr;
->>      vq->vring.desc[vq->free_head].len = len;
->>      vq->vring.desc[vq->free_head].flags = cpu_to_virtio16(_vq->vdev, flags);
->>      /* return to the caller the desc id */
->>      *idx = vq->free_head;
->>      ...
->> }
->>
->> int virtqueue_add_next(struct virtqueue *_vq,
->>                                       uint64_t addr,
->>                                       uint32_t len,
->>                                       bool in,
->>                                       bool end,
->>                                       unsigned int *idx) {
->>      ...
->>      vq->vring.desc[*idx].next = vq->free_head;
->>      vq->vring.desc[vq->free_head].addr = addr;
->>      ...
->>      if (end)
->>          remove the VRING_DESC_F_NEXT flag
->> }
->>
-> Add I would say add-last.
->
->> What do you think? We can also combine the two functions into one.
->>
->>
->>
->> Best,
->> Wei
-> With an enum? Yes that's also an option.
->
+here is the first bunch on patches for s390:
 
-Thanks for the suggestion. I shifted it a little bit, please have a check
-the latest v12 patches that I just sent out.
+- Some more PCI changes
+- storage attribute migration (migration of CMMA state)
+- cpu model cleanups and preparations
 
-Best,
-Wei
+part 2 will follow shortly (sorry for the delay - process reasons ;-)).
+
+In addition to that I plan to have the migration rework from Halil
+and Thomas network boot.
+
+
+Christian Borntraeger (1):
+  linux-headers: update to 4.13-rc0
+
+Claudio Imbrenda (2):
+  s390x/migration: Storage attributes device
+  s390x/migration: Monitor commands for storage attributes
+
+Fei Li (3):
+  s390x: add flags field for registering I/O adapter
+  s390x/flic: introduce modify_ais_mode callback
+  s390x/sic: realize SIC handling
+
+Janosch Frank (1):
+  s390x/kvm: Rework cmma management
+
+Jason J. Herne (2):
+  s390x/cpumodel: clean up spacing and comments
+  s390x/cpumodel: provide compat handling for new cpu features
+
+Yi Min Zhao (2):
+  s390x/flic: introduce inject_airq callback
+  s390x/css: update css_adapter_interrupt
+
+ hmp-commands-info.hx                               |  16 +
+ hmp-commands.hx                                    |  16 +
+ hw/intc/s390_flic.c                                |  66 +++-
+ hw/intc/s390_flic_kvm.c                            |  57 ++-
+ hw/intc/trace-events                               |   4 +
+ hw/s390x/Makefile.objs                             |   2 +
+ hw/s390x/css-bridge.c                              |   2 +-
+ hw/s390x/css.c                                     |  52 ++-
+ hw/s390x/s390-pci-bus.c                            |   5 +-
+ hw/s390x/s390-stattrib-kvm.c                       | 178 +++++++++
+ hw/s390x/s390-stattrib.c                           | 410 +++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c                         |  10 +-
+ hw/s390x/trace-events                              |   1 +
+ hw/s390x/virtio-ccw.c                              |   2 +-
+ include/hw/s390x/css.h                             |  12 +-
+ include/hw/s390x/s390_flic.h                       |  13 +-
+ include/hw/s390x/storage-attributes.h              |  72 ++++
+ include/standard-headers/asm-x86/hyperv.h          |  21 +-
+ include/standard-headers/linux/input-event-codes.h |   1 +
+ include/standard-headers/linux/pci_regs.h          |   1 +
+ linux-headers/asm-arm/kvm.h                        |   8 +
+ linux-headers/asm-arm64/kvm.h                      |   3 +
+ linux-headers/asm-powerpc/kvm.h                    |   6 +
+ linux-headers/asm-s390/kvm.h                       |  12 +
+ linux-headers/linux/kvm.h                          |  35 ++
+ monitor.c                                          |   1 +
+ target/s390x/cpu.h                                 |   1 +
+ target/s390x/cpu_features.c                        |   3 +
+ target/s390x/cpu_features_def.h                    |  35 ++
+ target/s390x/cpu_models.c                          |  26 ++
+ target/s390x/cpu_models.h                          |   2 +
+ target/s390x/gen-features.c                        |  58 ++-
+ target/s390x/kvm.c                                 |  42 ++-
+ 33 files changed, 1135 insertions(+), 38 deletions(-)
+ create mode 100644 hw/s390x/s390-stattrib-kvm.c
+ create mode 100644 hw/s390x/s390-stattrib.c
+ create mode 100644 include/hw/s390x/storage-attributes.h
+
+-- 
+2.7.4
