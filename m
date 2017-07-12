@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVLkN-0008Iv-60
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVLkx-0000a8-Ka
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVLkI-0006RS-9E
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:23 -0400
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:33088)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dVLkI-0006Qt-0I
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:18 -0400
-Received: by mail-wm0-f41.google.com with SMTP id t70so309225wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 10:48:17 -0700 (PDT)
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-20-git-send-email-cota@braap.org>
-	<8737a18wzf.fsf@linaro.org>
-	<9d22af0e-e87f-4f6c-2369-5affe7e1d468@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <9d22af0e-e87f-4f6c-2369-5affe7e1d468@twiddle.net>
-Date: Wed, 12 Jul 2017 18:47:14 +0100
-Message-ID: <871spl8s4d.fsf@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dVLks-0006l0-O9
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37866)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVLks-0006kL-Ec
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:54 -0400
+Date: Wed, 12 Jul 2017 14:48:44 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170712174844.GH6020@localhost.localdomain>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
+	<8760ex4q1x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 19/22] tcg: introduce tcg_context_clone
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8760ex4q1x.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Wed, Jul 12, 2017 at 05:45:30PM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+[...]
+> > It could be changed to something like this:
+> >
+> >   Supported machines are:
+> >   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+> >   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+> >   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+> >   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+> >   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+> >   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+> >   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+> >   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+> >   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+> >   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+> >   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+> >   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+> >   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+> >   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+> >   isapc                ISA-only PC
+> >   none                 empty machine
+> >
+> >   Deprecated machines: pc-1.2, pc-1.1, pc-1.0, pc-0.15, pc-0.14, pc-0.13,
+> >                        pc-0.12, pc-0.11, pc-0.10.
+> 
+> I'd add "(deprecated)" to the existing lines instead.  Probably simpler
+> to code, because it's consistent with the existing format.
 
-Richard Henderson <rth@twiddle.net> writes:
+That would be good enough to me, and probably a one-line patch.
+My intention was to hide the deprecated machines in a corner,
+separated from the "Supported machines" list.
 
-> On 07/12/2017 06:02 AM, Alex Bennée wrote:
->> Why a copy approach as opposed to a plain tcg_context_new() with the
->> appropriate init cleanup.
->
-> We need the globals that were set up by the target/foo/translate.c
-> code to be the same for each thread.  That's what makes it easier to
-> copy the struct.
-
-Ahh I see. Maybe expand the comment for the function a little then?
-
-
---
-Alex Bennée
+-- 
+Eduardo
