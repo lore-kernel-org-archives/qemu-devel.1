@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVBXG-000486-7Y
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:54:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1dVBa0-0006RA-Vu
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:57:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVBXB-0005So-Cn
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:54:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54084)
+	(envelope-from <thuth@redhat.com>) id 1dVBZw-0000Bo-4S
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:57:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVBXB-0005S7-5k
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:54:05 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12F6AC0587C1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 06:54:04 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 12 Jul 2017 14:53:43 +0800
-Message-Id: <1499842423-21101-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1499842423-21101-1-git-send-email-peterx@redhat.com>
-References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] migration: export capabilities to props
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVBZv-0000B9-To
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 02:56:56 -0400
+References: <1499781397-19749-1-git-send-email-thuth@redhat.com>
+	<1499781397-19749-8-git-send-email-thuth@redhat.com>
+	<20170711162326.4b34d8da@dhcp-192-215.str.redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f65b053f-ecb0-4697-47d2-3191b6128c88@redhat.com>
+Date: Wed, 12 Jul 2017 08:56:46 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170711162326.4b34d8da@dhcp-192-215.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 07/11] pc-bios/s390-ccw: Add code for
+ virtio feature negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Do the same thing to migration capabilities, just like what we did in
-previous patch for migration parameters.
+On 11.07.2017 16:23, Cornelia Huck wrote:
+> On Tue, 11 Jul 2017 15:56:33 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> The upcoming virtio-net driver needs to negotiate some features,
+>> so we need the possibility to do this in the core virtio code.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/s390-ccw.h |  2 ++
+>>  pc-bios/s390-ccw/virtio.c   | 23 +++++++++++++++++------
+>>  pc-bios/s390-ccw/virtio.h   |  1 +
+>>  3 files changed, 20 insertions(+), 6 deletions(-)
+> 
+> 
+>> diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
+>> index d733780..a00a320 100644
+>> --- a/pc-bios/s390-ccw/virtio.h
+>> +++ b/pc-bios/s390-ccw/virtio.h
+>> @@ -251,6 +251,7 @@ struct VDev {
+>>      ScsiDevice selected_scsi_device;
+>>      uint64_t netboot_start_addr;
+>>      uint32_t max_transfer;
+>> +    uint32_t guest_features[2];
+> 
+> Just 'features' might have been a better name, but:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+I think it's clearer to call it guest_features ... in case we ever want
+to store the host features, too.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index fd00670..7e6f353 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2001,6 +2001,9 @@ void migration_global_dump(Monitor *mon)
-                    ms->send_configuration, ms->send_section_footer);
- }
- 
-+#define DEFINE_PROP_MIG_CAP(name, x)             \
-+    DEFINE_PROP_BOOL(name, MigrationState, enabled_capabilities[x], false)
-+
- static Property migration_properties[] = {
-     DEFINE_PROP_BOOL("store-global-state", MigrationState,
-                      store_global_state, true),
-@@ -2034,6 +2037,20 @@ static Property migration_properties[] = {
-     DEFINE_PROP_INT64("x-checkpoint-delay", MigrationState,
-                       parameters.x_checkpoint_delay,
-                       DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
-+
-+    /* Migration capabilities */
-+    DEFINE_PROP_MIG_CAP("xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-+    DEFINE_PROP_MIG_CAP("rdma-pin-all", MIGRATION_CAPABILITY_RDMA_PIN_ALL),
-+    DEFINE_PROP_MIG_CAP("auto-converge", MIGRATION_CAPABILITY_AUTO_CONVERGE),
-+    DEFINE_PROP_MIG_CAP("zero-blocks", MIGRATION_CAPABILITY_ZERO_BLOCKS),
-+    DEFINE_PROP_MIG_CAP("compress", MIGRATION_CAPABILITY_COMPRESS),
-+    DEFINE_PROP_MIG_CAP("events", MIGRATION_CAPABILITY_EVENTS),
-+    DEFINE_PROP_MIG_CAP("postcopy-ram", MIGRATION_CAPABILITY_POSTCOPY_RAM),
-+    DEFINE_PROP_MIG_CAP("x-colo", MIGRATION_CAPABILITY_X_COLO),
-+    DEFINE_PROP_MIG_CAP("release-ram", MIGRATION_CAPABILITY_RELEASE_RAM),
-+    DEFINE_PROP_MIG_CAP("block", MIGRATION_CAPABILITY_BLOCK),
-+    DEFINE_PROP_MIG_CAP("return-path", MIGRATION_CAPABILITY_RETURN_PATH),
-+
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-2.7.4
+>>  };
+>>  typedef struct VDev VDev;
+>>  
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+Thanks!
+
+ Thomas
