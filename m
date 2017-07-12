@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVLkx-0000a8-Ka
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:49:00 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dVLlW-0001EX-8V
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVLks-0006l0-O9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVLks-0006kL-Ec
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:48:54 -0400
-Date: Wed, 12 Jul 2017 14:48:44 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170712174844.GH6020@localhost.localdomain>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<8760ex4q1x.fsf@dusky.pond.sub.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dVLlR-00072z-BM
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:49:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45540
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dVLlR-00072h-5j
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 13:49:29 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6CHmwc3127993
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 13:49:28 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bnp3cxupx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 13:49:28 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 12 Jul 2017 18:49:26 +0100
+References: <20170711004303.3902-1-ehabkost@redhat.com>
+	<20170711004303.3902-4-ehabkost@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 12 Jul 2017 19:49:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8760ex4q1x.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+In-Reply-To: <20170711004303.3902-4-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <2cda5b0b-0169-d12e-114e-77fcb1a4bb07@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] Revert "machine: Convert abstract
+ typename on compat_props to subclass names"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +44,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>
 
-On Wed, Jul 12, 2017 at 05:45:30PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-[...]
-> > It could be changed to something like this:
-> >
-> >   Supported machines are:
-> >   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-> >   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
-> >   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
-> >   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-> >   pc-1.3               Standard PC (i440FX + PIIX, 1996)
-> >   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-> >   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
-> >   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
-> >   isapc                ISA-only PC
-> >   none                 empty machine
-> >
-> >   Deprecated machines: pc-1.2, pc-1.1, pc-1.0, pc-0.15, pc-0.14, pc-0.13,
-> >                        pc-0.12, pc-0.11, pc-0.10.
+
+
+On 07/11/2017 02:43 AM, Eduardo Habkost wrote:
+> This reverts commit 0bcba41fe379e4c6834adcf1456d9099db31a5b2.
 > 
-> I'd add "(deprecated)" to the existing lines instead.  Probably simpler
-> to code, because it's consistent with the existing format.
+> The bug addressed by that commit is now fixed in a better way by the
+> commit "qdev: fix the order compat and global properties are applied".
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-That would be good enough to me, and probably a one-line patch.
-My intention was to hide the deprecated machines in a corner,
-separated from the "Supported machines" list.
+Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
--- 
-Eduardo
+Note: It is not like the effect of commit 0bcba41fe3 is canceled
+out with your first patch in place. It depends on the client
+code (the implementation of the individual devices) wether
+this patch changes something or not. I did not check myself.
+So the did you verify that nothing breaks with this change applies
+here too.
+
+> ---
+>  hw/core/machine.c | 26 +++-----------------------
+>  1 file changed, 3 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index ecb5552..1d10b01 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -770,18 +770,11 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
+>      g_free(mc->name);
+>  }
+> 
+> -static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
+> -{
+> -    GlobalProperty *p = opaque;
+> -    register_compat_prop(object_class_get_name(oc), p->property, p->value);
+> -}
+> -
+>  void machine_register_compat_props(MachineState *machine)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      int i;
+>      GlobalProperty *p;
+> -    ObjectClass *oc;
+> 
+>      if (!mc->compat_props) {
+>          return;
+> @@ -789,22 +782,9 @@ void machine_register_compat_props(MachineState *machine)
+> 
+>      for (i = 0; i < mc->compat_props->len; i++) {
+>          p = g_array_index(mc->compat_props, GlobalProperty *, i);
+> -        oc = object_class_by_name(p->driver);
+> -        if (oc && object_class_is_abstract(oc)) {
+> -            /* temporary hack to make sure we do not override
+> -             * globals set explicitly on -global: if an abstract class
+> -             * is on compat_props, register globals for all its
+> -             * non-abstract subtypes instead.
+> -             *
+> -             * This doesn't solve the problem for cases where
+> -             * a non-abstract typename mentioned on compat_props
+> -             * has subclasses, like spapr-pci-host-bridge.
+> -             */
+> -            object_class_foreach(machine_register_compat_for_subclass,
+> -                                 p->driver, false, p);
+> -        } else {
+> -            register_compat_prop(p->driver, p->property, p->value);
+> -        }
+> +        /* Machine compat_props must never cause errors: */
+> +        p->errp = &error_abort;
+> +        qdev_prop_register_global(p);
+>      }
+>  }
+> 
