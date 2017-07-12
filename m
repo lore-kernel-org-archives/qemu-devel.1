@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dVE8p-0007zu-S9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:41:08 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVEA0-0000Ty-0I
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dVE8k-00028T-VY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:41:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dVE8k-00027U-PX
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:41:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dVE8j-0004Ng-GM
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:41:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 732E12E8197
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 09:41:01 +0000 (UTC)
+	(envelope-from <alex.bennee@linaro.org>) id 1dVE9v-0002pV-9F
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:20 -0400
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:36171)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dVE9v-0002p2-1g
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:42:15 -0400
+Received: by mail-wr0-f180.google.com with SMTP id c11so25698147wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 02:42:14 -0700 (PDT)
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	<149943378206.8972.1141843062606418973.stgit@frigg.lan>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <149943378206.8972.1141843062606418973.stgit@frigg.lan>
+Date: Wed, 12 Jul 2017 10:41:12 +0100
+Message-ID: <87tw2i801z.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Jul 2017 09:31:24 -0000
-From: Ruslan <b7.10110111@gmail.com>
-Reply-To: Bug 1703795 <1703795@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <149985188503.15456.11517595781983565935.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703795] [NEW] Unable to release mouse in SDL2
- mode
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v12 25/27] target/arm: [tcg] Port to
+ disas_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-Public bug reported:
 
-Starting with commit 8f4ea9cd0b770dbe496d9d24f0ef8813fdbfe0d0 "sdl:
-prefer sdl2 over sdl1", I can no longer release mouse pointer grab
-unless I use --with-sdlabi=3D1.2 configure option.
+Lluís Vilanova <vilanova@ac.upc.edu> writes:
 
-This easily reproduces in e.g. guest Kubuntu, when I let it start Xorg
-and then click into the QEMU window. After this the mouse is trapped and
-no matter how I combine Ctrl+Alt and motion of the cursor, the pointer
-never goes out from the window. When at the border, QEMU window switches
-from "Press Ctrl+Alt to exit grab" to "QEMU", i.e. it thinks that it has
-released the grab. But it hasn't really, so I have to go to VT1 and do
-"pkill qemu" from there to get my pointer back.
+> Incrementally paves the way towards using the generic instruction translation
+> loop.
+>
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
--- =
+> ---
+>  target/arm/translate.c |   13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 00cac01d66..5db381491f 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -12133,6 +12133,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+>      }
+>  }
+>
+> +static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
+> +{
+> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
+> +
+> +    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+> +    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
+> +                     dc->thumb | (dc->sctlr_b << 1));
+> +}
+> +
+>  /* generate intermediate code for basic block 'tb'.  */
+>  void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>  {
+> @@ -12236,9 +12245,7 @@ done_generating:
+>          qemu_log_in_addr_range(dc->base.pc_first)) {
+>          qemu_log_lock();
+>          qemu_log("----------------\n");
+> -        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+> -        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_first,
+> -                         dc->thumb | (dc->sctlr_b << 1));
+> +        arm_tr_disas_log(&dc->base, cs);
+>          qemu_log("\n");
+>          qemu_log_unlock();
+>      }
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703795
 
-Title:
-  Unable to release mouse in SDL2 mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  Starting with commit 8f4ea9cd0b770dbe496d9d24f0ef8813fdbfe0d0 "sdl:
-  prefer sdl2 over sdl1", I can no longer release mouse pointer grab
-  unless I use --with-sdlabi=3D1.2 configure option.
-
-  This easily reproduces in e.g. guest Kubuntu, when I let it start Xorg
-  and then click into the QEMU window. After this the mouse is trapped
-  and no matter how I combine Ctrl+Alt and motion of the cursor, the
-  pointer never goes out from the window. When at the border, QEMU
-  window switches from "Press Ctrl+Alt to exit grab" to "QEMU", i.e. it
-  thinks that it has released the grab. But it hasn't really, so I have
-  to go to VT1 and do "pkill qemu" from there to get my pointer back.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703795/+subscriptions
+--
+Alex Bennée
