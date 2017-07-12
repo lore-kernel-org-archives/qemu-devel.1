@@ -1,19 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVCv4-000698-4W
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:22:51 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1dVCwR-00074U-E9
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:24:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVCv0-0005FC-41
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:22:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46548)
+	(envelope-from <kevin.tian@intel.com>) id 1dVCwK-0005vF-Iv
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:24:15 -0400
+Received: from mga06.intel.com ([134.134.136.31]:49488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVCuz-0005Em-U6
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:22:46 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Jul 2017 10:22:33 +0200
-Message-Id: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10 to
- pc-1.2
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1dVCwK-0005v9-8U
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:24:08 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Wed, 12 Jul 2017 08:24:03 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D34761@SHSMSX101.ccr.corp.intel.com>
+References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
+	<20170626141906.6e38b235@w520.home>
+	<01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
+	<20170627134431.5947c771@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
+	<20170628095938.1329c358@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
+	<20170629145722.4af0a0fa@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D1F630@SHSMSX101.ccr.corp.intel.com>
+	<20170630105952.720b63b8@w520.home>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D2B902@SHSMSX101.ccr.corp.intel.com>
+	<20170710134721.4d778118@w520.home>
+In-Reply-To: <20170710134721.4d778118@w520.home>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
+ VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,75 +40,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "Zhang, Yulei" <yulei.zhang@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 
-We don't want to carry along old machine types forever. If we are able to
-remove the pc machines up to 0.13 one day for example, this would allow
-us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-BARs directly to low memory). Everything up to pc-1.2 is also known to
-have issues with migration.  So let's start with a deprecation message
-for the old machine types so that the (hopefully) few users of these old
-systems start switching over to newer machine types instead.
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Tuesday, July 11, 2017 3:47 AM
+>=20
+> On Fri, 7 Jul 2017 06:40:58 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+>=20
+> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > Sent: Saturday, July 1, 2017 1:00 AM
+> > >
+> > > On Fri, 30 Jun 2017 05:14:40 +0000
+> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > >
+> > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > > Sent: Friday, June 30, 2017 4:57 AM
+> > > > >
+> > > > > On Thu, 29 Jun 2017 00:10:59 +0000
+> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > > >
+> > > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > > > > Sent: Thursday, June 29, 2017 12:00 AM
+> > > > > > > Thanks Kevin.  So really it's not really a dirty bitmap, it's=
+ just a
+> > > > > > > bitmap of pages that the device has access to and may have di=
+rtied.
+> > > > > > > Don't we have this more generally in the vfio type1 IOMMU
+> backend?
+> > > For
+> > > > > > > a mediated device, we know all the pages that the vendor driv=
+er
+> has
+> > > > > > > asked to be pinned.  Should we perhaps make this interface on=
+ the
+> > > vfio
+> > > > > > > container rather than the device?  Any mediated device can
+> provide
+> > > this
+> > > > > > > level of detail without specific vendor support.  If we had D=
+MA
+> page
+> > > > > > > faulting, this would be the natural place to put it as well, =
+so maybe
+> > > > > > > we should design the interface there to support everything
+> similarly.
+> > > > > > > Thanks,
+> > > > > > >
+> > > > > >
+> > > > > > That's a nice idea. Just two comments:
+> > > > > >
+> > > > > > 1) If some mediated device has its own way to construct true di=
+rty
+> > > > > > bitmap (not thru DMA page faulting), the interface is better
+> designed
+> > > > > > to allow that flexibility. Maybe an optional callback if not re=
+gistered
+> > > > > > then use common type1 IOMMU logic otherwise prefers to vendor
+> > > > > > specific callback
+> > > > >
+> > > > > I'm not sure what that looks like, but I agree with the idea.  Co=
+uld
+> > > > > the pages that type1 knows about every be anything other than a
+> > > > > superset of the dirty pages?  Perhaps a device ioctl to flush unu=
+sed
+> > > > > mappings would be sufficient.
+> > > >
+> > > > sorry I didn't quite get your idea here. My understanding is that
+> > > > type1 is OK as an alternative in case mediated device has no way
+> > > > to track dirtied pages (as for Intel GPU), so we can use type1 pinn=
+ed
+> > > > pages as an indirect way to indicate dirtied pages. But if mediated
+> > > > device has its own way (e.g. a device private MMU) to track dirty
+> > > > pages, then we should allow that device to provide dirty bitmap
+> > > > instead of using type1.
+> > >
+> > > My thought was that our current mdev iommu interface allows the
+> vendor
+> > > driver to pin specific pages.  In order for the mdev device to dirty =
+a
+> > > page, we need for it to be pinned.  Therefore at worst, the set of
+> > > pages pinned in type1 is the superset of all pages that can potential=
+ly
+> > > be dirtied by the device.  In the worst case, this devolves to all
+> > > pages mapped through the iommu in the case of direct assigned devices=
+.
+> > > My assertion is therefore that a device specific dirty page bitmap ca=
+n
+> > > only be a subset of the type1 pinned pages.  Therefore if the mdev
+> >
+> > this assertion is correct.
+> >
+> > > vendor driver can flush any stale pinnings, then the type1 view off
+> > > pinned pages should match the devices view of the current working set=
+.
+> > > Then we wouldn't need a device specific dirty bitmap, we'd only need =
+a
+> > > mechanism to trigger a flush of stale mappings on the device.
+> >
+> > what's your definition of 'stale pinnings"? take Intel vGPU for example=
+,
+> > we pin pages when they are mapped to GPU page table and then unpin
+> > them when unmapped from GPU page table. Based on this policy type1
+> > view of pinned pages should just match device view.  There is no 'stale=
+'
+> > page example which I can think of since all currently-pinned pages must
+> > be pinned for various read/write purpose.
+>=20
+> Then it seems that the mdev support in the IOMMU already tracks the
+> minimum page set for Intel vGPUs, it can be a noop in that case.  Are
+> we missing some ability to identify pages through vendor specific
+> hooks, or were those hooks never really needed?
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Note: Even if we mark all these old machines as deprecated, this ofcourse
- doesn't mean that we also have to remove them all at once later when we
- decide to finally really remove some. We could then also start by removing
- 0.10 and 0.11 only, for example (since there should really be no users left
- for these), or only up to 0.13 (to be able to kill rombar=0).
+No vendor specific hook for Intel side. In the future once IOMMU=20
+provides standard dirty bit tracking, also no vendor specific hook
+is required. I'm just thinking about such possibility in the design. :-)
 
- v3:
- - Use a more generic approach by introducing a "deprecation_msg" in the
-   MachineClass instead.
+>=20
+> > but I do realize one limitation of this option now. Given there are
+> > both physical device and mdev assigned to the same guest, we
+> > have to pin all pages for physically assigned device. In that case we
+> > may need away to differentiate which device a given pinned page
+> > is for. I'm not sure whether it's an easy thing or require lots of chan=
+ge.
+> > interface wise we don't need additional one since there is still
+> > unpin request from mdev path. Just internal structure needs to
+> > be extended to maintain that ownership info.
+>=20
+> We can't migrate with regular assigned device and this model fails in
+> the right way, assuming that all memory is dirty, which is correct.
+> Currently we'd need to detach any directly assigned devices, leaving
+> only the mdev device.  If we had PRI support, then a way to flush
+> stale mappings and fault in new ones would be a way to reduce the
+> working set during migration.  I don't really see that per device
+> tracking helps us, we need to consider the page dirty regardless of
+> who dirtied it.
+>=20
+> > >
+> > > Otherwise I'm not sure how we cleanly create an interface where the
+> > > dirty bitmap can either come from the device or the container... but
+> > > I'd welcome suggestions.  Thanks,
+> > >
+> >
+> > My original thought is simple:
+> >
+> > - by default type1 can give dirty bitmap
+> > - when mdev is created, mdev driver has chance to claim whether
+> > it would like to track its own dirty bitmap
+> > - then when Qemu requests dirty bitmap of mdev, vfio check the
+> > flag to decide whether return type1 or call into mdev driver
+>=20
+> What would the device do differently?  The container is the logical
+> component tracking memory and therefore seems the logical component to
+> track dirty memory.  Potentially there's even some efficiency that we
+> can handle the dirty memory for multiple devices via a container
+> interface.  It also means that we don't have per vendor driver
+> implementations (and bugs) for dirty bitmaps.  Thanks,
+>=20
 
- v2:
- - Deprecate machines up to pc-1.2
+I'm OK with this since I don't have a real example for that case.
+let's go with this proposal - tracking dirty bitmap in VFIO through
+type1 interface. No vendor specific hook.
 
- hw/i386/pc_piix.c   | 1 +
- include/hw/boards.h | 1 +
- vl.c                | 4 ++++
- 3 files changed, 6 insertions(+)
-
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 22dbef6..8e70308 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -707,6 +707,7 @@ static void pc_i440fx_1_2_machine_options(MachineClass *m)
- {
-     pc_i440fx_1_3_machine_options(m);
-     m->hw_version = "1.2.0";
-+    m->deprecation_msg = "Please use a newer machine type instead.";
-     SET_MACHINE_COMPAT(m, PC_COMPAT_1_2);
- }
- 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 76ce021..42a0264 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -112,6 +112,7 @@ struct MachineClass {
-     char *name;
-     const char *alias;
-     const char *desc;
-+    const char *deprecation_msg;
- 
-     void (*init)(MachineState *state);
-     void (*reset)(void);
-diff --git a/vl.c b/vl.c
-index f7560de..0058d41 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4115,6 +4115,10 @@ int main(int argc, char **argv, char **envp)
-     replay_configure(icount_opts);
- 
-     machine_class = select_machine();
-+    if (machine_class->deprecation_msg) {
-+        error_report("Machine type '%s' is deprecated. %s",
-+                     machine_class->name, machine_class->deprecation_msg);
-+    }
- 
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
- 
--- 
-1.8.3.1
+Thanks
+Kevin
