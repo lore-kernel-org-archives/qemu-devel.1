@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dV5uy-0001eV-IN
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 20:54:17 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dV5zs-0003P9-3B
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 20:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dV5uu-0004YK-Lw
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 20:54:16 -0400
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:35977)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dV5uu-0004Y4-Fw
-	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 20:54:12 -0400
-Received: by mail-pf0-f172.google.com with SMTP id q86so4163636pfl.3
-	for <qemu-devel@nongnu.org>; Tue, 11 Jul 2017 17:54:12 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1499586614-20507-1-git-send-email-cota@braap.org>
-	<1499586614-20507-10-git-send-email-cota@braap.org>
-	<cb152594-248b-85fb-180a-fb83eecf4998@twiddle.net>
-	<20170710235751.GA16131@flamenco>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <57e5db60-7008-7c60-7139-7eb426078c0d@twiddle.net>
-Date: Tue, 11 Jul 2017 14:53:00 -1000
-MIME-Version: 1.0
-In-Reply-To: <20170710235751.GA16131@flamenco>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/22] exec-all: shrink tb->invalid to
- uint8_t
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dV5zo-0006Uo-1x
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 20:59:20 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:50455)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dV5zn-0006UL-Ex
+	for qemu-devel@nongnu.org; Tue, 11 Jul 2017 20:59:15 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Wed, 12 Jul 2017 17:12:07 +0800
+Message-Id: <1499850727-50728-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] target-i386:kvm_get/put_vcpu_events don't
+ handle sipi_vector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org
+To: rth@twiddle.net, pbonzini@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-On 07/10/2017 01:57 PM, Emilio G. Cota wrote:
->> What I would prefer to do is generalize tb->cflags.  Those values *do*
->> affect how we compile the TB, and yet we don't take them into account.  So I
->> think it would be a good idea to feed that into the TB hash.
-> 
-> I'm having trouble seeing how this could work.
-> Where do we get the "current" values from the current state, i.e.
-> the ones we need to generate the hash and perform comparisons?
-> In particular:
-> - CF_COUNT_MASK: just use CF_COUNT_MASK?
-> - CF_LAST_IO: ?
-> - CF_NOCACHE: always 0 I guess
+qemu call kvm_get_vcpu_events, and kernel return sipi_vector always 0,
+never valid when reporting to user space. But qemu call kvm_put_vcpu_events
+will make sipi_vector in kernel be 0. This will accidently modify sipi_vector
+when sipi_vector in kernel is not 0.
 
-All of these are set by cpu_io_recompile as needed.
-They are all clear for normal TBs.
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+Reviewed-by: Wang Yechao <wang.yechao255@zte.com.cn>
+---
+ target/i386/kvm.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-> - CF_USE/IGNORE_ICOUNT: ?
-CF_IGNORE_ICOUNT probably shouldn't exist.  Probably the callers of tb_gen_code 
-should simply set CF_USE_ICOUNT properly if use_icount is true, rather than 
-having two flags control the same feature.
-
-At which point CF_USE_ICOUNT should be set iff use_icount is true.
-
-Likewise CF_PARALLEL would be set iff parallel_cpus is true, except for within 
-cpu_exec_step_atomic where we would always use 0 (because that's the whole 
-point of that function).
-
-
-r~
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index f84a49d..bbbd696 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2417,7 +2417,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+     events.nmi.masked = !!(env->hflags2 & HF2_NMI_MASK);
+     events.nmi.pad = 0;
+ 
+-    events.sipi_vector = env->sipi_vector;
+     events.flags = 0;
+ 
+     if (has_msr_smbase) {
+@@ -2506,8 +2505,6 @@ static int kvm_get_vcpu_events(X86CPU *cpu)
+         }
+     }
+ 
+-    env->sipi_vector = events.sipi_vector;
+-
+     return 0;
+ }
+ 
+-- 
+1.8.3.1
