@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVCOv-0007Oj-SJ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:49:38 -0400
+	(envelope-from <famz@redhat.com>) id 1dVCUm-0000GO-Ho
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVCOv-0003vH-6r
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:49:37 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170711163748.17817-1-el13635@mail.ntua.gr>
-Date: Wed, 12 Jul 2017 09:49:20 +0200
-In-Reply-To: <20170711163748.17817-1-el13635@mail.ntua.gr> (Manos
-	Pitsidianakis's message of "Tue, 11 Jul 2017 19:37:44 +0300")
-Message-ID: <87tw2iaydb.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] block: Block driver callbacks fixes
+	(envelope-from <famz@redhat.com>) id 1dVCUj-0008Vr-Be
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:55:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43336)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVCUi-0008UP-Do
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 03:55:36 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 12 Jul 2017 15:55:26 +0800
+Message-Id: <20170712075528.22770-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] Two small improvements for docker.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,28 +21,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Manos Pitsidianakis <el13635@mail.ntua.gr> writes:
+The first one is a small simplification, the second one is an error handling
+improvement.
 
-> This series makes implementing some of the bdrv_* callbacks easier for block
-> filters by passing requests to bs->file if bs->drv doesn't implement it instead
-> of failing, and adding default bdrv_co_get_block_status() implementations.
->
-> This is based against Kevin Wolf's block branch, commit
-> da4bd74d2450ab72a7c26bbabb10c6a287dd043e
+Fam Zheng (2):
+  docker.py: Drop infile parameter
+  docker.py: Improve subprocess exit code handling
 
-Haven't seen BlockDriver member is_filter before.  Interesting.  It's
-documentation
+ tests/docker/docker.py | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-    /* set to true if the BlockDriver is a block filter */
-    bool is_filter;
-
-is seriously lacking.  What does it *mean* to be a block filter?  Which
-block layer facilities are affected, and how?
-
-Observation: driver "raw" is filter-like in the sense that all it does
-is pass along method arguments and results.  Can't say whether that
-makes it a filter in the sense of is_filter, because "the sense of
-is_filter" is nebulous to me :)
+-- 
+2.9.4
