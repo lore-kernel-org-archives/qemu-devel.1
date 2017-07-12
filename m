@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVO3F-0004hb-2P
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:16:02 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVOD8-00083m-Ct
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVO3E-00029Q-0q
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:16:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45474)
+	(envelope-from <ehabkost@redhat.com>) id 1dVOD5-0003DD-7y
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:26:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVO3D-00028o-NF
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:15:59 -0400
-Date: Wed, 12 Jul 2017 17:15:50 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVOD5-0003Ch-2P
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 16:26:11 -0400
+Date: Wed, 12 Jul 2017 17:26:00 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170712201550.GN6020@localhost.localdomain>
+Message-ID: <20170712202600.GO6020@localhost.localdomain>
 References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<20170712181652-mutt-send-email-mst@kernel.org>
+	<20170712150400.GH5237@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170712181652-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170712150400.GH5237@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
  to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
@@ -29,74 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
-> On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
-> > On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
-> > > We don't want to carry along old machine types forever. If we are able to
-> > > remove the pc machines up to 0.13 one day for example, this would allow
-> > > us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> > > BARs directly to low memory). Everything up to pc-1.2 is also known to
-> > > have issues with migration.  So let's start with a deprecation message
-> > > for the old machine types so that the (hopefully) few users of these old
-> > > systems start switching over to newer machine types instead.
-> > > 
-> > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > 
-> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> > 
-> > I suggest changing "-machine help" too.  Today it looks like this:
-> > 
-> >   Supported machines are:
-> >   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-> >   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
-> >   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
-> >   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-> >   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-> >   pc-1.3               Standard PC (i440FX + PIIX, 1996)
-> >   pc-1.2               Standard PC (i440FX + PIIX, 1996)
-> >   pc-1.1               Standard PC (i440FX + PIIX, 1996)
-> >   pc-1.0               Standard PC (i440FX + PIIX, 1996)
-> >   pc-0.15              Standard PC (i440FX + PIIX, 1996)
-> >   pc-0.14              Standard PC (i440FX + PIIX, 1996)
-> >   pc-0.13              Standard PC (i440FX + PIIX, 1996)
-> >   pc-0.12              Standard PC (i440FX + PIIX, 1996)
-> >   pc-0.11              Standard PC (i440FX + PIIX, 1996)
-> >   pc-0.10              Standard PC (i440FX + PIIX, 1996)
-> >   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-> >   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-> >   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
-> >   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
-> >   isapc                ISA-only PC
-> >   none                 empty machine
+On Wed, Jul 12, 2017 at 04:04:00PM +0100, Daniel P. Berrange wrote:
+> On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+> > We don't want to carry along old machine types forever. If we are able to
+> > remove the pc machines up to 0.13 one day for example, this would allow
+> > us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+> > BARs directly to low memory). Everything up to pc-1.2 is also known to
+> > have issues with migration.  So let's start with a deprecation message
+> > for the old machine types so that the (hopefully) few users of these old
+> > systems start switching over to newer machine types instead.
 > 
-> Any chance we can sort them reasonably too?
+> I think we must document & agree on our support policy for machine
+> types, before we start marking them as deprecated. eg please consider
+> the following document before accepting this deprecation patch:
+> 
+>  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00652.html
+> 
+> Note in that proposal there, I say we do *not* go through trouble of
+> explicitly marking machines as deprecated. We just document upfront
+> the intended lifecycle and then delete them when it is done.
+> 
+> Just use deprecation warnings for things where there is no predictable
+> lifecycle upfront.
 
-If we use strverscmp(), it will be sorted in a more reasonable
-way.  We could copy the gnulib version on systems without glibc.
-Life is too short for writing configure checks by hand, though; I
-will add this to the end of my wish-todo list.  If somebody wants
-to volunteer, be my guest.
-
-I'm CCing Eric in case he has suggestions that would help import
-the gnulib module in an easy way.
+I'd bet most people won't read the deprecation policy
+documentation, and a deprecation warning for 1 or 2 releases
+would be still useful before we finally remove a machine-type.
 
 -- 
 Eduardo
