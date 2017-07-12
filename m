@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVHZZ-0001j5-KE
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:20:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVHbu-0003eC-Lo
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVHZV-0000XF-Kd
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:20:57 -0400
-Date: Wed, 12 Jul 2017 15:20:38 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dVHbq-0002Pg-0J
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:23:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVHbp-0002Os-R8
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:23:17 -0400
+Date: Wed, 12 Jul 2017 15:23:11 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170712152038.16cddfbc@dhcp-192-215.str.redhat.com>
-In-Reply-To: <20170711035620.4232-1-aik@ozlabs.ru>
-References: <20170711035620.4232-1-aik@ozlabs.ru>
+Message-ID: <20170712152311.40c8561b@dhcp-192-215.str.redhat.com>
+In-Reply-To: <9d882fcb-2600-877c-8355-246fb9b30f48@redhat.com>
+References: <1499863793-18627-1-git-send-email-thuth@redhat.com>
+	<5d875407-37fd-bd27-8a04-619247fc2d91@de.ibm.com>
+	<9d882fcb-2600-877c-8355-246fb9b30f48@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v9 0/2] memory/iommu: QOM'fy IOMMU
- MemoryRegion
+Subject: Re: [Qemu-devel] [PATCH v5 00/11] Implement network booting in the
+ s390-ccw BIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Farhan Ali <alifm@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-On Tue, 11 Jul 2017 13:56:18 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Wed, 12 Jul 2017 15:04:17 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> Here is a couple of patches to QOM'fy IOMMU memory regions.
+> On 12.07.2017 15:00, Christian Borntraeger wrote:
+> > On 07/12/2017 02:49 PM, Thomas Huth wrote:  
+> >> It's already possible to do a network boot of an s390x guest with an
+> >> external netboot image based on a Linux installation, but it would
+> >> be much more convenient if the s390-ccw firmware supported network
+> >> booting right out of the box, without the need to assemble such an
+> >> external image first.
+> >>
+> >> This patch series now introduces a s390-netboot.img that can be used
+> >> for network booting via DHCP and TFTP by re-using the networking stack
+> >> from the SLOF firmware (see https://github.com/aik/SLOF/ for details),
+> >> and adds a driver for virtio-net-ccw devices.  
+> [...]
+> > thanks applied.
+> > 
+> > (will do some testing and rebuilding of the image files on top). Where do
+> > we want to put the binary result? pc-bios/s390-netboot.img I assume?  
 > 
-> I have made them in order to proceed with in-kernel TCE stuff acceleration
-> enablement which sort of depends on sPAPR IOMMU MR being QOM'ed.
-> 
-> 
-> This is based on sha1
-> 3f0602927b Peter Maydell "Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging".
-> 
-> Please comment. Thanks.
-> 
-> 
-> Changes:
-> v9:
-> * reworked 2/2 to follow the existing function naming style
-> 
-> v8:
-> * now 2 patches
-> 
-> This is based on sha1
-> b113658675 Peter Maydell "Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20170706' into staging".
-> 
-> Please comment. Thanks.
+> Yes. And I guess we need to add a BLOBS entry in main Makefile for this,
+> too, so that it gets installed properly? Could you please do that, too,
+> after you've added the binary?
 
-While the patches seem sane to me at a glance, I haven't done a
-in-depth review. But for the s390 parts:
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-
-for both patches.
-
-> 
-> 
-> 
-> Alexey Kardashevskiy (2):
->   memory/iommu: QOM'fy IOMMU MemoryRegion
->   memory/iommu: introduce IOMMUMemoryRegionClass
-> 
->  hw/i386/amd_iommu.h           |   5 +-
->  hw/s390x/s390-pci-bus.h       |   3 +-
->  include/exec/memory.h         |  94 +++++++++++++++++++++++++----------
->  include/hw/i386/intel_iommu.h |   5 +-
->  include/hw/mips/mips.h        |   2 +-
->  include/hw/ppc/spapr.h        |   7 ++-
->  include/hw/vfio/vfio-common.h |   2 +-
->  include/qemu/typedefs.h       |   1 +
->  exec.c                        |  14 +++---
->  hw/alpha/typhoon.c            |  31 +++++++++---
->  hw/dma/rc4030.c               |  34 +++++++++----
->  hw/i386/amd_iommu.c           |  33 +++++++++---
->  hw/i386/intel_iommu.c         |  42 +++++++++++-----
->  hw/mips/mips_jazz.c           |   2 +-
->  hw/pci-host/apb.c             |  29 ++++++++---
->  hw/ppc/spapr_iommu.c          |  42 ++++++++++------
->  hw/s390x/s390-pci-bus.c       |  29 +++++++----
->  hw/s390x/s390-pci-inst.c      |  11 ++--
->  hw/vfio/common.c              |  12 +++--
->  hw/vfio/spapr.c               |   3 +-
->  memory.c                      | 113 ++++++++++++++++++++++++++++--------------
->  21 files changed, 355 insertions(+), 159 deletions(-)
-> 
++1
