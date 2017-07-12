@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVENI-0005zE-QJ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:56:05 -0400
+	(envelope-from <groug@kaod.org>) id 1dVERQ-0007AT-47
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dVENF-0008V6-J4
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:56:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60480)
+	(envelope-from <groug@kaod.org>) id 1dVERM-0001eN-2H
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:20 -0400
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:50505)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dVENF-0008UO-CS
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:56:01 -0400
-Date: Wed, 12 Jul 2017 10:55:56 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170712095556.GC6923@stefanha-x1.localdomain>
-References: <20170712080538.28010-1-lprosek@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVERL-0001dm-P3
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 06:00:15 -0400
+Received: from player750.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 20F3C6C112
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 12:00:14 +0200 (CEST)
+Date: Wed, 12 Jul 2017 12:00:01 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170712120001.31d858de@bahia.lan>
+In-Reply-To: <20170712055317.26225-3-david@gibson.dropbear.id.au>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="3siQDZowHQqNOShm"
-Content-Disposition: inline
-In-Reply-To: <20170712080538.28010-1-lprosek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: enhance virtio_error messages
+	boundary="Sig_/h1BJXztGUQmbSmNJiwXkrqA";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
+ DRC flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, casasfernando@hotmail.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-
---3siQDZowHQqNOShm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/h1BJXztGUQmbSmNJiwXkrqA
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 12, 2017 at 10:05:38AM +0200, Ladi Prosek wrote:
-> Output like "Virtqueue size exceeded" is not much useful in identifying t=
-he
-> culprit. This commit adds virtio device name and queue index to all error
-> messages in virtio.c to improve debuggability.
+On Wed, 12 Jul 2017 15:53:11 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> The awaiting_allocation flag in the DRC was introduced by aab9913
+> "spapr_drc: Prevent detach racing against attach for CPU DR", allegedly to
+> prevent a guest crash on racing attach and detach.  Except.. information
+> from the BZ actually suggests a qemu crash, not a guest crash.  And there
+
+Can you share an url to the BZ ?
+
+> shouldn't be a problem here anyway: if the guest has already moved the DRC
+> away from UNUSABLE state, the detach would already be deferred, and if it
+> hadn't it should be safe to detach it (the guest should fail gracefully
+> when it attempts to change the allocation state).
 >=20
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> I think this was probably just a bandaid for some other problem in the
+> state management.  So, remove awaiting_allocation and associated code.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/virtio/virtio.c | 74 +++++++++++++++++++++++++++++++++---------------=
-------
->  1 file changed, 46 insertions(+), 28 deletions(-)
+>  hw/ppc/spapr_drc.c         | 25 +++----------------------
+>  include/hw/ppc/spapr_drc.h |  1 -
+>  2 files changed, 3 insertions(+), 23 deletions(-)
 >=20
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 464947f..5040f26 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -143,7 +143,7 @@ static void virtio_init_region_cache(VirtIODevice *vd=
-ev, int n)
->      len =3D address_space_cache_init(&new->desc, vdev->dma_as,
->                                     addr, size, false);
->      if (len < size) {
-> -        virtio_error(vdev, "Cannot map desc");
-> +        virtio_error(vdev, "%s queue %u: Cannot map desc", vdev->name, n=
-);
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 9b07f80..89ba3d6 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *dr=
+c)
+>      if (!drc->dev) {
+>          return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+> -    if (drc->awaiting_release && drc->awaiting_allocation) {
+> -        /* kernel is acknowledging a previous hotplug event
+> -         * while we are already removing it.
+> -         * it's safe to ignore awaiting_allocation here since we know the
+> -         * situation is predicated on the guest either already having do=
+ne
+> -         * so (boot-time hotplug), or never being able to acquire in the
+> -         * first place (hotplug followed by immediate unplug).
+> -         */
+> +    if (drc->awaiting_release) {
+> +        /* Don't allow the guest to move a device away from UNUSABLE
+> +         * state when we want to unplug it */
+>          return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+> =20
+>      drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
+> -    drc->awaiting_allocation =3D false;
+> =20
+>      return RTAS_OUT_SUCCESS;
+>  }
+> @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceS=
+tate *d, void *fdt,
+>      drc->fdt =3D fdt;
+>      drc->fdt_start_offset =3D fdt_start_offset;
+> =20
+> -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> -        drc->awaiting_allocation =3D true;
+> -    }
+> -
+>      object_property_add_link(OBJECT(drc), "device",
+>                               object_get_typename(OBJECT(drc->dev)),
+>                               (Object **)(&drc->dev),
+> @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceS=
+tate *d, Error **errp)
+>          return;
+>      }
+> =20
+> -    if (drc->awaiting_allocation) {
+> -        drc->awaiting_release =3D true;
+> -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+> -        return;
+> -    }
+> -
+>      spapr_drc_release(drc);
+>  }
+> =20
+> @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+>          spapr_drc_release(drc);
+>      }
+> =20
+> -    drc->awaiting_allocation =3D false;
+> -
+>      if (drc->dev) {
+>          /* A device present at reset is coldplugged */
+>          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+> @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc =3D=
+ {
+>          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+>          VMSTATE_BOOL(configured, sPAPRDRConnector),
+>          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+> -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index 715016b..18a196e 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
+>      sPAPRConfigureConnectorState *ccs;
+> =20
+>      bool awaiting_release;
+> -    bool awaiting_allocation;
+> =20
+>      /* device pointer, via link property */
+>      DeviceState *dev;
 
-Good idea!
 
-Please build the identifying information into virtio_error() to avoid
-code duplication.
-
-It probably makes sense to add a virtqueue_error(VirtIOQueue *vq, fmt,
-=2E..) function.  That way the virtqueue number printing doesn't need to
-be duplicated.
-
-vdev->name specifies the device type ("virtio-net", "virtio-9p") but
-does not uniquely identify the device instance.  If a guest has multiple
-virtio-net devices then the error message will not identify the device
-instance.  I think you can use DEVICE(vdev)->id instead to get the
-unique -device virtio-net-pci,id=3Dvnet0 identifier.
-
---3siQDZowHQqNOShm
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/h1BJXztGUQmbSmNJiwXkrqA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJZZfIsAAoJEJykq7OBq3PI89sH/2tXa/YNNFHmABI9Pk7AOOBF
-YCUHsPqW9ge2A9ZT6KpDP2pio0F2f7vP+wKgVbnAhTMANWhclPu/S9Ssr+YoXH0T
-DF4xDKNMhwCTmtyRNcN3JvASxe3MBqlRRYTNi7E+gmGxdWlL4kV6H8jqE925LFvC
-8MJfuKTmDQ7fenNlGePJvZoOtSnLIA00fcI+f+r0rX+f8taXhhNWDxeiZGA5o2GG
-CURSWBrz3sEZjG5ypuzzXZpf/79ht2HjwqDoGzsTg8N1raA57Z4R4KhBqLLzTeyk
-cloUYSWejyOlD4kmw1im+27YJu6aednXdSFBPCCDCg86QG9ERMcu0RwzFAS+PiY=
-=EUSf
+iEYEARECAAYFAlll8yEACgkQAvw66wEB28JWXgCeMK6ke+Rfv8E3u71QafPPjH6r
+MqkAnjjT7lkZuAf0e7yn6y/81yO87AGF
+=zllP
 -----END PGP SIGNATURE-----
 
---3siQDZowHQqNOShm--
+--Sig_/h1BJXztGUQmbSmNJiwXkrqA--
