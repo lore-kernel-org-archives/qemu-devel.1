@@ -1,37 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dVCwR-00074U-E9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:24:16 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dVCz1-0007uW-WF
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:26:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dVCwK-0005vF-Iv
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:24:15 -0400
-Received: from mga06.intel.com ([134.134.136.31]:49488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1dVCwK-0005v9-8U
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:24:08 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Wed, 12 Jul 2017 08:24:03 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D34761@SHSMSX101.ccr.corp.intel.com>
-References: <1491301684-24367-1-git-send-email-yulei.zhang@intel.com>
-	<20170626141906.6e38b235@w520.home>
-	<01FDBDDE256B79498DC57789713132D469DCC1EE@SHSMSX101.ccr.corp.intel.com>
-	<20170627134431.5947c771@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D1956B@SHSMSX101.ccr.corp.intel.com>
-	<20170628095938.1329c358@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D1CF1C@SHSMSX101.ccr.corp.intel.com>
-	<20170629145722.4af0a0fa@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D1F630@SHSMSX101.ccr.corp.intel.com>
-	<20170630105952.720b63b8@w520.home>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D2B902@SHSMSX101.ccr.corp.intel.com>
-	<20170710134721.4d778118@w520.home>
-In-Reply-To: <20170710134721.4d778118@w520.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dVCyy-00077Q-3D
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:26:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55496)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dVCyx-000770-PK
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:26:52 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6C8OF87069976
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:26:49 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bncj87sbn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 04:26:49 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Wed, 12 Jul 2017 18:26:46 +1000
+Date: Wed, 12 Jul 2017 13:56:37 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <20170711043917.1757-1-david@gibson.dropbear.id.au>
+	<20170711043917.1757-10-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC 5/5] vifo: introduce new VFIO ioctl
- VFIO_DEVICE_PCI_GET_DIRTY_BITMAP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170711043917.1757-10-david@gibson.dropbear.id.au>
+Message-Id: <20170712082637.GA5377@in.ibm.com>
+Subject: Re: [Qemu-devel] [PULL 09/17] spapr: Remove unnecessary differences
+ between hotplug and coldplug paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,168 +43,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Zhang, Yulei" <yulei.zhang@intel.com>, "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>, "Zheng, Xiao" <xiao.zheng@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, groug@kaod.org, lvivier@redhat.com, aik@ozlabs.ru, surajjs@au1.ibm.com, sbobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Tuesday, July 11, 2017 3:47 AM
->=20
-> On Fri, 7 Jul 2017 06:40:58 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
->=20
-> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > Sent: Saturday, July 1, 2017 1:00 AM
-> > >
-> > > On Fri, 30 Jun 2017 05:14:40 +0000
-> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > >
-> > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > Sent: Friday, June 30, 2017 4:57 AM
-> > > > >
-> > > > > On Thu, 29 Jun 2017 00:10:59 +0000
-> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > > >
-> > > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > > > Sent: Thursday, June 29, 2017 12:00 AM
-> > > > > > > Thanks Kevin.  So really it's not really a dirty bitmap, it's=
- just a
-> > > > > > > bitmap of pages that the device has access to and may have di=
-rtied.
-> > > > > > > Don't we have this more generally in the vfio type1 IOMMU
-> backend?
-> > > For
-> > > > > > > a mediated device, we know all the pages that the vendor driv=
-er
-> has
-> > > > > > > asked to be pinned.  Should we perhaps make this interface on=
- the
-> > > vfio
-> > > > > > > container rather than the device?  Any mediated device can
-> provide
-> > > this
-> > > > > > > level of detail without specific vendor support.  If we had D=
-MA
-> page
-> > > > > > > faulting, this would be the natural place to put it as well, =
-so maybe
-> > > > > > > we should design the interface there to support everything
-> similarly.
-> > > > > > > Thanks,
-> > > > > > >
-> > > > > >
-> > > > > > That's a nice idea. Just two comments:
-> > > > > >
-> > > > > > 1) If some mediated device has its own way to construct true di=
-rty
-> > > > > > bitmap (not thru DMA page faulting), the interface is better
-> designed
-> > > > > > to allow that flexibility. Maybe an optional callback if not re=
-gistered
-> > > > > > then use common type1 IOMMU logic otherwise prefers to vendor
-> > > > > > specific callback
-> > > > >
-> > > > > I'm not sure what that looks like, but I agree with the idea.  Co=
-uld
-> > > > > the pages that type1 knows about every be anything other than a
-> > > > > superset of the dirty pages?  Perhaps a device ioctl to flush unu=
-sed
-> > > > > mappings would be sufficient.
-> > > >
-> > > > sorry I didn't quite get your idea here. My understanding is that
-> > > > type1 is OK as an alternative in case mediated device has no way
-> > > > to track dirtied pages (as for Intel GPU), so we can use type1 pinn=
-ed
-> > > > pages as an indirect way to indicate dirtied pages. But if mediated
-> > > > device has its own way (e.g. a device private MMU) to track dirty
-> > > > pages, then we should allow that device to provide dirty bitmap
-> > > > instead of using type1.
-> > >
-> > > My thought was that our current mdev iommu interface allows the
-> vendor
-> > > driver to pin specific pages.  In order for the mdev device to dirty =
-a
-> > > page, we need for it to be pinned.  Therefore at worst, the set of
-> > > pages pinned in type1 is the superset of all pages that can potential=
-ly
-> > > be dirtied by the device.  In the worst case, this devolves to all
-> > > pages mapped through the iommu in the case of direct assigned devices=
-.
-> > > My assertion is therefore that a device specific dirty page bitmap ca=
-n
-> > > only be a subset of the type1 pinned pages.  Therefore if the mdev
-> >
-> > this assertion is correct.
-> >
-> > > vendor driver can flush any stale pinnings, then the type1 view off
-> > > pinned pages should match the devices view of the current working set=
-.
-> > > Then we wouldn't need a device specific dirty bitmap, we'd only need =
-a
-> > > mechanism to trigger a flush of stale mappings on the device.
-> >
-> > what's your definition of 'stale pinnings"? take Intel vGPU for example=
-,
-> > we pin pages when they are mapped to GPU page table and then unpin
-> > them when unmapped from GPU page table. Based on this policy type1
-> > view of pinned pages should just match device view.  There is no 'stale=
-'
-> > page example which I can think of since all currently-pinned pages must
-> > be pinned for various read/write purpose.
->=20
-> Then it seems that the mdev support in the IOMMU already tracks the
-> minimum page set for Intel vGPUs, it can be a noop in that case.  Are
-> we missing some ability to identify pages through vendor specific
-> hooks, or were those hooks never really needed?
+On Tue, Jul 11, 2017 at 02:39:09PM +1000, David Gibson wrote:
+> spapr_drc_attach() has a 'coldplug' parameter which sets the DRC into
+> configured state initially, instead of the usual ISOLATED/UNUSABLE state.
+> It turns out this is unnecessary: although coldplugged devices do need to
+> be in CONFIGURED state once the guest starts, that will already be
+> accomplished by the reset code which will move DRCs for already plugged
+> devices into a coldplug equivalent state.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/spapr.c             | 13 +++----------
+>  hw/ppc/spapr_drc.c         |  5 ++---
+>  hw/ppc/spapr_pci.c         |  3 +--
+>  include/hw/ppc/spapr_drc.h |  2 +-
+>  4 files changed, 7 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 4fa982d..70b3fd3 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2611,7 +2611,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+>          fdt_offset = spapr_populate_memory_node(fdt, node, addr,
+>                                                  SPAPR_MEMORY_BLOCK_SIZE);
+> 
+> -        spapr_drc_attach(drc, dev, fdt, fdt_offset, !dev->hotplugged, errp);
+> +        spapr_drc_attach(drc, dev, fdt, fdt_offset, errp);
+>          addr += SPAPR_MEMORY_BLOCK_SIZE;
+>      }
+>      /* send hotplug notification to the
+> @@ -2956,17 +2956,10 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> 
+>      g_assert(drc || !mc->has_hotpluggable_cpus);
+> 
+> -    /*
+> -     * Setup CPU DT entries only for hotplugged CPUs. For boot time or
+> -     * coldplugged CPUs DT entries are setup in spapr_build_fdt().
+> -     */
+> -    if (dev->hotplugged) {
+> -        fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+> -    }
+> +    fdt = spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
 
-No vendor specific hook for Intel side. In the future once IOMMU=20
-provides standard dirty bit tracking, also no vendor specific hook
-is required. I'm just thinking about such possibility in the design. :-)
+A harmless (but still good to get rid of) side effect of this change is
+that we are now building the CPU device tree for boot time and cold-plugged
+CPUs twice:
 
->=20
-> > but I do realize one limitation of this option now. Given there are
-> > both physical device and mdev assigned to the same guest, we
-> > have to pin all pages for physically assigned device. In that case we
-> > may need away to differentiate which device a given pinned page
-> > is for. I'm not sure whether it's an easy thing or require lots of chan=
-ge.
-> > interface wise we don't need additional one since there is still
-> > unpin request from mdev path. Just internal structure needs to
-> > be extended to maintain that ownership info.
->=20
-> We can't migrate with regular assigned device and this model fails in
-> the right way, assuming that all memory is dirty, which is correct.
-> Currently we'd need to detach any directly assigned devices, leaving
-> only the mdev device.  If we had PRI support, then a way to flush
-> stale mappings and fault in new ones would be a way to reduce the
-> working set during migration.  I don't really see that per device
-> tracking helps us, we need to consider the page dirty regardless of
-> who dirtied it.
->=20
-> > >
-> > > Otherwise I'm not sure how we cleanly create an interface where the
-> > > dirty bitmap can either come from the device or the container... but
-> > > I'd welcome suggestions.  Thanks,
-> > >
-> >
-> > My original thought is simple:
-> >
-> > - by default type1 can give dirty bitmap
-> > - when mdev is created, mdev driver has chance to claim whether
-> > it would like to track its own dirty bitmap
-> > - then when Qemu requests dirty bitmap of mdev, vfio check the
-> > flag to decide whether return type1 or call into mdev driver
->=20
-> What would the device do differently?  The container is the logical
-> component tracking memory and therefore seems the logical component to
-> track dirty memory.  Potentially there's even some efficiency that we
-> can handle the dirty memory for multiple devices via a container
-> interface.  It also means that we don't have per vendor driver
-> implementations (and bugs) for dirty bitmaps.  Thanks,
->=20
+first from spapr_core_plug() -> spapr_populate_hotplug_cpu_dt()
+second from spapr_build_fdt() -> spapr_populate_cpus_dt_node()
 
-I'm OK with this since I don't have a real example for that case.
-let's go with this proposal - tracking dirty bitmap in VFIO through
-type1 interface. No vendor specific hook.
+The first one is not used while the 2nd one acutally ends up building
+the CPUs DT entries for the boot time and cold-plugged CPUs.
 
-Thanks
-Kevin
+Regards,
+Bharata.
