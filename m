@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVE5H-0005WQ-Dm
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:37:28 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dVE6R-00065T-QU
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVE5C-0000fu-Hu
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:37:27 -0400
-Date: Wed, 12 Jul 2017 17:37:15 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170712093715.GJ29326@pxdev.xzpeter.org>
-References: <CAOE=1Z3ve+zQJbjqqfNA1iB_mNgFkoTTXRxyBikSiJ5_AZwpiA@mail.gmail.com>
+	(envelope-from <lvivier@redhat.com>) id 1dVE6Q-00011n-Re
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 05:38:39 -0400
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-3-david@gibson.dropbear.id.au>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <74f8e27d-ddc1-2630-c42e-2f8aac2c6472@redhat.com>
+Date: Wed, 12 Jul 2017 11:38:33 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170712055317.26225-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOE=1Z3ve+zQJbjqqfNA1iB_mNgFkoTTXRxyBikSiJ5_AZwpiA@mail.gmail.com>
-Subject: Re: [Qemu-devel] How to stop `qemu-system-x86_64 ...` instead of
- `kill -9`?
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
+ DRC flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,22 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: qemu-discuss@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, mdroth@linux.vnet.ibm.com, groug@kaod.org, danielhb@linux.vnet.ibm.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-On Wed, Jul 12, 2017 at 05:24:40PM +0800, Sam wrote:
-> hi all,
+On 12/07/2017 07:53, David Gibson wrote:
+> The awaiting_allocation flag in the DRC was introduced by aab9913
+> "spapr_drc: Prevent detach racing against attach for CPU DR", allegedly to
+> prevent a guest crash on racing attach and detach.  Except.. information
+> from the BZ actually suggests a qemu crash, not a guest crash.  And there
+> shouldn't be a problem here anyway: if the guest has already moved the DRC
+> away from UNUSABLE state, the detach would already be deferred, and if it
+> hadn't it should be safe to detach it (the guest should fail gracefully
+> when it attempts to change the allocation state).
 > 
-> I'm running `qemu-system-x86_64 ...` to start a guest vm. Now I want to
-> stop and destroy this vm, I found there is no `qemu-stop` related command,
-> so I have to `kill -9` this process.
+> I think this was probably just a bandaid for some other problem in the
+> state management.  So, remove awaiting_allocation and associated code.
 > 
-> How could I stop `qemu-system-x86_64` instead of `kill -9`? Use `virsh`
-> command or something?
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-"virsh destroy $name"? Or "quit" in qemu QMP/HMP?
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-(I'd say I use kill a lot, especially when I'm using -nographic)
-
--- 
-Peter Xu
+> ---
+>  hw/ppc/spapr_drc.c         | 25 +++----------------------
+>  include/hw/ppc/spapr_drc.h |  1 -
+>  2 files changed, 3 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 9b07f80..89ba3d6 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+>      if (!drc->dev) {
+>          return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+> -    if (drc->awaiting_release && drc->awaiting_allocation) {
+> -        /* kernel is acknowledging a previous hotplug event
+> -         * while we are already removing it.
+> -         * it's safe to ignore awaiting_allocation here since we know the
+> -         * situation is predicated on the guest either already having done
+> -         * so (boot-time hotplug), or never being able to acquire in the
+> -         * first place (hotplug followed by immediate unplug).
+> -         */
+> +    if (drc->awaiting_release) {
+> +        /* Don't allow the guest to move a device away from UNUSABLE
+> +         * state when we want to unplug it */
+>          return RTAS_OUT_NO_SUCH_INDICATOR;
+>      }
+>  
+>      drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
+> -    drc->awaiting_allocation = false;
+>  
+>      return RTAS_OUT_SUCCESS;
+>  }
+> @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+>      drc->fdt = fdt;
+>      drc->fdt_start_offset = fdt_start_offset;
+>  
+> -    if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> -        drc->awaiting_allocation = true;
+> -    }
+> -
+>      object_property_add_link(OBJECT(drc), "device",
+>                               object_get_typename(OBJECT(drc->dev)),
+>                               (Object **)(&drc->dev),
+> @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
+>          return;
+>      }
+>  
+> -    if (drc->awaiting_allocation) {
+> -        drc->awaiting_release = true;
+> -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+> -        return;
+> -    }
+> -
+>      spapr_drc_release(drc);
+>  }
+>  
+> @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+>          spapr_drc_release(drc);
+>      }
+>  
+> -    drc->awaiting_allocation = false;
+> -
+>      if (drc->dev) {
+>          /* A device present at reset is coldplugged */
+>          drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+> @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc = {
+>          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+>          VMSTATE_BOOL(configured, sPAPRDRConnector),
+>          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+> -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> index 715016b..18a196e 100644
+> --- a/include/hw/ppc/spapr_drc.h
+> +++ b/include/hw/ppc/spapr_drc.h
+> @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
+>      sPAPRConfigureConnectorState *ccs;
+>  
+>      bool awaiting_release;
+> -    bool awaiting_allocation;
+>  
+>      /* device pointer, via link property */
+>      DeviceState *dev;
+> 
