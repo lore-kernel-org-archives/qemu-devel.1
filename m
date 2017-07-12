@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVHXJ-00082c-VL
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:18:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVHZZ-0001j5-KE
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVHXF-0007MJ-Ud
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:18:37 -0400
-Date: Wed, 12 Jul 2017 15:18:21 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dVHZV-0000XF-Kd
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 09:20:57 -0400
+Date: Wed, 12 Jul 2017 15:20:38 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170712151821.5237af0a@dhcp-192-215.str.redhat.com>
-In-Reply-To: <20170711035620.4232-3-aik@ozlabs.ru>
+Message-ID: <20170712152038.16cddfbc@dhcp-192-215.str.redhat.com>
+In-Reply-To: <20170711035620.4232-1-aik@ozlabs.ru>
 References: <20170711035620.4232-1-aik@ozlabs.ru>
-	<20170711035620.4232-3-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v9 2/2] memory/iommu: introduce
- IOMMUMemoryRegionClass
+Subject: Re: [Qemu-devel] [PATCH qemu v9 0/2] memory/iommu: QOM'fy IOMMU
+ MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +26,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexey Kardashevskiy <aik@ozlabs.ru>
 Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
 
-On Tue, 11 Jul 2017 13:56:20 +1000
+On Tue, 11 Jul 2017 13:56:18 +1000
 Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-> This finishes QOM'fication of IOMMUMemoryRegion by introducing
-> a IOMMUMemoryRegionClass. This also provides a fastpath analog for
-> IOMMU_MEMORY_REGION_GET_CLASS().
+> Here is a couple of patches to QOM'fy IOMMU memory regions.
 > 
-> This makes IOMMUMemoryRegion an abstract class.
+> I have made them in order to proceed with in-kernel TCE stuff acceleration
+> enablement which sort of depends on sPAPR IOMMU MR being QOM'ed.
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
+> 
+> This is based on sha1
+> 3f0602927b Peter Maydell "Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170613' into staging".
+> 
+> Please comment. Thanks.
+> 
+> 
 > Changes:
 > v9:
-> * moved IOMMU MR typenames next to respective IOMMU device typenames
-> * renamed few definitions and functions to match the rest of the code
-> (for example intel_vtd_iommu_memory_region_class_init -> vtd_iommu_memory_region_class_init
-> as the rest of that file uses "vtd_" as a prefix)
+> * reworked 2/2 to follow the existing function naming style
 > 
 > v8:
-> * first appearance
-> ---
->  hw/i386/amd_iommu.h           |  5 ++---
->  hw/s390x/s390-pci-bus.h       |  1 +
->  include/exec/memory.h         | 45 +++++++++++++++++++++++++++++++++----------
->  include/hw/i386/intel_iommu.h |  3 ++-
->  include/hw/ppc/spapr.h        |  4 ++++
->  exec.c                        |  6 ++++--
->  hw/alpha/typhoon.c            | 23 +++++++++++++++++-----
->  hw/dma/rc4030.c               | 26 +++++++++++++++++++------
->  hw/i386/amd_iommu.c           | 24 +++++++++++++++++++----
->  hw/i386/intel_iommu.c         | 25 +++++++++++++++++++-----
->  hw/pci-host/apb.c             | 23 +++++++++++++++++-----
->  hw/ppc/spapr_iommu.c          | 26 ++++++++++++++++++-------
->  hw/s390x/s390-pci-bus.c       | 23 ++++++++++++++++------
->  hw/s390x/s390-pci-inst.c      |  5 ++++-
->  memory.c                      | 36 +++++++++++++++++++---------------
->  15 files changed, 205 insertions(+), 70 deletions(-)
+> * now 2 patches
+> 
+> This is based on sha1
+> b113658675 Peter Maydell "Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20170706' into staging".
+> 
+> Please comment. Thanks.
 
-(...)
+While the patches seem sane to me at a glance, I haven't done a
+in-depth review. But for the s390 parts:
 
-> diff --git a/memory.c b/memory.c
-> index 45e10e2e3b..69f697c20e 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1506,19 +1506,20 @@ void memory_region_init_rom_device(MemoryRegion *mr,
->      mr->ram_block = qemu_ram_alloc(size, mr, errp);
->  }
->  
-> -void memory_region_init_iommu(IOMMUMemoryRegion *iommu_mr,
-> +void memory_region_init_iommu(void *_iommu_mr,
-> +                              size_t instance_size,
-> +                              const char *mrtypename,
->                                Object *owner,
-> -                              const MemoryRegionIOMMUOps *ops,
->                                const char *name,
->                                uint64_t size)
->  {
-> +    struct IOMMUMemoryRegion *iommu_mr;
->      struct MemoryRegion *mr;
->  
-> -    object_initialize(iommu_mr, sizeof(*iommu_mr), TYPE_IOMMU_MEMORY_REGION);
-> -    mr = MEMORY_REGION(iommu_mr);
-> +    object_initialize(_iommu_mr, instance_size, mrtypename);
-> +    mr = MEMORY_REGION(_iommu_mr);
->      memory_region_do_init(mr, owner, name, size);
->      iommu_mr = IOMMU_MEMORY_REGION(mr);
-> -    iommu_mr->iommu_ops = ops,
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
-Ah, here the comma is gone anyway :)
+for both patches.
 
->      mr->terminates = true;  /* then re-forwards */
->      QLIST_INIT(&iommu_mr->iommu_notify);
->      iommu_mr->iommu_notify_flags = IOMMU_NOTIFIER_NONE;
-
-(...)
-
-> @@ -1655,8 +1656,10 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
->  
->  uint64_t memory_region_iommu_get_min_page_size(IOMMUMemoryRegion *iommu_mr)
->  {
-> -    if (iommu_mr->iommu_ops && iommu_mr->iommu_ops->get_min_page_size) {
-> -        return iommu_mr->iommu_ops->get_min_page_size(iommu_mr);
-> +    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
-> +
-> +    if (imrc->get_min_page_size) {
-> +        return imrc->get_min_page_size(iommu_mr);
-
-And this voids my other complaint for the previous patch as well.
-
->      }
->      return TARGET_PAGE_SIZE;
->  }
-
-s390 parts look fine.
+> 
+> 
+> 
+> Alexey Kardashevskiy (2):
+>   memory/iommu: QOM'fy IOMMU MemoryRegion
+>   memory/iommu: introduce IOMMUMemoryRegionClass
+> 
+>  hw/i386/amd_iommu.h           |   5 +-
+>  hw/s390x/s390-pci-bus.h       |   3 +-
+>  include/exec/memory.h         |  94 +++++++++++++++++++++++++----------
+>  include/hw/i386/intel_iommu.h |   5 +-
+>  include/hw/mips/mips.h        |   2 +-
+>  include/hw/ppc/spapr.h        |   7 ++-
+>  include/hw/vfio/vfio-common.h |   2 +-
+>  include/qemu/typedefs.h       |   1 +
+>  exec.c                        |  14 +++---
+>  hw/alpha/typhoon.c            |  31 +++++++++---
+>  hw/dma/rc4030.c               |  34 +++++++++----
+>  hw/i386/amd_iommu.c           |  33 +++++++++---
+>  hw/i386/intel_iommu.c         |  42 +++++++++++-----
+>  hw/mips/mips_jazz.c           |   2 +-
+>  hw/pci-host/apb.c             |  29 ++++++++---
+>  hw/ppc/spapr_iommu.c          |  42 ++++++++++------
+>  hw/s390x/s390-pci-bus.c       |  29 +++++++----
+>  hw/s390x/s390-pci-inst.c      |  11 ++--
+>  hw/vfio/common.c              |  12 +++--
+>  hw/vfio/spapr.c               |   3 +-
+>  memory.c                      | 113 ++++++++++++++++++++++++++++--------------
+>  21 files changed, 355 insertions(+), 159 deletions(-)
+> 
