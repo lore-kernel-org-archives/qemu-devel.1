@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVFNh-0002wX-Sc
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:00:35 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVFOD-0003Lt-KV
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:01:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVFNd-00058L-P4
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:00:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38296)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVFNd-000586-FY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:00:29 -0400
-Date: Wed, 12 Jul 2017 12:00:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170712110021.GA30658@work-vm>
-References: <20170704184915.31586-1-dgilbert@redhat.com>
-	<20170704184915.31586-3-dgilbert@redhat.com>
-	<20170712032046.GD29326@pxdev.xzpeter.org>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVFOA-0005Lc-G1
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:01:05 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:59285 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVFO9-0005LP-Pg
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:01:02 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
+	<149942884319.8972.5495880570191453546.stgit@frigg.lan>
+	<878tju9foc.fsf@linaro.org>
+Date: Wed, 12 Jul 2017 14:00:50 +0300
+In-Reply-To: <878tju9foc.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
+	message of "Wed, 12 Jul 2017 10:18:27 +0100")
+Message-ID: <87pod5ex7h.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170712032046.GD29326@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 2/5] migration: Close file on failed
- migration load
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v12 05/27] target/i386: [tcg] Port to
+ DisasContextBase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +30,503 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, michael@hinespot.com, quintela@redhat.com, lvivier@redhat.com, berrange@redhat.com
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Tue, Jul 04, 2017 at 07:49:12PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Closing the file before exit on a failure allows
-> > the source to cleanup better, especially with RDMA.
-> > 
-> > Partial fix for https://bugs.launchpad.net/qemu/+bug/1545052
-> 
-> In above bug reported, the issue is that both dst and src VMs hanged
-> when migration failed (which is a by-design failure). On destination,
-> it hangs at (copied from the link):
-> 
-> #0 0x00007ffff39141cd in write () at ../sysdeps/unix/syscall-template.S:81
-> #1 0x00007ffff27fe795 in rdma_get_cm_event.part.15 () from /lib64/librdmacm.so.1
-> #2 0x000055555593e445 in qemu_rdma_cleanup (rdma=0x7fff9647e010) at migration/rdma.c:2210
-> #3 0x000055555593ea45 in qemu_rdma_close (opaque=0x555557796770) at migration/rdma.c:2652
-> #4 0x00005555559397cc in qemu_fclose (f=f@entry=0x5555564b1450) at migration/qemu-file.c:270
-> #5 0x0000555555936b88 in process_incoming_migration_co (opaque=0x5555564b1450) at migration/migration.c:361
-> #6 0x0000555555a25a1a in coroutine_trampoline (i0=<optimized out>, i1=<optimized out>) at util/coroutine-ucontext.c:79
-> #7 0x00007fffef5b3110 in ?? () from /lib64/libc.so.6
-> 
-> So looks like at that time we have qemu_fclose() for the incoming fd,
-> and that's the thing that caused trouble.
+Alex Benn=C3=A9e writes:
 
-I never saw that hang in the current world; I saw the source hang
-rather than the destination.   A hung destination is annoying but
-since it's a failed migration anyway it's no big problem; the much
-bigger problem is a failed migration which breaks the source.
+> Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
 
-> (just to mention that the version caused failure is commit fc1ec1acf,
->  which is mentioned in the first comment in the bz)
-> 
-> Now the situation is: we don't have qemu_flose() now in current QEMU
-> master on the failure path (see below, we just exit() directly). Then
-> would the bz still valid now? And, if we apply this fix (then we do
-> qemu_fclose() again), would it hang again instead of fixing anything?
+>> Incrementally paves the way towards using the generic instruction transl=
+ation
+>> loop.
+>>=20
+>> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> Reviewed-by: Emilio G. Cota <cota@braap.org>
+>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>> target/i386/translate.c |  142 +++++++++++++++++++++++------------------=
+------
+>> 1 file changed, 70 insertions(+), 72 deletions(-)
+>>=20
+>> diff --git a/target/i386/translate.c b/target/i386/translate.c
+>> index b118fcb834..f61f5c7227 100644
+>> --- a/target/i386/translate.c
+>> +++ b/target/i386/translate.c
+>> @@ -99,6 +99,8 @@ static int x86_64_hregs;
+>> #endif
+>>=20
+>> typedef struct DisasContext {
+>> +    DisasContextBase base;
+>> +
+>> /* current insn context */
+>> int override; /* -1 if no override */
+>> int prefix;
+>> @@ -106,8 +108,6 @@ typedef struct DisasContext {
+>> TCGMemOp dflag;
+>> target_ulong pc_start;
+>> target_ulong pc; /* pc =3D eip + cs_base */
+>> -    int is_jmp; /* 1 =3D means jump (stop translation), 2 means CPU
+>> -                   static state change (stop translation) */
+>> /* current block context */
+>> target_ulong cs_base; /* base of CS segment */
+>> int pe;     /* protected mode */
+>> @@ -128,12 +128,10 @@ typedef struct DisasContext {
+>> int cpl;
+>> int iopl;
+>> int tf;     /* TF cpu flag */
+>> -    int singlestep_enabled; /* "hardware" single step enabled */
+>> int jmp_opt; /* use direct block chaining for direct jumps */
+>> int repz_opt; /* optimize jumps within repz instructions */
+>> int mem_index; /* select memory access functions */
+>> uint64_t flags; /* all execution flags */
+>> -    struct TranslationBlock *tb;
+>> int popl_esp_hack; /* for correct popl with esp base handling */
+>> int rip_offset; /* only used in x86_64, but left for simplicity */
+>> int cpuid_features;
+>> @@ -1123,7 +1121,7 @@ static void gen_bpt_io(DisasContext *s, TCGv_i32 t=
+_port, int ot)
+>>=20
+>> static inline void gen_ins(DisasContext *s, TCGMemOp ot)
+>> {
+>> -    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> gen_string_movl_A0_EDI(s);
+>> @@ -1138,14 +1136,14 @@ static inline void gen_ins(DisasContext *s, TCGM=
+emOp ot)
+>> gen_op_movl_T0_Dshift(ot);
+>> gen_op_add_reg_T0(s->aflag, R_EDI);
+>> gen_bpt_io(s, cpu_tmp2_i32, ot);
+>> -    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> }
+>> }
+>>=20
+>> static inline void gen_outs(DisasContext *s, TCGMemOp ot)
+>> {
+>> -    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> gen_string_movl_A0_ESI(s);
+>> @@ -1158,7 +1156,7 @@ static inline void gen_outs(DisasContext *s, TCGMe=
+mOp ot)
+>> gen_op_movl_T0_Dshift(ot);
+>> gen_op_add_reg_T0(s->aflag, R_ESI);
+>> gen_bpt_io(s, cpu_tmp2_i32, ot);
+>> -    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> }
+>> }
+>> @@ -2141,7 +2139,7 @@ static inline int insn_const_size(TCGMemOp ot)
+>> static inline bool use_goto_tb(DisasContext *s, target_ulong pc)
+>> {
+>> #ifndef CONFIG_USER_ONLY
+>> -    return (pc & TARGET_PAGE_MASK) =3D=3D (s->tb->pc & TARGET_PAGE_MASK=
+) ||
+>> +    return (pc & TARGET_PAGE_MASK) =3D=3D (s->base.tb->pc & TARGET_PAGE=
+_MASK) ||
+>> (pc & TARGET_PAGE_MASK) =3D=3D (s->pc_start & TARGET_PAGE_MASK);
+>> #else
+>> return true;
+>> @@ -2156,7 +2154,7 @@ static inline void gen_goto_tb(DisasContext *s, in=
+t tb_num, target_ulong eip)
+>> /* jump to same page: we can use a direct jump */
+>> tcg_gen_goto_tb(tb_num);
+>> gen_jmp_im(eip);
+>> -        tcg_gen_exit_tb((uintptr_t)s->tb + tb_num);
+>> +        tcg_gen_exit_tb((uintptr_t)s->base.tb + tb_num);
+>> } else {
+>> /* jump to another page */
+>> gen_jmp_im(eip);
+>> @@ -2177,7 +2175,7 @@ static inline void gen_jcc(DisasContext *s, int b,
+>>=20
+>> gen_set_label(l1);
+>> gen_goto_tb(s, 1, val);
+>> -        s->is_jmp =3D DISAS_TB_JUMP;
+>> +        s->base.is_jmp =3D DISAS_TB_JUMP;
+>> } else {
+>> l1 =3D gen_new_label();
+>> l2 =3D gen_new_label();
+>> @@ -2248,11 +2246,11 @@ static void gen_movl_seg_T0(DisasContext *s, int=
+ seg_reg)
+>> stop as a special handling must be done to disable hardware
+>> interrupts for the next instruction */
+>> if (seg_reg =3D=3D R_SS || (s->code32 && seg_reg < R_FS))
+>> -            s->is_jmp =3D DISAS_TB_JUMP;
+>> +            s->base.is_jmp =3D DISAS_TB_JUMP;
+>> } else {
+>> gen_op_movl_seg_T0_vm(seg_reg);
+>> if (seg_reg =3D=3D R_SS)
+>> -            s->is_jmp =3D DISAS_TB_JUMP;
+>> +            s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>> }
+>>=20
+>> @@ -2424,7 +2422,7 @@ static void gen_exception(DisasContext *s, int tra=
+pno, target_ulong cur_eip)
+>> gen_update_cc_op(s);
+>> gen_jmp_im(cur_eip);
+>> gen_helper_raise_exception(cpu_env, tcg_const_i32(trapno));
+>> -    s->is_jmp =3D DISAS_TB_JUMP;
+>> +    s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>>=20
+>> /* Generate #UD for the current instruction.  The assumption here is that
+>> @@ -2462,7 +2460,7 @@ static void gen_interrupt(DisasContext *s, int int=
+no,
+>> gen_jmp_im(cur_eip);
+>> gen_helper_raise_interrupt(cpu_env, tcg_const_i32(intno),
+>> tcg_const_i32(next_eip - cur_eip));
+>> -    s->is_jmp =3D DISAS_TB_JUMP;
+>> +    s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>>=20
+>> static void gen_debug(DisasContext *s, target_ulong cur_eip)
+>> @@ -2470,7 +2468,7 @@ static void gen_debug(DisasContext *s, target_ulon=
+g cur_eip)
+>> gen_update_cc_op(s);
+>> gen_jmp_im(cur_eip);
+>> gen_helper_debug(cpu_env);
+>> -    s->is_jmp =3D DISAS_TB_JUMP;
+>> +    s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>>=20
+>> static void gen_set_hflag(DisasContext *s, uint32_t mask)
+>> @@ -2526,10 +2524,10 @@ do_gen_eob_worker(DisasContext *s, bool inhibit,=
+ bool recheck_tf, TCGv jr)
+>> gen_reset_hflag(s, HF_INHIBIT_IRQ_MASK);
+>> }
+>>=20
+>> -    if (s->tb->flags & HF_RF_MASK) {
+>> +    if (s->base.tb->flags & HF_RF_MASK) {
+>> gen_helper_reset_rf(cpu_env);
+>> }
+>> -    if (s->singlestep_enabled) {
+>> +    if (s->base.singlestep_enabled) {
+>> gen_helper_debug(cpu_env);
+>> } else if (recheck_tf) {
+>> gen_helper_rechecking_single_step(cpu_env);
+>> @@ -2545,7 +2543,7 @@ do_gen_eob_worker(DisasContext *s, bool inhibit, b=
+ool recheck_tf, TCGv jr)
+>> } else {
+>> tcg_gen_exit_tb(0);
+>> }
+>> -    s->is_jmp =3D DISAS_TB_JUMP;
+>> +    s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>>=20
+>> static inline void
+>> @@ -2584,7 +2582,7 @@ static void gen_jmp_tb(DisasContext *s, target_ulo=
+ng eip, int tb_num)
+>> set_cc_op(s, CC_OP_DYNAMIC);
+>> if (s->jmp_opt) {
+>> gen_goto_tb(s, tb_num, eip);
+>> -        s->is_jmp =3D DISAS_TB_JUMP;
+>> +        s->base.is_jmp =3D DISAS_TB_JUMP;
+>> } else {
+>> gen_jmp_im(eip);
+>> gen_eob(s);
+>> @@ -4419,7 +4417,7 @@ static void gen_sse(CPUX86State *env, DisasContext=
+ *s, int b,
+>> }
+>> }
+>>=20
+>> -/* convert one instruction. s->is_jmp is set if the translation must
+>> +/* convert one instruction. s->base.is_jmp is set if the translation mu=
+st
+>> be stopped. Return the next pc value */
+>> static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+>> target_ulong pc_start)
+>> @@ -5379,7 +5377,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_movl_seg_T0(s, reg);
+>> gen_pop_update(s, ot);
+>> /* Note that reg =3D=3D R_SS in gen_movl_seg_T0 always sets is_jmp.  */
+>> -        if (s->is_jmp) {
+>> +        if (s->base.is_jmp) {
+>> gen_jmp_im(s->pc - s->cs_base);
+>> if (reg =3D=3D R_SS) {
+s-> tf =3D 0;
+>> @@ -5394,7 +5392,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> ot =3D gen_pop_T0(s);
+>> gen_movl_seg_T0(s, (b >> 3) & 7);
+>> gen_pop_update(s, ot);
+>> -        if (s->is_jmp) {
+>> +        if (s->base.is_jmp) {
+>> gen_jmp_im(s->pc - s->cs_base);
+>> gen_eob(s);
+>> }
+>> @@ -5445,7 +5443,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_ldst_modrm(env, s, modrm, MO_16, OR_TMP0, 0);
+>> gen_movl_seg_T0(s, reg);
+>> /* Note that reg =3D=3D R_SS in gen_movl_seg_T0 always sets is_jmp.  */
+>> -        if (s->is_jmp) {
+>> +        if (s->base.is_jmp) {
+>> gen_jmp_im(s->pc - s->cs_base);
+>> if (reg =3D=3D R_SS) {
+s-> tf =3D 0;
+>> @@ -5654,7 +5652,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_movl_seg_T0(s, op);
+>> /* then put the data */
+>> gen_op_mov_reg_v(ot, reg, cpu_T1);
+>> -        if (s->is_jmp) {
+>> +        if (s->base.is_jmp) {
+>> gen_jmp_im(s->pc - s->cs_base);
+>> gen_eob(s);
+>> }
+>> @@ -6310,7 +6308,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_repz_ins(s, ot, pc_start - s->cs_base, s->pc - s->cs_base);
+>> } else {
+>> gen_ins(s, ot);
+>> -            if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +            if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> }
+>> @@ -6325,7 +6323,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_repz_outs(s, ot, pc_start - s->cs_base, s->pc - s->cs_base);
+>> } else {
+>> gen_outs(s, ot);
+>> -            if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +            if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> }
+>> @@ -6341,14 +6339,14 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> tcg_gen_movi_tl(cpu_T0, val);
+>> gen_check_io(s, ot, pc_start - s->cs_base,
+>> SVM_IOIO_TYPE_MASK | svm_is_rep(prefixes));
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> tcg_gen_movi_i32(cpu_tmp2_i32, val);
+>> gen_helper_in_func(ot, cpu_T1, cpu_tmp2_i32);
+>> gen_op_mov_reg_v(ot, R_EAX, cpu_T1);
+>> gen_bpt_io(s, cpu_tmp2_i32, ot);
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> @@ -6362,14 +6360,14 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> svm_is_rep(prefixes));
+>> gen_op_mov_v_reg(ot, cpu_T1, R_EAX);
+>>=20
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> tcg_gen_movi_i32(cpu_tmp2_i32, val);
+>> tcg_gen_trunc_tl_i32(cpu_tmp3_i32, cpu_T1);
+>> gen_helper_out_func(ot, cpu_tmp2_i32, cpu_tmp3_i32);
+>> gen_bpt_io(s, cpu_tmp2_i32, ot);
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> @@ -6380,14 +6378,14 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> tcg_gen_ext16u_tl(cpu_T0, cpu_regs[R_EDX]);
+>> gen_check_io(s, ot, pc_start - s->cs_base,
+>> SVM_IOIO_TYPE_MASK | svm_is_rep(prefixes));
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
+>> gen_helper_in_func(ot, cpu_T1, cpu_tmp2_i32);
+>> gen_op_mov_reg_v(ot, R_EAX, cpu_T1);
+>> gen_bpt_io(s, cpu_tmp2_i32, ot);
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> @@ -6400,14 +6398,14 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> svm_is_rep(prefixes));
+>> gen_op_mov_v_reg(ot, cpu_T1, R_EAX);
+>>=20
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
+>> tcg_gen_trunc_tl_i32(cpu_tmp3_i32, cpu_T1);
+>> gen_helper_out_func(ot, cpu_tmp2_i32, cpu_tmp3_i32);
+>> gen_bpt_io(s, cpu_tmp2_i32, ot);
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> @@ -6946,7 +6944,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_update_cc_op(s);
+>> gen_jmp_im(pc_start - s->cs_base);
+>> gen_helper_pause(cpu_env, tcg_const_i32(s->pc - pc_start));
+>> -            s->is_jmp =3D DISAS_TB_JUMP;
+>> +            s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>> break;
+>> case 0x9b: /* fwait */
+>> @@ -7115,11 +7113,11 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> case 0x131: /* rdtsc */
+>> gen_update_cc_op(s);
+>> gen_jmp_im(pc_start - s->cs_base);
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> gen_helper_rdtsc(cpu_env);
+>> -        if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +        if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> @@ -7191,7 +7189,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_update_cc_op(s);
+>> gen_jmp_im(pc_start - s->cs_base);
+>> gen_helper_hlt(cpu_env, tcg_const_i32(s->pc - pc_start));
+>> -            s->is_jmp =3D DISAS_TB_JUMP;
+>> +            s->base.is_jmp =3D DISAS_TB_JUMP;
+>> }
+>> break;
+>> case 0x100:
+>> @@ -7374,7 +7372,7 @@ static target_ulong disas_insn(CPUX86State *env, D=
+isasContext *s,
+>> gen_helper_vmrun(cpu_env, tcg_const_i32(s->aflag - 1),
+>> tcg_const_i32(s->pc - pc_start));
+>> tcg_gen_exit_tb(0);
+>> -            s->is_jmp =3D DISAS_TB_JUMP;
+>> +            s->base.is_jmp =3D DISAS_TB_JUMP;
+>> break;
+>>=20
+>> case 0xd9: /* VMMCALL */
+>> @@ -7574,11 +7572,11 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> }
+>> gen_update_cc_op(s);
+>> gen_jmp_im(pc_start - s->cs_base);
+>> -            if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +            if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> gen_helper_rdtscp(cpu_env);
+>> -            if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +            if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> gen_jmp(s, s->pc - s->cs_base);
+>> }
+>> @@ -7943,24 +7941,24 @@ static target_ulong disas_insn(CPUX86State *env,=
+ DisasContext *s,
+>> gen_update_cc_op(s);
+>> gen_jmp_im(pc_start - s->cs_base);
+>> if (b & 2) {
+>> -                    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +                    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> gen_op_mov_v_reg(ot, cpu_T0, rm);
+>> gen_helper_write_crN(cpu_env, tcg_const_i32(reg),
+>> cpu_T0);
+>> -                    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +                    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> }
+>> gen_jmp_im(s->pc - s->cs_base);
+>> gen_eob(s);
+>> } else {
+>> -                    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +                    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_start();
+>> }
+>> gen_helper_read_crN(cpu_T0, cpu_env, tcg_const_i32(reg));
+>> gen_op_mov_reg_v(ot, rm, cpu_T0);
+>> -                    if (s->tb->cflags & CF_USE_ICOUNT) {
+>> +                    if (s->base.tb->cflags & CF_USE_ICOUNT) {
+>> gen_io_end();
+>> }
+>> }
+>> @@ -8386,15 +8384,13 @@ void gen_intermediate_code(CPUState *cs, Transla=
+tionBlock *tb)
+>> {
+>> CPUX86State *env =3D cs->env_ptr;
+>> DisasContext dc1, *dc =3D &dc1;
+>> -    target_ulong pc_ptr;
+>> uint32_t flags;
+>> -    target_ulong pc_start;
+>> target_ulong cs_base;
+>> int num_insns;
+>> int max_insns;
+>>=20
+>> /* generate intermediate code */
+>> -    pc_start =3D tb->pc;
+>> +    dc->base.pc_first =3D tb->pc;
+>> cs_base =3D tb->cs_base;
+>> flags =3D tb->flags;
+>>=20
+>> @@ -8407,11 +8403,11 @@ void gen_intermediate_code(CPUState *cs, Transla=
+tionBlock *tb)
+dc-> cpl =3D (flags >> HF_CPL_SHIFT) & 3;
+dc-> iopl =3D (flags >> IOPL_SHIFT) & 3;
+dc-> tf =3D (flags >> TF_SHIFT) & 1;
+>> -    dc->singlestep_enabled =3D cs->singlestep_enabled;
+>> +    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+dc-> cc_op =3D CC_OP_DYNAMIC;
+dc-> cc_op_dirty =3D false;
+dc-> cs_base =3D cs_base;
+>> -    dc->tb =3D tb;
+>> +    dc->base.tb =3D tb;
+dc-> popl_esp_hack =3D 0;
+>> /* select memory access functions */
+dc-> mem_index =3D 0;
+>> @@ -8461,8 +8457,8 @@ void gen_intermediate_code(CPUState *cs, Translati=
+onBlock *tb)
+>> cpu_ptr1 =3D tcg_temp_new_ptr();
+>> cpu_cc_srcT =3D tcg_temp_local_new();
+>>=20
+>> -    dc->is_jmp =3D DISAS_NEXT;
+>> -    pc_ptr =3D pc_start;
+>> +    dc->base.is_jmp =3D DISAS_NEXT;
+>> +    dc->base.pc_next =3D dc->base.pc_first;
 
-It doesn't seem to - but the big benefit we get from doing the close
-is that we trigger the 'Early Error. Sending error.' case in
-qemu_rdma_cleanup - by sending that error flag we cause the
-received_error flag to be set on the source, and that causes the
-migration to cleanly fail.
+> Given the point of the DisasContextBase is it should be common
+> boilerplate it might be worth having a:
 
-Also, since it sets that received_error flag on the source, my patch 3/5
-would exit it's qemu_rdma_wait_comp_channel loop so theoretically the
-other side of the hang seen in lp1545052 couldn't happen.
+>    init_dcbase(dc->base, tb, cs->singlestep_enabled)
 
-Dave
+> So we can keep this all in one place rather than in each targets
+> preamble code.
 
-> 
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/migration.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 51ccd1a4c5..21d6902a29 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -355,6 +355,7 @@ static void process_incoming_migration_co(void *opaque)
-> >                            MIGRATION_STATUS_FAILED);
-> >          error_report("load of migration failed: %s", strerror(-ret));
-> >          migrate_decompress_threads_join();
-> > +        qemu_fclose(mis->from_src_file);
-> >          exit(EXIT_FAILURE);
-> >      }
-> >  
-> > -- 
-> > 2.13.0
-> > 
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This change is only temporary until the target gets ported to translator_lo=
+op(),
+where this initalization is handled from a single place (i.e., no need for
+init_dcbase()).
+
+
+[...]
+
+> That said:
+
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
+Thanks,
+  Lluis
