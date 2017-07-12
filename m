@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVKVn-0001SQ-O9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:29:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVKZQ-0004FM-Ha
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:33:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVKVm-0008Rh-IX
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:29:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53656)
+	(envelope-from <armbru@redhat.com>) id 1dVKZN-0001yl-EV
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:33:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVKVm-0008RJ-Cj
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:29:14 -0400
-Date: Wed, 12 Jul 2017 17:29:01 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170712162901.GL5237@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712150400.GH5237@redhat.com>
-	<9d51d348-7ad6-a98d-3f6d-89e8af5e3a16@redhat.com>
-	<20170712161254.GJ5237@redhat.com>
-	<d3c71dc9-1286-802a-b663-7d37f97daf72@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVKZN-0001xo-7r
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 12:32:57 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1499866456.git.alistair.francis@xilinx.com>
+	<e81d6354fe83b9c870097428214f400f020f24ea.1499866456.git.alistair.francis@xilinx.com>
+Date: Wed, 12 Jul 2017 18:32:53 +0200
+In-Reply-To: <e81d6354fe83b9c870097428214f400f020f24ea.1499866456.git.alistair.francis@xilinx.com>
+	(Alistair Francis's message of "Wed, 12 Jul 2017 06:57:44 -0700")
+Message-ID: <87o9sp39ai.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d3c71dc9-1286-802a-b663-7d37f97daf72@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 4/7] hw/i386: Improve some of the
+ warning messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, alistair23@gmail.com, philippe@mathieu-daude.net
 
-On Wed, Jul 12, 2017 at 06:23:51PM +0200, Paolo Bonzini wrote:
-> On 12/07/2017 18:12, Daniel P. Berrange wrote:
-> >> I'm still not 100% sure whether that auto-deprecation of machine types
-> >> is such a good idea ... since we might need to maintain machines in
-> >> downstream a little bit longer than specified there, it might be better
-> >> to rather deprecate them manually from time to time.
-> > 
-> > Downstreams usually maintain custom machine types, so fact that the
-> > upstream machine types get deleted is not a problem in itself. The problem
-> > comes if followup internal code removal then prevents downstream from
-> > creating their custom machine type.  I don't think we need tie these
-> > issues together. We can remove old machine types, without immediately
-> > removing features that our harm creation of downstream machine types.
-> 
-> I think machine type and feature removal should be tied together.
-> 
-> Doing the opposite leaves around code that is more or less dead from an
-> upstream point of view, and looks like an ad hoc rule for Red Hat.  It
-> harms downstreams that do not participate in upstream development
-> (though perhaps this is an intended side effect?).
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
-Yep, I'm amenable to that POV too. It is entirely valid to say that if
-downstream distros need to care about such ancient back-compat, then they
-will just have to do the extra work to use git history to undelete any bits
-they need that upstream has discarded.
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+[...]
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 1653a47f0a..c915719b0c 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -101,9 +101,11 @@ static void pc_q35_init(MachineState *machine)
+>          lowmem = pcms->max_ram_below_4g;
+>          if (machine->ram_size - lowmem > lowmem &&
+>              lowmem & ((1ULL << 30) - 1)) {
+> -            warn_report("Large machine and max_ram_below_4g(%"PRIu64
+> -                        ") not a multiple of 1G; possible bad performance.",
+> -                        pcms->max_ram_below_4g);
+> +            warn_report("Large machine as the ram size (0x%" PRIx64 ") is more"
+> +                        " then twice the size of the internal limit"
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+than
+
+> +                        " (0x%" PRIx64 ") and max_ram_below_4g (%"PRIu64")"
+
+Space between string literal and PRIu64, please.
+
+> +                        " note a multiple of 1G; possible bad performance.",
+> +                        machine->ram_size, lowmem, pcms->max_ram_below_4g);
+>          }
+>      }
