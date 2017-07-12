@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dVJk1-0006oy-8x
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:39:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVJkw-0007QE-Lf
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dVJjw-0000V5-98
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:39:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50344)
+	(envelope-from <cohuck@redhat.com>) id 1dVJkr-0001Hn-Nw
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:40:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dVJjv-0000UQ-W7
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:39:48 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC64A3DBC1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 15:39:46 +0000 (UTC)
-References: <20170712094149.23069-1-jfreimann@redhat.com>
-	<20170712094149.23069-3-jfreimann@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <3ebcaa16-2362-4611-9b3b-3f1db172ee40@redhat.com>
-Date: Wed, 12 Jul 2017 17:39:31 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVJkr-0001Fu-Cv
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:40:45 -0400
+Date: Wed, 12 Jul 2017 17:40:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170712174040.5241897d@dhcp-192-215.str.redhat.com>
+In-Reply-To: <c70ce5b2-cbf0-e0c0-0697-8ffac5446dea@redhat.com>
+References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
+	<1499864265-144136-11-git-send-email-borntraeger@de.ibm.com>
+	<c70ce5b2-cbf0-e0c0-0697-8ffac5446dea@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170712094149.23069-3-jfreimann@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/3] tests/pxe-test: add testcase using
- vhost-user-bridge
+Subject: Re: [Qemu-devel] [PATCH 10/11] s390x/sic: realize SIC handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,185 +28,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mst@redhat.com, victork@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Fei Li <sherrylf@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
+On Wed, 12 Jul 2017 15:40:02 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-
-On 07/12/2017 11:41 AM, Jens Freimann wrote:
-> From: Jens Freimann <jfreiman@redhat.com>
+> On 12.07.2017 14:57, Christian Borntraeger wrote:
+> > From: Fei Li <sherrylf@linux.vnet.ibm.com>
+> > 
+> > Currently, we do nothing for the SIC instruction, but we need to
+> > implement it properly. Let's add proper handling in the backend code.
+> > 
+> > Co-authored-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> > Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> > Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
+> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > ---
+> >  hw/s390x/css.c         | 26 ++++++++++++++++++++++++++
+> >  hw/s390x/trace-events  |  1 +
+> >  include/hw/s390x/css.h |  2 ++
+> >  target/s390x/kvm.c     | 16 +++++++++++++++-
+> >  4 files changed, 44 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> > index 1fcbc84..7b82176 100644
+> > --- a/hw/s390x/css.c
+> > +++ b/hw/s390x/css.c
+> > @@ -521,6 +521,32 @@ void css_conditional_io_interrupt(SubchDev *sch)
+> >      }
+> >  }
+> >  
+> > +int css_do_sic(CPUS390XState *env, uint8_t isc, uint16_t mode)
+> > +{
+> > +    S390FLICState *fs = s390_get_flic();
+> > +    S390FLICStateClass *fsc = S390_FLIC_COMMON_GET_CLASS(fs);
+> > +    int r;
+> > +
+> > +    if (env->psw.mask & PSW_MASK_PSTATE) {
+> > +        r = -PGM_PRIVILEGED;
+> > +        goto out;  
 > 
-> Add a test to pxe-test using the vhost-user interface.
-> Create a vhost-user-bridge process and connect it to qemu.
+> Why not simply:
 > 
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> ---
->   tests/Makefile.include |   4 +-
->   tests/pxe-test.c       | 106 ++++++++++++++++++++++++++++++++++++++++++++++++-
->   2 files changed, 108 insertions(+), 2 deletions(-)
+>            return -PGM_PRIVILEGED;
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 18cd06a..eccb27e 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -698,7 +698,8 @@ tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
->   tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
->   tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
->   	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
-> -tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
-> +tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o \
-> +    tests/vhost-user-bridge$(EXESUF) $(libqos-obj-y)
->   tests/tmp105-test$(EXESUF): tests/tmp105-test.o $(libqos-omap-obj-y)
->   tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
->   tests/m25p80-test$(EXESUF): tests/m25p80-test.o
-> @@ -826,6 +827,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
->   	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->   	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
->   		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-> +		QTEST_VUBR_BINARY=./tests/vhost-user-bridge$(EXESUF) \
->   		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
->   		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
->   	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
-> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-> index 34282d3..5a0d182 100644
-> --- a/tests/pxe-test.c
-> +++ b/tests/pxe-test.c
-> @@ -5,7 +5,8 @@
->    *
->    * Authors:
->    *  Michael S. Tsirkin <mst@redhat.com>,
-> - *  Victor Kaplansky <victork@redhat.com>
-> + *  Victor Kaplansky <victork@redhat.com>,
-> + *  Jens Freimann <jfreiman@redhat.com>
->    *
->    * This work is licensed under the terms of the GNU GPL, version 2 or later.
->    * See the COPYING file in the top-level directory.
-> @@ -13,13 +14,115 @@
->   
->   #include "qemu/osdep.h"
->   #include <glib/gstdio.h>
-> +#include <glib.h>
->   #include "qemu-common.h"
->   #include "libqtest.h"
->   #include "boot-sector.h"
-> +#include <sys/vfs.h>
->   
-> +#define LPORT 5555
-> +#define RPORT 4444
->   #define NETNAME "net0"
-> +#define QEMU_CMD_MEM    "--enable-kvm -m %d -object memory-backend-file,id=mem,size=%dM,"\
-> +                        "mem-path=%s,share=on -numa node,memdev=mem -mem-prealloc "
-> +#define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s"
-> +#define QEMU_CMD_NETDEV " -device virtio-net-pci,netdev=net0 "\
-> +                        " -netdev vhost-user,id=net0,chardev=%s,vhostforce "\
-> +                        " -netdev user,id=n0,tftp=./,bootfile=%s "\
-> +                        " -netdev socket,id=n1,udp=localhost:%d,localaddr=localhost:%d"
-> +#define QEMU_CMD_NET    " -device virtio-net-pci,netdev=n0 "\
-> +                        " -device virtio-net-pci,netdev=n1 "
-> +
-> +#define QEMU_CMD        QEMU_CMD_MEM QEMU_CMD_CHR \
-> +                        QEMU_CMD_NETDEV QEMU_CMD_NET
-> +
-> +#define HUGETLBFS_MAGIC       0x958458f6
-> +#define VUBR_SOCK "vubr.sock"
-> +#define MEMSZ 1024
->   
->   static char disk[] = "tests/pxe-test-disk-XXXXXX";
-> +static const char *root;
-> +static const char *tmpfs;
-> +static const char *tmpfs2;
-Can't these be declared directly in test_pxe_vhost_user()?
+> ?
+> 
+> Same for the other goto below ... and then you also do not need the "r"
+> variable anymore.
 
-> +
-> +static const char *init_hugepagefs(const char *path)
-> +{
-> +    struct statfs fs;
-> +    int ret;
-> +
-> +    if (access(path, R_OK | W_OK | X_OK)) {
-> +        g_test_message("access on path (%s): %s\n", path, strerror(errno));
-> +        return NULL;
-> +    }
-> +
-> +    do {
-> +        ret = statfs(path, &fs);
-> +    } while (ret != 0 && errno == EINTR);
-> +
-> +    if (ret != 0) {
-> +        g_test_message("statfs on path (%s): %s\n", path, strerror(errno));
-> +        return NULL;
-> +    }
-> +
-> +    if (fs.f_type != HUGETLBFS_MAGIC) {
-> +        g_test_message("Warning: path not on HugeTLBFS: %s\n", path);
-> +        return NULL;
-> +    }
-> +
-> +    return path;
-> +}
-> +
-> +static void test_pxe_vhost_user(void)
-> +{
-> +    char template[] = "/tmp/vhost-user-bridge-XXXXXX";
-> +    char template2[] = "/tmp/hugepages-XXXXXX";
-> +    gchar *vubr_args[] = {NULL, NULL, NULL, NULL};
-> +    const char *hugefs;
-> +    GError *error = NULL;
-> +    char *vubr_binary;
-> +    char *qemu_args;
-> +    GPid vubr_pid;
-> +
-> +    tmpfs = mkdtemp(template);
-> +    if (!tmpfs) {
-> +        g_test_message("mkdtemp on path(%s): %s\n",
-> +                       template, strerror(errno));
-> +    }
-> +    vubr_binary = getenv("QTEST_VUBR_BINARY");
-> +    g_assert(vubr_binary);
-> +    vubr_args[0] = g_strdup_printf("%s", vubr_binary);
-> +    vubr_args[1] = g_strdup_printf("-u");
-> +    vubr_args[2] = g_strdup_printf("%s/%s", tmpfs, VUBR_SOCK);
-> +    g_spawn_async(NULL, vubr_args, NULL,
-> +                  G_SPAWN_SEARCH_PATH_FROM_ENVP |
-> +                  G_SPAWN_SEARCH_PATH,
-> +                  NULL, NULL, &vubr_pid, &error);
-> +    g_assert_no_error(error);
-> +
-> +    hugefs = getenv("QTEST_HUGETLBFS_PATH");
-> +    if (hugefs) {
-> +        root = init_hugepagefs(hugefs);
-> +        g_assert(root);
-> +    } else {
-> +        tmpfs2 = mkdtemp(template2);
-> +        g_assert(tmpfs2);
-> +        root = tmpfs2;
-> +    }
-> +
-> +    qemu_args = g_strdup_printf(QEMU_CMD, MEMSZ, MEMSZ, (root),
-> +                                "char0", vubr_args[2], "char0", disk,
-> +                                RPORT, LPORT);
-> +    qtest_start(qemu_args);
-> +    boot_sector_test();
-> +    qtest_quit(global_qtest);
-> +    g_free(qemu_args);
-> +    g_free(vubr_args[0]);
-> +    g_free(vubr_args[1]);
-> +    g_free(vubr_args[2]);
-> +    g_assert_cmpint (g_remove(g_strdup_printf("%s/%s", tmpfs,VUBR_SOCK)),
-> +		     ==, 0);
-> +    g_assert_cmpint(rmdir(tmpfs), ==, 0);
-If created, shouldn't tmpfs2 be cleaned here too?
+I'm slightly in favour of the single exit style.
 
-> +}
->   
->   static void test_pxe_one(const char *params, bool ipv6)
->   {
-> @@ -65,6 +168,7 @@ int main(int argc, char *argv[])
->       if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->           qtest_add_func("pxe/e1000", test_pxe_e1000);
->           qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
-> +        qtest_add_func("pxe/vhost-user", test_pxe_vhost_user);
->       } else if (strcmp(arch, "ppc64") == 0) {
->           qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
->           qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
 > 
+> > +    }
+> > +
+> > +    trace_css_do_sic(mode, isc);
+> > +    switch (mode) {
+> > +    case SIC_IRQ_MODE_ALL:
+> > +    case SIC_IRQ_MODE_SINGLE:
+> > +        break;
+> > +    default:
+> > +        r = -PGM_OPERAND;
+> > +        goto out;
+> > +    }
+> > +
+> > +    r = fsc->modify_ais_mode(fs, isc, mode) ? -PGM_OPERATION : 0;
+> > +out:
+> > +    return r;
+> > +}
+> > +
+> >  void css_adapter_interrupt(uint8_t isc)
+> >  {
+> >      uint32_t io_int_word = (isc << 27) | IO_INT_WORD_AI;
+
+(...)
+
+> > diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> > index e028960..5ee6d52 100644
+> > --- a/include/hw/s390x/css.h
+> > +++ b/include/hw/s390x/css.h
+> > @@ -12,6 +12,7 @@
+> >  #ifndef CSS_H
+> >  #define CSS_H
+> >  
+> > +#include "cpu.h"  
+> 
+> Not sure, but it's a little bit strange that the channel sub-system now
+> depends on the CPU ... maybe the check for problem state should rather
+> be done in kvm.c instead?
+
+This would mean that tcg would need to duplicate those checks should we
+want to wire it up in the future. (FWIW, the sclp backend code in
+hw/s390x/sclp.c also does the respective checks, probably for exactly
+that reason.)
+
+> Or should css_do_sic() rather reside in s390-pci-inst.c or in ioinst.c
+> instead?
+
+s390-pci-inst.c is only a good choice if we are sure that sic will be
+applicable for pci only even in the future - and I don't think we can
+be. (The ais stuff is tied to the adapter, who knows which adapter
+types may arrive in the future...)
+
+I/O interrupt injection is currently triggered from the css code (where
+it belongs IMO), so I think the code should stay where it is now.
