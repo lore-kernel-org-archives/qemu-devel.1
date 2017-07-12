@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVItX-0007eS-4k
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:45:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVIzP-0001aZ-M5
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVItT-0000Cm-2G
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:45:39 -0400
-Date: Wed, 12 Jul 2017 16:45:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170712144519.GD4917@noname.str.redhat.com>
-References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
-	<20170712114700.20008-3-pbutsykin@virtuozzo.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dVIzL-0003kQ-K6
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:51:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVIzL-0003jc-Ax
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 10:51:39 -0400
+Date: Wed, 12 Jul 2017 11:51:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170712145121.GF6020@localhost.localdomain>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170712114700.20008-3-pbutsykin@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] qcow2: add qcow2_cache_discard
+In-Reply-To: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Am 12.07.2017 um 13:46 hat Pavel Butsykin geschrieben:
-> Whenever l2/refcount table clusters are discarded from the file we can
-> automatically drop unnecessary content of the cache tables. This reduces
-> the chance of eviction useful cache data and eliminates inconsistent data
-> in the cache with the data in the file.
+On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+> We don't want to carry along old machine types forever. If we are able to
+> remove the pc machines up to 0.13 one day for example, this would allow
+> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+> BARs directly to low memory). Everything up to pc-1.2 is also known to
+> have issues with migration.  So let's start with a deprecation message
+> for the old machine types so that the (hopefully) few users of these old
+> systems start switching over to newer machine types instead.
 > 
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/qcow2-cache.c    | 26 ++++++++++++++++++++++++++
->  block/qcow2-refcount.c | 14 ++++++++++++++
->  block/qcow2.h          |  3 +++
->  3 files changed, 43 insertions(+)
-> 
-> diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-> index 1d25147392..75746a7f43 100644
-> --- a/block/qcow2-cache.c
-> +++ b/block/qcow2-cache.c
-> @@ -411,3 +411,29 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
->      assert(c->entries[i].offset != 0);
->      c->entries[i].dirty = true;
->  }
-> +
-> +void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
-> +                                  uint64_t offset)
-> +{
-> +    int i;
-> +
-> +    for (i = 0; i < c->size; i++) {
-> +        if (c->entries[i].offset == offset) {
-> +            return qcow2_cache_get_table_addr(bs, c, i);
-> +        }
-> +    }
-> +    return NULL;
-> +}
-> +
-> +void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
-> +{
-> +    int i = qcow2_cache_get_table_idx(bs, c, table);
-> +
-> +    assert(c->entries[i].ref == 0);
-> +
-> +    c->entries[i].offset = 0;
-> +    c->entries[i].lru_counter = 0;
-> +    c->entries[i].dirty = false;
-> +
-> +    qcow2_cache_table_release(bs, c, i, 1);
-> +}
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index c9b0dcb4f3..8050db4544 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -862,6 +862,20 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
->          s->set_refcount(refcount_block, block_index, refcount);
->  
->          if (refcount == 0 && s->discard_passthrough[type]) {
-> +            void *table;
-> +
-> +            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
-> +                                                offset);
-> +            if (table != NULL) {
-> +                qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
-> +                qcow2_cache_discard(bs, s->refcount_block_cache, table);
-> +            }
-> +
-> +            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
-> +            if (table != NULL) {
-> +                qcow2_cache_discard(bs, s->l2_table_cache, table);
-> +            }
-> +
->              update_refcount_discard(bs, cluster_offset, s->cluster_size);
->          }
->      }
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-This is not wrong, but wouldn't actually even refcount == 0 be enough as
-a condition to evict the cluster from the cache? I don't think it really
-matters whether we actually send a discard request or not for the image
-file.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Kevin
+I suggest changing "-machine help" too.  Today it looks like this:
+
+  Supported machines are:
+  pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+  pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+  pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+  pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+  pc-1.3               Standard PC (i440FX + PIIX, 1996)
+  pc-1.2               Standard PC (i440FX + PIIX, 1996)
+  pc-1.1               Standard PC (i440FX + PIIX, 1996)
+  pc-1.0               Standard PC (i440FX + PIIX, 1996)
+  pc-0.15              Standard PC (i440FX + PIIX, 1996)
+  pc-0.14              Standard PC (i440FX + PIIX, 1996)
+  pc-0.13              Standard PC (i440FX + PIIX, 1996)
+  pc-0.12              Standard PC (i440FX + PIIX, 1996)
+  pc-0.11              Standard PC (i440FX + PIIX, 1996)
+  pc-0.10              Standard PC (i440FX + PIIX, 1996)
+  pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+  q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+  pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+  isapc                ISA-only PC
+  none                 empty machine
+
+
+It could be changed to something like this:
+
+  Supported machines are:
+  pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+  pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+  pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+  pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+  pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+  pc-1.3               Standard PC (i440FX + PIIX, 1996)
+  pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+  pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+  q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+  pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+  isapc                ISA-only PC
+  none                 empty machine
+
+  Deprecated machines: pc-1.2, pc-1.1, pc-1.0, pc-0.15, pc-0.14, pc-0.13,
+                       pc-0.12, pc-0.11, pc-0.10.
+
+-- 
+Eduardo
