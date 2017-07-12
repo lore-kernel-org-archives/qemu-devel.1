@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVCkd-0007yB-Q7
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:12:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1dVClp-00008t-Dx
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVCkc-0001A8-Oa
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:12:03 -0400
-Date: Wed, 12 Jul 2017 11:10:22 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170712081022.fcvchnilcfcyt23j@postretch>
-References: <20170711163748.17817-1-el13635@mail.ntua.gr>
-	<87tw2iaydb.fsf@dusky.pond.sub.org>
+	(envelope-from <peterx@redhat.com>) id 1dVCll-0001bb-3c
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:13:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVClk-0001bJ-TA
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 04:13:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A7AE561E50
+	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 08:13:11 +0000 (UTC)
+Date: Wed, 12 Jul 2017 16:13:03 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170712081303.GH29326@pxdev.xzpeter.org>
+References: <1499844982-5738-1-git-send-email-peterx@redhat.com>
+	<149984564169.66.8890128169968285578@5d477a5b5989>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="stryz4gynwckxzcc"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87tw2iaydb.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] block: Block driver callbacks fixes
+In-Reply-To: <149984564169.66.8890128169968285578@5d477a5b5989>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] VT-d: some enhancements on iotlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +33,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, jasowang@redhat.com, mst@redhat.com
 
+On Wed, Jul 12, 2017 at 12:47:22AM -0700, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Type: series
+> Message-id: 1499844982-5738-1-git-send-email-peterx@redhat.com
+> Subject: [Qemu-devel] [PATCH v2 0/4] VT-d: some enhancements on iotlb
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 0363bbd intel_iommu: implement mru list for iotlb
+> 661bf52 intel_iommu: use access_flags for iotlb
+> a571ac1 intel_iommu: let iotlb size tunable
+> 3d04c28 intel_iommu: fix VTD_PAGE_MASK
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/4: intel_iommu: fix VTD_PAGE_MASK...
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #38: FILE: hw/i386/intel_iommu_internal.h:387:
+> +#define VTD_PAGE_MASK               ~(VTD_PAGE_SIZE - 1)
+> 
+> total: 1 errors, 0 warnings, 16 lines checked
 
---stryz4gynwckxzcc
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Oops. I forgot this one (after weeks). Will repost.
 
-On Wed, Jul 12, 2017 at 09:49:20AM +0200, Markus Armbruster wrote:
->Manos Pitsidianakis <el13635@mail.ntua.gr> writes:
->
->> This series makes implementing some of the bdrv_* callbacks easier for b=
-lock
->> filters by passing requests to bs->file if bs->drv doesn't implement it =
-instead
->> of failing, and adding default bdrv_co_get_block_status() implementation=
-s.
->>
->> This is based against Kevin Wolf's block branch, commit
->> da4bd74d2450ab72a7c26bbabb10c6a287dd043e
->
->Haven't seen BlockDriver member is_filter before.  Interesting.  It's
->documentation
->
->    /* set to true if the BlockDriver is a block filter */
->    bool is_filter;
->
->is seriously lacking.  What does it *mean* to be a block filter?  Which
->block layer facilities are affected, and how?
-
-Currently it is only used in bdrv_recurse_is_first_non_filter.=20
-
->Observation: driver "raw" is filter-like in the sense that all it does
->is pass along method arguments and results.  Can't say whether that
->makes it a filter in the sense of is_filter, because "the sense of
->is_filter" is nebulous to me :)
-
-I'm not very acquainted with raw, so I can't really comment. But the=20
-drivers I'm working on, throttle and before write notifier have that=20
-exact semantic, ie they do something when IO is intercepted and pass=20
-everything to the BDSes below. There was a mini discussion about raw and=20
-filters in the previous version's thread.
-
-I might add documentation to block_int.h in the future. When I first=20
-read it it felt nebulous to me too.
-
---stryz4gynwckxzcc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlll2W4ACgkQc2J8L2kN
-9xAS6w/9GMKpC7KoKaxRxUZmxEUaSKIwPPmRQOKHKV3pnHqFfn8MlNLAN+w4FFQX
-pZojjzFHK8Ucbss+JKxcjV0PpjZwIa9a7IaHBP+hqhrQEKogyYbaCjYR6kUPMLRc
-wDZiEbXm8mItn1phbsdfoCjGWe/U1BQKmT/RGL3eSB9B0Lq+GjNl+UJC5m5kRUTn
-O0oh/u5IzMOyp+wAyGdH/FKZsO9mEvmoSs0Rxq4TMLFqKwd3w6+lugk5XuOL1hsw
-uxC+cicwJRmjTGM+1G63bwmpFxyqQVxPz15nA4UOw1MBos/n2KSMk0S93npFAty2
-GDQX4sEE4uqtKGWCoaWRPMVIvo18sR1AEFgToRGEukEFvVu6+iQLUb6GJucRUvhh
-p/U3Ysv/6uBWP8ir4HOlo8QTkzb7pzP+CZyO/YS2IpYa1a3r9QQxP5Ii6J5iMhQS
-vlyuB7PBz8gKTllBLCiLGZH8ZUcyDyh9eppxQWyXQTpg7LjdUX+iFiF9GldWsENW
-J1jougO8iGCOlmg2mP6wkVOi7tSLeipeYwLWI9enQht2YDFYFUZ7DkmtfKBsftbQ
-bgsYoiF+4c4n9f5ZYM/7Hvv4J+VIGYQ70nys4EZPadf1uhToh8PJx1EZhFulP6NB
-6Q7pPNzPBTuFtV8ZxOwJku6jE2ipQaEx7SitG08yQ6fvqMObmdM=
-=Ig63
------END PGP SIGNATURE-----
-
---stryz4gynwckxzcc--
+-- 
+Peter Xu
