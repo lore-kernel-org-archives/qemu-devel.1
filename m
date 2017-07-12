@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVFT6-0006Kd-Ux
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:06:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVFTD-0006NE-Ly
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVFT3-000849-ON
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:06:08 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <149942760788.8972.474351671751194003.stgit@frigg.lan>
-	<149943279497.8972.16033572732296843579.stgit@frigg.lan>
-	<87vamy804n.fsf@linaro.org>
-Date: Wed, 12 Jul 2017 14:05:46 +0300
-In-Reply-To: <87vamy804n.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
-	message of "Wed, 12 Jul 2017 10:39:36 +0100")
-Message-ID: <87inixewz9.fsf@frigg.lan>
+	(envelope-from <dgibson@ozlabs.org>) id 1dVFTC-0008Ck-Ia
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 07:06:15 -0400
+Date: Wed, 12 Jul 2017 21:05:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170712110545.GN4083@umbus.fritz.box>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-3-david@gibson.dropbear.id.au>
+	<20170712120001.31d858de@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v12 21/27] target/arm: [tcg] Port to
- translate_insn
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="E0h0CbphJD8hN+Gf"
+Content-Disposition: inline
+In-Reply-To: <20170712120001.31d858de@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCHv2 2/8] spapr: Remove 'awaiting_allocation'
+ DRC flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,288 +26,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>
+Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-Alex Benn=C3=A9e writes:
 
-> Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
+--E0h0CbphJD8hN+Gf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> Incrementally paves the way towards using the generic instruction transl=
-ation
->> loop.
->>=20
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->> target/arm/translate.c |  148 ++++++++++++++++++++++++++++--------------=
-------
->> target/arm/translate.h |    2 +
->> 2 files changed, 87 insertions(+), 63 deletions(-)
->>=20
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index 29428b2920..9d033f2fb7 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -11842,6 +11842,9 @@ static void arm_tr_init_disas_context(DisasConte=
-xtBase *dcbase,
-dc-> is_ldex =3D false;
-dc-> ss_same_el =3D false; /* Can't be true since EL_d must be AArch64 */
->>=20
->> +    dc->next_page_start =3D
->> +        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
->> +
->>=20
->> cpu_F0s =3D tcg_temp_new_i32();
->> cpu_F1s =3D tcg_temp_new_i32();
->> @@ -11942,14 +11945,83 @@ static BreakpointCheckType arm_tr_breakpoint_c=
-heck(
->> }
->> }
->>=20
->> +static target_ulong arm_tr_translate_insn(DisasContextBase *dcbase,
->> +                                               CPUState *cpu)
->> +{
->> +    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
->> +    CPUARMState *env =3D cpu->env_ptr;
->> +
->> +    if (dc->ss_active && !dc->pstate_ss) {
->> +        /* Singlestep state is Active-pending.
->> +         * If we're in this state at the start of a TB then either
->> +         *  a) we just took an exception to an EL which is being debugg=
-ed
->> +         *     and this is the first insn in the exception handler
->> +         *  b) debug exceptions were masked and we just unmasked them
->> +         *     without changing EL (eg by clearing PSTATE.D)
->> +         * In either case we're going to take a swstep exception in the
->> +         * "did not step an insn" case, and so the syndrome ISV and EX
->> +         * bits should be zero.
->> +         */
->> +        assert(dc->base.num_insns =3D=3D 1);
->> +        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
->> +                      default_exception_el(dc));
->> +        dc->base.is_jmp =3D DISAS_SKIP;
->> +        return dc->pc;
->> +    }
->> +
->> +    if (dc->thumb) {
->> +        disas_thumb_insn(env, dc);
->> +        if (dc->condexec_mask) {
->> +            dc->condexec_cond =3D (dc->condexec_cond & 0xe)
->> +                | ((dc->condexec_mask >> 4) & 1);
->> +            dc->condexec_mask =3D (dc->condexec_mask << 1) & 0x1f;
->> +            if (dc->condexec_mask =3D=3D 0) {
->> +                dc->condexec_cond =3D 0;
->> +            }
->> +        }
->> +    } else {
->> +        unsigned int insn =3D arm_ldl_code(env, dc->pc, dc->sctlr_b);
->> +        dc->pc +=3D 4;
->> +        disas_arm_insn(dc, insn);
->> +    }
->> +
->> +    if (dc->condjmp && !dc->base.is_jmp) {
->> +        gen_set_label(dc->condlabel);
->> +        dc->condjmp =3D 0;
->> +    }
->> +
->> +    if (dc->base.is_jmp =3D=3D DISAS_NEXT) {
->> +        /* Translation stops when a conditional branch is encountered.
->> +         * Otherwise the subsequent code could get translated several t=
-imes.
->> +         * Also stop translation when a page boundary is reached.  This
->> +         * ensures prefetch aborts occur at the right place.  */
->> +
->> +        if (is_singlestepping(dc)) {
->> +            dc->base.is_jmp =3D DISAS_TOO_MANY;
->> +        } else if ((dc->pc >=3D dc->next_page_start) ||
->> +                   ((dc->pc >=3D dc->next_page_start - 3) &&
->> +                    insn_crosses_page(env, dc))) {
->> +            /* We want to stop the TB if the next insn starts in a new =
-page,
->> +             * or if it spans between this page and the next. This mean=
-s that
->> +             * if we're looking at the last halfword in the page we nee=
-d to
->> +             * see if it's a 16-bit Thumb insn (which will fit in this =
-TB)
->> +             * or a 32-bit Thumb insn (which won't).
->> +             * This is to avoid generating a silly TB with a single 16-=
-bit insn
->> +             * in it at the end of this page (which would execute corre=
-ctly
->> +             * but isn't very efficient).
->> +             */
->> +            dc->base.is_jmp =3D DISAS_TOO_MANY;
->> +        }
->> +    }
->> +
->> +    return dc->pc;
->> +}
->> +
->> /* generate intermediate code for basic block 'tb'.  */
->> void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->> {
->> -    CPUARMState *env =3D cs->env_ptr;
->> DisasContext dc1, *dc =3D &dc1;
->> -    target_ulong next_page_start;
->> int max_insns;
->> -    bool end_of_page;
->>=20
->> /* generate intermediate code */
->>=20
->> @@ -11969,7 +12041,6 @@ void gen_intermediate_code(CPUState *cs, Transla=
-tionBlock *tb)
-dc-> base.singlestep_enabled =3D cs->singlestep_enabled;
->> arm_tr_init_disas_context(&dc->base, cs);
->>=20
->> -    next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET=
-_PAGE_SIZE;
->> max_insns =3D tb->cflags & CF_COUNT_MASK;
->> if (max_insns =3D=3D 0) {
->> max_insns =3D CF_COUNT_MASK;
->> @@ -12020,72 +12091,20 @@ void gen_intermediate_code(CPUState *cs, Trans=
-lationBlock *tb)
->> gen_io_start();
->> }
->>=20
->> -        if (dc->ss_active && !dc->pstate_ss) {
->> -            /* Singlestep state is Active-pending.
->> -             * If we're in this state at the start of a TB then either
->> -             *  a) we just took an exception to an EL which is being de=
-bugged
->> -             *     and this is the first insn in the exception handler
->> -             *  b) debug exceptions were masked and we just unmasked th=
-em
->> -             *     without changing EL (eg by clearing PSTATE.D)
->> -             * In either case we're going to take a swstep exception in=
- the
->> -             * "did not step an insn" case, and so the syndrome ISV and=
- EX
->> -             * bits should be zero.
->> -             */
->> -            assert(dc->base.num_insns =3D=3D 1);
->> -            gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
->> -                          default_exception_el(dc));
->> -            goto done_generating;
->> -        }
->> -
->> -        if (dc->thumb) {
->> -            disas_thumb_insn(env, dc);
->> -            if (dc->condexec_mask) {
->> -                dc->condexec_cond =3D (dc->condexec_cond & 0xe)
->> -                                   | ((dc->condexec_mask >> 4) & 1);
->> -                dc->condexec_mask =3D (dc->condexec_mask << 1) & 0x1f;
->> -                if (dc->condexec_mask =3D=3D 0) {
->> -                    dc->condexec_cond =3D 0;
->> -                }
->> -            }
->> -        } else {
->> -            unsigned int insn =3D arm_ldl_code(env, dc->pc, dc->sctlr_b=
-);
->> -            dc->pc +=3D 4;
->> -            disas_arm_insn(dc, insn);
->> -        }
->> -
->> -        if (dc->condjmp && !dc->base.is_jmp) {
->> -            gen_set_label(dc->condlabel);
->> -            dc->condjmp =3D 0;
->> -        }
->> +        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
->>=20
->> if (tcg_check_temp_count()) {
->> fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n",
-dc-> pc);
->> }
->>=20
->> -        /* Translation stops when a conditional branch is encountered.
->> -         * Otherwise the subsequent code could get translated several t=
-imes.
->> -         * Also stop translation when a page boundary is reached.  This
->> -         * ensures prefetch aborts occur at the right place.  */
->> -
->> -        /* We want to stop the TB if the next insn starts in a new page,
->> -         * or if it spans between this page and the next. This means th=
-at
->> -         * if we're looking at the last halfword in the page we need to
->> -         * see if it's a 16-bit Thumb insn (which will fit in this TB)
->> -         * or a 32-bit Thumb insn (which won't).
->> -         * This is to avoid generating a silly TB with a single 16-bit =
-insn
->> -         * in it at the end of this page (which would execute correctly
->> -         * but isn't very efficient).
->> -         */
->> -        end_of_page =3D (dc->pc >=3D next_page_start) ||
->> -            ((dc->pc >=3D next_page_start - 3) && insn_crosses_page(env=
-, dc));
->> -
->> -    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
->> -             !is_singlestepping(dc) &&
->> -             !singlestep &&
->> -             !end_of_page &&
->> -             dc->base.num_insns < max_insns);
->> +        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
->> +                            dc->base.num_insns >=3D max_insns)) {
->> +            dc->base.is_jmp =3D DISAS_TOO_MANY;
->> +        }
->> +    } while (!dc->base.is_jmp);
->>=20
->> +    if (dc->base.is_jmp !=3D DISAS_SKIP) {
->> if (tb->cflags & CF_LAST_IO) {
->> if (dc->condjmp) {
->> /* FIXME:  This can theoretically happen with self-modifying
->> @@ -12123,6 +12142,7 @@ void gen_intermediate_code(CPUState *cs, Transla=
-tionBlock *tb)
->> gen_exception(EXCP_SMC, syn_aa32_smc(), 3);
->> break;
->> case DISAS_NEXT:
->> +        case DISAS_TOO_MANY:
->> case DISAS_UPDATE:
->> gen_set_pc_im(dc, dc->pc);
->> /* fall through */
->> @@ -12141,6 +12161,7 @@ void gen_intermediate_code(CPUState *cs, Transla=
-tionBlock *tb)
->> */
->> switch(dc->base.is_jmp) {
->> case DISAS_NEXT:
->> +        case DISAS_TOO_MANY:
->> gen_goto_tb(dc, 1, dc->pc);
->> break;
->> case DISAS_UPDATE:
->> @@ -12194,6 +12215,7 @@ void gen_intermediate_code(CPUState *cs, Transla=
-tionBlock *tb)
->> gen_goto_tb(dc, 1, dc->pc);
->> }
->> }
->> +    }
->>=20
->> done_generating:
->> gen_tb_end(tb, dc->base.num_insns);
->> diff --git a/target/arm/translate.h b/target/arm/translate.h
->> index 6fe40a344a..83e56dcb08 100644
->> --- a/target/arm/translate.h
->> +++ b/target/arm/translate.h
->> @@ -9,6 +9,7 @@ typedef struct DisasContext {
->> DisasContextBase base;
->>=20
->> target_ulong pc;
->> +    target_ulong next_page_start;
->> uint32_t insn;
->> /* Nonzero if this instruction has been conditionally skipped.  */
->> int condjmp;
->> @@ -148,6 +149,7 @@ static void disas_set_insn_syndrome(DisasContext *s,=
- uint32_t syn)
->> * as opposed to attempting to use lookup_and_goto_ptr.
->> */
->> #define DISAS_EXIT DISAS_TARGET_11
->> +#define DISAS_SKIP DISAS_TARGET_12
+On Wed, Jul 12, 2017 at 12:00:01PM +0200, Greg Kurz wrote:
+> On Wed, 12 Jul 2017 15:53:11 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > The awaiting_allocation flag in the DRC was introduced by aab9913
+> > "spapr_drc: Prevent detach racing against attach for CPU DR", allegedly=
+ to
+> > prevent a guest crash on racing attach and detach.  Except.. information
+> > from the BZ actually suggests a qemu crash, not a guest crash.  And the=
+re
+>=20
+> Can you share an url to the BZ ?
 
-> What are the semantics of this new exit condition? This seems a case
-> that should be covered a well defined common exit condition rather than
-> yet-another-architecture specific one.
+Alas, no.  I have that information second hand from.. Bharata,
+think.. and I believe the BZ is an IBM internal one.
 
-Right. As per Richard's suggestion, this is now the generic DISAS_NORETURN =
-(on
-the future v13).
+>=20
+> > shouldn't be a problem here anyway: if the guest has already moved the =
+DRC
+> > away from UNUSABLE state, the detach would already be deferred, and if =
+it
+> > hadn't it should be safe to detach it (the guest should fail gracefully
+> > when it attempts to change the allocation state).
+> >=20
+> > I think this was probably just a bandaid for some other problem in the
+> > state management.  So, remove awaiting_allocation and associated code.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr_drc.c         | 25 +++----------------------
+> >  include/hw/ppc/spapr_drc.h |  1 -
+> >  2 files changed, 3 insertions(+), 23 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index 9b07f80..89ba3d6 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *=
+drc)
+> >      if (!drc->dev) {
+> >          return RTAS_OUT_NO_SUCH_INDICATOR;
+> >      }
+> > -    if (drc->awaiting_release && drc->awaiting_allocation) {
+> > -        /* kernel is acknowledging a previous hotplug event
+> > -         * while we are already removing it.
+> > -         * it's safe to ignore awaiting_allocation here since we know =
+the
+> > -         * situation is predicated on the guest either already having =
+done
+> > -         * so (boot-time hotplug), or never being able to acquire in t=
+he
+> > -         * first place (hotplug followed by immediate unplug).
+> > -         */
+> > +    if (drc->awaiting_release) {
+> > +        /* Don't allow the guest to move a device away from UNUSABLE
+> > +         * state when we want to unplug it */
+> >          return RTAS_OUT_NO_SUCH_INDICATOR;
+> >      }
+> > =20
+> >      drc->allocation_state =3D SPAPR_DR_ALLOCATION_STATE_USABLE;
+> > -    drc->awaiting_allocation =3D false;
+> > =20
+> >      return RTAS_OUT_SUCCESS;
+> >  }
+> > @@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, Devic=
+eState *d, void *fdt,
+> >      drc->fdt =3D fdt;
+> >      drc->fdt_start_offset =3D fdt_start_offset;
+> > =20
+> > -    if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI) {
+> > -        drc->awaiting_allocation =3D true;
+> > -    }
+> > -
+> >      object_property_add_link(OBJECT(drc), "device",
+> >                               object_get_typename(OBJECT(drc->dev)),
+> >                               (Object **)(&drc->dev),
+> > @@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, Devic=
+eState *d, Error **errp)
+> >          return;
+> >      }
+> > =20
+> > -    if (drc->awaiting_allocation) {
+> > -        drc->awaiting_release =3D true;
+> > -        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+> > -        return;
+> > -    }
+> > -
+> >      spapr_drc_release(drc);
+> >  }
+> > =20
+> > @@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+> >          spapr_drc_release(drc);
+> >      }
+> > =20
+> > -    drc->awaiting_allocation =3D false;
+> > -
+> >      if (drc->dev) {
+> >          /* A device present at reset is coldplugged */
+> >          drc->isolation_state =3D SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+> > @@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc =
+=3D {
+> >          VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+> >          VMSTATE_BOOL(configured, sPAPRDRConnector),
+> >          VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+> > -        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
+> >          VMSTATE_END_OF_LIST()
+> >      }
+> >  };
+> > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> > index 715016b..18a196e 100644
+> > --- a/include/hw/ppc/spapr_drc.h
+> > +++ b/include/hw/ppc/spapr_drc.h
+> > @@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
+> >      sPAPRConfigureConnectorState *ccs;
+> > =20
+> >      bool awaiting_release;
+> > -    bool awaiting_allocation;
+> > =20
+> >      /* device pointer, via link property */
+> >      DeviceState *dev;
+>=20
 
-Cheers,
-  Lluis
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--E0h0CbphJD8hN+Gf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZZgKGAAoJEGw4ysog2bOSXC0QAMVRDcuNberuRduZ4DYo/HbR
+RVorR6cMxDTKvu1ShH/kan+KQuUX8ULjRpVCC+jzuMdiaRfSfqo4rvvk2WMx86nz
+xazZZoiu8lkFDAPrSEfkbqknuBl7zlr4EeOTHQyowI4zj0J4W+f6WM98onG/vLS5
+Td2FWD5S7/tNWyBiQvZjvaM2fQpMYX1lCmVHbJ+PlIrzlxGVJThDAYwViL0k2Zrs
+3dnPAkb0CO/gCkfjmV7XrtXa+SYv/ztofVN1zKsycB0WULpfbfiiMo1WpPfFHgP2
+a3kTMTHkkTQ67hLWOP/C/+gtLrFkRW6pVCcABDfe5vMB4NY6sK0y+rHvvz1k4D3g
+aKieZffU4I64MK8T9ClOIJNgea0OgqTrPGP+kctsha5d/UUh5kq7ZlS1Gcuk7pP6
+DQRFOKe9qX2NstIAQ+v+34IiS3jVCYRR2AOiKsIr6Q9TnUUa4bqX/tuLowwmq3UE
+aA9EvVE3S1d5SLdJly0bFYLQVChOXawKf3WXSI//wML9OYCJdNqwj5B1J89ZWjOF
+VMt+hMe66ffZ/YmZX4iHaNhfqQXOl29tBeHxqvlZ+MutzIs3spf0LLNn0i0by5Fh
+pRgfShQcXvEzQmN6FUlGbbGwqglVt5FW0tP1x8Vez93oql508H4UrzC46mxOikaB
+R8et6yJT1+F6qMIYQlMC
+=mnJO
+-----END PGP SIGNATURE-----
+
+--E0h0CbphJD8hN+Gf--
