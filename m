@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVJBY-00012E-FD
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:04:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVJDq-0002Kl-U0
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVJBV-0002nY-3C
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:04:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVJBU-0002nK-TH
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:04:13 -0400
-Date: Wed, 12 Jul 2017 16:04:00 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170712150400.GH5237@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dVJDp-0003sw-Ki
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:06:38 -0400
+References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
+	<1499864249-26305-3-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <793a9e5e-f782-5824-5b19-d2cf4da89d3a@redhat.com>
+Date: Wed, 12 Jul 2017 10:06:20 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+In-Reply-To: <1499864249-26305-3-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ"
+Subject: Re: [Qemu-devel] [PATCH 2/9] block/qapi: Add qdev device name to
+ query-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
-> We don't want to carry along old machine types forever. If we are able to
-> remove the pc machines up to 0.13 one day for example, this would allow
-> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> BARs directly to low memory). Everything up to pc-1.2 is also known to
-> have issues with migration.  So let's start with a deprecation message
-> for the old machine types so that the (hopefully) few users of these old
-> systems start switching over to newer machine types instead.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com,
+ armbru@redhat.com, qemu-devel@nongnu.org
+Message-ID: <793a9e5e-f782-5824-5b19-d2cf4da89d3a@redhat.com>
+Subject: Re: [PATCH 2/9] block/qapi: Add qdev device name to query-block
+References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
+ <1499864249-26305-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1499864249-26305-3-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I think we must document & agree on our support policy for machine
-types, before we start marking them as deprecated. eg please consider
-the following document before accepting this deprecation patch:
+On 07/12/2017 07:57 AM, Kevin Wolf wrote:
+> With -blockdev/-device, users can indirectly create anonymous
+> BlockBackends, in the state of which they are still interested. As a
 
- https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00652.html
+Reads awkwardly.  Maybe:
 
-Note in that proposal there, I say we do *not* go through trouble of
-explicitly marking machines as deprecated. We just document upfront
-the intended lifecycle and then delete them when it is done.
+BlockBackends, although it is still of interest to learn the state of
+such backends.
 
-Just use deprecation warnings for things where there is no predictable
-lifecycle upfront.
+> preparation for making such BBs visible in query-block, make sure that
+> they can be identified even without a name by adding the ID/QOM path of=
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> their qdev device to BlockInfo.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  Note: Even if we mark all these old machines as deprecated, this ofcourse
->  doesn't mean that we also have to remove them all at once later when we
->  decide to finally really remove some. We could then also start by removing
->  0.10 and 0.11 only, for example (since there should really be no users left
->  for these), or only up to 0.13 (to be able to kill rombar=0).
-> 
->  v3:
->  - Use a more generic approach by introducing a "deprecation_msg" in the
->    MachineClass instead.
-> 
->  v2:
->  - Deprecate machines up to pc-1.2
-> 
->  hw/i386/pc_piix.c   | 1 +
->  include/hw/boards.h | 1 +
->  vl.c                | 4 ++++
->  3 files changed, 6 insertions(+)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> +++ b/qapi/block-core.json
+> @@ -433,6 +433,9 @@
+>  #
+>  # @device: The device name associated with the virtual device.
+>  #
+> +# @qdev: The qdev ID, or if no ID is assigned the QOM path, of the blo=
+ck
+
+s/assigned the QOM path, of/assigned, the QOM path of/
+
+> +#        device.
+
+Missing a (since 2.10) tag.
+
+> +#
+>  # @type: This field is returned only for compatibility reasons, it sho=
+uld
+>  #        not be used (always returns 'unknown')
+>  #
+> @@ -458,7 +461,7 @@
+>  # Since:  0.14.0
+>  ##
+>  { 'struct': 'BlockInfo',
+> -  'data': {'device': 'str', 'type': 'str', 'removable': 'bool',
+> +  'data': {'device': 'str', '*qdev': 'str', 'type': 'str', 'removable'=
+: 'bool',
+>             'locked': 'bool', '*inserted': 'BlockDeviceInfo',
+>             '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
+>             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+
+Besides the testsuite, are there any example outputs that need to be
+adjusted?
+
+> diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
+> index 782eae2..e3c4496 100644
+> --- a/tests/qemu-iotests/067.out
+> +++ b/tests/qemu-iotests/067.out
+> @@ -57,6 +57,7 @@ Testing: -drive file=3DTEST_DIR/t.qcow2,format=3Dqcow=
+2,if=3Dnone,id=3Ddisk -device virti
+>                  "file": "TEST_DIR/t.qcow2",
+>                  "encryption_key_missing": false
+>              },
+> +            "qdev": "/machine/peripheral/virtio0/virtio-backend",
+>              "type": "unknown"
+>          }
+>      ]
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZZjrsAAoJEKeha0olJ0NqxegH/RupGoukwshUu6Jumx8EK1Bm
+csXtKqNiyZoraMqduOvqFpkRAm1XFz5gKoKlCavVRYHU8fk8KWgGGv8WWfvNtq1F
+P/APlZrjpSHrbF6+VkA3vSh8Wy9luWdfH+hJtJxpRy48Aw5DW2+l53GtFH9C5N6M
+GbNeRzwV3/XGoNvtiRc76ZHMd/xYPxH7e0NGjWZrSdAjT5SkPLS3CYTTzv+DsQSm
+V4bE1AUiUnkpkB1Zt4LR+Zkt9GQu2aD5m6x5ZZOxPSvg+Lsrjfi+3GRFWNHM03Z2
+N4R6+rBobGzZyIGK3GrBL1RAUTUC3vF4xFHgpzX1GKTdQNJIvBPeGCavOKsoi6w=
+=GfQT
+-----END PGP SIGNATURE-----
+
+--SS3UNquQT6rS6060X2xpNJBhGWKxbpjlJ--
