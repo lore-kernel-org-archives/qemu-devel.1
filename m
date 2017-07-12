@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVJOu-0000ru-P6
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:18:05 -0400
+	(envelope-from <mst@redhat.com>) id 1dVJOx-0000to-Ph
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVJOs-0001EZ-3C
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:18:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48824)
+	(envelope-from <mst@redhat.com>) id 1dVJOw-0001Fw-Lz
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:18:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58424)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVJOr-0001EE-Pd
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:18:02 -0400
-Date: Wed, 12 Jul 2017 12:17:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170712151752.GG6020@localhost.localdomain>
-References: <20170707180358.GA12152@localhost.localdomain>
-	<626ce419-8418-a4a2-88d3-b61bf20bbb32@redhat.com>
-	<20170710135943.GG12152@localhost.localdomain>
-	<20170710194345-mutt-send-email-mst@kernel.org>
-	<20170710174730.GL12152@localhost.localdomain>
-	<063778b8-d517-dcac-3c83-95076604a16c@redhat.com>
-	<1499760785.8257.5.camel@redhat.com>
-	<20170711144215.GI4335@noname.str.redhat.com>
-	<1cc3488e-d40b-ac73-9087-f2bf64f2cd1c@redhat.com>
-	<8d6ed662-63e5-fe49-f41e-05f80a52bc20@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVJOw-0001Fj-CU
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 11:18:06 -0400
+Date: Wed, 12 Jul 2017 18:17:55 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170712181652-mutt-send-email-mst@kernel.org>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8d6ed662-63e5-fe49-f41e-05f80a52bc20@redhat.com>
-Subject: Re: [Qemu-devel] change x86 default machine type to Q35?
+In-Reply-To: <20170712145121.GF6020@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,48 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Chao Peng <chao.p.peng@linux.intel.com>, Laszlo Ersek <lersek@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, Jul 12, 2017 at 09:39:39AM +0300, Marcel Apfelbaum wrote:
-> On 11/07/2017 17:47, Paolo Bonzini wrote:
-> > On 11/07/2017 16:42, Kevin Wolf wrote:
-> > > > >   Concerning QEMU, could we maybe simply emit a warning a la
-> > > > > 
-> > > > >   "you did not specify a machine type with the -M option, so you are
-> > > > >    currently running the the 'pc' machine type. Please note that
-> > > > > future
-> > > > >    versions of QEMU might use the 'q35' machine type instead. If you
-> > > > >    require the 'pc' machine type for your setting, then please specify
-> > > > >    it with the -M option."
-> > > > Warnings tend to get ignored until things are actually break, so I
-> > > > don't think this helps much.  I think simply not having a default
-> > > > machine type (as already suggested elsewhere in this thread) is the
-> > > > best way to deal with this.
-> > > I would absolutely hate this. One of the nice things about qemu has
-> > > always been that 'qemu disk.img' is enough to start a simple VM. You
-> > > only need to touch any other options for things you care about. I
-> > > wouldn't want to give this up.
+On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
+> On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+> > We don't want to carry along old machine types forever. If we are able to
+> > remove the pc machines up to 0.13 one day for example, this would allow
+> > us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+> > BARs directly to low memory). Everything up to pc-1.2 is also known to
+> > have issues with migration.  So let's start with a deprecation message
+> > for the old machine types so that the (hopefully) few users of these old
+> > systems start switching over to newer machine types instead.
 > > 
-> > I agree.  Don't change anything, leave "-M pc" aside, and let libosinfo
-> > pick q35 for newer guests.
-> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > 
-> Hi Paolo,
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 > 
-> While I do think it would be a good step moving forward, I am not
-> convinced is "enough" to get more users using it. More so, a low
-> level bug in upper layers (e.g. Open stack) will lead to difficulty
-> to debug and result in the same "The machine is not steady enough,
-> it doesn't worth the effort, let's move back to pc", or even
-> frustration of the people that really need Q35.
+> I suggest changing "-machine help" too.  Today it looks like this:
+> 
+>   Supported machines are:
+>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+>   pc-1.2               Standard PC (i440FX + PIIX, 1996)
+>   pc-1.1               Standard PC (i440FX + PIIX, 1996)
+>   pc-1.0               Standard PC (i440FX + PIIX, 1996)
+>   pc-0.15              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.14              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.13              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.12              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.11              Standard PC (i440FX + PIIX, 1996)
+>   pc-0.10              Standard PC (i440FX + PIIX, 1996)
+>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+>   isapc                ISA-only PC
+>   none                 empty machine
 
-I guess not being enough depends on which users we want to
-affect.  People who run QEMU from the command-line don't get a
-virtio drive or a modern CPU model chosen by default, either.  Is
-the choice of machine-type different?  Why?
+Any chance we can sort them reasonably too?
 
-> [...]
-
--- 
-Eduardo
+> 
+> It could be changed to something like this:
+> 
+>   Supported machines are:
+>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+>   isapc                ISA-only PC
+>   none                 empty machine
+> 
+>   Deprecated machines: pc-1.2, pc-1.1, pc-1.0, pc-0.15, pc-0.14, pc-0.13,
+>                        pc-0.12, pc-0.11, pc-0.10.
+> 
+> -- 
+> Eduardo
