@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVS4K-0004Z5-DL
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:33:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVSDh-0001q4-M8
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVS4H-00066L-8q
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:33:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVS4G-00065m-V9
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:33:21 -0400
-Date: Thu, 13 Jul 2017 03:33:13 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170713032314-mutt-send-email-mst@kernel.org>
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dVSDe-0003vg-Id
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:43:05 -0400
+Date: Thu, 13 Jul 2017 10:30:54 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170713003054.GP4083@umbus.fritz.box>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-4-david@gibson.dropbear.id.au>
+	<20170712120451.198aef60@bahia.lan>
+	<20170712123148.3b4bc4f2@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Kynn+LdAwU9N+JqL"
 Content-Disposition: inline
-In-Reply-To: <1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+In-Reply-To: <20170712123148.3b4bc4f2@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCHv2 3/8] spapr: Simplify unplug path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,193 +26,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
-
-On Wed, Jul 12, 2017 at 08:40:19PM +0800, Wei Wang wrote:
-> This patch adds support for reporting blocks of pages on the free list
-> specified by the caller.
-> 
-> As pages can leave the free list during this call or immediately
-> afterwards, they are not guaranteed to be free after the function
-> returns. The only guarantee this makes is that the page was on the free
-> list at some point in time after the function has been invoked.
-> 
-> Therefore, it is not safe for caller to use any pages on the returned
-> block or to discard data that is put there after the function returns.
-> However, it is safe for caller to discard data that was in one of these
-> pages before the function was invoked.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> Signed-off-by: Liang Li <liang.z.li@intel.com>
-> ---
->  include/linux/mm.h |  5 +++
->  mm/page_alloc.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 101 insertions(+)
-> 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 46b9ac5..76cb433 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1835,6 +1835,11 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
->  		unsigned long zone_start_pfn, unsigned long *zholes_size);
->  extern void free_initmem(void);
->  
-> +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
-> +extern int report_unused_page_block(struct zone *zone, unsigned int order,
-> +				    unsigned int migratetype,
-> +				    struct page **page);
-> +#endif
->  /*
->   * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
->   * into the buddy system. The freed pages will be poisoned with pattern
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index 64b7d82..8b3c9dd 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -4753,6 +4753,102 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
->  	show_swap_cache_info();
->  }
->  
-> +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
-> +
-> +/*
-> + * Heuristically get a page block in the system that is unused.
-> + * It is possible that pages from the page block are used immediately after
-> + * report_unused_page_block() returns. It is the caller's responsibility
-> + * to either detect or prevent the use of such pages.
-> + *
-> + * The free list to check: zone->free_area[order].free_list[migratetype].
-> + *
-> + * If the caller supplied page block (i.e. **page) is on the free list, offer
-> + * the next page block on the list to the caller. Otherwise, offer the first
-> + * page block on the list.
-> + *
-> + * Note: it is not safe for caller to use any pages on the returned
-> + * block or to discard data that is put there after the function returns.
-> + * However, it is safe for caller to discard data that was in one of these
-> + * pages before the function was invoked.
-> + *
-> + * Return 0 when a page block is found on the caller specified free list.
-
-Otherwise?
-
-> + */
-
-As an alternative, we could have an API that scans free pages
-and invokes a callback under a lock. Granted, this might end up
-staying a lot of time under a lock. Is this a big issue?
-Some benchmarking will tell.
-
-It would then be up to the hypervisor to decide whether it wants to play
-tricks with the dirty bit or just wants to drop pages while VCPU is
-stopped.
+To: Greg Kurz <groug@kaod.org>
+Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
 
-> +int report_unused_page_block(struct zone *zone, unsigned int order,
-> +			     unsigned int migratetype, struct page **page)
-> +{
-> +	struct zone *this_zone;
-> +	struct list_head *this_list;
-> +	int ret = 0;
-> +	unsigned long flags;
-> +
-> +	/* Sanity check */
-> +	if (zone == NULL || page == NULL || order >= MAX_ORDER ||
-> +	    migratetype >= MIGRATE_TYPES)
-> +		return -EINVAL;
+--Kynn+LdAwU9N+JqL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Why do callers this?
+On Wed, Jul 12, 2017 at 12:31:48PM +0200, Greg Kurz wrote:
+> On Wed, 12 Jul 2017 12:04:51 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+> > On Wed, 12 Jul 2017 15:53:12 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > spapr_lmb_release() and spapr_core_release() call hotplug_handler_unp=
+lug()
+> > > which after a bunch of indirection calls spapr_memory_unplug() or
+> > > spapr_core_unplug().  But we already know which is the appropriate th=
+ing
+> > > to call here, so we can just fold it directly into the release functi=
+on.
+> > >=20
+> > > Once that's done, there's no need for an hc->unplug method in the spa=
+pr
+> > > machine at all: since we also have an hc->unplug_request method, the
+> > > hotplug core will never use ->unplug.
+> > >=20
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > --- =20
+> >=20
+> > Nice cleanup :)
+> >=20
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> >=20
+> > >  hw/ppc/spapr.c | 54 ++++++++----------------------------------------=
+------
+> > >  1 file changed, 8 insertions(+), 46 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 2a059d5..ff2aa6b 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -2818,6 +2818,9 @@ void spapr_lmb_release(DeviceState *dev)
+> > >  {
+> > >      HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+> > >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(hotplug_ctrl);
+>=20
+> BTW, maybe you can also drop the hotplug_ctrl variable since it only has
+> one trivial user.
 
-> +
-> +	/* Zone validity check */
-> +	for_each_populated_zone(this_zone) {
-> +		if (zone == this_zone)
-> +			break;
-> +	}
+Good idea, done.
 
-Why?  Will take a long time if there are lots of zones.
+>=20
+> > > +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
+> > > +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
+> > > +    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
+> > >      sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, PC=
+_DIMM(dev));
+> > > =20
+> > >      /* This information will get lost if a migration occurs
+> > > @@ -2838,18 +2841,7 @@ void spapr_lmb_release(DeviceState *dev)
+> > >       * Now that all the LMBs have been removed by the guest, call the
+> > >       * pc-dimm unplug handler to cleanup up the pc-dimm device.
+> > >       */
+> > > -    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+> > > -}
+> > > -
+> > > -static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceS=
+tate *dev,
+> > > -                                Error **errp)
+> > > -{
+> > > -    sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
+> > > -    PCDIMMDevice *dimm =3D PC_DIMM(dev);
+> > > -    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
+> > > -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
+> > > -
+> > > -    pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
+> > > +    pc_dimm_memory_unplug(dev, &spapr->hotplug_memory, mr);
+> > >      object_unparent(OBJECT(dev));
+> > >  }
+> > > =20
+> > > @@ -2918,10 +2910,11 @@ static void *spapr_populate_hotplug_cpu_dt(CP=
+UState *cs, int *fdt_offset,
+> > >      return fdt;
+> > >  }
+> > > =20
+> > > -static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceSta=
+te *dev,
+> > > -                              Error **errp)
+> > > +/* Callback to be called during DRC release. */
+> > > +void spapr_core_release(DeviceState *dev)
+> > >  {
+> > > -    MachineState *ms =3D MACHINE(qdev_get_machine());
+> > > +    HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+> > > +    MachineState *ms =3D MACHINE(hotplug_ctrl);
+>=20
+> Same here.
+>=20
+> > >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(ms);
+> > >      CPUCore *cc =3D CPU_CORE(dev);
+> > >      CPUArchId *core_slot =3D spapr_find_cpu_slot(ms, cc->core_id, NU=
+LL);
+> > > @@ -2945,15 +2938,6 @@ static void spapr_core_unplug(HotplugHandler *=
+hotplug_dev, DeviceState *dev,
+> > >      object_unparent(OBJECT(dev));
+> > >  }
+> > > =20
+> > > -/* Callback to be called during DRC release. */
+> > > -void spapr_core_release(DeviceState *dev)
+> > > -{
+> > > -    HotplugHandler *hotplug_ctrl;
+> > > -
+> > > -    hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
+> > > -    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+> > > -}
+> > > -
+> > >  static
+> > >  void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceSt=
+ate *dev,
+> > >                                 Error **errp)
+> > > @@ -3159,27 +3143,6 @@ static void spapr_machine_device_plug(HotplugH=
+andler *hotplug_dev,
+> > >      }
+> > >  }
+> > > =20
+> > > -static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
+> > > -                                      DeviceState *dev, Error **errp)
+> > > -{
+> > > -    sPAPRMachineState *sms =3D SPAPR_MACHINE(qdev_get_machine());
+> > > -    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
+> > > -
+> > > -    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > > -        if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+> > > -            spapr_memory_unplug(hotplug_dev, dev, errp);
+> > > -        } else {
+> > > -            error_setg(errp, "Memory hot unplug not supported for th=
+is guest");
+> > > -        }
+> > > -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)=
+) {
+> > > -        if (!mc->has_hotpluggable_cpus) {
+> > > -            error_setg(errp, "CPU hot unplug not supported on this m=
+achine");
+> > > -            return;
+> > > -        }
+> > > -        spapr_core_unplug(hotplug_dev, dev, errp);
+> > > -    }
+> > > -}
+> > > -
+> > >  static void spapr_machine_device_unplug_request(HotplugHandler *hotp=
+lug_dev,
+> > >                                                  DeviceState *dev, Er=
+ror **errp)
+> > >  {
+> > > @@ -3397,7 +3360,6 @@ static void spapr_machine_class_init(ObjectClas=
+s *oc, void *data)
+> > >      mc->get_hotplug_handler =3D spapr_get_hotplug_handler;
+> > >      hc->pre_plug =3D spapr_machine_device_pre_plug;
+> > >      hc->plug =3D spapr_machine_device_plug;
+> > > -    hc->unplug =3D spapr_machine_device_unplug;
+> > >      mc->cpu_index_to_instance_props =3D spapr_cpu_index_to_props;
+> > >      mc->possible_cpu_arch_ids =3D spapr_possible_cpu_arch_ids;
+> > >      hc->unplug_request =3D spapr_machine_device_unplug_request; =20
+> >=20
+>=20
 
-> +
-> +	/* Got a non-existent zone from the caller? */
-> +	if (zone != this_zone)
-> +		return -EINVAL;
-
-When does this happen?
-
-> +
-> +	spin_lock_irqsave(&this_zone->lock, flags);
-> +
-> +	this_list = &zone->free_area[order].free_list[migratetype];
-> +	if (list_empty(this_list)) {
-> +		*page = NULL;
-> +		ret = 1;
 
 
-What does this mean?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +		goto out;
-> +	}
-> +
-> +	/* The caller is asking for the first free page block on the list */
-> +	if ((*page) == NULL) {
+--Kynn+LdAwU9N+JqL
+Content-Type: application/pgp-signature; name="signature.asc"
 
-if (!*page) is shorter and prettier.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-> +		*page = list_first_entry(this_list, struct page, lru);
-> +		ret = 0;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * The page block passed from the caller is not on this free list
-> +	 * anymore (e.g. a 1MB free page block has been split). In this case,
-> +	 * offer the first page block on the free list that the caller is
-> +	 * asking for.
+iQIcBAEBCAAGBQJZZr89AAoJEGw4ysog2bOSoiYP/jnbu0AAvW0xhYFIBmqGI85c
+pCgrTRGNxPqcmr1tgwtXh9amj1wecqCfLXhO68DNRFWyPfnB8uIfzLl177GTdBz4
+Gs5zfZJ6Xox9CZhm3UxV4VF6IBOGgrAaatJ4WHKWsxSog2G9PNgL2nfbmvlmhSp4
+ckqEgxBtZrULIiDx/OiRo10BQ1bwaEha1HtNQfwtnl1gJxYO0aMkecITJ2hcOYT7
+kxn0wHjKfoACp+QrYh5H3zaypKpKu0iMIUeBYaGD6F2vVrQSYzPaoqEEN83HLErR
+4+JsJ0GNfn+s9RDp/QKp2lXJYBWwIF5qY/DE3FN0kIN/YHNguhl8XBEGpUAPLmNy
+kEq6l0Ege0Sc4UK1ks1cXTkxeySxDSsV0a+13jyp0SApAyUBpiS55rn2WQP/sJpM
+DOXV+mdVgEtZfDA4jmdyI3DjZL7gKdVGuiaodceeSySG3r7imlAZtdy6PXlh0Wtq
+TEqt2RDzQgy+8paJu+4+J3a5eju+Oz6RYwk+mp1V7Ak0dC52P8gqOclOyBiFFD5U
+Q9sinNWmFApSWLrIF/mYzi4y6Je2V5W607kH4uEKqDDn/vkzr390IZ5SkwgwQK/J
+x9umtTGQuj8RZuLfBuTacJYePn+shrmNinsDzH8AqyI7H7+RSzIYKZL+eGazASWA
+tAL8vK93+myp5a/aMGg+
+=ZH85
+-----END PGP SIGNATURE-----
 
-This just might keep giving you same block over and over again.
-E.g.
-	- get 1st block
-	- get 2nd block
-	- 2nd gets broken up
-	- get 1st block again
-
-this way we might never make progress beyond the 1st 2 blocks
-
-
-> +	 */
-> +	if (PageBuddy(*page) && order != page_order(*page)) {
-> +		*page = list_first_entry(this_list, struct page, lru);
-> +		ret = 0;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * The page block passed from the caller has been the last page block
-> +	 * on the list.
-> +	 */
-> +	if ((*page)->lru.next == this_list) {
-> +		*page = NULL;
-> +		ret = 1;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * Finally, fall into the regular case: the page block passed from the
-> +	 * caller is still on the free list. Offer the next one.
-> +	 */
-> +	*page = list_next_entry((*page), lru);
-> +	ret = 0;
-> +out:
-> +	spin_unlock_irqrestore(&this_zone->lock, flags);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(report_unused_page_block);
-> +
-> +#endif
-> +
->  static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
->  {
->  	zoneref->zone = zone;
-> -- 
-> 2.7.4
+--Kynn+LdAwU9N+JqL--
