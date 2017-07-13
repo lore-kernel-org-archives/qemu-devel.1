@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVf0I-0006JE-Ks
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:22:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVf27-0007iw-2c
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVf0D-0008Bn-Jp
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:22:06 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:35280)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVf0D-0008B6-Ck
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:22:01 -0400
-Received: from player796.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D03A4A0B71
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 16:21:58 +0200 (CEST)
-Date: Thu, 13 Jul 2017 16:21:47 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170713162147.3c94d1fc@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20170713110237.6712-5-lprosek@redhat.com>
-References: <20170713110237.6712-1-lprosek@redhat.com>
-	<20170713110237.6712-5-lprosek@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/07NGTqV1aEYOa/rUQ.41u66";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] virtio-9p: use virtqueue_error for
- errors with queue context
+	(envelope-from <pm215@archaic.org.uk>) id 1dVf22-0001G7-9b
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:23:59 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Jul 2017 15:21:37 +0100
+Message-Id: <1499955697-28045-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] configure: Drop ancient Solaris 9 and earlier
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,136 +18,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org
 
---Sig_/07NGTqV1aEYOa/rUQ.41u66
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Solaris 9 was released in 2002, its successor Solaris 10 was
+released in 2005, and Solaris 9 was end-of-lifed in 2014.
+Nobody has stepped forward to express interest in supporting
+Solaris of any flavour, so removing support for the ancient
+versions seems uncontroversial.
 
-On Thu, 13 Jul 2017 13:02:33 +0200
-Ladi Prosek <lprosek@redhat.com> wrote:
+In particular, this allows us to remove a use of 'uname'
+in configure that won't work if you're cross-compiling.
 
-> virtqueue_error includes queue index in the error output and is preferred
-> for errors that pertain to a virtqueue rather than to the device as a who=
-le.
->=20
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> ---
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Not a big thing, but it's a start on cleaning out some
+of the untested and untestable cruft from configure...
 
-Acked-by: Greg Kurz <groug@kaod.org>
+ configure               | 21 ---------------------
+ include/fpu/softfloat.h |  5 -----
+ 2 files changed, 26 deletions(-)
 
->  hw/9pfs/virtio-9p-device.c | 37 +++++++++++++++----------------------
->  1 file changed, 15 insertions(+), 22 deletions(-)
->=20
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index 62650b0..cf16b4b 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -54,16 +54,16 @@ static void handle_9p_output(VirtIODevice *vdev, Virt=
-Queue *vq)
->          }
-> =20
->          if (iov_size(elem->in_sg, elem->in_num) < 7) {
-> -            virtio_error(vdev,
-> -                         "The guest sent a VirtFS request without space =
-for "
-> -                         "the reply");
-> +            virtqueue_error(vq,
-> +                            "The guest sent a VirtFS request without spa=
-ce for "
-> +                            "the reply");
->              goto out_free_req;
->          }
-> =20
->          len =3D iov_to_buf(elem->out_sg, elem->out_num, 0, &out, 7);
->          if (len !=3D 7) {
-> -            virtio_error(vdev, "The guest sent a malformed VirtFS reques=
-t: "
-> -                         "header size is %zd, should be 7", len);
-> +            virtqueue_error(vq, "The guest sent a malformed VirtFS reque=
-st: "
-> +                            "header size is %zd, should be 7", len);
->              goto out_free_req;
->          }
-> =20
-> @@ -150,10 +150,8 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, siz=
-e_t offset,
-> =20
->      ret =3D v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt,=
- ap);
->      if (ret < 0) {
-> -        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
-> -
-> -        virtio_error(vdev, "Failed to encode VirtFS reply type %d",
-> -                     pdu->id + 1);
-> +        virtqueue_error(v->vq, "Failed to encode VirtFS reply type %d",
-> +                        pdu->id + 1);
->      }
->      return ret;
->  }
-> @@ -168,9 +166,8 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, si=
-ze_t offset,
-> =20
->      ret =3D v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, =
-fmt, ap);
->      if (ret < 0) {
-> -        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
-> -
-> -        virtio_error(vdev, "Failed to decode VirtFS request type %d", pd=
-u->id);
-> +        virtqueue_error(v->vq, "Failed to decode VirtFS request type %d",
-> +                        pdu->id);
->      }
->      return ret;
->  }
-> @@ -184,11 +181,9 @@ static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu=
-, struct iovec **piov,
->      size_t buf_size =3D iov_size(elem->in_sg, elem->in_num);
-> =20
->      if (buf_size < size) {
-> -        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
-> -
-> -        virtio_error(vdev,
-> -                     "VirtFS reply type %d needs %zu bytes, buffer has %=
-zu",
-> -                     pdu->id + 1, size, buf_size);
-> +        virtqueue_error(v->vq,
-> +                        "VirtFS reply type %d needs %zu bytes, buffer ha=
-s %zu",
-> +                        pdu->id + 1, size, buf_size);
->      }
-> =20
->      *piov =3D elem->in_sg;
-> @@ -204,11 +199,9 @@ static void virtio_init_out_iov_from_pdu(V9fsPDU *pd=
-u, struct iovec **piov,
->      size_t buf_size =3D iov_size(elem->out_sg, elem->out_num);
-> =20
->      if (buf_size < size) {
-> -        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
-> -
-> -        virtio_error(vdev,
-> -                     "VirtFS request type %d needs %zu bytes, buffer has=
- %zu",
-> -                     pdu->id, size, buf_size);
-> +        virtqueue_error(v->vq,
-> +                        "VirtFS request type %d needs %zu bytes, "
-> +                        "buffer has %zu", pdu->id, size, buf_size);
->      }
-> =20
->      *piov =3D elem->out_sg;
-
-
---Sig_/07NGTqV1aEYOa/rUQ.41u66
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAllngfsACgkQAvw66wEB28KNKgCfbyfFHgja8lN8utBSky6AFfNY
-Fd8AnjLvV/I6JMOU9VXgaSRSZ62p2UTN
-=H5jN
------END PGP SIGNATURE-----
-
---Sig_/07NGTqV1aEYOa/rUQ.41u66--
+diff --git a/configure b/configure
+index 5096cbc..ff77896 100755
+--- a/configure
++++ b/configure
+@@ -730,23 +730,6 @@ SunOS)
+   install="${INSTALL-ginstall}"
+   ld="gld"
+   smbd="${SMBD-/usr/sfw/sbin/smbd}"
+-  needs_libsunmath="no"
+-  solarisrev=$(uname -r | cut -f2 -d.)
+-  if [ "$cpu" = "i386" -o "$cpu" = "x86_64" ] ; then
+-    if test "$solarisrev" -le 9 ; then
+-      if test -f /opt/SUNWspro/prod/lib/libsunmath.so.1; then
+-        needs_libsunmath="yes"
+-        QEMU_CFLAGS="-I/opt/SUNWspro/prod/include/cc $QEMU_CFLAGS"
+-        LDFLAGS="-L/opt/SUNWspro/prod/lib -R/opt/SUNWspro/prod/lib $LDFLAGS"
+-        LIBS="-lsunmath $LIBS"
+-      else
+-        error_exit "QEMU will not link correctly on Solaris 8/X86 or 9/x86 without" \
+-            "libsunmath from the Sun Studio compilers tools, due to a lack of" \
+-            "C99 math features in libm.so in Solaris 8/x86 and Solaris 9/x86" \
+-            "Studio 11 can be downloaded from www.sun.com."
+-      fi
+-    fi
+-  fi
+   if test -f /usr/include/sys/soundcard.h ; then
+     audio_drv_list="oss"
+   fi
+@@ -5430,10 +5413,6 @@ fi
+ 
+ if test "$solaris" = "yes" ; then
+   echo "CONFIG_SOLARIS=y" >> $config_host_mak
+-  echo "CONFIG_SOLARIS_VERSION=$solarisrev" >> $config_host_mak
+-  if test "$needs_libsunmath" = "yes" ; then
+-    echo "CONFIG_NEEDS_LIBSUNMATH=y" >> $config_host_mak
+-  fi
+ fi
+ if test "$haiku" = "yes" ; then
+   echo "CONFIG_HAIKU=y" >> $config_host_mak
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index d9689ec..0f96a0e 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -82,11 +82,6 @@ this code that are retained.
+ #ifndef SOFTFLOAT_H
+ #define SOFTFLOAT_H
+ 
+-#if defined(CONFIG_SOLARIS) && defined(CONFIG_NEEDS_LIBSUNMATH)
+-#include <sunmath.h>
+-#endif
+-
+-
+ /* This 'flag' type must be able to hold at least 0 and 1. It should
+  * probably be replaced with 'bool' but the uses would need to be audited
+  * to check that they weren't accidentally relying on it being a larger type.
+-- 
+2.7.4
