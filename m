@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVdMz-0005f4-Sf
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:37:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVdNQ-0005sY-JG
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:37:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVdMz-0001lG-1O
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:37:25 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVdMy-0001db-Rs
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:37:24 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id 77so52550419wrb.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:37:02 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170713123225.GE4139@noname.redhat.com>
-References: <20170709210717.984-1-peter.maydell@linaro.org>
-	<20170713123225.GE4139@noname.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Jul 2017 13:36:40 +0100
-Message-ID: <CAFEAcA_mAF23axLZ8tMcyQxjkv3pgu6PUtHyBTTVJLSMd5BTaQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] block/vpc.c: Handle write failures in
- get_image_offset()
+	(envelope-from <kwolf@redhat.com>) id 1dVdNP-0001u3-P9
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:37:52 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 13 Jul 2017 14:37:43 +0200
+Message-Id: <1499949463-22531-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] vpc: Remove useless parameters in
+ get_sector_offset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-On 13 July 2017 at 13:32, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 09.07.2017 um 23:07 hat Peter Maydell geschrieben:
->> Coverity (CID 1355236) points out that get_image_offset() doesn't check that
->> it actually succeeded in writing the updated block bitmap to the file.
->> Check the error return from bdrv_pwrite_sync() and propagate an error
->> response back up to the function which calls get_image_offset() for
->> a write so that it can return the error to its caller.
->>
->> get_sector_offset() is only used for reads, but we move it to the
->> same API for consistency.
+All callers of get_sector_offset() pass write=false and err=NULL. Remove
+the parameters.
 
-> get_sector_offset() has two useless parameters now instead of one, but
-> I'll just send a patch on top to remove them.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+Based on my block branch, specifically Peter's 'block/vpc.c: Handle write
+failures in get_image_offset()'
 
-I thought about doing that, but I decided it was better to
-keep it as it is. A get_sector_offset() that silently only
-works for reads and causes disk corruption if you use it for
-a write seemed like a bit of a bear trap to leave lying around.
+ block/vpc.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-thanks
--- PMM
+diff --git a/block/vpc.c b/block/vpc.c
+index bccc981..471f9ab 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -508,10 +508,9 @@ static inline int64_t get_image_offset(BlockDriverState *bs, uint64_t offset,
+ }
+ 
+ static inline int64_t get_sector_offset(BlockDriverState *bs,
+-                                        int64_t sector_num, bool write,
+-                                        int *err)
++                                        int64_t sector_num)
+ {
+-    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, write, err);
++    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, false, NULL);
+ }
+ 
+ /*
+@@ -721,7 +720,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+                (sector_num << BDRV_SECTOR_BITS);
+     }
+ 
+-    offset = get_sector_offset(bs, sector_num, false, NULL);
++    offset = get_sector_offset(bs, sector_num);
+     start = offset;
+     allocated = (offset != -1);
+     *pnum = 0;
+@@ -744,7 +743,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+         if (nb_sectors == 0) {
+             break;
+         }
+-        offset = get_sector_offset(bs, sector_num, false, NULL);
++        offset = get_sector_offset(bs, sector_num);
+     } while (offset == -1);
+ 
+     return 0;
+-- 
+1.8.3.1
