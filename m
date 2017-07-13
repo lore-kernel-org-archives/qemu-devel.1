@@ -1,29 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dVdPt-0007m7-25
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:40:25 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVdQk-0008Tr-Kq
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dVdPm-0003Bu-RB
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:40:24 -0400
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33575)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dVdPm-0003A2-Kc
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:40:18 -0400
-Received: by mail-wm0-f65.google.com with SMTP id j85so4835374wmj.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:40:18 -0700 (PDT)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVdQh-0003vy-A9
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:41:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dVdQg-0003uW-WA
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:41:15 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6DCdDeJ061480
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:41:13 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3xewws-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:41:12 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 13 Jul 2017 08:41:11 -0400
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-3-git-send-email-borntraeger@de.ibm.com>
+	<20170713141158.32e74897@gondolin>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 13 Jul 2017 14:41:05 +0200
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <1c00858e-2425-ecf5-af6e-ba1030715f16@redhat.com>
-References: <468425bd8090e3a9fd7fc791db42e24d6c75315c.1499940552.git.alistair.francis@xilinx.com>
-	<20170713102359.GH4011@redhat.com>
-	<1c00858e-2425-ecf5-af6e-ba1030715f16@redhat.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 13 Jul 2017 14:38:46 +0200
-Message-ID: <CAKmqyKN1a1N3y39K-u2tZecjERoLAOOJKCQ29H=mp0KiT7Fixw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] io/channel-watch.c: Only select on
- what we are actually waiting for
+In-Reply-To: <20170713141158.32e74897@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 8bit
+Message-Id: <c6f110e2-7abf-7029-25bb-d46ee67541db@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH/s390-next 2/3] s390x/cpumodel: add zpci,
+ aen and ais facilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +44,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Thu, Jul 13, 2017 at 1:09 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 13/07/2017 12:23, Daniel P. Berrange wrote:
->> On Thu, Jul 13, 2017 at 03:15:49AM -0700, Alistair Francis wrote:
->>> diff --git a/io/channel-watch.c b/io/channel-watch.c
->>> index 8640d1c464..d80722f496 100644
->>> --- a/io/channel-watch.c
->>> +++ b/io/channel-watch.c
->>> @@ -286,9 +286,21 @@ GSource *qio_channel_create_socket_watch(QIOChannel *ioc,
->>>      QIOChannelSocketSource *ssource;
->>>
->>>  #ifdef WIN32
->>> -    WSAEventSelect(socket, ioc->event,
->>> -                   FD_READ | FD_ACCEPT | FD_CLOSE |
->>> -                   FD_CONNECT | FD_WRITE | FD_OOB);
->>> +    long bitmask = 0;
->>> +
->>> +    if (condition & (G_IO_IN | G_IO_PRI)) {
->>> +        bitmask |= FD_READ | FD_ACCEPT;
->>> +    }
->>> +
->>> +    if (condition & G_IO_HUP) {
->>> +        bitmask |= FD_CLOSE;
->>> +    }
->>> +
->>> +    if (condition & G_IO_OUT) {
->>> +        bitmask |= FD_WRITE | FD_CONNECT;
->>> +    }
->>> +
->>> +    WSAEventSelect(socket, ioc->event, bitmask);
->>>  #endif
+On 07/13/2017 02:11 PM, Cornelia Huck wrote:
+> On Thu, 13 Jul 2017 12:40:28 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 >>
->> I think the problem with doing this is that WSAEventSelect is a global
->> setting that applies to the socket handle. If you use qio_channel_create_watch
->> twice on the same socket with different events, the second watch will break
->> the first watch by potentially discarding events that it requested.
->
-> This makes sense, and it means the corresponding aio-win32 patch is
-> wrong too.
+>> zPCI instructions and facilities are available since IBM zEnterprise
+>> EC12. To support z/PCI in QEMU we enable zpci, aen and ais facilities
+>> starting with zEC12 GA1. And we always set zpci and aen bits in max cpu
+>> model. Later they might be switched off due to applied real cpu model.
+>> For ais bit, we only provide it in the full cpu model beginning with
+>> zEC12 and defer its enablement in the default cpu model to a later point
+>> in time. At the same time, disable them for 2.9 and older machines.
+>>
+>> Because of introducing AIS facility, we could check if it's enabled to
+>> initialize flic->ais_supported with the real value.
+>>
+>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  hw/intc/s390_flic.c             | 3 ++-
+>>  hw/intc/s390_flic_kvm.c         | 3 ---
+>>  hw/s390x/s390-virtio-ccw.c      | 3 +++
+>>  target/s390x/cpu_features.c     | 3 +++
+>>  target/s390x/cpu_features_def.h | 3 +++
+>>  target/s390x/gen-features.c     | 5 +++++
+>>  target/s390x/kvm.c              | 7 +++++++
+>>  7 files changed, 23 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+>> index ff6e4ec..6e7c610 100644
+>> --- a/hw/intc/s390_flic.c
+>> +++ b/hw/intc/s390_flic.c
+>> @@ -163,9 +163,10 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
+>>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
+>>          error_setg(errp, "flic property adapter_routes_max_batch too big"
+>>                     " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
+>> +        return;
+> 
+> Hunk should go into a previous patch?
+> 
+> (And does it really matter?)
 
-Ah, I see that.
-
->
-> WSAEventSelect events are edge-triggered, so they shouldn't be too bad.
-> In particular, they won't cause a busy wait.
-
-The problem I have seen is that threads get kicked at incorrect times
-for events that you aren't waiting for. It isn't a horrific issue, but
-it does contribute to extra resource usage.
-
-I don't see any nice way to get the value of lNetworkEvents back from
-Windows, so unless we keep track of it for a socket we can't just add
-to it.
-
-Is it even possible to assign two different events to a single socket?
-Every call seems to overwrite whatever was previously set. Are there
-cases where we call this two for different events on the same socket?
-
-Thanks,
-Alistair
-
->
-> Paolo
+I can
+- move to the previous series patch 8 (s390x/flic: introduce modify_ais_mode callback)
+- remove the return as it does not matter (this is realize, and realize failures here
+are fatal as far as I can tell)
+- keep it here since this version was tested and it does not hurt
