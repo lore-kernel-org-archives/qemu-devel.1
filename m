@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVf2v-00007m-4b
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:54 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVf33-0000Uk-1R
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVf2u-0001wr-A5
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:49 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33635)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVf2x-0001ym-Vt
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:57 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35819)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dVf2u-0001w6-2M
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:48 -0400
-Received: by mail-wm0-x243.google.com with SMTP id j85so5436558wmj.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 07:24:47 -0700 (PDT)
+	id 1dVf2x-0001yB-MN
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:24:51 -0400
+Received: by mail-wr0-x244.google.com with SMTP id y28so4890440wrd.2
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 07:24:51 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 13 Jul 2017 16:23:58 +0200
-Message-Id: <1499955874-10954-6-git-send-email-pbonzini@redhat.com>
+Date: Thu, 13 Jul 2017 16:24:01 +0200
+Message-Id: <1499955874-10954-9-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1499955874-10954-1-git-send-email-pbonzini@redhat.com>
 References: <1499955874-10954-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/41] MAINTAINERS: update TCI entry
+Subject: [Qemu-devel] [PULL 08/41] char: move QemuOpts->ChardevBackend
+ translation to a separate func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +32,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-moved in 244f1441 to tcg/
+parse function will be used by the following patch
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20170629150308.22766-5-f4bug@amsat.org>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-Id: <1499342940-56739-2-git-send-email-anton.nefedov@virtuozzo.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ chardev/char.c | 81 ++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 51 insertions(+), 30 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5540460..dd7e1e5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1645,7 +1645,7 @@ TCI target
- M: Stefan Weil <sw@weilnetz.de>
- S: Maintained
- F: tcg/tci/
--F: tci.c
-+F: tcg/tci.c
- F: disas/tci.c
+diff --git a/chardev/char.c b/chardev/char.c
+index 2b679a2..839eff6 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -556,17 +556,23 @@ help_string_append(const char *name, void *opaque)
+     g_string_append_printf(str, "\n%s", name);
+ }
  
- Block drivers
+-Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+-                                Error **errp)
++static const char *chardev_alias_translate(const char *name)
++{
++    int i;
++    for (i = 0; i < (int)ARRAY_SIZE(chardev_alias_table); i++) {
++        if (g_strcmp0(chardev_alias_table[i].alias, name) == 0) {
++            return chardev_alias_table[i].typename;
++        }
++    }
++    return name;
++}
++
++static ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+ {
+     Error *local_err = NULL;
+     const ChardevClass *cc;
+-    Chardev *chr;
+-    int i;
+     ChardevBackend *backend = NULL;
+-    const char *name = qemu_opt_get(opts, "backend");
+-    const char *id = qemu_opts_id(opts);
+-    char *bid = NULL;
++    const char *name = chardev_alias_translate(qemu_opt_get(opts, "backend"));
+ 
+     if (name == NULL) {
+         error_setg(errp, "chardev: \"%s\" missing backend",
+@@ -574,7 +580,40 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+         return NULL;
+     }
+ 
+-    if (is_help_option(name)) {
++    cc = char_get_class(name, errp);
++    if (cc == NULL) {
++        return NULL;
++    }
++
++    backend = g_new0(ChardevBackend, 1);
++    backend->type = CHARDEV_BACKEND_KIND_NULL;
++
++    if (cc->parse) {
++        cc->parse(opts, backend, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            qapi_free_ChardevBackend(backend);
++            return NULL;
++        }
++    } else {
++        ChardevCommon *ccom = g_new0(ChardevCommon, 1);
++        qemu_chr_parse_common(opts, ccom);
++        backend->u.null.data = ccom; /* Any ChardevCommon member would work */
++    }
++
++    return backend;
++}
++
++Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
++{
++    const ChardevClass *cc;
++    Chardev *chr = NULL;
++    ChardevBackend *backend = NULL;
++    const char *name = chardev_alias_translate(qemu_opt_get(opts, "backend"));
++    const char *id = qemu_opts_id(opts);
++    char *bid = NULL;
++
++    if (name && is_help_option(name)) {
+         GString *str = g_string_new("");
+ 
+         chardev_name_foreach(help_string_append, str);
+@@ -589,38 +628,20 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+         return NULL;
+     }
+ 
+-    for (i = 0; i < (int)ARRAY_SIZE(chardev_alias_table); i++) {
+-        if (g_strcmp0(chardev_alias_table[i].alias, name) == 0) {
+-            name = chardev_alias_table[i].typename;
+-            break;
+-        }
++    backend = qemu_chr_parse_opts(opts, errp);
++    if (backend == NULL) {
++        return NULL;
+     }
+ 
+     cc = char_get_class(name, errp);
+     if (cc == NULL) {
+-        return NULL;
++        goto out;
+     }
+ 
+-    backend = g_new0(ChardevBackend, 1);
+-    backend->type = CHARDEV_BACKEND_KIND_NULL;
+-
+     if (qemu_opt_get_bool(opts, "mux", 0)) {
+         bid = g_strdup_printf("%s-base", id);
+     }
+ 
+-    chr = NULL;
+-    if (cc->parse) {
+-        cc->parse(opts, backend, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-            goto out;
+-        }
+-    } else {
+-        ChardevCommon *ccom = g_new0(ChardevCommon, 1);
+-        qemu_chr_parse_common(opts, ccom);
+-        backend->u.null.data = ccom; /* Any ChardevCommon member would work */
+-    }
+-
+     chr = qemu_chardev_new(bid ? bid : id,
+                            object_class_get_name(OBJECT_CLASS(cc)),
+                            backend, errp);
 -- 
 1.8.3.1
