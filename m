@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dVbtw-00065z-Gz
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:03:21 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dVbzi-0003s5-7l
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dVbtr-0001aa-3B
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:03:20 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dVbzd-0005Op-AX
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:09:18 -0400
 References: <20170713010555.6769-1-eblake@redhat.com>
-	<20170713010555.6769-16-eblake@redhat.com>
+	<20170713010555.6769-17-eblake@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <22ecdb2a-1402-f487-073a-5b368dd2c4b1@virtuozzo.com>
-Date: Thu, 13 Jul 2017 14:03:10 +0300
+Message-ID: <406fd8eb-820d-2511-f4de-630c5d5d724a@virtuozzo.com>
+Date: Thu, 13 Jul 2017 14:09:10 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170713010555.6769-16-eblake@redhat.com>
-Content-Language: en-US
+In-Reply-To: <20170713010555.6769-17-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 15/18] qcow2: Switch load_bitmap_data()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v5 16/18] qcow2: Switch store_bitmap_data()
  to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,7 +36,8 @@ Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > Reviewed-by: John Snow <jsnow@redhat.com>
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
 
 -- 
 Best regards,
