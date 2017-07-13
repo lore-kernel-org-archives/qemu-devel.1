@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dVg7g-0004lO-OL
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:33:49 -0400
+	(envelope-from <lersek@redhat.com>) id 1dVg8g-0005eV-NB
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:34:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dVg7f-0007ie-MA
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:33:48 -0400
-References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
-	<1499825297-20335-2-git-send-email-gengdongjiu@huawei.com>
-	<74ac9b79-0225-0cab-559f-6204754de5f0@redhat.com>
-	<47cc803a-d1d9-da3b-43f9-31a54ce290e2@huawei.com>
+	(envelope-from <lersek@redhat.com>) id 1dVg8c-00085M-JJ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:34:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dVg8c-00084y-AB
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:34:46 -0400
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
+	<20170712181652-mutt-send-email-mst@kernel.org>
+	<20170712201550.GN6020@localhost.localdomain>
+	<20170712232214-mutt-send-email-mst@kernel.org>
+	<20170712205646.GQ6020@localhost.localdomain>
+	<20170713003116-mutt-send-email-mst@kernel.org>
+	<91a1c7c2-0e87-4023-c960-5078267abf95@redhat.com>
+	<20170713151740.GR6020@localhost.localdomain>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ca0eaafd-21b7-9cf8-91aa-8c4e2c5d95e3@redhat.com>
-Date: Thu, 13 Jul 2017 17:33:30 +0200
+Message-ID: <c54643b3-dd1c-200e-371f-e036eb98f9cd@redhat.com>
+Date: Thu, 13 Jul 2017 17:34:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <47cc803a-d1d9-da3b-43f9-31a54ce290e2@huawei.com>
+In-Reply-To: <20170713151740.GR6020@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] ACPI: Add new ACPI structures and
- macros
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +36,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>, mst@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, Gaozhihui <zhihui.gao@huawei.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 07/13/17 14:00, gengdongjiu wrote:
-> Laszlo,
->   Thank you for your review and comments.
-> 
-> 
-> On 2017/7/13 18:33, Laszlo Ersek wrote:
->> On 07/12/17 04:08, Dongjiu Geng wrote:
-
-[snip]
-
->>> --- a/include/qemu/uuid.h
->>> +++ b/include/qemu/uuid.h
->>> @@ -44,6 +44,17 @@ typedef struct {
->>>  
->>>  #define UUID_NONE "00000000-0000-0000-0000-000000000000"
->>>  
->>> +#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)        \
->>> +{{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
->>> +   ((b) >> 8) & 0xff, (b) & 0xff,                   \
->>> +    ((c) >> 8) & 0xff, (c) & 0xff,                    \
->>> +    (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) } } }
->>> +
->>> +/* Platform Memory, this is from UEFI 2.6 N.2.2 Section Descriptor */
->>> +#define UEFI_CPER_SEC_PLATFORM_MEM                   \
->>> +    UUID_BE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
->>> +    0xED, 0x7C, 0x83, 0xB1)
->>> +
->>>  void qemu_uuid_generate(QemuUUID *out);
->>>  
->>>  int qemu_uuid_is_null(const QemuUUID *uu);
+On 07/13/17 17:17, Eduardo Habkost wrote:
+> On Thu, Jul 13, 2017 at 02:23:39AM +0200, Laszlo Ersek wrote:
+>> On 07/13/17 00:27, Michael S. Tsirkin wrote:
+>>> On Wed, Jul 12, 2017 at 05:56:46PM -0300, Eduardo Habkost wrote:
+>>>> On Wed, Jul 12, 2017 at 11:31:59PM +0300, Michael S. Tsirkin wrote:
+>>>>> On Wed, Jul 12, 2017 at 05:15:50PM -0300, Eduardo Habkost wrote:
+>>>>>> On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
+>>>>>>> On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
+>>>>>>>> On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+>>>>>>>>> We don't want to carry along old machine types forever. If we are able to
+>>>>>>>>> remove the pc machines up to 0.13 one day for example, this would allow
+>>>>>>>>> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+>>>>>>>>> BARs directly to low memory). Everything up to pc-1.2 is also known to
+>>>>>>>>> have issues with migration.  So let's start with a deprecation message
+>>>>>>>>> for the old machine types so that the (hopefully) few users of these old
+>>>>>>>>> systems start switching over to newer machine types instead.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>>>>>
+>>>>>>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>>>>>>
+>>>>>>>> I suggest changing "-machine help" too.  Today it looks like this:
+>>>>>>>>
+>>>>>>>>   Supported machines are:
+>>>>>>>>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+>>>>>>>>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+>>>>>>>>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-1.2               Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-1.1               Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-1.0               Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-0.15              Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-0.14              Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-0.13              Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-0.12              Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-0.11              Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-0.10              Standard PC (i440FX + PIIX, 1996)
+>>>>>>>>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+>>>>>>>>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+>>>>>>>>   isapc                ISA-only PC
+>>>>>>>>   none                 empty machine
+>>>>>>>
+>>>>>>> Any chance we can sort them reasonably too?
+>>>>>>
+>>>>>> If we use strverscmp(), it will be sorted in a more reasonable
+>>>>>> way.  We could copy the gnulib version on systems without glibc.
+>>>>>> Life is too short for writing configure checks by hand, though; I
+>>>>>> will add this to the end of my wish-todo list.  If somebody wants
+>>>>>> to volunteer, be my guest.
+>>>>>>
+>>>>>> I'm CCing Eric in case he has suggestions that would help import
+>>>>>> the gnulib module in an easy way.
+>>>>>>
+>>>>>> -- 
+>>>>>> Eduardo
+>>>>>
+>>>>> As we never have leading zeroes, and input comes from QEMU so
+>>>>> it's safe, it's probably easier to just open-code it:
+>>>>>
+>>>>> /* compare string numerically: shorter strings give smaller numbers */
+>>>>> int mstcmp(const char *s1, const char *s2)
+>>>>> {
+>>>>> 	int l1, l2;
+>>>>>
+>>>>> 	l1 = strlen(s1);
+>>>>> 	l2 = strlen(s2);
+>>>>> 	return l1 == l2 ? strcmp(s1, s2) : l1 - l2;
+>>>>> }
+>>>>>
+>>>>
+>>>> This doesn't work because strlen("pc-0.10") > strlen("pc-1.0").
 >>>
->>
->> (e) I think the addition of UUID_BE should be split out to a separate
->> patch; it adds a general facility. It should likely be the very first
->> patch in the series.
->   Ok.
+>>> Oh right. So you need to find dots and split at these points.
+>>> Something like the below? Completely untested.
+>>>
+>>> int mstcmp(const char *s1, const char *s2)
+>>> {
+>>> 	const char *e1, *e2;
+>>>  	int l1, l2, c;
+>>>
+>>> 	do {
+>>> 		e1 = strchr(s1, '.');
+>>> 		e2 = strchr(s2, '.');
+>>>
+>>> 		l1 = e1 ? e1 - s1 + 1 : strlen(s1);
+>>> 		l2 = e2 ? e2 - s2 + 1 : strlen(s2);
+>>>
+>>> 		/* compare numerically: shorter strings give smaller numbers */
+>>> 		if (l1 != l2) {
+>>> 			break;
+>>> 		}
+>>> 		c = strncmp(s1, s2, l1);
+>>> 		if (c) {
+>>> 			return c;
+>>> 		}
+>>> 		s1 += l1;
+>>> 		s2 += l1;
+>>> 	} while (l1);
+>>>
+>>> 	return l1 - l2;
+>>> }
+> 
+> I believe copying strverscmp() from gnulib as-is is better than
+> reimplementing a subset of it.
 > 
 >>
->> (f) While I think it is justified to have UUID_BE() in "qemu/uuid.h", I
->> think UEFI_CPER_SEC_PLATFORM_MEM is too specific to have here.
+>> QEMU already has machine type sorting code:
 >>
->> If UEFI_CPER_SEC_PLATFORM_MEM were *not* a standardized UUID, I would
->> suggest moving it to the implementation ("include/hw/acpi/hest_ghes.h"
->> -- which in turn should be moved to patch #2, see my remark (d)), *plus*
->> I would suggest eliminating the new #include from "acpi-defs.h", see my
->> remark (b).
->   understand your idea.
+>>   1  2709f263952b well-defined listing order for machine types
+>>   2  562542b6aee2 i386/pc: add piix and q35 machtypes to sorting
+>>                   families for -M \?
+>>
+>> I guess it should be possible to refine machine_class_cmp() in "vl.c",
+>> so that some numeric sorting is applied to machine types in the same
+>> "family".
 > 
->>
->> However, given that this UUID *is* standard, I suggest keeping the (b)
->> #include as you currently propose, and to move the definition of
->> UEFI_CPER_SEC_PLATFORM_MEM to "acpi-defs.h".
->   I agree with you.
+> Yes.  My suggestion is to use strverscmp() inside
+> machine_class_cmp().
 > 
->>
->> I vaguely recall that Michael commented on this previously, but I don't
->> remember what he said. Michael, are you OK with my suggestion?
->    Laszlo, I pasted Michael's comments here, as shown below. Michael said the definition
-> should use build_append_int_noprefix to add data. but I think it may not good, becuase
-> the section "UEFI_CPER_SEC_PLATFORM_MEM" is runtime recorded as CPER, not a ACPI/HEST
-> table member, so it is not generated when system boot up.
 
-I agree: the UUID in question is not placed into the ACPI payload /
-fw_cfg blobs, it is written into guest memory at runtime, into the
-firmware-allocated area, if and when there is a hardware error to report.
-
+Works for me!
 Thanks
 Laszlo
-
-> On the other hand,UEFI_CPER_SEC_PLATFORM_MEM
-> definition is from UEFI spec 2.6, N.2.2 Section Descriptor: {0xA5BC1114, 0x6F64, 0x4EDE, {0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C, 0x83, 0xB1}}.
-> if use  build_append_int_noprefix to add, may confuse others.
-> 
-> -----------------------------------------------------------------
-> -----------------------------------------------------------------
-> There's no reason to define these messy one-time use macros.
-> They just make it hard to look things up in the spec.
-> 
-> 
-> You can use build_append_int_noprefix to add data of
-> any length in LE format.
-> -----------------------------------------------------------------
-> -----------------------------------------------------------------
-> 
-> Hi  Michael,
->   what is your suggestion about it? do you agree with Laszlo?
