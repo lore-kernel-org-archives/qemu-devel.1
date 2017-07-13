@@ -1,15 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43577)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dVfw7-0002GN-EA
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:21:52 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43629)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1dVfwM-0002T0-Ue
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:22:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dVfw3-0000J0-AJ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:21:51 -0400
-Received: from mx01.kamp.de ([82.141.2.16]:41780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dVfw2-0000HC-WF
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:21:47 -0400
-References: <20170713140022.GN4011@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dVfwL-0000Oq-RE
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:22:06 -0400
+References: <20170713092100.GD4011@redhat.com>
+	<e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
+	<20170713140022.GN4011@redhat.com>
 	<1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
 	<20170713140711.GO4011@redhat.com>
 	<4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
@@ -19,14 +17,14 @@ References: <20170713140022.GN4011@redhat.com>
 	<2c5db580-1e3e-9b82-2768-ba2510173387@kamp.de>
 	<20170713150652.GR4011@redhat.com>
 	<07042f09-594a-a288-588b-59c70479c414@kamp.de>
-	<20170713151708.GT4011@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <956c5224-57f0-7bbe-830a-f760a05ade0c@kamp.de>
-Date: Thu, 13 Jul 2017 17:21:13 +0200
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2348778a-dfff-804f-32f7-4325f7347633@redhat.com>
+Date: Thu, 13 Jul 2017 10:21:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170713151708.GT4011@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <07042f09-594a-a288-588b-59c70479c414@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm"
 Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
  compress format extension
 List-Id: <qemu-devel.nongnu.org>
@@ -37,81 +35,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Peter Lieven <pl@kamp.de>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com
 
-Am 13.07.2017 um 17:17 schrieb Daniel P. Berrange:
-> On Thu, Jul 13, 2017 at 05:13:23PM +0200, Peter Lieven wrote:
->> Am 13.07.2017 um 17:06 schrieb Daniel P. Berrange:
->>> On Thu, Jul 13, 2017 at 05:02:51PM +0200, Peter Lieven wrote:
->>>> Am 13.07.2017 um 17:01 schrieb Daniel P. Berrange:
->>>>> On Thu, Jul 13, 2017 at 05:00:39PM +0200, Peter Lieven wrote:
->>>>>> Am 13.07.2017 um 16:58 schrieb Daniel P. Berrange:
->>>>>>> On Thu, Jul 13, 2017 at 04:18:13PM +0200, Peter Lieven wrote:
->>>>>>>> Okay, so it has to be a mix of QAPI parsing and manual parameter checking,
->>>>>>>> right?
->>>>>>> Yeah. It does feel like a valid RFE for QAPI to add a permitted range to
->>>>>>> 'int' types though, which would simplify the code in future.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com
+Message-ID: <2348778a-dfff-804f-32f7-4325f7347633@redhat.com>
+Subject: Re: [PATCH V2 5/8] block/qcow2: read and write the compress format
+ extension
+References: <20170713092100.GD4011@redhat.com>
+ <e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
+ <20170713140022.GN4011@redhat.com>
+ <1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
+ <20170713140711.GO4011@redhat.com>
+ <4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
+ <20170713145801.GP4011@redhat.com>
+ <37d97fcb-aa71-1ed4-2134-6d308da7b527@kamp.de>
+ <20170713150148.GQ4011@redhat.com>
+ <2c5db580-1e3e-9b82-2768-ba2510173387@kamp.de>
+ <20170713150652.GR4011@redhat.com>
+ <07042f09-594a-a288-588b-59c70479c414@kamp.de>
+In-Reply-To: <07042f09-594a-a288-588b-59c70479c414@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/13/2017 10:13 AM, Peter Lieven wrote:
+>>>>>>
+>>>>>>> I currently have the following:
 >>>>>>>
->>>>>>>> I currently have the following:
->>>>>>>>
->>>>>>>>         options = qemu_opts_to_qdict(opts, NULL);
->>>>>>>>         qdict_extract_subqdict(options, &compressopts, "compress.");
->>>>>>>>         v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
->>>>>>>>         visit_start_struct(v, NULL, NULL, 0, &local_err);
->>>>>>>>         if (local_err) {
->>>>>>>>             ret= -EINVAL;
->>>>>>>>             goto finish;
->>>>>>>>         }
->>>>>>>>         visit_type_Qcow2Compress_members(v, &compress, &local_err);
->>>>>>>>         if (local_err) {
->>>>>>>>             ret= -EINVAL;
->>>>>>>>             goto finish;
->>>>>>>>         }
->>>>>>>>         visit_end_struct(v, NULL);
->>>>>>>>         visit_free(v);
->>>>>>>>         QDECREF(compressopts);
->>>>>>>>         QDECREF(options)
->>>>>>> Looks good.
->>>>>>>
->>>>>>>> And I have the following 2 questions:
->>>>>>>>      a) I have to specifiy compress.format and compress.level otherwise I will get an error. How can I fix that the settings are optional?
->>>>>>> Put an '*' as the first character of any field name if it should be optional.
->>>>>>>
->>>>>>>>      b) If I just specify a compress.format can I default the compress.level to 0 without an error?
->>>>>>> I believe you'd get compress.level as 0 automatically for an 'int' type.
->>>>>> I still face the issue that I now always have to specify a compress.format.
->>>>>> I tried to solve it like this:
->>>>> [snip]
->>>>>
->>>>> that's not needed if you name the parameter '*level' in the QAPI schema
->>>> its not needed for the *level, but I still get the error that the format
->>>> parameter is missing otherwise. And I can't make format optional.
->>> Surely specifying compress.format is how you turn on compression in the
->>> first place, so making that optional should not be necessary. eg the
->>> simple case becomes:
->>>
->>>     qemu-img create -f qcow2 -o compress.format=zlib  foo.qcow2 1G
->>>
->>> Yes, there is no notion of a "default" format, but IMHO that's a good
->>> thing - same way with encryption - it requires an explict encrypt.format=luks
->>> to turn on encryption
->> Yes, but visit_type_Qcow2Compress_members always returns an error if compress.format
->> is missing from the options. So I should not call it an error out if compress.format is not in the
->> options. Thus the check if either compress.format or compress.level is specified at all.
-> Oh yes, I see what you mean now. Yes, just wrapping the whole qapi block
-> in an    if(qemu_opt_get(opts, "compress.format"))  is the right way to
-> handle that.
+>>>>>>>        options =3D qemu_opts_to_qdict(opts, NULL);
+>>>>>>>        qdict_extract_subqdict(options, &compressopts, "compress."=
+);
+
+Can you show your .json patches as well?
+
+> Yes, but visit_type_Qcow2Compress_members always returns an error if
+> compress.format
+> is missing from the options. So I should not call it an error out if
+> compress.format is not in the
+> options. Thus the check if either compress.format or compress.level is
+> specified at all.
+
+In the JSON, you want '*compress':'CompressUnion' (or some such name)
+(overall, the user does not have to specify compression); but within
+CompressUnion, you want 'format' to be unconditional (it is the
+discriminator), and then branches of the union to add whatever other
+fields match the enum members covered by 'format'.
+
+{ 'enum': 'CompressionType', 'data': [ 'gzip', 'lzo' ] }
+{ 'union': 'CompressUnion', 'discriminator': 'format',
+  'base': { 'format': 'CompressionType', '*level': 'int' },
+  'data': { 'gzip': {...any gzip-specific extras}, 'lzo': {...any
+lzo-specific extras} } }
+
+[hmm, I think I'm STILL missing my patches to allow for an anonymous
+base...  I should rebase and send those; but in the meantime, you'll
+have to create a separate 'CompressBase' struct and use
+'base':'CompressBase' instead]
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-qemu_opt_get doesn't work, because it seems to return an empty string. I now also always see
-compress.format and compress.level in the qemu-img output even if I don't specify it. Have
-to figure out why this is...
+--Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-~/git/qemu$ ./qemu-img create -f qcow2 /tmp/1G.qcow2 1G
-Formatting '/tmp/1G.qcow2', fmt=qcow2 size=1073741824 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16 compress.format= compress.level=0
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I hope I have the new patchset ready tomorrow. I would appreciate if you could have a look at it.
+iQEcBAEBCAAGBQJZZ5AUAAoJEKeha0olJ0Nq8FsH/0qskuQ6CldZMu+W29KfU989
+7HGc6ljFp9hzdZ7cbEeOFO47PV68DtEm6ZqXAi5Cq9CtxsDuZDgluoxB1RYmxYDt
+h38I9+UrGSeJqtc3D4h0YEc1EdEBZP9kzhdicaCK4tdTwFqbqI004m0D/QuksNr7
+bbEU74mpxnLa92gs0ntuI+XQq1DE0XiivpOd/IlSCAdFvcGQ6Cq2OezvMyfp16Vn
+Oj7TAp0W35FxpKmFEowLTIdlaLgvfdcd/0FfRqLsKZ0RfIaAMLZ1ZwqsR9L4Z/mZ
+2h+n5l++0+cspCADeYmWGOyVkEY8YEYNXf3irp9tvBU6iSKzqCoH3p02RHoBNiI=
+=nB86
+-----END PGP SIGNATURE-----
 
-Thank you,
-Peter
+--Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm--
