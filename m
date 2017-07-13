@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVcVN-0002mP-EA
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:42:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVcVO-0002nD-B3
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVcVM-0002nL-Ju
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:42:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVcVN-0002nr-He
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:42:02 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 13 Jul 2017 13:41:30 +0200
-Message-Id: <1499946095-8224-5-git-send-email-kwolf@redhat.com>
+Date: Thu, 13 Jul 2017 13:41:32 +0200
+Message-Id: <1499946095-8224-7-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
 References: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/9] block/qapi: Use blk_all_next() for
- query-block
+Subject: [Qemu-devel] [PATCH v2 6/9] ide: bdrv_attach_dev() for empty CD-ROM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,37 +22,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-This patch replaces the blk_next() loop in query-block by a
-blk_all_next() one so that we also get access to BlockBackends that
-aren't owned by the monitor. For now, the next thing we do is check
-whether each BB has a name, so there is no semantic difference.
+If no drive=... option is passed (for an empty drive), we don't only
+lack the BlockBackend normally created by parse_drive(), but we also
+need to manually call blk_attach_dev().
+
+IDE does not support hot unplug, but if it did, qdev would take care to
+call the matching blk_detach_dev() on unplug.
+
+This fixes at least the bug that such devices didn't show up in
+query-block, and probably some more problems.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/qapi.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/ide/qdev.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/qapi.c b/block/qapi.c
-index 705cd11..2f86c79 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -472,8 +472,14 @@ BlockInfoList *qmp_query_block(Error **errp)
-     BlockBackend *blk;
-     Error *local_err = NULL;
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 299e592..cc2f5bd 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -164,6 +164,7 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+     IDEBus *bus = DO_UPCAST(IDEBus, qbus, dev->qdev.parent_bus);
+     IDEState *s = bus->ifs + dev->unit;
+     Error *err = NULL;
++    int ret;
  
--    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
--        BlockInfoList *info = g_malloc0(sizeof(*info));
-+    for (blk = blk_all_next(NULL); blk; blk = blk_all_next(blk)) {
-+        BlockInfoList *info;
-+
-+        if (!*blk_name(blk)) {
-+            continue;
-+        }
-+
-+        info = g_malloc0(sizeof(*info));
-         bdrv_query_info(blk, &info->value, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
+     if (!dev->conf.blk) {
+         if (kind != IDE_CD) {
+@@ -172,6 +173,8 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+         } else {
+             /* Anonymous BlockBackend for an empty drive */
+             dev->conf.blk = blk_new(0, BLK_PERM_ALL);
++            ret = blk_attach_dev(dev->conf.blk, &dev->qdev);
++            assert(ret == 0);
+         }
+     }
+ 
 -- 
 1.8.3.1
