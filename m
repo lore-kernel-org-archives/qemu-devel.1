@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVhDc-0005QM-9E
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:44:01 -0400
+	(envelope-from <mst@redhat.com>) id 1dVhH8-0000f3-5H
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVhDb-0005Qu-Fa
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:44:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42532)
+	(envelope-from <mst@redhat.com>) id 1dVhH5-00076T-0q
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:47:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25708)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVhDb-0005QT-8u
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:43:59 -0400
-Date: Thu, 13 Jul 2017 19:43:57 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVhH4-00075u-Qv
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:47:34 -0400
+Date: Thu, 13 Jul 2017 19:47:21 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1499964233-24206-1-git-send-email-mst@redhat.com>
+Message-ID: <1499964378-24344-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -26,12 +26,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ben Warren <ben@skyportsystems.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
-Speed up tests on host systems with kvm by using it.
+Speed up tests on host systems with kvm support.
 
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
+
+This is on top of my previous patch fixing vmgenid.
+
+PPC PXE test is reported to be especially slow - does anyone care to try
+it and measure whether this helps?
+
  tests/pxe-test.c     | 2 +-
  tests/vmgenid-test.c | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
