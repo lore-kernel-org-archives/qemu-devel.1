@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dVbta-0005ng-8I
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:03:02 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dVbte-0005qc-1G
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:03:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dVbtW-0001Lm-Ad
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:02:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49948)
+	(envelope-from <lprosek@redhat.com>) id 1dVbtY-0001ML-Sj
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:03:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVbtW-0001LZ-2K
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:02:54 -0400
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVbtY-0001M9-N0
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:02:56 -0400
 From: Ladi Prosek <lprosek@redhat.com>
-Date: Thu, 13 Jul 2017 13:02:33 +0200
-Message-Id: <20170713110237.6712-5-lprosek@redhat.com>
+Date: Thu, 13 Jul 2017 13:02:34 +0200
+Message-Id: <20170713110237.6712-6-lprosek@redhat.com>
 In-Reply-To: <20170713110237.6712-1-lprosek@redhat.com>
 References: <20170713110237.6712-1-lprosek@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/8] virtio-9p: use virtqueue_error for
+Subject: [Qemu-devel] [PATCH v2 5/8] virtio-blk: use virtqueue_error for
  errors with queue context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,89 +32,36 @@ for errors that pertain to a virtqueue rather than to the device as a whole.
 
 Signed-off-by: Ladi Prosek <lprosek@redhat.com>
 ---
- hw/9pfs/virtio-9p-device.c | 37 +++++++++++++++----------------------
- 1 file changed, 15 insertions(+), 22 deletions(-)
+ hw/block/virtio-blk.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-index 62650b0..cf16b4b 100644
---- a/hw/9pfs/virtio-9p-device.c
-+++ b/hw/9pfs/virtio-9p-device.c
-@@ -54,16 +54,16 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
-         }
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index c0bd247..e82d2a3 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -490,20 +490,20 @@ static int virtio_blk_handle_request(VirtIOBlockReq *req, MultiReqBuffer *mrb)
+     VirtIODevice *vdev = VIRTIO_DEVICE(s);
  
-         if (iov_size(elem->in_sg, elem->in_num) < 7) {
--            virtio_error(vdev,
--                         "The guest sent a VirtFS request without space for "
--                         "the reply");
-+            virtqueue_error(vq,
-+                            "The guest sent a VirtFS request without space for "
-+                            "the reply");
-             goto out_free_req;
-         }
- 
-         len = iov_to_buf(elem->out_sg, elem->out_num, 0, &out, 7);
-         if (len != 7) {
--            virtio_error(vdev, "The guest sent a malformed VirtFS request: "
--                         "header size is %zd, should be 7", len);
-+            virtqueue_error(vq, "The guest sent a malformed VirtFS request: "
-+                            "header size is %zd, should be 7", len);
-             goto out_free_req;
-         }
- 
-@@ -150,10 +150,8 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, size_t offset,
- 
-     ret = v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
-     if (ret < 0) {
--        VirtIODevice *vdev = VIRTIO_DEVICE(v);
--
--        virtio_error(vdev, "Failed to encode VirtFS reply type %d",
--                     pdu->id + 1);
-+        virtqueue_error(v->vq, "Failed to encode VirtFS reply type %d",
-+                        pdu->id + 1);
-     }
-     return ret;
- }
-@@ -168,9 +166,8 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
- 
-     ret = v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
-     if (ret < 0) {
--        VirtIODevice *vdev = VIRTIO_DEVICE(v);
--
--        virtio_error(vdev, "Failed to decode VirtFS request type %d", pdu->id);
-+        virtqueue_error(v->vq, "Failed to decode VirtFS request type %d",
-+                        pdu->id);
-     }
-     return ret;
- }
-@@ -184,11 +181,9 @@ static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
-     size_t buf_size = iov_size(elem->in_sg, elem->in_num);
- 
-     if (buf_size < size) {
--        VirtIODevice *vdev = VIRTIO_DEVICE(v);
--
--        virtio_error(vdev,
--                     "VirtFS reply type %d needs %zu bytes, buffer has %zu",
--                     pdu->id + 1, size, buf_size);
-+        virtqueue_error(v->vq,
-+                        "VirtFS reply type %d needs %zu bytes, buffer has %zu",
-+                        pdu->id + 1, size, buf_size);
+     if (req->elem.out_num < 1 || req->elem.in_num < 1) {
+-        virtio_error(vdev, "virtio-blk missing headers");
++        virtqueue_error(req->vq, "virtio-blk missing headers");
+         return -1;
      }
  
-     *piov = elem->in_sg;
-@@ -204,11 +199,9 @@ static void virtio_init_out_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
-     size_t buf_size = iov_size(elem->out_sg, elem->out_num);
- 
-     if (buf_size < size) {
--        VirtIODevice *vdev = VIRTIO_DEVICE(v);
--
--        virtio_error(vdev,
--                     "VirtFS request type %d needs %zu bytes, buffer has %zu",
--                     pdu->id, size, buf_size);
-+        virtqueue_error(v->vq,
-+                        "VirtFS request type %d needs %zu bytes, "
-+                        "buffer has %zu", pdu->id, size, buf_size);
+     if (unlikely(iov_to_buf(iov, out_num, 0, &req->out,
+                             sizeof(req->out)) != sizeof(req->out))) {
+-        virtio_error(vdev, "virtio-blk request outhdr too short");
++        virtqueue_error(req->vq, "virtio-blk request outhdr too short");
+         return -1;
      }
  
-     *piov = elem->out_sg;
+     iov_discard_front(&iov, &out_num, sizeof(req->out));
+ 
+     if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
+-        virtio_error(vdev, "virtio-blk request inhdr too short");
++        virtqueue_error(req->vq, "virtio-blk request inhdr too short");
+         return -1;
+     }
+ 
 -- 
 2.9.3
