@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVeyr-00053E-I1
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:20:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVeyr-000522-0E
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dVeyq-0007Bn-DN
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:20:37 -0400
-Received: from mail-wr0-f179.google.com ([209.85.128.179]:33445)
+	(envelope-from <alex.bennee@linaro.org>) id 1dVeym-00076j-Fy
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:20:36 -0400
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:36768)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dVeyq-0007AV-6U
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:20:36 -0400
-Received: by mail-wr0-f179.google.com with SMTP id r103so53943315wrb.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 07:20:36 -0700 (PDT)
+	id 1dVeym-00075m-9L
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:20:32 -0400
+Received: by mail-wm0-f49.google.com with SMTP id 62so25143198wmw.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 07:20:32 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 13 Jul 2017 15:19:26 +0100
-Message-Id: <20170713141928.25419-5-alex.bennee@linaro.org>
+Date: Thu, 13 Jul 2017 15:19:23 +0100
+Message-Id: <20170713141928.25419-2-alex.bennee@linaro.org>
 In-Reply-To: <20170713141928.25419-1-alex.bennee@linaro.org>
 References: <20170713141928.25419-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 4/6] target/arm/translate: ensure
- gen_goto_tb sets exit flags
+Subject: [Qemu-devel] [PATCH v4 1/6] include/exec/exec-all: document common
+ exit conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +31,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-As the gen_goto_tb function can do both static and dynamic jumps it
-should also set the is_jmp field. This matches the behaviour of the
-a64 code.
+As a precursor to later patches attempt to come up with a more
+concrete wording for what each of the common exit cases would be.
 
+CC: Emilio G. Cota <cota@braap.org>
+CC: Richard Henderson <rth@twiddle.net>
+CC: Lluís Vilanova <vilanova@ac.upc.edu>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-
---
-v4
-  - set s->is_jmp = DISAS_TB_JUMP in both cases
 ---
- target/arm/translate.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ include/exec/exec-all.h | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 5f2cea8641..493a7b424a 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4158,6 +4158,9 @@ static void gen_goto_ptr(void)
-     tcg_temp_free(addr);
- }
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 8096d64a1d..a23894f687 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -35,11 +35,34 @@ typedef abi_ulong tb_page_addr_t;
+ typedef ram_addr_t tb_page_addr_t;
+ #endif
  
-+/* This will end the TB but doesn't guarantee we'll return to
-+ * cpu_loop_exec. Any live exit_requests will be processed as we
-+ * enter the next TB. */
- static void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
- {
-     if (use_goto_tb(s, dest)) {
-@@ -4168,6 +4171,7 @@ static void gen_goto_tb(DisasContext *s, int n, target_ulong dest)
-         gen_set_pc_im(s, dest);
-         gen_goto_ptr();
-     }
-+    s->is_jmp = DISAS_TB_JUMP;
- }
+-/* is_jmp field values */
++/* DisasContext is_jmp field values
++ *
++ * is_jmp starts as DISAS_NEXT. The translator will keep processing
++ * instructions until an exit condition is reached. If we reach the
++ * exit condition and is_jmp is still DISAS_NEXT (because of some
++ * other condition) we simply "jump" to the next address.
++ * The remaining exit cases are:
++ *
++ *   DISAS_JUMP    - Only the PC was modified dynamically (e.g computed)
++ *   DISAS_TB_JUMP - Only the PC was modified statically (e.g. branch)
++ *
++ * In these cases as long as the PC is updated we can chain to the
++ * next TB either by exiting the loop or looking up the next TB via
++ * the loookup helper.
++ *
++ *   DISAS_UPDATE  - CPU State was modified dynamically
++ *
++ * This covers any other CPU state which necessities us exiting the
++ * TCG code to the main run-loop. Typically this includes anything
++ * that might change the interrupt state.
++ *
++ * Individual translators may define additional exit cases to deal
++ * with per-target special conditions.
++ */
+ #define DISAS_NEXT    0 /* next instruction can be analyzed */
+ #define DISAS_JUMP    1 /* only pc was modified dynamically */
+-#define DISAS_UPDATE  2 /* cpu state was modified dynamically */
+-#define DISAS_TB_JUMP 3 /* only pc was modified statically */
++#define DISAS_TB_JUMP 2 /* only pc was modified statically */
++#define DISAS_UPDATE  3 /* cpu state was modified dynamically */
  
- static inline void gen_jmp (DisasContext *s, uint32_t dest)
-@@ -4179,7 +4183,6 @@ static inline void gen_jmp (DisasContext *s, uint32_t dest)
-         gen_bx_im(s, dest);
-     } else {
-         gen_goto_tb(s, 0, dest);
--        s->is_jmp = DISAS_TB_JUMP;
-     }
- }
+ #include "qemu/log.h"
  
 -- 
 2.13.0
