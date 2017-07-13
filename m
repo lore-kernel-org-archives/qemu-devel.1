@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVfZE-00075e-0s
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:58:12 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dVfbi-0001TS-8o
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:00:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVfZD-0004vO-1l
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:58:12 -0400
-Date: Thu, 13 Jul 2017 15:58:01 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170713145801.GP4011@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170710134436.GB6770@redhat.com>
-	<20170710135218.GK5772@noname.redhat.com>
-	<20170710135539.GD6770@redhat.com>
-	<e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
-	<20170713092100.GD4011@redhat.com>
-	<e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
-	<20170713140022.GN4011@redhat.com>
-	<1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
-	<20170713140711.GO4011@redhat.com>
-	<4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
+	(envelope-from <lprosek@redhat.com>) id 1dVfbf-0006QU-N5
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:00:46 -0400
+Received: from mail-ua0-f177.google.com ([209.85.217.177]:33784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVfbf-0006QE-Hi
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:00:43 -0400
+Received: by mail-ua0-f177.google.com with SMTP id g13so16614499uaj.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:00:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+In-Reply-To: <20170713163620.48c6a93c@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+	<20170713163620.48c6a93c@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Thu, 13 Jul 2017 17:00:42 +0200
+Message-ID: <CABdb736of+LSqEQuV15=i-f1rEwBPz0P71Jty5ZZsBc=5nf5uQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] virtio: enhance virtio_error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,51 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, Jul 13, 2017 at 04:18:13PM +0200, Peter Lieven wrote:
-> 
-> Okay, so it has to be a mix of QAPI parsing and manual parameter checking,
-> right?
+On Thu, Jul 13, 2017 at 4:36 PM, Greg Kurz <groug@kaod.org> wrote:
+> On Thu, 13 Jul 2017 13:02:29 +0200
+> Ladi Prosek <lprosek@redhat.com> wrote:
+>
+>> Output like "Virtqueue size exceeded" is not much useful in identifying the
+>> culprit. This series beefs up virtio_error to print the virtio device name
+>> and id, and introduces virtqueue_error which additionally includes the index
+>> of the virtqueue where the error occured.
+>>
+>> Patches 1 to 3 lay the groundwork, patches 4 to 8 convert virtio devices to
+>> use virtqueue_error instead of virtio_error.
+>>
+>> v1->v2:
+>> * Modified virtio_error and added virtqueue_error (Stefan)
+>> * Now also printing device id (Stefan)
+>> * Went over all virtio_error call sites and converted them to virtqueue_error
+>>   as appropriate; added virtio device maintainers to cc
+>>
+>> Ladi Prosek (8):
+>>   qemu-error: introduce error_report_nolf
+>>   virtio: enhance virtio_error messages
+>>   virtio: introduce virtqueue_error
+>>   virtio-9p: use virtqueue_error for errors with queue context
+>>   virtio-blk: use virtqueue_error for errors with queue context
+>>   virtio-net: use virtqueue_error for errors with queue context
+>>   virtio-scsi: use virtqueue_error for errors with queue context
+>>   virtio-crypto: use virtqueue_error for errors with queue context
+>>
+>
+> While here, maybe you can add all the virtio_error related functions to the
+> $qemu_error_funcs variable in scripts/checkpatch.pl ?
 
-Yeah. It does feel like a valid RFE for QAPI to add a permitted range to
-'int' types though, which would simplify the code in future.
+Will do, thanks!
 
-> I currently have the following:
-> 
->     options = qemu_opts_to_qdict(opts, NULL);
->     qdict_extract_subqdict(options, &compressopts, "compress.");
->     v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
->     visit_start_struct(v, NULL, NULL, 0, &local_err);
->     if (local_err) {
->         ret= -EINVAL;
->         goto finish;
->     }
->     visit_type_Qcow2Compress_members(v, &compress, &local_err);
->     if (local_err) {
->         ret= -EINVAL;
->         goto finish;
->     }
->     visit_end_struct(v, NULL);
->     visit_free(v);
->     QDECREF(compressopts);
->     QDECREF(options)
-
-Looks good.
-
-> And I have the following 2 questions:
->  a) I have to specifiy compress.format and compress.level otherwise I will get an error. How can I fix that the settings are optional?
-
-Put an '*' as the first character of any field name if it should be optional.
-
->  b) If I just specify a compress.format can I default the compress.level to 0 without an error?
-
-I believe you'd get compress.level as 0 automatically for an 'int' type.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Cheers,
+>
+> --
+> Greg
+>
+>>  hw/9pfs/virtio-9p-device.c  |  37 ++++++--------
+>>  hw/block/virtio-blk.c       |   6 +--
+>>  hw/net/virtio-net.c         |  24 ++++-----
+>>  hw/scsi/virtio-scsi.c       |   2 +-
+>>  hw/virtio/virtio-crypto.c   |  56 ++++++++++-----------
+>>  hw/virtio/virtio.c          | 116 ++++++++++++++++++++++++++++++--------------
+>>  include/hw/virtio/virtio.h  |   1 +
+>>  include/qemu/error-report.h |   3 +-
+>>  util/qemu-error.c           |  32 +++++++++---
+>>  9 files changed, 169 insertions(+), 108 deletions(-)
+>>
+>
