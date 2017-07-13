@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dVRnD-0004oi-HC
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:15:44 -0400
+	(envelope-from <mst@redhat.com>) id 1dVRoS-0005M4-EM
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dVRn9-0000nm-EF
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:15:43 -0400
-Received: from mail-it0-f67.google.com ([209.85.214.67]:34495)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dVRn8-0000n5-SZ
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:15:39 -0400
-Received: by mail-it0-f67.google.com with SMTP id o202so4657164itc.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 17:15:38 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dVRoO-0001ju-Gk
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:17:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVRoO-0001jJ-Ap
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:16:56 -0400
+Date: Thu, 13 Jul 2017 03:16:49 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170713031526-mutt-send-email-mst@kernel.org>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-8-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <507fef62-746c-703e-6b91-5becd7456d9d@twiddle.net>
-References: <20170712221414.3867-1-bobby.prani@gmail.com>
-	<507fef62-746c-703e-6b91-5becd7456d9d@twiddle.net>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Wed, 12 Jul 2017 20:14:07 -0400
-Message-ID: <CAJhHMCDAXopimU1t0w=a9MCYTN87cQPA3zEx3z11oURcTYBr_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg/aarch64: Use ADR for shorter jumps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499863221-16206-8-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 7/8] mm: export symbol of next_zone and
+ first_online_pgdat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On Wed, Jul 12, 2017 at 7:08 PM, Richard Henderson <rth@twiddle.net> wrote:
-> On 07/12/2017 12:14 PM, Pranith Kumar wrote:
->>
->> Use ADR instruction for shorter jumps.
->>
->> I was going through rth's email and realized that I should have done
->> this the first time.
->>
->> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->> ---
->>   tcg/aarch64/tcg-target.inc.c | 14 +++++++++-----
->>   1 file changed, 9 insertions(+), 5 deletions(-)
->>
->> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
->> index 04bc369a92..5121ebc1a1 100644
->> --- a/tcg/aarch64/tcg-target.inc.c
->> +++ b/tcg/aarch64/tcg-target.inc.c
->> @@ -886,12 +886,16 @@ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr,
->> uintptr_t addr)
->>           i1 = I3206_B | ((offset >> 2) & 0x3ffffff);
->>           i2 = NOP;
->>       } else {
->> -        offset = (addr >> 12) - (jmp_addr >> 12);
->> +        if (offset == sextract64(offset, 0, 21)) {
->> +            i1 = I3406_ADR;
->> +            i2 = NOP;
->> +        } else {
->
->
-> This is dead code because it is covered by the direct jump above.
-> B has a 26-bit range, whereas ADR has a 21-bit range.
+On Wed, Jul 12, 2017 at 08:40:20PM +0800, Wei Wang wrote:
+> This patch enables for_each_zone()/for_each_populated_zone() to be
+> invoked by a kernel module.
 
-Hmm, yep. And I guess it doesn't make sense to use ADR for short jumps
-because this will be a 2 instruction jump vs 1 instruction for direct
-branch.
+... for use by virtio balloon.
 
-Thanks,
--- 
-Pranith
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+
+balloon seems to only use
++       for_each_populated_zone(zone)
++               for_each_migratetype_order(order, type)
+
+
+> ---
+>  mm/mmzone.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/mm/mmzone.c b/mm/mmzone.c
+> index a51c0a6..08a2a3a 100644
+> --- a/mm/mmzone.c
+> +++ b/mm/mmzone.c
+> @@ -13,6 +13,7 @@ struct pglist_data *first_online_pgdat(void)
+>  {
+>  	return NODE_DATA(first_online_node);
+>  }
+> +EXPORT_SYMBOL_GPL(first_online_pgdat);
+>  
+>  struct pglist_data *next_online_pgdat(struct pglist_data *pgdat)
+>  {
+> @@ -41,6 +42,7 @@ struct zone *next_zone(struct zone *zone)
+>  	}
+>  	return zone;
+>  }
+> +EXPORT_SYMBOL_GPL(next_zone);
+>  
+>  static inline int zref_in_nodemask(struct zoneref *zref, nodemask_t *nodes)
+>  {
+> -- 
+> 2.7.4
