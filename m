@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55911)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVay2-00051P-3J
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:31 -0400
+	id 1dVaz0-0006El-BK
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVay0-0004Wq-U3
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:30 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35939)
+	id 1dVayw-0005ZA-1H
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:04:30 -0400
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:36256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVay0-0004WU-P8
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:28 -0400
-Received: by mail-qt0-x244.google.com with SMTP id v31so5380767qtb.3
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:03:28 -0700 (PDT)
+	id 1dVayv-0005Yn-Sg
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:04:25 -0400
+Received: by mail-qk0-f196.google.com with SMTP id v17so5133127qka.3
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:04:25 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 13 Jul 2017 07:03:11 -0300
-Message-Id: <20170713100311.20037-3-f4bug@amsat.org>
+Date: Thu, 13 Jul 2017 07:03:10 -0300
+Message-Id: <20170713100311.20037-2-f4bug@amsat.org>
 In-Reply-To: <20170713100311.20037-1-f4bug@amsat.org>
 References: <20170713100311.20037-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH RESEND 2/2] travis: use console aliveness
- script
+Subject: [Qemu-devel] [RFC PATCH RESEND 1/2] scripts: helper to keep console
+ alive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,29 +37,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Travis CI has specific time limits for each job, and will stop the build and
-add an error message to the build log in the following situation[s]:
-- A job produces no log output for 10 minutes
-
-See: https://docs.travis-ci.com/user/customizing-the-build#build-timeouts
+useful to avoid Travis CI jobs getting killed after 10min of inactivity.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- .travis.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS          |  1 +
+ scripts/aliveness.sh | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+ create mode 100755 scripts/aliveness.sh
 
-diff --git a/.travis.yml b/.travis.yml
-index 27a2d9cfb3..032d111bb4 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -45,7 +45,7 @@ notifications:
-     on_failure: always
- env:
-   global:
--    - TEST_CMD="make check"
-+    - TEST_CMD="scripts/aliveness.sh 69 make check"
-   matrix:
-     - CONFIG=""
-     - CONFIG="--enable-debug --enable-debug-tcg --enable-trace-backends=log"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9529c9484c..c39f418a13 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1866,6 +1866,7 @@ S: Maintained
+ F: .travis.yml
+ F: .shippable.yml
+ F: tests/docker/
++F: scripts/aliveness.sh
+ W: https://travis-ci.org/qemu/qemu
+ W: https://app.shippable.com/github/qemu/qemu
+ W: http://patchew.org/QEMU/
+diff --git a/scripts/aliveness.sh b/scripts/aliveness.sh
+new file mode 100755
+index 0000000000..1c2b6136b9
+--- /dev/null
++++ b/scripts/aliveness.sh
+@@ -0,0 +1,32 @@
++#! /usr/bin/env sh
++#
++# Send an "Alive!" message regularly to stderr
++#
++# Copyright (C) 2017 Philippe Mathieu-Daudé
++#
++# Author: Philippe Mathieu-Daudé <f4bug@amsat.org>
++#
++# This work is licensed under the terms of the GNU LGPL, version 2+.
++# See the COPYING file in the top-level directory.
++
++TIMEOUT_S=$1
++shift 1
++{
++  set -e
++  while true
++  do
++    sleep ${TIMEOUT_S}
++    echo "Alive!" >&2
++  done
++} &
++WATCHDOG_PID=$!
++
++cleanup() {
++    echo "killing watchdog ${WATCHDOG_PID}" >&2
++    kill -TERM ${WATCHDOG_PID}
++    exit $((1 - $#))
++}
++trap cleanup INT
++
++$*
++cleanup 0
 -- 
 2.13.2
