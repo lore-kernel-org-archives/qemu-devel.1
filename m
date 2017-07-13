@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVcjq-0004j6-4v
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:56:59 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dVcjr-0004jL-ME
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVcjo-0000qh-AN
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:56:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43570)
+	(envelope-from <dgilbert@redhat.com>) id 1dVcjq-0000sN-Ny
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:56:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVcjo-0000pB-44
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:56:56 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVcjq-0000rn-Hj
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:56:58 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0D0657AE93
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 11:56:55 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 732AC7D0CB
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 11:56:57 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 13 Jul 2017 12:56:45 +0100
-Message-Id: <20170713115649.11853-2-dgilbert@redhat.com>
+Date: Thu, 13 Jul 2017 12:56:46 +0100
+Message-Id: <20170713115649.11853-3-dgilbert@redhat.com>
 In-Reply-To: <20170713115649.11853-1-dgilbert@redhat.com>
 References: <20170713115649.11853-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/5] migration/rdma: Fix race on source
+Subject: [Qemu-devel] [PATCH v2 2/5] migration: Close file on failed
+ migration load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +35,27 @@ Cc: quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Fix a race where the destination might try and send the source a
-WRID_READY before the source has done a post-recv for it.
+Closing the file before exit on a failure allows
+the source to cleanup better, especially with RDMA.
 
-rdma_post_recv has to happen after the qp exists, and we're
-OK since we've already called qemu_rdma_source_init that calls
-qemu_alloc_qp.
-
-This corresponds to:
-https://bugzilla.redhat.com/show_bug.cgi?id=1285044
-
-The race can be triggered by adding a few ms wait before this
-post_recv_control (which was originally due to me turning on loads of
-debug).
+Partial fix for https://bugs.launchpad.net/qemu/+bug/1545052
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- migration/rdma.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ migration/migration.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index c6bc607a03..6111e10c70 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2365,6 +2365,12 @@ static int qemu_rdma_connect(RDMAContext *rdma, Error **errp)
- 
-     caps_to_network(&cap);
- 
-+    ret = qemu_rdma_post_recv_control(rdma, RDMA_WRID_READY);
-+    if (ret) {
-+        ERROR(errp, "posting second control recv");
-+        goto err_rdma_source_connect;
-+    }
-+
-     ret = rdma_connect(rdma->cm_id, &conn_param);
-     if (ret) {
-         perror("rdma_connect");
-@@ -2405,12 +2411,6 @@ static int qemu_rdma_connect(RDMAContext *rdma, Error **errp)
- 
-     rdma_ack_cm_event(cm_event);
- 
--    ret = qemu_rdma_post_recv_control(rdma, RDMA_WRID_READY);
--    if (ret) {
--        ERROR(errp, "posting second control recv!");
--        goto err_rdma_source_connect;
--    }
--
-     rdma->control_ready_expected = 1;
-     rdma->nb_sent = 0;
-     return 0;
+diff --git a/migration/migration.c b/migration/migration.c
+index a0db40d364..8552f54ab4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -348,6 +348,7 @@ static void process_incoming_migration_co(void *opaque)
+         migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                           MIGRATION_STATUS_FAILED);
+         error_report("load of migration failed: %s", strerror(-ret));
++        qemu_fclose(mis->from_src_file);
+         exit(EXIT_FAILURE);
+     }
+     mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
 -- 
 2.13.0
