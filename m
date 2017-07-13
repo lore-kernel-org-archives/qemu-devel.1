@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVgcS-0006Vq-Fq
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:05:38 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dVgcb-0006ej-UG
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:05:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVgcP-0006cS-93
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:05:36 -0400
-Resent-Message-Id: <E1dVgcP-0006cS-93@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dVgcP-0006c0-1C
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:05:33 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <149996191269.69.6935745034515082236@5d477a5b5989>
-In-Reply-To: <1499955874-10954-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dVgca-0006im-Dd
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:05:45 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dVgca-0006hN-1L
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:05:44 -0400
+Received: by mail-lf0-x242.google.com with SMTP id g21so6129441lfk.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 09:05:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 13 Jul 2017 09:05:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/41] Misc patches for QEMU 2.10 soft freeze
+References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
+	<1499842423-21101-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1499842423-21101-2-git-send-email-peterx@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 13 Jul 2017 16:05:32 +0000
+Message-ID: <CAJ+F1CK6xti_5utnP+kb0dTEoT6m4DRCiumX-jhdvJ5SnZPmJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] qdev: provide DEFINE_PROP_INT64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE0OTk5NTU4NzQtMTA5NTQtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRo
-YXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC80MV0gTWlzYyBwYXRjaGVzIGZv
-ciBRRU1VIDIuMTAgc29mdCBmcmVlemUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBb
-dGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0OTk5NTU2OTctMjgwNDUtMS1naXQtc2VuZC1lbWFp
-bC1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8xNDk5OTU1Njk3LTI4MDQ1LTEt
-Z2l0LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnCiAqIFtuZXcgdGFnXSAgICAg
-ICAgIHBhdGNoZXcvMTQ5OTk1NTg3NC0xMDk1NC0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJl
-ZGhhdC5jb20gLT4gcGF0Y2hldy8xNDk5OTU1ODc0LTEwOTU0LTEtZ2l0LXNlbmQtZW1haWwtcGJv
-bnppbmlAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0OTk5NTg5MzIt
-MjM4MzktMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hl
-dy8xNDk5OTU4OTMyLTIzODM5LTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8u
-b3JnCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxNzA3MTMxMTAyMzcuNjcxMi0xLWxw
-cm9zZWtAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNzEzMTEwMjM3LjY3MTItMS1scHJvc2Vr
-QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDcxMzE0NDM1Mi4y
-MjEyLTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwNzEzMTQ0MzUyLjIyMTIt
-MS1iZXJyYW5nZUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzA3
-MTMxNTMwMjguMzEwNjUtMS1lbDEzNjM1QG1haWwubnR1YS5nciAtPiBwYXRjaGV3LzIwMTcwNzEz
-MTUzMDI4LjMxMDY1LTEtZWwxMzYzNUBtYWlsLm50dWEuZ3IKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0Jwo2ZDY3Y2YzIHRyYW5zbGF0ZS1hbGw6IHJlbW92ZSByZWR1bmRhbnQgIXRjZ19l
-bmFibGVkIGNoZWNrIGluIGR1bXBfZXhlY19pbmZvCjQ2YjkyYTkgdmw6IGZpeCBicmVha2FnZSBv
-ZiAtdGItc2l6ZQo0YzdkZTM0IG5iZDogSW1wbGVtZW50IE5CRF9JTkZPX0JMT0NLX1NJWkUgb24g
-Y2xpZW50CjI4MGRhMTkgbmJkOiBJbXBsZW1lbnQgTkJEX0lORk9fQkxPQ0tfU0laRSBvbiBzZXJ2
-ZXIKOGFiZTJjZSBuYmQ6IEltcGxlbWVudCBOQkRfT1BUX0dPIG9uIGNsaWVudAowYTM5N2JlIG5i
-ZDogSW1wbGVtZW50IE5CRF9PUFRfR08gb24gc2VydmVyCjJiYmFkM2YgbmJkOiBSZWZhY3RvciBy
-ZXBseSB0byBOQkRfT1BUX0VYUE9SVF9OQU1FCjQ3NGVmMDAgbmJkOiBTaW1wbGlmeSB0cmFjZSBv
-ZiBjbGllbnQgZmxhZ3MgaW4gbmVnb3RpYXRpb24KMDgwZjU2OSBuYmQ6IEV4cG9zZSBhbmQgZGVi
-dWcgbW9yZSBOQkQgY29uc3RhbnRzCmM1ZWE5MTYgbmJkOiBEb24ndCBib3RoZXIgdHJhY2luZyBh
-biBOQkRfT1BUX0FCT1JUIHJlc3BvbnNlIGZhaWx1cmUKODkyMTM0OCBuYmQ6IENyZWF0ZSBzdHJ1
-Y3QgZm9yIHRyYWNraW5nIGV4cG9ydCBpbmZvCmMzNmVjOWIgbWVtb3J5L2lvbW11OiBpbnRyb2R1
-Y2UgSU9NTVVNZW1vcnlSZWdpb25DbGFzcwo5ODk3YjkxIG1lbW9yeS9pb21tdTogUU9NJ2Z5IElP
-TU1VIE1lbW9yeVJlZ2lvbgplYjFhNzVjIGNoYXJkZXY6IGZpeCBwYXJhbGxlbCBkZXZpY2UgY2Fu
-J3QgYmUgcmVjb25uZWN0CmE4NjI4NjAgZ2Ric3R1YjogZG9uJ3QgZmFpbCBvbiB2Q29udDsgQzA0
-OjA7IGMgcGFja2V0cwpkNDdiZDQ2IHFvbS9jcHU6IHJlbW92ZSBob3N0X3RpZCBmaWVsZAo0MjIw
-YTg1IGdkYnN0dWI6IHJlbmFtZSBjcHVfaW5kZXggLT4gY3B1X2dkYl9pbmRleAoyODEwMzQxIGdk
-YnN0dWI6IG1vZGVybmlzZSBERUJVR19HREIKM2I3Y2U2MyBtdHRjZy9pMzg2OiBQYXRjaCBpbnN0
-cnVjdGlvbiB1c2luZyBhc3luY19zYWZlXyogZnJhbWV3b3JrCmJkYmNhNjkgUmV2ZXJ0ICJleGVj
-LmM6IEZpeCBicmVha3BvaW50IGludmFsaWRhdGlvbiByYWNlIgpkMDYwZDBlIGV4ZWM6IHVzZSBx
-ZW11X3JhbV9wdHJfbGVuZ3RoIHRvIGFjY2VzcyBndWVzdCByYW0KYzc2YzNiYiBzZXJpYWw6IGNo
-YXJkZXYgaG90c3dhcCBzdXBwb3J0Cjc5Nzk2ZDQgc2VyaWFsOiBtb3ZlIFRJT0NNIHVwZGF0ZSB0
-byBhIHNlcGFyYXRlIGZ1bmN0aW9uCmJlMDhmY2YgdmlydGlvLWNvbnNvbGU6IGNoYXJkZXYgaG90
-c3dhcCBzdXBwb3J0CmU1MjJiZGEgaG1wOiBhZGQgaG1wIGFuYWxvZ3VlIGZvciBxbXAtY2hhcmRl
-di1jaGFuZ2UKNjRjZTQ3ZSB0ZXN0LWNoYXI6IGFkZCBob3Rzd2FwIHRlc3QKZTU0ZmNhNiB0ZXN0
-LWNoYXI6IHNwbGl0IGNoYXJfZmlsZV90ZXN0CmQ5NzEwNjUgdGVzdC1jaGFyOiBzcGxpdCBjaGFy
-X3VkcF90ZXN0CmI4MjNhM2IgdGVzdC1jaGFyOiBkZXN0cm95IGNoYXJkZXYtdWRwIGFmdGVyIHRl
-c3QKZTdiYTdmNSBjaGFyOiBhdm9pZCBjaGFyZGV2aWNlIGRpcmVjdCBhY2Nlc3MKNDYzOGI3NCBj
-aGFyOiBmb3JiaWQgZGlyZWN0IGNoYXJkZXZpY2UgYWNjZXNzIGZvciBob3Rzd2FwIGRldmljZXMK
-ZjU2MDQ5OCBjaGFyOiBjaGFyZGV2aWNlIGhvdHN3YXAKOTE5Zjg2YyBjaGFyOiBhZGQgYmFja2Vu
-ZCBob3Rzd2FwIGhhbmRsZXIKZDAwYTU4YSBjaGFyOiBtb3ZlIFFlbXVPcHRzLT5DaGFyZGV2QmFj
-a2VuZCB0cmFuc2xhdGlvbiB0byBhIHNlcGFyYXRlIGZ1bmMKOTdkN2I0OCBjaGFyZGV2OiBibG9j
-ayBkdXJpbmcgc3luYyByZWFkCmU1YjFkZTQgTUFJTlRBSU5FUlM6IGFkZCBlbnRyeSBmb3IgIlVu
-aW1wbGVtZW50ZWQiIGRldmljZQpkNTUxNzljIE1BSU5UQUlORVJTOiB1cGRhdGUgVENJIGVudHJ5
-CmU2YjUyMjcgTUFJTlRBSU5FUlM6IHVwZGF0ZSBYZW4gZW50cmllcwpiMzVlNzI3IE1BSU5UQUlO
-RVJTOiB1cGRhdGUgS1ZNIGVudHJpZXMKNGIyZWU3MCBNQUlOVEFJTkVSUzogdXBkYXRlIFRDRyBl
-bnRyaWVzCmNkMjY2ODQgYnVpbGQ6IGFkZCAtV2V4cGFuc2lvbi10by1kZWZpbmVkCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQxOiBidWlsZDogYWRkIC1XZXhwYW5zaW9u
-LXRvLWRlZmluZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80MTogTUFJTlRBSU5FUlM6IHVwZGF0ZSBU
-Q0cgZW50cmllcy4uLgpDaGVja2luZyBQQVRDSCAzLzQxOiBNQUlOVEFJTkVSUzogdXBkYXRlIEtW
-TSBlbnRyaWVzLi4uCkNoZWNraW5nIFBBVENIIDQvNDE6IE1BSU5UQUlORVJTOiB1cGRhdGUgWGVu
-IGVudHJpZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS80MTogTUFJTlRBSU5FUlM6IHVwZGF0ZSBUQ0kg
-ZW50cnkuLi4KQ2hlY2tpbmcgUEFUQ0ggNi80MTogTUFJTlRBSU5FUlM6IGFkZCBlbnRyeSBmb3Ig
-IlVuaW1wbGVtZW50ZWQiIGRldmljZS4uLgpDaGVja2luZyBQQVRDSCA3LzQxOiBjaGFyZGV2OiBi
-bG9jayBkdXJpbmcgc3luYyByZWFkLi4uCkNoZWNraW5nIFBBVENIIDgvNDE6IGNoYXI6IG1vdmUg
-UWVtdU9wdHMtPkNoYXJkZXZCYWNrZW5kIHRyYW5zbGF0aW9uIHRvIGEgc2VwYXJhdGUgZnVuYy4u
-LgpDaGVja2luZyBQQVRDSCA5LzQxOiBjaGFyOiBhZGQgYmFja2VuZCBob3Rzd2FwIGhhbmRsZXIu
-Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcyNTogRklMRTogdGFyZ2V0L3h0
-ZW5zYS94dGVuc2Etc2VtaS5jOjE2MToKKyAgICBxZW11X2Nocl9mZV9zZXRfaGFuZGxlcnMoJmNv
-bnNvbGUsIE5VTEwsIE5VTEwsIE5VTEwsIE5VTEwsIE5VTEwsIE5VTEwsIHRydWUpOwoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NDQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxMC80MTogY2hhcjogY2hhcmRl
-dmljZSBob3Rzd2FwLi4uCkNoZWNraW5nIFBBVENIIDExLzQxOiBjaGFyOiBmb3JiaWQgZGlyZWN0
-IGNoYXJkZXZpY2UgYWNjZXNzIGZvciBob3Rzd2FwIGRldmljZXMuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTIvNDE6IGNoYXI6IGF2b2lkIGNoYXJkZXZpY2UgZGlyZWN0IGFjY2Vzcy4uLgpDaGVja2luZyBQ
-QVRDSCAxMy80MTogdGVzdC1jaGFyOiBkZXN0cm95IGNoYXJkZXYtdWRwIGFmdGVyIHRlc3QuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTQvNDE6IHRlc3QtY2hhcjogc3BsaXQgY2hhcl91ZHBfdGVzdC4uLgpD
-aGVja2luZyBQQVRDSCAxNS80MTogdGVzdC1jaGFyOiBzcGxpdCBjaGFyX2ZpbGVfdGVzdC4uLgpD
-aGVja2luZyBQQVRDSCAxNi80MTogdGVzdC1jaGFyOiBhZGQgaG90c3dhcCB0ZXN0Li4uCkNoZWNr
-aW5nIFBBVENIIDE3LzQxOiBobXA6IGFkZCBobXAgYW5hbG9ndWUgZm9yIHFtcC1jaGFyZGV2LWNo
-YW5nZS4uLgpDaGVja2luZyBQQVRDSCAxOC80MTogdmlydGlvLWNvbnNvbGU6IGNoYXJkZXYgaG90
-c3dhcCBzdXBwb3J0Li4uCkNoZWNraW5nIFBBVENIIDE5LzQxOiBzZXJpYWw6IG1vdmUgVElPQ00g
-dXBkYXRlIHRvIGEgc2VwYXJhdGUgZnVuY3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvNDE6IHNl
-cmlhbDogY2hhcmRldiBob3Rzd2FwIHN1cHBvcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvNDE6IGV4
-ZWM6IHVzZSBxZW11X3JhbV9wdHJfbGVuZ3RoIHRvIGFjY2VzcyBndWVzdCByYW0uLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjIvNDE6IFJldmVydCAiZXhlYy5jOiBGaXggYnJlYWtwb2ludCBpbnZhbGlkYXRp
-b24gcmFjZSIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvNDE6IG10dGNnL2kzODY6IFBhdGNoIGluc3Ry
-dWN0aW9uIHVzaW5nIGFzeW5jX3NhZmVfKiBmcmFtZXdvcmsuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQv
-NDE6IGdkYnN0dWI6IG1vZGVybmlzZSBERUJVR19HREIuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvNDE6
-IGdkYnN0dWI6IHJlbmFtZSBjcHVfaW5kZXggLT4gY3B1X2dkYl9pbmRleC4uLgpDaGVja2luZyBQ
-QVRDSCAyNi80MTogcW9tL2NwdTogcmVtb3ZlIGhvc3RfdGlkIGZpZWxkLi4uCkNoZWNraW5nIFBB
-VENIIDI3LzQxOiBnZGJzdHViOiBkb24ndCBmYWlsIG9uIHZDb250OyBDMDQ6MDsgYyBwYWNrZXRz
-Li4uCkNoZWNraW5nIFBBVENIIDI4LzQxOiBjaGFyZGV2OiBmaXggcGFyYWxsZWwgZGV2aWNlIGNh
-bid0IGJlIHJlY29ubmVjdC4uLgpDaGVja2luZyBQQVRDSCAyOS80MTogbWVtb3J5L2lvbW11OiBR
-T00nZnkgSU9NTVUgTWVtb3J5UmVnaW9uLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJyonIChjdHg6V3hPKQojMTMzOiBGSUxFOiBody9kbWEvcmM0MDMwLmM6NzIwOgorRGV2
-aWNlU3RhdGUgKnJjNDAzMF9pbml0KHJjNDAzMF9kbWEgKipkbWFzLCBJT01NVU1lbW9yeVJlZ2lv
-biAqKmRtYV9tcikKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzcyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMwLzQxOiBtZW1vcnkvaW9t
-bXU6IGludHJvZHVjZSBJT01NVU1lbW9yeVJlZ2lvbkNsYXNzLi4uCkNoZWNraW5nIFBBVENIIDMx
-LzQxOiBuYmQ6IENyZWF0ZSBzdHJ1Y3QgZm9yIHRyYWNraW5nIGV4cG9ydCBpbmZvLi4uCkNoZWNr
-aW5nIFBBVENIIDMyLzQxOiBuYmQ6IERvbid0IGJvdGhlciB0cmFjaW5nIGFuIE5CRF9PUFRfQUJP
-UlQgcmVzcG9uc2UgZmFpbHVyZS4uLgpDaGVja2luZyBQQVRDSCAzMy80MTogbmJkOiBFeHBvc2Ug
-YW5kIGRlYnVnIG1vcmUgTkJEIGNvbnN0YW50cy4uLgpDaGVja2luZyBQQVRDSCAzNC80MTogbmJk
-OiBTaW1wbGlmeSB0cmFjZSBvZiBjbGllbnQgZmxhZ3MgaW4gbmVnb3RpYXRpb24uLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzUvNDE6IG5iZDogUmVmYWN0b3IgcmVwbHkgdG8gTkJEX09QVF9FWFBPUlRfTkFN
-RS4uLgpDaGVja2luZyBQQVRDSCAzNi80MTogbmJkOiBJbXBsZW1lbnQgTkJEX09QVF9HTyBvbiBz
-ZXJ2ZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMzcvNDE6IG5iZDogSW1wbGVtZW50IE5CRF9PUFRfR08g
-b24gY2xpZW50Li4uCkNoZWNraW5nIFBBVENIIDM4LzQxOiBuYmQ6IEltcGxlbWVudCBOQkRfSU5G
-T19CTE9DS19TSVpFIG9uIHNlcnZlci4uLgpDaGVja2luZyBQQVRDSCAzOS80MTogbmJkOiBJbXBs
-ZW1lbnQgTkJEX0lORk9fQkxPQ0tfU0laRSBvbiBjbGllbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDAv
-NDE6IHZsOiBmaXggYnJlYWthZ2Ugb2YgLXRiLXNpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggNDEvNDE6
-IHRyYW5zbGF0ZS1hbGw6IHJlbW92ZSByZWR1bmRhbnQgIXRjZ19lbmFibGVkIGNoZWNrIGluIGR1
-bXBfZXhlY19pbmZvLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hi
+
+On Wed, Jul 12, 2017 at 8:55 AM Peter Xu <peterx@redhat.com> wrote:
+
+> We have merely all the stuff, but this one is missing. Add it in.
+>
+> Am going to use this new helper for MigrationParameters fields, since
+> most of them are int64_t.
+>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+> CC: Peter Xu <peterx@redhat.com>
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Marcel Apfelbaum <marcel@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/core/qdev-properties.c    | 32 ++++++++++++++++++++++++++++++++
+>  include/hw/qdev-properties.h |  3 +++
+>  2 files changed, 35 insertions(+)
+>
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index f11d578..70e14df 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -403,6 +403,31 @@ static void set_uint64(Object *obj, Visitor *v, cons=
+t
+> char *name,
+>      visit_type_uint64(v, name, ptr, errp);
+>  }
+>
+> +static void get_int64(Object *obj, Visitor *v, const char *name,
+> +                      void *opaque, Error **errp)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    Property *prop =3D opaque;
+> +    int64_t *ptr =3D qdev_get_prop_ptr(dev, prop);
+> +
+> +    visit_type_int64(v, name, ptr, errp);
+> +}
+> +
+> +static void set_int64(Object *obj, Visitor *v, const char *name,
+> +                      void *opaque, Error **errp)
+> +{
+> +    DeviceState *dev =3D DEVICE(obj);
+> +    Property *prop =3D opaque;
+> +    int64_t *ptr =3D qdev_get_prop_ptr(dev, prop);
+> +
+> +    if (dev->realized) {
+> +        qdev_prop_set_after_realize(dev, name, errp);
+> +        return;
+> +    }
+> +
+> +    visit_type_int64(v, name, ptr, errp);
+> +}
+> +
+>  PropertyInfo qdev_prop_uint64 =3D {
+>      .name  =3D "uint64",
+>      .get   =3D get_uint64,
+> @@ -410,6 +435,13 @@ PropertyInfo qdev_prop_uint64 =3D {
+>      .set_default_value =3D set_default_value_uint,
+>  };
+>
+> +PropertyInfo qdev_prop_int64 =3D {
+> +    .name  =3D "int64",
+> +    .get   =3D get_int64,
+> +    .set   =3D set_int64,
+> +    .set_default_value =3D set_default_value_int,
+> +};
+> +
+>  /* --- string --- */
+>
+>  static void release_string(Object *obj, const char *name, void *opaque)
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 0604c33..2939614 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -13,6 +13,7 @@ extern PropertyInfo qdev_prop_uint16;
+>  extern PropertyInfo qdev_prop_uint32;
+>  extern PropertyInfo qdev_prop_int32;
+>  extern PropertyInfo qdev_prop_uint64;
+> +extern PropertyInfo qdev_prop_int64;
+>  extern PropertyInfo qdev_prop_size;
+>  extern PropertyInfo qdev_prop_string;
+>  extern PropertyInfo qdev_prop_chr;
+> @@ -127,6 +128,8 @@ extern PropertyInfo qdev_prop_arraylen;
+>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_int32, int32_t)
+>  #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
+>      DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
+> +#define DEFINE_PROP_INT64(_n, _s, _f, _d)                      \
+> +    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_int64, int64_t)
+>
+
+
+Make it SIGNED, with that:
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
+
+>  #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
+>      DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_size, uint64_t)
+>  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
