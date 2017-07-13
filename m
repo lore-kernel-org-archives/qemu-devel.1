@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tn@semihalf.com>) id 1dVcnd-0000nQ-8j
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:00:59 -0400
+	(envelope-from <tn@semihalf.com>) id 1dVdhx-0003Ep-MA
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tn@semihalf.com>) id 1dVcnY-0002NN-LK
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:00:53 -0400
-Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:32977)
+	(envelope-from <tn@semihalf.com>) id 1dVdhv-0002jD-3l
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:59:05 -0400
+Received: from mail-lf0-f52.google.com ([209.85.215.52]:35564)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tn@semihalf.com>) id 1dVcnY-0002Cr-6D
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:00:48 -0400
-Received: by mail-lf0-x22c.google.com with SMTP id z78so35432088lff.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:00:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tn@semihalf.com>) id 1dVdhu-0002iy-Ss
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:59:03 -0400
+Received: by mail-lf0-f52.google.com with SMTP id b207so36180225lfg.2
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:59:02 -0700 (PDT)
 References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
 	<1499633493-19865-3-git-send-email-eric.auger@redhat.com>
 From: Tomasz Nowicki <tn@semihalf.com>
-Message-ID: <04b06baa-75d8-291b-ef6e-89bbb89b3fd1@semihalf.com>
-Date: Thu, 13 Jul 2017 14:00:22 +0200
+Message-ID: <448765a4-1ffc-f27b-fcb1-61445fd785d4@semihalf.com>
+Date: Thu, 13 Jul 2017 14:57:54 +0200
 MIME-Version: 1.0
 In-Reply-To: <1499633493-19865-3-git-send-email-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -57,36 +57,32 @@ On 09.07.2017 22:51, Eric Auger wrote:
 [...]
 
 > +
-> +/*****************************
-> + *  Register Access Primitives
-> + *****************************/
-> +
-> +static inline void smmu_write64_reg(SMMUV3State *s, uint32_t addr, uint64_t val)
+> +static void smmu_update_qreg(SMMUV3State *s, SMMUQueue *q, hwaddr reg,
+> +                             uint32_t off, uint64_t val, unsigned size)
 > +{
-> +    addr >>= 2;
-> +    s->regs[addr] = val & 0xFFFFFFFFULL;
-> +    s->regs[addr + 1] = val & ~0xFFFFFFFFULL;
-> +}
-> +
-> +static inline void smmu_write_reg(SMMUV3State *s, uint32_t addr, uint64_t val)
-> +{
-> +    s->regs[addr >> 2] = val;
-> +}
-> +
-> +static inline uint32_t smmu_read_reg(SMMUV3State *s, uint32_t addr)
-> +{
-> +    return s->regs[addr >> 2];
-> +}
-> +
-> +static inline uint64_t smmu_read64_reg(SMMUV3State *s, uint32_t addr)
-> +{
-> +    addr >>= 2;
-> +    return s->regs[addr] | (s->regs[addr + 1] << 32);
+> +   if (size == 8 && off == 0) {
+> +        smmu_write64_reg(s, reg, val);
 
-To be consistent with smmu_write64_reg() we should not shift here second 
-half of register, instead simply:
+Based on my observation we never get here.
 
-return s->regs[addr] | s->regs[addr + 1];
+If I read the code correctly, 
+memory_region_dispatch_{write|read}()->memory_region_{write|read}_accessor() 
+will cut all 8-bytes accesses into 4-bytes slices. However, this makes 
+my SMMUv3 register handling happy:
+
+  static const MemoryRegionOps smmu_mem_ops = {
+      .read = smmu_read_mmio,
+      .write = smmu_write_mmio,
+      .endianness = DEVICE_LITTLE_ENDIAN,
+      .valid = {
+          .min_access_size = 4,
+          .max_access_size = 8,
+      },
++    .impl = {
++        .min_access_size = 4,
++	.max_access_size = 8,
++    },
+  };
 
 Thanks,
 Tomasz
