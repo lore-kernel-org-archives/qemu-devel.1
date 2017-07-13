@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVgMB-0006Gi-MC
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVgMK-0006an-5b
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVgMA-0006N0-EH
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVgMI-0006SA-Ty
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:56 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 13 Jul 2017 10:47:06 -0500
-Message-Id: <20170713154711.32374-19-eblake@redhat.com>
+Date: Thu, 13 Jul 2017 10:47:07 -0500
+Message-Id: <20170713154711.32374-20-eblake@redhat.com>
 In-Reply-To: <20170713154711.32374-1-eblake@redhat.com>
 References: <20170713154711.32374-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 18/23] qemu-img: Change compare_sectors() to
- be byte-based
+Subject: [Qemu-devel] [PATCH v3 19/23] qemu-img: Change img_rebase() to be
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +24,178 @@ To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>
 
 In the continuing quest to make more things byte-based, change
-compare_sectors(), renaming it to compare_buffers() in the
-process.  Note that one caller (qemu-img compare) only cares
-about the first difference, while the other (qemu-img rebase)
-cares about how many consecutive sectors have the same
-equal/different status; however, this patch does not bother to
-micro-optimize the compare case to avoid the comparisons of
-sectors beyond the first mismatch.  Both callers are always
-passing valid buffers in, so the initial check for buffer size
-can be turned into an assertion.
+the internal iteration of img_rebase().  We can finally drop the
+TODO assertion added earlier, now that the entire algorithm is
+byte-based and no longer has to shift from bytes to sectors.
+
+Most of the change is mechanical ('num_sectors' becomes 'size',
+'sector' becomes 'offset', 'n' goes from sectors to bytes); some
+of it is also a cleanup (use of MIN() instead of open-coding,
+loss of variable 'count' added earlier in commit d6a644bb).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
 v3: new patch
 ---
- qemu-img.c | 55 +++++++++++++++++++++++++++----------------------------
- 1 file changed, 27 insertions(+), 28 deletions(-)
+ qemu-img.c | 84 +++++++++++++++++++++++++-------------------------------------
+ 1 file changed, 34 insertions(+), 50 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index baf20db..2514193 100644
+index 2514193..3454a97 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -1149,31 +1149,28 @@ static int is_allocated_sectors_min(const uint8_t *buf, int n, int *pnum,
- }
+@@ -3238,70 +3238,58 @@ static int img_rebase(int argc, char **argv)
+      * the image is the same as the original one at any time.
+      */
+     if (!unsafe) {
+-        int64_t num_sectors;
+-        int64_t old_backing_num_sectors;
+-        int64_t new_backing_num_sectors = 0;
+-        uint64_t sector;
+-        int n;
+-        int64_t count;
++        int64_t size;
++        int64_t old_backing_size;
++        int64_t new_backing_size = 0;
++        uint64_t offset;
++        int64_t n;
+         float local_progress = 0;
 
- /*
-- * Compares two buffers sector by sector. Returns 0 if the first sector of both
-- * buffers matches, non-zero otherwise.
-+ * Compares two buffers sector by sector. Returns 0 if the first
-+ * sector of each buffer matches, non-zero otherwise.
-  *
-- * pnum is set to the number of sectors (including and immediately following
-- * the first one) that are known to have the same comparison result
-+ * pnum is set to the sector-aligned size of the buffer prefix that
-+ * has the same matching status as the first sector.
-  */
--static int compare_sectors(const uint8_t *buf1, const uint8_t *buf2, int n,
--    int *pnum)
-+static int compare_buffers(const uint8_t *buf1, const uint8_t *buf2,
-+                           int64_t bytes, int64_t *pnum)
- {
-     bool res;
--    int i;
-+    int64_t i = MIN(bytes, BDRV_SECTOR_SIZE);
+         buf_old = blk_blockalign(blk, IO_BUF_SIZE);
+         buf_new = blk_blockalign(blk, IO_BUF_SIZE);
 
--    if (n <= 0) {
--        *pnum = 0;
--        return 0;
--    }
-+    assert(bytes > 0);
-
--    res = !!memcmp(buf1, buf2, 512);
--    for(i = 1; i < n; i++) {
--        buf1 += 512;
--        buf2 += 512;
-+    res = !!memcmp(buf1, buf2, i);
-+    while (i < bytes) {
-+        int64_t len = MIN(bytes - i, BDRV_SECTOR_SIZE);
-
--        if (!!memcmp(buf1, buf2, 512) != res) {
-+        if (!!memcmp(buf1 + i, buf2 + i, len) != res) {
-             break;
+-        num_sectors = blk_nb_sectors(blk);
+-        if (num_sectors < 0) {
++        size = blk_getlength(blk);
++        if (size < 0) {
+             error_report("Could not get size of '%s': %s",
+-                         filename, strerror(-num_sectors));
++                         filename, strerror(-size));
+             ret = -1;
+             goto out;
          }
-+        i += len;
-     }
+-        old_backing_num_sectors = blk_nb_sectors(blk_old_backing);
+-        if (old_backing_num_sectors < 0) {
++        old_backing_size = blk_getlength(blk_old_backing);
++        if (old_backing_size < 0) {
+             char backing_name[PATH_MAX];
 
-     *pnum = i;
-@@ -1248,7 +1245,7 @@ static int img_compare(int argc, char **argv)
-     int64_t total_sectors;
-     int64_t sector_num = 0;
-     int64_t nb_sectors;
--    int c, pnum;
-+    int c;
-     uint64_t progress_base;
-     bool image_opts = false;
-     bool force_share = false;
-@@ -1430,6 +1427,8 @@ static int img_compare(int argc, char **argv)
-             /* nothing to do */
-         } else if (allocated1 == allocated2) {
-             if (allocated1) {
-+                int64_t pnum;
-+
-                 nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-                 ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
-                                 nb_sectors << BDRV_SECTOR_BITS);
-@@ -1449,11 +1448,11 @@ static int img_compare(int argc, char **argv)
-                     ret = 4;
+             bdrv_get_backing_filename(bs, backing_name, sizeof(backing_name));
+             error_report("Could not get size of '%s': %s",
+-                         backing_name, strerror(-old_backing_num_sectors));
++                         backing_name, strerror(-old_backing_size));
+             ret = -1;
+             goto out;
+         }
+         if (blk_new_backing) {
+-            new_backing_num_sectors = blk_nb_sectors(blk_new_backing);
+-            if (new_backing_num_sectors < 0) {
++            new_backing_size = blk_getlength(blk_new_backing);
++            if (new_backing_size < 0) {
+                 error_report("Could not get size of '%s': %s",
+-                             out_baseimg, strerror(-new_backing_num_sectors));
++                             out_baseimg, strerror(-new_backing_size));
+                 ret = -1;
+                 goto out;
+             }
+         }
+
+-        if (num_sectors != 0) {
+-            local_progress = (float)100 /
+-                (num_sectors / MIN(num_sectors, IO_BUF_SIZE / 512));
++        if (size != 0) {
++            local_progress = (float)100 / (size / MIN(size, IO_BUF_SIZE));
+         }
+
+-        for (sector = 0; sector < num_sectors; sector += n) {
+-
+-            /* How many sectors can we handle with the next read? */
+-            if (sector + (IO_BUF_SIZE / 512) <= num_sectors) {
+-                n = (IO_BUF_SIZE / 512);
+-            } else {
+-                n = num_sectors - sector;
+-            }
++        for (offset = 0; offset < size; offset += n) {
++            /* How many bytes can we handle with the next read? */
++            n = MIN(IO_BUF_SIZE, size - offset);
+
+             /* If the cluster is allocated, we don't need to take action */
+-            ret = bdrv_is_allocated(bs, sector << BDRV_SECTOR_BITS,
+-                                    n << BDRV_SECTOR_BITS, &count);
++            ret = bdrv_is_allocated(bs, offset, n, &n);
+             if (ret < 0) {
+                 error_report("error while reading image metadata: %s",
+                              strerror(-ret));
+                 goto out;
+             }
+-            /* TODO relax this once bdrv_is_allocated does not enforce
+-             * sector alignment */
+-            assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+-            n = count >> BDRV_SECTOR_BITS;
+             if (ret) {
+                 continue;
+             }
+@@ -3310,30 +3298,28 @@ static int img_rebase(int argc, char **argv)
+              * Read old and new backing file and take into consideration that
+              * backing files may be smaller than the COW image.
+              */
+-            if (sector >= old_backing_num_sectors) {
+-                memset(buf_old, 0, n * BDRV_SECTOR_SIZE);
++            if (offset >= old_backing_size) {
++                memset(buf_old, 0, n);
+             } else {
+-                if (sector + n > old_backing_num_sectors) {
+-                    n = old_backing_num_sectors - sector;
++                if (offset + n > old_backing_size) {
++                    n = old_backing_size - offset;
+                 }
+
+-                ret = blk_pread(blk_old_backing, sector << BDRV_SECTOR_BITS,
+-                                buf_old, n << BDRV_SECTOR_BITS);
++                ret = blk_pread(blk_old_backing, offset, buf_old, n);
+                 if (ret < 0) {
+                     error_report("error while reading from old backing file");
                      goto out;
                  }
--                ret = compare_sectors(buf1, buf2, nb_sectors, &pnum);
--                if (ret || pnum != nb_sectors) {
-+                ret = compare_buffers(buf1, buf2,
-+                                      nb_sectors * BDRV_SECTOR_SIZE, &pnum);
-+                if (ret || pnum != nb_sectors * BDRV_SECTOR_SIZE) {
-                     qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
--                            sectors_to_bytes(
--                                ret ? sector_num : sector_num + pnum));
-+                            sectors_to_bytes(sector_num) + (ret ? 0 : pnum));
-                     ret = 1;
-                     goto out;
+             }
+
+-            if (sector >= new_backing_num_sectors || !blk_new_backing) {
+-                memset(buf_new, 0, n * BDRV_SECTOR_SIZE);
++            if (offset >= new_backing_size || !blk_new_backing) {
++                memset(buf_new, 0, n);
+             } else {
+-                if (sector + n > new_backing_num_sectors) {
+-                    n = new_backing_num_sectors - sector;
++                if (offset + n > new_backing_size) {
++                    n = new_backing_size - offset;
                  }
-@@ -3344,16 +3343,16 @@ static int img_rebase(int argc, char **argv)
+
+-                ret = blk_pread(blk_new_backing, sector << BDRV_SECTOR_BITS,
+-                                buf_new, n << BDRV_SECTOR_BITS);
++                ret = blk_pread(blk_new_backing, offset, buf_new, n);
+                 if (ret < 0) {
+                     error_report("error while reading from new backing file");
+                     goto out;
+@@ -3343,15 +3329,13 @@ static int img_rebase(int argc, char **argv)
              /* If they differ, we need to write to the COW file */
              uint64_t written = 0;
 
--            while (written < n) {
--                int pnum;
-+            while (written < n * BDRV_SECTOR_SIZE) {
-+                int64_t pnum;
+-            while (written < n * BDRV_SECTOR_SIZE) {
++            while (written < n) {
+                 int64_t pnum;
 
--                if (compare_sectors(buf_old + written * 512,
--                    buf_new + written * 512, n - written, &pnum))
-+                if (compare_buffers(buf_old + written,
-+                                    buf_new + written,
-+                                    n * BDRV_SECTOR_SIZE - written, &pnum))
+-                if (compare_buffers(buf_old + written,
+-                                    buf_new + written,
+-                                    n * BDRV_SECTOR_SIZE - written, &pnum))
++                if (compare_buffers(buf_old + written, buf_new + written,
++                                    n - written, &pnum))
                  {
-                     ret = blk_pwrite(blk,
--                                     (sector + written) << BDRV_SECTOR_BITS,
--                                     buf_old + written * 512,
--                                     pnum << BDRV_SECTOR_BITS, 0);
-+                                     (sector << BDRV_SECTOR_BITS) + written,
-+                                     buf_old + written, pnum, 0);
+-                    ret = blk_pwrite(blk,
+-                                     (sector << BDRV_SECTOR_BITS) + written,
++                    ret = blk_pwrite(blk, offset + written,
+                                      buf_old + written, pnum, 0);
                      if (ret < 0) {
                          error_report("Error while writing to COW image: %s",
-                             strerror(-ret));
 -- 
 2.9.4
