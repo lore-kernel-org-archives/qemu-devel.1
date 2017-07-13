@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVawY-0003ye-CJ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:01:59 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVawf-00043K-JZ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVawX-0003d7-7d
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:01:58 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVawa-0003ep-0j
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:02:05 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Thu, 13 Jul 2017 13:01:17 +0300
-Message-Id: <20170713100117.11961-5-el13635@mail.ntua.gr>
-In-Reply-To: <20170713100117.11961-1-el13635@mail.ntua.gr>
-References: <20170713100117.11961-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v5 4/4] block: add default implementations for
- bdrv_co_get_block_status()
+Date: Thu, 13 Jul 2017 13:01:13 +0300
+Message-Id: <20170713100117.11961-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v5 0/4] block: Block driver callbacks fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,181 +20,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-bdrv_co_get_block_status_from_file() and
-bdrv_co_get_block_status_from_backing() set *file to bs->file and
-bs->backing respectively, so that bdrv_co_get_block_status() can recurse
-to them. Future block drivers won't have to duplicate code to implement
-this.
+This series makes implementing some of the bdrv_* callbacks easier for block
+filters by passing requests to bs->file if bs->drv doesn't implement it instead
+of failing, and adding default bdrv_co_get_block_status() implementations.
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/blkdebug.c          | 12 +-----------
+This is based against Kevin Wolf's block branch, commit
+da4bd74d2450ab72a7c26bbabb10c6a287dd043e
+
+v5:
+  rebase against ced1484322 of https://github.com/XanClic/qemu.git block to fix
+  apply conflicts
+  add suggested commit message in block: remove unused bdrv_media_changed
+  add is_filter implication in commit message of block: remove bdrv_truncate
+  callback in blkdebug
+
+v4:
+  forward only for block filters
+  new patch: remove bdrv_media_changed
+  dropped commit `block: Use defaults of bdrv_* callbacks in raw`, since raw is
+  not a filter driver and is incompatible with the changes.
+
+v3:
+  minor changes by Eric Blake's suggestion
+  new patch: remove bdrv_truncate method from blkdebug
+
+v2:
+  do not pass to bs->file if bs->drv is NULL
+  move bs->file check outside of bdrv_inc_in_flight() area in bdrv_co_ioctl()
+  new patch: remove duplicate code from block/raw-format.c
+
+Manos Pitsidianakis (4):
+  block: pass bdrv_* methods to bs->file by default in block filters
+  block: remove unused bdrv_media_changed
+  block: remove bdrv_truncate callback in blkdebug
+  block: add default implementations for bdrv_co_get_block_status()
+
+ block.c                   | 35 +++++++++++++++++++----------------
+ block/blkdebug.c          | 20 ++------------------
  block/commit.c            | 12 +-----------
  block/io.c                | 26 ++++++++++++++++++++++++++
  block/mirror.c            | 12 +-----------
- include/block/block_int.h | 18 ++++++++++++++++++
- 5 files changed, 47 insertions(+), 33 deletions(-)
+ block/raw-format.c        |  6 ------
+ include/block/block.h     |  1 -
+ include/block/block_int.h | 25 +++++++++++++++++++++++--
+ 8 files changed, 72 insertions(+), 65 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 91ffd1fe12..775c464b4e 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -641,16 +641,6 @@ static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
-     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
- }
- 
--static int64_t coroutine_fn blkdebug_co_get_block_status(
--    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
--    BlockDriverState **file)
--{
--    *pnum = nb_sectors;
--    *file = bs->file->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
--        (sector_num << BDRV_SECTOR_BITS);
--}
--
- static void blkdebug_close(BlockDriverState *bs)
- {
-     BDRVBlkdebugState *s = bs->opaque;
-@@ -920,7 +910,7 @@ static BlockDriver bdrv_blkdebug = {
-     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
-     .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
-     .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
--    .bdrv_co_get_block_status = blkdebug_co_get_block_status,
-+    .bdrv_co_get_block_status = bdrv_co_get_block_status_from_file,
- 
-     .bdrv_debug_event           = blkdebug_debug_event,
-     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
-diff --git a/block/commit.c b/block/commit.c
-index 13143608f8..f646c13000 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -242,16 +242,6 @@ static int coroutine_fn bdrv_commit_top_preadv(BlockDriverState *bs,
-     return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
- }
- 
--static int64_t coroutine_fn bdrv_commit_top_get_block_status(
--    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
--    BlockDriverState **file)
--{
--    *pnum = nb_sectors;
--    *file = bs->backing->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
--           (sector_num << BDRV_SECTOR_BITS);
--}
--
- static void bdrv_commit_top_refresh_filename(BlockDriverState *bs, QDict *opts)
- {
-     bdrv_refresh_filename(bs->backing->bs);
-@@ -277,7 +267,7 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
- static BlockDriver bdrv_commit_top = {
-     .format_name                = "commit_top",
-     .bdrv_co_preadv             = bdrv_commit_top_preadv,
--    .bdrv_co_get_block_status   = bdrv_commit_top_get_block_status,
-+    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
-     .bdrv_close                 = bdrv_commit_top_close,
-     .bdrv_child_perm            = bdrv_commit_top_child_perm,
-diff --git a/block/io.c b/block/io.c
-index b413727524..797109fcfd 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1690,6 +1690,32 @@ typedef struct BdrvCoGetBlockStatusData {
-     bool done;
- } BdrvCoGetBlockStatusData;
- 
-+int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
-+                                                        int64_t sector_num,
-+                                                        int nb_sectors,
-+                                                        int *pnum,
-+                                                        BlockDriverState **file)
-+{
-+    assert(bs->file && bs->file->bs);
-+    *pnum = nb_sectors;
-+    *file = bs->file->bs;
-+    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
-+           (sector_num << BDRV_SECTOR_BITS);
-+}
-+
-+int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
-+                                                           int64_t sector_num,
-+                                                           int nb_sectors,
-+                                                           int *pnum,
-+                                                           BlockDriverState **file)
-+{
-+    assert(bs->backing && bs->backing->bs);
-+    *pnum = nb_sectors;
-+    *file = bs->backing->bs;
-+    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
-+           (sector_num << BDRV_SECTOR_BITS);
-+}
-+
- /*
-  * Returns the allocation status of the specified sectors.
-  * Drivers not implementing the functionality are assumed to not support
-diff --git a/block/mirror.c b/block/mirror.c
-index 8583b764a0..499fcc3ea3 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1059,16 +1059,6 @@ static int coroutine_fn bdrv_mirror_top_flush(BlockDriverState *bs)
-     return bdrv_co_flush(bs->backing->bs);
- }
- 
--static int64_t coroutine_fn bdrv_mirror_top_get_block_status(
--    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnum,
--    BlockDriverState **file)
--{
--    *pnum = nb_sectors;
--    *file = bs->backing->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
--           (sector_num << BDRV_SECTOR_BITS);
--}
--
- static int coroutine_fn bdrv_mirror_top_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int bytes, BdrvRequestFlags flags)
- {
-@@ -1115,7 +1105,7 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
-     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
-     .bdrv_co_flush              = bdrv_mirror_top_flush,
--    .bdrv_co_get_block_status   = bdrv_mirror_top_get_block_status,
-+    .bdrv_co_get_block_status   = bdrv_co_get_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_close                 = bdrv_mirror_top_close,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index afdebe7c52..3d7b9f3402 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -964,6 +964,24 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                uint64_t perm, uint64_t shared,
-                                uint64_t *nperm, uint64_t *nshared);
- 
-+/*
-+ * Default implementation for drivers to pass bdrv_co_get_block_status() to
-+ * their file.
-+ */
-+int64_t coroutine_fn bdrv_co_get_block_status_from_file(BlockDriverState *bs,
-+                                                        int64_t sector_num,
-+                                                        int nb_sectors,
-+                                                        int *pnum,
-+                                                        BlockDriverState **file);
-+/*
-+ * Default implementation for drivers to pass bdrv_co_get_block_status() to
-+ * their backing file.
-+ */
-+int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
-+                                                           int64_t sector_num,
-+                                                           int nb_sectors,
-+                                                           int *pnum,
-+                                                           BlockDriverState **file);
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
- void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
- bool blk_dev_has_removable_media(BlockBackend *blk);
 -- 
 2.11.0
