@@ -1,25 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVcbw-0000RN-Ix
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:48:49 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dVcfX-0002tV-NJ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:52:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVcbv-0006CJ-SL
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:48:48 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38410)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dVcfT-0007dL-RY
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:52:31 -0400
+Received: from mail-lf0-f45.google.com ([209.85.215.45]:34858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVcbv-0006C0-Ir
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:48:47 -0400
-Received: by mail-wm0-x232.google.com with SMTP id f67so23125765wmh.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 04:48:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dVcfT-0007cE-Gp
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:52:27 -0400
+Received: by mail-lf0-f45.google.com with SMTP id b207so35153648lfg.2
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 04:52:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
-References: <1499768952-24990-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Jul 2017 12:48:25 +0100
-Message-ID: <CAFEAcA_csR70+TZKGY=DyoOKjA9dmHuxX5UXMLzX0f_45miybA@mail.gmail.com>
+References: <1499111049-13721-1-git-send-email-mst@redhat.com>
+	<1499111049-13721-20-git-send-email-mst@redhat.com>
+	<CAFEAcA_giHFa-aw=WuuqmVFL+dr7HeD9E1o=oLszQywJbAd0wA@mail.gmail.com>
+	<7EC3FA95-777F-4F8F-B02D-85FA09BAFC00@skyportsystems.com>
+	<CAFEAcA8-o28j-FvHWz3=nZX_pO=+XOc_6MnmyFWB324+G7Ppqw@mail.gmail.com>
+	<CAFEAcA-ireu_2fW00dX=Z3hu4Jongftab_ysymbJMB0893M4Ww@mail.gmail.com>
+	<20170711220915-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_-hCV2Ogy3BS2RV4_AWYYQDT+fCNChVcz8uKZ8-VxhWA@mail.gmail.com>
+	<273a7da7-2243-171f-e96d-39e8e8031984@redhat.com>
+	<3CA8C399-80D0-4BC8-ACC6-FD72A09D9685@skyportsystems.com>
+	<CAFEAcA8ZiTqAGS01Rtu8Vv9FHKXtUXwfc9mULkCkanQzirB14Q@mail.gmail.com>
+	<06cbc0c4-73bc-d527-a466-de5a05b0641e@redhat.com>
+In-Reply-To: <06cbc0c4-73bc-d527-a466-de5a05b0641e@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 13 Jul 2017 11:51:12 +0000
+Message-ID: <CAJ+F1CJaRE2hAJUxfeqLYi3Bj46E9nRUOdyWxPHbHQS6oDoQEg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] target-arm queue
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 19/21] tests: Add unit tests for the VM
+ Generation ID feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +41,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 11 July 2017 at 11:29, Peter Maydell <peter.maydell@linaro.org> wrote:
-> A surprisingly short target-arm queue, but no point in holding
-> onto these waiting for more code to arrive :-)
+Hi
+
+On Thu, Jul 13, 2017 at 1:32 PM Laszlo Ersek <lersek@redhat.com> wrote:
+
+> On 07/13/17 12:47, Peter Maydell wrote:
+> > On 12 July 2017 at 00:43, Ben Warren <ben@skyportsystems.com> wrote:
+> >> Yes, it=E2=80=99s definitely a setup time problem.  With the values th=
+at are
+> checked
+> >> in, I can=E2=80=99t get it to fail on my setup, but if I wind the numb=
+ers down
+> I see
+> >> the same failure as Peter.  So now we have the ages-old problem of
+> =E2=80=9Cwhat new
+> >> arbitrary value should I use that will not cause false failures but wi=
+ll
+> >> eventually time out=E2=80=9D.
+> >
+> > Empirically, we already have an answer to this, in the form
+> > of the existing code in tests/boot-sector.c, which is used
+> > by both that test and the bios-tables-test.c code to wait
+> > for the BIOS initialization to complete, and which doesn't
+> > cause false test timeouts in practice.
+> >
+> > Can we make this test just use that existing function to
+> > wait for the BIOS to be done, rather than having its own
+> > timeout loop?
 >
-> thanks
-> -- PMM
+> This is incredibly cool. Now that I've looked at "tests/boot-sector.c"
+> (again), I recall having seen it earlier, but I couldn't have remembered
+> it off-hand.
 >
-> The following changes since commit 3d0bf8dfdfebd7f2ae41b6f220444b8047d6b1ee:
+> Perhaps this boot sector code should be factored out and moved to
+> "tests/acpi-utils".
 >
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20170710a' into staging (2017-07-10 18:13:03 +0100)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170711
->
-> for you to fetch changes up to 792dac309c8660306557ba058b8b5a6a75ab3c1f:
->
->   target-arm: v7M: ignore writes to CONTROL.SPSEL from Thread mode (2017-07-11 11:21:26 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * v7M: ignore writes to CONTROL.SPSEL from Thread mode
->  * KVM: Enable in-kernel timers with user space gic
->  * aspeed: Register all watchdogs
->  * hw/misc: Add Exynos4210 Pseudo Random Number Generator
+> Marc-Andr=C3=A9, do you think it would be feasible for the vmcoreinfo uni=
+t
+> test as well? (Which is derived from the vmgenid unit test.)
 >
 
-Applied, thanks.
+It seems likely.
 
--- PMM
+Ben, are you going to work on the fix?
+
+Thanks
+--=20
+Marc-Andr=C3=A9 Lureau
