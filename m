@@ -1,25 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVff6-0004R1-MO
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:04:17 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVfgr-0005x5-2P
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:06:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dVff4-0000UD-27
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:04:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVff3-0000Sl-So
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:04:14 -0400
-Date: Thu, 13 Jul 2017 17:03:58 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170713170358.056a8fcd@gondolin>
-In-Reply-To: <20170713110237.6712-8-lprosek@redhat.com>
-References: <20170713110237.6712-1-lprosek@redhat.com>
-	<20170713110237.6712-8-lprosek@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVfgo-0001NX-D2
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:06:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dVfgo-0001ND-30
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:06:02 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6DF5v3q104481
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 11:05:59 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3pv9gj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 11:05:59 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 13 Jul 2017 11:05:51 -0400
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
+	<20170713142721.3a40e083@gondolin>
+	<1798a9f2-63f0-ab03-11ad-5513d9a90da9@linux.vnet.ibm.com>
+	<20170713144941.GD2121@work-vm>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 13 Jul 2017 17:05:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] virtio-scsi: use virtqueue_error
- for errors with queue context
+In-Reply-To: <20170713144941.GD2121@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 8bit
+Message-Id: <99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +46,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com, stefanha@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Juan Quintela <quintela@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 13 Jul 2017 13:02:36 +0200
-Ladi Prosek <lprosek@redhat.com> wrote:
-
-> virtqueue_error includes queue index in the error output and is preferred
-> for errors that pertain to a virtqueue rather than to the device as a whole.
+On 07/13/2017 04:49 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>>
+>>
+>> On 07/13/2017 02:27 PM, Cornelia Huck wrote:
+>>>> +static void kvm_flic_ais_pre_save(void *opaque)
+>>>> +{
+>>>> +    KVMS390FLICStateMigTmp *tmp = opaque;
+>>>> +    KVMS390FLICState *flic = tmp->parent;
+>>>> +    struct kvm_s390_ais_all ais;
+>>>> +    struct kvm_device_attr attr = {
+>>>> +        .group = KVM_DEV_FLIC_AISM_ALL,
+>>>> +        .addr = (uint64_t)&ais,
+>>>> +        .attr = sizeof(ais),
+>>>> +    };
+>>>> +
+>>>> +    if (ioctl(flic->fd, KVM_GET_DEVICE_ATTR, &attr)) {
+>>>> +        error_report("Failed to retrieve kvm flic ais states");
+>>> There's not much else we can do in that case, is there?
+>>>
+>>
+>> I think this is a very good question! The ioctl should not fail
+>> under any circumstances, but if it does we have a problem.
+>>
+>> Carrying on happily (what we do now) means effectively discarding
+>> ais state. In general just discarding state ain't a good idea.
+>>
+>> In particular it might be OK, but the patch should explain that!
+>>
+>> Regarding what could/should we do in such a case (instead
+>> of discarding state and carrying on happily) I don't know, so
+>> I tend to agree with you regarding 'not much else we can do'.
+>>
+>> Adding Dave and Juan. Maybe they can tell.
 > 
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> ---
->  hw/scsi/virtio-scsi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index d076fe7..a633d51 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -84,7 +84,7 @@ static void virtio_scsi_complete_req(VirtIOSCSIReq *req)
->  
->  static void virtio_scsi_bad_req(VirtIOSCSIReq *req)
->  {
-> -    virtio_error(VIRTIO_DEVICE(req->dev), "wrong size for virtio-scsi headers");
-> +    virtqueue_error(req->vq, "wrong size for virtio-scsi headers");
->      virtqueue_detach_element(req->vq, &req->elem, 0);
->      virtio_scsi_free_req(req);
->  }
+> I keep meaning to make the pre_save give a return value for failure,
+> but it hasn't currently got one.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Would you accept patches for that?
+
+> 
+> You could try something like:
+> 
+>   qemu_file_set_error(migrate_get_current()->to_dst_file, -EINVAL);
+> 
+>   I *think* the migration code should spot that before it finishes
+> but it might carry on for a little while before it does.
+
+I will keep this patch as is, since this is one of the "should not happen"
+cases.
