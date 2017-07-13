@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVSaY-0005Mc-Ty
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:06:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVSdv-0000A3-Nx
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:10:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVSaX-0001xp-KY
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:06:42 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 12 Jul 2017 20:05:55 -0500
-Message-Id: <20170713010555.6769-19-eblake@redhat.com>
-In-Reply-To: <20170713010555.6769-1-eblake@redhat.com>
-References: <20170713010555.6769-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 18/18] dirty-bitmap: Convert internal
- hbitmap size/granularity
+	(envelope-from <dgibson@ozlabs.org>) id 1dVSdr-0004It-OO
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:10:11 -0400
+Date: Thu, 13 Jul 2017 11:09:57 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170713010957.GS4083@umbus.fritz.box>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MdJ3p2aQbVp3YFXz"
+Content-Disposition: inline
+In-Reply-To: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+Subject: Re: [Qemu-devel] [PATCHv2 0/8] spapr: DRC cleanups (part VI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,216 +23,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: mdroth@linux.vnet.ibm.com, groug@kaod.org, danielhb@linux.vnet.ibm.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-Now that all callers are using byte-based interfaces, there's no
-reason for our internal hbitmap to remain with sector-based
-granularity.  It also simplifies our internal scaling, since we
-already know that hbitmap widens requests out to granularity
-boundaries.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+--MdJ3p2aQbVp3YFXz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
-v5: fix bdrv_dirty_bitmap_truncate [John]
-v4: rebase to earlier changes, include serialization, R-b dropped
-v3: no change
-v2: no change
----
- block/dirty-bitmap.c | 61 ++++++++++++++++------------------------------------
- 1 file changed, 18 insertions(+), 43 deletions(-)
+On Wed, Jul 12, 2017 at 03:53:09PM +1000, David Gibson wrote:
+> This sixth set of DRC cleanup patches is a complete rework of DRC
+> state management.  We stop tracking some unnecessary things, and
+> change the basic state representation to a simpler and more robust
+> model.
+>=20
+> Many of the patches in this set "break" migration from earlier git
+> snapshots, but not from any released qemu version.  The previous
+> migration stream format had multiple problems, so better to fix them
+> now, before 2.10 is out.
+>=20
+> Although there are certainly more things that can be improved in the
+> DRC system, with this series we should have a solid foundation for
+> migrating DRCs - the state trasferred is about as minimal and well
+> defined as it's possible to be.
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index b54eed4..0b349f0 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -38,7 +38,7 @@
-  */
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
--    HBitmap *bitmap;            /* Dirty sector bitmap implementation */
-+    HBitmap *bitmap;            /* Dirty bitmap implementation */
-     HBitmap *meta;              /* Meta dirty bitmap */
-     BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
-     char *name;                 /* Optional non-empty unique ID */
-@@ -130,12 +130,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-     }
-     bitmap = g_new0(BdrvDirtyBitmap, 1);
-     bitmap->mutex = &bs->dirty_bitmap_mutex;
--    /*
--     * TODO - let hbitmap track full granularity. For now, it is tracking
--     * only sector granularity, as a shortcut for our iterators.
--     */
--    bitmap->bitmap = hbitmap_alloc(DIV_ROUND_UP(bitmap_size, BDRV_SECTOR_SIZE),
--                                   ctz32(granularity) - BDRV_SECTOR_BITS);
-+    bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(granularity));
-     bitmap->size = bitmap_size;
-     bitmap->name = g_strdup(name);
-     bitmap->disabled = false;
-@@ -314,7 +309,7 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
-     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
-         assert(!bdrv_dirty_bitmap_frozen(bitmap));
-         assert(!bitmap->active_iterators);
--        hbitmap_truncate(bitmap->bitmap, DIV_ROUND_UP(size, BDRV_SECTOR_SIZE));
-+        hbitmap_truncate(bitmap->bitmap, size);
-         bitmap->size = size;
-     }
-     bdrv_dirty_bitmaps_unlock(bs);
-@@ -444,7 +439,7 @@ bool bdrv_get_dirty_locked(BlockDriverState *bs, BdrvDirtyBitmap *bitmap,
-                            int64_t offset)
- {
-     if (bitmap) {
--        return hbitmap_get(bitmap->bitmap, offset >> BDRV_SECTOR_BITS);
-+        return hbitmap_get(bitmap->bitmap, offset);
-     } else {
-         return false;
-     }
-@@ -472,7 +467,7 @@ uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs)
+Thanks for the reviews.  I've made a few tweaks as suggested.  I'm now
+sufficiently confident of the series, that I've merged it into
+ppc-for-2.10.
 
- uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
- {
--    return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
-+    return 1U << hbitmap_granularity(bitmap->bitmap);
- }
+>=20
+> Changes since v1:
+>   * Rebased onto current tree
+>   * Added cleanup to unplug path
+>   * Added restriction of DR-indicator to physical DRCs
+>   * Included revised version of Laurent's patch to correctly handle
+>     things "hot" plugged before incoming migration
+>=20
+> David Gibson (7):
+>   spapr: Remove 'awaiting_allocation' DRC flag
+>   spapr: Simplify unplug path
+>   spapr: Refactor spapr_drc_detach()
+>   spapr: Cleanups relating to DRC awaiting_release field
+>   spapr: Consolidate DRC state variables
+>   spapr: Remove sPAPRConfigureConnectorState sub-structure
+>   spapr: Implement DR-indicator for physical DRCs only
+>=20
+> Laurent Vivier (1):
+>   spapr: Treat devices added before inbound migration as coldplugged
+>=20
+>  hw/ppc/spapr.c             |  89 +++-------
+>  hw/ppc/spapr_drc.c         | 399 ++++++++++++++++++++++++---------------=
+------
+>  hw/ppc/spapr_pci.c         |  17 +-
+>  hw/ppc/trace-events        |   3 +-
+>  include/hw/ppc/spapr_drc.h |  74 ++++++---
+>  5 files changed, 301 insertions(+), 281 deletions(-)
+>=20
 
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap)
-@@ -505,19 +500,16 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
- {
--    return hbitmap_iter_next(&iter->hbi) * BDRV_SECTOR_SIZE;
-+    return hbitmap_iter_next(&iter->hbi);
- }
+--MdJ3p2aQbVp3YFXz
+Content-Type: application/pgp-signature; name="signature.asc"
 
- /* Called within bdrv_dirty_bitmap_lock..unlock */
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes)
- {
--    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
--
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
--    hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                end_sector - (offset >> BDRV_SECTOR_BITS));
-+    hbitmap_set(bitmap->bitmap, offset, bytes);
- }
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
- void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-@@ -532,12 +524,9 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t offset, int64_t bytes)
- {
--    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
--
-     assert(bdrv_dirty_bitmap_enabled(bitmap));
-     assert(!bdrv_dirty_bitmap_readonly(bitmap));
--    hbitmap_reset(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                  end_sector - (offset >> BDRV_SECTOR_BITS));
-+    hbitmap_reset(bitmap->bitmap, offset, bytes);
- }
+iQIcBAEBCAAGBQJZZshjAAoJEGw4ysog2bOSN9AP/RRcMh/L+hq+u7EzX0fmziei
+SLNByl9r6WudERZi55MtQca7AD+jVW00Hloo4Tiy7+5rkgSxLmKL2fB/p0OtJNRE
+iry6iIkKmOvFliUFoOsFjuLpZ5B7hURIBOq6jmKvbts4crw2R8aw/hgvYJdSaknp
+1n+4NZ5AfHraGuDE2Fsp1UIbNr8j6Uq82VkLJIxGdSrDJU4FmLW9c0fna3fxfKiO
+9rD1S4h1y7x8nQv1vs2gd739LCCPxWHVOX+4WLxTymmHDKVxE1Zzld1eW8HX3Fn7
+T0lTnuI6aA4rf+FP7hGEEu26AbjmSRn2egm2+7eEffv8du/nccaiKcT/0lQdKypJ
+58jRVkbWaJTWjD/jv6FtQte48y2VfFWRJ+epl4UAALRNNapXeTTkcKYyWXFb4MCs
+m3mZhBSQdCvE0Qb7WsRX3VQCwF3cXO5QlMQ3zGbyhUEF2hLnPX6REp29NPSfxfAp
+REftMGXdp/STxg4mnqUO7I076pnLZnqNocPAKkXBPm23ANpxJjfHnE/P9lL18Qg4
+EkZU04Rn4A405ijP+4dxODXHtumbolfjx8Y+2ek4pLKNaUTcBp+eDQIbYeblb/gS
+sRUiZU0GYb3DWc4y8/Q08DHlln5rGvT0vxo41EipDJtjBH77wnJ6J3Dbo+NL52Rk
+ERDONcmiFGXUkWpISSZG
+=/x69
+-----END PGP SIGNATURE-----
 
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-@@ -557,8 +546,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
-         hbitmap_reset_all(bitmap->bitmap);
-     } else {
-         HBitmap *backup = bitmap->bitmap;
--        bitmap->bitmap = hbitmap_alloc(DIV_ROUND_UP(bitmap->size,
--                                                    BDRV_SECTOR_SIZE),
-+        bitmap->bitmap = hbitmap_alloc(bitmap->size,
-                                        hbitmap_granularity(backup));
-         *out = backup;
-     }
-@@ -577,51 +565,40 @@ void bdrv_undo_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *in)
- uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-                                               uint64_t offset, uint64_t bytes)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    return hbitmap_serialization_size(bitmap->bitmap,
--                                      offset >> BDRV_SECTOR_BITS,
--                                      bytes >> BDRV_SECTOR_BITS);
-+    return hbitmap_serialization_size(bitmap->bitmap, offset, bytes);
- }
-
- uint64_t bdrv_dirty_bitmap_serialization_align(const BdrvDirtyBitmap *bitmap)
- {
--    return hbitmap_serialization_align(bitmap->bitmap) * BDRV_SECTOR_SIZE;
-+    return hbitmap_serialization_align(bitmap->bitmap);
- }
-
- void bdrv_dirty_bitmap_serialize_part(const BdrvDirtyBitmap *bitmap,
-                                       uint8_t *buf, uint64_t offset,
-                                       uint64_t bytes)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_serialize_part(bitmap->bitmap, buf, offset >> BDRV_SECTOR_BITS,
--                           bytes >> BDRV_SECTOR_BITS);
-+    hbitmap_serialize_part(bitmap->bitmap, buf, offset, bytes);
- }
-
- void bdrv_dirty_bitmap_deserialize_part(BdrvDirtyBitmap *bitmap,
-                                         uint8_t *buf, uint64_t offset,
-                                         uint64_t bytes, bool finish)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_deserialize_part(bitmap->bitmap, buf, offset >> BDRV_SECTOR_BITS,
--                             bytes >> BDRV_SECTOR_BITS, finish);
-+    hbitmap_deserialize_part(bitmap->bitmap, buf, offset, bytes, finish);
- }
-
- void bdrv_dirty_bitmap_deserialize_zeroes(BdrvDirtyBitmap *bitmap,
-                                           uint64_t offset, uint64_t bytes,
-                                           bool finish)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_deserialize_zeroes(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                               bytes >> BDRV_SECTOR_BITS, finish);
-+    hbitmap_deserialize_zeroes(bitmap->bitmap, offset, bytes, finish);
- }
-
- void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-                                         uint64_t offset, uint64_t bytes,
-                                         bool finish)
- {
--    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
--    hbitmap_deserialize_ones(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                             bytes >> BDRV_SECTOR_BITS, finish);
-+    hbitmap_deserialize_ones(bitmap->bitmap, offset, bytes, finish);
- }
-
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
-@@ -632,7 +609,6 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap)
- void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
- {
-     BdrvDirtyBitmap *bitmap;
--    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
-
-     if (QLIST_EMPTY(&bs->dirty_bitmaps)) {
-         return;
-@@ -644,8 +620,7 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
-             continue;
-         }
-         assert(!bdrv_dirty_bitmap_readonly(bitmap));
--        hbitmap_set(bitmap->bitmap, offset >> BDRV_SECTOR_BITS,
--                    end_sector - (offset >> BDRV_SECTOR_BITS));
-+        hbitmap_set(bitmap->bitmap, offset, bytes);
-     }
-     bdrv_dirty_bitmaps_unlock(bs);
- }
-@@ -655,12 +630,12 @@ void bdrv_set_dirty(BlockDriverState *bs, int64_t offset, int64_t bytes)
-  */
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *iter, int64_t offset)
- {
--    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset >> BDRV_SECTOR_BITS);
-+    hbitmap_iter_init(&iter->hbi, iter->hbi.hb, offset);
- }
-
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap)
- {
--    return hbitmap_count(bitmap->bitmap) << BDRV_SECTOR_BITS;
-+    return hbitmap_count(bitmap->bitmap);
- }
-
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
--- 
-2.9.4
+--MdJ3p2aQbVp3YFXz--
