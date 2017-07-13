@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVSaQ-0005FG-GF
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:06:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVSaU-0005JJ-UL
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVSaP-0001t9-Gb
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:06:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVSaQ-0001tn-BW
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:06:38 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 12 Jul 2017 20:05:51 -0500
-Message-Id: <20170713010555.6769-15-eblake@redhat.com>
+Date: Wed, 12 Jul 2017 20:05:52 -0500
+Message-Id: <20170713010555.6769-16-eblake@redhat.com>
 In-Reply-To: <20170713010555.6769-1-eblake@redhat.com>
 References: <20170713010555.6769-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 14/18] qcow2: Switch qcow2_measure() to
+Subject: [Qemu-devel] [PATCH v5 15/18] qcow2: Switch load_bitmap_data() to
  byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,70 +23,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 
-This is new code, but it is easier to read if it makes passes over
-the image using bytes rather than sectors (and will get easier in
-the future when bdrv_get_block_status is converted to byte-based).
-
-While at it, fix a bug in the computation of nb_sectors using MAX
-rather than MIN and thus always passing INT_MAX (thankfully, the
-bug was harmless, as bdrv_get_block_status_above() clamps its
-answers according to image size).
+Now that we have adjusted the majority of the calls this function
+makes to be byte-based, it is easier to read the code if it makes
+passes over the image using bytes rather than sectors.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v5: new patch
+v5: no change
+v4: new patch
 ---
- block/qcow2.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ block/qcow2-bitmap.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index c144ea5..85ee9b2 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3662,20 +3662,19 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-              */
-             required = virtual_size;
-         } else {
--            int cluster_sectors = cluster_size / BDRV_SECTOR_SIZE;
--            int64_t sector_num;
-+            int64_t offset;
-             int pnum = 0;
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 5540fba..c44cf78 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -291,9 +291,8 @@ static int load_bitmap_data(BlockDriverState *bs,
+ {
+     int ret = 0;
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t sector, limit, sbc;
++    uint64_t offset, limit;
+     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
+-    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
+     uint8_t *buf = NULL;
+     uint64_t i, tab_size =
+             size_to_clusters(s,
+@@ -305,32 +304,27 @@ static int load_bitmap_data(BlockDriverState *bs,
 
--            for (sector_num = 0;
--                 sector_num < ssize / BDRV_SECTOR_SIZE;
--                 sector_num += pnum) {
--                int nb_sectors = MAX(ssize / BDRV_SECTOR_SIZE - sector_num,
--                                     INT_MAX);
-+            for (offset = 0; offset < ssize;
-+                 offset += pnum * BDRV_SECTOR_SIZE) {
-+                int nb_sectors = MIN(ssize - offset,
-+                                     INT_MAX) / BDRV_SECTOR_SIZE;
-                 BlockDriverState *file;
-                 int64_t ret;
+     buf = g_malloc(s->cluster_size);
+     limit = bytes_covered_by_bitmap_cluster(s, bitmap);
+-    sbc = limit >> BDRV_SECTOR_BITS;
+-    for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
+-        uint64_t count = MIN(bm_sectors - sector, sbc);
++    for (i = 0, offset = 0; i < tab_size; ++i, offset += limit) {
++        uint64_t count = MIN(bm_size - offset, limit);
+         uint64_t entry = bitmap_table[i];
+-        uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
++        uint64_t data_offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
 
-                 ret = bdrv_get_block_status_above(in_bs, NULL,
--                                                  sector_num, nb_sectors,
-+                                                  offset >> BDRV_SECTOR_BITS,
-+                                                  nb_sectors,
-                                                   &pnum, &file);
-                 if (ret < 0) {
-                     error_setg_errno(&local_err, -ret,
-@@ -3688,12 +3687,11 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-                 } else if ((ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) ==
-                            (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) {
-                     /* Extend pnum to end of cluster for next iteration */
--                    pnum = ROUND_UP(sector_num + pnum, cluster_sectors) -
--                           sector_num;
-+                    pnum = (ROUND_UP(offset + pnum * BDRV_SECTOR_SIZE,
-+                                 cluster_size) - offset) >> BDRV_SECTOR_BITS;
+         assert(check_table_entry(entry, s->cluster_size) == 0);
 
-                     /* Count clusters we've seen */
--                    required += (sector_num % cluster_sectors + pnum) *
--                                BDRV_SECTOR_SIZE;
-+                    required += offset % cluster_size + pnum * BDRV_SECTOR_SIZE;
-                 }
+-        if (offset == 0) {
++        if (data_offset == 0) {
+             if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
+-                bdrv_dirty_bitmap_deserialize_ones(bitmap,
+-                                                   sector * BDRV_SECTOR_SIZE,
+-                                                   count * BDRV_SECTOR_SIZE,
++                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset, count,
+                                                    false);
+             } else {
+                 /* No need to deserialize zeros because the dirty bitmap is
+                  * already cleared */
              }
+         } else {
+-            ret = bdrv_pread(bs->file, offset, buf, s->cluster_size);
++            ret = bdrv_pread(bs->file, data_offset, buf, s->cluster_size);
+             if (ret < 0) {
+                 goto finish;
+             }
+-            bdrv_dirty_bitmap_deserialize_part(bitmap, buf,
+-                                               sector * BDRV_SECTOR_SIZE,
+-                                               count * BDRV_SECTOR_SIZE,
++            bdrv_dirty_bitmap_deserialize_part(bitmap, buf, offset, count,
+                                                false);
          }
+     }
 -- 
 2.9.4
