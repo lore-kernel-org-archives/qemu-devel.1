@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVZgm-00034q-LB
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:37 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dVZgv-0003AU-8W
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVZgl-0000rL-PI
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:36 -0400
-Date: Thu, 13 Jul 2017 10:41:26 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170713084126.GA4139@noname.redhat.com>
-References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
-	<20170712114700.20008-4-pbutsykin@virtuozzo.com>
-	<20170712145251.GE4917@noname.str.redhat.com>
-	<ca2e112d-23d7-48c1-07a9-b60ee8ab743f@redhat.com>
+	(envelope-from <jasowang@redhat.com>) id 1dVZgs-0000tz-2l
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dVZgr-0000tS-S7
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0EEB083F43
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:41:40 +0000 (UTC)
+References: <1499847223-8078-1-git-send-email-peterx@redhat.com>
+	<1499847223-8078-2-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a03fa1c3-f8d8-1639-fc21-a53e7da355dd@redhat.com>
+Date: Thu, 13 Jul 2017 16:41:32 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NzB8fVQJ5HfG6fxh"
-Content-Disposition: inline
-In-Reply-To: <ca2e112d-23d7-48c1-07a9-b60ee8ab743f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] qcow2: add shrink image support
+In-Reply-To: <1499847223-8078-2-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] intel_iommu: fix VTD_PAGE_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,140 +34,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, den@openvz.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>
 
 
---NzB8fVQJ5HfG6fxh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Am 12.07.2017 um 18:58 hat Max Reitz geschrieben:
-> On 2017-07-12 16:52, Kevin Wolf wrote:
-> > Am 12.07.2017 um 13:46 hat Pavel Butsykin geschrieben:
-> >> This patch add shrinking of the image file for qcow2. As a result, thi=
-s allows
-> >> us to reduce the virtual image size and free up space on the disk with=
-out
-> >> copying the image. Image can be fragmented and shrink is done by punch=
-ing holes
-> >> in the image file.
-> >>
-> >> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> >> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> >> ---
-> >>  block/qcow2-cluster.c  |  40 ++++++++++++++++++
-> >>  block/qcow2-refcount.c | 110 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++
-> >>  block/qcow2.c          |  43 +++++++++++++++----
-> >>  block/qcow2.h          |  14 +++++++
-> >>  qapi/block-core.json   |   3 +-
-> >>  5 files changed, 200 insertions(+), 10 deletions(-)
-> >>
-> >> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> >> index f06c08f64c..518429c64b 100644
-> >> --- a/block/qcow2-cluster.c
-> >> +++ b/block/qcow2-cluster.c
-> >> @@ -32,6 +32,46 @@
-> >>  #include "qemu/bswap.h"
-> >>  #include "trace.h"
-> >> =20
-> >> +int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t exact_size)
-> >> +{
-> >> +    BDRVQcow2State *s =3D bs->opaque;
-> >> +    int new_l1_size, i, ret;
-> >> +
-> >> +    if (exact_size >=3D s->l1_size) {
-> >> +        return 0;
-> >> +    }
-> >> +
-> >> +    new_l1_size =3D exact_size;
-> >> +
-> >> +#ifdef DEBUG_ALLOC2
-> >> +    fprintf(stderr, "shrink l1_table from %d to %d\n", s->l1_size, ne=
-w_l1_size);
-> >> +#endif
-> >> +
-> >> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
-> >> +    ret =3D bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
-> >> +                                       sizeof(uint64_t) * new_l1_size,
-> >> +                             (s->l1_size - new_l1_size) * sizeof(uint=
-64_t), 0);
-> >> +    if (ret < 0) {
-> >> +        return ret;
-> >> +    }
-> >> +
-> >> +    ret =3D bdrv_flush(bs->file->bs);
-> >> +    if (ret < 0) {
-> >> +        return ret;
-> >> +    }
-> >=20
-> > If we have an error here (or after a partial bdrv_pwrite_zeroes()), we
-> > have entries zeroed out on disk, but in memory we still have the
-> > original L1 table.
-> >=20
-> > Should the in-memory L1 table be zeroed first? Then we can't
-> > accidentally reuse stale entries, but would have to allocate new ones,
-> > which would get on-disk state and in-memory state back in sync again.
->=20
-> Yes, I thought of the same.  But this implies that the allocation is
-> able to modify the L1 table, and I find that unlikely if that
-> bdrv_flush() failed already...
->=20
-> So I concluded not to have an opinion on which order is better.
+On 2017=E5=B9=B407=E6=9C=8812=E6=97=A5 16:13, Peter Xu wrote:
+> IOMMUTLBEntry.iova is returned incorrectly in one PT path (though mostl=
+y
+> we cannot really trigger this path, even if we do, we are mostly
+> disgarding this value, so it didn't break anything). Fix it by
+> converting the VTD_PAGE_MASK into normal definition (normally it should
+> be pfn mask, not offset mask), then switch the other user of it.
+>
+> Fixes: b93130 ("intel_iommu: cleanup vtd_{do_}iommu_translate()")
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   hw/i386/intel_iommu.c          | 2 +-
+>   hw/i386/intel_iommu_internal.h | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 88dc042..392da45 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1141,7 +1141,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpac=
+e *vtd_as, PCIBus *bus,
+>       if (vtd_ce_get_type(&ce) =3D=3D VTD_CONTEXT_TT_PASS_THROUGH) {
+>           entry->iova =3D addr & VTD_PAGE_MASK;
+>           entry->translated_addr =3D entry->iova;
+> -        entry->addr_mask =3D VTD_PAGE_MASK;
+> +        entry->addr_mask =3D ~VTD_PAGE_MASK;
+>           entry->perm =3D IOMMU_RW;
+>           trace_vtd_translate_pt(source_id, entry->iova);
+>  =20
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_inter=
+nal.h
+> index f50ecd8..754cf8a 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -384,7 +384,7 @@ typedef struct VTDIOTLBPageInvInfo VTDIOTLBPageInvI=
+nfo;
+>   /* Pagesize of VTD paging structures, including root and context tabl=
+es */
+>   #define VTD_PAGE_SHIFT              12
+>   #define VTD_PAGE_SIZE               (1ULL << VTD_PAGE_SHIFT)
+> -#define VTD_PAGE_MASK               (VTD_PAGE_SIZE - 1)
+> +#define VTD_PAGE_MASK               (~(VTD_PAGE_SIZE - 1))
+>  =20
+>   #define VTD_PAGE_SHIFT_4K           12
+>   #define VTD_PAGE_MASK_4K            (~((1ULL << VTD_PAGE_SHIFT_4K) - =
+1))
 
-Well, let me ask the other way round: Is there any disadvantage in first
-zeroing the in-memory table and then writing to the image?
+I wonder whether or not using VTD_PAGE_MASK_4K is more than enough.
 
-If I have a choice between "always safe" and "not completely safe, but I
-think it's unlikely to happen", especially in image formats, then I will
-certainly take the "always safe".
-
-> >> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
-> >> +    for (i =3D s->l1_size - 1; i > new_l1_size - 1; i--) {
-> >> +        if ((s->l1_table[i] & L1E_OFFSET_MASK) =3D=3D 0) {
-> >> +            continue;
-> >> +        }
-> >> +        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
-> >> +                            s->cluster_size, QCOW2_DISCARD_ALWAYS);
-> >> +        s->l1_table[i] =3D 0;
-> >> +    }
-> >> +    return 0;
-> >> +}
-> >> +
-> >>  int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
-> >>                          bool exact_size)
-> >>  {
-> >=20
-> > I haven't checked qcow2_shrink_reftable() for similar kinds of problems,
-> > I hope Max has.
->=20
-> Well, it's exactly the same there.
-
-Ok, so I'll object to this code without really having looked at it.
-
-Kevin
-
---NzB8fVQJ5HfG6fxh
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZZzI2AAoJEH8JsnLIjy/WU6oP/1Jek5aPi0zwBIADVLqRY6q9
-8mtXNzksmjJKdu9xNF+eOMRdZvG5OzB/tenqqUlwKx1g3DdJR+VbEgWg2/PIsfBb
-AaEDdY99R/9BcRagsvx9o7KqeYBJlhmsQWPRUZB0nPqnNqi6HcHX5gEJ7D9m64Om
-eU+HvPDgKPcudOsQtNpCOKxy8TLZx0XSh5A/Pgri8VgVTcM0h1BUdmHwF6qxG9v1
-qeGCZF06yUetxuTY3XW3KKDAPYHTb8WKCkaUud/NghIaj3IUy9ojx+qy5r0V//nM
-DaKe5krv38NH8+coK/CE0Rm2xiae5lRFUHSDBOSUiraQubU/z9RinTGi1vOEA+aR
-rI/Kp5jDNAtLHQIaFKnL5vMNBBkAikL1mPXlWhjShAqsvejkRlvISqUG2cxuVDFK
-sdcoMlM+G6Tlu93m8Pjk75oFozCCuox7VGWXOaNXCbIPLmDcDpjWKwY8b7NSjrZ/
-saBTTWTh8tSwp2wb4S4WLYG81RgDYVLyGusvEhwsBsNzK9vZqCrSKRVNHEIu/PBe
-3IGwgepsYtMOjBgxy21h7rZVv8LP/G7xf+wac/AnIPAEd2NvSM13wfrOMQPNKzcU
-5t0sPY5SKv+Mgp8OHZhk4XR2RrMbiCdEl7kC4mxzjgWx+RQlVb3T6O3rd1X88O5S
-++Y9yRYc9X2koIQdFTyG
-=WTmV
------END PGP SIGNATURE-----
-
---NzB8fVQJ5HfG6fxh--
+Thanks
