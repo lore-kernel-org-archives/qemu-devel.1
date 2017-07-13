@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVeA0-0008V5-HG
+	(envelope-from <armbru@redhat.com>) id 1dVeA0-0008V9-J2
 	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVe9x-0001Kj-0S
+	(envelope-from <armbru@redhat.com>) id 1dVe9x-0001Kz-3y
 	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56784)
+Received: from mx1.redhat.com ([209.132.183.28]:38572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVe9w-0001K9-OZ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:00 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVe9w-0001KB-Q7
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:01 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Jul 2017 15:27:54 +0200
-Message-Id: <1499952476-3454-8-git-send-email-armbru@redhat.com>
+Date: Thu, 13 Jul 2017 15:27:55 +0200
+Message-Id: <1499952476-3454-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1499952476-3454-1-git-send-email-armbru@redhat.com>
 References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 7/9] char-socket: Report TCP socket waiting as
- information
+Subject: [Qemu-devel] [PULL 8/9] error: Implement the warn and free Error
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +29,96 @@ Cc: Alistair Francis <alistair.francis@xilinx.com>
 
 From: Alistair Francis <alistair.francis@xilinx.com>
 
-When QEMU is waiting for a TCP socket connection it reports that message =
-as
-an error. This isn't an error it is just information so let's change the
-report to use info_report() instead.
+Implement warn_report_err() and warn_reportf_err() functions which
+are the same as the error_report_err() and error_reportf_err()
+functions except report a warning instead of an error.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <b3f3601c52843afca9a9b12c7a4fefd68e60de32.1499866456.git.alis=
-tair.francis@xilinx.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <276ff93eadc0b01b8243cc61ffc331f77922c0d0.1499866456.git.alistair.francis@xilinx.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- chardev/char-socket.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/qapi/error.h  | 11 +++++++++++
+ scripts/checkpatch.pl |  1 +
+ util/error.c          | 20 ++++++++++++++++++++
+ 3 files changed, 32 insertions(+)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index ccc499c..a050a68 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -765,8 +765,8 @@ static int tcp_chr_wait_connected(Chardev *chr, Error=
- **errp)
-      * in TLS and telnet cases, only wait for an accepted socket */
-     while (!s->ioc) {
-         if (s->is_listen) {
--            error_report("QEMU waiting for connection on: %s",
--                         chr->filename);
-+            info_report("QEMU waiting for connection on: %s",
-+                        chr->filename);
-             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, N=
-ULL);
-             tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
-             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), false, =
-NULL);
---=20
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 7e532d0..af53b34 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -267,11 +267,22 @@ void error_free(Error *err);
+ void error_free_or_abort(Error **errp);
+ 
+ /*
++ * Convenience function to warn_report() and free @err.
++ */
++void warn_report_err(Error *err);
++
++/*
+  * Convenience function to error_report() and free @err.
+  */
+ void error_report_err(Error *err);
+ 
+ /*
++ * Convenience function to error_prepend(), warn_report() and free @err.
++ */
++void warn_reportf_err(Error *err, const char *fmt, ...)
++    GCC_FMT_ATTR(2, 3);
++
++/*
+  * Convenience function to error_prepend(), error_report() and free @err.
+  */
+ void error_reportf_err(Error *err, const char *fmt, ...)
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 9287cc5..4e91122 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2533,6 +2533,7 @@ sub process {
+ 				error_setg_file_open|
+ 				error_set|
+ 				error_prepend|
++				warn_reportf_err|
+ 				error_reportf_err|
+ 				error_vreport|
+ 				warn_vreport|
+diff --git a/util/error.c b/util/error.c
+index 020b86b..3efdd69 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -232,6 +232,15 @@ void error_report_err(Error *err)
+     error_free(err);
+ }
+ 
++void warn_report_err(Error *err)
++{
++    warn_report("%s", error_get_pretty(err));
++    if (err->hint) {
++        error_printf_unless_qmp("%s", err->hint->str);
++    }
++    error_free(err);
++}
++
+ void error_reportf_err(Error *err, const char *fmt, ...)
+ {
+     va_list ap;
+@@ -242,6 +251,17 @@ void error_reportf_err(Error *err, const char *fmt, ...)
+     error_report_err(err);
+ }
+ 
++
++void warn_reportf_err(Error *err, const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    error_vprepend(&err, fmt, ap);
++    va_end(ap);
++    warn_report_err(err);
++}
++
+ void error_free(Error *err)
+ {
+     if (err) {
+-- 
 2.7.5
