@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVfEL-0002fZ-0P
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:36:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVfEs-00035i-Ua
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dVfEH-0001PV-0S
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:36:37 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:42493)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dVfEG-0001ON-PT
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:36:32 -0400
-Received: from player796.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 27A7F9DA35
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 16:36:31 +0200 (CEST)
-Date: Thu, 13 Jul 2017 16:36:20 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170713163620.48c6a93c@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20170713110237.6712-1-lprosek@redhat.com>
-References: <20170713110237.6712-1-lprosek@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dVfEo-0001lS-UA
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:37:10 -0400
+References: <1499955697-28045-1-git-send-email-peter.maydell@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <da746ef9-1d03-5054-7ce5-7f7193b0894d@redhat.com>
+Date: Thu, 13 Jul 2017 09:37:03 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/PUpOc2aDCkRR6XXhYadEYHO";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] virtio: enhance virtio_error
- messages
+In-Reply-To: <1499955697-28045-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jwFCwkCXBVOnGVjaw0AVfCIrV4KNdgxVJ"
+Subject: Re: [Qemu-devel] [PATCH] configure: Drop ancient Solaris 9 and
+ earlier support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org
 
---Sig_/PUpOc2aDCkRR6XXhYadEYHO
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jwFCwkCXBVOnGVjaw0AVfCIrV4KNdgxVJ
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+Cc: patches@linaro.org
+Message-ID: <da746ef9-1d03-5054-7ce5-7f7193b0894d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] configure: Drop ancient Solaris 9 and
+ earlier support
+References: <1499955697-28045-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1499955697-28045-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 13 Jul 2017 13:02:29 +0200
-Ladi Prosek <lprosek@redhat.com> wrote:
-
-> Output like "Virtqueue size exceeded" is not much useful in identifying t=
-he
-> culprit. This series beefs up virtio_error to print the virtio device name
-> and id, and introduces virtqueue_error which additionally includes the in=
-dex
-> of the virtqueue where the error occured.
+On 07/13/2017 09:21 AM, Peter Maydell wrote:
+> Solaris 9 was released in 2002, its successor Solaris 10 was
+> released in 2005, and Solaris 9 was end-of-lifed in 2014.
+> Nobody has stepped forward to express interest in supporting
+> Solaris of any flavour, so removing support for the ancient
+> versions seems uncontroversial.
 >=20
-> Patches 1 to 3 lay the groundwork, patches 4 to 8 convert virtio devices =
-to
-> use virtqueue_error instead of virtio_error.
+> In particular, this allows us to remove a use of 'uname'
+> in configure that won't work if you're cross-compiling.
 >=20
-> v1->v2:
-> * Modified virtio_error and added virtqueue_error (Stefan)
-> * Now also printing device id (Stefan)
-> * Went over all virtio_error call sites and converted them to virtqueue_e=
-rror
->   as appropriate; added virtio device maintainers to cc
->=20
-> Ladi Prosek (8):
->   qemu-error: introduce error_report_nolf
->   virtio: enhance virtio_error messages
->   virtio: introduce virtqueue_error
->   virtio-9p: use virtqueue_error for errors with queue context
->   virtio-blk: use virtqueue_error for errors with queue context
->   virtio-net: use virtqueue_error for errors with queue context
->   virtio-scsi: use virtqueue_error for errors with queue context
->   virtio-crypto: use virtqueue_error for errors with queue context
->=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Not a big thing, but it's a start on cleaning out some
+> of the untested and untestable cruft from configure...
 
-While here, maybe you can add all the virtio_error related functions to the
-$qemu_error_funcs variable in scripts/checkpatch.pl ?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Cheers,
-
---
-Greg
-
->  hw/9pfs/virtio-9p-device.c  |  37 ++++++--------
->  hw/block/virtio-blk.c       |   6 +--
->  hw/net/virtio-net.c         |  24 ++++-----
->  hw/scsi/virtio-scsi.c       |   2 +-
->  hw/virtio/virtio-crypto.c   |  56 ++++++++++-----------
->  hw/virtio/virtio.c          | 116 ++++++++++++++++++++++++++++++--------=
-------
->  include/hw/virtio/virtio.h  |   1 +
->  include/qemu/error-report.h |   3 +-
->  util/qemu-error.c           |  32 +++++++++---
->  9 files changed, 169 insertions(+), 108 deletions(-)
->=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
---Sig_/PUpOc2aDCkRR6XXhYadEYHO
-Content-Type: application/pgp-signature
+--jwFCwkCXBVOnGVjaw0AVfCIrV4KNdgxVJ
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAllnhWQACgkQAvw66wEB28J0zACfU+Mp54iuc0ruebOnNDhGnu02
-vnUAmgJYpVgMX7UrfcgRbSFIYMWCOPFk
-=fzi/
+iQEcBAEBCAAGBQJZZ4WQAAoJEKeha0olJ0NqMjIIAJ+6uyISgomOALlQpyx/P/Wv
+cLnx98RYz13gaJlN5mNS7pomiOsw4CDqAzTNGLUmdmHb5oYTPlvdXvilgVWJPvd0
+pXOuNYINZ92NUipWCiH1ud9EcIxak/yAC9cHwCDvJ5XJEh9KjRUCAghWUz23mAA/
++v2e4DIXqYZMoQU8iG6rH97agDpLDRPwEbgndeLfM9n7l9FI4vnxZhAR/iSanvOV
+Y8WJ2kG9CVxehHxJTrYM7bqE+plRSDSm23Dq3go3OPxp5R3iA8ck7dDGCAijznfk
+sVKUIskUzwNrmmMP8Yzv2AgHP2K8rgm2EtIcFWQfX3LbQqKVF2VcFgRBozBvMrM=
+=P1ks
 -----END PGP SIGNATURE-----
 
---Sig_/PUpOc2aDCkRR6XXhYadEYHO--
+--jwFCwkCXBVOnGVjaw0AVfCIrV4KNdgxVJ--
