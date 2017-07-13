@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dVZel-00024X-2r
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:39:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVZgm-00034q-LB
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dVZeh-00086f-4z
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:39:31 -0400
-Received: from mga02.intel.com ([134.134.136.20]:6997)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dVZeg-00083u-QJ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:39:27 -0400
-Message-ID: <59673252.7090203@intel.com>
-Date: Thu, 13 Jul 2017 16:41:54 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1dVZgl-0000rL-PI
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:41:36 -0400
+Date: Thu, 13 Jul 2017 10:41:26 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170713084126.GA4139@noname.redhat.com>
+References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
+	<20170712114700.20008-4-pbutsykin@virtuozzo.com>
+	<20170712145251.GE4917@noname.str.redhat.com>
+	<ca2e112d-23d7-48c1-07a9-b60ee8ab743f@redhat.com>
 MIME-Version: 1.0
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-8-git-send-email-wei.w.wang@intel.com>
-	<20170713031526-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170713031526-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v12 7/8] mm: export symbol
- of next_zone and first_online_pgdat
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="NzB8fVQJ5HfG6fxh"
+Content-Disposition: inline
+In-Reply-To: <ca2e112d-23d7-48c1-07a9-b60ee8ab743f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-On 07/13/2017 08:16 AM, Michael S. Tsirkin wrote:
-> On Wed, Jul 12, 2017 at 08:40:20PM +0800, Wei Wang wrote:
->> This patch enables for_each_zone()/for_each_populated_zone() to be
->> invoked by a kernel module.
-> ... for use by virtio balloon.
 
-With this patch, other kernel modules can also use the for_each_zone().
-Would it be better to claim it broader?
+--NzB8fVQJ5HfG6fxh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> balloon seems to only use
-> +       for_each_populated_zone(zone)
-> +               for_each_migratetype_order(order, type)
->
+Am 12.07.2017 um 18:58 hat Max Reitz geschrieben:
+> On 2017-07-12 16:52, Kevin Wolf wrote:
+> > Am 12.07.2017 um 13:46 hat Pavel Butsykin geschrieben:
+> >> This patch add shrinking of the image file for qcow2. As a result, thi=
+s allows
+> >> us to reduce the virtual image size and free up space on the disk with=
+out
+> >> copying the image. Image can be fragmented and shrink is done by punch=
+ing holes
+> >> in the image file.
+> >>
+> >> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> >> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>  block/qcow2-cluster.c  |  40 ++++++++++++++++++
+> >>  block/qcow2-refcount.c | 110 ++++++++++++++++++++++++++++++++++++++++=
++++++++++
+> >>  block/qcow2.c          |  43 +++++++++++++++----
+> >>  block/qcow2.h          |  14 +++++++
+> >>  qapi/block-core.json   |   3 +-
+> >>  5 files changed, 200 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> >> index f06c08f64c..518429c64b 100644
+> >> --- a/block/qcow2-cluster.c
+> >> +++ b/block/qcow2-cluster.c
+> >> @@ -32,6 +32,46 @@
+> >>  #include "qemu/bswap.h"
+> >>  #include "trace.h"
+> >> =20
+> >> +int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t exact_size)
+> >> +{
+> >> +    BDRVQcow2State *s =3D bs->opaque;
+> >> +    int new_l1_size, i, ret;
+> >> +
+> >> +    if (exact_size >=3D s->l1_size) {
+> >> +        return 0;
+> >> +    }
+> >> +
+> >> +    new_l1_size =3D exact_size;
+> >> +
+> >> +#ifdef DEBUG_ALLOC2
+> >> +    fprintf(stderr, "shrink l1_table from %d to %d\n", s->l1_size, ne=
+w_l1_size);
+> >> +#endif
+> >> +
+> >> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
+> >> +    ret =3D bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
+> >> +                                       sizeof(uint64_t) * new_l1_size,
+> >> +                             (s->l1_size - new_l1_size) * sizeof(uint=
+64_t), 0);
+> >> +    if (ret < 0) {
+> >> +        return ret;
+> >> +    }
+> >> +
+> >> +    ret =3D bdrv_flush(bs->file->bs);
+> >> +    if (ret < 0) {
+> >> +        return ret;
+> >> +    }
+> >=20
+> > If we have an error here (or after a partial bdrv_pwrite_zeroes()), we
+> > have entries zeroed out on disk, but in memory we still have the
+> > original L1 table.
+> >=20
+> > Should the in-memory L1 table be zeroed first? Then we can't
+> > accidentally reuse stale entries, but would have to allocate new ones,
+> > which would get on-disk state and in-memory state back in sync again.
+>=20
+> Yes, I thought of the same.  But this implies that the allocation is
+> able to modify the L1 table, and I find that unlikely if that
+> bdrv_flush() failed already...
+>=20
+> So I concluded not to have an opinion on which order is better.
 
-Yes. using for_each_populated_zone() requires the following export.
+Well, let me ask the other way round: Is there any disadvantage in first
+zeroing the in-memory table and then writing to the image?
 
-Best,
-Wei
->> ---
->>   mm/mmzone.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/mm/mmzone.c b/mm/mmzone.c
->> index a51c0a6..08a2a3a 100644
->> --- a/mm/mmzone.c
->> +++ b/mm/mmzone.c
->> @@ -13,6 +13,7 @@ struct pglist_data *first_online_pgdat(void)
->>   {
->>   	return NODE_DATA(first_online_node);
->>   }
->> +EXPORT_SYMBOL_GPL(first_online_pgdat);
->>   
->>   struct pglist_data *next_online_pgdat(struct pglist_data *pgdat)
->>   {
->> @@ -41,6 +42,7 @@ struct zone *next_zone(struct zone *zone)
->>   	}
->>   	return zone;
->>   }
->> +EXPORT_SYMBOL_GPL(next_zone);
->>   
->>   static inline int zref_in_nodemask(struct zoneref *zref, nodemask_t *nodes)
->>   {
->> -- 
->> 2.7.4
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->
+If I have a choice between "always safe" and "not completely safe, but I
+think it's unlikely to happen", especially in image formats, then I will
+certainly take the "always safe".
+
+> >> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
+> >> +    for (i =3D s->l1_size - 1; i > new_l1_size - 1; i--) {
+> >> +        if ((s->l1_table[i] & L1E_OFFSET_MASK) =3D=3D 0) {
+> >> +            continue;
+> >> +        }
+> >> +        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
+> >> +                            s->cluster_size, QCOW2_DISCARD_ALWAYS);
+> >> +        s->l1_table[i] =3D 0;
+> >> +    }
+> >> +    return 0;
+> >> +}
+> >> +
+> >>  int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+> >>                          bool exact_size)
+> >>  {
+> >=20
+> > I haven't checked qcow2_shrink_reftable() for similar kinds of problems,
+> > I hope Max has.
+>=20
+> Well, it's exactly the same there.
+
+Ok, so I'll object to this code without really having looked at it.
+
+Kevin
+
+--NzB8fVQJ5HfG6fxh
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZZzI2AAoJEH8JsnLIjy/WU6oP/1Jek5aPi0zwBIADVLqRY6q9
+8mtXNzksmjJKdu9xNF+eOMRdZvG5OzB/tenqqUlwKx1g3DdJR+VbEgWg2/PIsfBb
+AaEDdY99R/9BcRagsvx9o7KqeYBJlhmsQWPRUZB0nPqnNqi6HcHX5gEJ7D9m64Om
+eU+HvPDgKPcudOsQtNpCOKxy8TLZx0XSh5A/Pgri8VgVTcM0h1BUdmHwF6qxG9v1
+qeGCZF06yUetxuTY3XW3KKDAPYHTb8WKCkaUud/NghIaj3IUy9ojx+qy5r0V//nM
+DaKe5krv38NH8+coK/CE0Rm2xiae5lRFUHSDBOSUiraQubU/z9RinTGi1vOEA+aR
+rI/Kp5jDNAtLHQIaFKnL5vMNBBkAikL1mPXlWhjShAqsvejkRlvISqUG2cxuVDFK
+sdcoMlM+G6Tlu93m8Pjk75oFozCCuox7VGWXOaNXCbIPLmDcDpjWKwY8b7NSjrZ/
+saBTTWTh8tSwp2wb4S4WLYG81RgDYVLyGusvEhwsBsNzK9vZqCrSKRVNHEIu/PBe
+3IGwgepsYtMOjBgxy21h7rZVv8LP/G7xf+wac/AnIPAEd2NvSM13wfrOMQPNKzcU
+5t0sPY5SKv+Mgp8OHZhk4XR2RrMbiCdEl7kC4mxzjgWx+RQlVb3T6O3rd1X88O5S
+++Y9yRYc9X2koIQdFTyG
+=WTmV
+-----END PGP SIGNATURE-----
+
+--NzB8fVQJ5HfG6fxh--
