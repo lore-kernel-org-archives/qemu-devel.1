@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dVYGa-0003Cl-Rz
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:10:29 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dVYH3-0003QP-De
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dVYGX-0002BR-KP
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:10:28 -0400
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:33941)
+	(envelope-from <alistair23@gmail.com>) id 1dVYH1-0002P0-V3
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:10:57 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33388)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dVYGX-00028Y-CB
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:10:25 -0400
-Received: by mail-wr0-f193.google.com with SMTP id k67so8387117wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 00:10:22 -0700 (PDT)
+	id 1dVYH1-0002Oo-Ma
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:10:55 -0400
+Received: by mail-wr0-x241.google.com with SMTP id n18so435896wrb.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 00:10:55 -0700 (PDT)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <87vamxzjln.fsf@dusky.pond.sub.org>
-References: <cover.1499866456.git.alistair.francis@xilinx.com>
-	<87vamxzjln.fsf@dusky.pond.sub.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 13 Jul 2017 09:08:50 +0200
-Message-ID: <CAKmqyKN_qjQn_am2HK=yAEi0=AzkEMfxP4b8qvLOYwMkrCFYQg@mail.gmail.com>
+In-Reply-To: <87r2xkua5e.fsf@dusky.pond.sub.org>
+References: <cover.1499774331.git.alistair.francis@xilinx.com>
+	<b80b284089ce9d4664a5014b65266c0e25e40072.1499774331.git.alistair.francis@xilinx.com>
+	<874lui9eog.fsf@dusky.pond.sub.org>
+	<20170712194504.GM6020@localhost.localdomain>
+	<87r2xkua5e.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 13 Jul 2017 09:10:23 +0200
+Message-ID: <CAKmqyKNrX8h63NEmk9s6on=bSNARHu5zWn=C5m63NeigUNVqWg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] Implement a warning_report function
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] hw/i386: Improve some of the
+ warning messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +34,175 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, philippe@mathieu-daude.net, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, philippe@mathieu-daude.net, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Jul 12, 2017 at 6:49 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> Alistair Francis <alistair.francis@xilinx.com> writes:
+On Thu, Jul 13, 2017 at 8:24 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 >
->> QEMU currently has a standard method to report errors with
->> error_repot(). This ensure a sane and standard format when printing
->> errors. This series is attempting to extend this functionality for
->> warnings and information as well.
+>> On Wed, Jul 12, 2017 at 11:39:59AM +0200, Markus Armbruster wrote:
+>>> Alistair Francis <alistair.francis@xilinx.com> writes:
+>>>
+>>> > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>> > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>
+>>> You forgot to cc: Eduardo.  Fixed.
+>>>
+>>> > ---
+>>> >
+>>> >  hw/i386/acpi-build.c | 7 ++++---
+>>> >  hw/i386/pc.c         | 9 ++++-----
+>>> >  hw/i386/pc_q35.c     | 4 ++--
+>>> >  3 files changed, 10 insertions(+), 10 deletions(-)
+>>> >
+>>> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>> > index 6b7bade183..f9efb6be41 100644
+>>> > --- a/hw/i386/acpi-build.c
+>>> > +++ b/hw/i386/acpi-build.c
+>>> > @@ -2766,7 +2766,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>> >                       ACPI_BUILD_ALIGN_SIZE);
+>>> >          if (tables_blob->len > legacy_table_size) {
+>>> >              /* Should happen only with PCI bridges and -M pc-i440fx-2.0.  */
+>>> > -            warn_report("migration may not work.");
+>>> > +            warn_report("ACPI tables are larger than legacy_table_size");
+>>> > +            warn_report("migration may not work");
+>>>
+>>> The user has no idea what legacy_table_size means, what its value might
+>>> be, or what he can do to reduce it.
+>>>
+>>> Recommend
+>>>
+>>>                warn_report("ACPI tables too large, migration may not work");
+>>>
+>>> If the user can do something to reduce the table size, printing suitable
+>>> hints would be nice.  Printing both tables_blob->len and
+>>> legacy_table_size might also help then.
+>>>
+>>> >          }
+>>> >          g_array_set_size(tables_blob, legacy_table_size);
+>>> >      } else {
+>>> > @@ -2774,9 +2775,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>> >          if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
+>>> >              /* As of QEMU 2.1, this fires with 160 VCPUs and 255 memory slots.  */
+>>> >              warn_report("ACPI tables are larger than 64k.");
+>>>
+>>> The warning text hardcodes the value of ACPI_BUILD_TABLE_SIZE / 2.  Not
+>>> nice.  Clean up while there?
+>>>
+>>> > -            warn_report("migration may not work.");
+>>> > +            warn_report("migration may not work");
+>>> >              warn_report("please remove CPUs, NUMA nodes, "
+>>> > -                        "memory slots or PCI bridges.");
+>>> > +                        "memory slots or PCI bridges");
+>>>
+>>> Aha, here's what the user can do.
+>>>
+>>> What about:
+>>>
+>>>                warn_report("ACPI tables are large, migration may not work");
+>>>                error_printf("Try removing CPUs, NUMA nodes, memory slots"
+>>>                             " or PCI bridges.");
+>>>
+>>> If we want to show actual size and limit, then this might do instead:
+>>>
+>>>                warn_report("ACPI table size %u exceeds %d bytes,"
+>>>                            " migration may not work",
+>>>                            tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
+>>>                error_printf("Try removing CPUs, NUMA nodes, memory slots"
+>>>                             " or PCI bridges.");
 >>
->> This patch renames error_print_loc() function to be more clear, but I
->> didn't bother renaming the others. It seems silly to change
->> error_printf() to error_warning_printf() and printf is already taken so
->> I just left it as is.
+>> Yep, this suggestion is good for both cases: the check
+>> (ACPI_BUILD_TABLE_SIZE / 2), and the check for legacy_table_size.
+>>
+>>>
+>>> >          }
+>>> >          acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
+>>> >      }
+>>> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>> > index 465e91cc5b..084ca796c2 100644
+>>> > --- a/hw/i386/pc.c
+>>> > +++ b/hw/i386/pc.c
+>>> > @@ -383,8 +383,8 @@ ISADevice *pc_find_fdc0(void)
+>>> >      if (state.multiple) {
+>>> >          warn_report("multiple floppy disk controllers with "
+>>> >                      "iobase=0x3f0 have been found");
+>>> > -        error_printf("the one being picked for CMOS setup might not reflect "
+>>> > -                     "your intent\n");
+>>> > +        warn_report("the one being picked for CMOS setup might not reflect "
+>>> > +                    "your intent");
+>>>
+>>> Please keep error_printf() here.
+>>>
+>>
+>> I think I suggested warn_report() here for consistency, because I
+>> have seen other cases where multiple warn_report() calls were
+>> used.  We probably want to change those other cases like you
+>> suggested above.
+>>
+>>> >      }
+>>> >
+>>> >      return state.floppy;
+>>> > @@ -2087,9 +2087,8 @@ static void pc_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
+>>> >      }
+>>> >
+>>> >      if (value < (1ULL << 20)) {
+>>> > -        warn_report("small max_ram_below_4g(%"PRIu64
+>>> > -                    ") less than 1M.  BIOS may not work..",
+>>> > -                    value);
+>>> > +        warn_report("max_ram_below_4g (%" PRIu64 ") is less than 1M; "
+>>> > +                    "BIOS may not work.", value);
+>>>
+>>> The user has no idea what max_ram_below_4g might be.  Suggest:
+>>>
+>>>            warn_report("Only %" PRIu64 " bytes of RAM below the 4GiB boundary,"
+>>>                        "BIOS may not work with less than 1MiB");
+>>
+>> Actually, the user probably knows what it is, because this setter
+>> will be invoked only if "-M max-ram-below-4g=..." is used in the
+>> command-line.  We should fix the spelling to "max-ram-below-4g",
+>> though.
+>>
+>>>
+>>> >      }
+>>> >
+>>> >      pcms->max_ram_below_4g = value;
+>>> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>>> > index 1653a47f0a..682c576cf1 100644
+>>> > --- a/hw/i386/pc_q35.c
+>>> > +++ b/hw/i386/pc_q35.c
+>>> > @@ -101,8 +101,8 @@ static void pc_q35_init(MachineState *machine)
+>>> >          lowmem = pcms->max_ram_below_4g;
+>>> >          if (machine->ram_size - lowmem > lowmem &&
+>>> >              lowmem & ((1ULL << 30) - 1)) {
+>>> > -            warn_report("Large machine and max_ram_below_4g(%"PRIu64
+>>> > -                        ") not a multiple of 1G; possible bad performance.",
+>>> > +            warn_report("Large machine and max_ram_below_4g (%"PRIu64") not a "
+>>> > +                        "multiple of 1G; possible bad performance.",
+>>>
+>>> Space between string literal and PRIu64, please.
+>>>
+>>> The user has no idea what max_ram_below_4g might be, [...]
+>>
+>> Same as above: the warning should appear only if the user set
+>> "max-ram-below-4g" explicitly, so the user probably knows what it
+>> is.
+>>
+>>>                                                [...] or what makes the
+>>> machine "large".
+>>
+>> True.
+>>
+>>>
+>>> >                          pcms->max_ram_below_4g);
+>>> >          }
+>>> >      }
 >
-> I can take this through my tree once PATCH 4 got some R-by from PC
-> paintainers.  Whom you again neglected to cc; I just did that for you.
-> I'll be happy to touch up minor issues like the ones I pointed out for
-> v4.
+> Alistair, I suggest I apply just the other six patches for now, and you
+> improve this patch without undue time pressure.  What do you think?
 
-Thanks for CCing them. I keep assuming git send-email will CC from the
-suggested-by line, but apparently not.
+That sounds great! I can move this patch into a future cleanup series
+(which has a growing amount of work) and work on it when I return. The
+sooner this series is in the better, then people can start to use
+warn_error() so we don't have more calls to convert.
 
 Thanks,
 Alistair
