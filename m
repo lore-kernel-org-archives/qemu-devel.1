@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVdYN-0004QN-HN
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:49:13 -0400
+	(envelope-from <njh@bandsman.co.uk>) id 1dVdat-0006Vp-Ag
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVdYM-0007oQ-HI
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:49:11 -0400
-Date: Thu, 13 Jul 2017 14:49:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170713124902.GA20828@noname.redhat.com>
-References: <1499949463-22531-1-git-send-email-kwolf@redhat.com>
-	<CAFEAcA9dFNhaWqv2SAmtUHm5XN+Ar_kGg1EAcqkhwtrTvSBAqg@mail.gmail.com>
+	(envelope-from <njh@bandsman.co.uk>) id 1dVdaq-0000CG-38
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:51:47 -0400
+Received: from nihsmtpxway6.hub.nih.gov ([128.231.90.122]:8484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <njh@bandsman.co.uk>) id 1dVdap-0008Tt-Ts
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:51:44 -0400
+From: Nigel Horne <njh@bandsman.co.uk>
+Message-ID: <f1a9dc49-40d8-828b-26fa-76261ee95fab@bandsman.co.uk>
+Date: Thu, 13 Jul 2017 08:51:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9dFNhaWqv2SAmtUHm5XN+Ar_kGg1EAcqkhwtrTvSBAqg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] vpc: Remove useless parameters in
- get_sector_offset()
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] Link error with github source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Am 13.07.2017 um 14:42 hat Peter Maydell geschrieben:
-> On 13 July 2017 at 13:37, Kevin Wolf <kwolf@redhat.com> wrote:
-> > All callers of get_sector_offset() pass write=false and err=NULL. Remove
-> > the parameters.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> > Based on my block branch, specifically Peter's 'block/vpc.c: Handle write
-> > failures in get_image_offset()'
-> >
-> >  block/vpc.c | 9 ++++-----
-> >  1 file changed, 4 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/block/vpc.c b/block/vpc.c
-> > index bccc981..471f9ab 100644
-> > --- a/block/vpc.c
-> > +++ b/block/vpc.c
-> > @@ -508,10 +508,9 @@ static inline int64_t get_image_offset(BlockDriverState *bs, uint64_t offset,
-> >  }
-> >
-> >  static inline int64_t get_sector_offset(BlockDriverState *bs,
-> > -                                        int64_t sector_num, bool write,
-> > -                                        int *err)
-> > +                                        int64_t sector_num)
-> >  {
-> > -    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, write, err);
-> > +    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, false, NULL);
-> >  }
-> >
-> >  /*
-> > @@ -721,7 +720,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
-> >                 (sector_num << BDRV_SECTOR_BITS);
-> >      }
-> >
-> > -    offset = get_sector_offset(bs, sector_num, false, NULL);
-> > +    offset = get_sector_offset(bs, sector_num);
-> >      start = offset;
-> >      allocated = (offset != -1);
-> >      *pnum = 0;
-> > @@ -744,7 +743,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
-> >          if (nb_sectors == 0) {
-> >              break;
-> >          }
-> > -        offset = get_sector_offset(bs, sector_num, false, NULL);
-> > +        offset = get_sector_offset(bs, sector_num);
-> >      } while (offset == -1);
-> >
-> >      return 0;
-> 
-> Just to copy my remark over from the other thread:
-> this turns a function that could be used for writes into a function
-> that doesn't look like it cares whether it's used for reads or
-> writes but which will actually silently cause disk image
-> corruption if you do ever use it in a write codepath. That's
-> a bit of a bear trap as API design goes, which is why I opted
-> to add the 'err' argument to get_image_offset() rather than
-> just removing the 'write' argument.
+The latest version in github fails to link (using gcc-7) with this error:
 
-Not sure if this is a problem in practice, but I'll leave it alone for
-now. Once all of Eric's patches are in and make .bdrv_get_block_status
-byte-based, the function should just go away anyway.
+   LINK    aarch64-softmmu/qemu-system-aarch64
+accel/tcg/cputlb.o: In function `helper_atomic_cmpxchgo_le_mmu':
+cputlb.c:(.text+0x5f3d): undefined reference to 
+`__atomic_compare_exchange_16'
+accel/tcg/cputlb.o: In function `helper_atomic_cmpxchgo_be_mmu':
+cputlb.c:(.text+0x6000): undefined reference to 
+`__atomic_compare_exchange_16'
+accel/tcg/cputlb.o: In function `helper_atomic_ldo_be_mmu':
+cputlb.c:(.text+0x602f): undefined reference to `__atomic_load_16'
+accel/tcg/cputlb.o: In function `helper_atomic_ldo_le_mmu':
+cputlb.c:(.text+0x5f73): undefined reference to `__atomic_load_16'
+accel/tcg/cputlb.o: In function `helper_atomic_sto_le_mmu':
+cputlb.c:(.text+0x5fa9): undefined reference to `__atomic_store_16'
+accel/tcg/cputlb.o: In function `helper_atomic_sto_be_mmu':
+cputlb.c:(.text+0x607f): undefined reference to `__atomic_store_16'
+collect2: error: ld returned 1 exit status
+Makefile:197: recipe for target 'qemu-system-aarch64' failed
+make[1]: *** [qemu-system-aarch64] Error 1
+Makefile:328: recipe for target 'subdir-aarch64-softmmu' failed
+make: *** [subdir-aarch64-softmmu] Error 2
 
-Kevin
+-Nigel
