@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVZre-0002Ga-S7
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:52:51 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1dVZvW-0003Wg-Kt
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVZre-0002xH-2v
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:52:50 -0400
-Date: Thu, 13 Jul 2017 10:52:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170713085241.GB4139@noname.redhat.com>
-References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-3-git-send-email-pl@kamp.de>
-	<20170710131007.GE5772@noname.redhat.com>
-	<136f3543-665b-a138-1ff0-f96e2aaca0b4@kamp.de>
-	<20170710133038.GH5772@noname.redhat.com>
-	<bc7a3168-c7de-ad6d-dc7d-09fab4f6e561@kamp.de>
+	(envelope-from <tgolembi@redhat.com>) id 1dVZvT-0006bp-Ih
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:56:50 -0400
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:38467)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dVZvT-0006bA-BW
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:56:47 -0400
+Received: by mail-wm0-f54.google.com with SMTP id f67so18425037wmh.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 01:56:47 -0700 (PDT)
+Date: Thu, 13 Jul 2017 10:56:42 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20170713105642.39a482ad@fiorina>
+In-Reply-To: <912a31de-a26b-9267-a5ea-9f1f9ffa04bd@redhat.com>
+References: <cover.1498222907.git.tgolembi@redhat.com>
+	<7e2e1329dbe5a6d93c3d58eb2251b8862e2d1340.1498222907.git.tgolembi@redhat.com>
+	<912a31de-a26b-9267-a5ea-9f1f9ffa04bd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc7a3168-c7de-ad6d-dc7d-09fab4f6e561@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 2/8] qapi: add compress parameters to
- Qcow2 Blockdev options
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 1/3] qemu-ga: add support for events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Am 13.07.2017 um 10:45 hat Peter Lieven geschrieben:
-> Am 10.07.2017 um 15:30 schrieb Kevin Wolf:
-> >Am 10.07.2017 um 15:24 hat Peter Lieven geschrieben:
-> >>Am 10.07.2017 um 15:10 schrieb Kevin Wolf:
-> >>>Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
-> >>>>Signed-off-by: Peter Lieven <pl@kamp.de>
-> >>>>---
-> >>>>  qapi/block-core.json | 44 +++++++++++++++++++++++++++++++++++++++++++-
-> >>>>  1 file changed, 43 insertions(+), 1 deletion(-)
-> >>>How does this make sense as a runtime option? What would happen if the
-> >>>image contains one compression format and I specify another one on the
-> >>>command line or in blockdev-add?
-> >>>
-> >>>Shouldn't it just be a create-time option and when you run qemu, it uses
-> >>>whatever format that image has?
-> >>I was asked to add it here. It is indeed only a create option and has
-> >>no other effect.
-> >But if it's only a create option, why is it added to blockdev-add?
-> 
-> Is there already a separate schemata for the create options?
+On Fri, 7 Jul 2017 15:53:37 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
-If you mean a separate schema file, no. Putting it in the same file
-isn't a problem either, but hooking it up in structs used by
-blockdev-add (or other QMP commands) probably is.
+> On 06/23/2017 08:02 AM, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD wrote:
+> > Events can play an integral role when monitoring internal state of the
+> > guest OS. This patch adds the core functionality for adding events to
+> > QEMU Guest Agent. =20
+>=20
+> Will sending events confuse existing clients that aren't expecting them?
+> Do we need to add some sort of protocol handshake when the client first
+> connects so that we know whether the client is able to parse events
+> (including ignoring unknown events)?  (It's a shame that events were
+> built into QMP from the beginning, so we've never had to figure out how
+> to portably hand-shake a client/server negotiation on additional
+> features to be used across the wire)
 
-So if you want to follow Dan's suggestion, I think you just need to put
-the new type into the schema, without referencing it anywhere except in
-qcow2's .bdrv_create C implementation.
+You're probably right. Something like this will be necessary.
 
-Kevin
+>=20
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>=20
+
+
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
