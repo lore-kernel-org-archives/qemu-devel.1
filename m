@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVdQk-0008Tr-Kq
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:41:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVdT5-0001tW-Pr
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:43:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVdQh-0003vy-A9
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:41:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVdQg-0003uW-WA
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:41:15 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6DCdDeJ061480
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:41:13 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3xewws-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:41:12 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 13 Jul 2017 08:41:11 -0400
-References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
-	<1499942429-55449-3-git-send-email-borntraeger@de.ibm.com>
-	<20170713141158.32e74897@gondolin>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 13 Jul 2017 14:41:05 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dVdT2-0006LA-KV
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:43:43 -0400
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:38684)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVdT2-0006Kr-E1
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:43:40 -0400
+Received: by mail-wm0-f53.google.com with SMTP id f67so24664923wmh.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:43:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170713141158.32e74897@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 8bit
-Message-Id: <c6f110e2-7abf-7029-25bb-d46ee67541db@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/s390-next 2/3] s390x/cpumodel: add zpci,
- aen and ais facilities
+In-Reply-To: <1499949463-22531-1-git-send-email-kwolf@redhat.com>
+References: <1499949463-22531-1-git-send-email-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Jul 2017 13:42:18 +0100
+Message-ID: <CAFEAcA9dFNhaWqv2SAmtUHm5XN+Ar_kGg1EAcqkhwtrTvSBAqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] vpc: Remove useless parameters in
+ get_sector_offset()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,54 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 07/13/2017 02:11 PM, Cornelia Huck wrote:
-> On Thu, 13 Jul 2017 12:40:28 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>
->> zPCI instructions and facilities are available since IBM zEnterprise
->> EC12. To support z/PCI in QEMU we enable zpci, aen and ais facilities
->> starting with zEC12 GA1. And we always set zpci and aen bits in max cpu
->> model. Later they might be switched off due to applied real cpu model.
->> For ais bit, we only provide it in the full cpu model beginning with
->> zEC12 and defer its enablement in the default cpu model to a later point
->> in time. At the same time, disable them for 2.9 and older machines.
->>
->> Because of introducing AIS facility, we could check if it's enabled to
->> initialize flic->ais_supported with the real value.
->>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  hw/intc/s390_flic.c             | 3 ++-
->>  hw/intc/s390_flic_kvm.c         | 3 ---
->>  hw/s390x/s390-virtio-ccw.c      | 3 +++
->>  target/s390x/cpu_features.c     | 3 +++
->>  target/s390x/cpu_features_def.h | 3 +++
->>  target/s390x/gen-features.c     | 5 +++++
->>  target/s390x/kvm.c              | 7 +++++++
->>  7 files changed, 23 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
->> index ff6e4ec..6e7c610 100644
->> --- a/hw/intc/s390_flic.c
->> +++ b/hw/intc/s390_flic.c
->> @@ -163,9 +163,10 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
->>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
->>          error_setg(errp, "flic property adapter_routes_max_batch too big"
->>                     " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
->> +        return;
-> 
-> Hunk should go into a previous patch?
-> 
-> (And does it really matter?)
+On 13 July 2017 at 13:37, Kevin Wolf <kwolf@redhat.com> wrote:
+> All callers of get_sector_offset() pass write=false and err=NULL. Remove
+> the parameters.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+> Based on my block branch, specifically Peter's 'block/vpc.c: Handle write
+> failures in get_image_offset()'
+>
+>  block/vpc.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/block/vpc.c b/block/vpc.c
+> index bccc981..471f9ab 100644
+> --- a/block/vpc.c
+> +++ b/block/vpc.c
+> @@ -508,10 +508,9 @@ static inline int64_t get_image_offset(BlockDriverState *bs, uint64_t offset,
+>  }
+>
+>  static inline int64_t get_sector_offset(BlockDriverState *bs,
+> -                                        int64_t sector_num, bool write,
+> -                                        int *err)
+> +                                        int64_t sector_num)
+>  {
+> -    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, write, err);
+> +    return get_image_offset(bs, sector_num * BDRV_SECTOR_SIZE, false, NULL);
+>  }
+>
+>  /*
+> @@ -721,7 +720,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+>                 (sector_num << BDRV_SECTOR_BITS);
+>      }
+>
+> -    offset = get_sector_offset(bs, sector_num, false, NULL);
+> +    offset = get_sector_offset(bs, sector_num);
+>      start = offset;
+>      allocated = (offset != -1);
+>      *pnum = 0;
+> @@ -744,7 +743,7 @@ static int64_t coroutine_fn vpc_co_get_block_status(BlockDriverState *bs,
+>          if (nb_sectors == 0) {
+>              break;
+>          }
+> -        offset = get_sector_offset(bs, sector_num, false, NULL);
+> +        offset = get_sector_offset(bs, sector_num);
+>      } while (offset == -1);
+>
+>      return 0;
 
-I can
-- move to the previous series patch 8 (s390x/flic: introduce modify_ais_mode callback)
-- remove the return as it does not matter (this is realize, and realize failures here
-are fatal as far as I can tell)
-- keep it here since this version was tested and it does not hurt
+Just to copy my remark over from the other thread:
+this turns a function that could be used for writes into a function
+that doesn't look like it cares whether it's used for reads or
+writes but which will actually silently cause disk image
+corruption if you do ever use it in a write codepath. That's
+a bit of a bear trap as API design goes, which is why I opted
+to add the 'err' argument to get_image_offset() rather than
+just removing the 'write' argument.
+
+thanks
+-- PMM
