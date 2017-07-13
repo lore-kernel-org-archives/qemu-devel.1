@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dVaF4-00018i-Vl
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:17:04 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVaH6-0002Fs-OI
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dVaEz-0005b6-W1
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:17:02 -0400
-References: <20170703151051.31327-1-eblake@redhat.com>
-	<20170703151051.31327-15-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
-Date: Thu, 13 Jul 2017 12:16:53 +0300
+	(envelope-from <berrange@redhat.com>) id 1dVaH5-0007Zo-GN
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:19:08 -0400
+Date: Thu, 13 Jul 2017 10:18:55 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170713091855.GC4011@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1498733831-15254-1-git-send-email-pl@kamp.de>
+	<1498733831-15254-3-git-send-email-pl@kamp.de>
+	<20170710131007.GE5772@noname.redhat.com>
+	<136f3543-665b-a138-1ff0-f96e2aaca0b4@kamp.de>
+	<20170710133038.GH5772@noname.redhat.com>
+	<bc7a3168-c7de-ad6d-dc7d-09fab4f6e561@kamp.de>
+	<20170713085241.GB4139@noname.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170703151051.31327-15-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data()
- to byte-based iteration
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170713085241.GB4139@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V2 2/8] qapi: add compress parameters to
+ Qcow2 Blockdev options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,87 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
 
-03.07.2017 18:10, Eric Blake wrote:
-> Now that we have adjusted the majority of the calls this function
-> makes to be byte-based, it is easier to read the code if it makes
-> passes over the image using bytes rather than sectors.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
->
-> ---
-> v4: new patch
-> ---
->   block/qcow2-bitmap.c | 22 ++++++++--------------
->   1 file changed, 8 insertions(+), 14 deletions(-)
->
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 280960a..1de2ab5 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -291,9 +291,8 @@ static int load_bitmap_data(BlockDriverState *bs,
->   {
->       int ret = 0;
->       BDRVQcow2State *s = bs->opaque;
-> -    uint64_t sector, limit, sbc;
-> +    uint64_t offset, limit;
->       uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
-> -    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
->       uint8_t *buf = NULL;
->       uint64_t i, tab_size =
->               size_to_clusters(s,
-> @@ -305,32 +304,27 @@ static int load_bitmap_data(BlockDriverState *bs,
->
->       buf = g_malloc(s->cluster_size);
->       limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-> -    sbc = limit >> BDRV_SECTOR_BITS;
-> -    for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
-> -        uint64_t count = MIN(bm_sectors - sector, sbc);
-> +    for (i = 0, offset = 0; i < tab_size; ++i, offset += limit) {
-> +        uint64_t count = MIN(bm_size - offset, limit);
->           uint64_t entry = bitmap_table[i];
-> -        uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-> +        uint64_t data_offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
->
->           assert(check_table_entry(entry, s->cluster_size) == 0);
->
-> -        if (offset == 0) {
-> +        if (data_offset == 0) {
->               if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
-> -                bdrv_dirty_bitmap_deserialize_ones(bitmap,
-> -                                                   sector * BDRV_SECTOR_SIZE,
-> -                                                   count * BDRV_SECTOR_SIZE,
-> +                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset, count,
+On Thu, Jul 13, 2017 at 10:52:41AM +0200, Kevin Wolf wrote:
+> Am 13.07.2017 um 10:45 hat Peter Lieven geschrieben:
+> > Am 10.07.2017 um 15:30 schrieb Kevin Wolf:
+> > >Am 10.07.2017 um 15:24 hat Peter Lieven geschrieben:
+> > >>Am 10.07.2017 um 15:10 schrieb Kevin Wolf:
+> > >>>Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
+> > >>>>Signed-off-by: Peter Lieven <pl@kamp.de>
+> > >>>>---
+> > >>>>  qapi/block-core.json | 44 +++++++++++++++++++++++++++++++++++++++++++-
+> > >>>>  1 file changed, 43 insertions(+), 1 deletion(-)
+> > >>>How does this make sense as a runtime option? What would happen if the
+> > >>>image contains one compression format and I specify another one on the
+> > >>>command line or in blockdev-add?
+> > >>>
+> > >>>Shouldn't it just be a create-time option and when you run qemu, it uses
+> > >>>whatever format that image has?
+> > >>I was asked to add it here. It is indeed only a create option and has
+> > >>no other effect.
+> > >But if it's only a create option, why is it added to blockdev-add?
+> > 
+> > Is there already a separate schemata for the create options?
+> 
+> If you mean a separate schema file, no. Putting it in the same file
+> isn't a problem either, but hooking it up in structs used by
+> blockdev-add (or other QMP commands) probably is.
+> 
+> So if you want to follow Dan's suggestion, I think you just need to put
+> the new type into the schema, without referencing it anywhere except in
+> qcow2's .bdrv_create C implementation.
 
-The change is that now 3rd parameter may not be aligned by sectors, but 
-looks like it should be ok.
+Yep, that's exactly what I intended by my suggestion
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
-
-
-
->                                                      false);
->               } else {
->                   /* No need to deserialize zeros because the dirty bitmap is
->                    * already cleared */
->               }
->           } else {
-> -            ret = bdrv_pread(bs->file, offset, buf, s->cluster_size);
-> +            ret = bdrv_pread(bs->file, data_offset, buf, s->cluster_size);
->               if (ret < 0) {
->                   goto finish;
->               }
-> -            bdrv_dirty_bitmap_deserialize_part(bitmap, buf,
-> -                                               sector * BDRV_SECTOR_SIZE,
-> -                                               count * BDRV_SECTOR_SIZE,
-> +            bdrv_dirty_bitmap_deserialize_part(bitmap, buf, offset, count,
->                                                  false);
->           }
->       }
-
-
+Regards,
+Daniel
 -- 
-Best regards,
-Vladimir
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
