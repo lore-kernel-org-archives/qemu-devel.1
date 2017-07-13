@@ -1,40 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVbpU-0004JG-8n
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:58:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVbq7-0004eN-Sp
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVbpP-0007zi-EX
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:58:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50964
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVbpP-0007zc-8j
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:58:39 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6DAmlvX074337
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 06:58:38 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bp61fkk2s-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 06:58:38 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 13 Jul 2017 06:58:37 -0400
-References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 13 Jul 2017 12:58:31 +0200
+	(envelope-from <eblake@redhat.com>) id 1dVbq6-0008EU-W4
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:59:23 -0400
+References: <20170703151051.31327-1-eblake@redhat.com>
+	<20170703151051.31327-15-eblake@redhat.com>
+	<6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9d88aeeb-9deb-d0e4-6807-1199ebdd9622@redhat.com>
+Date: Thu, 13 Jul 2017 05:59:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <5ae6eccd-274a-3278-1240-42ebe7a23cc1@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/s390-next 0/3] s390x: remaining pci related
- fixes
+In-Reply-To: <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lxTllHl8sRo40OftFNiBb60of0G5ts3Q1"
+Subject: Re: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data()
+ to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,35 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 07/13/2017 12:40 PM, Christian Borntraeger wrote:
-> here are the remaining PCI patches also enabling AIS via KVM.
-> CPU model wise we do not put AIS in a default model for zEC12 and z13
-> since almost all distribution kernels do not have ais yet. This would
-> break -cpu zEC12 and -cpu z13 if QEMU is updated.
-> 
-> patches are against previous series.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lxTllHl8sRo40OftFNiBb60of0G5ts3Q1
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <9d88aeeb-9deb-d0e4-6807-1199ebdd9622@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data() to
+ byte-based iteration
+References: <20170703151051.31327-1-eblake@redhat.com>
+ <20170703151051.31327-15-eblake@redhat.com>
+ <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
+In-Reply-To: <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The current state (including netboot bios) can be found on
+On 07/13/2017 04:16 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 03.07.2017 18:10, Eric Blake wrote:
+>> Now that we have adjusted the majority of the calls this function
+>> makes to be byte-based, it is easier to read the code if it makes
+>> passes over the image using bytes rather than sectors.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> ---
+>> v4: new patch
+>> ---
 
-https://github.com/borntraeger/qemu/tree/s390-next
+>>
+>> -        if (offset =3D=3D 0) {
+>> +        if (data_offset =3D=3D 0) {
+>>               if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
+>> -                bdrv_dirty_bitmap_deserialize_ones(bitmap,
+>> -                                                   sector *
+>> BDRV_SECTOR_SIZE,
+>> -                                                   count *
+>> BDRV_SECTOR_SIZE,
+>> +                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset,
+>> count,
+>=20
+> The change is that now 3rd parameter may not be aligned by sectors, but=
 
-> 
-> 
-> Yi Min Zhao (3):
->   s390x: initialize cpu firstly
->   s390x/cpumodel: add zpci, aen and ais facilities
->   s390x/flic: migrate ais states
-> 
->  hw/intc/s390_flic.c             | 23 +++++++++++-
->  hw/intc/s390_flic_kvm.c         | 78 +++++++++++++++++++++++++++++++++++++++--
->  hw/s390x/s390-virtio-ccw.c      |  9 +++--
->  include/hw/s390x/s390_flic.h    |  1 +
->  target/s390x/cpu_features.c     |  3 ++
->  target/s390x/cpu_features_def.h |  3 ++
->  target/s390x/gen-features.c     |  5 +++
->  target/s390x/kvm.c              |  7 ++++
->  8 files changed, 122 insertions(+), 7 deletions(-)
-> 
+> looks like it should be ok.
+
+Correct - the dirty bitmap automatically widens any non-aligned input
+into granularity.
+
+>=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+>=20
+
+I posted a v5 prior to this email, if you want to add your Reviewed-by
+on any patches there (I think this patch went unchanged into that
+revision, but scripts don't always pick up R-b given on a previous
+version of a patch).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--lxTllHl8sRo40OftFNiBb60of0G5ts3Q1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZZ1J+AAoJEKeha0olJ0NqRZoH/jHmuoLD6ivDC90BX8sK3t7B
+9aBIOUu0NPeMyysQzw0DD81Q5zA1uIm2kQCJWKW/MPGOikyhlWD0HPYgtUYqrN/v
+xKUc6FzPm9PePCehAHuyRsa4yRByS4cNfXu6ZZlx9m0E6vZe/BvSGaVjPEWatl0a
+fIgJLwiVfbDsxr4Jx9BbWI9lfrZwIDe/eoWa9VHRkSTyL9A7thQ6ZpTMlEc149mS
+9AvScDpt2HRabsDYdtwWumwncWbrJWErFv3y01IX9YExrumDbQV+PJm7u1okOxLg
+2akqKT53eSgZnYHjRpYGtDsWcRHoyhMFXQ0esYM4ITFiRCdPsv6mLweyvoPAZRA=
+=DvW+
+-----END PGP SIGNATURE-----
+
+--lxTllHl8sRo40OftFNiBb60of0G5ts3Q1--
