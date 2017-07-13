@@ -1,43 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dVcxm-0005zU-55
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:11:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVcyW-0006Rg-UV
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:12:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dVcxh-000838-2Z
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:11:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44977
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dVcxg-00082y-Ss
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:11:16 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6DC9ZNi124946
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:11:16 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3s5c7h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:11:15 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 13 Jul 2017 13:11:13 +0100
-References: <20170711004303.3902-1-ehabkost@redhat.com>
-	<20170711004303.3902-4-ehabkost@redhat.com>
-	<2cda5b0b-0169-d12e-114e-77fcb1a4bb07@linux.vnet.ibm.com>
-	<20170712192055.GL6020@localhost.localdomain>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 13 Jul 2017 14:11:09 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dVcyR-0000Ez-Rk
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:12:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60208)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVcyR-0000Et-Hv
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 08:12:03 -0400
+Date: Thu, 13 Jul 2017 14:11:58 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170713141158.32e74897@gondolin>
+In-Reply-To: <1499942429-55449-3-git-send-email-borntraeger@de.ibm.com>
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-3-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170712192055.GL6020@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <fc38afe1-ee3c-f2e2-9d21-31396d271829@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] Revert "machine: Convert abstract
- typename on compat_props to subclass names"
+Subject: Re: [Qemu-devel] [PATCH/s390-next 2/3] s390x/cpumodel: add zpci,
+ aen and ais facilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,51 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
+On Thu, 13 Jul 2017 12:40:28 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-
-On 07/12/2017 09:20 PM, Eduardo Habkost wrote:
-> On Wed, Jul 12, 2017 at 07:49:22PM +0200, Halil Pasic wrote:
->> On 07/11/2017 02:43 AM, Eduardo Habkost wrote:
->>> This reverts commit 0bcba41fe379e4c6834adcf1456d9099db31a5b2.
->>>
->>> The bug addressed by that commit is now fixed in a better way by the
->>> commit "qdev: fix the order compat and global properties are applied".
->>>
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->>
->> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>
->> Note: It is not like the effect of commit 0bcba41fe3 is canceled
->> out with your first patch in place. It depends on the client
->> code (the implementation of the individual devices) wether
->> this patch changes something or not. I did not check myself.
->> So the did you verify that nothing breaks with this change applies
->> here too.
+> From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 > 
-> I don't get this part.  I don't see how individual devices
-> implementation will be able to affect the outcome after this
-> patch is applied.
+> zPCI instructions and facilities are available since IBM zEnterprise
+> EC12. To support z/PCI in QEMU we enable zpci, aen and ais facilities
+> starting with zEC12 GA1. And we always set zpci and aen bits in max cpu
+> model. Later they might be switched off due to applied real cpu model.
+> For ais bit, we only provide it in the full cpu model beginning with
+> zEC12 and defer its enablement in the default cpu model to a later point
+> in time. At the same time, disable them for 2.9 and older machines.
 > 
-> GlobalProperty::driver is not used as input for
-> object_property_parse() at all (see qdev_prop_set_globals()).
-> This means exactly the same property setter is invoked when
-> registering "<superclass>.<property>" or "<subclass>.<property>".
-> The only difference introduced by this series is in the ordering
-> of the object_property_parse() calls.
+> Because of introducing AIS facility, we could check if it's enabled to
+> initialize flic->ais_supported with the real value.
 > 
-> And even the object_property_parse() call ordering is not
-> affected by this patch at all, because of patch 1/3.  Patch 1/3
-> will ensure the properties will be applied in exactly the same
-> order they were registered, so this patch should introduce
-> absolutely no behavior change on any device.
+> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  hw/intc/s390_flic.c             | 3 ++-
+>  hw/intc/s390_flic_kvm.c         | 3 ---
+>  hw/s390x/s390-virtio-ccw.c      | 3 +++
+>  target/s390x/cpu_features.c     | 3 +++
+>  target/s390x/cpu_features_def.h | 3 +++
+>  target/s390x/gen-features.c     | 5 +++++
+>  target/s390x/kvm.c              | 7 +++++++
+>  7 files changed, 23 insertions(+), 4 deletions(-)
 > 
+> diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
+> index ff6e4ec..6e7c610 100644
+> --- a/hw/intc/s390_flic.c
+> +++ b/hw/intc/s390_flic.c
+> @@ -163,9 +163,10 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
+>      if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
+>          error_setg(errp, "flic property adapter_routes_max_batch too big"
+>                     " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
+> +        return;
 
-Resolving this disagreement IMHO depends on resolving our disagreement
-about patch 1. Let us postpone this until we have an agreement
-there.
+Hunk should go into a previous patch?
 
-Cheers,
-Halil
+(And does it really matter?)
+
+>      }
+>  
+> -    fs->ais_supported = true;
+> +    fs->ais_supported = s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION);
+>  }
+>  
+>  static void s390_flic_class_init(ObjectClass *oc, void *data)
+
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 78ebe83..1901153 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -302,6 +302,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>          }
+>      }
+>  
+> +    /* Try to enable AIS facility */
+> +    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+
+What happens if you fail to enable it? You probably don't want to allow
+the feature bit, then?
+
+> +
+>      qemu_mutex_init(&qemu_sigp_mutex);
+>  
+>      return 0;
+
+Let's summarize to make sure that I'm not confused:
+
+- Starting with zEC12 GA1, we provide zpci, aen, ais in the full model
+- Starting with zEC12 GA1, we provide zpci and aen in the default model
+- In the host model, we add zpci and aen; they might be switched off
+  after applying the found model
+- Compat for 2.9 and earlier switches off zpci, aen, ais
+- We unconditionally enable the kvm part of ais
+
+I'm still not sure what's supposed to happen with new qemu + old kernel
+(no ais) + full zEC12 GA1 or later model.
