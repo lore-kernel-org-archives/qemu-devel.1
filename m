@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVlSZ-0005FW-1g
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:15:43 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dVlkT-00022R-JT
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVlSX-0007br-Qs
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:15:42 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVlSX-0007bJ-ED
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:15:41 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id y28so7075873wrd.3
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 14:15:41 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1dVlkS-00088W-KD
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:34:13 -0400
+References: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ceebbf00-df78-e2cb-daf5-3731b806fc1b@redhat.com>
+Date: Thu, 13 Jul 2017 17:34:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <cd8f1049-b975-06d8-528b-9d1c3c4bc0fb@redhat.com>
-References: <CAFEAcA9A0fBB+QE68O7aea+c6SXPaVK4+7B8DJoYE27qshtrcQ@mail.gmail.com>
-	<cd8f1049-b975-06d8-528b-9d1c3c4bc0fb@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Jul 2017 22:15:19 +0100
-Message-ID: <CAFEAcA97q+WAzP=QhOc4EU05t9sqGJnpYGxuoOyg0R9QgQo-yA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] tests/Makefile.include non-portable use of $RANDOM
+In-Reply-To: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] block: -device drive=<node-name>
+ fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
 
-On 13 July 2017 at 21:16, Eric Blake <eblake@redhat.com> wrote:
-> On 07/13/2017 12:32 PM, Peter Maydell wrote:
->> On NetBSD the shell complains:
->> # echo $((RANDOM % 255 + 1))
->> -sh: arith: syntax error: "RANDOM % 255 + 1"
->>
->> and so 'make check' doesn't work.
->>
->> Any suggestions for something more portable?
->
-> Yes; echo $(( ${RANDOM:-0} % 255 + 1))
->
-> should reliably give you 1, even on current BSD /bin/sh, regardless of
-> whether BSD adds $RANDOM support in the future.
->
->> https://unix.stackexchange.com/questions/140750/generate-random-numbers-in-specific-range
->> suggests
->>   awk 'BEGIN{srand(); print int(1+rand()*256)}'
->> and of course there are similar things possible with perl et al.
->
-> But why bother. MALLOC_PERTURB_ only makes sense on glibc systems, so
-> picking a non-random value is no worse on non-glibc systems.
 
-"has glibc" != "has bash as /bin/sh". In particular most
-of my build-test systems run ubuntu and will have dash
-for /bin/sh.
 
-On the other hand the :-0 trick is simple and probably
-good enough.
+On 07/13/2017 07:41 AM, Kevin Wolf wrote:
+> Since 2.9 it is possible for a user to care only about nodes and qdev devices,
+> but not about BlockBackends, by defining with -blockdev and using their node
+> name in -device. Devices create an anonymous BlockBackend internally then.
+> 
+> One of the major problems in this setup is that such devices are not listed in
+> query-block or HMP 'info block' because the BBs are not monitor-owned. A recent
+> discussion concluded that we really want to replace query-block and friends
+> with something that matches QEMU's internals better, but there's no way to do
+> that in 2.10 (and I wouldn't bet on it to be completed for 2.11). So for now,
+> just make the devices appear in query-block and add the qdev ID there in order
+> to make the devices identifiable (they have 'device': '' because the BB is
+> anonymous).
+> 
+> With the additional qdev field, it turned out that with empty drives, ide-cd
+> and scsi-cd weren't even properly attached to the BlockBackend. If you do it
+> right, this even results in crashes. (Floppy already gets it right, in case you
+> wondered.)
+> 
+> After this series, -device drive=<node-name> should be reasonably usable
+> without a major loss of functionality like before.
+> 
+> v2:
+> - Updated example QMP outputs in schema comments [Eric]
+> - Added missing "since" tag in schema [Eric]
+> - Improved some commit messages [Eric]
+> 
+> Kevin Wolf (9):
+>   block: Make blk_get_attached_dev_id() public
+>   block/qapi: Add qdev device name to query-block
+>   block: Make blk_all_next() public
+>   block/qapi: Use blk_all_next() for query-block
+>   block: List anonymous device BBs in query-block
+>   ide: bdrv_attach_dev() for empty CD-ROM
 
-thanks
--- PMM
+oops...
+
+>   scsi-disk: bdrv_attach_dev() for empty CD-ROM
+
+Well, at least I'm in good company.
+
+>   qemu-iotests: Test 'info block'
+>   qemu-iotests: Test unplug of -device without drive
+> 
+>  block/block-backend.c          |   5 +-
+>  block/qapi.c                   |  20 +-
+>  hmp.c                          |  11 +-
+>  hw/ide/qdev.c                  |   3 +
+>  hw/scsi/scsi-disk.c            |   5 +
+>  include/sysemu/block-backend.h |   2 +
+>  qapi/block-core.json           |   9 +-
+>  tests/qemu-iotests/067         |  13 ++
+>  tests/qemu-iotests/067.out     |  40 ++++
+>  tests/qemu-iotests/186         | 147 +++++++++++++
+>  tests/qemu-iotests/186.out     | 489 +++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group       |   1 +
+>  12 files changed, 735 insertions(+), 10 deletions(-)
+>  create mode 100755 tests/qemu-iotests/186
+>  create mode 100644 tests/qemu-iotests/186.out
+> 
+
+Series:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
