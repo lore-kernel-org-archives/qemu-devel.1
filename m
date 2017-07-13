@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVi36-0000Ce-0H
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:13 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dVi3J-0000ME-NM
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVi34-0007Bt-Oe
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:12 -0400
-Date: Thu, 13 Jul 2017 20:36:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170713203512-mutt-send-email-mst@kernel.org>
-References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dVi3F-0007K4-QK
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:25 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:43128)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dVi3E-0007Fd-Q0
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:21 -0400
+Date: Thu, 13 Jul 2017 23:07:09 +0530 (IST)
+From: Ishani <chugh.ishani@research.iiit.ac.in>
+Message-ID: <844447909.2115207.1499967429943.JavaMail.zimbra@research.iiit.ac.in>
+In-Reply-To: <20170707110124.GB15945@redhat.com>
+References: <1499368127-19855-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<20170707110124.GB15945@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/3] Generate APEI GHES table and
- dynamically record CPER
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] Python3 Support for qmp.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +30,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: lersek@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow <jsnow@redhat.com>, stefanha <stefanha@redhat.com>
 
-On Wed, Jul 12, 2017 at 10:08:14AM +0800, Dongjiu Geng wrote:
-> In the armv8 platform, the mainly hardware error source are ARMv8
-> SEA/SEI/GSIV. For the ARMv8 SEA/SEI, the KVM or host kernel will signal SIGBUS
-> or use other interface to notify user space, such as Qemu. After Qemu gets
-> the notification, it will record the CPER and inject the SEA/SEI to KVM. this
-> series of patches will generate APEI table when guest OS boot up, and dynamically
-> record CPER for the guest OS about the generic hardware errors, currently the
-> userspace only handle the memory section hardware errors
+----- On Jul 7, 2017, at 4:31 PM, Daniel P. Berrange berrange@redhat.com wrote:
 
-This is in a decent shape. I would prefer some cod cleanups
-before this goes in. Mostly I would like the amount of
-pointer math trickery to go down, drop a bunch of
-unused code and fix up comments that point to ACPI spec.
+> On Fri, Jul 07, 2017 at 12:38:47AM +0530, Ishani Chugh wrote:
+>> This patch intends to make qmp.py compatible with both python2 and python3.
+>> 
+>>  * Python 3 does not have dict.has_key(key), use key in dict instead
+>>  * Avoid line-based I/O since Python 2/3 have different character
+>>    encoding behavior.  Explicitly encode/decode JSON UTF-8.
+>>  * Replace print by print function.
+> 
+> If you're going todo this, then you need to actually import the python3
+> compatible print function - not just call the python2 print statement
+> with brackets, as the semantics are different:
+> 
+>  $ python2
+>  >>> print("foo", "bar")
+>  ('foo', 'bar')
+>  >>> from __future__ import print_function
+>  >>> print("foo", "bar")
+>  foo bar
+> 
+> Only the latter matches python3 semantics
 
-I pointed out some instances but pls find all instances and try
-to clean up some more.
+Thanks. Will fix in v3.
 
-Thanks!
+>> 
+>> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+>> ---
+>>  scripts/qmp/qmp.py | 58 ++++++++++++++++++++++++++++++++++--------------------
+>>  1 file changed, 37 insertions(+), 21 deletions(-)
+>> 
+>> diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+>> index 62d3651..58fb7d1 100644
+>> --- a/scripts/qmp/qmp.py
+>> +++ b/scripts/qmp/qmp.py
+>> @@ -42,6 +42,7 @@ class QEMUMonitorProtocol:
+>>          self.__address = address
+>>          self._debug = debug
+>>          self.__sock = self.__get_sock()
+>> +        self.__data = b""
+>>          if server:
+>>              self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+>>              self.__sock.bind(self.__address)
+>> @@ -56,7 +57,7 @@ class QEMUMonitorProtocol:
+>>  
+>>      def __negotiate_capabilities(self):
+>>          greeting = self.__json_read()
+>> -        if greeting is None or not greeting.has_key('QMP'):
+>> +        if greeting is None or 'QMP' not in greeting:
+>>              raise QMPConnectError
+>>          # Greeting seems ok, negotiate capabilities
+>>          resp = self.cmd('qmp_capabilities')
+>> @@ -64,15 +65,28 @@ class QEMUMonitorProtocol:
+>>              return greeting
+>>          raise QMPCapabilitiesError
+>>  
+>> +    def __sock_readline(self):
+>> +        while True:
+>> +            ch = self.__sock.recv(1)
+>> +            if ch is None:
+>> +                if self.__data:
+>> +                    raise ValueError('socket closed mid-line')
+>> +                return None
+>> +            self.__data += ch
+>> +            if ch == b'\n':
+>> +                line = self.__data.decode('utf-8')
+>> +                self.__data = b""
+>> +                return line
+>> +
+>>      def __json_read(self, only_event=False):
+>>          while True:
+>> -            data = self.__sockfile.readline()
+>> +            data = self.__sock_readline()
+> 
+> So originally we could get back a "str" on python2, but now
+> we get a "str" (which is unicode) on python2, but "unicode"
+> on python2.
+> 
+>>              if not data:
+>>                  return
+>>              resp = json.loads(data)
+> 
+> This means the 'resp' now contains "unicode" data too on
+> python2 instead of 'str'.
+> 
+> This hopefully isn't a problem, but we certainly need to
+> make sure the iotests still pass on py2, as it could well
+> have a ripple effect in this respect.  Have you run the
+> iotests with this change applied ?
 
-> how to test:
-> 1. In the guest OS, use this command to dump the APEI table: 
-> 	"iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST"
-> 2. And find the address for the generic error status block
->    according to the notification type
-> 3. then find the CPER record through the generic error status block.
+No. I haven't run iotests with this change. Thanks for good 
+suggestion. I will run iotests before v3.
+
 > 
-> For example(notification type is SEA):
+>>              if 'event' in resp:
+>>                  if self._debug:
+>> -                    print >>sys.stderr, "QMP:<<< %s" % resp
+>> +                    print("QMP:<<< %s" % resp)
 > 
-> (1) root@genericarmv8:~# iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
-> (2) root@genericarmv8:~# cat HEST.dsl
-> 	/*
-> 	 * Intel ACPI Component Architecture
-> 	 * AML/ASL+ Disassembler version 20170303 (64-bit version)
-> 	 * Copyright (c) 2000 - 2017 Intel Corporation
-> 	 *
-> 	 * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Dec 12 07:19:43 2016
-> 	 *
-> 	 * ACPI Data Table [HEST]
-> 	 *
-> 	 * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
-> 	 */
->     ..................................................................................
->     [228h 0552   2]                Subtable Type : 0009 [Generic Hardware Error Source]
-> 	[22Ah 0554   2]                    Source Id : 0008
-> 	[22Ch 0556   2]            Related Source Id : FFFF
-> 	[22Eh 0558   1]                     Reserved : 00
-> 	[22Fh 0559   1]                      Enabled : 01
-> 	[230h 0560   4]       Records To Preallocate : 00000001
-> 	[234h 0564   4]      Max Sections Per Record : 00000001
-> 	[238h 0568   4]          Max Raw Data Length : 00001000
+> This is changing from printing to stderr, to printing to stdout
+> which is not desirable. Likewise all the similar changes below.
 > 
-> 	[23Ch 0572  12]         Error Status Address : [Generic Address Structure]
-> 	[23Ch 0572   1]                     Space ID : 00 [SystemMemory]
-> 	[23Dh 0573   1]                    Bit Width : 40
-> 	[23Eh 0574   1]                   Bit Offset : 00
-> 	[23Fh 0575   1]         Encoded Access Width : 04 [QWord Access:64]
-> 	[240h 0576   8]                      Address : 00000000785D0040
+>>                  self.__events.append(resp)
+>>                  if not only_event:
+>>                      continue
+>> @@ -87,10 +101,10 @@ class QEMUMonitorProtocol:
+>>          @param wait (bool): block until an event is available.
+>>          @param wait (float): If wait is a float, treat it as a timeout value.
+>>  
+>> -        @raise QMPTimeoutError: If a timeout float is provided and the timeout
+>> -                                period elapses.
+>> -        @raise QMPConnectError: If wait is True but no events could be
+>> retrieved
+>> -                                or if some other error occurred.
+>> +        @raise QMPTimeoutError: If a timeout float is provided and the
+>> +                                timeout period elapses.
+>> +        @raise QMPConnectError: If wait is True but no events could be
+>> +                                retrieved or if some other error occurred.
+>>          """
 > 
-> 	[248h 0584  28]                       Notify : [Hardware Error Notification Structure]
-> 	[248h 0584   1]                  Notify Type : 08 [SEA]
-> 	[249h 0585   1]                Notify Length : 1C
-> 	[24Ah 0586   2]   Configuration Write Enable : 0000
-> 	[24Ch 0588   4]                 PollInterval : 00000000
-> 	[250h 0592   4]                       Vector : 00000000
-> 	[254h 0596   4]      Polling Threshold Value : 00000000
-> 	[258h 0600   4]     Polling Threshold Window : 00000000
-> 	[25Ch 0604   4]        Error Threshold Value : 00000000
-> 	[260h 0608   4]       Error Threshold Window : 00000000
+> Don't mix whitespace changes in with other functional changes.
 > 
-> 	[264h 0612   4]    Error Status Block Length : 00001000
->     .....................................................................................
-> (3) according to above table, the address that contains the physical address of a block
->     of memory that holds the error status data for SEA notification error source is 0x00000000785D0040
-> (4) the address for SEA notification error source is 0x785d8058
-> 	(qemu) xp /2x 0x00000000785D0040
-> 	00000000785d0040: 0x785d8058 0x00000000
-> (5) check the content of generic error status block and generic error data entry
->     (qemu) xp /100x 0x785d8058
->     00000000785d8058: 0x00000001 0x00000000 0x00000000 0x00000098
->     00000000785d8068: 0x00000001 0xa5bc1114 0x4ede6f64 0x833e63b8
-> 	00000000785d8078: 0xb1837ced 0x00000000 0x00000000 0x00000050
-> 	00000000785d8088: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d8098: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d80a8: 0x00000000 0x00000000 0x00000000 0x00004002
-> 	00000000785d80b8: 0x00000000 0x00000000 0x00000000 0x00001111
-> 	00000000785d80c8: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d80d8: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d80e8: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d80f8: 0x00000000 0x00000003 0x00000000 0x00000000
-> 	00000000785d8108: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d8118: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d8128: 0x00000000 0x00000000 0x00000000 0x00000000
-> 	00000000785d8138: 0x00000000 0x00000000 0x00000000 0x00000000
 > 
-> Dongjiu Geng (3):
->   ACPI: Add new ACPI structures and macros
->   ACPI: Add APEI GHES Table Generation support
->   ACPI: build and enable APEI GHES in the Makefile and configuration
+>>  
+>>          # Check for new events regardless and pull them into the cache:
+>> @@ -98,9 +112,11 @@ class QEMUMonitorProtocol:
+>>          try:
+>>              self.__json_read()
+>>          except socket.error as err:
+>> -            if err[0] == errno.EAGAIN:
+>> +            if err.errno == errno.EAGAIN:
+>>                  # No data available
+>>                  pass
+>> +            else:
+>> +                raise
+>>          self.__sock.setblocking(1)
+>>  
+>>          # Wait for new events, if needed.
+>> @@ -128,7 +144,6 @@ class QEMUMonitorProtocol:
+>>          @raise QMPCapabilitiesError if fails to negotiate capabilities
+>>          """
+>>          self.__sock.connect(self.__address)
+>> -        self.__sockfile = self.__sock.makefile()
+>>          if negotiate:
+>>              return self.__negotiate_capabilities()
+>>  
+>> @@ -143,7 +158,6 @@ class QEMUMonitorProtocol:
+>>          """
+>>          self.__sock.settimeout(15)
+>>          self.__sock, _ = self.__sock.accept()
+>> -        self.__sockfile = self.__sock.makefile()
+>>          return self.__negotiate_capabilities()
+>>  
+>>      def cmd_obj(self, qmp_cmd):
+>> @@ -155,16 +169,17 @@ class QEMUMonitorProtocol:
+>>                  been closed
+>>          """
+>>          if self._debug:
+>> -            print >>sys.stderr, "QMP:>>> %s" % qmp_cmd
+>> +            print("QMP:>>> %s" % qmp_cmd)
+>>          try:
+>> -            self.__sock.sendall(json.dumps(qmp_cmd))
+>> +            command = json.dumps(qmp_cmd)
+>> +            self.__sock.sendall(command.encode('UTF-8'))
+>>          except socket.error as err:
+>> -            if err[0] == errno.EPIPE:
+>> +            if err.errno == errno.EPIPE:
+>>                  return
+>> -            raise socket.error(err)
+>> +            raise
+>>          resp = self.__json_read()
+>>          if self._debug:
+>> -            print >>sys.stderr, "QMP:<<< %s" % resp
+>> +            print("QMP:<<< %s" % resp)
+>>          return resp
+>>  
+>>      def cmd(self, name, args=None, id=None):
+>> @@ -175,7 +190,7 @@ class QEMUMonitorProtocol:
+>>          @param args: command arguments (dict)
+>>          @param id: command id (dict, list, string or int)
+>>          """
+>> -        qmp_cmd = { 'execute': name }
+>> +        qmp_cmd = {'execute': name}
 > 
->  default-configs/arm-softmmu.mak |   1 +
->  hw/acpi/Makefile.objs           |   1 +
->  hw/acpi/aml-build.c             |   2 +
->  hw/acpi/hest_ghes.c             | 219 ++++++++++++++++++++++++++++++++++++++++
->  hw/arm/virt-acpi-build.c        |   6 ++
->  include/hw/acpi/acpi-defs.h     | 194 +++++++++++++++++++++++++++++++++++
->  include/hw/acpi/aml-build.h     |   1 +
->  include/hw/acpi/hest_ghes.h     |  47 +++++++++
->  include/qemu/uuid.h             |  11 ++
->  9 files changed, 482 insertions(+)
->  create mode 100644 hw/acpi/hest_ghes.c
->  create mode 100644 include/hw/acpi/hest_ghes.h
+> Again bogus whitespace changes
 > 
-> -- 
-> 2.10.1
+>>          if args:
+>>              qmp_cmd['arguments'] = args
+>>          if id:
+>> @@ -184,7 +199,7 @@ class QEMUMonitorProtocol:
+>>  
+>>      def command(self, cmd, **kwds):
+>>          ret = self.cmd(cmd, kwds)
+>> -        if ret.has_key('error'):
+>> +        if 'error' in ret:
+>>              raise Exception(ret['error']['desc'])
+>>          return ret['return']
+>>  
+>> @@ -197,8 +212,8 @@ class QEMUMonitorProtocol:
+>>  
+>>          @raise QMPTimeoutError: If a timeout float is provided and the timeout
+>>                                  period elapses.
+>> -        @raise QMPConnectError: If wait is True but no events could be
+>> retrieved
+>> -                                or if some other error occurred.
+>> +        @raise QMPConnectError: If wait is True but no events could be
+>> +                                retrieved or if some other error occurred.
+> 
+> And again
+> 
+>>  
+>>          @return The first available QMP event, or None.
+>>          """
+>> @@ -217,8 +232,8 @@ class QEMUMonitorProtocol:
+>>  
+>>          @raise QMPTimeoutError: If a timeout float is provided and the timeout
+>>                                  period elapses.
+>> -        @raise QMPConnectError: If wait is True but no events could be
+>> retrieved
+>> -                                or if some other error occurred.
+>> +        @raise QMPConnectError: If wait is True but no events could be
+>> +                                retrieved or if some other error occurred.
+> 
+> Same
+> 
+>>  
+>>          @return The list of available QMP events.
+>>          """
+>> @@ -245,3 +260,4 @@ class QEMUMonitorProtocol:
+>>  
+>>      def is_scm_available(self):
+>>          return self.__sock.family == socket.AF_UNIX
+>> +
+> 
+> Adding trailing blank line to the file is bad.
+
+The reason for making formatting changes is adhering to PEP8 standards.
+I will undo these changes in v3 and send a separate patch for PEP8 standards.
+
+> Regards,
+> Daniel
+> --
+>|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+>|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+Regards,
+Ishani
