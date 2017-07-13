@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dVfYI-0006GB-HN
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:57:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVfZE-00075e-0s
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dVfYH-0004Mi-ID
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:57:14 -0400
-References: <20170707203049.534-1-eblake@redhat.com>
-	<20170707203049.534-2-eblake@redhat.com>
-	<b4c5c384-d759-44f8-bc9a-41f619133a83@virtuozzo.com>
-	<91f92ed8-cc6d-d4d6-d217-95d91f6bea7c@virtuozzo.com>
-	<1dba6465-b2b4-b3f9-d1f6-54437ccae9e0@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <278f74d6-0ac7-ad54-2e0d-d1f47fe252a1@redhat.com>
-Date: Thu, 13 Jul 2017 16:56:54 +0200
+	(envelope-from <berrange@redhat.com>) id 1dVfZD-0004vO-1l
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:58:12 -0400
+Date: Thu, 13 Jul 2017 15:58:01 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170713145801.GP4011@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170710134436.GB6770@redhat.com>
+	<20170710135218.GK5772@noname.redhat.com>
+	<20170710135539.GD6770@redhat.com>
+	<e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
+	<20170713092100.GD4011@redhat.com>
+	<e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
+	<20170713140022.GN4011@redhat.com>
+	<1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
+	<20170713140711.GO4011@redhat.com>
+	<4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <1dba6465-b2b4-b3f9-d1f6-54437ccae9e0@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rE8xRGS06jg3DRgg6iBb6ETOvQnd8LQNV"
-Subject: Re: [Qemu-devel] [PATCH v5 1/9] nbd: Create struct for tracking
- export info
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
+ compress format extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rE8xRGS06jg3DRgg6iBb6ETOvQnd8LQNV
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Message-ID: <278f74d6-0ac7-ad54-2e0d-d1f47fe252a1@redhat.com>
-Subject: Re: [PATCH v5 1/9] nbd: Create struct for tracking export info
-References: <20170707203049.534-1-eblake@redhat.com>
- <20170707203049.534-2-eblake@redhat.com>
- <b4c5c384-d759-44f8-bc9a-41f619133a83@virtuozzo.com>
- <91f92ed8-cc6d-d4d6-d217-95d91f6bea7c@virtuozzo.com>
- <1dba6465-b2b4-b3f9-d1f6-54437ccae9e0@redhat.com>
-In-Reply-To: <1dba6465-b2b4-b3f9-d1f6-54437ccae9e0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 13, 2017 at 04:18:13PM +0200, Peter Lieven wrote:
+> 
+> Okay, so it has to be a mix of QAPI parsing and manual parameter checking,
+> right?
 
-On 13/07/2017 16:35, Eric Blake wrote:
-> On 07/13/2017 07:31 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 13.07.2017 15:09, Vladimir Sementsov-Ogievskiy wrote:
->>> 07.07.2017 23:30, Eric Blake wrote:
->>>> The NBD Protocol is introducing some additional information
->>>> about exports, such as minimum request size and alignment, as
->>>> well as an advertised maximum request size.  It will be easier
->>>> to feed this information back to the block layer if we gather
->>>> all the information into a struct, rather than adding yet more
->>>> pointer parameters during negotiation.
->>>
->>> // it was me who do so)
->>>
->=20
->>>> +int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
->>>>                Error **errp)
->>>>   {
->>>> -    unsigned long sectors =3D size / BDRV_SECTOR_SIZE;
->>>> -    if (size / BDRV_SECTOR_SIZE !=3D sectors) {
->>>> -        error_setg(errp, "Export size %lld too large for 32-bit
->>>> kernel",
->>>> -                   (long long) size);
->>>> +    unsigned long sectors =3D info->size / BDRV_SECTOR_SIZE;
->>>> +    if (info->size / BDRV_SECTOR_SIZE !=3D sectors) {
->>>> +        error_setg(errp, "Export size %" PRId64 " too large for
->>>> 32-bit kernel",
->>>
->>> should be PRIu64
->=20
-> Even with an unsigned size, we can't support more than the maximum off_=
-t
-> (2^63-1) rather than the full uint64_t range (2^64-1).  Any positive
-> size prints the same, and if any caller is passing in a negative size,
-> things are already weird.  But you are correct that matching unsigned t=
-o
-> PRIu64 is nicer, even if we already make blatant assumptions that all
-> platforms that qemu runs on can interchange signedness in printf withou=
-t
-> repercussion.
->=20
->>>
->>>> +                   info->size);
->>>>           return -E2BIG;
->>>>       }
->>>>
->>> [...]
->>>
->>
->> with fixed:
->>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> (if it is not too late ;)
->=20
-> Depends on whether Paolo wants to send a v2 pull request omitting the
-> NBD stuff (in which case I'll submit a separate NBD pull request), or
-> whether we just let the pull request happen (in which case I'll submit
-> followup patches to address your reviews).  It's slightly cleaner to ge=
-t
-> it right from the get-go, but followups are better than nothing, so I'm=
+Yeah. It does feel like a valid RFE for QAPI to add a permitted range to
+'int' types though, which would simplify the code in future.
 
-> not too fussed either way.
+> I currently have the following:
+> 
+>     options = qemu_opts_to_qdict(opts, NULL);
+>     qdict_extract_subqdict(options, &compressopts, "compress.");
+>     v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
+>     visit_start_struct(v, NULL, NULL, 0, &local_err);
+>     if (local_err) {
+>         ret= -EINVAL;
+>         goto finish;
+>     }
+>     visit_type_Qcow2Compress_members(v, &compress, &local_err);
+>     if (local_err) {
+>         ret= -EINVAL;
+>         goto finish;
+>     }
+>     visit_end_struct(v, NULL);
+>     visit_free(v);
+>     QDECREF(compressopts);
+>     QDECREF(options)
 
-I've fixed the PRIu64 already when applying (and also the tracepoint in
-patch 2).
+Looks good.
 
-Paolo
+> And I have the following 2 questions:
+>  a) I have to specifiy compress.format and compress.level otherwise I will get an error. How can I fix that the settings are optional?
 
+Put an '*' as the first character of any field name if it should be optional.
 
+>  b) If I just specify a compress.format can I default the compress.level to 0 without an error?
 
---rE8xRGS06jg3DRgg6iBb6ETOvQnd8LQNV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I believe you'd get compress.level as 0 automatically for an 'int' type.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAllnijYACgkQv/vSX3jH
-roOC9wf7BmuYb5LmYEdMWlQwgTe/WTrP9Y+UHaQEPMr8moXsU0UJT0p6ZVpDpI4h
-VL5alsA05R+ex8RQfxyryR2mWyFsW2U9V/dx0bePAE/mYvdAHcFHdwC7vfpRMFGs
-WADRiBZjzLba00whmqld+sJERKK8OP1P8mhV2zhHAUfhj/04DBYBR/PWxzWLM8TS
-rV8VkGcPzOwnrWlamiF8KN1pvi0HkGLzowCoYaE4bLVZMlcCxp+XngJ/Oz3QtaP2
-W4/cd1CPzj7xo7XkYUBZb/BzvmQ8OkoGRJQGgyHcGTSATMqYJvRS3aQyFd+0lZ7U
-mYziP7Gms7NPTaktdJuGF2ggb/zIDg==
-=EkID
------END PGP SIGNATURE-----
-
---rE8xRGS06jg3DRgg6iBb6ETOvQnd8LQNV--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
