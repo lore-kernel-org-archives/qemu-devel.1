@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVaxc-0004hW-CJ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:05 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVay0-000500-Ba
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVaxb-0004Ax-5h
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:04 -0400
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Thu, 13 Jul 2017 13:01:15 +0300
-Message-Id: <20170713100117.11961-3-el13635@mail.ntua.gr>
-In-Reply-To: <20170713100117.11961-1-el13635@mail.ntua.gr>
-References: <20170713100117.11961-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v5 2/4] block: remove unused bdrv_media_changed
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVaxu-0004Q9-EB
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:28 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:34163)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dVaxu-0004Pi-9V
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:22 -0400
+Received: by mail-qt0-x236.google.com with SMTP id 32so33585429qtv.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:03:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 13 Jul 2017 07:03:09 -0300
+Message-Id: <20170713100311.20037-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH RESEND 0/2] avoid Travis CI "no log output
+ for 10 minutes" failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,102 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This function is not used anywhere, so remove it.
+Hi, still trying to reduce Travis false negatives...
 
-Markus Armbruster adds:
-The i82078 floppy device model used to call bdrv_media_changed() to
-implement its media change bit when backed by a host floppy.  This
-went away in 21fcf36 "fdc: simplify media change handling".
-Probably broke host floppy media change.  Host floppy pass-through
-was dropped in commit f709623.  bdrv_media_changed() has never been
-used for anything else.  Remove it.
-(Source is Message-ID: <87y3ruaypm.fsf@dusky.pond.sub.org>)
+Suggested yesterday on IRC:
+  pm215: this one seems to be that we hit the "10 minutes with no output" limit
+  stefanha: f4bug: We could literally have a SIGALRM that wakes up to print out a '.' :-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
----
- block.c                   | 14 --------------
- block/raw-format.c        |  6 ------
- include/block/block.h     |  1 -
- include/block/block_int.h |  1 -
- 4 files changed, 22 deletions(-)
+Let's try with an easy shell script.
 
-diff --git a/block.c b/block.c
-index 892f29d231..eecec6a016 100644
---- a/block.c
-+++ b/block.c
-@@ -4200,20 +4200,6 @@ bool bdrv_is_inserted(BlockDriverState *bs)
- }
- 
- /**
-- * Return whether the media changed since the last call to this
-- * function, or -ENOTSUP if we don't know.  Most drivers don't know.
-- */
--int bdrv_media_changed(BlockDriverState *bs)
--{
--    BlockDriver *drv = bs->drv;
--
--    if (drv && drv->bdrv_media_changed) {
--        return drv->bdrv_media_changed(bs);
--    }
--    return -ENOTSUP;
--}
--
--/**
-  * If eject_flag is TRUE, eject the media. Otherwise, close the tray
-  */
- void bdrv_eject(BlockDriverState *bs, bool eject_flag)
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 142649ed56..ab552c0954 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -372,11 +372,6 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
-     return bdrv_truncate(bs->file, offset, prealloc, errp);
- }
- 
--static int raw_media_changed(BlockDriverState *bs)
--{
--    return bdrv_media_changed(bs->file->bs);
--}
--
- static void raw_eject(BlockDriverState *bs, bool eject_flag)
- {
-     bdrv_eject(bs->file->bs, eject_flag);
-@@ -510,7 +505,6 @@ BlockDriver bdrv_raw = {
-     .bdrv_refresh_limits  = &raw_refresh_limits,
-     .bdrv_probe_blocksizes = &raw_probe_blocksizes,
-     .bdrv_probe_geometry  = &raw_probe_geometry,
--    .bdrv_media_changed   = &raw_media_changed,
-     .bdrv_eject           = &raw_eject,
-     .bdrv_lock_medium     = &raw_lock_medium,
-     .bdrv_co_ioctl        = &raw_co_ioctl,
-diff --git a/include/block/block.h b/include/block/block.h
-index b3e2674845..7e0cec5242 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -441,7 +441,6 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
- int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
- bool bdrv_is_sg(BlockDriverState *bs);
- bool bdrv_is_inserted(BlockDriverState *bs);
--int bdrv_media_changed(BlockDriverState *bs);
- void bdrv_lock_medium(BlockDriverState *bs, bool locked);
- void bdrv_eject(BlockDriverState *bs, bool eject_flag);
- const char *bdrv_get_format_name(BlockDriverState *bs);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 37388ccb18..afdebe7c52 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -249,7 +249,6 @@ struct BlockDriver {
- 
-     /* removable device specific */
-     bool (*bdrv_is_inserted)(BlockDriverState *bs);
--    int (*bdrv_media_changed)(BlockDriverState *bs);
-     void (*bdrv_eject)(BlockDriverState *bs, bool eject_flag);
-     void (*bdrv_lock_medium)(BlockDriverState *bs, bool locked);
- 
+This doesn't solve the 50min TO problem which is a different issue, but seems
+to work a bit more stable:
+
+https://travis-ci.org/philmd/qemu/builds/253032034
+
+tagged 'RFC' because it's just a PoC script without comment.
+
+Regards,
+
+Phil.
+
+PD: sorry, resent since I forgot to Cc: qemu-devel@nongnu.org :S
+
+Philippe Mathieu-Daudé (2):
+  scripts: helper to keep console alive
+  travis: use console aliveness script
+
+ .travis.yml          |  2 +-
+ MAINTAINERS          |  1 +
+ scripts/aliveness.sh | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
+ create mode 100755 scripts/aliveness.sh
+
 -- 
-2.11.0
+2.13.2
