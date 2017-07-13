@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVe7Z-0007ja-35
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:25:36 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVeA0-0008V2-3E
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVe7T-0008NU-8S
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:25:33 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVe7T-0008N7-3Z
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:25:27 -0400
-Received: by mail-qt0-x243.google.com with SMTP id c20so5997436qte.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 06:25:27 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <f1a9dc49-40d8-828b-26fa-76261ee95fab@bandsman.co.uk>
-	<CAFEAcA-8qNiyD3yfBS3EBq6rdB8oUcc7B9qeGp5KBQs7SggmAA@mail.gmail.com>
-	<be531cc1-50d4-4149-7499-ac8fe554bd23@bandsman.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ff9234b1-1d33-dc38-8e62-846914f7d0ea@amsat.org>
-Date: Thu, 13 Jul 2017 10:25:23 -0300
+	(envelope-from <armbru@redhat.com>) id 1dVe9v-0001Jl-JT
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVe9v-0001JN-Cy
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:27:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 13 Jul 2017 15:27:51 +0200
+Message-Id: <1499952476-3454-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1499952476-3454-1-git-send-email-armbru@redhat.com>
+References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <be531cc1-50d4-4149-7499-ac8fe554bd23@bandsman.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Link error with github source
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 4/9] util/qemu-error: Rename error_print_loc()
+ to be more generic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nigel Horne <njh@bandsman.co.uk>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>
 
-Hi Nigel,
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-On 07/13/2017 09:59 AM, Nigel Horne wrote:
-> On 7/13/17 8:57 AM, Peter Maydell wrote:
->> On 13 July 2017 at 13:51, Nigel Horne <njh@bandsman.co.uk> wrote:
->>> The latest version in github fails to link (using gcc-7) with this 
->>> error:
->>>
->>>    LINK    aarch64-softmmu/qemu-system-aarch64
->>> accel/tcg/cputlb.o: In function `helper_atomic_cmpxchgo_le_mmu':
->>> cputlb.c:(.text+0x5f3d): undefined reference to
->>> `__atomic_compare_exchange_16'
->>> accel/tcg/cputlb.o: In function `helper_atomic_cmpxchgo_be_mmu':
->>> cputlb.c:(.text+0x6000): undefined reference to
->>> `__atomic_compare_exchange_16'
->>> accel/tcg/cputlb.o: In function `helper_atomic_ldo_be_mmu':
->>> cputlb.c:(.text+0x602f): undefined reference to `__atomic_load_16'
->>> accel/tcg/cputlb.o: In function `helper_atomic_ldo_le_mmu':
->>> cputlb.c:(.text+0x5f73): undefined reference to `__atomic_load_16'
->>> accel/tcg/cputlb.o: In function `helper_atomic_sto_le_mmu':
->>> cputlb.c:(.text+0x5fa9): undefined reference to `__atomic_store_16'
->>> accel/tcg/cputlb.o: In function `helper_atomic_sto_be_mmu':
->>> cputlb.c:(.text+0x607f): undefined reference to `__atomic_store_16'
->>> collect2: error: ld returned 1 exit status
->>> Makefile:197: recipe for target 'qemu-system-aarch64' failed
->>> make[1]: *** [qemu-system-aarch64] Error 1
->>> Makefile:328: recipe for target 'subdir-aarch64-softmmu' failed
->>> make: *** [subdir-aarch64-softmmu] Error 2
->> Emilio's recent-ish change (commit f3ced3c5928) maybe?
->>
->> Nigel -- what host architecture are you building for?
-> x86_64 - Debian Linux.
+Rename the error_print_loc() function in preparation for using it to
+print warnings as well.
 
-can not reproduce, what are your ./configure options?
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <661b215695db878a0aef8401b506fb3da50e981a.1499866456.git.alis=
+tair.francis@xilinx.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ util/qemu-error.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-((f0d2ead97c...))$ head -2 config.log
-# QEMU configure log Thu Jul 13 10:08:49 -03 2017
-# Configured with: '../configure' 
-'--target-list=aarch64-softmmu,aarch64-linux-user' 
-'--enable-trace-backends=simple' '--disable-docs' '--disable-vnc' 
-'--disable-brlapi' '--disable-bluez' '--disable-smartcard' 
-'--disable-gtk' '--audio-drv-list=pa' '--disable-tpm' '--enable-curses' 
-'--cc=gcc-7'
-
-((f0d2ead97c...))$ make -j5 subdir-aarch64-softmmu
-[...]
-   CC      aarch64-softmmu/trace/generated-helpers.o
-   LINK    aarch64-softmmu/qemu-system-aarch64
-
-((f0d2ead97c...))$ readelf -p .comment aarch64-softmmu/qemu-system-aarch64
-
-String dump of section '.comment':
-   [     0]  GCC: (Debian 6.4.0-1) 6.4.0 20170704
-   [    25]  GCC: (Debian 7.1.0-9) 7.1.0
-   [    41]  GCC: (Debian 6.3.0-18) 6.3.0 20170516
-
-((f0d2ead97c...))$ readelf -wi aarch64-softmmu/qemu-system-aarch64|fgrep 
-DW_AT_producer|cut -d: -f2-|sort -u
-  (indirect string, offset: 0x12026f): GNU C11 6.3.0 20170516 
--mtune=generic -march=x86-64 -g -O2 -std=gnu11 -fgnu89-inline 
--fmerge-all-constants -frounding-math -fPIC -ftls-model=initial-exec
-  (indirect string, offset: 0x57c0): GNU C11 7.1.0 -m64 -mcx16 
--mtune=generic -march=x86-64 -g -O2 -fPIE -fno-strict-aliasing 
--fno-common -fwrapv -fstack-protector-strong
-  (indirect string, offset: 0x72b6e): GNU C++14 6.4.0 20170704 -m64 
--mcx16 -mtune=generic -march=x86-64 -g -O2 -fPIE -fno-strict-aliasing 
--fno-common -fwrapv -fstack-protector-strong
-  (indirect string, offset: 0x7768a): GNU C++14 6.4.0 20170704 -m64 
--mcx16 -mtune=generic -march=x86-64 -ggdb -g -fPIE -fno-strict-aliasing 
--fno-common -fwrapv -fstack-protector-strong
-  (indirect string, offset: 0xcc5ac): GNU C11 7.1.0 -m64 -mcx16 
--mtune=generic -march=x86-64 -ggdb -g -fPIE -fno-strict-aliasing 
--fno-common -fwrapv -fstack-protector-strong
-
-(f0d2ead97c...))$ aarch64-softmmu/qemu-system-aarch64 -version
-QEMU emulator version 2.9.50 (v2.9.0-1376-g80f464ef84-dirty)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-((f0d2ead97c...))$ apt-cache policy gcc-7
-gcc-7:
-   Installed: 7.1.0-9
-   Candidate: 7.1.0-9
-   Version table:
-  *** 7.1.0-9 500
-         500 http://httpredir.debian.org/debian unstable/main amd64 Packages
-         100 /var/lib/dpkg/status
-
-Regards,
-
-Phil.
+diff --git a/util/qemu-error.c b/util/qemu-error.c
+index b331f8f..1c5e35e 100644
+--- a/util/qemu-error.c
++++ b/util/qemu-error.c
+@@ -146,7 +146,7 @@ const char *error_get_progname(void)
+ /*
+  * Print current location to current monitor if we have one, else to std=
+err.
+  */
+-static void error_print_loc(void)
++static void print_loc(void)
+ {
+     const char *sep =3D "";
+     int i;
+@@ -197,7 +197,7 @@ void error_vreport(const char *fmt, va_list ap)
+         g_free(timestr);
+     }
+=20
+-    error_print_loc();
++    print_loc();
+     error_vprintf(fmt, ap);
+     error_printf("\n");
+ }
+--=20
+2.7.5
