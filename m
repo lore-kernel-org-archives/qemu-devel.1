@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35717)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dVZka-0005Q9-Vo
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:45:34 -0400
+	id 1dVZlS-00061J-64
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:46:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dVZkX-0002dV-QZ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:45:33 -0400
-Received: from mx01.kamp.de ([82.141.2.16]:38734)
+	(envelope-from <pl@kamp.de>) id 1dVZlO-00038y-U2
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:46:26 -0400
+Received: from mx01.kamp.de ([82.141.2.16]:38758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dVZkX-0002cK-HW
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:45:29 -0400
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dVZlO-00038I-JJ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 04:46:22 -0400
 References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-6-git-send-email-pl@kamp.de>
-	<20170710132546.GG5772@noname.redhat.com>
-	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
-	<20170710133459.GI5772@noname.redhat.com>
-	<20170710134436.GB6770@redhat.com>
-	<20170710135218.GK5772@noname.redhat.com>
-	<20170710135539.GD6770@redhat.com>
+	<1498733831-15254-3-git-send-email-pl@kamp.de>
+	<20170710131007.GE5772@noname.redhat.com>
+	<136f3543-665b-a138-1ff0-f96e2aaca0b4@kamp.de>
+	<20170710133038.GH5772@noname.redhat.com>
 From: Peter Lieven <pl@kamp.de>
-Message-ID: <e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
-Date: Thu, 13 Jul 2017 10:44:53 +0200
+Message-ID: <bc7a3168-c7de-ad6d-dc7d-09fab4f6e561@kamp.de>
+Date: Thu, 13 Jul 2017 10:45:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170710135539.GD6770@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170710133038.GH5772@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+Subject: Re: [Qemu-devel] [PATCH V2 2/8] qapi: add compress parameters to
+ Qcow2 Blockdev options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-Am 10.07.2017 um 15:55 schrieb Daniel P. Berrange:
-> On Mon, Jul 10, 2017 at 03:52:18PM +0200, Kevin Wolf wrote:
->> Am 10.07.2017 um 15:44 hat Daniel P. Berrange geschrieben:
->>> On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
->>>> Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
->>>>> Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
->>>>>> Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
->>>>>>> we now read the extension on open and write it on update, but
->>>>>>> do not yet use it.
->>>>>>>
->>>>>>> Signed-off-by: Peter Lieven <pl@kamp.de>
->>>>>>> ---
->>>>>>>   block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
->>>>>>>   block/qcow2.h |  23 +++++++++++---
->>>>>>>   2 files changed, 104 insertions(+), 19 deletions(-)
->>>>>>>
->>>>>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>>>>> index 308121a..39a8afc 100644
->>>>>>> --- a/block/qcow2.c
->>>>>>> +++ b/block/qcow2.c
->>>>>>> @@ -63,6 +63,7 @@ typedef struct {
->>>>>>>   #define  QCOW2_EXT_MAGIC_END 0
->>>>>>>   #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
->>>>>>>   #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
->>>>>>> +#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
->>>>>>>   static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
->>>>>>>   {
->>>>>>> @@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
->>>>>>>           return 0;
->>>>>>>   }
->>>>>>> +static int qcow2_compress_format_from_name(char *fmt)
->>>>>>> +{
->>>>>>> +    if (!fmt || !fmt[0]) {
->>>>>>> +        return QCOW2_COMPRESS_ZLIB_COMPAT;
->>>>>>> +    } else if (g_str_equal(fmt, "zlib")) {
->>>>>>> +        return QCOW2_COMPRESS_ZLIB;
->>>>>>> +    } else {
->>>>>>> +        return -EINVAL;
->>>>>>> +    }
->>>>>>> +}
->>>>>> It might make sense to allow specifying the old compression format in
->>>>>> the compression header. But I'm not so sure about using the empty string
->>>>>> rather than a proper name for it, and even less about not documenting
->>>>>> it.
->>>>> The old format is used if and only if the compression header is absent.
->>>>> It makes no sense to write a header and use the old format. The old
->>>>> settings are suboptimal and old versions can't open a qcow2 with a
->>>>> compression header anyway.
->>>> Your code allows an empty string in the header extension. If you don't
->>>> want it there, you need to reject it.
->>> This is a good reason to use the QAPI schema to parse the create options
->>> instead of doing it using qemu_opts - the QAPI schema will generate correct
->>> code to parse & validate enum values
->> I'd really like to see QAPI used for bdrv_create(), but here we're in
->> the bdrv_open() path and parsing qcow2 headers. So either way this one
->> specifically wouldn't be fixed.
-> Sorry, yes, I was getting mixed up in the two different patches with
-> similar bits of code.
->
-> We could still replace the qcow2_compress_format_from_name() method
-> though with a call to the qapi_enum_parse() passing in the
-> 'QcowCompressFormat_lookup' table.
+Am 10.07.2017 um 15:30 schrieb Kevin Wolf:
+> Am 10.07.2017 um 15:24 hat Peter Lieven geschrieben:
+>> Am 10.07.2017 um 15:10 schrieb Kevin Wolf:
+>>> Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
+>>>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>>>> ---
+>>>>   qapi/block-core.json | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>>>>   1 file changed, 43 insertions(+), 1 deletion(-)
+>>> How does this make sense as a runtime option? What would happen if the
+>>> image contains one compression format and I specify another one on the
+>>> command line or in blockdev-add?
+>>>
+>>> Shouldn't it just be a create-time option and when you run qemu, it uses
+>>> whatever format that image has?
+>> I was asked to add it here. It is indeed only a create option and has
+>> no other effect.
+> But if it's only a create option, why is it added to blockdev-add?
 
-Can you advise how exactly I would do that? Sorry, but this is new stuff for me.
+Is there already a separate schemata for the create options?
 
 Thanks,
 Peter
