@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVaJ7-0002we-Ap
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:21:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVaMr-0004Mh-Ij
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVaJ6-0000VB-7m
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:21:13 -0400
-Date: Thu, 13 Jul 2017 10:21:00 +0100
+	(envelope-from <berrange@redhat.com>) id 1dVaMn-0001ji-BT
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:25:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVaMn-0001jS-20
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:25:01 -0400
+Date: Thu, 13 Jul 2017 10:24:53 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170713092100.GD4011@redhat.com>
+Message-ID: <20170713092453.GE4011@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1498733831-15254-1-git-send-email-pl@kamp.de>
-	<1498733831-15254-6-git-send-email-pl@kamp.de>
-	<20170710132546.GG5772@noname.redhat.com>
-	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
-	<20170710133459.GI5772@noname.redhat.com>
-	<20170710134436.GB6770@redhat.com>
-	<20170710135218.GK5772@noname.redhat.com>
-	<20170710135539.GD6770@redhat.com>
-	<e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
+References: <20170712162550.8061-1-berrange@redhat.com>
+	<292ec5a0-8722-4c66-d3d6-377b9863e092@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+In-Reply-To: <292ec5a0-8722-4c66-d3d6-377b9863e092@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Don't enable networking as a side-effect
+ of DEBUG=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Thu, Jul 13, 2017 at 10:44:53AM +0200, Peter Lieven wrote:
-> Am 10.07.2017 um 15:55 schrieb Daniel P. Berrange:
-> > On Mon, Jul 10, 2017 at 03:52:18PM +0200, Kevin Wolf wrote:
-> > > Am 10.07.2017 um 15:44 hat Daniel P. Berrange geschrieben:
-> > > > On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
-> > > > > Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
-> > > > > > Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
-> > > > > > > Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
-> > > > > > > > we now read the extension on open and write it on update, but
-> > > > > > > > do not yet use it.
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Peter Lieven <pl@kamp.de>
-> > > > > > > > ---
-> > > > > > > >   block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
-> > > > > > > >   block/qcow2.h |  23 +++++++++++---
-> > > > > > > >   2 files changed, 104 insertions(+), 19 deletions(-)
-> > > > > > > > 
-> > > > > > > > diff --git a/block/qcow2.c b/block/qcow2.c
-> > > > > > > > index 308121a..39a8afc 100644
-> > > > > > > > --- a/block/qcow2.c
-> > > > > > > > +++ b/block/qcow2.c
-> > > > > > > > @@ -63,6 +63,7 @@ typedef struct {
-> > > > > > > >   #define  QCOW2_EXT_MAGIC_END 0
-> > > > > > > >   #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
-> > > > > > > >   #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
-> > > > > > > > +#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
-> > > > > > > >   static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
-> > > > > > > >   {
-> > > > > > > > @@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
-> > > > > > > >           return 0;
-> > > > > > > >   }
-> > > > > > > > +static int qcow2_compress_format_from_name(char *fmt)
-> > > > > > > > +{
-> > > > > > > > +    if (!fmt || !fmt[0]) {
-> > > > > > > > +        return QCOW2_COMPRESS_ZLIB_COMPAT;
-> > > > > > > > +    } else if (g_str_equal(fmt, "zlib")) {
-> > > > > > > > +        return QCOW2_COMPRESS_ZLIB;
-> > > > > > > > +    } else {
-> > > > > > > > +        return -EINVAL;
-> > > > > > > > +    }
-> > > > > > > > +}
-> > > > > > > It might make sense to allow specifying the old compression format in
-> > > > > > > the compression header. But I'm not so sure about using the empty string
-> > > > > > > rather than a proper name for it, and even less about not documenting
-> > > > > > > it.
-> > > > > > The old format is used if and only if the compression header is absent.
-> > > > > > It makes no sense to write a header and use the old format. The old
-> > > > > > settings are suboptimal and old versions can't open a qcow2 with a
-> > > > > > compression header anyway.
-> > > > > Your code allows an empty string in the header extension. If you don't
-> > > > > want it there, you need to reject it.
-> > > > This is a good reason to use the QAPI schema to parse the create options
-> > > > instead of doing it using qemu_opts - the QAPI schema will generate correct
-> > > > code to parse & validate enum values
-> > > I'd really like to see QAPI used for bdrv_create(), but here we're in
-> > > the bdrv_open() path and parsing qcow2 headers. So either way this one
-> > > specifically wouldn't be fixed.
-> > Sorry, yes, I was getting mixed up in the two different patches with
-> > similar bits of code.
-> > 
-> > We could still replace the qcow2_compress_format_from_name() method
-> > though with a call to the qapi_enum_parse() passing in the
-> > 'QcowCompressFormat_lookup' table.
-> 
-> Can you advise how exactly I would do that? Sorry, but this is new stuff
-> for me.
+On Wed, Jul 12, 2017 at 06:55:45PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> Hi Daniel,
+>=20
+> On 07/12/2017 01:25 PM, Daniel P. Berrange wrote:
+> > When trying to debug problems with tests it is natural to set
+> > DEBUG=3D1 when starting the docker environment. Unfortunately
+> > this has a side-effect of enabling an eth0 network interface
+> > in the container, which changes the operating environment of
+> > the test suite. IOW tests with fail may suddenly start
+> > working again if DEBUG=3D1 is set, due to changed network setup.
+> >=20
+> > Add a separate NETWORK=3D1 option to allow enablement of
+> > networking separately from DEBUG=3D1, since common debugging
+> > tasks probably don't require networking anyway.
+> >=20
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >   tests/docker/Makefile.include | 4 +++-
+> >   1 file changed, 3 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.in=
+clude
+> > index 037cb9e..a8c4b82 100644
+> > --- a/tests/docker/Makefile.include
+> > +++ b/tests/docker/Makefile.include
+> > @@ -106,6 +106,7 @@ docker:
+> >   	@echo '                         (default is 1)'
+> >   	@echo '    DEBUG=3D1              Stop and drop to shell in the cr=
+eated container'
+> >   	@echo '                         before running the command.'
+> > +	@echo '    NETWORK=3D1            Enable eth0 virtual network inter=
+face.'
+>=20
+> "eth0" is not always true...
+>=20
+> This patch could be more generic, maybe documented as:
+>=20
+>   NETWORK=3Dhost     Use full host network stack (default no network).'
+>=20
+> >   	@echo '    NOUSER               Define to disable adding current u=
+ser to containers passwd.'
+> >   	@echo '    NOCACHE=3D1            Ignore cache when build images.'
+> >   	@echo '    EXECUTABLE=3D<path>    Include executable in image.'
+> > @@ -132,7 +133,8 @@ docker-run: docker-qemu-src
+> >   		$(SRC_PATH)/tests/docker/docker.py run 			\
+> >   			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
+> >   			$(if $V,,--rm) 					\
+> > -			$(if $(DEBUG),-i,--net=3Dnone) 			\
+> > +			$(if $(DEBUG),-i,)				\
+> > +			$(if $(NETWORK),,--net=3Dnone)			\
+>=20
+> and here use directly:  --net=3D${NETWORK:-none}
+>=20
+> so an experimented docker user could even run tests as:
+>=20
+>   make docker-test-quick@centos6 NETWORK=3Dcontainer:qemu
+>=20
+> (or NETWORK=3Dbridge)
 
-In your line of code:
-
-          s->compress_format_id =
-               qcow2_compress_format_from_name(s->compress_format.name);
-
-Instead do
-
-           s->compress_format_id =
-               qapi_enum_parse(QcowCompressFormat_lookup, s->compress_format.name);
-
-
-The 'QcowCompressFormat_lookup' symbol is a global variable that is an
-array of strings, automatically created from the 'enum' you define in
-the QAPI schema.
+This is a nice idea, though slightly more complicated. It would be good
+to support NETWORK=3D1 as a short-cut for enabling the default docker
+network backend, as well as being able to give an explicit backend for
+those who really care about the flexibility.
 
 
 Regards,
 Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
