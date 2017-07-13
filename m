@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVSDh-0001q4-M8
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:43:07 -0400
+	(envelope-from <mst@redhat.com>) id 1dVSF9-00038Q-N7
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:44:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVSDe-0003vg-Id
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:43:05 -0400
-Date: Thu, 13 Jul 2017 10:30:54 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170713003054.GP4083@umbus.fritz.box>
-References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
-	<20170712055317.26225-4-david@gibson.dropbear.id.au>
-	<20170712120451.198aef60@bahia.lan>
-	<20170712123148.3b4bc4f2@bahia.lan>
+	(envelope-from <mst@redhat.com>) id 1dVSF6-0004nD-Hn
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:44:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVSF6-0004mQ-51
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:44:32 -0400
+Date: Thu, 13 Jul 2017 03:44:21 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170713033352-mutt-send-email-mst@kernel.org>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Kynn+LdAwU9N+JqL"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170712123148.3b4bc4f2@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCHv2 3/8] spapr: Simplify unplug path
+In-Reply-To: <1499863221-16206-6-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 5/8] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,201 +27,607 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+
+On Wed, Jul 12, 2017 at 08:40:18PM +0800, Wei Wang wrote:
+> Add a new feature, VIRTIO_BALLOON_F_SG, which enables to
+> transfer a chunk of ballooned (i.e. inflated/deflated) pages using
+> scatter-gather lists to the host.
+> 
+> The implementation of the previous virtio-balloon is not very
+> efficient, because the balloon pages are transferred to the
+> host one by one. Here is the breakdown of the time in percentage
+> spent on each step of the balloon inflating process (inflating
+> 7GB of an 8GB idle guest).
+> 
+> 1) allocating pages (6.5%)
+> 2) sending PFNs to host (68.3%)
+> 3) address translation (6.1%)
+> 4) madvise (19%)
+> 
+> It takes about 4126ms for the inflating process to complete.
+> The above profiling shows that the bottlenecks are stage 2)
+> and stage 4).
+> 
+> This patch optimizes step 2) by transferring pages to the host in
+> sgs. An sg describes a chunk of guest physically continuous pages.
+> With this mechanism, step 4) can also be optimized by doing address
+> translation and madvise() in chunks rather than page by page.
+> 
+> With this new feature, the above ballooning process takes ~491ms
+> resulting in an improvement of ~88%.
+> 
+> TODO: optimize stage 1) by allocating/freeing a chunk of pages
+> instead of a single page each time.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> Signed-off-by: Liang Li <liang.z.li@intel.com>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/virtio/virtio_balloon.c     | 141 ++++++++++++++++++++++---
+>  drivers/virtio/virtio_ring.c        | 199 +++++++++++++++++++++++++++++++++---
+>  include/linux/virtio.h              |  20 ++++
+>  include/uapi/linux/virtio_balloon.h |   1 +
+>  4 files changed, 329 insertions(+), 32 deletions(-)
+> 
+> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+> index f0b3a0b..aa4e7ec 100644
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -32,6 +32,7 @@
+>  #include <linux/mm.h>
+>  #include <linux/mount.h>
+>  #include <linux/magic.h>
+> +#include <linux/xbitmap.h>
+>  
+>  /*
+>   * Balloon device works in 4K page units.  So each page is pointed to by
+> @@ -79,6 +80,9 @@ struct virtio_balloon {
+>  	/* Synchronize access/update to this struct virtio_balloon elements */
+>  	struct mutex balloon_lock;
+>  
+> +	/* The xbitmap used to record ballooned pages */
+> +	struct xb page_xb;
+> +
+>  	/* The array of pfns we tell the Host about. */
+>  	unsigned int num_pfns;
+>  	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
+> @@ -141,13 +145,71 @@ static void set_page_pfns(struct virtio_balloon *vb,
+>  					  page_to_balloon_pfn(page) + i);
+>  }
+>  
+> +/*
+> + * Send balloon pages in sgs to host.
+> + * The balloon pages are recorded in the page xbitmap. Each bit in the bitmap
+> + * corresponds to a page of PAGE_SIZE. The page xbitmap is searched for
+> + * continuous "1" bits, which correspond to continuous pages, to chunk into
+> + * sgs.
+> + *
+> + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
+> + * need to be serached.
+
+searched
+
+> + */
+> +static void tell_host_sgs(struct virtio_balloon *vb,
+> +			  struct virtqueue *vq,
+> +			  unsigned long page_xb_start,
+> +			  unsigned long page_xb_end)
+> +{
+> +	unsigned int head_id = VIRTQUEUE_DESC_ID_INIT,
+> +		     prev_id = VIRTQUEUE_DESC_ID_INIT;
+> +	unsigned long sg_pfn_start, sg_pfn_end;
+> +	uint64_t sg_addr;
+> +	uint32_t sg_size;
+> +
+> +	sg_pfn_start = page_xb_start;
+> +	while (sg_pfn_start < page_xb_end) {
+> +		sg_pfn_start = xb_find_next_bit(&vb->page_xb, sg_pfn_start,
+> +						page_xb_end, 1);
+> +		if (sg_pfn_start == page_xb_end + 1)
+> +			break;
+> +		sg_pfn_end = xb_find_next_bit(&vb->page_xb, sg_pfn_start + 1,
+> +					      page_xb_end, 0);
+> +		sg_addr = sg_pfn_start << PAGE_SHIFT;
+> +		sg_size = (sg_pfn_end - sg_pfn_start) * PAGE_SIZE;
+
+There's an issue here - this might not fit in uint32_t.
+You need to limit sg_pfn_end - something like:
+
+	/* make sure sg_size below fits in a 32 bit integer */
+	sg_pfn_end = min(sg_pfn_end, sg_pfn_start + UINT_MAX >> PAGE_SIZE);
+
+> +		virtqueue_add_chain_desc(vq, sg_addr, sg_size, &head_id,
+> +					 &prev_id, 0);
+> +		xb_zero(&vb->page_xb, sg_pfn_start, sg_pfn_end);
+> +		sg_pfn_start = sg_pfn_end + 1;
+> +	}
+> +
+> +	if (head_id != VIRTQUEUE_DESC_ID_INIT) {
+> +		virtqueue_add_chain(vq, head_id, 0, NULL, vb, NULL);
+> +		virtqueue_kick_async(vq, vb->acked);
+> +	}
+> +}
+> +
+> +/* Update pfn_max and pfn_min according to the pfn of @page */
+> +static inline void update_pfn_range(struct virtio_balloon *vb,
+> +				    struct page *page,
+> +				    unsigned long *pfn_min,
+> +				    unsigned long *pfn_max)
+> +{
+> +	unsigned long pfn = page_to_pfn(page);
+> +
+> +	*pfn_min = min(pfn, *pfn_min);
+> +	*pfn_max = max(pfn, *pfn_max);
+> +}
+> +
+>  static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  {
+>  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+>  	unsigned num_allocated_pages;
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>  
+>  	/* We can only do one array worth at a time. */
+> -	num = min(num, ARRAY_SIZE(vb->pfns));
+> +	if (!use_sg)
+> +		num = min(num, ARRAY_SIZE(vb->pfns));
+>  
+>  	mutex_lock(&vb->balloon_lock);
+>  	for (vb->num_pfns = 0; vb->num_pfns < num;
+> @@ -162,7 +224,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  			msleep(200);
+>  			break;
+>  		}
+> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		if (use_sg) {
+> +			update_pfn_range(vb, page, &pfn_min, &pfn_max);
+> +			xb_set_bit(&vb->page_xb, page_to_pfn(page));
+> +		} else {
+> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		}
+>  		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
+>  		if (!virtio_has_feature(vb->vdev,
+>  					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+> @@ -171,8 +238,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  
+>  	num_allocated_pages = vb->num_pfns;
+>  	/* Did we get any? */
+> -	if (vb->num_pfns != 0)
+> -		tell_host(vb, vb->inflate_vq);
+> +	if (vb->num_pfns != 0) {
+> +		if (use_sg)
+> +			tell_host_sgs(vb, vb->inflate_vq, pfn_min, pfn_max);
+> +		else
+> +			tell_host(vb, vb->inflate_vq);
+> +	}
+>  	mutex_unlock(&vb->balloon_lock);
+>  
+>  	return num_allocated_pages;
+> @@ -198,9 +269,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  	struct page *page;
+>  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+>  	LIST_HEAD(pages);
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>  
+> -	/* We can only do one array worth at a time. */
+> -	num = min(num, ARRAY_SIZE(vb->pfns));
+> +	/* Traditionally, we can only do one array worth at a time. */
+> +	if (!use_sg)
+> +		num = min(num, ARRAY_SIZE(vb->pfns));
+>  
+>  	mutex_lock(&vb->balloon_lock);
+>  	/* We can't release more pages than taken */
+> @@ -210,7 +284,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  		page = balloon_page_dequeue(vb_dev_info);
+>  		if (!page)
+>  			break;
+> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		if (use_sg) {
+> +			update_pfn_range(vb, page, &pfn_min, &pfn_max);
+> +			xb_set_bit(&vb->page_xb, page_to_pfn(page));
+> +		} else {
+> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		}
+>  		list_add(&page->lru, &pages);
+>  		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
+>  	}
+> @@ -221,8 +300,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  	 * virtio_has_feature(vdev, VIRTIO_BALLOON_F_MUST_TELL_HOST);
+>  	 * is true, we *have* to do it in this order
+>  	 */
+> -	if (vb->num_pfns != 0)
+> -		tell_host(vb, vb->deflate_vq);
+> +	if (vb->num_pfns != 0) {
+> +		if (use_sg)
+> +			tell_host_sgs(vb, vb->deflate_vq, pfn_min, pfn_max);
+> +		else
+> +			tell_host(vb, vb->deflate_vq);
+> +	}
+>  	release_pages_balloon(vb, &pages);
+>  	mutex_unlock(&vb->balloon_lock);
+>  	return num_freed_pages;
+> @@ -441,6 +524,18 @@ static int init_vqs(struct virtio_balloon *vb)
+>  }
+>  
+>  #ifdef CONFIG_BALLOON_COMPACTION
+> +
+> +static void tell_host_one_page(struct virtio_balloon *vb, struct virtqueue *vq,
+> +			       struct page *page)
+> +{
+> +	unsigned int id = VIRTQUEUE_DESC_ID_INIT;
+> +	u64 addr = page_to_pfn(page) << VIRTIO_BALLOON_PFN_SHIFT;
+> +
+> +	virtqueue_add_chain_desc(vq, addr, PAGE_SIZE, &id, &id, 0);
+> +	virtqueue_add_chain(vq, id, 0, NULL, (void *)addr, NULL);
+> +	virtqueue_kick_async(vq, vb->acked);
+> +}
+> +
+>  /*
+>   * virtballoon_migratepage - perform the balloon page migration on behalf of
+>   *			     a compation thread.     (called under page lock)
+> @@ -464,6 +559,7 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
+>  {
+>  	struct virtio_balloon *vb = container_of(vb_dev_info,
+>  			struct virtio_balloon, vb_dev_info);
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+>  	unsigned long flags;
+>  
+>  	/*
+> @@ -485,16 +581,22 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
+>  	vb_dev_info->isolated_pages--;
+>  	__count_vm_event(BALLOON_MIGRATE);
+>  	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+> -	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> -	set_page_pfns(vb, vb->pfns, newpage);
+> -	tell_host(vb, vb->inflate_vq);
+> -
+> +	if (use_sg) {
+> +		tell_host_one_page(vb, vb->inflate_vq, newpage);
+> +	} else {
+> +		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> +		set_page_pfns(vb, vb->pfns, newpage);
+> +		tell_host(vb, vb->inflate_vq);
+> +	}
+>  	/* balloon's page migration 2nd step -- deflate "page" */
+>  	balloon_page_delete(page);
+> -	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> -	set_page_pfns(vb, vb->pfns, page);
+> -	tell_host(vb, vb->deflate_vq);
+> -
+> +	if (use_sg) {
+> +		tell_host_one_page(vb, vb->deflate_vq, page);
+> +	} else {
+> +		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> +		set_page_pfns(vb, vb->pfns, page);
+> +		tell_host(vb, vb->deflate_vq);
+> +	}
+>  	mutex_unlock(&vb->balloon_lock);
+>  
+>  	put_page(page); /* balloon reference */
+> @@ -553,6 +655,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
+>  	if (err)
+>  		goto out_free_vb;
+>  
+> +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_SG))
+> +		xb_init(&vb->page_xb);
+> +
+>  	vb->nb.notifier_call = virtballoon_oom_notify;
+>  	vb->nb.priority = VIRTBALLOON_OOM_NOTIFY_PRIORITY;
+>  	err = register_oom_notifier(&vb->nb);
+> @@ -618,6 +723,7 @@ static void virtballoon_remove(struct virtio_device *vdev)
+>  	cancel_work_sync(&vb->update_balloon_size_work);
+>  	cancel_work_sync(&vb->update_balloon_stats_work);
+>  
+> +	xb_empty(&vb->page_xb);
+>  	remove_common(vb);
+>  #ifdef CONFIG_BALLOON_COMPACTION
+>  	if (vb->vb_dev_info.inode)
+> @@ -669,6 +775,7 @@ static unsigned int features[] = {
+>  	VIRTIO_BALLOON_F_MUST_TELL_HOST,
+>  	VIRTIO_BALLOON_F_STATS_VQ,
+>  	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+> +	VIRTIO_BALLOON_F_SG,
+>  };
+>  
+>  static struct virtio_driver virtio_balloon_driver = {
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 5e1b548..b9d7e10 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -269,7 +269,7 @@ static inline int virtqueue_add(struct virtqueue *_vq,
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+>  	struct scatterlist *sg;
+>  	struct vring_desc *desc;
+> -	unsigned int i, n, avail, descs_used, uninitialized_var(prev), err_idx;
+> +	unsigned int i, n, descs_used, uninitialized_var(prev), err_id;
+>  	int head;
+>  	bool indirect;
+>  
+> @@ -387,10 +387,68 @@ static inline int virtqueue_add(struct virtqueue *_vq,
+>  	else
+>  		vq->free_head = i;
+>  
+> -	/* Store token and indirect buffer state. */
+> +	END_USE(vq);
+> +
+> +	return virtqueue_add_chain(_vq, head, indirect, desc, data, ctx);
+> +
+> +unmap_release:
+> +	err_id = i;
+> +	i = head;
+> +
+> +	for (n = 0; n < total_sg; n++) {
+> +		if (i == err_id)
+> +			break;
+> +		vring_unmap_one(vq, &desc[i]);
+> +		i = virtio16_to_cpu(_vq->vdev, vq->vring.desc[i].next);
+> +	}
+> +
+> +	vq->vq.num_free += total_sg;
+> +
+> +	if (indirect)
+> +		kfree(desc);
+> +
+> +	END_USE(vq);
+> +	return -EIO;
+> +}
+> +
+> +/**
+> + * virtqueue_add_chain - expose a chain of buffers to the other end
+> + * @_vq: the struct virtqueue we're talking about.
+> + * @head: desc id of the chain head.
+> + * @indirect: set if the chain of descs are indrect descs.
+> + * @indir_desc: the first indirect desc.
+> + * @data: the token identifying the chain.
+> + * @ctx: extra context for the token.
+> + *
+> + * Caller must ensure we don't call this with other virtqueue operations
+> + * at the same time (except where noted).
+> + *
+> + * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
+> + */
+> +int virtqueue_add_chain(struct virtqueue *_vq,
+> +			unsigned int head,
+> +			bool indirect,
+> +			struct vring_desc *indir_desc,
+> +			void *data,
+> +			void *ctx)
+> +{
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	unsigned int avail;
+> +
+> +	/* The desc chain is empty. */
+> +	if (head == VIRTQUEUE_DESC_ID_INIT)
+> +		return 0;
+> +
+> +	START_USE(vq);
+> +
+> +	if (unlikely(vq->broken)) {
+> +		END_USE(vq);
+> +		return -EIO;
+> +	}
+> +
+>  	vq->desc_state[head].data = data;
+>  	if (indirect)
+> -		vq->desc_state[head].indir_desc = desc;
+> +		vq->desc_state[head].indir_desc = indir_desc;
+>  	if (ctx)
+>  		vq->desc_state[head].indir_desc = ctx;
+>  
+> @@ -415,26 +473,87 @@ static inline int virtqueue_add(struct virtqueue *_vq,
+>  		virtqueue_kick(_vq);
+>  
+>  	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(virtqueue_add_chain);
+>  
+> -unmap_release:
+> -	err_idx = i;
+> -	i = head;
+> +/**
+> + * virtqueue_add_chain_desc - add a buffer to a chain using a vring desc
+> + * @vq: the struct virtqueue we're talking about.
+> + * @addr: address of the buffer to add.
+> + * @len: length of the buffer.
+> + * @head_id: desc id of the chain head.
+> + * @prev_id: desc id of the previous buffer.
+> + * @in: set if the buffer is for the device to write.
+> + *
+> + * Caller must ensure we don't call this with other virtqueue operations
+> + * at the same time (except where noted).
+> + *
+> + * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
+> + */
+> +int virtqueue_add_chain_desc(struct virtqueue *_vq,
+> +			     uint64_t addr,
+> +			     uint32_t len,
+> +			     unsigned int *head_id,
+> +			     unsigned int *prev_id,
+> +			     bool in)
+> +{
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	struct vring_desc *desc = vq->vring.desc;
+> +	uint16_t flags = in ? VRING_DESC_F_WRITE : 0;
+> +	unsigned int i;
+>  
+> -	for (n = 0; n < total_sg; n++) {
+> -		if (i == err_idx)
+> -			break;
+> -		vring_unmap_one(vq, &desc[i]);
+> -		i = virtio16_to_cpu(_vq->vdev, vq->vring.desc[i].next);
+> +	/* Sanity check */
+> +	if (!_vq || !head_id || !prev_id)
+> +		return -EINVAL;
+> +retry:
+> +	START_USE(vq);
+> +	if (unlikely(vq->broken)) {
+> +		END_USE(vq);
+> +		return -EIO;
+>  	}
+>  
+> -	vq->vq.num_free += total_sg;
+> +	if (vq->vq.num_free < 1) {
+> +		/*
+> +		 * If there is no desc avail in the vq, so kick what is
+> +		 * already added, and re-start to build a new chain for
+> +		 * the passed sg.
+> +		 */
+> +		if (likely(*head_id != VIRTQUEUE_DESC_ID_INIT)) {
+> +			END_USE(vq);
+> +			virtqueue_add_chain(_vq, *head_id, 0, NULL, vq, NULL);
+> +			virtqueue_kick_sync(_vq);
+> +			*head_id = VIRTQUEUE_DESC_ID_INIT;
+> +			*prev_id = VIRTQUEUE_DESC_ID_INIT;
+> +			goto retry;
+> +		} else {
+> +			END_USE(vq);
+> +			return -ENOSPC;
+> +		}
+> +	}
+>  
+> -	if (indirect)
+> -		kfree(desc);
+> +	i = vq->free_head;
+> +	flags &= ~VRING_DESC_F_NEXT;
+> +	desc[i].flags = cpu_to_virtio16(_vq->vdev, flags);
+> +	desc[i].addr = cpu_to_virtio64(_vq->vdev, addr);
+> +	desc[i].len = cpu_to_virtio32(_vq->vdev, len);
+> +
+> +	/* Add the desc to the end of the chain */
+> +	if (*prev_id != VIRTQUEUE_DESC_ID_INIT) {
+> +		desc[*prev_id].next = cpu_to_virtio16(_vq->vdev, i);
+> +		desc[*prev_id].flags |= cpu_to_virtio16(_vq->vdev,
+> +							 VRING_DESC_F_NEXT);
+> +	}
+> +	*prev_id = i;
+> +	if (*head_id == VIRTQUEUE_DESC_ID_INIT)
+> +		*head_id = *prev_id;
+>  
+> +	vq->vq.num_free--;
+> +	vq->free_head = virtio16_to_cpu(_vq->vdev, desc[i].next);
+>  	END_USE(vq);
+> -	return -EIO;
+> +
+> +	return 0;
+>  }
+> +EXPORT_SYMBOL_GPL(virtqueue_add_chain_desc);
+>  
+>  /**
+>   * virtqueue_add_sgs - expose buffers to other end
+> @@ -627,6 +746,56 @@ bool virtqueue_kick(struct virtqueue *vq)
+>  }
+>  EXPORT_SYMBOL_GPL(virtqueue_kick);
+>  
+> +/**
+> + * virtqueue_kick_sync - update after add_buf and busy wait till update is done
+> + * @vq: the struct virtqueue
+> + *
+> + * After one or more virtqueue_add_* calls, invoke this to kick
+> + * the other side. Busy wait till the other side is done with the update.
+> + *
+> + * Caller must ensure we don't call this with other virtqueue
+> + * operations at the same time (except where noted).
+> + *
+> + * Returns false if kick failed, otherwise true.
+> + */
+> +bool virtqueue_kick_sync(struct virtqueue *vq)
+> +{
+> +	u32 len;
+> +
+> +	if (likely(virtqueue_kick(vq))) {
+> +		while (!virtqueue_get_buf(vq, &len) &&
+> +		       !virtqueue_is_broken(vq))
+> +			cpu_relax();
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +EXPORT_SYMBOL_GPL(virtqueue_kick_sync);
+> +
+> +/**
+> + * virtqueue_kick_async - update after add_buf and blocking till update is done
+> + * @vq: the struct virtqueue
+> + *
+> + * After one or more virtqueue_add_* calls, invoke this to kick
+> + * the other side. Blocking till the other side is done with the update.
+> + *
+> + * Caller must ensure we don't call this with other virtqueue
+> + * operations at the same time (except where noted).
+> + *
+> + * Returns false if kick failed, otherwise true.
+> + */
+> +bool virtqueue_kick_async(struct virtqueue *vq, wait_queue_head_t wq)
+> +{
+> +	u32 len;
+> +
+> +	if (likely(virtqueue_kick(vq))) {
+> +		wait_event(wq, virtqueue_get_buf(vq, &len));
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +EXPORT_SYMBOL_GPL(virtqueue_kick_async);
+> +
+
+This happens to
+1. drop the buf
+2. not do the right thing if more than one is in flight
+
+which means this API isn't all that useful. Even balloon
+might benefit from keeping multiple bufs in flight down
+the road.
 
 
---Kynn+LdAwU9N+JqL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jul 12, 2017 at 12:31:48PM +0200, Greg Kurz wrote:
-> On Wed, 12 Jul 2017 12:04:51 +0200
-> Greg Kurz <groug@kaod.org> wrote:
->=20
-> > On Wed, 12 Jul 2017 15:53:12 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >=20
-> > > spapr_lmb_release() and spapr_core_release() call hotplug_handler_unp=
-lug()
-> > > which after a bunch of indirection calls spapr_memory_unplug() or
-> > > spapr_core_unplug().  But we already know which is the appropriate th=
-ing
-> > > to call here, so we can just fold it directly into the release functi=
-on.
-> > >=20
-> > > Once that's done, there's no need for an hc->unplug method in the spa=
-pr
-> > > machine at all: since we also have an hc->unplug_request method, the
-> > > hotplug core will never use ->unplug.
-> > >=20
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > --- =20
-> >=20
-> > Nice cleanup :)
-> >=20
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> >=20
-> > >  hw/ppc/spapr.c | 54 ++++++++----------------------------------------=
-------
-> > >  1 file changed, 8 insertions(+), 46 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 2a059d5..ff2aa6b 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2818,6 +2818,9 @@ void spapr_lmb_release(DeviceState *dev)
-> > >  {
-> > >      HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
-> > >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(hotplug_ctrl);
->=20
-> BTW, maybe you can also drop the hotplug_ctrl variable since it only has
-> one trivial user.
-
-Good idea, done.
-
->=20
-> > > +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> > > +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> > > +    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> > >      sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, PC=
-_DIMM(dev));
-> > > =20
-> > >      /* This information will get lost if a migration occurs
-> > > @@ -2838,18 +2841,7 @@ void spapr_lmb_release(DeviceState *dev)
-> > >       * Now that all the LMBs have been removed by the guest, call the
-> > >       * pc-dimm unplug handler to cleanup up the pc-dimm device.
-> > >       */
-> > > -    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
-> > > -}
-> > > -
-> > > -static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceS=
-tate *dev,
-> > > -                                Error **errp)
-> > > -{
-> > > -    sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
-> > > -    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> > > -    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> > > -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> > > -
-> > > -    pc_dimm_memory_unplug(dev, &ms->hotplug_memory, mr);
-> > > +    pc_dimm_memory_unplug(dev, &spapr->hotplug_memory, mr);
-> > >      object_unparent(OBJECT(dev));
-> > >  }
-> > > =20
-> > > @@ -2918,10 +2910,11 @@ static void *spapr_populate_hotplug_cpu_dt(CP=
-UState *cs, int *fdt_offset,
-> > >      return fdt;
-> > >  }
-> > > =20
-> > > -static void spapr_core_unplug(HotplugHandler *hotplug_dev, DeviceSta=
-te *dev,
-> > > -                              Error **errp)
-> > > +/* Callback to be called during DRC release. */
-> > > +void spapr_core_release(DeviceState *dev)
-> > >  {
-> > > -    MachineState *ms =3D MACHINE(qdev_get_machine());
-> > > +    HotplugHandler *hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
-> > > +    MachineState *ms =3D MACHINE(hotplug_ctrl);
->=20
-> Same here.
->=20
-> > >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(ms);
-> > >      CPUCore *cc =3D CPU_CORE(dev);
-> > >      CPUArchId *core_slot =3D spapr_find_cpu_slot(ms, cc->core_id, NU=
-LL);
-> > > @@ -2945,15 +2938,6 @@ static void spapr_core_unplug(HotplugHandler *=
-hotplug_dev, DeviceState *dev,
-> > >      object_unparent(OBJECT(dev));
-> > >  }
-> > > =20
-> > > -/* Callback to be called during DRC release. */
-> > > -void spapr_core_release(DeviceState *dev)
-> > > -{
-> > > -    HotplugHandler *hotplug_ctrl;
-> > > -
-> > > -    hotplug_ctrl =3D qdev_get_hotplug_handler(dev);
-> > > -    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
-> > > -}
-> > > -
-> > >  static
-> > >  void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceSt=
-ate *dev,
-> > >                                 Error **errp)
-> > > @@ -3159,27 +3143,6 @@ static void spapr_machine_device_plug(HotplugH=
-andler *hotplug_dev,
-> > >      }
-> > >  }
-> > > =20
-> > > -static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
-> > > -                                      DeviceState *dev, Error **errp)
-> > > -{
-> > > -    sPAPRMachineState *sms =3D SPAPR_MACHINE(qdev_get_machine());
-> > > -    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
-> > > -
-> > > -    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> > > -        if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
-> > > -            spapr_memory_unplug(hotplug_dev, dev, errp);
-> > > -        } else {
-> > > -            error_setg(errp, "Memory hot unplug not supported for th=
-is guest");
-> > > -        }
-> > > -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)=
-) {
-> > > -        if (!mc->has_hotpluggable_cpus) {
-> > > -            error_setg(errp, "CPU hot unplug not supported on this m=
-achine");
-> > > -            return;
-> > > -        }
-> > > -        spapr_core_unplug(hotplug_dev, dev, errp);
-> > > -    }
-> > > -}
-> > > -
-> > >  static void spapr_machine_device_unplug_request(HotplugHandler *hotp=
-lug_dev,
-> > >                                                  DeviceState *dev, Er=
-ror **errp)
-> > >  {
-> > > @@ -3397,7 +3360,6 @@ static void spapr_machine_class_init(ObjectClas=
-s *oc, void *data)
-> > >      mc->get_hotplug_handler =3D spapr_get_hotplug_handler;
-> > >      hc->pre_plug =3D spapr_machine_device_pre_plug;
-> > >      hc->plug =3D spapr_machine_device_plug;
-> > > -    hc->unplug =3D spapr_machine_device_unplug;
-> > >      mc->cpu_index_to_instance_props =3D spapr_cpu_index_to_props;
-> > >      mc->possible_cpu_arch_ids =3D spapr_possible_cpu_arch_ids;
-> > >      hc->unplug_request =3D spapr_machine_device_unplug_request; =20
-> >=20
->=20
-
-
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Kynn+LdAwU9N+JqL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZZr89AAoJEGw4ysog2bOSoiYP/jnbu0AAvW0xhYFIBmqGI85c
-pCgrTRGNxPqcmr1tgwtXh9amj1wecqCfLXhO68DNRFWyPfnB8uIfzLl177GTdBz4
-Gs5zfZJ6Xox9CZhm3UxV4VF6IBOGgrAaatJ4WHKWsxSog2G9PNgL2nfbmvlmhSp4
-ckqEgxBtZrULIiDx/OiRo10BQ1bwaEha1HtNQfwtnl1gJxYO0aMkecITJ2hcOYT7
-kxn0wHjKfoACp+QrYh5H3zaypKpKu0iMIUeBYaGD6F2vVrQSYzPaoqEEN83HLErR
-4+JsJ0GNfn+s9RDp/QKp2lXJYBWwIF5qY/DE3FN0kIN/YHNguhl8XBEGpUAPLmNy
-kEq6l0Ege0Sc4UK1ks1cXTkxeySxDSsV0a+13jyp0SApAyUBpiS55rn2WQP/sJpM
-DOXV+mdVgEtZfDA4jmdyI3DjZL7gKdVGuiaodceeSySG3r7imlAZtdy6PXlh0Wtq
-TEqt2RDzQgy+8paJu+4+J3a5eju+Oz6RYwk+mp1V7Ak0dC52P8gqOclOyBiFFD5U
-Q9sinNWmFApSWLrIF/mYzi4y6Je2V5W607kH4uEKqDDn/vkzr390IZ5SkwgwQK/J
-x9umtTGQuj8RZuLfBuTacJYePn+shrmNinsDzH8AqyI7H7+RSzIYKZL+eGazASWA
-tAL8vK93+myp5a/aMGg+
-=ZH85
------END PGP SIGNATURE-----
-
---Kynn+LdAwU9N+JqL--
+>  static void detach_buf(struct vring_virtqueue *vq, unsigned int head,
+>  		       void **ctx)
+>  {
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index 28b0e96..9f27101 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -57,8 +57,28 @@ int virtqueue_add_sgs(struct virtqueue *vq,
+>  		      void *data,
+>  		      gfp_t gfp);
+>  
+> +/* A desc with this init id is treated as an invalid desc */
+> +#define VIRTQUEUE_DESC_ID_INIT UINT_MAX
+> +int virtqueue_add_chain_desc(struct virtqueue *_vq,
+> +			     uint64_t addr,
+> +			     uint32_t len,
+> +			     unsigned int *head_id,
+> +			     unsigned int *prev_id,
+> +			     bool in);
+> +
+> +int virtqueue_add_chain(struct virtqueue *_vq,
+> +			unsigned int head,
+> +			bool indirect,
+> +			struct vring_desc *indirect_desc,
+> +			void *data,
+> +			void *ctx);
+> +
+>  bool virtqueue_kick(struct virtqueue *vq);
+>  
+> +bool virtqueue_kick_sync(struct virtqueue *vq);
+> +
+> +bool virtqueue_kick_async(struct virtqueue *vq, wait_queue_head_t wq);
+> +
+>  bool virtqueue_kick_prepare(struct virtqueue *vq);
+>  
+>  bool virtqueue_notify(struct virtqueue *vq);
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> index 343d7dd..37780a7 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -34,6 +34,7 @@
+>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+>  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+> +#define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
+>  
+>  /* Size of a PFN in the balloon interface. */
+>  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> -- 
+> 2.7.4
