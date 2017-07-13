@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVfcy-0002Vh-6J
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:02:06 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dVfd6-0002Ze-Br
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVfcx-000771-66
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:02:04 -0400
-Date: Thu, 13 Jul 2017 16:01:48 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170713150148.GQ4011@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170710135539.GD6770@redhat.com>
-	<e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
-	<20170713092100.GD4011@redhat.com>
-	<e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
-	<20170713140022.GN4011@redhat.com>
-	<1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
-	<20170713140711.GO4011@redhat.com>
-	<4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
-	<20170713145801.GP4011@redhat.com>
-	<37d97fcb-aa71-1ed4-2134-6d308da7b527@kamp.de>
+	(envelope-from <lprosek@redhat.com>) id 1dVfd3-0007AU-R7
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:02:12 -0400
+Received: from mail-ua0-f175.google.com ([209.85.217.175]:35145)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVfd3-0007AF-MG
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:02:09 -0400
+Received: by mail-ua0-f175.google.com with SMTP id j53so35409292uaa.2
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:02:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <37d97fcb-aa71-1ed4-2134-6d308da7b527@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+In-Reply-To: <20170713164210.45b2f3fc@gondolin>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+	<20170713110237.6712-4-lprosek@redhat.com>
+	<20170713164210.45b2f3fc@gondolin>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Thu, 13 Jul 2017 17:02:08 +0200
+Message-ID: <CABdb7367eVJNd8hWqVpF3RN58g7xchCyPLP=aaTy7jKXd8ws+A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] virtio: introduce virtqueue_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, Jul 13, 2017 at 05:00:39PM +0200, Peter Lieven wrote:
-> Am 13.07.2017 um 16:58 schrieb Daniel P. Berrange:
-> > On Thu, Jul 13, 2017 at 04:18:13PM +0200, Peter Lieven wrote:
-> > > Okay, so it has to be a mix of QAPI parsing and manual parameter checking,
-> > > right?
-> > Yeah. It does feel like a valid RFE for QAPI to add a permitted range to
-> > 'int' types though, which would simplify the code in future.
-> > 
-> > > I currently have the following:
-> > > 
-> > >      options = qemu_opts_to_qdict(opts, NULL);
-> > >      qdict_extract_subqdict(options, &compressopts, "compress.");
-> > >      v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
-> > >      visit_start_struct(v, NULL, NULL, 0, &local_err);
-> > >      if (local_err) {
-> > >          ret= -EINVAL;
-> > >          goto finish;
-> > >      }
-> > >      visit_type_Qcow2Compress_members(v, &compress, &local_err);
-> > >      if (local_err) {
-> > >          ret= -EINVAL;
-> > >          goto finish;
-> > >      }
-> > >      visit_end_struct(v, NULL);
-> > >      visit_free(v);
-> > >      QDECREF(compressopts);
-> > >      QDECREF(options)
-> > Looks good.
-> > 
-> > > And I have the following 2 questions:
-> > >   a) I have to specifiy compress.format and compress.level otherwise I will get an error. How can I fix that the settings are optional?
-> > Put an '*' as the first character of any field name if it should be optional.
-> > 
-> > >   b) If I just specify a compress.format can I default the compress.level to 0 without an error?
-> > I believe you'd get compress.level as 0 automatically for an 'int' type.
-> 
-> I still face the issue that I now always have to specify a compress.format.
-> I tried to solve it like this:
+On Thu, Jul 13, 2017 at 4:42 PM, Cornelia Huck <cohuck@redhat.com> wrote:
+> On Thu, 13 Jul 2017 13:02:32 +0200
+> Ladi Prosek <lprosek@redhat.com> wrote:
+>
+>> Most virtio error output pertains to a specific virtqueue so it makes
+>> sense to include the queue index in error messages. This commit makes
+>> all error output in virtio.c use the newly introduced virtqueue_error.
+>
+> Split out the change introducing virtqueue_error(), as this patch is
+> quite large?
 
-[snip]
+Will do, thanks!
 
-that's not needed if you name the parameter '*level' in the QAPI schema
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>>
+>> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+>> ---
+>>  hw/virtio/virtio.c         | 98 ++++++++++++++++++++++++++++------------------
+>>  include/hw/virtio/virtio.h |  1 +
+>>  2 files changed, 60 insertions(+), 39 deletions(-)
+>
+> I like the change. Feel free to add
+>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
