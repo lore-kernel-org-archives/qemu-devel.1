@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVSI8-0005CR-TX
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:47:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVSPv-0000Yz-4I
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVSI5-0006d2-Rc
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:47:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51880)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVSI5-0006cS-HP
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:47:37 -0400
-Date: Thu, 13 Jul 2017 03:47:31 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170713034716-mutt-send-email-mst@kernel.org>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<20170712181652-mutt-send-email-mst@kernel.org>
-	<20170712201550.GN6020@localhost.localdomain>
-	<20170712232214-mutt-send-email-mst@kernel.org>
-	<20170712205646.GQ6020@localhost.localdomain>
-	<20170713003116-mutt-send-email-mst@kernel.org>
-	<91a1c7c2-0e87-4023-c960-5078267abf95@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dVSPr-0002q8-3a
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:55:43 -0400
+Date: Thu, 13 Jul 2017 10:53:38 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170713005338.GQ4083@umbus.fritz.box>
+References: <20170712055317.26225-1-david@gibson.dropbear.id.au>
+	<20170712055317.26225-5-david@gibson.dropbear.id.au>
+	<20170712134715.46aec1e0@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="FcSpk3Icpd/Pbul4"
 Content-Disposition: inline
-In-Reply-To: <91a1c7c2-0e87-4023-c960-5078267abf95@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+In-Reply-To: <20170712134715.46aec1e0@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCHv2 4/8] spapr: Refactor spapr_drc_detach()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,140 +25,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>
+Cc: mdroth@linux.vnet.ibm.com, danielhb@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, sjitindarsingh@gmail.com, bharata@linux.vnet.ibm.com
 
-On Thu, Jul 13, 2017 at 02:23:39AM +0200, Laszlo Ersek wrote:
-> On 07/13/17 00:27, Michael S. Tsirkin wrote:
-> > On Wed, Jul 12, 2017 at 05:56:46PM -0300, Eduardo Habkost wrote:
-> >> On Wed, Jul 12, 2017 at 11:31:59PM +0300, Michael S. Tsirkin wrote:
-> >>> On Wed, Jul 12, 2017 at 05:15:50PM -0300, Eduardo Habkost wrote:
-> >>>> On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
-> >>>>> On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
-> >>>>>> On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
-> >>>>>>> We don't want to carry along old machine types forever. If we are able to
-> >>>>>>> remove the pc machines up to 0.13 one day for example, this would allow
-> >>>>>>> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
-> >>>>>>> BARs directly to low memory). Everything up to pc-1.2 is also known to
-> >>>>>>> have issues with migration.  So let's start with a deprecation message
-> >>>>>>> for the old machine types so that the (hopefully) few users of these old
-> >>>>>>> systems start switching over to newer machine types instead.
-> >>>>>>>
-> >>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>>>>>
-> >>>>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> >>>>>>
-> >>>>>> I suggest changing "-machine help" too.  Today it looks like this:
-> >>>>>>
-> >>>>>>   Supported machines are:
-> >>>>>>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
-> >>>>>>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
-> >>>>>>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-1.2               Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-1.1               Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-1.0               Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-0.15              Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-0.14              Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-0.13              Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-0.12              Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-0.11              Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-0.10              Standard PC (i440FX + PIIX, 1996)
-> >>>>>>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
-> >>>>>>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
-> >>>>>>   isapc                ISA-only PC
-> >>>>>>   none                 empty machine
-> >>>>>
-> >>>>> Any chance we can sort them reasonably too?
-> >>>>
-> >>>> If we use strverscmp(), it will be sorted in a more reasonable
-> >>>> way.  We could copy the gnulib version on systems without glibc.
-> >>>> Life is too short for writing configure checks by hand, though; I
-> >>>> will add this to the end of my wish-todo list.  If somebody wants
-> >>>> to volunteer, be my guest.
-> >>>>
-> >>>> I'm CCing Eric in case he has suggestions that would help import
-> >>>> the gnulib module in an easy way.
-> >>>>
-> >>>> -- 
-> >>>> Eduardo
-> >>>
-> >>> As we never have leading zeroes, and input comes from QEMU so
-> >>> it's safe, it's probably easier to just open-code it:
-> >>>
-> >>> /* compare string numerically: shorter strings give smaller numbers */
-> >>> int mstcmp(const char *s1, const char *s2)
-> >>> {
-> >>> 	int l1, l2;
-> >>>
-> >>> 	l1 = strlen(s1);
-> >>> 	l2 = strlen(s2);
-> >>> 	return l1 == l2 ? strcmp(s1, s2) : l1 - l2;
-> >>> }
-> >>>
-> >>
-> >> This doesn't work because strlen("pc-0.10") > strlen("pc-1.0").
-> > 
-> > Oh right. So you need to find dots and split at these points.
-> > Something like the below? Completely untested.
-> > 
-> > int mstcmp(const char *s1, const char *s2)
-> > {
-> > 	const char *e1, *e2;
-> >  	int l1, l2, c;
-> > 
-> > 	do {
-> > 		e1 = strchr(s1, '.');
-> > 		e2 = strchr(s2, '.');
-> > 
-> > 		l1 = e1 ? e1 - s1 + 1 : strlen(s1);
-> > 		l2 = e2 ? e2 - s2 + 1 : strlen(s2);
-> > 
-> > 		/* compare numerically: shorter strings give smaller numbers */
-> > 		if (l1 != l2) {
-> > 			break;
-> > 		}
-> > 		c = strncmp(s1, s2, l1);
-> > 		if (c) {
-> > 			return c;
-> > 		}
-> > 		s1 += l1;
-> > 		s2 += l1;
-> > 	} while (l1);
-> > 
-> > 	return l1 - l2;
-> > }
-> 
-> QEMU already has machine type sorting code:
-> 
->   1  2709f263952b well-defined listing order for machine types
->   2  562542b6aee2 i386/pc: add piix and q35 machtypes to sorting
->                   families for -M \?
-> 
-> I guess it should be possible to refine machine_class_cmp() in "vl.c",
-> so that some numeric sorting is applied to machine types in the same
-> "family".
-> 
-> Thanks
-> Laszlo
 
-Exactly.
+--FcSpk3Icpd/Pbul4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jul 12, 2017 at 01:47:15PM +0200, Greg Kurz wrote:
+> On Wed, 12 Jul 2017 15:53:13 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > This function has two unused parameters - remove them.
+> >=20
+> > It also sets awaiting_release on all paths, except one.  On that path
+> > setting it is harmless, since it will be immediately cleared by
+> > spapr_drc_release().  So factor it out of the if statements.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+>=20
+> Patch 3 drops the hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort)
+> lines that could be called below spapr_drc_detach(), but we still have:
+>=20
+> spapr_drc_detach()
+>  spapr_drc_release()
+>   object_property_del(OBJECT(drc), "device", NULL);
+>                                               ^^
+> Should this be &error_abort or should we pass an Error ** down to here ?
+> (which, would require to add an errp argument to both spapr_drc_release()
+>  and spapr_drc_reset())
+>=20
+> I would favor &error_abort since a failure in object_property_del() would
+> mean we're calling spapr_drc_detach() on a DRC that wasn't attached to a
+> device... ie, a bug. In this case:
+
+Done, although as a separate patch, since it's not really tied to the
+changes here.
+
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> >  hw/ppc/spapr.c             | 11 +++--------
+> >  hw/ppc/spapr_drc.c         | 12 ++++++------
+> >  hw/ppc/spapr_pci.c         |  7 +------
+> >  include/hw/ppc/spapr_drc.h |  2 +-
+> >  4 files changed, 11 insertions(+), 21 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index ff2aa6b..5c528e2 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2654,7 +2654,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint=
+64_t addr_start, uint64_t size,
+> >                  addr -=3D SPAPR_MEMORY_BLOCK_SIZE;
+> >                  drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+> >                                        addr / SPAPR_MEMORY_BLOCK_SIZE);
+> > -                spapr_drc_detach(drc, dev, NULL);
+> > +                spapr_drc_detach(drc);
+> >              }
+> >              g_free(fdt);
+> >              error_propagate(errp, local_err);
+> > @@ -2877,7 +2877,7 @@ static void spapr_memory_unplug_request(HotplugHa=
+ndler *hotplug_dev,
+> >                                addr / SPAPR_MEMORY_BLOCK_SIZE);
+> >          g_assert(drc);
+> > =20
+> > -        spapr_drc_detach(drc, dev, errp);
+> > +        spapr_drc_detach(drc);
+> >          addr +=3D SPAPR_MEMORY_BLOCK_SIZE;
+> >      }
+> > =20
+> > @@ -2944,7 +2944,6 @@ void spapr_core_unplug_request(HotplugHandler *ho=
+tplug_dev, DeviceState *dev,
+> >  {
+> >      int index;
+> >      sPAPRDRConnector *drc;
+> > -    Error *local_err =3D NULL;
+> >      CPUCore *cc =3D CPU_CORE(dev);
+> >      int smt =3D kvmppc_smt_threads();
+> > =20
+> > @@ -2961,11 +2960,7 @@ void spapr_core_unplug_request(HotplugHandler *h=
+otplug_dev, DeviceState *dev,
+> >      drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
+> >      g_assert(drc);
+> > =20
+> > -    spapr_drc_detach(drc, dev, &local_err);
+> > -    if (local_err) {
+> > -        error_propagate(errp, local_err);
+> > -        return;
+> > -    }
+> > +    spapr_drc_detach(drc);
+> > =20
+> >      spapr_hotplug_req_remove_by_index(drc);
+> >  }
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index 89ba3d6..08fc715 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -70,7 +70,7 @@ static uint32_t drc_isolate_physical(sPAPRDRConnector=
+ *drc)
+> >          uint32_t drc_index =3D spapr_drc_index(drc);
+> >          if (drc->configured) {
+> >              trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+> > -            spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
+> > +            spapr_drc_detach(drc);
+> >          } else {
+> >              trace_spapr_drc_set_isolation_state_deferring(drc_index);
+> >          }
+> > @@ -134,7 +134,7 @@ static uint32_t drc_isolate_logical(sPAPRDRConnecto=
+r *drc)
+> >          uint32_t drc_index =3D spapr_drc_index(drc);
+> >          if (drc->configured) {
+> >              trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+> > -            spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
+> > +            spapr_drc_detach(drc);
+> >          } else {
+> >              trace_spapr_drc_set_isolation_state_deferring(drc_index);
+> >          }
+> > @@ -187,7 +187,7 @@ static uint32_t drc_set_unusable(sPAPRDRConnector *=
+drc)
+> >      if (drc->awaiting_release) {
+> >          uint32_t drc_index =3D spapr_drc_index(drc);
+> >          trace_spapr_drc_set_allocation_state_finalizing(drc_index);
+> > -        spapr_drc_detach(drc, DEVICE(drc->dev), NULL);
+> > +        spapr_drc_detach(drc);
+> >      }
+> > =20
+> >      return RTAS_OUT_SUCCESS;
+> > @@ -371,20 +371,20 @@ static void spapr_drc_release(sPAPRDRConnector *d=
+rc)
+> >      drc->dev =3D NULL;
+> >  }
+> > =20
+> > -void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **e=
+rrp)
+> > +void spapr_drc_detach(sPAPRDRConnector *drc)
+> >  {
+> >      trace_spapr_drc_detach(spapr_drc_index(drc));
+> > =20
+> > +    drc->awaiting_release =3D true;
+> > +
+> >      if (drc->isolation_state !=3D SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+> >          trace_spapr_drc_awaiting_isolated(spapr_drc_index(drc));
+> > -        drc->awaiting_release =3D true;
+> >          return;
+> >      }
+> > =20
+> >      if (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PCI &&
+> >          drc->allocation_state !=3D SPAPR_DR_ALLOCATION_STATE_UNUSABLE)=
+ {
+> >          trace_spapr_drc_awaiting_unusable(spapr_drc_index(drc));
+> > -        drc->awaiting_release =3D true;
+> >          return;
+> >      }
+> > =20
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 1e84c55..092a2f5 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1478,7 +1478,6 @@ static void spapr_pci_unplug_request(HotplugHandl=
+er *plug_handler,
+> >      PCIDevice *pdev =3D PCI_DEVICE(plugged_dev);
+> >      sPAPRDRConnectorClass *drck;
+> >      sPAPRDRConnector *drc =3D spapr_phb_get_pci_drc(phb, pdev);
+> > -    Error *local_err =3D NULL;
+> > =20
+> >      if (!phb->dr_enabled) {
+> >          error_setg(errp, QERR_BUS_NO_HOTPLUG,
+> > @@ -1516,11 +1515,7 @@ static void spapr_pci_unplug_request(HotplugHand=
+ler *plug_handler,
+> >              }
+> >          }
+> > =20
+> > -        spapr_drc_detach(drc, DEVICE(pdev), &local_err);
+> > -        if (local_err) {
+> > -            error_propagate(errp, local_err);
+> > -            return;
+> > -        }
+> > +        spapr_drc_detach(drc);
+> > =20
+> >          /* if this isn't func 0, defer unplug event. otherwise signal =
+removal
+> >           * for all present functions
+> > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> > index 18a196e..fc8b721 100644
+> > --- a/include/hw/ppc/spapr_drc.h
+> > +++ b/include/hw/ppc/spapr_drc.h
+> > @@ -242,6 +242,6 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset=
+, Object *owner,
+> > =20
+> >  void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+> >                        int fdt_start_offset, Error **errp);
+> > -void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **e=
+rrp);
+> > +void spapr_drc_detach(sPAPRDRConnector *drc);
+> > =20
+> >  #endif /* HW_SPAPR_DRC_H */
+>=20
+
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--FcSpk3Icpd/Pbul4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZZsSOAAoJEGw4ysog2bOSuAAQAJuJG37+bUflfog0XpdRcpWc
+Ghk0Grv640yoSs7/TJw+l+9GcVLxKB+E52ZbCJYYrHiO8k1awut6bAS0u+kVttPa
+A1tVosSqBWnwAWswE/b/jXO0+Qpb4GGKLeGTKQHBY0Oo3uInElQC7psnGVe7XRJg
+sCbsevzxEx2lKzTPUf2Ps1CV8EMRrVXwPt5Ebdj40RWrFDiFCmW6I/BYiqCLWrIQ
+c9eGNQmwaqfo2fzW+zj74AkNlPsJDVsP5f0Hj4Oi9i8K1FryZWIw0YGYhLMjq8+m
++oTpvPSeGIAdixYr9bPH6l+GqlP8itUgA/li3QcMQb5mei/evereMb9oM7ickS7y
+TXPZNc1h197P/AP13+BsSrgWWqf6LwCpH7LJ7BWN1wP+HQ+Sc1rW/zo6awhIGJCZ
++BCGYq0FQkCPXirQAnqkTneNL+OwNkqNZwwXqxORA5FlF6Z69jah6YDgaeE6ZXR8
+tttpEV6CJlxsI6tnJMX0wP3pNy0ruMc8KBXgVDX9mlUXs928wb1rr2QUksI0HTR6
+ytnVkxMQaYgQcwsOERSVFOVWExXKKcaTVBDuQINpjVxE6xK2b/HsFtPU/TXdg6RN
+odXDKGr2fnmyLBkJSjKIPLssUQDS+985gi3QF2WnEJ7EMBR+ldL70utyYn9VvyQD
+IO+yQLMlicQb1DEmtKVR
+=fLEb
+-----END PGP SIGNATURE-----
+
+--FcSpk3Icpd/Pbul4--
