@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVgRz-0004fG-2J
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:54:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVgTS-0006KU-D7
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVgRw-0000sF-09
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:54:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54618)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVgRv-0000ru-Mw
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:54:43 -0400
-Date: Thu, 13 Jul 2017 16:54:37 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170713155437.GF2121@work-vm>
-References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
-	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
-	<20170713142721.3a40e083@gondolin>
-	<1798a9f2-63f0-ab03-11ad-5513d9a90da9@linux.vnet.ibm.com>
-	<20170713144941.GD2121@work-vm>
-	<99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
-	<20170713151104.GE2121@work-vm>
-	<1a32d619-0b5b-fe11-36b4-94ef6bdcb331@linux.vnet.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dVgTR-0001sh-D6
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:56:18 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36733)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVgTR-0001rS-5Q
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:56:17 -0400
+Received: by mail-wm0-x236.google.com with SMTP id 62so27863997wmw.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 08:56:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1a32d619-0b5b-fe11-36b4-94ef6bdcb331@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
- states
+In-Reply-To: <cover.1499867930.git.mjt@msgid.tls.msk.ru>
+References: <cover.1499867930.git.mjt@msgid.tls.msk.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Jul 2017 16:55:55 +0100
+Message-ID: <CAFEAcA-1ehg6oet1wa40r85mxzFzuMFdTo3REM=n-8AG0zgK5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] Trivial patches for 2017-07-12 (#2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,118 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Juan Quintela <quintela@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> 
-> 
-> On 07/13/2017 05:11 PM, Dr. David Alan Gilbert wrote:
-> > * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
-> >> On 07/13/2017 04:49 PM, Dr. David Alan Gilbert wrote:
-> >>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> >>>>
-> >>>>
-> >>>> On 07/13/2017 02:27 PM, Cornelia Huck wrote:
-> >>>>>> +static void kvm_flic_ais_pre_save(void *opaque)
-> >>>>>> +{
-> >>>>>> +    KVMS390FLICStateMigTmp *tmp = opaque;
-> >>>>>> +    KVMS390FLICState *flic = tmp->parent;
-> >>>>>> +    struct kvm_s390_ais_all ais;
-> >>>>>> +    struct kvm_device_attr attr = {
-> >>>>>> +        .group = KVM_DEV_FLIC_AISM_ALL,
-> >>>>>> +        .addr = (uint64_t)&ais,
-> >>>>>> +        .attr = sizeof(ais),
-> >>>>>> +    };
-> >>>>>> +
-> >>>>>> +    if (ioctl(flic->fd, KVM_GET_DEVICE_ATTR, &attr)) {
-> >>>>>> +        error_report("Failed to retrieve kvm flic ais states");
-> >>>>> There's not much else we can do in that case, is there?
-> >>>>>
-> >>>>
-> >>>> I think this is a very good question! The ioctl should not fail
-> >>>> under any circumstances, but if it does we have a problem.
-> >>>>
-> >>>> Carrying on happily (what we do now) means effectively discarding
-> >>>> ais state. In general just discarding state ain't a good idea.
-> >>>>
-> >>>> In particular it might be OK, but the patch should explain that!
-> >>>>
-> >>>> Regarding what could/should we do in such a case (instead
-> >>>> of discarding state and carrying on happily) I don't know, so
-> >>>> I tend to agree with you regarding 'not much else we can do'.
-> >>>>
-> >>>> Adding Dave and Juan. Maybe they can tell.
-> >>>
-> >>> I keep meaning to make the pre_save give a return value for failure,
-> >>> but it hasn't currently got one.
-> >>
-> >> Would you accept patches for that?
-> > 
-> > Sure.
-> > 
-> >>>
-> >>> You could try something like:
-> >>>
-> >>>   qemu_file_set_error(migrate_get_current()->to_dst_file, -EINVAL);
-> 
-> @Dave:
-> Thanks Dave! I was not aware of that! Had a quick look at the
-> code, I think qemu_file_set_error would indeed do the right thing.
-> 
-> I would prefer error handling being part of the pre_save interface,
-> because that would be easier to understand, and would provoke thinking
-> about these problems.
-> 
-> @Christian:
-> Would you like to implement 'return value for pre_save'
-> yourself? I mean, I the meanwhile I'm familiar with the code in question
-> and I enjoy working with Dave and Juan, so if you aren't interested in
-> doing it yourself but think it's important enough to get it done, I could
-> take it too?
-> 
-> @Dave:
-> There are a couple of questions I'm gonna have to ask/investigate should
-> it be me doing the 'return value for pre_save' (also notes to myself):
-> 
-> Would you see this error handling via pre_save as a parallel infrastructure
-> (keep the current qemu_file_set_error mechanism) or would you prefer
-> things converted? IMHO having a single method would be cleaner, but I
-> have not looked into this in great detail.
+On 12 July 2017 at 15:00, Michael Tokarev <mjt@tls.msk.ru> wrote:
+> The same but without two patches from Eric Blake.
+> Not resending all the patches, only the cover letter.
+>
+> The following changes since commit 6b06e3e49eb8c91cc286c16d6bf3181ac296f33d:
+>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2017-07-10-v2' into staging (2017-07-10 16:12:47 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+>
+> for you to fetch changes up to a7a305aee1e9a74a3f4b263aa98babed795b1f0a:
+>
+>   include/hw/ptimer.h: Add documentation comments (2017-07-11 17:44:27 +0300)
+>
+> ----------------------------------------------------------------
+> trivial patches for 2017-07-12
+>
+> ----------------------------------------------------------------
 
-The only thing I'd like to change is make pre_save be:
-  int (*pre_save)(void *opaque)
+Applied, thanks.
 
-  rather than void.
-If there are any current pre_save's that call set_error or assert or
-anything like that then they could be converted, but I don't think there
-are many.
-
-> Also the question what is the semantic of qemu_file_set_error arises.
-> It ain't documented and I would intuitively suspect that it's rather
-> about the 'file' (that is transport) than the whole migration.
-
-It's really an internal interface in migration (where it's not
-very nice either); but really it shouldn't be used for anything else.
-
-Dave
-> 
-> 
-> >>>
-> >>>   I *think* the migration code should spot that before it finishes
-> >>> but it might carry on for a little while before it does.
-> >>
-> >> I will keep this patch as is, since this is one of the "should not happen"
-> >> cases.
-> 
-> @Christian
-> I'm OK with it, because knowing the kernel code behind the ioctl
-> this is really unlikely and even if it should happen the risks involved
-> are rather limited. But I would be much happier if all such
-> cases would result in refusing migration.
-> 
-> Regards,
-> Halil
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
