@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dVjlQ-00011p-Hb
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:27:05 -0400
+	(envelope-from <lersek@redhat.com>) id 1dVjzJ-0004un-0h
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dVjlN-00084s-FA
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:27:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dVjlN-00084O-8Z
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:27:01 -0400
-References: <20170711103011.32631-1-marcandre.lureau@redhat.com>
-	<20170711103011.32631-7-marcandre.lureau@redhat.com>
-	<7a147bbd-04d1-be64-6479-990156596704@redhat.com>
-	<CAJ+F1CK1EKBTUEbyaEHqje-S-R43rSD7cUQvsJQxEA-m=WnAUQ@mail.gmail.com>
-	<CAJ+F1C+vErCmqwEgoJjzVYmxFpnOHh58eSaYExQmMgET5dse1Q@mail.gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1dVjzH-0008LA-QM
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:41:25 -0400
+References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
+	<1499825297-20335-3-git-send-email-gengdongjiu@huawei.com>
+	<20170713201407-mutt-send-email-mst@kernel.org>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <72dd73d0-cc42-9ddd-db88-2b02f8b2c0e3@redhat.com>
-Date: Thu, 13 Jul 2017 21:26:52 +0200
+Message-ID: <660d600a-107c-e44a-7322-ae4a74bc5565@redhat.com>
+Date: Thu, 13 Jul 2017 21:41:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+vErCmqwEgoJjzVYmxFpnOHh58eSaYExQmMgET5dse1Q@mail.gmail.com>
+In-Reply-To: <20170713201407-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] scripts/dump-guest-memory.py: add
- vmcoreinfo
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] ACPI: Add APEI GHES Table
+ Generation support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +26,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc: imammedo@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, anderson@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
 
-On 07/13/17 17:36, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Wed, Jul 12, 2017 at 2:08 AM Marc-Andr=C3=A9 Lureau <
-> marcandre.lureau@gmail.com> wrote:
->=20
->> Acked-by: Laszlo Ersek <lersek@redhat.com>
->>
->>>
->>> but I would still like a real Pythonista to review this patch. Adding
->>> Janosch.
->>>
->>>
->> sure, let's wait for his feedback
->>
->>
->> Janosch -- can you please help review this patch?
->>
->>
-> I am going to resend the series, it would be nice if we can make it bef=
-ore
-> the soft-freeze.
+On 07/13/17 19:32, Michael S. Tsirkin wrote:
+> On Wed, Jul 12, 2017 at 10:08:16AM +0800, Dongjiu Geng wrote:
 
-Well if noone with better Python than mine steps up to review the python
-changes, I say we go ahead with them using my Acked-by.
+snip
 
-Thanks
+>> etc/acpi/tables                 etc/hardware_errors
+>> ================     ==========================================
+>>                      +-----------+
+>> +--------------+     | address   |         +-> +--------------+
+>> |    HEST      +     | registers |         |   | Error Status |
+>> + +------------+     | +---------+         |   | Data Block 0 |
+>> | | GHES0      | --> | |address0 | --------+   | +------------+
+>> | | GHES1      | --> | |address1 | ------+     | |  CPER      |
+>> | | GHES2      | --> | |address2 | ----+ |     | |  CPER      |
+>> | |  ....      | --> | | ....... |     | |     | |  CPER      |
+>> | | GHES10     | --> | |address10| -+  | |     | |  CPER      |
+>> +-+------------+     +-+---------+  |  | |     +-+------------+
+>>                                     |  | |
+>>                                     |  | +---> +--------------+
+>>                                     |  |       | Error Status |
+>>                                     |  |       | Data Block 1 |
+>>                                     |  |       | +------------+
+>>                                     |  |       | |  CPER      |
+>>                                     |  |       | |  CPER      |
+>>                                     |  |       +-+------------+
+>>                                     |  |
+>>                                     |  +-----> +--------------+
+>>                                     |          | Error Status |
+>>                                     |          | Data Block 2 |
+>>                                     |          | +------------+
+>>                                     |          | |  CPER      |
+>>                                     |          +-+------------+
+>>                                     |            ...........
+>>                                     +--------> +--------------+
+>>                                                | Error Status |
+>>                                                | Data Block 10|
+>>                                                | +------------+
+>>                                                | |  CPER      |
+>>                                                | |  CPER      |
+>>                                                | |  CPER      |
+>>                                                +-+------------+
+
+snip
+
+>> +
+>> +    error_source_table = (AcpiHardwareErrorSourceTable *)(table_data->data
+>> +                        + table_data->len - buffer->len);
+>> +    error_source_table->error_source_count = GHES_ACPI_HEST_NOTIFY_RESERVED;
+>> +    error_source = (AcpiGenericHardwareErrorSource *)
+>> +        ((AcpiHardwareErrorSourceTable *)error_source_table + 1);
+> 
+> Concern with all these casts and pointer math is that it is barely readable.
+> We can easily overflow the array and get hard to debug heap corruption
+> errors.
+> 
+> What can I suggest?  Just add this to the array in steps. Then you will
+> not need all the math.
+> 
+> Or again, you can just add things as you init them using build_append_int_noprefix.
+> 
+> 
+>> +
+>> +    bios_linker_loader_write_pointer(linker, GHES_DATA_ADDR_FW_CFG_FILE,
+>> +        0, sizeof(uint64_t), GHES_ERRORS_FW_CFG_FILE,
+>> +        GHES_ACPI_HEST_NOTIFY_RESERVED * sizeof(uint64_t));
+> 
+> What does this uint64_t refer to? It's repeated everywhere.
+> 
+>> +
+>> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
+>> +        error_source->type = ACPI_HEST_SOURCE_GENERIC_ERROR;
+>> +        error_source->source_id = cpu_to_le16(i);
+>> +        error_source->related_source_id = 0xffff;
+>> +        error_source->flags = 0;
+>> +        error_source->enabled = 1;
+>> +        /* The number of error status block per Generic Hardware Error Source */
+> 
+> number of ... blocks ?
+> 
+>> +        error_source->number_of_records = 1;
+>> +        error_source->max_sections_per_record = 1;
+>> +        error_source->max_raw_data_length = GHES_MAX_RAW_DATA_LENGTH;
+>> +        error_source->error_status_address.space_id =
+>> +                                    AML_SYSTEM_MEMORY;
+>> +        error_source->error_status_address.bit_width = 64;
+>> +        error_source->error_status_address.bit_offset = 0;
+>> +        error_source->error_status_address.access_width = 4;
+>> +        error_source->notify.type = i;
+>> +        error_source->notify.length = sizeof(AcpiHestNotify);
+>> +
+>> +        error_source->error_status_block_length = GHES_MAX_RAW_DATA_LENGTH;
+>> +
+>> +        bios_linker_loader_add_pointer(linker,
+>> +            ACPI_BUILD_TABLE_FILE, address_registers_offset + i *
+>> +            sizeof(AcpiGenericHardwareErrorSource), sizeof(uint64_t),
+>> +            GHES_ERRORS_FW_CFG_FILE, i * sizeof(uint64_t));
+> 
+> and what's this math for?
+> 
+>> +
+>> +        error_source++;
+>> +    }
+>> +
+>> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
+>> +        bios_linker_loader_add_pointer(linker,
+>> +            GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i, sizeof(uint64_t),
+>> +            GHES_ERRORS_FW_CFG_FILE, GHES_ACPI_HEST_NOTIFY_RESERVED *
+>> +            sizeof(uint64_t) + i * GHES_MAX_RAW_DATA_LENGTH);
+>> +    }
+
+So basically all this math exists to set up the pointers that are shown
+in the diagram in the commit message. It is a bit tricky because most of
+those pointer fields (all 8-bytes wide) are individually embedded into
+their own containing structures. In the previous version of this patch
+set, I painstakingly verified the math, and pointed out wherever I
+thought updates were necessary.
+
+I agree the math is hard to read, the code is very "dense". My
+suggestion (supporting yours) would be to calculate the fw_cfg blob
+offsets that should be patched in more fine-grained steps, possibly with
+multiple separate increments, using:
+- structure type names,
+- sizeof operators,
+- offsetof macros,
+- and possibly a separate comment for each offset increment.
+
+Thanks,
 Laszlo
