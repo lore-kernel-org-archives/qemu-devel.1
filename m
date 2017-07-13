@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVQkw-0006Rf-CV
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 19:09:19 -0400
+	(envelope-from <mst@redhat.com>) id 1dVRls-0004CE-7L
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVQkt-00019t-44
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 19:09:18 -0400
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:33898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dVQks-00019c-Rt
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 19:09:15 -0400
-Received: by mail-qt0-f195.google.com with SMTP id m54so4049112qtb.1
-	for <qemu-devel@nongnu.org>; Wed, 12 Jul 2017 16:09:14 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170712221414.3867-1-bobby.prani@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <507fef62-746c-703e-6b91-5becd7456d9d@twiddle.net>
-Date: Wed, 12 Jul 2017 13:08:08 -1000
+	(envelope-from <mst@redhat.com>) id 1dVRlo-0008NU-9A
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:14:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60522)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVRln-0008Lx-VX
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 20:14:16 -0400
+Date: Thu, 13 Jul 2017 03:14:07 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170713031326-mutt-send-email-mst@kernel.org>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170712221414.3867-1-bobby.prani@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/aarch64: Use ADR for shorter jumps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 0/8] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>, alex.bennee@linaro.org
-Cc: qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On 07/12/2017 12:14 PM, Pranith Kumar wrote:
-> Use ADR instruction for shorter jumps.
+On Wed, Jul 12, 2017 at 08:40:13PM +0800, Wei Wang wrote:
+> This patch series enhances the existing virtio-balloon with the following new
+> features:
+> 1) fast ballooning: transfer ballooned pages between the guest and host in
+> chunks using sgs, instead of one by one; and
+> 2) cmdq: a new virtqueue to send commands between the device and driver.
+> Currently, it supports commands to report memory stats (replace the old statq
+> mechanism) and report guest unused pages.
+
+Could we get some feedback from mm crowd on patches 6 and 7?
+
+> Change Log:
 > 
-> I was going through rth's email and realized that I should have done
-> this the first time.
+> v11->v12:
+> 1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned pages.
+> 2) virtio-ring: enable the driver to build up a desc chain using vring desc.
+> 3) virtio-ring: Add locking to the existing START_USE() and END_USE() macro
+> to lock/unlock the vq when a vq operation starts/ends.
+> 4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async()
+> 5) virtio-balloon: describe chunks of ballooned pages and free pages blocks
+> directly using one or more chains of desc from the vq.
 > 
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->   tcg/aarch64/tcg-target.inc.c | 14 +++++++++-----
->   1 file changed, 9 insertions(+), 5 deletions(-)
+> v10->v11:
+> 1) virtio_balloon: use vring_desc to describe a chunk;
+> 2) virtio_ring: support to add an indirect desc table to virtqueue;
+> 3)  virtio_balloon: use cmdq to report guest memory statistics.
 > 
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 04bc369a92..5121ebc1a1 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -886,12 +886,16 @@ void aarch64_tb_set_jmp_target(uintptr_t jmp_addr, uintptr_t addr)
->           i1 = I3206_B | ((offset >> 2) & 0x3ffffff);
->           i2 = NOP;
->       } else {
-> -        offset = (addr >> 12) - (jmp_addr >> 12);
-> +        if (offset == sextract64(offset, 0, 21)) {
-> +            i1 = I3406_ADR;
-> +            i2 = NOP;
-> +        } else {
-
-This is dead code because it is covered by the direct jump above.
-B has a 26-bit range, whereas ADR has a 21-bit range.
-
-
-r~
+> v9->v10:
+> 1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
+> 2) virtio-balloon: add virtballoon_validate();
+> 3) virtio-balloon: msg format change;
+> 4) virtio-balloon: move miscq handling to a task on system_freezable_wq;
+> 5) virtio-balloon: code cleanup.
+> 
+> v8->v9:
+> 1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
+> VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
+> implementation;
+> 2) Simpler function to get the free page block.
+> 
+> v7->v8:
+> 1) Use only one chunk format, instead of two.
+> 2) re-write the virtio-balloon implementation patch.
+> 3) commit changes
+> 4) patch re-org
+> 
+> Liang Li (1):
+>   virtio-balloon: deflate via a page list
+> 
+> Matthew Wilcox (1):
+>   Introduce xbitmap
+> 
+> Wei Wang (6):
+>   virtio-balloon: coding format cleanup
+>   xbitmap: add xb_find_next_bit() and xb_zero()
+>   virtio-balloon: VIRTIO_BALLOON_F_SG
+>   mm: support reporting free page blocks
+>   mm: export symbol of next_zone and first_online_pgdat
+>   virtio-balloon: VIRTIO_BALLOON_F_CMD_VQ
+> 
+>  drivers/virtio/virtio_balloon.c     | 414 ++++++++++++++++++++++++++++++++----
+>  drivers/virtio/virtio_ring.c        | 224 +++++++++++++++++--
+>  include/linux/mm.h                  |   5 +
+>  include/linux/radix-tree.h          |   2 +
+>  include/linux/virtio.h              |  22 ++
+>  include/linux/xbitmap.h             |  53 +++++
+>  include/uapi/linux/virtio_balloon.h |  11 +
+>  lib/radix-tree.c                    | 164 +++++++++++++-
+>  mm/mmzone.c                         |   2 +
+>  mm/page_alloc.c                     |  96 +++++++++
+>  10 files changed, 926 insertions(+), 67 deletions(-)
+>  create mode 100644 include/linux/xbitmap.h
+> 
+> -- 
+> 2.7.4
