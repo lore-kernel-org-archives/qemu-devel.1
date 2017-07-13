@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVgM1-0005xB-Tp
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVgM3-000621-Ef
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVgM0-0006Hu-V9
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVgM2-0006IZ-BA
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:48:39 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 13 Jul 2017 10:47:02 -0500
-Message-Id: <20170713154711.32374-15-eblake@redhat.com>
+Date: Thu, 13 Jul 2017 10:47:03 -0500
+Message-Id: <20170713154711.32374-16-eblake@redhat.com>
 In-Reply-To: <20170713154711.32374-1-eblake@redhat.com>
 References: <20170713154711.32374-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 14/23] qemu-img: Speed up compare on
- pre-allocated larger file
+Subject: [Qemu-devel] [PATCH v3 15/23] qemu-img: Add find_nonzero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +22,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, el13635@mail.ntua.gr, Max Reitz <mreitz@redhat.com>
 
-Compare the following images with all-zero contents:
-$ truncate --size 1M A
-$ qemu-img create -f qcow2 -o preallocation=off B 1G
-$ qemu-img create -f qcow2 -o preallocation=metadata C 1G
+During 'qemu-img compare', when we are checking that an allocated
+portion of one file is all zeros, we don't need to waste time
+computing how many additional sectors after the first non-zero
+byte are also non-zero.  Create a new helper find_nonzero() to do
+the check for a first non-zero sector, and rebase
+check_empty_sectors() to use it.
 
-On my machine, the difference is noticeable for pre-patch speeds,
-with more than an order of magnitude in difference caused by the
-choice of preallocation in the qcow2 file:
-
-$ time ./qemu-img compare -f raw -F qcow2 A B
-Warning: Image size mismatch!
-Images are identical.
-
-real	0m0.014s
-user	0m0.007s
-sys	0m0.007s
-
-$ time ./qemu-img compare -f raw -F qcow2 A C
-Warning: Image size mismatch!
-Images are identical.
-
-real	0m0.341s
-user	0m0.144s
-sys	0m0.188s
-
-Why? Because bdrv_is_allocated() returns false for image B but
-true for image C, throwing away the fact that both images know
-via lseek(SEEK_HOLE) that the entire image still reads as zero.
->From there, qemu-img ends up calling bdrv_pread() for every byte
-of the tail, instead of quickly looking for the next allocation.
-The solution: use block_status instead of is_allocated, giving:
-
-$ time ./qemu-img compare -f raw -F qcow2 A C
-Warning: Image size mismatch!
-Images are identical.
-
-real	0m0.014s
-user	0m0.011s
-sys	0m0.003s
-
-which is on par with the speeds for no pre-allocation.
+The new interface intentionally uses bytes in its interface, even
+though it still crawls the buffer a sector at a time; it is robust
+to a partial sector at the end of the buffer.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
 v3: new patch
 ---
- qemu-img.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ qemu-img.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index bc21d00..46f9da5 100644
+index 46f9da5..e54c47a 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -1471,11 +1471,11 @@ static int img_compare(int argc, char **argv)
-         while (sector_num < progress_base) {
-             int64_t count;
+@@ -1058,6 +1058,28 @@ done:
+ }
 
--            ret = bdrv_is_allocated_above(blk_bs(blk_over), NULL,
-+            ret = bdrv_block_status_above(blk_bs(blk_over), NULL,
-                                           sector_num * BDRV_SECTOR_SIZE,
-                                           (progress_base - sector_num) *
-                                           BDRV_SECTOR_SIZE,
--                                          &count);
-+                                          &count, NULL);
-             if (ret < 0) {
-                 ret = 3;
-                 error_report("Sector allocation test failed for %s",
-@@ -1483,11 +1483,11 @@ static int img_compare(int argc, char **argv)
-                 goto out;
+ /*
++ * Returns -1 if 'buf' contains only zeroes, otherwise the byte index
++ * of the first sector boundary within buf where the sector contains a
++ * non-zero byte.  This function is robust to a buffer that is not
++ * sector-aligned.
++ */
++static int64_t find_nonzero(const uint8_t *buf, int64_t n)
++{
++    int64_t i;
++    int64_t end = QEMU_ALIGN_DOWN(n, BDRV_SECTOR_SIZE);
++
++    for (i = 0; i < end; i += BDRV_SECTOR_SIZE) {
++        if (!buffer_is_zero(buf + i, BDRV_SECTOR_SIZE)) {
++            return i;
++        }
++    }
++    if (i < n && !buffer_is_zero(buf + i, n - end)) {
++        return i;
++    }
++    return -1;
++}
++
++/*
+  * Returns true iff the first sector pointed to by 'buf' contains at least
+  * a non-NUL byte.
+  *
+@@ -1182,7 +1204,9 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
+                                int sect_count, const char *filename,
+                                uint8_t *buffer, bool quiet)
+ {
+-    int pnum, ret = 0;
++    int ret = 0;
++    int64_t idx;
++
+     ret = blk_pread(blk, sect_num << BDRV_SECTOR_BITS, buffer,
+                     sect_count << BDRV_SECTOR_BITS);
+     if (ret < 0) {
+@@ -1190,10 +1214,10 @@ static int check_empty_sectors(BlockBackend *blk, int64_t sect_num,
+                      sectors_to_bytes(sect_num), filename, strerror(-ret));
+         return ret;
+     }
+-    ret = is_allocated_sectors(buffer, sect_count, &pnum);
+-    if (ret || pnum != sect_count) {
++    idx = find_nonzero(buffer, sect_count * BDRV_SECTOR_SIZE);
++    if (idx >= 0) {
+         qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
+-                sectors_to_bytes(ret ? sect_num : sect_num + pnum));
++                sectors_to_bytes(sect_num) + idx);
+         return 1;
+     }
 
-             }
--            /* TODO relax this once bdrv_is_allocated_above does not enforce
-+            /* TODO relax this once bdrv_block_status_above does not enforce
-              * sector alignment */
-             assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
-             nb_sectors = count >> BDRV_SECTOR_BITS;
--            if (ret) {
-+            if (ret & BDRV_BLOCK_ALLOCATED && !(ret & BDRV_BLOCK_ZERO)) {
-                 nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
-                 ret = check_empty_sectors(blk_over, sector_num, nb_sectors,
-                                           filename_over, buf1, quiet);
 -- 
 2.9.4
