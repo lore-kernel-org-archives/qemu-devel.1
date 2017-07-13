@@ -1,27 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVaMr-0004Mh-Ij
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:25:07 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dVaQv-0005n6-HU
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:29:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVaMn-0001ji-BT
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:25:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVaMn-0001jS-20
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:25:01 -0400
-Date: Thu, 13 Jul 2017 10:24:53 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170713092453.GE4011@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170712162550.8061-1-berrange@redhat.com>
-	<292ec5a0-8722-4c66-d3d6-377b9863e092@amsat.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dVaQs-00041Z-DN
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:29:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dVaQs-00041E-3x
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:29:14 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6D9Ntej046184
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:29:12 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3rquec-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:29:11 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Thu, 13 Jul 2017 19:29:09 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <8760ewbt38.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+References: <20170608063608.17855-1-nikunj@linux.vnet.ibm.com>
+	<20170609020141.GB26521@umbus.fritz.box>
+	<87mv9heota.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170609102714.GK26521@umbus.fritz.box>
+	<87eftlar4a.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<1ec762f9-d8b2-5195-1ffe-f4cde35571fd@kaod.org>
+	<b54ec156-725d-d954-1d05-ade845caa2a2@kaod.org>
+	<878tjsbwj4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<5fa5cb00-ee28-0ba4-2084-b0a43b8429f1@kaod.org>
+	<8760ewbt38.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Date: Thu, 13 Jul 2017 14:57:55 +0530
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <292ec5a0-8722-4c66-d3d6-377b9863e092@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Don't enable networking as a side-effect
- of DEBUG=1
+Message-Id: <871spkbs9w.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC] spapr: ignore interrupts
+ during reset state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +50,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: alex.bennee@linaro.org, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net
 
-On Wed, Jul 12, 2017 at 06:55:45PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Hi Daniel,
->=20
-> On 07/12/2017 01:25 PM, Daniel P. Berrange wrote:
-> > When trying to debug problems with tests it is natural to set
-> > DEBUG=3D1 when starting the docker environment. Unfortunately
-> > this has a side-effect of enabling an eth0 network interface
-> > in the container, which changes the operating environment of
-> > the test suite. IOW tests with fail may suddenly start
-> > working again if DEBUG=3D1 is set, due to changed network setup.
-> >=20
-> > Add a separate NETWORK=3D1 option to allow enablement of
-> > networking separately from DEBUG=3D1, since common debugging
-> > tasks probably don't require networking anyway.
-> >=20
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >   tests/docker/Makefile.include | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.in=
-clude
-> > index 037cb9e..a8c4b82 100644
-> > --- a/tests/docker/Makefile.include
-> > +++ b/tests/docker/Makefile.include
-> > @@ -106,6 +106,7 @@ docker:
-> >   	@echo '                         (default is 1)'
-> >   	@echo '    DEBUG=3D1              Stop and drop to shell in the cr=
-eated container'
-> >   	@echo '                         before running the command.'
-> > +	@echo '    NETWORK=3D1            Enable eth0 virtual network inter=
-face.'
->=20
-> "eth0" is not always true...
->=20
-> This patch could be more generic, maybe documented as:
->=20
->   NETWORK=3Dhost     Use full host network stack (default no network).'
->=20
-> >   	@echo '    NOUSER               Define to disable adding current u=
-ser to containers passwd.'
-> >   	@echo '    NOCACHE=3D1            Ignore cache when build images.'
-> >   	@echo '    EXECUTABLE=3D<path>    Include executable in image.'
-> > @@ -132,7 +133,8 @@ docker-run: docker-qemu-src
-> >   		$(SRC_PATH)/tests/docker/docker.py run 			\
-> >   			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
-> >   			$(if $V,,--rm) 					\
-> > -			$(if $(DEBUG),-i,--net=3Dnone) 			\
-> > +			$(if $(DEBUG),-i,)				\
-> > +			$(if $(NETWORK),,--net=3Dnone)			\
->=20
-> and here use directly:  --net=3D${NETWORK:-none}
->=20
-> so an experimented docker user could even run tests as:
->=20
->   make docker-test-quick@centos6 NETWORK=3Dcontainer:qemu
->=20
-> (or NETWORK=3Dbridge)
+Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
 
-This is a nice idea, though slightly more complicated. It would be good
-to support NETWORK=3D1 as a short-cut for enabling the default docker
-network backend, as well as being able to give an explicit backend for
-those who really care about the flexibility.
+> C=C3=A9dric Le Goater <clg@kaod.org> writes:
+>
+>> On 07/13/2017 09:55 AM, Nikunj A Dadhania wrote:
+>>> C=C3=A9dric Le Goater <clg@kaod.org> writes:
+>>>=20
+>>>>>> How about the following, we do not report work until MSR_EE is disab=
+led:
+>>>>>
+>>>>> With this fix, I could test the XIVE<->XICS transitions at reboot=20
+>>>>> under TCG. However, the second boot is very slow for some reason.=20
+>>>>
+>>>> hmm, I am not sure this is related but I just got :=20
+>>>=20
+>>> Havent seen in my setup after around 10 reboot cycles, I was using 2
+>>> cores pseries setup. Lets give it some more testing. When did this
+>>> happen, during boot ?
+>>
+>> yes.=20
+>>
+>> I could not reproduce either :/ but I am keeping the patch. qemu runs
+>> with :
+>>
+>> -m 2G -M pseries -accel tcg,thread=3Dmulti -cpu POWER9 -smp cores=3D4,ma=
+xcpus=3D8 -realtime mlock=3Doff -kernel ./vmlinux-4.12.0+ -initrd ./initrd.=
+img-4.12.0+ -append 'console=3Dhvc0 dyndbg=3D"file arch/powerpc/sysdev/xive=
+/* +p"' -nographic -nodefaults -serial mon:stdio -snapshot  -d guest_errors=
+,unimp -no-shutdown
+>>
+>
+> With 4 cores I am seeing hangs occasionally, although I havent seen a
+> crash. But seems to be similar problem that you had seen.
 
+Can you try this one, localized patch, only taking care of DECR
+interrupt. I am not seeing the hangs with this one.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 783bf98..07e405f 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8536,7 +8536,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
+         }
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
+             (env->spr[SPR_LPCR] & LPCR_P7_PECE1)) {
+-            return true;
++            return msr_ee ? true : false;
+         }
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK)) &&
+             (env->spr[SPR_LPCR] & LPCR_P7_PECE2)) {
+@@ -8693,7 +8693,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
+         }
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
+             (env->spr[SPR_LPCR] & LPCR_P8_PECE3)) {
+-            return true;
++            return msr_ee ? true : false;
+         }
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK)) &&
+             (env->spr[SPR_LPCR] & LPCR_P8_PECE4)) {
+@@ -8876,7 +8876,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
+         /* Decrementer Exception */
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
+             (env->spr[SPR_LPCR] & LPCR_DEE)) {
+-            return true;
++            return msr_ee ? true : false;
+         }
+         /* Machine Check or Hypervisor Maintenance Exception */
+         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK |
