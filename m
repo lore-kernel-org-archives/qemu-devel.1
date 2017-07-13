@@ -1,27 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dVedb-0003Pm-JC
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:58:40 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVedf-0003Vc-3H
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dVedY-0005Gt-8B
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVedb-0005Je-Vq
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:58:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43876
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dVedb-0005Id-QF
 	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:58:39 -0400
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:33557)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVedY-0005Gd-3g
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:58:36 -0400
-Received: by mail-vk0-f41.google.com with SMTP id r126so30399716vkg.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 06:58:35 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6DDs5LI116189
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 09:58:38 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bp1squ2x0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 09:58:38 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 13 Jul 2017 09:58:37 -0400
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
+	<20170713142721.3a40e083@gondolin>
+	<606fdb06-cb0e-00b3-ffa3-18a024f14309@de.ibm.com>
+	<20170713151054.28eb7909@gondolin>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 13 Jul 2017 15:58:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170713134002.GB18623@stefanha-x1.localdomain>
-References: <20170713110237.6712-1-lprosek@redhat.com>
-	<20170713110237.6712-3-lprosek@redhat.com>
-	<20170713134002.GB18623@stefanha-x1.localdomain>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Thu, 13 Jul 2017 15:58:34 +0200
-Message-ID: <CABdb736O3U5CBQkARp5ozwR++NoOCH2rnDbuM934S1bjPCGc-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] virtio: enhance virtio_error
- messages
+In-Reply-To: <20170713151054.28eb7909@gondolin>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 8bit
+Message-Id: <5bd135ce-ed8e-3326-04b7-3bff51ecc78a@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +47,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Thu, Jul 13, 2017 at 3:40 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Thu, Jul 13, 2017 at 01:02:31PM +0200, Ladi Prosek wrote:
->> +static const char *virtio_get_device_id(VirtIODevice *vdev)
->> +{
->> +    DeviceState *qdev = DEVICE(vdev);
->> +    while (qdev) {
->> +        /* Find the proxy object corresponding to the vdev backend */
->> +        Object *prop = object_property_get_link(OBJECT(qdev),
->> +                                                VIRTIO_PROP_BACKEND, NULL);
->> +        if (prop == OBJECT(vdev)) {
->> +            return qdev->id;
->> +        }
->> +        qdev = qdev->parent_bus->parent;
->> +    }
->> +    return NULL;
->> +}
->> +
->>  void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
->>  {
->>      va_list ap;
+On 07/13/2017 03:10 PM, Cornelia Huck wrote:
+> On Thu, 13 Jul 2017 15:02:08 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 07/13/2017 02:27 PM, Cornelia Huck wrote:
+>>> On Thu, 13 Jul 2017 12:40:29 +0200
+>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>   
+>>>> From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>>>>
+>>>> During migration we should transfer ais states to the target guest.
+>>>> This patch introduces a subsection to kvm_s390_flic_vmstate and new
+>>>> vmsd for qemu_flic. The ais states need to be migrated only when
+>>>> ais is supported.
+>>>>
+>>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>> ---
+>>>>  hw/intc/s390_flic.c          | 20 ++++++++++++
+>>>>  hw/intc/s390_flic_kvm.c      | 75 ++++++++++++++++++++++++++++++++++++++++++++
+>>>>  include/hw/s390x/s390_flic.h |  1 +
+>>>>  3 files changed, 96 insertions(+)
+> 
+>>>> +static int kvm_flic_ais_post_load(void *opaque, int version_id)
+>>>> +{
+>>>> +    KVMS390FLICStateMigTmp *tmp = opaque;
+>>>> +    KVMS390FLICState *flic = tmp->parent;
+>>>> +    struct kvm_s390_ais_all ais = {
+>>>> +        .simm = tmp->simm,
+>>>> +        .nimm = tmp->nimm,
+>>>> +    };
+>>>> +    struct kvm_device_attr attr = {
+>>>> +        .group = KVM_DEV_FLIC_AISM_ALL,
+>>>> +        .addr = (uint64_t)&ais,
+>>>> +    };
+>>>> +
+>>>> +    if (!ais_needed(flic)) {
+>>>> +        return -ENOSYS;
+>>>> +    }  
+>>>
+>>> I do not understand this... does that mean that
+>>> - we should never get here or 
+>>> - we should not try to change the fields or
+>>> - I need coffee?  
 >>
->> +    error_report_nolf("%s (id=%s): ", vdev->name, virtio_get_device_id(vdev));
->
-> virtio_get_device_id() can return NULL.  POSIX does not guarantee that
-> the printf(3) family functions handle "%s", NULL safely.  glibc prints
-> "(null)" but other libc implementations crash (e.g. Solaris).
->
-> http://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
->
-> Should the return NULL above have g_assert_not_reached()?  That would
-> communicate the assumption that we never reach return NULL and it might
-> silence static checkers like Coverity but I'm not sure.
+>> My understanding is that this should not happen with a normal setup, 
+>> but it can happen if the user does something "wrong". For example
+>> use qemu without libvirt and with -cpu host (which is not migration safe)
+>> and do a migration from a host that has AIS to a host that has no AIS.
+>> In that case the target system will reject the migration (late, but hopefully
+>> not too late).
+> 
+> A comment would be helpful here.
 
-virtio_get_device_id is expected to return NULL if the device has no
-id assigned and I kind of liked the "(null)" output. I just failed to
-realize that not all printf's will handle it. I'll definitely fix
-this, thanks!
+Something like
+
+diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+index 4cf73ee..9b8dbd1 100644
+--- a/hw/intc/s390_flic_kvm.c
++++ b/hw/intc/s390_flic_kvm.c
+@@ -452,6 +452,12 @@ static int kvm_flic_ais_post_load(void *opaque, int version_id)
+         .addr = (uint64_t)&ais,
+     };
+ 
++    /* This can happen when the user mis-configures its guests in an
++     * incompatible fashion or without a CPU model. For example using
++     * qemu with -cpu host (which is not migration safe) and do a
++     * migration from a host that has AIS to a host that has no AIS.
++     * In that case the target system will reject the migration here.
++     */
+     if (!ais_needed(flic)) {
+         return -ENOSYS;
+     }
