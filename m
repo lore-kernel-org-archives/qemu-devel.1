@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVi5r-0002f8-NC
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:40:04 -0400
+	(envelope-from <mst@redhat.com>) id 1dViCg-0005Ii-D2
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:47:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVi5q-0000lf-Km
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:40:03 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVi5q-0000km-DE
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:40:02 -0400
-Received: by mail-wr0-x233.google.com with SMTP id y28so4861383wrd.3
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 10:40:02 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dViCd-0007mK-Au
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:47:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dViCd-0007ji-13
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:47:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B81261A14
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 17:47:01 +0000 (UTC)
+Date: Thu, 13 Jul 2017 20:47:00 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170713204619-mutt-send-email-mst@kernel.org>
+References: <1499847223-8078-1-git-send-email-peterx@redhat.com>
+	<1499847223-8078-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1499875776-12688-1-git-send-email-armbru@redhat.com>
-References: <1499875776-12688-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Jul 2017 18:39:40 +0100
-Message-ID: <CAFEAcA_3mJLWWeVx_0YFFXbf51avUFwqfxs43=Z_M=1LoNpDeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/3] QAPI patches for 2017-07-12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499847223-8078-3-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] intel_iommu: let iotlb size tunable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
 
-On 12 July 2017 at 17:09, Markus Armbruster <armbru@redhat.com> wrote:
-> The following changes since commit aa916e409c04cb614ec2fee8b6b33836bf5998=
-bb:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.10-2017071=
-1' into staging (2017-07-11 16:34:09 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-07-12
->
-> for you to fetch changes up to 086ee7a6200fa5ad795b12110b5b3d5a93dcac3e:
->
->   scripts: use build_ prefix for string not piped through cgen() (2017-07=
--12 17:51:54 +0200)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2017-07-12
->
-> ----------------------------------------------------------------
-> Eric Blake (2):
->       qobject: Catch another straggler for use of qdict_put_str()
->       qobject: Update coccinelle script to catch Q{INC, DEC}REF
->
-> Marc-Andr=C3=A9 Lureau (1):
->       scripts: use build_ prefix for string not piped through cgen()
->
+On Wed, Jul 12, 2017 at 04:13:41PM +0800, Peter Xu wrote:
+> We were having static IOTLB size as 1024. Let it be a tunable. We can
+> also turns IOTLB off if we want, by specify the size as zero.
+> 
+> The tunable is named as "x-iotlb-size" since that should not really be
+> something used by user yet, but mostly for debugging purpose now.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Applied, thanks.
+I'm somewhat vary of adding tunables just for developers to play with.
+People will find and abuse them :)
 
--- PMM
+> ---
+>  hw/i386/intel_iommu.c          | 11 ++++++++++-
+>  hw/i386/intel_iommu_internal.h |  1 -
+>  include/hw/i386/intel_iommu.h  |  1 +
+>  3 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 392da45..9c36866 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -222,6 +222,10 @@ static VTDIOTLBEntry *vtd_lookup_iotlb(IntelIOMMUState *s, uint16_t source_id,
+>      uint64_t key;
+>      int level;
+>  
+> +    if (s->iotlb_size == 0) {
+> +        return NULL;
+> +    }
+> +
+>      for (level = VTD_SL_PT_LEVEL; level < VTD_SL_PML4_LEVEL; level++) {
+>          key = vtd_get_iotlb_key(vtd_get_iotlb_gfn(addr, level),
+>                                  source_id, level);
+> @@ -244,8 +248,12 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+>      uint64_t *key = g_malloc(sizeof(*key));
+>      uint64_t gfn = vtd_get_iotlb_gfn(addr, level);
+>  
+> +    if (s->iotlb_size == 0) {
+> +        return;
+> +    }
+> +
+>      trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
+> -    if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
+> +    if (g_hash_table_size(s->iotlb) >= s->iotlb_size) {
+>          trace_vtd_iotlb_reset("iotlb exceeds size limit");
+>          vtd_reset_iotlb(s);
+>      }
+> @@ -2397,6 +2405,7 @@ static Property vtd_properties[] = {
+>                              ON_OFF_AUTO_AUTO),
+>      DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+> +    DEFINE_PROP_UINT16("x-iotlb-size", IntelIOMMUState, iotlb_size, 1024),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index 754cf8a..2d77249 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -116,7 +116,6 @@
+>  /* The shift of source_id in the key of IOTLB hash table */
+>  #define VTD_IOTLB_SID_SHIFT         36
+>  #define VTD_IOTLB_LVL_SHIFT         52
+> -#define VTD_IOTLB_MAX_SIZE          1024    /* Max size of the hash table */
+>  
+>  /* IOTLB_REG */
+>  #define VTD_TLB_GLOBAL_FLUSH        (1ULL << 60) /* Global invalidation */
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 3e51876..a57f419 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -288,6 +288,7 @@ struct IntelIOMMUState {
+>  
+>      uint32_t context_cache_gen;     /* Should be in [1,MAX] */
+>      GHashTable *iotlb;              /* IOTLB */
+> +    uint16_t iotlb_size;            /* IOTLB max cache entries */
+>  
+>      MemoryRegionIOMMUOps iommu_ops;
+>      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
+> -- 
+> 2.7.4
