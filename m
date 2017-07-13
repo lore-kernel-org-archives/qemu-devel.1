@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVlnz-0003Dy-KP
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:37:53 -0400
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dVlsj-0004di-Km
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVlnv-0002PW-Ov
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:37:51 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35247)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dVlnv-0002PG-JI
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:37:47 -0400
-Received: by mail-qk0-x243.google.com with SMTP id 16so9818477qkg.2
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 14:37:47 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dVlsg-0004l5-IX
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:42:45 -0400
+Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:35517)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
+	id 1dVlsg-0004kL-CK
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 17:42:42 -0400
 References: <20170707022111.21836-1-rth@twiddle.net>
 	<20170707022111.21836-9-rth@twiddle.net>
 	<9645bafa-2c7e-96e8-5f3c-9cf7a9415285@physik.fu-berlin.de>
@@ -21,12 +19,13 @@ References: <20170707022111.21836-1-rth@twiddle.net>
 	<b7f8b2dd-a154-fc14-7be1-1cdbe248d350@twiddle.net>
 	<20170713090908.GA25275@physik.fu-berlin.de>
 	<20170713105652.GC25275@physik.fu-berlin.de>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a18f211f-ea06-51ed-3961-55dbecdbc766@twiddle.net>
-Date: Thu, 13 Jul 2017 11:37:40 -1000
+	<a18f211f-ea06-51ed-3961-55dbecdbc766@twiddle.net>
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Message-ID: <608ab9c6-38d9-e731-a4e0-a764376f641b@physik.fu-berlin.de>
+Date: Thu, 13 Jul 2017 23:42:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170713105652.GC25275@physik.fu-berlin.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <a18f211f-ea06-51ed-3961-55dbecdbc766@twiddle.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2 08/27] linux-user/sh4: Notice gUSA
@@ -39,42 +38,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org, aurelien@aurel32.net, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-On 07/13/2017 12:56 AM, John Paul Adrian Glaubitz wrote:
-> It either hangs, so I had to use "Ctrl+C" or it segfaulted.
-> 
-> Sometimes it would crash with:
-> 
-> (sid-sh4-sbuild)root@nofan:/# ghc Main.hs
-> /bin/bash: warning: setlocale: LC_ALL: cannot change locale
-> (en_US.UTF-8)
-> Unhandled trap: 0x180
-> pc=0x07019782 sr=0x00000000 pr=0x0668c52c fpscr=0x00080000
-> spc=0x00000000 ssr=0x00000000 gbr=0x7f5ae680 vbr=0x00000000
-> sgr=0x00000000 dbr=0x00000000 delayed_pc=0x0668c52c fpul=0x05f7595c
-> r0=0x07019780 r1=0x7d9f90d8 r2=0x00019780 r3=0x00009780
-> r4=0x00000001 r5=0x0000001e r6=0x70000000 r7=0x00000080
-> r8=0x00000001 r9=0x00000000 r10=0x7f5ae694 r11=0x00000000
-> r12=0x07099840 r13=0x7f4fe000 r14=0x7ffff4cc r15=0x7ffff4c8
-> r16=0x00000000 r17=0x00000000 r18=0x00000000 r19=0x00000000
-> r20=0x00000000 r21=0x00000000 r22=0x00000000 r23=0x00000000
-> (sid-sh4-sbuild)root@nofan:/#
-> 
-> Source file is available here [1]. In order to be able to install,
-> you need to bind-mount /proc into the chroot first:
-> 
-> mount -o bind /proc /path/to/sid-sh4-sbuild/proc/
-> 
-> Adrian
-> 
->> [1] https://people.debian.org/~glaubitz/Main.hs
+On 07/13/2017 11:37 PM, Richard Henderson wrote:
+> Unfortunately with something as complex as ghc this doesn't help much.
+> I hope you can find something smaller that produces a similar problem...
 
-I can reproduce this non-reproducible behaviour.
+GHC is truly a complex matter. It's in fact the package that causes most
+trouble on qemu-user, both on m68k and sh4. Although it works fine on
+qemu-user for ARM.
 
-Unfortunately with something as complex as ghc this doesn't help much.  I hope 
-you can find something smaller that produces a similar problem...
+I will try to reduce the test case.
 
+Adrian
 
-r~
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
