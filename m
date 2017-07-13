@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dVjzJ-0004un-0h
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:41:26 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dVkGV-0003kH-Qx
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:59:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dVjzH-0008LA-QM
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:41:25 -0400
-References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
-	<1499825297-20335-3-git-send-email-gengdongjiu@huawei.com>
-	<20170713201407-mutt-send-email-mst@kernel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <660d600a-107c-e44a-7322-ae4a74bc5565@redhat.com>
-Date: Thu, 13 Jul 2017 21:41:03 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170713201407-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] ACPI: Add APEI GHES Table
- Generation support
+	(envelope-from <programmingkidx@gmail.com>) id 1dVkGS-0000pJ-0a
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:59:11 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dVkGR-0000p4-Rj
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 15:59:07 -0400
+Received: by mail-it0-x244.google.com with SMTP id 188so8988629itx.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 12:59:07 -0700 (PDT)
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <c9179f0b-d978-31ad-19d5-2f4070a1b1b1@denx.de>
+Date: Thu, 13 Jul 2017 15:59:04 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C1AED432-9B05-4B84-AB8D-6BC1AEDEE4F8@gmail.com>
+References: <4EE89732-1A49-4D45-B94A-F8A57873E6EB@gmail.com>
+	<1a59d15c-9bba-fa7b-198b-bf4bbdc11488@denx.de>
+	<C130A840-281E-4A82-A4E1-4142261AB2FC@gmail.com>
+	<c9179f0b-d978-31ad-19d5-2f4070a1b1b1@denx.de>
+Subject: Re: [Qemu-devel] Nios2 documentation page now up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,134 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Dongjiu Geng <gengdongjiu@huawei.com>
-Cc: imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
+To: Marek Vasut <marex@denx.de>
+Cc: crwulff@gmail.com, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-On 07/13/17 19:32, Michael S. Tsirkin wrote:
-> On Wed, Jul 12, 2017 at 10:08:16AM +0800, Dongjiu Geng wrote:
 
-snip
+On Jul 13, 2017, at 3:01 PM, Marek Vasut wrote:
 
->> etc/acpi/tables                 etc/hardware_errors
->> ================     ==========================================
->>                      +-----------+
->> +--------------+     | address   |         +-> +--------------+
->> |    HEST      +     | registers |         |   | Error Status |
->> + +------------+     | +---------+         |   | Data Block 0 |
->> | | GHES0      | --> | |address0 | --------+   | +------------+
->> | | GHES1      | --> | |address1 | ------+     | |  CPER      |
->> | | GHES2      | --> | |address2 | ----+ |     | |  CPER      |
->> | |  ....      | --> | | ....... |     | |     | |  CPER      |
->> | | GHES10     | --> | |address10| -+  | |     | |  CPER      |
->> +-+------------+     +-+---------+  |  | |     +-+------------+
->>                                     |  | |
->>                                     |  | +---> +--------------+
->>                                     |  |       | Error Status |
->>                                     |  |       | Data Block 1 |
->>                                     |  |       | +------------+
->>                                     |  |       | |  CPER      |
->>                                     |  |       | |  CPER      |
->>                                     |  |       +-+------------+
->>                                     |  |
->>                                     |  +-----> +--------------+
->>                                     |          | Error Status |
->>                                     |          | Data Block 2 |
->>                                     |          | +------------+
->>                                     |          | |  CPER      |
->>                                     |          +-+------------+
->>                                     |            ...........
->>                                     +--------> +--------------+
->>                                                | Error Status |
->>                                                | Data Block 10|
->>                                                | +------------+
->>                                                | |  CPER      |
->>                                                | |  CPER      |
->>                                                | |  CPER      |
->>                                                +-+------------+
+> On 07/13/2017 08:23 PM, Programmingkid wrote:
+>>=20
+>> On Jul 13, 2017, at 10:48 AM, Marek Vasut wrote:
+>>=20
+>>> On 07/13/2017 04:28 PM, Programmingkid wrote:
+>>>> Hi I have recently created a new documentation page for the Nios2 =
+target. I would greatly appreciate any feedback you might have on it. =
+Thank you.
+>>>=20
+>>> Great, thanks !
+>>>=20
+>>> A few nits, we also support nios2 userspace binary emulation. And =
+Nios2
+>>> is I believe Altera specific. And we only support Nios2 R1 EL thus =
+far.
+>>>=20
+>>>> Page: http://wiki.qemu.org/Documentation/Platforms/Nios2
+>>>>=20
+>>=20
+>> Thank you for the info. Did the suggested command line look good to =
+you?
+>=20
+> I mean, ./configure --target-list=3Dnios2-softmmu,nios2-linux-user =
+when I
+> say that userspace linux binary emulation is supported.
 
-snip
+I just did a git pull and tried your configure command. This is the =
+error I saw:
 
->> +
->> +    error_source_table = (AcpiHardwareErrorSourceTable *)(table_data->data
->> +                        + table_data->len - buffer->len);
->> +    error_source_table->error_source_count = GHES_ACPI_HEST_NOTIFY_RESERVED;
->> +    error_source = (AcpiGenericHardwareErrorSource *)
->> +        ((AcpiHardwareErrorSourceTable *)error_source_table + 1);
-> 
-> Concern with all these casts and pointer math is that it is barely readable.
-> We can easily overflow the array and get hard to debug heap corruption
-> errors.
-> 
-> What can I suggest?  Just add this to the array in steps. Then you will
-> not need all the math.
-> 
-> Or again, you can just add things as you init them using build_append_int_noprefix.
-> 
-> 
->> +
->> +    bios_linker_loader_write_pointer(linker, GHES_DATA_ADDR_FW_CFG_FILE,
->> +        0, sizeof(uint64_t), GHES_ERRORS_FW_CFG_FILE,
->> +        GHES_ACPI_HEST_NOTIFY_RESERVED * sizeof(uint64_t));
-> 
-> What does this uint64_t refer to? It's repeated everywhere.
-> 
->> +
->> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
->> +        error_source->type = ACPI_HEST_SOURCE_GENERIC_ERROR;
->> +        error_source->source_id = cpu_to_le16(i);
->> +        error_source->related_source_id = 0xffff;
->> +        error_source->flags = 0;
->> +        error_source->enabled = 1;
->> +        /* The number of error status block per Generic Hardware Error Source */
-> 
-> number of ... blocks ?
-> 
->> +        error_source->number_of_records = 1;
->> +        error_source->max_sections_per_record = 1;
->> +        error_source->max_raw_data_length = GHES_MAX_RAW_DATA_LENGTH;
->> +        error_source->error_status_address.space_id =
->> +                                    AML_SYSTEM_MEMORY;
->> +        error_source->error_status_address.bit_width = 64;
->> +        error_source->error_status_address.bit_offset = 0;
->> +        error_source->error_status_address.access_width = 4;
->> +        error_source->notify.type = i;
->> +        error_source->notify.length = sizeof(AcpiHestNotify);
->> +
->> +        error_source->error_status_block_length = GHES_MAX_RAW_DATA_LENGTH;
->> +
->> +        bios_linker_loader_add_pointer(linker,
->> +            ACPI_BUILD_TABLE_FILE, address_registers_offset + i *
->> +            sizeof(AcpiGenericHardwareErrorSource), sizeof(uint64_t),
->> +            GHES_ERRORS_FW_CFG_FILE, i * sizeof(uint64_t));
-> 
-> and what's this math for?
-> 
->> +
->> +        error_source++;
->> +    }
->> +
->> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
->> +        bios_linker_loader_add_pointer(linker,
->> +            GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i, sizeof(uint64_t),
->> +            GHES_ERRORS_FW_CFG_FILE, GHES_ACPI_HEST_NOTIFY_RESERVED *
->> +            sizeof(uint64_t) + i * GHES_MAX_RAW_DATA_LENGTH);
->> +    }
+ERROR: Unknown target name 'nios2-linux-user'
 
-So basically all this math exists to set up the pointers that are shown
-in the diagram in the commit message. It is a bit tricky because most of
-those pointer fields (all 8-bytes wide) are individually embedded into
-their own containing structures. In the previous version of this patch
-set, I painstakingly verified the math, and pointed out wherever I
-thought updates were necessary.
+>=20
+>> Also would you know of any pre-made images the user could download to =
+test the emulator?=20
+>=20
+> I build them using OE with meta-altera myself.
 
-I agree the math is hard to read, the code is very "dense". My
-suggestion (supporting yours) would be to calculate the fw_cfg blob
-offsets that should be patched in more fine-grained steps, possibly with
-multiple separate increments, using:
-- structure type names,
-- sizeof operators,
-- offsetof macros,
-- and possibly a separate comment for each offset increment.
+Actually I was talking about a HD image file the user could try to boot =
+from. A simple test image file would be good enough.=20
 
-Thanks,
-Laszlo
+>=20
+>> I will add your note about how only Nios2 R1 EL is currently =
+supported.
+>>=20
+>> If you have any pictures of this emulator running I would be glad to =
+add them to the wiki page.=20
+>=20
+> Not at the moment, just a random post on my G+ (which I'd prefer to =
+NOT
+> have linked in the wiki) ; although feel free to copy-paste the =
+console
+> output:
+>=20
+> https://plus.google.com/+MarekVa%C5%A1ut/posts/BEvfXANeCs7
+
+I will be glad to post any pictures whenever you decide to add pictures =
+to the wiki page.
