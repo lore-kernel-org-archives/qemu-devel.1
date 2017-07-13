@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dVUGh-0000xB-B3
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 22:54:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVUIG-0001Zg-Gl
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 22:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dVUGd-0000nM-FS
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 22:54:19 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:50244)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dVUGc-0000gi-2X
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 22:54:15 -0400
-Date: Thu, 13 Jul 2017 10:53:57 +0800 (CST)
-Message-ID: <201707131053572555365@zte.com.cn>
-References: 1499850727-50728-1-git-send-email-peng.hao2@zte.com.cn,
-	7cdaad86-333a-4b7b-1c91-09ad6e036ecd@redhat.com
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIXSB0YXJnZXQtaTM4?=
- =?utf-8?q?6=3Akvm=5Fget/put=5Fvcpu=5Fevents_don=27t_handlesipi=5Fvector?=
+	(envelope-from <dgibson@ozlabs.org>) id 1dVUIF-00028P-KV
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 22:55:56 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 13 Jul 2017 12:55:47 +1000
+Message-Id: <20170713025547.820-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH for qemu-2.9] spapr: fix migration to pseries
+ machine < 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +18,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, jan.kiszka@siemens.com
+To: mdroth@linux.vnet.ibm.com, qemu-stable@nongnu.org
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-5Y+R5Lu25Lq677yaIDxwYm9uemluaUByZWRoYXQuY29tPg0K5pS25Lu25Lq677ya5b2t5rWpMTAw
-OTY3NDIgPHJ0aEB0d2lkZGxlLm5ldD4gPGVoYWJrb3N0QHJlZGhhdC5jb20+IDxrdm1Admdlci5r
-ZXJuZWwub3JnPiA8bXRvc2F0dGlAcmVkaGF0LmNvbT4NCuaKhOmAgeS6uu+8miA8cWVtdS1kZXZl
-bEBub25nbnUub3JnPiA8amFuLmtpc3prYUBzaWVtZW5zLmNvbT4NCuaXpSDmnJ8g77yaMjAxN+W5
-tDA35pyIMTPml6UgMDE6MDENCuS4uyDpopgg77yaUmU6IFtQQVRDSF0gdGFyZ2V0LWkzODY6a3Zt
-X2dldC9wdXRfdmNwdV9ldmVudHMgZG9uJ3QgaGFuZGxlc2lwaV92ZWN0b3INCg0KDQoNCg0KDQpP
-biAxMi8wNy8yMDE3IDExOjEyLCBQZW5nIEhhbyB3cm90ZToNCj4gcWVtdSBjYWxsIGt2bV9nZXRf
-dmNwdV9ldmVudHMsIGFuZCBrZXJuZWwgcmV0dXJuIHNpcGlfdmVjdG9yIGFsd2F5cyAwLA0KPiBu
-ZXZlciB2YWxpZCB3aGVuIHJlcG9ydGluZyB0byB1c2VyIHNwYWNlLiBCdXQgcWVtdSBjYWxsIGt2
-bV9wdXRfdmNwdV9ldmVudHMNCj4gd2lsbCBtYWtlIHNpcGlfdmVjdG9yIGluIGtlcm5lbCBiZSAw
-LiBUaGlzIHdpbGwgYWNjaWRlbnRseSBtb2RpZnkgc2lwaV92ZWN0b3INCj4gd2hlbiBzaXBpX3Zl
-Y3RvciBpbiBrZXJuZWwgaXMgbm90IDAuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8
-cGVuZy5oYW8yQHp0ZS5jb20uY24+DQo+IFJldmlld2VkLWJ5OiBXYW5nIFllY2hhbyA8d2FuZy55
-ZWNoYW8yNTVAenRlLmNvbS5jbj4NCj4gLS0tDQo+ICB0YXJnZXQvaTM4Ni9rdm0uYyB8IDMgLS0t
-DQo+ICAxIGZpbGUgY2hhbmdlZCwgMyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS90
-YXJnZXQvaTM4Ni9rdm0uYyBiL3RhcmdldC9pMzg2L2t2bS5jDQo+IGluZGV4IGY4NGE0OWQuLmJi
-YmQ2OTYgMTAwNjQ0DQo+IC0tLSBhL3RhcmdldC9pMzg2L2t2bS5jDQo+ICsrKyBiL3RhcmdldC9p
-Mzg2L2t2bS5jDQo+IEBAIC0yNDE3LDcgKzI0MTcsNiBAQCBzdGF0aWMgaW50IGt2bV9wdXRfdmNw
-dV9ldmVudHMoWDg2Q1BVICpjcHUsIGludCBsZXZlbCkNCj4gICAgICBldmVudHMubm1pLm1hc2tl
-ZCA9ICEhKGVudi0+aGZsYWdzMiAmIEhGMl9OTUlfTUFTSykNCj4gICAgICBldmVudHMubm1pLnBh
-ZCA9IDANCj4gIA0KPiAtICAgIGV2ZW50cy5zaXBpX3ZlY3RvciA9IGVudi0+c2lwaV92ZWN0b3IN
-Cj4gICAgICBldmVudHMuZmxhZ3MgPSAwDQo+ICANCj4gICAgICBpZiAoaGFzX21zcl9zbWJhc2Up
-IHsNCg0KVGhpcyBzaG91bGQgY2xlYXIgS1ZNX1ZDUFVFVkVOVF9WQUxJRF9TSVBJX1ZFQ1RPUiBp
-biB0aGUgImlmIiBzdGF0ZW1lbnQNCmJlbG93LiAgT3RoZXJ3aXNlLCB5b3UncmUgcGFzc2luZyBh
-IHJhbmRvbSB2YWx1ZSB0byB0aGUga2VybmVsLg0KLS0teWVzLHlvdSdyZSByaWdodC5JIGxvc3Qg
-dGhpcyApDQoNCj4gQEAgLTI1MDYsOCArMjUwNSw2IEBAIHN0YXRpYyBpbnQga3ZtX2dldF92Y3B1
-X2V2ZW50cyhYODZDUFUgKmNwdSkNCj4gICAgICAgICAgfQ0KPiAgICAgIH0NCj4gIA0KPiAtICAg
-IGVudi0+c2lwaV92ZWN0b3IgPSBldmVudHMuc2lwaV92ZWN0b3INCj4gLQ0KPiAgICAgIHJldHVy
-biAwDQo+ICB9DQo+ICANCj4gDQoNCkkgdGhpbmsgd2hhdCB5b3UncmUgc2VlaW5nIGlzIGEgcmFj
-ZSBsaWtlIHRoaXM6DQoNCiAgICBWQ1BVIDAgICAgICAgICAgICAgICAgICAgIFZDUFUgMQ0KICAg
-IFtxZW11XSBrdm1fZ2V0X21wX3N0YXRlDQogICAgICBba3ZtXSBrdm1fYXBpY19hY2NlcHRfZXZl
-bnRzDQogICAgICAgICAgICAgICAgICAgICAgICBfX2FwaWNfYWNjZXB0X2lycQ0KICAgICAgICAg
-ICAgICAgICAgICAgICAgICBzZXQgS1ZNX0FQSUNfU0lQSQ0KICAgIFtxZW11XSBrdm1fZ2V0X3Zj
-cHVfZXZlbnRzDQotLS0tSSBkb24ndCB0aGluayBpdCB3aWxsIGhhcHBlbi4NCklmIHRoaXMgaXMg
-d2hhdCBoYXBwZW5zIGhhcHBlbiwgdGhlIGZpeCBpcyB0byBjYWxsIHRoZSBmdW5jdGlvbnMgaW4g
-dGhpcw0Kb3JkZXI6DQoNCi0gZmlyc3Qga3ZtX2dldF92Y3B1X2V2ZW50cw0KDQotIHRoZW4ga3Zt
-X2dldF9tcF9zdGF0ZQ0KDQotIHRoZW4gYWxsIHRoZSBvdGhlcnMuDQoNClRoaXMgd2F5IHlvdSBo
-YXZlOg0KDQogICAgVkNQVSAwICAgICAgICAgICAgICAgICAgICBWQ1BVIDENCiAgICBbcWVtdV0g
-a3ZtX2dldF92Y3B1X2V2ZW50cw0KICAgICAgICAgICAgICAgICAgICAgICAgX19hcGljX2FjY2Vw
-dF9pcnENCiAgICAgICAgICAgICAgICAgICAgICAgICAgc2V0IEtWTV9BUElDX1NJUEkNCiAgICBb
-cWVtdV0ga3ZtX2dldF9tcF9zdGF0ZQ0KICAgICAgW2t2bV0ga3ZtX2FwaWNfYWNjZXB0X2V2ZW50
-cw0KICAgICAgICAgW2t2bV0ga3ZtX3ZjcHVfZGVsaXZlcl9zaXBpX3ZlY3Rvcg0KICAgICAgICAg
-ICAgLy8gdGhpcyBtb2RpZmllcyBDUyBhbmQgUklQISEhDQogICAgW3FlbXVdIGt2bV9nZXRwdXRf
-cmVncw0KICAgICAgLy8gcmVhZHMgUklQDQogICAgLi4uDQogICAgW3FlbXVdIGt2bV9nZXRwdXRf
-c3JlZ3MNCiAgICAgIC8vIHJlYWRzIENTDQogICAgLi4uDQoNCmFuZCB0aGUgc2lwaV92ZWN0b3Ig
-aXMgbmV2ZXIgbG9zdC4NCg0KLS0tLUkgc3VzcGVjdCB0aGF0IHNpcGlfdmVjdG9yIGlzIGxvc3Qg
-d2hlbiBob3RwbHVnIGNwdSBpbiBzb21lIHRpbWUuDQoNClZDUFUwICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIFZDUFUxIChob3RwbHVnKQ0KDQpba3ZtXWFwaWNfc2VuZF9pcGkN
-Cg0KW2t2bV1zZXQgdmNwdTEuc2lwaV92ZWN0b3IgICAgICANCg0KW2t2bV0gd2FrZXVwIHZjcHUx
-IHRocmVhZCAgIFtxZW11XSBrdm1fcHV0X3ZjcHVfZXZlbnRzDQoNCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBba3ZtXSBzZXQgdmNwdTEuc2lwaV92ZWN0b3I9
-MA0KDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgW2t2bV0g
-a3ZtX2FwaWNfYWNjZXB0X2V2ZW50cw0KDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgW2t2bV1rdm1fdmNwdV9kZWxpdmVyX3NpcGlfdmVjdG9y
-KHNpcGlfdmVjdG9yPTAp
+From: Laurent Vivier <lvivier@redhat.com>
+
+since commit 5c4537bd ("spapr: Fix 2.7<->2.8 migration of PCI host bridge"),
+some migration fields are forged from the new ones in spapr_pci_pre_save().
+
+It works well, except when the number of MSI devices is 0,
+because in this case the function exits immediately.
+
+This fix moves the migration code before the exit code.
+
+The problem can be reproduced with these commands:
+
+source qemu-2.9:
+
+    qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults -S
+
+destination qemu-2.6:
+
+    qemu-system-ppc64 -monitor stdio -M pseries-2.6 -nodefaults \
+                      -incoming tcp:0:4444
+
+on the source:
+
+    migrate tcp:localhost:4444
+
+Destination fails with the following error:
+
+    qemu-system-ppc64: error while loading state for
+                       instance 0x0 of device 'spapr_pci'
+    qemu-system-ppc64: load of migration failed: Invalid argument
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit e806b4db1477a1c6bfda7bba28c7f26c47f18e1e)
+---
+ hw/ppc/spapr_pci.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 98c52e4..ecfbf01 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1893,20 +1893,6 @@ static void spapr_pci_pre_save(void *opaque)
+     gpointer key, value;
+     int i;
+ 
+-    g_free(sphb->msi_devs);
+-    sphb->msi_devs = NULL;
+-    sphb->msi_devs_num = g_hash_table_size(sphb->msi);
+-    if (!sphb->msi_devs_num) {
+-        return;
+-    }
+-    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
+-
+-    g_hash_table_iter_init(&iter, sphb->msi);
+-    for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
+-        sphb->msi_devs[i].key = *(uint32_t *) key;
+-        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
+-    }
+-
+     if (sphb->pre_2_8_migration) {
+         sphb->mig_liobn = sphb->dma_liobn[0];
+         sphb->mig_mem_win_addr = sphb->mem_win_addr;
+@@ -1920,6 +1906,20 @@ static void spapr_pci_pre_save(void *opaque)
+             sphb->mig_mem_win_size += sphb->mem64_win_size;
+         }
+     }
++
++    g_free(sphb->msi_devs);
++    sphb->msi_devs = NULL;
++    sphb->msi_devs_num = g_hash_table_size(sphb->msi);
++    if (!sphb->msi_devs_num) {
++        return;
++    }
++    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
++
++    g_hash_table_iter_init(&iter, sphb->msi);
++    for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
++        sphb->msi_devs[i].key = *(uint32_t *) key;
++        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
++    }
+ }
+ 
+ static int spapr_pci_post_load(void *opaque, int version_id)
+-- 
+2.9.4
