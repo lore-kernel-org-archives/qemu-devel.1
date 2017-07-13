@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVcFn-0003Hn-BZ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:25:56 -0400
+	(envelope-from <lersek@redhat.com>) id 1dVcLe-0004Fu-Mp
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:31:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVcFm-0001pm-Mb
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:25:55 -0400
-Date: Thu, 13 Jul 2017 13:25:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170713112543.GC4139@noname.redhat.com>
-References: <1499864249-26305-1-git-send-email-kwolf@redhat.com>
-	<1499864249-26305-6-git-send-email-kwolf@redhat.com>
-	<266aa00c-27cd-2f18-f756-844a9a321de7@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1dVcLZ-00049d-Pn
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:31:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45860)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dVcLZ-00049R-Jo
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:31:53 -0400
+References: <1499111049-13721-1-git-send-email-mst@redhat.com>
+	<1499111049-13721-20-git-send-email-mst@redhat.com>
+	<CAFEAcA_giHFa-aw=WuuqmVFL+dr7HeD9E1o=oLszQywJbAd0wA@mail.gmail.com>
+	<7EC3FA95-777F-4F8F-B02D-85FA09BAFC00@skyportsystems.com>
+	<CAFEAcA8-o28j-FvHWz3=nZX_pO=+XOc_6MnmyFWB324+G7Ppqw@mail.gmail.com>
+	<CAFEAcA-ireu_2fW00dX=Z3hu4Jongftab_ysymbJMB0893M4Ww@mail.gmail.com>
+	<20170711220915-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_-hCV2Ogy3BS2RV4_AWYYQDT+fCNChVcz8uKZ8-VxhWA@mail.gmail.com>
+	<273a7da7-2243-171f-e96d-39e8e8031984@redhat.com>
+	<3CA8C399-80D0-4BC8-ACC6-FD72A09D9685@skyportsystems.com>
+	<CAFEAcA8ZiTqAGS01Rtu8Vv9FHKXtUXwfc9mULkCkanQzirB14Q@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <06cbc0c4-73bc-d527-a466-de5a05b0641e@redhat.com>
+Date: Thu, 13 Jul 2017 13:31:45 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="i0/AhcQY5QxfSsSZ"
-Content-Disposition: inline
-In-Reply-To: <266aa00c-27cd-2f18-f756-844a9a321de7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/9] block: List anonymous device BBs in
- query-block
+In-Reply-To: <CAFEAcA8ZiTqAGS01Rtu8Vv9FHKXtUXwfc9mULkCkanQzirB14Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 19/21] tests: Add unit tests for the VM
+ Generation ID feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +38,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-
---i0/AhcQY5QxfSsSZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 12.07.2017 um 17:47 hat Eric Blake geschrieben:
-> On 07/12/2017 07:57 AM, Kevin Wolf wrote:
-> > Instead of listing only monitor-owned BlockBackends in query-block, also
-> > add those anonymous BlockBackends that are owned by a qdev device and as
-> > such under the control of the user.
-> >=20
-> > This allows to use query-block to inspect BlockBackends for the modern
+On 07/13/17 12:47, Peter Maydell wrote:
+> On 12 July 2017 at 00:43, Ben Warren <ben@skyportsystems.com> wrote:
+>> Yes, it=E2=80=99s definitely a setup time problem.  With the values th=
+at are checked
+>> in, I can=E2=80=99t get it to fail on my setup, but if I wind the numb=
+ers down I see
+>> the same failure as Peter.  So now we have the ages-old problem of =E2=
+=80=9Cwhat new
+>> arbitrary value should I use that will not cause false failures but wi=
+ll
+>> eventually time out=E2=80=9D.
 >=20
-> "allows to VERB" is not idiomatic; better is "allows VERBing" (as in
-> "allows using query-block"); or "allows SUBJECT to VERB" (as in the
-> verbose "allows the client to use query-block").
+> Empirically, we already have an answer to this, in the form
+> of the existing code in tests/boot-sector.c, which is used
+> by both that test and the bios-tables-test.c code to wait
+> for the BIOS initialization to complete, and which doesn't
+> cause false test timeouts in practice.
+>=20
+> Can we make this test just use that existing function to
+> wait for the BIOS to be done, rather than having its own
+> timeout loop?
 
-Is this inconsistency a known problem in English or should we file a new
-bug report against it? But as long as this isn't fixed yet, I'll apply
-your workaround.
+This is incredibly cool. Now that I've looked at "tests/boot-sector.c"
+(again), I recall having seen it earlier, but I couldn't have remembered
+it off-hand.
 
-Kevin
+Perhaps this boot sector code should be factored out and moved to
+"tests/acpi-utils".
 
---i0/AhcQY5QxfSsSZ
-Content-Type: application/pgp-signature
+Marc-Andr=C3=A9, do you think it would be feasible for the vmcoreinfo uni=
+t
+test as well? (Which is derived from the vmgenid unit test.)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZZ1i3AAoJEH8JsnLIjy/WYzEP/1q3KqJLAfJlbrvrqwYVJr+O
-ls17a4yh+6/Z3e1Zeehjzi3L1lMqBDLtYsxgmyTqd9NEsfpq6mxmS8Z6rQOy5R2H
-cF8PVnop2GB4Ja39cZBgK88xNTMe54L+2tSZNfme/qQWM5Jt5eLnmmgMgTvnzP0v
-RP5qn66T/uY9d9PDFNHpK1QAG/QWnra/hmV+pnreFdcwtsXJ8nnPCcrJXcLeTzEP
-KehHJy6iizaGZrkuOE7gTiu/YP2V8N5gHAFwA10HOpvoE6aZE28MS9IOac7JDGD1
-T9XOeZvxbzZ3k5cm7udSZHgOii1gbn+X/J96Aj7H+ebS/+k/BYwI4umQJW5GC3g/
-PRqj2I97LBTGB4qH6TuWWXXLDcopmneeFelnk6HandPQYSPic3nJVzGhV3pf3+3b
-5BiO9xj4QnW4sKG7F3ye3vjOgNYq6Pvs+ng3I3g6dl+jqZuzibUHYnq9etG/0OLJ
-uMBuStKAGEWQ6k2wXrVtw6NZVVMb6QjKuwvbqZjpt+LV3PCpB9mosGOESm3jtxp3
-NIbmA7Ggrg8vIJ2w9ThH9sushQDa+Kcj6K5WPxsmSyJDrpRThSR4Gy0UNOPUzP4I
-G2hA4y99d7q5ZHYXuF8K+zUF8rhjAIo2ZKWU6cu865B4E1ZNYR6z+FU17A25iLkV
-cCTl+opqg+ZrneoHCn3K
-=qvuv
------END PGP SIGNATURE-----
-
---i0/AhcQY5QxfSsSZ--
+Thanks!
+Laszlo
