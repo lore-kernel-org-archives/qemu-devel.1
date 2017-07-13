@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVfrl-0007Go-Bh
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:17:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVfsK-0007iI-VN
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVfrk-0006ip-3g
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:17:21 -0400
-Date: Thu, 13 Jul 2017 16:17:08 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170713151708.GT4011@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170713140022.GN4011@redhat.com>
-	<1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
-	<20170713140711.GO4011@redhat.com>
-	<4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
-	<20170713145801.GP4011@redhat.com>
-	<37d97fcb-aa71-1ed4-2134-6d308da7b527@kamp.de>
-	<20170713150148.GQ4011@redhat.com>
-	<2c5db580-1e3e-9b82-2768-ba2510173387@kamp.de>
-	<20170713150652.GR4011@redhat.com>
-	<07042f09-594a-a288-588b-59c70479c414@kamp.de>
+	(envelope-from <ehabkost@redhat.com>) id 1dVfsG-0006vY-QL
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:17:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46246)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVfsG-0006uG-Gq
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:17:52 -0400
+Date: Thu, 13 Jul 2017 12:17:40 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170713151740.GR6020@localhost.localdomain>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
+	<20170712181652-mutt-send-email-mst@kernel.org>
+	<20170712201550.GN6020@localhost.localdomain>
+	<20170712232214-mutt-send-email-mst@kernel.org>
+	<20170712205646.GQ6020@localhost.localdomain>
+	<20170713003116-mutt-send-email-mst@kernel.org>
+	<91a1c7c2-0e87-4023-c960-5078267abf95@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <07042f09-594a-a288-588b-59c70479c414@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+In-Reply-To: <91a1c7c2-0e87-4023-c960-5078267abf95@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +34,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jul 13, 2017 at 05:13:23PM +0200, Peter Lieven wrote:
-> Am 13.07.2017 um 17:06 schrieb Daniel P. Berrange:
-> > On Thu, Jul 13, 2017 at 05:02:51PM +0200, Peter Lieven wrote:
-> > > Am 13.07.2017 um 17:01 schrieb Daniel P. Berrange:
-> > > > On Thu, Jul 13, 2017 at 05:00:39PM +0200, Peter Lieven wrote:
-> > > > > Am 13.07.2017 um 16:58 schrieb Daniel P. Berrange:
-> > > > > > On Thu, Jul 13, 2017 at 04:18:13PM +0200, Peter Lieven wrote:
-> > > > > > > Okay, so it has to be a mix of QAPI parsing and manual parameter checking,
-> > > > > > > right?
-> > > > > > Yeah. It does feel like a valid RFE for QAPI to add a permitted range to
-> > > > > > 'int' types though, which would simplify the code in future.
-> > > > > > 
-> > > > > > > I currently have the following:
-> > > > > > > 
-> > > > > > >        options = qemu_opts_to_qdict(opts, NULL);
-> > > > > > >        qdict_extract_subqdict(options, &compressopts, "compress.");
-> > > > > > >        v = qobject_input_visitor_new_keyval(QOBJECT(compressopts));
-> > > > > > >        visit_start_struct(v, NULL, NULL, 0, &local_err);
-> > > > > > >        if (local_err) {
-> > > > > > >            ret= -EINVAL;
-> > > > > > >            goto finish;
-> > > > > > >        }
-> > > > > > >        visit_type_Qcow2Compress_members(v, &compress, &local_err);
-> > > > > > >        if (local_err) {
-> > > > > > >            ret= -EINVAL;
-> > > > > > >            goto finish;
-> > > > > > >        }
-> > > > > > >        visit_end_struct(v, NULL);
-> > > > > > >        visit_free(v);
-> > > > > > >        QDECREF(compressopts);
-> > > > > > >        QDECREF(options)
-> > > > > > Looks good.
-> > > > > > 
-> > > > > > > And I have the following 2 questions:
-> > > > > > >     a) I have to specifiy compress.format and compress.level otherwise I will get an error. How can I fix that the settings are optional?
-> > > > > > Put an '*' as the first character of any field name if it should be optional.
-> > > > > > 
-> > > > > > >     b) If I just specify a compress.format can I default the compress.level to 0 without an error?
-> > > > > > I believe you'd get compress.level as 0 automatically for an 'int' type.
-> > > > > I still face the issue that I now always have to specify a compress.format.
-> > > > > I tried to solve it like this:
-> > > > [snip]
-> > > > 
-> > > > that's not needed if you name the parameter '*level' in the QAPI schema
-> > > its not needed for the *level, but I still get the error that the format
-> > > parameter is missing otherwise. And I can't make format optional.
-> > Surely specifying compress.format is how you turn on compression in the
-> > first place, so making that optional should not be necessary. eg the
-> > simple case becomes:
+On Thu, Jul 13, 2017 at 02:23:39AM +0200, Laszlo Ersek wrote:
+> On 07/13/17 00:27, Michael S. Tsirkin wrote:
+> > On Wed, Jul 12, 2017 at 05:56:46PM -0300, Eduardo Habkost wrote:
+> >> On Wed, Jul 12, 2017 at 11:31:59PM +0300, Michael S. Tsirkin wrote:
+> >>> On Wed, Jul 12, 2017 at 05:15:50PM -0300, Eduardo Habkost wrote:
+> >>>> On Wed, Jul 12, 2017 at 06:17:55PM +0300, Michael S. Tsirkin wrote:
+> >>>>> On Wed, Jul 12, 2017 at 11:51:21AM -0300, Eduardo Habkost wrote:
+> >>>>>> On Wed, Jul 12, 2017 at 10:22:33AM +0200, Thomas Huth wrote:
+> >>>>>>> We don't want to carry along old machine types forever. If we are able to
+> >>>>>>> remove the pc machines up to 0.13 one day for example, this would allow
+> >>>>>>> us to eventually kill the code for rombar=0 (i.e. where QEMU copies ROM
+> >>>>>>> BARs directly to low memory). Everything up to pc-1.2 is also known to
+> >>>>>>> have issues with migration.  So let's start with a deprecation message
+> >>>>>>> for the old machine types so that the (hopefully) few users of these old
+> >>>>>>> systems start switching over to newer machine types instead.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >>>>>>
+> >>>>>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> >>>>>>
+> >>>>>> I suggest changing "-machine help" too.  Today it looks like this:
+> >>>>>>
+> >>>>>>   Supported machines are:
+> >>>>>>   pc-i440fx-2.9        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.8        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.7        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc                   Standard PC (i440FX + PIIX, 1996) (alias of pc-i440fx-2.10)
+> >>>>>>   pc-i440fx-2.10       Standard PC (i440FX + PIIX, 1996) (default)
+> >>>>>>   pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-1.3               Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-1.2               Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-1.1               Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-1.0               Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-0.15              Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-0.14              Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-0.13              Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-0.12              Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-0.11              Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-0.10              Standard PC (i440FX + PIIX, 1996)
+> >>>>>>   pc-q35-2.9           Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   pc-q35-2.8           Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   pc-q35-2.7           Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
+> >>>>>>   pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+> >>>>>>   isapc                ISA-only PC
+> >>>>>>   none                 empty machine
+> >>>>>
+> >>>>> Any chance we can sort them reasonably too?
+> >>>>
+> >>>> If we use strverscmp(), it will be sorted in a more reasonable
+> >>>> way.  We could copy the gnulib version on systems without glibc.
+> >>>> Life is too short for writing configure checks by hand, though; I
+> >>>> will add this to the end of my wish-todo list.  If somebody wants
+> >>>> to volunteer, be my guest.
+> >>>>
+> >>>> I'm CCing Eric in case he has suggestions that would help import
+> >>>> the gnulib module in an easy way.
+> >>>>
+> >>>> -- 
+> >>>> Eduardo
+> >>>
+> >>> As we never have leading zeroes, and input comes from QEMU so
+> >>> it's safe, it's probably easier to just open-code it:
+> >>>
+> >>> /* compare string numerically: shorter strings give smaller numbers */
+> >>> int mstcmp(const char *s1, const char *s2)
+> >>> {
+> >>> 	int l1, l2;
+> >>>
+> >>> 	l1 = strlen(s1);
+> >>> 	l2 = strlen(s2);
+> >>> 	return l1 == l2 ? strcmp(s1, s2) : l1 - l2;
+> >>> }
+> >>>
+> >>
+> >> This doesn't work because strlen("pc-0.10") > strlen("pc-1.0").
 > > 
-> >    qemu-img create -f qcow2 -o compress.format=zlib  foo.qcow2 1G
+> > Oh right. So you need to find dots and split at these points.
+> > Something like the below? Completely untested.
 > > 
-> > Yes, there is no notion of a "default" format, but IMHO that's a good
-> > thing - same way with encryption - it requires an explict encrypt.format=luks
-> > to turn on encryption
+> > int mstcmp(const char *s1, const char *s2)
+> > {
+> > 	const char *e1, *e2;
+> >  	int l1, l2, c;
+> > 
+> > 	do {
+> > 		e1 = strchr(s1, '.');
+> > 		e2 = strchr(s2, '.');
+> > 
+> > 		l1 = e1 ? e1 - s1 + 1 : strlen(s1);
+> > 		l2 = e2 ? e2 - s2 + 1 : strlen(s2);
+> > 
+> > 		/* compare numerically: shorter strings give smaller numbers */
+> > 		if (l1 != l2) {
+> > 			break;
+> > 		}
+> > 		c = strncmp(s1, s2, l1);
+> > 		if (c) {
+> > 			return c;
+> > 		}
+> > 		s1 += l1;
+> > 		s2 += l1;
+> > 	} while (l1);
+> > 
+> > 	return l1 - l2;
+> > }
+
+I believe copying strverscmp() from gnulib as-is is better than
+reimplementing a subset of it.
+
 > 
-> Yes, but visit_type_Qcow2Compress_members always returns an error if compress.format
-> is missing from the options. So I should not call it an error out if compress.format is not in the
-> options. Thus the check if either compress.format or compress.level is specified at all.
+> QEMU already has machine type sorting code:
+> 
+>   1  2709f263952b well-defined listing order for machine types
+>   2  562542b6aee2 i386/pc: add piix and q35 machtypes to sorting
+>                   families for -M \?
+> 
+> I guess it should be possible to refine machine_class_cmp() in "vl.c",
+> so that some numeric sorting is applied to machine types in the same
+> "family".
 
-Oh yes, I see what you mean now. Yes, just wrapping the whole qapi block
-in an    if(qemu_opt_get(opts, "compress.format"))  is the right way to
-handle that.
+Yes.  My suggestion is to use strverscmp() inside
+machine_class_cmp().
 
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eduardo
