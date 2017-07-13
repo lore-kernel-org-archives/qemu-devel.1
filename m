@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVhym-0005tQ-Ht
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:32:45 -0400
+	(envelope-from <mst@redhat.com>) id 1dVi1H-0007yJ-8B
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVhyl-000499-Nm
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:32:44 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36382)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVhyl-00047r-GO
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:32:43 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id 62so30248813wmw.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 10:32:43 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dVi1G-0005jQ-F7
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:35:19 -0400
+Date: Thu, 13 Jul 2017 20:35:05 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170713203308-mutt-send-email-mst@kernel.org>
+References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
+	<1499825297-20335-2-git-send-email-gengdongjiu@huawei.com>
+	<74ac9b79-0225-0cab-559f-6204754de5f0@redhat.com>
+	<47cc803a-d1d9-da3b-43f9-31a54ce290e2@huawei.com>
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Jul 2017 18:32:21 +0100
-Message-ID: <CAFEAcA9A0fBB+QE68O7aea+c6SXPaVK4+7B8DJoYE27qshtrcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] tests/Makefile.include non-portable use of $RANDOM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <47cc803a-d1d9-da3b-43f9-31a54ce290e2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] ACPI: Add new ACPI structures and
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,38 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, Gaozhihui <zhihui.gao@huawei.com>
 
-Currently our test makefile does
+On Thu, Jul 13, 2017 at 08:00:26PM +0800, gengdongjiu wrote:
+>    Laszlo, I pasted Michael's comments here, as shown below. Michael said the definition
+> should use build_append_int_noprefix to add data. but I think it may not good, becuase
+> the section "UEFI_CPER_SEC_PLATFORM_MEM" is runtime recorded as CPER,
 
-   MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))}
+One thing I wanted to understand is how are races avoided. E.g. what if
+you are in the process of writing out CPER and guest reads it.
+I tried to find where is this function writing CPER called and couldn't.
+Can you clarify pls?
 
-This works on bash, but $RANDOM is bash-specific.
-On dash, it doesn't do what we want, but it does do something:
+> not a ACPI/HEST
+> table member, so it is not generated when system boot up. On the other hand,UEFI_CPER_SEC_PLATFORM_MEM
+> definition is from UEFI spec 2.6, N.2.2 Section Descriptor: {0xA5BC1114, 0x6F64, 0x4EDE, {0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C, 0x83, 0xB1}}.
+> if use  build_append_int_noprefix to add, may confuse others.
 
-$ echo $((RANDOM % 255 + 1))
-1
+Right but ACPI/HEST generation could use cleanup, and build_append_int_noprefix
+would be a nice way to do it.
 
-On NetBSD the shell complains:
-# echo $((RANDOM % 255 + 1))
--sh: arith: syntax error: "RANDOM % 255 + 1"
-
-and so 'make check' doesn't work.
-
-Any suggestions for something more portable?
-https://unix.stackexchange.com/questions/140750/generate-random-numbers-in-specific-range
-suggests
-  awk 'BEGIN{srand(); print int(1+rand()*256)}'
-and of course there are similar things possible with perl et al.
-
-Or we could just have the makefile check whether we have bash,
-and if not then set
-  RANDOM=4
-
-(thus putting NetBSD into the same boat as all our dash users).
-
-Opinions?
-
-thanks
--- PMM
+-- 
+MST
