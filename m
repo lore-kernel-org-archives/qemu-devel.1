@@ -1,47 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dVaQv-0005n6-HU
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:29:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVaiO-0000Zf-Oy
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dVaQs-00041Z-DN
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:29:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41858)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dVaQs-00041E-3x
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:29:14 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6D9Ntej046184
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:29:12 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3rquec-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:29:11 -0400
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 13 Jul 2017 19:29:09 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <8760ewbt38.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-References: <20170608063608.17855-1-nikunj@linux.vnet.ibm.com>
-	<20170609020141.GB26521@umbus.fritz.box>
-	<87mv9heota.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170609102714.GK26521@umbus.fritz.box>
-	<87eftlar4a.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<1ec762f9-d8b2-5195-1ffe-f4cde35571fd@kaod.org>
-	<b54ec156-725d-d954-1d05-ade845caa2a2@kaod.org>
-	<878tjsbwj4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<5fa5cb00-ee28-0ba4-2084-b0a43b8429f1@kaod.org>
-	<8760ewbt38.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Date: Thu, 13 Jul 2017 14:57:55 +0530
+	(envelope-from <peter.maydell@linaro.org>) id 1dVaiN-000271-W2
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:47:20 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35847)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVaiN-00026d-Q8
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:47:19 -0400
+Received: by mail-wm0-x236.google.com with SMTP id 62so18066937wmw.1
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 02:47:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170711083552.17433-1-stefanha@redhat.com>
+References: <20170711083552.17433-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Jul 2017 10:46:58 +0100
+Message-ID: <CAFEAcA9+W8ad0Nu3OufXdKXBYaf1E6NFApB-nZrsMqbgAzWnXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <871spkbs9w.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC] spapr: ignore interrupts
- during reset state
+Subject: Re: [Qemu-devel] [PULL 0/2] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,74 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: alex.bennee@linaro.org, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
-
-> C=C3=A9dric Le Goater <clg@kaod.org> writes:
+On 11 July 2017 at 09:35, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 6b06e3e49eb8c91cc286c16d6bf3181ac296f3=
+3d:
 >
->> On 07/13/2017 09:55 AM, Nikunj A Dadhania wrote:
->>> C=C3=A9dric Le Goater <clg@kaod.org> writes:
->>>=20
->>>>>> How about the following, we do not report work until MSR_EE is disab=
-led:
->>>>>
->>>>> With this fix, I could test the XIVE<->XICS transitions at reboot=20
->>>>> under TCG. However, the second boot is very slow for some reason.=20
->>>>
->>>> hmm, I am not sure this is related but I just got :=20
->>>=20
->>> Havent seen in my setup after around 10 reboot cycles, I was using 2
->>> cores pseries setup. Lets give it some more testing. When did this
->>> happen, during boot ?
->>
->> yes.=20
->>
->> I could not reproduce either :/ but I am keeping the patch. qemu runs
->> with :
->>
->> -m 2G -M pseries -accel tcg,thread=3Dmulti -cpu POWER9 -smp cores=3D4,ma=
-xcpus=3D8 -realtime mlock=3Doff -kernel ./vmlinux-4.12.0+ -initrd ./initrd.=
-img-4.12.0+ -append 'console=3Dhvc0 dyndbg=3D"file arch/powerpc/sysdev/xive=
-/* +p"' -nographic -nodefaults -serial mon:stdio -snapshot  -d guest_errors=
-,unimp -no-shutdown
->>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2017-07-10-v2=
+' into staging (2017-07-10 16:12:47 +0100)
 >
-> With 4 cores I am seeing hangs occasionally, although I havent seen a
-> crash. But seems to be similar problem that you had seen.
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/tracing-pull-request
+>
+> for you to fetch changes up to cbea0ac4fe4989ae70088e01ad8b5e99f7ce3846:
+>
+>   backends: remove empty trace-events file (2017-07-11 09:35:11 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrange (1):
+>   backends: remove empty trace-events file
+>
+> Llu=C3=ADs Vilanova (1):
+>   trace: Fix early setting of events with the "vcpu" property
+>
 
-Can you try this one, localized patch, only taking care of DECR
-interrupt. I am not seeing the hangs with this one.
+Applied, thanks.
 
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 783bf98..07e405f 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8536,7 +8536,7 @@ static bool cpu_has_work_POWER7(CPUState *cs)
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
-             (env->spr[SPR_LPCR] & LPCR_P7_PECE1)) {
--            return true;
-+            return msr_ee ? true : false;
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK)) &&
-             (env->spr[SPR_LPCR] & LPCR_P7_PECE2)) {
-@@ -8693,7 +8693,7 @@ static bool cpu_has_work_POWER8(CPUState *cs)
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
-             (env->spr[SPR_LPCR] & LPCR_P8_PECE3)) {
--            return true;
-+            return msr_ee ? true : false;
-         }
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK)) &&
-             (env->spr[SPR_LPCR] & LPCR_P8_PECE4)) {
-@@ -8876,7 +8876,7 @@ static bool cpu_has_work_POWER9(CPUState *cs)
-         /* Decrementer Exception */
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
-             (env->spr[SPR_LPCR] & LPCR_DEE)) {
--            return true;
-+            return msr_ee ? true : false;
-         }
-         /* Machine Check or Hypervisor Maintenance Exception */
-         if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK |
+-- PMM
