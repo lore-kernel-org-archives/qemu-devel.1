@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVbq7-0004eN-Sp
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:59:25 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dVbtT-0005iE-2Z
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVbq6-0008EU-W4
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:59:23 -0400
-References: <20170703151051.31327-1-eblake@redhat.com>
-	<20170703151051.31327-15-eblake@redhat.com>
-	<6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9d88aeeb-9deb-d0e4-6807-1199ebdd9622@redhat.com>
-Date: Thu, 13 Jul 2017 05:59:09 -0500
-MIME-Version: 1.0
-In-Reply-To: <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lxTllHl8sRo40OftFNiBb60of0G5ts3Q1"
-Subject: Re: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data()
- to byte-based iteration
+	(envelope-from <lprosek@redhat.com>) id 1dVbtP-0001Gf-Pd
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:02:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34006)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVbtP-0001FK-GR
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:02:47 -0400
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Thu, 13 Jul 2017 13:02:30 +0200
+Message-Id: <20170713110237.6712-2-lprosek@redhat.com>
+In-Reply-To: <20170713110237.6712-1-lprosek@redhat.com>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce error_report_nolf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +23,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com, stefanha@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lxTllHl8sRo40OftFNiBb60of0G5ts3Q1
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <9d88aeeb-9deb-d0e4-6807-1199ebdd9622@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data() to
- byte-based iteration
-References: <20170703151051.31327-1-eblake@redhat.com>
- <20170703151051.31327-15-eblake@redhat.com>
- <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
-In-Reply-To: <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Callers of error_report may want to compose the error message out of multiple
+separate format strings. To save them from always having to combine their
+strings into one (a process that would likely involve memory allocation which
+is good to avoid on error paths), new "nolf" variants of error_report and
+error_vreport are introduced.
 
-On 07/13/2017 04:16 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 03.07.2017 18:10, Eric Blake wrote:
->> Now that we have adjusted the majority of the calls this function
->> makes to be byte-based, it is easier to read the code if it makes
->> passes over the image using bytes rather than sectors.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> v4: new patch
->> ---
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+---
+ hw/virtio/virtio.c          |  3 ++-
+ include/qemu/error-report.h |  3 ++-
+ util/qemu-error.c           | 32 ++++++++++++++++++++++++++------
+ 3 files changed, 30 insertions(+), 8 deletions(-)
 
->>
->> -        if (offset =3D=3D 0) {
->> +        if (data_offset =3D=3D 0) {
->>               if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
->> -                bdrv_dirty_bitmap_deserialize_ones(bitmap,
->> -                                                   sector *
->> BDRV_SECTOR_SIZE,
->> -                                                   count *
->> BDRV_SECTOR_SIZE,
->> +                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset,
->> count,
->=20
-> The change is that now 3rd parameter may not be aligned by sectors, but=
-
-> looks like it should be ok.
-
-Correct - the dirty bitmap automatically widens any non-aligned input
-into granularity.
-
->=20
-> Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
->=20
-
-I posted a v5 prior to this email, if you want to add your Reviewed-by
-on any patches there (I think this patch went unchanged into that
-revision, but scripts don't always pick up R-b given on a previous
-version of a patch).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---lxTllHl8sRo40OftFNiBb60of0G5ts3Q1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZ1J+AAoJEKeha0olJ0NqRZoH/jHmuoLD6ivDC90BX8sK3t7B
-9aBIOUu0NPeMyysQzw0DD81Q5zA1uIm2kQCJWKW/MPGOikyhlWD0HPYgtUYqrN/v
-xKUc6FzPm9PePCehAHuyRsa4yRByS4cNfXu6ZZlx9m0E6vZe/BvSGaVjPEWatl0a
-fIgJLwiVfbDsxr4Jx9BbWI9lfrZwIDe/eoWa9VHRkSTyL9A7thQ6ZpTMlEc149mS
-9AvScDpt2HRabsDYdtwWumwncWbrJWErFv3y01IX9YExrumDbQV+PJm7u1okOxLg
-2akqKT53eSgZnYHjRpYGtDsWcRHoyhMFXQ0esYM4ITFiRCdPsv6mLweyvoPAZRA=
-=DvW+
------END PGP SIGNATURE-----
-
---lxTllHl8sRo40OftFNiBb60of0G5ts3Q1--
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 464947f..0e76a73 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2448,8 +2448,9 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+     va_list ap;
+ 
+     va_start(ap, fmt);
+-    error_vreport(fmt, ap);
++    error_vreport_nolf(fmt, ap);
+     va_end(ap);
++    error_printf("\n");
+ 
+     if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+         virtio_set_status(vdev, vdev->status | VIRTIO_CONFIG_S_NEEDS_RESET);
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index 3001865..cdee84f 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -35,7 +35,8 @@ void error_printf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_vprintf_unless_qmp(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+ void error_printf_unless_qmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_set_progname(const char *argv0);
+-void error_vreport(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++void error_vreport_nolf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
++void error_report_nolf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ const char *error_get_progname(void);
+ extern bool enable_timestamp_msg;
+diff --git a/util/qemu-error.c b/util/qemu-error.c
+index b331f8f..c7fd127 100644
+--- a/util/qemu-error.c
++++ b/util/qemu-error.c
+@@ -181,11 +181,13 @@ bool enable_timestamp_msg;
+ /*
+  * Print an error message to current monitor if we have one, else to stderr.
+  * Format arguments like vsprintf().  The resulting message should be
+- * a single phrase, with no newline or trailing punctuation.
+- * Prepend the current location and append a newline.
++ * a single phrase, with no trailing punctuation.  The no-LF version allows
++ * additional text to be appended with error_printf() or error_vprintf().
++ * Make sure to always close with a newline after all text is printed.
++ * Prepends the current location.
+  * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+  */
+-void error_vreport(const char *fmt, va_list ap)
++void error_vreport_nolf(const char *fmt, va_list ap)
+ {
+     GTimeVal tv;
+     gchar *timestr;
+@@ -199,14 +201,31 @@ void error_vreport(const char *fmt, va_list ap)
+ 
+     error_print_loc();
+     error_vprintf(fmt, ap);
+-    error_printf("\n");
++}
++
++/*
++ * Print an error message to current monitor if we have one, else to stderr.
++ * Format arguments like sprintf().  The resulting message should be a
++ * single phrase, with no trailing punctuation.  The no-LF version allows
++ * additional text to be appended with error_printf() or error_vprintf().
++ * Make sure to always close with a newline after all text is printed.
++ * Prepends the current location.
++ * It's wrong to call this in a QMP monitor.  Use error_setg() there.
++ */
++void error_report_nolf(const char *fmt, ...)
++{
++    va_list ap;
++
++    va_start(ap, fmt);
++    error_vreport_nolf(fmt, ap);
++    va_end(ap);
+ }
+ 
+ /*
+  * Print an error message to current monitor if we have one, else to stderr.
+  * Format arguments like sprintf().  The resulting message should be a
+  * single phrase, with no newline or trailing punctuation.
+- * Prepend the current location and append a newline.
++ * Prepends the current location and appends a newline.
+  * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+  */
+ void error_report(const char *fmt, ...)
+@@ -214,6 +233,7 @@ void error_report(const char *fmt, ...)
+     va_list ap;
+ 
+     va_start(ap, fmt);
+-    error_vreport(fmt, ap);
++    error_vreport_nolf(fmt, ap);
+     va_end(ap);
++    error_printf("\n");
+ }
+-- 
+2.9.3
