@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dVX3v-0007O6-FF
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 01:53:20 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dVX4d-0008GZ-85
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 01:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dVX3s-0006G0-CU
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 01:53:19 -0400
-Received: from [59.151.112.132] (port=25092 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dVX3r-0006C3-Vt
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 01:53:16 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Thu, 13 Jul 2017 13:52:53 +0800
-Message-ID: <1499925175-21218-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <hpoussin@reactos.org>) id 1dVX4a-0006lx-70
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 01:54:03 -0400
+Received: from iserv.reactos.org ([188.40.64.40]:41834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+	id 1dVX4Z-0006hR-Ll
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 01:54:00 -0400
+References: <20170621043401.19842-1-hpoussin@reactos.org>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <1b322dd0-963e-c29d-702c-c4cb4396b6f7@reactos.org>
+Date: Thu, 13 Jul 2017 07:51:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V2 2/4] net/colo-compare.c: Compare the tcp
- packets that has the same sequence number
+In-Reply-To: <20170621043401.19842-1-hpoussin@reactos.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] Support multiple adlib sound cards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-If primary packet's sequence number not same with secondary packet's
-sequence number, no need to compare the packet other field.
+Ping ?
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 0f8e198..2caeb80 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -222,6 +222,12 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
-     ptcp = (struct tcphdr *)ppkt->transport_header;
-     stcp = (struct tcphdr *)spkt->transport_header;
- 
-+    if ((ptcp->th_flags & TH_SYN) != TH_SYN &&
-+        ptcp->th_seq != stcp->th_seq) {
-+        trace_colo_compare_main("colo_packet_compare_tcp seq not same");
-+        return -1;
-+    }
-+
-     /*
-      * The 'identification' field in the IP header is *very* random
-      * it almost never matches.  Fudge this by ignoring differences in
--- 
-2.7.4
+Le 21/06/2017 à 06:33, Hervé Poussineau a écrit :
+> Hi,
+>
+> This patchset removes a global variable in adlib emulation, and allows to
+> have multiple adlib sound cards.
+> Note that indentation seem off because I have replaced some tabulations by spaces.
+>
+> Before:
+> qemu-system-i386 -device adlib,iobase=0x220 -device adlib,iobase=0x240
+> qemu-system-i386: -device adlib,iobase=0x240: Cannot create more than 1 adlib device
+>
+> After:
+> qemu-system-i386 -device adlib,iobase=0x220 -device adlib,iobase=0x240
+> Machine starts.
+>
+> Hervé
+>
+> Hervé Poussineau (2):
+>   audio/fmopl: modify timer callback to give opaque and channel
+>     parameters in two arguments
+>   audio/adlib: remove limitation of one adlib card
+>
+>  hw/audio/adlib.c | 14 +++-----------
+>  hw/audio/fmopl.c | 18 +++++++++++++-----
+>  hw/audio/fmopl.h |  7 ++++---
+>  3 files changed, 20 insertions(+), 19 deletions(-)
+>
