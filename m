@@ -1,47 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dVa8t-0008AL-7X
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:10:40 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dVaF4-00018i-Vl
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:17:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dVa8o-0002sd-3y
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:10:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48838
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dVa8n-0002sT-Tw
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:10:34 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6D98dvV087104
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:10:33 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3ry122-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 05:10:32 -0400
-Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 13 Jul 2017 19:10:30 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <5fa5cb00-ee28-0ba4-2084-b0a43b8429f1@kaod.org>
-References: <20170608063608.17855-1-nikunj@linux.vnet.ibm.com>
-	<20170609020141.GB26521@umbus.fritz.box>
-	<87mv9heota.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170609102714.GK26521@umbus.fritz.box>
-	<87eftlar4a.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<1ec762f9-d8b2-5195-1ffe-f4cde35571fd@kaod.org>
-	<b54ec156-725d-d954-1d05-ade845caa2a2@kaod.org>
-	<878tjsbwj4.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<5fa5cb00-ee28-0ba4-2084-b0a43b8429f1@kaod.org>
-Date: Thu, 13 Jul 2017 14:40:19 +0530
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dVaEz-0005b6-W1
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 05:17:02 -0400
+References: <20170703151051.31327-1-eblake@redhat.com>
+	<20170703151051.31327-15-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6a1fb943-160b-2e47-b985-dc9af86c9634@virtuozzo.com>
+Date: Thu, 13 Jul 2017 12:16:53 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8760ewbt38.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH RFC] spapr: ignore interrupts
- during reset state
+In-Reply-To: <20170703151051.31327-15-eblake@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 14/17] qcow2: Switch load_bitmap_data()
+ to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,40 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: alex.bennee@linaro.org, bharata@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-C=C3=A9dric Le Goater <clg@kaod.org> writes:
+03.07.2017 18:10, Eric Blake wrote:
+> Now that we have adjusted the majority of the calls this function
+> makes to be byte-based, it is easier to read the code if it makes
+> passes over the image using bytes rather than sectors.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+>
+> ---
+> v4: new patch
+> ---
+>   block/qcow2-bitmap.c | 22 ++++++++--------------
+>   1 file changed, 8 insertions(+), 14 deletions(-)
+>
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 280960a..1de2ab5 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -291,9 +291,8 @@ static int load_bitmap_data(BlockDriverState *bs,
+>   {
+>       int ret = 0;
+>       BDRVQcow2State *s = bs->opaque;
+> -    uint64_t sector, limit, sbc;
+> +    uint64_t offset, limit;
+>       uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
+> -    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
+>       uint8_t *buf = NULL;
+>       uint64_t i, tab_size =
+>               size_to_clusters(s,
+> @@ -305,32 +304,27 @@ static int load_bitmap_data(BlockDriverState *bs,
+>
+>       buf = g_malloc(s->cluster_size);
+>       limit = bytes_covered_by_bitmap_cluster(s, bitmap);
+> -    sbc = limit >> BDRV_SECTOR_BITS;
+> -    for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
+> -        uint64_t count = MIN(bm_sectors - sector, sbc);
+> +    for (i = 0, offset = 0; i < tab_size; ++i, offset += limit) {
+> +        uint64_t count = MIN(bm_size - offset, limit);
+>           uint64_t entry = bitmap_table[i];
+> -        uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
+> +        uint64_t data_offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
+>
+>           assert(check_table_entry(entry, s->cluster_size) == 0);
+>
+> -        if (offset == 0) {
+> +        if (data_offset == 0) {
+>               if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
+> -                bdrv_dirty_bitmap_deserialize_ones(bitmap,
+> -                                                   sector * BDRV_SECTOR_SIZE,
+> -                                                   count * BDRV_SECTOR_SIZE,
+> +                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset, count,
 
-> On 07/13/2017 09:55 AM, Nikunj A Dadhania wrote:
->> C=C3=A9dric Le Goater <clg@kaod.org> writes:
->>=20
->>>>> How about the following, we do not report work until MSR_EE is disabl=
-ed:
->>>>
->>>> With this fix, I could test the XIVE<->XICS transitions at reboot=20
->>>> under TCG. However, the second boot is very slow for some reason.=20
->>>
->>> hmm, I am not sure this is related but I just got :=20
->>=20
->> Havent seen in my setup after around 10 reboot cycles, I was using 2
->> cores pseries setup. Lets give it some more testing. When did this
->> happen, during boot ?
->
-> yes.=20
->
-> I could not reproduce either :/ but I am keeping the patch. qemu runs
-> with :
->
-> -m 2G -M pseries -accel tcg,thread=3Dmulti -cpu POWER9 -smp cores=3D4,max=
-cpus=3D8 -realtime mlock=3Doff -kernel ./vmlinux-4.12.0+ -initrd ./initrd.i=
-mg-4.12.0+ -append 'console=3Dhvc0 dyndbg=3D"file arch/powerpc/sysdev/xive/=
-* +p"' -nographic -nodefaults -serial mon:stdio -snapshot  -d guest_errors,=
-unimp -no-shutdown
->
+The change is that now 3rd parameter may not be aligned by sectors, but 
+looks like it should be ok.
 
-With 4 cores I am seeing hangs occasionally, although I havent seen a
-crash. But seems to be similar problem that you had seen.
+Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
 
-Regards,
-Nikunj
+
+
+>                                                      false);
+>               } else {
+>                   /* No need to deserialize zeros because the dirty bitmap is
+>                    * already cleared */
+>               }
+>           } else {
+> -            ret = bdrv_pread(bs->file, offset, buf, s->cluster_size);
+> +            ret = bdrv_pread(bs->file, data_offset, buf, s->cluster_size);
+>               if (ret < 0) {
+>                   goto finish;
+>               }
+> -            bdrv_dirty_bitmap_deserialize_part(bitmap, buf,
+> -                                               sector * BDRV_SECTOR_SIZE,
+> -                                               count * BDRV_SECTOR_SIZE,
+> +            bdrv_dirty_bitmap_deserialize_part(bitmap, buf, offset, count,
+>                                                  false);
+>           }
+>       }
+
+
+-- 
+Best regards,
+Vladimir
