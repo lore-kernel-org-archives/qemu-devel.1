@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVgrU-0005ZI-0O
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:21:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVgsL-0006Hp-Kf
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVgrP-0006s7-2p
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:21:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47932)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dVgrO-0006rJ-PY
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:21:03 -0400
-Date: Thu, 13 Jul 2017 13:20:51 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170713162051.GV6020@localhost.localdomain>
-References: <20170711004303.3902-1-ehabkost@redhat.com>
-	<20170711004303.3902-4-ehabkost@redhat.com>
-	<2cda5b0b-0169-d12e-114e-77fcb1a4bb07@linux.vnet.ibm.com>
-	<20170712192055.GL6020@localhost.localdomain>
-	<fc38afe1-ee3c-f2e2-9d21-31396d271829@linux.vnet.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1dVgsK-0007J7-K8
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:22:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
+	<1499788408-10096-2-git-send-email-peter.maydell@linaro.org>
+	<87lgns2zps.fsf@dusky.pond.sub.org>
+	<CAFEAcA--qraHck1_ba9ZFbZU+N-3FMzY8Z5rpri-NKr6K-dUmA@mail.gmail.com>
+Date: Thu, 13 Jul 2017 18:21:50 +0200
+In-Reply-To: <CAFEAcA--qraHck1_ba9ZFbZU+N-3FMzY8Z5rpri-NKr6K-dUmA@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 13 Jul 2017 15:26:35 +0100")
+Message-ID: <87k23cxq75.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc38afe1-ee3c-f2e2-9d21-31396d271829@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] Revert "machine: Convert abstract
- typename on compat_props to subclass names"
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/3] qdev-properties.h: Explicitly set the
+ default value for arraylen properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Thu, Jul 13, 2017 at 02:11:09PM +0200, Halil Pasic wrote:
-> 
-> 
-> On 07/12/2017 09:20 PM, Eduardo Habkost wrote:
-> > On Wed, Jul 12, 2017 at 07:49:22PM +0200, Halil Pasic wrote:
-> >> On 07/11/2017 02:43 AM, Eduardo Habkost wrote:
-> >>> This reverts commit 0bcba41fe379e4c6834adcf1456d9099db31a5b2.
-> >>>
-> >>> The bug addressed by that commit is now fixed in a better way by the
-> >>> commit "qdev: fix the order compat and global properties are applied".
-> >>>
-> >>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >>
-> >> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >>
-> >> Note: It is not like the effect of commit 0bcba41fe3 is canceled
-> >> out with your first patch in place. It depends on the client
-> >> code (the implementation of the individual devices) wether
-> >> this patch changes something or not. I did not check myself.
-> >> So the did you verify that nothing breaks with this change applies
-> >> here too.
-> > 
-> > I don't get this part.  I don't see how individual devices
-> > implementation will be able to affect the outcome after this
-> > patch is applied.
-> > 
-> > GlobalProperty::driver is not used as input for
-> > object_property_parse() at all (see qdev_prop_set_globals()).
-> > This means exactly the same property setter is invoked when
-> > registering "<superclass>.<property>" or "<subclass>.<property>".
-> > The only difference introduced by this series is in the ordering
-> > of the object_property_parse() calls.
-> > 
-> > And even the object_property_parse() call ordering is not
-> > affected by this patch at all, because of patch 1/3.  Patch 1/3
-> > will ensure the properties will be applied in exactly the same
-> > order they were registered, so this patch should introduce
-> > absolutely no behavior change on any device.
-> > 
-> 
-> Resolving this disagreement IMHO depends on resolving our disagreement
-> about patch 1. Let us postpone this until we have an agreement
-> there.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Your observation on patch 1 was correct, so the ordering of
-object_property_parse() calls will change if using
-pseries <= 2.3 and "-global spapr-pci-vfio-host-bridge".
+> On 13 July 2017 at 15:11, Markus Armbruster <armbru@redhat.com> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> In DEFINE_PROP_ARRAY, because we use a PropertyInfo (qdev_prop_arraylen)
+>>> which has a .set_default_value member we will set the field to a default
+>>> value. That default value will be zero, by the C rule that struct
+>>> initialization sets unmentioned members to zero if at least one member
+>>> is initialized. However it's clearer to state it explicitly.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>> If my eyeball of the sources is correct, this is the only case we
+>>> have of a Property struct that uses a PropertyInfo with a non-NULL
+>>> .set_default_value but which doesn't explicitly set .defval.u.
+>>> ---
+>>>  include/hw/qdev-properties.h | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>>> index 0604c33..36d040c 100644
+>>> --- a/include/hw/qdev-properties.h
+>>> +++ b/include/hw/qdev-properties.h
+>>> @@ -110,6 +110,7 @@ extern PropertyInfo qdev_prop_arraylen;
+>>>                            _arrayfield, _arrayprop, _arraytype) {        \
+>>>          .name = (PROP_ARRAY_LEN_PREFIX _name),                          \
+>>>          .info = &(qdev_prop_arraylen),                                  \
+>>> +        .defval.u = 0,                                                  \
+>>>          .offset = offsetof(_state, _field)                              \
+>>>              + type_check(uint32_t, typeof_field(_state, _field)),       \
+>>>          .arrayinfo = &(_arrayprop),                                     \
+>>
+>> Hmm.
+>>
+>> .info and .defval apply to the array *length*.
+>> .info.set_default_value() is set_default_uint(), which uses .defval.u.
+>> Setting it here is correct.
+>>
+>> The array *elements* are described by .arrayinfo.  There is no
+>> .arraydefval, but that's okay, because .arrayinfo.set_default_value()
+>> doesn't get called.  Correct?
+>
+> Correct. (There's no way to specify a default value for array properties.)
 
--- 
-Eduardo
+Thanks!
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
