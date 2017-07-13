@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVefb-00052F-4Y
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:00:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVeh1-0005s9-Ip
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:02:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVefU-0006R2-VQ
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:00:43 -0400
-Date: Thu, 13 Jul 2017 15:00:22 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170713140022.GN4011@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1498733831-15254-6-git-send-email-pl@kamp.de>
-	<20170710132546.GG5772@noname.redhat.com>
-	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
-	<20170710133459.GI5772@noname.redhat.com>
-	<20170710134436.GB6770@redhat.com>
-	<20170710135218.GK5772@noname.redhat.com>
-	<20170710135539.GD6770@redhat.com>
-	<e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
-	<20170713092100.GD4011@redhat.com>
-	<e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
+	(envelope-from <cohuck@redhat.com>) id 1dVegy-0007ER-EU
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:02:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVegy-0007Ds-6A
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 10:02:08 -0400
+Date: Thu, 13 Jul 2017 16:01:58 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170713160158.6f072ad1@gondolin>
+In-Reply-To: <5bd135ce-ed8e-3326-04b7-3bff51ecc78a@de.ibm.com>
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
+	<20170713142721.3a40e083@gondolin>
+	<606fdb06-cb0e-00b3-ffa3-18a024f14309@de.ibm.com>
+	<20170713151054.28eb7909@gondolin>
+	<5bd135ce-ed8e-3326-04b7-3bff51ecc78a@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Thu, Jul 13, 2017 at 03:49:09PM +0200, Peter Lieven wrote:
-> Am 13.07.2017 um 11:21 schrieb Daniel P. Berrange:
-> > On Thu, Jul 13, 2017 at 10:44:53AM +0200, Peter Lieven wrote:
-> > > Am 10.07.2017 um 15:55 schrieb Daniel P. Berrange:
-> > > > On Mon, Jul 10, 2017 at 03:52:18PM +0200, Kevin Wolf wrote:
-> > > > > Am 10.07.2017 um 15:44 hat Daniel P. Berrange geschrieben:
-> > > > > > On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
-> > > > > > > Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
-> > > > > > > > Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
-> > > > > > > > > Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
-> > > > > > > > > > we now read the extension on open and write it on update, but
-> > > > > > > > > > do not yet use it.
-> > > > > > > > > > 
-> > > > > > > > > > Signed-off-by: Peter Lieven <pl@kamp.de>
-> > > > > > > > > > ---
-> > > > > > > > > >    block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
-> > > > > > > > > >    block/qcow2.h |  23 +++++++++++---
-> > > > > > > > > >    2 files changed, 104 insertions(+), 19 deletions(-)
-> > > > > > > > > > 
-> > > > > > > > > > diff --git a/block/qcow2.c b/block/qcow2.c
-> > > > > > > > > > index 308121a..39a8afc 100644
-> > > > > > > > > > --- a/block/qcow2.c
-> > > > > > > > > > +++ b/block/qcow2.c
-> > > > > > > > > > @@ -63,6 +63,7 @@ typedef struct {
-> > > > > > > > > >    #define  QCOW2_EXT_MAGIC_END 0
-> > > > > > > > > >    #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
-> > > > > > > > > >    #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
-> > > > > > > > > > +#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
-> > > > > > > > > >    static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
-> > > > > > > > > >    {
-> > > > > > > > > > @@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
-> > > > > > > > > >            return 0;
-> > > > > > > > > >    }
-> > > > > > > > > > +static int qcow2_compress_format_from_name(char *fmt)
-> > > > > > > > > > +{
-> > > > > > > > > > +    if (!fmt || !fmt[0]) {
-> > > > > > > > > > +        return QCOW2_COMPRESS_ZLIB_COMPAT;
-> > > > > > > > > > +    } else if (g_str_equal(fmt, "zlib")) {
-> > > > > > > > > > +        return QCOW2_COMPRESS_ZLIB;
-> > > > > > > > > > +    } else {
-> > > > > > > > > > +        return -EINVAL;
-> > > > > > > > > > +    }
-> > > > > > > > > > +}
-> > > > > > > > > It might make sense to allow specifying the old compression format in
-> > > > > > > > > the compression header. But I'm not so sure about using the empty string
-> > > > > > > > > rather than a proper name for it, and even less about not documenting
-> > > > > > > > > it.
-> > > > > > > > The old format is used if and only if the compression header is absent.
-> > > > > > > > It makes no sense to write a header and use the old format. The old
-> > > > > > > > settings are suboptimal and old versions can't open a qcow2 with a
-> > > > > > > > compression header anyway.
-> > > > > > > Your code allows an empty string in the header extension. If you don't
-> > > > > > > want it there, you need to reject it.
-> > > > > > This is a good reason to use the QAPI schema to parse the create options
-> > > > > > instead of doing it using qemu_opts - the QAPI schema will generate correct
-> > > > > > code to parse & validate enum values
-> > > > > I'd really like to see QAPI used for bdrv_create(), but here we're in
-> > > > > the bdrv_open() path and parsing qcow2 headers. So either way this one
-> > > > > specifically wouldn't be fixed.
-> > > > Sorry, yes, I was getting mixed up in the two different patches with
-> > > > similar bits of code.
-> > > > 
-> > > > We could still replace the qcow2_compress_format_from_name() method
-> > > > though with a call to the qapi_enum_parse() passing in the
-> > > > 'QcowCompressFormat_lookup' table.
-> > > Can you advise how exactly I would do that? Sorry, but this is new stuff
-> > > for me.
-> > In your line of code:
+On Thu, 13 Jul 2017 15:58:30 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 07/13/2017 03:10 PM, Cornelia Huck wrote:
+> > On Thu, 13 Jul 2017 15:02:08 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> >> On 07/13/2017 02:27 PM, Cornelia Huck wrote:  
+> >>> On Thu, 13 Jul 2017 12:40:29 +0200
+> >>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >>>     
+> >>>> From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> >>>>
+> >>>> During migration we should transfer ais states to the target guest.
+> >>>> This patch introduces a subsection to kvm_s390_flic_vmstate and new
+> >>>> vmsd for qemu_flic. The ais states need to be migrated only when
+> >>>> ais is supported.
+> >>>>
+> >>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> >>>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >>>> ---
+> >>>>  hw/intc/s390_flic.c          | 20 ++++++++++++
+> >>>>  hw/intc/s390_flic_kvm.c      | 75 ++++++++++++++++++++++++++++++++++++++++++++
+> >>>>  include/hw/s390x/s390_flic.h |  1 +
+> >>>>  3 files changed, 96 insertions(+)  
+> >   
+> >>>> +static int kvm_flic_ais_post_load(void *opaque, int version_id)
+> >>>> +{
+> >>>> +    KVMS390FLICStateMigTmp *tmp = opaque;
+> >>>> +    KVMS390FLICState *flic = tmp->parent;
+> >>>> +    struct kvm_s390_ais_all ais = {
+> >>>> +        .simm = tmp->simm,
+> >>>> +        .nimm = tmp->nimm,
+> >>>> +    };
+> >>>> +    struct kvm_device_attr attr = {
+> >>>> +        .group = KVM_DEV_FLIC_AISM_ALL,
+> >>>> +        .addr = (uint64_t)&ais,
+> >>>> +    };
+> >>>> +
+> >>>> +    if (!ais_needed(flic)) {
+> >>>> +        return -ENOSYS;
+> >>>> +    }    
+> >>>
+> >>> I do not understand this... does that mean that
+> >>> - we should never get here or 
+> >>> - we should not try to change the fields or
+> >>> - I need coffee?    
+> >>
+> >> My understanding is that this should not happen with a normal setup, 
+> >> but it can happen if the user does something "wrong". For example
+> >> use qemu without libvirt and with -cpu host (which is not migration safe)
+> >> and do a migration from a host that has AIS to a host that has no AIS.
+> >> In that case the target system will reject the migration (late, but hopefully
+> >> not too late).  
 > > 
-> >            s->compress_format_id =
-> >                 qcow2_compress_format_from_name(s->compress_format.name);
-> > 
-> > Instead do
-> > 
-> >             s->compress_format_id =
-> >                 qapi_enum_parse(QcowCompressFormat_lookup, s->compress_format.name);
-> > 
-> > 
-> > The 'QcowCompressFormat_lookup' symbol is a global variable that is an
-> > array of strings, automatically created from the 'enum' you define in
-> > the QAPI schema.
+> > A comment would be helpful here.  
 > 
-> Is it possible to limit the valid integer values for an integer in the QAPI specification?
+> Something like
 > 
-> I would like to do that for the compress.level stuff.
+> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+> index 4cf73ee..9b8dbd1 100644
+> --- a/hw/intc/s390_flic_kvm.c
+> +++ b/hw/intc/s390_flic_kvm.c
+> @@ -452,6 +452,12 @@ static int kvm_flic_ais_post_load(void *opaque, int version_id)
+>          .addr = (uint64_t)&ais,
+>      };
+>  
+> +    /* This can happen when the user mis-configures its guests in an
+> +     * incompatible fashion or without a CPU model. For example using
+> +     * qemu with -cpu host (which is not migration safe) and do a
+> +     * migration from a host that has AIS to a host that has no AIS.
+> +     * In that case the target system will reject the migration here.
+> +     */
+>      if (!ais_needed(flic)) {
+>          return -ENOSYS;
+>      }
 
-Not that I know of.
+With that added:
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
