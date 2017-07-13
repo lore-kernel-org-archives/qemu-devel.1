@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVT23-0006Pj-M7
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:35:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVT8B-00081g-U7
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVT22-0004yF-KP
-	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:35:07 -0400
-References: <20170711163748.17817-1-el13635@mail.ntua.gr>
-	<20170711163748.17817-2-el13635@mail.ntua.gr>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4b9e0c05-db46-6174-a543-1226b4fc7402@redhat.com>
-Date: Wed, 12 Jul 2017 20:34:54 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1dVT87-0002fj-TZ
+	for qemu-devel@nongnu.org; Wed, 12 Jul 2017 21:41:27 -0400
+Date: Thu, 13 Jul 2017 11:22:28 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170713012228.GU4083@umbus.fritz.box>
+References: <149985291912.20899.12562819149683053534.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170711163748.17817-2-el13635@mail.ntua.gr>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mbrv5tp4l6CAGQi4HvFfxtQqQSVr3JKd8"
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] block: pass bdrv_* methods to
- bs->file by default in block filters
+	protocol="application/pgp-signature"; boundary="0rpW5bEisVBStM29"
+Content-Disposition: inline
+In-Reply-To: <149985291912.20899.12562819149683053534.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: fix potential memory leak in
+ spapr_core_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block <qemu-block@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mbrv5tp4l6CAGQi4HvFfxtQqQSVr3JKd8
-From: Eric Blake <eblake@redhat.com>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
- qemu-devel <qemu-devel@nongnu.org>
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block <qemu-block@nongnu.org>
-Message-ID: <4b9e0c05-db46-6174-a543-1226b4fc7402@redhat.com>
-Subject: Re: [PATCH v4 1/4] block: pass bdrv_* methods to bs->file by default
- in block filters
-References: <20170711163748.17817-1-el13635@mail.ntua.gr>
- <20170711163748.17817-2-el13635@mail.ntua.gr>
-In-Reply-To: <20170711163748.17817-2-el13635@mail.ntua.gr>
-Content-Type: text/plain; charset=utf-8
+
+--0rpW5bEisVBStM29
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/11/2017 11:37 AM, Manos Pitsidianakis wrote:
-> The following functions fail if bs->drv is a filter and does not
-> implement them:
+On Wed, Jul 12, 2017 at 11:48:39AM +0200, Greg Kurz wrote:
+> Since commit 5c1da81215c7 ("spapr: Remove unnecessary differences between
+> hotplug and coldplug paths"), the CPU DT for the DRC is always allocated.
+> This causes a memory leak for pseries-2.6 and older machine types, that
+> don't support CPU hotplug and don't allocate DRCs for CPUs.
 >=20
-> bdrv_probe_blocksizes
-> bdrv_probe_geometry
-> bdrv_truncate
-> bdrv_has_zero_init
-> bdrv_get_info
->=20
-> Instead, the call should be passed to bs->file if it exists, to allow
-> filter drivers to support those methods without implementing them. This=
+> Reported-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-> commit makes `drv->is_filter =3D true` imply that these callbacks will =
-be
-> forwarded to bs->file by default, so disabling support for these
-> functions must be done explicitly.
->=20
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Applied, thanks.
+
 > ---
->  block.c                   | 21 +++++++++++++++++++--
->  include/block/block_int.h |  6 +++++-
->  2 files changed, 24 insertions(+), 3 deletions(-)
-
-> @@ -3406,11 +3410,15 @@ int bdrv_truncate(BdrvChild *child, int64_t off=
-set, Error **errp)
+>  hw/ppc/spapr.c |    9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 12b3f099d4c9..4a480e1c1dd9 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2993,8 +2993,6 @@ static void spapr_core_plug(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+>      CPUState *cs =3D CPU(core->threads);
+>      sPAPRDRConnector *drc;
+>      Error *local_err =3D NULL;
+> -    void *fdt =3D NULL;
+> -    int fdt_offset =3D 0;
+>      int smt =3D kvmppc_smt_threads();
+>      CPUArchId *core_slot;
+>      int index;
+> @@ -3009,9 +3007,12 @@ static void spapr_core_plug(HotplugHandler *hotplu=
+g_dev, DeviceState *dev,
 > =20
->      assert(child->perm & BLK_PERM_RESIZE);
+>      g_assert(drc || !mc->has_hotpluggable_cpus);
 > =20
-> +    /* if bs->drv =3D=3D NULL, bs is closed, so there's nothing to do =
-here */
->      if (!drv) {
->          error_setg(errp, "No medium inserted");
->          return -ENOMEDIUM;
->      }
->      if (!drv->bdrv_truncate) {
-> +        if (bs->file && drv->is_filter) {
-> +            return bdrv_truncate(bs->file, offset, errp);
-> +        }
-
-This has a semantic (but not merge) conflict with Max's preallocation
-work, and it started to be non-trivial for me to adjust locally in my
-testing. It may be easiest if you send a v5 on top of
-'https://github.com/XanClic/qemu.git block', since Max already has a
-pending pull request:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg02841.html
+> -    fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+> -
+>      if (drc) {
+> +        void *fdt;
+> +        int fdt_offset;
+> +
+> +        fdt =3D spapr_populate_hotplug_cpu_dt(cs, &fdt_offset, spapr);
+> +
+>          spapr_drc_attach(drc, dev, fdt, fdt_offset, &local_err);
+>          if (local_err) {
+>              g_free(fdt);
+>=20
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-
---mbrv5tp4l6CAGQi4HvFfxtQqQSVr3JKd8
+--0rpW5bEisVBStM29
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZZs4+AAoJEKeha0olJ0NqoyUH/1nj21N44fJVe4cBpOYPoVEn
-ycBfUqQ9AtM3JQHiLeim230bmFuYt3+gn+op+EvhToHVDT3a1z8H1ZGDMeE/xVHk
-Du6IWh1RDYxGXHLa/GvU79rM03B48piSVMjvwAncit9zZSGy2TvVkg4r8TedV6/W
-YC4l7CwFyJqWQCkJaQ3cx0aDopsN47WTojM0aZULVhHN8KFsfOvdr6lEoa2PipsW
-YTpU1QFoxqVypWQbdIogDV5XzjGzut+xkHWYtwW11Se8qYxoGTyuL80NUZCVgut1
-wqNyR3fHWhlLlOzmx3cRQFAAPDz3Viqr+4OXyaZFNfcutpZ28RfvnOiH8LN05zw=
-=9bbA
+iQIcBAEBCAAGBQJZZstUAAoJEGw4ysog2bOSlYAQAKjZl8EYMDADzu6/tyYzKzUM
+aSmgeDQzDTetGwtP4PZbuXfcHCileaKOT3ZOiNUCqUXmJtTjnwmfjUfQep3oGPb1
+j4CFKI+rQEU6FXIufe0kSqxTN3znGzx9o+6pO/Tc9ZIIgKTVQfvxDXkSod53YpLN
+0h6ySvLuv5pPAmMb4urEhVWXPTqnGA+BLuBTSHEvUNwy+ltQtSO3Ob2yDNCoR/K6
+HdOg+MCYn90OAYkmzhAF9m5dlIRd7SogDl3jOXAFmjRoa5KbRbPWU/uWv3zoTDM/
+MsNFdpE0R5MQbrebdkTvxmDYs/01I2oNrNwRPAH7wQKaSKEQ5Edmzd+1lne/VqUz
+FgfHrBqlYcHuSyBHc2NlWo9AtbHtijoXJhs0moplhkVNS9eMQV9UwRWh1Ek+ROo1
+ITe5D9YaxPavmqo8EYaf2BcrWOjSSrfUhLfudzLVQVmcXYy2cRk2/QueHEmfKOy+
+Lirqh+NS/lOkTo6iW0XQ3Xp1hqlpvmjpkNCMPyP4cPAAh/vXC0q7iuN3F/WvvPzk
+aTJSeblCpSf081XfBwrxf2hzFiXndIO4N/y9U8QndT5Bn/vRuCWLv5pEA/bVUDLy
+Qa1pitYGG72S7GuQbwjgJGAEJpzKqqjQ3/H2Ylr3qOCU+aCbxZmf1W3He54aRSdg
+LrCKJzi55ATUIJCeFbDg
+=0KXQ
 -----END PGP SIGNATURE-----
 
---mbrv5tp4l6CAGQi4HvFfxtQqQSVr3JKd8--
+--0rpW5bEisVBStM29--
