@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVhkz-0008BH-GR
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:18:30 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dVhmt-0001EP-T6
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVhky-0005fs-I9
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:18:29 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37167)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVhky-0005fS-AP
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:18:28 -0400
-Received: by mail-wm0-x229.google.com with SMTP id i127so33082284wma.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 10:18:28 -0700 (PDT)
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dVhmq-0006LP-Lr
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:20:27 -0400
+References: <20170712114700.20008-1-pbutsykin@virtuozzo.com>
+	<20170712114700.20008-4-pbutsykin@virtuozzo.com>
+	<20170712145251.GE4917@noname.str.redhat.com>
+	<ca2e112d-23d7-48c1-07a9-b60ee8ab743f@redhat.com>
+	<20170713084126.GA4139@noname.redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <e6d3c11d-a020-457c-d38f-4114e3023dc8@virtuozzo.com>
+Date: Thu, 13 Jul 2017 20:18:59 +0300
 MIME-Version: 1.0
-In-Reply-To: <87d194xnyp.fsf@dusky.pond.sub.org>
-References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
-	<1499788408-10096-3-git-send-email-peter.maydell@linaro.org>
-	<87lgnt99xz.fsf@dusky.pond.sub.org>
-	<CAFEAcA-oEZZgPDOayLpZ1_aC0hEeOcYBL3+XejtJXnt4wDyqow@mail.gmail.com>
-	<87d194xnyp.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Jul 2017 18:18:06 +0100
-Message-ID: <CAFEAcA-XrYnnzH58LkyObyJH-eGuEHK-BuQkRjwFbZmMr1oeXQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/3] qdev: support properties which don't
- set a default value
+In-Reply-To: <20170713084126.GA4139@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +27,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-On 13 July 2017 at 18:10, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> On 12 July 2017 at 12:22, Markus Armbruster <armbru@redhat.com> wrote:
->>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>
->>>> In some situations it's useful to have a qdev property which doesn't
->>>> automatically set its default value when qdev_property_add_static is
->>>> called (for instance when the default value is not constant).
+On 13.07.2017 11:41, Kevin Wolf wrote:
+> Am 12.07.2017 um 18:58 hat Max Reitz geschrieben:
+>> On 2017-07-12 16:52, Kevin Wolf wrote:
+>>> Am 12.07.2017 um 13:46 hat Pavel Butsykin geschrieben:
+>>>> This patch add shrinking of the image file for qcow2. As a result, this allows
+>>>> us to reduce the virtual image size and free up space on the disk without
+>>>> copying the image. Image can be fragmented and shrink is done by punching holes
+>>>> in the image file.
 >>>>
->>>> Support this by adding a flag to the Property struct indicating
->>>> whether to set the default value.  This replaces the existing test
->>>> for whether the PorpertyInfo set_default_value function pointer is
->>>
->>> PropertyInfo
->>>
->>>> NULL, and we set the .set_default field to true for all those cases
->>>> of struct Property which use a PropertyInfo with a non-NULL
->>>> set_default_value, so behaviour remains the same as before.
+>>>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>   block/qcow2-cluster.c  |  40 ++++++++++++++++++
+>>>>   block/qcow2-refcount.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>   block/qcow2.c          |  43 +++++++++++++++----
+>>>>   block/qcow2.h          |  14 +++++++
+>>>>   qapi/block-core.json   |   3 +-
+>>>>   5 files changed, 200 insertions(+), 10 deletions(-)
 >>>>
->>>> We define two new macros DEFINE_PROP_SIGNED_NODEFAULT and
->>>> DEFINE_PROP_UNSIGNED_NODEFAULT, to cover the most plausible use cases
->>>> of wanting to set an integer property with no default value.
+>>>> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+>>>> index f06c08f64c..518429c64b 100644
+>>>> --- a/block/qcow2-cluster.c
+>>>> +++ b/block/qcow2-cluster.c
+>>>> @@ -32,6 +32,46 @@
+>>>>   #include "qemu/bswap.h"
+>>>>   #include "trace.h"
+>>>>   
+>>>> +int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t exact_size)
+>>>> +{
+>>>> +    BDRVQcow2State *s = bs->opaque;
+>>>> +    int new_l1_size, i, ret;
+>>>> +
+>>>> +    if (exact_size >= s->l1_size) {
+>>>> +        return 0;
+>>>> +    }
+>>>> +
+>>>> +    new_l1_size = exact_size;
+>>>> +
+>>>> +#ifdef DEBUG_ALLOC2
+>>>> +    fprintf(stderr, "shrink l1_table from %d to %d\n", s->l1_size, new_l1_size);
+>>>> +#endif
+>>>> +
+>>>> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
+>>>> +    ret = bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
+>>>> +                                       sizeof(uint64_t) * new_l1_size,
+>>>> +                             (s->l1_size - new_l1_size) * sizeof(uint64_t), 0);
+>>>> +    if (ret < 0) {
+>>>> +        return ret;
+>>>> +    }
+>>>> +
+>>>> +    ret = bdrv_flush(bs->file->bs);
+>>>> +    if (ret < 0) {
+>>>> +        return ret;
+>>>> +    }
 >>>
->>> Your text makes me wonder what is supposed to set the default value
->>> then.  Glancing ahead to PATCH 3, it looks like method instance_init()
->>> is.  Can you think of a scenario where something else sets it?
+>>> If we have an error here (or after a partial bdrv_pwrite_zeroes()), we
+>>> have entries zeroed out on disk, but in memory we still have the
+>>> original L1 table.
+>>>
+>>> Should the in-memory L1 table be zeroed first? Then we can't
+>>> accidentally reuse stale entries, but would have to allocate new ones,
+>>> which would get on-disk state and in-memory state back in sync again.
 >>
->> OK, proposed extra paragraph for commit message:
+>> Yes, I thought of the same.  But this implies that the allocation is
+>> able to modify the L1 table, and I find that unlikely if that
+>> bdrv_flush() failed already...
 >>
->> This gives us the semantics of:
->>  * if .set_default is true and .info->set_default_value is not NULL,
->>    then .defval is used as the the default value of the property
->
-> If I read your patch correctly, then this should be "if .set_default is
-> true, then .info->set_default_value() must not be null, and .defval is
-> used ..."
+>> So I concluded not to have an opinion on which order is better.
+> 
+> Well, let me ask the other way round: Is there any disadvantage in first
+> zeroing the in-memory table and then writing to the image?
 
-Yes.
+If bdrv_flush/drv_pwrite_zeroes function failed, the subsequent writes
+to truncated area lead to allocation L2 tables. This implies two things:
 
-thanks
--- PMM
+1. We need call qcow2_free_clusters() after bdrv_flush/drv_pwrite_zeroes
+anyway, otherwise it may lead to the situation when the l1 table will
+have two identical offsets.
+
+2. Old l2 blocks may be lost and will be dead weight for the image.
+
+> If I have a choice between "always safe" and "not completely safe, but I
+> think it's unlikely to happen", especially in image formats, then I will
+> certainly take the "always safe".
+
+In my understanding both cases are "unsafe", because both cases may lead
+to inconsistent state between image and memory. When writing this code I
+was looking at an existing approach in qcow2*.c to such kind of issues:
+...
+static int l2_allocate(BlockDriverState *bs, int l1_index, uint64_t **table)
+...
+     trace_qcow2_l2_allocate_write_l1(bs, l1_index);
+     s->l1_table[l1_index] = l2_offset | QCOW_OFLAG_COPIED;
+     ret = qcow2_write_l1_entry(bs, l1_index);
+     if (ret < 0) {
+         goto fail;
+     }
+
+     *table = l2_table;
+     trace_qcow2_l2_allocate_done(bs, l1_index, 0);
+     return 0;
+
+fail:
+     trace_qcow2_l2_allocate_done(bs, l1_index, ret);
+     if (l2_table != NULL) {
+         qcow2_cache_put(bs, s->l2_table_cache, (void**) table);
+     }
+     s->l1_table[l1_index] = old_l2_offset;
+     if (l2_offset > 0) {
+         qcow2_free_clusters(bs, l2_offset, s->l2_size * sizeof(uint64_t),
+                             QCOW2_DISCARD_ALWAYS);
+     }
+     return ret;
+
+Do I understand correctly? that if qcow2_write_l1_entr call fails
+somewhere in the middle of bdrv_flush() then l1_table still contain the
+old l2_offset, but the image may already contain the new l2_offset. We
+can continue to use the image and write data, but in this case we lose
+the data after reopening image.
+
+So it seemed to me that in current conditions we can't escape from such
+kind of problem completely. But I understand your desire to do better
+even in little things, I agree that would be a little safer in the case
+"first zeroing the in-memory table and then writing". So if this
+solution suits all, let me write the next patch-set version :)
+
+>>>> +    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
+>>>> +    for (i = s->l1_size - 1; i > new_l1_size - 1; i--) {
+>>>> +        if ((s->l1_table[i] & L1E_OFFSET_MASK) == 0) {
+>>>> +            continue;
+>>>> +        }
+>>>> +        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
+>>>> +                            s->cluster_size, QCOW2_DISCARD_ALWAYS);
+>>>> +        s->l1_table[i] = 0;
+>>>> +    }
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>>   int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+>>>>                           bool exact_size)
+>>>>   {
+>>>
+>>> I haven't checked qcow2_shrink_reftable() for similar kinds of problems,
+>>> I hope Max has.
+>>
+>> Well, it's exactly the same there.
+> 
+> Ok, so I'll object to this code without really having looked at it.
+> 
+> Kevin
+> 
