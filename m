@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVi1H-0007yJ-8B
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:35:22 -0400
+	(envelope-from <mst@redhat.com>) id 1dVi36-0000Ce-0H
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVi1G-0005jQ-F7
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:35:19 -0400
-Date: Thu, 13 Jul 2017 20:35:05 +0300
+	(envelope-from <mst@redhat.com>) id 1dVi34-0007Bt-Oe
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 13:37:12 -0400
+Date: Thu, 13 Jul 2017 20:36:56 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170713203308-mutt-send-email-mst@kernel.org>
+Message-ID: <20170713203512-mutt-send-email-mst@kernel.org>
 References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
-	<1499825297-20335-2-git-send-email-gengdongjiu@huawei.com>
-	<74ac9b79-0225-0cab-559f-6204754de5f0@redhat.com>
-	<47cc803a-d1d9-da3b-43f9-31a54ce290e2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <47cc803a-d1d9-da3b-43f9-31a54ce290e2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] ACPI: Add new ACPI structures and
- macros
+In-Reply-To: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/3] Generate APEI GHES table and
+ dynamically record CPER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +23,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com, Gaozhihui <zhihui.gao@huawei.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: lersek@redhat.com, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
 
-On Thu, Jul 13, 2017 at 08:00:26PM +0800, gengdongjiu wrote:
->    Laszlo, I pasted Michael's comments here, as shown below. Michael said the definition
-> should use build_append_int_noprefix to add data. but I think it may not good, becuase
-> the section "UEFI_CPER_SEC_PLATFORM_MEM" is runtime recorded as CPER,
+On Wed, Jul 12, 2017 at 10:08:14AM +0800, Dongjiu Geng wrote:
+> In the armv8 platform, the mainly hardware error source are ARMv8
+> SEA/SEI/GSIV. For the ARMv8 SEA/SEI, the KVM or host kernel will signal SIGBUS
+> or use other interface to notify user space, such as Qemu. After Qemu gets
+> the notification, it will record the CPER and inject the SEA/SEI to KVM. this
+> series of patches will generate APEI table when guest OS boot up, and dynamically
+> record CPER for the guest OS about the generic hardware errors, currently the
+> userspace only handle the memory section hardware errors
 
-One thing I wanted to understand is how are races avoided. E.g. what if
-you are in the process of writing out CPER and guest reads it.
-I tried to find where is this function writing CPER called and couldn't.
-Can you clarify pls?
+This is in a decent shape. I would prefer some cod cleanups
+before this goes in. Mostly I would like the amount of
+pointer math trickery to go down, drop a bunch of
+unused code and fix up comments that point to ACPI spec.
 
-> not a ACPI/HEST
-> table member, so it is not generated when system boot up. On the other hand,UEFI_CPER_SEC_PLATFORM_MEM
-> definition is from UEFI spec 2.6, N.2.2 Section Descriptor: {0xA5BC1114, 0x6F64, 0x4EDE, {0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C, 0x83, 0xB1}}.
-> if use  build_append_int_noprefix to add, may confuse others.
+I pointed out some instances but pls find all instances and try
+to clean up some more.
 
-Right but ACPI/HEST generation could use cleanup, and build_append_int_noprefix
-would be a nice way to do it.
+Thanks!
 
--- 
-MST
+> how to test:
+> 1. In the guest OS, use this command to dump the APEI table: 
+> 	"iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST"
+> 2. And find the address for the generic error status block
+>    according to the notification type
+> 3. then find the CPER record through the generic error status block.
+> 
+> For example(notification type is SEA):
+> 
+> (1) root@genericarmv8:~# iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
+> (2) root@genericarmv8:~# cat HEST.dsl
+> 	/*
+> 	 * Intel ACPI Component Architecture
+> 	 * AML/ASL+ Disassembler version 20170303 (64-bit version)
+> 	 * Copyright (c) 2000 - 2017 Intel Corporation
+> 	 *
+> 	 * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Dec 12 07:19:43 2016
+> 	 *
+> 	 * ACPI Data Table [HEST]
+> 	 *
+> 	 * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
+> 	 */
+>     ..................................................................................
+>     [228h 0552   2]                Subtable Type : 0009 [Generic Hardware Error Source]
+> 	[22Ah 0554   2]                    Source Id : 0008
+> 	[22Ch 0556   2]            Related Source Id : FFFF
+> 	[22Eh 0558   1]                     Reserved : 00
+> 	[22Fh 0559   1]                      Enabled : 01
+> 	[230h 0560   4]       Records To Preallocate : 00000001
+> 	[234h 0564   4]      Max Sections Per Record : 00000001
+> 	[238h 0568   4]          Max Raw Data Length : 00001000
+> 
+> 	[23Ch 0572  12]         Error Status Address : [Generic Address Structure]
+> 	[23Ch 0572   1]                     Space ID : 00 [SystemMemory]
+> 	[23Dh 0573   1]                    Bit Width : 40
+> 	[23Eh 0574   1]                   Bit Offset : 00
+> 	[23Fh 0575   1]         Encoded Access Width : 04 [QWord Access:64]
+> 	[240h 0576   8]                      Address : 00000000785D0040
+> 
+> 	[248h 0584  28]                       Notify : [Hardware Error Notification Structure]
+> 	[248h 0584   1]                  Notify Type : 08 [SEA]
+> 	[249h 0585   1]                Notify Length : 1C
+> 	[24Ah 0586   2]   Configuration Write Enable : 0000
+> 	[24Ch 0588   4]                 PollInterval : 00000000
+> 	[250h 0592   4]                       Vector : 00000000
+> 	[254h 0596   4]      Polling Threshold Value : 00000000
+> 	[258h 0600   4]     Polling Threshold Window : 00000000
+> 	[25Ch 0604   4]        Error Threshold Value : 00000000
+> 	[260h 0608   4]       Error Threshold Window : 00000000
+> 
+> 	[264h 0612   4]    Error Status Block Length : 00001000
+>     .....................................................................................
+> (3) according to above table, the address that contains the physical address of a block
+>     of memory that holds the error status data for SEA notification error source is 0x00000000785D0040
+> (4) the address for SEA notification error source is 0x785d8058
+> 	(qemu) xp /2x 0x00000000785D0040
+> 	00000000785d0040: 0x785d8058 0x00000000
+> (5) check the content of generic error status block and generic error data entry
+>     (qemu) xp /100x 0x785d8058
+>     00000000785d8058: 0x00000001 0x00000000 0x00000000 0x00000098
+>     00000000785d8068: 0x00000001 0xa5bc1114 0x4ede6f64 0x833e63b8
+> 	00000000785d8078: 0xb1837ced 0x00000000 0x00000000 0x00000050
+> 	00000000785d8088: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d8098: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d80a8: 0x00000000 0x00000000 0x00000000 0x00004002
+> 	00000000785d80b8: 0x00000000 0x00000000 0x00000000 0x00001111
+> 	00000000785d80c8: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d80d8: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d80e8: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d80f8: 0x00000000 0x00000003 0x00000000 0x00000000
+> 	00000000785d8108: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d8118: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d8128: 0x00000000 0x00000000 0x00000000 0x00000000
+> 	00000000785d8138: 0x00000000 0x00000000 0x00000000 0x00000000
+> 
+> Dongjiu Geng (3):
+>   ACPI: Add new ACPI structures and macros
+>   ACPI: Add APEI GHES Table Generation support
+>   ACPI: build and enable APEI GHES in the Makefile and configuration
+> 
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/acpi/Makefile.objs           |   1 +
+>  hw/acpi/aml-build.c             |   2 +
+>  hw/acpi/hest_ghes.c             | 219 ++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/virt-acpi-build.c        |   6 ++
+>  include/hw/acpi/acpi-defs.h     | 194 +++++++++++++++++++++++++++++++++++
+>  include/hw/acpi/aml-build.h     |   1 +
+>  include/hw/acpi/hest_ghes.h     |  47 +++++++++
+>  include/qemu/uuid.h             |  11 ++
+>  9 files changed, 482 insertions(+)
+>  create mode 100644 hw/acpi/hest_ghes.c
+>  create mode 100644 include/hw/acpi/hest_ghes.h
+> 
+> -- 
+> 2.10.1
