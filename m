@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVgsL-0006Hp-Kf
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:22:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dVh2U-0002Bb-Oj
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVgsK-0007J7-K8
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:22:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1499788408-10096-1-git-send-email-peter.maydell@linaro.org>
-	<1499788408-10096-2-git-send-email-peter.maydell@linaro.org>
-	<87lgns2zps.fsf@dusky.pond.sub.org>
-	<CAFEAcA--qraHck1_ba9ZFbZU+N-3FMzY8Z5rpri-NKr6K-dUmA@mail.gmail.com>
-Date: Thu, 13 Jul 2017 18:21:50 +0200
-In-Reply-To: <CAFEAcA--qraHck1_ba9ZFbZU+N-3FMzY8Z5rpri-NKr6K-dUmA@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 13 Jul 2017 15:26:35 +0100")
-Message-ID: <87k23cxq75.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dVh2T-0003tB-0W
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:32:30 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 13 Jul 2017 18:31:51 +0200
+Message-Id: <20170713163219.9024-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170713163219.9024-1-marcandre.lureau@redhat.com>
+References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/3] qdev-properties.h: Explicitly set the
- default value for arraylen properties
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 01/29] i386: use ROUND_UP macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +22,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+I used the clang-tidy qemu-round check (with the option OnlyAlignUp)
+to generate the fix:
+https://github.com/elmarco/clang-tools-extra
 
-> On 13 July 2017 at 15:11, Markus Armbruster <armbru@redhat.com> wrote:
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>
->>> In DEFINE_PROP_ARRAY, because we use a PropertyInfo (qdev_prop_arraylen)
->>> which has a .set_default_value member we will set the field to a default
->>> value. That default value will be zero, by the C rule that struct
->>> initialization sets unmentioned members to zero if at least one member
->>> is initialized. However it's clearer to state it explicitly.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>> ---
->>> If my eyeball of the sources is correct, this is the only case we
->>> have of a Property struct that uses a PropertyInfo with a non-NULL
->>> .set_default_value but which doesn't explicitly set .defval.u.
->>> ---
->>>  include/hw/qdev-properties.h | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
->>> index 0604c33..36d040c 100644
->>> --- a/include/hw/qdev-properties.h
->>> +++ b/include/hw/qdev-properties.h
->>> @@ -110,6 +110,7 @@ extern PropertyInfo qdev_prop_arraylen;
->>>                            _arrayfield, _arrayprop, _arraytype) {        \
->>>          .name = (PROP_ARRAY_LEN_PREFIX _name),                          \
->>>          .info = &(qdev_prop_arraylen),                                  \
->>> +        .defval.u = 0,                                                  \
->>>          .offset = offsetof(_state, _field)                              \
->>>              + type_check(uint32_t, typeof_field(_state, _field)),       \
->>>          .arrayinfo = &(_arrayprop),                                     \
->>
->> Hmm.
->>
->> .info and .defval apply to the array *length*.
->> .info.set_default_value() is set_default_uint(), which uses .defval.u.
->> Setting it here is correct.
->>
->> The array *elements* are described by .arrayinfo.  There is no
->> .arraydefval, but that's okay, because .arrayinfo.set_default_value()
->> doesn't get called.  Correct?
->
-> Correct. (There's no way to specify a default value for array properties.)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+---
+ target/i386/arch_dump.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Thanks!
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
+index fe0aa36932..1d51bb5206 100644
+--- a/target/i386/arch_dump.c
++++ b/target/i386/arch_dump.c
+@@ -84,9 +84,9 @@ static int x86_64_write_elf64_note(WriteCoreDumpFunctio=
+n f,
+     note->n_descsz =3D cpu_to_le32(descsz);
+     note->n_type =3D cpu_to_le32(NT_PRSTATUS);
+     buf =3D (char *)note;
+-    buf +=3D ((sizeof(Elf64_Nhdr) + 3) / 4) * 4;
++    buf +=3D ROUND_UP(sizeof(Elf64_Nhdr), 4);
+     memcpy(buf, name, name_size);
+-    buf +=3D ((name_size + 3) / 4) * 4;
++    buf +=3D ROUND_UP(name_size, 4);
+     memcpy(buf + 32, &id, 4); /* pr_pid */
+     buf +=3D descsz - sizeof(x86_64_user_regs_struct)-sizeof(target_ulon=
+g);
+     memcpy(buf, &regs, sizeof(x86_64_user_regs_struct));
+@@ -163,9 +163,9 @@ static int x86_write_elf64_note(WriteCoreDumpFunction=
+ f, CPUX86State *env,
+     note->n_descsz =3D cpu_to_le32(descsz);
+     note->n_type =3D cpu_to_le32(NT_PRSTATUS);
+     buf =3D (char *)note;
+-    buf +=3D ((sizeof(Elf64_Nhdr) + 3) / 4) * 4;
++    buf +=3D ROUND_UP(sizeof(Elf64_Nhdr), 4);
+     memcpy(buf, name, name_size);
+-    buf +=3D ((name_size + 3) / 4) * 4;
++    buf +=3D ROUND_UP(name_size, 4);
+     memcpy(buf, &prstatus, sizeof(prstatus));
+=20
+     ret =3D f(note, note_size, opaque);
+@@ -218,9 +218,9 @@ int x86_cpu_write_elf32_note(WriteCoreDumpFunction f,=
+ CPUState *cs,
+     note->n_descsz =3D cpu_to_le32(descsz);
+     note->n_type =3D cpu_to_le32(NT_PRSTATUS);
+     buf =3D (char *)note;
+-    buf +=3D ((sizeof(Elf32_Nhdr) + 3) / 4) * 4;
++    buf +=3D ROUND_UP(sizeof(Elf32_Nhdr), 4);
+     memcpy(buf, name, name_size);
+-    buf +=3D ((name_size + 3) / 4) * 4;
++    buf +=3D ROUND_UP(name_size, 4);
+     memcpy(buf, &prstatus, sizeof(prstatus));
+=20
+     ret =3D f(note, note_size, opaque);
+@@ -353,9 +353,9 @@ static inline int cpu_write_qemu_note(WriteCoreDumpFu=
+nction f,
+         note64->n_type =3D 0;
+     }
+     buf =3D note;
+-    buf +=3D ((note_head_size + 3) / 4) * 4;
++    buf +=3D ROUND_UP(note_head_size, 4);
+     memcpy(buf, name, name_size);
+-    buf +=3D ((name_size + 3) / 4) * 4;
++    buf +=3D ROUND_UP(name_size, 4);
+     memcpy(buf, &state, sizeof(state));
+=20
+     ret =3D f(note, note_size, opaque);
+--=20
+2.13.1.395.gf7b71de06
