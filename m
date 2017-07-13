@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dVh5L-0005lK-Ln
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:35:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dVh85-0007vD-8g
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:38:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dVh5K-0006Mf-VB
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:35:27 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 13 Jul 2017 18:32:18 +0200
-Message-Id: <20170713163219.9024-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20170713163219.9024-1-marcandre.lureau@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1dVh81-0000sG-C4
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:38:17 -0400
+Date: Thu, 13 Jul 2017 13:38:08 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170713163808.GX6020@localhost.localdomain>
 References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
+	<20170713163219.9024-24-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170713163219.9024-24-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 28/29] test-iov: replace g_malloc()+memcpy()
- with g_memdup()
+Subject: Re: [Qemu-devel] [PATCH v2 23/29] i386/dump: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +24,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-I found these pattern via grepping the source tree. I don't have a
-coccinelle script for it!
+On Thu, Jul 13, 2017 at 06:32:13PM +0200, Marc-Andr=E9 Lureau wrote:
+> I used the clang-tidy qemu-round check to generate the fix:
+> https://github.com/elmarco/clang-tools-extra
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/test-iov.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Acked-by: Eduardo Habkost <ehabkost@redhat.com>
 
-diff --git a/tests/test-iov.c b/tests/test-iov.c
-index a22d71fd2c..fa3d75aee1 100644
---- a/tests/test-iov.c
-+++ b/tests/test-iov.c
-@@ -167,8 +167,7 @@ static void test_io(void)
-     }
-     iov_from_buf(iov, niov, 0, buf, sz);
-=20
--    siov =3D g_malloc(sizeof(*iov) * niov);
--    memcpy(siov, iov, sizeof(*iov) * niov);
-+    siov =3D g_memdup(iov, sizeof(*iov) * niov);
-=20
-     if (socketpair(PF_UNIX, SOCK_STREAM, 0, sv) < 0) {
-        perror("socketpair");
 --=20
-2.13.1.395.gf7b71de06
+Eduardo
