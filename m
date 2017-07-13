@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVaz0-0006El-BK
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:04:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVb0z-0007pm-TY
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVayw-0005ZA-1H
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:04:30 -0400
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:36256)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVayv-0005Yn-Sg
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:04:25 -0400
-Received: by mail-qk0-f196.google.com with SMTP id v17so5133127qka.3
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:04:25 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 13 Jul 2017 07:03:10 -0300
-Message-Id: <20170713100311.20037-2-f4bug@amsat.org>
-In-Reply-To: <20170713100311.20037-1-f4bug@amsat.org>
-References: <20170713100311.20037-1-f4bug@amsat.org>
+	(envelope-from <berrange@redhat.com>) id 1dVb0v-0008B2-Sk
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:06:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVb0v-0008AG-JS
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:06:29 -0400
+Date: Thu, 13 Jul 2017 11:06:24 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170713100624.GG4011@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1499158630-75260-1-git-send-email-longpeng2@huawei.com>
+	<1499158630-75260-14-git-send-email-longpeng2@huawei.com>
+	<20170711122958.GM7116@redhat.com>
+	<CACnE9px5A5_q4acVHYf=y0s7Qaie=18fEh3Q4ed5kyWMXAveQQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH RESEND 1/2] scripts: helper to keep console
- alive
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CACnE9px5A5_q4acVHYf=y0s7Qaie=18fEh3Q4ed5kyWMXAveQQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 13/18] crypto: cipher: add afalg-backend
+ cipher support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +31,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: long mike <longpeng.mike@gmail.com>
+Cc: "Longpeng(Mike)" <longpeng2@huawei.com>, arei.gonglei@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org
 
-useful to avoid Travis CI jobs getting killed after 10min of inactivity.
+On Thu, Jul 13, 2017 at 05:55:00PM +0800, long mike wrote:
+> 2017-07-11 20:29 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
+> > On Tue, Jul 04, 2017 at 04:57:05PM +0800, Longpeng(Mike) wrote:
+> >> Adds afalg-backend cipher support: introduces some private APIs
+> >> firstly, and then intergrates them into qcrypto_cipher_afalg_driver.
+> >>
+> >> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> >> ---
+> >>  crypto/Makefile.objs  |   1 +
+> >>  crypto/afalgpriv.h    |   9 ++
+> >>  crypto/cipher-afalg.c | 223 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  crypto/cipher.c       |  23 +++++-
+> >>  crypto/cipherpriv.h   |  16 ++++
+> >>  5 files changed, 268 insertions(+), 4 deletions(-)
+> >>  create mode 100644 crypto/cipher-afalg.c
+> >>
+> [...]
+> 
+> >> +
+> >> +static int
+> >> +qcrypto_afalg_cipher_op(QCryptoAFAlg *afalg,
+> >> +                        const void *in, void *out,
+> >> +                        size_t len, bool do_encrypt,
+> >> +                        Error **errp)
+> >> +{
+> >> +    uint32_t *type = NULL;
+> >> +    struct iovec iov;
+> >> +    size_t ret, done = 0;
+> >> +    uint32_t origin_controllen;
+> >> +
+> >> +    origin_controllen = afalg->msg->msg_controllen;
+> >> +    /* movev ->cmsg to first header, for crypto-info */
+> >> +    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
+> >> +
+> >> +    /* build encrypt msg */
+> >> +    afalg->cmsg->cmsg_level = SOL_ALG;
+> >> +    afalg->msg->msg_iov = &iov;
+> >> +    afalg->msg->msg_iovlen = 1;
+> >> +    type = (uint32_t *)CMSG_DATA(afalg->cmsg);
+> >> +    if (do_encrypt) {
+> >> +        *type = ALG_OP_ENCRYPT;
+> >> +    } else {
+> >> +        *type = ALG_OP_DECRYPT;
+> >> +    }
+> >> +
+> >> +    do {
+> >> +        iov.iov_base = (void *)in + done;
+> >> +        iov.iov_len = len - done;
+> >> +
+> >> +        /* send info to AF_ALG core */
+> >> +        ret = sendmsg(afalg->opfd, afalg->msg, 0);
+> >> +        if (ret == -1) {
+> >> +            error_setg_errno(errp, errno, "Send data to AF_ALG core failed");
+> >> +            return -1;
+> >> +        }
+> >> +
+> >> +        /* encrypto && get result */
+> >> +        if (ret != read(afalg->opfd, out, ret)) {
+> >> +            error_setg_errno(errp, errno, "Get result from AF_ALG core failed");
+> >> +            return -1;
+> >> +        }
+> >> +
+> >> +        /* do not update IV for following chunks */
+> >> +        afalg->msg->msg_controllen = 0;
+> >> +        done += ret;
+> >> +    } while (done < len);
+> >
+> > In the next patch you use iov_send_recv() which provides the
+> > while()  loop automatically upon short write. Lets just use
+> > that method here too.
+> >
+> 
+> Hi Daniel,
+> 
+> I'm afraid we couldn't use  iov_send_recv() here.
+> 
+> For the AF_ALG API of cipher, it needs some additional control info
+> in 'struct msghdr', while iov_send_recv-->do_send_recv would set a
+> local msghdr object and there's no opportunity for caller to pass any
+> control info.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- MAINTAINERS          |  1 +
- scripts/aliveness.sh | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
- create mode 100755 scripts/aliveness.sh
+[snip]
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9529c9484c..c39f418a13 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1866,6 +1866,7 @@ S: Maintained
- F: .travis.yml
- F: .shippable.yml
- F: tests/docker/
-+F: scripts/aliveness.sh
- W: https://travis-ci.org/qemu/qemu
- W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
-diff --git a/scripts/aliveness.sh b/scripts/aliveness.sh
-new file mode 100755
-index 0000000000..1c2b6136b9
---- /dev/null
-+++ b/scripts/aliveness.sh
-@@ -0,0 +1,32 @@
-+#! /usr/bin/env sh
-+#
-+# Send an "Alive!" message regularly to stderr
-+#
-+# Copyright (C) 2017 Philippe Mathieu-Daudé
-+#
-+# Author: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+#
-+# This work is licensed under the terms of the GNU LGPL, version 2+.
-+# See the COPYING file in the top-level directory.
-+
-+TIMEOUT_S=$1
-+shift 1
-+{
-+  set -e
-+  while true
-+  do
-+    sleep ${TIMEOUT_S}
-+    echo "Alive!" >&2
-+  done
-+} &
-+WATCHDOG_PID=$!
-+
-+cleanup() {
-+    echo "killing watchdog ${WATCHDOG_PID}" >&2
-+    kill -TERM ${WATCHDOG_PID}
-+    exit $((1 - $#))
-+}
-+trap cleanup INT
-+
-+$*
-+cleanup 0
+> Do you have any suggestion?
+
+Ah, I missed that subtle point - just ignore my comment and leave your
+code as-is. Just consider the error handling for read() possibly returning
+less bytes than requested.
+
+Regards,
+Daniel
 -- 
-2.13.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
