@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVfwM-0002T0-Ue
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:22:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVfz6-0004mH-H8
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVfwL-0000Oq-RE
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:22:06 -0400
-References: <20170713092100.GD4011@redhat.com>
-	<e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
-	<20170713140022.GN4011@redhat.com>
-	<1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
-	<20170713140711.GO4011@redhat.com>
-	<4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
-	<20170713145801.GP4011@redhat.com>
-	<37d97fcb-aa71-1ed4-2134-6d308da7b527@kamp.de>
-	<20170713150148.GQ4011@redhat.com>
-	<2c5db580-1e3e-9b82-2768-ba2510173387@kamp.de>
-	<20170713150652.GR4011@redhat.com>
-	<07042f09-594a-a288-588b-59c70479c414@kamp.de>
+	(envelope-from <eblake@redhat.com>) id 1dVfz2-0001ki-Cw
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:24:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dVfz2-0001kN-3d
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:24:52 -0400
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
+	<20170712181652-mutt-send-email-mst@kernel.org>
+	<20170712201550.GN6020@localhost.localdomain>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <2348778a-dfff-804f-32f7-4325f7347633@redhat.com>
-Date: Thu, 13 Jul 2017 10:21:56 -0500
+Message-ID: <4393c710-fb1e-892c-3c24-cdd6284c3a80@redhat.com>
+Date: Thu, 13 Jul 2017 10:24:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <07042f09-594a-a288-588b-59c70479c414@kamp.de>
+In-Reply-To: <20170712201550.GN6020@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm"
-Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
- compress format extension
+	boundary="blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue"
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,67 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm
+--blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue
 From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com
-Message-ID: <2348778a-dfff-804f-32f7-4325f7347633@redhat.com>
-Subject: Re: [PATCH V2 5/8] block/qcow2: read and write the compress format
- extension
-References: <20170713092100.GD4011@redhat.com>
- <e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
- <20170713140022.GN4011@redhat.com>
- <1f4ca3cc-b17b-b577-f5a7-5d550c387cb5@kamp.de>
- <20170713140711.GO4011@redhat.com>
- <4648fb64-c1ea-0962-0123-2326769a07c2@kamp.de>
- <20170713145801.GP4011@redhat.com>
- <37d97fcb-aa71-1ed4-2134-6d308da7b527@kamp.de>
- <20170713150148.GQ4011@redhat.com>
- <2c5db580-1e3e-9b82-2768-ba2510173387@kamp.de>
- <20170713150652.GR4011@redhat.com>
- <07042f09-594a-a288-588b-59c70479c414@kamp.de>
-In-Reply-To: <07042f09-594a-a288-588b-59c70479c414@kamp.de>
+To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <4393c710-fb1e-892c-3c24-cdd6284c3a80@redhat.com>
+Subject: Re: [PATCH v3] hw/i386: Deprecate the machines pc-0.10 to pc-1.2
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+ <20170712145121.GF6020@localhost.localdomain>
+ <20170712181652-mutt-send-email-mst@kernel.org>
+ <20170712201550.GN6020@localhost.localdomain>
+In-Reply-To: <20170712201550.GN6020@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/13/2017 10:13 AM, Peter Lieven wrote:
->>>>>>
->>>>>>> I currently have the following:
->>>>>>>
->>>>>>>        options =3D qemu_opts_to_qdict(opts, NULL);
->>>>>>>        qdict_extract_subqdict(options, &compressopts, "compress."=
-);
+On 07/12/2017 03:15 PM, Eduardo Habkost wrote:
 
-Can you show your .json patches as well?
+>=20
+> If we use strverscmp(), it will be sorted in a more reasonable
+> way.  We could copy the gnulib version on systems without glibc.
+> Life is too short for writing configure checks by hand, though; I
+> will add this to the end of my wish-todo list.  If somebody wants
+> to volunteer, be my guest.
+>=20
+> I'm CCing Eric in case he has suggestions that would help import
+> the gnulib module in an easy way.
 
-> Yes, but visit_type_Qcow2Compress_members always returns an error if
-> compress.format
-> is missing from the options. So I should not call it an error out if
-> compress.format is not in the
-> options. Thus the check if either compress.format or compress.level is
-> specified at all.
-
-In the JSON, you want '*compress':'CompressUnion' (or some such name)
-(overall, the user does not have to specify compression); but within
-CompressUnion, you want 'format' to be unconditional (it is the
-discriminator), and then branches of the union to add whatever other
-fields match the enum members covered by 'format'.
-
-{ 'enum': 'CompressionType', 'data': [ 'gzip', 'lzo' ] }
-{ 'union': 'CompressUnion', 'discriminator': 'format',
-  'base': { 'format': 'CompressionType', '*level': 'int' },
-  'data': { 'gzip': {...any gzip-specific extras}, 'lzo': {...any
-lzo-specific extras} } }
-
-[hmm, I think I'm STILL missing my patches to allow for an anonymous
-base...  I should rebase and send those; but in the meantime, you'll
-have to create a separate 'CompressBase' struct and use
-'base':'CompressBase' instead]
+We don't use autoconf, so we can't directly use gnulib. Copying the
+files and making sure we provide the configure tests those files depend
+on (or tweaking the files to simplify to our build system, where we
+don't have to be quite as portable as gnulib tries to be) is going to be
+a manual process. But at least the license is compatible (LGPLv2+), and
+I'll willingly review patches attempted along those lines.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -103,7 +78,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm
+--blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -113,13 +88,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZZ5AUAAoJEKeha0olJ0Nq8FsH/0qskuQ6CldZMu+W29KfU989
-7HGc6ljFp9hzdZ7cbEeOFO47PV68DtEm6ZqXAi5Cq9CtxsDuZDgluoxB1RYmxYDt
-h38I9+UrGSeJqtc3D4h0YEc1EdEBZP9kzhdicaCK4tdTwFqbqI004m0D/QuksNr7
-bbEU74mpxnLa92gs0ntuI+XQq1DE0XiivpOd/IlSCAdFvcGQ6Cq2OezvMyfp16Vn
-Oj7TAp0W35FxpKmFEowLTIdlaLgvfdcd/0FfRqLsKZ0RfIaAMLZ1ZwqsR9L4Z/mZ
-2h+n5l++0+cspCADeYmWGOyVkEY8YEYNXf3irp9tvBU6iSKzqCoH3p02RHoBNiI=
-=nB86
+iQEcBAEBCAAGBQJZZ5CmAAoJEKeha0olJ0NqeF8H/A3/1HsiPec29yy2ItEKFetp
+cSjF1DhfPH766M/14mH0cKHn7yU89w1NqDrhNMdld6b8He/b6U8RsoSRozm5xGJo
+NJHd9omP/JMGgtS6HBg5qU9QeehALjFu3uC4FAoxepuEs2fhsRqZDumXY5vBD7Ht
+AKRFAzFlIm//HkjDnZDhiuAq8Qx7ntODezlns1PEvd3Xp6UQ4Ko1my43xtwRGBpf
+G/coOp6wiJrvcFOyeMoB1ZtvRlmlQi+us9qXuDEy0oSmWLuURCnCmuSOcRUr6kMr
+Kb6M/MxZEEtaPaWeVV/O/Lh8LTI7QIZu7Qz3LKfOmo5mX5tR3ZnLxa9Lel6j0ho=
+=+FfD
 -----END PGP SIGNATURE-----
 
---Q9hheDLKPO9l2ouaDQswh3Vp4sItpJSFm--
+--blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue--
