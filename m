@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVcVD-0002cI-7a
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:41:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVcVG-0002ep-8R
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:41:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dVcVC-0002hE-Bi
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:41:51 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dVcVF-0002j8-7Y
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 07:41:54 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 13 Jul 2017 13:41:26 +0200
-Message-Id: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/9] block: -device drive=<node-name> fixes
+Date: Thu, 13 Jul 2017 13:41:28 +0200
+Message-Id: <1499946095-8224-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
+References: <1499946095-8224-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/9] block/qapi: Add qdev device name to
+ query-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +23,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-Since 2.9 it is possible for a user to care only about nodes and qdev devices,
-but not about BlockBackends, by defining with -blockdev and using their node
-name in -device. Devices create an anonymous BlockBackend internally then.
+With -blockdev/-device, users can indirectly create anonymous
+BlockBackends, while the state of such backends is still of interest. As
+a preparation for making such BBs visible in query-block, make sure that
+they can be identified even without a name by adding the ID/QOM path of
+their qdev device to BlockInfo.
 
-One of the major problems in this setup is that such devices are not listed in
-query-block or HMP 'info block' because the BBs are not monitor-owned. A recent
-discussion concluded that we really want to replace query-block and friends
-with something that matches QEMU's internals better, but there's no way to do
-that in 2.10 (and I wouldn't bet on it to be completed for 2.11). So for now,
-just make the devices appear in query-block and add the qdev ID there in order
-to make the devices identifiable (they have 'device': '' because the BB is
-anonymous).
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qapi.c               | 10 ++++++++++
+ hmp.c                      |  3 +++
+ qapi/block-core.json       |  9 ++++++++-
+ tests/qemu-iotests/067.out |  1 +
+ 4 files changed, 22 insertions(+), 1 deletion(-)
 
-With the additional qdev field, it turned out that with empty drives, ide-cd
-and scsi-cd weren't even properly attached to the BlockBackend. If you do it
-right, this even results in crashes. (Floppy already gets it right, in case you
-wondered.)
-
-After this series, -device drive=<node-name> should be reasonably usable
-without a major loss of functionality like before.
-
-v2:
-- Updated example QMP outputs in schema comments [Eric]
-- Added missing "since" tag in schema [Eric]
-- Improved some commit messages [Eric]
-
-Kevin Wolf (9):
-  block: Make blk_get_attached_dev_id() public
-  block/qapi: Add qdev device name to query-block
-  block: Make blk_all_next() public
-  block/qapi: Use blk_all_next() for query-block
-  block: List anonymous device BBs in query-block
-  ide: bdrv_attach_dev() for empty CD-ROM
-  scsi-disk: bdrv_attach_dev() for empty CD-ROM
-  qemu-iotests: Test 'info block'
-  qemu-iotests: Test unplug of -device without drive
-
- block/block-backend.c          |   5 +-
- block/qapi.c                   |  20 +-
- hmp.c                          |  11 +-
- hw/ide/qdev.c                  |   3 +
- hw/scsi/scsi-disk.c            |   5 +
- include/sysemu/block-backend.h |   2 +
- qapi/block-core.json           |   9 +-
- tests/qemu-iotests/067         |  13 ++
- tests/qemu-iotests/067.out     |  40 ++++
- tests/qemu-iotests/186         | 147 +++++++++++++
- tests/qemu-iotests/186.out     | 489 +++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group       |   1 +
- 12 files changed, 735 insertions(+), 10 deletions(-)
- create mode 100755 tests/qemu-iotests/186
- create mode 100644 tests/qemu-iotests/186.out
-
+diff --git a/block/qapi.c b/block/qapi.c
+index 0a41d59..705cd11 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -322,11 +322,21 @@ static void bdrv_query_info(BlockBackend *blk, BlockInfo **p_info,
+ {
+     BlockInfo *info = g_malloc0(sizeof(*info));
+     BlockDriverState *bs = blk_bs(blk);
++    char *qdev;
++
+     info->device = g_strdup(blk_name(blk));
+     info->type = g_strdup("unknown");
+     info->locked = blk_dev_is_medium_locked(blk);
+     info->removable = blk_dev_has_removable_media(blk);
+ 
++    qdev = blk_get_attached_dev_id(blk);
++    if (qdev && *qdev) {
++        info->has_qdev = true;
++        info->qdev = qdev;
++    } else {
++        g_free(qdev);
++    }
++
+     if (blk_dev_has_tray(blk)) {
+         info->has_tray_open = true;
+         info->tray_open = blk_dev_is_tray_open(blk);
+diff --git a/hmp.c b/hmp.c
+index dee4028..d1d769e 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -425,6 +425,9 @@ static void print_block_info(Monitor *mon, BlockInfo *info,
+     }
+ 
+     if (info) {
++        if (info->has_qdev) {
++            monitor_printf(mon, "    Attached to:      %s\n", info->qdev);
++        }
+         if (info->has_io_status && info->io_status != BLOCK_DEVICE_IO_STATUS_OK) {
+             monitor_printf(mon, "    I/O status:       %s\n",
+                            BlockDeviceIoStatus_lookup[info->io_status]);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index f85c223..0dd9c30 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -433,6 +433,9 @@
+ #
+ # @device: The device name associated with the virtual device.
+ #
++# @qdev: The qdev ID, or if no ID is assigned, the QOM path of the block
++#        device. (since 2.10)
++#
+ # @type: This field is returned only for compatibility reasons, it should
+ #        not be used (always returns 'unknown')
+ #
+@@ -458,7 +461,7 @@
+ # Since:  0.14.0
+ ##
+ { 'struct': 'BlockInfo',
+-  'data': {'device': 'str', 'type': 'str', 'removable': 'bool',
++  'data': {'device': 'str', '*qdev': 'str', 'type': 'str', 'removable': 'bool',
+            'locked': 'bool', '*inserted': 'BlockDeviceInfo',
+            '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
+            '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+@@ -528,6 +531,7 @@
+ #                   }
+ #                }
+ #             },
++#             "qdev": "ide_disk",
+ #             "type":"unknown"
+ #          },
+ #          {
+@@ -535,12 +539,15 @@
+ #             "device":"ide1-cd0",
+ #             "locked":false,
+ #             "removable":true,
++#             "qdev": "/machine/unattached/device[23]",
++#             "tray_open": false,
+ #             "type":"unknown"
+ #          },
+ #          {
+ #             "device":"floppy0",
+ #             "locked":false,
+ #             "removable":true,
++#             "qdev": "/machine/unattached/device[20]",
+ #             "type":"unknown"
+ #          },
+ #          {
+diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
+index 782eae2..e3c4496 100644
+--- a/tests/qemu-iotests/067.out
++++ b/tests/qemu-iotests/067.out
+@@ -57,6 +57,7 @@ Testing: -drive file=TEST_DIR/t.qcow2,format=qcow2,if=none,id=disk -device virti
+                 "file": "TEST_DIR/t.qcow2",
+                 "encryption_key_missing": false
+             },
++            "qdev": "/machine/peripheral/virtio0/virtio-backend",
+             "type": "unknown"
+         }
+     ]
 -- 
 1.8.3.1
