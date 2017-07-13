@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVbE5-0005QQ-5M
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:20:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVbI3-00089D-9G
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVbE1-0008De-4I
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:20:05 -0400
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:33200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dVbE0-0008DK-Vn
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:20:01 -0400
-Received: by mail-qt0-f195.google.com with SMTP id c20so5424195qte.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:20:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170621043401.19842-1-hpoussin@reactos.org>
-	<20170621043401.19842-2-hpoussin@reactos.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0344b107-7e9e-f1d0-acee-fd9d3cbe25ee@amsat.org>
-Date: Thu, 13 Jul 2017 07:18:57 -0300
+	(envelope-from <berrange@redhat.com>) id 1dVbHz-0001l3-Dl
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:24:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVbHz-0001kc-7N
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:24:07 -0400
+Date: Thu, 13 Jul 2017 11:23:59 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170713102359.GH4011@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <468425bd8090e3a9fd7fc791db42e24d6c75315c.1499940552.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20170621043401.19842-2-hpoussin@reactos.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] audio/fmopl: modify timer callback to
- give opaque and channel parameters in two arguments
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <468425bd8090e3a9fd7fc791db42e24d6c75315c.1499940552.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] io/channel-watch.c: Only select on
+ what we are actually waiting for
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,113 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, stefanha@redhat.com, alistair23@gmail.com
 
-Hi Hervé,
+On Thu, Jul 13, 2017 at 03:15:49AM -0700, Alistair Francis wrote:
+> When calling WAEventSelect() only wait on events as specified by the
+> condition variable. This requires that the condition variable is set
+> correctly for the specific events that we need to wait for.
 
-On 06/21/2017 01:34 AM, Hervé Poussineau wrote:
-> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+Can you describe the actual problem / buggy behaviour you were seeing
+with the current code.
+
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
->   hw/audio/adlib.c |  2 +-
->   hw/audio/fmopl.c | 18 +++++++++++++-----
->   hw/audio/fmopl.h |  7 ++++---
->   3 files changed, 18 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
-> index c6e0f10c16..be4203476a 100644
-> --- a/hw/audio/adlib.c
-> +++ b/hw/audio/adlib.c
-> @@ -130,7 +130,7 @@ static uint32_t adlib_read(void *opaque, uint32_t nport)
->       return data;
->   }
->   
-> -static void timer_handler (int c, double interval_Sec)
-> +static void timer_handler (void *opaque, int c, double interval_Sec)
->   {
->       AdlibState *s = glob_adlib;
->       unsigned n = c & 1;
-> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
-> index 202f752c5d..5cfb6a96dd 100644
-> --- a/hw/audio/fmopl.c
-> +++ b/hw/audio/fmopl.c
-> @@ -788,14 +788,18 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
->   				{
->   					double interval = st2 ? (double)OPL->T[1]*OPL->TimerBase : 0.0;
->   					OPL->st[1] = st2;
-> -					if (OPL->TimerHandler) (OPL->TimerHandler)(OPL->TimerParam+1,interval);
-> +                    if (OPL->TimerHandler) {
-> +                        (OPL->TimerHandler)(OPL->TimerParam, 1, interval);
-> +                    }
->   				}
->   				/* timer 1 */
->   				if(OPL->st[0] != st1)
->   				{
->   					double interval = st1 ? (double)OPL->T[0]*OPL->TimerBase : 0.0;
->   					OPL->st[0] = st1;
-> -					if (OPL->TimerHandler) (OPL->TimerHandler)(OPL->TimerParam+0,interval);
-> +                    if (OPL->TimerHandler) {
-> +                        (OPL->TimerHandler)(OPL->TimerParam, 0, interval);
-> +                    }
->   				}
->   			}
->   			return;
-> @@ -1128,10 +1132,11 @@ void OPLDestroy(FM_OPL *OPL)
->   
->   /* ----------  Option handlers ----------       */
->   
-> -void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOffset)
-> +void OPLSetTimerHandler(FM_OPL *OPL, OPL_TIMERHANDLER TimerHandler,
-> +                        void *param)
->   {
->   	OPL->TimerHandler   = TimerHandler;
-> -	OPL->TimerParam = channelOffset;
-> +    OPL->TimerParam = param;
->   }
->   
->   /* ---------- YM3812 I/O interface ---------- */
-> @@ -1197,6 +1202,9 @@ int OPLTimerOver(FM_OPL *OPL,int c)
->   		}
->   	}
->   	/* reload timer */
-> -	if (OPL->TimerHandler) (OPL->TimerHandler)(OPL->TimerParam+c,(double)OPL->T[c]*OPL->TimerBase);
-> +    if (OPL->TimerHandler) {
-> +        (OPL->TimerHandler)(OPL->TimerParam, c,
-> +                            (double)OPL->T[c] * OPL->TimerBase);
+>  io/channel-watch.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/io/channel-watch.c b/io/channel-watch.c
+> index 8640d1c464..d80722f496 100644
+> --- a/io/channel-watch.c
+> +++ b/io/channel-watch.c
+> @@ -286,9 +286,21 @@ GSource *qio_channel_create_socket_watch(QIOChannel *ioc,
+>      QIOChannelSocketSource *ssource;
+>  
+>  #ifdef WIN32
+> -    WSAEventSelect(socket, ioc->event,
+> -                   FD_READ | FD_ACCEPT | FD_CLOSE |
+> -                   FD_CONNECT | FD_WRITE | FD_OOB);
+> +    long bitmask = 0;
+> +
+> +    if (condition & (G_IO_IN | G_IO_PRI)) {
+> +        bitmask |= FD_READ | FD_ACCEPT;
 > +    }
->   	return OPL->status>>7;
->   }
-> diff --git a/hw/audio/fmopl.h b/hw/audio/fmopl.h
-> index fc9f16b58a..f4065f425c 100644
-> --- a/hw/audio/fmopl.h
-> +++ b/hw/audio/fmopl.h
-> @@ -3,7 +3,7 @@
->   
->   #include <stdint.h>
->   
-> -typedef void (*OPL_TIMERHANDLER)(int channel,double interval_Sec);
-> +typedef void (*OPL_TIMERHANDLER)(void *param, int channel, double interval_Sec);
->   
->   /* !!!!! here is private section , do not access there member direct !!!!! */
->   
-> @@ -87,13 +87,14 @@ typedef struct fm_opl_f {
->   	uint8_t wavesel;
->   	/* external event callback handler */
->   	OPL_TIMERHANDLER  TimerHandler;		/* TIMER handler   */
-> -	int TimerParam;						/* TIMER parameter */
-> +    void *TimerParam; /* TIMER parameter */
+> +
+> +    if (condition & G_IO_HUP) {
+> +        bitmask |= FD_CLOSE;
+> +    }
+> +
+> +    if (condition & G_IO_OUT) {
+> +        bitmask |= FD_WRITE | FD_CONNECT;
+> +    }
+> +
+> +    WSAEventSelect(socket, ioc->event, bitmask);
+>  #endif
 
-not very useful comment ;)
+I think the problem with doing this is that WSAEventSelect is a global
+setting that applies to the socket handle. If you use qio_channel_create_watch
+twice on the same socket with different events, the second watch will break
+the first watch by potentially discarding events that it requested.
 
->   } FM_OPL;
->   
->   /* ---------- Generic interface section ---------- */
->   FM_OPL *OPLCreate(int clock, int rate);
->   void OPLDestroy(FM_OPL *OPL);
-> -void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,int channelOffset);
-> +void OPLSetTimerHandler(FM_OPL *OPL, OPL_TIMERHANDLER TimerHandler,
-> +                        void *param);
->   
->   int OPLWrite(FM_OPL *OPL,int a,int v);
->   unsigned char OPLRead(FM_OPL *OPL,int a);
-> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
