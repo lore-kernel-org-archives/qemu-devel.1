@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dVYnx-0007SZ-4M
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:44:58 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVYp3-0008Us-VJ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:46:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dVYns-0003RY-A5
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:44:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1dVYns-0003Qe-3S
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:44:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B0CD07D0C6
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 07:44:49 +0000 (UTC)
-From: Michal Privoznik <mprivozn@redhat.com>
-Date: Thu, 13 Jul 2017 09:44:38 +0200
-Message-Id: <ae882d766ec76c57a7babc2798f16a5a31d64358.1499931846.git.mprivozn@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtion-net: Prefer is_power_of_2()
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVYoz-0003vF-3E
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:46:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51661)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dVYoy-0003uh-PV
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 03:46:01 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6D7iw9i078105
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:45:59 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bnt3qc703-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 03:45:58 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 13 Jul 2017 03:45:57 -0400
+References: <1499864265-144136-1-git-send-email-borntraeger@de.ibm.com>
+	<1499864265-144136-4-git-send-email-borntraeger@de.ibm.com>
+	<92a0944a-156a-6800-88f1-ae39b5263730@redhat.com>
+	<83795acd-ddfd-e039-80bb-78a785fb7669@de.ibm.com>
+	<0445c2d0-c810-8d1e-4075-8251eb79a166@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 13 Jul 2017 09:45:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <0445c2d0-c810-8d1e-4075-8251eb79a166@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+Message-Id: <05677519-ff4e-9dd7-2bcb-d01a5e4782bb@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 03/11] s390x/migration: Storage attributes
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +46,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, jasowang@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-We have a function that checks if given number is power of two.
-We should prefer it instead of expanding the check on our own.
+On 07/13/2017 09:35 AM, Thomas Huth wrote:
+> On 13.07.2017 09:11, Christian Borntraeger wrote:
+>> Thanks for the review, all valid. Claudio has provided me the following fixup.
+>>
+>> I plan to fold that in the base patch (retest pending).
+>>
+>> Christian
+>>
+>>
+>> ---
+>>  hw/s390x/s390-stattrib-kvm.c          | 26 +++++++++++++++++++-------
+>>  hw/s390x/s390-stattrib.c              | 12 +++---------
+>>  include/hw/s390x/storage-attributes.h |  9 +++++++++
+>>  3 files changed, 31 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
+>> index 2e7f144..2ab3060 100644
+>> --- a/hw/s390x/s390-stattrib-kvm.c
+>> +++ b/hw/s390x/s390-stattrib-kvm.c
+>> @@ -11,7 +11,6 @@
+>>
+>>  #include "qemu/osdep.h"
+>>  #include "hw/boards.h"
+>> -#include "qmp-commands.h"
+>>  #include "migration/qemu-file.h"
+>>  #include "hw/s390x/storage-attributes.h"
+>>  #include "qemu/error-report.h"
+>> @@ -19,6 +18,15 @@
+>>  #include "exec/ram_addr.h"
+>>  #include "cpu.h"
+>>
+>> +Object *kvm_s390_stattrib_create(void)
+>> +{
+>> +    if (kvm_enabled() &&
+>> +                kvm_check_extension(kvm_state, KVM_CAP_S390_CMMA_MIGRATION)) {
+>> +        return object_new(TYPE_KVM_S390_STATTRIB);
+>> +    }
+>> +    return object_new(TYPE_QEMU_S390_STATTRIB);
+>> +}
+> 
+> I think you could also return NULL here instead of
+> object_new(TYPE_QEMU_S390_STATTRIB) since ...
 
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
----
- hw/net/virtio-net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 5630a9ec44..657d099c54 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -1942,7 +1942,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
-      */
-     if (n->net_conf.rx_queue_size < VIRTIO_NET_RX_QUEUE_MIN_SIZE ||
-         n->net_conf.rx_queue_size > VIRTQUEUE_MAX_SIZE ||
--        (n->net_conf.rx_queue_size & (n->net_conf.rx_queue_size - 1))) {
-+        !is_power_of_2(n->net_conf.rx_queue_size)) {
-         error_setg(errp, "Invalid rx_queue_size (= %" PRIu16 "), "
-                    "must be a power of 2 between %d and %d.",
-                    n->net_conf.rx_queue_size, VIRTIO_NET_RX_QUEUE_MIN_SIZE,
--- 
-2.13.0
+Yes, I like return NULL better so that we do not create the QEMU one
+in *kvm.c. Will also fixup. thanks
+> 
+>> diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
+>> index b9533b4..bac9aea 100644
+>> --- a/hw/s390x/s390-stattrib.c
+>> +++ b/hw/s390x/s390-stattrib.c
+>> @@ -40,16 +40,10 @@ void s390_stattrib_init(void)
+>>  {
+>>      Object *obj;
+>>
+>> -#ifdef CONFIG_KVM
+>> -    if (kvm_enabled() &&
+>> -            kvm_check_extension(kvm_state, KVM_CAP_S390_CMMA_MIGRATION)) {
+>> -        obj = object_new(TYPE_KVM_S390_STATTRIB);
+>> -    } else {
+>> +    obj = kvm_s390_stattrib_create();
+>> +    if (!obj) {
+>>          obj = object_new(TYPE_QEMU_S390_STATTRIB);
+>>      }
+> 
+> ... the object will be created here, too.
+> 
+>  Thomas
+> 
