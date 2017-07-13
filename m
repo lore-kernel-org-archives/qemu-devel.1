@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVme9-0001ND-ES
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 18:31:46 -0400
+	(envelope-from <mst@redhat.com>) id 1dVmoD-0003yc-9K
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 18:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dVme8-0002Zb-E5
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 18:31:45 -0400
-Date: Fri, 14 Jul 2017 01:31:31 +0300
+	(envelope-from <mst@redhat.com>) id 1dVmoA-00031n-4L
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 18:42:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dVmo9-00031a-UP
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 18:42:06 -0400
+Date: Fri, 14 Jul 2017 01:41:58 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170714012613-mutt-send-email-mst@kernel.org>
-References: <1499825297-20335-1-git-send-email-gengdongjiu@huawei.com>
-	<1499825297-20335-3-git-send-email-gengdongjiu@huawei.com>
-	<20170713201407-mutt-send-email-mst@kernel.org>
-	<660d600a-107c-e44a-7322-ae4a74bc5565@redhat.com>
+Message-ID: <20170714013246-mutt-send-email-mst@kernel.org>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712145121.GF6020@localhost.localdomain>
+	<20170712181652-mutt-send-email-mst@kernel.org>
+	<20170712201550.GN6020@localhost.localdomain>
+	<20170712232214-mutt-send-email-mst@kernel.org>
+	<20170712205646.GQ6020@localhost.localdomain>
+	<20170713003116-mutt-send-email-mst@kernel.org>
+	<91a1c7c2-0e87-4023-c960-5078267abf95@redhat.com>
+	<20170713151740.GR6020@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <660d600a-107c-e44a-7322-ae4a74bc5565@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] ACPI: Add APEI GHES Table
- Generation support
+In-Reply-To: <20170713151740.GR6020@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Dongjiu Geng <gengdongjiu@huawei.com>, imammedo@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, zhaoshenglong@huawei.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, james.morse@arm.com, zhengqiang10@huawei.com, huangshaoyu@huawei.com, wuquanming@huawei.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jul 13, 2017 at 09:41:03PM +0200, Laszlo Ersek wrote:
-> >> +
-> >> +        error_source++;
-> >> +    }
-> >> +
-> >> +    for (i = 0; i < GHES_ACPI_HEST_NOTIFY_RESERVED; i++) {
-> >> +        bios_linker_loader_add_pointer(linker,
-> >> +            GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i, sizeof(uint64_t),
-> >> +            GHES_ERRORS_FW_CFG_FILE, GHES_ACPI_HEST_NOTIFY_RESERVED *
-> >> +            sizeof(uint64_t) + i * GHES_MAX_RAW_DATA_LENGTH);
-> >> +    }
+On Thu, Jul 13, 2017 at 12:17:40PM -0300, Eduardo Habkost wrote:
+> > > Oh right. So you need to find dots and split at these points.
+> > > Something like the below? Completely untested.
+> > > 
+> > > int mstcmp(const char *s1, const char *s2)
+> > > {
+> > > 	const char *e1, *e2;
+> > >  	int l1, l2, c;
+> > > 
+> > > 	do {
+> > > 		e1 = strchr(s1, '.');
+> > > 		e2 = strchr(s2, '.');
+> > > 
+> > > 		l1 = e1 ? e1 - s1 + 1 : strlen(s1);
+> > > 		l2 = e2 ? e2 - s2 + 1 : strlen(s2);
+> > > 
+> > > 		/* compare numerically: shorter strings give smaller numbers */
+> > > 		if (l1 != l2) {
+> > > 			break;
+> > > 		}
+> > > 		c = strncmp(s1, s2, l1);
+> > > 		if (c) {
+> > > 			return c;
+> > > 		}
+> > > 		s1 += l1;
+> > > 		s2 += l1;
+> > > 	} while (l1);
+> > > 
+> > > 	return l1 - l2;
+> > > }
 > 
-> So basically all this math exists to set up the pointers that are shown
-> in the diagram in the commit message. It is a bit tricky because most of
-> those pointer fields (all 8-bytes wide) are individually embedded into
-> their own containing structures. In the previous version of this patch
-> set, I painstakingly verified the math, and pointed out wherever I
-> thought updates were necessary.
+> I believe copying strverscmp() from gnulib as-is is better than
+> reimplementing a subset of it.
+
+I would then probably copy it unconditionally.
+
 > 
-> I agree the math is hard to read, the code is very "dense". My
-> suggestion (supporting yours) would be to calculate the fw_cfg blob
-> offsets that should be patched in more fine-grained steps, possibly with
-> multiple separate increments, using:
-> - structure type names,
-> - sizeof operators,
-> - offsetof macros,
-> - and possibly a separate comment for each offset increment.
-> 
-> Thanks,
-> Laszlo
-
-Right. That's not what rest of ACPI does though. What we do there
-is one of:
-
-1. Use GArray to gradually build up the structure.
-
-Struct *s = acpi_data_push(table, sizeof (*s));
-s->foo = bar;
-
-2. Even simpler: use build_append_int_noprefix:
-
-build_append_int_noprefix(table, 2, bar); /* Foo field */
-
-this removes the need to declare Struct in a header,
-just add comments to match the spec exactly.
-
-We might gradually move more code to (2) but (1) is an
-OK style too, it makes it obvious the sizes are fine.
-
-
--- 
-MST
+> -- 
+> Eduardo
