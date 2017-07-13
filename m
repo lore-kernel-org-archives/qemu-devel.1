@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVeA2-0008Vp-Ih
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVeA4-00005w-12
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dVeA1-0001Nq-N2
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1dVeA3-0001Oh-2b
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dVeA2-0001OE-Sn
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:28:07 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 13 Jul 2017 15:27:49 +0200
-Message-Id: <1499952476-3454-3-git-send-email-armbru@redhat.com>
+Date: Thu, 13 Jul 2017 15:27:56 +0200
+Message-Id: <1499952476-3454-10-git-send-email-armbru@redhat.com>
 In-Reply-To: <1499952476-3454-1-git-send-email-armbru@redhat.com>
 References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 2/9] block: Don't try to set *errp directly
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 9/9] Convert error_report*_err() to
+ warn_report*_err()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +28,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
 
-Assigning directly to *errp is not valid, as errp may be NULL,
-&error_fatal, or &error_abort.  Use error_propagate() instead.
+Convert all uses of error_report*_err("Warning:"... to use
+warn_report*_err() instead. This helps standardise on a single
+method of printing warnings to the user.
 
-With this, there's no need to check if errp is NULL anymore, as
-error_propagate() and error_prepend() are able to handle that.
-
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170608133906.12737-3-ehabkost@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <d8e088757186955f40f04ec4f4be7f640d3c8660.1499866456.git.alis=
+tair.francis@xilinx.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ hw/core/qdev-properties.c | 2 +-
+ hw/i386/pc.c              | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/block.c b/block.c
-index 6943962..b1599d2 100644
---- a/block.c
-+++ b/block.c
-@@ -4267,11 +4267,9 @@ bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **errp)
-     assert((int) op >= 0 && op < BLOCK_OP_TYPE_MAX);
-     if (!QLIST_EMPTY(&bs->op_blockers[op])) {
-         blocker = QLIST_FIRST(&bs->op_blockers[op]);
--        if (errp) {
--            *errp = error_copy(blocker->reason);
--            error_prepend(errp, "Node '%s' is busy: ",
--                          bdrv_get_device_or_node_name(bs));
--        }
-+        error_propagate(errp, error_copy(blocker->reason));
-+        error_prepend(errp, "Node '%s' is busy: ",
-+                      bdrv_get_device_or_node_name(bs));
-         return true;
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index f5983c8..3d0bba2 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1169,7 +1169,7 @@ static void qdev_prop_set_globals_for_type(DeviceSt=
+ate *dev,
+                 error_propagate(prop->errp, err);
+             } else {
+                 assert(prop->user_provided);
+-                error_reportf_err(err, "Warning: ");
++                warn_report_err(err);
+             }
+         }
      }
-     return false;
--- 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 465e91c..bf541ca 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1320,8 +1320,7 @@ void pc_acpi_init(const char *default_dsdt)
+=20
+         acpi_table_add_builtin(opts, &err);
+         if (err) {
+-            error_reportf_err(err, "WARNING: failed to load %s: ",
+-                              filename);
++            warn_reportf_err(err, "failed to load %s: ", filename);
+         }
+         g_free(filename);
+     }
+--=20
 2.7.5
