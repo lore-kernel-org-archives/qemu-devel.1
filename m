@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38220)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dVeTQ-0007TA-Cp
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:48:09 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38406)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dVeUX-0000DO-Un
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:49:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dVeTM-0006zI-Fw
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:48:08 -0400
-Received: from mail-ua0-f175.google.com ([209.85.217.175]:34402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dVeTM-0006yo-Af
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:48:04 -0400
-Received: by mail-ua0-f175.google.com with SMTP id z22so33958730uah.1
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 06:48:04 -0700 (PDT)
+	(envelope-from <pl@kamp.de>) id 1dVeUU-0007fY-1P
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:49:18 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:36305 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dVeUT-0007e5-Mz
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 09:49:13 -0400
+References: <1498733831-15254-1-git-send-email-pl@kamp.de>
+	<1498733831-15254-6-git-send-email-pl@kamp.de>
+	<20170710132546.GG5772@noname.redhat.com>
+	<cbc8ec09-9de2-afe6-1cf0-e414482bc6a4@kamp.de>
+	<20170710133459.GI5772@noname.redhat.com>
+	<20170710134436.GB6770@redhat.com>
+	<20170710135218.GK5772@noname.redhat.com>
+	<20170710135539.GD6770@redhat.com>
+	<e7640733-88fa-230b-2631-d43e22404b16@kamp.de>
+	<20170713092100.GD4011@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <e0a85555-aaa9-c2d0-efc7-8a932ca8a915@kamp.de>
+Date: Thu, 13 Jul 2017 15:49:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170713133206.GA18623@stefanha-x1.localdomain>
-References: <20170713110237.6712-1-lprosek@redhat.com>
-	<20170713110237.6712-2-lprosek@redhat.com>
-	<20170713133206.GA18623@stefanha-x1.localdomain>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Thu, 13 Jul 2017 15:48:02 +0200
-Message-ID: <CABdb735h_vjCsHR+5reKxdHXLZkzfiCiW0qr=xoxXyYJ=1Y3Mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce
- error_report_nolf
+In-Reply-To: <20170713092100.GD4011@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 5/8] block/qcow2: read and write the
+ compress format extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +36,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com
 
-On Thu, Jul 13, 2017 at 3:32 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> On Thu, Jul 13, 2017 at 01:02:30PM +0200, Ladi Prosek wrote:
->> +/*
->> + * Print an error message to current monitor if we have one, else to stderr.
->> + * Format arguments like sprintf().  The resulting message should be a
->> + * single phrase, with no trailing punctuation.  The no-LF version allows
->> + * additional text to be appended with error_printf() or error_vprintf().
->> + * Make sure to always close with a newline after all text is printed.
->> + * Prepends the current location.
->> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
->> + */
->> +void error_report_nolf(const char *fmt, ...)
->> +{
->> +    va_list ap;
->> +
->> +    va_start(ap, fmt);
->> +    error_vreport_nolf(fmt, ap);
->> +    va_end(ap);
->>  }
+Am 13.07.2017 um 11:21 schrieb Daniel P. Berrange:
+> On Thu, Jul 13, 2017 at 10:44:53AM +0200, Peter Lieven wrote:
+>> Am 10.07.2017 um 15:55 schrieb Daniel P. Berrange:
+>>> On Mon, Jul 10, 2017 at 03:52:18PM +0200, Kevin Wolf wrote:
+>>>> Am 10.07.2017 um 15:44 hat Daniel P. Berrange geschrieben:
+>>>>> On Mon, Jul 10, 2017 at 03:34:59PM +0200, Kevin Wolf wrote:
+>>>>>> Am 10.07.2017 um 15:29 hat Peter Lieven geschrieben:
+>>>>>>> Am 10.07.2017 um 15:25 schrieb Kevin Wolf:
+>>>>>>>> Am 29.06.2017 um 12:57 hat Peter Lieven geschrieben:
+>>>>>>>>> we now read the extension on open and write it on update, but
+>>>>>>>>> do not yet use it.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>>>>>>>>> ---
+>>>>>>>>>    block/qcow2.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
+>>>>>>>>>    block/qcow2.h |  23 +++++++++++---
+>>>>>>>>>    2 files changed, 104 insertions(+), 19 deletions(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>>>>>>>> index 308121a..39a8afc 100644
+>>>>>>>>> --- a/block/qcow2.c
+>>>>>>>>> +++ b/block/qcow2.c
+>>>>>>>>> @@ -63,6 +63,7 @@ typedef struct {
+>>>>>>>>>    #define  QCOW2_EXT_MAGIC_END 0
+>>>>>>>>>    #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
+>>>>>>>>>    #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
+>>>>>>>>> +#define  QCOW2_EXT_MAGIC_COMPRESS_FORMAT 0xC03183A3
+>>>>>>>>>    static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+>>>>>>>>>    {
+>>>>>>>>> @@ -76,6 +77,26 @@ static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
+>>>>>>>>>            return 0;
+>>>>>>>>>    }
+>>>>>>>>> +static int qcow2_compress_format_from_name(char *fmt)
+>>>>>>>>> +{
+>>>>>>>>> +    if (!fmt || !fmt[0]) {
+>>>>>>>>> +        return QCOW2_COMPRESS_ZLIB_COMPAT;
+>>>>>>>>> +    } else if (g_str_equal(fmt, "zlib")) {
+>>>>>>>>> +        return QCOW2_COMPRESS_ZLIB;
+>>>>>>>>> +    } else {
+>>>>>>>>> +        return -EINVAL;
+>>>>>>>>> +    }
+>>>>>>>>> +}
+>>>>>>>> It might make sense to allow specifying the old compression format in
+>>>>>>>> the compression header. But I'm not so sure about using the empty string
+>>>>>>>> rather than a proper name for it, and even less about not documenting
+>>>>>>>> it.
+>>>>>>> The old format is used if and only if the compression header is absent.
+>>>>>>> It makes no sense to write a header and use the old format. The old
+>>>>>>> settings are suboptimal and old versions can't open a qcow2 with a
+>>>>>>> compression header anyway.
+>>>>>> Your code allows an empty string in the header extension. If you don't
+>>>>>> want it there, you need to reject it.
+>>>>> This is a good reason to use the QAPI schema to parse the create options
+>>>>> instead of doing it using qemu_opts - the QAPI schema will generate correct
+>>>>> code to parse & validate enum values
+>>>> I'd really like to see QAPI used for bdrv_create(), but here we're in
+>>>> the bdrv_open() path and parsing qcow2 headers. So either way this one
+>>>> specifically wouldn't be fixed.
+>>> Sorry, yes, I was getting mixed up in the two different patches with
+>>> similar bits of code.
+>>>
+>>> We could still replace the qcow2_compress_format_from_name() method
+>>> though with a call to the qapi_enum_parse() passing in the
+>>> 'QcowCompressFormat_lookup' table.
+>> Can you advise how exactly I would do that? Sorry, but this is new stuff
+>> for me.
+> In your line of code:
 >
-> Each call to this function prepends the timestamp, so it cannot really
-> be used for a sequence of prints in a single line.
+>            s->compress_format_id =
+>                 qcow2_compress_format_from_name(s->compress_format.name);
+>
+> Instead do
+>
+>             s->compress_format_id =
+>                 qapi_enum_parse(QcowCompressFormat_lookup, s->compress_format.name);
+>
+>
+> The 'QcowCompressFormat_lookup' symbol is a global variable that is an
+> array of strings, automatically created from the 'enum' you define in
+> the QAPI schema.
 
-True, the _nolf means "does not append \n" rather than "can be called
-repeatedly". You would use error_printf() / error_vprintf() for
-subsequent prints, as mentioned in the comment above this function.
+Is it possible to limit the valid integer values for an integer in the QAPI specification?
 
-> It's a little ugly but I expected something along the lines of
-> g_strdup_vprintf() in virtio_error():
->
->   char *msg;
->
->   va_start(ap, fmt);
->   msg = g_strdup_vprintf(fmt, ap);
->   va_end(ap);
->
->   error_report("%s: %s", DEVICE(vdev)->id, msg);
->
->   g_free(msg);
->
-> https://developer.gnome.org/glib/stable/glib-String-Utility-Functions.html#g-strdup-vprintf
+I would like to do that for the compress.level stuff.
 
-I wanted to avoid the memory allocation, that's all. Not for
-performance, obviously, but to increase the chances that it will come
-through and always look the same if the process is under memory
-pressure, the heap corrupted or otherwise in a bad state.
-
-Both approaches look about the same ugly to me but I can certainly
-change it to the one you're suggesting.
-
-> Stefan
+Thanks,
+Peter
