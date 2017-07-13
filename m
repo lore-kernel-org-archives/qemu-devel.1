@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVfz6-0004mH-H8
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:24:57 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dVg1o-00079P-CH
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVfz2-0001ki-Cw
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:24:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60350)
+	(envelope-from <cohuck@redhat.com>) id 1dVg1l-0003eR-2k
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:27:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48432)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dVfz2-0001kN-3d
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:24:52 -0400
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712145121.GF6020@localhost.localdomain>
-	<20170712181652-mutt-send-email-mst@kernel.org>
-	<20170712201550.GN6020@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4393c710-fb1e-892c-3c24-cdd6284c3a80@redhat.com>
-Date: Thu, 13 Jul 2017 10:24:22 -0500
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dVg1k-0003dx-Pc
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 11:27:40 -0400
+Date: Thu, 13 Jul 2017 17:27:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170713172735.758c4e68@gondolin>
+In-Reply-To: <99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
+	<20170713142721.3a40e083@gondolin>
+	<1798a9f2-63f0-ab03-11ad-5513d9a90da9@linux.vnet.ibm.com>
+	<20170713144941.GD2121@work-vm>
+	<99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170712201550.GN6020@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue"
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <4393c710-fb1e-892c-3c24-cdd6284c3a80@redhat.com>
-Subject: Re: [PATCH v3] hw/i386: Deprecate the machines pc-0.10 to pc-1.2
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
- <20170712145121.GF6020@localhost.localdomain>
- <20170712181652-mutt-send-email-mst@kernel.org>
- <20170712201550.GN6020@localhost.localdomain>
-In-Reply-To: <20170712201550.GN6020@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 13 Jul 2017 17:05:45 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-On 07/12/2017 03:15 PM, Eduardo Habkost wrote:
+> On 07/13/2017 04:49 PM, Dr. David Alan Gilbert wrote:
+> > * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:  
+> >>
+> >>
+> >> On 07/13/2017 02:27 PM, Cornelia Huck wrote:  
+> >>>> +static void kvm_flic_ais_pre_save(void *opaque)
+> >>>> +{
+> >>>> +    KVMS390FLICStateMigTmp *tmp = opaque;
+> >>>> +    KVMS390FLICState *flic = tmp->parent;
+> >>>> +    struct kvm_s390_ais_all ais;
+> >>>> +    struct kvm_device_attr attr = {
+> >>>> +        .group = KVM_DEV_FLIC_AISM_ALL,
+> >>>> +        .addr = (uint64_t)&ais,
+> >>>> +        .attr = sizeof(ais),
+> >>>> +    };
+> >>>> +
+> >>>> +    if (ioctl(flic->fd, KVM_GET_DEVICE_ATTR, &attr)) {
+> >>>> +        error_report("Failed to retrieve kvm flic ais states");  
+> >>> There's not much else we can do in that case, is there?
+> >>>  
+> >>
+> >> I think this is a very good question! The ioctl should not fail
+> >> under any circumstances, but if it does we have a problem.
+> >>
+> >> Carrying on happily (what we do now) means effectively discarding
+> >> ais state. In general just discarding state ain't a good idea.
+> >>
+> >> In particular it might be OK, but the patch should explain that!
+> >>
+> >> Regarding what could/should we do in such a case (instead
+> >> of discarding state and carrying on happily) I don't know, so
+> >> I tend to agree with you regarding 'not much else we can do'.
+> >>
+> >> Adding Dave and Juan. Maybe they can tell.  
+> > 
+> > I keep meaning to make the pre_save give a return value for failure,
+> > but it hasn't currently got one.  
+> 
+> Would you accept patches for that?
+> 
+> > 
+> > You could try something like:
+> > 
+> >   qemu_file_set_error(migrate_get_current()->to_dst_file, -EINVAL);
+> > 
+> >   I *think* the migration code should spot that before it finishes
+> > but it might carry on for a little while before it does.  
+> 
+> I will keep this patch as is, since this is one of the "should not happen"
+> cases.
+> 
 
->=20
-> If we use strverscmp(), it will be sorted in a more reasonable
-> way.  We could copy the gnulib version on systems without glibc.
-> Life is too short for writing configure checks by hand, though; I
-> will add this to the end of my wish-todo list.  If somebody wants
-> to volunteer, be my guest.
->=20
-> I'm CCing Eric in case he has suggestions that would help import
-> the gnulib module in an easy way.
-
-We don't use autoconf, so we can't directly use gnulib. Copying the
-files and making sure we provide the configure tests those files depend
-on (or tweaking the files to simplify to our build system, where we
-don't have to be quite as portable as gnulib tries to be) is going to be
-a manual process. But at least the license is compatible (LGPLv2+), and
-I'll willingly review patches attempted along those lines.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZZ5CmAAoJEKeha0olJ0NqeF8H/A3/1HsiPec29yy2ItEKFetp
-cSjF1DhfPH766M/14mH0cKHn7yU89w1NqDrhNMdld6b8He/b6U8RsoSRozm5xGJo
-NJHd9omP/JMGgtS6HBg5qU9QeehALjFu3uC4FAoxepuEs2fhsRqZDumXY5vBD7Ht
-AKRFAzFlIm//HkjDnZDhiuAq8Qx7ntODezlns1PEvd3Xp6UQ4Ko1my43xtwRGBpf
-G/coOp6wiJrvcFOyeMoB1ZtvRlmlQi+us9qXuDEy0oSmWLuURCnCmuSOcRUr6kMr
-Kb6M/MxZEEtaPaWeVV/O/Lh8LTI7QIZu7Qz3LKfOmo5mX5tR3ZnLxa9Lel6j0ho=
-=+FfD
------END PGP SIGNATURE-----
-
---blQn0OEN4VXtJMjcWUtNwGq5xslw2mCue--
+Fine with me.
