@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVh5B-0005an-TS
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:35:18 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dVh5B-0005ak-TF
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dVh58-00064M-2y
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dVh58-00066J-UR
 	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 12:35:17 -0400
-Date: Thu, 13 Jul 2017 13:35:09 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170713163509.GW6020@localhost.localdomain>
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 13 Jul 2017 18:32:15 +0200
+Message-Id: <20170713163219.9024-26-marcandre.lureau@redhat.com>
+In-Reply-To: <20170713163219.9024-1-marcandre.lureau@redhat.com>
 References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
-	<20170713163219.9024-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170713163219.9024-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/29] i386: use ROUND_UP macro
+Subject: [Qemu-devel] [PATCH v2 25/29] decnumber: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +22,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Thu, Jul 13, 2017 at 06:31:51PM +0200, Marc-Andr=E9 Lureau wrote:
-> I used the clang-tidy qemu-round check (with the option OnlyAlignUp)
-> to generate the fix:
-> https://github.com/elmarco/clang-tools-extra
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+I used the clang-tidy qemu-round check to generate the fix:
+https://github.com/elmarco/clang-tools-extra
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ libdecnumber/decNumber.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/libdecnumber/decNumber.c b/libdecnumber/decNumber.c
+index c9e7807f87..8c197023f4 100644
+--- a/libdecnumber/decNumber.c
++++ b/libdecnumber/decNumber.c
+@@ -4775,7 +4775,7 @@ static decNumber * decDivideOp(decNumber *res,
+ 	    half=3D*up & 0x01;
+ 	    *up/=3D2;		   /* [shift] */
+ 	    if (!half) continue;
+-	    *(up-1)+=3D(DECDPUNMAX+1)/2;
++	    *(up-1)+=3DDIV_ROUND_UP(DECDPUNMAX, 2);
+ 	    }
+ 	  /* [accunits still describes the original remainder length] */
+=20
 --=20
-Eduardo
+2.13.1.395.gf7b71de06
