@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVaxa-0004er-5v
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:03 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVaxc-0004hW-CJ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dVaxZ-00049O-54
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:02 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVaxb-0004Ax-5h
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 06:03:04 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Thu, 13 Jul 2017 13:01:14 +0300
-Message-Id: <20170713100117.11961-2-el13635@mail.ntua.gr>
+Date: Thu, 13 Jul 2017 13:01:15 +0300
+Message-Id: <20170713100117.11961-3-el13635@mail.ntua.gr>
 In-Reply-To: <20170713100117.11961-1-el13635@mail.ntua.gr>
 References: <20170713100117.11961-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v5 1/4] block: pass bdrv_* methods to bs->file
- by default in block filters
+Subject: [Qemu-devel] [PATCH v5 2/4] block: remove unused bdrv_media_changed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,112 +22,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-The following functions fail if bs->drv is a filter and does not
-implement them:
+This function is not used anywhere, so remove it.
 
-bdrv_probe_blocksizes
-bdrv_probe_geometry
-bdrv_truncate
-bdrv_has_zero_init
-bdrv_get_info
-
-Instead, the call should be passed to bs->file if it exists, to allow
-filter drivers to support those methods without implementing them. This
-commit makes `drv->is_filter = true` imply that these callbacks will be
-forwarded to bs->file by default, so disabling support for these
-functions must be done explicitly.
+Markus Armbruster adds:
+The i82078 floppy device model used to call bdrv_media_changed() to
+implement its media change bit when backed by a host floppy.  This
+went away in 21fcf36 "fdc: simplify media change handling".
+Probably broke host floppy media change.  Host floppy pass-through
+was dropped in commit f709623.  bdrv_media_changed() has never been
+used for anything else.  Remove it.
+(Source is Message-ID: <87y3ruaypm.fsf@dusky.pond.sub.org>)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- block.c                   | 21 +++++++++++++++++++--
- include/block/block_int.h |  6 +++++-
- 2 files changed, 24 insertions(+), 3 deletions(-)
+ block.c                   | 14 --------------
+ block/raw-format.c        |  6 ------
+ include/block/block.h     |  1 -
+ include/block/block_int.h |  1 -
+ 4 files changed, 22 deletions(-)
 
 diff --git a/block.c b/block.c
-index d24ae85868..892f29d231 100644
+index 892f29d231..eecec6a016 100644
 --- a/block.c
 +++ b/block.c
-@@ -494,6 +494,8 @@ int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
- 
-     if (drv && drv->bdrv_probe_blocksizes) {
-         return drv->bdrv_probe_blocksizes(bs, bsz);
-+    } else if (drv && drv->is_filter && bs->file) {
-+        return bdrv_probe_blocksizes(bs->file->bs, bsz);
-     }
- 
-     return -ENOTSUP;
-@@ -511,6 +513,8 @@ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
- 
-     if (drv && drv->bdrv_probe_geometry) {
-         return drv->bdrv_probe_geometry(bs, geo);
-+    } else if (drv && drv->is_filter && bs->file) {
-+        return bdrv_probe_geometry(bs->file->bs, geo);
-     }
- 
-     return -ENOTSUP;
-@@ -3420,11 +3424,15 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
- 
-     assert(child->perm & BLK_PERM_RESIZE);
- 
-+    /* if bs->drv == NULL, bs is closed, so there's nothing to do here */
-     if (!drv) {
-         error_setg(errp, "No medium inserted");
-         return -ENOMEDIUM;
-     }
-     if (!drv->bdrv_truncate) {
-+        if (bs->file && drv->is_filter) {
-+            return bdrv_truncate(bs->file, prealloc, offset, errp);
-+        }
-         error_setg(errp, "Image format driver does not support resize");
-         return -ENOTSUP;
-     }
-@@ -3761,6 +3769,9 @@ int bdrv_has_zero_init(BlockDriverState *bs)
-     if (bs->drv->bdrv_has_zero_init) {
-         return bs->drv->bdrv_has_zero_init(bs);
-     }
-+    if (bs->file && bs->drv->is_filter) {
-+        return bdrv_has_zero_init(bs->file->bs);
-+    }
- 
-     /* safe default */
-     return 0;
-@@ -3815,10 +3826,16 @@ void bdrv_get_backing_filename(BlockDriverState *bs,
- int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- {
-     BlockDriver *drv = bs->drv;
--    if (!drv)
-+    /* if bs->drv == NULL, bs is closed, so there's nothing to do here */
-+    if (!drv) {
-         return -ENOMEDIUM;
--    if (!drv->bdrv_get_info)
-+    }
-+    if (!drv->bdrv_get_info) {
-+        if (bs->file && drv->is_filter) {
-+            return bdrv_get_info(bs->file->bs, bdi);
-+        }
-         return -ENOTSUP;
-+    }
-     memset(bdi, 0, sizeof(*bdi));
-     return drv->bdrv_get_info(bs, bdi);
+@@ -4200,20 +4200,6 @@ bool bdrv_is_inserted(BlockDriverState *bs)
  }
+ 
+ /**
+- * Return whether the media changed since the last call to this
+- * function, or -ENOTSUP if we don't know.  Most drivers don't know.
+- */
+-int bdrv_media_changed(BlockDriverState *bs)
+-{
+-    BlockDriver *drv = bs->drv;
+-
+-    if (drv && drv->bdrv_media_changed) {
+-        return drv->bdrv_media_changed(bs);
+-    }
+-    return -ENOTSUP;
+-}
+-
+-/**
+  * If eject_flag is TRUE, eject the media. Otherwise, close the tray
+  */
+ void bdrv_eject(BlockDriverState *bs, bool eject_flag)
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 142649ed56..ab552c0954 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -372,11 +372,6 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
+     return bdrv_truncate(bs->file, offset, prealloc, errp);
+ }
+ 
+-static int raw_media_changed(BlockDriverState *bs)
+-{
+-    return bdrv_media_changed(bs->file->bs);
+-}
+-
+ static void raw_eject(BlockDriverState *bs, bool eject_flag)
+ {
+     bdrv_eject(bs->file->bs, eject_flag);
+@@ -510,7 +505,6 @@ BlockDriver bdrv_raw = {
+     .bdrv_refresh_limits  = &raw_refresh_limits,
+     .bdrv_probe_blocksizes = &raw_probe_blocksizes,
+     .bdrv_probe_geometry  = &raw_probe_geometry,
+-    .bdrv_media_changed   = &raw_media_changed,
+     .bdrv_eject           = &raw_eject,
+     .bdrv_lock_medium     = &raw_lock_medium,
+     .bdrv_co_ioctl        = &raw_co_ioctl,
+diff --git a/include/block/block.h b/include/block/block.h
+index b3e2674845..7e0cec5242 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -441,7 +441,6 @@ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+ bool bdrv_is_sg(BlockDriverState *bs);
+ bool bdrv_is_inserted(BlockDriverState *bs);
+-int bdrv_media_changed(BlockDriverState *bs);
+ void bdrv_lock_medium(BlockDriverState *bs, bool locked);
+ void bdrv_eject(BlockDriverState *bs, bool eject_flag);
+ const char *bdrv_get_format_name(BlockDriverState *bs);
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 669a2797fd..37388ccb18 100644
+index 37388ccb18..afdebe7c52 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -87,7 +87,11 @@ struct BlockDriver {
-     const char *format_name;
-     int instance_size;
+@@ -249,7 +249,6 @@ struct BlockDriver {
  
--    /* set to true if the BlockDriver is a block filter */
-+    /* set to true if the BlockDriver is a block filter. Block filters pass
-+     * certain callbacks that refer to data (see block.c) to their bs->file if
-+     * the driver doesn't implement them. Drivers that do not wish to forward
-+     * must implement them and return -ENOTSUP.
-+     */
-     bool is_filter;
-     /* for snapshots block filter like Quorum can implement the
-      * following recursive callback.
+     /* removable device specific */
+     bool (*bdrv_is_inserted)(BlockDriverState *bs);
+-    int (*bdrv_media_changed)(BlockDriverState *bs);
+     void (*bdrv_eject)(BlockDriverState *bs, bool eject_flag);
+     void (*bdrv_lock_medium)(BlockDriverState *bs, bool locked);
+ 
 -- 
 2.11.0
