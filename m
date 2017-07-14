@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2D-0003GH-6t
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:22 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2F-0003HK-0l
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2B-0003LC-UW
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41253)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2C-0003LT-E6
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51898
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVy2B-0003KY-Kd
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:19 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EAcg5m053649
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:18 -0400
+	id 1dVy2C-0003LB-7p
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:20 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6EAceDU128050
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:19 -0400
 Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpsnc6cmk-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bph7xxwcy-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:18 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:19 -0400
 Received: from localhost
 	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 11:41:15 +0100
+	Fri, 14 Jul 2017 11:41:17 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:45 +0200
+Date: Fri, 14 Jul 2017 12:40:47 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-19-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 18/40] pc-bios/s390-ccw: Move libc functions to
- separate header
+Message-Id: <1500028867-134709-21-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 20/40] pc-bios/s390-ccw: Move virtio-block
+ related functions into a separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,215 +44,709 @@ Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard 
 
 From: Thomas Huth <thuth@redhat.com>
 
-The upcoming netboot code will use the libc from SLOF. To be able
-to still use s390-ccw.h there, the libc related functions in this
-header have to be moved to a different location.
-And while we're at it, remove the duplicate memcpy() function from
-sclp.c.
+The netboot code is going to link against the code from virtio.c, too, so
+we've got to move the virtio-block and -scsi related code out of the way.
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1499863793-18627-2-git-send-email-thuth@redhat.com>
+Message-Id: <1499863793-18627-4-git-send-email-thuth@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- pc-bios/s390-ccw/bootmap.c     |  1 +
- pc-bios/s390-ccw/libc.h        | 45 ++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/main.c        |  1 +
- pc-bios/s390-ccw/s390-ccw.h    | 29 ---------------------------
- pc-bios/s390-ccw/sclp.c        | 10 ++--------
- pc-bios/s390-ccw/virtio-scsi.c |  1 +
- pc-bios/s390-ccw/virtio.c      |  1 +
- 7 files changed, 51 insertions(+), 37 deletions(-)
- create mode 100644 pc-bios/s390-ccw/libc.h
+ pc-bios/s390-ccw/Makefile        |   2 +-
+ pc-bios/s390-ccw/main.c          |   2 +-
+ pc-bios/s390-ccw/s390-ccw.h      |   2 +-
+ pc-bios/s390-ccw/virtio-blkdev.c | 296 +++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/virtio.c        | 277 +-----------------------------------
+ pc-bios/s390-ccw/virtio.h        |   6 +
+ 6 files changed, 311 insertions(+), 274 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/virtio-blkdev.c
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 523fa78..458d3da 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index fb88c13..82b41ef 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
  
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "bootmap.h"
- #include "virtio.h"
-diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
-new file mode 100644
-index 0000000..0142ea8
---- /dev/null
-+++ b/pc-bios/s390-ccw/libc.h
-@@ -0,0 +1,45 @@
-+/*
-+ * libc-style definitions and functions
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
-+ */
-+
-+#ifndef S390_CCW_LIBC_H
-+#define S390_CCW_LIBC_H
-+
-+typedef long               size_t;
-+typedef int                bool;
-+typedef unsigned char      uint8_t;
-+typedef unsigned short     uint16_t;
-+typedef unsigned int       uint32_t;
-+typedef unsigned long long uint64_t;
-+
-+static inline void *memset(void *s, int c, size_t n)
-+{
-+    int i;
-+    unsigned char *p = s;
-+
-+    for (i = 0; i < n; i++) {
-+        p[i] = c;
-+    }
-+
-+    return s;
-+}
-+
-+static inline void *memcpy(void *s1, const void *s2, size_t n)
-+{
-+    uint8_t *dest = s1;
-+    const uint8_t *src = s2;
-+    int i;
-+
-+    for (i = 0; i < n; i++) {
-+        dest[i] = src[i];
-+    }
-+
-+    return s1;
-+}
-+
-+#endif
+ .PHONY : all clean build-all
+ 
+-OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o
++OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
 diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 1cacc1b..40cba8d 100644
+index 0580eac..401e9db 100644
 --- a/pc-bios/s390-ccw/main.c
 +++ b/pc-bios/s390-ccw/main.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
+@@ -144,7 +144,7 @@ static void virtio_setup(void)
+         sclp_print("Network boot device detected\n");
+         vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
+     } else {
+-        virtio_setup_device(blk_schid);
++        virtio_blk_setup_device(blk_schid);
  
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- 
+         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
+     }
 diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 2089274..43e2d42 100644
+index 43e2d42..6fdc858 100644
 --- a/pc-bios/s390-ccw/s390-ccw.h
 +++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -18,12 +18,6 @@ typedef unsigned short     u16;
- typedef unsigned int       u32;
- typedef unsigned long long u64;
- typedef unsigned long      ulong;
--typedef long               size_t;
--typedef int                bool;
--typedef unsigned char      uint8_t;
--typedef unsigned short     uint16_t;
--typedef unsigned int       uint32_t;
--typedef unsigned long long uint64_t;
- typedef unsigned char      __u8;
- typedef unsigned short     __u16;
- typedef unsigned int       __u32;
-@@ -88,18 +82,6 @@ ulong get_second(void);
- /* bootmap.c */
- void zipl_load(void);
- 
--static inline void *memset(void *s, int c, size_t n)
--{
--    int i;
--    unsigned char *p = s;
--
--    for (i = 0; i < n; i++) {
--        p[i] = c;
--    }
--
--    return s;
--}
--
- static inline void fill_hex(char *out, unsigned char val)
- {
-     const char hex[] = "0123456789abcdef";
-@@ -169,17 +151,6 @@ static inline void sleep(unsigned int seconds)
-     }
- }
- 
--static inline void *memcpy(void *s1, const void *s2, size_t n)
--{
--    uint8_t *p1 = s1;
--    const uint8_t *p2 = s2;
--
--    while (n--) {
--        p1[n] = p2[n];
--    }
--    return s1;
--}
--
- static inline void IPL_assert(bool term, const char *message)
- {
-     if (!term) {
-diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
-index a1639ba..aa1c862 100644
---- a/pc-bios/s390-ccw/sclp.c
-+++ b/pc-bios/s390-ccw/sclp.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
- 
+@@ -74,7 +74,7 @@ void sclp_get_loadparm_ascii(char *loadparm);
+ unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
+                                  ulong subchan_id, void *load_addr);
+ bool virtio_is_supported(SubChannelId schid);
+-void virtio_setup_device(SubChannelId schid);
++void virtio_blk_setup_device(SubChannelId schid);
+ int virtio_read(ulong sector, void *load_addr);
+ int enable_mss_facility(void);
+ ulong get_second(void);
+diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
+new file mode 100644
+index 0000000..11c5626
+--- /dev/null
++++ b/pc-bios/s390-ccw/virtio-blkdev.c
+@@ -0,0 +1,296 @@
++/*
++ * Virtio driver bits
++ *
++ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
 +#include "libc.h"
- #include "s390-ccw.h"
- #include "sclp.h"
- 
-@@ -59,13 +60,6 @@ static int _strlen(const char *str)
-     return i;
- }
- 
--static void _memcpy(char *dest, const char *src, int len)
--{
--    int i;
--    for (i = 0; i < len; i++)
--        dest[i] = src[i];
--}
--
- void sclp_print(const char *str)
- {
-     int len = _strlen(str);
-@@ -76,7 +70,7 @@ void sclp_print(const char *str)
-     sccb->ebh.length = sizeof(EventBufferHeader) + len;
-     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-     sccb->ebh.flags = 0;
--    _memcpy(sccb->data, str, len);
-+    memcpy(sccb->data, str, len);
- 
-     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
- }
-diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
-index f61ecf0..c92f5d3 100644
---- a/pc-bios/s390-ccw/virtio-scsi.c
-+++ b/pc-bios/s390-ccw/virtio-scsi.c
-@@ -9,6 +9,7 @@
-  * directory.
-  */
- 
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "scsi.h"
++#include "s390-ccw.h"
++#include "virtio.h"
++#include "virtio-scsi.h"
++
++static int virtio_blk_read_many(VDev *vdev, ulong sector, void *load_addr,
++                                int sec_num)
++{
++    VirtioBlkOuthdr out_hdr;
++    u8 status;
++    VRing *vr = &vdev->vrings[vdev->cmd_vr_idx];
++
++    /* Tell the host we want to read */
++    out_hdr.type = VIRTIO_BLK_T_IN;
++    out_hdr.ioprio = 99;
++    out_hdr.sector = virtio_sector_adjust(sector);
++
++    vring_send_buf(vr, &out_hdr, sizeof(out_hdr), VRING_DESC_F_NEXT);
++
++    /* This is where we want to receive data */
++    vring_send_buf(vr, load_addr, virtio_get_block_size() * sec_num,
++                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN |
++                   VRING_DESC_F_NEXT);
++
++    /* status field */
++    vring_send_buf(vr, &status, sizeof(u8),
++                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN);
++
++    /* Now we can tell the host to read */
++    vring_wait_reply();
++
++    if (drain_irqs(vr->schid)) {
++        /* Well, whatever status is supposed to contain... */
++        status = 1;
++    }
++    return status;
++}
++
++int virtio_read_many(ulong sector, void *load_addr, int sec_num)
++{
++    VDev *vdev = virtio_get_device();
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return virtio_blk_read_many(vdev, sector, load_addr, sec_num);
++    case VIRTIO_ID_SCSI:
++        return virtio_scsi_read_many(vdev, sector, load_addr, sec_num);
++    }
++    panic("\n! No readable IPL device !\n");
++    return -1;
++}
++
++unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
++                                 ulong subchan_id, void *load_addr)
++{
++    u8 status;
++    int sec = rec_list1;
++    int sec_num = ((rec_list2 >> 32) & 0xffff) + 1;
++    int sec_len = rec_list2 >> 48;
++    ulong addr = (ulong)load_addr;
++
++    if (sec_len != virtio_get_block_size()) {
++        return -1;
++    }
++
++    sclp_print(".");
++    status = virtio_read_many(sec, (void *)addr, sec_num);
++    if (status) {
++        panic("I/O Error");
++    }
++    addr += sec_num * virtio_get_block_size();
++
++    return addr;
++}
++
++int virtio_read(ulong sector, void *load_addr)
++{
++    return virtio_read_many(sector, load_addr, 1);
++}
++
++/*
++ * Other supported value pairs, if any, would need to be added here.
++ * Note: head count is always 15.
++ */
++static inline u8 virtio_eckd_sectors_for_block_size(int size)
++{
++    switch (size) {
++    case 512:
++        return 49;
++    case 1024:
++        return 33;
++    case 2048:
++        return 21;
++    case 4096:
++        return 12;
++    }
++    return 0;
++}
++
++VirtioGDN virtio_guessed_disk_nature(void)
++{
++    return virtio_get_device()->guessed_disk_nature;
++}
++
++void virtio_assume_scsi(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        vdev->guessed_disk_nature = VIRTIO_GDN_SCSI;
++        vdev->config.blk.blk_size = VIRTIO_SCSI_BLOCK_SIZE;
++        vdev->config.blk.physical_block_exp = 0;
++        vdev->blk_factor = 1;
++        break;
++    case VIRTIO_ID_SCSI:
++        vdev->scsi_block_size = VIRTIO_SCSI_BLOCK_SIZE;
++        break;
++    }
++}
++
++void virtio_assume_iso9660(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        vdev->guessed_disk_nature = VIRTIO_GDN_SCSI;
++        vdev->config.blk.blk_size = VIRTIO_ISO_BLOCK_SIZE;
++        vdev->config.blk.physical_block_exp = 0;
++        vdev->blk_factor = VIRTIO_ISO_BLOCK_SIZE / VIRTIO_SECTOR_SIZE;
++        break;
++    case VIRTIO_ID_SCSI:
++        vdev->scsi_block_size = VIRTIO_ISO_BLOCK_SIZE;
++        break;
++    }
++}
++
++void virtio_assume_eckd(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    vdev->guessed_disk_nature = VIRTIO_GDN_DASD;
++    vdev->blk_factor = 1;
++    vdev->config.blk.physical_block_exp = 0;
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        vdev->config.blk.blk_size = 4096;
++        break;
++    case VIRTIO_ID_SCSI:
++        vdev->config.blk.blk_size = vdev->scsi_block_size;
++        break;
++    }
++    vdev->config.blk.geometry.heads = 15;
++    vdev->config.blk.geometry.sectors =
++        virtio_eckd_sectors_for_block_size(vdev->config.blk.blk_size);
++}
++
++bool virtio_disk_is_scsi(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    if (vdev->guessed_disk_nature == VIRTIO_GDN_SCSI) {
++        return true;
++    }
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return (vdev->config.blk.geometry.heads == 255)
++            && (vdev->config.blk.geometry.sectors == 63)
++            && (virtio_get_block_size()  == VIRTIO_SCSI_BLOCK_SIZE);
++    case VIRTIO_ID_SCSI:
++        return true;
++    }
++    return false;
++}
++
++bool virtio_disk_is_eckd(void)
++{
++    VDev *vdev = virtio_get_device();
++    const int block_size = virtio_get_block_size();
++
++    if (vdev->guessed_disk_nature == VIRTIO_GDN_DASD) {
++        return true;
++    }
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return (vdev->config.blk.geometry.heads == 15)
++            && (vdev->config.blk.geometry.sectors ==
++                virtio_eckd_sectors_for_block_size(block_size));
++    case VIRTIO_ID_SCSI:
++        return false;
++    }
++    return false;
++}
++
++bool virtio_ipl_disk_is_valid(void)
++{
++    return virtio_disk_is_scsi() || virtio_disk_is_eckd();
++}
++
++int virtio_get_block_size(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return vdev->config.blk.blk_size << vdev->config.blk.physical_block_exp;
++    case VIRTIO_ID_SCSI:
++        return vdev->scsi_block_size;
++    }
++    return 0;
++}
++
++uint8_t virtio_get_heads(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return vdev->config.blk.geometry.heads;
++    case VIRTIO_ID_SCSI:
++        return vdev->guessed_disk_nature == VIRTIO_GDN_DASD
++               ? vdev->config.blk.geometry.heads : 255;
++    }
++    return 0;
++}
++
++uint8_t virtio_get_sectors(void)
++{
++    VDev *vdev = virtio_get_device();
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return vdev->config.blk.geometry.sectors;
++    case VIRTIO_ID_SCSI:
++        return vdev->guessed_disk_nature == VIRTIO_GDN_DASD
++               ? vdev->config.blk.geometry.sectors : 63;
++    }
++    return 0;
++}
++
++uint64_t virtio_get_blocks(void)
++{
++    VDev *vdev = virtio_get_device();
++    const uint64_t factor = virtio_get_block_size() / VIRTIO_SECTOR_SIZE;
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        return vdev->config.blk.capacity / factor;
++    case VIRTIO_ID_SCSI:
++        return vdev->scsi_last_block / factor;
++    }
++    return 0;
++}
++
++void virtio_blk_setup_device(SubChannelId schid)
++{
++    VDev *vdev = virtio_get_device();
++
++    vdev->schid = schid;
++    virtio_setup_ccw(vdev);
++
++    switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_BLOCK:
++        sclp_print("Using virtio-blk.\n");
++        if (!virtio_ipl_disk_is_valid()) {
++            /* make sure all getters but blocksize return 0 for
++             * invalid IPL disk
++             */
++            memset(&vdev->config.blk, 0, sizeof(vdev->config.blk));
++            virtio_assume_scsi();
++        }
++        break;
++    case VIRTIO_ID_SCSI:
++        IPL_assert(vdev->config.scsi.sense_size == VIRTIO_SCSI_SENSE_SIZE,
++            "Config: sense size mismatch");
++        IPL_assert(vdev->config.scsi.cdb_size == VIRTIO_SCSI_CDB_SIZE,
++            "Config: CDB size mismatch");
++
++        sclp_print("Using virtio-scsi.\n");
++        virtio_scsi_setup(vdev);
++        break;
++    default:
++        panic("\n! No IPL device available !\n");
++    }
++}
 diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index 6ee93d5..8768331 100644
+index 8768331..9d9e61f 100644
 --- a/pc-bios/s390-ccw/virtio.c
 +++ b/pc-bios/s390-ccw/virtio.c
-@@ -8,6 +8,7 @@
-  * directory.
-  */
+@@ -70,7 +70,7 @@ static long virtio_notify(SubChannelId schid, int vq_idx, long cookie)
+  *             Virtio functions                *
+  ***********************************************/
  
-+#include "libc.h"
- #include "s390-ccw.h"
- #include "virtio.h"
- #include "virtio-scsi.h"
+-static int drain_irqs(SubChannelId schid)
++int drain_irqs(SubChannelId schid)
+ {
+     Irb irb = {};
+     int r = 0;
+@@ -149,13 +149,13 @@ static void vring_init(VRing *vr, VqInfo *info)
+     debug_print_addr("init vr", vr);
+ }
+ 
+-static bool vring_notify(VRing *vr)
++bool vring_notify(VRing *vr)
+ {
+     vr->cookie = virtio_notify(vr->schid, vr->id, vr->cookie);
+     return vr->cookie >= 0;
+ }
+ 
+-static void vring_send_buf(VRing *vr, void *p, int len, int flags)
++void vring_send_buf(VRing *vr, void *p, int len, int flags)
+ {
+     /* For follow-up chains we need to keep the first entry point */
+     if (!(flags & VRING_HIDDEN_IS_CHAIN)) {
+@@ -188,7 +188,7 @@ ulong get_second(void)
+     return (get_clock() >> 12) / 1000000;
+ }
+ 
+-static int vr_poll(VRing *vr)
++int vr_poll(VRing *vr)
+ {
+     if (vr->used->idx == vr->used_idx) {
+         vring_notify(vr);
+@@ -210,7 +210,7 @@ static int vr_poll(VRing *vr)
+  *
+  * Returns 0 on success, 1 on timeout.
+  */
+-static int vring_wait_reply(void)
++int vring_wait_reply(void)
+ {
+     ulong target_second = get_second() + vdev.wait_reply_timeout;
+ 
+@@ -247,242 +247,7 @@ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd)
+     return 0;
+ }
+ 
+-/***********************************************
+- *               Virtio block                  *
+- ***********************************************/
+-
+-static int virtio_blk_read_many(VDev *vdev,
+-                                ulong sector, void *load_addr, int sec_num)
+-{
+-    VirtioBlkOuthdr out_hdr;
+-    u8 status;
+-    VRing *vr = &vdev->vrings[vdev->cmd_vr_idx];
+-
+-    /* Tell the host we want to read */
+-    out_hdr.type = VIRTIO_BLK_T_IN;
+-    out_hdr.ioprio = 99;
+-    out_hdr.sector = virtio_sector_adjust(sector);
+-
+-    vring_send_buf(vr, &out_hdr, sizeof(out_hdr), VRING_DESC_F_NEXT);
+-
+-    /* This is where we want to receive data */
+-    vring_send_buf(vr, load_addr, virtio_get_block_size() * sec_num,
+-                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN |
+-                   VRING_DESC_F_NEXT);
+-
+-    /* status field */
+-    vring_send_buf(vr, &status, sizeof(u8),
+-                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN);
+-
+-    /* Now we can tell the host to read */
+-    vring_wait_reply();
+-
+-    if (drain_irqs(vr->schid)) {
+-        /* Well, whatever status is supposed to contain... */
+-        status = 1;
+-    }
+-    return status;
+-}
+-
+-int virtio_read_many(ulong sector, void *load_addr, int sec_num)
+-{
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return virtio_blk_read_many(&vdev, sector, load_addr, sec_num);
+-    case VIRTIO_ID_SCSI:
+-        return virtio_scsi_read_many(&vdev, sector, load_addr, sec_num);
+-    }
+-    panic("\n! No readable IPL device !\n");
+-    return -1;
+-}
+-
+-unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
+-                                 ulong subchan_id, void *load_addr)
+-{
+-    u8 status;
+-    int sec = rec_list1;
+-    int sec_num = ((rec_list2 >> 32) & 0xffff) + 1;
+-    int sec_len = rec_list2 >> 48;
+-    ulong addr = (ulong)load_addr;
+-
+-    if (sec_len != virtio_get_block_size()) {
+-        return -1;
+-    }
+-
+-    sclp_print(".");
+-    status = virtio_read_many(sec, (void *)addr, sec_num);
+-    if (status) {
+-        panic("I/O Error");
+-    }
+-    addr += sec_num * virtio_get_block_size();
+-
+-    return addr;
+-}
+-
+-int virtio_read(ulong sector, void *load_addr)
+-{
+-    return virtio_read_many(sector, load_addr, 1);
+-}
+-
+-/*
+- * Other supported value pairs, if any, would need to be added here.
+- * Note: head count is always 15.
+- */
+-static inline u8 virtio_eckd_sectors_for_block_size(int size)
+-{
+-    switch (size) {
+-    case 512:
+-        return 49;
+-    case 1024:
+-        return 33;
+-    case 2048:
+-        return 21;
+-    case 4096:
+-        return 12;
+-    }
+-    return 0;
+-}
+-
+-VirtioGDN virtio_guessed_disk_nature(void)
+-{
+-    return vdev.guessed_disk_nature;
+-}
+-
+-void virtio_assume_scsi(void)
+-{
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        vdev.guessed_disk_nature = VIRTIO_GDN_SCSI;
+-        vdev.config.blk.blk_size = VIRTIO_SCSI_BLOCK_SIZE;
+-        vdev.config.blk.physical_block_exp = 0;
+-        vdev.blk_factor = 1;
+-        break;
+-    case VIRTIO_ID_SCSI:
+-        vdev.scsi_block_size = VIRTIO_SCSI_BLOCK_SIZE;
+-        break;
+-    }
+-}
+-
+-void virtio_assume_iso9660(void)
+-{
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        vdev.guessed_disk_nature = VIRTIO_GDN_SCSI;
+-        vdev.config.blk.blk_size = VIRTIO_ISO_BLOCK_SIZE;
+-        vdev.config.blk.physical_block_exp = 0;
+-        vdev.blk_factor = VIRTIO_ISO_BLOCK_SIZE / VIRTIO_SECTOR_SIZE;
+-        break;
+-    case VIRTIO_ID_SCSI:
+-        vdev.scsi_block_size = VIRTIO_ISO_BLOCK_SIZE;
+-        break;
+-    }
+-}
+-
+-void virtio_assume_eckd(void)
+-{
+-    vdev.guessed_disk_nature = VIRTIO_GDN_DASD;
+-    vdev.blk_factor = 1;
+-    vdev.config.blk.physical_block_exp = 0;
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        vdev.config.blk.blk_size = 4096;
+-        break;
+-    case VIRTIO_ID_SCSI:
+-        vdev.config.blk.blk_size = vdev.scsi_block_size;
+-        break;
+-    }
+-    vdev.config.blk.geometry.heads = 15;
+-    vdev.config.blk.geometry.sectors =
+-        virtio_eckd_sectors_for_block_size(vdev.config.blk.blk_size);
+-}
+-
+-bool virtio_disk_is_scsi(void)
+-{
+-    if (vdev.guessed_disk_nature == VIRTIO_GDN_SCSI) {
+-        return true;
+-    }
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return (vdev.config.blk.geometry.heads == 255)
+-            && (vdev.config.blk.geometry.sectors == 63)
+-            && (virtio_get_block_size()  == VIRTIO_SCSI_BLOCK_SIZE);
+-    case VIRTIO_ID_SCSI:
+-        return true;
+-    }
+-    return false;
+-}
+-
+-bool virtio_disk_is_eckd(void)
+-{
+-    const int block_size = virtio_get_block_size();
+-
+-    if (vdev.guessed_disk_nature == VIRTIO_GDN_DASD) {
+-        return true;
+-    }
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return (vdev.config.blk.geometry.heads == 15)
+-            && (vdev.config.blk.geometry.sectors ==
+-                virtio_eckd_sectors_for_block_size(block_size));
+-    case VIRTIO_ID_SCSI:
+-        return false;
+-    }
+-    return false;
+-}
+-
+-bool virtio_ipl_disk_is_valid(void)
+-{
+-    return virtio_disk_is_scsi() || virtio_disk_is_eckd();
+-}
+-
+-int virtio_get_block_size(void)
+-{
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return vdev.config.blk.blk_size << vdev.config.blk.physical_block_exp;
+-    case VIRTIO_ID_SCSI:
+-        return vdev.scsi_block_size;
+-    }
+-    return 0;
+-}
+-
+-uint8_t virtio_get_heads(void)
+-{
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return vdev.config.blk.geometry.heads;
+-    case VIRTIO_ID_SCSI:
+-        return vdev.guessed_disk_nature == VIRTIO_GDN_DASD
+-               ? vdev.config.blk.geometry.heads : 255;
+-    }
+-    return 0;
+-}
+-
+-uint8_t virtio_get_sectors(void)
+-{
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return vdev.config.blk.geometry.sectors;
+-    case VIRTIO_ID_SCSI:
+-        return vdev.guessed_disk_nature == VIRTIO_GDN_DASD
+-               ? vdev.config.blk.geometry.sectors : 63;
+-    }
+-    return 0;
+-}
+-
+-uint64_t virtio_get_blocks(void)
+-{
+-    const uint64_t factor = virtio_get_block_size() / VIRTIO_SECTOR_SIZE;
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        return vdev.config.blk.capacity / factor;
+-    case VIRTIO_ID_SCSI:
+-        return vdev.scsi_last_block / factor;
+-    }
+-    return 0;
+-}
+-
+-static void virtio_setup_ccw(VDev *vdev)
++void virtio_setup_ccw(VDev *vdev)
+ {
+     int i, cfg_size = 0;
+     unsigned char status = VIRTIO_CONFIG_S_DRIVER_OK;
+@@ -544,36 +309,6 @@ static void virtio_setup_ccw(VDev *vdev)
+         "Could not write status to host");
+ }
+ 
+-void virtio_setup_device(SubChannelId schid)
+-{
+-    vdev.schid = schid;
+-    virtio_setup_ccw(&vdev);
+-
+-    switch (vdev.senseid.cu_model) {
+-    case VIRTIO_ID_BLOCK:
+-        sclp_print("Using virtio-blk.\n");
+-        if (!virtio_ipl_disk_is_valid()) {
+-            /* make sure all getters but blocksize return 0 for
+-             * invalid IPL disk
+-             */
+-            memset(&vdev.config.blk, 0, sizeof(vdev.config.blk));
+-            virtio_assume_scsi();
+-        }
+-        break;
+-    case VIRTIO_ID_SCSI:
+-        IPL_assert(vdev.config.scsi.sense_size == VIRTIO_SCSI_SENSE_SIZE,
+-            "Config: sense size mismatch");
+-        IPL_assert(vdev.config.scsi.cdb_size == VIRTIO_SCSI_CDB_SIZE,
+-            "Config: CDB size mismatch");
+-
+-        sclp_print("Using virtio-scsi.\n");
+-        virtio_scsi_setup(&vdev);
+-        break;
+-    default:
+-        panic("\n! No IPL device available !\n");
+-    }
+-}
+-
+ bool virtio_is_supported(SubChannelId schid)
+ {
+     vdev.schid = schid;
+diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
+index 1eaf865..024e9a6 100644
+--- a/pc-bios/s390-ccw/virtio.h
++++ b/pc-bios/s390-ccw/virtio.h
+@@ -291,6 +291,12 @@ struct VirtioCmd {
+ };
+ typedef struct VirtioCmd VirtioCmd;
+ 
++bool vring_notify(VRing *vr);
++int drain_irqs(SubChannelId schid);
++void vring_send_buf(VRing *vr, void *p, int len, int flags);
++int vr_poll(VRing *vr);
++int vring_wait_reply(void);
+ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
++void virtio_setup_ccw(VDev *vdev);
+ 
+ #endif /* VIRTIO_H */
 -- 
 2.7.4
