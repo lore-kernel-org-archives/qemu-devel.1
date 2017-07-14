@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYY-0000En-3i
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:43 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYV-0000CE-I0
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYW-00050L-VR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:42 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33580)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYS-0004vo-GE
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:39 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35961)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dVxYW-0004zo-BN
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:40 -0400
-Received: by mail-wr0-x241.google.com with SMTP id g46so1016325wrd.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:40 -0700 (PDT)
+	id 1dVxYS-0004vE-6e
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:36 -0400
+Received: by mail-wr0-x241.google.com with SMTP id 77so11332075wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:36 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 14 Jul 2017 12:10:17 +0200
-Message-Id: <1500027028-4127-6-git-send-email-pbonzini@redhat.com>
+Date: Fri, 14 Jul 2017 12:10:14 +0200
+Message-Id: <1500027028-4127-3-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
 References: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 44/55] qdev: Introduce DEFINE_PROP_LINK
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 23/55] mttcg/i386: Patch instruction using
+ async_safe_* framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +32,156 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
+Cc: Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-This property can be used to replace the object_property_add_link in
-device code, to add a link to other objects, which is a common pattern.
+In mttcg, calling pause_all_vcpus() during execution from the
+generated TBs causes a deadlock if some vCPU is waiting for exclusive
+execution in start_exclusive(). Fix this by using the aync_safe_*
+framework instead of pausing vcpus for patching instructions.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170714021509.23681-4-famz@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+Message-Id: <20170712215143.19594-2-bobby.prani@gmail.com>
+[Get rid completely of the TCG-specific code. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/qdev-properties.c    | 18 ++++++++++++++++++
- include/hw/qdev-core.h       |  1 +
- include/hw/qdev-properties.h |  9 +++++++++
- 3 files changed, 28 insertions(+)
+ hw/i386/kvmvapic.c | 85 +++++++++++++++++++++++++-----------------------------
+ 1 file changed, 39 insertions(+), 46 deletions(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 113ce7d..5429c63 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -1214,3 +1214,21 @@ PropertyInfo qdev_prop_size = {
-     .set = set_size,
-     .set_default_value = set_default_value_uint,
- };
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index 0d9ef77..fc962c5 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -383,8 +383,7 @@ static void patch_byte(X86CPU *cpu, target_ulong addr, uint8_t byte)
+     cpu_memory_rw_debug(CPU(cpu), addr, &byte, 1, 1);
+ }
+ 
+-static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+-                       uint32_t target)
++static void patch_call(X86CPU *cpu, target_ulong ip, uint32_t target)
+ {
+     uint32_t offset;
+ 
+@@ -393,77 +392,71 @@ static void patch_call(VAPICROMState *s, X86CPU *cpu, target_ulong ip,
+     cpu_memory_rw_debug(CPU(cpu), ip + 1, (void *)&offset, sizeof(offset), 1);
+ }
+ 
+-static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
++typedef struct PatchInfo {
++    VAPICHandlers *handler;
++    target_ulong ip;
++} PatchInfo;
 +
-+/* --- object link property --- */
-+
-+static void create_link_property(Object *obj, Property *prop, Error **errp)
-+{
-+    Object **child = qdev_get_prop_ptr(DEVICE(obj), prop);
-+
-+    object_property_add_link(obj, prop->name, prop->link_type,
-+                             child,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-+                             errp);
++static void do_patch_instruction(CPUState *cs, run_on_cpu_data data)
+ {
+-    CPUState *cs = CPU(cpu);
+-    CPUX86State *env = &cpu->env;
+-    VAPICHandlers *handlers;
++    X86CPU *x86_cpu = X86_CPU(cs);
++    PatchInfo *info = (PatchInfo *) data.host_ptr;
++    VAPICHandlers *handlers = info->handler;
++    target_ulong ip = info->ip;
+     uint8_t opcode[2];
+     uint32_t imm32 = 0;
+-    target_ulong current_pc = 0;
+-    target_ulong current_cs_base = 0;
+-    uint32_t current_flags = 0;
+-
+-    if (smp_cpus == 1) {
+-        handlers = &s->rom_state.up;
+-    } else {
+-        handlers = &s->rom_state.mp;
+-    }
+-
+-    if (tcg_enabled()) {
+-        cpu_restore_state(cs, cs->mem_io_pc);
+-        cpu_get_tb_cpu_state(env, &current_pc, &current_cs_base,
+-                             &current_flags);
+-        /* Account this instruction, because we will exit the tb.
+-           This is the first instruction in the block. Therefore
+-           there is no need in restoring CPU state. */
+-        if (use_icount) {
+-            --cs->icount_decr.u16.low;
+-        }
+-    }
+-
+-    pause_all_vcpus();
+ 
+     cpu_memory_rw_debug(cs, ip, opcode, sizeof(opcode), 0);
+ 
+     switch (opcode[0]) {
+     case 0x89: /* mov r32 to r/m32 */
+-        patch_byte(cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
+-        patch_call(s, cpu, ip + 1, handlers->set_tpr);
++        patch_byte(x86_cpu, ip, 0x50 + modrm_reg(opcode[1]));  /* push reg */
++        patch_call(x86_cpu, ip + 1, handlers->set_tpr);
+         break;
+     case 0x8b: /* mov r/m32 to r32 */
+-        patch_byte(cpu, ip, 0x90);
+-        patch_call(s, cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
++        patch_byte(x86_cpu, ip, 0x90);
++        patch_call(x86_cpu, ip + 1, handlers->get_tpr[modrm_reg(opcode[1])]);
+         break;
+     case 0xa1: /* mov abs to eax */
+-        patch_call(s, cpu, ip, handlers->get_tpr[0]);
++        patch_call(x86_cpu, ip, handlers->get_tpr[0]);
+         break;
+     case 0xa3: /* mov eax to abs */
+-        patch_call(s, cpu, ip, handlers->set_tpr_eax);
++        patch_call(x86_cpu, ip, handlers->set_tpr_eax);
+         break;
+     case 0xc7: /* mov imm32, r/m32 (c7/0) */
+-        patch_byte(cpu, ip, 0x68);  /* push imm32 */
++        patch_byte(x86_cpu, ip, 0x68);  /* push imm32 */
+         cpu_memory_rw_debug(cs, ip + 6, (void *)&imm32, sizeof(imm32), 0);
+         cpu_memory_rw_debug(cs, ip + 1, (void *)&imm32, sizeof(imm32), 1);
+-        patch_call(s, cpu, ip + 5, handlers->set_tpr);
++        patch_call(x86_cpu, ip + 5, handlers->set_tpr);
+         break;
+     case 0xff: /* push r/m32 */
+-        patch_byte(cpu, ip, 0x50); /* push eax */
+-        patch_call(s, cpu, ip + 1, handlers->get_tpr_stack);
++        patch_byte(x86_cpu, ip, 0x50); /* push eax */
++        patch_call(x86_cpu, ip + 1, handlers->get_tpr_stack);
+         break;
+     default:
+         abort();
+     }
+ 
+-    resume_all_vcpus();
++    g_free(info);
 +}
 +
-+PropertyInfo qdev_prop_link = {
-+    .name = "link",
-+    .create = create_link_property,
-+};
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 33518ee..08d1d2c 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -233,6 +233,7 @@ struct Property {
-     int          arrayoffset;
-     PropertyInfo *arrayinfo;
-     int          arrayfieldsize;
-+    const char   *link_type;
- };
++static void patch_instruction(VAPICROMState *s, X86CPU *cpu, target_ulong ip)
++{
++    CPUState *cs = CPU(cpu);
++    VAPICHandlers *handlers;
++    PatchInfo *info;
  
- struct PropertyInfo {
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 9edded2..876ba2e 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -30,6 +30,7 @@ extern PropertyInfo qdev_prop_pci_devfn;
- extern PropertyInfo qdev_prop_blocksize;
- extern PropertyInfo qdev_prop_pci_host_devaddr;
- extern PropertyInfo qdev_prop_arraylen;
-+extern PropertyInfo qdev_prop_link;
- 
- #define DEFINE_PROP(_name, _state, _field, _prop, _type) { \
-         .name      = (_name),                                    \
-@@ -117,6 +118,14 @@ extern PropertyInfo qdev_prop_arraylen;
-         .arrayoffset = offsetof(_state, _arrayfield),                   \
-         }
- 
-+#define DEFINE_PROP_LINK(_name, _state, _field, _type, _ptr_type) {     \
-+        .name = (_name),                                                \
-+        .info = &(qdev_prop_link),                                      \
-+        .offset = offsetof(_state, _field)                              \
-+            + type_check(_ptr_type, typeof_field(_state, _field)),      \
-+        .link_type  = _type,                                            \
-+        }
+-    if (tcg_enabled()) {
+-        /* Both tb_lock and iothread_mutex will be reset when
+-         *  longjmps back into the cpu_exec loop. */
+-        tb_lock();
+-        tb_gen_code(cs, current_pc, current_cs_base, current_flags, 1);
+-        cpu_loop_exit_noexc(cs);
++    if (smp_cpus == 1) {
++        handlers = &s->rom_state.up;
++    } else {
++        handlers = &s->rom_state.mp;
+     }
 +
- #define DEFINE_PROP_UINT8(_n, _s, _f, _d)                       \
-     DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint8, uint8_t)
- #define DEFINE_PROP_UINT16(_n, _s, _f, _d)                      \
++    info  = g_new(PatchInfo, 1);
++    info->handler = handlers;
++    info->ip = ip;
++
++    async_safe_run_on_cpu(cs, do_patch_instruction, RUN_ON_CPU_HOST_PTR(info));
+ }
+ 
+ void vapic_report_tpr_access(DeviceState *dev, CPUState *cs, target_ulong ip,
 -- 
 1.8.3.1
