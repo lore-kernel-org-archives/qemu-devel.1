@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVq8X-0003EH-VD
+	(envelope-from <famz@redhat.com>) id 1dVq8X-0003EG-VA
 	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVq8T-00015C-VH
+	(envelope-from <famz@redhat.com>) id 1dVq8V-00015Z-KT
 	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:15:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45648)
+Received: from mx1.redhat.com ([209.132.183.28]:16604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVq8T-000150-M9
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:15:17 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVq8V-00015N-BZ
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:15:19 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 733B75114A
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 02:15:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CC443345BA
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 02:15:18 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 14 Jul 2017 10:14:49 +0800
-Message-Id: <20170714021509.23681-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/20] qdev: Introduce DEFINE_PROP_LINK
+Date: Fri, 14 Jul 2017 10:14:50 +0800
+Message-Id: <20170714021509.23681-2-famz@redhat.com>
+In-Reply-To: <20170714021509.23681-1-famz@redhat.com>
+References: <20170714021509.23681-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 01/20] qom: enforce readonly nature of
+ link's check callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +33,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-v4: Add a pointer type param to DEFINE_PROP_LINK, don't change pointer types to
-    "Object *". [Paolo]
+From: Igor Mammedov <imammedo@redhat.com>
 
-v3: Include Igor's patch, and fix virtio-crypto too.
-    Always use qdev_prop_allow_set_link_before_realize and
-    OBJ_PROP_LINK_UNREF_ON_RELEASE.
-    Include as many applicable devices as possible and some more clean-ups.
-    There are still more left but they use uncommon check and flags parameters,
-    it's better to take care of them in following batches.
+link's check callback is supposed to verify/permit setting it,
+however currently nothing restricts it from misusing it
+and modifying target object from within.
+Make sure that readonly semantics are checked by compiler
+to prevent callback's misuse.
 
-v2: Create a new header for link properties. [Paolo]
-    Don't wrap, use PropertyInfo.create() (much better diffstat, yay!).
-    [Paolo]
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ hw/core/qdev-properties.c    | 3 ++-
+ hw/display/xlnx_dp.c         | 2 +-
+ hw/ipmi/ipmi.c               | 2 +-
+ hw/mem/pc-dimm.c             | 2 +-
+ hw/misc/ivshmem.c            | 2 +-
+ hw/virtio/virtio-crypto.c    | 2 +-
+ include/hw/qdev-properties.h | 3 ++-
+ include/qom/object.h         | 6 +++---
+ qom/object.c                 | 8 ++++----
+ 9 files changed, 16 insertions(+), 14 deletions(-)
 
-Link properties of devices created with object_property_add_link() are not
-reflected in HMP "info qtree". For example, whether a virtio-blk device has an
-iothread (i.e. has enabled data plane) can not be introspected easily.
-
-Introduce a new type of qdev property macro to fix that.
-
-Fam Zheng (19):
-  qdev: Introduce PropertyInfo.create
-  qdev: Introduce DEFINE_PROP_LINK
-  qmp: Use ObjectProperty.type if present
-  qdev: Add const qualifier to PropertyInfo definitions
-  virtio-blk: Convert to DEFINE_PROP_LINK
-  virtio-scsi: Convert to DEFINE_PROP_LINK
-  virtio-rng: Convert to DEFINE_PROP_LINK
-  virtio-crypto: Convert to DEFINE_PROP_LINK
-  dimm: Convert to DEFINE_PROP_LINK
-  ivshmem: Convert to DEFINE_PROP_LINK
-  armv7m: Convert bitband.source-mamory to DEFINE_PROP_LINK
-  armv7m: Convert armv7m.memory to DEFINE_PROP_LINK
-  gicv3: Convert to DEFINE_PROP_LINK
-  xlnx_zynqmp: Convert to DEFINE_PROP_LINK
-  xilinx_axienet: Convert to DEFINE_PROP_LINK
-  xilinx_axidma: Convert to DEFINE_PROP_LINK
-  mips_cmgcr: Convert to DEFINE_PROP_LINK
-  cpu: Convert to DEFINE_PROP_LINK
-  spapr_rng: Convert to DEFINE_PROP_LINK
-
-Igor Mammedov (1):
-  qom: enforce readonly nature of link's check callback
-
- exec.c                           | 27 +++++++++--------
- hw/arm/armv7m.c                  | 16 +++-------
- hw/arm/xlnx-zynqmp.c             |  7 ++---
- hw/block/virtio-blk.c            |  6 ++--
- hw/core/qdev-properties-system.c |  8 ++---
- hw/core/qdev-properties.c        | 63 ++++++++++++++++++++++++++--------------
- hw/core/qdev.c                   | 31 ++++++++++++--------
- hw/display/xlnx_dp.c             |  2 +-
- hw/dma/xilinx_axidma.c           | 16 +++-------
- hw/intc/arm_gicv3_its_kvm.c      | 19 +++++-------
- hw/ipmi/ipmi.c                   |  2 +-
- hw/mem/pc-dimm.c                 | 30 +++++--------------
- hw/misc/ivshmem.c                | 24 +++++----------
- hw/misc/mips_cmgcr.c             | 16 +++-------
- hw/net/xilinx_axienet.c          | 16 +++-------
- hw/ppc/spapr_rng.c               |  8 ++---
- hw/s390x/css.c                   |  4 +--
- hw/s390x/s390-pci-bus.c          |  2 +-
- hw/s390x/virtio-ccw.c            |  9 ------
- hw/scsi/virtio-scsi.c            | 13 ++-------
- hw/virtio/virtio-crypto-pci.c    |  2 --
- hw/virtio/virtio-crypto.c        | 27 +++++------------
- hw/virtio/virtio-pci.c           |  6 ----
- hw/virtio/virtio-rng.c           | 12 +-------
- include/hw/qdev-core.h           |  6 ++--
- include/hw/qdev-properties.h     | 62 ++++++++++++++++++++++-----------------
- include/hw/s390x/css.h           |  4 +--
- include/qom/cpu.h                |  1 +
- include/qom/object.h             |  6 ++--
- qmp.c                            |  5 ++--
- qom/cpu.c                        |  1 +
- qom/object.c                     |  8 ++---
- target/i386/cpu.c                |  2 +-
- target/ppc/translate_init.c      |  2 +-
- 34 files changed, 193 insertions(+), 270 deletions(-)
-
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index f11d578..113ce7d 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+     }
+ }
+ 
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index a77d7db..561f828 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
+     s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
+ }
+ 
+-static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
++static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
+                               Error **errp)
+ {
+     XlnxDPState *s = XLNX_DP(obj);
+diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
+index afafe14..b27babd 100644
+--- a/hw/ipmi/ipmi.c
++++ b/hw/ipmi/ipmi.c
+@@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
+     .class_init = ipmi_interface_class_init,
+ };
+ 
+-static void isa_ipmi_bmc_check(Object *obj, const char *name,
++static void isa_ipmi_bmc_check(const Object *obj, const char *name,
+                                Object *val, Error **errp)
+ {
+     IPMIBmc *bmc = IPMI_BMC(val);
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index b72258e..5e23495 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -367,7 +367,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+     visit_type_uint64(v, name, &value, errp);
+ }
+ 
+-static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
++static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     Error *local_err = NULL;
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 2f0819d..97beaf6 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -1009,7 +1009,7 @@ static const TypeInfo ivshmem_common_info = {
+     .class_init    = ivshmem_common_class_init,
+ };
+ 
+-static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
++static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
+                                          Object *val, Error **errp)
+ {
+     if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+index 0353eb6..2590893 100644
+--- a/hw/virtio/virtio-crypto.c
++++ b/hw/virtio/virtio-crypto.c
+@@ -889,7 +889,7 @@ static void virtio_crypto_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static void
+-virtio_crypto_check_cryptodev_is_used(Object *obj, const char *name,
++virtio_crypto_check_cryptodev_is_used(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     if (cryptodev_backend_is_used(CRYPTODEV_BACKEND(val))) {
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 0604c33..9edded2 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -272,7 +272,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+  * This function should be used as the check() argument to
+  * object_property_add_link().
+  */
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp);
+ 
+ #endif
+diff --git a/include/qom/object.h b/include/qom/object.h
+index abaeb8c..1b82899 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -764,7 +764,7 @@ ObjectClass *object_get_class(Object *obj);
+  *
+  * Returns: The QOM typename of @obj.
+  */
+-const char *object_get_typename(Object *obj);
++const char *object_get_typename(const Object *obj);
+ 
+ /**
+  * type_register_static:
+@@ -1319,7 +1319,7 @@ typedef enum {
+  * callback function.  It allows the link property to be set and never returns
+  * an error.
+  */
+-void object_property_allow_set_link(Object *, const char *,
++void object_property_allow_set_link(const Object *, const char *,
+                                     Object *, Error **);
+ 
+ /**
+@@ -1352,7 +1352,7 @@ void object_property_allow_set_link(Object *, const char *,
+  */
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *obj, const char *name,
++                              void (*check)(const Object *obj, const char *name,
+                                             Object *val, Error **errp),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp);
+diff --git a/qom/object.c b/qom/object.c
+index 5f6fdfa..dfdbd50 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -740,7 +740,7 @@ out:
+     return ret;
+ }
+ 
+-const char *object_get_typename(Object *obj)
++const char *object_get_typename(const Object *obj)
+ {
+     return obj->class->type->name;
+ }
+@@ -1428,7 +1428,7 @@ out:
+     g_free(type);
+ }
+ 
+-void object_property_allow_set_link(Object *obj, const char *name,
++void object_property_allow_set_link(const Object *obj, const char *name,
+                                     Object *val, Error **errp)
+ {
+     /* Allow the link to be set, always */
+@@ -1436,7 +1436,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
+ 
+ typedef struct {
+     Object **child;
+-    void (*check)(Object *, const char *, Object *, Error **);
++    void (*check)(const Object *, const char *, Object *, Error **);
+     ObjectPropertyLinkFlags flags;
+ } LinkProperty;
+ 
+@@ -1552,7 +1552,7 @@ static void object_release_link_property(Object *obj, const char *name,
+ 
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *, const char *,
++                              void (*check)(const Object *, const char *,
+                                             Object *, Error **),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp)
 -- 
 2.9.4
