@@ -1,49 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dVq9m-0004HN-LC
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:16:39 -0400
+	(envelope-from <peterx@redhat.com>) id 1dVqB3-0005Jy-FL
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dongdwdw@linux.vnet.ibm.com>) id 1dVq9i-0001Xx-JY
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:16:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39397)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dongdwdw@linux.vnet.ibm.com>)
-	id 1dVq9i-0001WX-9V
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:16:34 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6E2FC4R090350
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 22:16:31 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpmjah0xk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Jul 2017 22:16:30 -0400
-Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <dongdwdw@linux.vnet.ibm.com>;
-	Fri, 14 Jul 2017 12:16:27 +1000
-Received: from d23av02.au.ibm.com (d23av02.au.ibm.com [9.190.235.138])
-	by d23relay10.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v6E2GPId26280044
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 12:16:25 +1000
-Received: from d23av02.au.ibm.com (localhost [127.0.0.1])
-	by d23av02.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v6E2GGQ5012015
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 12:16:17 +1000
-References: <f7206d1d-addb-1f69-1a77-dc83c1b50e36@linux.vnet.ibm.com>
-	<f462bb68-fc63-baec-235c-726066e25d44@gmail.com>
-	<8b8c84aa-16c0-2bac-3b8a-9be595682356@linux.vnet.ibm.com>
-	<2f6d682c-68af-b689-701b-b7b05a598d7a@gmail.com>
-From: Wang Dong <dongdwdw@linux.vnet.ibm.com>
-Date: Fri, 14 Jul 2017 10:16:23 +0800
+	(envelope-from <peterx@redhat.com>) id 1dVqB2-00028k-3c
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:17:57 -0400
+Date: Fri, 14 Jul 2017 10:17:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170714021733.GA27284@pxdev.xzpeter.org>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<1496851287-9428-7-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2f6d682c-68af-b689-701b-b7b05a598d7a@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <dcc90618-bef2-5572-3350-695686a62323@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] About the trace framework
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1496851287-9428-7-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 6/8] virtio-iommu: Implement the
+ translation and commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -52,60 +24,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, jean-philippe.brucker@arm.com, wei@redhat.com, kevin.tian@intel.com, bharat.bhushan@nxp.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org
 
+On Wed, Jun 07, 2017 at 06:01:25PM +0200, Eric Auger wrote:
+> This patch adds the actual implementation for the translation routine
+> and the virtio-iommu commands.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
+[...]
 
-On 07/11/2017 05:39 PM, Xie Changlong wrote:
-> =E5=9C=A8 7/11/2017 9:33 AM, Wang Dong =E5=86=99=E9=81=93:
->>
->>
->> On 07/10/2017 01:24 PM, Xie Changlong wrote:
->>> =E5=9C=A8 7/9/2017 5:57 PM, Wang Dong =E5=86=99=E9=81=93:
->>>> Hi,
->>>>
->>>> I am new to QEMU. But I got some problem so that  I want to figure=20
->>>> it out.
->>>>
->>>> So I try to debug qemu to see what happened.
->>>>
->>>> And I found trace framework. I think this will help me understand=20
->>>> the point.
->>>>
->>>> So I compiled qemu with option:
->>>>
->>>> ## *--enable-trace-backends=3Dsimple*
->>>>
->>>> And did as the docs/tracing.txt tell. But when I execute the=20
->>>> example command in it, nothing just happens.
->>>>
->>>> *./scripts/simpletrace.py trace-events-all trace-xxxxxx(my trace=20
->>>> file produced by qemu)
->>>> I am not sure what happened. Just ask this.
->>>> Any clue will be appreciated. Thanks in advance.
->>>> *
->>>>
->>>
->>> Did you set *trace-event*? I've encountered this issue in the past :)
->>> (qemu) help trace-event
->>> trace-event name on|off -- changes status of a specific trace event
->>> (qemu) info trace-events
->> yes, I set it. I just did as the docs told. If this does not work or=20
->> misses something, it should be corrected I think.
->>
->> Have you also tried out the examples in docs? how did you do that? I=20
->
-> Yes, just follow the docs. No something special.
->
->> think I misses some. Could you tell more about
->> it? Thanks.
->
-> You should confirm the *trace-event*s you set are really triggered by=20
-> qemu. Use gdb breakpoint to verify it is a good choice.
->
->>
-OK, I will try that. Thanks for your advice.
+>  static int virtio_iommu_attach(VirtIOIOMMU *s,
+>                                 struct virtio_iommu_req_attach *req)
+> @@ -95,10 +135,34 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+>      uint32_t asid = le32_to_cpu(req->address_space);
+>      uint32_t devid = le32_to_cpu(req->device);
+>      uint32_t reserved = le32_to_cpu(req->reserved);
+> +    viommu_as *as;
+> +    viommu_dev *dev;
+>  
+>      trace_virtio_iommu_attach(asid, devid, reserved);
+>  
+> -    return VIRTIO_IOMMU_S_UNSUPP;
+> +    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(devid));
+> +    if (dev) {
+> +        return -1;
+> +    }
+> +
+> +    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
+> +    if (!as) {
+> +        as = g_malloc0(sizeof(*as));
+> +        as->id = asid;
+> +        as->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
+> +                                         NULL, NULL, (GDestroyNotify)g_free);
+> +        g_tree_insert(s->address_spaces, GUINT_TO_POINTER(asid), as);
+> +        trace_virtio_iommu_new_asid(asid);
+> +    }
+> +
+> +    dev = g_malloc0(sizeof(*dev));
+> +    dev->as = as;
+> +    dev->id = devid;
+> +    as->nr_devices++;
+> +    trace_virtio_iommu_new_devid(devid);
+> +    g_tree_insert(s->devices, GUINT_TO_POINTER(devid), dev);
 
---=20
-Best regards. Wang Dong
+Here do we need to record something like a refcount for address space?
+Since...
+
+> +
+> +    return VIRTIO_IOMMU_S_OK;
+>  }
+>  
+>  static int virtio_iommu_detach(VirtIOIOMMU *s,
+> @@ -106,10 +170,13 @@ static int virtio_iommu_detach(VirtIOIOMMU *s,
+>  {
+>      uint32_t devid = le32_to_cpu(req->device);
+>      uint32_t reserved = le32_to_cpu(req->reserved);
+> +    int ret;
+>  
+>      trace_virtio_iommu_detach(devid, reserved);
+>  
+> -    return VIRTIO_IOMMU_S_UNSUPP;
+> +    ret = g_tree_remove(s->devices, GUINT_TO_POINTER(devid));
+
+... here when detach, imho we should check the refcount: if there is
+no device using specific address space, we should release the address
+space as well.
+
+Otherwise there would have no way to destroy an address space?
+
+> +
+> +    return ret ? VIRTIO_IOMMU_S_OK : VIRTIO_IOMMU_S_INVAL;
+>  }
+
+[...]
+
+>  static int virtio_iommu_unmap(VirtIOIOMMU *s,
+> @@ -133,10 +227,64 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+>      uint64_t virt_addr = le64_to_cpu(req->virt_addr);
+>      uint64_t size = le64_to_cpu(req->size);
+>      uint32_t flags = le32_to_cpu(req->flags);
+> +    viommu_mapping *mapping;
+> +    viommu_interval interval;
+> +    viommu_as *as;
+>  
+>      trace_virtio_iommu_unmap(asid, virt_addr, size, flags);
+>  
+> -    return VIRTIO_IOMMU_S_UNSUPP;
+> +    as = g_tree_lookup(s->address_spaces, GUINT_TO_POINTER(asid));
+> +    if (!as) {
+> +        error_report("%s: no as", __func__);
+> +        return VIRTIO_IOMMU_S_INVAL;
+> +    }
+> +    interval.low = virt_addr;
+> +    interval.high = virt_addr + size - 1;
+> +
+> +    mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
+> +
+> +    while (mapping) {
+> +        viommu_interval current;
+> +        uint64_t low  = mapping->virt_addr;
+> +        uint64_t high = mapping->virt_addr + mapping->size - 1;
+> +
+> +        current.low = low;
+> +        current.high = high;
+> +
+> +        if (low == interval.low && size >= mapping->size) {
+> +            g_tree_remove(as->mappings, (gpointer)&current);
+> +            interval.low = high + 1;
+> +            trace_virtio_iommu_unmap_left_interval(current.low, current.high,
+> +                interval.low, interval.high);
+> +        } else if (high == interval.high && size >= mapping->size) {
+> +            trace_virtio_iommu_unmap_right_interval(current.low, current.high,
+> +                interval.low, interval.high);
+> +            g_tree_remove(as->mappings, (gpointer)&current);
+> +            interval.high = low - 1;
+> +        } else if (low > interval.low && high < interval.high) {
+> +            trace_virtio_iommu_unmap_inc_interval(current.low, current.high);
+> +            g_tree_remove(as->mappings, (gpointer)&current);
+> +        } else {
+> +            break;
+> +        }
+> +        if (interval.low >= interval.high) {
+> +            return VIRTIO_IOMMU_S_OK;
+> +        } else {
+> +            mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
+> +        }
+> +    }
+
+IIUC for unmap here we are very strict - a extreme case is that when
+an address space is just created (so no mapping inside), if we send
+one UNMAP to a range, it'll fail currently, right? Should we loosen
+it?
+
+IMHO as long as we make sure all the mappings in the range of an UNMAP
+request are destroyed, then we are good. I think at least both vfio
+api and vt-d emuation have this assumption. But maybe I am wrong.
+Please correct me if so.
+
+> +
+> +    if (mapping) {
+> +        error_report("****** %s: Unmap 0x%"PRIx64" size=0x%"PRIx64
+> +                     " from 0x%"PRIx64" size=0x%"PRIx64" is not supported",
+> +                     __func__, interval.low, size,
+> +                     mapping->virt_addr, mapping->size);
+> +    } else {
+> +        error_report("****** %s: no mapping for [0x%"PRIx64",0x%"PRIx64"]",
+> +                     __func__, interval.low, interval.high);
+> +    }
+> +
+> +    return VIRTIO_IOMMU_S_INVAL;
+>  }
+
+Thanks,
+
+-- 
+Peter Xu
