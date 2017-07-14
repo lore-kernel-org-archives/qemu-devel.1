@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dW260-0008Gr-M7
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:01:33 -0400
+	(envelope-from <berrange@redhat.com>) id 1dW2Fn-0004v3-Dx
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:11:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dW25w-00053t-T4
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:01:32 -0400
-Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:35528)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dW25w-00053G-Od
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:01:28 -0400
-Received: by mail-it0-x22d.google.com with SMTP id v202so23071425itb.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 08:01:26 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
+	(envelope-from <berrange@redhat.com>) id 1dW2Fj-00016q-Dl
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:11:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38724)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dW2Fj-00015t-88
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:11:35 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri, 14 Jul 2017 16:11:17 +0100
+Message-Id: <20170714151121.18447-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Jul 2017 11:01:24 -0400
-Message-Id: <E069C2FF-508A-4F1B-8821-BAE8451D06F6@gmail.com>
-Mime-Version: 1.0 (Apple Message framework v1084)
-Subject: [Qemu-devel] help with tilegx
+Subject: [Qemu-devel] [PULL v3 0/4] Merge sockets 2017/07/11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,9 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xili_gchen_5257@hotmail.com
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-How do I build the tilegx target? I have tried "./configure =
---target-list=3Dtilegx" and "./configure --target-list=3Dtilegx-softmmu". =
-They both fail with this message: "ERROR: Unknown target name".=
+The following changes since commit 6c6076662d98c068059983d411cb2a8987ba56=
+70:
+
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2017-07-14 12:16:09 +0100)
+
+are available in the git repository at:
+
+  git://github.com/berrange/qemu tags/pull-sockets-2017-07-11-3
+
+for you to fetch changes up to 563a3987b980a36e6941720a99d5cf36960f78ea:
+
+  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress (2017-07-=
+14 14:28:29 +0100)
+
+----------------------------------------------------------------
+Merge sockets 2017/07/11 v3
+
+----------------------------------------------------------------
+
+Daniel P. Berrange (4):
+  sockets: ensure we can bind to both ipv4 & ipv6 separately
+  sockets: don't block IPv4 clients when listening on "::"
+  sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
+  io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
+
+ io/dns-resolver.c   |  6 +++--
+ util/qemu-sockets.c | 71 +++++++++++++++++++++++++++++++++++++++--------=
+------
+ 2 files changed, 56 insertions(+), 21 deletions(-)
+
+--=20
+2.13.0
