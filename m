@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dW3I1-0007U8-GQ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:18:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dW3IK-0007cr-3x
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dW3Hy-0005Iu-T0
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:18:01 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35596)
+	(envelope-from <alex.bennee@linaro.org>) id 1dW3IH-0005OS-Ej
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:18:20 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38256)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dW3Hy-0005IN-Lw
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:17:58 -0400
-Received: by mail-wr0-x233.google.com with SMTP id k67so69469499wrc.2
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 09:17:58 -0700 (PDT)
+	id 1dW3IH-0005O9-97
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:18:17 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id f67so27403367wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 09:18:17 -0700 (PDT)
 References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
-	<1500029487-14822-9-git-send-email-peter.maydell@linaro.org>
+	<1500029487-14822-10-git-send-email-peter.maydell@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1500029487-14822-9-git-send-email-peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 17:17:55 +0100
-Message-ID: <87inivuh58.fsf@linaro.org>
+In-reply-to: <1500029487-14822-10-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 17:18:14 +0100
+Message-ID: <87h8yfuh4p.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 8/9] hw/arm/mps2: Add ethernet
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 9/9] MAINTAINERS: Add entries
+ for MPS2 board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +37,62 @@ Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.franc
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> The MPS2 FPGA images support ethernet via a LAN9220. We use
-> QEMU's LAN9118 model, which is software compatible except
-> that it is missing the checksum-offload feature.
+> Add entries to the MAINTAINERS file for the new MPS2
+> board and devices.
+>
+> Since the CMSDK devices are not specific to the MPS2 board,
+> extend the existing 'PrimeCell' section to cover CMSDK
+> devices as well; in both cases these are devices implemented
+> by ARM and provided as RTL that may be used in multiple
+> SoCs and boards.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/mps2.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-> index bdc631a..6adfb22 100644
-> --- a/hw/arm/mps2.c
-> +++ b/hw/arm/mps2.c
-> @@ -35,6 +35,8 @@
->  #include "hw/char/cmsdk-apb-uart.h"
->  #include "hw/timer/cmsdk-apb-timer.h"
->  #include "hw/misc/mps2-scc.h"
-> +#include "hw/devices.h"
-> +#include "net/net.h"
->
->  typedef enum MPS2FPGAType {
->      FPGA_AN385,
-> @@ -210,7 +212,6 @@ static void mps2_common_init(MachineState *machine)
->      create_unimplemented_device("Extra peripheral region @0x40020000",
->                                  0x40020000, 0x00010000);
->      create_unimplemented_device("RESERVED 4", 0x40030000, 0x001D0000);
-> -    create_unimplemented_device("Ethernet", 0x40200000, 0x00100000);
->      create_unimplemented_device("VGA", 0x41000000, 0x0200000);
->
->      switch (mmc->fpga_type) {
-> @@ -309,6 +310,13 @@ static void mps2_common_init(MachineState *machine)
->                               &error_fatal);
->      sysbus_mmio_map(SYS_BUS_DEVICE(sccdev), 0, 0x4002f000);
->
-> +    /* In hardware this is a LAN9220; the LAN9118 is software compatible
-> +     * except that it doesn't support the checksum-offload feature.
-> +     */
-> +    lan9118_init(&nd_table[0], 0x40200000,
-> +                 qdev_get_gpio_in(armv7m,
-> +                                  mmc->fpga_type == FPGA_AN385 ? 13 : 47));
-> +
-
-As the lan9118 model will log guest errors if the software tries to
-access the csum feature I guess thats OK.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-
->      system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
+> ---
+>  MAINTAINERS | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 >
->      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9529c94..10f5cd6 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -380,7 +380,7 @@ F: hw/*/allwinner*
+>  F: include/hw/*/allwinner*
+>  F: hw/arm/cubieboard.c
+>
+> -ARM PrimeCell
+> +ARM PrimeCell and CMSDK devices
+>  M: Peter Maydell <peter.maydell@linaro.org>
+>  L: qemu-arm@nongnu.org
+>  S: Maintained
+> @@ -394,6 +394,10 @@ F: hw/intc/pl190.c
+>  F: hw/sd/pl181.c
+>  F: hw/timer/pl031.c
+>  F: include/hw/arm/primecell.h
+> +F: hw/timer/cmsdk-apb-timer.c
+> +F: include/hw/timer/cmsdk-apb-timer.h
+> +F: hw/char/cmsdk-apb-uart.c
+> +F: include/hw/char/cmsdk-apb-uart.h
+>
+>  ARM cores
+>  M: Peter Maydell <peter.maydell@linaro.org>
+> @@ -455,6 +459,14 @@ S: Maintained
+>  F: hw/arm/integratorcp.c
+>  F: hw/misc/arm_integrator_debug.c
+>
+> +MPS2
+> +M: Peter Maydell <peter.maydell@linaro.org>
+> +L: qemu-arm@nongnu.org
+> +S: Maintained
+> +F: hw/arm/mps2.c
+> +F: hw/misc/mps2-scc.c
+> +F: include/hw/misc/mps2-scc.h
+> +
+>  Musicpal
+>  M: Jan Kiszka <jan.kiszka@web.de>
+>  L: qemu-arm@nongnu.org
 
 
 --
