@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVy6P-0007xj-O8
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:45:43 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCS-0004xW-82
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:51:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVy6L-0004w8-3n
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:45:41 -0400
-Received: from [2001:8b0:1d0::2] (port=37578 helo=orth.archaic.org.uk)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dVy6K-0004pi-PI
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:45:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCO-0007Fw-0c
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:51:56 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 11:45:17 +0100
-Message-Id: <1500029117-6387-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] tests: Handle $RANDOM not being supported by
- the shell
+Date: Fri, 14 Jul 2017 11:51:27 +0100
+Message-Id: <1500029487-14822-10-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
+References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 9/9] MAINTAINERS: Add entries for MPS2 board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +19,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Eric Blake <eblake@redhat.com>, Kamil Rytarowski <n54@gmx.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-In various places in our test makefiles and scripts we use the
-shell $RANDOM to create a random number. This is a bash
-specific extension, and doesn't work on other shells.
-With dash the shell doesn't complain, it just effectively
-always evaluates $RANDOM to 0:
-  echo $((RANDOM + 32768))     => 32768
+Add entries to the MAINTAINERS file for the new MPS2
+board and devices.
 
-However, on NetBSD the shell will complain:
-  "-sh: arith: syntax error: "RANDOM + 32768"
+Since the CMSDK devices are not specific to the MPS2 board,
+extend the existing 'PrimeCell' section to cover CMSDK
+devices as well; in both cases these are devices implemented
+by ARM and provided as RTL that may be used in multiple
+SoCs and boards.
 
-which means that "make check" fails.
-
-Switch to using "${RANDOM:-0}" instead of $RANDOM,
-which will portably either give us a random number or zero.
-This means that on non-bash shells we don't get such
-good test coverage via the MALLOC_PERTURB_ setting, but
-we were already in that situation for non-bash shells.
-
-Our only other uses of $RANDOM (in tests/qemu-iotests/check
-and tests/qemu-iotests/162) are in shell scripts which use
-a #!/bin/bash line so they are always run under bash.
-
-Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- tests/Makefile.include | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ MAINTAINERS | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 6d6cb74..f6310d2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -826,7 +826,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
- 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
- 		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
--		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
-+		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
- 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
- 	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
- 	  echo Gcov report for $$f:;\
-@@ -837,7 +837,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
- $(patsubst %, check-%, $(check-unit-y)): check-%: %
- 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command, \
--		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
-+		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
- 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
- 	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
- 	  echo Gcov report for $$f:;\
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9529c94..10f5cd6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -380,7 +380,7 @@ F: hw/*/allwinner*
+ F: include/hw/*/allwinner*
+ F: hw/arm/cubieboard.c
+ 
+-ARM PrimeCell
++ARM PrimeCell and CMSDK devices
+ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Maintained
+@@ -394,6 +394,10 @@ F: hw/intc/pl190.c
+ F: hw/sd/pl181.c
+ F: hw/timer/pl031.c
+ F: include/hw/arm/primecell.h
++F: hw/timer/cmsdk-apb-timer.c
++F: include/hw/timer/cmsdk-apb-timer.h
++F: hw/char/cmsdk-apb-uart.c
++F: include/hw/char/cmsdk-apb-uart.h
+ 
+ ARM cores
+ M: Peter Maydell <peter.maydell@linaro.org>
+@@ -455,6 +459,14 @@ S: Maintained
+ F: hw/arm/integratorcp.c
+ F: hw/misc/arm_integrator_debug.c
+ 
++MPS2
++M: Peter Maydell <peter.maydell@linaro.org>
++L: qemu-arm@nongnu.org
++S: Maintained
++F: hw/arm/mps2.c
++F: hw/misc/mps2-scc.c
++F: include/hw/misc/mps2-scc.h
++
+ Musicpal
+ M: Jan Kiszka <jan.kiszka@web.de>
+ L: qemu-arm@nongnu.org
 -- 
 2.7.4
