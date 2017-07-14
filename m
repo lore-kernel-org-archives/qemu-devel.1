@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVyCY-00054C-DK
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCW-00052I-PA
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVyCU-0007PD-74
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:02 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCS-0007OP-VN
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:00 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 11:51:21 +0100
-Message-Id: <1500029487-14822-4-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 11:51:22 +0100
+Message-Id: <1500029487-14822-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
 References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 3/9] hw/arm/mps2: Add UARTs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 4/9] hw/char/cmsdk-apb-timer: Implement
+ CMSDK APB timer device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,124 +26,377 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Add the UARTs to the MPS2 board models.
-
-Unfortunately the details of the wiring of the interrupts through
-various OR gates differ between AN511 and AN385 so this can't
-be purely a data-driven difference.
+Implement a model of the simple timer device found in the CMSDK.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/mps2.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 86 insertions(+)
+ hw/timer/Makefile.objs             |   1 +
+ include/hw/timer/cmsdk-apb-timer.h |  59 +++++++++
+ hw/timer/cmsdk-apb-timer.c         | 253 +++++++++++++++++++++++++++++++++++++
+ default-configs/arm-softmmu.mak    |   1 +
+ hw/timer/trace-events              |   5 +
+ 5 files changed, 319 insertions(+)
+ create mode 100644 include/hw/timer/cmsdk-apb-timer.h
+ create mode 100644 hw/timer/cmsdk-apb-timer.c
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index 3dad02d..180c5d2 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -27,9 +27,12 @@
- #include "qemu/error-report.h"
- #include "hw/arm/arm.h"
- #include "hw/arm/armv7m.h"
-+#include "hw/or-irq.h"
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
-+#include "sysemu/sysemu.h"
- #include "hw/misc/unimp.h"
-+#include "hw/char/cmsdk-apb-uart.h"
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index dd6f27e..15cce1c 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -41,3 +41,4 @@ common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
+ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
  
- typedef enum MPS2FPGAType {
-     FPGA_AN385,
-@@ -206,6 +209,89 @@ static void mps2_common_init(MachineState *machine)
-     create_unimplemented_device("Ethernet", 0x40200000, 0x00100000);
-     create_unimplemented_device("VGA", 0x41000000, 0x0200000);
- 
-+    switch (mmc->fpga_type) {
-+    case FPGA_AN385:
-+    {
-+        /* The overflow IRQs for UARTs 0, 1 and 2 are ORed together.
-+         * Overflow for UARTs 4 and 5 doesn't trigger any interrupt.
-+         */
-+        Object *orgate;
-+        DeviceState *orgate_dev;
-+        int i;
+ common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
++common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+diff --git a/include/hw/timer/cmsdk-apb-timer.h b/include/hw/timer/cmsdk-apb-timer.h
+new file mode 100644
+index 0000000..f21686d
+--- /dev/null
++++ b/include/hw/timer/cmsdk-apb-timer.h
+@@ -0,0 +1,59 @@
++/*
++ * ARM CMSDK APB timer emulation
++ *
++ * Copyright (c) 2017 Linaro Limited
++ * Written by Peter Maydell
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 or
++ *  (at your option) any later version.
++ */
 +
-+        orgate = object_new(TYPE_OR_IRQ);
-+        object_property_set_int(orgate, 6, "num-lines", &error_fatal);
-+        object_property_set_bool(orgate, true, "realized", &error_fatal);
-+        orgate_dev = DEVICE(orgate);
-+        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
++#ifndef CMSDK_APB_TIMER_H
++#define CMSDK_APB_TIMER_H
 +
-+        for (i = 0; i < 5; i++) {
-+            hwaddr uartbase[] = {0x40004000, 0x40005000, 0x40006000,
-+                                 0x40007000, 0x40009000};
-+            Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
-+            /* RX irq number; TX irq is always one greater */
-+            int uartirq[] = {0, 2, 4, 18, 20};
-+            qemu_irq txovrint = NULL, rxovrint = NULL;
++#include "hw/sysbus.h"
++#include "hw/ptimer.h"
 +
-+            if (i < 3) {
-+                txovrint = qdev_get_gpio_in(orgate_dev, i * 2);
-+                rxovrint = qdev_get_gpio_in(orgate_dev, i * 2 + 1);
-+            }
++#define TYPE_CMSDK_APB_TIMER "cmsdk-apb-timer"
++#define CMSDK_APB_TIMER(obj) OBJECT_CHECK(CMSDKAPBTIMER, (obj), \
++                                         TYPE_CMSDK_APB_TIMER)
 +
-+            cmsdk_apb_uart_create(uartbase[i],
-+                                  qdev_get_gpio_in(armv7m, uartirq[i] + 1),
-+                                  qdev_get_gpio_in(armv7m, uartirq[i]),
-+                                  txovrint, rxovrint,
-+                                  NULL,
-+                                  uartchr, SYSCLK_FRQ);
-+        }
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion iomem;
++    qemu_irq timerint;
++    uint32_t pclk_frq;
++    struct ptimer_state *timer;
++
++    uint32_t ctrl;
++    uint32_t value;
++    uint32_t reload;
++    uint32_t intstatus;
++} CMSDKAPBTIMER;
++
++/**
++ * cmsdk_apb_timer_create - convenience function to create TYPE_CMSDK_APB_TIMER
++ * @addr: location in system memory to map registers
++ * @pclk_frq: frequency in Hz of the PCLK clock (used for calculating baud rate)
++ */
++static inline DeviceState *cmsdk_apb_timer_create(hwaddr addr,
++                                                 qemu_irq timerint,
++                                                 uint32_t pclk_frq)
++{
++    DeviceState *dev;
++    SysBusDevice *s;
++
++    dev = qdev_create(NULL, TYPE_CMSDK_APB_TIMER);
++    s = SYS_BUS_DEVICE(dev);
++    qdev_prop_set_uint32(dev, "pclk-frq", pclk_frq);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(s, 0, addr);
++    sysbus_connect_irq(s, 0, timerint);
++    return dev;
++}
++
++#endif
+diff --git a/hw/timer/cmsdk-apb-timer.c b/hw/timer/cmsdk-apb-timer.c
+new file mode 100644
+index 0000000..9878746
+--- /dev/null
++++ b/hw/timer/cmsdk-apb-timer.c
+@@ -0,0 +1,253 @@
++/*
++ * ARM CMSDK APB timer emulation
++ *
++ * Copyright (c) 2017 Linaro Limited
++ * Written by Peter Maydell
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 or
++ *  (at your option) any later version.
++ */
++
++/* This is a model of the "APB timer" which is part of the Cortex-M
++ * System Design Kit (CMSDK) and documented in the Cortex-M System
++ * Design Kit Technical Reference Manual (ARM DDI0479C):
++ * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
++ *
++ * The hardware has an EXTIN input wire, which can be configured
++ * by the guest to act either as a 'timer enable' (timer does not run
++ * when EXTIN is low), or as a 'timer clock' (timer runs at frequency
++ * of EXTIN clock, not PCLK frequency). We don't model this.
++ *
++ * The documentation is not very clear about the exact behaviour;
++ * we choose to implement that the interrupt is triggered when
++ * the counter goes from 1 to 0, that the counter then holds at 0
++ * for one clock cycle before reloading from the RELOAD register,
++ * and that if the RELOAD register is 0 this does not cause an
++ * interrupt (as there is no further 1->0 transition).
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/main-loop.h"
++#include "qapi/error.h"
++#include "trace.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/timer/cmsdk-apb-timer.h"
++
++REG32(CTRL, 0)
++    FIELD(CTRL, EN, 0, 1)
++    FIELD(CTRL, SELEXTEN, 1, 1)
++    FIELD(CTRL, SELEXTCLK, 2, 1)
++    FIELD(CTRL, IRQEN, 3, 1)
++REG32(VALUE, 4)
++REG32(RELOAD, 8)
++REG32(INTSTATUS, 0xc)
++    FIELD(INTSTATUS, IRQ, 0, 1)
++REG32(PID4, 0xFD0)
++REG32(PID5, 0xFD4)
++REG32(PID6, 0xFD8)
++REG32(PID7, 0xFDC)
++REG32(PID0, 0xFE0)
++REG32(PID1, 0xFE4)
++REG32(PID2, 0xFE8)
++REG32(PID3, 0xFEC)
++REG32(CID0, 0xFF0)
++REG32(CID1, 0xFF4)
++REG32(CID2, 0xFF8)
++REG32(CID3, 0xFFC)
++
++/* PID/CID values */
++static const int timer_id[] = {
++    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
++    0x22, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
++    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
++};
++
++static void cmsdk_apb_timer_update(CMSDKAPBTIMER *s)
++{
++    qemu_set_irq(s->timerint, !!(s->intstatus & R_INTSTATUS_IRQ_MASK));
++}
++
++static uint64_t cmsdk_apb_timer_read(void *opaque, hwaddr offset, unsigned size)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(opaque);
++    uint64_t r;
++
++    switch (offset) {
++    case A_CTRL:
++        r = s->ctrl;
 +        break;
-+    }
-+    case FPGA_AN511:
-+    {
-+        /* The overflow IRQs for all UARTs are ORed together.
-+         * Tx and Rx IRQs for each UART are ORed together.
-+         */
-+        Object *orgate;
-+        DeviceState *orgate_dev;
-+        int i;
-+
-+        orgate = object_new(TYPE_OR_IRQ);
-+        object_property_set_int(orgate, 10, "num-lines", &error_fatal);
-+        object_property_set_bool(orgate, true, "realized", &error_fatal);
-+        orgate_dev = DEVICE(orgate);
-+        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
-+
-+        for (i = 0; i < 5; i++) {
-+            /* system irq numbers for the combined tx/rx for each UART */
-+            const int uart_txrx_irqno[] = {0, 2, 45, 46, 56};
-+            hwaddr uartbase[] = {0x40004000, 0x40005000, 0x4002c000,
-+                                 0x4002d000, 0x4002e000};
-+            Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
-+            Object *txrx_orgate;
-+            DeviceState *txrx_orgate_dev;
-+
-+            txrx_orgate = object_new(TYPE_OR_IRQ);
-+            object_property_set_int(txrx_orgate, 2, "num-lines", &error_fatal);
-+            object_property_set_bool(txrx_orgate, true, "realized",
-+                                     &error_fatal);
-+            txrx_orgate_dev = DEVICE(txrx_orgate);
-+            qdev_connect_gpio_out(txrx_orgate_dev, 0,
-+                                  qdev_get_gpio_in(armv7m, uart_txrx_irqno[i]));
-+            cmsdk_apb_uart_create(uartbase[i],
-+                                  qdev_get_gpio_in(txrx_orgate_dev, 0),
-+                                  qdev_get_gpio_in(txrx_orgate_dev, 1),
-+                                  qdev_get_gpio_in(orgate_dev, 0),
-+                                  qdev_get_gpio_in(orgate_dev, 1),
-+                                  NULL,
-+                                  uartchr, SYSCLK_FRQ);
-+        }
++    case A_VALUE:
++        r = ptimer_get_count(s->timer);
 +        break;
-+    }
++    case A_RELOAD:
++        r = ptimer_get_limit(s->timer);
++        break;
++    case A_INTSTATUS:
++        r = s->intstatus;
++        break;
++    case A_PID4 ... A_CID3:
++        r = timer_id[(offset - A_PID4) / 4];
++        break;
 +    default:
-+        g_assert_not_reached();
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB timer read: bad offset %x\n", (int) offset);
++        r = 0;
++        break;
++    }
++    trace_cmsdk_apb_timer_read(offset, r, size);
++    return r;
++}
++
++static void cmsdk_apb_timer_write(void *opaque, hwaddr offset, uint64_t value,
++                                  unsigned size)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(opaque);
++
++    trace_cmsdk_apb_timer_write(offset, value, size);
++
++    switch (offset) {
++    case A_CTRL:
++        if (value & 6) {
++            /* Bits [1] and [2] enable using EXTIN as either clock or
++             * an enable line. We don't model this.
++             */
++            qemu_log_mask(LOG_UNIMP,
++                          "CMSDK APB timer: EXTIN input not supported\n");
++        }
++        s->ctrl = value & 0xf;
++        if (s->ctrl & R_CTRL_EN_MASK) {
++            ptimer_run(s->timer, 0);
++        } else {
++            ptimer_stop(s->timer);
++        }
++        break;
++    case A_RELOAD:
++        /* Writing to reload also sets the current timer value */
++        ptimer_set_limit(s->timer, value, 1);
++        break;
++    case A_VALUE:
++        ptimer_set_count(s->timer, value);
++        break;
++    case A_INTSTATUS:
++        /* Just one bit, which is W1C. */
++        value &= 1;
++        s->intstatus &= ~value;
++        cmsdk_apb_timer_update(s);
++        break;
++    case A_PID4 ... A_CID3:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB timer write: write to RO offset 0x%x\n",
++                      (int)offset);
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB timer write: bad offset 0x%x\n", (int) offset);
++        break;
++    }
++}
++
++static const MemoryRegionOps cmsdk_apb_timer_ops = {
++    .read = cmsdk_apb_timer_read,
++    .write = cmsdk_apb_timer_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
++static void cmsdk_apb_timer_tick(void *opaque)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(opaque);
++
++    if (s->ctrl & R_CTRL_IRQEN_MASK) {
++        s->intstatus |= R_INTSTATUS_IRQ_MASK;
++        cmsdk_apb_timer_update(s);
++    }
++}
++
++static void cmsdk_apb_timer_reset(DeviceState *dev)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(dev);
++
++    trace_cmsdk_apb_timer_reset();
++    s->ctrl = 0;
++    s->intstatus = 0;
++    ptimer_stop(s->timer);
++    /* Set the limit and the count */
++    ptimer_set_limit(s->timer, 0, 1);
++}
++
++static void cmsdk_apb_timer_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(obj);
++
++    memory_region_init_io(&s->iomem, obj, &cmsdk_apb_timer_ops,
++                          s, "cmsdk-apb-timer", 0x1000);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->timerint);
++}
++
++static void cmsdk_apb_timer_realize(DeviceState *dev, Error **errp)
++{
++    CMSDKAPBTIMER *s = CMSDK_APB_TIMER(dev);
++    QEMUBH *bh;
++
++    if (s->pclk_frq == 0) {
++        error_setg(errp, "CMSDK APB timer: pclk-frq property must be set");
++        return;
 +    }
 +
-     system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
++    bh = qemu_bh_new(cmsdk_apb_timer_tick, s);
++    s->timer = ptimer_init(bh,
++                           PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
++                           PTIMER_POLICY_NO_IMMEDIATE_TRIGGER |
++                           PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
++                           PTIMER_POLICY_NO_COUNTER_ROUND_DOWN);
++
++    ptimer_set_freq(s->timer, s->pclk_frq);
++}
++
++static const VMStateDescription cmsdk_apb_timer_vmstate = {
++    .name = "cmsdk-apb-timer",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PTIMER(timer, CMSDKAPBTIMER),
++        VMSTATE_UINT32(ctrl, CMSDKAPBTIMER),
++        VMSTATE_UINT32(value, CMSDKAPBTIMER),
++        VMSTATE_UINT32(reload, CMSDKAPBTIMER),
++        VMSTATE_UINT32(intstatus, CMSDKAPBTIMER),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property cmsdk_apb_timer_properties[] = {
++    DEFINE_PROP_UINT32("pclk-frq", CMSDKAPBTIMER, pclk_frq, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void cmsdk_apb_timer_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = cmsdk_apb_timer_realize;
++    dc->vmsd = &cmsdk_apb_timer_vmstate;
++    dc->reset = cmsdk_apb_timer_reset;
++    dc->props = cmsdk_apb_timer_properties;
++}
++
++static const TypeInfo cmsdk_apb_timer_info = {
++    .name = TYPE_CMSDK_APB_TIMER,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(CMSDKAPBTIMER),
++    .instance_init = cmsdk_apb_timer_init,
++    .class_init = cmsdk_apb_timer_class_init,
++};
++
++static void cmsdk_apb_timer_register_types(void)
++{
++    type_register_static(&cmsdk_apb_timer_info);
++}
++
++type_init(cmsdk_apb_timer_register_types);
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index d128e9d..c75f52c 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -96,6 +96,7 @@ CONFIG_STM32F2XX_ADC=y
+ CONFIG_STM32F2XX_SPI=y
+ CONFIG_STM32F205_SOC=y
  
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
++CONFIG_CMSDK_APB_TIMER=y
+ CONFIG_CMSDK_APB_UART=y
+ 
+ CONFIG_VERSATILE_PCI=y
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index d17cfe6..fd8196b 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -55,3 +55,8 @@ systick_reload(void) "systick reload"
+ systick_timer_tick(void) "systick reload"
+ systick_read(uint64_t addr, uint32_t value, unsigned size) "systick read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ systick_write(uint64_t addr, uint32_t value, unsigned size) "systick write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
++
++# hw/char/cmsdk_apb_timer.c
++cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
++cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
++cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
 -- 
 2.7.4
