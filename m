@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVwIa-0001r9-NK
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:50:09 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwMV-0005Pp-S6
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVwIV-0007Xr-RS
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:50:08 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:45593 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwMQ-0001O5-WF
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:54:11 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:37683 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVwIV-0007Xc-Ef
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:50:03 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwMQ-0001Nq-Jw
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:54:06 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri, 14 Jul 2017 11:49:53 +0300
-Message-Id: <150002219289.22386.17959138704858928730.stgit@frigg.lan>
+Date: Fri, 14 Jul 2017 11:53:55 +0300
+Message-Id: <150002243497.22386.8888053391875656102.stgit@frigg.lan>
 In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
 References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 09/26] target/i386: [tcg] Port to tb_stop
+Subject: [Qemu-devel] [PATCH v13 10/26] target/i386: [tcg] Port to disas_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,80 +37,58 @@ Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c |   26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ target/i386/translate.c |   28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 3518d3a78e..fe95340daf 100644
+index fe95340daf..a7c227203a 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -8491,8 +8491,6 @@ static target_ulong i386_tr_translate_insn(DisasCon=
-textBase *dcbase,
-         /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
-            the flag and abort the translation to give the irqs a
-            chance to happen */
--        gen_jmp_im(pc_next - dc->cs_base);
--        gen_eob(dc);
-         dc->base.is_jmp =3D DISAS_TOO_MANY;
-     } else if ((dc->base.tb->cflags & CF_USE_ICOUNT)
-                && ((dc->base.pc_next & TARGET_PAGE_MASK)
-@@ -8505,18 +8503,24 @@ static target_ulong i386_tr_translate_insn(DisasC=
-ontextBase *dcbase,
-            If current instruction already crossed the bound - it's ok,
-            because an exception hasn't stopped this code.
-          */
--        gen_jmp_im(pc_next - dc->cs_base);
--        gen_eob(dc);
-         dc->base.is_jmp =3D DISAS_TOO_MANY;
-     } else if ((pc_next - dc->base.pc_first) >=3D (TARGET_PAGE_SIZE - 32=
-)) {
--        gen_jmp_im(pc_next - dc->cs_base);
--        gen_eob(dc);
-         dc->base.is_jmp =3D DISAS_TOO_MANY;
+@@ -8521,6 +8521,23 @@ static void i386_tr_tb_stop(DisasContextBase *dcba=
+se, CPUState *cpu)
      }
-=20
-     return pc_next;
  }
 =20
-+static void i386_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
++static void i386_tr_disas_log(const DisasContextBase *dcbase,
++                              CPUState *cpu)
 +{
 +    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++    int disas_flags =3D !dc->code32;
 +
-+    if (dc->base.is_jmp =3D=3D DISAS_TOO_MANY) {
-+        gen_jmp_im(dc->base.pc_next - dc->cs_base);
-+        gen_eob(dc);
++    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
++#ifdef TARGET_X86_64
++    if (dc->code64) {
++        disas_flags =3D 2;
 +    }
++#endif
++    log_target_disas(cpu, dc->base.pc_first, dc->base.pc_next - dc->base=
+.pc_first,
++                     disas_flags);
++
 +}
 +
  /* generate intermediate code for basic block 'tb'.  */
  void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
  {
-@@ -8573,23 +8577,21 @@ void gen_intermediate_code(CPUState *cs, Translat=
-ionBlock *tb)
-         /* if single step mode, we generate only one instruction and
-            generate an exception */
-         if (dc->base.singlestep_enabled) {
--            gen_jmp_im(dc->base.pc_next - dc->cs_base);
--            gen_eob(dc);
-+            dc->base.is_jmp =3D DISAS_TOO_MANY;
-             break;
-         }
-         /* if too long translation, stop generation too */
-         if (tcg_op_buf_full() ||
-             num_insns >=3D max_insns) {
--            gen_jmp_im(dc->base.pc_next - dc->cs_base);
--            gen_eob(dc);
-+            dc->base.is_jmp =3D DISAS_TOO_MANY;
-             break;
-         }
-         if (singlestep) {
--            gen_jmp_im(dc->base.pc_next - dc->cs_base);
--            gen_eob(dc);
-+            dc->base.is_jmp =3D DISAS_TOO_MANY;
-             break;
-         }
+@@ -8599,18 +8616,9 @@ void gen_intermediate_code(CPUState *cs, Translati=
+onBlock *tb)
+ #ifdef DEBUG_DISAS
+     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+         && qemu_log_in_addr_range(dc->base.pc_first)) {
+-        int disas_flags;
+         qemu_log_lock();
+         qemu_log("----------------\n");
+-        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+-#ifdef TARGET_X86_64
+-        if (dc->code64)
+-            disas_flags =3D 2;
+-        else
+-#endif
+-            disas_flags =3D !dc->code32;
+-        log_target_disas(cs, dc->base.pc_first, dc->base.pc_next - dc->b=
+ase.pc_first,
+-                         disas_flags);
++        i386_tr_disas_log(&dc->base, cs);
+         qemu_log("\n");
+         qemu_log_unlock();
      }
-+    i386_tr_tb_stop(&dc->base, cs);
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end();
-     gen_tb_end(tb, num_insns);
