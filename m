@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dWA93-00084n-0q
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:37:14 -0400
+	(envelope-from <mst@redhat.com>) id 1dWACh-0001rK-82
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dWA8z-0002uE-Sa
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:37:13 -0400
-Resent-Message-Id: <E1dWA8z-0002uE-Sa@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21733)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dWA8z-0002tf-Ji
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:37:09 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150007541710.78.13703815043203905479@5d477a5b5989>
-In-Reply-To: <20170714182012.4595-1-marcandre.lureau@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1dWACe-00042h-37
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:40:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dWACd-00042b-PY
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:40:56 -0400
+Date: Sat, 15 Jul 2017 02:40:53 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170715023159-mutt-send-email-mst@kernel.org>
+References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
+	<20170714182012.4595-3-marcandre.lureau@redhat.com>
+	<20170714222023-mutt-send-email-mst@kernel.org>
+	<5d31f22d-e0ae-92f4-ea17-690419f72944@redhat.com>
+	<20170714230852-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CJW1pCqJMN3JmGunFKswNnR=J74+Z_m5Lj5WYT2Z1ZoPQ@mail.gmail.com>
+	<20170715012551-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CJP2DSo-khn+do0YG_ALDXrqBi6wEPH=m+W59rPfRTuiA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 14 Jul 2017 16:36:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] KASLR kernel dump support
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJP2DSo-khn+do0YG_ALDXrqBi6wEPH=m+W59rPfRTuiA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/8] acpi: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +34,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, anderson@redhat.com, imammedo@redhat.com, lersek@redhat.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Dave Anderson <anderson@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA3MTQxODIwMTIuNDU5NS0xLW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbQpTdWJqZWN0OiBb
-UWVtdS1kZXZlbF0gW1BBVENIIHY0IDAvOF0gS0FTTFIga2VybmVsIGR1bXAgc3VwcG9ydApUeXBl
-OiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA0ZTYyYjggTUFJTlRBSU5FUlM6IGFkZCBEdW1wIG1h
-aW50YWluZXJzCjk0NzU5OWQgc2NyaXB0cy9kdW1wLWd1ZXN0LW1lbW9yeS5weTogYWRkIHZtY29y
-ZWluZm8KN2YwN2MyZiBrZHVtcDogYWRkIHZtY29yZWluZm8gRUxGIG5vdGUKZGZmYzc3NSBkdW1w
-OiBhZGQgdm1jb3JlaW5mbyBFTEYgbm90ZQo1ZjZiZjI2IHRlc3RzOiBhZGQgc2ltcGxlIHZtY29y
-ZWluZm8gdGVzdAo2ZGQzMTU0IHN0dWJzOiBhZGQgdm1jb3JlaW5mb19nZXQoKSBzdHViCjIzMmM3
-M2MgYWNwaTogYWRkIHZtY29yZWluZm8gZGV2aWNlCmUxM2ZiZjYgdm1nZW5pZDogcmVwbGFjZSB4
-LXdyaXRlLXBvaW50ZXItYXZhaWxhYmxlIGhhY2sKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvODogdm1nZW5pZDogcmVwbGFjZSB4LXdyaXRlLXBvaW50ZXItYXZhaWxhYmxl
-IGhhY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiBhY3BpOiBhZGQgdm1jb3JlaW5mbyBkZXZpY2Uu
-Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4ODogRklMRTogaHcvYWNwaS92
-bWNvcmVpbmZvLmM6MTUzOgorICAgICAgICBWTVNUQVRFX1VJTlQ4X0FSUkFZKHZtY29yZWluZm9f
-YWRkcl9sZSwgVk1Db3JlSW5mb1N0YXRlLCBzaXplb2YodWludDY0X3QpKSwKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgNDcwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy84OiBzdHViczogYWRkIHZtY29yZWlu
-Zm9fZ2V0KCkgc3R1Yi4uLgpDaGVja2luZyBQQVRDSCA0Lzg6IHRlc3RzOiBhZGQgc2ltcGxlIHZt
-Y29yZWluZm8gdGVzdC4uLgpDaGVja2luZyBQQVRDSCA1Lzg6IGR1bXA6IGFkZCB2bWNvcmVpbmZv
-IEVMRiBub3RlLi4uCkNoZWNraW5nIFBBVENIIDYvODoga2R1bXA6IGFkZCB2bWNvcmVpbmZvIEVM
-RiBub3RlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDogRklMRTogZHVt
-cC5jOjg0NzoKKyAgICAgICAgZ2V0X25vdGVfc2l6ZXMocywgcy0+dm1jb3JlaW5mbywgJmhzaXpl
-LCAmbmFtZV9zaXplLCAmc2l6ZV92bWNvcmVpbmZvX2Rlc2MpOwoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzQ3OiBGSUxFOiBkdW1wLmM6OTU3OgorICAgICAgICBnZXRfbm90ZV9z
-aXplcyhzLCBzLT52bWNvcmVpbmZvLCAmaHNpemUsICZuYW1lX3NpemUsICZzaXplX3ZtY29yZWlu
-Zm9fZGVzYyk7Cgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDMyIGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNy84
-OiBzY3JpcHRzL2R1bXAtZ3Vlc3QtbWVtb3J5LnB5OiBhZGQgdm1jb3JlaW5mby4uLgpFUlJPUjog
-VXNlIG9mIHZvbGF0aWxlIGlzIHVzdWFsbHkgd3Jvbmc6IHNlZSBEb2N1bWVudGF0aW9uL3ZvbGF0
-aWxlLWNvbnNpZGVyZWQtaGFybWZ1bC50eHQKIzI2OiBGSUxFOiBody9hY3BpL3ZtY29yZWluZm8u
-YzoxNjg6CisgICAgc3RhdGljIHZvbGF0aWxlIFZNQ29yZUluZm9TdGF0ZSAqdm1jb3JlaW5mb19n
-ZGJfaGVscGVyIEdfR05VQ19VTlVTRUQ7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDg2
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDgvODogTUFJTlRBSU5FUlM6IGFkZCBEdW1wIG1haW50YWluZXJzLi4uCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+On Sat, Jul 15, 2017 at 01:30:56AM +0200, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Sat, Jul 15, 2017 at 1:09 AM Michael S. Tsirkin <mst@redhat.com> wro=
+te:
+> >
+> > On Sat, Jul 15, 2017 at 12:12:06AM +0200, Marc-Andr=E9 Lureau wrote:
+> > > Hi
+> > >
+> > > On Fri, Jul 14, 2017 at 10:17 PM, Michael S. Tsirkin <mst@redhat.co=
+m> wrote:
+> > > > On Fri, Jul 14, 2017 at 10:04:31PM +0200, Laszlo Ersek wrote:
+> > > >> > It worries me that the format of this seems completely undefin=
+ed
+> > > >> > except in the patchset cover letter.
+> > > >> > I don't think we should merge this before it is.
+> > > >>
+> > > >> I'm not sure what you mean, this patch adds "docs/specs/vmcorein=
+fo.txt".
+> > > >> That file is the first level contract between the guest firmware
+> > > >> (generally, via the linker/loader), the guest kernel driver
+> > > >> (specifically), and QEMU (also specifically).
+> > > >>
+> > > >> The second level contract is the guest kernel's vmcoreinfo ELF n=
+ote
+> > > >> (which is pointed-to by the first level contract). The layout of=
+ that is
+> > > >> specified elsewhere indeed (I don't think it belongs here).
+> > > >>
+> > > >> We've taken care not to trust anything coming from the guest ker=
+nel.
+> > > >>
+> > > >> Can you clarify please?
+> > > >>
+> > > >> Thanks
+> > > >> Laszlo
+> > > >
+> > > > All there is is this:
+> > > >
+> > > > +Version 0 content:
+> > > > +
+> > > > + uint64 paddr:
+> > > > +  Physical address of the Linux vmcoreinfo ELF note.
+> > > > + uint32 size:
+> > > > +  Size of the vmcoreinfo ELF note.
+> > > >
+> > > > It isn't defined here what is the Linux vmcoreinfo ELF note.
+> > > > You want a bit more info so people trying to use it know where to=
+ start
+> > > > and what they can get out of it.
+> > >
+> > > QEMU is not responsible for the content of the ELF note. All there =
+is afaik is:
+> > >
+> > > https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-kernel-v=
+mcoreinfo
+> > >
+> > > The rest you need to dig in the kernel code and git history I think=
+.
+> >
+> > We need to do a good enough job to at least make it possible for peop=
+le
+> > to make use of it without reading your python code.
+> >
+> > Documentation/kdump/kdump.txt has a bit more information.
+> >
+> >         All of the necessary information about the system kernel's co=
+re image is
+> >         encoded in the ELF format, and stored in a reserved area of m=
+emory
+> >         before a crash. The physical address of the start of the ELF =
+header is
+> >         passed to the dump-capture kernel through the elfcorehdr=3D b=
+oot
+> >         parameter. Optionally the size of the ELF header can also be =
+passed
+> >         when using the elfcorehdr=3D[size[KMG]@]offset[KMG] syntax.
+> >
+> >
+> >         With the dump-capture kernel, you can access the memory image=
+ through
+> >         /proc/vmcore. This exports the dump as an ELF-format file tha=
+t you can
+> >         write out using file copy commands such as cp or scp. Further=
+, you can
+> >         use analysis tools such as the GNU Debugger (GDB) and the Cra=
+sh tool to
+> >         debug the dump file. This method ensures that the dump pages =
+are correctly
+> >         ordered.
+> >
+> > I know where to find it but most people likely won't be able to.
+> >
+>=20
+> What do you learn from that regarding vmcoreinfo? That is it being
+> used by kdump? and that you can use gdb/crash, that we already use to
+> analyse our dumps.
+
+Some things I learn:
+
+That its written by a dump-capture kernel (so you need to set one up
+if you want it to work!).
+
+That it's an ELF-format file, that one can use analysis tools such as
+the GNU Debugger (GDB) and the Crash tool to debug the dump file.
+
+There's more info scattered in other places.
+
+Why do you get to document it? Because you are the one exposing it
+across the hypervisor/vm boundary where it will need to be
+understood by people/tools not running within guest.
+
+So "just read the script in qemu source" is not how an interface
+should be documented.
+
+> >
+> > BTW why does it pass ELF header size? Any idea?
+>=20
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3Dd3bf37955d46718ee1a7f1fc69f953d2328ba7c2
+
+Right but I mean, ELF header has two options: 32 and 64 bit, that's all.
+
+--=20
+MST
