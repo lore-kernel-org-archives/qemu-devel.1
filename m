@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dW317-0002nd-4F
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:00:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dW31r-0003YC-Ov
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dW316-0006K5-Cm
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:00:33 -0400
-References: <20170714123341.373857-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b9f574d1-91b5-c5dc-46b2-1a8976c5539f@redhat.com>
-Date: Fri, 14 Jul 2017 18:00:24 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1dW31o-0006g4-JI
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dW31o-0006fe-DR
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4E912351276
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 16:01:15 +0000 (UTC)
+Date: Fri, 14 Jul 2017 13:01:10 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170714160110.GF6020@localhost.localdomain>
+References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
+	<20170712190558.GK6020@localhost.localdomain>
+	<20170714050423.GM27284@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170714123341.373857-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pHLOlxW5IEFt53RnXaaA3FemESfvTKMJa"
-Subject: Re: [Qemu-devel] [PATCH] qcow2-bitmap: fix bitmap_free
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170714050423.GM27284@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH 0/3] migration: export cap/params to qdev
+ props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +35,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org, peter.maydell@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pHLOlxW5IEFt53RnXaaA3FemESfvTKMJa
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org,
- peter.maydell@linaro.org
-Message-ID: <b9f574d1-91b5-c5dc-46b2-1a8976c5539f@redhat.com>
-Subject: Re: [PATCH] qcow2-bitmap: fix bitmap_free
-References: <20170714123341.373857-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20170714123341.373857-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 14, 2017 at 01:04:23PM +0800, Peter Xu wrote:
+> On Wed, Jul 12, 2017 at 04:05:58PM -0300, Eduardo Habkost wrote:
+> > On Wed, Jul 12, 2017 at 02:53:40PM +0800, Peter Xu wrote:
+> > [...]
+> > > These properties should only be used for debugging/testing purpose,
+> > > and we should not guarantee any interface compatibility for them (just
+> > > like HMP).
+> > 
+> > If we don't guarantee compatibility, the property names need to
+> > be prefixed with "x-".
+> 
+> Indeed. Sorry I missed that.
+> 
+> But I'd say it is slightly awkward to add "x-" for all these (for me,
+> "x-" means more like "this is not stable and experimental, use it
+> carefully", while this does not suite for this series). Maybe I can
+> just remove this sentence in commit log (I think I am just a little
+> bit frightened by the compatibility problems)...
 
-On 2017-07-14 14:33, Vladimir Sementsov-Ogievskiy wrote:
-> Fix possible crash on error path in
-> qcow2_remove_persistent_dirty_bitmap. Although bitmap_free was added in=
+"x-" in property names doesn't mean "experimental", but just "not
+part of the stable interface".  If you have the tiniest doubt
+about command-line compatibility, I think it won't hurt to use
+"x-".
 
-> 88ddffae8fc the bug was introduced later in commit 469c71edc72 (when
-> qcow2_remove_persistent_dirty_bitmap was added).
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2-bitmap.c | 4 ++++
->  1 file changed, 4 insertions(+)
-
-Thanks, applied to my block branch:
-
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-
---pHLOlxW5IEFt53RnXaaA3FemESfvTKMJa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZaOqZEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQMbl
-B/99kTYpdZ/gOGHbGMm5lH6JDmjf4jo+jJwqiI9p2qZpze245SEuHwfgSnkn0iQT
-PhnArCDwYKcgc9hQj5wvVbOdrd1Z5DXUSc7BP0gwHd4dTYtG0Z2R0XW1ezF2ST3d
-SowrLhECABxpXVpiotx8yobu+xWYAixXLyWCv96wuOXUm8r1EaB54k/Yx0IYX9QH
-naA/TJXSrcQ8WkUOaXOtQoTCIdfMTMaZ/Q05Yqou5RPKuM7p0NWi0oeLMLlrRD6t
-xkCUlOuTB7u8l1ZWk7iAwET/Qs8DyOetFL0rXLHTlHE+WmGdRfEXFX8bKDTI2h2k
-tAPwvb8jBvWXz9+8ME13q1B7
-=4S0L
------END PGP SIGNATURE-----
-
---pHLOlxW5IEFt53RnXaaA3FemESfvTKMJa--
+-- 
+Eduardo
