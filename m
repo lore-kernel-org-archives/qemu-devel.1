@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVqMI-0007sI-Gy
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:29:35 -0400
+	(envelope-from <peterx@redhat.com>) id 1dVqcH-000572-RD
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:46:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVqMH-0006VV-LD
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:29:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52048)
+	(envelope-from <peterx@redhat.com>) id 1dVqcE-0007TL-Nh
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:46:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVqMH-0006UG-Bn
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:29:33 -0400
-Date: Fri, 14 Jul 2017 10:29:30 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170714022930.GC18687@lemon>
-References: <20170713144352.2212-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVqcE-0007Qs-EU
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 22:46:02 -0400
+Date: Fri, 14 Jul 2017 10:45:52 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170714024552.GB27284@pxdev.xzpeter.org>
+References: <20170628190047.26159-1-dgilbert@redhat.com>
+	<20170628190047.26159-23-dgilbert@redhat.com>
+	<20170711042232.GA29326@pxdev.xzpeter.org>
+	<20170712150004.GJ22628@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170713144352.2212-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] docker: Don't enable networking as a
- side-effect of DEBUG=1
+In-Reply-To: <20170712150004.GJ22628@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 22/29] vhost+postcopy: Call wakeups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Andrea Arcangeli <aarcange@redhat.com>
+Cc: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, lvivier@redhat.com
 
-On Thu, 07/13 15:43, Daniel P. Berrange wrote:
-> When trying to debug problems with tests it is natural to set
-> DEBUG=1 when starting the docker environment. Unfortunately
-> this has a side-effect of enabling an eth0 network interface
-> in the container, which changes the operating environment of
-> the test suite. IOW tests with fail may suddenly start
-> working again if DEBUG=1 is set, due to changed network setup.
+On Wed, Jul 12, 2017 at 05:00:04PM +0200, Andrea Arcangeli wrote:
+> On Tue, Jul 11, 2017 at 12:22:32PM +0800, Peter Xu wrote:
+> > On Wed, Jun 28, 2017 at 08:00:40PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > Cause the vhost-user client to be woken up whenever:
+> > >   a) We place a page in postcopy mode
+> > 
+> > Just to make sure I understand it correctly - UFFDIO_COPY will only
+> > wake up the waiters on the same userfaultfd context, so we don't need
+> > to wake up QEMU userfaultfd (vcpu threads), but we need to explicitly
+> > wake up other ufds/threads, like vhost-user backends. Am I right?
 > 
-> Add a separate NETWORK variable to allow enablement of
-> networking separately from DEBUG=1. This can be used in two
-> ways. To enable the default docker network backend
+> Yes.
 > 
->   make docker-test-build@fedora NETWORK=1
+> Every "uffd" represents one and only one "mm" (i.e. a process). So
+> there is no way a single UFFDIO_COPY can wake the faults happening on
+> a process different from the "mm" the uffd is associated with.
 > 
-> while to enable a specific network backend, eg join the network
-> associated with the container 'wibble':
+> vhost-bridge being a different process requires a UFFDIO_WAKE on its
+> own uffd it passed to qemu in addition of the UFFDIO_COPY that like
+> you said implicitly wakes the userfaults happening on the qemu process
+> (vcpus iothread, dataplane etc..).
 > 
->   make docker-test-build@fedora NETWORK=container:wibble
+> On a side note there's a way not to wake userfaults implicitly in
+> UFFDIO_COPY in case you want to wake userfaults in batches but nobody
+> uses that for now (uffdio_copy.mode |= UFFDIO_COPY_MODE_DONTWAKE).
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
+> It'd be theoretically nice to optimize away the additional enter/exit
+> kernel introduced by the UFFDIO_WAKE and the translation table as
+> well.
 > 
-> Changed in v2:
+> What we could do is to add a UFFDIO_BIND that takes an "fd" as
+> parameter to the ioctl to bind the two uffd together. Then we could
+> push logical offsets in addition to the virtual address ranges when
+> calling UFFDIO_REGISTER_LOGICAL (the logical offsets would then match
+> the guest physical addresses) so that the UFFDIO_COPY_LOGICAL would
+> then be able to get a logical range to wakeup that the kernel would
+> translate into virtual addresses for all uffds bind together. Pushing
+> offsets into UFFDIO_REGISTER was David's idea.
 > 
->  - Remove reference to eth0
->  - Allow arbitrary docker network backend to be given
+> That would eliminate the enter/exit kernel for the explicit
+> UFFDIO_WAKE and calling a single UFFDIO_COPY would be enough.
 > 
->  tests/docker/Makefile.include | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 037cb9e9e7..ec8e8d935d 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -106,6 +106,8 @@ docker:
->  	@echo '                         (default is 1)'
->  	@echo '    DEBUG=1              Stop and drop to shell in the created container'
->  	@echo '                         before running the command.'
-> +	@echo '    NETWORK=1            Enable virtual network interface with default backend.'
-> +	@echo '    NETWORK=$BACKEND     Enable virtual network interface with $BACKEND.'
->  	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
->  	@echo '    NOCACHE=1            Ignore cache when build images.'
->  	@echo '    EXECUTABLE=<path>    Include executable in image.'
-> @@ -132,7 +134,8 @@ docker-run: docker-qemu-src
->  		$(SRC_PATH)/tests/docker/docker.py run 			\
->  			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
->  			$(if $V,,--rm) 					\
-> -			$(if $(DEBUG),-i,--net=none) 			\
-> +			$(if $(DEBUG),-i,)				\
-> +			$(if $(NETWORK),$(if $(subst $(NETWORK),,1)$(subst 1,,$(NETWORK)),--net=$(NETWORK),),--net=none) \
+> Alternatively we should make the uffd work based on file offsets
+> instead of virtual addresses but that would involve changes to
+> filesystems and it only would move the needle on top of tmpfs
+> (shared=on/off no difference) and hugetlbfs. It would be enough for
+> vhost-bridge.
 
-Isn't the first subst enough? We already know $(NETWORK) is non-empty. If it is
-"1", $(subst 1,,1) is empty; otherwise, $(subst foo,,1) is non-empty:
+Really glad to know these ideas.
 
-			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),,--net=$(NETWORK)),--net=none) \
-
-The second subst is only a necessary condition.
-
-Another way to write it is:
-
-			$(if $(NETWORK),$(if $(findstring $(NETWORK),1),,--net=$(NETWORK)),--net=none) \
-
-Fam
-
->  			-e TARGET_LIST=$(TARGET_LIST) 			\
->  			-e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
->  			-e V=$V -e J=$J -e DEBUG=$(DEBUG)		\
-> -- 
-> 2.13.0
 > 
+> Usually the uffd fault lives at the higher level of the virtual memory
+> subsystem and never deals with file offsets so if we can get away with
+> logical ranges per-uffd for UFFDIO_REGISTER and UFFDIO_COPY, it may be
+> simpler and easier to extend automatically to all memory types
+> supported by uffd (including anon which has no file offset).
+> 
+> No major improvement is to be expected by such an enhancement though
+> so it's not very high priority to implement. It's not even clear if
+> the complexity is worth it. Doing one more syscall per page I think
+> might be measurable only on very fast network. The current way of
+> operation where uffd are independent of each other and the translation
+> table is transferred by userland means is quite optimal already and
+> much simpler. Furthermore for hugetlbfs the performance difference
+> most certainly wouldn't be measurable, as the enter/exit kernel would
+> be diluted by a factor of 512 compared to 4k userfaults.
+
+Indeed, performance critical scenarios should be using huge pages, and
+that means that extra WAKE will have even smaller impact.
+
+Thanks Andrea!
+
+-- 
+Peter Xu
