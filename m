@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x3-0005Jg-59
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:30 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x2-0003EX-8z
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x2-0005JG-Sc
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:29 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34103)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4wz-0003BS-OX
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:28 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:34424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dW4x2-0003Dw-3j
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:28 -0400
-Received: by mail-pg0-x242.google.com with SMTP id j186so11377544pge.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:27 -0700 (PDT)
+	id 1dW4wz-0003B9-JE
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:25 -0400
+Received: by mail-pf0-x243.google.com with SMTP id c24so11760875pfe.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:25 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 14:04:03 -0400
-Message-Id: <1500055451-14041-11-git-send-email-longpeng.mike@gmail.com>
+Date: Fri, 14 Jul 2017 14:04:01 -0400
+Message-Id: <1500055451-14041-9-git-send-email-longpeng.mike@gmail.com>
 In-Reply-To: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
 References: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 10/18] crypto: hmac: introduce
- qcrypto_hmac_ctx_new for glib-backend
+Subject: [Qemu-devel] [PATCH v6 08/18] crypto: hmac: introduce
+ qcrypto_hmac_ctx_new for gcrypt-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,54 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
-glib-backend impls.
+1) Fix a handle-leak problem in qcrypto_hmac_new(), didn't free
+   ctx->handle if gcry_mac_setkey fails.
+
+2) Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
+   gcrypt-backend impls.
 
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/hmac-glib.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ crypto/hmac-gcrypt.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/hmac-glib.c b/crypto/hmac-glib.c
-index 08a1fdd..f0ccfd6 100644
---- a/crypto/hmac-glib.c
-+++ b/crypto/hmac-glib.c
-@@ -49,11 +49,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
+diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
+index 21189e6..372ad7f 100644
+--- a/crypto/hmac-gcrypt.c
++++ b/crypto/hmac-gcrypt.c
+@@ -42,11 +42,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
      return false;
  }
  
 -QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
 -                              const uint8_t *key, size_t nkey,
 -                              Error **errp)
-+static QCryptoHmacGlib *
++static QCryptoHmacGcrypt *
 +qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
 +                     const uint8_t *key, size_t nkey,
 +                     Error **errp)
  {
 -    QCryptoHmac *hmac;
-     QCryptoHmacGlib *ctx;
+     QCryptoHmacGcrypt *ctx;
+     gcry_error_t err;
  
-     if (!qcrypto_hmac_supports(alg)) {
-@@ -62,9 +62,6 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+@@ -56,9 +56,6 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
          return NULL;
      }
  
 -    hmac = g_new0(QCryptoHmac, 1);
 -    hmac->alg = alg;
 -
-     ctx = g_new0(QCryptoHmacGlib, 1);
+     ctx = g_new0(QCryptoHmacGcrypt, 1);
  
-     ctx->ghmac = g_hmac_new(qcrypto_hmac_alg_map[alg],
-@@ -74,12 +71,10 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+     err = gcry_mac_open(&ctx->handle, qcrypto_hmac_alg_map[alg],
+@@ -73,15 +70,14 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+     if (err != 0) {
+         error_setg(errp, "Cannot set key: %s",
+                    gcry_strerror(err));
++        gcry_mac_close(ctx->handle);
          goto error;
      }
  
@@ -86,16 +93,17 @@ index 08a1fdd..f0ccfd6 100644
      return NULL;
  }
  
-@@ -134,6 +129,25 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+@@ -150,3 +146,22 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+ 
      return 0;
  }
- 
++
 +QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
 +                              const uint8_t *key, size_t nkey,
 +                              Error **errp)
 +{
 +    QCryptoHmac *hmac;
-+    QCryptoHmacGlib *ctx;
++    QCryptoHmacGcrypt *ctx;
 +
 +    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
 +    if (!ctx) {
@@ -108,9 +116,5 @@ index 08a1fdd..f0ccfd6 100644
 +
 +    return hmac;
 +}
-+
- #else
- 
- bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
 -- 
 1.8.3.1
