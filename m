@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVy40-0004t8-OX
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:43:13 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVy6P-0007xj-O8
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVy3z-0004C2-SL
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:43:12 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37286)
+	(envelope-from <pm215@archaic.org.uk>) id 1dVy6L-0004w8-3n
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:45:41 -0400
+Received: from [2001:8b0:1d0::2] (port=37578 helo=orth.archaic.org.uk)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVy3z-0004Bp-K2
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:43:11 -0400
-Received: by mail-wm0-x234.google.com with SMTP id i127so18588958wma.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:43:11 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170711160814.20941-51-mreitz@redhat.com>
-References: <20170711160814.20941-1-mreitz@redhat.com>
-	<20170711160814.20941-51-mreitz@redhat.com>
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dVy6K-0004pi-PI
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:45:36 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 11:42:49 +0100
-Message-ID: <CAFEAcA90jG=vzGX0xKQh5ZkDsnNw6mMQb5QDip7+sAqd8HVTSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 50/85] qcow2: add
- .bdrv_remove_persistent_dirty_bitmap
+Date: Fri, 14 Jul 2017 11:45:17 +0100
+Message-Id: <1500029117-6387-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] tests: Handle $RANDOM not being supported by
+ the shell
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Eric Blake <eblake@redhat.com>, Kamil Rytarowski <n54@gmx.com>
 
-On 11 July 2017 at 17:07, Max Reitz <mreitz@redhat.com> wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->
-> Realize .bdrv_remove_persistent_dirty_bitmap interface.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Message-id: 20170628120530.31251-29-vsementsov@virtuozzo.com
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+In various places in our test makefiles and scripts we use the
+shell $RANDOM to create a random number. This is a bash
+specific extension, and doesn't work on other shells.
+With dash the shell doesn't complain, it just effectively
+always evaluates $RANDOM to 0:
+  echo $((RANDOM + 32768))     => 32768
 
-> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-> +                                          const char *name,
-> +                                          Error **errp)
-> +{
-> +    int ret;
-> +    BDRVQcow2State *s = bs->opaque;
-> +    Qcow2Bitmap *bm;
-> +    Qcow2BitmapList *bm_list;
-> +
-> +    if (s->nb_bitmaps == 0) {
-> +        /* Absence of the bitmap is not an error: see explanation above
-> +         * bdrv_remove_persistent_dirty_bitmap() definition. */
-> +        return;
-> +    }
-> +
-> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-> +                               s->bitmap_directory_size, errp);
-> +    if (bm_list == NULL) {
-> +        return;
-> +    }
-> +
-> +    bm = find_bitmap_by_name(bm_list, name);
-> +    if (bm == NULL) {
-> +        goto fail;
-> +    }
-> +
-> +    QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
-> +
-> +    ret = update_ext_header_and_dir(bs, bm_list);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "Failed to update bitmap extension");
-> +        goto fail;
-> +    }
-> +
-> +    free_bitmap_clusters(bs, &bm->table);
-> +
-> +fail:
-> +    bitmap_free(bm);
-> +    bitmap_list_free(bm_list);
-> +}
+However, on NetBSD the shell will complain:
+  "-sh: arith: syntax error: "RANDOM + 32768"
 
-Coverity points out that this can crash in the error-exit paths,
-because bitmap_free() doesn't handle being passed a NULL pointer.
-(CID 1377700).
+which means that "make check" fails.
 
-Probably the best fix for this is to make bitmap_free() do
-nothing when handed NULL.
+Switch to using "${RANDOM:-0}" instead of $RANDOM,
+which will portably either give us a random number or zero.
+This means that on non-bash shells we don't get such
+good test coverage via the MALLOC_PERTURB_ setting, but
+we were already in that situation for non-bash shells.
 
-thanks
--- PMM
+Our only other uses of $RANDOM (in tests/qemu-iotests/check
+and tests/qemu-iotests/162) are in shell scripts which use
+a #!/bin/bash line so they are always run under bash.
+
+Suggested-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/Makefile.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 6d6cb74..f6310d2 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -826,7 +826,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+ 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+ 		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
+-		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
++		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+ 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
+ 	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
+ 	  echo Gcov report for $$f:;\
+@@ -837,7 +837,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+ $(patsubst %, check-%, $(check-unit-y)): check-%: %
+ 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command, \
+-		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
++		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+ 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
+ 	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
+ 	  echo Gcov report for $$f:;\
+-- 
+2.7.4
