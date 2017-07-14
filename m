@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2C-0003GG-TF
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2D-0003GH-6t
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy29-0003Ju-MZ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43112
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2B-0003LC-UW
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41253)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVy29-0003Jj-HI
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:17 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1dVy2B-0003KY-Kd
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:19 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EAclP7015753
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:17 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpuk7swg8-1
+	v6EAcg5m053649
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:18 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpsnc6cmk-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:16 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:18 -0400
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
 	Fri, 14 Jul 2017 11:41:15 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:44 +0200
+Date: Fri, 14 Jul 2017 12:40:45 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-18-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 17/40] s390x/css: use SubchDev.orb
+Message-Id: <1500028867-134709-19-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 18/40] pc-bios/s390-ccw: Move libc functions to
+ separate header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,182 +39,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Instead of passing around a pointer to ORB let us simplify some
-function signatures by using the previously introduced ORB saved at the
-subchannel (SubchDev).
+The upcoming netboot code will use the libc from SLOF. To be able
+to still use s390-ccw.h there, the libc related functions in this
+header have to be moved to a different location.
+And while we're at it, remove the duplicate memcpy() function from
+sclp.c.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Message-Id: <20170711145441.33925-7-pasic@linux.vnet.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1499863793-18627-2-git-send-email-thuth@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/s390x/css.c         | 30 +++++++++++++++---------------
- include/hw/s390x/css.h |  6 +++---
- 2 files changed, 18 insertions(+), 18 deletions(-)
+ pc-bios/s390-ccw/bootmap.c     |  1 +
+ pc-bios/s390-ccw/libc.h        | 45 ++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/main.c        |  1 +
+ pc-bios/s390-ccw/s390-ccw.h    | 29 ---------------------------
+ pc-bios/s390-ccw/sclp.c        | 10 ++--------
+ pc-bios/s390-ccw/virtio-scsi.c |  1 +
+ pc-bios/s390-ccw/virtio.c      |  1 +
+ 7 files changed, 51 insertions(+), 37 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/libc.h
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 62db7f6..997815c 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -909,7 +909,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
-     return ret;
- }
- 
--static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
-+static void sch_handle_start_func_virtual(SubchDev *sch)
- {
- 
-     PMCW *p = &sch->curr_status.pmcw;
-@@ -923,10 +923,10 @@ static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
- 
-     if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-         /* Start Function triggered via ssch, i.e. we have an ORB */
-+        ORB *orb = &sch->orb;
-         s->cstat = 0;
-         s->dstat = 0;
-         /* Look at the orb and try to execute the channel program. */
--        assert(orb != NULL); /* resume does not pass an orb */
-         p->intparm = orb->intparm;
-         if (!(orb->lpm & path)) {
-             /* Generate a deferred cc 3 condition. */
-@@ -940,8 +940,7 @@ static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
-         sch->ccw_no_data_cnt = 0;
-         suspend_allowed = !!(orb->ctrl0 & ORB_CTRL0_MASK_SPND);
-     } else {
--        /* Start Function resumed via rsch, i.e. we don't have an
--         * ORB */
-+        /* Start Function resumed via rsch */
-         s->ctrl &= ~(SCSW_ACTL_SUSP | SCSW_ACTL_RESUME_PEND);
-         /* The channel program had been suspended before. */
-         suspend_allowed = true;
-@@ -1011,13 +1010,14 @@ static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
- 
- }
- 
--static int sch_handle_start_func_passthrough(SubchDev *sch, ORB *orb)
-+static int sch_handle_start_func_passthrough(SubchDev *sch)
- {
- 
-     PMCW *p = &sch->curr_status.pmcw;
-     SCSW *s = &sch->curr_status.scsw;
-     int ret;
- 
-+    ORB *orb = &sch->orb;
-     if (!(s->ctrl & SCSW_ACTL_SUSP)) {
-         assert(orb != NULL);
-         p->intparm = orb->intparm;
-@@ -1062,7 +1062,7 @@ static int sch_handle_start_func_passthrough(SubchDev *sch, ORB *orb)
-  * read/writes) asynchronous later on if we start supporting more than
-  * our current very simple devices.
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 523fa78..458d3da 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -8,6 +8,7 @@
+  * directory.
   */
--int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
-+int do_subchannel_work_virtual(SubchDev *sch)
- {
  
-     SCSW *s = &sch->curr_status.scsw;
-@@ -1073,7 +1073,7 @@ int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
-         sch_handle_halt_func(sch);
-     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
-         /* Triggered by both ssch and rsch. */
--        sch_handle_start_func_virtual(sch, orb);
-+        sch_handle_start_func_virtual(sch);
-     } else {
-         /* Cannot happen. */
-         return 0;
-@@ -1082,7 +1082,7 @@ int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
-     return 0;
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "bootmap.h"
+ #include "virtio.h"
+diff --git a/pc-bios/s390-ccw/libc.h b/pc-bios/s390-ccw/libc.h
+new file mode 100644
+index 0000000..0142ea8
+--- /dev/null
++++ b/pc-bios/s390-ccw/libc.h
+@@ -0,0 +1,45 @@
++/*
++ * libc-style definitions and functions
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
++
++#ifndef S390_CCW_LIBC_H
++#define S390_CCW_LIBC_H
++
++typedef long               size_t;
++typedef int                bool;
++typedef unsigned char      uint8_t;
++typedef unsigned short     uint16_t;
++typedef unsigned int       uint32_t;
++typedef unsigned long long uint64_t;
++
++static inline void *memset(void *s, int c, size_t n)
++{
++    int i;
++    unsigned char *p = s;
++
++    for (i = 0; i < n; i++) {
++        p[i] = c;
++    }
++
++    return s;
++}
++
++static inline void *memcpy(void *s1, const void *s2, size_t n)
++{
++    uint8_t *dest = s1;
++    const uint8_t *src = s2;
++    int i;
++
++    for (i = 0; i < n; i++) {
++        dest[i] = src[i];
++    }
++
++    return s1;
++}
++
++#endif
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 1cacc1b..40cba8d 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ 
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 2089274..43e2d42 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -18,12 +18,6 @@ typedef unsigned short     u16;
+ typedef unsigned int       u32;
+ typedef unsigned long long u64;
+ typedef unsigned long      ulong;
+-typedef long               size_t;
+-typedef int                bool;
+-typedef unsigned char      uint8_t;
+-typedef unsigned short     uint16_t;
+-typedef unsigned int       uint32_t;
+-typedef unsigned long long uint64_t;
+ typedef unsigned char      __u8;
+ typedef unsigned short     __u16;
+ typedef unsigned int       __u32;
+@@ -88,18 +82,6 @@ ulong get_second(void);
+ /* bootmap.c */
+ void zipl_load(void);
+ 
+-static inline void *memset(void *s, int c, size_t n)
+-{
+-    int i;
+-    unsigned char *p = s;
+-
+-    for (i = 0; i < n; i++) {
+-        p[i] = c;
+-    }
+-
+-    return s;
+-}
+-
+ static inline void fill_hex(char *out, unsigned char val)
+ {
+     const char hex[] = "0123456789abcdef";
+@@ -169,17 +151,6 @@ static inline void sleep(unsigned int seconds)
+     }
  }
  
--int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
-+int do_subchannel_work_passthrough(SubchDev *sch)
+-static inline void *memcpy(void *s1, const void *s2, size_t n)
+-{
+-    uint8_t *p1 = s1;
+-    const uint8_t *p2 = s2;
+-
+-    while (n--) {
+-        p1[n] = p2[n];
+-    }
+-    return s1;
+-}
+-
+ static inline void IPL_assert(bool term, const char *message)
  {
-     int ret;
-     SCSW *s = &sch->curr_status.scsw;
-@@ -1096,7 +1096,7 @@ int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
-         sch_handle_halt_func(sch);
-         ret = 0;
-     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
--        ret = sch_handle_start_func_passthrough(sch, orb);
-+        ret = sch_handle_start_func_passthrough(sch);
-     } else {
-         /* Cannot happen. */
-         return -ENODEV;
-@@ -1105,10 +1105,10 @@ int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
-     return ret;
+     if (!term) {
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index a1639ba..aa1c862 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
+ 
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "sclp.h"
+ 
+@@ -59,13 +60,6 @@ static int _strlen(const char *str)
+     return i;
  }
  
--static int do_subchannel_work(SubchDev *sch, ORB *orb)
-+static int do_subchannel_work(SubchDev *sch)
+-static void _memcpy(char *dest, const char *src, int len)
+-{
+-    int i;
+-    for (i = 0; i < len; i++)
+-        dest[i] = src[i];
+-}
+-
+ void sclp_print(const char *str)
  {
-     if (sch->do_subchannel_work) {
--        return sch->do_subchannel_work(sch, orb);
-+        return sch->do_subchannel_work(sch);
-     } else {
-         return -EINVAL;
-     }
-@@ -1315,7 +1315,7 @@ int css_do_csch(SubchDev *sch)
-     s->ctrl &= ~(SCSW_CTRL_MASK_FCTL | SCSW_CTRL_MASK_ACTL);
-     s->ctrl |= SCSW_FCTL_CLEAR_FUNC | SCSW_ACTL_CLEAR_PEND;
+     int len = _strlen(str);
+@@ -76,7 +70,7 @@ void sclp_print(const char *str)
+     sccb->ebh.length = sizeof(EventBufferHeader) + len;
+     sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
+     sccb->ebh.flags = 0;
+-    _memcpy(sccb->data, str, len);
++    memcpy(sccb->data, str, len);
  
--    do_subchannel_work(sch, NULL);
-+    do_subchannel_work(sch);
-     ret = 0;
+     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+ }
+diff --git a/pc-bios/s390-ccw/virtio-scsi.c b/pc-bios/s390-ccw/virtio-scsi.c
+index f61ecf0..c92f5d3 100644
+--- a/pc-bios/s390-ccw/virtio-scsi.c
++++ b/pc-bios/s390-ccw/virtio-scsi.c
+@@ -9,6 +9,7 @@
+  * directory.
+  */
  
- out:
-@@ -1356,7 +1356,7 @@ int css_do_hsch(SubchDev *sch)
-     }
-     s->ctrl |= SCSW_ACTL_HALT_PEND;
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "scsi.h"
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index 6ee93d5..8768331 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -8,6 +8,7 @@
+  * directory.
+  */
  
--    do_subchannel_work(sch, NULL);
-+    do_subchannel_work(sch);
-     ret = 0;
- 
- out:
-@@ -1431,7 +1431,7 @@ int css_do_ssch(SubchDev *sch, ORB *orb)
-     s->ctrl |= (SCSW_FCTL_START_FUNC | SCSW_ACTL_START_PEND);
-     s->flags &= ~SCSW_FLAGS_MASK_PNO;
- 
--    ret = do_subchannel_work(sch, orb);
-+    ret = do_subchannel_work(sch);
- 
- out:
-     return ret;
-@@ -1710,7 +1710,7 @@ int css_do_rsch(SubchDev *sch)
-     }
- 
-     s->ctrl |= SCSW_ACTL_RESUME_PEND;
--    do_subchannel_work(sch, NULL);
-+    do_subchannel_work(sch);
-     ret = 0;
- 
- out:
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 71076cb..c9edd07 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -94,7 +94,7 @@ struct SubchDev {
-     /* transport-provided data: */
-     int (*ccw_cb) (SubchDev *, CCW1);
-     void (*disable_cb)(SubchDev *);
--    int (*do_subchannel_work) (SubchDev *, ORB *);
-+    int (*do_subchannel_work) (SubchDev *);
-     SenseId id;
-     void *driver_data;
- };
-@@ -157,8 +157,8 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
- void css_generate_css_crws(uint8_t cssid);
- void css_clear_sei_pending(void);
- int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data);
--int do_subchannel_work_virtual(SubchDev *sub, ORB *orb);
--int do_subchannel_work_passthrough(SubchDev *sub, ORB *orb);
-+int do_subchannel_work_virtual(SubchDev *sub);
-+int do_subchannel_work_passthrough(SubchDev *sub);
- 
- typedef enum {
-     CSS_IO_ADAPTER_VIRTIO = 0,
++#include "libc.h"
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "virtio-scsi.h"
 -- 
 2.7.4
