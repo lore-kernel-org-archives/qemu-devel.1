@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVxSs-0002Vw-UQ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:04:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dVxTU-00034x-Tz
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVxSo-00031e-Rw
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:04:50 -0400
-Date: Fri, 14 Jul 2017 18:34:49 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170714083449.GC17539@umbus.fritz.box>
-References: <150001864048.7077.16008343547703241545.stgit@bahia.lan>
+	(envelope-from <alex.bennee@linaro.org>) id 1dVxTP-0003O0-Uk
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:05:28 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38394)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dVxTP-0003NF-Nk
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:05:23 -0400
+Received: by mail-wm0-x231.google.com with SMTP id f67so17641396wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:05:22 -0700 (PDT)
+References: <20170714093407.11526-1-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170714093407.11526-1-pbonzini@redhat.com>
+Date: Fri, 14 Jul 2017 11:05:19 +0100
+Message-ID: <87shhzuye8.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qtZFehHsKgwS5rPz"
-Content-Disposition: inline
-In-Reply-To: <150001864048.7077.16008343547703241545.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: fix memory leak in
- spapr_core_pre_plug()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] docker: allow running "docker-travis"
+ with arbitrary parallelism
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-stable@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
 
 
---qtZFehHsKgwS5rPz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On Fri, Jul 14, 2017 at 09:50:40AM +0200, Greg Kurz wrote:
-> In case of error, we must ensure the dynamically allocated base_core_type
-> is freed, like it is done everywhere else in this function.
->=20
-> This is a regression introduced in QEMU 2.9 by commit 8149e2992f78.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> docker-travis is limited to the -j3 flag specified for running on the
+> SaaS Travis CI infrastructure.
+>
+> When running the test matrix locally with docker, however, we can run
+> much more jobs at the same time on a suitably beefy server.  Let people
+> do that with the usual J=nn option already supported by the other
+> docker-based tests.
 
-Applied to ppc-for-2.10.
+Eh, I was debugging stuff on our beefy server with J=20 and then I
+realised I was just running:
 
-> ---
->  hw/ppc/spapr.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 638b8243de04..ed9b57d1fc2a 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3150,9 +3150,9 @@ static void spapr_core_pre_plug(HotplugHandler *hot=
-plug_dev, DeviceState *dev,
->       * total vcpus not a multiple of threads-per-core.
->       */
->      if (mc->has_hotpluggable_cpus && (cc->nr_threads !=3D smp_threads)) {
-> -        error_setg(errp, "invalid nr-threads %d, must be %d",
-> +        error_setg(&local_err, "invalid nr-threads %d, must be %d",
->                     cc->nr_threads, smp_threads);
-> -        return;
-> +        goto out;
->      }
-> =20
->      core_slot =3D spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id,=
- &index);
->=20
+  make docker-test-quick@travis J=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+So I guess some people do use the pseudo Travis expansion then?
 
---qtZFehHsKgwS5rPz
-Content-Type: application/pgp-signature; name="signature.asc"
+>
+> Paolo
+>
+> Paolo Bonzini (2):
+>   docker: allow customizing Travis global_env variables
+>   travis: move make -j flag out of script
+>
+>  .travis.yml            | 3 ++-
+>  tests/docker/travis.py | 6 +++---
+>  2 files changed, 5 insertions(+), 4 deletions(-)
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllogiYACgkQbDjKyiDZ
-s5J2hg/9Fw0nhjKdlrlANGRG0qvxKreR3o/pUthlaDFgcPIBESSjs48wOfMNaRGS
-HfHOtdgh8Jk+gWxgWbxTUHweuKL2ykpXWRrENj1UejMWP8Vi+mDZceXFyFBQD4Nq
-JpRVfzsmth7GWgHYvZWcRgVCdOWNZaSLRivDUHe2c/yz9OC7r1vnqBWQPmqMmEkn
-Y35MNV5dWo5vJyMTakVndHgK9LObSWsZSa+axz0YbqnlM9yKX+wm3TMdl1TKJR5c
-bo3QPkJRoT2xiQQ1N3PNGt4c55Q87ik+c6D93mgJMCdRKhVKyGy/hPIjDnVfQYhD
-1cN3T7TmFphLVwFUiCWxmIkDa66WKhWUvMki56sMMbVVe2f8QwVU5dJ1mWxGOcRj
-XTCIvu+5IcFq70ZXwaZyBMGafre9+3lAsOsg63BGHQBLZJuSlVllKTnDLDFolvEA
-kGF5oum7DMfFPQ5mlUqQEiAk3OxfJq26iwsVD9zBfUSmdTA1GjJ3/J5UpG1eFEar
-q1bMiFN+HPeysb0v0mula3Aw7C7GDBR4z+hJ9S9zsPt247+/karWZcAmLDGQFryw
-P/XP5nlPCcOrv6z9DwbM0xFepX7wh9+vsD0CKlX4eLFIDowxpgUm0XC/O3zO2LyX
-606DxW83thyWyjPJ/Ii74RByKhDCchlWAEyOdnDD0mzJx+b5oPM=
-=Dx7v
------END PGP SIGNATURE-----
-
---qtZFehHsKgwS5rPz--
+--
+Alex Bennée
