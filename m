@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW12K-0002EN-V6
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dW12O-0002Lh-Tn
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW12I-0001mq-EF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57892)
+	(envelope-from <imammedo@redhat.com>) id 1dW12N-0001q4-Vu
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58588)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW12I-0001mg-5P
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:38 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW12N-0001pi-Pn
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:43 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 14 Jul 2017 15:52:06 +0200
-Message-Id: <1500040339-119465-16-git-send-email-imammedo@redhat.com>
+Date: Fri, 14 Jul 2017 15:52:08 +0200
+Message-Id: <1500040339-119465-18-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
 References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 15/28] microblaze: replace cpu_mb_init() with
+Subject: [Qemu-devel] [PATCH 17/28] tilegx: replace cpu_tilegx_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,89 +25,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>
 
-cpu_mb_init() always falls back to TYPE_MICROBLAZE_CPU object
+cpu_tilegx_init() always falls back to TYPE_TILEGX_CPU object
 regardless of cpu_model. Put fallback logic into
-mb_cpu_class_by_name() which would translate any cpu_model
-into TYPE_MICROBLAZE_CPU class and replace cpu_mb_init()
+tilegx_cpu_class_by_name() which would translate any cpu_model
+into TYPE_TILEGX_CPU class and replace cpu_tilegx_init()
 with cpu_generic_init().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+CC: David Gibson <david@gibson.dropbear.id.au>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Laurent Vivier <laurent@vivier.eu>
+CC: Richard Henderson <rth@twiddle.net>
 ---
- target/microblaze/cpu.h       |  3 +--
- target/microblaze/cpu.c       |  6 ++++++
- target/microblaze/translate.c | 11 -----------
- 3 files changed, 7 insertions(+), 13 deletions(-)
+ target/tilegx/cpu.h |  4 +---
+ target/tilegx/cpu.c | 11 +++--------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 5ce4c82..52b6b6a 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -331,7 +331,6 @@ int mb_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int mb_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+index f32be49..71cea04 100644
+--- a/target/tilegx/cpu.h
++++ b/target/tilegx/cpu.h
+@@ -164,9 +164,7 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGState *env)
+ void tilegx_tcg_init(void);
+ int cpu_tilegx_signal_handler(int host_signum, void *pinfo, void *puc);
  
- void mb_tcg_init(void);
--MicroBlazeCPU *cpu_mb_init(const char *cpu_model);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-@@ -344,7 +343,7 @@ int cpu_mb_signal_handler(int host_signum, void *pinfo,
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
+-TileGXCPU *cpu_tilegx_init(const char *cpu_model);
+-
+-#define cpu_init(cpu_model) CPU(cpu_tilegx_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_TILEGX_CPU, cpu_model)
  
--#define cpu_init(cpu_model) CPU(cpu_mb_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_MICROBLAZE_CPU, cpu_model)
+ #define cpu_signal_handler cpu_tilegx_signal_handler
  
- #define cpu_signal_handler cpu_mb_signal_handler
- 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index f85ff01..ddffe86 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -253,6 +253,11 @@ static Property mb_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static ObjectClass *mb_cpu_class_by_name(const char *cpu_model)
-+{
-+    return object_class_by_name(TYPE_MICROBLAZE_CPU);
-+}
-+
- static void mb_cpu_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-@@ -265,6 +270,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
-     mcc->parent_reset = cc->reset;
-     cc->reset = mb_cpu_reset;
- 
-+    cc->class_by_name = mb_cpu_class_by_name;
-     cc->has_work = mb_cpu_has_work;
-     cc->do_interrupt = mb_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = mb_cpu_exec_interrupt;
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index cb65d1e..c97c9d8 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1845,17 +1845,6 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     cpu_fprintf(f, "\n\n");
+diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+index 4532639..7345f5a 100644
+--- a/target/tilegx/cpu.c
++++ b/target/tilegx/cpu.c
+@@ -52,15 +52,9 @@ static void tilegx_cpu_dump_state(CPUState *cs, FILE *f,
+                 env->pc, env->spregs[TILEGX_SPR_CMPEXCH]);
  }
  
--MicroBlazeCPU *cpu_mb_init(const char *cpu_model)
--{
--    MicroBlazeCPU *cpu;
+-TileGXCPU *cpu_tilegx_init(const char *cpu_model)
++static ObjectClass *tilegx_cpu_class_by_name(const char *cpu_model)
+ {
+-    TileGXCPU *cpu;
 -
--    cpu = MICROBLAZE_CPU(object_new(TYPE_MICROBLAZE_CPU));
+-    cpu = TILEGX_CPU(object_new(TYPE_TILEGX_CPU));
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
--}
--
- void mb_tcg_init(void)
- {
-     int i;
++    return object_class_by_name(TYPE_TILEGX_CPU);
+ }
+ 
+ static void tilegx_cpu_set_pc(CPUState *cs, vaddr value)
+@@ -159,6 +153,7 @@ static void tilegx_cpu_class_init(ObjectClass *oc, void *data)
+     tcc->parent_reset = cc->reset;
+     cc->reset = tilegx_cpu_reset;
+ 
++    cc->class_by_name = tilegx_cpu_class_by_name;
+     cc->has_work = tilegx_cpu_has_work;
+     cc->do_interrupt = tilegx_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = tilegx_cpu_exec_interrupt;
 -- 
 2.7.4
