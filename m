@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYV-0000C1-CD
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYV-0000CI-IW
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYQ-0004ui-BV
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYT-0004yY-Vl
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:39 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36787)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35962)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dVxYQ-0004u3-1E
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:34 -0400
-Received: by mail-wr0-x235.google.com with SMTP id y28so13192004wrd.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:33 -0700 (PDT)
-Received: from 640k.lan (94-39-191-51.adsl-ull.clienti.tiscali.it.
-	[94.39.191.51])
-	by smtp.gmail.com with ESMTPSA id 143sm2934870wmg.9.2017.07.14.03.10.30
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 14 Jul 2017 03:10:30 -0700 (PDT)
+	id 1dVxYT-0004we-Li
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:37 -0400
+Received: by mail-wr0-x241.google.com with SMTP id 77so11332116wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:37 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 14 Jul 2017 12:10:12 +0200
-Message-Id: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/55] Misc patches for QEMU 2.10 soft freeze
+Date: Fri, 14 Jul 2017 12:10:15 +0200
+Message-Id: <1500027028-4127-4-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
+References: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 42/55] qom: enforce readonly nature of link's
+ check callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,234 +29,195 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, Fam Zheng <famz@redhat.com>
 
-The following changes since commit 49bcce4b9c11759678fd223aefb48691c4959d4f:
+From: Igor Mammedov <imammedo@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-07-12' into staging (2017-07-13 16:56:06 +0100)
+link's check callback is supposed to verify/permit setting it,
+however currently nothing restricts it from misusing it
+and modifying target object from within.
+Make sure that readonly semantics are checked by compiler
+to prevent callback's misuse.
 
-are available in the git repository at:
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170714021509.23681-2-famz@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/core/qdev-properties.c    | 3 ++-
+ hw/display/xlnx_dp.c         | 2 +-
+ hw/ipmi/ipmi.c               | 2 +-
+ hw/mem/pc-dimm.c             | 2 +-
+ hw/misc/ivshmem.c            | 2 +-
+ hw/virtio/virtio-crypto.c    | 2 +-
+ include/hw/qdev-properties.h | 3 ++-
+ include/qom/object.h         | 6 +++---
+ qom/object.c                 | 8 ++++----
+ 9 files changed, 16 insertions(+), 14 deletions(-)
 
-
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 68c761e19c2ea453f880dbbd04e867d34d1468b8:
-
-  spapr_rng: Convert to DEFINE_PROP_LINK (2017-07-14 12:04:43 +0200)
-
-----------------------------------------------------------------
-* gdbstub fixes (Alex)
-* IOMMU MemoryRegion subclass (Alexey)
-* Chardev hotswap (Anton)
-* NBD_OPT_GO support (Eric)
-* Misc bugfixes
-* DEFINE_PROP_LINK (minus the ARM patches - Fam)
-* MAINTAINERS updates (Philippe)
-
-----------------------------------------------------------------
-Alex Bennée (4):
-      gdbstub: modernise DEBUG_GDB
-      gdbstub: rename cpu_index -> cpu_gdb_index
-      qom/cpu: remove host_tid field
-      gdbstub: don't fail on vCont; C04:0; c packets
-
-Alexey Kardashevskiy (2):
-      memory/iommu: QOM'fy IOMMU MemoryRegion
-      memory/iommu: introduce IOMMUMemoryRegionClass
-
-Anton Nefedov (13):
-      char: move QemuOpts->ChardevBackend translation to a separate func
-      char: add backend hotswap handler
-      char: chardevice hotswap
-      char: forbid direct chardevice access for hotswap devices
-      char: avoid chardevice direct access
-      test-char: destroy chardev-udp after test
-      test-char: split char_udp_test
-      test-char: split char_file_test
-      test-char: add hotswap test
-      hmp: add hmp analogue for qmp-chardev-change
-      virtio-console: chardev hotswap support
-      serial: move TIOCM update to a separate function
-      serial: chardev hotswap support
-
-Emilio G. Cota (2):
-      vl: fix breakage of -tb-size
-      translate-all: remove redundant !tcg_enabled check in dump_exec_info
-
-Eric Blake (9):
-      nbd: Create struct for tracking export info
-      nbd: Don't bother tracing an NBD_OPT_ABORT response failure
-      nbd: Expose and debug more NBD constants
-      nbd: Simplify trace of client flags in negotiation
-      nbd: Refactor reply to NBD_OPT_EXPORT_NAME
-      nbd: Implement NBD_OPT_GO on server
-      nbd: Implement NBD_OPT_GO on client
-      nbd: Implement NBD_INFO_BLOCK_SIZE on server
-      nbd: Implement NBD_INFO_BLOCK_SIZE on client
-
-Fam Zheng (13):
-      qdev: Introduce PropertyInfo.create
-      qdev: Introduce DEFINE_PROP_LINK
-      qmp: Use ObjectProperty.type if present
-      qdev: Add const qualifier to PropertyInfo definitions
-      virtio-blk: Convert to DEFINE_PROP_LINK
-      virtio-scsi: Convert to DEFINE_PROP_LINK
-      virtio-rng: Convert to DEFINE_PROP_LINK
-      virtio-crypto: Convert to DEFINE_PROP_LINK
-      dimm: Convert to DEFINE_PROP_LINK
-      ivshmem: Convert to DEFINE_PROP_LINK
-      mips_cmgcr: Convert to DEFINE_PROP_LINK
-      cpu: Convert to DEFINE_PROP_LINK
-      spapr_rng: Convert to DEFINE_PROP_LINK
-
-Igor Mammedov (1):
-      qom: enforce readonly nature of link's check callback
-
-Marc-André Lureau (1):
-      chardev: block during sync read
-
-Paolo Bonzini (1):
-      build: add -Wexpansion-to-defined
-
-Peng Hao (1):
-      chardev: fix parallel device can't be reconnect
-
-Philippe Mathieu-Daudé (5):
-      MAINTAINERS: update TCG entries
-      MAINTAINERS: update KVM entries
-      MAINTAINERS: update Xen entries
-      MAINTAINERS: update TCI entry
-      MAINTAINERS: add entry for "Unimplemented" device
-
-Pranith Kumar (2):
-      Revert "exec.c: Fix breakpoint invalidation race"
-      mttcg/i386: Patch instruction using async_safe_* framework
-
-Prasad J Pandit (1):
-      exec: use qemu_ram_ptr_length to access guest ram
-
- MAINTAINERS                      |  18 +--
- accel/tcg/translate-all.c        |   5 -
- backends/rng-egd.c               |   2 +-
- block/nbd-client.c               |  22 +--
- block/nbd-client.h               |   3 +-
- block/nbd.c                      |  16 ++-
- bsd-user/qemu.h                  |   2 +
- chardev/char-fe.c                |  16 ++-
- chardev/char-mux.c               |   1 +
- chardev/char-socket.c            |   2 +
- chardev/char.c                   | 164 +++++++++++++++++----
- configure                        |   2 +-
- exec.c                           |  70 +++++----
- gdbstub.c                        | 119 ++++++++-------
- hmp-commands.hx                  |  18 ++-
- hmp.c                            |  34 +++++
- hmp.h                            |   1 +
- hw/alpha/typhoon.c               |  31 ++--
- hw/arm/pxa2xx.c                  |   3 +-
- hw/arm/strongarm.c               |   4 +-
- hw/block/virtio-blk.c            |   6 +-
- hw/char/bcm2835_aux.c            |   2 +-
- hw/char/cadence_uart.c           |   4 +-
- hw/char/debugcon.c               |   4 +-
- hw/char/digic-uart.c             |   2 +-
- hw/char/escc.c                   |   8 +-
- hw/char/etraxfs_ser.c            |   2 +-
- hw/char/exynos4210_uart.c        |   4 +-
- hw/char/grlib_apbuart.c          |   4 +-
- hw/char/imx_serial.c             |   2 +-
- hw/char/ipoctal232.c             |   4 +-
- hw/char/lm32_juart.c             |   2 +-
- hw/char/lm32_uart.c              |   2 +-
- hw/char/mcf_uart.c               |   2 +-
- hw/char/milkymist-uart.c         |   2 +-
- hw/char/parallel.c               |   8 +-
- hw/char/pl011.c                  |   2 +-
- hw/char/sclpconsole-lm.c         |   4 +-
- hw/char/sclpconsole.c            |   4 +-
- hw/char/serial.c                 |  63 ++++++--
- hw/char/sh_serial.c              |   4 +-
- hw/char/spapr_vty.c              |   4 +-
- hw/char/stm32f2xx_usart.c        |   3 +-
- hw/char/terminal3270.c           |   4 +-
- hw/char/virtio-console.c         |  35 ++++-
- hw/char/xen_console.c            |   4 +-
- hw/char/xilinx_uartlite.c        |   2 +-
- hw/core/qdev-properties-system.c |   8 +-
- hw/core/qdev-properties.c        |  63 +++++---
- hw/core/qdev.c                   |  31 ++--
- hw/display/xlnx_dp.c             |   2 +-
- hw/dma/rc4030.c                  |  34 +++--
- hw/i386/amd_iommu.c              |  33 +++--
- hw/i386/amd_iommu.h              |   5 +-
- hw/i386/intel_iommu.c            |  42 ++++--
- hw/i386/kvmvapic.c               |  85 +++++------
- hw/ipmi/ipmi.c                   |   2 +-
- hw/ipmi/ipmi_bmc_extern.c        |   4 +-
- hw/mem/pc-dimm.c                 |  30 +---
- hw/mips/boston.c                 |   2 +-
- hw/mips/mips_jazz.c              |   2 +-
- hw/mips/mips_malta.c             |   2 +-
- hw/misc/ivshmem.c                |  30 ++--
- hw/misc/mips_cmgcr.c             |  16 +--
- hw/pci-host/apb.c                |  29 ++--
- hw/ppc/spapr_iommu.c             |  42 ++++--
- hw/ppc/spapr_rng.c               |   8 +-
- hw/s390x/css.c                   |   4 +-
- hw/s390x/s390-pci-bus.c          |  31 ++--
- hw/s390x/s390-pci-bus.h          |   3 +-
- hw/s390x/s390-pci-inst.c         |  11 +-
- hw/s390x/virtio-ccw.c            |   9 --
- hw/scsi/virtio-scsi.c            |  13 +-
- hw/usb/ccid-card-passthru.c      |   6 +-
- hw/usb/dev-serial.c              |   7 +-
- hw/usb/redirect.c                |   7 +-
- hw/vfio/common.c                 |  12 +-
- hw/vfio/spapr.c                  |   3 +-
- hw/virtio/virtio-crypto-pci.c    |   2 -
- hw/virtio/virtio-crypto.c        |  27 +---
- hw/virtio/virtio-pci.c           |   6 -
- hw/virtio/virtio-rng.c           |  12 +-
- include/block/nbd.h              |  58 ++++++--
- include/chardev/char-fe.h        |  22 +++
- include/chardev/char.h           |  19 +++
- include/exec/exec-all.h          |   3 +
- include/exec/gdbstub.h           |   9 --
- include/exec/memory.h            |  94 ++++++++----
- include/hw/i386/intel_iommu.h    |   5 +-
- include/hw/mips/mips.h           |   2 +-
- include/hw/ppc/spapr.h           |   7 +-
- include/hw/qdev-core.h           |   6 +-
- include/hw/qdev-properties.h     |  62 ++++----
- include/hw/s390x/css.h           |   4 +-
- include/hw/vfio/vfio-common.h    |   2 +-
- include/qemu/typedefs.h          |   1 +
- include/qom/cpu.h                |   3 +-
- include/qom/object.h             |   6 +-
- linux-user/syscall.c             |   1 -
- memory.c                         | 113 ++++++++++-----
- monitor.c                        |   4 +-
- nbd/client.c                     | 283 ++++++++++++++++++++++++++++++------
- nbd/common.c                     |  92 ++++++++++++
- nbd/nbd-internal.h               |  13 +-
- nbd/server.c                     | 304 +++++++++++++++++++++++++++++++++------
- nbd/trace-events                 |  25 ++--
- net/colo-compare.c               |  10 +-
- net/filter-mirror.c              |   8 +-
- net/slirp.c                      |   2 +-
- net/vhost-user.c                 |   7 +-
- qapi-schema.json                 |  40 ++++++
- qemu-nbd.c                       |  10 +-
- qmp.c                            |   5 +-
- qom/cpu.c                        |   1 +
- qom/object.c                     |   8 +-
- qtest.c                          |   2 +-
- target/i386/cpu.c                |   2 +-
- target/ppc/translate_init.c      |   2 +-
- target/xtensa/xtensa-semi.c      |   2 +-
- tests/test-char.c                | 275 ++++++++++++++++++++++++++---------
- tests/test-hmp.c                 |   1 +
- tests/vhost-user-test.c          |   2 +-
- vl.c                             |   8 +-
- 123 files changed, 2006 insertions(+), 860 deletions(-)
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index f11d578..113ce7d 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -25,7 +25,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+     }
+ }
+ 
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
+diff --git a/hw/display/xlnx_dp.c b/hw/display/xlnx_dp.c
+index a77d7db..561f828 100644
+--- a/hw/display/xlnx_dp.c
++++ b/hw/display/xlnx_dp.c
+@@ -515,7 +515,7 @@ static void xlnx_dp_aux_set_command(XlnxDPState *s, uint32_t value)
+     s->core_registers[DP_INTERRUPT_SIGNAL_STATE] |= 0x04;
+ }
+ 
+-static void xlnx_dp_set_dpdma(Object *obj, const char *name, Object *val,
++static void xlnx_dp_set_dpdma(const Object *obj, const char *name, Object *val,
+                               Error **errp)
+ {
+     XlnxDPState *s = XLNX_DP(obj);
+diff --git a/hw/ipmi/ipmi.c b/hw/ipmi/ipmi.c
+index afafe14..b27babd 100644
+--- a/hw/ipmi/ipmi.c
++++ b/hw/ipmi/ipmi.c
+@@ -90,7 +90,7 @@ static TypeInfo ipmi_interface_type_info = {
+     .class_init = ipmi_interface_class_init,
+ };
+ 
+-static void isa_ipmi_bmc_check(Object *obj, const char *name,
++static void isa_ipmi_bmc_check(const Object *obj, const char *name,
+                                Object *val, Error **errp)
+ {
+     IPMIBmc *bmc = IPMI_BMC(val);
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index b72258e..5e23495 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -367,7 +367,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+     visit_type_uint64(v, name, &value, errp);
+ }
+ 
+-static void pc_dimm_check_memdev_is_busy(Object *obj, const char *name,
++static void pc_dimm_check_memdev_is_busy(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     Error *local_err = NULL;
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 7f678d0..731f3c1 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -1009,7 +1009,7 @@ static const TypeInfo ivshmem_common_info = {
+     .class_init    = ivshmem_common_class_init,
+ };
+ 
+-static void ivshmem_check_memdev_is_busy(Object *obj, const char *name,
++static void ivshmem_check_memdev_is_busy(const Object *obj, const char *name,
+                                          Object *val, Error **errp)
+ {
+     if (host_memory_backend_is_mapped(MEMORY_BACKEND(val))) {
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+index 0353eb6..2590893 100644
+--- a/hw/virtio/virtio-crypto.c
++++ b/hw/virtio/virtio-crypto.c
+@@ -889,7 +889,7 @@ static void virtio_crypto_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static void
+-virtio_crypto_check_cryptodev_is_used(Object *obj, const char *name,
++virtio_crypto_check_cryptodev_is_used(const Object *obj, const char *name,
+                                       Object *val, Error **errp)
+ {
+     if (cryptodev_backend_is_used(CRYPTODEV_BACKEND(val))) {
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 0604c33..9edded2 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -272,7 +272,8 @@ void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+  * This function should be used as the check() argument to
+  * object_property_add_link().
+  */
+-void qdev_prop_allow_set_link_before_realize(Object *obj, const char *name,
++void qdev_prop_allow_set_link_before_realize(const Object *obj,
++                                             const char *name,
+                                              Object *val, Error **errp);
+ 
+ #endif
+diff --git a/include/qom/object.h b/include/qom/object.h
+index abaeb8c..1b82899 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -764,7 +764,7 @@ ObjectClass *object_get_class(Object *obj);
+  *
+  * Returns: The QOM typename of @obj.
+  */
+-const char *object_get_typename(Object *obj);
++const char *object_get_typename(const Object *obj);
+ 
+ /**
+  * type_register_static:
+@@ -1319,7 +1319,7 @@ typedef enum {
+  * callback function.  It allows the link property to be set and never returns
+  * an error.
+  */
+-void object_property_allow_set_link(Object *, const char *,
++void object_property_allow_set_link(const Object *, const char *,
+                                     Object *, Error **);
+ 
+ /**
+@@ -1352,7 +1352,7 @@ void object_property_allow_set_link(Object *, const char *,
+  */
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *obj, const char *name,
++                              void (*check)(const Object *obj, const char *name,
+                                             Object *val, Error **errp),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp);
+diff --git a/qom/object.c b/qom/object.c
+index 5f6fdfa..dfdbd50 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -740,7 +740,7 @@ out:
+     return ret;
+ }
+ 
+-const char *object_get_typename(Object *obj)
++const char *object_get_typename(const Object *obj)
+ {
+     return obj->class->type->name;
+ }
+@@ -1428,7 +1428,7 @@ out:
+     g_free(type);
+ }
+ 
+-void object_property_allow_set_link(Object *obj, const char *name,
++void object_property_allow_set_link(const Object *obj, const char *name,
+                                     Object *val, Error **errp)
+ {
+     /* Allow the link to be set, always */
+@@ -1436,7 +1436,7 @@ void object_property_allow_set_link(Object *obj, const char *name,
+ 
+ typedef struct {
+     Object **child;
+-    void (*check)(Object *, const char *, Object *, Error **);
++    void (*check)(const Object *, const char *, Object *, Error **);
+     ObjectPropertyLinkFlags flags;
+ } LinkProperty;
+ 
+@@ -1552,7 +1552,7 @@ static void object_release_link_property(Object *obj, const char *name,
+ 
+ void object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **child,
+-                              void (*check)(Object *, const char *,
++                              void (*check)(const Object *, const char *,
+                                             Object *, Error **),
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp)
 -- 
 1.8.3.1
