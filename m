@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dW4cA-00064X-7W
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:42:55 -0400
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4wt-0005Bz-M1
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dW4c9-0005cU-7x
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:42:54 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-	<150002437386.22386.7745855254236101855.stgit@frigg.lan>
-	<584dade6-5ce0-4950-c0e3-03128bae119e@twiddle.net>
-Message-ID: <a831e072-2a10-d6c5-5d04-f00772b85b5b@twiddle.net>
-Date: Fri, 14 Jul 2017 07:42:40 -1000
-MIME-Version: 1.0
-In-Reply-To: <584dade6-5ce0-4950-c0e3-03128bae119e@twiddle.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v13 18/26] target/arm: [tcg] Port to
- breakpoint_check
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4wr-00032J-4D
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:19 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:34408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
+	id 1dW4wq-00031U-Vg
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:17 -0400
+Received: by mail-pf0-x243.google.com with SMTP id c24so11760437pfe.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:16 -0700 (PDT)
+From: longpeng.mike@gmail.com
+Date: Fri, 14 Jul 2017 14:03:54 -0400
+Message-Id: <1500055451-14041-2-git-send-email-longpeng.mike@gmail.com>
+In-Reply-To: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
+References: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
+Subject: [Qemu-devel] [PATCH v6 01/18] crypto: cipher: introduce context
+ free function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +27,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: berrange@redhat.com
+Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-On 07/14/2017 07:26 AM, Richard Henderson wrote:
-> On 07/13/2017 11:26 PM, Lluís Vilanova wrote:
->> Incrementally paves the way towards using the generic instruction translation
->> loop.
->>
->> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
->> Reviewed-by: Richard Henderson <rth@twiddle.net>
->> ---
->>   target/arm/translate.c |   53 +++++++++++++++++++++++++++++++-----------------
->>   1 file changed, 34 insertions(+), 19 deletions(-)
->>
->> diff --git a/target/arm/translate.c b/target/arm/translate.c
->> index b9183fc511..55bef09739 100644
->> --- a/target/arm/translate.c
->> +++ b/target/arm/translate.c
->> @@ -11917,6 +11917,33 @@ static void arm_tr_insn_start(DisasContextBase 
->> *dcbase, CPUState *cpu)
->>   #endif
->>   }
->> +static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
->> +                                    const CPUBreakpoint *bp)
->> +{
->> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
->> +
->> +    if (bp->flags & BP_CPU) {
->> +        gen_set_condexec(dc);
->> +        gen_set_pc_im(dc, dc->pc);
->> +        gen_helper_check_breakpoints(cpu_env);
->> +        /* End the TB early; it's likely not going to be executed */
->> +        dc->base.is_jmp = DISAS_UPDATE;
->> +    } else {
->> +        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
->> +        /* The address covered by the breakpoint must be
->> +           included in [tb->pc, tb->pc + tb->size) in order
->> +           to for it to be properly cleared -- thus we
->> +           increment the PC here so that the logic setting
->> +           tb->size below does the right thing.  */
->> +        /* TODO: Advance PC by correct instruction length to
->> +         * avoid disassembler error messages */
->> +        dc->pc += 2;
->> +        dc->base.is_jmp = DISAS_NORETURN;
->> +    }
->> +
->> +    return true;
->> +}
->> +
->>   /* generate intermediate code for basic block 'tb'.  */
->>   void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->>   {
->> @@ -11965,28 +11992,16 @@ void gen_intermediate_code(CPUState *cs, 
->> TranslationBlock *tb)
->>           if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
->>               CPUBreakpoint *bp;
->>               QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
->> -                if (bp->pc == dc->pc) {
->> -                    if (bp->flags & BP_CPU) {
->> -                        gen_set_condexec(dc);
->> -                        gen_set_pc_im(dc, dc->pc);
->> -                        gen_helper_check_breakpoints(cpu_env);
->> -                        /* End the TB early; it's likely not going to be 
->> executed */
->> -                        dc->base.is_jmp = DISAS_UPDATE;
-> 
-> Oh I see what you're doing there in the main loop.
-> And I see that you're copying existing behaviour.
-> 
-> That said, I do wonder if there's a better way.
-> 
-> Looking back at the original patch (5d98bf8f), there do not
-> seem to have been any other side effects intended; simply
-> "single step" any insn for which this bp condition is met.
-> 
-> Another way to handle this would be if we could adjust max_insns = num_insns.
-> That would cause the loop to exit after the current insn, with DISAS_TOO_MANY 
-> if nothing else.
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Another possibility is is_jmp = DISAS_TOO_MANY, and exit the translation loop 
-after the breakpoint check only for is_jmp > DISAS_TOO_MANY.  That allows all 
-of the DISAS_TARGET_N values to exit as well.
+Refactors the qcrypto_cipher_free(), splits it into two parts. One
+is gcrypt/nettle__cipher_free_ctx() to free the special context.
 
+This makes code more clear, what's more, it would be used by the
+later patch.
 
-r~
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ crypto/cipher-gcrypt.c | 31 ++++++++++++++++++-------------
+ crypto/cipher-nettle.c | 18 ++++++++++++++----
+ 2 files changed, 32 insertions(+), 17 deletions(-)
+
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 6487eca..0ecffa2 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -64,6 +64,22 @@ struct QCryptoCipherGcrypt {
+     uint8_t *iv;
+ };
+ 
++static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
++                                   QCryptoCipherMode mode)
++{
++    if (!ctx) {
++        return;
++    }
++
++    gcry_cipher_close(ctx->handle);
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
++        gcry_cipher_close(ctx->tweakhandle);
++    }
++    g_free(ctx->iv);
++    g_free(ctx);
++}
++
++
+ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   QCryptoCipherMode mode,
+                                   const uint8_t *key, size_t nkey,
+@@ -228,11 +244,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+     return cipher;
+ 
+  error:
+-    gcry_cipher_close(ctx->handle);
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
+-        gcry_cipher_close(ctx->tweakhandle);
+-    }
+-    g_free(ctx);
++    gcrypt_cipher_free_ctx(ctx, mode);
+     g_free(cipher);
+     return NULL;
+ }
+@@ -240,17 +252,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+ 
+ void qcrypto_cipher_free(QCryptoCipher *cipher)
+ {
+-    QCryptoCipherGcrypt *ctx;
+     if (!cipher) {
+         return;
+     }
+-    ctx = cipher->opaque;
+-    gcry_cipher_close(ctx->handle);
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
+-        gcry_cipher_close(ctx->tweakhandle);
+-    }
+-    g_free(ctx->iv);
+-    g_free(ctx);
++    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
+     g_free(cipher);
+ }
+ 
+diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+index dfc9030..e04e3a1 100644
+--- a/crypto/cipher-nettle.c
++++ b/crypto/cipher-nettle.c
+@@ -249,6 +249,19 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+ }
+ 
+ 
++static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
++{
++    if (!ctx) {
++        return;
++    }
++
++    g_free(ctx->iv);
++    g_free(ctx->ctx);
++    g_free(ctx->ctx_tweak);
++    g_free(ctx);
++}
++
++
+ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   QCryptoCipherMode mode,
+                                   const uint8_t *key, size_t nkey,
+@@ -440,10 +453,7 @@ void qcrypto_cipher_free(QCryptoCipher *cipher)
+     }
+ 
+     ctx = cipher->opaque;
+-    g_free(ctx->iv);
+-    g_free(ctx->ctx);
+-    g_free(ctx->ctx_tweak);
+-    g_free(ctx);
++    nettle_cipher_free_ctx(ctx);
+     g_free(cipher);
+ }
+ 
+-- 
+1.8.3.1
