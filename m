@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVyCY-000544-9j
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:04 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCZ-00055c-EL
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVyCU-0007PQ-9d
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:02 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCX-0007RE-8d
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:03 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 11:51:24 +0100
-Message-Id: <1500029487-14822-7-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 11:51:20 +0100
+Message-Id: <1500029487-14822-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
 References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 6/9] hw/misc/mps2_scc: Implement MPS2 Serial
- Communication Controller
+Subject: [Qemu-devel] [PATCH v2 2/9] hw/char/cmsdk-apb-uart.c: Implement
+ CMSDK APB UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Implement a model of the Serial Communication Controller (SCC) found
-in MPS2 FPGA images.
-
-The primary purpose of this device is to communicate with the
-Motherboard Configuration Controller (MCC) which is located on
-the MPS board itself, outside the FPGA image. This is used
-for programming the MPS clock generators. The SCC also has
-some basic ID registers and an output for the board LEDs.
+Implement a model of the simple "APB UART" provided in
+the Cortex-M System Design Kit (CMSDK).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/Makefile.objs           |   1 +
- include/hw/misc/mps2-scc.h      |  43 ++++++
- hw/misc/mps2-scc.c              | 310 ++++++++++++++++++++++++++++++++++++++++
- default-configs/arm-softmmu.mak |   2 +
- hw/misc/trace-events            |   8 ++
- 5 files changed, 364 insertions(+)
- create mode 100644 include/hw/misc/mps2-scc.h
- create mode 100644 hw/misc/mps2-scc.c
+ hw/char/Makefile.objs            |   1 +
+ include/hw/char/cmsdk-apb-uart.h |  78 ++++++++
+ hw/char/cmsdk-apb-uart.c         | 402 +++++++++++++++++++++++++++++++++++++++
+ default-configs/arm-softmmu.mak  |   2 +
+ hw/char/trace-events             |   9 +
+ 5 files changed, 492 insertions(+)
+ create mode 100644 include/hw/char/cmsdk-apb-uart.h
+ create mode 100644 hw/char/cmsdk-apb-uart.c
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 7e373db..3b91d32 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -52,6 +52,7 @@ obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-+obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 55fcb68..1bcd37e 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -19,6 +19,7 @@ obj-$(CONFIG_DIGIC) += digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) += bcm2835_aux.o
  
- obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
-diff --git a/include/hw/misc/mps2-scc.h b/include/hw/misc/mps2-scc.h
++common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
+ common-obj-$(CONFIG_ISA_DEBUG) += debugcon.o
+ common-obj-$(CONFIG_GRLIB) += grlib_apbuart.o
+diff --git a/include/hw/char/cmsdk-apb-uart.h b/include/hw/char/cmsdk-apb-uart.h
 new file mode 100644
-index 0000000..7045473
+index 0000000..c41fba9
 --- /dev/null
-+++ b/include/hw/misc/mps2-scc.h
-@@ -0,0 +1,43 @@
++++ b/include/hw/char/cmsdk-apb-uart.h
+@@ -0,0 +1,78 @@
 +/*
-+ * ARM MPS2 SCC emulation
++ * ARM CMSDK APB UART emulation
 + *
 + * Copyright (c) 2017 Linaro Limited
 + * Written by Peter Maydell
@@ -76,15 +66,15 @@ index 0000000..7045473
 + *  (at your option) any later version.
 + */
 +
-+#ifndef MPS2_SCC_H
-+#define MPS2_SCC_H
++#ifndef CMSDK_APB_UART_H
++#define CMSDK_APB_UART_H
 +
 +#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
 +
-+#define TYPE_MPS2_SCC "mps2-scc"
-+#define MPS2_SCC(obj) OBJECT_CHECK(MPS2SCC, (obj), TYPE_MPS2_SCC)
-+
-+#define NUM_OSCCLK 3
++#define TYPE_CMSDK_APB_UART "cmsdk-apb-uart"
++#define CMSDK_APB_UART(obj) OBJECT_CHECK(CMSDKAPBUART, (obj), \
++                                         TYPE_CMSDK_APB_UART)
 +
 +typedef struct {
 +    /*< private >*/
@@ -92,30 +82,65 @@ index 0000000..7045473
 +
 +    /*< public >*/
 +    MemoryRegion iomem;
++    CharBackend chr;
++    qemu_irq txint;
++    qemu_irq rxint;
++    qemu_irq txovrint;
++    qemu_irq rxovrint;
++    qemu_irq uartint;
++    guint watch_tag;
++    uint32_t pclk_frq;
 +
-+    uint32_t cfg0;
-+    uint32_t cfg1;
-+    uint32_t cfg4;
-+    uint32_t cfgdata_rtn;
-+    uint32_t cfgdata_out;
-+    uint32_t cfgctrl;
-+    uint32_t cfgstat;
-+    uint32_t dll;
-+    uint32_t aid;
-+    uint32_t id;
-+    uint32_t oscclk[NUM_OSCCLK];
-+    uint32_t oscclk_reset[NUM_OSCCLK];
-+} MPS2SCC;
++    uint32_t state;
++    uint32_t ctrl;
++    uint32_t intstatus;
++    uint32_t bauddiv;
++    /* This UART has no FIFO, only a 1-character buffer for each of Tx and Rx */
++    uint8_t txbuf;
++    uint8_t rxbuf;
++} CMSDKAPBUART;
++
++/**
++ * cmsdk_apb_uart_create - convenience function to create TYPE_CMSDK_APB_UART
++ * @addr: location in system memory to map registers
++ * @chr: Chardev backend to connect UART to, or NULL if no backend
++ * @pclk_frq: frequency in Hz of the PCLK clock (used for calculating baud rate)
++ */
++static inline DeviceState *cmsdk_apb_uart_create(hwaddr addr,
++                                                 qemu_irq txint,
++                                                 qemu_irq rxint,
++                                                 qemu_irq txovrint,
++                                                 qemu_irq rxovrint,
++                                                 qemu_irq uartint,
++                                                 Chardev *chr,
++                                                 uint32_t pclk_frq)
++{
++    DeviceState *dev;
++    SysBusDevice *s;
++
++    dev = qdev_create(NULL, TYPE_CMSDK_APB_UART);
++    s = SYS_BUS_DEVICE(dev);
++    qdev_prop_set_chr(dev, "chardev", chr);
++    qdev_prop_set_uint32(dev, "pclk-frq", pclk_frq);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(s, 0, addr);
++    sysbus_connect_irq(s, 0, txint);
++    sysbus_connect_irq(s, 1, rxint);
++    sysbus_connect_irq(s, 2, txovrint);
++    sysbus_connect_irq(s, 3, rxovrint);
++    sysbus_connect_irq(s, 4, uartint);
++    return dev;
++}
 +
 +#endif
-diff --git a/hw/misc/mps2-scc.c b/hw/misc/mps2-scc.c
+diff --git a/hw/char/cmsdk-apb-uart.c b/hw/char/cmsdk-apb-uart.c
 new file mode 100644
-index 0000000..cc58d26
+index 0000000..82d2bea
 --- /dev/null
-+++ b/hw/misc/mps2-scc.c
-@@ -0,0 +1,310 @@
++++ b/hw/char/cmsdk-apb-uart.c
+@@ -0,0 +1,402 @@
 +/*
-+ * ARM MPS2 SCC emulation
++ * ARM CMSDK APB UART emulation
 + *
 + * Copyright (c) 2017 Linaro Limited
 + * Written by Peter Maydell
@@ -125,12 +150,10 @@ index 0000000..cc58d26
 + *  (at your option) any later version.
 + */
 +
-+/* This is a model of the SCC (Serial Communication Controller)
-+ * found in the FPGA images of MPS2 development boards.
-+ *
-+ * Documentation of it can be found in the MPS2 TRM:
-+ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.100112_0100_03_en/index.html
-+ * and also in the Application Notes documenting individual FPGA images.
++/* This is a model of the "APB UART" which is part of the Cortex-M
++ * System Design Kit (CMSDK) and documented in the Cortex-M System
++ * Design Kit Technical Reference Manual (ARM DDI0479C):
++ * https://developer.arm.com/products/system-design/system-design-kits/cortex-m-system-design-kit
 + */
 +
 +#include "qemu/osdep.h"
@@ -139,319 +162,414 @@ index 0000000..cc58d26
 +#include "trace.h"
 +#include "hw/sysbus.h"
 +#include "hw/registerfields.h"
-+#include "hw/misc/mps2-scc.h"
++#include "chardev/char-fe.h"
++#include "chardev/char-serial.h"
++#include "hw/char/cmsdk-apb-uart.h"
 +
-+REG32(CFG0, 0)
-+REG32(CFG1, 4)
-+REG32(CFG3, 0xc)
-+REG32(CFG4, 0x10)
-+REG32(CFGDATA_RTN, 0xa0)
-+REG32(CFGDATA_OUT, 0xa4)
-+REG32(CFGCTRL, 0xa8)
-+    FIELD(CFGCTRL, DEVICE, 0, 12)
-+    FIELD(CFGCTRL, RES1, 12, 8)
-+    FIELD(CFGCTRL, FUNCTION, 20, 6)
-+    FIELD(CFGCTRL, RES2, 26, 4)
-+    FIELD(CFGCTRL, WRITE, 30, 1)
-+    FIELD(CFGCTRL, START, 31, 1)
-+REG32(CFGSTAT, 0xac)
-+    FIELD(CFGSTAT, DONE, 0, 1)
-+    FIELD(CFGSTAT, ERROR, 1, 1)
-+REG32(DLL, 0x100)
-+REG32(AID, 0xFF8)
-+REG32(ID, 0xFFC)
++REG32(DATA, 0)
++REG32(STATE, 4)
++    FIELD(STATE, TXFULL, 0, 1)
++    FIELD(STATE, RXFULL, 1, 1)
++    FIELD(STATE, TXOVERRUN, 2, 1)
++    FIELD(STATE, RXOVERRUN, 3, 1)
++REG32(CTRL, 8)
++    FIELD(CTRL, TX_EN, 0, 1)
++    FIELD(CTRL, RX_EN, 1, 1)
++    FIELD(CTRL, TX_INTEN, 2, 1)
++    FIELD(CTRL, RX_INTEN, 3, 1)
++    FIELD(CTRL, TXO_INTEN, 4, 1)
++    FIELD(CTRL, RXO_INTEN, 5, 1)
++    FIELD(CTRL, HSTEST, 6, 1)
++REG32(INTSTATUS, 0xc)
++    FIELD(INTSTATUS, TX, 0, 1)
++    FIELD(INTSTATUS, RX, 1, 1)
++    FIELD(INTSTATUS, TXO, 2, 1)
++    FIELD(INTSTATUS, RXO, 3, 1)
++REG32(BAUDDIV, 0x10)
++REG32(PID4, 0xFD0)
++REG32(PID5, 0xFD4)
++REG32(PID6, 0xFD8)
++REG32(PID7, 0xFDC)
++REG32(PID0, 0xFE0)
++REG32(PID1, 0xFE4)
++REG32(PID2, 0xFE8)
++REG32(PID3, 0xFEC)
++REG32(CID0, 0xFF0)
++REG32(CID1, 0xFF4)
++REG32(CID2, 0xFF8)
++REG32(CID3, 0xFFC)
 +
-+/* Handle a write via the SYS_CFG channel to the specified function/device.
-+ * Return false on error (reported to guest via SYS_CFGCTRL ERROR bit).
-+ */
-+static bool scc_cfg_write(MPS2SCC *s, unsigned function,
-+                          unsigned device, uint32_t value)
++/* PID/CID values */
++static const int uart_id[] = {
++    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
++    0x21, 0xb8, 0x1b, 0x00, /* PID0..PID3 */
++    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
++};
++
++static bool uart_baudrate_ok(CMSDKAPBUART *s)
 +{
-+    trace_mps2_scc_cfg_write(function, device, value);
-+
-+    if (function != 1 || device >= NUM_OSCCLK) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "MPS2 SCC config write: bad function %d device %d\n",
-+                      function, device);
-+        return false;
-+    }
-+
-+    s->oscclk[device] = value;
-+    return true;
++    /* The minimum permitted bauddiv setting is 16, so we just ignore
++     * settings below that (usually this means the device has just
++     * been reset and not yet programmed).
++     */
++    return s->bauddiv >= 16 && s->bauddiv <= s->pclk_frq;
 +}
 +
-+/* Handle a read via the SYS_CFG channel to the specified function/device.
-+ * Return false on error (reported to guest via SYS_CFGCTRL ERROR bit),
-+ * or set *value on success.
-+ */
-+static bool scc_cfg_read(MPS2SCC *s, unsigned function,
-+                         unsigned device, uint32_t *value)
++static void uart_update_parameters(CMSDKAPBUART *s)
 +{
-+    if (function != 1 || device >= NUM_OSCCLK) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "MPS2 SCC config read: bad function %d device %d\n",
-+                      function, device);
-+        return false;
++    QEMUSerialSetParams ssp;
++
++    /* This UART is always 8N1 but the baud rate is programmable. */
++    if (!uart_baudrate_ok(s)) {
++        return;
 +    }
 +
-+    *value = s->oscclk[device];
-+
-+    trace_mps2_scc_cfg_read(function, device, *value);
-+    return true;
++    ssp.data_bits = 8;
++    ssp.parity = 'N';
++    ssp.stop_bits = 1;
++    ssp.speed = s->pclk_frq / s->bauddiv;
++    qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
++    trace_cmsdk_apb_uart_set_params(ssp.speed);
 +}
 +
-+static uint64_t mps2_scc_read(void *opaque, hwaddr offset, unsigned size)
++static void cmsdk_apb_uart_update(CMSDKAPBUART *s)
 +{
-+    MPS2SCC *s = MPS2_SCC(opaque);
++    /* update outbound irqs, including handling the way the rxo and txo
++     * interrupt status bits are just logical AND of the overrun bit in
++     * STATE and the overrun interrupt enable bit in CTRL.
++     */
++    uint32_t omask = (R_INTSTATUS_RXO_MASK | R_INTSTATUS_TXO_MASK);
++    s->intstatus &= ~omask;
++    s->intstatus |= (s->state & (s->ctrl >> 2) & omask);
++
++    qemu_set_irq(s->txint, !!(s->intstatus & R_INTSTATUS_TX_MASK));
++    qemu_set_irq(s->rxint, !!(s->intstatus & R_INTSTATUS_RX_MASK));
++    qemu_set_irq(s->txovrint, !!(s->intstatus & R_INTSTATUS_TXO_MASK));
++    qemu_set_irq(s->rxovrint, !!(s->intstatus & R_INTSTATUS_RXO_MASK));
++    qemu_set_irq(s->uartint, !!(s->intstatus));
++}
++
++static int uart_can_receive(void *opaque)
++{
++    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
++
++    /* We can take a char if RX is enabled and the buffer is empty */
++    if (s->ctrl & R_CTRL_RX_EN_MASK && !(s->state & R_STATE_RXFULL_MASK)) {
++        return 1;
++    }
++    return 0;
++}
++
++static void uart_receive(void *opaque, const uint8_t *buf, int size)
++{
++    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
++
++    trace_cmsdk_apb_uart_receive(*buf);
++
++    /* In fact uart_can_receive() ensures that we can't be
++     * called unless RX is enabled and the buffer is empty,
++     * but we include this logic as documentation of what the
++     * hardware does if a character arrives in these circumstances.
++     */
++    if (!(s->ctrl & R_CTRL_RX_EN_MASK)) {
++        /* Just drop the character on the floor */
++        return;
++    }
++
++    if (s->state & R_STATE_RXFULL_MASK) {
++        s->state |= R_STATE_RXOVERRUN_MASK;
++    }
++
++    s->rxbuf = *buf;
++    s->state |= R_STATE_RXFULL_MASK;
++    if (s->ctrl & R_CTRL_RX_INTEN_MASK) {
++        s->intstatus |= R_INTSTATUS_RX_MASK;
++    }
++    cmsdk_apb_uart_update(s);
++}
++
++static uint64_t uart_read(void *opaque, hwaddr offset, unsigned size)
++{
++    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
 +    uint64_t r;
 +
 +    switch (offset) {
-+    case A_CFG0:
-+        r = s->cfg0;
++    case A_DATA:
++        r = s->rxbuf;
++        s->state &= ~R_STATE_RXFULL_MASK;
++        cmsdk_apb_uart_update(s);
 +        break;
-+    case A_CFG1:
-+        r = s->cfg1;
++    case A_STATE:
++        r = s->state;
 +        break;
-+    case A_CFG3:
-+        /* These are user-settable DIP switches on the board. We don't
-+         * model that, so just return zeroes.
-+         */
-+        r = 0;
++    case A_CTRL:
++        r = s->ctrl;
 +        break;
-+    case A_CFG4:
-+        r = s->cfg4;
++    case A_INTSTATUS:
++        r = s->intstatus;
 +        break;
-+    case A_CFGDATA_RTN:
-+        r = s->cfgdata_rtn;
++    case A_BAUDDIV:
++        r = s->bauddiv;
 +        break;
-+    case A_CFGDATA_OUT:
-+        r = s->cfgdata_out;
-+        break;
-+    case A_CFGCTRL:
-+        r = s->cfgctrl;
-+        break;
-+    case A_CFGSTAT:
-+        r = s->cfgstat;
-+        break;
-+    case A_DLL:
-+        r = s->dll;
-+        break;
-+    case A_AID:
-+        r = s->aid;
-+        break;
-+    case A_ID:
-+        r = s->id;
++    case A_PID4 ... A_CID3:
++        r = uart_id[(offset - A_PID4) / 4];
 +        break;
 +    default:
 +        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "MPS2 SCC read: bad offset %x\n", (int) offset);
++                      "CMSDK APB UART read: bad offset %x\n", (int) offset);
 +        r = 0;
 +        break;
 +    }
-+
-+    trace_mps2_scc_read(offset, r, size);
++    trace_cmsdk_apb_uart_read(offset, r, size);
 +    return r;
 +}
 +
-+static void mps2_scc_write(void *opaque, hwaddr offset, uint64_t value,
-+                           unsigned size)
++/* Try to send tx data, and arrange to be called back later if
++ * we can't (ie the char backend is busy/blocking).
++ */
++static gboolean uart_transmit(GIOChannel *chan, GIOCondition cond, void *opaque)
 +{
-+    MPS2SCC *s = MPS2_SCC(opaque);
++    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
++    int ret;
 +
-+    trace_mps2_scc_write(offset, value, size);
++    s->watch_tag = 0;
++
++    if (!(s->ctrl & R_CTRL_TX_EN_MASK) || !(s->state & R_STATE_TXFULL_MASK)) {
++        return FALSE;
++    }
++
++    ret = qemu_chr_fe_write(&s->chr, &s->txbuf, 1);
++    if (ret <= 0) {
++        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
++                                             uart_transmit, s);
++        if (!s->watch_tag) {
++            /* Most common reason to be here is "no chardev backend":
++             * just insta-drain the buffer, so the serial output
++             * goes into a void, rather than blocking the guest.
++             */
++            goto buffer_drained;
++        }
++        /* Transmit pending */
++        trace_cmsdk_apb_uart_tx_pending();
++        return FALSE;
++    }
++
++buffer_drained:
++    /* Character successfully sent */
++    trace_cmsdk_apb_uart_tx(s->txbuf);
++    s->state &= ~R_STATE_TXFULL_MASK;
++    /* Going from TXFULL set to clear triggers the tx interrupt */
++    if (s->ctrl & R_CTRL_TX_INTEN_MASK) {
++        s->intstatus |= R_INTSTATUS_TX_MASK;
++    }
++    cmsdk_apb_uart_update(s);
++    return FALSE;
++}
++
++static void uart_cancel_transmit(CMSDKAPBUART *s)
++{
++    if (s->watch_tag) {
++        g_source_remove(s->watch_tag);
++        s->watch_tag = 0;
++    }
++}
++
++static void uart_write(void *opaque, hwaddr offset, uint64_t value,
++                       unsigned size)
++{
++    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
++
++    trace_cmsdk_apb_uart_write(offset, value, size);
 +
 +    switch (offset) {
-+    case A_CFG0:
-+        /* TODO on some boards bit 0 controls RAM remapping */
-+        s->cfg0 = value;
-+        break;
-+    case A_CFG1:
-+        /* CFG1 bits [7:0] control the board LEDs. We don't currently have
-+         * a mechanism for displaying this graphically, so use a trace event.
-+         */
-+        trace_mps2_scc_leds(value & 0x80 ? '*' : '.',
-+                            value & 0x40 ? '*' : '.',
-+                            value & 0x20 ? '*' : '.',
-+                            value & 0x10 ? '*' : '.',
-+                            value & 0x08 ? '*' : '.',
-+                            value & 0x04 ? '*' : '.',
-+                            value & 0x02 ? '*' : '.',
-+                            value & 0x01 ? '*' : '.');
-+        s->cfg1 = value;
-+        break;
-+    case A_CFGDATA_OUT:
-+        s->cfgdata_out = value;
-+        break;
-+    case A_CFGCTRL:
-+        /* Writing to CFGCTRL clears SYS_CFGSTAT */
-+        s->cfgstat = 0;
-+        s->cfgctrl = value & ~(R_CFGCTRL_RES1_MASK |
-+                               R_CFGCTRL_RES2_MASK |
-+                               R_CFGCTRL_START_MASK);
-+
-+        if (value & R_CFGCTRL_START_MASK) {
-+            /* Start bit set -- do a read or write (instantaneously) */
-+            int device = extract32(s->cfgctrl, R_CFGCTRL_DEVICE_SHIFT,
-+                                   R_CFGCTRL_DEVICE_LENGTH);
-+            int function = extract32(s->cfgctrl, R_CFGCTRL_FUNCTION_SHIFT,
-+                                     R_CFGCTRL_FUNCTION_LENGTH);
-+
-+            s->cfgstat = R_CFGSTAT_DONE_MASK;
-+            if (s->cfgctrl & R_CFGCTRL_WRITE_MASK) {
-+                if (!scc_cfg_write(s, function, device, s->cfgdata_out)) {
-+                    s->cfgstat |= R_CFGSTAT_ERROR_MASK;
-+                }
-+            } else {
-+                uint32_t result;
-+                if (!scc_cfg_read(s, function, device, &result)) {
-+                    s->cfgstat |= R_CFGSTAT_ERROR_MASK;
-+                } else {
-+                    s->cfgdata_rtn = result;
-+                }
-+            }
++    case A_DATA:
++        s->txbuf = value;
++        if (s->state & R_STATE_TXFULL_MASK) {
++            /* Buffer already full -- note the overrun and let the
++             * existing pending transmit callback handle the new char.
++             */
++            s->state |= R_STATE_TXOVERRUN_MASK;
++            cmsdk_apb_uart_update(s);
++        } else {
++            s->state |= R_STATE_TXFULL_MASK;
++            uart_transmit(NULL, G_IO_OUT, s);
 +        }
 +        break;
-+    case A_DLL:
-+        /* DLL stands for Digital Locked Loop.
-+         * Bits [31:24] (DLL_LOCK_MASK) are writable, and indicate a
-+         * mask of which of the DLL_LOCKED bits [16:23] should be ORed
-+         * together to determine the ALL_UNMASKED_DLLS_LOCKED bit [0].
-+         * For QEMU, our DLLs are always locked, so we can leave bit 0
-+         * as 1 always and don't need to recalculate it.
++    case A_STATE:
++        /* Bits 0 and 1 are read only; bits 2 and 3 are W1C */
++        s->state &= ~(value & 0xc);
++        cmsdk_apb_uart_update(s);
++        break;
++    case A_CTRL:
++        s->ctrl = value & 0x7f;
++        if ((s->ctrl & R_CTRL_TX_EN_MASK) && !uart_baudrate_ok(s)) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "CMSDK APB UART: Tx enabled with invalid baudrate\n");
++        }
++        cmsdk_apb_uart_update(s);
++        break;
++    case A_INTSTATUS:
++        /* All bits are W1C. Clearing the overrun interrupt bits really
++         * clears the overrun status bits in the STATE register (which
++         * is then reflected into the intstatus value by the update function).
 +         */
-+        s->dll = deposit32(s->dll, 24, 8, extract32(value, 24, 8));
++        s->state &= ~(value & 0xc);
++        cmsdk_apb_uart_update(s);
++        break;
++    case A_BAUDDIV:
++        s->bauddiv = value & 0xFFFFF;
++        uart_update_parameters(s);
++        break;
++    case A_PID4 ... A_CID3:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "CMSDK APB UART write: write to RO offset 0x%x\n",
++                      (int)offset);
 +        break;
 +    default:
 +        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "MPS2 SCC write: bad offset 0x%x\n", (int) offset);
++                      "CMSDK APB UART write: bad offset 0x%x\n", (int) offset);
 +        break;
 +    }
 +}
 +
-+static const MemoryRegionOps mps2_scc_ops = {
-+    .read = mps2_scc_read,
-+    .write = mps2_scc_write,
++static const MemoryRegionOps uart_ops = {
++    .read = uart_read,
++    .write = uart_write,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +};
 +
-+static void mps2_scc_reset(DeviceState *dev)
++static void cmsdk_apb_uart_reset(DeviceState *dev)
 +{
-+    MPS2SCC *s = MPS2_SCC(dev);
-+    int i;
++    CMSDKAPBUART *s = CMSDK_APB_UART(dev);
 +
-+    trace_mps2_scc_reset();
-+    s->cfg0 = 0;
-+    s->cfg1 = 0;
-+    s->cfgdata_rtn = 0;
-+    s->cfgdata_out = 0;
-+    s->cfgctrl = 0x100000;
-+    s->cfgstat = 0;
-+    s->dll = 0xffff0001;
-+    for (i = 0; i < NUM_OSCCLK; i++) {
-+        s->oscclk[i] = s->oscclk_reset[i];
-+    }
++    trace_cmsdk_apb_uart_reset();
++    uart_cancel_transmit(s);
++    s->state = 0;
++    s->ctrl = 0;
++    s->intstatus = 0;
++    s->bauddiv = 0;
++    s->txbuf = 0;
++    s->rxbuf = 0;
 +}
 +
-+static void mps2_scc_init(Object *obj)
++static void cmsdk_apb_uart_init(Object *obj)
 +{
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MPS2SCC *s = MPS2_SCC(obj);
++    CMSDKAPBUART *s = CMSDK_APB_UART(obj);
 +
-+    memory_region_init_io(&s->iomem, obj, &mps2_scc_ops, s, "mps2-scc", 0x1000);
++    memory_region_init_io(&s->iomem, obj, &uart_ops, s, "uart", 0x1000);
 +    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->txint);
++    sysbus_init_irq(sbd, &s->rxint);
++    sysbus_init_irq(sbd, &s->txovrint);
++    sysbus_init_irq(sbd, &s->rxovrint);
++    sysbus_init_irq(sbd, &s->uartint);
 +}
 +
-+static void mps2_scc_realize(DeviceState *dev, Error **errp)
++static void cmsdk_apb_uart_realize(DeviceState *dev, Error **errp)
 +{
++    CMSDKAPBUART *s = CMSDK_APB_UART(dev);
++
++    if (s->pclk_frq == 0) {
++        error_setg(errp, "CMSDK APB UART: pclk-frq property must be set");
++        return;
++    }
++
++    /* This UART has no flow control, so we do not need to register
++     * an event handler to deal with CHR_EVENT_BREAK.
++     */
++    qemu_chr_fe_set_handlers(&s->chr, uart_can_receive, uart_receive,
++                             NULL, s, NULL, true);
 +}
 +
-+static const VMStateDescription mps2_scc_vmstate = {
-+    .name = "mps2-scc",
++static int cmsdk_apb_uart_post_load(void *opaque, int version_id)
++{
++    CMSDKAPBUART *s = CMSDK_APB_UART(opaque);
++
++    /* If we have a pending character, arrange to resend it. */
++    if (s->state & R_STATE_TXFULL_MASK) {
++        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
++                                             uart_transmit, s);
++    }
++    uart_update_parameters(s);
++    return 0;
++}
++
++static const VMStateDescription cmsdk_apb_uart_vmstate = {
++    .name = "cmsdk-apb-uart",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
++    .post_load = cmsdk_apb_uart_post_load,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(cfg0, MPS2SCC),
-+        VMSTATE_UINT32(cfg1, MPS2SCC),
-+        VMSTATE_UINT32(cfgdata_rtn, MPS2SCC),
-+        VMSTATE_UINT32(cfgdata_out, MPS2SCC),
-+        VMSTATE_UINT32(cfgctrl, MPS2SCC),
-+        VMSTATE_UINT32(cfgstat, MPS2SCC),
-+        VMSTATE_UINT32(dll, MPS2SCC),
-+        VMSTATE_UINT32_ARRAY(oscclk, MPS2SCC, NUM_OSCCLK),
++        VMSTATE_UINT32(state, CMSDKAPBUART),
++        VMSTATE_UINT32(ctrl, CMSDKAPBUART),
++        VMSTATE_UINT32(intstatus, CMSDKAPBUART),
++        VMSTATE_UINT32(bauddiv, CMSDKAPBUART),
++        VMSTATE_UINT8(txbuf, CMSDKAPBUART),
++        VMSTATE_UINT8(rxbuf, CMSDKAPBUART),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static Property mps2_scc_properties[] = {
-+    /* Values for various read-only ID registers (which are specific
-+     * to the board model or FPGA image)
-+     */
-+    DEFINE_PROP_UINT32("scc-cfg4", MPS2SCC, aid, 0),
-+    DEFINE_PROP_UINT32("scc-aid", MPS2SCC, aid, 0),
-+    DEFINE_PROP_UINT32("scc-id", MPS2SCC, aid, 0),
-+    /* These are the initial settings for the source clocks on the board.
-+     * In hardware they can be configured via a config file read by the
-+     * motherboard configuration controller to suit the FPGA image.
-+     * These default values are used by most of the standard FPGA images.
-+     */
-+    DEFINE_PROP_UINT32("oscclk0", MPS2SCC, oscclk_reset[0], 50000000),
-+    DEFINE_PROP_UINT32("oscclk1", MPS2SCC, oscclk_reset[1], 24576000),
-+    DEFINE_PROP_UINT32("oscclk2", MPS2SCC, oscclk_reset[2], 25000000),
++static Property cmsdk_apb_uart_properties[] = {
++    DEFINE_PROP_CHR("chardev", CMSDKAPBUART, chr),
++    DEFINE_PROP_UINT32("pclk-frq", CMSDKAPBUART, pclk_frq, 0),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void mps2_scc_class_init(ObjectClass *klass, void *data)
++static void cmsdk_apb_uart_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->realize = mps2_scc_realize;
-+    dc->vmsd = &mps2_scc_vmstate;
-+    dc->reset = mps2_scc_reset;
-+    dc->props = mps2_scc_properties;
++    dc->realize = cmsdk_apb_uart_realize;
++    dc->vmsd = &cmsdk_apb_uart_vmstate;
++    dc->reset = cmsdk_apb_uart_reset;
++    dc->props = cmsdk_apb_uart_properties;
 +}
 +
-+static const TypeInfo mps2_scc_info = {
-+    .name = TYPE_MPS2_SCC,
++static const TypeInfo cmsdk_apb_uart_info = {
++    .name = TYPE_CMSDK_APB_UART,
 +    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MPS2SCC),
-+    .instance_init = mps2_scc_init,
-+    .class_init = mps2_scc_class_init,
++    .instance_size = sizeof(CMSDKAPBUART),
++    .instance_init = cmsdk_apb_uart_init,
++    .class_init = cmsdk_apb_uart_class_init,
 +};
 +
-+static void mps2_scc_register_types(void)
++static void cmsdk_apb_uart_register_types(void)
 +{
-+    type_register_static(&mps2_scc_info);
++    type_register_static(&cmsdk_apb_uart_info);
 +}
 +
-+type_init(mps2_scc_register_types);
++type_init(cmsdk_apb_uart_register_types);
 diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index c75f52c..bbdd3c1 100644
+index bfd2a88..d128e9d 100644
 --- a/default-configs/arm-softmmu.mak
 +++ b/default-configs/arm-softmmu.mak
-@@ -99,6 +99,8 @@ CONFIG_STM32F205_SOC=y
- CONFIG_CMSDK_APB_TIMER=y
- CONFIG_CMSDK_APB_UART=y
+@@ -96,6 +96,8 @@ CONFIG_STM32F2XX_ADC=y
+ CONFIG_STM32F2XX_SPI=y
+ CONFIG_STM32F205_SOC=y
  
-+CONFIG_MPS2_SCC=y
++CONFIG_CMSDK_APB_UART=y
 +
  CONFIG_VERSATILE_PCI=y
  CONFIG_VERSATILE_I2C=y
  
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 0cc556c..28b8cd1 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -53,3 +53,11 @@ milkymist_pfpu_pulse_irq(void) "Pulse IRQ"
- 
- # hw/misc/aspeed_scu.c
- aspeed_scu_write(uint64_t offset, unsigned size, uint32_t data) "To 0x%" PRIx64 " of size %u: 0x%" PRIx32
+diff --git a/hw/char/trace-events b/hw/char/trace-events
+index 7fd48bb..daf4ee4 100644
+--- a/hw/char/trace-events
++++ b/hw/char/trace-events
+@@ -56,3 +56,12 @@ pl011_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+ pl011_can_receive(uint32_t lcr, int read_count, int r) "LCR %08x read_count %d returning %d"
+ pl011_put_fifo(uint32_t c, int read_count) "new char 0x%x read_count now %d"
+ pl011_put_fifo_full(void) "FIFO now full, RXFF set"
 +
-+# hw/misc/mps2_scc.c
-+mps2_scc_read(uint64_t offset, uint64_t data, unsigned size) "MPS2 SCC read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+mps2_scc_write(uint64_t offset, uint64_t data, unsigned size) "MPS2 SCC write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
-+mps2_scc_reset(void) "MPS2 SCC: reset"
-+mps2_scc_leds(char led7, char led6, char led5, char led4, char led3, char led2, char led1, char led0) "MPS2 SCC LEDs: %c%c%c%c%c%c%c%c"
-+mps2_scc_cfg_write(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config write: function %d device %d data 0x%" PRIx32
-+mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config read: function %d device %d data 0x%" PRIx32
++# hw/char/cmsdk_apb_uart.c
++cmsdk_apb_uart_read(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB UART read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
++cmsdk_apb_uart_write(uint64_t offset, uint64_t data, unsigned size) "CMSDK APB UART write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
++cmsdk_apb_uart_reset(void) "CMSDK APB UART: reset"
++cmsdk_apb_uart_receive(uint8_t c) "CMSDK APB UART: got character 0x%x from backend"
++cmsdk_apb_uart_tx_pending(void) "CMSDK APB UART: character send to backend pending"
++cmsdk_apb_uart_tx(uint8_t c) "CMSDK APB UART: character 0x%x sent to backend"
++cmsdk_apb_uart_set_params(int speed) "CMSDK APB UART: params set to %d 8N1"
 -- 
 2.7.4
