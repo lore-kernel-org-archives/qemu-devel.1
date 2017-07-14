@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1dW07F-0001A2-Qb
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:54:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1dW0Gw-0004cu-EU
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:04:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1dW07C-0004n1-MY
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:54:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36688 helo=mx1.suse.de)
+	(envelope-from <berrange@redhat.com>) id 1dW0Gs-0007sb-KM
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:04:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43082)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1dW07C-0004lc-B4
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:54:38 -0400
-Date: Fri, 14 Jul 2017 14:54:30 +0200
-From: Michal Hocko <mhocko@kernel.org>
-Message-ID: <20170714125429.GP2618@dhcp22.suse.cz>
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
-	<20170714123023.GA2624@dhcp22.suse.cz>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dW0Gs-0007rY-BB
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:04:38 -0400
+Date: Fri, 14 Jul 2017 14:04:28 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170714130428.GG28095@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170714123023.GA2624@dhcp22.suse.cz>
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+In-Reply-To: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 00/18] crypto: add afalg-backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,185 +27,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: longpeng.mike@gmail.com
+Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-On Fri 14-07-17 14:30:23, Michal Hocko wrote:
-> On Wed 12-07-17 20:40:19, Wei Wang wrote:
-> > This patch adds support for reporting blocks of pages on the free list
-> > specified by the caller.
-> > 
-> > As pages can leave the free list during this call or immediately
-> > afterwards, they are not guaranteed to be free after the function
-> > returns. The only guarantee this makes is that the page was on the free
-> > list at some point in time after the function has been invoked.
-> > 
-> > Therefore, it is not safe for caller to use any pages on the returned
-> > block or to discard data that is put there after the function returns.
-> > However, it is safe for caller to discard data that was in one of these
-> > pages before the function was invoked.
+On Fri, Jul 14, 2017 at 07:38:22AM -0400, longpeng.mike@gmail.com wrote:
+> From: "Longpeng(Mike)" <longpeng2@huawei.com>
 > 
-> I do not understand what is the point of such a function and how it is
-> used because the patch doesn't give us any user (I haven't checked other
-> patches yet).
+> The AF_ALG socket family is the userspace interface for linux
+> crypto API, users can use it to access hardware accelerators.
 > 
-> But just from the semantic point of view this sounds like a horrible
-> idea. The only way to get a free block of pages is to call the page
-> allocator. I am tempted to give it Nack right on those grounds but I
-> would like to hear more about what you actually want to achieve.
+> This patchset adds a afalg-backend for qemu crypto subsystem. Currently
+> when performs encrypt/decrypt, we'll try afalg-backend first and will
+> back to libiary-backend if it failed.
+> 
+> In the next step, It would support a command parameter to specifies
+> which backends prefer to and some other improvements.
+> 
+> I measured the performance about the afalg-backend impls, I tested
+> how many data could be encrypted in 5 seconds.
+> 
+> NOTE: If we use specific hardware crypto cards, I think afalg-backend
+>       would even faster.
+> 
+> test-environment: Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
+> 
+> *sha256*
+> chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+> 512                 93.03                       185.87
+> 1024                146.32                      201.78
+> 2048                213.32                      210.93
+> 4096                275.48                      215.26
+> 8192                321.77                      217.49
+> 16384               349.60                      219.26
+> 32768               363.59                      219.73
+> 65536               375.79                      219.99
+> 
+> *hmac(sha256)*
+> chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+> 512                 71.26                       165.55
+> 1024                117.43                      189.15
+> 2048                180.96                      203.24
+> 4096                247.60                      211.38
+> 8192                301.99                      215.65
+> 16384               340.79                      218.22
+> 32768               365.51                      219.49
+> 65536               377.92                      220.24
+> 
+> *cbc(aes128)*
+> chunk_size(bytes)   MB/sec(afalg:cbc-aes-aesni)  MB/sec(nettle)
+> 512                 371.76                       188.41
+> 1024                559.86                       189.64
+> 2048                768.66                       192.11
+> 4096                939.15                       192.40
+> 8192                1029.48                      192.49
+> 16384               1072.79                      190.52
+> 32768               1109.38                      190.41
+> 65536               1102.38                      190.40
 
-OK, so I gave it another thought and giving a page which is still on the
-free list to a random module is just a free ticket to a disaster.
-Nacked-by: Michal Hocko <mhocko@suse.com>
+So I've attempted to replicate these results, and see totally
+different outcome. NB, I hacked your code so that setting
+QEMU_DISABLE_AF_ALG=1 would skip the af-alg impl. The results
+I get are:
 
-> 
-> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > ---
-> >  include/linux/mm.h |  5 +++
-> >  mm/page_alloc.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 101 insertions(+)
-> > 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 46b9ac5..76cb433 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -1835,6 +1835,11 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
-> >  		unsigned long zone_start_pfn, unsigned long *zholes_size);
-> >  extern void free_initmem(void);
-> >  
-> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
-> > +extern int report_unused_page_block(struct zone *zone, unsigned int order,
-> > +				    unsigned int migratetype,
-> > +				    struct page **page);
-> > +#endif
-> >  /*
-> >   * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
-> >   * into the buddy system. The freed pages will be poisoned with pattern
-> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> > index 64b7d82..8b3c9dd 100644
-> > --- a/mm/page_alloc.c
-> > +++ b/mm/page_alloc.c
-> > @@ -4753,6 +4753,102 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
-> >  	show_swap_cache_info();
-> >  }
-> >  
-> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
-> > +
-> > +/*
-> > + * Heuristically get a page block in the system that is unused.
-> > + * It is possible that pages from the page block are used immediately after
-> > + * report_unused_page_block() returns. It is the caller's responsibility
-> > + * to either detect or prevent the use of such pages.
-> > + *
-> > + * The free list to check: zone->free_area[order].free_list[migratetype].
-> > + *
-> > + * If the caller supplied page block (i.e. **page) is on the free list, offer
-> > + * the next page block on the list to the caller. Otherwise, offer the first
-> > + * page block on the list.
-> > + *
-> > + * Note: it is not safe for caller to use any pages on the returned
-> > + * block or to discard data that is put there after the function returns.
-> > + * However, it is safe for caller to discard data that was in one of these
-> > + * pages before the function was invoked.
-> > + *
-> > + * Return 0 when a page block is found on the caller specified free list.
-> > + */
-> > +int report_unused_page_block(struct zone *zone, unsigned int order,
-> > +			     unsigned int migratetype, struct page **page)
-> > +{
-> > +	struct zone *this_zone;
-> > +	struct list_head *this_list;
-> > +	int ret = 0;
-> > +	unsigned long flags;
-> > +
-> > +	/* Sanity check */
-> > +	if (zone == NULL || page == NULL || order >= MAX_ORDER ||
-> > +	    migratetype >= MIGRATE_TYPES)
-> > +		return -EINVAL;
-> > +
-> > +	/* Zone validity check */
-> > +	for_each_populated_zone(this_zone) {
-> > +		if (zone == this_zone)
-> > +			break;
-> > +	}
-> > +
-> > +	/* Got a non-existent zone from the caller? */
-> > +	if (zone != this_zone)
-> > +		return -EINVAL;
-> 
-> Huh, what do you check for here? Why don't you simply
-> populated_zone(zone)?
-> 
-> > +
-> > +	spin_lock_irqsave(&this_zone->lock, flags);
-> > +
-> > +	this_list = &zone->free_area[order].free_list[migratetype];
-> > +	if (list_empty(this_list)) {
-> > +		*page = NULL;
-> > +		ret = 1;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/* The caller is asking for the first free page block on the list */
-> > +	if ((*page) == NULL) {
-> > +		*page = list_first_entry(this_list, struct page, lru);
-> > +		ret = 0;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/*
-> > +	 * The page block passed from the caller is not on this free list
-> > +	 * anymore (e.g. a 1MB free page block has been split). In this case,
-> > +	 * offer the first page block on the free list that the caller is
-> > +	 * asking for.
-> > +	 */
-> > +	if (PageBuddy(*page) && order != page_order(*page)) {
-> > +		*page = list_first_entry(this_list, struct page, lru);
-> > +		ret = 0;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/*
-> > +	 * The page block passed from the caller has been the last page block
-> > +	 * on the list.
-> > +	 */
-> > +	if ((*page)->lru.next == this_list) {
-> > +		*page = NULL;
-> > +		ret = 1;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/*
-> > +	 * Finally, fall into the regular case: the page block passed from the
-> > +	 * caller is still on the free list. Offer the next one.
-> > +	 */
-> > +	*page = list_next_entry((*page), lru);
-> > +	ret = 0;
-> > +out:
-> > +	spin_unlock_irqrestore(&this_zone->lock, flags);
-> > +	return ret;
-> > +}
-> > +EXPORT_SYMBOL(report_unused_page_block);
-> > +
-> > +#endif
-> > +
-> >  static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
-> >  {
-> >  	zoneref->zone = zone;
-> > -- 
-> > 2.7.4
-> > 
-> > --
-> > To unsubscribe, send a message with 'unsubscribe linux-mm' in
-> > the body to majordomo@kvack.org.  For more info on Linux MM,
-> > see: http://www.linux-mm.org/ .
-> > Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
-> 
-> -- 
-> Michal Hocko
-> SUSE Labs
+$ tests/benchmark-crypto-hash --quiet
+sha256: Testing chunk_size 512 bytes done: 197.31 MB in 5.00 secs: 39.46 MB/sec
+sha256: Testing chunk_size 1024 bytes done: 337.03 MB in 5.00 secs: 67.41 MB/sec
+sha256: Testing chunk_size 2048 bytes done: 516.27 MB in 5.00 secs: 103.25 MB/sec
+sha256: Testing chunk_size 4096 bytes done: 675.18 MB in 5.00 secs: 135.04 MB/sec
+sha256: Testing chunk_size 8192 bytes done: 837.73 MB in 5.00 secs: 167.55 MB/sec
+sha256: Testing chunk_size 16384 bytes done: 946.78 MB in 5.00 secs: 189.35 MB/sec
+sha256: Testing chunk_size 32768 bytes done: 1008.56 MB in 5.00 secs: 201.71 MB/sec
+sha256: Testing chunk_size 65536 bytes done: 1037.19 MB in 5.00 secs: 207.43 MB/sec
 
+$ QEMU_DISABLE_AF_ALG=1 tests/benchmark-crypto-hash --quiet
+sha256: Testing chunk_size 512 bytes done: 1099.92 MB in 5.00 secs: 219.98 MB/sec
+sha256: Testing chunk_size 1024 bytes done: 1223.40 MB in 5.00 secs: 244.68 MB/sec
+sha256: Testing chunk_size 2048 bytes done: 1304.04 MB in 5.00 secs: 260.81 MB/sec
+sha256: Testing chunk_size 4096 bytes done: 1339.29 MB in 5.00 secs: 267.86 MB/sec
+sha256: Testing chunk_size 8192 bytes done: 1359.68 MB in 5.00 secs: 271.94 MB/sec
+sha256: Testing chunk_size 16384 bytes done: 1363.58 MB in 5.00 secs: 272.71 MB/sec
+sha256: Testing chunk_size 32768 bytes done: 1364.66 MB in 5.00 secs: 272.93 MB/sec
+sha256: Testing chunk_size 65536 bytes done: 1326.56 MB in 5.00 secs: 265.30 MB/sec
+
+
+  ==> AF_ALG is slower in every case, by as much as x4
+
+
+
+$ tests/benchmark-crypto-hmac --quiet
+hmac(sha256): Testing chunk_size 512 bytes done: 173.83 MB in 5.00 secs: 34.77 MB/sec
+hmac(sha256): Testing chunk_size 1024 bytes done: 302.32 MB in 5.00 secs: 60.46 MB/sec
+hmac(sha256): Testing chunk_size 2048 bytes done: 469.93 MB in 5.00 secs: 93.99 MB/sec
+hmac(sha256): Testing chunk_size 4096 bytes done: 648.27 MB in 5.00 secs: 129.65 MB/sec
+hmac(sha256): Testing chunk_size 8192 bytes done: 800.80 MB in 5.00 secs: 160.16 MB/sec
+hmac(sha256): Testing chunk_size 16384 bytes done: 887.09 MB in 5.00 secs: 177.42 MB/sec
+hmac(sha256): Testing chunk_size 32768 bytes done: 932.09 MB in 5.00 secs: 186.41 MB/sec
+hmac(sha256): Testing chunk_size 65536 bytes done: 1013.25 MB in 5.00 secs: 202.64 MB/sec
+
+$ QEMU_DISABLE_AF_ALG=1 tests/benchmark-crypto-hmac --quiet
+hmac(sha256): Testing chunk_size 512 bytes done: 751.36 MB in 5.00 secs: 150.27 MB/sec
+hmac(sha256): Testing chunk_size 1024 bytes done: 961.43 MB in 5.00 secs: 192.29 MB/sec
+hmac(sha256): Testing chunk_size 2048 bytes done: 1110.92 MB in 5.00 secs: 222.18 MB/sec
+hmac(sha256): Testing chunk_size 4096 bytes done: 1225.78 MB in 5.00 secs: 245.16 MB/sec
+hmac(sha256): Testing chunk_size 8192 bytes done: 1300.52 MB in 5.00 secs: 260.10 MB/sec
+hmac(sha256): Testing chunk_size 16384 bytes done: 1327.00 MB in 5.00 secs: 265.40 MB/sec
+hmac(sha256): Testing chunk_size 32768 bytes done: 1345.72 MB in 5.00 secs: 269.14 MB/sec
+hmac(sha256): Testing chunk_size 65536 bytes done: 1348.50 MB in 5.00 secs: 269.69 MB/sec
+
+
+  ==> AF_ALG is slower in every case, by as much as x4
+
+
+
+$ tests/benchmark-crypto-cipher --quiet
+cbc(aes128): Testing chunk_size 512 bytes done: 1571.74 MB in 5.00 secs: 314.35 MB/sec
+cbc(aes128): Testing chunk_size 1024 bytes done: 2436.54 MB in 5.00 secs: 487.31 MB/sec
+cbc(aes128): Testing chunk_size 2048 bytes done: 3412.53 MB in 5.00 secs: 682.50 MB/sec
+cbc(aes128): Testing chunk_size 4096 bytes done: 4307.00 MB in 5.00 secs: 861.40 MB/sec
+cbc(aes128): Testing chunk_size 8192 bytes done: 4854.20 MB in 5.00 secs: 970.84 MB/sec
+cbc(aes128): Testing chunk_size 16384 bytes done: 5180.72 MB in 5.00 secs: 1036.14 MB/sec
+cbc(aes128): Testing chunk_size 32768 bytes done: 5390.25 MB in 5.00 secs: 1078.05 MB/sec
+cbc(aes128): Testing chunk_size 65536 bytes done: 5427.94 MB in 5.00 secs: 1085.59 MB/sec
+
+
+$ QEMU_DISABLE_AF_ALG=1 tests/benchmark-crypto-cipher --quiet
+cbc(aes128): Testing chunk_size 512 bytes done: 4204.65 MB in 5.00 secs: 840.93 MB/sec
+cbc(aes128): Testing chunk_size 1024 bytes done: 4362.01 MB in 5.00 secs: 872.40 MB/sec
+cbc(aes128): Testing chunk_size 2048 bytes done: 4347.91 MB in 5.00 secs: 869.58 MB/sec
+cbc(aes128): Testing chunk_size 4096 bytes done: 4432.54 MB in 5.00 secs: 886.51 MB/sec
+cbc(aes128): Testing chunk_size 8192 bytes done: 4416.47 MB in 5.00 secs: 883.29 MB/sec
+cbc(aes128): Testing chunk_size 16384 bytes done: 4469.45 MB in 5.00 secs: 893.89 MB/sec
+cbc(aes128): Testing chunk_size 32768 bytes done: 4454.56 MB in 5.00 secs: 890.91 MB/sec
+cbc(aes128): Testing chunk_size 65536 bytes done: 4518.50 MB in 5.00 secs: 903.70 MB/sec
+
+
+  => AF_ALG is slower until chunk_size is 8192 or larger.
+
+
+I of course don't have the same CPU as you, but it is a representative
+current model  Intel(R) Core(TM) i7-6820HQ CPU @ 2.70GHz
+
+I can, however, imagine that there are scenarios where this is faster,
+particularly if using this in an embedded scenario with a relatively
+low perf main CPU, but a hardware accelerator available.
+
+Based on this though, I'm very reluctant to enable AF_ALG by default
+when building QEMU, because I think it'll likely cause a major perf
+regression for the common case of people with fast CPUs and no
+hardware accelerator.
+
+I think in the immediate term we should add a switch to configure
+--enable-crypto-afalg, that must be opt-in when building QEMU,
+so those people who know they have good hardware accelerator
+present can use it, but in the general case we avoid it.
+
+For the general case, I think we need to figure out how to make
+direct use of CPU insturctions for crypto, eg Intel aesni. This
+might be possible by using GNUTLS for ciphers (though it lacks
+coverage for all the combinations we want)
+
+Regards,
+Daniel
 -- 
-Michal Hocko
-SUSE Labs
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
