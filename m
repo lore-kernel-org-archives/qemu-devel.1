@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP8-0008Mi-Sh
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:04 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP9-0008Nf-RA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP7-00040V-Gk
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34549
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP6-0003zU-NI
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38821
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVyP7-0003zv-BX
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:01 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1dVyP6-0003yq-H2
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:00 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EB4msi072654
+	v6EB4oQH044272
 	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:05:00 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bps8cr2qa-1
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bpmfrhj0q-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:05:00 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:04:59 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 12:04:58 +0100
+	Fri, 14 Jul 2017 12:04:57 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:59 +0200
+Date: Fri, 14 Jul 2017 12:40:51 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-33-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 32/40] s390x/cpumodel: add zpci,
- aen and ais facilities
+Message-Id: <1500028867-134709-25-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 24/40] pc-bios/s390-ccw: Add code for virtio
+ feature negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,160 +40,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
 
-zPCI instructions and facilities are available since IBM zEnterprise
-EC12. To support z/PCI in QEMU we enable zpci, aen and ais facilities
-starting with zEC12 GA1. And we always set zpci and aen bits in max cpu
-model. Later they might be switched off due to applied real cpu model.
-For ais bit, we only provide it in the full cpu model beginning with
-zEC12 and defer its enablement in the default cpu model to a later point
-in time. At the same time, disable them for 2.9 and older machines.
+The upcoming virtio-net driver needs to negotiate some features,
+so we need the possibility to do this in the core virtio code.
 
-Because of introducing AIS facility, we could check if it's enabled to
-initialize flic->ais_supported with the real value.
-
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1499863793-18627-8-git-send-email-thuth@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/intc/s390_flic.c             | 3 ++-
- hw/intc/s390_flic_kvm.c         | 3 ---
- hw/s390x/s390-virtio-ccw.c      | 3 +++
- target/s390x/cpu_features.c     | 3 +++
- target/s390x/cpu_features_def.h | 3 +++
- target/s390x/gen-features.c     | 5 +++++
- target/s390x/kvm.c              | 7 +++++++
- 7 files changed, 23 insertions(+), 4 deletions(-)
+ pc-bios/s390-ccw/s390-ccw.h |  2 ++
+ pc-bios/s390-ccw/virtio.c   | 23 +++++++++++++++++------
+ pc-bios/s390-ccw/virtio.h   |  1 +
+ 3 files changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index ff6e4ec..6e7c610 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -163,9 +163,10 @@ static void s390_flic_common_realize(DeviceState *dev, Error **errp)
-     if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
-         error_setg(errp, "flic property adapter_routes_max_batch too big"
-                    " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
-+        return;
-     }
+diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+index 6fdc858..25d4d21 100644
+--- a/pc-bios/s390-ccw/s390-ccw.h
++++ b/pc-bios/s390-ccw/s390-ccw.h
+@@ -44,6 +44,8 @@ typedef unsigned long long __u64;
+                             ((b) == 0 ? (a) : (MIN(a, b))))
+ #endif
  
--    fs->ais_supported = true;
-+    fs->ais_supported = s390_has_feat(S390_FEAT_ADAPTER_INT_SUPPRESSION);
- }
- 
- static void s390_flic_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index a587ace..d93503f 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -444,7 +444,6 @@ typedef struct KVMS390FLICStateClass {
- 
- static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
- {
--    S390FLICState *fs = S390_FLIC_COMMON(dev);
-     KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
-     struct kvm_create_device cd = {0};
-     struct kvm_device_attr test_attr = {0};
-@@ -476,8 +475,6 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     test_attr.group = KVM_DEV_FLIC_CLEAR_IO_IRQ;
-     flic_state->clear_io_supported = !ioctl(flic_state->fd,
-                                             KVM_HAS_DEVICE_ATTR, test_attr);
--
--    fs->ais_supported = false;
-     return;
- fail:
-     error_propagate(errp, errp_local);
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 23e9658..e484aed 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -503,6 +503,9 @@ DEFINE_CCW_MACHINE(2_10, "2.10", true);
- static void ccw_machine_2_9_instance_options(MachineState *machine)
- {
-     ccw_machine_2_10_instance_options(machine);
-+    s390_cpudef_featoff_greater(12, 1, S390_FEAT_ZPCI);
-+    s390_cpudef_featoff_greater(12, 1, S390_FEAT_ADAPTER_INT_SUPPRESSION);
-+    s390_cpudef_featoff_greater(12, 1, S390_FEAT_ADAPTER_EVENT_NOTIFICATION);
- }
- 
- static void ccw_machine_2_9_class_options(MachineClass *mc)
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 0436dc2..8ab5cd7 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -74,6 +74,9 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("stfle53", S390_FEAT_TYPE_STFL, 53, "Various facilities introduced with z13"),
-     FEAT_INIT("msa5-base", S390_FEAT_TYPE_STFL, 57, "Message-security-assist-extension-5 facility (excluding subfunctions)"),
-     FEAT_INIT("ri", S390_FEAT_TYPE_STFL, 64, "CPU runtime-instrumentation facility"),
-+    FEAT_INIT("zpci", S390_FEAT_TYPE_STFL, 69, "z/PCI facility"),
-+    FEAT_INIT("aen", S390_FEAT_TYPE_STFL, 71, "General-purpose-adapter-event-notification facility"),
-+    FEAT_INIT("ais", S390_FEAT_TYPE_STFL, 72, "General-purpose-adapter-interruption-suppression facility"),
-     FEAT_INIT("te", S390_FEAT_TYPE_STFL, 73, "Transactional-execution facility"),
-     FEAT_INIT("sthyi", S390_FEAT_TYPE_STFL, 74, "Store-hypervisor-information facility"),
-     FEAT_INIT("aefsi", S390_FEAT_TYPE_STFL, 75, "Access-exception-fetch/store-indication facility"),
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index f5bb7ed..c939a00 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -65,6 +65,9 @@ typedef enum {
-     S390_FEAT_STFLE_53,
-     S390_FEAT_MSA_EXT_5,
-     S390_FEAT_RUNTIME_INSTRUMENTATION,
-+    S390_FEAT_ZPCI,
-+    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
-+    S390_FEAT_ADAPTER_INT_SUPPRESSION,
-     S390_FEAT_TRANSACTIONAL_EXE,
-     S390_FEAT_STORE_HYPERVISOR_INFO,
-     S390_FEAT_ACCESS_EXCEPTION_FS_INDICATION,
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 8ca2b47..622ee24 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -389,6 +389,9 @@ static uint16_t full_GEN12_GA1[] = {
-     S390_FEAT_CONSTRAINT_TRANSACTIONAL_EXE,
-     S390_FEAT_TRANSACTIONAL_EXE,
-     S390_FEAT_RUNTIME_INSTRUMENTATION,
-+    S390_FEAT_ZPCI,
-+    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
-+    S390_FEAT_ADAPTER_INT_SUPPRESSION,
-     S390_FEAT_EDAT_2,
- };
- 
-@@ -446,6 +449,8 @@ static uint16_t default_GEN12_GA1[] = {
-     S390_FEAT_CONSTRAINT_TRANSACTIONAL_EXE,
-     S390_FEAT_TRANSACTIONAL_EXE,
-     S390_FEAT_RUNTIME_INSTRUMENTATION,
-+    S390_FEAT_ZPCI,
-+    S390_FEAT_ADAPTER_EVENT_NOTIFICATION,
-     S390_FEAT_EDAT_2,
- };
- 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 78ebe83..1901153 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -302,6 +302,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
-+    /* Try to enable AIS facility */
-+    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
++#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 +
-     qemu_mutex_init(&qemu_sigp_mutex);
+ #include "cio.h"
+ #include "iplb.h"
  
-     return 0;
-@@ -2635,6 +2638,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         set_bit(S390_FEAT_CMM, model->features);
-     }
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index 9d9e61f..18fc5d1 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -12,6 +12,7 @@
+ #include "s390-ccw.h"
+ #include "virtio.h"
+ #include "virtio-scsi.h"
++#include "bswap.h"
  
-+    /* set zpci and aen facilities */
-+    set_bit(S390_FEAT_ZPCI, model->features);
-+    set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
-+
-     if (s390_known_cpu_type(cpu_type)) {
-         /* we want the exact model, even if some features are missing */
-         model->def = s390_find_cpu_def(cpu_type, ibc_gen(unblocked_ibc),
+ #define VRING_WAIT_REPLY_TIMEOUT 3
+ 
+@@ -249,8 +250,12 @@ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd)
+ 
+ void virtio_setup_ccw(VDev *vdev)
+ {
+-    int i, cfg_size = 0;
++    int i, rc, cfg_size = 0;
+     unsigned char status = VIRTIO_CONFIG_S_DRIVER_OK;
++    struct VirtioFeatureDesc {
++        uint32_t features;
++        uint8_t index;
++    } __attribute__((packed)) feats;
+ 
+     IPL_assert(virtio_is_supported(vdev->schid), "PE");
+     /* device ID has been established now */
+@@ -277,11 +282,17 @@ void virtio_setup_ccw(VDev *vdev)
+     IPL_assert(run_ccw(vdev, CCW_CMD_READ_CONF, &vdev->config, cfg_size) == 0,
+                "Could not get block device configuration");
+ 
+-    /*
+-     * Skipping CCW_CMD_READ_FEAT. We're not doing anything fancy, and
+-     * we'll just stop dead anyway if anything does not work like we
+-     * expect it.
+-     */
++    /* Feature negotiation */
++    for (i = 0; i < ARRAY_SIZE(vdev->guest_features); i++) {
++        feats.features = 0;
++        feats.index = i;
++        rc = run_ccw(vdev, CCW_CMD_READ_FEAT, &feats, sizeof(feats));
++        IPL_assert(rc == 0, "Could not get features bits");
++        vdev->guest_features[i] &= bswap32(feats.features);
++        feats.features = bswap32(vdev->guest_features[i]);
++        rc = run_ccw(vdev, CCW_CMD_WRITE_FEAT, &feats, sizeof(feats));
++        IPL_assert(rc == 0, "Could not set features bits");
++    }
+ 
+     for (i = 0; i < vdev->nr_vqs; i++) {
+         VqInfo info = {
+diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
+index d733780..a00a320 100644
+--- a/pc-bios/s390-ccw/virtio.h
++++ b/pc-bios/s390-ccw/virtio.h
+@@ -251,6 +251,7 @@ struct VDev {
+     ScsiDevice selected_scsi_device;
+     uint64_t netboot_start_addr;
+     uint32_t max_transfer;
++    uint32_t guest_features[2];
+ };
+ typedef struct VDev VDev;
+ 
 -- 
 2.7.4
