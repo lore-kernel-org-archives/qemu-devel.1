@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVxFB-0007CG-RD
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVxFm-0007eS-Mi
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:51:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVxF8-0004mv-Of
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:41 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri, 14 Jul 2017 12:50:27 +0300
-Message-Id: <150002582711.22386.191527630537864599.stgit@frigg.lan>
-In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+	(envelope-from <peter.maydell@linaro.org>) id 1dVxFl-0005Tn-Tj
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:51:18 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38291)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVxFl-0005Sh-LJ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:51:17 -0400
+Received: by mail-wm0-x232.google.com with SMTP id f67so17281849wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 02:51:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 24/26] target/arm: [tcg] Port to disas_log
+In-Reply-To: <72a57684-fcbe-6096-32c6-6dfe19804667@redhat.com>
+References: <20170714021509.23681-1-famz@redhat.com>
+	<72a57684-fcbe-6096-32c6-6dfe19804667@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 10:50:55 +0100
+Message-ID: <CAFEAcA8MuMQAXspZO0s8dgjLhO5v1g7EDRgitS9eSMxhVWrktg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] qdev: Introduce DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
+On 14 July 2017 at 10:42, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 14/07/2017 04:14, Fam Zheng wrote:
+>> v4: Add a pointer type param to DEFINE_PROP_LINK, don't change pointer types to
+>>     "Object *". [Paolo]
+>>
+>> v3: Include Igor's patch, and fix virtio-crypto too.
+>>     Always use qdev_prop_allow_set_link_before_realize and
+>>     OBJ_PROP_LINK_UNREF_ON_RELEASE.
+>>     Include as many applicable devices as possible and some more clean-ups.
+>>     There are still more left but they use uncommon check and flags parameters,
+>>     it's better to take care of them in following batches.
+>>
+>> v2: Create a new header for link properties. [Paolo]
+>>     Don't wrap, use PropertyInfo.create() (much better diffstat, yay!).
+>>     [Paolo]
+>>
+>> Link properties of devices created with object_property_add_link() are not
+>> reflected in HMP "info qtree". For example, whether a virtio-blk device has an
+>> iothread (i.e. has enabled data plane) can not be introspected easily.
+>>
+>> Introduce a new type of qdev property macro to fix that.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Benne=C3=A9 <alex.benee@linaro.org>
----
- target/arm/translate.c |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+> I'm leaving the ARM patches to Peter and respinning my pull request with
+> the others.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index f221cbee5d..507f51d001 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12135,6 +12135,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcb=
-ase, CPUState *cpu)
-     }
- }
-=20
-+static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *c=
-pu)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
-+
-+    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
-+    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
-+                     dc->thumb | (dc->sctlr_b << 1));
-+}
-+
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
- {
-@@ -12222,9 +12231,7 @@ void gen_intermediate_code(CPUState *cs, Translat=
-ionBlock *tb)
-         qemu_log_in_addr_range(dc->base.pc_first)) {
-         qemu_log_lock();
-         qemu_log("----------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_fir=
-st,
--                         dc->thumb | (dc->sctlr_b << 1));
-+        arm_tr_disas_log(&dc->base, cs);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
+OK. Fam, you'll need to send a patchset with whatever the stuff
+I need to pick up is, then (and it'll need to get to me by monday
+given the freeze date is tuesday).
+
+thanks
+-- PMM
