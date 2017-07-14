@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dW7pY-0005R1-27
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:08:57 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dW7y6-0007ar-Q1
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dW7pX-0007M2-2h
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:08:55 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:40896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dW7pW-0007LX-SR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:08:55 -0400
-Date: Fri, 14 Jul 2017 23:08:53 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170714210853.ofowponstnf6ncgo@aurel32.net>
-References: <20170710204521.2058-1-rth@twiddle.net>
-	<20170710204521.2058-3-rth@twiddle.net>
-	<fc0ca76b-ecee-1f38-166b-4dcd8d7dcd00@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1dW7y3-0004N2-H3
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:17:46 -0400
+Date: Fri, 14 Jul 2017 15:17:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170714151740.60394531@w520.home>
+In-Reply-To: <20170711053218.6700-1-aik@ozlabs.ru>
+References: <20170711053218.6700-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc0ca76b-ecee-1f38-166b-4dcd8d7dcd00@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/s390x: Implement CONVERT
- UNICODE insns
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3] vfio-pci,
+ ppc64/spapr: Reorder group-to-container attaching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +23,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, david@redhat.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 2017-07-11 17:18, Thomas Huth wrote:
-> On 10.07.2017 22:45, Richard Henderson wrote:
-> > Signed-off-by: Richard Henderson <rth@twiddle.net>
-> > ---
-> >  target/s390x/helper.h      |   6 +
-> >  target/s390x/mem_helper.c  | 310 +++++++++++++++++++++++++++++++++++++++++++++
-> >  target/s390x/translate.c   |  43 +++++++
-> >  target/s390x/insn-data.def |  13 ++
-> >  4 files changed, 372 insertions(+)
-> > 
-> > diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> > index 23e8d1d..2793cf3 100644
-> > --- a/target/s390x/helper.h
-> > +++ b/target/s390x/helper.h
-> > @@ -107,6 +107,12 @@ DEF_HELPER_2(stfle, i32, env, i64)
-> >  DEF_HELPER_FLAGS_2(lpq, TCG_CALL_NO_WG, i64, env, i64)
-> >  DEF_HELPER_FLAGS_4(stpq, TCG_CALL_NO_WG, void, env, i64, i64, i64)
-> >  DEF_HELPER_4(mvcos, i32, env, i64, i64, i64)
-> > +DEF_HELPER_4(cu12, i32, env, i32, i32, i32)
-> > +DEF_HELPER_4(cu14, i32, env, i32, i32, i32)
-> > +DEF_HELPER_4(cu21, i32, env, i32, i32, i32)
-> > +DEF_HELPER_4(cu24, i32, env, i32, i32, i32)
-> > +DEF_HELPER_4(cu41, i32, env, i32, i32, i32)
-> > +DEF_HELPER_4(cu42, i32, env, i32, i32, i32)
-> >  
-> >  #ifndef CONFIG_USER_ONLY
-> >  DEF_HELPER_3(servc, i32, env, i64, i64)
-> > diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> > index 513b402..0b18560 100644
-> > --- a/target/s390x/mem_helper.c
-> > +++ b/target/s390x/mem_helper.c
-> [...]
-> > +static inline uint32_t convert_unicode(CPUS390XState *env, uint32_t r1,
-> > +                                       uint32_t r2, uint32_t m3, uintptr_t ra,
-> > +                                       decode_unicode_fn decode,
-> > +                                       encode_unicode_fn encode)
-> > +{
-> > +    uint64_t dst = get_address(env, r1);
-> > +    uint64_t dlen = get_length(env, r1 + 1);
-> > +    uint64_t src = get_address(env, r2);
-> > +    uint64_t slen = get_length(env, r2 + 1);
-> > +    bool enh_check = m3 & 1;
-> > +    int cc, i;
+On Tue, 11 Jul 2017 15:32:18 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> At the moment VFIO PCI device initialization works as follows:
+> vfio_realize
+> 	vfio_get_group
+> 		vfio_connect_container
+> 			register memory listeners (1)
+> 			update QEMU groups lists
+> 		vfio_kvm_device_add_group
 > 
-> According to the PoP:
+> Then (example for pseries) the machine reset hook triggers region_add()
+> for all regions where listeners from (1) are listening:
 > 
-> "The R1 and R2 fields [...] must designate an even-
->  numbered register; otherwise, a specification excep-
->  tion is recognized."
+> ppc_spapr_reset
+> 	spapr_phb_reset
+> 		spapr_tce_table_enable
+> 			memory_region_add_subregion
+> 				vfio_listener_region_add
+> 					vfio_spapr_create_window
 > 
-> I think you should add such a check for even-numbered registers here.
+> This scheme works fine until we need to handle VFIO PCI device hotplug
+> and we want to enable PPC64/sPAPR in-kernel TCE acceleration on,
+> i.e. after PCI hotplug we need a place to call
+> ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
+> Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
+> (from VFIOGroup), vfio_listener_region_add() seems to be the only place
+> for this ioctl().
+> 
+> However this only works during boot time because the machine reset
+> happens strictly after all devices are finalized. When hotplug happens,
+> vfio_listener_region_add() is called when a memory listener is registered
+> but when this happens:
+> 1. new group is not added to the container->group_list yet;
+> 2. VFIO KVM device is unaware of the new IOMMU group.
+> 
+> This moves bits around to have all necessary VFIO infrastructure
+> in place for both initial startup and hotplug cases.
 
-Actually it should not be done here, but at translation time in
-translate.c.
 
-There are a few places where the register number is checked to be even
-and later loaded into a temp. I guess that can be replaced by generators
-instead?
+Wow, for a fairly straight forward patch this changelog is brutal.  Can
+this be summarized as "Register vfio groups with kvm prior to memory
+listener registration such that kvm-vfio pseudo device ioctls are
+available during the region_add callback"?  If so I'll queue this up
+for a pull request prior to soft freeze.  Thanks,
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Alex
+
+ 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+> 
+> 
+> This is an independend part of a bigger patchset to enable in-kernel
+> acceleration of TCE operations. While I stuck with IOMMU MR QOM-fication,
+> let's try to parallel patchset pieces' review/acceptance.
+> 
+> ---
+> Changes:
+> v3:
+> * rebased on current upstream
+> 
+> v2:
+> * moved container->initialized back to its correct location
+> * added missing QLIST_REMOVE()
+> ---
+>  hw/vfio/common.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 2965b68e5d..4e75dc8c56 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1107,6 +1107,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>          goto free_container_exit;
+>      }
+>  
+> +    vfio_kvm_device_add_group(group);
+> +
+> +    QLIST_INIT(&container->group_list);
+> +    QLIST_INSERT_HEAD(&space->containers, container, next);
+> +
+> +    group->container = container;
+> +    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> +
+>      container->listener = vfio_memory_listener;
+>  
+>      memory_listener_register(&container->listener, container->space->as);
+> @@ -1120,14 +1128,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>  
+>      container->initialized = true;
+>  
+> -    QLIST_INIT(&container->group_list);
+> -    QLIST_INSERT_HEAD(&space->containers, container, next);
+> -
+> -    group->container = container;
+> -    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+> -
+>      return 0;
+>  listener_release_exit:
+> +    QLIST_REMOVE(group, container_next);
+> +    QLIST_REMOVE(container, next);
+> +    vfio_kvm_device_del_group(group);
+>      vfio_listener_release(container);
+>  
+>  free_container_exit:
+> @@ -1232,8 +1237,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+>  
+>      QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+>  
+> -    vfio_kvm_device_add_group(group);
+> -
+>      return group;
+>  
+>  close_fd_exit:
