@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dW1ZR-0006FX-FU
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:27:54 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1dW1ad-0007JY-VO
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dW1ZM-00080U-EA
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:27:53 -0400
-Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:15849)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dW1ZM-0007xL-2r
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:27:48 -0400
-Date: Fri, 14 Jul 2017 17:26:39 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170714142639.ycu6b7qeeb7akxkb@postretch>
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170714122221.pyx2pwubtaylqdu6@postretch>
-	<e059cf44-53df-4d5f-3257-cc9b6be775df@huawei.com>
+	(envelope-from <tgolembi@redhat.com>) id 1dW1aY-0000Ev-UA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:07 -0400
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:33293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dW1aY-0000EI-NP
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:02 -0400
+Received: by mail-wm0-f47.google.com with SMTP id t70so10181717wmt.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:29:01 -0700 (PDT)
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Date: Fri, 14 Jul 2017 16:28:55 +0200
+Message-Id: <cover.1500042528.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="d35jmbvpqdeixl5j"
-Content-Disposition: inline
-In-Reply-To: <e059cf44-53df-4d5f-3257-cc9b6be775df@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v8 0/3] qemu-ga: add guest-get-osinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
+To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
+v8:
+- not tracking len in ga_parse_osrelease()
+- replaced if(ret != TRUE) lines in ga_parse_osrelease()
+- removed underscores from schema documentation
+- renamed field 'machine-hardware' to 'machine' and clarified it's
+  documentation for Windows
+- fields kernel_version, kernel_release and machine are also optional
+- added fixture_tear_down() in tests
 
---d35jmbvpqdeixl5j
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v7:
+- fixed incorrect error check in ga_get_win_version()
+- added missing test-qga-os-release
+- fixed coding style issues
 
-On Fri, Jul 14, 2017 at 03:15:06PM +0200, Pradeep Jagadeesh wrote:
->Hi Manos,
->
->Thanks for sharing the link to your code patch.
->
->On 7/14/2017 2:22 PM, Manos Pitsidianakis wrote:
->>Hello Pradeep, you might be interested in my work on refactoring the
->>block layer's throttling interface in my series:
->>https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04191.html
->Sure will have a look.
->>In this series you copy the existing legacy interface we want to get rid
->>of. I think it will be easier work for you to use the changes introduced
->>in my patches when they are merged.
->So, should I wait till they are in?. Actually my throttle patches for=20
->fsdev are already upstream (2.9). Now I am just introducing the=20
->qmp/hmp interfaces for the same.
+v6:
+- fixed the documentation comment in schema
+- disguising os-release as key-value file (thanks Marc-André)
+- dropped dependency on gio
+- improved error handling
+- added test
 
-If you plan on using ThrottleGroups, probably yes, I think, because we'd=20
-have duplicate interfaces afterwards instead of a unified one. You'd=20
-have to introduce a qmp/hmp command to set fsdev throttle now and after=20
-you use throttle groups it will become obsolete.
+v5:
+- fixed build failure with older glib
+- fixed coding style issues
+- fixed one log string
 
->>Have you thought about using throttle groups? It'd mean many devices
->>sharing the same limits. This way the interfaces can be unified.  Please
->>read docs/throttle.txt and see if it would be useful for you.
->
->I have read about the throttle group, last year when I was=20
->implementing the throttle feature for fsdev.My open source work=20
->depends on the projects I/my group work on. So, when I have more=20
->bandwidth work on those, I will surely take it up. Throttle group=20
->option may be useful feature even in case of fsdev devices.
->
->Regards,
->Pradeep
->
->
+This is a continuation of the work started by Vinzenz Feenstra in the
+threads:
 
---d35jmbvpqdeixl5j
-Content-Type: application/pgp-signature; name="signature.asc"
+https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04154.html
+https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg04302.html
+https://lists.nongnu.org/archive/html/qemu-devel/2017-03/msg06262.html
 
------BEGIN PGP SIGNATURE-----
+The idea is to report some basic information from uname and from
+os-release file, if it is present. On MS Windows, where neither uname
+nor os-release exist we fill the values based on the information we can
+get from the OS.
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllo1J8ACgkQc2J8L2kN
-9xA0Cg/+LU2Wsuzgm1XtokhSyIHX1vEC6stdqDhDLHPbRz3INL9w/RbGu8trl3sw
-KI+iTj3K76UAjqW5UgiHKWYQ/3J5+j/i8sKSpOhUoa1YTGZfXQ0/C9vmU/VReXyN
-nYI+ivGUJHVquzNVz1CVHjE3XD40FFlm6u6/+FY7inxxbn5+UIXnuUKYWr8mOaIa
-hcL3qz2dIaWjmwLG7A2ZbBHrHw3jcwE3XWWrC3vFN096/MG0kmQHtr/Of/v/4+Lu
-NsUSl/0JUaYLb34AetSWXNKcWmOKzKCd+H/czLmV86yokvzGyp6BklX0lZH2/tvN
-Ha/oD5B1NFM4CLHMsFGSsz9KB2pYGxoAZ1buU7iOOLekT2CvkEz2+49QS2xkqxKY
-ej3xcwT4cENHLAmZ7jMIULzxeLLobw3qQ4FHBs9ikC+trf0wV8tZf+4CTM3ie5dn
-ie2QtyHPFY9uJAmZVHQfp4//X3sazfb3Bwft/YPqZ1c8KOANycdFfkmJaZFuFH4q
-W12EPI9ro5R4fbDD2ldRFUrwWFjH7y2mTAMFVIS8keu/KMrSoZKTvVXIRUAGbr3j
-C/bOOet+v971qCUSFnrAvS6lQzaix4dtRISU8AejAOMNfUWqfEFTGySG02MsLedJ
-cCvZcfcp1g+44wK2Le4e040+FROGxvMpvCImtA/ychgWoZoaHGE=
-=r9pe
------END PGP SIGNATURE-----
+The example output on Fedora is:
 
---d35jmbvpqdeixl5j--
+{
+  "return": {
+    "kernel-version": "#1 SMP Mon May 8 18:46:06 UTC 2017",
+    "kernel-release": "4.10.15-200.fc25.x86_64",
+    "machine-hardware": "x86_64",
+    "id": "fedora",
+    "name": "Fedora",
+    "pretty-name": "Fedora 25 (Server Edition)",
+    "version": "25 (Server Edition)",
+    "variant": "Server Edition",
+    "version-id": "25",
+    "variant-id": "server"
+  }
+}
+
+The example output on MS Windows 10 is:
+
+{
+  "return": {
+    "kernel-version": "10.0",
+    "kernel-release": "10240",
+    "machine-hardware": "x86_64",
+    "id": "mswindows",
+    "name": "Microsoft Windows",
+    "pretty-name": "Windows 10 Enterprise",
+    "version": "Microsoft Windows 10",
+    "version-id": "10",
+    "variant": "client",
+    "variant-id": "client"
+  }
+}
+
+    Tomas Golembiovsky
+
+Tomáš Golembiovský (3):
+  qemu-ga: add guest-get-osinfo command
+  test-qga: pass environemnt to qemu-ga
+  test-qga: add test for guest-get-osinfo
+
+ qga/commands-posix.c           | 141 +++++++++++++++++++++++++++++++
+ qga/commands-win32.c           | 188 +++++++++++++++++++++++++++++++++++++++++
+ qga/qapi-schema.json           |  65 ++++++++++++++
+ tests/data/test-qga-os-release |   7 ++
+ tests/test-qga.c               |  64 +++++++++++++-
+ 5 files changed, 461 insertions(+), 4 deletions(-)
+ create mode 100644 tests/data/test-qga-os-release
+
+-- 
+2.13.1
