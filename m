@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzV5-0003Ox-Vk
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzV9-0003S2-KZ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzV4-0003dE-Nn
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzV8-0003fM-AP
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:19 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 14 Jul 2017 07:14:37 -0500
-Message-Id: <20170714121457.10322-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/20] add byte-based block_status driver
- callbacks
+Date: Fri, 14 Jul 2017 07:14:38 -0500
+Message-Id: <20170714121457.10322-2-eblake@redhat.com>
+In-Reply-To: <20170714121457.10322-1-eblake@redhat.com>
+References: <20170714121457.10322-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 01/20] block: Add .bdrv_co_block_status()
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,101 +21,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com
+Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-but NBD wants to report status on byte granularity (even if the
-reporting will probably be naturally aligned to sectors or even
-much higher levels).  I've therefore started the task of
-converting our block status code to report at a byte granularity
-rather than sectors.
+We are gradually moving away from sector-based interfaces, towards
+byte-based. Now that the block layer exposes byte-based allocation,
+it's time to tackle the drivers.  Add a new callback that operates
+on as small as byte boundaries. Subsequent patches will then update
+individual drivers, then finally remove .bdrv_co_get_block_status().
+The old code now uses a goto in order to minimize churn at that later
+removal.
 
-The overall conversion currently looks like:
-part 1: bdrv_is_allocated (merged, commit 51b0a488)
-part 2: dirty-bitmap (v5 is posted [1], mostly reviewed)
-part 3: bdrv_get_block_status (v3 is posted [2], mostly reviewed)
-part 4: .bdrv_co_block_status (this series, second half of v1 [3])
+The new code also passes through the 'mapping' hint, which will
+allow subsequent patches to further optimize callers that only care
+about how much of the image is allocated, rather than which offsets
+the allocation actually maps to.
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-callback-v2
+Note that most drivers give sector-aligned answers, except at
+end-of-file, even when request_alignment is smaller than a sector.
+However, bdrv_getlength() is sector-aligned (even though it gives a
+byte answer), often by exceeding the actual file size.  If we were to
+give back strict results, at least file-posix.c would report a
+transition from DATA to HOLE at the end of a file even in the middle
+of a sector, which can throw off callers; so we intentionally lie and
+state that any partial sector at the end of a file has the same
+status for the entire sector.
 
-It depends on my dirty-bitmap patches [1], Manos' filter cleanups [4],
-and my bdrv_get_block_status patches [2].
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg03512.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg03853.html
-[3] https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg02642.html
-[4] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg03846.html
+---
+v2: improve alignment handling, ensure all iotests still pass
+---
+ include/block/block_int.h | 11 ++++++++---
+ block/io.c                | 27 ++++++++++++++++++++++++---
+ 2 files changed, 32 insertions(+), 6 deletions(-)
 
-Since v1:
-- rebase to master and changes in earlier series
-- fix a couple of bugs
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f2c1da7..aeb2bf8 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -176,13 +176,18 @@ struct BlockDriver {
+      * bdrv_is_allocated[_above].  The driver should answer only
+      * according to the current layer, and should not set
+      * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
+-     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
+-     * layer guarantees input aligned to request_alignment, as well as
+-     * non-NULL pnum and file.
++     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  As a hint,
++     * the flag mapping is true if the caller cares more about precise
++     * mappings (favor _OFFSET_VALID) or false for overall allocation
++     * (favor larger *pnum).  The block layer guarantees input aligned
++     * to request_alignment, as well as non-NULL pnum and file.
+      */
+     int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
+         int64_t sector_num, int nb_sectors, int *pnum,
+         BlockDriverState **file);
++    int64_t coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
++        bool mapping, int64_t offset, int64_t bytes, int64_t *pnum,
++        BlockDriverState **file);
 
-001/20:[0083] [FC] 'block: Add .bdrv_co_block_status() callback'
-002/20:[down] 'block: Switch passthrough drivers to .bdrv_co_block_status=
-()'
-003/20:[0010] [FC] 'file-posix: Switch to .bdrv_co_block_status()'
-004/20:[0017] [FC] 'gluster: Switch to .bdrv_co_block_status()'
-005/20:[----] [--] 'iscsi: Switch cluster_sectors to byte-based'
-006/20:[0016] [FC] 'iscsi: Switch iscsi_allocmap_update() to byte-based'
-007/20:[0004] [FC] 'iscsi: Switch to .bdrv_co_block_status()'
-008/20:[0001] [FC] 'null: Switch to .bdrv_co_block_status()'
-009/20:[0006] [FC] 'parallels: Switch to .bdrv_co_block_status()'
-010/20:[0005] [FC] 'qcow: Switch to .bdrv_co_block_status()'
-011/20:[0006] [FC] 'qcow2: Switch to .bdrv_co_block_status()'
-012/20:[0010] [FC] 'qed: Switch to .bdrv_co_block_status()'
-013/20:[0001] [FC] 'raw: Switch to .bdrv_co_block_status()'
-014/20:[0004] [FC] 'sheepdog: Switch to .bdrv_co_block_status()'
-015/20:[----] [--] 'vdi: Avoid bitrot of debugging code'
-016/20:[0005] [FC] 'vdi: Switch to .bdrv_co_block_status()'
-017/20:[0005] [FC] 'vmdk: Switch to .bdrv_co_block_status()'
-018/20:[0013] [FC] 'vpc: Switch to .bdrv_co_block_status()'
-019/20:[0016] [FC] 'vvfat: Switch to .bdrv_co_block_status()'
-020/20:[0068] [FC] 'block: Drop unused .bdrv_co_get_block_status()'
+     /*
+      * Invalidate any cached meta-data.
+diff --git a/block/io.c b/block/io.c
+index 0e4a3e6..899a7b3 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1770,7 +1770,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+         bytes = n;
+     }
 
-Eric Blake (20):
-  block: Add .bdrv_co_block_status() callback
-  block: Switch passthrough drivers to .bdrv_co_block_status()
-  file-posix: Switch to .bdrv_co_block_status()
-  gluster: Switch to .bdrv_co_block_status()
-  iscsi: Switch cluster_sectors to byte-based
-  iscsi: Switch iscsi_allocmap_update() to byte-based
-  iscsi: Switch to .bdrv_co_block_status()
-  null: Switch to .bdrv_co_block_status()
-  parallels: Switch to .bdrv_co_block_status()
-  qcow: Switch to .bdrv_co_block_status()
-  qcow2: Switch to .bdrv_co_block_status()
-  qed: Switch to .bdrv_co_block_status()
-  raw: Switch to .bdrv_co_block_status()
-  sheepdog: Switch to .bdrv_co_block_status()
-  vdi: Avoid bitrot of debugging code
-  vdi: Switch to .bdrv_co_block_status()
-  vmdk: Switch to .bdrv_co_block_status()
-  vpc: Switch to .bdrv_co_block_status()
-  vvfat: Switch to .bdrv_co_block_status()
-  block: Drop unused .bdrv_co_get_block_status()
+-    if (!bs->drv->bdrv_co_get_block_status) {
++    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
+         *pnum = bytes;
+         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
+         if (offset + bytes == total_size) {
+@@ -1790,11 +1790,14 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     bdrv_inc_in_flight(bs);
 
- include/block/block_int.h |  38 ++++++------
- block/io.c                |  60 ++++++++++---------
- block/blkdebug.c          |  19 +++---
- block/commit.c            |   2 +-
- block/file-posix.c        |  57 ++++++++++--------
- block/gluster.c           |  62 +++++++++++---------
- block/iscsi.c             | 146 +++++++++++++++++++++++++---------------=
-------
- block/mirror.c            |   2 +-
- block/null.c              |  22 +++----
- block/parallels.c         |  19 ++++--
- block/qcow.c              |  25 ++++----
- block/qcow2.c             |  21 ++++---
- block/qed.c               |  22 +++----
- block/raw-format.c        |  17 +++---
- block/sheepdog.c          |  23 ++++----
- block/vdi.c               |  40 ++++++-------
- block/vmdk.c              |  27 +++++----
- block/vpc.c               |  40 ++++++-------
- block/vvfat.c             |  16 +++--
- 19 files changed, 349 insertions(+), 309 deletions(-)
+     /* Round out to request_alignment boundaries */
+-    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
++    align = bs->bl.request_alignment;
++    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
++        align = BDRV_SECTOR_SIZE;
++    }
+     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
+     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
 
---=20
+-    {
++    if (bs->drv->bdrv_co_get_block_status) {
+         int count; /* sectors */
+
+         assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
+@@ -1808,8 +1811,26 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+             goto out;
+         }
+         *pnum = count * BDRV_SECTOR_SIZE;
++        goto refine;
+     }
+
++    ret = bs->drv->bdrv_co_block_status(bs, mapping, aligned_offset,
++                                        aligned_bytes, pnum, &local_file);
++    if (ret < 0) {
++        *pnum = 0;
++        goto out;
++    }
++
++    /*
++     * total_size is always sector-aligned, by sometimes exceeding actual
++     * file size. Expand pnum if it lands mid-sector due to end-of-file.
++     */
++    if (QEMU_ALIGN_UP(*pnum + aligned_offset,
++                      BDRV_SECTOR_SIZE) == total_size) {
++        *pnum = total_size - aligned_offset;
++    }
++
++ refine:
+     /* Clamp pnum and ret to original request */
+     assert(QEMU_IS_ALIGNED(*pnum, align));
+     *pnum -= offset - aligned_offset;
+-- 
 2.9.4
