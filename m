@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tn@semihalf.com>) id 1dVush-0008FY-Fw
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:19:20 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1dVuuE-0000UY-5D
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tn@semihalf.com>) id 1dVuse-0006LL-BM
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:19:19 -0400
-Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:33291)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tn@semihalf.com>) id 1dVusd-0006L0-TF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:19:16 -0400
-Received: by mail-lf0-x22a.google.com with SMTP id z78so49033144lff.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 00:19:15 -0700 (PDT)
-References: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
-From: Tomasz Nowicki <tn@semihalf.com>
-Message-ID: <0686a7f3-1ca5-f63e-01a1-a7982073b517@semihalf.com>
-Date: Fri, 14 Jul 2017 09:19:05 +0200
+	(envelope-from <kevin.tian@intel.com>) id 1dVuuC-0007Ch-Vi
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:20:54 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Fri, 14 Jul 2017 07:20:44 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D3834F@SHSMSX101.ccr.corp.intel.com>
+References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
+	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
+	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
+	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
+	<19a85866-1e72-58b9-d120-8b5e5b809e90@arm.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D190D2B865@SHSMSX101.ccr.corp.intel.com>
+	<1c78deea-a1c9-2ef7-113a-f6be93888560@arm.com>
+In-Reply-To: <1c78deea-a1c9-2ef7-113a-f6be93888560@arm.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1499633493-19865-1-git-send-email-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v5 0/8] ARM SMMUv3 Emulation Support
+Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com
-Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, tcain@qti.qualcomm.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, jean-philippe.brucker@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "wei@redhat.com" <wei@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
 
-Hi Eric,
-
-With fixes in comments that I made, I was able to run VM with 
-virtio-blk-pci and virtio-net-pci devices.
-
-I have tried vhost-net as well but I am seeing outgoing packets payload 
-corrupted from host perspective, tcpdump on host tun i/f shows zeroes in 
-packet payload. However, tcpdump in VM shows that packets are fine. Have 
-you seen anything like that? Packets incoming to VM are fine though. I 
-will keep debugging on my side too.
-
-Thanks,
-Tomasz
-
-On 09.07.2017 22:51, Eric Auger wrote:
-> This series implements the emulation code for ARM SMMUv3.
-> This is the continuation of Prem's work [1].
-> 
-> This v5 mainly brings VFIO integration in DT mode. On guest kernel
-> side, this requires a quirk [1] to force TLB invalidation on map.
-> 
-> The following changes also are noticeable:
-> - fix SMMU_CMDQ_CONS offset
-> - adds dma-coherent dt property which fixes the unhandled command
->    opcode bug.
-> - implements block PTE
-> 
-> The smmu is instantiated when passing the smmu option to machvirt:
-> "-M virt-2.10,smmu"
-> 
-> As I haven't split the code yet so that it can be easily reviewable
-> I don't expect deep reviews at this stage. Also the implementation may
-> be largely sub-optimal.
-> 
-> Tested Use Cases:
-> - booted a guest in dt and acpi mode with an iommu_platform
->    virtio-net-pci device (using dma ops). Tested with the following
->    guest combinations: 4K page - 39 bit VA, 4K - 48b, 64K - 39b,
->    64K - 48b.
-> - booted a guest (featuring [1]) with PCIe passthrough'ed PCIe devices:
->    - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
->    - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
-> 
-> Unfortunately I have not been able to run DPDK testpmd yet on guest side.
-> The problem I see is the user space driver dma-maps a huge area
-> and this causes plenty of CMDQ_OP_TLBI_NH_VA commands to be sent
-> (tlbi-on-map) which are sent for each page whereas the dma-map covers a
-> huge page. I will work on this issue for next version.
-> 
-> Known limitations:
-> - no VMSAv8-32 suport
-> - no nested stage support (S1 + S2)
-> - no support for HYP mappings
-> - register fine emulation, commands, interrupts and errors were
->    not accurately tested. Handling is sufficient to run use cases
->    described hereafter though.
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> v5: https://github.com/eauger/qemu/tree/v2.9-SMMU-v5
-> v4: https://github.com/eauger/qemu/tree/v2.9-SMMU-v4
-> 
-> References:
-> [1] [RFC 0/2] arm-smmu-v3 tlbi-on-map option
-> [2] Prem's last iteration:
-> - https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03531.html
-> 
-> History:
-> v4 -> v5:
-> - initial_level now part of SMMUTransCfg
-> - smmu_page_walk_64 takes into account the max input size
-> - implement sys->iommu_ops.replay and sys->iommu_ops.notify_flag_changed
-> - smmuv3_translate: bug fix: don't walk on bypass
-> - smmu_update_qreg: fix PROD index update
-> - I did not yet address Peter's comments as the code is not mature enough
->    to be split into sub patches.
-> 
-> v3 -> v4 [Eric]:
-> - page table walk rewritten to allow scan of the page table within a
->    range of IOVA. This prepares for VFIO integration and replay.
-> - configuration parsing partially reworked.
-> - do not advertise unsupported/untested features: S2, S1 + S2, HYP,
->    PRI, ATS, ..
-> - added ACPI table generation
-> - migrated to dynamic traces
-> - mingw compilation fix
-> 
-> v2 -> v3 [Eric]:
-> - rebased on 2.9
-> - mostly code and patch reorganization to ease the review process
-> - optional patches removed. They may be handled separately. I am currently
->    working on ACPI enablement.
-> - optional instantiation of the smmu in mach-virt
-> - removed [2/9] (fdt functions) since not mandated
-> - start splitting main patch into base and derived object
-> - no new function feature added
-> 
-> v1 -> v2 [Prem]:
-> - Adopted review comments from Eric Auger
->          - Make SMMU_DPRINTF to internally call qemu_log
->              (since translation requests are too many, we need control
->               on the type of log we want)
->          - SMMUTransCfg modified to suite simplicity
->          - Change RegInfo to uint64 register array
->          - Code cleanup
->          - Test cleanups
-> - Reshuffled patches
-> 
-> v0 -> v1 [Prem]:
-> - As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
-> - Reworked register access/update logic
-> - Factored out translation code for
->          - single point bug fix
->          - sharing/removal in future
-> - (optional) Unit tests added, with PCI test device
->          - S1 with 4k/64k, S1+S2 with 4k/64k
->          - (S1 or S2) only can be verified by Linux 4.7 driver
->          - (optional) Priliminary ACPI support
-> 
-> v0 [Prem]:
-> - Implements SMMUv3 spec 11.0
-> - Supported for PCIe devices,
-> - Command Queue and Event Queue supported
-> - LPAE only, S1 is supported and Tested, S2 not tested
-> - BE mode Translation not supported
-> - IRQ support (legacy, no MSI)
-> - Tested with DPDK and e1000
-> 
-> 
-> Eric Auger (5):
->    hw/arm/smmu-common: smmu base class
->    hw/arm/virt: Add 2.10 machine type
->    hw/arm/virt: Add tlbi-on-map property to the smmuv3 node
->    target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
->    hw/arm/smmuv3: VFIO integration
-> 
-> Prem Mallappa (3):
->    hw/arm/smmuv3: smmuv3 emulation model
->    hw/arm/virt: Add SMMUv3 to the virt board
->    hw/arm/virt-acpi-build: Add smmuv3 node in IORT table
-> 
->   default-configs/aarch64-softmmu.mak |    1 +
->   hw/arm/Makefile.objs                |    1 +
->   hw/arm/smmu-common.c                |  474 +++++++++++++
->   hw/arm/smmu-internal.h              |   89 +++
->   hw/arm/smmuv3-internal.h            |  651 ++++++++++++++++++
->   hw/arm/smmuv3.c                     | 1256 +++++++++++++++++++++++++++++++++++
->   hw/arm/trace-events                 |   54 ++
->   hw/arm/virt-acpi-build.c            |   56 +-
->   hw/arm/virt.c                       |  111 +++-
->   include/hw/acpi/acpi-defs.h         |   15 +
->   include/hw/arm/smmu-common.h        |  127 ++++
->   include/hw/arm/smmuv3.h             |   87 +++
->   include/hw/arm/virt.h               |    5 +
->   target/arm/kvm.c                    |   28 +
->   target/arm/trace-events             |    3 +
->   15 files changed, 2949 insertions(+), 9 deletions(-)
->   create mode 100644 hw/arm/smmu-common.c
->   create mode 100644 hw/arm/smmu-internal.h
->   create mode 100644 hw/arm/smmuv3-internal.h
->   create mode 100644 hw/arm/smmuv3.c
->   create mode 100644 include/hw/arm/smmu-common.h
->   create mode 100644 include/hw/arm/smmuv3.h
-> 
+PiBGcm9tOiBKZWFuLVBoaWxpcHBlIEJydWNrZXIgW21haWx0bzpqZWFuLXBoaWxpcHBlLmJydWNr
+ZXJAYXJtLmNvbV0NCj4gU2VudDogRnJpZGF5LCBKdWx5IDcsIDIwMTcgMTE6MTUgUE0NCj4gDQo+
+IE9uIDA3LzA3LzE3IDA3OjIxLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPiBzb3JyeSBJIGRpZG4n
+dCBxdWl0ZSBnZXQgdGhpcyBwYXJ0LCBhbmQgaGVyZSBpcyBteSB1bmRlcnN0YW5kaW5nOg0KPiA+
+DQo+ID4gR3Vlc3QgcHJvZ3JhbXMgdklPTU1VIHRvIG1hcCBhIGdJT1ZBICh1c2VkIGJ5IE1TSSB0
+byBhIEdQQQ0KPiA+IG9mIGRvb3JiZWxsIHJlZ2lzdGVyIG9mIHZpcnR1YWwgaXJxY2hpcC4gdklP
+TU1VIHRoZW4NCj4gPiB0cmlnZ2VycyBWRklPIG1hcC91bm1hcCB0byB1cGRhdGUgcGh5c2ljYWwg
+SU9NTVUgcGFnZQ0KPiA+IHRhYmxlIGZvciBnSU9WQSAtPiBIUEEgb2YgcmVhbCBkb29yYmVsbCBv
+ZiBwaHlzaWNhbCBpcnFjaGlwDQo+IA0KPiBBdCB0aGUgbW9tZW50IChub24tU1ZNKSwgcGh5c2lj
+YWwgYW5kIHZpcnR1YWwgTVNJIGRvb3JiZWxsIGFyZSBjb21wbGV0ZWx5DQo+IGRpc3NvY2lhdGVk
+LiBWRklPIGl0c2VsZiBtYXBzIHRoZSBkb29yYmVsbCBHUEEtPkhQQSBkdXJpbmcgY29udGFpbmVy
+DQo+IGluaXRpYWxpemF0aW9uLiBUaGUgR1BBLCBjaG9zZW4gYXJiaXRyYXJpbHkgYnkgdGhlIGhv
+c3QsIGlzIHRoZW4gcmVtb3ZlZA0KPiBmcm9tIHRoZSBndWVzdCBHUEEgc3BhY2UuDQoNCmdvdCB5
+b3UuIEkgYWxzbyBnb3Qgc29tZSBiYXNpYyB1bmRlcnN0YW5kaW5nIGZyb20gYmVsb3cgbGluay4g
+Oi0pDQoNCmh0dHBzOi8vd3d3LmxpbmFyby5vcmcvYmxvZy9jb3JlLWR1bXAva3ZtLXBjaWVtc2kt
+cGFzc3Rocm91Z2gtYXJtYXJtNjQvDQoNCj4gDQo+IFdoZW4gdGhlIGd1ZXN0IHByb2dyYW1zIHRo
+ZSB2SU9NTVUgdG8gbWFwIGEgZ0lPVkEgdG8gdGhlIHZpcnR1YWwgaXJxY2hpcA0KPiBkb29yYmVs
+bCwgSSBzdXBwb3NlIFFlbXUgd2lsbCBub3RpY2UgdGhhdCB0aGUgR1BBIGRvZXNuJ3QgY29ycmVz
+cG9uZCB0bw0KPiBSQU0gYW5kIHdpbGwgd2l0aGhvbGQgc2VuZGluZyBhIFZGSU9fSU9NTVVfTUFQ
+X0RNQSByZXF1ZXN0Lg0KPiANCj4gKEZvciBTVk0gSSBkb24ndCB3YW50IHRvIGdvIGludG8gdGhl
+IGRldGFpbHMganVzdCBub3csIGJ1dCB3ZSB3aWxsDQo+IHByb2JhYmx5IG5lZWQgYSBzZXBhcmF0
+ZSBWRklPIG1lY2hhbmlzbSB0byB1cGRhdGUgdGhlIHBoeXNpY2FsIE1TSS1YDQo+IHRhYmxlcyB3
+aXRoIHdoYXRldmVyIGdJT1ZBIHRoZSBndWVzdCBtYXBwZWQgaW4gaXRzIHByaXZhdGUgc3RhZ2Ut
+MSBwYWdlDQo+IHRhYmxlcy4pDQoNCkkgZ3Vlc3MgdGhlcmUgbWF5IGJlIGVpdGhlciBhIHRlcm1p
+bm9sb2d5IGRpZmZlcmVuY2Ugb3IgYSBoYXJkd2FyZQ0KZGlmZmVyZW5jZSBoZXJlLCBzaW5jZSBJ
+IG5vdGVkIHlvdSBtZW50aW9uZWQgSU9WQSB3aXRoIHN0YWdlLTENCm11bHRpcGxlIHRpbWVzLg0K
+DQpGb3IgSW50ZWwgVlQtZDoNCg0KLSBzdGFnZS0xIGlzIG9ubHkgZm9yIFZBIHRyYW5zbGF0aW9u
+LCB0YWdnZWQgd2l0aCBQQVNJRA0KLSBzdGFnZS0yIGNhbiBiZSB1c2VkIGZvciBJT1ZBIHRyYW5z
+bGF0aW9uIG9uIGJhcmUgbWV0YWwgb3IgR1BBL2dJT1ZBDQp0cmFuc2xhdGlvbiBpbiB2aXJ0dWFs
+aXphdGlvbiwgdy9vIFBBU0lEIHRhZ2dlZA0KDQpEb2VzIEFSTSBTTU1VIGFsbG93IHN0YWdlLTEg
+dXNlZCBmb3IgYm90aCBWQSBhbmQgSU9WQT8gSUlSQw0KeW91IHNhaWQgUEFTSUQjMCByZXNlcnZl
+ZCBmb3IgdHJhZmZpYyB3L28gUEFTSUQgaW4gc29tZSBtYWlsLi4uDQoNCj4gDQo+ID4gKGFzc3Vt
+ZSB5b3VyIGlycWNoaXAgd2lsbCBwcm92aWRlIG11bHRpcGxlIGRvb3JiZWxscyBzbyBlYWNoDQo+
+ID4gZGV2aWNlIGNhbiBoYXZlIGl0cyBvd24gY2hhbm5lbCkuDQo+IA0KPiBJbiBleGlzdGluZyBp
+cnFjaGlwcyB0aGUgZG9vcmJlbGwgaXMgc2hhcmVkIGJ5IGVuZHBvaW50cywgd2hpY2ggYXJlDQo+
+IGRpZmZlcmVudGlhdGVkIGJ5IHRoZWlyIGRldmljZSBJRCAoZ2VuZXJhbGx5IHRoZSBCREYpLiBJ
+J20gbm90IHN1cmUgd2h5DQo+IHRoaXMgbWF0dGVycyBoZXJlPw0KDQpOb3QgbWF0dGVyIG5vdyB3
+aXRoIGRldmljZSBJRA0KDQo+IA0KPiA+IHRoZW4gb25jZSB0aGlzIHVwZGF0ZSBpcw0KPiA+IGRv
+bmUsIGxhdGVyIE1TSSBpbnRlcnJ1cHRzIGZyb20gYXNzaWduZWQgZGV2aWNlIHdpbGwgZ28NCj4g
+PiB0aHJvdWdoIHBoeXNpY2FsIElPTU1VIChnSU9WQS0+SFBBKSB0aGVuIHJlYWNoIGlycWNoaXAN
+Cj4gPiBmb3IgaXJxIHJlbWFwcGluZy4gdklPTU1VIGlzIGludm9sdmVkIG9ubHkgaW4gY29uZmln
+dXJhdGlvbg0KPiA+IHBhdGggaW5zdGVhZCBvZiBhY3R1YWwgaW50ZXJydXB0IHBhdGguDQo+IA0K
+PiBZZXMgdGhlIHZJT01NVSBpcyB1c2VkIHRvIGNvcnJlbGF0ZSB0aGUgSU9WQSB3cml0dGVuIGJ5
+IHRoZSBndWVzdCBpbiBpdHMNCj4gdmlydHVhbCBNU0ktWCB0YWJsZSB3aXRoIHRoZSBNQVAgcmVx
+dWVzdCByZWNlaXZlZCBieSB0aGUgdklPTU1VLiBUaGF0IGlzDQo+IHByb2JhYmx5IHVzZWQgdG8g
+c2V0dXAgSVJRRkQgcm91dGVzIHdpdGggS1ZNLiBCdXQgdGhlIHZJT01NVSBpcyBub3QNCj4gaW52
+b2x2ZWQgZnVydGhlciB0aGFuIHRoYXQgaW4gTVNJcy4NCj4gDQo+ID4gSWYgbXkgdW5kZXJzdGFu
+ZGluZyBpcyBjb3JyZWN0LCBhYm92ZSB3aWxsIGJlIHRoZSBuYXR1cmFsIGZsb3cgdGhlbg0KPiA+
+IHdoeSBpcyBhZGRpdGlvbmFsIHZpcnRpby1pb21tdSBjaGFuZ2UgcmVxdWlyZWQ/IDotKQ0KPiAN
+Cj4gVGhlIGNoYW5nZSBpcyBub3QgKnJlcXVpcmVkKiBmb3IgQVJNIHN5c3RlbXMsIEkgb25seSBw
+cm9wb3NlZCByZW1vdmluZyB0aGUNCj4gZG9vcmJlbGwgYWRkcmVzcyB0cmFuc2xhdGlvbiBzdGFn
+ZSB0byBtYWtlIGhvc3QgaW1wbGVtZW50YXRpb24gc2ltcGxlcg0KPiAoYW5kIHNpbmNlIHZpcnRp
+by1pb21tdSBvbiB4ODYgd29uJ3QgdHJhbnNsYXRlIHRoZSBkb29yYmVsbCBhbnl3YXksIHdlDQo+
+IGhhdmUgdG8gYWRkIHN1cHBvcnQgZm9yIHRoaXMgdG8gdmlydGlvLWlvbW11KS4gQnV0IGZvciBR
+ZW11LCBzaW5jZSB2U01NVQ0KPiBuZWVkcyB0byBpbXBsZW1lbnQgdGhlIG5hdHVyYWwgZmxvdyBh
+bnl3YXksIGl0IG1pZ2h0IG5vdCBiZSBhIGxvdCBvZg0KPiBlZmZvcnQgdG8gYWxzbyBkbyBpdCBm
+b3IgdmlydGlvLWlvbW11LiBPdGhlciBpbXBsZW1lbnRhdGlvbnMgKGUuZy4NCj4ga3ZtdG9vbCkg
+bWlnaHQgcGlnZ3ktYmFjayBvbiB0aGUgeDg2IHdheSBhbmQgZGVjbGFyZSB0aGUgaXJxY2hpcCBk
+b29yYmVsbA0KPiBhcyB1bnRyYW5zbGF0ZWQuDQo+IA0KPiBNeSBwcm9wb3NhbCBhbHNvIGJyZWFr
+cyB3aGVuIGNvbmZyb250ZWQgdG8gdmlydHVhbCBTVk0gaW4gYSBwaHlzaWNhbCBBUk0NCj4gc3lz
+dGVtLCB3aGVyZSB0aGUgZ3Vlc3Qgb3ducyBzdGFnZS0xIHBhZ2UgdGFibGVzIGFuZCAqaGFzKiB0
+byBtYXAgdGhlDQo+IGRvb3JiZWxsIGlmIGl0IHdhbnRzIE1TSXMgdG8gd29yaywgc28geW91IGNh
+biBkaXNyZWdhcmQgaXQgOikNCj4gDQoNCkl0IGlzIGEgZ29vZCBsZWFybmluZy4gdGhhbmtzLg0K
