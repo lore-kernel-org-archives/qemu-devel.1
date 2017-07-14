@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVwac-0000pR-QU
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:08:52 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwc8-0002Cn-Ap
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVwaY-0008Q7-Rz
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:08:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43281
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVwaY-0008Pp-NA
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:08:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6E93jQ9029483
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 05:08:41 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bph7xuu32-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 05:08:41 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 05:08:41 -0400
-References: <1499961789-127874-1-git-send-email-borntraeger@de.ibm.com>
-	<20170714110325.67e7d205@gondolin>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 11:08:36 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwc4-0000Xh-Aa
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:10:20 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri, 14 Jul 2017 12:10:04 +0300
+Message-Id: <150002340430.22386.10889954302345646107.stgit@frigg.lan>
+In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170714110325.67e7d205@gondolin>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <213f15fd-5410-d869-ce14-2cdc2a5880fd@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/7] s390: remaining patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v13 14/26] target/arm: [tcg,
+ a64] Port to init_disas_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,21 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 07/14/2017 11:03 AM, Cornelia Huck wrote:
-> On Thu, 13 Jul 2017 18:03:02 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> here is a bunch of patches that teaches recent HW features
->> to the CPU model and kvm code in QEMU. We also add the 
->> enhanced suppression on protection facility to the z12 and later
->> for the 2.10 machine type.
-> 
-> Looks good from my side.
-> 
-> I assume you'll put out a pull request soon?
-> 
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-Yes. Will do one today unless there is more feedback.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Benne=C3=A9 <alex.benee@linaro.org>
+---
+ target/arm/translate-a64.c |   36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 4270ac3847..5c04ff3d8b 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11190,21 +11190,12 @@ static void disas_a64_insn(CPUARMState *env, Di=
+sasContext *s)
+     free_tmp_a64(s);
+ }
+=20
+-void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+-                               TranslationBlock *tb)
++static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
++                                               CPUState *cpu)
+ {
+-    CPUARMState *env =3D cs->env_ptr;
+-    ARMCPU *cpu =3D arm_env_get_cpu(env);
+     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+-    target_ulong next_page_start;
+-    int max_insns;
+-
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D dc->base.tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
++    CPUARMState *env =3D cpu->env_ptr;
++    ARMCPU *arm_cpu =3D arm_env_get_cpu(env);
+=20
+     dc->pc =3D dc->base.pc_first;
+     dc->condjmp =3D 0;
+@@ -11230,7 +11221,7 @@ void gen_intermediate_code_a64(DisasContextBase *=
+dcbase, CPUState *cs,
+     dc->fp_excp_el =3D ARM_TBFLAG_FPEXC_EL(dc->base.tb->flags);
+     dc->vec_len =3D 0;
+     dc->vec_stride =3D 0;
+-    dc->cp_regs =3D cpu->cp_regs;
++    dc->cp_regs =3D arm_cpu->cp_regs;
+     dc->features =3D env->features;
+=20
+     /* Single step state. The code-generation logic here is:
+@@ -11254,6 +11245,23 @@ void gen_intermediate_code_a64(DisasContextBase =
+*dcbase, CPUState *cs,
+     dc->ss_same_el =3D (arm_debug_target_el(env) =3D=3D dc->current_el);
+=20
+     init_tmp_a64_array(dc);
++}
++
++void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
++                               TranslationBlock *tb)
++{
++    CPUARMState *env =3D cs->env_ptr;
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++    target_ulong next_page_start;
++    int max_insns;
++
++    dc->base.tb =3D tb;
++    dc->base.pc_first =3D dc->base.tb->pc;
++    dc->base.pc_next =3D dc->base.pc_first;
++    dc->base.is_jmp =3D DISAS_NEXT;
++    dc->base.num_insns =3D 0;
++    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
++    aarch64_tr_init_disas_context(&dc->base, cs);
+=20
+     next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_=
+PAGE_SIZE;
+     max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
