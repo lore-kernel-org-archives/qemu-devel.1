@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2F-0003HK-0l
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:26 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2B-0003G5-0m
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2C-0003LT-E6
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51898
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy27-0003J5-SX
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41762
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVy2C-0003LB-7p
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:20 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EAceDU128050
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:19 -0400
+	id 1dVy27-0003Iq-My
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:15 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6EAcekL022038
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:15 -0400
 Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bph7xxwcy-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpmhwrmkv-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:19 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:15 -0400
 Received: from localhost
 	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 11:41:17 +0100
+	Fri, 14 Jul 2017 11:41:13 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:47 +0200
+Date: Fri, 14 Jul 2017 12:40:32 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-21-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 20/40] pc-bios/s390-ccw: Move virtio-block
- related functions into a separate file
+Message-Id: <1500028867-134709-6-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 05/40] s390x/cpumodel: clean up spacing and
+ comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,713 +40,432 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
 
-The netboot code is going to link against the code from virtio.c, too, so
-we've got to move the virtio-block and -scsi related code out of the way.
+Clean up spacing and add comments to clarify difference between base, full and
+default models.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1499863793-18627-4-git-send-email-thuth@redhat.com>
+Not having spacing around the model definitions in gen-features.c is
+particularly frustrating as the reader tends to misinterpret which model they
+are looking at or editing.
+
+Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- pc-bios/s390-ccw/Makefile        |   2 +-
- pc-bios/s390-ccw/main.c          |   2 +-
- pc-bios/s390-ccw/s390-ccw.h      |   2 +-
- pc-bios/s390-ccw/virtio-blkdev.c | 296 +++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/virtio.c        | 277 +-----------------------------------
- pc-bios/s390-ccw/virtio.h        |   6 +
- 6 files changed, 311 insertions(+), 274 deletions(-)
- create mode 100644 pc-bios/s390-ccw/virtio-blkdev.c
+ target/s390x/cpu_features.c     |  3 +++
+ target/s390x/cpu_features_def.h | 35 +++++++++++++++++++++++++
+ target/s390x/gen-features.c     | 58 ++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 93 insertions(+), 3 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index fb88c13..82b41ef 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -9,7 +9,7 @@ $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 42fd9d7..0436dc2 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -83,9 +83,11 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("dfppc", S390_FEAT_TYPE_STFL, 80, "Decimal-floating-point packed-conversion facility"),
+     FEAT_INIT("vx", S390_FEAT_TYPE_STFL, 129, "Vector facility"),
  
- .PHONY : all clean build-all
++    /* SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
+     FEAT_INIT("gsls", S390_FEAT_TYPE_SCLP_CONF_CHAR, 40, "SIE: Guest-storage-limit-suppression facility"),
+     FEAT_INIT("esop", S390_FEAT_TYPE_SCLP_CONF_CHAR, 46, "Enhanced-suppression-on-protection facility"),
  
--OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o
-+OBJECTS = start.o main.o bootmap.o sclp.o virtio.o virtio-scsi.o virtio-blkdev.o
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 0580eac..401e9db 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -144,7 +144,7 @@ static void virtio_setup(void)
-         sclp_print("Network boot device detected\n");
-         vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
-     } else {
--        virtio_setup_device(blk_schid);
-+        virtio_blk_setup_device(blk_schid);
++    /* SCLP SCCB Byte 116 - 119 (bit numbers relative to byte-116) */
+     FEAT_INIT("64bscao", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 0, "SIE: 64-bit-SCAO facility"),
+     FEAT_INIT("cmma", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 1, "SIE: Collaborative-memory-management assist"),
+     FEAT_INIT("pfmfi", S390_FEAT_TYPE_SCLP_CONF_CHAR_EXT, 9, "SIE: PFMF interpretation facility"),
+@@ -183,6 +185,7 @@ static const S390FeatDef s390_features[] = {
+     FEAT_INIT("kimd-sha-256", S390_FEAT_TYPE_KIMD, 2, "KIMD SHA-256"),
+     FEAT_INIT("kimd-sha-512", S390_FEAT_TYPE_KIMD, 3, "KIMD SHA-512"),
+     FEAT_INIT("kimd-ghash", S390_FEAT_TYPE_KIMD, 65, "KIMD GHASH"),
++
+     FEAT_INIT("klmd-sha-1", S390_FEAT_TYPE_KLMD, 1, "KLMD SHA-1"),
+     FEAT_INIT("klmd-sha-256", S390_FEAT_TYPE_KLMD, 2, "KLMD SHA-256"),
+     FEAT_INIT("klmd-sha-512", S390_FEAT_TYPE_KLMD, 3, "KLMD SHA-512"),
+diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
+index aa5ab8d..f5bb7ed 100644
+--- a/target/s390x/cpu_features_def.h
++++ b/target/s390x/cpu_features_def.h
+@@ -15,6 +15,7 @@
+ #define TARGET_S390X_CPU_FEATURES_DEF_H
  
-         IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
-     }
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 43e2d42..6fdc858 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -74,7 +74,7 @@ void sclp_get_loadparm_ascii(char *loadparm);
- unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
-                                  ulong subchan_id, void *load_addr);
- bool virtio_is_supported(SubChannelId schid);
--void virtio_setup_device(SubChannelId schid);
-+void virtio_blk_setup_device(SubChannelId schid);
- int virtio_read(ulong sector, void *load_addr);
- int enable_mss_facility(void);
- ulong get_second(void);
-diff --git a/pc-bios/s390-ccw/virtio-blkdev.c b/pc-bios/s390-ccw/virtio-blkdev.c
-new file mode 100644
-index 0000000..11c5626
---- /dev/null
-+++ b/pc-bios/s390-ccw/virtio-blkdev.c
-@@ -0,0 +1,296 @@
-+/*
-+ * Virtio driver bits
-+ *
-+ * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
+ typedef enum {
++    /* Stfle */
+     S390_FEAT_ESAN3 = 0,
+     S390_FEAT_ZARCH,
+     S390_FEAT_DAT_ENH,
+@@ -72,12 +73,18 @@ typedef enum {
+     S390_FEAT_EDAT_2,
+     S390_FEAT_DFP_PACKED_CONVERSION,
+     S390_FEAT_VECTOR,
 +
-+#include "libc.h"
-+#include "s390-ccw.h"
-+#include "virtio.h"
-+#include "virtio-scsi.h"
++    /* Sclp Conf Char */
+     S390_FEAT_SIE_GSLS,
+     S390_FEAT_ESOP,
 +
-+static int virtio_blk_read_many(VDev *vdev, ulong sector, void *load_addr,
-+                                int sec_num)
-+{
-+    VirtioBlkOuthdr out_hdr;
-+    u8 status;
-+    VRing *vr = &vdev->vrings[vdev->cmd_vr_idx];
++    /* Sclp Conf Char Ext */
+     S390_FEAT_SIE_64BSCAO,
+     S390_FEAT_SIE_CMMA,
+     S390_FEAT_SIE_PFMFI,
+     S390_FEAT_SIE_IBS,
 +
-+    /* Tell the host we want to read */
-+    out_hdr.type = VIRTIO_BLK_T_IN;
-+    out_hdr.ioprio = 99;
-+    out_hdr.sector = virtio_sector_adjust(sector);
++    /* Sclp Cpu */
+     S390_FEAT_SIE_F2,
+     S390_FEAT_SIE_SKEY,
+     S390_FEAT_SIE_GPERE,
+@@ -85,8 +92,12 @@ typedef enum {
+     S390_FEAT_SIE_SIGPIF,
+     S390_FEAT_SIE_IB,
+     S390_FEAT_SIE_CEI,
 +
-+    vring_send_buf(vr, &out_hdr, sizeof(out_hdr), VRING_DESC_F_NEXT);
++    /* Misc */
+     S390_FEAT_DAT_ENH_2,
+     S390_FEAT_CMM,
 +
-+    /* This is where we want to receive data */
-+    vring_send_buf(vr, load_addr, virtio_get_block_size() * sec_num,
-+                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN |
-+                   VRING_DESC_F_NEXT);
++    /* PLO */
+     S390_FEAT_PLO_CL,
+     S390_FEAT_PLO_CLG,
+     S390_FEAT_PLO_CLGR,
+@@ -111,6 +122,8 @@ typedef enum {
+     S390_FEAT_PLO_CSTSTG,
+     S390_FEAT_PLO_CSTSTGR,
+     S390_FEAT_PLO_CSTSTX,
 +
-+    /* status field */
-+    vring_send_buf(vr, &status, sizeof(u8),
-+                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN);
++    /* PTFF */
+     S390_FEAT_PTFF_QTO,
+     S390_FEAT_PTFF_QSI,
+     S390_FEAT_PTFF_QPT,
+@@ -118,6 +131,8 @@ typedef enum {
+     S390_FEAT_PTFF_QTOU,
+     S390_FEAT_PTFF_STO,
+     S390_FEAT_PTFF_STOU,
 +
-+    /* Now we can tell the host to read */
-+    vring_wait_reply();
++    /* KMAC */
+     S390_FEAT_KMAC_DEA,
+     S390_FEAT_KMAC_TDEA_128,
+     S390_FEAT_KMAC_TDEA_192,
+@@ -130,6 +145,8 @@ typedef enum {
+     S390_FEAT_KMAC_EAES_128,
+     S390_FEAT_KMAC_EAES_192,
+     S390_FEAT_KMAC_EAES_256,
 +
-+    if (drain_irqs(vr->schid)) {
-+        /* Well, whatever status is supposed to contain... */
-+        status = 1;
-+    }
-+    return status;
-+}
++    /* KMC */
+     S390_FEAT_KMC_DEA,
+     S390_FEAT_KMC_TDEA_128,
+     S390_FEAT_KMC_TDEA_192,
+@@ -143,6 +160,8 @@ typedef enum {
+     S390_FEAT_KMC_EAES_192,
+     S390_FEAT_KMC_EAES_256,
+     S390_FEAT_KMC_PRNG,
 +
-+int virtio_read_many(ulong sector, void *load_addr, int sec_num)
-+{
-+    VDev *vdev = virtio_get_device();
++    /* KM */
+     S390_FEAT_KM_DEA,
+     S390_FEAT_KM_TDEA_128,
+     S390_FEAT_KM_TDEA_192,
+@@ -159,19 +178,27 @@ typedef enum {
+     S390_FEAT_KM_XTS_AES_256,
+     S390_FEAT_KM_XTS_EAES_128,
+     S390_FEAT_KM_XTS_EAES_256,
 +
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return virtio_blk_read_many(vdev, sector, load_addr, sec_num);
-+    case VIRTIO_ID_SCSI:
-+        return virtio_scsi_read_many(vdev, sector, load_addr, sec_num);
-+    }
-+    panic("\n! No readable IPL device !\n");
-+    return -1;
-+}
++    /* KIMD */
+     S390_FEAT_KIMD_SHA_1,
+     S390_FEAT_KIMD_SHA_256,
+     S390_FEAT_KIMD_SHA_512,
+     S390_FEAT_KIMD_GHASH,
 +
-+unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
-+                                 ulong subchan_id, void *load_addr)
-+{
-+    u8 status;
-+    int sec = rec_list1;
-+    int sec_num = ((rec_list2 >> 32) & 0xffff) + 1;
-+    int sec_len = rec_list2 >> 48;
-+    ulong addr = (ulong)load_addr;
++    /* KLMD */
+     S390_FEAT_KLMD_SHA_1,
+     S390_FEAT_KLMD_SHA_256,
+     S390_FEAT_KLMD_SHA_512,
 +
-+    if (sec_len != virtio_get_block_size()) {
-+        return -1;
-+    }
++    /* PCKMO */
+     S390_FEAT_PCKMO_EDEA,
+     S390_FEAT_PCKMO_ETDEA_128,
+     S390_FEAT_PCKMO_ETDEA_256,
+     S390_FEAT_PCKMO_AES_128,
+     S390_FEAT_PCKMO_AES_192,
+     S390_FEAT_PCKMO_AES_256,
 +
-+    sclp_print(".");
-+    status = virtio_read_many(sec, (void *)addr, sec_num);
-+    if (status) {
-+        panic("I/O Error");
-+    }
-+    addr += sec_num * virtio_get_block_size();
++    /* KMCTR */
+     S390_FEAT_KMCTR_DEA,
+     S390_FEAT_KMCTR_TDEA_128,
+     S390_FEAT_KMCTR_TDEA_192,
+@@ -184,6 +211,8 @@ typedef enum {
+     S390_FEAT_KMCTR_EAES_128,
+     S390_FEAT_KMCTR_EAES_192,
+     S390_FEAT_KMCTR_EAES_256,
 +
-+    return addr;
-+}
++    /* KMF */
+     S390_FEAT_KMF_DEA,
+     S390_FEAT_KMF_TDEA_128,
+     S390_FEAT_KMF_TDEA_192,
+@@ -196,6 +225,8 @@ typedef enum {
+     S390_FEAT_KMF_EAES_128,
+     S390_FEAT_KMF_EAES_192,
+     S390_FEAT_KMF_EAES_256,
 +
-+int virtio_read(ulong sector, void *load_addr)
-+{
-+    return virtio_read_many(sector, load_addr, 1);
-+}
++    /* KMO */
+     S390_FEAT_KMO_DEA,
+     S390_FEAT_KMO_TDEA_128,
+     S390_FEAT_KMO_TDEA_192,
+@@ -208,6 +239,8 @@ typedef enum {
+     S390_FEAT_KMO_EAES_128,
+     S390_FEAT_KMO_EAES_192,
+     S390_FEAT_KMO_EAES_256,
 +
-+/*
-+ * Other supported value pairs, if any, would need to be added here.
-+ * Note: head count is always 15.
-+ */
-+static inline u8 virtio_eckd_sectors_for_block_size(int size)
-+{
-+    switch (size) {
-+    case 512:
-+        return 49;
-+    case 1024:
-+        return 33;
-+    case 2048:
-+        return 21;
-+    case 4096:
-+        return 12;
-+    }
-+    return 0;
-+}
++    /* PCC */
+     S390_FEAT_PCC_CMAC_DEA,
+     S390_FEAT_PCC_CMAC_TDEA_128,
+     S390_FEAT_PCC_CMAC_TDEA_192,
+@@ -224,6 +257,8 @@ typedef enum {
+     S390_FEAT_PCC_XTS_AES_256,
+     S390_FEAT_PCC_XTS_EAES_128,
+     S390_FEAT_PCC_XTS_EAES_256,
 +
-+VirtioGDN virtio_guessed_disk_nature(void)
-+{
-+    return virtio_get_device()->guessed_disk_nature;
-+}
-+
-+void virtio_assume_scsi(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        vdev->guessed_disk_nature = VIRTIO_GDN_SCSI;
-+        vdev->config.blk.blk_size = VIRTIO_SCSI_BLOCK_SIZE;
-+        vdev->config.blk.physical_block_exp = 0;
-+        vdev->blk_factor = 1;
-+        break;
-+    case VIRTIO_ID_SCSI:
-+        vdev->scsi_block_size = VIRTIO_SCSI_BLOCK_SIZE;
-+        break;
-+    }
-+}
-+
-+void virtio_assume_iso9660(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        vdev->guessed_disk_nature = VIRTIO_GDN_SCSI;
-+        vdev->config.blk.blk_size = VIRTIO_ISO_BLOCK_SIZE;
-+        vdev->config.blk.physical_block_exp = 0;
-+        vdev->blk_factor = VIRTIO_ISO_BLOCK_SIZE / VIRTIO_SECTOR_SIZE;
-+        break;
-+    case VIRTIO_ID_SCSI:
-+        vdev->scsi_block_size = VIRTIO_ISO_BLOCK_SIZE;
-+        break;
-+    }
-+}
-+
-+void virtio_assume_eckd(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    vdev->guessed_disk_nature = VIRTIO_GDN_DASD;
-+    vdev->blk_factor = 1;
-+    vdev->config.blk.physical_block_exp = 0;
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        vdev->config.blk.blk_size = 4096;
-+        break;
-+    case VIRTIO_ID_SCSI:
-+        vdev->config.blk.blk_size = vdev->scsi_block_size;
-+        break;
-+    }
-+    vdev->config.blk.geometry.heads = 15;
-+    vdev->config.blk.geometry.sectors =
-+        virtio_eckd_sectors_for_block_size(vdev->config.blk.blk_size);
-+}
-+
-+bool virtio_disk_is_scsi(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    if (vdev->guessed_disk_nature == VIRTIO_GDN_SCSI) {
-+        return true;
-+    }
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return (vdev->config.blk.geometry.heads == 255)
-+            && (vdev->config.blk.geometry.sectors == 63)
-+            && (virtio_get_block_size()  == VIRTIO_SCSI_BLOCK_SIZE);
-+    case VIRTIO_ID_SCSI:
-+        return true;
-+    }
-+    return false;
-+}
-+
-+bool virtio_disk_is_eckd(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+    const int block_size = virtio_get_block_size();
-+
-+    if (vdev->guessed_disk_nature == VIRTIO_GDN_DASD) {
-+        return true;
-+    }
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return (vdev->config.blk.geometry.heads == 15)
-+            && (vdev->config.blk.geometry.sectors ==
-+                virtio_eckd_sectors_for_block_size(block_size));
-+    case VIRTIO_ID_SCSI:
-+        return false;
-+    }
-+    return false;
-+}
-+
-+bool virtio_ipl_disk_is_valid(void)
-+{
-+    return virtio_disk_is_scsi() || virtio_disk_is_eckd();
-+}
-+
-+int virtio_get_block_size(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return vdev->config.blk.blk_size << vdev->config.blk.physical_block_exp;
-+    case VIRTIO_ID_SCSI:
-+        return vdev->scsi_block_size;
-+    }
-+    return 0;
-+}
-+
-+uint8_t virtio_get_heads(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return vdev->config.blk.geometry.heads;
-+    case VIRTIO_ID_SCSI:
-+        return vdev->guessed_disk_nature == VIRTIO_GDN_DASD
-+               ? vdev->config.blk.geometry.heads : 255;
-+    }
-+    return 0;
-+}
-+
-+uint8_t virtio_get_sectors(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return vdev->config.blk.geometry.sectors;
-+    case VIRTIO_ID_SCSI:
-+        return vdev->guessed_disk_nature == VIRTIO_GDN_DASD
-+               ? vdev->config.blk.geometry.sectors : 63;
-+    }
-+    return 0;
-+}
-+
-+uint64_t virtio_get_blocks(void)
-+{
-+    VDev *vdev = virtio_get_device();
-+    const uint64_t factor = virtio_get_block_size() / VIRTIO_SECTOR_SIZE;
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        return vdev->config.blk.capacity / factor;
-+    case VIRTIO_ID_SCSI:
-+        return vdev->scsi_last_block / factor;
-+    }
-+    return 0;
-+}
-+
-+void virtio_blk_setup_device(SubChannelId schid)
-+{
-+    VDev *vdev = virtio_get_device();
-+
-+    vdev->schid = schid;
-+    virtio_setup_ccw(vdev);
-+
-+    switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_BLOCK:
-+        sclp_print("Using virtio-blk.\n");
-+        if (!virtio_ipl_disk_is_valid()) {
-+            /* make sure all getters but blocksize return 0 for
-+             * invalid IPL disk
-+             */
-+            memset(&vdev->config.blk, 0, sizeof(vdev->config.blk));
-+            virtio_assume_scsi();
-+        }
-+        break;
-+    case VIRTIO_ID_SCSI:
-+        IPL_assert(vdev->config.scsi.sense_size == VIRTIO_SCSI_SENSE_SIZE,
-+            "Config: sense size mismatch");
-+        IPL_assert(vdev->config.scsi.cdb_size == VIRTIO_SCSI_CDB_SIZE,
-+            "Config: CDB size mismatch");
-+
-+        sclp_print("Using virtio-scsi.\n");
-+        virtio_scsi_setup(vdev);
-+        break;
-+    default:
-+        panic("\n! No IPL device available !\n");
-+    }
-+}
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index 8768331..9d9e61f 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -70,7 +70,7 @@ static long virtio_notify(SubChannelId schid, int vq_idx, long cookie)
-  *             Virtio functions                *
-  ***********************************************/
- 
--static int drain_irqs(SubChannelId schid)
-+int drain_irqs(SubChannelId schid)
- {
-     Irb irb = {};
-     int r = 0;
-@@ -149,13 +149,13 @@ static void vring_init(VRing *vr, VqInfo *info)
-     debug_print_addr("init vr", vr);
- }
- 
--static bool vring_notify(VRing *vr)
-+bool vring_notify(VRing *vr)
- {
-     vr->cookie = virtio_notify(vr->schid, vr->id, vr->cookie);
-     return vr->cookie >= 0;
- }
- 
--static void vring_send_buf(VRing *vr, void *p, int len, int flags)
-+void vring_send_buf(VRing *vr, void *p, int len, int flags)
- {
-     /* For follow-up chains we need to keep the first entry point */
-     if (!(flags & VRING_HIDDEN_IS_CHAIN)) {
-@@ -188,7 +188,7 @@ ulong get_second(void)
-     return (get_clock() >> 12) / 1000000;
- }
- 
--static int vr_poll(VRing *vr)
-+int vr_poll(VRing *vr)
- {
-     if (vr->used->idx == vr->used_idx) {
-         vring_notify(vr);
-@@ -210,7 +210,7 @@ static int vr_poll(VRing *vr)
-  *
-  * Returns 0 on success, 1 on timeout.
-  */
--static int vring_wait_reply(void)
-+int vring_wait_reply(void)
- {
-     ulong target_second = get_second() + vdev.wait_reply_timeout;
- 
-@@ -247,242 +247,7 @@ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd)
-     return 0;
- }
- 
--/***********************************************
-- *               Virtio block                  *
-- ***********************************************/
--
--static int virtio_blk_read_many(VDev *vdev,
--                                ulong sector, void *load_addr, int sec_num)
--{
--    VirtioBlkOuthdr out_hdr;
--    u8 status;
--    VRing *vr = &vdev->vrings[vdev->cmd_vr_idx];
--
--    /* Tell the host we want to read */
--    out_hdr.type = VIRTIO_BLK_T_IN;
--    out_hdr.ioprio = 99;
--    out_hdr.sector = virtio_sector_adjust(sector);
--
--    vring_send_buf(vr, &out_hdr, sizeof(out_hdr), VRING_DESC_F_NEXT);
--
--    /* This is where we want to receive data */
--    vring_send_buf(vr, load_addr, virtio_get_block_size() * sec_num,
--                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN |
--                   VRING_DESC_F_NEXT);
--
--    /* status field */
--    vring_send_buf(vr, &status, sizeof(u8),
--                   VRING_DESC_F_WRITE | VRING_HIDDEN_IS_CHAIN);
--
--    /* Now we can tell the host to read */
--    vring_wait_reply();
--
--    if (drain_irqs(vr->schid)) {
--        /* Well, whatever status is supposed to contain... */
--        status = 1;
--    }
--    return status;
--}
--
--int virtio_read_many(ulong sector, void *load_addr, int sec_num)
--{
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return virtio_blk_read_many(&vdev, sector, load_addr, sec_num);
--    case VIRTIO_ID_SCSI:
--        return virtio_scsi_read_many(&vdev, sector, load_addr, sec_num);
--    }
--    panic("\n! No readable IPL device !\n");
--    return -1;
--}
--
--unsigned long virtio_load_direct(ulong rec_list1, ulong rec_list2,
--                                 ulong subchan_id, void *load_addr)
--{
--    u8 status;
--    int sec = rec_list1;
--    int sec_num = ((rec_list2 >> 32) & 0xffff) + 1;
--    int sec_len = rec_list2 >> 48;
--    ulong addr = (ulong)load_addr;
--
--    if (sec_len != virtio_get_block_size()) {
--        return -1;
--    }
--
--    sclp_print(".");
--    status = virtio_read_many(sec, (void *)addr, sec_num);
--    if (status) {
--        panic("I/O Error");
--    }
--    addr += sec_num * virtio_get_block_size();
--
--    return addr;
--}
--
--int virtio_read(ulong sector, void *load_addr)
--{
--    return virtio_read_many(sector, load_addr, 1);
--}
--
--/*
-- * Other supported value pairs, if any, would need to be added here.
-- * Note: head count is always 15.
-- */
--static inline u8 virtio_eckd_sectors_for_block_size(int size)
--{
--    switch (size) {
--    case 512:
--        return 49;
--    case 1024:
--        return 33;
--    case 2048:
--        return 21;
--    case 4096:
--        return 12;
--    }
--    return 0;
--}
--
--VirtioGDN virtio_guessed_disk_nature(void)
--{
--    return vdev.guessed_disk_nature;
--}
--
--void virtio_assume_scsi(void)
--{
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        vdev.guessed_disk_nature = VIRTIO_GDN_SCSI;
--        vdev.config.blk.blk_size = VIRTIO_SCSI_BLOCK_SIZE;
--        vdev.config.blk.physical_block_exp = 0;
--        vdev.blk_factor = 1;
--        break;
--    case VIRTIO_ID_SCSI:
--        vdev.scsi_block_size = VIRTIO_SCSI_BLOCK_SIZE;
--        break;
--    }
--}
--
--void virtio_assume_iso9660(void)
--{
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        vdev.guessed_disk_nature = VIRTIO_GDN_SCSI;
--        vdev.config.blk.blk_size = VIRTIO_ISO_BLOCK_SIZE;
--        vdev.config.blk.physical_block_exp = 0;
--        vdev.blk_factor = VIRTIO_ISO_BLOCK_SIZE / VIRTIO_SECTOR_SIZE;
--        break;
--    case VIRTIO_ID_SCSI:
--        vdev.scsi_block_size = VIRTIO_ISO_BLOCK_SIZE;
--        break;
--    }
--}
--
--void virtio_assume_eckd(void)
--{
--    vdev.guessed_disk_nature = VIRTIO_GDN_DASD;
--    vdev.blk_factor = 1;
--    vdev.config.blk.physical_block_exp = 0;
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        vdev.config.blk.blk_size = 4096;
--        break;
--    case VIRTIO_ID_SCSI:
--        vdev.config.blk.blk_size = vdev.scsi_block_size;
--        break;
--    }
--    vdev.config.blk.geometry.heads = 15;
--    vdev.config.blk.geometry.sectors =
--        virtio_eckd_sectors_for_block_size(vdev.config.blk.blk_size);
--}
--
--bool virtio_disk_is_scsi(void)
--{
--    if (vdev.guessed_disk_nature == VIRTIO_GDN_SCSI) {
--        return true;
--    }
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return (vdev.config.blk.geometry.heads == 255)
--            && (vdev.config.blk.geometry.sectors == 63)
--            && (virtio_get_block_size()  == VIRTIO_SCSI_BLOCK_SIZE);
--    case VIRTIO_ID_SCSI:
--        return true;
--    }
--    return false;
--}
--
--bool virtio_disk_is_eckd(void)
--{
--    const int block_size = virtio_get_block_size();
--
--    if (vdev.guessed_disk_nature == VIRTIO_GDN_DASD) {
--        return true;
--    }
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return (vdev.config.blk.geometry.heads == 15)
--            && (vdev.config.blk.geometry.sectors ==
--                virtio_eckd_sectors_for_block_size(block_size));
--    case VIRTIO_ID_SCSI:
--        return false;
--    }
--    return false;
--}
--
--bool virtio_ipl_disk_is_valid(void)
--{
--    return virtio_disk_is_scsi() || virtio_disk_is_eckd();
--}
--
--int virtio_get_block_size(void)
--{
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return vdev.config.blk.blk_size << vdev.config.blk.physical_block_exp;
--    case VIRTIO_ID_SCSI:
--        return vdev.scsi_block_size;
--    }
--    return 0;
--}
--
--uint8_t virtio_get_heads(void)
--{
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return vdev.config.blk.geometry.heads;
--    case VIRTIO_ID_SCSI:
--        return vdev.guessed_disk_nature == VIRTIO_GDN_DASD
--               ? vdev.config.blk.geometry.heads : 255;
--    }
--    return 0;
--}
--
--uint8_t virtio_get_sectors(void)
--{
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return vdev.config.blk.geometry.sectors;
--    case VIRTIO_ID_SCSI:
--        return vdev.guessed_disk_nature == VIRTIO_GDN_DASD
--               ? vdev.config.blk.geometry.sectors : 63;
--    }
--    return 0;
--}
--
--uint64_t virtio_get_blocks(void)
--{
--    const uint64_t factor = virtio_get_block_size() / VIRTIO_SECTOR_SIZE;
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        return vdev.config.blk.capacity / factor;
--    case VIRTIO_ID_SCSI:
--        return vdev.scsi_last_block / factor;
--    }
--    return 0;
--}
--
--static void virtio_setup_ccw(VDev *vdev)
-+void virtio_setup_ccw(VDev *vdev)
- {
-     int i, cfg_size = 0;
-     unsigned char status = VIRTIO_CONFIG_S_DRIVER_OK;
-@@ -544,36 +309,6 @@ static void virtio_setup_ccw(VDev *vdev)
-         "Could not write status to host");
- }
- 
--void virtio_setup_device(SubChannelId schid)
--{
--    vdev.schid = schid;
--    virtio_setup_ccw(&vdev);
--
--    switch (vdev.senseid.cu_model) {
--    case VIRTIO_ID_BLOCK:
--        sclp_print("Using virtio-blk.\n");
--        if (!virtio_ipl_disk_is_valid()) {
--            /* make sure all getters but blocksize return 0 for
--             * invalid IPL disk
--             */
--            memset(&vdev.config.blk, 0, sizeof(vdev.config.blk));
--            virtio_assume_scsi();
--        }
--        break;
--    case VIRTIO_ID_SCSI:
--        IPL_assert(vdev.config.scsi.sense_size == VIRTIO_SCSI_SENSE_SIZE,
--            "Config: sense size mismatch");
--        IPL_assert(vdev.config.scsi.cdb_size == VIRTIO_SCSI_CDB_SIZE,
--            "Config: CDB size mismatch");
--
--        sclp_print("Using virtio-scsi.\n");
--        virtio_scsi_setup(&vdev);
--        break;
--    default:
--        panic("\n! No IPL device available !\n");
--    }
--}
--
- bool virtio_is_supported(SubChannelId schid)
- {
-     vdev.schid = schid;
-diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
-index 1eaf865..024e9a6 100644
---- a/pc-bios/s390-ccw/virtio.h
-+++ b/pc-bios/s390-ccw/virtio.h
-@@ -291,6 +291,12 @@ struct VirtioCmd {
++    /* PPNO */
+     S390_FEAT_PPNO_SHA_512_DRNG,
+     S390_FEAT_MAX,
+ } S390Feat;
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index e674738..8ca2b47 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -211,14 +211,20 @@ static uint16_t group_MSA_EXT_5[] = {
+     S390_FEAT_GROUP_MSA_EXT_5,
  };
- typedef struct VirtioCmd VirtioCmd;
  
-+bool vring_notify(VRing *vr);
-+int drain_irqs(SubChannelId schid);
-+void vring_send_buf(VRing *vr, void *p, int len, int flags);
-+int vr_poll(VRing *vr);
-+int vring_wait_reply(void);
- int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
-+void virtio_setup_ccw(VDev *vdev);
+-/* base features in order of release */
++/* Base features (in order of release)
++ * Only non-hypervisor managed features belong here.
++ * Base feature sets are static meaning they do not change in future QEMU
++ * releases.
++ */
+ static uint16_t base_GEN7_GA1[] = {
+     S390_FEAT_GROUP_PLO,
+     S390_FEAT_ESAN3,
+     S390_FEAT_ZARCH,
+ };
++
+ #define base_GEN7_GA2 EmptyFeat
+ #define base_GEN7_GA3 EmptyFeat
++
+ static uint16_t base_GEN8_GA1[] = {
+     S390_FEAT_DAT_ENH,
+     S390_FEAT_EXTENDED_TRANSLATION_2,
+@@ -227,10 +233,12 @@ static uint16_t base_GEN8_GA1[] = {
+     S390_FEAT_LONG_DISPLACEMENT_FAST,
+     S390_FEAT_HFP_MADDSUB,
+ };
++
+ #define base_GEN8_GA2 EmptyFeat
+ #define base_GEN8_GA3 EmptyFeat
+ #define base_GEN8_GA4 EmptyFeat
+ #define base_GEN8_GA5 EmptyFeat
++
+ static uint16_t base_GEN9_GA1[] = {
+     S390_FEAT_IDTE_SEGMENT,
+     S390_FEAT_ASN_LX_REUSE,
+@@ -245,8 +253,10 @@ static uint16_t base_GEN9_GA1[] = {
+     S390_FEAT_ETF3_ENH,
+     S390_FEAT_DAT_ENH_2,
+ };
++
+ #define base_GEN9_GA2 EmptyFeat
+ #define base_GEN9_GA3 EmptyFeat
++
+ static uint16_t base_GEN10_GA1[] = {
+     S390_FEAT_CONDITIONAL_SSKE,
+     S390_FEAT_PARSING_ENH,
+@@ -263,6 +273,7 @@ static uint16_t base_GEN10_GA1[] = {
+ };
+ #define base_GEN10_GA2 EmptyFeat
+ #define base_GEN10_GA3 EmptyFeat
++
+ static uint16_t base_GEN11_GA1[] = {
+     S390_FEAT_NONQ_KEY_SETTING,
+     S390_FEAT_ENHANCED_MONITOR,
+@@ -272,21 +283,30 @@ static uint16_t base_GEN11_GA1[] = {
+     S390_FEAT_CMPSC_ENH,
+     S390_FEAT_INTERLOCKED_ACCESS_2,
+ };
++
+ #define base_GEN11_GA2 EmptyFeat
++
+ static uint16_t base_GEN12_GA1[] = {
+     S390_FEAT_DFP_ZONED_CONVERSION,
+     S390_FEAT_STFLE_49,
+     S390_FEAT_LOCAL_TLB_CLEARING,
+ };
++
+ #define base_GEN12_GA2 EmptyFeat
++
+ static uint16_t base_GEN13_GA1[] = {
+     S390_FEAT_STFLE_53,
+     S390_FEAT_DFP_PACKED_CONVERSION,
+     S390_FEAT_GROUP_GEN13_PTFF,
+ };
++
+ #define base_GEN13_GA2 EmptyFeat
  
- #endif /* VIRTIO_H */
+-/* full features differing to the base in order of release */
++/* Full features (in order of release)
++ * Automatically includes corresponding base features.
++ * Full features are all features this hardware supports even if kvm/QEMU do not
++ * support these features yet.
++ */
+ static uint16_t full_GEN7_GA1[] = {
+     S390_FEAT_SIE_F2,
+     S390_FEAT_SIE_SKEY,
+@@ -294,30 +314,38 @@ static uint16_t full_GEN7_GA1[] = {
+     S390_FEAT_SIE_IB,
+     S390_FEAT_SIE_CEI,
+ };
++
+ static uint16_t full_GEN7_GA2[] = {
+     S390_FEAT_EXTENDED_TRANSLATION_2,
+ };
++
+ static uint16_t full_GEN7_GA3[] = {
+     S390_FEAT_LONG_DISPLACEMENT,
+     S390_FEAT_SIE_SIIF,
+ };
++
+ static uint16_t full_GEN8_GA1[] = {
+     S390_FEAT_SIE_GSLS,
+     S390_FEAT_SIE_64BSCAO,
+ };
++
+ #define full_GEN8_GA2 EmptyFeat
++
+ static uint16_t full_GEN8_GA3[] = {
+     S390_FEAT_ASN_LX_REUSE,
+     S390_FEAT_EXTENDED_TRANSLATION_3,
+ };
++
+ #define full_GEN8_GA4 EmptyFeat
+ #define full_GEN8_GA5 EmptyFeat
++
+ static uint16_t full_GEN9_GA1[] = {
+     S390_FEAT_STORE_HYPERVISOR_INFO,
+     S390_FEAT_GROUP_MSA_EXT_1,
+     S390_FEAT_CMM,
+     S390_FEAT_SIE_CMMA,
+ };
++
+ static uint16_t full_GEN9_GA2[] = {
+     S390_FEAT_MOVE_WITH_OPTIONAL_SPEC,
+     S390_FEAT_EXTRACT_CPU_TIME,
+@@ -325,10 +353,12 @@ static uint16_t full_GEN9_GA2[] = {
+     S390_FEAT_FLOATING_POINT_SUPPPORT_ENH,
+     S390_FEAT_DFP,
+ };
++
+ static uint16_t full_GEN9_GA3[] = {
+     S390_FEAT_CONDITIONAL_SSKE,
+     S390_FEAT_PFPO,
+ };
++
+ static uint16_t full_GEN10_GA1[] = {
+     S390_FEAT_EDAT,
+     S390_FEAT_CONFIGURATION_TOPOLOGY,
+@@ -337,34 +367,46 @@ static uint16_t full_GEN10_GA1[] = {
+     S390_FEAT_SIE_PFMFI,
+     S390_FEAT_SIE_SIGPIF,
+ };
++
+ static uint16_t full_GEN10_GA2[] = {
+     S390_FEAT_SET_PROGRAM_PARAMETERS,
+     S390_FEAT_SIE_IBS,
+ };
++
+ static uint16_t full_GEN10_GA3[] = {
+     S390_FEAT_GROUP_MSA_EXT_3,
+ };
++
+ static uint16_t full_GEN11_GA1[] = {
+     S390_FEAT_IPTE_RANGE,
+     S390_FEAT_ACCESS_EXCEPTION_FS_INDICATION,
+     S390_FEAT_GROUP_MSA_EXT_4,
+ };
++
+ #define full_GEN11_GA2 EmptyFeat
++
+ static uint16_t full_GEN12_GA1[] = {
+     S390_FEAT_CONSTRAINT_TRANSACTIONAL_EXE,
+     S390_FEAT_TRANSACTIONAL_EXE,
+     S390_FEAT_RUNTIME_INSTRUMENTATION,
+     S390_FEAT_EDAT_2,
+ };
++
+ static uint16_t full_GEN12_GA2[] = {
+     S390_FEAT_GROUP_MSA_EXT_5,
+ };
++
+ static uint16_t full_GEN13_GA1[] = {
+     S390_FEAT_VECTOR,
+ };
++
+ #define full_GEN13_GA2 EmptyFeat
+ 
+-/* default features differing to the base in order of release */
++/* Default features (in order of release)
++ * Automatically includes corresponding base features.
++ * Default features are all features this version of QEMU supports for this
++ * hardware model. Default feature sets can grow with new QEMU releases.
++ */
+ #define default_GEN7_GA1 EmptyFeat
+ #define default_GEN7_GA2 EmptyFeat
+ #define default_GEN7_GA3 EmptyFeat
+@@ -373,37 +415,47 @@ static uint16_t full_GEN13_GA1[] = {
+ #define default_GEN8_GA3 EmptyFeat
+ #define default_GEN8_GA4 EmptyFeat
+ #define default_GEN8_GA5 EmptyFeat
++
+ static uint16_t default_GEN9_GA1[] = {
+     S390_FEAT_STORE_HYPERVISOR_INFO,
+     S390_FEAT_GROUP_MSA_EXT_1,
+     S390_FEAT_CMM,
+ };
++
+ #define default_GEN9_GA2 EmptyFeat
+ #define default_GEN9_GA3 EmptyFeat
++
+ static uint16_t default_GEN10_GA1[] = {
+     S390_FEAT_EDAT,
+     S390_FEAT_GROUP_MSA_EXT_2,
+ };
++
+ #define default_GEN10_GA2 EmptyFeat
+ #define default_GEN10_GA3 EmptyFeat
++
+ static uint16_t default_GEN11_GA1[] = {
+     S390_FEAT_GROUP_MSA_EXT_3,
+     S390_FEAT_IPTE_RANGE,
+     S390_FEAT_ACCESS_EXCEPTION_FS_INDICATION,
+     S390_FEAT_GROUP_MSA_EXT_4,
+ };
++
+ #define default_GEN11_GA2 EmptyFeat
++
+ static uint16_t default_GEN12_GA1[] = {
+     S390_FEAT_CONSTRAINT_TRANSACTIONAL_EXE,
+     S390_FEAT_TRANSACTIONAL_EXE,
+     S390_FEAT_RUNTIME_INSTRUMENTATION,
+     S390_FEAT_EDAT_2,
+ };
++
+ #define default_GEN12_GA2 EmptyFeat
++
+ static uint16_t default_GEN13_GA1[] = {
+     S390_FEAT_GROUP_MSA_EXT_5,
+     S390_FEAT_VECTOR,
+ };
++
+ #define default_GEN13_GA2 EmptyFeat
+ 
+ /****** END FEATURE DEFS ******/
 -- 
 2.7.4
