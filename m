@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dW31r-0003YC-Ov
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dW32E-0003xL-LG
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dW31o-0006g4-JI
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dW31o-0006fe-DR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4E912351276
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 16:01:15 +0000 (UTC)
-Date: Fri, 14 Jul 2017 13:01:10 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170714160110.GF6020@localhost.localdomain>
-References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
-	<20170712190558.GK6020@localhost.localdomain>
-	<20170714050423.GM27284@pxdev.xzpeter.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dW32D-00072j-Sj
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:42 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36412)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dW32D-00072L-LI
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:01:41 -0400
+Received: by mail-wm0-x233.google.com with SMTP id 62so24400668wmw.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 09:01:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170714050423.GM27284@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 0/3] migration: export cap/params to qdev
- props
+In-Reply-To: <20170714151121.18447-1-berrange@redhat.com>
+References: <20170714151121.18447-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 17:01:19 +0100
+Message-ID: <CAFEAcA__Zkxf7cdtH7fi-wxBP-JP59iOquoR0oVgv793AYRhPQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 0/4] Merge sockets 2017/07/11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jul 14, 2017 at 01:04:23PM +0800, Peter Xu wrote:
-> On Wed, Jul 12, 2017 at 04:05:58PM -0300, Eduardo Habkost wrote:
-> > On Wed, Jul 12, 2017 at 02:53:40PM +0800, Peter Xu wrote:
-> > [...]
-> > > These properties should only be used for debugging/testing purpose,
-> > > and we should not guarantee any interface compatibility for them (just
-> > > like HMP).
-> > 
-> > If we don't guarantee compatibility, the property names need to
-> > be prefixed with "x-".
-> 
-> Indeed. Sorry I missed that.
-> 
-> But I'd say it is slightly awkward to add "x-" for all these (for me,
-> "x-" means more like "this is not stable and experimental, use it
-> carefully", while this does not suite for this series). Maybe I can
-> just remove this sentence in commit log (I think I am just a little
-> bit frightened by the compatibility problems)...
+On 14 July 2017 at 16:11, Daniel P. Berrange <berrange@redhat.com> wrote:
+> The following changes since commit 6c6076662d98c068059983d411cb2a8987ba5670:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-07-14 12:16:09 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/berrange/qemu tags/pull-sockets-2017-07-11-3
+>
+> for you to fetch changes up to 563a3987b980a36e6941720a99d5cf36960f78ea:
+>
+>   io: preserve ipv4/ipv6 flags when resolving InetSocketAddress (2017-07-14 14:28:29 +0100)
+>
+> ----------------------------------------------------------------
+> Merge sockets 2017/07/11 v3
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrange (4):
+>   sockets: ensure we can bind to both ipv4 & ipv6 separately
+>   sockets: don't block IPv4 clients when listening on "::"
+>   sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
+>   io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
+>
+>  io/dns-resolver.c   |  6 +++--
+>  util/qemu-sockets.c | 71 +++++++++++++++++++++++++++++++++++++++--------------
+>  2 files changed, 56 insertions(+), 21 deletions(-)
+>
 
-"x-" in property names doesn't mean "experimental", but just "not
-part of the stable interface".  If you have the tiniest doubt
-about command-line compatibility, I think it won't hurt to use
-"x-".
+Applied, thanks.
 
--- 
-Eduardo
+-- PMM
