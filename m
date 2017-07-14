@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2L-0003O6-U1
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2K-0003MX-H1
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2I-0003S3-P8
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42283
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2H-0003QZ-46
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVy2I-0003Rr-J6
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:26 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1dVy2G-0003Og-Py
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:25 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EAceYV022054
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:26 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpmhwrms7-1
+	v6EAcdWP118783
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:23 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpsv8dtfp-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:25 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:23 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 11:41:24 +0100
+	Fri, 14 Jul 2017 11:41:20 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:41:07 +0200
+Date: Fri, 14 Jul 2017 12:40:54 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-41-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 40/40] s390x/gdb: add gs registers
+Message-Id: <1500028867-134709-28-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 27/40] pc-bios/s390-ccw: Add virtio-net driver
+ code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,90 +41,235 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Let's provide the guarded storage registers via gdb server.
+From: Thomas Huth <thuth@redhat.com>
 
+The driver provides the recv() and send() functions which will
+be required by SLOF's libnet code for receiving and sending
+packets.
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1499863793-18627-11-git-send-email-thuth@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- configure              |  2 +-
- gdb-xml/s390-gs.xml    | 14 ++++++++++++++
- target/s390x/gdbstub.c | 24 ++++++++++++++++++++++++
- 3 files changed, 39 insertions(+), 1 deletion(-)
- create mode 100644 gdb-xml/s390-gs.xml
+ pc-bios/s390-ccw/netboot.mak  |   2 +-
+ pc-bios/s390-ccw/virtio-net.c | 135 ++++++++++++++++++++++++++++++++++++++++++
+ pc-bios/s390-ccw/virtio.c     |   5 ++
+ pc-bios/s390-ccw/virtio.h     |  12 +++-
+ 4 files changed, 151 insertions(+), 3 deletions(-)
+ create mode 100644 pc-bios/s390-ccw/virtio-net.c
 
-diff --git a/configure b/configure
-index 902653a..8cc4afb 100755
---- a/configure
-+++ b/configure
-@@ -6231,7 +6231,7 @@ case "$target_name" in
-     echo "TARGET_ABI32=y" >> $config_target_mak
-   ;;
-   s390x)
--    gdb_xml_files="s390x-core64.xml s390-acr.xml s390-fpr.xml s390-vx.xml s390-cr.xml s390-virt.xml"
-+    gdb_xml_files="s390x-core64.xml s390-acr.xml s390-fpr.xml s390-vx.xml s390-cr.xml s390-virt.xml s390-gs.xml"
-   ;;
-   tilegx)
-   ;;
-diff --git a/gdb-xml/s390-gs.xml b/gdb-xml/s390-gs.xml
+diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+index 44b7645..eb70430 100644
+--- a/pc-bios/s390-ccw/netboot.mak
++++ b/pc-bios/s390-ccw/netboot.mak
+@@ -1,7 +1,7 @@
+ 
+ SLOF_DIR := $(SRC_PATH)/roms/SLOF
+ 
+-NETOBJS := start.o sclp.o virtio.o netmain.o libc.a
++NETOBJS := start.o sclp.o virtio.o virtio-net.o netmain.o libc.a
+ 
+ LIBC_INC := -nostdinc -I$(SLOF_DIR)/lib/libc/include
+ LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
+diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-net.c
 new file mode 100644
-index 0000000..0487d31
+index 0000000..ff7f4da
 --- /dev/null
-+++ b/gdb-xml/s390-gs.xml
-@@ -0,0 +1,14 @@
-+<?xml version="1.0"?>
-+<!-- Copyright 2017 IBM Corp.
++++ b/pc-bios/s390-ccw/virtio-net.c
+@@ -0,0 +1,135 @@
++/*
++ * Virtio-net driver for the s390-ccw firmware
++ *
++ * Copyright 2017 Thomas Huth, Red Hat Inc.
++ *
++ * This code is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or (at your
++ * option) any later version.
++ */
 +
-+     This work is licensed under the terms of the GNU GPL, version 2 or
-+     (at your option) any later version. See the COPYING file in the
-+     top-level directory. -->
++#include <stdint.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <ethernet.h>
++#include "s390-ccw.h"
++#include "virtio.h"
 +
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.s390.gs">
-+  <reg name="gs_reserved" bitsize="64" type="uint64" group="system"/>
-+  <reg name="gsd" bitsize="64" type="uint64" group="system"/>
-+  <reg name="gssm" bitsize="64" type="uint64" group="system"/>
-+  <reg name="gsepla" bitsize="64" type="data_ptr" group="system"/>
-+</feature>
-diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
-index 94ab74d..a7efafe 100644
---- a/target/s390x/gdbstub.c
-+++ b/target/s390x/gdbstub.c
-@@ -286,6 +286,26 @@ static int cpu_write_virt_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
- }
- #endif
- 
-+/* the values represent the positions in s390-gs.xml */
-+#define S390_GS_RESERVED_REGNUM 0
-+#define S390_GS_GSD_REGNUM      1
-+#define S390_GS_GSSM_REGNUM     2
-+#define S390_GS_GSEPLA_REGNUM   3
-+/* total number of registers in s390-gs.xml */
-+#define S390_NUM_GS_REGS 4
++#ifndef DEBUG_VIRTIO_NET
++#define DEBUG_VIRTIO_NET 0
++#endif
 +
-+static int cpu_read_gs_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
++#define VIRTIO_NET_F_MAC_BIT  (1 << 5)
++
++#define VQ_RX 0         /* Receive queue */
++#define VQ_TX 1         /* Transmit queue */
++
++struct VirtioNetHdr {
++    uint8_t flags;
++    uint8_t gso_type;
++    uint16_t hdr_len;
++    uint16_t gso_size;
++    uint16_t csum_start;
++    uint16_t csum_offset;
++    /*uint16_t num_buffers;*/ /* Only with VIRTIO_NET_F_MRG_RXBUF or VIRTIO1 */
++};
++typedef struct VirtioNetHdr VirtioNetHdr;
++
++static uint16_t rx_last_idx;  /* Last index in receive queue "used" ring */
++
++int virtio_net_init(void *mac_addr)
 +{
-+    return gdb_get_regl(mem_buf, env->gscb[n]);
++    VDev *vdev = virtio_get_device();
++    VRing *rxvq = &vdev->vrings[VQ_RX];
++    void *buf;
++    int i;
++
++    vdev->guest_features[0] = VIRTIO_NET_F_MAC_BIT;
++    virtio_setup_ccw(vdev);
++
++    IPL_assert(vdev->guest_features[0] & VIRTIO_NET_F_MAC_BIT,
++               "virtio-net device does not support the MAC address feature");
++    memcpy(mac_addr, vdev->config.net.mac, ETH_ALEN);
++
++    for (i = 0; i < 64; i++) {
++        buf = malloc(ETH_MTU_SIZE + sizeof(VirtioNetHdr));
++        IPL_assert(buf != NULL, "Can not allocate memory for receive buffers");
++        vring_send_buf(rxvq, buf, ETH_MTU_SIZE + sizeof(VirtioNetHdr),
++                       VRING_DESC_F_WRITE);
++    }
++    vring_notify(rxvq);
++
++    return 0;
 +}
 +
-+static int cpu_write_gs_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
++int send(int fd, const void *buf, int len, int flags)
 +{
-+    env->gscb[n] = ldtul_p(mem_buf);
-+    cpu_synchronize_post_init(ENV_GET_CPU(env));
-+    return 8;
++    VirtioNetHdr tx_hdr;
++    VDev *vdev = virtio_get_device();
++    VRing *txvq = &vdev->vrings[VQ_TX];
++
++    /* Set up header - we do not use anything special, so simply clear it */
++    memset(&tx_hdr, 0, sizeof(tx_hdr));
++
++    vring_send_buf(txvq, &tx_hdr, sizeof(tx_hdr), VRING_DESC_F_NEXT);
++    vring_send_buf(txvq, (void *)buf, len, VRING_HIDDEN_IS_CHAIN);
++    while (!vr_poll(txvq)) {
++        yield();
++    }
++    if (drain_irqs(txvq->schid)) {
++        puts("send: drain irqs failed");
++        return -1;
++    }
++
++    return len;
 +}
 +
- void s390_cpu_gdb_init(CPUState *cs)
- {
-     gdb_register_coprocessor(cs, cpu_read_ac_reg,
-@@ -300,6 +320,10 @@ void s390_cpu_gdb_init(CPUState *cs)
-                              cpu_write_vreg,
-                              S390_NUM_VREGS, "s390-vx.xml", 0);
- 
-+    gdb_register_coprocessor(cs, cpu_read_gs_reg,
-+                             cpu_write_gs_reg,
-+                             S390_NUM_GS_REGS, "s390-gs.xml", 0);
++int recv(int fd, void *buf, int maxlen, int flags)
++{
++    VDev *vdev = virtio_get_device();
++    VRing *rxvq = &vdev->vrings[VQ_RX];
++    int len, id;
++    uint8_t *pkt;
 +
- #ifndef CONFIG_USER_ONLY
-     gdb_register_coprocessor(cs, cpu_read_c_reg,
-                              cpu_write_c_reg,
++    if (rx_last_idx == rxvq->used->idx) {
++        return 0;
++    }
++
++    len = rxvq->used->ring[rx_last_idx % rxvq->num].len - sizeof(VirtioNetHdr);
++    if (len > maxlen) {
++        puts("virtio-net: Receive buffer too small");
++        len = maxlen;
++    }
++    id = rxvq->used->ring[rx_last_idx % rxvq->num].id % rxvq->num;
++    pkt = (uint8_t *)(rxvq->desc[id].addr + sizeof(VirtioNetHdr));
++
++#if DEBUG_VIRTIO_NET   /* Dump packet */
++    int i;
++    printf("\nbuf %p: len=%i\n", (void *)rxvq->desc[id].addr, len);
++    for (i = 0; i < 64; i++) {
++        printf(" %02x", pkt[i]);
++        if ((i % 16) == 15) {
++            printf("\n");
++        }
++    }
++    printf("\n");
++#endif
++
++    /* Copy data to destination buffer */
++    memcpy(buf, pkt, len);
++
++    /* Mark buffer as available to the host again */
++    rxvq->avail->ring[rxvq->avail->idx % rxvq->num] = id;
++    rxvq->avail->idx = rxvq->avail->idx + 1;
++    vring_notify(rxvq);
++
++    /* Move index to next entry */
++    rx_last_idx = rx_last_idx + 1;
++
++    return len;
++}
+diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
+index 18fc5d1..c890a03 100644
+--- a/pc-bios/s390-ccw/virtio.c
++++ b/pc-bios/s390-ccw/virtio.c
+@@ -266,6 +266,11 @@ void virtio_setup_ccw(VDev *vdev)
+     run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
+ 
+     switch (vdev->senseid.cu_model) {
++    case VIRTIO_ID_NET:
++        vdev->nr_vqs = 2;
++        vdev->cmd_vr_idx = 0;
++        cfg_size = sizeof(vdev->config.net);
++        break;
+     case VIRTIO_ID_BLOCK:
+         vdev->nr_vqs = 1;
+         vdev->cmd_vr_idx = 0;
+diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
+index a00a320..19fceb6 100644
+--- a/pc-bios/s390-ccw/virtio.h
++++ b/pc-bios/s390-ccw/virtio.h
+@@ -11,8 +11,6 @@
+ #ifndef VIRTIO_H
+ #define VIRTIO_H
+ 
+-#include "s390-ccw.h"
+-
+ /* Status byte for guest to report progress, and synchronize features. */
+ /* We have seen device and processed generic fields (VIRTIO_CONFIG_F_VIRTIO) */
+ #define VIRTIO_CONFIG_S_ACKNOWLEDGE     1
+@@ -227,6 +225,13 @@ struct ScsiDevice {
+ };
+ typedef struct ScsiDevice ScsiDevice;
+ 
++struct VirtioNetConfig {
++    uint8_t mac[6];
++    /* uint16_t status; */               /* Only with VIRTIO_NET_F_STATUS */
++    /* uint16_t max_virtqueue_pairs; */  /* Only with VIRTIO_NET_F_MQ */
++};
++typedef struct VirtioNetConfig VirtioNetConfig;
++
+ struct VDev {
+     int nr_vqs;
+     VRing *vrings;
+@@ -239,6 +244,7 @@ struct VDev {
+     union {
+         VirtioBlkConfig blk;
+         VirtioScsiConfig scsi;
++        VirtioNetConfig net;
+     } config;
+     ScsiDevice *scsi_device;
+     bool is_cdrom;
+@@ -273,4 +279,6 @@ int vring_wait_reply(void);
+ int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
+ void virtio_setup_ccw(VDev *vdev);
+ 
++int virtio_net_init(void *mac_addr);
++
+ #endif /* VIRTIO_H */
 -- 
 2.7.4
