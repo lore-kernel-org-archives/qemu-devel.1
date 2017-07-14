@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzW1-0004dQ-J8
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVq-0004NA-Nv
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzW0-0004Ws-Gc
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVk-0004Ft-Uf
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:02 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 14 Jul 2017 07:14:57 -0500
-Message-Id: <20170714121457.10322-21-eblake@redhat.com>
+Date: Fri, 14 Jul 2017 07:14:53 -0500
+Message-Id: <20170714121457.10322-17-eblake@redhat.com>
 In-Reply-To: <20170714121457.10322-1-eblake@redhat.com>
 References: <20170714121457.10322-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 20/20] block: Drop unused
- .bdrv_co_get_block_status()
+Subject: [Qemu-devel] [PATCH v2 16/20] vdi: Switch to .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,86 +20,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all drivers have been updated to provide the
-byte-based .bdrv_co_block_status(), we can delete the sector-based
-interface.
+byte-based.  Update the vdi driver accordingly.  Note that the
+TODO is already covered (the block layer guarantees bounds of its
+requests), and that we can remove the now-unused s->block_sectors.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: rebase to earlier changes
+v2: rebase to mapping flag
 ---
- include/block/block_int.h |  3 ---
- block/io.c                | 23 +----------------------
- 2 files changed, 1 insertion(+), 25 deletions(-)
+ block/vdi.c | 28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 72b8b81..9b94b32 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -182,9 +182,6 @@ struct BlockDriver {
-      * (favor larger *pnum).  The block layer guarantees input aligned
-      * to request_alignment, as well as non-NULL pnum and file.
-      */
--    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum,
--        BlockDriverState **file);
-     int64_t coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
-         bool mapping, int64_t offset, int64_t bytes, int64_t *pnum,
-         BlockDriverState **file);
-diff --git a/block/io.c b/block/io.c
-index 2e8ddd7..375fc66 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1772,7 +1772,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         bytes = n;
-     }
+diff --git a/block/vdi.c b/block/vdi.c
+index dc36685..7a438a3 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -171,8 +171,6 @@ typedef struct {
+     uint32_t *bmap;
+     /* Size of block (bytes). */
+     uint32_t block_size;
+-    /* Size of block (sectors). */
+-    uint32_t block_sectors;
+     /* First sector of block map. */
+     uint32_t bmap_sector;
+     /* VDI header (converted to host endianness). */
+@@ -462,7 +460,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->total_sectors = header.disk_size / SECTOR_SIZE;
 
--    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-+    if (!bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1793,29 +1793,9 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     s->block_size = header.block_size;
+-    s->block_sectors = header.block_size / SECTOR_SIZE;
+     s->bmap_sector = header.offset_bmap / SECTOR_SIZE;
+     s->header = header;
 
-     /* Round out to request_alignment boundaries */
-     align = bs->bl.request_alignment;
--    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
--        align = BDRV_SECTOR_SIZE;
+@@ -508,23 +505,20 @@ static int vdi_reopen_prepare(BDRVReopenState *state,
+     return 0;
+ }
+
+-static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
++static int64_t coroutine_fn vdi_co_block_status(BlockDriverState *bs,
++                                                bool mapping,
++                                                int64_t offset, int64_t bytes,
++                                                int64_t *pnum,
++                                                BlockDriverState **file)
+ {
+-    /* TODO: Check for too large sector_num (in bdrv_is_allocated or here). */
+     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
+-    size_t bmap_index = sector_num / s->block_sectors;
+-    size_t sector_in_block = sector_num % s->block_sectors;
+-    int n_sectors = s->block_sectors - sector_in_block;
++    size_t bmap_index = offset / s->block_size;
++    size_t index_in_block = offset % s->block_size;
+     uint32_t bmap_entry = le32_to_cpu(s->bmap[bmap_index]);
+-    uint64_t offset;
+     int result;
+
+-    logout("%p, %" PRId64 ", %d, %p\n", bs, sector_num, nb_sectors, pnum);
+-    if (n_sectors > nb_sectors) {
+-        n_sectors = nb_sectors;
 -    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+-    *pnum = n_sectors;
++    logout("%p, %" PRId64 ", %" PRId64 ", %p\n", bs, offset, bytes, pnum);
++    *pnum = MIN(s->block_size, bytes);
+     result = VDI_IS_ALLOCATED(bmap_entry);
+     if (!result) {
+         return 0;
+@@ -532,7 +526,7 @@ static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
 
--    if (bs->drv->bdrv_co_get_block_status) {
--        int count; /* sectors */
--
--        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
--                               BDRV_SECTOR_SIZE));
--        ret = bs->drv->bdrv_co_get_block_status(
--            bs, aligned_offset >> BDRV_SECTOR_BITS,
--            MIN(INT_MAX, aligned_bytes) >> BDRV_SECTOR_BITS, &count,
--            &local_file);
--        if (ret < 0) {
--            *pnum = 0;
--            goto out;
--        }
--        *pnum = count * BDRV_SECTOR_SIZE;
--        goto refine;
--    }
--
-     ret = bs->drv->bdrv_co_block_status(bs, mapping, aligned_offset,
-                                         aligned_bytes, pnum, &local_file);
-     if (ret < 0) {
-@@ -1832,7 +1812,6 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         *pnum = total_size - aligned_offset;
-     }
+     offset = s->header.offset_data +
+                               (uint64_t)bmap_entry * s->block_size +
+-                              sector_in_block * SECTOR_SIZE;
++                              (index_in_block & BDRV_BLOCK_OFFSET_MASK);
+     *file = bs->file->bs;
+     return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
+ }
+@@ -902,7 +896,7 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_create = vdi_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = vdi_co_get_block_status,
++    .bdrv_co_block_status = vdi_co_block_status,
+     .bdrv_make_empty = vdi_make_empty,
 
-- refine:
-     /* Clamp pnum and ret to original request */
-     assert(QEMU_IS_ALIGNED(*pnum, align));
-     *pnum -= offset - aligned_offset;
+     .bdrv_co_preadv     = vdi_co_preadv,
 -- 
 2.9.4
