@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dVx5F-0006bR-M9
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:40:26 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVx7N-0008JK-U0
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dVx5E-0007aN-OU
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:40:25 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:41074
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dVx5E-0007a7-FW
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:40:24 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 14 Jul 2017 10:40:08 +0100
-Message-Id: <1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and fw_cfg
- types into fw_cfg.h
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVx7K-0000UB-RY
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:42:37 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri, 14 Jul 2017 12:42:23 +0300
+Message-Id: <150002534291.22386.13499916738708680298.stgit@frigg.lan>
+In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v13 22/26] target/arm: [tcg] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,173 +22,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-By exposing FWCfgIoState and FWCfgMemState internals we allow the possibility
-for the internal MemoryRegion fields to be mapped by name for boards that wish
-to wire up the fw_cfg device themselves.
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- hw/nvram/fw_cfg.c         |   49 +-------------------------------------------
- include/hw/nvram/fw_cfg.h |   50 +++++++++++++++++++++++++++++++++++++++++++++
- include/qemu/typedefs.h   |    1 +
- 3 files changed, 52 insertions(+), 48 deletions(-)
+ target/arm/translate.c |  165 +++++++++++++++++++++++++-----------------=
+------
+ target/arm/translate.h |    1=20
+ 2 files changed, 87 insertions(+), 79 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index b850ac3..2375f21 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -37,14 +37,6 @@
- 
- #define FW_CFG_FILE_SLOTS_DFLT 0x20
- 
--#define TYPE_FW_CFG     "fw_cfg"
--#define TYPE_FW_CFG_IO  "fw_cfg_io"
--#define TYPE_FW_CFG_MEM "fw_cfg_mem"
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c60be757dc..f221cbee5d 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -11967,7 +11967,7 @@ static target_ulong arm_tr_translate_insn(DisasCo=
+ntextBase *dcbase,
+         assert(dc->base.num_insns =3D=3D 1);
+         gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+                       default_exception_el(dc));
+-        dc->base.is_jmp =3D DISAS_SKIP;
++        dc->base.is_jmp =3D DISAS_NORETURN;
+         return dc->pc;
+     }
+=20
+@@ -12019,87 +12019,17 @@ static target_ulong arm_tr_translate_insn(Disas=
+ContextBase *dcbase,
+     return dc->pc;
+ }
+=20
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+ {
+-    DisasContext dc1, *dc =3D &dc1;
+-    int max_insns;
 -
--#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
--#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
--#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
+-    /* generate intermediate code */
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+=20
+-    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
+-     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
+-     */
+-    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+-        gen_intermediate_code_a64(&dc->base, cs, tb);
++    if (dc->base.is_jmp =3D=3D DISAS_NORETURN) {
+         return;
+     }
+=20
+-    dc->base.tb =3D tb;
+-    dc->base.pc_first =3D dc->base.tb->pc;
+-    dc->base.pc_next =3D dc->base.pc_first;
+-    dc->base.is_jmp =3D DISAS_NEXT;
+-    dc->base.num_insns =3D 0;
+-    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
+-    arm_tr_init_disas_context(&dc->base, cs);
 -
- /* FW_CFG_VERSION bits */
- #define FW_CFG_VERSION      0x01
- #define FW_CFG_VERSION_DMA  0x02
-@@ -58,51 +50,12 @@
- 
- #define FW_CFG_DMA_SIGNATURE 0x51454d5520434647ULL /* "QEMU CFG" */
- 
--typedef struct FWCfgEntry {
-+struct FWCfgEntry {
-     uint32_t len;
-     bool allow_write;
-     uint8_t *data;
-     void *callback_opaque;
-     FWCfgReadCallback read_callback;
--} FWCfgEntry;
+-    max_insns =3D tb->cflags & CF_COUNT_MASK;
+-    if (max_insns =3D=3D 0) {
+-        max_insns =3D CF_COUNT_MASK;
+-    }
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns =3D TCG_MAX_INSNS;
+-    }
 -
--struct FWCfgState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
+-    gen_tb_start(tb);
 -
--    uint16_t file_slots;
--    FWCfgEntry *entries[2];
--    int *entry_order;
--    FWCfgFiles *files;
--    uint16_t cur_entry;
--    uint32_t cur_offset;
--    Notifier machine_ready;
+-    tcg_clear_temp_count();
+-    arm_tr_tb_start(&dc->base, cs, &max_insns);
 -
--    int fw_cfg_order_override;
+-    do {
+-        dc->base.num_insns++;
+-        arm_tr_insn_start(&dc->base, cs);
 -
--    bool dma_enabled;
--    dma_addr_t dma_addr;
--    AddressSpace *dma_as;
--    MemoryRegion dma_iomem;
--};
+-        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+-            CPUBreakpoint *bp;
+-            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+-                if (bp->pc =3D=3D dc->base.pc_next) {
+-                    if (arm_tr_breakpoint_check(&dc->base, cs, bp)) {
+-                        break;
+-                    }
+-                }
+-            }
 -
--struct FWCfgIoState {
--    /*< private >*/
--    FWCfgState parent_obj;
--    /*< public >*/
+-            if (dc->base.is_jmp =3D=3D DISAS_NORETURN) {
+-                break;
+-            }
+-        }
 -
--    MemoryRegion comb_iomem;
--};
+-        if (dc->base.num_insns =3D=3D max_insns && (tb->cflags & CF_LAST=
+_IO)) {
+-            gen_io_start();
+-        }
 -
--struct FWCfgMemState {
--    /*< private >*/
--    FWCfgState parent_obj;
--    /*< public >*/
+-        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
 -
--    MemoryRegion ctl_iomem, data_iomem;
--    uint32_t data_width;
--    MemoryRegionOps wide_data_ops;
- };
- 
- #define JPG_FILE 0
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index b980cba..b77ea48 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -1,8 +1,19 @@
- #ifndef FW_CFG_H
- #define FW_CFG_H
- 
-+#include "qemu/typedefs.h"
- #include "exec/hwaddr.h"
- #include "hw/nvram/fw_cfg_keys.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/dma.h"
+-        if (tcg_check_temp_count()) {
+-            fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
+-                    dc->pc);
+-        }
+-
+-        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
+-                            dc->base.num_insns >=3D max_insns)) {
+-            dc->base.is_jmp =3D DISAS_TOO_MANY;
+-        }
+-    } while (!dc->base.is_jmp);
+-
+-    if (dc->base.is_jmp !=3D DISAS_SKIP) {
+-    if (tb->cflags & CF_LAST_IO) {
+-        if (dc->condjmp) {
+-            /* FIXME:  This can theoretically happen with self-modifying
+-               code.  */
+-            cpu_abort(cs, "IO on conditional branch instruction");
+-        }
+-        gen_io_end();
++    if (dc->base.tb->cflags & CF_LAST_IO && dc->condjmp) {
++        /* FIXME: This can theoretically happen with self-modifying code=
+. */
++        cpu_abort(cpu, "IO on conditional branch instruction");
+     }
+=20
+     /* At this stage dc->condjmp will only be set when the skipped
+@@ -12203,9 +12133,88 @@ void gen_intermediate_code(CPUState *cs, Transla=
+tionBlock *tb)
+             gen_goto_tb(dc, 1, dc->pc);
+         }
+     }
++}
 +
-+#define TYPE_FW_CFG     "fw_cfg"
-+#define TYPE_FW_CFG_IO  "fw_cfg_io"
-+#define TYPE_FW_CFG_MEM "fw_cfg_mem"
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
++{
++    DisasContext dc1, *dc =3D &dc1;
++    int max_insns;
 +
-+#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
-+#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
-+#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
- 
- typedef struct FWCfgFile {
-     uint32_t  size;        /* file size */
-@@ -35,6 +46,45 @@ typedef struct FWCfgDmaAccess {
- 
- typedef void (*FWCfgReadCallback)(void *opaque);
- 
-+struct FWCfgState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
++    /* generate intermediate code */
 +
-+    uint16_t file_slots;
-+    FWCfgEntry *entries[2];
-+    int *entry_order;
-+    FWCfgFiles *files;
-+    uint16_t cur_entry;
-+    uint32_t cur_offset;
-+    Notifier machine_ready;
++    /* The A64 decoder has its own top level loop, because it doesn't ne=
+ed
++     * the A32/T32 complexity to do with conditional execution/IT blocks=
+/etc.
++     */
++    if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
++        gen_intermediate_code_a64(&dc->base, cs, tb);
++        return;
++    }
 +
-+    int fw_cfg_order_override;
++    dc->base.tb =3D tb;
++    dc->base.pc_first =3D dc->base.tb->pc;
++    dc->base.pc_next =3D dc->base.pc_first;
++    dc->base.is_jmp =3D DISAS_NEXT;
++    dc->base.num_insns =3D 0;
++    dc->base.singlestep_enabled =3D cs->singlestep_enabled;
++    arm_tr_init_disas_context(&dc->base, cs);
 +
-+    bool dma_enabled;
-+    dma_addr_t dma_addr;
-+    AddressSpace *dma_as;
-+    MemoryRegion dma_iomem;
-+};
 +
-+struct FWCfgIoState {
-+    /*< private >*/
-+    FWCfgState parent_obj;
-+    /*< public >*/
++    max_insns =3D tb->cflags & CF_COUNT_MASK;
++    if (max_insns =3D=3D 0) {
++        max_insns =3D CF_COUNT_MASK;
++    }
++    if (max_insns > TCG_MAX_INSNS) {
++        max_insns =3D TCG_MAX_INSNS;
++    }
 +
-+    MemoryRegion comb_iomem;
-+};
++    gen_tb_start(tb);
 +
-+struct FWCfgMemState {
-+    /*< private >*/
-+    FWCfgState parent_obj;
-+    /*< public >*/
++    tcg_clear_temp_count();
++    arm_tr_tb_start(&dc->base, cs, &max_insns);
 +
-+    MemoryRegion ctl_iomem, data_iomem;
-+    uint32_t data_width;
-+    MemoryRegionOps wide_data_ops;
-+};
++    do {
++        dc->base.num_insns++;
++        arm_tr_insn_start(&dc->base, cs);
 +
- /**
-  * fw_cfg_add_bytes:
-  * @s: fw_cfg device being modified
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 2706aab..0a23020 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -30,6 +30,7 @@ typedef struct DisplaySurface DisplaySurface;
- typedef struct DriveInfo DriveInfo;
- typedef struct Error Error;
- typedef struct EventNotifier EventNotifier;
-+typedef struct FWCfgEntry FWCfgEntry;
- typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
--- 
-1.7.10.4
++        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
++            CPUBreakpoint *bp;
++            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
++                if (bp->pc =3D=3D dc->base.pc_next) {
++                    if (arm_tr_breakpoint_check(&dc->base, cs, bp)) {
++                        break;
++                    }
++                }
++            }
++
++            if (dc->base.is_jmp =3D=3D DISAS_NORETURN) {
++                break;
++            }
++        }
++
++        if (dc->base.num_insns =3D=3D max_insns && (tb->cflags & CF_LAST=
+_IO)) {
++            gen_io_start();
++        }
++
++        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
++
++        if (tcg_check_temp_count()) {
++            fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
+",
++                    dc->pc);
++        }
++
++        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
++                            dc->base.num_insns >=3D max_insns)) {
++            dc->base.is_jmp =3D DISAS_TOO_MANY;
++        }
++    } while (!dc->base.is_jmp);
++
++    arm_tr_tb_stop(&dc->base, cs);
++
++    if (dc->base.tb->cflags & CF_LAST_IO) {
++        gen_io_end();
+     }
+=20
+-done_generating:
+     gen_tb_end(tb, dc->base.num_insns);
+=20
+ #ifdef DEBUG_DISAS
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 83e56dcb08..720cb102e3 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -149,7 +149,6 @@ static void disas_set_insn_syndrome(DisasContext *s, =
+uint32_t syn)
+  * as opposed to attempting to use lookup_and_goto_ptr.
+  */
+ #define DISAS_EXIT DISAS_TARGET_11
+-#define DISAS_SKIP DISAS_TARGET_12
+=20
+ #ifdef TARGET_AARCH64
+ void a64_translate_init(void);
