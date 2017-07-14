@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dW2fw-0004ss-I1
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dW2fx-0004sw-2Q
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dW2fv-0004x9-6x
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:38:40 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dW2fv-0004xL-ED
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:38:41 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri, 14 Jul 2017 18:37:46 +0300
-Message-Id: <20170714153749.25132-2-pbutsykin@virtuozzo.com>
+Date: Fri, 14 Jul 2017 18:37:48 +0300
+Message-Id: <20170714153749.25132-4-pbutsykin@virtuozzo.com>
 In-Reply-To: <20170714153749.25132-1-pbutsykin@virtuozzo.com>
 References: <20170714153749.25132-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 1/4] qemu-img: add --shrink flag for resize
+Subject: [Qemu-devel] [PATCH v6 3/4] qcow2: add shrink image support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,142 +24,323 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-The flag is additional precaution against data loss. Perhaps in the future the
-operation shrink without this flag will be blocked for all formats, but for now
-we need to maintain compatibility with raw.
+This patch add shrinking of the image file for qcow2. As a result, this allows
+us to reduce the virtual image size and free up space on the disk without
+copying the image. Image can be fragmented and shrink is done by punching holes
+in the image file.
 
 Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img-cmds.hx       |  4 ++--
- qemu-img.c             | 23 +++++++++++++++++++++++
- qemu-img.texi          |  6 +++++-
- tests/qemu-iotests/102 |  4 ++--
- 4 files changed, 32 insertions(+), 5 deletions(-)
+ block/qcow2-cluster.c  |  50 +++++++++++++++++++++
+ block/qcow2-refcount.c | 120 +++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |  43 ++++++++++++++----
+ block/qcow2.h          |  14 ++++++
+ qapi/block-core.json   |   3 +-
+ 5 files changed, 220 insertions(+), 10 deletions(-)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index ac5946bc4f..e36957a2ca 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -82,9 +82,9 @@ STEXI
- ETEXI
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index f06c08f64c..405bc2e7af 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -32,6 +32,56 @@
+ #include "qemu/bswap.h"
+ #include "trace.h"
  
- DEF("resize", img_resize,
--    "resize [--object objectdef] [--image-opts] [-q] filename [+ | -]size")
-+    "resize [--object objectdef] [--image-opts] [-q] [--shrink] filename [+ | -]size")
- STEXI
--@item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
-+@item resize [--object @var{objectdef}] [--image-opts] [-q] [--shrink] @var{filename} [+ | -]@var{size}
- ETEXI
- 
- DEF("amend", img_amend,
-diff --git a/qemu-img.c b/qemu-img.c
-index 28022145d5..b4dc4bb5c4 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -64,6 +64,7 @@ enum {
-     OPTION_TARGET_IMAGE_OPTS = 263,
-     OPTION_SIZE = 264,
-     OPTION_PREALLOCATION = 265,
-+    OPTION_SHRINK = 266,
- };
- 
- typedef enum OutputFormat {
-@@ -3430,6 +3431,7 @@ static int img_resize(int argc, char **argv)
-         },
-     };
-     bool image_opts = false;
-+    bool shrink = false;
- 
-     /* Remove size from argv manually so that negative numbers are not treated
-      * as options by getopt. */
-@@ -3448,6 +3450,7 @@ static int img_resize(int argc, char **argv)
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {"preallocation", required_argument, 0, OPTION_PREALLOCATION},
-+            {"shrink", no_argument, 0, OPTION_SHRINK},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, ":f:hq",
-@@ -3491,6 +3494,9 @@ static int img_resize(int argc, char **argv)
-                 return 1;
-             }
-             break;
-+        case OPTION_SHRINK:
-+            shrink = true;
-+            break;
-         }
-     }
-     if (optind != argc - 1) {
-@@ -3564,6 +3570,23 @@ static int img_resize(int argc, char **argv)
-         goto out;
-     }
- 
-+    if (total_size < current_size && !shrink) {
-+        warn_report("Shrinking an image will delete all data beyond the "
-+                    "shrunken image's end. Before performing such an "
-+                    "operation, make sure there is no important data there.");
++int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t exact_size)
++{
++    BDRVQcow2State *s = bs->opaque;
++    int new_l1_size, i, ret;
 +
-+        if (g_strcmp0(bdrv_get_format_name(blk_bs(blk)), "raw") != 0) {
-+            error_report(
-+              "Use the --shrink option to perform a shrink operation.");
-+            ret = -1;
++    if (exact_size >= s->l1_size) {
++        return 0;
++    }
++
++    new_l1_size = exact_size;
++
++#ifdef DEBUG_ALLOC2
++    fprintf(stderr, "shrink l1_table from %d to %d\n", s->l1_size, new_l1_size);
++#endif
++
++    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_WRITE_TABLE);
++    ret = bdrv_pwrite_zeroes(bs->file, s->l1_table_offset +
++                                       new_l1_size * sizeof(uint64_t),
++                             (s->l1_size - new_l1_size) * sizeof(uint64_t), 0);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = bdrv_flush(bs->file->bs);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    BLKDBG_EVENT(bs->file, BLKDBG_L1_SHRINK_FREE_L2_CLUSTERS);
++    for (i = s->l1_size - 1; i > new_l1_size - 1; i--) {
++        if ((s->l1_table[i] & L1E_OFFSET_MASK) == 0) {
++            continue;
++        }
++        qcow2_free_clusters(bs, s->l1_table[i] & L1E_OFFSET_MASK,
++                            s->cluster_size, QCOW2_DISCARD_ALWAYS);
++        s->l1_table[i] = 0;
++    }
++    return 0;
++
++fail:
++    /*
++     * If the write in the l1_table failed the image may contain partially
++     * overwritten the l1_table. In this case would be better to clear the
++     * l1_table in memory to avoid possible image corruption.
++     */
++    memset(s->l1_table + exact_size, 0,
++           (s->l1_size - new_l1_size) * sizeof(uint64_t));
++    return ret;
++}
++
+ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+                         bool exact_size)
+ {
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index bbe5a2b2cc..6f7c3132c6 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -29,6 +29,7 @@
+ #include "block/qcow2.h"
+ #include "qemu/range.h"
+ #include "qemu/bswap.h"
++#include "qemu/cutils.h"
+ 
+ static int64_t alloc_clusters_noref(BlockDriverState *bs, uint64_t size);
+ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+@@ -3061,3 +3062,122 @@ done:
+     qemu_vfree(new_refblock);
+     return ret;
+ }
++
++static int qcow2_discard_refcount_block(BlockDriverState *bs,
++                                        uint64_t discard_block_offs)
++{
++    BDRVQcow2State *s = bs->opaque;
++    uint64_t refblock_offs = get_refblock_offset(s, discard_block_offs);
++    uint64_t cluster_index = discard_block_offs >> s->cluster_bits;
++    uint32_t block_index = cluster_index & (s->refcount_block_size - 1);
++    void *refblock;
++    int ret;
++
++    assert(discard_block_offs != 0);
++
++    ret = qcow2_cache_get(bs, s->refcount_block_cache, refblock_offs,
++                          &refblock);
++    if (ret < 0) {
++        return ret;
++    }
++
++    if (s->get_refcount(refblock, block_index) != 1) {
++        qcow2_signal_corruption(bs, true, -1, -1, "Invalid refcount:"
++                                " refblock offset %#" PRIx64
++                                ", reftable index %u"
++                                ", block offset %#" PRIx64
++                                ", refcount %#" PRIx64,
++                                refblock_offs,
++                                offset_to_reftable_index(s, discard_block_offs),
++                                discard_block_offs,
++                                s->get_refcount(refblock, block_index));
++        qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
++        return -EINVAL;
++    }
++    s->set_refcount(refblock, block_index, 0);
++
++    qcow2_cache_entry_mark_dirty(bs, s->refcount_block_cache, refblock);
++
++    qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
++
++    if (cluster_index < s->free_cluster_index) {
++        s->free_cluster_index = cluster_index;
++    }
++
++    refblock = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
++                                           discard_block_offs);
++    if (refblock) {
++        /* discard refblock from the cache if refblock is cached */
++        qcow2_cache_discard(bs, s->refcount_block_cache, refblock);
++    }
++    update_refcount_discard(bs, discard_block_offs, s->cluster_size);
++
++    return 0;
++}
++
++int qcow2_shrink_reftable(BlockDriverState *bs)
++{
++    BDRVQcow2State *s = bs->opaque;
++    uint64_t *reftable_tmp =
++        g_malloc(s->refcount_table_size * sizeof(uint64_t));
++    int i, ret;
++
++    for (i = 0; i < s->refcount_table_size; i++) {
++        int64_t refblock_offs = s->refcount_table[i] & REFT_OFFSET_MASK;
++        void *refblock;
++        bool unused_block;
++
++        if (refblock_offs == 0) {
++            reftable_tmp[i] = 0;
++            continue;
++        }
++        ret = qcow2_cache_get(bs, s->refcount_block_cache, refblock_offs,
++                              &refblock);
++        if (ret < 0) {
 +            goto out;
++        }
++
++        /* the refblock has own reference */
++        if (i == offset_to_reftable_index(s, refblock_offs)) {
++            uint64_t block_index = (refblock_offs >> s->cluster_bits) &
++                                   (s->refcount_block_size - 1);
++            uint64_t refcount = s->get_refcount(refblock, block_index);
++
++            s->set_refcount(refblock, block_index, 0);
++
++            unused_block = buffer_is_zero(refblock, s->cluster_size);
++
++            s->set_refcount(refblock, block_index, refcount);
 +        } else {
-+            warn_report("Using the --shrink option will suppress this message."
-+                        "Note that future versions of qemu-img may refuse to "
-+                        "shrink images without this option.");
++            unused_block = buffer_is_zero(refblock, s->cluster_size);
++        }
++        qcow2_cache_put(bs, s->refcount_block_cache, &refblock);
++
++        reftable_tmp[i] = unused_block ? 0 : cpu_to_be64(s->refcount_table[i]);
++    }
++
++    ret = bdrv_pwrite_sync(bs->file, s->refcount_table_offset, reftable_tmp,
++                           s->refcount_table_size * sizeof(uint64_t));
++    /*
++     * If the write in the reftable failed the image may contain partially
++     * overwritten the reftable. In this case would be better to clear the
++     * reftable in memory to avoid possible image corruption.
++     */
++    for (i = 0; i < s->refcount_table_size; i++) {
++        if (s->refcount_table[i] && !reftable_tmp[i]) {
++            if (ret == 0) {
++                ret = qcow2_discard_refcount_block(bs, s->refcount_table[i] &
++                                                       REFT_OFFSET_MASK);
++            }
++            s->refcount_table[i] = 0;
 +        }
 +    }
 +
-     ret = blk_truncate(blk, total_size, prealloc, &err);
-     if (!ret) {
-         qprintf(quiet, "Image resized.\n");
-diff --git a/qemu-img.texi b/qemu-img.texi
-index f11f6036ad..9a930f5e6d 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -529,7 +529,7 @@ qemu-img rebase -b base.img diff.qcow2
- At this point, @code{modified.img} can be discarded, since
- @code{base.img + diff.qcow2} contains the same information.
- 
--@item resize [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
-+@item resize [--shrink] [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
- 
- Change the disk image as if it had been created with @var{size}.
- 
-@@ -537,6 +537,10 @@ Before using this command to shrink a disk image, you MUST use file system and
- partitioning tools inside the VM to reduce allocated file systems and partition
- sizes accordingly.  Failure to do so will result in data loss!
- 
-+When shrinking images, the @code{--shrink} option must be given. This informs
-+qemu-img that the user acknowledges all loss of data beyond the truncated
-+image's end.
++    if (!s->cache_discards) {
++        qcow2_process_discards(bs, ret);
++    }
 +
- After using this command to grow a disk image, you must use file system and
- partitioning tools inside the VM to actually begin using the new space on the
- device.
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 87db1bb1bf..d7ad8d9840 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -54,7 +54,7 @@ _make_test_img $IMG_SIZE
- $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
- # Remove data cluster from image (first cluster: image header, second: reftable,
- # third: refblock, fourth: L1 table, fifth: L2 table)
--$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
-+$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
++out:
++    g_free(reftable_tmp);
++    return ret;
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index c144ea5620..bd281fdd04 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3120,18 +3120,43 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+     }
  
- $QEMU_IO -c map "$TEST_IMG"
- $QEMU_IMG map "$TEST_IMG"
-@@ -69,7 +69,7 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
+     old_length = bs->total_sectors * 512;
++    new_l1_size = size_to_l1(s, offset);
  
- qemu_comm_method=monitor _launch_qemu -drive if=none,file="$TEST_IMG",id=drv0
+-    /* shrinking is currently not supported */
+     if (offset < old_length) {
+-        error_setg(errp, "qcow2 doesn't support shrinking images yet");
+-        return -ENOTSUP;
+-    }
++        if (prealloc != PREALLOC_MODE_OFF) {
++            error_setg(errp,
++                       "Preallocation can't be used for shrinking an image");
++            return -EINVAL;
++        }
  
--$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
-+$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
+-    new_l1_size = size_to_l1(s, offset);
+-    ret = qcow2_grow_l1_table(bs, new_l1_size, true);
+-    if (ret < 0) {
+-        error_setg_errno(errp, -ret, "Failed to grow the L1 table");
+-        return ret;
++        ret = qcow2_cluster_discard(bs, ROUND_UP(offset, s->cluster_size),
++                                    old_length - ROUND_UP(offset,
++                                                          s->cluster_size),
++                                    QCOW2_DISCARD_ALWAYS, true);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to discard cropped clusters");
++            return ret;
++        }
++
++        ret = qcow2_shrink_l1_table(bs, new_l1_size);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret,
++                             "Failed to reduce the number of L2 tables");
++            return ret;
++        }
++
++        ret = qcow2_shrink_reftable(bs);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret,
++                             "Failed to discard unused refblocks");
++            return ret;
++        }
++    } else {
++        ret = qcow2_grow_l1_table(bs, new_l1_size, true);
++        if (ret < 0) {
++            error_setg_errno(errp, -ret, "Failed to grow the L1 table");
++            return ret;
++        }
+     }
  
- _send_qemu_cmd $QEMU_HANDLE 'qemu-io drv0 map' 'allocated' \
-     | sed -e 's/^(qemu).*qemu-io drv0 map...$/(qemu) qemu-io drv0 map/'
+     switch (prealloc) {
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 52c374e9ed..5a289a81e2 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -521,6 +521,18 @@ static inline uint64_t refcount_diff(uint64_t r1, uint64_t r2)
+     return r1 > r2 ? r1 - r2 : r2 - r1;
+ }
+ 
++static inline
++uint32_t offset_to_reftable_index(BDRVQcow2State *s, uint64_t offset)
++{
++    return offset >> (s->refcount_block_bits + s->cluster_bits);
++}
++
++static inline uint64_t get_refblock_offset(BDRVQcow2State *s, uint64_t offset)
++{
++    uint32_t index = offset_to_reftable_index(s, offset);
++    return s->refcount_table[index] & REFT_OFFSET_MASK;
++}
++
+ /* qcow2.c functions */
+ int qcow2_backing_read1(BlockDriverState *bs, QEMUIOVector *qiov,
+                   int64_t sector_num, int nb_sectors);
+@@ -584,10 +596,12 @@ int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
+ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
+                                 BlockDriverAmendStatusCB *status_cb,
+                                 void *cb_opaque, Error **errp);
++int qcow2_shrink_reftable(BlockDriverState *bs);
+ 
+ /* qcow2-cluster.c functions */
+ int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+                         bool exact_size);
++int qcow2_shrink_l1_table(BlockDriverState *bs, uint64_t max_size);
+ int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
+ int qcow2_decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset);
+ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index c437aa50ef..99cef55b7c 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2487,7 +2487,8 @@
+             'cluster_alloc_bytes', 'cluster_free', 'flush_to_os',
+             'flush_to_disk', 'pwritev_rmw_head', 'pwritev_rmw_after_head',
+             'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
+-            'pwritev_zero', 'pwritev_done', 'empty_image_prepare' ] }
++            'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
++            'l1_shrink_write_table', 'l1_shrink_free_l2_clusters' ] }
+ 
+ ##
+ # @BlkdebugInjectErrorOptions:
 -- 
 2.13.0
