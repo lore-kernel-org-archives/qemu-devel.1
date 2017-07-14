@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dW3ur-0001zh-Me
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:58:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dW3yC-0003Ed-49
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dW3uo-0005gj-KJ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:58:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47766)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dW3uo-0005gG-BK
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:58:06 -0400
-Date: Fri, 14 Jul 2017 12:58:03 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1055983739.16609523.1500051483584.JavaMail.zimbra@redhat.com>
-In-Reply-To: <61a76ac4-23f9-7c99-92e5-8097516de2a9@amsat.org>
-References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-	<1499238885-26161-23-git-send-email-pbonzini@redhat.com>
-	<CAFEAcA-B+aChqZBSnGws7RXheEyg+cutaqvXP8qVgNoUgzQAJA@mail.gmail.com>
-	<4f304a14-572d-2835-cb0e-9d93c1c6dece@redhat.com>
-	<CAFEAcA-vuPxc0GZc4Her1Trtak-RL9wcMR1L9SGRhzGg3wUGEA@mail.gmail.com>
-	<55c62a5d-2ac5-4a89-f20a-100b19f8b0e9@redhat.com>
-	<61a76ac4-23f9-7c99-92e5-8097516de2a9@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dW3yB-000749-8x
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:01:36 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37355)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dW3yB-00073t-1w
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:01:35 -0400
+Received: by mail-wm0-x235.google.com with SMTP id i127so28526331wma.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 10:01:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 22/42] configure: factor out list of
- supported Xen/KVM/HAX targets
+In-Reply-To: <438bc671-4d94-9efc-540a-151be39583e2@redhat.com>
+References: <1499438577-7674-1-git-send-email-peter.maydell@linaro.org>
+	<438bc671-4d94-9efc-540a-151be39583e2@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 18:01:13 +0100
+Message-ID: <CAFEAcA_e6mnkTAZZ+9incvBuhTgt7tj3k_WMHhMLrB6X01v-MQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/11] Make memory_region_init_ram() and
+ friends handle migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+On 10 July 2017 at 11:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 07/07/2017 16:42, Peter Maydell wrote:
+>> This patchset changes the memory region functions
+>>  - memory_region_init_ram()
+>>  - memory_region_init_rom()
+>>  - memory_region_init_rom_device()
+>> to all automatically register the backing memory they allocate
+>> for migration using vmstate_register_ram(). Renamed functions
+>>  - memory_region_init_ram_nomigrate()
+>>  - memory_region_init_rom_nomigrate()
+>>  - memory_region_init_rom_device_nomigrate()
+>> are provided which only do the MR init, for the oddball
+>> cases which want to manage migration of the backing memory
+>> themselves (and to avoid behavioural changes for callers
+>> which weren't managing correctly migration themselves...)
+>>
+>> The idea is based on discussion from a previous patchset:
+>>  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00764.html
+>>
+>> The series includes a largish coccinelle-scripted patch and a
+>> few by-hand conversions which change callsites which previously
+>> manually created the region and registered its backing ram in
+>> two separate steps to use the new functions.
+>>
+>> This series does not include any patches to fix bugs like:
+>>  * caller forgot to call vmstate_register_ram() so region
+>>    is not actually migrated (eg hw/arm/highbank.c)
+>>  * caller used vmstate_register_ram_global() even though it is
+>>    a device, so you can't create 2 copies of the device (eg sm501)
+>> because I wanted to stick to strictly no-behaviour-change
+>> for this patch -- we can fix the bugs separately (fixes will
+>> tend to imply migration compat breaks so can only be done
+>> for some boards.) Most of the remaining callers of the
+>> _nomigrate functions are buggy, I think (and a demonstration
+>> that our current API does not score well on the "hard to
+>> get wrong by accident" scale).
+>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
+Thanks. I'm going to apply this directly to master (so then
+I can check that nothing has got applied to it since which
+uses the old semantics for these functions; nothing in
+fact has.)
 
------ Original Message -----
-> From: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>, "Peter Maydell" <peter.maydell=
-@linaro.org>
-> Cc: "Anthony PERARD" <anthony.perard@citrix.com>, "Stefano Stabellini" <s=
-stabellini@kernel.org>, "Alex Benn=C3=A9e"
-> <alex.bennee@linaro.org>, "QEMU Developers" <qemu-devel@nongnu.org>
-> Sent: Friday, July 14, 2017 5:26:36 PM
-> Subject: Re: [Qemu-devel] [PULL 22/42] configure: factor out list of supp=
-orted Xen/KVM/HAX targets
->=20
-> what about this RFC series?
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg02513.html
-
-Too late for 2.10, but the way to go is to define a new "xenpv" target.
-In fact, --disable-tcg was the prerequisite for that if I remember correctl=
-y
-my old discussions with Citrix folks (could it have been Wei Liu?)
-
-Paolo
-
-> On 07/10/2017 01:28 PM, Paolo Bonzini wrote:
-> > On 10/07/2017 18:24, Peter Maydell wrote:
-> >> On 10 July 2017 at 17:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>> On 10/07/2017 17:49, Peter Maydell wrote:
-> >>>> On 5 July 2017 at 08:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>>>> This will be useful when the functions are called, early in the
-> >>>>> configure
-> >>>>> process, to filter out targets that do not support hardware
-> >>>>> acceleration.
-> >>>>>
-> >>>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >>>>
-> >>>>> +supported_xen_target() {
-> >>>>> +    test "$xen" =3D "yes" || return 1
-> >>>>> +    glob "$1" "*-softmmu" || return 1
-> >>>>> +    case "${1%-softmmu}:$cpu" in
-> >>>>> +        arm:arm | aarch64:aarch64 | \
-> >>>>> +        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
-> >>>>> +            return 0
-> >>>>> +        ;;
-> >>>>
-> >>>> This says that arm-on-arm and aarch64-on-aarch64 are supported
-> >>>> Xen targets...
-> >>>
-> >>> Hmm, this comes from my old patches.  IIRC the reason for the change,
-> >>> when it wasn't a change (many conflicts ago) was that Xen folks were
-> >>> using --disable-tcg because their device model for Xen PV on ARM was
-> >>> actually an x86_64 QEMU.
-> >>>
-> >>> Stefano and Anthony, is this still true?  If so, would it make sense =
-to
-> >>> add the Xen PV machine type to qemu-system-arm---that is, is it
-> >>> something you can whip up easily, or should I just remove that line?
-> >>
-> >> I think you should just fix configure for the moment, because
-> >> this patch wasn't supposed to change anything about what we
-> >> build (AIUI). We can think about changing the Xen PV on ARM
-> >> build setup as a separate thing if we want to, I suspect it
-> >> is more invasive than a couple of lines changing in configure.
-> >=20
-> > Yes, definitely more invasive.
-> >=20
-> > I'll prepare a fix.
-> >=20
-> > Paolo
-> >=20
->=20
+thanks
+-- PMM
