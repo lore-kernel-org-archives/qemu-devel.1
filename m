@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dW3Vr-00082V-PR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:32:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dW3XU-00018H-4B
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dW3Vo-0002A6-LX
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:32:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53194)
+	(envelope-from <ehabkost@redhat.com>) id 1dW3XR-0002rs-1Y
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:34:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33380)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dW3Vo-00029v-EB
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:32:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45976C0B0CED
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 16:32:15 +0000 (UTC)
-Date: Fri, 14 Jul 2017 17:32:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170714163210.GE2091@work-vm>
-References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
-	<20170712190558.GK6020@localhost.localdomain>
-	<20170714050423.GM27284@pxdev.xzpeter.org>
-	<20170714160110.GF6020@localhost.localdomain>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dW3XQ-0002rn-RN
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:33:56 -0400
+Date: Fri, 14 Jul 2017 13:33:47 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170714163347.GG6020@localhost.localdomain>
+References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
+	<20170712150400.GH5237@redhat.com>
+	<9d51d348-7ad6-a98d-3f6d-89e8af5e3a16@redhat.com>
+	<20170712161254.GJ5237@redhat.com>
+	<d3c71dc9-1286-802a-b663-7d37f97daf72@redhat.com>
+	<20170712162901.GL5237@redhat.com>
+	<20170714020546-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170714160110.GF6020@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 0/3] migration: export cap/params to qdev
- props
+In-Reply-To: <20170714020546-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
+ to pc-1.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> On Fri, Jul 14, 2017 at 01:04:23PM +0800, Peter Xu wrote:
-> > On Wed, Jul 12, 2017 at 04:05:58PM -0300, Eduardo Habkost wrote:
-> > > On Wed, Jul 12, 2017 at 02:53:40PM +0800, Peter Xu wrote:
-> > > [...]
-> > > > These properties should only be used for debugging/testing purpose,
-> > > > and we should not guarantee any interface compatibility for them (just
-> > > > like HMP).
-> > > 
-> > > If we don't guarantee compatibility, the property names need to
-> > > be prefixed with "x-".
-> > 
-> > Indeed. Sorry I missed that.
-> > 
-> > But I'd say it is slightly awkward to add "x-" for all these (for me,
-> > "x-" means more like "this is not stable and experimental, use it
-> > carefully", while this does not suite for this series). Maybe I can
-> > just remove this sentence in commit log (I think I am just a little
-> > bit frightened by the compatibility problems)...
+On Fri, Jul 14, 2017 at 02:14:33AM +0300, Michael S. Tsirkin wrote:
+> On Wed, Jul 12, 2017 at 05:29:01PM +0100, Daniel P. Berrange wrote:
+> > Yep, I'm amenable to that POV too. It is entirely valid to say that if
+> > downstream distros need to care about such ancient back-compat, then they
+> > will just have to do the extra work to use git history to undelete any bits
+> > they need that upstream has discarded.
 > 
-> "x-" in property names doesn't mean "experimental", but just "not
-> part of the stable interface".  If you have the tiniest doubt
-> about command-line compatibility, I think it won't hurt to use
-> "x-".
-
-We have:
-    DEFINE_PROP_MIG_CAP("xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-
-so we could easily do:
-    DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-
-to ensure that all of the things we expose as props here have
-that added fealing of uncertainty but don't change what migration
-parameters see.
-
-
-(It's a shame we have to have those lists manually, there are so
-many manual places for each parameter and capability)
-
-Dave
-
+> Unfortunately people seem to conflate compatibility question of live
+> migration and of booting images.
 > 
-> -- 
-> Eduardo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Live migration is a complex topic, and you always have a work
+> around of restarting the VM to upgrade if it does not work.
+> 
+> But I don't think we can stop supporting booting old images, ever, for
+> all versions that have a decent number of users, until someone develops
+> a tool to upgrade machine type in XML painlessly and safely.
+> 
+
+I don't agree with this part.  It's perfectly valid to remove a
+feature from a software component if nobody is willing to
+maintain it.
+
+> If we can guarantee that changing pc-0.10 to pc-1.13 will keep booting,
+> then we should just alias one to another so people can stil start their
+> VMs. If we can't then we really can't drop old machine types from
+> booting point of view.
+
+I don't think we can't guarantee that changing "pc-0.10" to
+"pc-0.13" will keep working, just like we can't guarantee that
+"pc-0.10" is still working in QEMU 2.9 the way it did in QEMU
+0.10.
+
+We try to not break stuff, but we can't really guarantee anything
+on either case (keeping the old machine-types; making the old
+machine-type names aliases; or deleting the old machine-types),
+if we are not spending efforts testing that.  Keeping the old
+machine-type names (either as real machines or as aliases) just
+gives us the illusion that we didn't break anything.
+
+-- 
+Eduardo
