@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dW15F-0005oK-Jp
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:56:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dW1Ki-0004Sc-8X
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dW15B-0004Nl-Of
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:56:41 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:35883)
+	(envelope-from <alex.bennee@linaro.org>) id 1dW1Kf-0002Jg-6S
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:12:40 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dW15B-0004NQ-G8
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:56:37 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id v60so1579260wrc.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:56:37 -0700 (PDT)
-References: <20170714093407.11526-1-pbonzini@redhat.com>
-	<87shhzuye8.fsf@linaro.org>
-	<52b9202e-7ad1-e7f8-e916-0f63f9d9b959@redhat.com>
+	id 1dW1Ke-0002JP-WD
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:12:37 -0400
+Received: by mail-wm0-x232.google.com with SMTP id f67so23975191wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:12:36 -0700 (PDT)
+References: <20170713141928.25419-1-alex.bennee@linaro.org>
+	<20170713141928.25419-6-alex.bennee@linaro.org>
+	<CAFEAcA8o4rU7BXR_+VEQhAXBSzJ7usAnkYXDb=CEqQ=duuirqA@mail.gmail.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <52b9202e-7ad1-e7f8-e916-0f63f9d9b959@redhat.com>
-Date: Fri, 14 Jul 2017 14:56:34 +0100
-Message-ID: <87r2xjunot.fsf@linaro.org>
+In-reply-to: <CAFEAcA8o4rU7BXR_+VEQhAXBSzJ7usAnkYXDb=CEqQ=duuirqA@mail.gmail.com>
+Date: Fri, 14 Jul 2017 15:12:33 +0100
+Message-ID: <87pod3umy6.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] docker: allow running "docker-travis"
- with arbitrary parallelism
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] target/arm: use gen_goto_tb for ISB
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> On 14/07/2017 12:05, Alex Bennée wrote:
+> On 13 July 2017 at 15:19, Alex Bennée <alex.bennee@linaro.org> wrote:
+>> While an ISB will ensure any raised IRQs happen on the next
+>> instruction it doesn't cause any to get raised by itself. We can
+>> therefor use a simple tb exit for ISB instructions and rely on the
+>> exit_request check at the top of each TB to deal with exiting if
+>> needed.
 >>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>  target/arm/translate-a64.c | 2 +-
+>>  target/arm/translate.c     | 4 ++--
+>>  2 files changed, 3 insertions(+), 3 deletions(-)
 >>
->>> docker-travis is limited to the -j3 flag specified for running on the
->>> SaaS Travis CI infrastructure.
->>>
->>> When running the test matrix locally with docker, however, we can run
->>> much more jobs at the same time on a suitably beefy server.  Let people
->>> do that with the usual J=nn option already supported by the other
->>> docker-based tests.
->>
->> Eh, I was debugging stuff on our beefy server with J=20 and then I
->> realised I was just running:
->>
->>   make docker-test-quick@travis J=20
->>
->> So I guess some people do use the pseudo Travis expansion then?
+>> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>> index 66139b6046..2ac565eb10 100644
+>> --- a/target/arm/translate-a64.c
+>> +++ b/target/arm/translate-a64.c
+>> @@ -1393,7 +1393,7 @@ static void handle_sync(DisasContext *s, uint32_t insn,
+>>           * a self-modified code correctly and also to take
+>>           * any pending interrupts immediately.
+>>           */
+>> -        s->is_jmp = DISAS_UPDATE;
+>> +        gen_goto_tb(s, 0, s->pc);
+>>          return;
+>>      default:
+>>          unallocated_encoding(s);
+>> diff --git a/target/arm/translate.c b/target/arm/translate.c
+>> index 493a7b424a..d8892d9ba5 100644
+>> --- a/target/arm/translate.c
+>> +++ b/target/arm/translate.c
+>> @@ -8168,7 +8168,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>>                   * self-modifying code correctly and also to take
+>>                   * any pending interrupts immediately.
+>>                   */
+>> -                gen_lookup_tb(s);
+>> +                gen_goto_tb(s, 0, s->pc & ~1);
+>>                  return;
+>>              default:
+>>                  goto illegal_op;
+>> @@ -10561,7 +10561,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+>>                               * and also to take any pending interrupts
+>>                               * immediately.
+>>                               */
+>> -                            gen_lookup_tb(s);
+>> +                            gen_goto_tb(s, 0, s->pc & ~1);
+>>                              break;
+>>                          default:
+>>                              goto illegal_op;
 >
-> How would that end up running tests/docker/travis?
+> Why do we need to clear the low bit of s->pc for ISB?
+> s->pc is the actual PC, not the "PC and low bit indicates
+> Thumb mode" form that jump addresses have.
 
-It runs the normal build and make check but in the Travis build
-environment. Essentially the .travis.yml is just a bunch of alternative
-configure invocations, there is nothing to stop you manually setting up
-a build with TARGET_LIST and EXTRA_CONFIGURE_OPTS which is what I do if
-there is a particular Travis test which is failing.
-
->
-> Paolo
->
->>>
->>> Paolo
->>>
->>> Paolo Bonzini (2):
->>>   docker: allow customizing Travis global_env variables
->>>   travis: move make -j flag out of script
->>>
->>>  .travis.yml            | 3 ++-
->>>  tests/docker/travis.py | 6 +++---
->>>  2 files changed, 5 insertions(+), 4 deletions(-)
->>
->>
->> --
->> Alex Bennée
->>
-
+It's what gen_lookup_tb does to it's PC before the calculated jump. If
+it can never happen I can get rid of it.
 
 --
 Alex Bennée
