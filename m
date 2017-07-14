@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVwzZ-0001cO-Mi
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:34:35 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVx3T-0004vO-4k
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVwzW-0005NK-Gq
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:34:33 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVx3Q-0006sW-1Q
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:38:35 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri, 14 Jul 2017 12:34:18 +0300
-Message-Id: <150002485863.22386.13949856269576226529.stgit@frigg.lan>
+Date: Fri, 14 Jul 2017 12:38:21 +0300
+Message-Id: <150002510079.22386.10164419868911710218.stgit@frigg.lan>
 In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
 References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 20/26] target/arm: [tcg] Port to
- translate_insn
+Subject: [Qemu-devel] [PATCH v13 21/26] target/arm: [tcg,
+ a64] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +32,36 @@ loop.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- target/arm/translate.c |  148 ++++++++++++++++++++++++++++--------------=
+ target/arm/translate-a64.c |   74 +++++++++++++++++++++++++++-----------=
 ------
- target/arm/translate.h |    2 +
- 2 files changed, 87 insertions(+), 63 deletions(-)
+ 1 file changed, 46 insertions(+), 28 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 55bef09739..c60be757dc 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11842,6 +11842,9 @@ static void arm_tr_init_disas_context(DisasContex=
-tBase *dcbase,
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 51a9c26396..0f0051ac98 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11244,6 +11244,9 @@ static void aarch64_tr_init_disas_context(DisasCo=
+ntextBase *dcbase,
      dc->is_ldex =3D false;
-     dc->ss_same_el =3D false; /* Can't be true since EL_d must be AArch6=
-4 */
+     dc->ss_same_el =3D (arm_debug_target_el(env) =3D=3D dc->current_el);
 =20
 +    dc->next_page_start =3D
 +        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
 +
+     init_tmp_a64_array(dc);
+ }
 =20
-     cpu_F0s =3D tcg_temp_new_i32();
-     cpu_F1s =3D tcg_temp_new_i32();
-@@ -11944,14 +11947,83 @@ static bool arm_tr_breakpoint_check(DisasContex=
-tBase *dcbase, CPUState *cpu,
+@@ -11279,12 +11282,45 @@ static bool aarch64_tr_breakpoint_check(DisasCo=
+ntextBase *dcbase, CPUState *cpu,
      return true;
  }
 =20
-+static target_ulong arm_tr_translate_insn(DisasContextBase *dcbase,
-+                                               CPUState *cpu)
++static target_ulong aarch64_tr_translate_insn(DisasContextBase *dcbase,
++                                                   CPUState *cpu)
 +{
 +    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
 +    CPUARMState *env =3D cpu->env_ptr;
++
 +
 +    if (dc->ss_active && !dc->pstate_ss) {
 +        /* Singlestep state is Active-pending.
@@ -79,58 +78,13 @@ d
 +        assert(dc->base.num_insns =3D=3D 1);
 +        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
 +                      default_exception_el(dc));
-+        dc->base.is_jmp =3D DISAS_SKIP;
-+        return dc->pc;
-+    }
-+
-+    if (dc->thumb) {
-+        disas_thumb_insn(env, dc);
-+        if (dc->condexec_mask) {
-+            dc->condexec_cond =3D (dc->condexec_cond & 0xe)
-+                | ((dc->condexec_mask >> 4) & 1);
-+            dc->condexec_mask =3D (dc->condexec_mask << 1) & 0x1f;
-+            if (dc->condexec_mask =3D=3D 0) {
-+                dc->condexec_cond =3D 0;
-+            }
-+        }
++        dc->base.is_jmp =3D DISAS_EXC;
 +    } else {
-+        unsigned int insn =3D arm_ldl_code(env, dc->pc, dc->sctlr_b);
-+        dc->pc +=3D 4;
-+        disas_arm_insn(dc, insn);
-+    }
-+
-+    if (dc->condjmp && !dc->base.is_jmp) {
-+        gen_set_label(dc->condlabel);
-+        dc->condjmp =3D 0;
++        disas_a64_insn(env, dc);
 +    }
 +
 +    if (dc->base.is_jmp =3D=3D DISAS_NEXT) {
-+        /* Translation stops when a conditional branch is encountered.
-+         * Otherwise the subsequent code could get translated several ti=
-mes.
-+         * Also stop translation when a page boundary is reached.  This
-+         * ensures prefetch aborts occur at the right place.  */
-+
-+        if (is_singlestepping(dc)) {
-+            dc->base.is_jmp =3D DISAS_TOO_MANY;
-+        } else if ((dc->pc >=3D dc->next_page_start) ||
-+                   ((dc->pc >=3D dc->next_page_start - 3) &&
-+                    insn_crosses_page(env, dc))) {
-+            /* We want to stop the TB if the next insn starts in a new p=
-age,
-+             * or if it spans between this page and the next. This means=
- that
-+             * if we're looking at the last halfword in the page we need=
- to
-+             * see if it's a 16-bit Thumb insn (which will fit in this T=
-B)
-+             * or a 32-bit Thumb insn (which won't).
-+             * This is to avoid generating a silly TB with a single 16-b=
-it insn
-+             * in it at the end of this page (which would execute correc=
-tly
-+             * but isn't very efficient).
-+             */
++        if (dc->ss_active || dc->pc >=3D dc->next_page_start) {
 +            dc->base.is_jmp =3D DISAS_TOO_MANY;
 +        }
 +    }
@@ -138,29 +92,27 @@ tly
 +    return dc->pc;
 +}
 +
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+                                TranslationBlock *tb)
  {
 -    CPUARMState *env =3D cs->env_ptr;
-     DisasContext dc1, *dc =3D &dc1;
+     DisasContext *dc =3D container_of(dcbase, DisasContext, base);
 -    target_ulong next_page_start;
      int max_insns;
--    bool end_of_page;
 =20
-     /* generate intermediate code */
-=20
-@@ -11971,7 +12043,6 @@ void gen_intermediate_code(CPUState *cs, Translat=
-ionBlock *tb)
+     dc->base.tb =3D tb;
+@@ -11295,7 +11331,6 @@ void gen_intermediate_code_a64(DisasContextBase *=
+dcbase, CPUState *cs,
      dc->base.singlestep_enabled =3D cs->singlestep_enabled;
-     arm_tr_init_disas_context(&dc->base, cs);
+     aarch64_tr_init_disas_context(&dc->base, cs);
 =20
 -    next_page_start =3D (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_=
 PAGE_SIZE;
-     max_insns =3D tb->cflags & CF_COUNT_MASK;
+     max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
      if (max_insns =3D=3D 0) {
          max_insns =3D CF_COUNT_MASK;
-@@ -12008,72 +12079,20 @@ void gen_intermediate_code(CPUState *cs, Transl=
-ationBlock *tb)
+@@ -11331,42 +11366,24 @@ void gen_intermediate_code_a64(DisasContextBase=
+ *dcbase, CPUState *cs,
              gen_io_start();
          }
 =20
@@ -182,31 +134,12 @@ EX
 -            assert(dc->base.num_insns =3D=3D 1);
 -            gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
 -                          default_exception_el(dc));
--            goto done_generating;
+-            dc->base.is_jmp =3D DISAS_EXC;
+-            break;
 -        }
 -
--        if (dc->thumb) {
--            disas_thumb_insn(env, dc);
--            if (dc->condexec_mask) {
--                dc->condexec_cond =3D (dc->condexec_cond & 0xe)
--                                   | ((dc->condexec_mask >> 4) & 1);
--                dc->condexec_mask =3D (dc->condexec_mask << 1) & 0x1f;
--                if (dc->condexec_mask =3D=3D 0) {
--                    dc->condexec_cond =3D 0;
--                }
--            }
--        } else {
--            unsigned int insn =3D arm_ldl_code(env, dc->pc, dc->sctlr_b)=
-;
--            dc->pc +=3D 4;
--            disas_arm_insn(dc, insn);
--        }
--
--        if (dc->condjmp && !dc->base.is_jmp) {
--            gen_set_label(dc->condlabel);
--            dc->condjmp =3D 0;
--        }
-+        dc->base.pc_next =3D arm_tr_translate_insn(&dc->base, cs);
+-        disas_a64_insn(env, dc);
++        dc->base.pc_next =3D aarch64_tr_translate_insn(&dc->base, cs);
 =20
          if (tcg_check_temp_count()) {
              fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n=
@@ -214,87 +147,35 @@ EX
                      dc->pc);
          }
 =20
--        /* Translation stops when a conditional branch is encountered.
--         * Otherwise the subsequent code could get translated several ti=
-mes.
--         * Also stop translation when a page boundary is reached.  This
--         * ensures prefetch aborts occur at the right place.  */
--
--        /* We want to stop the TB if the next insn starts in a new page,
--         * or if it spans between this page and the next. This means tha=
-t
--         * if we're looking at the last halfword in the page we need to
--         * see if it's a 16-bit Thumb insn (which will fit in this TB)
--         * or a 32-bit Thumb insn (which won't).
--         * This is to avoid generating a silly TB with a single 16-bit i=
-nsn
--         * in it at the end of this page (which would execute correctly
--         * but isn't very efficient).
--         */
--        end_of_page =3D (dc->pc >=3D next_page_start) ||
--            ((dc->pc >=3D next_page_start - 3) && insn_crosses_page(env,=
- dc));
--
--    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
--             !is_singlestepping(dc) &&
--             !singlestep &&
--             !end_of_page &&
--             dc->base.num_insns < max_insns);
-+        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
-+                            dc->base.num_insns >=3D max_insns)) {
++        if (!dc->base.is_jmp && (tcg_op_buf_full() || cs->singlestep_ena=
+bled ||
++                            singlestep || dc->base.num_insns >=3D max_in=
+sns)) {
 +            dc->base.is_jmp =3D DISAS_TOO_MANY;
 +        }
++
+         /* Translation stops when a conditional branch is encountered.
+          * Otherwise the subsequent code could get translated several ti=
+mes.
+          * Also stop translation when a page boundary is reached.  This
+          * ensures prefetch aborts occur at the right place.
+          */
+-    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
+-             !cs->singlestep_enabled &&
+-             !singlestep &&
+-             !dc->ss_active &&
+-             dc->pc < next_page_start &&
+-             dc->base.num_insns < max_insns);
 +    } while (!dc->base.is_jmp);
 =20
-+    if (dc->base.is_jmp !=3D DISAS_SKIP) {
-     if (tb->cflags & CF_LAST_IO) {
-         if (dc->condjmp) {
-             /* FIXME:  This can theoretically happen with self-modifying
-@@ -12111,6 +12130,7 @@ void gen_intermediate_code(CPUState *cs, Translat=
-ionBlock *tb)
-             gen_exception(EXCP_SMC, syn_aa32_smc(), 3);
-             break;
-         case DISAS_NEXT:
-+        case DISAS_TOO_MANY:
-         case DISAS_UPDATE:
-             gen_set_pc_im(dc, dc->pc);
-             /* fall through */
-@@ -12129,6 +12149,7 @@ void gen_intermediate_code(CPUState *cs, Translat=
-ionBlock *tb)
-          */
-         switch(dc->base.is_jmp) {
+     if (dc->base.tb->cflags & CF_LAST_IO) {
+         gen_io_end();
+@@ -11391,6 +11408,7 @@ void gen_intermediate_code_a64(DisasContextBase *=
+dcbase, CPUState *cs,
+     } else {
+         switch (dc->base.is_jmp) {
          case DISAS_NEXT:
 +        case DISAS_TOO_MANY:
              gen_goto_tb(dc, 1, dc->pc);
              break;
-         case DISAS_UPDATE:
-@@ -12182,6 +12203,7 @@ void gen_intermediate_code(CPUState *cs, Translat=
-ionBlock *tb)
-             gen_goto_tb(dc, 1, dc->pc);
-         }
-     }
-+    }
-=20
- done_generating:
-     gen_tb_end(tb, dc->base.num_insns);
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 6fe40a344a..83e56dcb08 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -9,6 +9,7 @@ typedef struct DisasContext {
-     DisasContextBase base;
-=20
-     target_ulong pc;
-+    target_ulong next_page_start;
-     uint32_t insn;
-     /* Nonzero if this instruction has been conditionally skipped.  */
-     int condjmp;
-@@ -148,6 +149,7 @@ static void disas_set_insn_syndrome(DisasContext *s, =
-uint32_t syn)
-  * as opposed to attempting to use lookup_and_goto_ptr.
-  */
- #define DISAS_EXIT DISAS_TARGET_11
-+#define DISAS_SKIP DISAS_TARGET_12
-=20
- #ifdef TARGET_AARCH64
- void a64_translate_init(void);
+         default:
