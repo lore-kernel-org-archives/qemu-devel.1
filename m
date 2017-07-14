@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dW97f-0004Z5-Uq
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 18:31:46 -0400
+	(envelope-from <mst@redhat.com>) id 1dW9ih-0008FO-6P
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dW97a-0001Lu-Vo
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 18:31:43 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33943)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dW97a-0001KU-Kk
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 18:31:38 -0400
-Received: by mail-lf0-x244.google.com with SMTP id g21so9093601lfk.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 15:31:38 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170715011517-mutt-send-email-mst@kernel.org>
+	(envelope-from <mst@redhat.com>) id 1dW9ie-0000sA-0j
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:09:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dW9id-0000rw-Ns
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:09:55 -0400
+Date: Sat, 15 Jul 2017 02:09:52 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170715012551-mutt-send-email-mst@kernel.org>
 References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
-	<20170714222705-mutt-send-email-mst@kernel.org>
-	<71fd872e-ca59-169d-07fb-5e304713fa84@redhat.com>
-	<20170715011517-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 15 Jul 2017 00:31:36 +0200
-Message-ID: <CAJ+F1CJZ2p_i-SCi-s5=-xcmg4wORv6B_7kjCyRGb5r8oDBWCQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<20170714182012.4595-3-marcandre.lureau@redhat.com>
+	<20170714222023-mutt-send-email-mst@kernel.org>
+	<5d31f22d-e0ae-92f4-ea17-690419f72944@redhat.com>
+	<20170714230852-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CJW1pCqJMN3JmGunFKswNnR=J74+Z_m5Lj5WYT2Z1ZoPQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJW1pCqJMN3JmGunFKswNnR=J74+Z_m5Lj5WYT2Z1ZoPQ@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] KASLR kernel dump support
+Subject: Re: [Qemu-devel] [PATCH v4 2/8] acpi: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dave Anderson <anderson@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Dave Anderson <anderson@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi
+On Sat, Jul 15, 2017 at 12:12:06AM +0200, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> On Fri, Jul 14, 2017 at 10:17 PM, Michael S. Tsirkin <mst@redhat.com> w=
+rote:
+> > On Fri, Jul 14, 2017 at 10:04:31PM +0200, Laszlo Ersek wrote:
+> >> > It worries me that the format of this seems completely undefined
+> >> > except in the patchset cover letter.
+> >> > I don't think we should merge this before it is.
+> >>
+> >> I'm not sure what you mean, this patch adds "docs/specs/vmcoreinfo.t=
+xt".
+> >> That file is the first level contract between the guest firmware
+> >> (generally, via the linker/loader), the guest kernel driver
+> >> (specifically), and QEMU (also specifically).
+> >>
+> >> The second level contract is the guest kernel's vmcoreinfo ELF note
+> >> (which is pointed-to by the first level contract). The layout of tha=
+t is
+> >> specified elsewhere indeed (I don't think it belongs here).
+> >>
+> >> We've taken care not to trust anything coming from the guest kernel.
+> >>
+> >> Can you clarify please?
+> >>
+> >> Thanks
+> >> Laszlo
+> >
+> > All there is is this:
+> >
+> > +Version 0 content:
+> > +
+> > + uint64 paddr:
+> > +  Physical address of the Linux vmcoreinfo ELF note.
+> > + uint32 size:
+> > +  Size of the vmcoreinfo ELF note.
+> >
+> > It isn't defined here what is the Linux vmcoreinfo ELF note.
+> > You want a bit more info so people trying to use it know where to sta=
+rt
+> > and what they can get out of it.
+>=20
+> QEMU is not responsible for the content of the ELF note. All there is a=
+faik is:
+>=20
+> https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-kernel-vmcor=
+einfo
+>=20
+> The rest you need to dig in the kernel code and git history I think.
 
-On Sat, Jul 15, 2017 at 12:23 AM, Michael S. Tsirkin <mst@redhat.com> wrote=
-:
-> On Fri, Jul 14, 2017 at 10:21:43PM +0200, Laszlo Ersek wrote:
->> On 07/14/17 21:59, Michael S. Tsirkin wrote:
->> > On Fri, Jul 14, 2017 at 08:20:03PM +0200, Marc-Andr=C3=A9 Lureau wrote=
-:
->> >> Recent linux kernels enable KASLR to randomize phys/virt memory
->> >> addresses. This series aims to provide enough information in qemu
->> >> dumps so that crash utility can work with randomized kernel too (it
->> >> hasn't been tested on other archs than x86 though, help welcome).
->> >>
->> >> The vmcoreinfo device is an emulated ACPI device that exposes a 4k
->> >> memory range to the guest to store various informations useful to
->> >> debug the guest OS. (it is greatly inspired by the VMGENID device
->> >> implementation). The version field with value 0 is meant to give
->> >> paddr/size of the VMCOREINFO ELF PT_NOTE, other values can be used fo=
-r
->> >> different purposes or OSes. (note: some wanted to see pvpanic somehow
->> >> merged with this device, I have no clear idea how to do that, nor do =
-I
->> >> think this is a good idea since the devices are quite different, used
->> >> at different time for different purposes. And it can be done as a
->> >> future iteration if it is appropriate, feel free to send patches)
->> >
->> > First, I think you underestimate the difficulty of maintaining
->> > compatibility.
->> >
->> > Second, this seems racy - how do you know when is guest done writing o=
-ut
->> > the data?
->>
->> What data exactly?
->>
->> The guest kernel module points the fields in the "vmcoreinfo page" to
->> the then-existent vmcoreinfo ELF note. At that point, the ELF note is
->> complete.
->
-> When does this happen?
+We need to do a good enough job to at least make it possible for people
+to make use of it without reading your python code.
 
-Very early boot afaik. But the exact details on when to expose it is
-left to the kernel side. For now, it's a test module I load manually.
+Documentation/kdump/kdump.txt has a bit more information.
 
->
->> If we catch the guest with a dump request while the kernel module is
->> setting up the fields (i.e., the fields are not consistent), then we'll
->> catch that in our sanity checks, and the note won't be extracted.
->
-> Are there assumptions about e.g. in which order pa and size
-> are written out then? Atomicity of these writes?
-
-I expect it to be atomic, but as Laszlo said, the code should be quite
-careful when trying to read the data.
-
->
->> This
->> is no different from the case when you simply dump the guest RAM before
->> the module got invoked.
->>
->> > Given you have very little data to export (PA, size - do
->> > you even need size?)
->>
->> Yes, it tells us in advance how much memory to allocate before we copy
->> out the vmcoreinfo ELF note (and we enforce a sanity limit on the size).
->>
->> > - how about just using an ACPI method do it,
->>
->> Do what exactly?
->
-> Pass address + size to host - that's what the interface is doing,
-> isn't it?
->
+	All of the necessary information about the system kernel's core image is
+	encoded in the ELF format, and stored in a reserved area of memory
+	before a crash. The physical address of the start of the ELF header is
+	passed to the dump-capture kernel through the elfcorehdr=3D boot
+	parameter. Optionally the size of the ELF header can also be passed
+	when using the elfcorehdr=3D[size[KMG]@]offset[KMG] syntax.
 
 
-The memory region is meant to be usable for other OS, or to export
-more details in the future. I think if we add a method, it would be to
-tell qemu that the memory has been written, but it may still be
-corrupted at the time we read it. So I am not sure it will really help
+	With the dump-capture kernel, you can access the memory image through
+	/proc/vmcore. This exports the dump as an ELF-format file that you can
+	write out using file copy commands such as cp or scp. Further, you can
+	use analysis tools such as the GNU Debugger (GDB) and the Crash tool to
+	debug the dump file. This method ensures that the dump pages are correct=
+ly
+	ordered.
+
+I know where to find it but most people likely won't be able to.
+
+BTW why does it pass ELF header size? Any idea?
 
 
->> > instead of exporting a physical addess and storing address there.  Thi=
-s
->> > way you can add more methods as you add functionality.
->>
->> I'm not saying this is a bad idea (especially because I don't fully
->> understand your point), but I will say that I'm quite sad that you are
->> sending Marc-Andr=C3=A9 back to the drawing board after he posted v4 -- =
-also
->> invalidating my review efforts. :/
->>
->> Laszlo
->
-> You are right, I should have looked at this sooner. Early RFC
-> suggested writing into fw cfg directly. I couldn't find any
-> discussion around this - why was this abandoned?
-
-Violation (or rather abuse) of layers iirc
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+> --=20
+> Marc-Andr=E9 Lureau
