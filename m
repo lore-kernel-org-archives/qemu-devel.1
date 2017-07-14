@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw2-0001Cn-2A
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw2-0001Cs-2l
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvx-0007p5-5u
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvz-0007qy-K0
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:02 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33859)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33890)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dVyvx-0007oV-01
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:57 -0400
-Received: by mail-pg0-x243.google.com with SMTP id j186so10399622pge.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:38:56 -0700 (PDT)
+	id 1dVyvz-0007qG-Be
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:59 -0400
+Received: by mail-pf0-x242.google.com with SMTP id c24so10758682pfe.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:38:59 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 07:38:32 -0400
-Message-Id: <1500032321-13951-11-git-send-email-longpeng.mike@gmail.com>
+Date: Fri, 14 Jul 2017 07:38:34 -0400
+Message-Id: <1500032321-13951-13-git-send-email-longpeng.mike@gmail.com>
 In-Reply-To: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
 References: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 10/18] crypto: hmac: introduce
- qcrypto_hmac_ctx_new for glib-backend
+Subject: [Qemu-devel] [PATCH v5 12/18] crypto: introduce some common
+ functions for af_alg backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,85 +32,254 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
-glib-backend impls.
+The AF_ALG socket family is the userspace interface for linux
+crypto API, this patch adds af_alg family support and some common
+functions for af_alg backend. It'll be used by afalg-backend crypto
+latter.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/hmac-glib.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+ configure            |  22 ++++++++++
+ crypto/Makefile.objs |   1 +
+ crypto/afalg.c       | 116 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/afalgpriv.h   |  54 ++++++++++++++++++++++++
+ 4 files changed, 193 insertions(+)
+ create mode 100644 crypto/afalg.c
+ create mode 100644 crypto/afalgpriv.h
 
-diff --git a/crypto/hmac-glib.c b/crypto/hmac-glib.c
-index 08a1fdd..f0ccfd6 100644
---- a/crypto/hmac-glib.c
-+++ b/crypto/hmac-glib.c
-@@ -49,11 +49,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
+diff --git a/configure b/configure
+index 902653a..7ddc531 100755
+--- a/configure
++++ b/configure
+@@ -4834,6 +4834,24 @@ if compile_prog "" "" ; then
+     have_af_vsock=yes
+ fi
  
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
-+static QCryptoHmacGlib *
-+qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                     const uint8_t *key, size_t nkey,
-+                     Error **errp)
- {
--    QCryptoHmac *hmac;
-     QCryptoHmacGlib *ctx;
- 
-     if (!qcrypto_hmac_supports(alg)) {
-@@ -62,9 +62,6 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-         return NULL;
-     }
- 
--    hmac = g_new0(QCryptoHmac, 1);
--    hmac->alg = alg;
--
-     ctx = g_new0(QCryptoHmacGlib, 1);
- 
-     ctx->ghmac = g_hmac_new(qcrypto_hmac_alg_map[alg],
-@@ -74,12 +71,10 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-         goto error;
-     }
- 
--    hmac->opaque = ctx;
--    return hmac;
-+    return ctx;
- 
- error:
-     g_free(ctx);
--    g_free(hmac);
-     return NULL;
- }
- 
-@@ -134,6 +129,25 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-     return 0;
- }
- 
-+QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-+                              const uint8_t *key, size_t nkey,
-+                              Error **errp)
-+{
-+    QCryptoHmac *hmac;
-+    QCryptoHmacGlib *ctx;
++##########################################
++# check for usable AF_ALG environment
++hava_af_alg=no
++cat > $TMPC << EOF
++#include <errno.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <linux/if_alg.h>
++int main(void) {
++    int sock;
++    sock = socket(AF_ALG, SOCK_SEQPACKET, 0);
++    return sock;
++}
++EOF
++if compile_prog "" "" ; then
++    have_af_alg=yes
++fi
 +
-+    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
-+    if (!ctx) {
-+        return NULL;
+ #################################################
+ # Sparc implicitly links with --relax, which is
+ # incompatible with -r, so --no-relax should be
+@@ -5951,6 +5969,10 @@ if test "$have_af_vsock" = "yes" ; then
+   echo "CONFIG_AF_VSOCK=y" >> $config_host_mak
+ fi
+ 
++if test "$have_af_alg" = "yes" ; then
++  echo "CONFIG_AF_ALG=y" >> $config_host_mak
++fi
++
+ if test "$have_sysmacros" = "yes" ; then
+   echo "CONFIG_SYSMACROS=y" >> $config_host_mak
+ fi
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index 1f749f2..2be5a3a 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -10,6 +10,7 @@ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib
+ crypto-obj-y += aes.o
+ crypto-obj-y += desrfb.o
+ crypto-obj-y += cipher.o
++crypto-obj-$(CONFIG_AF_ALG) += afalg.o
+ crypto-obj-y += tlscreds.o
+ crypto-obj-y += tlscredsanon.o
+ crypto-obj-y += tlscredsx509.o
+diff --git a/crypto/afalg.c b/crypto/afalg.c
+new file mode 100644
+index 0000000..10046bb
+--- /dev/null
++++ b/crypto/afalg.c
+@@ -0,0 +1,116 @@
++/*
++ * QEMU Crypto af_alg support
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include "qemu/sockets.h"
++#include "qapi/error.h"
++#include "afalgpriv.h"
++
++static bool
++qcrypto_afalg_build_saddr(const char *type, const char *name,
++                          struct sockaddr_alg *salg, Error **errp)
++{
++    salg->salg_family = AF_ALG;
++
++    if (strnlen(type, SALG_TYPE_LEN_MAX) >= SALG_TYPE_LEN_MAX) {
++        error_setg(errp, "Afalg type(%s) is larger than %d bytes",
++                   type, SALG_TYPE_LEN_MAX);
++        return false;
 +    }
 +
-+    hmac = g_new0(QCryptoHmac, 1);
-+    hmac->alg = alg;
-+    hmac->opaque = ctx;
++    if (strnlen(name, SALG_NAME_LEN_MAX) >= SALG_NAME_LEN_MAX) {
++        error_setg(errp, "Afalg name(%s) is larger than %d bytes",
++                   name, SALG_NAME_LEN_MAX);
++        return false;
++    }
 +
-+    return hmac;
++    pstrcpy((char *)salg->salg_type, SALG_TYPE_LEN_MAX, type);
++    pstrcpy((char *)salg->salg_name, SALG_NAME_LEN_MAX, name);
++
++    return true;
 +}
 +
- #else
- 
- bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
++static int
++qcrypto_afalg_socket_bind(const char *type, const char *name,
++                          Error **errp)
++{
++    int sbind;
++    struct sockaddr_alg salg = {0};
++
++    if (!qcrypto_afalg_build_saddr(type, name, &salg, errp)) {
++        return -1;
++    }
++
++    sbind = qemu_socket(AF_ALG, SOCK_SEQPACKET, 0);
++    if (sbind < 0) {
++        error_setg_errno(errp, errno, "Failed to create socket");
++        return -1;
++    }
++
++    if (bind(sbind, (const struct sockaddr *)&salg, sizeof(salg)) != 0) {
++        error_setg_errno(errp, errno, "Failed to bind socket");
++        closesocket(sbind);
++        return -1;
++    }
++
++    return sbind;
++}
++
++QCryptoAFAlg *
++qcrypto_afalg_comm_alloc(const char *type, const char *name,
++                         Error **errp)
++{
++    QCryptoAFAlg *afalg;
++
++    afalg = g_new0(QCryptoAFAlg, 1);
++    /* initilize crypto API socket */
++    afalg->opfd = -1;
++    afalg->tfmfd = qcrypto_afalg_socket_bind(type, name, errp);
++    if (afalg->tfmfd == -1) {
++        goto error;
++    }
++
++    afalg->opfd = qemu_accept(afalg->tfmfd, NULL, 0);
++    if (afalg->opfd == -1) {
++        error_setg_errno(errp, errno, "Failed to accept socket");
++        goto error;
++    }
++
++    return afalg;
++
++error:
++    qcrypto_afalg_comm_free(afalg);
++    return NULL;
++}
++
++void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
++{
++    if (!afalg) {
++        return;
++    }
++
++    if (afalg->msg) {
++        g_free(afalg->msg->msg_control);
++        g_free(afalg->msg);
++    }
++
++    if (afalg->tfmfd != -1) {
++        closesocket(afalg->tfmfd);
++    }
++
++    if (afalg->opfd != -1) {
++        closesocket(afalg->opfd);
++    }
++
++    g_free(afalg);
++}
+diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
+new file mode 100644
+index 0000000..76118cf
+--- /dev/null
++++ b/crypto/afalgpriv.h
+@@ -0,0 +1,54 @@
++/*
++ * QEMU Crypto af_alg support
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++
++#ifndef QCRYPTO_AFALGPRIV_H
++#define QCRYPTO_AFALGPRIV_H
++
++#include <linux/if_alg.h>
++
++#define SALG_TYPE_LEN_MAX 14
++#define SALG_NAME_LEN_MAX 64
++
++typedef struct QCryptoAFAlg QCryptoAFAlg;
++
++struct QCryptoAFAlg {
++    int tfmfd;
++    int opfd;
++    struct msghdr *msg;
++    struct cmsghdr *cmsg;
++};
++
++/**
++ * qcrypto_afalg_comm_alloc:
++ * @type: the type of crypto operation
++ * @name: the name of crypto operation
++ *
++ * Allocate a QCryptoAFAlg object and bind itself to
++ * a AF_ALG socket.
++ *
++ * Returns:
++ *  a new QCryptoAFAlg object, or NULL in error.
++ */
++QCryptoAFAlg *
++qcrypto_afalg_comm_alloc(const char *type, const char *name,
++                         Error **errp);
++
++/**
++ * afalg_comm_free:
++ * @afalg: the QCryptoAFAlg object
++ *
++ * Free the @afalg.
++ */
++void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg);
++
++#endif
 -- 
 1.8.3.1
