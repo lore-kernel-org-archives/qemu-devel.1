@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW12K-0002EJ-Ug
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dW12M-0002I6-CK
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW12H-0001mT-2N
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38938)
+	(envelope-from <imammedo@redhat.com>) id 1dW12K-0001op-Rp
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW12G-0001mF-PV
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:36 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW12K-0001oe-IG
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:40 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 14 Jul 2017 15:52:05 +0200
-Message-Id: <1500040339-119465-15-git-send-email-imammedo@redhat.com>
+Date: Fri, 14 Jul 2017 15:52:07 +0200
+Message-Id: <1500040339-119465-17-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
 References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 14/28] m68k: replace cpu_m68k_init() with
+Subject: [Qemu-devel] [PATCH 16/28] nios2: replace cpu_nios2_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,115 +25,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
-call register_m68k_insns() at realize time which makes
-cpu_m68k_init() typical object creation function.
-As result we can replace it with cpu_generic_init()
-which does the same job, reducing code duplication a bit.
+cpu_nios2_init() always falls back to TYPE_NIOS2_CPU object
+regardless of cpu_model. Put fallback logic into
+nios2_cpu_class_by_name() which would translate any cpu_model
+into TYPE_NIOS2_CPU class and replace cpu_nios2_init()
+with cpu_generic_init()
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: Thomas Huth <huth@tuxfamily.org>
-CC: Laurent Vivier <laurent@vivier.eu>
+CC: Chris Wulff <crwulff@gmail.com>
+CC: Marek Vasut <marex@denx.de>
 ---
- target/m68k/cpu.h    |  3 +--
- hw/m68k/an5206.c     |  2 +-
- hw/m68k/mcf5208.c    |  2 +-
- target/m68k/cpu.c    |  2 ++
- target/m68k/helper.c | 20 --------------------
- 5 files changed, 5 insertions(+), 24 deletions(-)
+ target/nios2/cpu.h        | 3 +--
+ hw/nios2/10m50_devboard.c | 2 +-
+ target/nios2/cpu.c        | 9 +++------
+ 3 files changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 38a7e11..d936547 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -163,7 +163,6 @@ int m68k_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 13931f3..50d803a 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -212,7 +212,6 @@ static inline Nios2CPU *nios2_env_get_cpu(CPUNios2State *env)
+ #define ENV_OFFSET offsetof(Nios2CPU, env)
  
- void m68k_tcg_init(void);
- void m68k_cpu_init_gdb(M68kCPU *cpu);
--M68kCPU *cpu_m68k_init(const char *cpu_model);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-@@ -322,7 +321,7 @@ void register_m68k_insns (CPUM68KState *env);
+ void nios2_tcg_init(void);
+-Nios2CPU *cpu_nios2_init(const char *cpu_model);
+ void nios2_cpu_do_interrupt(CPUState *cs);
+ int cpu_nios2_signal_handler(int host_signum, void *pinfo, void *puc);
+ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUNios2State *env);
+@@ -229,7 +228,7 @@ void nios2_check_interrupts(CPUNios2State *env);
  #define TARGET_PHYS_ADDR_SPACE_BITS 32
  #define TARGET_VIRT_ADDR_SPACE_BITS 32
  
--#define cpu_init(cpu_model) CPU(cpu_m68k_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
+-#define cpu_init(cpu_model) CPU(cpu_nios2_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
  
- #define cpu_signal_handler cpu_m68k_signal_handler
- #define cpu_list m68k_cpu_list
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index 142bab9..23c23df 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -42,7 +42,7 @@ static void an5206_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5206";
-     }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         error_report("Unable to find m68k CPU definition");
-         exit(1);
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index 6563518..cca2e73 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -232,7 +232,7 @@ static void mcf5208evb_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5208";
-     }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         fprintf(stderr, "Unable to find m68k CPU definition\n");
-         exit(1);
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index a14b6dd..55bf24b 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
-     M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
+ #define cpu_gen_code cpu_nios2_gen_code
+ #define cpu_signal_handler cpu_nios2_signal_handler
+diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
+index 051be73..c8aa116 100644
+--- a/hw/nios2/10m50_devboard.c
++++ b/hw/nios2/10m50_devboard.c
+@@ -75,7 +75,7 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+                                 phys_ram_alias);
  
-+    register_m68k_insns(&cpu->env);
-+
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index caae291..7e50ff5 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -156,26 +156,6 @@ static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-     return 0;
+     /* Create CPU -- FIXME */
+-    cpu = cpu_nios2_init("nios2");
++    cpu = NIOS2_CPU(cpu_generic_init(TYPE_NIOS2_CPU, "nios2"));
+ 
+     /* Register: CPU interrupt controller (PIC) */
+     cpu_irq = nios2_cpu_pic_init(cpu);
+diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+index d56bb72..5b02fb6 100644
+--- a/target/nios2/cpu.c
++++ b/target/nios2/cpu.c
+@@ -83,13 +83,9 @@ static void nios2_cpu_initfn(Object *obj)
+     }
  }
  
--M68kCPU *cpu_m68k_init(const char *cpu_model)
--{
--    M68kCPU *cpu;
--    CPUM68KState *env;
--    ObjectClass *oc;
--
--    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
--    env = &cpu->env;
--
--    register_m68k_insns(env);
+-Nios2CPU *cpu_nios2_init(const char *cpu_model)
++static ObjectClass *nios2_cpu_class_by_name(const char *cpu_model)
+ {
+-    Nios2CPU *cpu = NIOS2_CPU(object_new(TYPE_NIOS2_CPU));
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
--}
--
- void m68k_cpu_init_gdb(M68kCPU *cpu)
- {
-     CPUState *cs = CPU(cpu);
++    return object_class_by_name(TYPE_NIOS2_CPU);
+ }
+ 
+ static void nios2_cpu_realizefn(DeviceState *dev, Error **errp)
+@@ -203,6 +199,7 @@ static void nios2_cpu_class_init(ObjectClass *oc, void *data)
+     ncc->parent_reset = cc->reset;
+     cc->reset = nios2_cpu_reset;
+ 
++    cc->class_by_name = nios2_cpu_class_by_name;
+     cc->has_work = nios2_cpu_has_work;
+     cc->do_interrupt = nios2_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = nios2_cpu_exec_interrupt;
 -- 
 2.7.4
