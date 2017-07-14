@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dW2tF-0007F2-Ep
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:52:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dW2v5-0008HR-TP
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:54:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dW2tB-0002VY-Fb
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:52:25 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dW2tB-0002V7-5O
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:52:21 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id w126so24240154wme.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 08:52:20 -0700 (PDT)
-References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
-	<1500029487-14822-4-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1500029487-14822-4-git-send-email-peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 16:52:18 +0100
-Message-ID: <87lgnruibx.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1dW2v1-0003W3-UL
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:54:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33933)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW2v1-0003Vp-Nx
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:54:15 -0400
+Date: Fri, 14 Jul 2017 17:53:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170714175350.40954793@nial.brq.redhat.com>
+In-Reply-To: <1500025208-14827-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1500025208-14827-2-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 3/9] hw/arm/mps2: Add UARTs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv9 1/3] fw_cfg: switch fw_cfg_find() to
+ locate the fw_cfg device by type rather than path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,150 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, patches@linaro.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, lersek@redhat.com, somlo@cmu.edu, ehabkost@redhat.com, mst@redhat.com, pbonzini@redhat.com, rjones@redhat.com, peter.maydell@linaro.org
 
+On Fri, 14 Jul 2017 10:40:06 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+> This will enable the fw_cfg device to be placed anywhere within the QOM tree
+> regardless of its machine location.
+> 
+> Note that we also add a comment to document the behaviour that we return NULL to
+> indicate failure where either no fw_cfg device or multiple fw_cfg devices are
+> found.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> Add the UARTs to the MPS2 board models.
->
-> Unfortunately the details of the wiring of the interrupts through
-> various OR gates differ between AN511 and AN385 so this can't
-> be purely a data-driven difference.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
->  hw/arm/mps2.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
->
-> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-> index 3dad02d..180c5d2 100644
-> --- a/hw/arm/mps2.c
-> +++ b/hw/arm/mps2.c
-> @@ -27,9 +27,12 @@
->  #include "qemu/error-report.h"
->  #include "hw/arm/arm.h"
->  #include "hw/arm/armv7m.h"
-> +#include "hw/or-irq.h"
->  #include "hw/boards.h"
->  #include "exec/address-spaces.h"
-> +#include "sysemu/sysemu.h"
->  #include "hw/misc/unimp.h"
-> +#include "hw/char/cmsdk-apb-uart.h"
->
->  typedef enum MPS2FPGAType {
->      FPGA_AN385,
-> @@ -206,6 +209,89 @@ static void mps2_common_init(MachineState *machine)
->      create_unimplemented_device("Ethernet", 0x40200000, 0x00100000);
->      create_unimplemented_device("VGA", 0x41000000, 0x0200000);
->
-> +    switch (mmc->fpga_type) {
-> +    case FPGA_AN385:
-> +    {
-> +        /* The overflow IRQs for UARTs 0, 1 and 2 are ORed together.
-> +         * Overflow for UARTs 4 and 5 doesn't trigger any interrupt.
-> +         */
-> +        Object *orgate;
-> +        DeviceState *orgate_dev;
-> +        int i;
-> +
-> +        orgate = object_new(TYPE_OR_IRQ);
-> +        object_property_set_int(orgate, 6, "num-lines", &error_fatal);
-> +        object_property_set_bool(orgate, true, "realized", &error_fatal);
-> +        orgate_dev = DEVICE(orgate);
-> +        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
-> +
-> +        for (i = 0; i < 5; i++) {
-> +            hwaddr uartbase[] = {0x40004000, 0x40005000, 0x40006000,
-> +                                 0x40007000, 0x40009000};
-
-I would expect these to be something like:
-
-  static hwaddr an385_uartbase[] = {0x40004000, 0x40005000, 0x40006000,
-                                    0x40007000, 0x40009000};
-  static hwaddr an511_uartbase[] = {0x40004000, 0x40005000, 0x4002c000,
-                                    0x4002d000, 0x4002e000};
-
-to save the compiler from filling in the table every loop. Not that it
-makes much different for an init routine.
-
-> +            Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
-> +            /* RX irq number; TX irq is always one greater */
-> +            int uartirq[] = {0, 2, 4, 18, 20};
-
-At the very least you an move uartbase and uartirq into the case block
-so it is not being pointlessly rebuilt each loop.
-
-> +            qemu_irq txovrint = NULL, rxovrint = NULL;
-> +
-> +            if (i < 3) {
-> +                txovrint = qdev_get_gpio_in(orgate_dev, i * 2);
-> +                rxovrint = qdev_get_gpio_in(orgate_dev, i * 2 + 1);
-> +            }
-> +
-> +            cmsdk_apb_uart_create(uartbase[i],
-> +                                  qdev_get_gpio_in(armv7m, uartirq[i] + 1),
-> +                                  qdev_get_gpio_in(armv7m, uartirq[i]),
-> +                                  txovrint, rxovrint,
-> +                                  NULL,
-> +                                  uartchr, SYSCLK_FRQ);
-> +        }
-> +        break;
-> +    }
-> +    case FPGA_AN511:
-> +    {
-> +        /* The overflow IRQs for all UARTs are ORed together.
-> +         * Tx and Rx IRQs for each UART are ORed together.
-> +         */
-> +        Object *orgate;
-> +        DeviceState *orgate_dev;
-> +        int i;
-> +
-> +        orgate = object_new(TYPE_OR_IRQ);
-> +        object_property_set_int(orgate, 10, "num-lines", &error_fatal);
-> +        object_property_set_bool(orgate, true, "realized", &error_fatal);
-> +        orgate_dev = DEVICE(orgate);
-> +        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
-> +
-> +        for (i = 0; i < 5; i++) {
-> +            /* system irq numbers for the combined tx/rx for each UART */
-> +            const int uart_txrx_irqno[] = {0, 2, 45, 46, 56};
-> +            hwaddr uartbase[] = {0x40004000, 0x40005000, 0x4002c000,
-> +                                 0x4002d000, 0x4002e000};
-
-Ditto. I see irqno is const here.
-
-> +            Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
-> +            Object *txrx_orgate;
-> +            DeviceState *txrx_orgate_dev;
-> +
-> +            txrx_orgate = object_new(TYPE_OR_IRQ);
-> +            object_property_set_int(txrx_orgate, 2, "num-lines", &error_fatal);
-> +            object_property_set_bool(txrx_orgate, true, "realized",
-> +                                     &error_fatal);
-> +            txrx_orgate_dev = DEVICE(txrx_orgate);
-> +            qdev_connect_gpio_out(txrx_orgate_dev, 0,
-> +                                  qdev_get_gpio_in(armv7m, uart_txrx_irqno[i]));
-> +            cmsdk_apb_uart_create(uartbase[i],
-> +                                  qdev_get_gpio_in(txrx_orgate_dev, 0),
-> +                                  qdev_get_gpio_in(txrx_orgate_dev, 1),
-> +                                  qdev_get_gpio_in(orgate_dev, 0),
-> +                                  qdev_get_gpio_in(orgate_dev, 1),
-> +                                  NULL,
-> +                                  uartchr, SYSCLK_FRQ);
-> +        }
-> +        break;
-> +    }
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +
->      system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
->
->      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-
-
---
-Alex Bennée
+>  hw/nvram/fw_cfg.c |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 99bdbc2..ac52b50 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -1017,7 +1017,8 @@ FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
+>  
+>  FWCfgState *fw_cfg_find(void)
+>  {
+> -    return FW_CFG(object_resolve_path(FW_CFG_PATH, NULL));
+> +    /* Returns NULL unless there is exactly one fw_cfg device */
+> +    return FW_CFG(object_resolve_path_type("", TYPE_FW_CFG, NULL));
+>  }
+>  
+>  static void fw_cfg_class_init(ObjectClass *klass, void *data)
