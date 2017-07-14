@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVX-0003up-QS
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVi-000485-SY
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVW-00040X-TR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVh-0004Ce-QR
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:54 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 14 Jul 2017 07:14:47 -0500
-Message-Id: <20170714121457.10322-11-eblake@redhat.com>
+Date: Fri, 14 Jul 2017 07:14:51 -0500
+Message-Id: <20170714121457.10322-15-eblake@redhat.com>
 In-Reply-To: <20170714121457.10322-1-eblake@redhat.com>
 References: <20170714121457.10322-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/20] qcow: Switch to
+Subject: [Qemu-devel] [PATCH v2 14/20] sheepdog: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,75 +21,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the qcow driver accordingly.  There is no
-intent to optimize based on the mapping flag for this format.
+byte-based.  Update the sheepdog driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
 v2: rebase to mapping flag
 ---
- block/qcow.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ block/sheepdog.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 66827d6..38dd191 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -486,20 +486,25 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
-     return cluster_offset;
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index b7b7e6b..8a83210 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -2972,18 +2972,17 @@ static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
  }
 
--static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int64_t coroutine_fn qcow_co_block_status(BlockDriverState *bs,
-+                                                 bool mapping,
-+                                                 int64_t offset, int64_t bytes,
-+                                                 int64_t *pnum,
-+                                                 BlockDriverState **file)
+ static coroutine_fn int64_t
+-sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
+-                       int *pnum, BlockDriverState **file)
++sd_co_block_status(BlockDriverState *bs, bool mapping, int64_t offset,
++                   int64_t bytes, int64_t *pnum, BlockDriverState **file)
  {
-     BDRVQcowState *s = bs->opaque;
--    int index_in_cluster, n;
-+    int index_in_cluster;
-+    int64_t n;
-     uint64_t cluster_offset;
+     BDRVSheepdogState *s = bs->opaque;
+     SheepdogInode *inode = &s->inode;
+     uint32_t object_size = (UINT32_C(1) << inode->block_size_shift);
+-    uint64_t offset = sector_num * BDRV_SECTOR_SIZE;
+     unsigned long start = offset / object_size,
+-                  end = DIV_ROUND_UP((sector_num + nb_sectors) *
+-                                     BDRV_SECTOR_SIZE, object_size);
++                  end = DIV_ROUND_UP(offset + bytes, object_size);
+     unsigned long idx;
+-    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
++    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID |
++        (offset & BDRV_BLOCK_OFFSET_MASK);
 
-     qemu_co_mutex_lock(&s->lock);
--    cluster_offset = get_cluster_offset(bs, sector_num << 9, 0, 0, 0, 0);
-+    cluster_offset = get_cluster_offset(bs, offset, 0, 0, 0, 0);
-     qemu_co_mutex_unlock(&s->lock);
--    index_in_cluster = sector_num & (s->cluster_sectors - 1);
--    n = s->cluster_sectors - index_in_cluster;
--    if (n > nb_sectors)
--        n = nb_sectors;
-+    index_in_cluster = offset & (s->cluster_size - 1);
-+    n = s->cluster_size - index_in_cluster;
-+    if (n > bytes) {
-+        n = bytes;
-+    }
-     *pnum = n;
-     if (!cluster_offset) {
-         return 0;
-@@ -507,7 +512,7 @@ static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
-     if ((cluster_offset & QCOW_OFLAG_COMPRESSED) || s->crypto) {
-         return BDRV_BLOCK_DATA;
+     for (idx = start; idx < end; idx++) {
+         if (inode->data_vdi_id[idx] == 0) {
+@@ -3000,9 +2999,9 @@ sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
+         }
      }
--    cluster_offset |= (index_in_cluster << BDRV_SECTOR_BITS);
-+    cluster_offset |= (index_in_cluster & BDRV_BLOCK_OFFSET_MASK);
-     *file = bs->file->bs;
-     return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | cluster_offset;
- }
-@@ -1076,7 +1081,7 @@ static BlockDriver bdrv_qcow = {
 
-     .bdrv_co_readv          = qcow_co_readv,
-     .bdrv_co_writev         = qcow_co_writev,
--    .bdrv_co_get_block_status   = qcow_co_get_block_status,
-+    .bdrv_co_block_status   = qcow_co_block_status,
+-    *pnum = (idx - start) * object_size / BDRV_SECTOR_SIZE;
+-    if (*pnum > nb_sectors) {
+-        *pnum = nb_sectors;
++    *pnum = (idx - start) * object_size;
++    if (*pnum > bytes) {
++        *pnum = bytes;
+     }
+     if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
+         *file = bs;
+@@ -3080,7 +3079,7 @@ static BlockDriver bdrv_sheepdog = {
+     .bdrv_co_writev = sd_co_writev,
+     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
+     .bdrv_co_pdiscard = sd_co_pdiscard,
+-    .bdrv_co_get_block_status = sd_co_get_block_status,
++    .bdrv_co_block_status   = sd_co_block_status,
 
-     .bdrv_make_empty        = qcow_make_empty,
-     .bdrv_co_pwritev_compressed = qcow_co_pwritev_compressed,
+     .bdrv_snapshot_create   = sd_snapshot_create,
+     .bdrv_snapshot_goto     = sd_snapshot_goto,
+@@ -3116,7 +3115,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
+     .bdrv_co_writev = sd_co_writev,
+     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
+     .bdrv_co_pdiscard = sd_co_pdiscard,
+-    .bdrv_co_get_block_status = sd_co_get_block_status,
++    .bdrv_co_block_status   = sd_co_block_status,
+
+     .bdrv_snapshot_create   = sd_snapshot_create,
+     .bdrv_snapshot_goto     = sd_snapshot_goto,
+@@ -3152,7 +3151,7 @@ static BlockDriver bdrv_sheepdog_unix = {
+     .bdrv_co_writev = sd_co_writev,
+     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
+     .bdrv_co_pdiscard = sd_co_pdiscard,
+-    .bdrv_co_get_block_status = sd_co_get_block_status,
++    .bdrv_co_block_status   = sd_co_block_status,
+
+     .bdrv_snapshot_create   = sd_snapshot_create,
+     .bdrv_snapshot_goto     = sd_snapshot_goto,
 -- 
 2.9.4
