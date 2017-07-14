@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw7-0001OY-PM
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:08 -0400
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVywD-0001Us-4Z
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw6-0007y1-MK
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:07 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36368)
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw8-0007zL-6l
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:13 -0400
+Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:35597)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dVyw6-0007x1-Et
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:06 -0400
-Received: by mail-pg0-x241.google.com with SMTP id y129so10416679pgy.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:39:06 -0700 (PDT)
+	id 1dVyw7-0007yW-UI
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:08 -0400
+Received: by mail-pg0-x229.google.com with SMTP id j186so44539874pge.2
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:39:07 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 07:38:40 -0400
-Message-Id: <1500032321-13951-19-git-send-email-longpeng.mike@gmail.com>
+Date: Fri, 14 Jul 2017 07:38:41 -0400
+Message-Id: <1500032321-13951-20-git-send-email-longpeng.mike@gmail.com>
 In-Reply-To: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
 References: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 18/18] tests: crypto: add hmac speed
- benchmark support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/18]  crypto: add afalg-backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,124 +34,173 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This patch add a hmac speed benchmark, it helps us to
-measure the performance by using "make check-speed" or
-using "./tests/benchmark-crypto-hmac" directly.
+The AF_ALG socket family is the userspace interface for linux
+crypto API, users can use it to access hardware accelerators.
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+This patchset adds a afalg-backend for qemu crypto subsystem. Currently
+when performs encrypt/decrypt, we'll try afalg-backend first and will
+back to libiary-backend if it failed.
+
+In the next step, It would support a command parameter to specifies
+which backends prefer to and some other improvements.
+
+I measured the performance about the afalg-backend impls, I tested
+how many data could be encrypted in 5 seconds.
+
+NOTE: If we use specific hardware crypto cards, I think afalg-backend
+      would even faster.
+
+test-environment: Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
+
+*sha256*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 93.03                       185.87
+1024                146.32                      201.78
+2048                213.32                      210.93
+4096                275.48                      215.26
+8192                321.77                      217.49
+16384               349.60                      219.26
+32768               363.59                      219.73
+65536               375.79                      219.99
+
+*hmac(sha256)*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 71.26                       165.55
+1024                117.43                      189.15
+2048                180.96                      203.24
+4096                247.60                      211.38
+8192                301.99                      215.65
+16384               340.79                      218.22
+32768               365.51                      219.49
+65536               377.92                      220.24
+
+*cbc(aes128)*
+chunk_size(bytes)   MB/sec(afalg:cbc-aes-aesni)  MB/sec(nettle)
+512                 371.76                       188.41
+1024                559.86                       189.64
+2048                768.66                       192.11
+4096                939.15                       192.40
+8192                1029.48                      192.49
+16384               1072.79                      190.52
+32768               1109.38                      190.41
+65536               1102.38                      190.40
+
 ---
- tests/Makefile.include        |  2 ++
- tests/benchmark-crypto-hmac.c | 82 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+Changes since v4:
+    - remove 'name' field in 'struct CryptoAFAlg'. [Daniel]
+    - add error handling for read() returning less than requested. [Daniel]
+    - use iov_send_recv to recv msg in hash-afalg.c. [Daniel]
+    - refactor hmac benchmark as suggestion. [Daniel]
+
+Changes since v3:
+    - add "Reviewed-by: Daniel P. Berrange <address@hidden>" in
+      commit messages of PATCH 1/2/3/4/5/7/8/9/10/11.
+    - PATCH 12: use strlen() instead of qemu_strnlen() in 
+qcrypto_afalg_build_saddr(). [Daniel]
+    - PATCH 12: rather than indenting the entire method, just return immediately
+                if afalg=NULL. [Daniel]
+    - PATCH 13: use g_strdup_printf() instead of g_new0+snprintf() and remove
+                redundant bounds check in qcrypto_afalg_cipher_format_name(). 
+[Daniel]
+    - PATCH 13: s/except_niv/expect_niv  s/origin_contorllen/origin_controllen. 
+[Daniel]
+    - PATCH 13: use '%zu' to print 'size_t' in qcrypto_afalg_cipher_setiv(). 
+[Daniel]
+    - PATCH 13: remove qcrypto_cipher_using_afalg_drv(). [Daniel]
+    - PATCH 13: refactor the qcrypto_cipher_new() as Daniel's suggestion. 
+[Daniel]
+    - PATCH 13: correct the ->cmsg initialization int 
+qcrypto_afalg_cipher_ctx_new() to
+                avoid different behaviour in test_cipher_null_iv(). [Daniel]
+    - PATCH 14: use g_strdup_printf() instead of g_new0+snprintf() and remove
+                edundant bounds check in qcrypto_afalg_hash_format_name(). 
+[Daniel]
+    - PATCH 14: s/except_len/expect_len. [Daniel]
+    - PATCH 14: free 'errp' if afalg_driver.hash_bytesv() failed. [Daniel]
+    - PATCH 14: maybe some afalg errors should be treated as fatal, but we
+                have no idea yet, so add a "TODO" comment.
+    - PATCH 15: refactor the qcrypto_hmac_new() as Daniel's suggestion. [Daniel]
+
+Changes since v2:
+    - init sockaddr_alg object when it's defined. [Gonglei]
+    - fix some superfluous initialization. [Gonglei]
+    - s/opeartion/operation/g in crypto/afalgpriv.h. [Gonglei]
+    - check 'niv' in qcrypto_afalg_cipher_setiv. [Gonglei]
+
+Changes since v1:
+    - use "make check-speed" to testing the performance. [Daniel]
+    - put private definations into crypto/***priv.h. [Daniel]
+    - remove afalg socket from qapi-schema, put them into crypto/. [Daniel]
+    - some Error report change. [Daniel]
+    - s/QCryptoAfalg/QCryptoAFAlg. [Daniel]
+    - use snprintf with bounds checking instead of sprintf. [Daniel]
+    - use "qcrypto_afalg_" prefix and "qcrypto_nettle(gcrypt,glib,builtin)_" 
+prefix. [Daniel]
+    - add testing results in cover-letter. [Gonglei]
+
+---
+Longpeng(Mike) (18):
+  crypto: cipher: introduce context free function
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for gcrypt-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for nettle-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for builtin-backend
+  crypto: cipher: add cipher driver framework
+  crypto: hash: add hash driver framework
+  crypto: hmac: move crypto/hmac.h into include/crypto/
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for gcrypt-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for nettle-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for glib-backend
+  crypto: hmac: add hmac driver framework
+  crypto: introduce some common functions for af_alg backend
+  crypto: cipher: add afalg-backend cipher support
+  crypto: hash: add afalg-backend hash support
+  crypto: hmac: add af_alg-backend hmac support
+  tests: crypto: add cipher speed benchmark support
+  tests: crypto: add hash speed benchmark support
+  tests: crypto: add hmac speed benchmark support
+
+ configure                       |  22 ++++
+ crypto/Makefile.objs            |   3 +
+ crypto/afalg.c                  | 116 +++++++++++++++++++++
+ crypto/afalgpriv.h              |  64 ++++++++++++
+ crypto/cipher-afalg.c           | 226 ++++++++++++++++++++++++++++++++++++++++
+ crypto/cipher-builtin.c         | 125 +++++++++++-----------
+ crypto/cipher-gcrypt.c          | 105 ++++++++++---------
+ crypto/cipher-nettle.c          |  84 ++++++++-------
+ crypto/cipher.c                 |  80 ++++++++++++++
+ crypto/cipherpriv.h             |  56 ++++++++++
+ crypto/hash-afalg.c             | 214 +++++++++++++++++++++++++++++++++++++
+ crypto/hash-gcrypt.c            |  19 ++--
+ crypto/hash-glib.c              |  19 ++--
+ crypto/hash-nettle.c            |  19 ++--
+ crypto/hash.c                   |  30 ++++++
+ crypto/hashpriv.h               |  39 +++++++
+ crypto/hmac-gcrypt.c            |  42 ++++----
+ crypto/hmac-glib.c              |  63 ++++++-----
+ crypto/hmac-nettle.c            |  42 ++++----
+ crypto/hmac.c                   |  58 +++++++++++
+ crypto/hmac.h                   | 166 -----------------------------
+ crypto/hmacpriv.h               |  48 +++++++++
+ hw/virtio/vhost-backend.c       |   8 +-
+ include/crypto/cipher.h         |   1 +
+ include/crypto/hmac.h           | 167 +++++++++++++++++++++++++++++
+ tests/Makefile.include          |  13 ++-
+ tests/benchmark-crypto-cipher.c |  88 ++++++++++++++++
+ tests/benchmark-crypto-hash.c   |  67 ++++++++++++
+ tests/benchmark-crypto-hmac.c   |  82 +++++++++++++++
+ 29 files changed, 1654 insertions(+), 412 deletions(-)
+ create mode 100644 crypto/afalg.c
+ create mode 100644 crypto/afalgpriv.h
+ create mode 100644 crypto/cipher-afalg.c
+ create mode 100644 crypto/cipherpriv.h
+ create mode 100644 crypto/hash-afalg.c
+ create mode 100644 crypto/hashpriv.h
+ delete mode 100644 crypto/hmac.h
+ create mode 100644 crypto/hmacpriv.h
+ create mode 100644 include/crypto/hmac.h
+ create mode 100644 tests/benchmark-crypto-cipher.c
+ create mode 100644 tests/benchmark-crypto-hash.c
  create mode 100644 tests/benchmark-crypto-hmac.c
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c5a67a3..18f9359 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
- check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
- check-unit-y += tests/test-crypto-hmac$(EXESUF)
-+check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
- check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
-@@ -638,6 +639,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
- tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
- tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
-+tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
-diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
-new file mode 100644
-index 0000000..72408be
---- /dev/null
-+++ b/tests/benchmark-crypto-hmac.c
-@@ -0,0 +1,82 @@
-+/*
-+ * QEMU Crypto hmac speed benchmark
-+ *
-+ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/hmac.h"
-+
-+#define KEY "monkey monkey monkey monkey"
-+
-+static void test_hmac_speed(const void *opaque)
-+{
-+    size_t chunk_size = (size_t)opaque;
-+    QCryptoHmac *hmac = NULL;
-+    uint8_t *in = NULL, *out = NULL;
-+    size_t out_len = 0;
-+    double total = 0.0;
-+    struct iovec iov;
-+    Error *err = NULL;
-+    int ret;
-+
-+    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
-+        return;
-+    }
-+
-+    in = g_new0(uint8_t, chunk_size);
-+    memset(in, g_test_rand_int(), chunk_size);
-+
-+    iov.iov_base = (char *)in;
-+    iov.iov_len = chunk_size;
-+
-+    g_test_timer_start();
-+    do {
-+        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256,
-+                                (const uint8_t *)KEY, strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
-+        g_assert(ret == 0);
-+        g_assert(err == NULL);
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        total += chunk_size;
-+    } while (g_test_timer_elapsed() < 5.0);
-+
-+    total /= 1024 * 1024; /* to MB */
-+
-+    g_print("hmac(sha256): ");
-+    g_print("Testing chunk_size %ld bytes ", chunk_size);
-+    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
-+    g_print("%.2f MB/sec\n", total / g_test_timer_last());
-+
-+    g_free(out);
-+    g_free(in);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    size_t i;
-+    char name[64];
-+
-+    g_test_init(&argc, &argv, NULL);
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    for (i = 512; i <= (64 * 1204); i *= 2) {
-+        memset(name, 0 , sizeof(name));
-+        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
-+        g_test_add_data_func(name, (void *)i, test_hmac_speed);
-+    }
-+
-+    return g_test_run();
-+}
 -- 
 1.8.3.1
