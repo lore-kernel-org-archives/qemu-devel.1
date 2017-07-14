@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1dVxmF-0005oV-Cg
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:24:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVxmm-0006MG-Hz
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1dVxm9-0003tB-5s
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:24:51 -0400
-Received: from mail-he1eur01on0106.outbound.protection.outlook.com
-	([104.47.0.106]:7776
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1dVxm8-0003q8-EZ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:24:45 -0400
-References: <1499342940-56739-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<221951d9-92f0-b8f2-06b0-cf49e9fc19be@virtuozzo.com>
-	<ee5623ec-b8a7-4e34-45e0-50f52da02ed9@redhat.com>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <cb380d5e-7fb4-8755-775a-52f8644efd85@virtuozzo.com>
-Date: Fri, 14 Jul 2017 13:24:36 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1dVxml-0004fN-Ii
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:24 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVxml-0004f8-CN
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:23 -0400
+Received: by mail-wm0-x231.google.com with SMTP id i127so18164530wma.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:25:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ee5623ec-b8a7-4e34-45e0-50f52da02ed9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v6 00/13] chardevice hotswap
+In-Reply-To: <20170714061521.28300-1-david@gibson.dropbear.id.au>
+References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 11:25:01 +0100
+Message-ID: <CAFEAcA9H7td0EogiAcp3rL6CB46fvq8fJbDBCZw1R3Z8Ch0AvA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,132 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, amit@kernel.org, mst@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
 
-On 07/14/2017 01:20 PM, Paolo Bonzini wrote:
-> On 14/07/2017 11:29, Denis V. Lunev wrote:
->> On 07/06/2017 03:08 PM, Anton Nefedov wrote:
->>> Changed in v6:
->>>   - patch 3: chr_lock mutex removed (as discussed, thread safety can be left to
->>>     the front-ends, and the front-ends currently supported are good as is).
->>>   - patch 5 now includes related changes for serial and virtio-serial 
->>>   - patch 13 commit message extended
->>>
->>> ========
->>>
->>> Changed in v5:
->>>   - rebased
->>>   - patch 6 fixed (wouldn't compile until patch 7 (broken by previous rebase))
->>>   - patch 11 commit message added
->>>
->>> ========
->>>
->>> Changed in v4:
->>>   - rebased on top of the latest chardev changes
->>>   - remarks applied
->>>   - patch 1 fixed so it works with alias names
->>>
->>> ========
->>>
->>> Changed in v3:
->>>   - minor remarks to patch 1 applied
->>>   - patch 3: avoid using bottom-half, handle syncronously
->>>     As mentioned, it gets thing complicated and is only a problem for
->>>     a monitor-connected chardev hotswap and that is not supported for now
->>>   - tests added (patches 6-9)
->>>
->>> ========
->>>
->>> This serie is a v2 of the February submit
->>> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01989.html
->>>
->>> The interface is changed as requested and the changes are slightly reworked
->>> and split into separate patches.
->>>
->>> ========
->>>
->>> The patchset adds support of the character device change without
->>> a frontend device removal.
->>> Yet isa-serial and virtio-serial frontends are supported.
->>>
->>> The feature can be helpful for e.g. Windows debug allowing to
->>> establish connection to a live VM from VM with WinDbg.
->>>
->>> Anton Nefedov (13):
->>>   char: move QemuOpts->ChardevBackend translation to a separate func
->>>   char: add backend hotswap handler
->>>   char: chardevice hotswap
->>>   char: forbid direct chardevice access for hotswap devices
->>>   char: avoid chardevice direct access
->>>   test-char: destroy chardev-udp after test
->>>   test-char: split char_udp_test
->>>   test-char: split char_file_test
->>>   test-char: add hotswap test
->>>   hmp: add hmp analogue for qmp-chardev-change
->>>   virtio-console: chardev hotswap support
->>>   serial: move TIOCM update to a separate function
->>>   serial: chardev hotswap support
->>>
->>>  include/chardev/char-fe.h   |  22 ++++
->>>  include/chardev/char.h      |  19 +++
->>>  hmp.h                       |   1 +
->>>  backends/rng-egd.c          |   2 +-
->>>  chardev/char-fe.c           |  16 ++-
->>>  chardev/char-mux.c          |   1 +
->>>  chardev/char.c              | 164 +++++++++++++++++++++-----
->>>  gdbstub.c                   |   2 +-
->>>  hmp-commands.hx             |  18 ++-
->>>  hmp.c                       |  34 ++++++
->>>  hw/arm/pxa2xx.c             |   3 +-
->>>  hw/arm/strongarm.c          |   4 +-
->>>  hw/char/bcm2835_aux.c       |   2 +-
->>>  hw/char/cadence_uart.c      |   4 +-
->>>  hw/char/debugcon.c          |   4 +-
->>>  hw/char/digic-uart.c        |   2 +-
->>>  hw/char/escc.c              |   8 +-
->>>  hw/char/etraxfs_ser.c       |   2 +-
->>>  hw/char/exynos4210_uart.c   |   4 +-
->>>  hw/char/grlib_apbuart.c     |   4 +-
->>>  hw/char/imx_serial.c        |   2 +-
->>>  hw/char/ipoctal232.c        |   4 +-
->>>  hw/char/lm32_juart.c        |   2 +-
->>>  hw/char/lm32_uart.c         |   2 +-
->>>  hw/char/mcf_uart.c          |   2 +-
->>>  hw/char/milkymist-uart.c    |   2 +-
->>>  hw/char/parallel.c          |   2 +-
->>>  hw/char/pl011.c             |   2 +-
->>>  hw/char/sclpconsole-lm.c    |   4 +-
->>>  hw/char/sclpconsole.c       |   4 +-
->>>  hw/char/serial.c            |  63 +++++++---
->>>  hw/char/sh_serial.c         |   4 +-
->>>  hw/char/spapr_vty.c         |   4 +-
->>>  hw/char/stm32f2xx_usart.c   |   3 +-
->>>  hw/char/terminal3270.c      |   4 +-
->>>  hw/char/virtio-console.c    |  35 +++++-
->>>  hw/char/xen_console.c       |   4 +-
->>>  hw/char/xilinx_uartlite.c   |   2 +-
->>>  hw/ipmi/ipmi_bmc_extern.c   |   4 +-
->>>  hw/mips/boston.c            |   2 +-
->>>  hw/mips/mips_malta.c        |   2 +-
->>>  hw/misc/ivshmem.c           |   6 +-
->>>  hw/usb/ccid-card-passthru.c |   6 +-
->>>  hw/usb/dev-serial.c         |   7 +-
->>>  hw/usb/redirect.c           |   7 +-
->>>  monitor.c                   |   4 +-
->>>  net/colo-compare.c          |  10 +-
->>>  net/filter-mirror.c         |   8 +-
->>>  net/slirp.c                 |   2 +-
->>>  net/vhost-user.c            |   7 +-
->>>  qapi-schema.json            |  40 +++++++
->>>  qtest.c                     |   2 +-
->>>  tests/test-char.c           | 275 ++++++++++++++++++++++++++++++++------------
->>>  tests/test-hmp.c            |   1 +
->>>  tests/vhost-user-test.c     |   2 +-
->>>  55 files changed, 647 insertions(+), 199 deletions(-)
->>>
->> ping
-> I've already sent a pull request. :)
+On 14 July 2017 at 07:15, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 49bcce4b9c11759678fd223aefb48691c4959d4f:
 >
-> Paolo
-that is great :) thanks a lot
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-07-12' into staging (2017-07-13 16:56:06 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170714
+>
+> for you to fetch changes up to e11134d2ac7744569d7c387102368c507d340c30:
+>
+>   pseries: Allow HPT resizing with KVM (2017-07-14 09:28:30 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-07-14
+>
+> Two major batches in this set, rather than the usual collection of
+> assorted fixes.
+>
+>     * More DRC cleanup.  This gets the state management into a state
+>       which should fix many of the hotplug+migration problems we've
+>       had.  Plus it gets the migration stream format into something
+>       well defined and pretty minimal which we can reasonably support
+>       into the future.
+>
+>     * Hashed Page Table resizing.  It's been a while since this was
+>       posted, but it's been through several previous rounds of review.
+>       The kernel parts (both guest and host) are merged in 4.11, so
+>       this is the only remaining piece left to allow resizing of the
+>       HPT in a running guest.
+>
+> There are also a handful of unrelated fixes.
+
+I see Alex Graf's update to the e500 u-boot image didn't make
+it in to this -- are you planning to send that separately
+or should I pick it up directly? (I definitely would like to
+see that in the 2.10 release, because it fixes a problem where
+our u-boot sources are (a) very old and (b) not even the version
+corresponding to the binary blob we ship...)
+
+thanks
+-- PMM
