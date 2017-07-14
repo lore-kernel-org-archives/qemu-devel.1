@@ -1,35 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dW2av-0002n1-A0
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:33:30 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dW2fw-0004sa-8y
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dW2aq-0002jF-Ej
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:33:29 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dW2aq-0002j0-BH
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:33:24 -0400
-Received: by mail-qt0-x244.google.com with SMTP id w12so10344872qta.2
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 08:33:24 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
-	<1499238885-26161-25-git-send-email-pbonzini@redhat.com>
-	<d42dd796-70c1-55c9-ff6c-9318b7d2a33a@amsat.org>
-	<1724026964.16491421.1500022952979.JavaMail.zimbra@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <401a360f-72ef-ec24-40bf-b15b5ec9a690@amsat.org>
-Date: Fri, 14 Jul 2017 12:33:20 -0300
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dW2fu-0004x1-Tl
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:38:40 -0400
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Fri, 14 Jul 2017 18:37:45 +0300
+Message-Id: <20170714153749.25132-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1724026964.16491421.1500022952979.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 24/42] configure: add --disable-tcg
- configure option
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v6 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,42 +19,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Anthony Liguori <aliguori@us.ibm.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-On 07/14/2017 06:02 AM, Paolo Bonzini wrote:
->> From: "Philippe Mathieu-Daudé" <f4bug@amsat.org>
->> To: "Paolo Bonzini" <pbonzini@redhat.com>, qemu-devel@nongnu.org
->> Cc: "Anthony Liguori" <aliguori@us.ibm.com>
->> Sent: Friday, July 14, 2017 7:24:29 AM
->> Subject: Re: [Qemu-devel] [PULL 24/42] configure: add --disable-tcg configure option
->>
->> Hi Paolo,
->>
->> trying "./configure --disable-docs --disable-tcg" I get:
->>
->>     CC      x86_64-softmmu/exec.o
->> qemu/exec.c: In function ‘breakpoint_invalidate’:
->> qemu/exec.c:797:9: error: implicit declaration of function
->> ‘tb_invalidate_phys_addr’ [-Werror=implicit-function-declaration]
->>            tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
->>            ^~~~~~~~~~~~~~~~~~~~~~~
->> qemu/exec.c:797:9: error: nested extern declaration of
->> ‘tb_invalidate_phys_addr’ [-Werror=nested-externs]
->> cc1: all warnings being treated as errors
->> qemu/rules.mak:66: recipe for target 'exec.o' failed
->> make[1]: *** [exec.o] Error 1
->> Makefile:328: recipe for target 'subdir-x86_64-softmmu' failed
->> make: *** [subdir-x86_64-softmmu] Error 2
->>
->> due to include/exec/exec-all.h:
->>
->> #if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->> void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr);
->> #else
-> 
-> This is introduced by Pranith's patch.  I will respin my pull request.
-> 
-> Paolo
+This patch add shrinking of the image file for qcow2. As a result, this allows
+us to reduce the virtual image size and free up space on the disk without
+copying the image. Image can be fragmented and shrink is done by punching holes
+in the image file.
 
-I pulled master with your PR merged and it now compiles fine, thank you.
+# ./qemu-img create -f qcow2 image.qcow2 4G
+Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+
+# ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+wrote 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
+
+# ./qemu-img resize image.qcow2 512M
+warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
+error: qemu-img: Use the --shrink option to perform a shrink operation.
+
+# ./qemu-img resize --shrink image.qcow2 128M
+Image resized.
+
+# ./qemu-img info image.qcow2
+image: image.qcow2
+file format: qcow2
+virtual size: 128M (134217728 bytes)
+disk size: 128M
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+
+# du -h image.qcow2
+129M    image.qcow2
+
+Changes from v1:
+- add --shrink flag for qemu-img resize
+- add qcow2_cache_discard
+- simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
+- add new qemu-iotests for shrinking images
+
+Changes from v2:
+- replace qprintf() on error_report() (1)
+- rewrite warning messages (1)
+- enforce --shrink flag for all formats except raw (1)
+- split qcow2_cache_discard() (2)
+- minor fixes according to comments (3)
+- rewrite the last part of qcow2_shrink_reftable() to avoid
+  qcow2_free_clusters() calls inside (3)
+- improve test for shrinking image (4)
+
+Changes from v3:
+- rebase on "Implement a warning_report function" Alistair's patch-set (1)
+- spelling fixes (1)
+- the man page fix according to the discussion (1)
+- add call qcow2_signal_corruption() in case of image corruption (3)
+
+Changes from v4:
+- rebase on https://github.com/XanClic/qemu/commits/block Max's block branch
+
+Changes from v5:
+- the condition refcount == 0 should be enough to evict the l2/refcount cluster
+  from the cache (2)
+- overwrite the l1/refcount table in memory with zeros, even if overwriting the
+  l1/refcount table on disk has failed (3)
+- replace g_try_malloc() on g_malloc() for allocation reftable_tmp (3)
+
+Pavel Butsykin (4):
+  qemu-img: add --shrink flag for resize
+  qcow2: add qcow2_cache_discard
+  qcow2: add shrink image support
+  qemu-iotests: add shrinking image test
+
+ block/qcow2-cache.c        |  26 +++++++
+ block/qcow2-cluster.c      |  50 +++++++++++++
+ block/qcow2-refcount.c     | 140 ++++++++++++++++++++++++++++++++++++-
+ block/qcow2.c              |  43 +++++++++---
+ block/qcow2.h              |  17 +++++
+ qapi/block-core.json       |   3 +-
+ qemu-img-cmds.hx           |   4 +-
+ qemu-img.c                 |  23 ++++++
+ qemu-img.texi              |   6 +-
+ tests/qemu-iotests/102     |   4 +-
+ tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/163.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 13 files changed, 475 insertions(+), 17 deletions(-)
+ create mode 100644 tests/qemu-iotests/163
+ create mode 100644 tests/qemu-iotests/163.out
+
+-- 
+2.13.0
