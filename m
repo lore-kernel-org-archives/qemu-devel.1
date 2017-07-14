@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVw3v-0003bF-6u
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:35:02 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dVw4Y-0004A7-FD
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVw3u-000840-Is
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:34:59 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33766)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVw3u-00083e-Bq
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:34:58 -0400
-Received: by mail-wr0-x233.google.com with SMTP id 48so3143167wrz.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 01:34:58 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dVw4X-0008Q5-Kg
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:35:38 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
+	<20170713163219.9024-11-marcandre.lureau@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f2013a35-090d-c9b8-085f-ea00c46f7837@twiddle.net>
+Date: Thu, 13 Jul 2017 22:35:23 -1000
 MIME-Version: 1.0
-In-Reply-To: <1499965423-13517-1-git-send-email-peter.maydell@linaro.org>
-References: <1499965423-13517-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 09:34:35 +0100
-Message-ID: <CAFEAcA8Akw3tjANvtoMBwC3OWtya5cjvddEAzptCkRLK6jJQuQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
- tools)
+In-Reply-To: <20170713163219.9024-11-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/29] vvfat: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,17 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Kamil Rytarowski <n54@gmx.com>, Markus Armbruster <armbru@redhat.com>, "patches@linaro.org" <patches@linaro.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org, "open list:vvfat" <qemu-block@nongnu.org>, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 13 July 2017 at 18:03, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This patchset fixes the build on NetBSD by making sure we only
-> build the ivshmem-client and ivshmem-server tools if the host OS
-> actually supports ivshmem. (Previously we were only gating building
-> of the within-QEMU ivshmem PCI device.)
+On 07/13/2017 06:32 AM, Marc-André Lureau wrote:
+> I used the clang-tidy qemu-round check to generate the fix:
+> https://github.com/elmarco/clang-tools-extra
+> 
+> Signed-off-by: Marc-André Lureau<marcandre.lureau@redhat.com>
+> ---
+>   block/vvfat.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 
-Markus pointed out that I'd accidentally only sent out the
-cover letter -- I've just resent the whole set.
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-thanks
--- PMM
+
+r~
