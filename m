@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW0Rx-0001Ux-OA
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:16:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dW0US-000298-5c
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW0Ru-0003F8-Iq
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:16:05 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:17918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW0Ru-0003B9-83
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:16:02 -0400
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170714122221.pyx2pwubtaylqdu6@postretch>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <e059cf44-53df-4d5f-3257-cc9b6be775df@huawei.com>
-Date: Fri, 14 Jul 2017 15:15:06 +0200
+	(envelope-from <stefanha@redhat.com>) id 1dW0UO-0004ML-VV
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:18:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dW0UO-0004Lu-M6
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:18:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7B99EC0467DE
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 13:18:35 +0000 (UTC)
+Date: Fri, 14 Jul 2017 14:18:31 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170714131831.GA17616@stefanha-x1.localdomain>
+References: <20170710072027.7948-1-famz@redhat.com>
+	<20170711145813.GX17792@stefanha-x1.localdomain>
+	<20170712110633.GB11040@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20170714122221.pyx2pwubtaylqdu6@postretch>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="FL5UXtIhxfXey3p5"
+Content-Disposition: inline
+In-Reply-To: <20170712110633.GB11040@lemon>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/5] Introduce "-object iothread-group"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +35,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Hi Manos,
 
-Thanks for sharing the link to your code patch.
+--FL5UXtIhxfXey3p5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 7/14/2017 2:22 PM, Manos Pitsidianakis wrote:
-> Hello Pradeep, you might be interested in my work on refactoring the
-> block layer's throttling interface in my series:
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04191.html
-Sure will have a look.
-> In this series you copy the existing legacy interface we want to get rid
-> of. I think it will be easier work for you to use the changes introduced
-> in my patches when they are merged.
-So, should I wait till they are in?. Actually my throttle patches for 
-fsdev are already upstream (2.9). Now I am just introducing the qmp/hmp 
-interfaces for the same.
-> Have you thought about using throttle groups? It'd mean many devices
-> sharing the same limits. This way the interfaces can be unified.  Please
-> read docs/throttle.txt and see if it would be useful for you.
+On Wed, Jul 12, 2017 at 07:06:33PM +0800, Fam Zheng wrote:
+> On Tue, 07/11 15:58, Stefan Hajnoczi wrote:
+> > On Mon, Jul 10, 2017 at 03:20:22PM +0800, Fam Zheng wrote:
+> > > Last time we've looked at "-object iothread,spawns=3DN" but it was a =
+bit abusive.
+> > > A dedicated "iothread-group" class is cleaner from the interface poin=
+t of view.
+> > > This series does that.
+> > >=20
+> > > It has the same set of poll parameters as the existing "iothread" obj=
+ect, plus
+> > > a "size" option to specify how many threads to start. Using iothread-=
+group
+> > > doesn't require the user to explicitly create the contained IOThreads=
+=2E The
+> > > IOThreads are created by the group object.
+> > >=20
+> > > Internally, IOThreads share one AioContext.  This is to make it easie=
+r to adapt
+> > > this to the current data plane code (see the last patch). But it is an
+> > > implementation detail, and will change depending on the block layer m=
+ultiqueue
+> > > needs.
+> > >=20
+> > > TODO:
+> > >=20
+> > > - qmp_query_iothread_groups, in addition to proper QOM @child propert=
+y from
+> > >   IOThreadGroup to its IOThread instances.
+> > > - Add virtio-scsi.
+> > > - Variant of iothread_stop_all().
+> > >=20
+> > > Fam Zheng (5):
+> > >   aio: Wrap poll parameters into AioContextPollParams
+> > >   iothread: Don't error on windows
+> > >   iothread: Extract iothread_start
+> > >   Introduce iothread-group
+> > >   virtio-blk: Add iothread-group property
+> > >=20
+> > >  Makefile.objs                   |   2 +-
+> > >  hw/block/dataplane/virtio-blk.c |  18 ++--
+> > >  hw/block/virtio-blk.c           |   6 ++
+> > >  include/block/aio.h             |  18 ++--
+> > >  include/hw/virtio/virtio-blk.h  |   2 +
+> > >  include/sysemu/iothread.h       |  35 ++++++-
+> > >  iothread-group.c                | 210 ++++++++++++++++++++++++++++++=
+++++++++++
+> > >  iothread.c                      |  97 +++++++++----------
+> > >  util/aio-posix.c                |  10 +-
+> > >  util/aio-win32.c                |   8 +-
+> > >  10 files changed, 328 insertions(+), 78 deletions(-)
+> > >  create mode 100644 iothread-group.c
+> >=20
+> > I reviewed QOM "foo[*]" array syntax but it's very limited.  Basically
+> > all it does it append the new property to foo[0], foo[1], ... (i.e. it
+> > allocates an index).  AFAICT there is no way to specify an array
+> > property and really arrays are just individual properties.
+> >=20
+> > Daniel Berrange has a patch for non-scalar properties:
+> > "[PATCH v14 15/21] qom: support non-scalar properties with -object"
+> > https://patchwork.kernel.org/patch/9358503/
+> >=20
+> > I think the challenge with existing "[*]" or pre-allocated "foo[0]",
+> > "foo[1]", ... is that they don't support variable-sized arrays via QAPI.
+>=20
+> Plus I'm not a fan of such a "spelling out indexes explicitly" syntax. It=
+ makes
+> me feel like a slave of a poorly coded programme. With it we'll avoid open
+> coding an iothread group class in QEMU, but will ask the user to "open ty=
+pe"
+> group configurations.
 
-I have read about the throttle group, last year when I was implementing 
-the throttle feature for fsdev.My open source work depends on the 
-projects I/my group work on. So, when I have more bandwidth work on 
-those, I will surely take it up. Throttle group option may be useful 
-feature even in case of fsdev devices.
+Indexes are necessary if the user wants to remove, swap, etc elements
+later, so they do serve a purpose.  Sometimes they might not be
+necessary.
 
-Regards,
-Pradeep
+> > When the virtio-blk-pci object is realized it can loop over iothread[*]
+> > properties to set them up (if necessary).
+> >=20
+> > Your current RFC series uses a single AioContext in IOThreadGroup.  I
+> > think something similar can be achieved with an iothread property:
+> >=20
+> >   -object iothread,id=3Diothread1,share-event-loop-with=3Diothread0
+> >=20
+> > The reason I am suggesting this approach is to keep IOThread as the
+> > first-class object.  Existing QMP APIs continue to apply to all objects.
+> > We avoid introducing an ad-hoc group object just for IOThread.
+>=20
+> Another possibility is to introduce 1) a "TYPE_GROUPABLE" InterfaceInfo t=
+hat
+> will add a ".group" str property to IOThread, and build a generic group o=
+bject
+> out of the objects sharing the same .group name; 2) a qdev prop
+> DEFINE_PROP_LINK_TO_GROUP() that can be used to reference a QOM object gr=
+oup
+> from virtio-blk/scsi. That way it is not specific to IOThread. (Since I a=
+m not
+> QOM expert, this is basically brainstorming.)
+
+What you describe sounds like qom/container.c except QOM links are used
+instead of a QOM child relationship.
+
+No new QOM interface is necessary in order to do this - the objects in a
+group don't have to be aware that they are being grouped.
+
+Stefan
+
+--FL5UXtIhxfXey3p5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZaMSnAAoJEJykq7OBq3PIuk0H/33Dk5FZtKwruXTaCLPwZzqZ
+06D2N9HHJ+0B/winbHnvcwBhcjPRQKF6cR4HqK4FKA6uCdlAeA4C3uNWwlQ1XEwI
+SnKHAGbe2bjYUm0MU2TkGZVhrfQur0SBBda9adbrqNFMLEExNNUPDrYALPW7uQgJ
+h1G7KdKQb2O86j3sotO8kxyJWh/AFMeET3kkg1oLgLOWEhSVg1pYv5+BO7OfSjjU
+RC5PIlO9W9W4Ts7P7zc0+NoFttOEPdqUOTCI5G+3eyQTfEfa+T4jFbG7PmgTGYrX
+lfXTU6jEpvG608rZsR4JScpbNfAydr9aYgf0Oj+TPR/jQEHrn+Jd25HIm1xeGOg=
+=H5cF
+-----END PGP SIGNATURE-----
+
+--FL5UXtIhxfXey3p5--
