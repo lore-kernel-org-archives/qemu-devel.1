@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVzXZ-0006Lx-Q6
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:17:51 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVzd2-0003Mk-U9
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dVzXV-0005Wv-QI
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:17:49 -0400
-Resent-Message-Id: <E1dVzXV-0005Wv-QI@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21795)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dVzXV-0005WR-I0
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:17:45 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150003464565.75.17410500886731634157@5d477a5b5989>
-In-Reply-To: <20170714113700.21319-1-otubo@redhat.com>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVzcz-0007zw-0i
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:23:28 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:64075)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dVzcy-0007yX-KH
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:23:24 -0400
+Date: Fri, 14 Jul 2017 15:22:21 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170714122221.pyx2pwubtaylqdu6@postretch>
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 14 Jul 2017 05:17:26 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/6] seccomp: feature refactoring
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ybzeb565qdyb44zc"
+Content-Disposition: inline
+In-Reply-To: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: otubo@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, jani kokkonen <jani.kokkonen@huawei.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwNzE0MTEzNzAwLjIxMzE5LTEtb3R1Ym9AcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNl0gc2VjY29tcDogZmVhdHVyZSByZWZhY3RvcmluZwoK
-PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
-bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
-Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
-b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
-dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
-KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
-YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
-dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
-MTUwMDAzMDc0NS0xMDYxOS0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9y
-ZyAtPiBwYXRjaGV3LzE1MDAwMzA3NDUtMTA2MTktMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDcxNDExNTcz
-Ni4xMzY5My0xLWRnaWxiZXJ0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDcxNDExNTczNi4x
-MzY5My0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwowNzlhZWIzIHNlY2NvbXA6IGFkZGluZyBkb2N1bWVudGF0aW9uIHRvIG5ldyBzZWNjb21wIG1v
-ZGVsCmYyOTU5NGYgc2VjY29tcDogYWRkIHJlc291cmNlY29udHJvbCBhcmd1bWVudCB0byBjb21t
-YW5kIGxpbmUKYzY0MDZiZCBzZWNjb21wOiBhZGQgc3Bhd24gYXJndW1lbnQgdG8gY29tbWFuZCBs
-aW5lCjZlMWNmODYgc2VjY29tcDogYWRkIGVsZXZhdGVwcml2aWxlZ2VzIGFyZ3VtZW50IHRvIGNv
-bW1hbmQgbGluZQphZmE4ZGNlIHNlY2NvbXA6IGFkZCBvYnNvbGV0ZSBhcmd1bWVudCB0byBjb21t
-YW5kIGxpbmUKMTY1M2E2YSBzZWNjb21wOiBjaGFuZ2luZyBmcm9tIHdoaXRlbGlzdCB0byBibGFj
-a2xpc3QKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogc2VjY29tcDog
-Y2hhbmdpbmcgZnJvbSB3aGl0ZWxpc3QgdG8gYmxhY2tsaXN0Li4uCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMxNTogRklMRTogdmwuYzoxMDQzOgorXkl9JAoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyOTUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi82OiBzZWNjb21wOiBh
-ZGQgb2Jzb2xldGUgYXJndW1lbnQgdG8gY29tbWFuZCBsaW5lLi4uCkVSUk9SOiAiZm9vICogYmFy
-IiBzaG91bGQgYmUgImZvbyAqYmFyIgojMTMxOiBGSUxFOiB2bC5jOjEwNDA6CisgICAgICAgIGNv
-bnN0IGNoYXIgKiB2YWx1ZSA9IE5VTEw7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhh
-dCAnLCcgKGN0eDpWeFYpCiMxMzM6IEZJTEU6IHZsLmM6MTA0MjoKKyAgICAgICAgdmFsdWUgPSBx
-ZW11X29wdF9nZXQob3B0cywib2Jzb2xldGUiKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTA4IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMv
-Njogc2VjY29tcDogYWRkIGVsZXZhdGVwcml2aWxlZ2VzIGFyZ3VtZW50IHRvIGNvbW1hbmQgbGlu
-ZS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM4NDogRklMRTog
-cWVtdS1zZWNjb21wLmM6MTI5OgorXkleSV5JXkkgIHByaXZpbGVnZWRfc3lzY2FsbHNbaV0ubnVt
-LCAwKTskCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMx
-MTk6IEZJTEU6IHZsLmM6MTA1MzoKKyAgICAgICAgdmFsdWUgPSBxZW11X29wdF9nZXQob3B0cywi
-ZWxldmF0ZXByaXZpbGVnZXMiKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNzogRklMRTogdmwu
-YzoxMDYxOgorXkleSS8qIGNhbGxpbmcgcHJjdGwgZGlyZWN0bHkgYmVjYXVzZSB3ZSdyZSQKCkVS
-Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyODogRklMRTogdmwuYzox
-MDYyOgorXkleSSAqIG5vdCBzdXJlIGlmIGhvc3QgaGFzIENBUF9TWVNfQURNSU4gc2V0Ki8kCgpF
-UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjk6IEZJTEU6IHZsLmM6
-MTA2MzoKK15JXklwcmN0bChQUl9TRVRfTk9fTkVXX1BSSVZTLCAxKTskCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMzA6IEZJTEU6IHZsLmM6MTA2NDoKK15JICAg
-IH0kCgp0b3RhbDogNiBlcnJvcnMsIDAgd2FybmluZ3MsIDk4IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNjogc2Vj
-Y29tcDogYWRkIHNwYXduIGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZS4uLgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3OTogRklMRTogcWVtdS1zZWNjb21wLmM6MTU0
-OgorXkleSV5JXkleSSAgc3Bhd25fc3lzY2FsbHNbaV0ucHJpb3JpdHkpOyQKCkVSUk9SOiBzcGFj
-ZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzEwNzogRklMRTogdmwuYzoxMDcx
-OgorICAgICAgICB2YWx1ZSA9IHFlbXVfb3B0X2dldChvcHRzLCJzcGF3biIpOwogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA4
-MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
-aGVja2luZyBQQVRDSCA1LzY6IHNlY2NvbXA6IGFkZCByZXNvdXJjZWNvbnRyb2wgYXJndW1lbnQg
-dG8gY29tbWFuZCBsaW5lLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4Mjog
-RklMRTogcWVtdS1zZWNjb21wLmM6MTc2OgorICAgICAgICAgICAgcmMgPSBzZWNjb21wX3J1bGVf
-YWRkKGN0eCwgU0NNUF9BQ1RfS0lMTCwgcmVzb3VyY2Vjb250cm9sX3N5c2NhbGxzW2ldLm51bSwg
-MCk7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM4NzogRklMRTog
-cWVtdS1zZWNjb21wLmM6MTgxOgorXkleSV5JXkleSSAgcmVzb3VyY2Vjb250cm9sX3N5c2NhbGxz
-W2ldLnByaW9yaXR5KTskCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0
-eDpWeFYpCiMxMTY6IEZJTEU6IHZsLmM6MTA4MjoKKyAgICAgICAgdmFsdWUgPSBxZW11X29wdF9n
-ZXQob3B0cywicmVzb3VyY2Vjb250cm9sIik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDkwIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvNjog
-c2VjY29tcDogYWRkaW5nIGRvY3VtZW50YXRpb24gdG8gbmV3IHNlY2NvbXAgbW9kZWwuLi4KPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
-cy5vcmc=
+
+--ybzeb565qdyb44zc
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello Pradeep, you might be interested in my work on refactoring the=20
+block layer's throttling interface in my series:
+https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04191.html
+
+In this series you copy the existing legacy interface we want to get rid=20
+of. I think it will be easier work for you to use the changes introduced=20
+in my patches when they are merged.=20
+
+Have you thought about using throttle groups? It'd mean many devices=20
+sharing the same limits. This way the interfaces can be unified.  Please=20
+read docs/throttle.txt and see if it would be useful for you.
+
+--ybzeb565qdyb44zc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAllot30ACgkQc2J8L2kN
+9xAP1w//W0fIc3CkxaeSSVbz22OpRK3Hs4GLLdC3Nzhh/bL1IoMcKL1jsnOZmuok
+dpm4fL/8eqKGDCTMu9fb0n8WrNMpaAqwYzLJCVBkDST7Mhl7MEsPbZrRoFRC1QVy
+bxxH2+EjXK5kCuiN1lLIQrYaCeWCSrJfzejFc7R56GH3GUkE3fyNci0xA872VLXV
+luy9McgdxENCYJ6nFuGdz81qbE/vqWyOMmZCfDwHp1NNvXqdFMfvgJAw1Tfu9/5m
+2hJydS7wpn84SdenjBozLpS4oCbDIVZLbTb7uzUOcn3ZqaxNiwqcfvYyzUpm5fgE
+TTUnjBRb9MNJXKtsuIZK17v0/y22XNGU9iQZeerjtwXdSKHeYrJrkud6uSIfRg1t
+OpXx2TgUEtVXw5H7UZndgEG3KL979qskRlBqQCiG/smQ9YaGjoY/7jj8ilfS3e3/
+Cvx9m90aI8r4A3GOccn8U+wgDqV+KUAWVKj/63jxQcP769m4gHiXOFGbYYPri7LZ
+sdW7lCpJrhLqkf0Kb6LhDAgWzfNusgrqIFbE5SiBOhGG8tjELz7tYr0gE7xLj8KS
+gymi0ikRmgGB+2sNlFuKlaHFcOcmKIceE6DzwzIhjVbU8vLXnPRNMwv2hBV3s/Ad
+bJIKunzjYGYNZ4SW3KY6h23X9OqY6KuZsmsD3h498RBPD6GpaGU=
+=gdPe
+-----END PGP SIGNATURE-----
+
+--ybzeb565qdyb44zc--
