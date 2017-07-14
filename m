@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW2W4-0006nT-VD
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:28:29 -0400
+	(envelope-from <mst@redhat.com>) id 1dW2YP-0001VC-IV
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW2W1-00016S-Pf
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:28:28 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:17922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW2W1-00015x-Ep
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:28:25 -0400
-References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170714122221.pyx2pwubtaylqdu6@postretch>
-	<e059cf44-53df-4d5f-3257-cc9b6be775df@huawei.com>
-	<20170714142639.ycu6b7qeeb7akxkb@postretch>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <3f128771-3400-ac00-7556-a99193bf604a@huawei.com>
-Date: Fri, 14 Jul 2017 17:27:47 +0200
+	(envelope-from <mst@redhat.com>) id 1dW2YL-000230-4y
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:30:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dW2YK-00022k-RT
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:30:49 -0400
+Date: Fri, 14 Jul 2017 18:30:45 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1500046217-24597-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170714142639.ycu6b7qeeb7akxkb@postretch>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v2] vmgenid-test: use boot-sector infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +24,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>
 
-On 7/14/2017 4:26 PM, Manos Pitsidianakis wrote:
-> On Fri, Jul 14, 2017 at 03:15:06PM +0200, Pradeep Jagadeesh wrote:
->> Hi Manos,
->>
->> Thanks for sharing the link to your code patch.
->>
->> On 7/14/2017 2:22 PM, Manos Pitsidianakis wrote:
->>> Hello Pradeep, you might be interested in my work on refactoring the
->>> block layer's throttling interface in my series:
->>> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04191.html
->> Sure will have a look.
->>> In this series you copy the existing legacy interface we want to get rid
->>> of. I think it will be easier work for you to use the changes introduced
->>> in my patches when they are merged.
->> So, should I wait till they are in?. Actually my throttle patches for
->> fsdev are already upstream (2.9). Now I am just introducing the
->> qmp/hmp interfaces for the same.
->
-> If you plan on using ThrottleGroups, probably yes, I think, because we'd
-> have duplicate interfaces afterwards instead of a unified one. You'd
-> have to introduce a qmp/hmp command to set fsdev throttle now and after
-> you use throttle groups it will become obsolete.
-I am not using ThrottleGroups in near future.
+There's no requirement for RSDP to be installed last
+by the firmware, so in rare cases vmgen id test hits
+a race: RSDP is there but VM GEN ID isn't.
 
--Pradeep
+To fix, switch to common boot sector infrastructure.
 
->
->>> Have you thought about using throttle groups? It'd mean many devices
->>> sharing the same limits. This way the interfaces can be unified.  Please
->>> read docs/throttle.txt and see if it would be useful for you.
->>
->> I have read about the throttle group, last year when I was
->> implementing the throttle feature for fsdev.My open source work
->> depends on the projects I/my group work on. So, when I have more
->> bandwidth work on those, I will surely take it up. Throttle group
->> option may be useful feature even in case of fsdev devices.
->>
->> Regards,
->> Pradeep
->>
->>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Ben Warren <ben@skyportsystems.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+
+Changes from v1
+    fix coding style violation reported by Peter
+
+ tests/vmgenid-test.c   | 46 ++++++++++++++++++++++++++++++----------------
+ tests/Makefile.include |  2 +-
+ 2 files changed, 31 insertions(+), 17 deletions(-)
+
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index e7ba38c..a49de92 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -15,6 +15,7 @@
+ #include "qemu/bitmap.h"
+ #include "qemu/uuid.h"
+ #include "hw/acpi/acpi-defs.h"
++#include "boot-sector.h"
+ #include "acpi-utils.h"
+ #include "libqtest.h"
+ 
+@@ -23,8 +24,6 @@
+                                   * OVMF SDT Header Probe Supressor
+                                   */
+ #define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address */
+-#define RSDP_SLEEP_US     100000   /* Sleep for 100ms between tries */
+-#define RSDP_TRIES_MAX    100      /* Max total time is 10 seconds */
+ 
+ typedef struct {
+     AcpiTableHeader header;
+@@ -47,14 +46,12 @@ static uint32_t acpi_find_vgia(void)
+     VgidTable vgid_table;
+     int i;
+ 
+-    /* Tables may take a short time to be set up by the guest */
+-    for (i = 0; i < RSDP_TRIES_MAX; i++) {
+-        rsdp_offset = acpi_find_rsdp_address();
+-        if (rsdp_offset < RSDP_ADDR_INVALID) {
+-            break;
+-        }
+-        g_usleep(RSDP_SLEEP_US);
+-    }
++    /* Wait for guest firmware to finish and start the payload. */
++    boot_sector_test();
++
++    /* Tables should be initialized now. */
++    rsdp_offset = acpi_find_rsdp_address();
++
+     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
+ 
+     acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
+@@ -131,6 +128,18 @@ static void read_guid_from_monitor(QemuUUID *guid)
+     QDECREF(rsp);
+ }
+ 
++static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
++
++static char *guid_cmd_strdup(const char *guid)
++{
++    return g_strdup_printf("-machine accel=tcg "
++                           "-device vmgenid,id=testvgid,guid=%s "
++                           "-drive id=hd0,if=none,file=%s,format=raw "
++                           "-device ide-hd,drive=hd0 ",
++                           guid, disk);
++}
++
++
+ static void vmgenid_set_guid_test(void)
+ {
+     QemuUUID expected, measured;
+@@ -138,8 +147,7 @@ static void vmgenid_set_guid_test(void)
+ 
+     g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
+ 
+-    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
+-                          "guid=%s", VGID_GUID);
++    cmd = guid_cmd_strdup(VGID_GUID);
+     qtest_start(cmd);
+ 
+     /* Read the GUID from accessing guest memory */
+@@ -152,10 +160,10 @@ static void vmgenid_set_guid_test(void)
+ 
+ static void vmgenid_set_guid_auto_test(void)
+ {
+-    const char *cmd;
++    char *cmd;
+     QemuUUID measured;
+ 
+-    cmd = "-machine accel=tcg -device vmgenid,id=testvgid," "guid=auto";
++    cmd = guid_cmd_strdup("auto");
+     qtest_start(cmd);
+ 
+     read_guid_from_memory(&measured);
+@@ -164,6 +172,7 @@ static void vmgenid_set_guid_auto_test(void)
+     g_assert(!qemu_uuid_is_null(&measured));
+ 
+     qtest_quit(global_qtest);
++    g_free(cmd);
+ }
+ 
+ static void vmgenid_query_monitor_test(void)
+@@ -173,8 +182,7 @@ static void vmgenid_query_monitor_test(void)
+ 
+     g_assert(qemu_uuid_parse(VGID_GUID, &expected) == 0);
+ 
+-    cmd = g_strdup_printf("-machine accel=tcg -device vmgenid,id=testvgid,"
+-                          "guid=%s", VGID_GUID);
++    cmd = guid_cmd_strdup(VGID_GUID);
+     qtest_start(cmd);
+ 
+     /* Read the GUID via the monitor */
+@@ -189,6 +197,11 @@ int main(int argc, char **argv)
+ {
+     int ret;
+ 
++    ret = boot_sector_init(disk);
++    if (ret) {
++        return ret;
++    }
++
+     g_test_init(&argc, &argv, NULL);
+ 
+     qtest_add_func("/vmgenid/vmgenid/set-guid",
+@@ -198,6 +211,7 @@ int main(int argc, char **argv)
+     qtest_add_func("/vmgenid/vmgenid/query-monitor",
+                    vmgenid_query_monitor_test);
+     ret = g_test_run();
++    boot_sector_cleanup(disk);
+ 
+     return ret;
+ }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 18cd06a..aef374b 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -761,7 +761,7 @@ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
+-tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/acpi-utils.o
++tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
+ 
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+-- 
+MST
