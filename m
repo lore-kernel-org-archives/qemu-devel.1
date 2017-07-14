@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVwV8-0003rQ-5h
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:03:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVwVE-0003wC-1G
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVwV7-0005yJ-9M
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:03:06 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37570)
+	(envelope-from <pm215@archaic.org.uk>) id 1dVwVD-00060e-4d
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:03:12 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37573)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dVwV6-0005xZ-UY
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:03:05 -0400
+	id 1dVwVC-00060O-TL
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:03:11 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 09:33:44 +0100
-Message-Id: <1500021225-4118-3-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 09:33:45 +0100
+Message-Id: <1500021225-4118-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
 References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/3] configure: Use an explicit CONFIG_IVSHMEM
- rather than CONFIG_EVENTFD
+Subject: [Qemu-devel] [PATCH 3/3] configure: Don't build ivshmem tools
+ unless CONFIG_IVSHMEM is set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,67 @@ Cc: patches@linaro.org, Kamil Rytarowski <n54@gmx.com>, Markus Armbruster <armbr
 
 From: Kamil Rytarowski <n54@gmx.com>
 
-Rather than relying on everywhere that cares about whether the host
-supports ivshmem using CONFIG_EVENTFD, make configure set an explicit
-CONFIG_IVSHMEM.
+Don't try to build the ivshmem-server and ivshmem-client tools unless
+CONFIG_IVSHMEM is set.
+
+This fixes in passing a build bug on NetBSD, which fails to build the
+ivshmem tools because they use shm_open() and on NetBSD that requires
+linking against -lrt.
 
 Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-[PMM: split out from another patch, add commit message]
+[PMM: moved some code into earlier patches; minor bugfixes;
+ added commit message]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- configure               | 9 +++++++++
- tests/Makefile.include  | 4 ++--
- default-configs/pci.mak | 2 +-
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ configure     | 2 ++
+ Makefile      | 2 ++
+ Makefile.objs | 4 ++--
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 5096cbc..dea46c5 100755
+index dea46c5..b54bc2e 100755
 --- a/configure
 +++ b/configure
-@@ -4969,6 +4969,11 @@ qemu_moddir=$libdir$confsuffix
- qemu_datadir=$datadir$confsuffix
- qemu_localedir="$datadir/locale"
- 
-+# We can only support ivshmem if we have eventfd
-+if [ "$eventfd" = "yes" ]; then
-+  ivshmem=yes
-+fi
-+
- tools=""
- if test "$want_tools" = "yes" ; then
+@@ -4979,6 +4979,8 @@ if test "$want_tools" = "yes" ; then
    tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
-@@ -5955,6 +5960,10 @@ if test "$have_static_assert" = "yes" ; then
-   echo "CONFIG_STATIC_ASSERT=y" >> $config_host_mak
+   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+     tools="qemu-nbd\$(EXESUF) $tools"
++  fi
++  if [ "$ivshmem" = "yes" ]; then
+     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
+   fi
  fi
+diff --git a/Makefile b/Makefile
+index 16a0430..5d5bd6a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -470,10 +470,12 @@ ifneq ($(EXESUF),)
+ qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+ endif
  
-+if test "$ivshmem" = "yes" ; then
-+  echo "CONFIG_IVSHMEM=y" >> $config_host_mak
-+fi
-+
- # Hold two types of flag:
- #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
- #                                     a thread we have a handle to
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 42e17e2..6d6cb74 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -201,7 +201,7 @@ gcov-files-pci-y += hw/display/virtio-gpu-pci.c
- gcov-files-pci-$(CONFIG_VIRTIO_VGA) += hw/display/virtio-vga.c
- check-qtest-pci-y += tests/intel-hda-test$(EXESUF)
- gcov-files-pci-y += hw/audio/intel-hda.c hw/audio/hda-codec.c
--check-qtest-pci-$(CONFIG_EVENTFD) += tests/ivshmem-test$(EXESUF)
-+check-qtest-pci-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
- gcov-files-pci-y += hw/misc/ivshmem.c
- check-qtest-pci-y += tests/megasas-test$(EXESUF)
- gcov-files-pci-y += hw/scsi/megasas.c
-@@ -303,7 +303,7 @@ check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
- check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
- check-qtest-ppc64-y += tests/numa-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_EVENTFD) += tests/ivshmem-test$(EXESUF)
-+check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
++ifdef CONFIG_IVSHMEM
+ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
++endif
+ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y)
+ 	$(call LINK, $^)
  
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+diff --git a/Makefile.objs b/Makefile.objs
+index bfd5a6c..24a4ea0 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -107,8 +107,8 @@ qga-vss-dll-obj-y = qga/
  
-diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-index 2451eb2..acaa703 100644
---- a/default-configs/pci.mak
-+++ b/default-configs/pci.mak
-@@ -41,6 +41,6 @@ CONFIG_SDHCI=y
- CONFIG_EDU=y
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
--CONFIG_IVSHMEM_DEVICE=$(CONFIG_EVENTFD)
-+CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
- CONFIG_ROCKER=y
- CONFIG_VHOST_USER_SCSI=$(CONFIG_LINUX)
+ ######################################################################
+ # contrib
+-ivshmem-client-obj-y = contrib/ivshmem-client/
+-ivshmem-server-obj-y = contrib/ivshmem-server/
++ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
++ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
+ libvhost-user-obj-y = contrib/libvhost-user/
+ vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
+ vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
 -- 
 2.7.4
