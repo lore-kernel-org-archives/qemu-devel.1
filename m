@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYg-0000Nq-QG
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYg-0000Nv-Qq
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYb-00052N-Qz
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYe-00053T-2i
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:50 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35965)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dVxYb-000525-Ik
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:45 -0400
-Received: by mail-wr0-x243.google.com with SMTP id 77so11332395wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:45 -0700 (PDT)
+	id 1dVxYd-00053B-OA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:48 -0400
+Received: by mail-wm0-x242.google.com with SMTP id p204so9958224wmg.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:47 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 14 Jul 2017 12:10:21 +0200
-Message-Id: <1500027028-4127-10-git-send-email-pbonzini@redhat.com>
+Date: Fri, 14 Jul 2017 12:10:23 +0200
+Message-Id: <1500027028-4127-12-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
 References: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 48/55] virtio-scsi: Convert to DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PULL 50/55] virtio-crypto: Convert to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +32,106 @@ Cc: Fam Zheng <famz@redhat.com>
 
 From: Fam Zheng <famz@redhat.com>
 
+Unlike other object_property_add_link() occurrences in virtio devices,
+virtio-crypto checks the "in use" state of the linked backend object in
+addition to qdev_prop_allow_set_link_before_realize. To convert it
+without needing to specialize DEFINE_PROP_LINK which always uses the
+qdev callback, move the "in use" check to device realize time.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170714021509.23681-8-famz@redhat.com>
+Message-Id: <20170714021509.23681-10-famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/s390x/virtio-ccw.c  |  2 --
- hw/scsi/virtio-scsi.c  | 13 ++-----------
- hw/virtio/virtio-pci.c |  2 --
- 3 files changed, 2 insertions(+), 15 deletions(-)
+ hw/s390x/virtio-ccw.c         |  3 ---
+ hw/virtio/virtio-crypto-pci.c |  2 --
+ hw/virtio/virtio-crypto.c     | 27 +++++++--------------------
+ 3 files changed, 7 insertions(+), 25 deletions(-)
 
 diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index a0437d1..c5e0606 100644
+index a492d0f..c07ddb1 100644
 --- a/hw/s390x/virtio-ccw.c
 +++ b/hw/s390x/virtio-ccw.c
-@@ -950,8 +950,6 @@ static void virtio_ccw_scsi_instance_init(Object *obj)
+@@ -1594,9 +1594,6 @@ static void virtio_ccw_crypto_instance_init(Object *obj)
+     ccw_dev->force_revision_1 = true;
+     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+                                 TYPE_VIRTIO_CRYPTO);
+-
+-    object_property_add_alias(obj, "cryptodev", OBJECT(&dev->vdev),
+-                              "cryptodev", &error_abort);
+ }
+ 
+ static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/virtio/virtio-crypto-pci.c b/hw/virtio/virtio-crypto-pci.c
+index 422aca3..bf64996 100644
+--- a/hw/virtio/virtio-crypto-pci.c
++++ b/hw/virtio/virtio-crypto-pci.c
+@@ -62,8 +62,6 @@ static void virtio_crypto_initfn(Object *obj)
  
      virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_SCSI);
--    object_property_add_alias(obj, "iothread", OBJECT(&dev->vdev), "iothread",
--                              &error_abort);
+                                 TYPE_VIRTIO_CRYPTO);
+-    object_property_add_alias(obj, "cryptodev", OBJECT(&dev->vdev),
+-                              "cryptodev", &error_abort);
  }
  
- #ifdef CONFIG_VHOST_SCSI
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index d076fe7..eb63944 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -898,16 +898,6 @@ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
-     virtio_scsi_dataplane_setup(s, errp);
- }
+ static const TypeInfo virtio_crypto_pci_info = {
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+index 2590893..19c82e0 100644
+--- a/hw/virtio/virtio-crypto.c
++++ b/hw/virtio/virtio-crypto.c
+@@ -781,6 +781,11 @@ static void virtio_crypto_device_realize(DeviceState *dev, Error **errp)
+     if (vcrypto->cryptodev == NULL) {
+         error_setg(errp, "'cryptodev' parameter expects a valid object");
+         return;
++    } else if (cryptodev_backend_is_used(vcrypto->cryptodev)) {
++        char *path = object_get_canonical_path_component(OBJECT(vcrypto->conf.cryptodev));
++        error_setg(errp, "can't use already used cryptodev backend: %s", path);
++        g_free(path);
++        return;
+     }
  
--static void virtio_scsi_instance_init(Object *obj)
--{
--    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(obj);
--
--    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
--                             (Object **)&vs->conf.iothread,
--                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE, &error_abort);
--}
--
- void virtio_scsi_common_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-@@ -935,6 +925,8 @@ static Property virtio_scsi_properties[] = {
-                                            VIRTIO_SCSI_F_HOTPLUG, true),
-     DEFINE_PROP_BIT("param_change", VirtIOSCSI, host_features,
-                                                 VIRTIO_SCSI_F_CHANGE, true),
-+    DEFINE_PROP_LINK("iothread", VirtIOSCSI, parent_obj.conf.iothread,
-+                     TYPE_IOTHREAD, IOThread *),
+     vcrypto->max_queues = MAX(vcrypto->cryptodev->conf.peers.queues, 1);
+@@ -845,6 +850,8 @@ static const VMStateDescription vmstate_virtio_crypto = {
+ };
+ 
+ static Property virtio_crypto_properties[] = {
++    DEFINE_PROP_LINK("cryptodev", VirtIOCrypto, conf.cryptodev,
++                     TYPE_CRYPTODEV_BACKEND, CryptoDevBackend *),
      DEFINE_PROP_END_OF_LIST(),
  };
  
-@@ -989,7 +981,6 @@ static const TypeInfo virtio_scsi_info = {
-     .name = TYPE_VIRTIO_SCSI,
-     .parent = TYPE_VIRTIO_SCSI_COMMON,
-     .instance_size = sizeof(VirtIOSCSI),
--    .instance_init = virtio_scsi_instance_init,
-     .class_init = virtio_scsi_class_init,
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_HOTPLUG_HANDLER },
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 94f72f3..cc69fe3 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -2069,8 +2069,6 @@ static void virtio_scsi_pci_instance_init(Object *obj)
- 
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_SCSI);
--    object_property_add_alias(obj, "iothread", OBJECT(&dev->vdev), "iothread",
--                              &error_abort);
+@@ -888,20 +895,6 @@ static void virtio_crypto_class_init(ObjectClass *klass, void *data)
+     vdc->reset = virtio_crypto_reset;
  }
  
- static const TypeInfo virtio_scsi_pci_info = {
+-static void
+-virtio_crypto_check_cryptodev_is_used(const Object *obj, const char *name,
+-                                      Object *val, Error **errp)
+-{
+-    if (cryptodev_backend_is_used(CRYPTODEV_BACKEND(val))) {
+-        char *path = object_get_canonical_path_component(val);
+-        error_setg(errp,
+-            "can't use already used cryptodev backend: %s", path);
+-        g_free(path);
+-    } else {
+-        qdev_prop_allow_set_link_before_realize(obj, name, val, errp);
+-    }
+-}
+-
+ static void virtio_crypto_instance_init(Object *obj)
+ {
+     VirtIOCrypto *vcrypto = VIRTIO_CRYPTO(obj);
+@@ -911,12 +904,6 @@ static void virtio_crypto_instance_init(Object *obj)
+      * Can be overriden with virtio_crypto_set_config_size.
+      */
+     vcrypto->config_size = sizeof(struct virtio_crypto_config);
+-
+-    object_property_add_link(obj, "cryptodev",
+-                             TYPE_CRYPTODEV_BACKEND,
+-                             (Object **)&vcrypto->conf.cryptodev,
+-                             virtio_crypto_check_cryptodev_is_used,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
+ }
+ 
+ static const TypeInfo virtio_crypto_info = {
 -- 
 1.8.3.1
