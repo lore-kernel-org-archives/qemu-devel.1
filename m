@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVxdj-0005XT-IR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:04 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVxdk-0005Xf-0O
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVxdf-0007Fw-Gc
+	(envelope-from <berrange@redhat.com>) id 1dVxdi-0007J1-St
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42280)
+Received: from mx1.redhat.com ([209.132.183.28]:46010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVxdf-0007Fg-A6
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:15:59 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVxdi-0007Ik-JM
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:02 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 14 Jul 2017 11:15:47 +0100
-Message-Id: <20170714101549.28665-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 0/2] Document deprecated features & support
- lifecycle
+Date: Fri, 14 Jul 2017 11:15:48 +0100
+Message-Id: <20170714101549.28665-2-berrange@redhat.com>
+In-Reply-To: <20170714101549.28665-1-berrange@redhat.com>
+References: <20170714101549.28665-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/2] docs: document support lifetime for
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +27,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-This is a followup to
+There is currently no explicit guidance on the duration of support
+for features such as versioned machine types, which have a finite
+useful lifespan. Thus apps / users cannot predict how much time
+they might be able to use a feature for, before it is removed (if
+ever).
 
-  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02390.html
-  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01286.html
-  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00651.html
+This adds a new appendix that lists items which have finite lifecycles,
+such as machine types. For items which are generally expected to be
+supported indefinitely, it sets out the policy around deprecation
+and removal, should it be needed.
 
-I would really strongly like to see this documented in time for the
-2.10 release, so that we can start the clock ticking on our deprecation
-policy and thus actually delete some stuff in the not too distant
-future.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ qemu-doc.texi | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-The goal is to clarify to users & app developers what they can expect
-from QEMU in terms of feature lifecycle & any deprecation policy should
-it be neccessary to remove features.
-
-The list of features marked as deprecated was determined by looking at
-the QEMU source for the word "deprecated'. It was then compared with
-the doc Thomas put up at http://wiki.qemu.org/Features/LegacyRemoval
-
-Key differences with the wiki page that Thomas wrote up vs patch 2
-in this series
-
- - Deprecated features are given a fixed lifespan of 2 releases,
-   rather than listing deletion at a future "major" v3.0.0 release.
-   This ensures that applications like libvirt have a predictable
-   fixed amount of time to react to deprecations.
-
- - Only lists features which are currently officially deprecated,
-   no list of possible future candidates. The wiki page is probably
-   a good place to maintain a list of future possible deprecations.
-   To turn them into actual deprecations, a patch to the QEMU doc
-   can then be posted & reviewed in the normal manner.
-
- - Not listing the '-6' and '-e' args to qemu-img create. Those
-   were never deprecations, because the functionality was
-   immediately turned into a fatal error. Patches to delete these
-   have been merged now
-
-Changed in v4:
-
- - Misc typos / wording clarification (Thomas)
-
-Changed in v3:
-
- - Rename appendix to "Deprecated features" (Markus)
- - List all currently deprecated features
- - Document that deprecated features will be removed after
-   2 releases of being deprecated
- - Clarify that clock for removing historically deprecated
-   features starts with the forthcoming release.
-
-Changed in v2:
-
- - Split into 2 patches so we can consider each suggested addition
-   independantly.
-
-Daniel P. Berrange (2):
-  docs: document support lifetime for features
-  docs: document deprecated features in appendix
-
- qemu-doc.texi | 205 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 205 insertions(+)
-
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 48af5155c7..f067015d4b 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -38,6 +38,7 @@
+ * QEMU Guest Agent::
+ * QEMU User space emulator::
+ * Implementation notes::
++* Support lifetime::
+ * License::
+ * Index::
+ @end menu
+@@ -3128,6 +3129,42 @@ Run the emulation in single step mode.
+ 
+ @include qemu-tech.texi
+ 
++@node Support lifetime
++@appendix Support lifetime
++
++In general features are intended to be supported indefinitely once
++introduced into QEMU.
++
++In the event that a feature needs to be removed, it will be listed
++in the ``Deprecated features'' appendix of this document. The feature
++will remain functional for 2 major releases prior to actual removal.
++
++Deprecated features may also generate warnings on the console when
++QEMU starts up, or if activated via a monitor command, however,
++this is not a mandatory requirement.
++
++Certain features have an inherently finite lifetime, and thus
++will be removed on a fixed schedule, without following the normal
++deprecation process. Such features are listed in the sections
++that follow.
++
++@node Machine types
++@section Machine types
++
++For architectures which aim to support live migration compatibility
++across releases, each release will introduce a new versioned machine
++type. For example, the 2.8.0 release introduced machine types
++``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
++
++To allow live migration of a guest running on a 2.8.0 release to a
++2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
++``pc-q35-2.8''. To allow users live migrating VMs to skip multiple
++intermediate releases when upgrading, new releases of QEMU will
++support machine types from many previous versions.
++
++The supported lifetime for versioned machine types is 12 releases,
++which is equivalent to 4 years worth of previous QEMU releases.
++
+ @node License
+ @appendix License
+ 
 -- 
 2.13.0
