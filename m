@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYj-0000Qb-OM
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:54 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYk-0000R1-7h
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYi-00056C-Nt
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:53 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35089)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dVxYj-00056W-BA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:54 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33588)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dVxYi-00055R-33
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:52 -0400
-Received: by mail-wm0-x244.google.com with SMTP id u23so9970259wma.2
+	id 1dVxYj-000561-0G
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:10:53 -0400
+Received: by mail-wr0-x241.google.com with SMTP id g46so1016827wrd.0
 	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:10:52 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 14 Jul 2017 12:10:27 +0200
-Message-Id: <1500027028-4127-16-git-send-email-pbonzini@redhat.com>
+Date: Fri, 14 Jul 2017 12:10:28 +0200
+Message-Id: <1500027028-4127-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
 References: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 54/55] cpu: Convert to DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PULL 55/55] spapr_rng: Convert to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +33,42 @@ Cc: Fam Zheng <famz@redhat.com>
 From: Fam Zheng <famz@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170714021509.23681-20-famz@redhat.com>
+Message-Id: <20170714021509.23681-21-famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c            | 27 +++++++++++++++------------
- include/qom/cpu.h |  1 +
- qom/cpu.c         |  1 +
- 3 files changed, 17 insertions(+), 12 deletions(-)
+ hw/ppc/spapr_rng.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index b3c080f..01ac21e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -27,6 +27,7 @@
- #include "exec/target_page.h"
- #include "tcg.h"
- #include "hw/qdev-core.h"
-+#include "hw/qdev-properties.h"
- #if !defined(CONFIG_USER_ONLY)
- #include "hw/boards.h"
- #include "hw/xen/xen.h"
-@@ -737,6 +738,20 @@ void cpu_exec_unrealizefn(CPUState *cpu)
-     }
- }
+diff --git a/hw/ppc/spapr_rng.c b/hw/ppc/spapr_rng.c
+index 80515eb..d2acd61 100644
+--- a/hw/ppc/spapr_rng.c
++++ b/hw/ppc/spapr_rng.c
+@@ -96,17 +96,11 @@ static target_ulong h_random(PowerPCCPU *cpu, sPAPRMachineState *spapr,
  
-+Property cpu_common_props[] = {
-+#ifndef CONFIG_USER_ONLY
-+    /* Create a memory property for softmmu CPU object,
-+     * so users can wire up its memory. (This can't go in qom/cpu.c
-+     * because that file is compiled only once for both user-mode
-+     * and system builds.) The default if no link is set up is to use
-+     * the system address space.
-+     */
-+    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+#endif
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- void cpu_exec_initfn(CPUState *cpu)
+ static void spapr_rng_instance_init(Object *obj)
  {
-     cpu->as = NULL;
-@@ -744,18 +759,6 @@ void cpu_exec_initfn(CPUState *cpu)
- 
- #ifndef CONFIG_USER_ONLY
-     cpu->thread_id = qemu_get_thread_id();
+-    sPAPRRngState *rngstate = SPAPR_RNG(obj);
 -
--    /* This is a softmmu CPU object, so create a property for it
--     * so users can wire up its memory. (This can't go in qom/cpu.c
--     * because that file is compiled only once for both user-mode
--     * and system builds.) The default if no link is set up is to use
--     * the system address space.
--     */
--    object_property_add_link(OBJECT(cpu), "memory", TYPE_MEMORY_REGION,
--                             (Object **)&cpu->memory,
--                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
--                             &error_abort);
-     cpu->memory = system_memory;
-     object_ref(OBJECT(cpu->memory));
- #endif
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index d3c783b..04c31e6 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -1013,6 +1013,7 @@ AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx);
+     if (object_resolve_path_type("", TYPE_SPAPR_RNG, NULL) != NULL) {
+         error_report("spapr-rng can not be instantiated twice!");
+         return;
+     }
  
- void QEMU_NORETURN cpu_abort(CPUState *cpu, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
-+extern Property cpu_common_props[];
- void cpu_exec_initfn(CPUState *cpu);
- void cpu_exec_realizefn(CPUState *cpu, Error **errp);
- void cpu_exec_unrealizefn(CPUState *cpu);
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 8757f03..a39ff6c 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -458,6 +458,7 @@ static void cpu_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-     dc->realize = cpu_common_realizefn;
-     dc->unrealize = cpu_common_unrealizefn;
-+    dc->props = cpu_common_props;
-     /*
-      * Reason: CPUs still need special care by board code: wiring up
-      * IRQs, adding reset handlers, halting non-first CPUs, ...
+-    object_property_add_link(obj, "rng", TYPE_RNG_BACKEND,
+-                             (Object **)&rngstate->backend,
+-                             object_property_allow_set_link,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
+     object_property_set_description(obj, "rng",
+                                     "ID of the random number generator backend",
+                                     NULL);
+@@ -163,6 +157,8 @@ int spapr_rng_populate_dt(void *fdt)
+ 
+ static Property spapr_rng_properties[] = {
+     DEFINE_PROP_BOOL("use-kvm", sPAPRRngState, use_kvm, false),
++    DEFINE_PROP_LINK("rng", sPAPRRngState, backend, TYPE_RNG_BACKEND,
++                     RngBackend *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 -- 
 1.8.3.1
