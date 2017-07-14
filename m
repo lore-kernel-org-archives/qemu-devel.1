@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dVxF8-00079U-V2
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:39 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVxFB-0007CG-RD
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dVxF4-0004i3-2s
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dVxF3-0004hW-Ja
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:33 -0400
-Message-ID: <1500025824.28252.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 14 Jul 2017 11:50:24 +0200
-In-Reply-To: <20170714015435-mutt-send-email-mst@kernel.org>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170713034755-mutt-send-email-mst@kernel.org>
-	<20170713152010.GS6020@localhost.localdomain>
-	<20170714015435-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVxF8-0004mv-Of
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:50:41 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri, 14 Jul 2017 12:50:27 +0300
+Message-Id: <150002582711.22386.191527630537864599.stgit@frigg.lan>
+In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v13 24/26] target/arm: [tcg] Port to disas_log
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-  Hi,
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
-> Removing the former might kind of work just this once on the
-> assumption
-> that we did not have real users back then, but fundamentally users
-> have
-> no safe way to upgrade machine types right now. It's stored in the
-> machine XML at install time and that's it, and reinstalling guests
-> is very painful.
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Benne=C3=A9 <alex.benee@linaro.org>
+---
+ target/arm/translate.c |   13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-You can easily change it using "virsh edit $domain", and improving
-virt-manager to offer some UI for that should be possible too.
-
-cheers,
-  Gerd
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f221cbee5d..507f51d001 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12135,6 +12135,15 @@ static void arm_tr_tb_stop(DisasContextBase *dcb=
+ase, CPUState *cpu)
+     }
+ }
+=20
++static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *c=
+pu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++
++    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
++    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
++                     dc->thumb | (dc->sctlr_b << 1));
++}
++
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ {
+@@ -12222,9 +12231,7 @@ void gen_intermediate_code(CPUState *cs, Translat=
+ionBlock *tb)
+         qemu_log_in_addr_range(dc->base.pc_first)) {
+         qemu_log_lock();
+         qemu_log("----------------\n");
+-        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+-        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_fir=
+st,
+-                         dc->thumb | (dc->sctlr_b << 1));
++        arm_tr_disas_log(&dc->base, cs);
+         qemu_log("\n");
+         qemu_log_unlock();
+     }
