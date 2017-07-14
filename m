@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVzPG-00068O-0x
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:09:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dVzQn-0007wd-JE
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVzP9-0000CY-SF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:09:14 -0400
-Received: from [2001:8b0:1d0::2] (port=37624 helo=orth.archaic.org.uk)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dVzP9-00005E-LW
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:09:07 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 12:12:23 +0100
-Message-Id: <1500030745-10619-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 0/2] slirp: handle errors in sosendoob()
+	(envelope-from <dgilbert@redhat.com>) id 1dVzQl-000108-0d
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:10:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVzQk-0000za-E5
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:10:46 -0400
+Date: Fri, 14 Jul 2017 13:10:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170714121040.GC2091@work-vm>
+References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH V2 1/4] net/colo-compare.c: Add checkpoint
+ min period to optimize performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,44 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@siemens.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-At the moment the slirp sosendoob() function doesn't properly
-handle errors from slirp_send(), and its callers don't do
-anything with its return value either. (Coverity spots the
-latter as CID 1005633.)
+* Zhang Chen (zhangchen.fnst@cn.fujitsu.com) wrote:
+> If colo-compare find out the first different packet that means
+> the following packet almost is different. we needn't do a lot
+> of checkpoint in this time, so we set the no-need-checkpoint
+> peroid, default just set 3 second.
+> 
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>  net/colo-compare.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 6d500e1..0f8e198 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -40,6 +40,9 @@
+>  /* TODO: Should be configurable */
+>  #define REGULAR_PACKET_CHECK_MS 3000
+>  
+> +/* TODO: Should be configurable */
 
-This patchset attempts to fix that. In the first patch we
-fix sosendoob() itself so that we return errors to the caller
-and treat short writes as reducing the amount of urgent data
-to be sent. In the second patch we make the call in sowrite()
-treat any return form sosendoob() which didn't transfer all
-the urgent data as a "disconnect the socket" error in the
-same way that it already handles errors for writes of
-non-urgent data. The call to sosendoob() in sbappend() can
-safely ignore any failures as in this case sowrite() will be
-called shortly and will deal with them.
+Yes it should!
 
-Coding style: I've opted to stick with the tab-indent
-that the slirp code uses rather than reindent to QEMU standard.
-Happy to go the other way if the maintainer prefers.
+> +#define CHECKPOINT_MIN_TIME 3000
+> +
+>  /*
+>    + CompareState ++
+>    |               |
+> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+>      Packet *pkt = NULL;
+>      GList *result = NULL;
+>      int ret;
+> +    static int64_t checkpoint_time_ms;
+>  
+>      while (!g_queue_is_empty(&conn->primary_list) &&
+>             !g_queue_is_empty(&conn->secondary_list)) {
+> @@ -494,7 +498,14 @@ static void colo_compare_connection(void *opaque, void *user_data)
+>               */
+>              trace_colo_compare_main("packet different");
+>              g_queue_push_tail(&conn->primary_list, pkt);
+> -            /* TODO: colo_notify_checkpoint();*/
+> +
+> +            if (pkt->creation_ms - checkpoint_time_ms > CHECKPOINT_MIN_TIME) {
+> +                /*
+> +                 * TODO: Notify colo frame to do checkpoint.
+> +                 * colo_compare_inconsistent_notify();
+> +                 */
+> +                checkpoint_time_ms = pkt->creation_ms;
+> +            }
 
-Changes v1->v2:
- * since sosendoob() updates so->so_urgc, we need to
-   capture the old value to check that the write has
-   actually written what it is supposed to.
+You need to be careful how this interacts with the actual start of the
+checkpoint.   Lets say you have two miscompared packets close to each
+other:
 
-thanks
--- PMM
 
-Peter Maydell (2):
-  slirp: Handle error returns from slirp_send() in sosendoob()
-  slirp: Handle error returns from sosendoob()
+    miscompare!
+         checkpoint
+    miscompare!
+         ignore it because it was close to the 1st one
 
- slirp/sbuf.c   |  2 +-
- slirp/socket.c | 52 +++++++++++++++++++++++++++++++++++-----------------
- 2 files changed, 36 insertions(+), 18 deletions(-)
+   That means we never trigger the 2nd checkpoint and it'll carry on
+until the maximum checkpoint length.
 
--- 
-2.7.4
+   But also, I think you need to consider what happens to future packets
+being compared; you can't release any packets now until the checkpoint
+as soon as you know there's a miscompare.
+
+Dave
+
+>              break;
+
+
+>          }
+>      }
+> -- 
+> 2.7.4
+> 
+> 
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
