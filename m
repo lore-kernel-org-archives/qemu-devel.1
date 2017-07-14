@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVyCS-0004xc-AJ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:51:57 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCU-0004zF-0q
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:52:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dVyCN-0007Fj-Us
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:51:56 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVyCS-0007Nu-B3
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:51:58 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 11:51:18 +0100
-Message-Id: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 11:51:25 +0100
+Message-Id: <1500029487-14822-8-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
+References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/9] ARM: implement MPS2 board (with 2 FPGA
- flavours)
+Subject: [Qemu-devel] [PATCH v2 7/9] hw/arm/mps2: Add SCC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +25,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-This patchseries adds support for the ARM MPS2/MPS2+ dev board:
+Add the SCC to the MPS2 board models.
 
-The MPS2 and MPS2+ dev boards are FPGA based (the 2+ has a bigger
-FPGA but is otherwise the same as the 2). Since the CPU itself
-and most of the devices are in the FPGA, the details of the board
-as seen by the guest depend significantly on the FPGA image.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/arm/mps2.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-We model the following FPGA images:
- "mps2_an385" -- Cortex-M3 as documented in ARM Application Note AN385
- "mps2_an511" -- Cortex-M3 'DesignStart' as documented in AN511
-
-They are fairly similar but differ in the details for some
-peripherals.
-Further info and links to all the documentation for the
-board and the various FPGA images can be found here:
- https://developer.arm.com/products/system-design/development-boards/cortex-m-prototyping-system
-
-This patchset adds the boards themselves, and the UART, timer
-and system-controller devices they need. There are a number
-of other devices on the board which are not yet modelled
-(notably more GPIOs, a watchdog, another different kind of timer,
-and a display device), but this minimal set is sufficient to
-boot the "hello world" binary of the Zephyr RTOS and the
-"blinky" binary of the mbed RTOS.
-[To run the zephyr binary you also need this fix:
-  http://patchwork.ozlabs.org/patch/782811/
- which is in the target-arm pullreq I just sent so should
- get into master in a few days.]
-
-We can add more devices to the model later, but I figured
-this was a sufficient place to start.
-
-The underlying motivation here is that the v8M work that I
-have planned will need a board, and there is a v8M FPGA
-image for the MPS2 that we can use. It's also perhaps a more
-useful M profile board for general purposes than the stellaris
-boards (64K RAM) or the Netduino2 (128K RAM), since it has
-16MB of RAM.
-
-Changes v1->v2:
- * fixed handling of ID register arrays in uart and timer devices
- * moved variable declarations to top of function
- * removed stray braces
- * log guest error if Tx enabled with bad baudrate
- * fixed cut-n-paste error in mps2-scc.h header comment
- * added ethernet support (I actually wrote this patch earlier
-   but forgot to put it in v1 ;-))
- * added MAINTAINERS file entries
-
-Non-change:
- * I've stuck with the naming of types/files/boards in the
-   first patch, because after consideration I still think
-   this is the best choice overall.
-
-Patches which still need review: 1, 2, 8, 9
-
-I'd quite like to get this into 2.10 if possible
-(softfreeze deadline rapidly approaching) so if people
-have time to review before tuesday that would be great.
-
-thanks
--- PMM
-
-Peter Maydell (9):
-  hw/arm/mps2: Implement skeleton mps2-an385 and mps2-an511 board models
-  hw/char/cmsdk-apb-uart.c: Implement CMSDK APB UART
-  hw/arm/mps2: Add UARTs
-  hw/char/cmsdk-apb-timer: Implement CMSDK APB timer device
-  hw/arm/mps2: Add timers
-  hw/misc/mps2_scc: Implement MPS2 Serial Communication Controller
-  hw/arm/mps2: Add SCC
-  hw/arm/mps2: Add ethernet
-  MAINTAINERS: Add entries for MPS2 board
-
- hw/arm/Makefile.objs               |   1 +
- hw/char/Makefile.objs              |   1 +
- hw/misc/Makefile.objs              |   1 +
- hw/timer/Makefile.objs             |   1 +
- include/hw/char/cmsdk-apb-uart.h   |  78 +++++++
- include/hw/misc/mps2-scc.h         |  43 ++++
- include/hw/timer/cmsdk-apb-timer.h |  59 ++++++
- hw/arm/mps2.c                      | 384 +++++++++++++++++++++++++++++++++++
- hw/char/cmsdk-apb-uart.c           | 402 +++++++++++++++++++++++++++++++++++++
- hw/misc/mps2-scc.c                 | 310 ++++++++++++++++++++++++++++
- hw/timer/cmsdk-apb-timer.c         | 253 +++++++++++++++++++++++
- MAINTAINERS                        |  14 +-
- default-configs/arm-softmmu.mak    |   6 +
- hw/char/trace-events               |   9 +
- hw/misc/trace-events               |   8 +
- hw/timer/trace-events              |   5 +
- 16 files changed, 1574 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/char/cmsdk-apb-uart.h
- create mode 100644 include/hw/misc/mps2-scc.h
- create mode 100644 include/hw/timer/cmsdk-apb-timer.h
- create mode 100644 hw/arm/mps2.c
- create mode 100644 hw/char/cmsdk-apb-uart.c
- create mode 100644 hw/misc/mps2-scc.c
- create mode 100644 hw/timer/cmsdk-apb-timer.c
-
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 0de0ffcb..bdc631a 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -34,6 +34,7 @@
+ #include "hw/misc/unimp.h"
+ #include "hw/char/cmsdk-apb-uart.h"
+ #include "hw/timer/cmsdk-apb-timer.h"
++#include "hw/misc/mps2-scc.h"
+ 
+ typedef enum MPS2FPGAType {
+     FPGA_AN385,
+@@ -44,6 +45,7 @@ typedef struct {
+     MachineClass parent;
+     MPS2FPGAType fpga_type;
+     const char *cpu_model;
++    uint32_t scc_id;
+ } MPS2MachineClass;
+ 
+ typedef struct {
+@@ -60,6 +62,7 @@ typedef struct {
+     MemoryRegion blockram_m2;
+     MemoryRegion blockram_m3;
+     MemoryRegion sram;
++    MPS2SCC scc;
+ } MPS2MachineState;
+ 
+ #define TYPE_MPS2_MACHINE "mps2"
+@@ -103,7 +106,7 @@ static void mps2_common_init(MachineState *machine)
+     MPS2MachineState *mms = MPS2_MACHINE(machine);
+     MPS2MachineClass *mmc = MPS2_MACHINE_GET_CLASS(machine);
+     MemoryRegion *system_memory = get_system_memory();
+-    DeviceState *armv7m;
++    DeviceState *armv7m, *sccdev;
+ 
+     if (!machine->cpu_model) {
+         machine->cpu_model = mmc->cpu_model;
+@@ -296,6 +299,16 @@ static void mps2_common_init(MachineState *machine)
+     cmsdk_apb_timer_create(0x40000000, qdev_get_gpio_in(armv7m, 8), SYSCLK_FRQ);
+     cmsdk_apb_timer_create(0x40001000, qdev_get_gpio_in(armv7m, 9), SYSCLK_FRQ);
+ 
++    object_initialize(&mms->scc, sizeof(mms->scc), TYPE_MPS2_SCC);
++    sccdev = DEVICE(&mms->scc);
++    qdev_set_parent_bus(armv7m, sysbus_get_default());
++    qdev_prop_set_uint32(sccdev, "scc-cfg4", 0x2);
++    qdev_prop_set_uint32(sccdev, "scc-aid", 0x02000008);
++    qdev_prop_set_uint32(sccdev, "scc-id", mmc->scc_id);
++    object_property_set_bool(OBJECT(&mms->scc), true, "realized",
++                             &error_fatal);
++    sysbus_mmio_map(SYS_BUS_DEVICE(sccdev), 0, 0x4002f000);
++
+     system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
+ 
+     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+@@ -318,6 +331,7 @@ static void mps2_an385_class_init(ObjectClass *oc, void *data)
+     mc->desc = "ARM MPS2 with AN385 FPGA image for Cortex-M3";
+     mmc->fpga_type = FPGA_AN385;
+     mmc->cpu_model = "cortex-m3";
++    mmc->scc_id = 0x41040000 | (385 << 4);
+ }
+ 
+ static void mps2_an511_class_init(ObjectClass *oc, void *data)
+@@ -328,6 +342,7 @@ static void mps2_an511_class_init(ObjectClass *oc, void *data)
+     mc->desc = "ARM MPS2 with AN511 DesignStart FPGA image for Cortex-M3";
+     mmc->fpga_type = FPGA_AN511;
+     mmc->cpu_model = "cortex-m3";
++    mmc->scc_id = 0x4104000 | (511 << 4);
+ }
+ 
+ static const TypeInfo mps2_info = {
 -- 
 2.7.4
