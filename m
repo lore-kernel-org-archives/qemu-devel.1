@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37390)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVxJ6-0001tn-UX
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:54:45 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38244)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1dVxLU-0003fD-Hw
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:57:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dVxJ3-0006WR-T2
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:54:45 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Fri, 14 Jul 2017 12:54:29 +0300
-Message-Id: <150002606914.22386.15524101311003685068.stgit@frigg.lan>
-In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v13 25/26] target/arm: [tcg,
- a64] Port to disas_log
+	(envelope-from <pl@kamp.de>) id 1dVxLS-000819-Tm
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:57:12 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:51273 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dVxLS-0007zk-L7
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:57:10 -0400
+From: Peter Lieven <pl@kamp.de>
+Date: Fri, 14 Jul 2017 11:56:38 +0200
+Message-Id: <1500026205-15542-3-git-send-email-pl@kamp.de>
+In-Reply-To: <1500026205-15542-1-git-send-email-pl@kamp.de>
+References: <1500026205-15542-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH V3 2/9] qapi/block-core: add Qcow2Compress
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>
 
-Incrementally paves the way towards using the generic instruction transla=
-tion
-loop.
-
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Peter Lieven <pl@kamp.de>
 ---
- target/arm/translate-a64.c |   14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ qapi/block-core.json | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index caeec69d93..5de7fbde29 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11380,6 +11380,16 @@ static void aarch64_tr_tb_stop(DisasContextBase =
-*dcbase, CPUState *cpu)
-     }
- }
-=20
-+static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
-+                                      CPUState *cpu)
-+{
-+    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index c437aa5..d6703a2 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2447,6 +2447,44 @@
+             '*encrypt': 'BlockdevQcow2Encryption' } }
+ 
+ ##
++# @Qcow2CompressFormat:
++# @zlib: standard zlib deflate compression
++#
++# Since: 2.10
++##
++{ 'enum': 'Qcow2CompressFormat',
++  'data': [ 'zlib' ] }
 +
-+    qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
-+    log_target_disas(cpu, dc->base.pc_first, dc->pc - dc->base.pc_first,
-+                     4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
-+}
++##
++# @Qcow2CompressZLib:
++#
++# Since: 2.10
++##
++{ 'struct': 'Qcow2CompressZLib',
++  'data': { } }
 +
- void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
-                                TranslationBlock *tb)
- {
-@@ -11461,9 +11471,7 @@ void gen_intermediate_code_a64(DisasContextBase *=
-dcbase, CPUState *cs,
-         qemu_log_in_addr_range(dc->base.pc_first)) {
-         qemu_log_lock();
-         qemu_log("----------------\n");
--        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
--        log_target_disas(cs, dc->base.pc_first, dc->pc - dc->base.pc_fir=
-st,
--                         4 | (bswap_code(dc->sctlr_b) ? 2 : 0));
-+        aarch64_tr_disas_log(&dc->base, cs);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
++##
++# @Qcow2Compress:
++#
++# Specifies the compression format and compression level that should
++# be used for compressed Qcow2 clusters.
++#
++# @format: specifies the compression format to use. (defaults to zlib)
++#
++# @level: specifies the compression level. 0 = default compression,
++#         1 = fastest compression, x = highest compresion (x may very between
++#         different compression formats)
++#
++# Since: 2.10
++##
++{ 'union': 'Qcow2Compress',
++  'base': { 'format': 'Qcow2CompressFormat',
++            '*level': 'uint8' },
++  'discriminator': 'format',
++  'data': { 'zlib': 'Qcow2CompressZLib' } }
++
++
++##
+ # @BlockdevOptionsSsh:
+ #
+ # @server:              host address
+-- 
+1.9.1
