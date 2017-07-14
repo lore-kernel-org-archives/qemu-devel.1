@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVqwB-0003uX-RL
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:06:40 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dVr08-00053s-2h
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dVqw6-0006l5-TC
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:06:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dVqw6-0006ku-N5
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:06:34 -0400
-Date: Fri, 14 Jul 2017 11:06:27 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170714030627.GE27284@pxdev.xzpeter.org>
-References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
-	<1499842423-21101-2-git-send-email-peterx@redhat.com>
-	<CAJ+F1CK6xti_5utnP+kb0dTEoT6m4DRCiumX-jhdvJ5SnZPmJw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CK6xti_5utnP+kb0dTEoT6m4DRCiumX-jhdvJ5SnZPmJw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] qdev: provide DEFINE_PROP_INT64()
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dVr07-0007oM-3O
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:10:43 -0400
+Message-ID: <1500001828.11655.1.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Fri, 14 Jul 2017 13:10:28 +1000
+In-Reply-To: <03821688-88ac-ca87-6cc4-85999fe4c1fc@kaod.org>
+References: <03821688-88ac-ca87-6cc4-85999fe4c1fc@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] CPU hotplug on POWER9 (TCG) fails in
+ ppc_radix64_handle_mmu_fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jul 13, 2017 at 04:05:32PM +0000, Marc-Andr=C3=A9 Lureau wrote:
+Hi Cedric,
 
-[...]
+On Wed, 2017-07-12 at 19:19 +0200, Cédric Le Goater wrote:
+> Hi, 
+> 
+> Today, if you try to hotplug a CPU on a POWER9 guest (TCG), it fails
+> with an assert on the LPCR_UPRT bit missing in
+> ppc_radix64_handle_mmu_fault()
+> 
+>   (qemu) device_add POWER9_v1.0-spapr-cpu-core,core-id=4,id=foo
+>   (qemu) [   12.766102] pseries-hotplug-cpu: Attempting to add CPU,
+> drc index: 10000004
+>   qemu-system-ppc64: ./target/ppc/mmu-radix64.c:204:
+> ppc_radix64_handle_mmu_fault: Assertion `ppc64_use_proc_tbl(cpu)'
+> failed.
+>   Aborted (core dumped)
+> 
+> The LPCR SPR is incorrectly set. I have hacked my way through to
+> make 
+> it work, by changing cpu_ppc_set_papr(), but this is really ugly and 
+> certainly wrong. 
 
-> > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-propertie=
-s.h
-> > index 0604c33..2939614 100644
-> > --- a/include/hw/qdev-properties.h
-> > +++ b/include/hw/qdev-properties.h
-> > @@ -13,6 +13,7 @@ extern PropertyInfo qdev_prop_uint16;
-> >  extern PropertyInfo qdev_prop_uint32;
-> >  extern PropertyInfo qdev_prop_int32;
-> >  extern PropertyInfo qdev_prop_uint64;
-> > +extern PropertyInfo qdev_prop_int64;
-> >  extern PropertyInfo qdev_prop_size;
-> >  extern PropertyInfo qdev_prop_string;
-> >  extern PropertyInfo qdev_prop_chr;
-> > @@ -127,6 +128,8 @@ extern PropertyInfo qdev_prop_arraylen;
-> >      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_int32, int32_t)
-> >  #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
-> >      DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
-> > +#define DEFINE_PROP_INT64(_n, _s, _f, _d)                      \
-> > +    DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_int64, int64_t)
-> >
->=20
->=20
-> Make it SIGNED, with that:
+Yes this is happening because the guest is radix (the bit is set in the
+process table) however the UPRT (use process tables) bit is not set in
+the LPCR, which is a requirement when in radix mode (there is no other
+way to translate addresses than to use process tables).
 
-Oops, definitely.
+Thus in the radix mmu emulation code the assert is failing (as you
+document above). I assume this is because when the hot-plugged cpu is
+added it is in the default state. For TCG at least the default state is
+assumed to be hash page tables (not radix). We set the UPRT bit in the
+LPCR and radix bit for the guest when handling the H_REGISTER_PROC_TBL
+hcall.
 
->=20
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> 
+> I would happy to cook the fix, as I need it for XIVE development.
+> What
+> would be the correct approach ?
 
-Thanks!
+I'm not sure what the code path is when hot plugging a cpu, but you
+would need to do some checks on the state of the guest and the other
+cpus and setup the cpu which you are adding appropriately. In this
+circumstance it would be checking if the guest is radix (there is
+already a function in target/ppc/mmu-book3s-v3.h ppc64_radix_guest())
+and setting up the cpu state for the new cpu appropriately (i.e.
+setting the LPCR bits).
 
---=20
-Peter Xu
+> 
+> Thanks,
+> 
+> C.
