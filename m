@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dVr08-00053s-2h
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:10:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dVrBq-0007sC-82
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1dVr07-0007oM-3O
-	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:10:43 -0400
-Message-ID: <1500001828.11655.1.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Fri, 14 Jul 2017 13:10:28 +1000
-In-Reply-To: <03821688-88ac-ca87-6cc4-85999fe4c1fc@kaod.org>
-References: <03821688-88ac-ca87-6cc4-85999fe4c1fc@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] CPU hotplug on POWER9 (TCG) fails in
- ppc_radix64_handle_mmu_fault
+	(envelope-from <jasowang@redhat.com>) id 1dVrBn-0003tX-3k
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:22:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52854)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dVrBm-0003tF-Tv
+	for qemu-devel@nongnu.org; Thu, 13 Jul 2017 23:22:47 -0400
+References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <80774faf-ebc4-4ffa-feb6-211b63495339@redhat.com>
+Date: Fri, 14 Jul 2017 11:22:39 +0800
+MIME-Version: 1.0
+In-Reply-To: <1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2 1/4] net/colo-compare.c: Add checkpoint
+ min period to optimize performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,57 +29,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hi Cedric,
 
-On Wed, 2017-07-12 at 19:19 +0200, Cédric Le Goater wrote:
-> Hi, 
-> 
-> Today, if you try to hotplug a CPU on a POWER9 guest (TCG), it fails
-> with an assert on the LPCR_UPRT bit missing in
-> ppc_radix64_handle_mmu_fault()
-> 
->   (qemu) device_add POWER9_v1.0-spapr-cpu-core,core-id=4,id=foo
->   (qemu) [   12.766102] pseries-hotplug-cpu: Attempting to add CPU,
-> drc index: 10000004
->   qemu-system-ppc64: ./target/ppc/mmu-radix64.c:204:
-> ppc_radix64_handle_mmu_fault: Assertion `ppc64_use_proc_tbl(cpu)'
-> failed.
->   Aborted (core dumped)
-> 
-> The LPCR SPR is incorrectly set. I have hacked my way through to
-> make 
-> it work, by changing cpu_ppc_set_papr(), but this is really ugly and 
-> certainly wrong. 
 
-Yes this is happening because the guest is radix (the bit is set in the
-process table) however the UPRT (use process tables) bit is not set in
-the LPCR, which is a requirement when in radix mode (there is no other
-way to translate addresses than to use process tables).
+On 2017=E5=B9=B407=E6=9C=8813=E6=97=A5 13:52, Zhang Chen wrote:
+> If colo-compare find out the first different packet that means
+> the following packet almost is different. we needn't do a lot
+> of checkpoint in this time, so we set the no-need-checkpoint
+> peroid, default just set 3 second.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 6d500e1..0f8e198 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -40,6 +40,9 @@
+>   /* TODO: Should be configurable */
+>   #define REGULAR_PACKET_CHECK_MS 3000
+>  =20
+> +/* TODO: Should be configurable */
+> +#define CHECKPOINT_MIN_TIME 3000
+> +
+>   /*
+>     + CompareState ++
+>     |               |
+> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, v=
+oid *user_data)
+>       Packet *pkt =3D NULL;
+>       GList *result =3D NULL;
+>       int ret;
+> +    static int64_t checkpoint_time_ms;
 
-Thus in the radix mmu emulation code the assert is failing (as you
-document above). I assume this is because when the hot-plugged cpu is
-added it is in the default state. For TCG at least the default state is
-assumed to be hash page tables (not radix). We set the UPRT bit in the
-LPCR and radix bit for the guest when handling the H_REGISTER_PROC_TBL
-hcall.
+Let's avoid static variable here since we support more than one compare=20
+instance.
 
-> 
-> I would happy to cook the fix, as I need it for XIVE development.
-> What
-> would be the correct approach ?
+Thanks
 
-I'm not sure what the code path is when hot plugging a cpu, but you
-would need to do some checks on the state of the guest and the other
-cpus and setup the cpu which you are adding appropriately. In this
-circumstance it would be checking if the guest is radix (there is
-already a function in target/ppc/mmu-book3s-v3.h ppc64_radix_guest())
-and setting up the cpu state for the new cpu appropriately (i.e.
-setting the LPCR bits).
-
-> 
-> Thanks,
-> 
-> C.
+>  =20
+>       while (!g_queue_is_empty(&conn->primary_list) &&
+>              !g_queue_is_empty(&conn->secondary_list)) {
+> @@ -494,7 +498,14 @@ static void colo_compare_connection(void *opaque, =
+void *user_data)
+>                */
+>               trace_colo_compare_main("packet different");
+>               g_queue_push_tail(&conn->primary_list, pkt);
+> -            /* TODO: colo_notify_checkpoint();*/
+> +
+> +            if (pkt->creation_ms - checkpoint_time_ms > CHECKPOINT_MIN=
+_TIME) {
+> +                /*
+> +                 * TODO: Notify colo frame to do checkpoint.
+> +                 * colo_compare_inconsistent_notify();
+> +                 */
+> +                checkpoint_time_ms =3D pkt->creation_ms;
+> +            }
+>               break;
+>           }
+>       }
