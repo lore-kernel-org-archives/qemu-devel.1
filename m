@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dW3lj-0007oz-8F
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dW3ur-0001zh-Me
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dW3li-0000f7-4E
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:43 -0400
-References: <20170713010555.6769-1-eblake@redhat.com>
-	<20170713010555.6769-15-eblake@redhat.com>
-	<6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6f6250a1-6fac-25b6-5b22-56a3e0f2df85@redhat.com>
-Date: Fri, 14 Jul 2017 11:48:30 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1dW3uo-0005gj-KJ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:58:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47766)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dW3uo-0005gG-BK
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:58:06 -0400
+Date: Fri, 14 Jul 2017 12:58:03 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1055983739.16609523.1500051483584.JavaMail.zimbra@redhat.com>
+In-Reply-To: <61a76ac4-23f9-7c99-92e5-8097516de2a9@amsat.org>
+References: <1499238885-26161-1-git-send-email-pbonzini@redhat.com>
+	<1499238885-26161-23-git-send-email-pbonzini@redhat.com>
+	<CAFEAcA-B+aChqZBSnGws7RXheEyg+cutaqvXP8qVgNoUgzQAJA@mail.gmail.com>
+	<4f304a14-572d-2835-cb0e-9d93c1c6dece@redhat.com>
+	<CAFEAcA-vuPxc0GZc4Her1Trtak-RL9wcMR1L9SGRhzGg3wUGEA@mail.gmail.com>
+	<55c62a5d-2ac5-4a89-f20a-100b19f8b0e9@redhat.com>
+	<61a76ac4-23f9-7c99-92e5-8097516de2a9@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM"
-Subject: Re: [Qemu-devel] [PATCH v5 14/18] qcow2: Switch qcow2_measure() to
- byte-based iteration
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 22/42] configure: factor out list of
+ supported Xen/KVM/HAX targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <6f6250a1-6fac-25b6-5b22-56a3e0f2df85@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 14/18] qcow2: Switch qcow2_measure() to
- byte-based iteration
-References: <20170713010555.6769-1-eblake@redhat.com>
- <20170713010555.6769-15-eblake@redhat.com>
- <6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
-In-Reply-To: <6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 07/13/2017 01:49 PM, John Snow wrote:
+
+----- Original Message -----
+> From: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> To: "Paolo Bonzini" <pbonzini@redhat.com>, "Peter Maydell" <peter.maydell=
+@linaro.org>
+> Cc: "Anthony PERARD" <anthony.perard@citrix.com>, "Stefano Stabellini" <s=
+stabellini@kernel.org>, "Alex Benn=C3=A9e"
+> <alex.bennee@linaro.org>, "QEMU Developers" <qemu-devel@nongnu.org>
+> Sent: Friday, July 14, 2017 5:26:36 PM
+> Subject: Re: [Qemu-devel] [PULL 22/42] configure: factor out list of supp=
+orted Xen/KVM/HAX targets
 >=20
+> what about this RFC series?
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg02513.html
+
+Too late for 2.10, but the way to go is to define a new "xenpv" target.
+In fact, --disable-tcg was the prerequisite for that if I remember correctl=
+y
+my old discussions with Citrix folks (could it have been Wei Liu?)
+
+Paolo
+
+> On 07/10/2017 01:28 PM, Paolo Bonzini wrote:
+> > On 10/07/2017 18:24, Peter Maydell wrote:
+> >> On 10 July 2017 at 17:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>> On 10/07/2017 17:49, Peter Maydell wrote:
+> >>>> On 5 July 2017 at 08:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>>>> This will be useful when the functions are called, early in the
+> >>>>> configure
+> >>>>> process, to filter out targets that do not support hardware
+> >>>>> acceleration.
+> >>>>>
+> >>>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >>>>
+> >>>>> +supported_xen_target() {
+> >>>>> +    test "$xen" =3D "yes" || return 1
+> >>>>> +    glob "$1" "*-softmmu" || return 1
+> >>>>> +    case "${1%-softmmu}:$cpu" in
+> >>>>> +        arm:arm | aarch64:aarch64 | \
+> >>>>> +        i386:i386 | i386:x86_64 | x86_64:i386 | x86_64:x86_64)
+> >>>>> +            return 0
+> >>>>> +        ;;
+> >>>>
+> >>>> This says that arm-on-arm and aarch64-on-aarch64 are supported
+> >>>> Xen targets...
+> >>>
+> >>> Hmm, this comes from my old patches.  IIRC the reason for the change,
+> >>> when it wasn't a change (many conflicts ago) was that Xen folks were
+> >>> using --disable-tcg because their device model for Xen PV on ARM was
+> >>> actually an x86_64 QEMU.
+> >>>
+> >>> Stefano and Anthony, is this still true?  If so, would it make sense =
+to
+> >>> add the Xen PV machine type to qemu-system-arm---that is, is it
+> >>> something you can whip up easily, or should I just remove that line?
+> >>
+> >> I think you should just fix configure for the moment, because
+> >> this patch wasn't supposed to change anything about what we
+> >> build (AIUI). We can think about changing the Xen PV on ARM
+> >> build setup as a separate thing if we want to, I suspect it
+> >> is more invasive than a couple of lines changing in configure.
+> >=20
+> > Yes, definitely more invasive.
+> >=20
+> > I'll prepare a fix.
+> >=20
+> > Paolo
+> >=20
 >=20
-> On 07/12/2017 09:05 PM, Eric Blake wrote:
->> This is new code, but it is easier to read if it makes passes over
->> the image using bytes rather than sectors (and will get easier in
->> the future when bdrv_get_block_status is converted to byte-based).
->>
->> While at it, fix a bug in the computation of nb_sectors using MAX
->> rather than MIN and thus always passing INT_MAX (thankfully, the
->> bug was harmless, as bdrv_get_block_status_above() clamps its
->> answers according to image size).
->>
->=20
-> Well, unless ssize was >=3D 2^40, and then it wouldn't have chosen
-> INT_MAX, right!?
-
-But then it would have wrapped the value around while assigning it to
-'int nb_sectors'.  I suppose for some very-interesting size images, you
-could get nb_sectors to turn into a negative value?  At any rate, it's
-good the bug was short-lived.
-
->=20
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZaPXeAAoJEKeha0olJ0NqdEcH/3XKe8ShfQEUwhJDbp+vDlD+
-t+hPwr+OwTu2+pfpNOP5HCVN2/shGwYbyJDz5VeKFLSwbcXNaL8epQw0IPBhdZN4
-QpI5su47TsbGZ9sxT3usMzBQ5WIjTTtVSfJSvqte6zYrsm2o8JOcNB9Oz+R8n1ti
-31rSE0AVk/0+BW/ceOyxaX/xkZNDX9P9uHlVs3UfctRsfdD0yWtynKBroHQYTS0e
-blQT9z3HLwjNLh6J1imLGVUK0shIYBcrM129zP+2PVASaP8VpuPhaVa6AIHlvqP5
-d1RLsseseeJbH4u2+7rZUVUkR1v4xoF50zgy5Mo8rCVP/t+4T9eLZ7VMa6jbg8w=
-=L3AK
------END PGP SIGNATURE-----
-
---7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM--
