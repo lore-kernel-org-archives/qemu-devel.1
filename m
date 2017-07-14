@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dW2HN-0006IX-1t
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:13:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dW2HY-0006T2-TG
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dW2HJ-0001nw-9F
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:13:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dW2HJ-0001nT-0q
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:13:13 -0400
-Date: Fri, 14 Jul 2017 16:13:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170714151307.GI28095@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170712161830.3621-1-berrange@redhat.com>
-	<CAFEAcA979j6Tw8=JAU0U1xTbxXmqj7pvo7sLvHfAv4k7OkCJYw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dW2HX-0001uO-GH
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:13:28 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dW2HX-0001ts-9S
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 11:13:27 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id v60so2628636wrc.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 08:13:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA979j6Tw8=JAU0U1xTbxXmqj7pvo7sLvHfAv4k7OkCJYw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v2 0/5] Merge sockets 2017/07/11
+In-Reply-To: <20170714061521.28300-1-david@gibson.dropbear.id.au>
+References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 16:13:05 +0100
+Message-ID: <CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
 
-On Fri, Jul 14, 2017 at 09:36:15AM +0100, Peter Maydell wrote:
-> On 12 July 2017 at 17:18, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > The following changes since commit 3d0bf8dfdfebd7f2ae41b6f220444b8047d6b1ee:
-> >
-> >   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20170710a' into staging (2017-07-10 18:13:03 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/berrange/qemu tags/pull-sockets-2017-07-11-2
-> >
-> > for you to fetch changes up to 4b1ac1b3abf0d07cd4d9f9011f12d62bff27154c:
-> >
-> >   tests: add functional test validating ipv4/ipv6 address flag handling (2017-07-12 16:49:00 +0100)
-> >
-> > ----------------------------------------------------------------
-> > Merge sockets 2017/07/11 v2
-> >
-> > ----------------------------------------------------------------
-> > Daniel P. Berrange (5):
-> >   sockets: ensure we can bind to both ipv4 & ipv6 separately
-> >   sockets: don't block IPv4 clients when listening on "::"
-> >   sockets: ensure we don't accept IPv4 clients when IPv4 is disabled
-> >   io: preserve ipv4/ipv6 flags when resolving InetSocketAddress
-> >   tests: add functional test validating ipv4/ipv6 address flag handling
-> 
-> This failed 'make check' on s390x host:
-> 
-> TEST: tests/test-sockets-proto... (pid=28872)
->   /sockets/migrate/wildcard/all:                                       OK
-> [...]
->   /sockets/chardev/::/ipv4onipv6on:                                    OK
->   /sockets/chardev/::/ipv4offipv6off:                                  OK
->   /sockets/net/wildcard/all:                                           **
-> ERROR:/home/linux1/qemu/tests/test-sockets-proto.c:849:test_listen:
-> assertion failed: (data->ipv4 == 0)
-> FAIL
-> GTester: last random seed: R02S575d305465be93e6120318b4f8434263
-> (pid=29314)
-> FAIL: tests/test-sockets-proto
+On 14 July 2017 at 07:15, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 49bcce4b9c11759678fd223aefb48691c4959d=
+4f:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-07-12'=
+ into staging (2017-07-13 16:56:06 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170714
+>
+> for you to fetch changes up to e11134d2ac7744569d7c387102368c507d340c30:
+>
+>   pseries: Allow HPT resizing with KVM (2017-07-14 09:28:30 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-07-14
+>
+> Two major batches in this set, rather than the usual collection of
+> assorted fixes.
+>
+>     * More DRC cleanup.  This gets the state management into a state
+>       which should fix many of the hotplug+migration problems we've
+>       had.  Plus it gets the migration stream format into something
+>       well defined and pretty minimal which we can reasonably support
+>       into the future.
+>
+>     * Hashed Page Table resizing.  It's been a while since this was
+>       posted, but it's been through several previous rounds of review.
+>       The kernel parts (both guest and host) are merged in 4.11, so
+>       this is the only remaining piece left to allow resizing of the
+>       HPT in a running guest.
+>
+> There are also a handful of unrelated fixes.
 
-Given the amount of trouble I've had making this test suite work reliably
-across all build envs, and the impeding freeze deadline, I've just decided
-to drop the test suite patch.
+Hi. I'm afraid this fails to build on the w32 compiler:
+  CC      ppc64-softmmu/hw/ppc/spapr.o
+/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
+=E2=80=98spapr_get_resize_hpt=E2=80=99:
+/home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2642:1: error:
+control reaches end of non-void functio
+n [-Werror=3Dreturn-type]
+ }
+ ^
 
-I'll queue the test suite again next cycle when I've more time to debug
-it.
+The compiler is confused (it doesn't realise that "assert(0)"
+cannot return), but you can make it happier like this:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 09b6ff0..68f936c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2638,7 +2638,7 @@ static char *spapr_get_resize_hpt(Object *obj,
+Error **errp)
+     case SPAPR_RESIZE_HPT_REQUIRED:
+         return g_strdup("required");
+     }
+-    assert(0);
++    g_assert_not_reached();
+ }
+
+ static void spapr_set_resize_hpt(Object *obj, const char *value, Error **e=
+rrp)
+
+
+I think g_assert_not_reached() is easier to read anyway; I
+always have to think for a moment about whether assert(0)
+or assert(1) is the "always assert" condition...
+
+thanks
+-- PMM
