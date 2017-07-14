@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dW7H8-000757-Qm
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:33:24 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dW7iB-00014e-Jk
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dW7H5-0002zG-GU
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:33:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dW7H5-0002ys-7H
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:33:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C862120FD
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 20:33:18 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 14 Jul 2017 17:33:13 -0300
-Message-Id: <20170714203313.31041-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] qapi: Fix error handling code on alternate
- conflict
+	(envelope-from <aurelien@aurel32.net>) id 1dW7iA-0002cV-JR
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:01:19 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:40846)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dW7iA-0002PC-CV
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 17:01:18 -0400
+Date: Fri, 14 Jul 2017 23:01:05 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170714210105.mchifmgphjjmaehz@aurel32.net>
+References: <20170710204521.2058-1-rth@twiddle.net>
+	<20170710204521.2058-2-rth@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170710204521.2058-2-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] target/s390x: Implement CSST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,153 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, david@redhat.com
 
-The conflict check added by commit c0644771 ("qapi: Reject
-alternates that can't work with keyval_parse()") doesn't work
-with the following declaration:
+On 2017-07-10 10:45, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  target/s390x/helper.h      |   1 +
+>  target/s390x/cpu_models.c  |   2 +
+>  target/s390x/mem_helper.c  | 189 +++++++++++++++++++++++++++++++++++++++++++++
+>  target/s390x/translate.c   |  13 +++-
+>  target/s390x/insn-data.def |   2 +
+>  5 files changed, 206 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index ede8471..513b402 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -1353,6 +1353,195 @@ void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
+>      env->regs[r1 + 1] = int128_getlo(oldv);
+>  }
+>  
+> +uint32_t HELPER(csst)(CPUS390XState *env, uint32_t r3, uint64_t a1, uint64_t a2)
+> +{
+> +#if !defined(CONFIG_USER_ONLY) || defined(CONFIG_ATOMIC128)
+> +    uint32_t mem_idx = cpu_mmu_index(env, false);
+> +#endif
+> +    uintptr_t ra = GETPC();
+> +    uint32_t fc = extract32(env->regs[0], 0, 8);
+> +    uint32_t sc = extract32(env->regs[0], 8, 8);
+> +    uint64_t pl = get_address(env, 1) & -16;
+> +    uint64_t svh, svl;
+> +    uint32_t cc;
+> +
+> +    /* Sanity check the function code and storage characteristic.  */
+> +    if (fc > 1 || sc > 3) {
+> +        if (!s390_has_feat(S390_FEAT_COMPARE_AND_SWAP_AND_STORE_2)) {
+> +            goto spec_exception;
+> +        }
+> +        if (fc > 2 || sc > 4 || (fc == 2 && (r3 & 1))) {
+> +            goto spec_exception;
+> +        }
+> +    }
+> +
+> +    /* Sanity check the alignments.  */
+> +    if (extract32(a1, 0, 4 << fc) || extract32(a2, 0, 1 << sc)) {
+> +        goto spec_exception;
+> +    }
+> +
+> +    /* Sanity check writability of the store address.  */
+> +#ifndef CONFIG_USER_ONLY
+> +    probe_write(env, a2, mem_idx, ra);
+> +#endif
+> +
+> +    /* Note that the compare-and-swap is atomic, and the store is atomic, but
+> +       the complete operation is not.  Therefore we do not need to assert serial
+> +       context in order to implement this.  That said, restart early if we can't
+> +       support either operation that is supposed to be atomic.  */
+> +    if (parallel_cpus) {
+> +        int mask = 0;
+> +#if !defined(CONFIG_ATOMIC64)
+> +        mask = -8;
+> +#elif !defined(CONFIG_ATOMIC128)
+> +        mask = -16;
+> +#endif
+> +        if (((4 << fc) | (1 << sc)) & mask) {
+> +            cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+> +        }
+> +    }
 
-  { 'alternate': 'Alt',
-    'data': { 'one': 'bool',
-              'two': 'str' } }
+This doesn't look correct. For a 16-byte store, ie sc = 4, and with
+ATOMIC128 support, ie mask = -16, the condition is true.
 
-It crashes with:
+> +    /* All loads happen before all stores.  For simplicity, load the entire
+> +       store value area from the parameter list.  */
+> +    svh = cpu_ldq_data_ra(env, pl + 16, ra);
+> +    svl = cpu_ldq_data_ra(env, pl + 24, ra);
+> +
+> +    switch (fc) {
+> +    case 0:
+> +        {
+> +            uint32_t nv = cpu_ldl_data_ra(env, pl, ra);
+> +            uint32_t cv = env->regs[r3];
+> +            uint32_t ov;
+> +
+> +            if (parallel_cpus) {
+> +#ifdef CONFIG_USER_ONLY
+> +                uint32_t *haddr = g2h(a1);
+> +                ov = atomic_cmpxchg__nocheck(haddr, cv, nv);
+> +#else
+> +                TCGMemOpIdx oi = make_memop_idx(MO_TEUL | MO_ALIGN, mem_idx);
+> +                ov = helper_atomic_cmpxchgl_be_mmu(env, a1, cv, nv, oi, ra);
+> +#endif
 
-  Traceback (most recent call last):
-    File "./scripts/qapi-types.py", line 295, in <module>
-      schema = QAPISchema(input_file)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
-      self.exprs = check_exprs(parser.exprs)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
-      check_alternate(expr, info)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
-      % (name, key, types_seen[qtype]))
-  KeyError: 'QTYPE_QSTRING'
+Not a problem with the patch itself, but how complicated would it be to
+make helper_atomic_cmpxchgl_be_mmu (just like the o version) available
+also in user mode? That would make less #ifdef in the backends.
 
-This happens because the previously-seen conflicting member
-('one') can't be found at types_seen[qtype], but at
-types_seen['QTYPE_BOOL'].
 
-Fix the bug by moving the error check to the same loop that adds
-new items to types_seen, raising an exception if types_seen[qt]
-is already set.
+The remaining of the patch looks all good to me.
 
-Add two additional test cases that can detect the bug.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/qapi.py                                       | 8 ++++----
- tests/Makefile.include                                | 2 ++
- tests/qapi-schema/alternate-conflict-bool-string.err  | 1 +
- tests/qapi-schema/alternate-conflict-bool-string.exit | 1 +
- tests/qapi-schema/alternate-conflict-bool-string.json | 4 ++++
- tests/qapi-schema/alternate-conflict-bool-string.out  | 0
- tests/qapi-schema/alternate-conflict-num-string.err   | 1 +
- tests/qapi-schema/alternate-conflict-num-string.exit  | 1 +
- tests/qapi-schema/alternate-conflict-num-string.json  | 4 ++++
- tests/qapi-schema/alternate-conflict-num-string.out   | 0
- tests/qapi-schema/alternate-multi-conflict.json       | 0
- 11 files changed, 18 insertions(+), 4 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.err
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.json
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.out
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.err
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.json
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.out
- create mode 100644 tests/qapi-schema/alternate-multi-conflict.json
-
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 84e2eb4..a9c12e5 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -824,11 +824,11 @@ def check_alternate(expr, info):
-             else:
-                 conflicting.add('QTYPE_QNUM')
-                 conflicting.add('QTYPE_QBOOL')
--        if conflicting & set(types_seen):
--            raise QAPISemError(info, "Alternate '%s' member '%s' can't "
--                               "be distinguished from member '%s'"
--                               % (name, key, types_seen[qtype]))
-         for qt in conflicting:
-+            if qt in types_seen:
-+                raise QAPISemError(info, "Alternate '%s' member '%s' can't "
-+                                   "be distinguished from member '%s'"
-+                                   % (name, key, types_seen[qt]))
-             types_seen[qt] = key
- 
- 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 42e17e2..40cf1dd 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -346,6 +346,8 @@ qapi-schema += alternate-conflict-dict.json
- qapi-schema += alternate-conflict-enum-bool.json
- qapi-schema += alternate-conflict-enum-int.json
- qapi-schema += alternate-conflict-string.json
-+qapi-schema += alternate-conflict-bool-string.json
-+qapi-schema += alternate-conflict-num-string.json
- qapi-schema += alternate-empty.json
- qapi-schema += alternate-nested.json
- qapi-schema += alternate-unknown.json
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.err b/tests/qapi-schema/alternate-conflict-bool-string.err
-new file mode 100644
-index 0000000..5c9af91
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-bool-string.json:3: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.exit b/tests/qapi-schema/alternate-conflict-bool-string.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.json b/tests/qapi-schema/alternate-conflict-bool-string.json
-new file mode 100644
-index 0000000..0544de1
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.json
-@@ -0,0 +1,4 @@
-+# alternate branches of 'str' type conflict with all scalar types
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'bool',
-+            'two': 'str' } }
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.out b/tests/qapi-schema/alternate-conflict-bool-string.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.err b/tests/qapi-schema/alternate-conflict-num-string.err
-new file mode 100644
-index 0000000..d8c6a88
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-num-string.json:3: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.exit b/tests/qapi-schema/alternate-conflict-num-string.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.json b/tests/qapi-schema/alternate-conflict-num-string.json
-new file mode 100644
-index 0000000..ae90144
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.json
-@@ -0,0 +1,4 @@
-+# alternate branches of 'str' type conflict with all scalar types
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'number',
-+            'two': 'str' } }
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/alternate-multi-conflict.json b/tests/qapi-schema/alternate-multi-conflict.json
-new file mode 100644
-index 0000000..e69de29
 -- 
-2.9.4
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
