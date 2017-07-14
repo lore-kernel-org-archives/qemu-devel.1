@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP6-0008Kn-Rl
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP7-0008Lw-W2
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP3-0003xe-NF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35628
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVyP4-0003yN-RH
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:05:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45560
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVyP3-0003xF-Gz
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:04:57 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1dVyP4-0003y1-MK
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:04:58 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EB4kNE084193
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:04:57 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpuk7tqwn-1
+	v6EB4jC5078193
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:04:58 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpmhws9yu-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:04:56 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:04:57 -0400
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 12:04:54 +0100
+	Fri, 14 Jul 2017 12:04:53 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:35 +0200
+Date: Fri, 14 Jul 2017 12:40:48 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-9-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 08/40] s390x/flic: introduce modify_ais_mode
- callback
+Message-Id: <1500028867-134709-22-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 21/40] pc-bios/s390-ccw: Add a write() function
+ for stdio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,238 +40,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Fei Li <sherrylf@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
 
-In order to emulate the adapter interruption suppression (AIS)
-facility properly, the guest needs to be able to modify the AIS mask.
-Interrupt suppression will be handled via the flic (for kvm, via a
-recently introduced kernel backend; for !kvm, in the flic code), so
-let's introduce a method to change the mode via the flic interface.
+The stdio functions from the SLOF libc need a write() function for
+printing text to stdout/stderr. Let's implement this function by
+refactoring the code from sclp_print().
 
-We introduce the 'simm' and 'nimm' fields to QEMUS390FLICState
-to store interruption modes for each ISC. Each bit in 'simm' and
-'nimm' targets one ISC, and collaboratively indicate three modes:
-ALL-Interruptions, SINGLE-Interruption and NO-Interruptions. This
-interface can initiate most transitions between the states; transition
-from SINGLE-Interruption to NO-Interruptions via adapter interrupt
-injection will be introduced in a following patch. The meaningful
-combinations are as follows:
-
-    interruption mode | simm bit | nimm bit
-    ------------------|----------|----------
-             ALL      |    0     |     0
-           SINGLE     |    1     |     0
-             NO       |    1     |     1
-
-Co-authored-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Signed-off-by: Fei Li <sherrylf@linux.vnet.ibm.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1499863793-18627-5-git-send-email-thuth@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/intc/s390_flic.c          | 37 ++++++++++++++++++++++++++++++++++++-
- hw/intc/s390_flic_kvm.c      | 36 ++++++++++++++++++++++++++++++++++++
- include/hw/s390x/s390_flic.h |  9 ++++++++-
- 3 files changed, 80 insertions(+), 2 deletions(-)
+ pc-bios/s390-ccw/sclp.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/s390_flic.c b/hw/intc/s390_flic.c
-index d3938b3..ce7f355 100644
---- a/hw/intc/s390_flic.c
-+++ b/hw/intc/s390_flic.c
-@@ -79,15 +79,47 @@ static int qemu_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
-     return -ENOSYS;
+diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+index 2ee204a..b1fc8ff 100644
+--- a/pc-bios/s390-ccw/sclp.c
++++ b/pc-bios/s390-ccw/sclp.c
+@@ -12,6 +12,8 @@
+ #include "s390-ccw.h"
+ #include "sclp.h"
+ 
++long write(int fd, const void *str, size_t len);
++
+ static char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
+ 
+ const unsigned char ebc2asc[256] =
+@@ -71,11 +73,14 @@ static int _strlen(const char *str)
+     return i;
  }
  
-+static int qemu_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
-+                                     uint16_t mode)
-+{
-+    QEMUS390FLICState *flic  = QEMU_S390_FLIC(fs);
-+
-+    switch (mode) {
-+    case SIC_IRQ_MODE_ALL:
-+        flic->simm &= ~AIS_MODE_MASK(isc);
-+        flic->nimm &= ~AIS_MODE_MASK(isc);
-+        break;
-+    case SIC_IRQ_MODE_SINGLE:
-+        flic->simm |= AIS_MODE_MASK(isc);
-+        flic->nimm &= ~AIS_MODE_MASK(isc);
-+        break;
-+    default:
-+        return -EINVAL;
+-void sclp_print(const char *str)
++long write(int fd, const void *str, size_t len)
+ {
+-    int len = _strlen(str);
+     WriteEventData *sccb = (void *)_sccb;
+ 
++    if (fd != 1 && fd != 2) {
++        return -EIO;
 +    }
 +
-+    return 0;
+     sccb->h.length = sizeof(WriteEventData) + len;
+     sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
+     sccb->ebh.length = sizeof(EventBufferHeader) + len;
+@@ -84,6 +89,13 @@ void sclp_print(const char *str)
+     memcpy(sccb->data, str, len);
+ 
+     sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
++
++    return len;
 +}
 +
-+static void qemu_s390_flic_reset(DeviceState *dev)
++void sclp_print(const char *str)
 +{
-+    QEMUS390FLICState *flic = QEMU_S390_FLIC(dev);
-+
-+    flic->simm = 0;
-+    flic->nimm = 0;
-+}
-+
- static void qemu_s390_flic_class_init(ObjectClass *oc, void *data)
- {
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-     S390FLICStateClass *fsc = S390_FLIC_COMMON_CLASS(oc);
- 
-+    dc->reset = qemu_s390_flic_reset;
-     fsc->register_io_adapter = qemu_s390_register_io_adapter;
-     fsc->io_adapter_map = qemu_s390_io_adapter_map;
-     fsc->add_adapter_routes = qemu_s390_add_adapter_routes;
-     fsc->release_adapter_routes = qemu_s390_release_adapter_routes;
-     fsc->clear_io_irq = qemu_s390_clear_io_flic;
-+    fsc->modify_ais_mode = qemu_s390_modify_ais_mode;
++    write(1, str, _strlen(str));
  }
  
- static Property s390_flic_common_properties[] = {
-@@ -98,12 +130,15 @@ static Property s390_flic_common_properties[] = {
- 
- static void s390_flic_common_realize(DeviceState *dev, Error **errp)
- {
--    uint32_t max_batch = S390_FLIC_COMMON(dev)->adapter_routes_max_batch;
-+    S390FLICState *fs = S390_FLIC_COMMON(dev);
-+    uint32_t max_batch = fs->adapter_routes_max_batch;
- 
-     if (max_batch > ADAPTER_ROUTES_MAX_GSI) {
-         error_setg(errp, "flic property adapter_routes_max_batch too big"
-                    " (%d > %d)", max_batch, ADAPTER_ROUTES_MAX_GSI);
-     }
-+
-+    fs->ais_supported = true;
- }
- 
- static void s390_flic_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index 15ff534..55aa35f 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -20,6 +20,7 @@
- #include "sysemu/kvm.h"
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/adapter.h"
-+#include "hw/s390x/css.h"
- #include "trace.h"
- 
- #define FLIC_SAVE_INITIAL_SIZE getpagesize()
-@@ -149,6 +150,26 @@ static int kvm_s390_clear_io_flic(S390FLICState *fs, uint16_t subchannel_id,
-     return rc ? -errno : 0;
- }
- 
-+static int kvm_s390_modify_ais_mode(S390FLICState *fs, uint8_t isc,
-+                                    uint16_t mode)
-+{
-+    KVMS390FLICState *flic = KVM_S390_FLIC(fs);
-+    struct kvm_s390_ais_req req = {
-+        .isc = isc,
-+        .mode = mode,
-+    };
-+    struct kvm_device_attr attr = {
-+        .group = KVM_DEV_FLIC_AISM,
-+        .addr = (uint64_t)&req,
-+    };
-+
-+    if (!fs->ais_supported) {
-+        return -ENOSYS;
-+    }
-+
-+    return ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr) ? -errno : 0;
-+}
-+
- /**
-  * __get_all_irqs - store all pending irqs in buffer
-  * @flic: pointer to flic device state
-@@ -406,6 +427,7 @@ typedef struct KVMS390FLICStateClass {
- 
- static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
- {
-+    S390FLICState *fs = S390_FLIC_COMMON(dev);
-     KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
-     struct kvm_create_device cd = {0};
-     struct kvm_device_attr test_attr = {0};
-@@ -438,6 +460,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
-     flic_state->clear_io_supported = !ioctl(flic_state->fd,
-                                             KVM_HAS_DEVICE_ATTR, test_attr);
- 
-+    fs->ais_supported = false;
-     return;
- fail:
-     error_propagate(errp, errp_local);
-@@ -446,10 +469,12 @@ fail:
- static void kvm_s390_flic_reset(DeviceState *dev)
- {
-     KVMS390FLICState *flic = KVM_S390_FLIC(dev);
-+    S390FLICState *fs = S390_FLIC_COMMON(dev);
-     struct kvm_device_attr attr = {
-         .group = KVM_DEV_FLIC_CLEAR_IRQS,
-     };
-     int rc = 0;
-+    uint8_t isc;
- 
-     if (flic->fd == -1) {
-         return;
-@@ -457,6 +482,16 @@ static void kvm_s390_flic_reset(DeviceState *dev)
- 
-     flic_disable_wait_pfault(flic);
- 
-+    if (fs->ais_supported) {
-+        for (isc = 0; isc <= MAX_ISC; isc++) {
-+            rc = kvm_s390_modify_ais_mode(fs, isc, SIC_IRQ_MODE_ALL);
-+            if (rc) {
-+                error_report("Failed to reset ais mode for isc %d: %s",
-+                             isc, strerror(-rc));
-+            }
-+        }
-+    }
-+
-     rc = ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
-     if (rc) {
-         trace_flic_reset_failed(errno);
-@@ -479,6 +514,7 @@ static void kvm_s390_flic_class_init(ObjectClass *oc, void *data)
-     fsc->add_adapter_routes = kvm_s390_add_adapter_routes;
-     fsc->release_adapter_routes = kvm_s390_release_adapter_routes;
-     fsc->clear_io_irq = kvm_s390_clear_io_flic;
-+    fsc->modify_ais_mode = kvm_s390_modify_ais_mode;
- }
- 
- static const TypeInfo kvm_s390_flic_info = {
-diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-index d4145ad..f500184 100644
---- a/include/hw/s390x/s390_flic.h
-+++ b/include/hw/s390x/s390_flic.h
-@@ -44,7 +44,7 @@ typedef struct S390FLICState {
-     SysBusDevice parent_obj;
-     /* to limit AdapterRoutes.num_routes for compat */
-     uint32_t adapter_routes_max_batch;
--
-+    bool ais_supported;
- } S390FLICState;
- 
- #define S390_FLIC_COMMON_CLASS(klass) \
-@@ -63,6 +63,7 @@ typedef struct S390FLICStateClass {
-     void (*release_adapter_routes)(S390FLICState *fs, AdapterRoutes *routes);
-     int (*clear_io_irq)(S390FLICState *fs, uint16_t subchannel_id,
-                         uint16_t subchannel_nr);
-+    int (*modify_ais_mode)(S390FLICState *fs, uint8_t isc, uint16_t mode);
- } S390FLICStateClass;
- 
- #define TYPE_KVM_S390_FLIC "s390-flic-kvm"
-@@ -73,8 +74,14 @@ typedef struct S390FLICStateClass {
- #define QEMU_S390_FLIC(obj) \
-     OBJECT_CHECK(QEMUS390FLICState, (obj), TYPE_QEMU_S390_FLIC)
- 
-+#define SIC_IRQ_MODE_ALL 0
-+#define SIC_IRQ_MODE_SINGLE 1
-+#define AIS_MODE_MASK(isc) (0x80 >> isc)
-+
- typedef struct QEMUS390FLICState {
-     S390FLICState parent_obj;
-+    uint8_t simm;
-+    uint8_t nimm;
- } QEMUS390FLICState;
- 
- void s390_flic_init(void);
+ void sclp_get_loadparm_ascii(char *loadparm)
 -- 
 2.7.4
