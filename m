@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVxmm-0006MG-Hz
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:25 -0400
+	(envelope-from <marcel@redhat.com>) id 1dVxnK-0006oV-FN
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dVxml-0004fN-Ii
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:24 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dVxml-0004f8-CN
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:23 -0400
-Received: by mail-wm0-x231.google.com with SMTP id i127so18164530wma.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:25:23 -0700 (PDT)
+	(envelope-from <marcel@redhat.com>) id 1dVxnG-0004y0-Fm
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dVxnG-0004x0-8W
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:25:54 -0400
+References: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<6d3baced-070b-908a-95b0-7784e2f0ca4e@ilande.co.uk>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <2f0d3ed6-5aa3-851e-3e9f-c08532ca1120@redhat.com>
+Date: Fri, 14 Jul 2017 13:25:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170714061521.28300-1-david@gibson.dropbear.id.au>
-References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 11:25:01 +0100
-Message-ID: <CAFEAcA9H7td0EogiAcp3rL6CB46fvq8fJbDBCZw1R3Z8Ch0AvA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
+In-Reply-To: <6d3baced-070b-908a-95b0-7784e2f0ca4e@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2 0/2] pci: allow PCI bus slots to be
+ marked as reserved
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
 
-On 14 July 2017 at 07:15, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 49bcce4b9c11759678fd223aefb48691c4959d4f:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-07-12' into staging (2017-07-13 16:56:06 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170714
->
-> for you to fetch changes up to e11134d2ac7744569d7c387102368c507d340c30:
->
->   pseries: Allow HPT resizing with KVM (2017-07-14 09:28:30 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-07-14
->
-> Two major batches in this set, rather than the usual collection of
-> assorted fixes.
->
->     * More DRC cleanup.  This gets the state management into a state
->       which should fix many of the hotplug+migration problems we've
->       had.  Plus it gets the migration stream format into something
->       well defined and pretty minimal which we can reasonably support
->       into the future.
->
->     * Hashed Page Table resizing.  It's been a while since this was
->       posted, but it's been through several previous rounds of review.
->       The kernel parts (both guest and host) are merged in 4.11, so
->       this is the only remaining piece left to allow resizing of the
->       HPT in a running guest.
->
-> There are also a handful of unrelated fixes.
+On 14/07/2017 12:59, Mark Cave-Ayland wrote:
+> On 11/07/17 22:44, Mark Cave-Ayland wrote:
+> 
+>> For some machines it is impossible to plug devices into a particular PCI bus
+>> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the root
+>> bus behind which all devices must be plugged. Ignoring this rule will cause
+>> problems with interrupt routing since the interrupt numbers are calculated
+>> based upon PCI bridge id and secondary PCI bus slot id.
+>>
+>> This patchset adds a new slot_reserved_mask property to PCIBus which is a
+>> bitmask used to indicate whether PCI bus slots are reserved, i.e. they cannot
+>> be used for hot or cold plugging on a particular PCI bus.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>
+>> v2:
+>> - Rename dev_reserved_mask to slot_reserved_mask as suggested by Marcel
+>> - Squash patches 2 and 3 together
+>>
+>>
+>> Mark Cave-Ayland (2):
+>>    pci: move check for existing devfn into new pci_bus_devfn_available()
+>>      helper
+>>    pci: add reserved slot check to do_pci_register_device()
+>>
+>>   hw/pci/pci.c             |   34 ++++++++++++++++++++++++++++++----
+>>   include/hw/pci/pci_bus.h |    1 +
+>>   2 files changed, 31 insertions(+), 4 deletions(-)
+> 
+> Ping? Any further feedback on the v2 version? My latest set of sun4u
+> patches is dependent upon this patchset and it's freeze coming up next week!
+> 
 
-I see Alex Graf's update to the e500 u-boot image didn't make
-it in to this -- are you planning to send that separately
-or should I pick it up directly? (I definitely would like to
-see that in the 2.10 release, because it fixes a problem where
-our u-boot sources are (a) very old and (b) not even the version
-corresponding to the binary blob we ship...)
+Hi,
 
-thanks
--- PMM
+As in prev version, other than the minor comment
+on replacing "if (...) return true; else return false"
+with the actual value, I am OK with it.
+
+I believe Michael asked to see the series using this feature,
+can you add a link to it, or post it with the dependency on this one?
+
+Thanks,
+Marcel
+
+> 
+> ATB,
+> 
+> Mark.
+> 
