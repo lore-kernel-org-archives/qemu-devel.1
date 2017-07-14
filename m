@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dW6vW-0006zZ-L1
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:11:04 -0400
+	(envelope-from <mst@redhat.com>) id 1dW72D-0000sg-Vg
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dW6vR-0006RY-Lc
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:11:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52122)
+	(envelope-from <mst@redhat.com>) id 1dW729-00027I-TQ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:17:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dW6vR-0006R9-Ch
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:10:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77E4E4A70F
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 20:10:56 +0000 (UTC)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dW729-00026d-NA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 16:17:53 -0400
+Date: Fri, 14 Jul 2017 23:17:48 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170714230852-mutt-send-email-mst@kernel.org>
 References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
-	<20170714182012.4595-5-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <09a46572-e761-6cc8-5f18-ded7ca893c7c@redhat.com>
-Date: Fri, 14 Jul 2017 22:10:47 +0200
+	<20170714182012.4595-3-marcandre.lureau@redhat.com>
+	<20170714222023-mutt-send-email-mst@kernel.org>
+	<5d31f22d-e0ae-92f4-ea17-690419f72944@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170714182012.4595-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/8] tests: add simple vmcoreinfo test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d31f22d-e0ae-92f4-ea17-690419f72944@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 2/8] acpi: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,206 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 07/14/17 20:20, Marc-Andr=C3=A9 Lureau wrote:
-> This test is based off vmgenid test from Ben Warren
-> <ben@skyportsystems.com>. It simply checks the vmcoreinfo ACPI device
-> is present and that the memory region associated can be read.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  tests/vmcoreinfo-test.c | 141 ++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/Makefile.include  |   2 +
->  2 files changed, 143 insertions(+)
->  create mode 100644 tests/vmcoreinfo-test.c
->=20
-> diff --git a/tests/vmcoreinfo-test.c b/tests/vmcoreinfo-test.c
-> new file mode 100644
-> index 0000000000..a54f3b5c6a
-> --- /dev/null
-> +++ b/tests/vmcoreinfo-test.c
-> @@ -0,0 +1,141 @@
-> +/*
-> + * QTest testcase for VM coreinfo device
-> + *
-> + * Copyright (c) 2017 Red Hat, Inc.
-> + * Copyright (c) 2017 Skyport Systems
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include <glib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include "qemu/osdep.h"
-> +#include "qemu/bitmap.h"
-> +#include "qemu/uuid.h"
-> +#include "hw/acpi/acpi-defs.h"
-> +#include "boot-sector.h"
-> +#include "acpi-utils.h"
-> +#include "libqtest.h"
-> +
-> +#define RSDP_ADDR_INVALID 0x100000 /* RSDP must be below this address =
-*/
-> +
-> +typedef struct {
-> +    AcpiTableHeader header;
-> +    gchar name_op;
-> +    gchar vcia[4];
-> +    gchar val_op;
-> +    uint32_t vcia_val;
-> +} QEMU_PACKED VmciTable;
-> +
-> +static uint32_t acpi_find_vcia(void)
-> +{
-> +    uint32_t rsdp_offset;
-> +    AcpiRsdpDescriptor rsdp_table;
-> +    uint32_t rsdt;
-> +    AcpiRsdtDescriptorRev1 rsdt_table;
-> +    int tables_nr;
-> +    uint32_t *tables;
-> +    AcpiTableHeader ssdt_table;
-> +    VmciTable vmci_table;
-> +    int i;
-> +
-> +    /* Wait for guest firmware to finish and start the payload. */
-> +    boot_sector_test();
-> +
-> +    /* Tables should be initialized now. */
-> +    rsdp_offset =3D acpi_find_rsdp_address();
-> +
-> +    g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
-> +
-> +    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
-> +
-> +    rsdt =3D rsdp_table.rsdt_physical_address;
-> +    /* read the header */
-> +    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
-> +    ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
-> +
-> +    /* compute the table entries in rsdt */
-> +    tables_nr =3D (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1))=
- /
-> +                sizeof(uint32_t);
-> +    g_assert_cmpint(tables_nr, >, 0);
-> +
-> +    /* get the addresses of the tables pointed by rsdt */
-> +    tables =3D g_new0(uint32_t, tables_nr);
-> +    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
-> +
-> +    for (i =3D 0; i < tables_nr; i++) {
-> +        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
-> +        if (!strncmp((char *)ssdt_table.oem_table_id, "VMCOREIN", 8)) =
-{
-> +            /* the first entry in the table should be VCIA
-> +             * That's all we need
-> +             */
-> +            ACPI_READ_FIELD(vmci_table.name_op, tables[i]);
-> +            g_assert(vmci_table.name_op =3D=3D 0x08);  /* name */
-> +            ACPI_READ_ARRAY(vmci_table.vcia, tables[i]);
-> +            g_assert(memcmp(vmci_table.vcia, "VCIA", 4) =3D=3D 0);
-> +            ACPI_READ_FIELD(vmci_table.val_op, tables[i]);
-> +            g_assert(vmci_table.val_op =3D=3D 0x0C);  /* dword */
-> +            ACPI_READ_FIELD(vmci_table.vcia_val, tables[i]);
-> +            /* The GUID is written at a fixed offset into the fw_cfg f=
-ile
-> +             * in order to implement the "OVMF SDT Header probe suppre=
-ssor"
-> +             * see docs/specs/vmgenid.txt for more details
-> +             */
-> +            g_free(tables);
-> +            return vmci_table.vcia_val;
-> +        }
-> +    }
-> +    g_free(tables);
-> +    return 0;
-> +}
-> +
-> +static char disk[] =3D "tests/vmci-test-disk-XXXXXX";
-> +
-> +static char *cmd_strdup(void)
-> +{
-> +    return g_strdup_printf("-machine accel=3Dtcg "
-> +                           "-device vmcoreinfo,id=3Dtestvmvci "
-> +                           "-drive id=3Dhd0,if=3Dnone,file=3D%s,format=
-=3Draw "
-> +                           "-device ide-hd,drive=3Dhd0 ",
-> +                           disk);
-> +}
-> +
-> +static void vmcoreinfo_test(void)
-> +{
-> +    gchar *cmd;
-> +    uint32_t vmci_addr;
-> +    int i;
-> +
-> +    cmd =3D cmd_strdup();
-> +    qtest_start(cmd);
-> +
-> +    vmci_addr =3D acpi_find_vcia();
-> +    g_assert(vmci_addr);
-> +
-> +    for (i =3D 0; i < 4096; i++) {
-> +        /* check the memory region can be read */
-> +        readb(vmci_addr + i);
-> +    }
-> +
-> +    qtest_quit(global_qtest);
-> +    g_free(cmd);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +    int ret;
-> +
-> +    ret =3D boot_sector_init(disk);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    g_test_init(&argc, &argv, NULL);
-> +
-> +    qtest_add_func("/vmcoreinfo/test", vmcoreinfo_test);
-> +    ret =3D g_test_run();
-> +    boot_sector_cleanup(disk);
-> +
-> +    return ret;
-> +}
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index cfbb689e0e..dd515f2159 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -251,6 +251,7 @@ gcov-files-i386-y +=3D hw/usb/hcd-xhci.c
->  check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
->  check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
->  check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
-> +check-qtest-i386-y +=3D tests/vmcoreinfo-test$(EXESUF)
->  gcov-files-i386-y +=3D hw/pci-host/q35.c
->  check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D tests/vhost-user-t=
-est$(EXESUF)
->  ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
-> @@ -762,6 +763,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mpt=
-imer.o
->  tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-=
-y)
->  tests/numa-test$(EXESUF): tests/numa-test.o
->  tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o =
-tests/acpi-utils.o
-> +tests/vmcoreinfo-test$(EXESUF): tests/vmcoreinfo-test.o tests/boot-sec=
-tor.o tests/acpi-utils.o
-> =20
->  tests/migration/stress$(EXESUF): tests/migration/stress.o
->  	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $<=
- ,"LINK","$(TARGET_DIR)$@")
->=20
+On Fri, Jul 14, 2017 at 10:04:31PM +0200, Laszlo Ersek wrote:
+> > It worries me that the format of this seems completely undefined
+> > except in the patchset cover letter.
+> > I don't think we should merge this before it is.
+> 
+> I'm not sure what you mean, this patch adds "docs/specs/vmcoreinfo.txt".
+> That file is the first level contract between the guest firmware
+> (generally, via the linker/loader), the guest kernel driver
+> (specifically), and QEMU (also specifically).
+> 
+> The second level contract is the guest kernel's vmcoreinfo ELF note
+> (which is pointed-to by the first level contract). The layout of that is
+> specified elsewhere indeed (I don't think it belongs here).
+> 
+> We've taken care not to trust anything coming from the guest kernel.
+> 
+> Can you clarify please?
+> 
+> Thanks
+> Laszlo
 
-I think I'll let Michael review this, given that he just converted
-vmgenid to the boot sector trick.
+All there is is this:
 
-Thanks
-Laszlo
++Version 0 content:
++
++ uint64 paddr:
++  Physical address of the Linux vmcoreinfo ELF note.
++ uint32 size:
++  Size of the vmcoreinfo ELF note.
+
+It isn't defined here what is the Linux vmcoreinfo ELF note.
+You want a bit more info so people trying to use it know where to start
+and what they can get out of it.
+
+-- 
+MST
