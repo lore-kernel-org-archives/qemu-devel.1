@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW12Z-0002ha-SY
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:59 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dW12f-0002qh-05
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW12Z-0001yj-5M
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52160)
+	(envelope-from <imammedo@redhat.com>) id 1dW12c-0001zr-NH
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:54:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW12Y-0001yO-Vz
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:55 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW12c-0001zl-H0
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:58 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 14 Jul 2017 15:52:14 +0200
-Message-Id: <1500040339-119465-24-git-send-email-imammedo@redhat.com>
+Date: Fri, 14 Jul 2017 15:52:16 +0200
+Message-Id: <1500040339-119465-26-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
 References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 23/28] x86: replace cpu_x86_init() with
+Subject: [Qemu-devel] [PATCH 25/28] moxie: replace cpu_moxie_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,56 +25,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Anthony Green <green@moxielogic.com>
 
 it's just a wrapper, drop it and use cpu_generic_init() directly
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Anthony Green <green@moxielogic.com>
 ---
- target/i386/cpu.h | 3 +--
- target/i386/cpu.c | 5 -----
- 2 files changed, 1 insertion(+), 7 deletions(-)
+ target/moxie/cpu.h  | 3 +--
+ hw/moxie/moxiesim.c | 2 +-
+ target/moxie/cpu.c  | 5 -----
+ 3 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 7a228af..6631e7b 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1326,7 +1326,6 @@ int x86_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void x86_cpu_exec_enter(CPUState *cpu);
- void x86_cpu_exec_exit(CPUState *cpu);
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index 8991aae..75decaa 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -112,7 +112,6 @@ static inline MoxieCPU *moxie_env_get_cpu(CPUMoxieState *env)
  
--X86CPU *cpu_x86_init(const char *cpu_model);
- void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- int cpu_x86_support_mca_broadcast(CPUX86State *env);
+ #define ENV_OFFSET offsetof(MoxieCPU, env)
  
-@@ -1506,7 +1505,7 @@ uint64_t cpu_get_tsc(CPUX86State *env);
+-MoxieCPU *cpu_moxie_init(const char *cpu_model);
+ void moxie_cpu_do_interrupt(CPUState *cs);
+ void moxie_cpu_dump_state(CPUState *cpu, FILE *f,
+                           fprintf_function cpu_fprintf, int flags);
+@@ -121,7 +120,7 @@ void moxie_translate_init(void);
+ int cpu_moxie_signal_handler(int host_signum, void *pinfo,
+                              void *puc);
  
- #define PHYS_ADDR_MASK MAKE_64BIT_MASK(0, TCG_PHYS_ADDR_BITS)
+-#define cpu_init(cpu_model) CPU(cpu_moxie_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_MOXIE_CPU, cpu_model)
  
--#define cpu_init(cpu_model) CPU(cpu_x86_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
+ #define cpu_signal_handler cpu_moxie_signal_handler
  
- #define cpu_signal_handler cpu_x86_signal_handler
- #define cpu_list x86_cpu_list
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 91d3684..1bcf208 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2485,11 +2485,6 @@ static gchar *x86_gdb_arch_name(CPUState *cs)
- #endif
- }
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 3069834..719dc0a 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -118,7 +118,7 @@ static void moxiesim_init(MachineState *machine)
+     if (cpu_model == NULL) {
+         cpu_model = "MoxieLite-moxie-cpu";
+     }
+-    cpu = cpu_moxie_init(cpu_model);
++    cpu = MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
+     if (!cpu) {
+         fprintf(stderr, "Unable to find CPU definition\n");
+         exit(1);
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 927b1a1..748d02f 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -150,11 +150,6 @@ static const MoxieCPUInfo moxie_cpus[] = {
+     { .name = "any",            .initfn = moxie_any_initfn },
+ };
  
--X86CPU *cpu_x86_init(const char *cpu_model)
+-MoxieCPU *cpu_moxie_init(const char *cpu_model)
 -{
--    return X86_CPU(cpu_generic_init(TYPE_X86_CPU, cpu_model));
+-    return MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
 -}
 -
- static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+ static void cpu_register(const MoxieCPUInfo *info)
  {
-     X86CPUDefinition *cpudef = data;
+     TypeInfo type_info = {
 -- 
 2.7.4
