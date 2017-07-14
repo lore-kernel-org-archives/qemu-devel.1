@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVtt5-00019c-Tm
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVtt0-00014x-VR
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVtt3-0002AX-8V
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVtsx-00025q-Ni
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:34 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 14 Jul 2017 16:15:14 +1000
-Message-Id: <20170714061521.28300-12-david@gibson.dropbear.id.au>
+Date: Fri, 14 Jul 2017 16:15:07 +1000
+Message-Id: <20170714061521.28300-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170714061521.28300-1-david@gibson.dropbear.id.au>
 References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/18] spapr: Implement DR-indicator for
- physical DRCs only
+Subject: [Qemu-devel] [PULL 04/18] spapr: Remove 'awaiting_allocation' DRC
+ flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,165 +23,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, groug@kaod.org, sjitindarsingh@gmail.com, sbobroff@au1.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-According to PAPR, the DR-indicator should only be valid for physical DRCs,
-not logical DRCs.  At the moment we implement it for all DRCs, so restrict
-it to physical ones only.
+The awaiting_allocation flag in the DRC was introduced by aab9913
+"spapr_drc: Prevent detach racing against attach for CPU DR", allegedly to
+prevent a guest crash on racing attach and detach.  Except.. information
+from the BZ actually suggests a qemu crash, not a guest crash.  And there
+shouldn't be a problem here anyway: if the guest has already moved the DRC
+away from UNUSABLE state, the detach would already be deferred, and if it
+hadn't it should be safe to detach it (the guest should fail gracefully
+when it attempts to change the allocation state).
 
-We move the state to the physical DRC subclass, which means adding some
-QOM boilerplate to handle the newly distinct type.
+I think this was probably just a bandaid for some other problem in the
+state management.  So, remove awaiting_allocation and associated code.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Greg Kurz <groug@kaod.org>
 Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_drc.c         | 68 ++++++++++++++++++++++++++++++++++++++++++----
- include/hw/ppc/spapr_drc.h | 13 ++++++---
- 2 files changed, 72 insertions(+), 9 deletions(-)
+ hw/ppc/spapr_drc.c         | 25 +++----------------------
+ include/hw/ppc/spapr_drc.h |  1 -
+ 2 files changed, 3 insertions(+), 23 deletions(-)
 
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 534fefa998..611dc57865 100644
+index 9b07f80bf4..89ba3d6b79 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -478,7 +478,6 @@ static const VMStateDescription vmstate_spapr_drc = {
-     .needed = spapr_drc_needed,
-     .fields  = (VMStateField []) {
-         VMSTATE_UINT32(state, sPAPRDRConnector),
--        VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+@@ -170,19 +170,13 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+     if (!drc->dev) {
+         return RTAS_OUT_NO_SUCH_INDICATOR;
+     }
+-    if (drc->awaiting_release && drc->awaiting_allocation) {
+-        /* kernel is acknowledging a previous hotplug event
+-         * while we are already removing it.
+-         * it's safe to ignore awaiting_allocation here since we know the
+-         * situation is predicated on the guest either already having done
+-         * so (boot-time hotplug), or never being able to acquire in the
+-         * first place (hotplug followed by immediate unplug).
+-         */
++    if (drc->awaiting_release) {
++        /* Don't allow the guest to move a device away from UNUSABLE
++         * state when we want to unplug it */
+         return RTAS_OUT_NO_SUCH_INDICATOR;
+     }
+ 
+     drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_USABLE;
+-    drc->awaiting_allocation = false;
+ 
+     return RTAS_OUT_SUCCESS;
+ }
+@@ -357,10 +351,6 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+     drc->fdt = fdt;
+     drc->fdt_start_offset = fdt_start_offset;
+ 
+-    if (spapr_drc_type(drc) != SPAPR_DR_CONNECTOR_TYPE_PCI) {
+-        drc->awaiting_allocation = true;
+-    }
+-
+     object_property_add_link(OBJECT(drc), "device",
+                              object_get_typename(OBJECT(drc->dev)),
+                              (Object **)(&drc->dev),
+@@ -398,12 +388,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc, DeviceState *d, Error **errp)
+         return;
+     }
+ 
+-    if (drc->awaiting_allocation) {
+-        drc->awaiting_release = true;
+-        trace_spapr_drc_awaiting_allocation(spapr_drc_index(drc));
+-        return;
+-    }
+-
+     spapr_drc_release(drc);
+ }
+ 
+@@ -426,8 +410,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+         spapr_drc_release(drc);
+     }
+ 
+-    drc->awaiting_allocation = false;
+-
+     if (drc->dev) {
+         /* A device present at reset is coldplugged */
+         drc->isolation_state = SPAPR_DR_ISOLATION_STATE_UNISOLATED;
+@@ -493,7 +475,6 @@ static const VMStateDescription vmstate_spapr_drc = {
+         VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+         VMSTATE_BOOL(configured, sPAPRDRConnector),
+         VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+-        VMSTATE_BOOL(awaiting_allocation, sPAPRDRConnector),
          VMSTATE_END_OF_LIST()
      }
  };
-@@ -575,10 +574,63 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
-     dk->user_creatable = false;
- }
- 
-+static bool drc_physical_needed(void *opaque)
-+{
-+    sPAPRDRCPhysical *drcp = (sPAPRDRCPhysical *)opaque;
-+    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(drcp);
-+
-+    if ((drc->dev && (drcp->dr_indicator == SPAPR_DR_INDICATOR_ACTIVE))
-+        || (!drc->dev && (drcp->dr_indicator == SPAPR_DR_INDICATOR_INACTIVE))) {
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static const VMStateDescription vmstate_spapr_drc_physical = {
-+    .name = "spapr_drc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = drc_physical_needed,
-+    .fields  = (VMStateField []) {
-+        VMSTATE_UINT32(dr_indicator, sPAPRDRCPhysical),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void drc_physical_reset(void *opaque)
-+{
-+    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(opaque);
-+    sPAPRDRCPhysical *drcp = SPAPR_DRC_PHYSICAL(drc);
-+
-+    if (drc->dev) {
-+        drcp->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
-+    } else {
-+        drcp->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
-+    }
-+}
-+
-+static void realize_physical(DeviceState *d, Error **errp)
-+{
-+    sPAPRDRCPhysical *drcp = SPAPR_DRC_PHYSICAL(d);
-+    Error *local_err = NULL;
-+
-+    realize(d, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    vmstate_register(DEVICE(drcp), spapr_drc_index(SPAPR_DR_CONNECTOR(drcp)),
-+                     &vmstate_spapr_drc_physical, drcp);
-+    qemu_register_reset(drc_physical_reset, drcp);
-+}
-+
- static void spapr_drc_physical_class_init(ObjectClass *k, void *data)
- {
-+    DeviceClass *dk = DEVICE_CLASS(k);
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
- 
-+    dk->realize = realize_physical;
-     drck->dr_entity_sense = physical_entity_sense;
-     drck->isolate = drc_isolate_physical;
-     drck->unisolate = drc_unisolate_physical;
-@@ -640,7 +692,7 @@ static const TypeInfo spapr_dr_connector_info = {
- static const TypeInfo spapr_drc_physical_info = {
-     .name          = TYPE_SPAPR_DRC_PHYSICAL,
-     .parent        = TYPE_SPAPR_DR_CONNECTOR,
--    .instance_size = sizeof(sPAPRDRConnector),
-+    .instance_size = sizeof(sPAPRDRCPhysical),
-     .class_init    = spapr_drc_physical_class_init,
-     .abstract      = true,
- };
-@@ -883,12 +935,18 @@ static uint32_t rtas_set_dr_indicator(uint32_t idx, uint32_t state)
- {
-     sPAPRDRConnector *drc = spapr_drc_by_index(idx);
- 
--    if (!drc) {
--        return RTAS_OUT_PARAM_ERROR;
-+    if (!drc || !object_dynamic_cast(OBJECT(drc), TYPE_SPAPR_DRC_PHYSICAL)) {
-+        return RTAS_OUT_NO_SUCH_INDICATOR;
-+    }
-+    if ((state != SPAPR_DR_INDICATOR_INACTIVE)
-+        && (state != SPAPR_DR_INDICATOR_ACTIVE)
-+        && (state != SPAPR_DR_INDICATOR_IDENTIFY)
-+        && (state != SPAPR_DR_INDICATOR_ACTION)) {
-+        return RTAS_OUT_PARAM_ERROR; /* bad state parameter */
-     }
- 
-     trace_spapr_drc_set_dr_indicator(idx, state);
--    drc->dr_indicator = state;
-+    SPAPR_DRC_PHYSICAL(drc)->dr_indicator = state;
-     return RTAS_OUT_SUCCESS;
- }
- 
 diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 9d4fd41d22..a7958d0a8d 100644
+index 715016b052..18a196e831 100644
 --- a/include/hw/ppc/spapr_drc.h
 +++ b/include/hw/ppc/spapr_drc.h
-@@ -33,7 +33,7 @@
- #define SPAPR_DRC_PHYSICAL_CLASS(klass) \
-         OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, \
-                            TYPE_SPAPR_DRC_PHYSICAL)
--#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
-+#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRCPhysical, (obj), \
-                                              TYPE_SPAPR_DRC_PHYSICAL)
+@@ -200,7 +200,6 @@ typedef struct sPAPRDRConnector {
+     sPAPRConfigureConnectorState *ccs;
  
- #define TYPE_SPAPR_DRC_LOGICAL "spapr-drc-logical"
-@@ -198,9 +198,6 @@ typedef struct sPAPRDRConnector {
-     uint32_t id;
-     Object *owner;
+     bool awaiting_release;
+-    bool awaiting_allocation;
  
--    /* DR-indicator */
--    uint32_t dr_indicator;
--
-     uint32_t state;
- 
-     /* RTAS ibm,configure-connector state */
-@@ -232,6 +229,14 @@ typedef struct sPAPRDRConnectorClass {
-     void (*release)(DeviceState *dev);
- } sPAPRDRConnectorClass;
- 
-+typedef struct sPAPRDRCPhysical {
-+    /*< private >*/
-+    sPAPRDRConnector parent;
-+
-+    /* DR-indicator */
-+    uint32_t dr_indicator;
-+} sPAPRDRCPhysical;
-+
- static inline bool spapr_drc_hotplugged(DeviceState *dev)
- {
-     return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
+     /* device pointer, via link property */
+     DeviceState *dev;
 -- 
 2.13.0
