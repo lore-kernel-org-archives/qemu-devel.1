@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dW3XU-00018H-4B
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:34:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dW3ZI-0001s8-NW
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dW3XR-0002rs-1Y
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:34:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dW3XQ-0002rn-RN
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:33:56 -0400
-Date: Fri, 14 Jul 2017 13:33:47 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170714163347.GG6020@localhost.localdomain>
-References: <1499847753-8513-1-git-send-email-thuth@redhat.com>
-	<20170712150400.GH5237@redhat.com>
-	<9d51d348-7ad6-a98d-3f6d-89e8af5e3a16@redhat.com>
-	<20170712161254.GJ5237@redhat.com>
-	<d3c71dc9-1286-802a-b663-7d37f97daf72@redhat.com>
-	<20170712162901.GL5237@redhat.com>
-	<20170714020546-mutt-send-email-mst@kernel.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1dW3ZF-0003xF-KM
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:35:52 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38204)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dW3ZF-0003wb-Cf
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:35:49 -0400
+Received: by mail-wm0-x229.google.com with SMTP id f67so27837249wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 09:35:49 -0700 (PDT)
+References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
+	<1500029487-14822-4-git-send-email-peter.maydell@linaro.org>
+	<87lgnruibx.fsf@linaro.org>
+	<CAFEAcA--sxG2rOdeTvD=uNsOj=RFW8wFVALSaE1QU92Xzow1wA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA--sxG2rOdeTvD=uNsOj=RFW8wFVALSaE1QU92Xzow1wA@mail.gmail.com>
+Date: Fri, 14 Jul 2017 17:35:46 +0100
+Message-ID: <87fudzugbh.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170714020546-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machines pc-0.10
- to pc-1.2
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 3/9] hw/arm/mps2: Add UARTs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Philippe =?utf-8?Q?Mathie?= =?utf-8?Q?u-Daud=C3=A9?= <f4bug@amsat.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Fri, Jul 14, 2017 at 02:14:33AM +0300, Michael S. Tsirkin wrote:
-> On Wed, Jul 12, 2017 at 05:29:01PM +0100, Daniel P. Berrange wrote:
-> > Yep, I'm amenable to that POV too. It is entirely valid to say that if
-> > downstream distros need to care about such ancient back-compat, then they
-> > will just have to do the extra work to use git history to undelete any bits
-> > they need that upstream has discarded.
-> 
-> Unfortunately people seem to conflate compatibility question of live
-> migration and of booting images.
-> 
-> Live migration is a complex topic, and you always have a work
-> around of restarting the VM to upgrade if it does not work.
-> 
-> But I don't think we can stop supporting booting old images, ever, for
-> all versions that have a decent number of users, until someone develops
-> a tool to upgrade machine type in XML painlessly and safely.
-> 
 
-I don't agree with this part.  It's perfectly valid to remove a
-feature from a software component if nobody is willing to
-maintain it.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> If we can guarantee that changing pc-0.10 to pc-1.13 will keep booting,
-> then we should just alias one to another so people can stil start their
-> VMs. If we can't then we really can't drop old machine types from
-> booting point of view.
+> On 14 July 2017 at 16:52, Alex Bennée <alex.bennee@linaro.org> wrote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> Add the UARTs to the MPS2 board models.
+>>>
+>>> Unfortunately the details of the wiring of the interrupts through
+>>> various OR gates differ between AN511 and AN385 so this can't
+>>> be purely a data-driven difference.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+>>> ---
+>>>  hw/arm/mps2.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 86 insertions(+)
+>>>
+>>> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+>>> index 3dad02d..180c5d2 100644
+>>> --- a/hw/arm/mps2.c
+>>> +++ b/hw/arm/mps2.c
+>>> @@ -27,9 +27,12 @@
+>>>  #include "qemu/error-report.h"
+>>>  #include "hw/arm/arm.h"
+>>>  #include "hw/arm/armv7m.h"
+>>> +#include "hw/or-irq.h"
+>>>  #include "hw/boards.h"
+>>>  #include "exec/address-spaces.h"
+>>> +#include "sysemu/sysemu.h"
+>>>  #include "hw/misc/unimp.h"
+>>> +#include "hw/char/cmsdk-apb-uart.h"
+>>>
+>>>  typedef enum MPS2FPGAType {
+>>>      FPGA_AN385,
+>>> @@ -206,6 +209,89 @@ static void mps2_common_init(MachineState *machine)
+>>>      create_unimplemented_device("Ethernet", 0x40200000, 0x00100000);
+>>>      create_unimplemented_device("VGA", 0x41000000, 0x0200000);
+>>>
+>>> +    switch (mmc->fpga_type) {
+>>> +    case FPGA_AN385:
+>>> +    {
+>>> +        /* The overflow IRQs for UARTs 0, 1 and 2 are ORed together.
+>>> +         * Overflow for UARTs 4 and 5 doesn't trigger any interrupt.
+>>> +         */
+>>> +        Object *orgate;
+>>> +        DeviceState *orgate_dev;
+>>> +        int i;
+>>> +
+>>> +        orgate = object_new(TYPE_OR_IRQ);
+>>> +        object_property_set_int(orgate, 6, "num-lines", &error_fatal);
+>>> +        object_property_set_bool(orgate, true, "realized", &error_fatal);
+>>> +        orgate_dev = DEVICE(orgate);
+>>> +        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
+>>> +
+>>> +        for (i = 0; i < 5; i++) {
+>>> +            hwaddr uartbase[] = {0x40004000, 0x40005000, 0x40006000,
+>>> +                                 0x40007000, 0x40009000};
+>>
+>> I would expect these to be something like:
+>>
+>>   static hwaddr an385_uartbase[] = {0x40004000, 0x40005000, 0x40006000,
+>>                                     0x40007000, 0x40009000};
+>>   static hwaddr an511_uartbase[] = {0x40004000, 0x40005000, 0x4002c000,
+>>                                     0x4002d000, 0x4002e000};
+>>
+>> to save the compiler from filling in the table every loop. Not that it
+>> makes much different for an init routine.
+>
+> I'm slightly surprised the compiler can't tell that these
+> are never written and emit the same code for all of them,
+> but yeah, let's just 'static const' all of them.
 
-I don't think we can't guarantee that changing "pc-0.10" to
-"pc-0.13" will keep working, just like we can't guarantee that
-"pc-0.10" is still working in QEMU 2.9 the way it did in QEMU
-0.10.
+I was just curious so I objdumped - maybe we should poke our TCWG
+friends ;-)
 
-We try to not break stuff, but we can't really guarantee anything
-on either case (keeping the old machine-types; making the old
-machine-type names aliases; or deleting the old machine-types),
-if we are not spending efforts testing that.  Keeping the old
-machine-type names (either as real machines or as aliases) just
-gives us the illusion that we didn't break anything.
-
--- 
-Eduardo
+--
+Alex Bennée
