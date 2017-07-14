@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVy2j-0003kt-Ng
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dVy40-0004t8-OX
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVy2g-0003Za-HY
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVy2g-0003ZJ-Bp
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:50 -0400
-Date: Fri, 14 Jul 2017 11:41:27 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170714104127.GA28095@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170713110237.6712-1-lprosek@redhat.com>
-	<20170713110237.6712-2-lprosek@redhat.com>
-	<20170713133206.GA18623@stefanha-x1.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1dVy3z-0004C2-SL
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:43:12 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dVy3z-0004Bp-K2
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:43:11 -0400
+Received: by mail-wm0-x234.google.com with SMTP id i127so18588958wma.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 03:43:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170713133206.GA18623@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce
- error_report_nolf
+In-Reply-To: <20170711160814.20941-51-mreitz@redhat.com>
+References: <20170711160814.20941-1-mreitz@redhat.com>
+	<20170711160814.20941-51-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 11:42:49 +0100
+Message-ID: <CAFEAcA90jG=vzGX0xKQh5ZkDsnNw6mMQb5QDip7+sAqd8HVTSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 50/85] qcow2: add
+ .bdrv_remove_persistent_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Ladi Prosek <lprosek@redhat.com>, casasfernando@hotmail.com, mst@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Thu, Jul 13, 2017 at 02:32:06PM +0100, Stefan Hajnoczi wrote:
-> On Thu, Jul 13, 2017 at 01:02:30PM +0200, Ladi Prosek wrote:
-> > +/*
-> > + * Print an error message to current monitor if we have one, else to stderr.
-> > + * Format arguments like sprintf().  The resulting message should be a
-> > + * single phrase, with no trailing punctuation.  The no-LF version allows
-> > + * additional text to be appended with error_printf() or error_vprintf().
-> > + * Make sure to always close with a newline after all text is printed.
-> > + * Prepends the current location.
-> > + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
-> > + */
-> > +void error_report_nolf(const char *fmt, ...)
-> > +{
-> > +    va_list ap;
-> > +
-> > +    va_start(ap, fmt);
-> > +    error_vreport_nolf(fmt, ap);
-> > +    va_end(ap);
-> >  }
-> 
-> Each call to this function prepends the timestamp, so it cannot really
-> be used for a sequence of prints in a single line.
-> 
-> It's a little ugly but I expected something along the lines of
-> g_strdup_vprintf() in virtio_error():
-> 
->   char *msg;
-> 
->   va_start(ap, fmt);
->   msg = g_strdup_vprintf(fmt, ap);
->   va_end(ap);
-> 
->   error_report("%s: %s", DEVICE(vdev)->id, msg);
-> 
->   g_free(msg);
+On 11 July 2017 at 17:07, Max Reitz <mreitz@redhat.com> wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> Realize .bdrv_remove_persistent_dirty_bitmap interface.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Message-id: 20170628120530.31251-29-vsementsov@virtuozzo.com
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-You could get the same thing by turning virtio_Error into a macro with
-a few games. Rename the current method to virtio_error_impl() and then
-define:
+> +void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+> +                                          const char *name,
+> +                                          Error **errp)
+> +{
+> +    int ret;
+> +    BDRVQcow2State *s = bs->opaque;
+> +    Qcow2Bitmap *bm;
+> +    Qcow2BitmapList *bm_list;
+> +
+> +    if (s->nb_bitmaps == 0) {
+> +        /* Absence of the bitmap is not an error: see explanation above
+> +         * bdrv_remove_persistent_dirty_bitmap() definition. */
+> +        return;
+> +    }
+> +
+> +    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+> +                               s->bitmap_directory_size, errp);
+> +    if (bm_list == NULL) {
+> +        return;
+> +    }
+> +
+> +    bm = find_bitmap_by_name(bm_list, name);
+> +    if (bm == NULL) {
+> +        goto fail;
+> +    }
+> +
+> +    QSIMPLEQ_REMOVE(bm_list, bm, Qcow2Bitmap, entry);
+> +
+> +    ret = update_ext_header_and_dir(bs, bm_list);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "Failed to update bitmap extension");
+> +        goto fail;
+> +    }
+> +
+> +    free_bitmap_clusters(bs, &bm->table);
+> +
+> +fail:
+> +    bitmap_free(bm);
+> +    bitmap_list_free(bm_list);
+> +}
 
-  #define virtio_error(dev, fmt, ...) \
-     virtio_error_impl(dev, "%s: " fmt, DEVICE(dev)->id, __VA_ARGS__)
+Coverity points out that this can crash in the error-exit paths,
+because bitmap_free() doesn't handle being passed a NULL pointer.
+(CID 1377700).
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Probably the best fix for this is to make bitmap_free() do
+nothing when handed NULL.
+
+thanks
+-- PMM
