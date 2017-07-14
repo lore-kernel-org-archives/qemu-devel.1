@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVzE8-0002IG-Dh
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dVzEA-0002Jm-TW
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dVzE5-0003au-D9
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53218)
+	(envelope-from <dgilbert@redhat.com>) id 1dVzEA-0003cb-1t
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVzE5-0003ab-7P
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:41 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVzE9-0003cF-P7
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:45 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2043773B3A
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:57:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A07803DBD5
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:57:44 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 14 Jul 2017 12:57:31 +0100
-Message-Id: <20170714115736.13693-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/5] A bunch of RDMA fixes
+Date: Fri, 14 Jul 2017 12:57:34 +0100
+Message-Id: <20170714115736.13693-4-dgilbert@redhat.com>
+In-Reply-To: <20170714115736.13693-1-dgilbert@redhat.com>
+References: <20170714115736.13693-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 3/5] migration/rdma: Allow cancelling while
+ waiting for wrid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +35,92 @@ Cc: quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-  This is a bunch of RDMA fixes, the first is a race
-I spotted a while ago that you don't hit during normal
-operation; the rest are to do with migration failure and
-cancellation that I started looking at because of lp1545052 which
-is a failure to recover on the source if the destination
-fails.
+When waiting for a WRID, if the other side dies we end up waiting
+for ever with no way to cancel the migration.
+Cure this by poll()ing the fd first with a timeout and checking
+error flags and migration state.
 
-  I'm pretty sure there are other cases where the source
-might hang waiting for a failed destination; particularly
-if the destination hangs rather than fails completely;
-one I know of is waiting for the event after the rdma_disconnect
-but I don't have a good fix for it.  Suggestions welcome.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/rdma.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 53 insertions(+), 6 deletions(-)
 
-v3
-  Cleaned up some error handling in qemu_rdma_wait_comp_channel
-
-Dr. David Alan Gilbert (5):
-  migration/rdma: Fix race on source
-  migration: Close file on failed migration load
-  migration/rdma: Allow cancelling while waiting for wrid
-  migration/rdma: Safely convert control types
-  migration/rdma: Send error during cancelling
-
- migration/migration.c |   1 +
- migration/rdma.c      | 129 ++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 95 insertions(+), 35 deletions(-)
-
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 6111e10c70..53076646ef 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1466,6 +1466,57 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
+     return  0;
+ }
+ 
++/* Wait for activity on the completion channel.
++ * Returns 0 on success, none-0 on error.
++ */
++static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
++{
++    /*
++     * Coroutine doesn't start until migration_fd_process_incoming()
++     * so don't yield unless we know we're running inside of a coroutine.
++     */
++    if (rdma->migration_started_on_destination) {
++        yield_until_fd_readable(rdma->comp_channel->fd);
++    } else {
++        /* This is the source side, we're in a separate thread
++         * or destination prior to migration_fd_process_incoming()
++         * we can't yield; so we have to poll the fd.
++         * But we need to be able to handle 'cancel' or an error
++         * without hanging forever.
++         */
++        while (!rdma->error_state  && !rdma->received_error) {
++            GPollFD pfds[1];
++            pfds[0].fd = rdma->comp_channel->fd;
++            pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
++            /* 0.1s timeout, should be fine for a 'cancel' */
++            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
++            case 1: /* fd active */
++                return 0;
++
++            case 0: /* Timeout, go around again */
++                break;
++
++            default: /* Error of some type -
++                      * I don't trust errno from qemu_poll_ns
++                     */
++                error_report("%s: poll failed", __func__);
++                rdma->error_state = -EPIPE;
++                return -1;
++            }
++
++            if (migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) {
++                /* Bail out and let the cancellation happen */
++                return -EPIPE;
++            }
++        }
++    }
++
++    if (rdma->received_error) {
++        return -EPIPE;
++    }
++    return rdma->error_state;
++}
++
+ /*
+  * Block until the next work request has completed.
+  *
+@@ -1513,12 +1564,8 @@ static int qemu_rdma_block_for_wrid(RDMAContext *rdma, int wrid_requested,
+     }
+ 
+     while (1) {
+-        /*
+-         * Coroutine doesn't start until migration_fd_process_incoming()
+-         * so don't yield unless we know we're running inside of a coroutine.
+-         */
+-        if (rdma->migration_started_on_destination) {
+-            yield_until_fd_readable(rdma->comp_channel->fd);
++        if (qemu_rdma_wait_comp_channel(rdma)) {
++            goto err_block_for_wrid;
+         }
+ 
+         if (ibv_get_cq_event(rdma->comp_channel, &cq, &cq_ctx)) {
 -- 
 2.13.0
