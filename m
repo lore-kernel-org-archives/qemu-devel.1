@@ -1,19 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dVv6s-0007WU-Kx
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:33:59 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dVvDC-0001ud-AO
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dVv6n-0005SG-Ue
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:33:58 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:39998)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dVv6n-0005Pi-Bh
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:33:53 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Fri, 14 Jul 2017 23:47:36 +0800
-Message-Id: <1500047256-8911-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V2] target-i386:kvm_get/put_vcpu_events don't
- handle sipi_vector
+	(envelope-from <jasowang@redhat.com>) id 1dVvD7-0008Eb-Ez
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:40:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dVvD7-0008Dm-8p
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 03:40:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01D9FC0587D4
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:40:24 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+References: <cover.1496132443.git.mprivozn@redhat.com>
+	<d627afbc-5cd8-d831-d089-d1fb30fbfdfd@redhat.com>
+	<03f93e78-b585-6d01-2c63-5de8dac97abe@redhat.com>
+	<20170711145456.GT7116@redhat.com>
+	<f9b427a0-c234-dfe1-a515-6e3e0428a725@redhat.com>
+Message-ID: <bf91be50-0f33-1779-f6e4-8c1e3d90c024@redhat.com>
+Date: Fri, 14 Jul 2017 15:40:19 +0800
+MIME-Version: 1.0
+In-Reply-To: <f9b427a0-c234-dfe1-a515-6e3e0428a725@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Fix qemu-bridge-helper with SUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,80 +37,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net, pbonzini@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Michal Privoznik <mprivozn@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-qemu call kvm_get_vcpu_events, and kernel return sipi_vector always 0,
-never valid when reporting to user space. But qemu call kvm_put_vcpu_events
-will make sipi_vector in kernel be 0. This will accidently modify sipi_vector
-when sipi_vector in kernel is not 0.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Reviewed-by: Liu Yi <liu.yi24@zte.com.cn>
----
- target/i386/kvm.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f84a49d..7abb533 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2444,8 +2444,12 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     }
- 
-     if (level >= KVM_PUT_RESET_STATE) {
--        events.flags |=
--            KVM_VCPUEVENT_VALID_NMI_PENDING | KVM_VCPUEVENT_VALID_SIPI_VECTOR;
-+        if (env->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
-+            events.flags |=
-+                KVM_VCPUEVENT_VALID_NMI_PENDING | KVM_VCPUEVENT_VALID_SIPI_VECTOR;
-+        } else {
-+            events.flags |= KVM_VCPUEVENT_VALID_NMI_PENDING;
-+        }
-     }
- 
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
-@@ -2633,6 +2637,10 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     if (ret < 0) {
-         return ret;
-     }
-+    ret = kvm_put_vcpu_events(x86_cpu, level);
-+    if (ret < 0) {
-+        return ret;
-+    }
-     if (level >= KVM_PUT_RESET_STATE) {
-         ret = kvm_put_mp_state(x86_cpu);
-         if (ret < 0) {
-@@ -2644,11 +2652,6 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     if (ret < 0) {
-         return ret;
-     }
--
--    ret = kvm_put_vcpu_events(x86_cpu, level);
--    if (ret < 0) {
--        return ret;
--    }
-     ret = kvm_put_debugregs(x86_cpu);
-     if (ret < 0) {
-         return ret;
-@@ -2688,15 +2691,15 @@ int kvm_arch_get_registers(CPUState *cs)
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_mp_state(cpu);
-+    ret = kvm_get_vcpu_events(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_apic(cpu);
-+    ret = kvm_get_mp_state(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_vcpu_events(cpu);
-+    ret = kvm_get_apic(cpu);
-     if (ret < 0) {
-         goto out;
-     }
--- 
-1.8.3.1
+On 2017=E5=B9=B407=E6=9C=8814=E6=97=A5 15:31, Jason Wang wrote:
+>
+>
+> On 2017=E5=B9=B407=E6=9C=8811=E6=97=A5 22:54, Daniel P. Berrange wrote:
+>> On Tue, Jul 11, 2017 at 03:10:43PM +0200, Michal Privoznik wrote:
+>>> On 06/22/2017 05:58 PM, Michal Privoznik wrote:
+>>>> On 05/30/2017 10:23 AM, Michal Privoznik wrote:
+>>>>> For more description see patch 3. Long story short, if the bridge=20
+>>>>> helper runs
+>>>>> with SUID, the mechanism we rely on (DAC denying access to ACL=20
+>>>>> files) does not
+>>>>> work.
+>>>>>
+>>>>> Michal Privoznik (3):
+>>>>>    qemu-bridge-helper: Reverse return value setting logic
+>>>>>    qemu-bridge-helper: Reverse return value setting logic in
+>>>>>      parse_acl_file
+>>>>>    qemu-bridge-helper: Take ACL file gid into account
+>>>>>
+>>>>>   qemu-bridge-helper.c | 79=20
+>>>>> ++++++++++++++++++++++++++++------------------------
+>>>>>   1 file changed, 42 insertions(+), 37 deletions(-)
+>>>>>
+>>>> ping?
+>>>>
+>>> ping^2?
+>
+> Applied.
+
+Just notice Daniel's comment. Michal, can you please address that?
+
+Thanks
+
+>
+>> Sigh, this is one of the files for which we have no nominated maintain=
+er
+>> listed, so it easily falls through the cracks.
+>>
+>> Since this is network related, I wonder if Jason should be listed in t=
+he
+>> MAINTAINERS file for this. Or perhaps we should move the=20
+>> qemu-bridge-helper.c
+>> file into the net/ sub-directory instead ?
+>
+> Let me claim this in MAINTAINERS.
+>
+> Thanks
+>
+>>
+>> Regards,
+>> Daniel
+>
+>
