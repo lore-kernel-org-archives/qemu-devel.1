@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dW4CI-00024u-7K
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:16:11 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dW4M3-0007hq-Fb
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dW4CG-00066T-M1
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:16:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dW4CG-00065H-CO
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:16:08 -0400
-Date: Fri, 14 Jul 2017 18:15:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170714171554.GF2091@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-17-dgilbert@redhat.com>
-	<20170711033159.GE21344@pxdev.xzpeter.org>
+	(envelope-from <rth7680@gmail.com>) id 1dW4M2-0005az-J1
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:26:15 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+	<150002437386.22386.7745855254236101855.stgit@frigg.lan>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <584dade6-5ce0-4950-c0e3-03128bae119e@twiddle.net>
+Date: Fri, 14 Jul 2017 07:26:01 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170711033159.GE21344@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 16/29] vhost+postcopy: Stash RAMBlock and
- offset
+In-Reply-To: <150002437386.22386.7745855254236101855.stgit@frigg.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v13 18/26] target/arm: [tcg] Port to
+ breakpoint_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Jun 28, 2017 at 08:00:34PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Stash the RAMBlock and offset for later use looking up
-> > addresses.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/virtio/trace-events |  1 +
-> >  hw/virtio/vhost-user.c | 11 +++++++++++
-> >  2 files changed, 12 insertions(+)
-> > 
-> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > index f7be340a45..1fd194363a 100644
-> > --- a/hw/virtio/trace-events
-> > +++ b/hw/virtio/trace-events
-> > @@ -3,6 +3,7 @@
-> >  # hw/virtio/vhost-user.c
-> >  vhost_user_postcopy_listen(void) ""
-> >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:%"PRIx64" for hva: %"PRIx64" reply %d region %d"
-> > +vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:%"PRIx64" GPA:%"PRIx64" QVA/userspace:%"PRIx64" RB offset:%"PRIx64
-> >  
-> >  # hw/virtio/virtio.c
-> >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > index 6be3e7ff2d..3185af7a45 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -133,6 +133,11 @@ struct vhost_user {
-> >      NotifierWithReturn postcopy_notifier;
-> >      struct PostCopyFD  postcopy_fd;
-> >      uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
-> > +    RAMBlock          *region_rb[VHOST_MEMORY_MAX_NREGIONS];
-> > +    /* The offset from the start of the RAMBlock to the start of the
-> > +     * vhost region.
-> > +     */
-> > +    ram_addr_t         region_rb_offset[VHOST_MEMORY_MAX_NREGIONS];
+On 07/13/2017 11:26 PM, Lluís Vilanova wrote:
+> Incrementally paves the way towards using the generic instruction translation
+> loop.
 > 
-> Here the array size is VHOST_MEMORY_MAX_NREGIONS, while...
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> ---
+>   target/arm/translate.c |   53 +++++++++++++++++++++++++++++++-----------------
+>   1 file changed, 34 insertions(+), 19 deletions(-)
 > 
-> >  };
-> >  
-> >  static bool ioeventfd_enabled(void)
-> > @@ -324,8 +329,14 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-> >          assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-> >          mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
-> >                                       &offset);
-> > +        u->region_rb_offset[i] = offset;
-> > +        u->region_rb[i] = mr->ram_block;
-> 
-> ... can i>=VHOST_MEMORY_MAX_NREGIONS here? Or do we only need to note
-> this down if fd > 0 below?  Thanks,
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index b9183fc511..55bef09739 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -11917,6 +11917,33 @@ static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+>   #endif
+>   }
+>   
+> +static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+> +                                    const CPUBreakpoint *bp)
+> +{
+> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
+> +
+> +    if (bp->flags & BP_CPU) {
+> +        gen_set_condexec(dc);
+> +        gen_set_pc_im(dc, dc->pc);
+> +        gen_helper_check_breakpoints(cpu_env);
+> +        /* End the TB early; it's likely not going to be executed */
+> +        dc->base.is_jmp = DISAS_UPDATE;
+> +    } else {
+> +        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
+> +        /* The address covered by the breakpoint must be
+> +           included in [tb->pc, tb->pc + tb->size) in order
+> +           to for it to be properly cleared -- thus we
+> +           increment the PC here so that the logic setting
+> +           tb->size below does the right thing.  */
+> +        /* TODO: Advance PC by correct instruction length to
+> +         * avoid disassembler error messages */
+> +        dc->pc += 2;
+> +        dc->base.is_jmp = DISAS_NORETURN;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+>   /* generate intermediate code for basic block 'tb'.  */
+>   void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>   {
+> @@ -11965,28 +11992,16 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+>           if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+>               CPUBreakpoint *bp;
+>               QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+> -                if (bp->pc == dc->pc) {
+> -                    if (bp->flags & BP_CPU) {
+> -                        gen_set_condexec(dc);
+> -                        gen_set_pc_im(dc, dc->pc);
+> -                        gen_helper_check_breakpoints(cpu_env);
+> -                        /* End the TB early; it's likely not going to be executed */
+> -                        dc->base.is_jmp = DISAS_UPDATE;
 
-I don't *think* so - I mean:
-    for (i = 0; i < dev->mem->nregions; ++i) {
+Oh I see what you're doing there in the main loop.
+And I see that you're copying existing behaviour.
 
-so if that's the maximum number of regions and that's the number of
-regions we should be safe???
+That said, I do wonder if there's a better way.
 
-Dave
+Looking back at the original patch (5d98bf8f), there do not
+seem to have been any other side effects intended; simply
+"single step" any insn for which this bp condition is met.
 
-> >          fd = memory_region_get_fd(mr);
-> >          if (fd > 0) {
-> > +            trace_vhost_user_set_mem_table_withfd(fd_num, mr->name,
-> > +                                                  reg->memory_size,
-> > +                                                  reg->guest_phys_addr,
-> > +                                                  reg->userspace_addr, offset);
-> >              msg.payload.memory.regions[fd_num].userspace_addr = reg->userspace_addr;
-> >              msg.payload.memory.regions[fd_num].memory_size  = reg->memory_size;
-> >              msg.payload.memory.regions[fd_num].guest_phys_addr = reg->guest_phys_addr;
-> > -- 
-> > 2.13.0
-> > 
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Another way to handle this would be if we could adjust max_insns = num_insns.
+That would cause the loop to exit after the current insn, with DISAS_TOO_MANY 
+if nothing else.
+
+
+r~
