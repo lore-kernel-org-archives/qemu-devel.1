@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dW1ag-0007Ov-Ra
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:11 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1dW1ag-0007Ow-Rr
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1dW1ab-0000GH-Qj
+	(envelope-from <tgolembi@redhat.com>) id 1dW1ad-0000HL-KF
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:10 -0400
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:35737)
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:38370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dW1ab-0000Ft-KN
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:05 -0400
-Received: by mail-wm0-f49.google.com with SMTP id w126so22193883wme.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:29:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dW1ad-0000Gx-Dc
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 10:29:07 -0400
+Received: by mail-wm0-f49.google.com with SMTP id f67so24437216wmh.1
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 07:29:07 -0700 (PDT)
 From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Fri, 14 Jul 2017 16:28:57 +0200
-Message-Id: <de646f7ede6b100affc0ccf0da9d5be9570fd42d.1500042528.git.tgolembi@redhat.com>
+Date: Fri, 14 Jul 2017 16:28:58 +0200
+Message-Id: <215c43ac1fed2d4e74caf8ade220a6769fbd5f9e.1500042528.git.tgolembi@redhat.com>
 In-Reply-To: <cover.1500042528.git.tgolembi@redhat.com>
 References: <cover.1500042528.git.tgolembi@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v8 2/3] test-qga: pass environemnt to qemu-ga
+Subject: [Qemu-devel] [PATCH v8 3/3] test-qga: add test for guest-get-osinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +31,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-Modify fixture_setup() to pass environemnt variables to spawned qemu-ga
-instance.
+Add test for guest-get-osinfo command.
+
+Qemu-ga was modified to accept QGA_OS_RELEASE environment variable. If
+the variable is defined it is interpreted as path to the os-release file
+and it is parsed instead of the default paths.
 
 Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- tests/test-qga.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ qga/commands-posix.c           | 13 +++++++---
+ tests/data/test-qga-os-release |  7 ++++++
+ tests/test-qga.c               | 56 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 73 insertions(+), 3 deletions(-)
+ create mode 100644 tests/data/test-qga-os-release
 
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index fdb850db2f..8404a68b38 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2667,6 +2667,8 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+ {
+     GuestOSInfo *info = NULL;
+     struct utsname kinfo = {0};
++    GKeyFile *osrelease = NULL;
++
+ 
+     info = g_new0(GuestOSInfo, 1);
+ 
+@@ -2681,9 +2683,14 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+         info->machine = g_strdup(kinfo.machine);
+     }
+ 
+-    GKeyFile *osrelease = ga_parse_osrelease("/etc/os-release");
+-    if (osrelease == NULL) {
+-        osrelease = ga_parse_osrelease("/usr/lib/os-release");
++    const char *qga_os_release = g_getenv("QGA_OS_RELEASE");
++    if (qga_os_release != NULL) {
++        osrelease = ga_parse_osrelease(qga_os_release);
++    } else {
++        osrelease = ga_parse_osrelease("/etc/os-release");
++        if (osrelease == NULL) {
++            osrelease = ga_parse_osrelease("/usr/lib/os-release");
++        }
+     }
+ 
+     if (osrelease != NULL) {
+diff --git a/tests/data/test-qga-os-release b/tests/data/test-qga-os-release
+new file mode 100644
+index 0000000000..70664eb6ec
+--- /dev/null
++++ b/tests/data/test-qga-os-release
+@@ -0,0 +1,7 @@
++ID=qemu-ga-test
++NAME=QEMU-GA
++PRETTY_NAME="QEMU Guest Agent test"
++VERSION="Test 1"
++VERSION_ID=1
++VARIANT="Unit test \"\'\$\`\\ and \\\\ etc."
++VARIANT_ID=unit-test
 diff --git a/tests/test-qga.c b/tests/test-qga.c
-index c77f241036..631b98639a 100644
+index 631b98639a..06783e7585 100644
 --- a/tests/test-qga.c
 +++ b/tests/test-qga.c
-@@ -46,7 +46,7 @@ static void qga_watch(GPid pid, gint status, gpointer user_data)
+@@ -936,6 +936,60 @@ static void test_qga_guest_exec_invalid(gconstpointer fix)
+     QDECREF(ret);
  }
  
- static void
--fixture_setup(TestFixture *fixture, gconstpointer data)
-+fixture_setup(TestFixture *fixture, gconstpointer data, gchar **envp)
++static void test_qga_guest_get_osinfo(gconstpointer data)
++{
++    TestFixture fixture;
++    const gchar *str;
++    gchar *cwd, *env[2];
++    QDict *ret, *val;
++
++    cwd = g_get_current_dir();
++    env[0] = g_strdup_printf(
++        "QGA_OS_RELEASE=%s%ctests%cdata%ctest-qga-os-release",
++        cwd, G_DIR_SEPARATOR, G_DIR_SEPARATOR, G_DIR_SEPARATOR);
++    env[1] = NULL;
++    g_free(cwd);
++    fixture_setup(&fixture, NULL, env);
++
++    ret = qmp_fd(fixture.fd, "{'execute': 'guest-get-osinfo'}");
++    g_assert_nonnull(ret);
++    qmp_assert_no_error(ret);
++
++    val = qdict_get_qdict(ret, "return");
++
++    str = qdict_get_try_str(val, "id");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "qemu-ga-test");
++
++    str = qdict_get_try_str(val, "name");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "QEMU-GA");
++
++    str = qdict_get_try_str(val, "pretty-name");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "QEMU Guest Agent test");
++
++    str = qdict_get_try_str(val, "version");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "Test 1");
++
++    str = qdict_get_try_str(val, "version-id");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "1");
++
++    str = qdict_get_try_str(val, "variant");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "Unit test \"'$`\\ and \\\\ etc.");
++
++    str = qdict_get_try_str(val, "variant-id");
++    g_assert_nonnull(str);
++    g_assert_cmpstr(str, ==, "unit-test");
++
++    QDECREF(ret);
++    g_free(env[0]);
++    fixture_tear_down(&fixture, NULL);
++}
++
+ int main(int argc, char **argv)
  {
-     const gchar *extra_arg = data;
-     GError *error = NULL;
-@@ -67,7 +67,7 @@ fixture_setup(TestFixture *fixture, gconstpointer data)
-     g_shell_parse_argv(cmd, NULL, &argv, &error);
-     g_assert_no_error(error);
+     TestFixture fix;
+@@ -972,6 +1026,8 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/qga/guest-exec", &fix, test_qga_guest_exec);
+     g_test_add_data_func("/qga/guest-exec-invalid", &fix,
+                          test_qga_guest_exec_invalid);
++    g_test_add_data_func("/qga/guest-get-osinfo", &fix,
++                         test_qga_guest_get_osinfo);
  
--    g_spawn_async(fixture->test_dir, argv, NULL,
-+    g_spawn_async(fixture->test_dir, argv, envp,
-                   G_SPAWN_SEARCH_PATH|G_SPAWN_DO_NOT_REAP_CHILD,
-                   NULL, NULL, &fixture->pid, &error);
-     g_assert_no_error(error);
-@@ -707,7 +707,7 @@ static void test_qga_blacklist(gconstpointer data)
-     QDict *ret, *error;
-     const gchar *class, *desc;
- 
--    fixture_setup(&fix, "-b guest-ping,guest-get-time");
-+    fixture_setup(&fix, "-b guest-ping,guest-get-time", NULL);
- 
-     /* check blacklist */
-     ret = qmp_fd(fix.fd, "{'execute': 'guest-ping'}");
-@@ -943,7 +943,7 @@ int main(int argc, char **argv)
- 
-     setlocale (LC_ALL, "");
-     g_test_init(&argc, &argv, NULL);
--    fixture_setup(&fix, NULL);
-+    fixture_setup(&fix, NULL, NULL);
- 
-     g_test_add_data_func("/qga/sync-delimited", &fix, test_qga_sync_delimited);
-     g_test_add_data_func("/qga/sync", &fix, test_qga_sync);
+     if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
+         g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
 -- 
 2.13.1
