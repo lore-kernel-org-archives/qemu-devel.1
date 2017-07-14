@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2B-0003G4-0i
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:21 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2C-0003GG-TF
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy27-0003It-EF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41740
+	(envelope-from <borntraeger@de.ibm.com>) id 1dVy29-0003Ju-MZ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43112
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVy27-0003Ic-6x
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:15 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1dVy29-0003Jj-HI
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:17 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EAceXh022053
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:14 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpmhwrmk7-1
+	v6EAclP7015753
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:17 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpuk7swg8-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:14 -0400
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:16 -0400
 Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 11:41:12 +0100
+	Fri, 14 Jul 2017 11:41:15 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:30 +0200
+Date: Fri, 14 Jul 2017 12:40:44 +0200
 In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-4-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 03/40] s390x/migration: Storage attributes device
+Message-Id: <1500028867-134709-18-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PULL 17/40] s390x/css: use SubchDev.orb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,698 +39,182 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Storage attributes device, like we have for storage keys.
+Instead of passing around a pointer to ORB let us simplify some
+function signatures by using the previously introduced ORB saved at the
+subchannel (SubchDev).
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Message-Id: <20170711145441.33925-7-pasic@linux.vnet.ibm.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/s390x/Makefile.objs                |   2 +
- hw/s390x/s390-stattrib-kvm.c          | 190 +++++++++++++++++++
- hw/s390x/s390-stattrib.c              | 342 ++++++++++++++++++++++++++++++++++
- hw/s390x/s390-virtio-ccw.c            |  10 +-
- include/hw/s390x/storage-attributes.h |  77 ++++++++
- 5 files changed, 620 insertions(+), 1 deletion(-)
- create mode 100644 hw/s390x/s390-stattrib-kvm.c
- create mode 100644 hw/s390x/s390-stattrib.c
- create mode 100644 include/hw/s390x/storage-attributes.h
+ hw/s390x/css.c         | 30 +++++++++++++++---------------
+ include/hw/s390x/css.h |  6 +++---
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index a8e5575..b2aade2 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -13,5 +13,7 @@ obj-y += css-bridge.o
- obj-y += ccw-device.o
- obj-y += s390-pci-bus.o s390-pci-inst.o
- obj-y += s390-skeys.o
-+obj-y += s390-stattrib.o
- obj-$(CONFIG_KVM) += s390-skeys-kvm.o
-+obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
- obj-y += s390-ccw.o
-diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-new file mode 100644
-index 0000000..ff3f89f
---- /dev/null
-+++ b/hw/s390x/s390-stattrib-kvm.c
-@@ -0,0 +1,190 @@
-+/*
-+ * s390 storage attributes device -- KVM object
-+ *
-+ * Copyright 2016 IBM Corp.
-+ * Author(s): Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/boards.h"
-+#include "migration/qemu-file.h"
-+#include "hw/s390x/storage-attributes.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/kvm.h"
-+#include "exec/ram_addr.h"
-+#include "cpu.h"
-+
-+Object *kvm_s390_stattrib_create(void)
-+{
-+    if (kvm_enabled() &&
-+                kvm_check_extension(kvm_state, KVM_CAP_S390_CMMA_MIGRATION)) {
-+        return object_new(TYPE_KVM_S390_STATTRIB);
-+    }
-+    return NULL;
-+}
-+
-+static void kvm_s390_stattrib_instance_init(Object *obj)
-+{
-+    KVMS390StAttribState *sas = KVM_S390_STATTRIB(obj);
-+
-+    sas->still_dirty = 0;
-+}
-+
-+static int kvm_s390_stattrib_read_helper(S390StAttribState *sa,
-+                                         uint64_t *start_gfn,
-+                                         uint32_t count,
-+                                         uint8_t *values,
-+                                         uint32_t flags)
-+{
-+    KVMS390StAttribState *sas = KVM_S390_STATTRIB(sa);
-+    int r;
-+    struct kvm_s390_cmma_log clog = {
-+        .values = (uint64_t)values,
-+        .start_gfn = *start_gfn,
-+        .count = count,
-+        .flags = flags,
-+    };
-+
-+    r = kvm_vm_ioctl(kvm_state, KVM_S390_GET_CMMA_BITS, &clog);
-+    if (r < 0) {
-+        error_report("KVM_S390_GET_CMMA_BITS failed: %s", strerror(-r));
-+        return r;
-+    }
-+
-+    *start_gfn = clog.start_gfn;
-+    sas->still_dirty = clog.remaining;
-+    return clog.count;
-+}
-+
-+static int kvm_s390_stattrib_get_stattr(S390StAttribState *sa,
-+                                        uint64_t *start_gfn,
-+                                        uint32_t count,
-+                                        uint8_t *values)
-+{
-+    return kvm_s390_stattrib_read_helper(sa, start_gfn, count, values, 0);
-+}
-+
-+static int kvm_s390_stattrib_peek_stattr(S390StAttribState *sa,
-+                                         uint64_t start_gfn,
-+                                         uint32_t count,
-+                                         uint8_t *values)
-+{
-+    return kvm_s390_stattrib_read_helper(sa, &start_gfn, count, values,
-+                                         KVM_S390_CMMA_PEEK);
-+}
-+
-+static int kvm_s390_stattrib_set_stattr(S390StAttribState *sa,
-+                                        uint64_t start_gfn,
-+                                        uint32_t count,
-+                                        uint8_t *values)
-+{
-+    KVMS390StAttribState *sas = KVM_S390_STATTRIB(sa);
-+    MachineState *machine = MACHINE(qdev_get_machine());
-+    unsigned long max = machine->maxram_size / TARGET_PAGE_SIZE;
-+
-+    if (start_gfn + count > max) {
-+        error_report("Out of memory bounds when setting storage attributes");
-+        return -1;
-+    }
-+    if (!sas->incoming_buffer) {
-+        sas->incoming_buffer = g_malloc0(max);
-+    }
-+
-+    memcpy(sas->incoming_buffer + start_gfn, values, count);
-+
-+    return 0;
-+}
-+
-+static void kvm_s390_stattrib_synchronize(S390StAttribState *sa)
-+{
-+    KVMS390StAttribState *sas = KVM_S390_STATTRIB(sa);
-+    MachineState *machine = MACHINE(qdev_get_machine());
-+    unsigned long max = machine->maxram_size / TARGET_PAGE_SIZE;
-+    unsigned long cx, len = 1 << 19;
-+    int r;
-+    struct kvm_s390_cmma_log clog = {
-+        .flags = 0,
-+        .mask = ~0ULL,
-+    };
-+
-+    if (sas->incoming_buffer) {
-+        for (cx = 0; cx + len <= max; cx += len) {
-+            clog.start_gfn = cx;
-+            clog.count = len;
-+            clog.values = (uint64_t)(sas->incoming_buffer + cx * len);
-+            r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS, &clog);
-+            if (r) {
-+                error_report("KVM_S390_SET_CMMA_BITS failed: %s", strerror(-r));
-+                return;
-+            }
-+        }
-+        if (cx < max) {
-+            clog.start_gfn = cx;
-+            clog.count = max - cx;
-+            clog.values = (uint64_t)(sas->incoming_buffer + cx * len);
-+            r = kvm_vm_ioctl(kvm_state, KVM_S390_SET_CMMA_BITS, &clog);
-+            if (r) {
-+                error_report("KVM_S390_SET_CMMA_BITS failed: %s", strerror(-r));
-+            }
-+        }
-+        g_free(sas->incoming_buffer);
-+        sas->incoming_buffer = NULL;
-+    }
-+}
-+
-+static int kvm_s390_stattrib_set_migrationmode(S390StAttribState *sa, bool val)
-+{
-+    struct kvm_device_attr attr = {
-+        .group = KVM_S390_VM_MIGRATION,
-+        .attr = val,
-+        .addr = 0,
-+    };
-+    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-+}
-+
-+static long long kvm_s390_stattrib_get_dirtycount(S390StAttribState *sa)
-+{
-+    KVMS390StAttribState *sas = KVM_S390_STATTRIB(sa);
-+    uint8_t val[8];
-+
-+    kvm_s390_stattrib_peek_stattr(sa, 0, 1, val);
-+    return sas->still_dirty;
-+}
-+
-+static int kvm_s390_stattrib_get_active(S390StAttribState *sa)
-+{
-+    return kvm_s390_cmma_active() && sa->migration_enabled;
-+}
-+
-+static void kvm_s390_stattrib_class_init(ObjectClass *oc, void *data)
-+{
-+    S390StAttribClass *sac = S390_STATTRIB_CLASS(oc);
-+
-+    sac->get_stattr = kvm_s390_stattrib_get_stattr;
-+    sac->peek_stattr = kvm_s390_stattrib_peek_stattr;
-+    sac->set_stattr = kvm_s390_stattrib_set_stattr;
-+    sac->set_migrationmode = kvm_s390_stattrib_set_migrationmode;
-+    sac->get_dirtycount = kvm_s390_stattrib_get_dirtycount;
-+    sac->synchronize = kvm_s390_stattrib_synchronize;
-+    sac->get_active = kvm_s390_stattrib_get_active;
-+}
-+
-+static const TypeInfo kvm_s390_stattrib_info = {
-+    .name          = TYPE_KVM_S390_STATTRIB,
-+    .parent        = TYPE_S390_STATTRIB,
-+    .instance_init = kvm_s390_stattrib_instance_init,
-+    .instance_size = sizeof(KVMS390StAttribState),
-+    .class_init    = kvm_s390_stattrib_class_init,
-+    .class_size    = sizeof(S390StAttribClass),
-+};
-+
-+static void kvm_s390_stattrib_register_types(void)
-+{
-+    type_register_static(&kvm_s390_stattrib_info);
-+}
-+
-+type_init(kvm_s390_stattrib_register_types)
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-new file mode 100644
-index 0000000..922b756
---- /dev/null
-+++ b/hw/s390x/s390-stattrib.c
-@@ -0,0 +1,342 @@
-+/*
-+ * s390 storage attributes device
-+ *
-+ * Copyright 2016 IBM Corp.
-+ * Author(s): Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/boards.h"
-+#include "migration/qemu-file.h"
-+#include "migration/register.h"
-+#include "hw/s390x/storage-attributes.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/kvm.h"
-+#include "exec/ram_addr.h"
-+#include "qapi/error.h"
-+
-+#define CMMA_BLOCK_SIZE  (1 << 10)
-+
-+#define STATTR_FLAG_EOS     0x01ULL
-+#define STATTR_FLAG_MORE    0x02ULL
-+#define STATTR_FLAG_ERROR   0x04ULL
-+#define STATTR_FLAG_DONE    0x08ULL
-+
-+void s390_stattrib_init(void)
-+{
-+    Object *obj;
-+
-+    obj = kvm_s390_stattrib_create();
-+    if (!obj) {
-+        obj = object_new(TYPE_QEMU_S390_STATTRIB);
-+    }
-+
-+    object_property_add_child(qdev_get_machine(), TYPE_S390_STATTRIB,
-+                              obj, NULL);
-+    object_unref(obj);
-+
-+    qdev_init_nofail(DEVICE(obj));
-+}
-+
-+/* Migration support: */
-+
-+static int cmma_load(QEMUFile *f, void *opaque, int version_id)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(opaque);
-+    S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-+    uint64_t count, cur_gfn;
-+    int flags, ret = 0;
-+    ram_addr_t addr;
-+    uint8_t *buf;
-+
-+    while (!ret) {
-+        addr = qemu_get_be64(f);
-+        flags = addr & ~TARGET_PAGE_MASK;
-+        addr &= TARGET_PAGE_MASK;
-+
-+        switch (flags) {
-+        case STATTR_FLAG_MORE: {
-+            cur_gfn = addr / TARGET_PAGE_SIZE;
-+            count = qemu_get_be64(f);
-+            buf = g_try_malloc(count);
-+            if (!buf) {
-+                error_report("cmma_load could not allocate memory");
-+                ret = -ENOMEM;
-+                break;
-+            }
-+
-+            qemu_get_buffer(f, buf, count);
-+            ret = sac->set_stattr(sas, cur_gfn, count, buf);
-+            if (ret < 0) {
-+                error_report("Error %d while setting storage attributes", ret);
-+            }
-+            g_free(buf);
-+            break;
-+        }
-+        case STATTR_FLAG_ERROR: {
-+            error_report("Storage attributes data is incomplete");
-+            ret = -EINVAL;
-+            break;
-+        }
-+        case STATTR_FLAG_DONE:
-+            /* This is after the last pre-copied value has been sent, nothing
-+             * more will be sent after this. Pre-copy has finished, and we
-+             * are done flushing all the remaining values. Now the target
-+             * system is about to take over. We synchronize the buffer to
-+             * apply the actual correct values where needed.
-+             */
-+             sac->synchronize(sas);
-+            break;
-+        case STATTR_FLAG_EOS:
-+            /* Normal exit */
-+            return 0;
-+        default:
-+            error_report("Unexpected storage attribute flag data: %#x", flags);
-+            ret = -EINVAL;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+static int cmma_save_setup(QEMUFile *f, void *opaque)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(opaque);
-+    S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-+    int res;
-+    /*
-+     * Signal that we want to start a migration, thus needing PGSTE dirty
-+     * tracking.
-+     */
-+    res = sac->set_migrationmode(sas, 1);
-+    if (res) {
-+        return res;
-+    }
-+    qemu_put_be64(f, STATTR_FLAG_EOS);
-+    return 0;
-+}
-+
-+static void cmma_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-+                             uint64_t *non_postcopiable_pending,
-+                             uint64_t *postcopiable_pending)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(opaque);
-+    S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-+    long long res = sac->get_dirtycount(sas);
-+
-+    if (res >= 0) {
-+        *non_postcopiable_pending += res;
-+    }
-+}
-+
-+static int cmma_save(QEMUFile *f, void *opaque, int final)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(opaque);
-+    S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-+    uint8_t *buf;
-+    int r, cx, reallen = 0, ret = 0;
-+    uint32_t buflen = 1 << 19;   /* 512kB cover 2GB of guest memory */
-+    uint64_t start_gfn = sas->migration_cur_gfn;
-+
-+    buf = g_try_malloc(buflen);
-+    if (!buf) {
-+        error_report("Could not allocate memory to save storage attributes");
-+        return -ENOMEM;
-+    }
-+
-+    while (final ? 1 : qemu_file_rate_limit(f) == 0) {
-+        reallen = sac->get_stattr(sas, &start_gfn, buflen, buf);
-+        if (reallen < 0) {
-+            g_free(buf);
-+            return reallen;
-+        }
-+
-+        ret = 1;
-+        if (!reallen) {
-+            break;
-+        }
-+        qemu_put_be64(f, (start_gfn << TARGET_PAGE_BITS) | STATTR_FLAG_MORE);
-+        qemu_put_be64(f, reallen);
-+        for (cx = 0; cx < reallen; cx++) {
-+            qemu_put_byte(f, buf[cx]);
-+        }
-+        if (!sac->get_dirtycount(sas)) {
-+            break;
-+        }
-+    }
-+
-+    sas->migration_cur_gfn = start_gfn + reallen;
-+    g_free(buf);
-+    if (final) {
-+        qemu_put_be64(f, STATTR_FLAG_DONE);
-+    }
-+    qemu_put_be64(f, STATTR_FLAG_EOS);
-+
-+    r = qemu_file_get_error(f);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    return ret;
-+}
-+
-+static int cmma_save_iterate(QEMUFile *f, void *opaque)
-+{
-+    return cmma_save(f, opaque, 0);
-+}
-+
-+static int cmma_save_complete(QEMUFile *f, void *opaque)
-+{
-+    return cmma_save(f, opaque, 1);
-+}
-+
-+static void cmma_save_cleanup(void *opaque)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(opaque);
-+    S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-+    sac->set_migrationmode(sas, 0);
-+}
-+
-+static bool cmma_active(void *opaque)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(opaque);
-+    S390StAttribClass *sac = S390_STATTRIB_GET_CLASS(sas);
-+    return sac->get_active(sas);
-+}
-+
-+/* QEMU object: */
-+
-+static void qemu_s390_stattrib_instance_init(Object *obj)
-+{
-+}
-+
-+static int qemu_s390_peek_stattr_stub(S390StAttribState *sa, uint64_t start_gfn,
-+                                     uint32_t count, uint8_t *values)
-+{
-+    return 0;
-+}
-+static void qemu_s390_synchronize_stub(S390StAttribState *sa)
-+{
-+}
-+static int qemu_s390_get_stattr_stub(S390StAttribState *sa, uint64_t *start_gfn,
-+                                     uint32_t count, uint8_t *values)
-+{
-+    return 0;
-+}
-+static long long qemu_s390_get_dirtycount_stub(S390StAttribState *sa)
-+{
-+    return 0;
-+}
-+static int qemu_s390_set_migrationmode_stub(S390StAttribState *sa, bool value)
-+{
-+    return 0;
-+}
-+
-+static int qemu_s390_get_active(S390StAttribState *sa)
-+{
-+    return sa->migration_enabled;
-+}
-+
-+static void qemu_s390_stattrib_class_init(ObjectClass *oc, void *data)
-+{
-+    S390StAttribClass *sa_cl = S390_STATTRIB_CLASS(oc);
-+
-+    sa_cl->synchronize = qemu_s390_synchronize_stub;
-+    sa_cl->get_stattr = qemu_s390_get_stattr_stub;
-+    sa_cl->set_stattr = qemu_s390_peek_stattr_stub;
-+    sa_cl->peek_stattr = qemu_s390_peek_stattr_stub;
-+    sa_cl->set_migrationmode = qemu_s390_set_migrationmode_stub;
-+    sa_cl->get_dirtycount = qemu_s390_get_dirtycount_stub;
-+    sa_cl->get_active = qemu_s390_get_active;
-+}
-+
-+static const TypeInfo qemu_s390_stattrib_info = {
-+    .name          = TYPE_QEMU_S390_STATTRIB,
-+    .parent        = TYPE_S390_STATTRIB,
-+    .instance_init = qemu_s390_stattrib_instance_init,
-+    .instance_size = sizeof(QEMUS390StAttribState),
-+    .class_init    = qemu_s390_stattrib_class_init,
-+    .class_size    = sizeof(S390StAttribClass),
-+};
-+
-+/* Generic abstract object: */
-+
-+static void s390_stattrib_realize(DeviceState *dev, Error **errp)
-+{
-+    bool ambiguous = false;
-+
-+    object_resolve_path_type("", TYPE_S390_STATTRIB, &ambiguous);
-+    if (ambiguous) {
-+        error_setg(errp, "storage_attributes device already exists");
-+    }
-+}
-+
-+static void s390_stattrib_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->hotpluggable = false;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->realize = s390_stattrib_realize;
-+}
-+
-+static inline bool s390_stattrib_get_migration_enabled(Object *obj, Error **e)
-+{
-+    S390StAttribState *s = S390_STATTRIB(obj);
-+
-+    return s->migration_enabled;
-+}
-+
-+static inline void s390_stattrib_set_migration_enabled(Object *obj, bool value,
-+                                            Error **errp)
-+{
-+    S390StAttribState *s = S390_STATTRIB(obj);
-+
-+    s->migration_enabled = value;
-+}
-+
-+static void s390_stattrib_instance_init(Object *obj)
-+{
-+    S390StAttribState *sas = S390_STATTRIB(obj);
-+    SaveVMHandlers *ops;
-+
-+    /* ops will always be freed by qemu when unregistering */
-+    ops = g_new0(SaveVMHandlers, 1);
-+
-+    ops->save_setup = cmma_save_setup;
-+    ops->save_live_iterate = cmma_save_iterate;
-+    ops->save_live_complete_precopy = cmma_save_complete;
-+    ops->save_live_pending = cmma_save_pending;
-+    ops->save_cleanup = cmma_save_cleanup;
-+    ops->load_state = cmma_load;
-+    ops->is_active = cmma_active;
-+    register_savevm_live(NULL, TYPE_S390_STATTRIB, 0, 0, ops, sas);
-+
-+    object_property_add_bool(obj, "migration-enabled",
-+                             s390_stattrib_get_migration_enabled,
-+                             s390_stattrib_set_migration_enabled, NULL);
-+    object_property_set_bool(obj, true, "migration-enabled", NULL);
-+    sas->migration_cur_gfn = 0;
-+}
-+
-+static const TypeInfo s390_stattrib_info = {
-+    .name          = TYPE_S390_STATTRIB,
-+    .parent        = TYPE_DEVICE,
-+    .instance_init = s390_stattrib_instance_init,
-+    .instance_size = sizeof(S390StAttribState),
-+    .class_init    = s390_stattrib_class_init,
-+    .class_size    = sizeof(S390StAttribClass),
-+    .abstract      = true,
-+};
-+
-+static void s390_stattrib_register_types(void)
-+{
-+    type_register_static(&s390_stattrib_info);
-+    type_register_static(&qemu_s390_stattrib_info);
-+}
-+
-+type_init(s390_stattrib_register_types)
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 41ca666..0c8f758 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -24,6 +24,7 @@
- #include "qemu/config-file.h"
- #include "s390-pci-bus.h"
- #include "hw/s390x/storage-keys.h"
-+#include "hw/s390x/storage-attributes.h"
- #include "hw/compat.h"
- #include "ipl.h"
- #include "hw/s390x/s390-virtio-ccw.h"
-@@ -103,6 +104,8 @@ void s390_memory_init(ram_addr_t mem_size)
- 
-     /* Initialize storage key device */
-     s390_skeys_init();
-+    /* Initialize storage attributes device */
-+    s390_stattrib_init();
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 62db7f6..997815c 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -909,7 +909,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+     return ret;
  }
  
- static SaveVMHandlers savevm_gtod = {
-@@ -406,7 +409,12 @@ static const TypeInfo ccw_machine_info = {
-     type_init(ccw_machine_register_##suffix)
+-static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
++static void sch_handle_start_func_virtual(SubchDev *sch)
+ {
  
- #define CCW_COMPAT_2_9 \
--        HW_COMPAT_2_9
-+        HW_COMPAT_2_9 \
-+        {\
-+            .driver   = TYPE_S390_STATTRIB,\
-+            .property = "migration-enabled",\
-+            .value    = "off",\
-+        },
+     PMCW *p = &sch->curr_status.pmcw;
+@@ -923,10 +923,10 @@ static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
  
- #define CCW_COMPAT_2_8 \
-         HW_COMPAT_2_8 \
-diff --git a/include/hw/s390x/storage-attributes.h b/include/hw/s390x/storage-attributes.h
-new file mode 100644
-index 0000000..678df95
---- /dev/null
-+++ b/include/hw/s390x/storage-attributes.h
-@@ -0,0 +1,77 @@
-+/*
-+ * s390 storage attributes device
-+ *
-+ * Copyright 2016 IBM Corp.
-+ * Author(s): Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef S390_STORAGE_ATTRIBUTES_H
-+#define S390_STORAGE_ATTRIBUTES_H
-+
-+#include <hw/qdev.h>
-+
-+#define TYPE_S390_STATTRIB "s390-storage_attributes"
-+#define TYPE_QEMU_S390_STATTRIB "s390-storage_attributes-qemu"
-+#define TYPE_KVM_S390_STATTRIB "s390-storage_attributes-kvm"
-+
-+#define S390_STATTRIB(obj) \
-+    OBJECT_CHECK(S390StAttribState, (obj), TYPE_S390_STATTRIB)
-+
-+typedef struct S390StAttribState {
-+    DeviceState parent_obj;
-+    uint64_t migration_cur_gfn;
-+    bool migration_enabled;
-+} S390StAttribState;
-+
-+#define S390_STATTRIB_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(S390StAttribClass, (klass), TYPE_S390_STATTRIB)
-+#define S390_STATTRIB_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(S390StAttribClass, (obj), TYPE_S390_STATTRIB)
-+
-+typedef struct S390StAttribClass {
-+    DeviceClass parent_class;
-+    /* Return value: < 0 on error, or new count */
-+    int (*get_stattr)(S390StAttribState *sa, uint64_t *start_gfn,
-+                      uint32_t count, uint8_t *values);
-+    int (*peek_stattr)(S390StAttribState *sa, uint64_t start_gfn,
-+                       uint32_t count, uint8_t *values);
-+    int (*set_stattr)(S390StAttribState *sa, uint64_t start_gfn,
-+                      uint32_t count, uint8_t *values);
-+    void (*synchronize)(S390StAttribState *sa);
-+    int (*set_migrationmode)(S390StAttribState *sa, bool value);
-+    int (*get_active)(S390StAttribState *sa);
-+    long long (*get_dirtycount)(S390StAttribState *sa);
-+} S390StAttribClass;
-+
-+#define QEMU_S390_STATTRIB(obj) \
-+    OBJECT_CHECK(QEMUS390StAttribState, (obj), TYPE_QEMU_S390_STATTRIB)
-+
-+typedef struct QEMUS390StAttribState {
-+    S390StAttribState parent_obj;
-+} QEMUS390StAttribState;
-+
-+#define KVM_S390_STATTRIB(obj) \
-+    OBJECT_CHECK(KVMS390StAttribState, (obj), TYPE_KVM_S390_STATTRIB)
-+
-+typedef struct KVMS390StAttribState {
-+    S390StAttribState parent_obj;
-+    uint64_t still_dirty;
-+    uint8_t *incoming_buffer;
-+} KVMS390StAttribState;
-+
-+void s390_stattrib_init(void);
-+
-+#ifdef CONFIG_KVM
-+Object *kvm_s390_stattrib_create(void);
-+#else
-+static inline Object *kvm_s390_stattrib_create(void)
-+{
-+    return NULL;
-+}
-+#endif
-+
-+#endif /* S390_STORAGE_ATTRIBUTES_H */
+     if (!(s->ctrl & SCSW_ACTL_SUSP)) {
+         /* Start Function triggered via ssch, i.e. we have an ORB */
++        ORB *orb = &sch->orb;
+         s->cstat = 0;
+         s->dstat = 0;
+         /* Look at the orb and try to execute the channel program. */
+-        assert(orb != NULL); /* resume does not pass an orb */
+         p->intparm = orb->intparm;
+         if (!(orb->lpm & path)) {
+             /* Generate a deferred cc 3 condition. */
+@@ -940,8 +940,7 @@ static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
+         sch->ccw_no_data_cnt = 0;
+         suspend_allowed = !!(orb->ctrl0 & ORB_CTRL0_MASK_SPND);
+     } else {
+-        /* Start Function resumed via rsch, i.e. we don't have an
+-         * ORB */
++        /* Start Function resumed via rsch */
+         s->ctrl &= ~(SCSW_ACTL_SUSP | SCSW_ACTL_RESUME_PEND);
+         /* The channel program had been suspended before. */
+         suspend_allowed = true;
+@@ -1011,13 +1010,14 @@ static void sch_handle_start_func_virtual(SubchDev *sch, ORB *orb)
+ 
+ }
+ 
+-static int sch_handle_start_func_passthrough(SubchDev *sch, ORB *orb)
++static int sch_handle_start_func_passthrough(SubchDev *sch)
+ {
+ 
+     PMCW *p = &sch->curr_status.pmcw;
+     SCSW *s = &sch->curr_status.scsw;
+     int ret;
+ 
++    ORB *orb = &sch->orb;
+     if (!(s->ctrl & SCSW_ACTL_SUSP)) {
+         assert(orb != NULL);
+         p->intparm = orb->intparm;
+@@ -1062,7 +1062,7 @@ static int sch_handle_start_func_passthrough(SubchDev *sch, ORB *orb)
+  * read/writes) asynchronous later on if we start supporting more than
+  * our current very simple devices.
+  */
+-int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
++int do_subchannel_work_virtual(SubchDev *sch)
+ {
+ 
+     SCSW *s = &sch->curr_status.scsw;
+@@ -1073,7 +1073,7 @@ int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
+         sch_handle_halt_func(sch);
+     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
+         /* Triggered by both ssch and rsch. */
+-        sch_handle_start_func_virtual(sch, orb);
++        sch_handle_start_func_virtual(sch);
+     } else {
+         /* Cannot happen. */
+         return 0;
+@@ -1082,7 +1082,7 @@ int do_subchannel_work_virtual(SubchDev *sch, ORB *orb)
+     return 0;
+ }
+ 
+-int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
++int do_subchannel_work_passthrough(SubchDev *sch)
+ {
+     int ret;
+     SCSW *s = &sch->curr_status.scsw;
+@@ -1096,7 +1096,7 @@ int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
+         sch_handle_halt_func(sch);
+         ret = 0;
+     } else if (s->ctrl & SCSW_FCTL_START_FUNC) {
+-        ret = sch_handle_start_func_passthrough(sch, orb);
++        ret = sch_handle_start_func_passthrough(sch);
+     } else {
+         /* Cannot happen. */
+         return -ENODEV;
+@@ -1105,10 +1105,10 @@ int do_subchannel_work_passthrough(SubchDev *sch, ORB *orb)
+     return ret;
+ }
+ 
+-static int do_subchannel_work(SubchDev *sch, ORB *orb)
++static int do_subchannel_work(SubchDev *sch)
+ {
+     if (sch->do_subchannel_work) {
+-        return sch->do_subchannel_work(sch, orb);
++        return sch->do_subchannel_work(sch);
+     } else {
+         return -EINVAL;
+     }
+@@ -1315,7 +1315,7 @@ int css_do_csch(SubchDev *sch)
+     s->ctrl &= ~(SCSW_CTRL_MASK_FCTL | SCSW_CTRL_MASK_ACTL);
+     s->ctrl |= SCSW_FCTL_CLEAR_FUNC | SCSW_ACTL_CLEAR_PEND;
+ 
+-    do_subchannel_work(sch, NULL);
++    do_subchannel_work(sch);
+     ret = 0;
+ 
+ out:
+@@ -1356,7 +1356,7 @@ int css_do_hsch(SubchDev *sch)
+     }
+     s->ctrl |= SCSW_ACTL_HALT_PEND;
+ 
+-    do_subchannel_work(sch, NULL);
++    do_subchannel_work(sch);
+     ret = 0;
+ 
+ out:
+@@ -1431,7 +1431,7 @@ int css_do_ssch(SubchDev *sch, ORB *orb)
+     s->ctrl |= (SCSW_FCTL_START_FUNC | SCSW_ACTL_START_PEND);
+     s->flags &= ~SCSW_FLAGS_MASK_PNO;
+ 
+-    ret = do_subchannel_work(sch, orb);
++    ret = do_subchannel_work(sch);
+ 
+ out:
+     return ret;
+@@ -1710,7 +1710,7 @@ int css_do_rsch(SubchDev *sch)
+     }
+ 
+     s->ctrl |= SCSW_ACTL_RESUME_PEND;
+-    do_subchannel_work(sch, NULL);
++    do_subchannel_work(sch);
+     ret = 0;
+ 
+ out:
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index 71076cb..c9edd07 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -94,7 +94,7 @@ struct SubchDev {
+     /* transport-provided data: */
+     int (*ccw_cb) (SubchDev *, CCW1);
+     void (*disable_cb)(SubchDev *);
+-    int (*do_subchannel_work) (SubchDev *, ORB *);
++    int (*do_subchannel_work) (SubchDev *);
+     SenseId id;
+     void *driver_data;
+ };
+@@ -157,8 +157,8 @@ void css_generate_chp_crws(uint8_t cssid, uint8_t chpid);
+ void css_generate_css_crws(uint8_t cssid);
+ void css_clear_sei_pending(void);
+ int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data);
+-int do_subchannel_work_virtual(SubchDev *sub, ORB *orb);
+-int do_subchannel_work_passthrough(SubchDev *sub, ORB *orb);
++int do_subchannel_work_virtual(SubchDev *sub);
++int do_subchannel_work_passthrough(SubchDev *sub);
+ 
+ typedef enum {
+     CSS_IO_ADAPTER_VIRTIO = 0,
 -- 
 2.7.4
