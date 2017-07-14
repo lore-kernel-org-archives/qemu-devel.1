@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVW-0003tu-Sc
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVX-0003up-QS
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVT-0003ue-0K
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVW-00040X-TR
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:43 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 14 Jul 2017 07:14:46 -0500
-Message-Id: <20170714121457.10322-10-eblake@redhat.com>
+Date: Fri, 14 Jul 2017 07:14:47 -0500
+Message-Id: <20170714121457.10322-11-eblake@redhat.com>
 In-Reply-To: <20170714121457.10322-1-eblake@redhat.com>
 References: <20170714121457.10322-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 09/20] parallels: Switch to
+Subject: [Qemu-devel] [PATCH v2 10/20] qcow: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,71 +21,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the parallels driver accordingly.  Note that
-the internal function block_status() is still sector-based, because
-it is still in use by other sector-based functions; but that's okay
-because request_alignment is 512 as a result of those functions.
-For now, no optimizations are added based on the mapping hint.
+byte-based.  Update the qcow driver accordingly.  There is no
+intent to optimize based on the mapping flag for this format.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Denis V. Lunev <den@openvz.org>
 
 ---
-v2: rebase to mapping parameter; it is ignored, so R-b kept
+v2: rebase to mapping flag
 ---
- block/parallels.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ block/qcow.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 5bbdfab..8aaacea 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -274,22 +274,29 @@ static coroutine_fn int parallels_co_flush_to_os(BlockDriverState *bs)
+diff --git a/block/qcow.c b/block/qcow.c
+index 66827d6..38dd191 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -486,20 +486,25 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
+     return cluster_offset;
  }
 
-
--static int64_t coroutine_fn parallels_co_get_block_status(BlockDriverState *bs,
+-static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
 -        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int64_t coroutine_fn parallels_co_block_status(BlockDriverState *bs,
-+                                                      bool mapping,
-+                                                      int64_t offset,
-+                                                      int64_t bytes,
-+                                                      int64_t *pnum,
-+                                                      BlockDriverState **file)
++static int64_t coroutine_fn qcow_co_block_status(BlockDriverState *bs,
++                                                 bool mapping,
++                                                 int64_t offset, int64_t bytes,
++                                                 int64_t *pnum,
++                                                 BlockDriverState **file)
  {
-     BDRVParallelsState *s = bs->opaque;
--    int64_t offset;
-+    int count;
+     BDRVQcowState *s = bs->opaque;
+-    int index_in_cluster, n;
++    int index_in_cluster;
++    int64_t n;
+     uint64_t cluster_offset;
 
-+    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
      qemu_co_mutex_lock(&s->lock);
--    offset = block_status(s, sector_num, nb_sectors, pnum);
-+    offset = block_status(s, offset >> BDRV_SECTOR_BITS,
-+                          bytes >> BDRV_SECTOR_BITS, &count);
+-    cluster_offset = get_cluster_offset(bs, sector_num << 9, 0, 0, 0, 0);
++    cluster_offset = get_cluster_offset(bs, offset, 0, 0, 0, 0);
      qemu_co_mutex_unlock(&s->lock);
-
-     if (offset < 0) {
+-    index_in_cluster = sector_num & (s->cluster_sectors - 1);
+-    n = s->cluster_sectors - index_in_cluster;
+-    if (n > nb_sectors)
+-        n = nb_sectors;
++    index_in_cluster = offset & (s->cluster_size - 1);
++    n = s->cluster_size - index_in_cluster;
++    if (n > bytes) {
++        n = bytes;
++    }
+     *pnum = n;
+     if (!cluster_offset) {
          return 0;
+@@ -507,7 +512,7 @@ static int64_t coroutine_fn qcow_co_get_block_status(BlockDriverState *bs,
+     if ((cluster_offset & QCOW_OFLAG_COMPRESSED) || s->crypto) {
+         return BDRV_BLOCK_DATA;
      }
-
-+    *pnum = count * BDRV_SECTOR_SIZE;
+-    cluster_offset |= (index_in_cluster << BDRV_SECTOR_BITS);
++    cluster_offset |= (index_in_cluster & BDRV_BLOCK_OFFSET_MASK);
      *file = bs->file->bs;
--    return (offset << BDRV_SECTOR_BITS) |
-+    return (offset & BDRV_BLOCK_OFFSET_MASK) |
-         BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
+     return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | cluster_offset;
  }
+@@ -1076,7 +1081,7 @@ static BlockDriver bdrv_qcow = {
 
-@@ -778,7 +785,7 @@ static BlockDriver bdrv_parallels = {
-     .bdrv_open		= parallels_open,
-     .bdrv_close		= parallels_close,
-     .bdrv_child_perm          = bdrv_format_default_perms,
--    .bdrv_co_get_block_status = parallels_co_get_block_status,
-+    .bdrv_co_block_status     = parallels_co_block_status,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
-     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
-     .bdrv_co_readv  = parallels_co_readv,
+     .bdrv_co_readv          = qcow_co_readv,
+     .bdrv_co_writev         = qcow_co_writev,
+-    .bdrv_co_get_block_status   = qcow_co_get_block_status,
++    .bdrv_co_block_status   = qcow_co_block_status,
+
+     .bdrv_make_empty        = qcow_make_empty,
+     .bdrv_co_pwritev_compressed = qcow_co_pwritev_compressed,
 -- 
 2.9.4
