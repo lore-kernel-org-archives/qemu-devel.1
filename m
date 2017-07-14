@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dW4M3-0007hq-Fb
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:26:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dW4TV-0002Am-VX
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dW4M2-0005az-J1
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:26:15 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dW4TV-0008NL-AB
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 13:33:58 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-	<150002437386.22386.7745855254236101855.stgit@frigg.lan>
+	<150002534291.22386.13499916738708680298.stgit@frigg.lan>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <584dade6-5ce0-4950-c0e3-03128bae119e@twiddle.net>
-Date: Fri, 14 Jul 2017 07:26:01 -1000
+Message-ID: <28a48f7c-930a-389b-b39d-64c43654cd04@twiddle.net>
+Date: Fri, 14 Jul 2017 07:33:46 -1000
 MIME-Version: 1.0
-In-Reply-To: <150002437386.22386.7745855254236101855.stgit@frigg.lan>
+In-Reply-To: <150002534291.22386.13499916738708680298.stgit@frigg.lan>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v13 18/26] target/arm: [tcg] Port to
- breakpoint_check
+Subject: Re: [Qemu-devel] [PATCH v13 22/26] target/arm: [tcg] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +28,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
 Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 07/13/2017 11:26 PM, Lluís Vilanova wrote:
-> Incrementally paves the way towards using the generic instruction translation
-> loop.
-> 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> ---
->   target/arm/translate.c |   53 +++++++++++++++++++++++++++++++-----------------
->   1 file changed, 34 insertions(+), 19 deletions(-)
-> 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index b9183fc511..55bef09739 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -11917,6 +11917,33 @@ static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
->   #endif
->   }
->   
-> +static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-> +                                    const CPUBreakpoint *bp)
-> +{
-> +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-> +
-> +    if (bp->flags & BP_CPU) {
-> +        gen_set_condexec(dc);
-> +        gen_set_pc_im(dc, dc->pc);
-> +        gen_helper_check_breakpoints(cpu_env);
-> +        /* End the TB early; it's likely not going to be executed */
-> +        dc->base.is_jmp = DISAS_UPDATE;
-> +    } else {
-> +        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
-> +        /* The address covered by the breakpoint must be
-> +           included in [tb->pc, tb->pc + tb->size) in order
-> +           to for it to be properly cleared -- thus we
-> +           increment the PC here so that the logic setting
-> +           tb->size below does the right thing.  */
-> +        /* TODO: Advance PC by correct instruction length to
-> +         * avoid disassembler error messages */
-> +        dc->pc += 2;
+On 07/13/2017 11:42 PM, Lluís Vilanova wrote:
+> -        dc->base.is_jmp = DISAS_SKIP;
 > +        dc->base.is_jmp = DISAS_NORETURN;
-> +    }
-> +
-> +    return true;
-> +}
-> +
->   /* generate intermediate code for basic block 'tb'.  */
->   void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->   {
-> @@ -11965,28 +11992,16 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
->           if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
->               CPUBreakpoint *bp;
->               QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
-> -                if (bp->pc == dc->pc) {
-> -                    if (bp->flags & BP_CPU) {
-> -                        gen_set_condexec(dc);
-> -                        gen_set_pc_im(dc, dc->pc);
-> -                        gen_helper_check_breakpoints(cpu_env);
-> -                        /* End the TB early; it's likely not going to be executed */
-> -                        dc->base.is_jmp = DISAS_UPDATE;
 
-Oh I see what you're doing there in the main loop.
-And I see that you're copying existing behaviour.
-
-That said, I do wonder if there's a better way.
-
-Looking back at the original patch (5d98bf8f), there do not
-seem to have been any other side effects intended; simply
-"single step" any insn for which this bp condition is met.
-
-Another way to handle this would be if we could adjust max_insns = num_insns.
-That would cause the loop to exit after the current insn, with DISAS_TOO_MANY 
-if nothing else.
+Really should fold this back into the patch that introduced SKIP temporarily.
 
 
 r~
