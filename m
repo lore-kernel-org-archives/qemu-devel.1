@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVtt3-00017G-KO
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:41 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVtt5-00019c-Tm
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dVtt1-00028K-3P
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dVtt3-0002AX-8V
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:15:39 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 14 Jul 2017 16:15:13 +1000
-Message-Id: <20170714061521.28300-11-david@gibson.dropbear.id.au>
+Date: Fri, 14 Jul 2017 16:15:14 +1000
+Message-Id: <20170714061521.28300-12-david@gibson.dropbear.id.au>
 In-Reply-To: <20170714061521.28300-1-david@gibson.dropbear.id.au>
 References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 10/18] spapr: Remove
- sPAPRConfigureConnectorState sub-structure
+Subject: [Qemu-devel] [PULL 11/18] spapr: Implement DR-indicator for
+ physical DRCs only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,227 +23,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, groug@kaod.org, sjitindarsingh@gmail.com, sbobroff@au1.ibm.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Most of the time, the state of a DRC object is contained in the single
-'state' variable.  However, during the transition from UNISOLATE to
-CONFIGURED state requires multiple calls to the ibm,configure-connector
-RTAS call to retrieve the device tree for the attached device.  We need
-some extra state to keep track of where we're up to in delivering the
-device tree information to the guest.
+According to PAPR, the DR-indicator should only be valid for physical DRCs,
+not logical DRCs.  At the moment we implement it for all DRCs, so restrict
+it to physical ones only.
 
-Currently that extra state is in a sPAPRConfigureConnectorState
-substructure which is only allocated when we're in the middle of the
-configure connector process.  That sounds like a good idea, but the extra
-state is only two integers - on many platforms that will take up the same
-room as the (maybe NULL) ccs pointer even before malloc() overhead.  Plus
-it's another object whose lifetime we need to manage.  In short, it's not
-worth it.
-
-So, fold the sPAPRConfigureConnectorState substructure directly into the
-DRC object.
-
-Previously the structure was allocated lazily when the configure-connector
-call discovers it's not there.  Now, we need to initialize the subfields
-pre-emptively, as soon as we enter UNISOLATE state.
-
-Although it's not strictly necessary (the field values should only ever
-be consulted when in UNISOLATE state), we try to keep them at -1 when in
-other states, as a debugging aid.
+We move the state to the physical DRC subclass, which means adding some
+QOM boilerplate to handle the newly distinct type.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_drc.c         | 56 +++++++++++++++-------------------------------
- include/hw/ppc/spapr_drc.h | 16 +++++--------
- 2 files changed, 24 insertions(+), 48 deletions(-)
+ hw/ppc/spapr_drc.c         | 68 ++++++++++++++++++++++++++++++++++++++++++----
+ include/hw/ppc/spapr_drc.h | 13 ++++++---
+ 2 files changed, 72 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 8c9c4f7092..534fefa998 100644
+index 534fefa998..611dc57865 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -59,14 +59,6 @@ static uint32_t drc_isolate_physical(sPAPRDRConnector *drc)
-         g_assert_not_reached();
+@@ -478,7 +478,6 @@ static const VMStateDescription vmstate_spapr_drc = {
+     .needed = spapr_drc_needed,
+     .fields  = (VMStateField []) {
+         VMSTATE_UINT32(state, sPAPRDRConnector),
+-        VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -575,10 +574,63 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     dk->user_creatable = false;
+ }
+ 
++static bool drc_physical_needed(void *opaque)
++{
++    sPAPRDRCPhysical *drcp = (sPAPRDRCPhysical *)opaque;
++    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(drcp);
++
++    if ((drc->dev && (drcp->dr_indicator == SPAPR_DR_INDICATOR_ACTIVE))
++        || (!drc->dev && (drcp->dr_indicator == SPAPR_DR_INDICATOR_INACTIVE))) {
++        return false;
++    }
++    return true;
++}
++
++static const VMStateDescription vmstate_spapr_drc_physical = {
++    .name = "spapr_drc",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = drc_physical_needed,
++    .fields  = (VMStateField []) {
++        VMSTATE_UINT32(dr_indicator, sPAPRDRCPhysical),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void drc_physical_reset(void *opaque)
++{
++    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(opaque);
++    sPAPRDRCPhysical *drcp = SPAPR_DRC_PHYSICAL(drc);
++
++    if (drc->dev) {
++        drcp->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
++    } else {
++        drcp->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
++    }
++}
++
++static void realize_physical(DeviceState *d, Error **errp)
++{
++    sPAPRDRCPhysical *drcp = SPAPR_DRC_PHYSICAL(d);
++    Error *local_err = NULL;
++
++    realize(d, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    vmstate_register(DEVICE(drcp), spapr_drc_index(SPAPR_DR_CONNECTOR(drcp)),
++                     &vmstate_spapr_drc_physical, drcp);
++    qemu_register_reset(drc_physical_reset, drcp);
++}
++
+ static void spapr_drc_physical_class_init(ObjectClass *k, void *data)
+ {
++    DeviceClass *dk = DEVICE_CLASS(k);
+     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
+ 
++    dk->realize = realize_physical;
+     drck->dr_entity_sense = physical_entity_sense;
+     drck->isolate = drc_isolate_physical;
+     drck->unisolate = drc_unisolate_physical;
+@@ -640,7 +692,7 @@ static const TypeInfo spapr_dr_connector_info = {
+ static const TypeInfo spapr_drc_physical_info = {
+     .name          = TYPE_SPAPR_DRC_PHYSICAL,
+     .parent        = TYPE_SPAPR_DR_CONNECTOR,
+-    .instance_size = sizeof(sPAPRDRConnector),
++    .instance_size = sizeof(sPAPRDRCPhysical),
+     .class_init    = spapr_drc_physical_class_init,
+     .abstract      = true,
+ };
+@@ -883,12 +935,18 @@ static uint32_t rtas_set_dr_indicator(uint32_t idx, uint32_t state)
+ {
+     sPAPRDRConnector *drc = spapr_drc_by_index(idx);
+ 
+-    if (!drc) {
+-        return RTAS_OUT_PARAM_ERROR;
++    if (!drc || !object_dynamic_cast(OBJECT(drc), TYPE_SPAPR_DRC_PHYSICAL)) {
++        return RTAS_OUT_NO_SUCH_INDICATOR;
++    }
++    if ((state != SPAPR_DR_INDICATOR_INACTIVE)
++        && (state != SPAPR_DR_INDICATOR_ACTIVE)
++        && (state != SPAPR_DR_INDICATOR_IDENTIFY)
++        && (state != SPAPR_DR_INDICATOR_ACTION)) {
++        return RTAS_OUT_PARAM_ERROR; /* bad state parameter */
      }
  
--    /* if the guest is configuring a device attached to this DRC, we
--     * should reset the configuration state at this point since it may
--     * no longer be reliable (guest released device and needs to start
--     * over, or unplug occurred so the FDT is no longer valid)
--     */
--    g_free(drc->ccs);
--    drc->ccs = NULL;
--
-     drc->state = SPAPR_DRC_STATE_PHYSICAL_POWERON;
- 
-     if (drc->unplug_requested) {
-@@ -99,6 +91,8 @@ static uint32_t drc_unisolate_physical(sPAPRDRConnector *drc)
-     }
- 
-     drc->state = SPAPR_DRC_STATE_PHYSICAL_UNISOLATE;
-+    drc->ccs_offset = drc->fdt_start_offset;
-+    drc->ccs_depth = 0;
- 
+     trace_spapr_drc_set_dr_indicator(idx, state);
+-    drc->dr_indicator = state;
++    SPAPR_DRC_PHYSICAL(drc)->dr_indicator = state;
      return RTAS_OUT_SUCCESS;
  }
-@@ -117,14 +111,6 @@ static uint32_t drc_isolate_logical(sPAPRDRConnector *drc)
-         g_assert_not_reached();
-     }
- 
--    /* if the guest is configuring a device attached to this DRC, we
--     * should reset the configuration state at this point since it may
--     * no longer be reliable (guest released device and needs to start
--     * over, or unplug occurred so the FDT is no longer valid)
--     */
--    g_free(drc->ccs);
--    drc->ccs = NULL;
--
-     /*
-      * Fail any requests to ISOLATE the LMB DRC if this LMB doesn't
-      * belong to a DIMM device that is marked for removal.
-@@ -176,6 +162,9 @@ static uint32_t drc_unisolate_logical(sPAPRDRConnector *drc)
-     g_assert(drc->dev);
- 
-     drc->state = SPAPR_DRC_STATE_LOGICAL_UNISOLATE;
-+    drc->ccs_offset = drc->fdt_start_offset;
-+    drc->ccs_depth = 0;
-+
-     return RTAS_OUT_SUCCESS;
- }
- 
-@@ -441,9 +430,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
- 
-     trace_spapr_drc_reset(spapr_drc_index(drc));
- 
--    g_free(drc->ccs);
--    drc->ccs = NULL;
--
-     /* immediately upon reset we can safely assume DRCs whose devices
-      * are pending removal can be safely removed.
-      */
-@@ -457,6 +443,9 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
-     } else {
-         drc->state = drck->empty_state;
-     }
-+
-+    drc->ccs_offset = -1;
-+    drc->ccs_depth = -1;
- }
- 
- static void drc_reset(void *opaque)
-@@ -1010,7 +999,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-     uint32_t drc_index;
-     sPAPRDRConnector *drc;
-     sPAPRDRConnectorClass *drck;
--    sPAPRConfigureConnectorState *ccs;
-     sPAPRDRCCResponse resp = SPAPR_DR_CC_RESPONSE_CONTINUE;
-     int rc;
- 
-@@ -1040,25 +1028,18 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
- 
-     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
- 
--    ccs = drc->ccs;
--    if (!ccs) {
--        ccs = g_new0(sPAPRConfigureConnectorState, 1);
--        ccs->fdt_offset = drc->fdt_start_offset;
--        drc->ccs = ccs;
--    }
--
-     do {
-         uint32_t tag;
-         const char *name;
-         const struct fdt_property *prop;
-         int fdt_offset_next, prop_len;
- 
--        tag = fdt_next_tag(drc->fdt, ccs->fdt_offset, &fdt_offset_next);
-+        tag = fdt_next_tag(drc->fdt, drc->ccs_offset, &fdt_offset_next);
- 
-         switch (tag) {
-         case FDT_BEGIN_NODE:
--            ccs->fdt_depth++;
--            name = fdt_get_name(drc->fdt, ccs->fdt_offset, NULL);
-+            drc->ccs_depth++;
-+            name = fdt_get_name(drc->fdt, drc->ccs_offset, NULL);
- 
-             /* provide the name of the next OF node */
-             wa_offset = CC_VAL_DATA_OFFSET;
-@@ -1067,23 +1048,22 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-             resp = SPAPR_DR_CC_RESPONSE_NEXT_CHILD;
-             break;
-         case FDT_END_NODE:
--            ccs->fdt_depth--;
--            if (ccs->fdt_depth == 0) {
-+            drc->ccs_depth--;
-+            if (drc->ccs_depth == 0) {
-                 uint32_t drc_index = spapr_drc_index(drc);
- 
-                 /* done sending the device tree, move to configured state */
-                 trace_spapr_drc_set_configured(drc_index);
-                 drc->state = drck->ready_state;
--                g_free(ccs);
--                drc->ccs = NULL;
--                ccs = NULL;
-+                drc->ccs_offset = -1;
-+                drc->ccs_depth = -1;
-                 resp = SPAPR_DR_CC_RESPONSE_SUCCESS;
-             } else {
-                 resp = SPAPR_DR_CC_RESPONSE_PREV_PARENT;
-             }
-             break;
-         case FDT_PROP:
--            prop = fdt_get_property_by_offset(drc->fdt, ccs->fdt_offset,
-+            prop = fdt_get_property_by_offset(drc->fdt, drc->ccs_offset,
-                                               &prop_len);
-             name = fdt_string(drc->fdt, fdt32_to_cpu(prop->nameoff));
- 
-@@ -1108,8 +1088,8 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-             /* keep seeking for an actionable tag */
-             break;
-         }
--        if (ccs) {
--            ccs->fdt_offset = fdt_offset_next;
-+        if (drc->ccs_offset >= 0) {
-+            drc->ccs_offset = fdt_offset_next;
-         }
-     } while (resp == SPAPR_DR_CC_RESPONSE_CONTINUE);
  
 diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 4ceaaf0eff..9d4fd41d22 100644
+index 9d4fd41d22..a7958d0a8d 100644
 --- a/include/hw/ppc/spapr_drc.h
 +++ b/include/hw/ppc/spapr_drc.h
-@@ -191,12 +191,6 @@ typedef enum {
-     SPAPR_DRC_STATE_PHYSICAL_CONFIGURED = 8,
- } sPAPRDRCState;
+@@ -33,7 +33,7 @@
+ #define SPAPR_DRC_PHYSICAL_CLASS(klass) \
+         OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, \
+                            TYPE_SPAPR_DRC_PHYSICAL)
+-#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
++#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRCPhysical, (obj), \
+                                              TYPE_SPAPR_DRC_PHYSICAL)
  
--/* rtas-configure-connector state */
--typedef struct sPAPRConfigureConnectorState {
--    int fdt_offset;
--    int fdt_depth;
--} sPAPRConfigureConnectorState;
+ #define TYPE_SPAPR_DRC_LOGICAL "spapr-drc-logical"
+@@ -198,9 +198,6 @@ typedef struct sPAPRDRConnector {
+     uint32_t id;
+     Object *owner;
+ 
+-    /* DR-indicator */
+-    uint32_t dr_indicator;
 -
- typedef struct sPAPRDRConnector {
-     /*< private >*/
-     DeviceState parent;
-@@ -209,14 +203,16 @@ typedef struct sPAPRDRConnector {
- 
      uint32_t state;
  
--    /* configure-connector state */
--    void *fdt;
--    int fdt_start_offset;
--    sPAPRConfigureConnectorState *ccs;
-+    /* RTAS ibm,configure-connector state */
-+    /* (only valid in UNISOLATE state) */
-+    int ccs_offset;
-+    int ccs_depth;
+     /* RTAS ibm,configure-connector state */
+@@ -232,6 +229,14 @@ typedef struct sPAPRDRConnectorClass {
+     void (*release)(DeviceState *dev);
+ } sPAPRDRConnectorClass;
  
-     /* device pointer, via link property */
-     DeviceState *dev;
-     bool unplug_requested;
-+    void *fdt;
-+    int fdt_start_offset;
- } sPAPRDRConnector;
- 
- typedef struct sPAPRDRConnectorClass {
++typedef struct sPAPRDRCPhysical {
++    /*< private >*/
++    sPAPRDRConnector parent;
++
++    /* DR-indicator */
++    uint32_t dr_indicator;
++} sPAPRDRCPhysical;
++
+ static inline bool spapr_drc_hotplugged(DeviceState *dev)
+ {
+     return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
 -- 
 2.13.0
