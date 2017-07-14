@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dW4xB-0005Qg-8Q
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:38 -0400
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4xD-0005Tk-8V
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x9-0003M7-Nh
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:37 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33172)
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4xC-0003NF-13
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:39 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36688)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dW4x9-0003LF-FV
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:35 -0400
-Received: by mail-pf0-x243.google.com with SMTP id e199so11743221pfh.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:35 -0700 (PDT)
+	id 1dW4xB-0003N1-RB
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:37 -0400
+Received: by mail-pg0-x241.google.com with SMTP id y129so11394972pgy.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:37 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 14:04:09 -0400
-Message-Id: <1500055451-14041-17-git-send-email-longpeng.mike@gmail.com>
+Date: Fri, 14 Jul 2017 14:04:11 -0400
+Message-Id: <1500055451-14041-19-git-send-email-longpeng.mike@gmail.com>
 In-Reply-To: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
 References: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 16/18] tests: crypto: add cipher speed
+Subject: [Qemu-devel] [PATCH v6 18/18] tests: crypto: add hmac speed
  benchmark support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,81 +32,45 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Now we have two qcrypto backends, libiary-backend and afalg-backend,
-but which one is faster? This patch add a cipher speed benchmark, it
-helps us to measure the performance by using "make check-speed" or
-using "./tests/benchmark-crypto-cipher" directly.
+This patch add a hmac speed benchmark, it helps us to
+measure the performance by using "make check-speed" or
+using "./tests/benchmark-crypto-hmac" directly.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- tests/Makefile.include          |  9 ++++-
- tests/benchmark-crypto-cipher.c | 88 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+), 2 deletions(-)
- create mode 100644 tests/benchmark-crypto-cipher.c
+ tests/Makefile.include        |  2 ++
+ tests/benchmark-crypto-hmac.c | 82 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+ create mode 100644 tests/benchmark-crypto-hmac.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 42e17e2..2f34c60 100644
+index c5a67a3..18f9359 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
 @@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
  check-unit-y += tests/test-crypto-hash$(EXESUF)
+ check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
  check-unit-y += tests/test-crypto-hmac$(EXESUF)
++check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
  check-unit-y += tests/test-crypto-cipher$(EXESUF)
-+check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
+ check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
  check-unit-y += tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlssession$(EXESUF)
-@@ -532,6 +533,7 @@ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
- test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
- 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
- 	$(test-qom-obj-y)
-+benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
- test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
- test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
- test-block-obj-y = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
-@@ -635,6 +637,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+@@ -638,6 +639,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
  tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+ tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
  tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
++tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
  tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
-+tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+ tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
  tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
- 
-@@ -803,6 +806,7 @@ check-help:
- 	@echo " make check-qtest-TARGET   Run qtest tests for given target"
- 	@echo " make check-qtest          Run qtest tests"
- 	@echo " make check-unit           Run qobject tests"
-+	@echo " make check-speed          Run qobject speed tests"
- 	@echo " make check-qapi-schema    Run QAPI schema tests"
- 	@echo " make check-block          Run block tests"
- 	@echo " make check-report.html    Generates an HTML test report"
-@@ -833,8 +837,8 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
- 	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
- 	done,)
- 
--.PHONY: $(patsubst %, check-%, $(check-unit-y))
--$(patsubst %, check-%, $(check-unit-y)): check-%: %
-+.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
-+$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
- 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
- 	$(call quiet-command, \
- 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
-@@ -893,6 +897,7 @@ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
- check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
- check-unit: $(patsubst %,check-%, $(check-unit-y))
-+check-speed: $(patsubst %,check-%, $(check-speed-y))
- check-block: $(patsubst %,check-%, $(check-block-y))
- check: check-qapi-schema check-unit check-qtest
- check-clean:
-diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-cipher.c
+diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
 new file mode 100644
-index 0000000..c6a4092
+index 0000000..72408be
 --- /dev/null
-+++ b/tests/benchmark-crypto-cipher.c
-@@ -0,0 +1,88 @@
++++ b/tests/benchmark-crypto-hmac.c
+@@ -0,0 +1,82 @@
 +/*
-+ * QEMU Crypto cipher speed benchmark
++ * QEMU Crypto hmac speed benchmark
 + *
 + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 + *
@@ -119,62 +83,56 @@ index 0000000..c6a4092
 + */
 +#include "qemu/osdep.h"
 +#include "crypto/init.h"
-+#include "crypto/cipher.h"
++#include "crypto/hmac.h"
 +
-+static void test_cipher_speed(const void *opaque)
++#define KEY "monkey monkey monkey monkey"
++
++static void test_hmac_speed(const void *opaque)
 +{
-+    QCryptoCipher *cipher;
-+    Error *err = NULL;
-+    double total = 0.0;
 +    size_t chunk_size = (size_t)opaque;
-+    uint8_t *key = NULL, *iv = NULL;
-+    uint8_t *plaintext = NULL, *ciphertext = NULL;
-+    size_t nkey = qcrypto_cipher_get_key_len(QCRYPTO_CIPHER_ALG_AES_128);
-+    size_t niv = qcrypto_cipher_get_iv_len(QCRYPTO_CIPHER_ALG_AES_128,
-+                                           QCRYPTO_CIPHER_MODE_CBC);
++    QCryptoHmac *hmac = NULL;
++    uint8_t *in = NULL, *out = NULL;
++    size_t out_len = 0;
++    double total = 0.0;
++    struct iovec iov;
++    Error *err = NULL;
++    int ret;
 +
-+    key = g_new0(uint8_t, nkey);
-+    memset(key, g_test_rand_int(), nkey);
++    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
++        return;
++    }
 +
-+    iv = g_new0(uint8_t, niv);
-+    memset(iv, g_test_rand_int(), niv);
++    in = g_new0(uint8_t, chunk_size);
++    memset(in, g_test_rand_int(), chunk_size);
 +
-+    ciphertext = g_new0(uint8_t, chunk_size);
-+
-+    plaintext = g_new0(uint8_t, chunk_size);
-+    memset(plaintext, g_test_rand_int(), chunk_size);
-+
-+    cipher = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_128,
-+                                QCRYPTO_CIPHER_MODE_CBC,
-+                                key, nkey, &err);
-+    g_assert(cipher != NULL);
-+
-+    g_assert(qcrypto_cipher_setiv(cipher,
-+                                  iv, niv,
-+                                  &err) == 0);
++    iov.iov_base = (char *)in;
++    iov.iov_len = chunk_size;
 +
 +    g_test_timer_start();
 +    do {
-+        g_assert(qcrypto_cipher_encrypt(cipher,
-+                                        plaintext,
-+                                        ciphertext,
-+                                        chunk_size,
-+                                        &err) == 0);
++        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256,
++                                (const uint8_t *)KEY, strlen(KEY), &err);
++        g_assert(err == NULL);
++        g_assert(hmac != NULL);
++
++        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
++        g_assert(ret == 0);
++        g_assert(err == NULL);
++
++        qcrypto_hmac_free(hmac);
++
 +        total += chunk_size;
 +    } while (g_test_timer_elapsed() < 5.0);
 +
 +    total /= 1024 * 1024; /* to MB */
 +
-+    g_print("cbc(aes128): ");
++    g_print("hmac(sha256): ");
 +    g_print("Testing chunk_size %ld bytes ", chunk_size);
 +    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
 +    g_print("%.2f MB/sec\n", total / g_test_timer_last());
 +
-+    qcrypto_cipher_free(cipher);
-+    g_free(plaintext);
-+    g_free(ciphertext);
-+    g_free(iv);
-+    g_free(key);
++    g_free(out);
++    g_free(in);
 +}
 +
 +int main(int argc, char **argv)
@@ -187,8 +145,8 @@ index 0000000..c6a4092
 +
 +    for (i = 512; i <= (64 * 1204); i *= 2) {
 +        memset(name, 0 , sizeof(name));
-+        snprintf(name, sizeof(name), "/crypto/cipher/speed-%lu", i);
-+        g_test_add_data_func(name, (void *)i, test_cipher_speed);
++        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
++        g_test_add_data_func(name, (void *)i, test_hmac_speed);
 +    }
 +
 +    return g_test_run();
