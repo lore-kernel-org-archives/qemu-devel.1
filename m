@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVyyo-0004az-Fz
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:41:59 -0400
+	(envelope-from <famz@redhat.com>) id 1dVz6r-0005BJ-NL
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:50:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVyyn-0001eU-Ls
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:41:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38408)
+	(envelope-from <famz@redhat.com>) id 1dVz6o-0007f3-LE
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:50:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58408)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVyyn-0001dP-CO
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:41:53 -0400
-Date: Fri, 14 Jul 2017 19:41:49 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVz6o-0007c6-Cj
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:50:10 -0400
+Date: Fri, 14 Jul 2017 19:50:03 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170714114149.GB10205@lemon>
-References: <1500029117-6387-1-git-send-email-peter.maydell@linaro.org>
+Message-ID: <20170714115002.GF18687@lemon>
+References: <20170713144352.2212-1-berrange@redhat.com>
+	<20170714022930.GC18687@lemon> <20170714114106.GD28095@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1500029117-6387-1-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] tests: Handle $RANDOM not being supported
- by the shell
+In-Reply-To: <20170714114106.GD28095@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] docker: Don't enable networking as a
+ side-effect of DEBUG=1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Kamil Rytarowski <n54@gmx.com>, patches@linaro.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On Fri, 07/14 11:45, Peter Maydell wrote:
-> In various places in our test makefiles and scripts we use the
-> shell $RANDOM to create a random number. This is a bash
-> specific extension, and doesn't work on other shells.
-> With dash the shell doesn't complain, it just effectively
-> always evaluates $RANDOM to 0:
->   echo $((RANDOM + 32768))     => 32768
+On Fri, 07/14 12:41, Daniel P. Berrange wrote:
+> On Fri, Jul 14, 2017 at 10:29:30AM +0800, Fam Zheng wrote:
+> > On Thu, 07/13 15:43, Daniel P. Berrange wrote:
+> > > When trying to debug problems with tests it is natural to set
+> > > DEBUG=1 when starting the docker environment. Unfortunately
+> > > this has a side-effect of enabling an eth0 network interface
+> > > in the container, which changes the operating environment of
+> > > the test suite. IOW tests with fail may suddenly start
+> > > working again if DEBUG=1 is set, due to changed network setup.
+> > > 
+> > > Add a separate NETWORK variable to allow enablement of
+> > > networking separately from DEBUG=1. This can be used in two
+> > > ways. To enable the default docker network backend
+> > > 
+> > >   make docker-test-build@fedora NETWORK=1
+> > > 
+> > > while to enable a specific network backend, eg join the network
+> > > associated with the container 'wibble':
+> > > 
+> > >   make docker-test-build@fedora NETWORK=container:wibble
+> > > 
+> > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > > ---
+> > > 
+> > > Changed in v2:
+> > > 
+> > >  - Remove reference to eth0
+> > >  - Allow arbitrary docker network backend to be given
+> > > 
+> > >  tests/docker/Makefile.include | 5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> > > index 037cb9e9e7..ec8e8d935d 100644
+> > > --- a/tests/docker/Makefile.include
+> > > +++ b/tests/docker/Makefile.include
+> > > @@ -106,6 +106,8 @@ docker:
+> > >  	@echo '                         (default is 1)'
+> > >  	@echo '    DEBUG=1              Stop and drop to shell in the created container'
+> > >  	@echo '                         before running the command.'
+> > > +	@echo '    NETWORK=1            Enable virtual network interface with default backend.'
+> > > +	@echo '    NETWORK=$BACKEND     Enable virtual network interface with $BACKEND.'
+> > >  	@echo '    NOUSER               Define to disable adding current user to containers passwd.'
+> > >  	@echo '    NOCACHE=1            Ignore cache when build images.'
+> > >  	@echo '    EXECUTABLE=<path>    Include executable in image.'
+> > > @@ -132,7 +134,8 @@ docker-run: docker-qemu-src
+> > >  		$(SRC_PATH)/tests/docker/docker.py run 			\
+> > >  			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
+> > >  			$(if $V,,--rm) 					\
+> > > -			$(if $(DEBUG),-i,--net=none) 			\
+> > > +			$(if $(DEBUG),-i,)				\
+> > > +			$(if $(NETWORK),$(if $(subst $(NETWORK),,1)$(subst 1,,$(NETWORK)),--net=$(NETWORK),),--net=none) \
+> > 
+> > Isn't the first subst enough? We already know $(NETWORK) is non-empty. If it is
+> > "1", $(subst 1,,1) is empty; otherwise, $(subst foo,,1) is non-empty:
+> > 
+> > 			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),,--net=$(NETWORK)),--net=none) \
 > 
-> However, on NetBSD the shell will complain:
->   "-sh: arith: syntax error: "RANDOM + 32768"
-> 
-> which means that "make check" fails.
-> 
-> Switch to using "${RANDOM:-0}" instead of $RANDOM,
-> which will portably either give us a random number or zero.
-> This means that on non-bash shells we don't get such
-> good test coverage via the MALLOC_PERTURB_ setting, but
-> we were already in that situation for non-bash shells.
-> 
-> Our only other uses of $RANDOM (in tests/qemu-iotests/check
-> and tests/qemu-iotests/162) are in shell scripts which use
-> a #!/bin/bash line so they are always run under bash.
-> 
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  tests/Makefile.include | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 6d6cb74..f6310d2 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -826,7 +826,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
->  	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->  	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
->  		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
-> -		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
-> +		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
->  		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
->  	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
->  	  echo Gcov report for $$f:;\
-> @@ -837,7 +837,7 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
->  $(patsubst %, check-%, $(check-unit-y)): check-%: %
->  	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
->  	$(call quiet-command, \
-> -		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
-> +		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+> This looks inverted to me - NETWORK=1, will generate --net=1 and
+> NETWORK=foo generates empty string.
 
-The whitespaces before $${RANDOM:-0} look a bit strange (unusual and unpaired).
-Otherwise looks good. (I guess it provides a tiny bit of more readability given
-how many non-whitespaces are already there before it.)
+You are right, I was confused (subst succeed is FALSE branch of if). I think
+s/,,/,/ and it will work?
 
-Regardlessly:
-
-Reviewed-by: Fam Zheng <famz@redhat.com>
-
->  		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
->  	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
->  	  echo Gcov report for $$f:;\
-> -- 
-> 2.7.4
-> 
-> 
+Fam
