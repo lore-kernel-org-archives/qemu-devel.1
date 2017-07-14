@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVwE5-0005zM-BA
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:45:30 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwEh-0006U5-Ef
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVwE4-0005C4-If
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:45:29 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
-	<20170713163219.9024-30-marcandre.lureau@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <075cac00-9a83-4ad3-2e1e-0278ecf36a69@twiddle.net>
-Date: Thu, 13 Jul 2017 22:45:21 -1000
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwEc-0005Xi-G8
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:46:07 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:46799 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dVwEc-0005XO-3Z
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:46:02 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Fri, 14 Jul 2017 11:45:50 +0300
+Message-Id: <150002195074.22386.16195894320027075398.stgit@frigg.lan>
+In-Reply-To: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
+References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170713163219.9024-30-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 29/29] eepro100: replace
- g_malloc()+memcpy() with g_memdup()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v13 08/26] target/i386: [tcg] Port to
+ translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +27,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 07/13/2017 06:32 AM, Marc-André Lureau wrote:
-> I found these pattern via grepping the source tree. I don't have a
-> coccinelle script for it!
-> 
-> Signed-off-by: Marc-André Lureau<marcandre.lureau@redhat.com>
-> Reviewed-by: Stefan Weil<sw@weilnetz.de>
-> Reviewed-by: Jason Wang<jasowang@redhat.com>
-> ---
->   hw/net/eepro100.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+Incrementally paves the way towards using the generic instruction transla=
+tion
+loop.
 
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+---
+ target/i386/translate.c |   71 +++++++++++++++++++++++++++++++----------=
+------
+ 1 file changed, 47 insertions(+), 24 deletions(-)
 
-
-r~
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index d3df91041f..3518d3a78e 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -4419,15 +4419,16 @@ static void gen_sse(CPUX86State *env, DisasContex=
+t *s, int b,
+=20
+ /* convert one instruction. s->base.is_jmp is set if the translation mus=
+t
+    be stopped. Return the next pc value */
+-static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+-                               target_ulong pc_start)
++static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+ {
++    CPUX86State *env =3D cpu->env_ptr;
+     int b, prefixes;
+     int shift;
+     TCGMemOp ot, aflag, dflag;
+     int modrm, reg, rm, mod, op, opreg, val;
+     target_ulong next_eip, tval;
+     int rex_w, rex_r;
++    target_ulong pc_start =3D s->base.pc_next;
+=20
+     s->pc_start =3D s->pc =3D pc_start;
+     prefixes =3D 0;
+@@ -8474,10 +8475,51 @@ static bool i386_tr_breakpoint_check(DisasContext=
+Base *dcbase, CPUState *cpu,
+     }
+ }
+=20
++static target_ulong i386_tr_translate_insn(DisasContextBase *dcbase,
++                                           CPUState *cpu)
++{
++    DisasContext *dc =3D container_of(dcbase, DisasContext, base);
++    target_ulong pc_next =3D disas_insn(dc, cpu);
++
++    if (dc->base.is_jmp) {
++        return pc_next;
++    }
++
++    if (dc->tf || (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
++        /* if single step mode, we generate only one instruction and
++           generate an exception */
++        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
++           the flag and abort the translation to give the irqs a
++           chance to happen */
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        dc->base.is_jmp =3D DISAS_TOO_MANY;
++    } else if ((dc->base.tb->cflags & CF_USE_ICOUNT)
++               && ((dc->base.pc_next & TARGET_PAGE_MASK)
++                   !=3D ((dc->base.pc_next + TARGET_MAX_INSN_SIZE - 1)
++                       & TARGET_PAGE_MASK)
++                   || (dc->base.pc_next & ~TARGET_PAGE_MASK) =3D=3D 0)) =
+{
++        /* Do not cross the boundary of the pages in icount mode,
++           it can cause an exception. Do it only when boundary is
++           crossed by the first instruction in the block.
++           If current instruction already crossed the bound - it's ok,
++           because an exception hasn't stopped this code.
++         */
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        dc->base.is_jmp =3D DISAS_TOO_MANY;
++    } else if ((pc_next - dc->base.pc_first) >=3D (TARGET_PAGE_SIZE - 32=
+)) {
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        dc->base.is_jmp =3D DISAS_TOO_MANY;
++    }
++
++    return pc_next;
++}
++
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ {
+-    CPUX86State *env =3D cs->env_ptr;
+     DisasContext dc1, *dc =3D &dc1;
+     int num_insns;
+     int max_insns;
+@@ -8523,39 +8565,20 @@ void gen_intermediate_code(CPUState *cs, Translat=
+ionBlock *tb)
+             gen_io_start();
+         }
+=20
+-        dc->base.pc_next =3D disas_insn(env, dc, dc->base.pc_next);
++        dc->base.pc_next =3D i386_tr_translate_insn(&dc->base, cs);
+         /* stop translation if indicated */
+         if (dc->base.is_jmp) {
+             break;
+         }
+         /* if single step mode, we generate only one instruction and
+            generate an exception */
+-        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
+-           the flag and abort the translation to give the irqs a
+-           change to be happen */
+-        if (dc->tf || dc->base.singlestep_enabled ||
+-            (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
+-            gen_jmp_im(dc->base.pc_next - dc->cs_base);
+-            gen_eob(dc);
+-            break;
+-        }
+-        /* Do not cross the boundary of the pages in icount mode,
+-           it can cause an exception. Do it only when boundary is
+-           crossed by the first instruction in the block.
+-           If current instruction already crossed the bound - it's ok,
+-           because an exception hasn't stopped this code.
+-         */
+-        if ((tb->cflags & CF_USE_ICOUNT)
+-            && ((dc->base.pc_next & TARGET_PAGE_MASK)
+-                !=3D ((dc->base.pc_next + TARGET_MAX_INSN_SIZE - 1) & TA=
+RGET_PAGE_MASK)
+-                || (dc->base.pc_next & ~TARGET_PAGE_MASK) =3D=3D 0)) {
++        if (dc->base.singlestep_enabled) {
+             gen_jmp_im(dc->base.pc_next - dc->cs_base);
+             gen_eob(dc);
+             break;
+         }
+         /* if too long translation, stop generation too */
+         if (tcg_op_buf_full() ||
+-            (dc->base.pc_next - dc->base.pc_first) >=3D (TARGET_PAGE_SIZ=
+E - 32) ||
+             num_insns >=3D max_insns) {
+             gen_jmp_im(dc->base.pc_next - dc->cs_base);
+             gen_eob(dc);
