@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dW02z-0006jp-S3
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:50:18 -0400
+	(envelope-from <mhocko@kernel.org>) id 1dW07F-0001A2-Qb
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dW02y-00034q-W6
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:50:17 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35913)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dW02y-00034D-PP
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:50:16 -0400
-Received: by mail-wm0-x229.google.com with SMTP id 62so19663691wmw.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 05:50:15 -0700 (PDT)
+	(envelope-from <mhocko@kernel.org>) id 1dW07C-0004n1-MY
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:54:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36688 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1dW07C-0004lc-B4
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:54:38 -0400
+Date: Fri, 14 Jul 2017 14:54:30 +0200
+From: Michal Hocko <mhocko@kernel.org>
+Message-ID: <20170714125429.GP2618@dhcp22.suse.cz>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	<20170714123023.GA2624@dhcp22.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20170713141928.25419-6-alex.bennee@linaro.org>
-References: <20170713141928.25419-1-alex.bennee@linaro.org>
-	<20170713141928.25419-6-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 13:49:53 +0100
-Message-ID: <CAFEAcA8o4rU7BXR_+VEQhAXBSzJ7usAnkYXDb=CEqQ=duuirqA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 5/6] target/arm: use gen_goto_tb for ISB
- handling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170714123023.GA2624@dhcp22.suse.cz>
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +29,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On 13 July 2017 at 15:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> While an ISB will ensure any raised IRQs happen on the next
-> instruction it doesn't cause any to get raised by itself. We can
-> therefor use a simple tb exit for ISB instructions and rely on the
-> exit_request check at the top of each TB to deal with exiting if
-> needed.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/arm/translate-a64.c | 2 +-
->  target/arm/translate.c     | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 66139b6046..2ac565eb10 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1393,7 +1393,7 @@ static void handle_sync(DisasContext *s, uint32_t i=
-nsn,
->           * a self-modified code correctly and also to take
->           * any pending interrupts immediately.
->           */
-> -        s->is_jmp =3D DISAS_UPDATE;
-> +        gen_goto_tb(s, 0, s->pc);
->          return;
->      default:
->          unallocated_encoding(s);
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 493a7b424a..d8892d9ba5 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -8168,7 +8168,7 @@ static void disas_arm_insn(DisasContext *s, unsigne=
-d int insn)
->                   * self-modifying code correctly and also to take
->                   * any pending interrupts immediately.
->                   */
-> -                gen_lookup_tb(s);
-> +                gen_goto_tb(s, 0, s->pc & ~1);
->                  return;
->              default:
->                  goto illegal_op;
-> @@ -10561,7 +10561,7 @@ static int disas_thumb2_insn(CPUARMState *env, Di=
-sasContext *s, uint16_t insn_hw
->                               * and also to take any pending interrupts
->                               * immediately.
->                               */
-> -                            gen_lookup_tb(s);
-> +                            gen_goto_tb(s, 0, s->pc & ~1);
->                              break;
->                          default:
->                              goto illegal_op;
+On Fri 14-07-17 14:30:23, Michal Hocko wrote:
+> On Wed 12-07-17 20:40:19, Wei Wang wrote:
+> > This patch adds support for reporting blocks of pages on the free list
+> > specified by the caller.
+> > 
+> > As pages can leave the free list during this call or immediately
+> > afterwards, they are not guaranteed to be free after the function
+> > returns. The only guarantee this makes is that the page was on the free
+> > list at some point in time after the function has been invoked.
+> > 
+> > Therefore, it is not safe for caller to use any pages on the returned
+> > block or to discard data that is put there after the function returns.
+> > However, it is safe for caller to discard data that was in one of these
+> > pages before the function was invoked.
+> 
+> I do not understand what is the point of such a function and how it is
+> used because the patch doesn't give us any user (I haven't checked other
+> patches yet).
+> 
+> But just from the semantic point of view this sounds like a horrible
+> idea. The only way to get a free block of pages is to call the page
+> allocator. I am tempted to give it Nack right on those grounds but I
+> would like to hear more about what you actually want to achieve.
 
-Why do we need to clear the low bit of s->pc for ISB?
-s->pc is the actual PC, not the "PC and low bit indicates
-Thumb mode" form that jump addresses have.
+OK, so I gave it another thought and giving a page which is still on the
+free list to a random module is just a free ticket to a disaster.
+Nacked-by: Michal Hocko <mhocko@suse.com>
 
-thanks
--- PMM
+> 
+> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > ---
+> >  include/linux/mm.h |  5 +++
+> >  mm/page_alloc.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 101 insertions(+)
+> > 
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index 46b9ac5..76cb433 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -1835,6 +1835,11 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
+> >  		unsigned long zone_start_pfn, unsigned long *zholes_size);
+> >  extern void free_initmem(void);
+> >  
+> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
+> > +extern int report_unused_page_block(struct zone *zone, unsigned int order,
+> > +				    unsigned int migratetype,
+> > +				    struct page **page);
+> > +#endif
+> >  /*
+> >   * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
+> >   * into the buddy system. The freed pages will be poisoned with pattern
+> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > index 64b7d82..8b3c9dd 100644
+> > --- a/mm/page_alloc.c
+> > +++ b/mm/page_alloc.c
+> > @@ -4753,6 +4753,102 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
+> >  	show_swap_cache_info();
+> >  }
+> >  
+> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
+> > +
+> > +/*
+> > + * Heuristically get a page block in the system that is unused.
+> > + * It is possible that pages from the page block are used immediately after
+> > + * report_unused_page_block() returns. It is the caller's responsibility
+> > + * to either detect or prevent the use of such pages.
+> > + *
+> > + * The free list to check: zone->free_area[order].free_list[migratetype].
+> > + *
+> > + * If the caller supplied page block (i.e. **page) is on the free list, offer
+> > + * the next page block on the list to the caller. Otherwise, offer the first
+> > + * page block on the list.
+> > + *
+> > + * Note: it is not safe for caller to use any pages on the returned
+> > + * block or to discard data that is put there after the function returns.
+> > + * However, it is safe for caller to discard data that was in one of these
+> > + * pages before the function was invoked.
+> > + *
+> > + * Return 0 when a page block is found on the caller specified free list.
+> > + */
+> > +int report_unused_page_block(struct zone *zone, unsigned int order,
+> > +			     unsigned int migratetype, struct page **page)
+> > +{
+> > +	struct zone *this_zone;
+> > +	struct list_head *this_list;
+> > +	int ret = 0;
+> > +	unsigned long flags;
+> > +
+> > +	/* Sanity check */
+> > +	if (zone == NULL || page == NULL || order >= MAX_ORDER ||
+> > +	    migratetype >= MIGRATE_TYPES)
+> > +		return -EINVAL;
+> > +
+> > +	/* Zone validity check */
+> > +	for_each_populated_zone(this_zone) {
+> > +		if (zone == this_zone)
+> > +			break;
+> > +	}
+> > +
+> > +	/* Got a non-existent zone from the caller? */
+> > +	if (zone != this_zone)
+> > +		return -EINVAL;
+> 
+> Huh, what do you check for here? Why don't you simply
+> populated_zone(zone)?
+> 
+> > +
+> > +	spin_lock_irqsave(&this_zone->lock, flags);
+> > +
+> > +	this_list = &zone->free_area[order].free_list[migratetype];
+> > +	if (list_empty(this_list)) {
+> > +		*page = NULL;
+> > +		ret = 1;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/* The caller is asking for the first free page block on the list */
+> > +	if ((*page) == NULL) {
+> > +		*page = list_first_entry(this_list, struct page, lru);
+> > +		ret = 0;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * The page block passed from the caller is not on this free list
+> > +	 * anymore (e.g. a 1MB free page block has been split). In this case,
+> > +	 * offer the first page block on the free list that the caller is
+> > +	 * asking for.
+> > +	 */
+> > +	if (PageBuddy(*page) && order != page_order(*page)) {
+> > +		*page = list_first_entry(this_list, struct page, lru);
+> > +		ret = 0;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * The page block passed from the caller has been the last page block
+> > +	 * on the list.
+> > +	 */
+> > +	if ((*page)->lru.next == this_list) {
+> > +		*page = NULL;
+> > +		ret = 1;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Finally, fall into the regular case: the page block passed from the
+> > +	 * caller is still on the free list. Offer the next one.
+> > +	 */
+> > +	*page = list_next_entry((*page), lru);
+> > +	ret = 0;
+> > +out:
+> > +	spin_unlock_irqrestore(&this_zone->lock, flags);
+> > +	return ret;
+> > +}
+> > +EXPORT_SYMBOL(report_unused_page_block);
+> > +
+> > +#endif
+> > +
+> >  static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
+> >  {
+> >  	zoneref->zone = zone;
+> > -- 
+> > 2.7.4
+> > 
+> > --
+> > To unsubscribe, send a message with 'unsubscribe linux-mm' in
+> > the body to majordomo@kvack.org.  For more info on Linux MM,
+> > see: http://www.linux-mm.org/ .
+> > Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+> 
+> -- 
+> Michal Hocko
+> SUSE Labs
+
+-- 
+Michal Hocko
+SUSE Labs
