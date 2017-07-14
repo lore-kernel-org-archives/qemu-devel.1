@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVzED-0002MH-4b
+	(envelope-from <dgilbert@redhat.com>) id 1dVzED-0002Mb-JC
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dVzEC-0003de-Cy
+	(envelope-from <dgilbert@redhat.com>) id 1dVzEC-0003dn-LY
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:49 -0400
-Date: Fri, 14 Jul 2017 19:57:43 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170714115742.GG18687@lemon>
-References: <20170714110048.GC28095@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170714110048.GC28095@redhat.com>
-Subject: Re: [Qemu-devel] qcow2 not cleaning up during image create failure
+Received: from mx1.redhat.com ([209.132.183.28]:58362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dVzEC-0003dU-G5
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:57:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 655AF793FC
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:57:47 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 14 Jul 2017 12:57:36 +0100
+Message-Id: <20170714115736.13693-6-dgilbert@redhat.com>
+In-Reply-To: <20170714115736.13693-1-dgilbert@redhat.com>
+References: <20170714115736.13693-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 5/5] migration/rdma: Send error during
+ cancelling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,29 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Fri, 07/14 12:00, Daniel P. Berrange wrote:
-> I've just been looking at the qcow2 image creation code, and found that
-> if any method in qcow2_create2() returns an error, then we'll report that,
-> but leave the newly created image file on disk in some partially initialized
-> state. A user may unwittingly use this file later with undefined behaviour.
-> This is particularly bad if we fail to setup encryption, because the user
-> is left with a file with no encryption enabled.
-> 
-> So I'm wondering how is the best way to clean up after failure ?
-> 
-> Naively I would like to just unlink(filename), but IIUC, filename is
-> not guaranteed to refer to a local file, and AFAIK, there is not
-> bdrv_delete() method todo this portably.
-> 
-> If we can't delete a file (because its a block device or network
-> volume), then we must at least blank out the just-written qcow2
-> header with zeros.
-> 
-> Ideas / suggestions.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Or just write the header as the last step?
+When we issue a cancel and clean up the RDMA channel
+send a CONTROL_ERROR to get the destination to quit.
 
-Fam
+The rdma_cleanup code waits for the event to come back
+from the rdma_disconnect; but that wont happen until the
+destination quits and there's currently nothing to force
+it.
+
+Note this makes the case of a cancel work while the destination
+is alive, and it already works if the destination is
+truly dead.  Note it doesn't fix the case where the destination
+is hung (we get stuck waiting for the rdma_disconnect event).
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ migration/rdma.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 13d6dd7709..0dc9fe115c 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -2265,7 +2265,9 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+     int ret, idx;
+ 
+     if (rdma->cm_id && rdma->connected) {
+-        if (rdma->error_state && !rdma->received_error) {
++        if ((rdma->error_state ||
++             migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) &&
++            !rdma->received_error) {
+             RDMAControlHeader head = { .len = 0,
+                                        .type = RDMA_CONTROL_ERROR,
+                                        .repeat = 1,
+-- 
+2.13.0
