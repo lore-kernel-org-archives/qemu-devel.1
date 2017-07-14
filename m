@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dVyuP-00089Q-Ci
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:37:27 -0400
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvr-0000uP-Th
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dVyuO-0006rk-Bp
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:37:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dVyuO-0006qx-36
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:37:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B52B80478
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:37:19 +0000 (UTC)
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri, 14 Jul 2017 13:36:59 +0200
-Message-Id: <20170714113700.21319-6-otubo@redhat.com>
-In-Reply-To: <20170714113700.21319-1-otubo@redhat.com>
-References: <20170714113700.21319-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/6] seccomp: add resourcecontrol argument to
- command line
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvq-0007jV-4j
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:51 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
+	id 1dVyvp-0007j3-Sm
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:50 -0400
+Received: by mail-pf0-x241.google.com with SMTP id z6so10753719pfk.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:38:49 -0700 (PDT)
+From: longpeng.mike@gmail.com
+Date: Fri, 14 Jul 2017 07:38:26 -0400
+Message-Id: <1500032321-13951-5-git-send-email-longpeng.mike@gmail.com>
+In-Reply-To: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
+References: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
+Subject: [Qemu-devel] [PATCH v5 04/18] crypto: cipher: introduce
+ qcrypto_cipher_ctx_new for builtin-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,133 +27,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Otubo <otubo@redhat.com>
+To: berrange@redhat.com
+Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This patch adds [,resourcecontrol=deny] to `-sandbox on' option. It
-blacklists all process affinity and scheduler priority system calls to
-avoid any bigger of the process.
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
+builtin-backend impls.
+
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- include/sysemu/seccomp.h |  1 +
- qemu-options.hx          |  5 ++++-
- qemu-seccomp.c           | 27 +++++++++++++++++++++++++++
- vl.c                     | 11 +++++++++++
- 4 files changed, 43 insertions(+), 1 deletion(-)
+ crypto/cipher-builtin.c | 101 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 55 insertions(+), 46 deletions(-)
 
-diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index f1614d6514..c7003dd197 100644
---- a/include/sysemu/seccomp.h
-+++ b/include/sysemu/seccomp.h
-@@ -18,6 +18,7 @@
- #define OBSOLETE    0x0001
- #define PRIVILEGED  0x0010
- #define SPAWN       0x0100
-+#define RESOURCECTL 0x1000
+diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
+index b4bc2b9..4ecd15e 100644
+--- a/crypto/cipher-builtin.c
++++ b/crypto/cipher-builtin.c
+@@ -235,23 +235,24 @@ static int qcrypto_cipher_setiv_aes(QCryptoCipher *cipher,
  
- #include <seccomp.h>
  
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 611a501684..77b437a052 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4004,11 +4004,12 @@ Old param mode (ARM only).
- ETEXI
  
- DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
--    "-sandbox on[,obsolete=allow][,elevateprivileges=allow|deny|children][,spawn=deny]\n" \
-+    "-sandbox on[,obsolete=allow][,elevateprivileges=allow|deny|children][,spawn=deny][,resourcecontrol=deny]\n" \
-     "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
-     "                               obsolete: Allow obsolete system calls\n" \
-     "                               elevateprivileges: allows or denies Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls. 'children' will deny set*uid|gid system calls for main Qemu process but will allow forks and execves to run unprivileged",
-     "                               spawn: avoids Qemu to spawn new threads or processes by blacklisting *fork and execve\n"
-+    "                               resourcecontrol: disable process affinity and schedular priority\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -sandbox @var{arg}[,obsolete=@var{string}]
-@@ -4022,6 +4023,8 @@ Enable Obsolete system calls
- Disable set*uid|gid systema calls
- @item spawn=@var{string}
- Disable *fork and execve
-+@item resourcecontrol=@var{string}
-+Disable process affinity and schedular priority
- @end table
- ETEXI
+-static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
+-                                   const uint8_t *key, size_t nkey,
+-                                   Error **errp)
++static QCryptoCipherBuiltin *
++qcrypto_cipher_init_aes(QCryptoCipherMode mode,
++                        const uint8_t *key, size_t nkey,
++                        Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt;
  
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 075d87e27f..a9a35456e9 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -31,6 +31,19 @@ struct QemuSeccompSyscall {
-     uint8_t priority;
- };
- 
-+static const struct QemuSeccompSyscall resourcecontrol_syscalls[] = {
-+    { SCMP_SYS(getpriority), 255 },
-+    { SCMP_SYS(setpriority), 255 },
-+    { SCMP_SYS(sched_setparam), 255 },
-+    { SCMP_SYS(sched_getparam), 255 },
-+    { SCMP_SYS(sched_setscheduler), 255 },
-+    { SCMP_SYS(sched_getscheduler), 255 },
-+    { SCMP_SYS(sched_setaffinity), 255 },
-+    { SCMP_SYS(sched_getaffinity), 255 },
-+    { SCMP_SYS(sched_get_priority_max), 255 },
-+    { SCMP_SYS(sched_get_priority_min), 255 },
-+};
-+
- static const struct QemuSeccompSyscall spawn_syscalls[] = {
-     { SCMP_SYS(fork), 255 },
-     { SCMP_SYS(vfork), 255 },
-@@ -158,6 +171,20 @@ int seccomp_start(uint8_t seccomp_opts)
-         }
+-    if (cipher->mode != QCRYPTO_CIPHER_MODE_CBC &&
+-        cipher->mode != QCRYPTO_CIPHER_MODE_ECB &&
+-        cipher->mode != QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode != QCRYPTO_CIPHER_MODE_CBC &&
++        mode != QCRYPTO_CIPHER_MODE_ECB &&
++        mode != QCRYPTO_CIPHER_MODE_XTS) {
+         error_setg(errp, "Unsupported cipher mode %s",
+-                   QCryptoCipherMode_lookup[cipher->mode]);
+-        return -1;
++                   QCryptoCipherMode_lookup[mode]);
++        return NULL;
      }
  
-+    if (seccomp_opts & RESOURCECTL) {
-+        for (i = 0; i < ARRAY_SIZE(resourcecontrol_syscalls); i++) {
-+            rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, resourcecontrol_syscalls[i].num, 0);
-+            if (rc < 0) {
-+                goto seccomp_return;
-+            }
-+            rc = seccomp_syscall_priority(ctx, resourcecontrol_syscalls[i].num,
-+					  resourcecontrol_syscalls[i].priority);
-+            if (rc < 0) {
-+                goto seccomp_return;
-+            }
-+        }
+     ctxt = g_new0(QCryptoCipherBuiltin, 1);
+ 
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+         if (AES_set_encrypt_key(key, nkey * 4, &ctxt->state.aes.key.enc) != 0) {
+             error_setg(errp, "Failed to set encryption key");
+             goto error;
+@@ -291,13 +292,11 @@ static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
+     ctxt->encrypt = qcrypto_cipher_encrypt_aes;
+     ctxt->decrypt = qcrypto_cipher_decrypt_aes;
+ 
+-    cipher->opaque = ctxt;
+-
+-    return 0;
++    return ctxt;
+ 
+  error:
+     g_free(ctxt);
+-    return -1;
++    return NULL;
+ }
+ 
+ 
+@@ -370,16 +369,17 @@ static int qcrypto_cipher_setiv_des_rfb(QCryptoCipher *cipher,
+ }
+ 
+ 
+-static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
+-                                       const uint8_t *key, size_t nkey,
+-                                       Error **errp)
++static QCryptoCipherBuiltin *
++qcrypto_cipher_init_des_rfb(QCryptoCipherMode mode,
++                            const uint8_t *key, size_t nkey,
++                            Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt;
+ 
+-    if (cipher->mode != QCRYPTO_CIPHER_MODE_ECB) {
++    if (mode != QCRYPTO_CIPHER_MODE_ECB) {
+         error_setg(errp, "Unsupported cipher mode %s",
+-                   QCryptoCipherMode_lookup[cipher->mode]);
+-        return -1;
++                   QCryptoCipherMode_lookup[mode]);
++        return NULL;
+     }
+ 
+     ctxt = g_new0(QCryptoCipherBuiltin, 1);
+@@ -394,9 +394,7 @@ static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
+     ctxt->encrypt = qcrypto_cipher_encrypt_des_rfb;
+     ctxt->decrypt = qcrypto_cipher_decrypt_des_rfb;
+ 
+-    cipher->opaque = ctxt;
+-
+-    return 0;
++    return ctxt;
+ }
+ 
+ 
+@@ -426,12 +424,13 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
++static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                                                    QCryptoCipherMode mode,
++                                                    const uint8_t *key,
++                                                    size_t nkey,
++                                                    Error **errp)
+ {
+-    QCryptoCipher *cipher;
++    QCryptoCipherBuiltin *ctxt;
+ 
+     switch (mode) {
+     case QCRYPTO_CIPHER_MODE_ECB:
+@@ -444,39 +443,27 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         return NULL;
+     }
+ 
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-
+     if (!qcrypto_cipher_validate_key_length(alg, mode, nkey, errp)) {
+-        goto error;
++        return NULL;
+     }
+ 
+-    switch (cipher->alg) {
++    switch (alg) {
+     case QCRYPTO_CIPHER_ALG_DES_RFB:
+-        if (qcrypto_cipher_init_des_rfb(cipher, key, nkey, errp) < 0) {
+-            goto error;
+-        }
++        ctxt = qcrypto_cipher_init_des_rfb(mode, key, nkey, errp);
+         break;
+     case QCRYPTO_CIPHER_ALG_AES_128:
+     case QCRYPTO_CIPHER_ALG_AES_192:
+     case QCRYPTO_CIPHER_ALG_AES_256:
+-        if (qcrypto_cipher_init_aes(cipher, key, nkey, errp) < 0) {
+-            goto error;
+-        }
++        ctxt = qcrypto_cipher_init_aes(mode, key, nkey, errp);
+         break;
+     default:
+         error_setg(errp,
+                    "Unsupported cipher algorithm %s",
+-                   QCryptoCipherAlgorithm_lookup[cipher->alg]);
+-        goto error;
++                   QCryptoCipherAlgorithm_lookup[alg]);
++        return NULL;
+     }
+ 
+-    return cipher;
+-
+- error:
+-    g_free(cipher);
+-    return NULL;
++    return ctxt;
+ }
+ 
+ void qcrypto_cipher_free(QCryptoCipher *cipher)
+@@ -537,3 +524,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ 
+     return ctxt->setiv(cipher, iv, niv, errp);
+ }
++
++
++QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
++                                  QCryptoCipherMode mode,
++                                  const uint8_t *key, size_t nkey,
++                                  Error **errp)
++{
++    QCryptoCipher *cipher;
++    QCryptoCipherBuiltin *ctxt;
++
++    ctxt = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
++    if (!ctxt) {
++        return NULL;
 +    }
 +
-     rc = seccomp_load(ctx);
- 
-   seccomp_return:
-diff --git a/vl.c b/vl.c
-index 456a518431..8e92052603 100644
---- a/vl.c
-+++ b/vl.c
-@@ -283,6 +283,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "spawn",
-             .type = QEMU_OPT_STRING,
-         },
-+        {
-+            .name = "resourcecontrol",
-+            .type = QEMU_OPT_STRING,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1075,6 +1079,13 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
-             }
-         }
- 
-+        value = qemu_opt_get(opts,"resourcecontrol");
-+        if (value) {
-+            if (strcmp(value, "deny") == 0) {
-+                seccomp_opts |= RESOURCECTL;
-+            }
-+        }
++    cipher = g_new0(QCryptoCipher, 1);
++    cipher->alg = alg;
++    cipher->mode = mode;
++    cipher->opaque = ctxt;
 +
-         if (seccomp_start(seccomp_opts) < 0) {
-             error_report("failed to install seccomp syscall filter "
-                          "in the kernel");
++    return cipher;
++}
 -- 
-2.13.0
+1.8.3.1
