@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW11v-0001kL-DQ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dW11w-0001lG-LL
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dW11r-0001Yr-Md
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24666)
+	(envelope-from <imammedo@redhat.com>) id 1dW11v-0001ag-6m
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW11r-0001Xg-Cs
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:11 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dW11u-0001aJ-U5
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:53:15 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 14 Jul 2017 15:51:59 +0200
-Message-Id: <1500040339-119465-9-git-send-email-imammedo@redhat.com>
+Date: Fri, 14 Jul 2017 15:52:00 +0200
+Message-Id: <1500040339-119465-10-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
 References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 08/28] x86: extract legacy cpu features format
- parser
+Subject: [Qemu-devel] [PATCH 09/28] sparc: replace custom cpu feature
+ parsing with cpu_legacy_parse_featurestr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,457 +25,284 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Move cpu_model +-feat parsing into a separate file so that it
-could be reused later for parsing similar format of sparc target
+with features converted to properties we can reuse shared
+with x86 cpu_legacy_parse_featurestr() for features parsing
+and drop legacy parser that manipulated CPU directly.
+
+With that in place and sparc_cpu_parse_features() providing
+generic CPUClass::parse_features callback, the cpu_sparc_init()
+will do the same job as cpu_generic_init() so replace content
+of cpu_sparc_init() with it.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
 CC: Riku Voipio <riku.voipio@iki.fi>
 CC: Laurent Vivier <laurent@vivier.eu>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: Artyom Tarasenko <atar4qemu@gmail.com>
 ---
- include/qom/cpu.h                     |   6 ++
- default-configs/i386-bsd-user.mak     |   1 +
- default-configs/i386-linux-user.mak   |   1 +
- default-configs/i386-softmmu.mak      |   1 +
- default-configs/x86_64-bsd-user.mak   |   1 +
- default-configs/x86_64-linux-user.mak |   1 +
- default-configs/x86_64-softmmu.mak    |   1 +
- target/i386/cpu.c                     | 124 ++-------------------------
- util/Makefile.objs                    |   1 +
- util/legacy_cpu_features_parser.c     | 153 ++++++++++++++++++++++++++++=
-++++++
- 10 files changed, 172 insertions(+), 118 deletions(-)
- create mode 100644 util/legacy_cpu_features_parser.c
+ default-configs/sparc-bsd-user.mak         |   1 +
+ default-configs/sparc-linux-user.mak       |   1 +
+ default-configs/sparc-softmmu.mak          |   1 +
+ default-configs/sparc32plus-linux-user.mak |   1 +
+ default-configs/sparc64-bsd-user.mak       |   1 +
+ default-configs/sparc64-linux-user.mak     |   1 +
+ default-configs/sparc64-softmmu.mak        |   1 +
+ target/sparc/cpu.c                         | 160 ++++-------------------------
+ 8 files changed, 27 insertions(+), 140 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 7bfd50c..60aea03 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -1039,4 +1039,10 @@ extern const struct VMStateDescription vmstate_cpu=
-_common;
-=20
- #define UNASSIGNED_CPU_INDEX -1
-=20
-+int cpu_legacy_apply_features(Object *obj, GList *features, bool enable,
-+                              Error **errp);
-+
-+void cpu_legacy_parse_featurestr(const char *typename, char *features,
-+                                 GList **plus_features, GList **minus_fe=
-atures,
-+                                 Error **errp);
+diff --git a/default-configs/sparc-bsd-user.mak b/default-configs/sparc-bsd-user.mak
+index 21e0950..caea9ea 100644
+--- a/default-configs/sparc-bsd-user.mak
++++ b/default-configs/sparc-bsd-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc-bsd-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc-linux-user.mak b/default-configs/sparc-linux-user.mak
+index 9c716d1..0f23504 100644
+--- a/default-configs/sparc-linux-user.mak
++++ b/default-configs/sparc-linux-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc-linux-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+index 004b0f4..d8fa9fd 100644
+--- a/default-configs/sparc-softmmu.mak
++++ b/default-configs/sparc-softmmu.mak
+@@ -18,3 +18,4 @@ CONFIG_GRLIB=y
+ CONFIG_STP2000=y
+ CONFIG_ECCMEMCTL=y
+ CONFIG_SUN4M=y
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc32plus-linux-user.mak b/default-configs/sparc32plus-linux-user.mak
+index 432e880..e3cc16b 100644
+--- a/default-configs/sparc32plus-linux-user.mak
++++ b/default-configs/sparc32plus-linux-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc32plus-linux-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc64-bsd-user.mak b/default-configs/sparc64-bsd-user.mak
+index b8b9eea..25bfa1f 100644
+--- a/default-configs/sparc64-bsd-user.mak
++++ b/default-configs/sparc64-bsd-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc64-bsd-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc64-linux-user.mak b/default-configs/sparc64-linux-user.mak
+index bf1bdd6..7c8a9f0 100644
+--- a/default-configs/sparc64-linux-user.mak
++++ b/default-configs/sparc64-linux-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc64-linux-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
+index d07876a..658546a 100644
+--- a/default-configs/sparc64-softmmu.mak
++++ b/default-configs/sparc64-softmmu.mak
+@@ -16,3 +16,4 @@ CONFIG_MC146818RTC=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_EMPTY_SLOT=y
+ CONFIG_SUN4V_RTC=y
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index cb13540..1271b7f 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -104,51 +104,23 @@ static void cpu_sparc_disas_set_info(CPUState *cpu, disassemble_info *info)
  #endif
-diff --git a/default-configs/i386-bsd-user.mak b/default-configs/i386-bsd=
--user.mak
-index af1b31a..b28a05f 100644
---- a/default-configs/i386-bsd-user.mak
-+++ b/default-configs/i386-bsd-user.mak
-@@ -1 +1,2 @@
- # Default configuration for i386-bsd-user
-+CONFIG_LEGACY_CPU_FEATURES=3Dy
-diff --git a/default-configs/i386-linux-user.mak b/default-configs/i386-l=
-inux-user.mak
-index 8657e68..c136967 100644
---- a/default-configs/i386-linux-user.mak
-+++ b/default-configs/i386-linux-user.mak
-@@ -1 +1,2 @@
- # Default configuration for i386-linux-user
-+CONFIG_LEGACY_CPU_FEATURES=3Dy
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-soft=
-mmu.mak
-index d2ab2f6..e3e7c0e 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -59,3 +59,4 @@ CONFIG_SMBIOS=3Dy
- CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
- CONFIG_PXB=3Dy
- CONFIG_ACPI_VMGENID=3Dy
-+CONFIG_LEGACY_CPU_FEATURES=3Dy
-diff --git a/default-configs/x86_64-bsd-user.mak b/default-configs/x86_64=
--bsd-user.mak
-index 73e5d34..952323c 100644
---- a/default-configs/x86_64-bsd-user.mak
-+++ b/default-configs/x86_64-bsd-user.mak
-@@ -1 +1,2 @@
- # Default configuration for x86_64-bsd-user
-+CONFIG_LEGACY_CPU_FEATURES=3Dy
-diff --git a/default-configs/x86_64-linux-user.mak b/default-configs/x86_=
-64-linux-user.mak
-index bec1d9e..b513ef2 100644
---- a/default-configs/x86_64-linux-user.mak
-+++ b/default-configs/x86_64-linux-user.mak
-@@ -1 +1,2 @@
- # Default configuration for x86_64-linux-user
-+CONFIG_LEGACY_CPU_FEATURES=3Dy
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-=
-softmmu.mak
-index 9bde2f1..6594ddf 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -59,3 +59,4 @@ CONFIG_SMBIOS=3Dy
- CONFIG_HYPERV_TESTDEV=3D$(CONFIG_KVM)
- CONFIG_PXB=3Dy
- CONFIG_ACPI_VMGENID=3Dy
-+CONFIG_LEGACY_CPU_FEATURES=3Dy
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c571772..91d3684 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -17,7 +17,6 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
- #include "qemu/osdep.h"
--#include "qemu/cutils.h"
-=20
- #include "cpu.h"
- #include "exec/exec-all.h"
-@@ -1970,13 +1969,6 @@ static PropertyInfo qdev_prop_spinlocks =3D {
- /* Convert all '_' in a feature string option name to '-', to make featu=
-re
-  * name conform to QOM property naming rule, which uses '-' instead of '=
-_'.
-  */
--static inline void feat2prop(char *s)
--{
--    while ((s =3D strchr(s, '_'))) {
--        *s =3D '-';
--    }
--}
--
- /* Return the feature property name for a feature flag bit */
- static const char *x86_cpu_feature_name(FeatureWord w, int bitnr)
+ }
+ 
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp);
++/* Compatibily hack to maintain legacy +-feat semantic,
++ * where +-feat overwrites any feature set by
++ * feat=on|feat even if the later is parsed after +-feat
++ * (i.e. "-float,float=on" will result in "float" disabled)
++ */
++static GList *plus_features, *minus_features;
+ 
+-static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
++static void sparc_cpu_parse_features(const char *typename, char *features,
++                                     Error **errp)
  {
-@@ -2005,100 +1997,11 @@ static const char *x86_cpu_feature_name(FeatureW=
-ord w, int bitnr)
-  */
- static GList *plus_features, *minus_features;
-=20
--static gint compare_string(gconstpointer a, gconstpointer b)
--{
--    return g_strcmp0(a, b);
--}
+-    char *s = g_strdup(cpu_model);
+-    char *featurestr = strtok(s, ",");
+-    Error *err = NULL;
 -
--/* Parse "+feature,-feature,feature=3Dfoo" CPU feature string
-- */
- static void x86_cpu_parse_featurestr(const char *typename, char *feature=
-s,
-                                      Error **errp)
- {
--    char *featurestr; /* Single 'key=3Dvalue" string being parsed */
--    static bool cpu_globals_initialized;
--    bool ambiguous =3D false;
--
--    if (cpu_globals_initialized) {
--        return;
--    }
--    cpu_globals_initialized =3D true;
--
--    if (!features) {
--        return;
+-    featurestr = strtok(NULL, ",");
+-    sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+-    g_free(s);
+-    if (err) {
+-        error_report_err(err);
+-        return -1;
 -    }
 -
--    for (featurestr =3D strtok(features, ",");
--         featurestr;
--         featurestr =3D strtok(NULL, ",")) {
--        const char *name;
--        const char *val =3D NULL;
--        char *eq =3D NULL;
--        char num[32];
--        GlobalProperty *prop;
--
--        /* Compatibility syntax: */
--        if (featurestr[0] =3D=3D '+') {
--            plus_features =3D g_list_append(plus_features,
--                                          g_strdup(featurestr + 1));
--            continue;
--        } else if (featurestr[0] =3D=3D '-') {
--            minus_features =3D g_list_append(minus_features,
--                                           g_strdup(featurestr + 1));
--            continue;
--        }
--
--        eq =3D strchr(featurestr, '=3D');
--        if (eq) {
--            *eq++ =3D 0;
--            val =3D eq;
--        } else {
--            val =3D "on";
--        }
--
--        feat2prop(featurestr);
--        name =3D featurestr;
--
--        if (g_list_find_custom(plus_features, name, compare_string)) {
--            error_report("warning: Ambiguous CPU model string. "
--                         "Don't mix both \"+%s\" and \"%s=3D%s\"",
--                         name, name, val);
--            ambiguous =3D true;
--        }
--        if (g_list_find_custom(minus_features, name, compare_string)) {
--            error_report("warning: Ambiguous CPU model string. "
--                         "Don't mix both \"-%s\" and \"%s=3D%s\"",
--                         name, name, val);
--            ambiguous =3D true;
--        }
--
--        /* Special case: */
--        if (!strcmp(name, "tsc-freq")) {
--            int ret;
--            uint64_t tsc_freq;
--
--            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq);
--            if (ret < 0 || tsc_freq > INT64_MAX) {
--                error_setg(errp, "bad numerical value %s", val);
--                return;
--            }
--            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
--            val =3D num;
--            name =3D "tsc-frequency";
--        }
--
--        prop =3D g_new0(typeof(*prop), 1);
--        prop->driver =3D typename;
--        prop->property =3D g_strdup(name);
--        prop->value =3D g_strdup(val);
--        prop->errp =3D &error_fatal;
--        qdev_prop_register_global(prop);
--    }
--
--    if (ambiguous) {
--        error_report("warning: Compatibility of ambiguous CPU model "
--                     "strings won't be kept on future QEMU versions");
--    }
+-    return 0;
 +    cpu_legacy_parse_featurestr(typename, features,
 +        &plus_features, &minus_features, errp);
  }
-=20
- static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
-@@ -3370,8 +3273,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, Er=
-ror **errp)
+ 
+ SPARCCPU *cpu_sparc_init(const char *cpu_model)
  {
-     CPUX86State *env =3D &cpu->env;
-     FeatureWord w;
--    GList *l;
--    Error *local_err =3D NULL;
-=20
-     /*TODO: Now cpu->max_features doesn't overwrite features
-      * set using QOM properties, and we can convert
-@@ -3389,20 +3290,12 @@ static void x86_cpu_expand_features(X86CPU *cpu, =
-Error **errp)
-         }
-     }
-=20
--    for (l =3D plus_features; l; l =3D l->next) {
--        const char *prop =3D l->data;
--        object_property_set_bool(OBJECT(cpu), true, prop, &local_err);
--        if (local_err) {
--            goto out;
--        }
-+    if (cpu_legacy_apply_features(OBJECT(cpu), plus_features, true, errp=
-)) {
-+        return;
-     }
-=20
--    for (l =3D minus_features; l; l =3D l->next) {
--        const char *prop =3D l->data;
--        object_property_set_bool(OBJECT(cpu), false, prop, &local_err);
--        if (local_err) {
--            goto out;
--        }
-+    if (cpu_legacy_apply_features(OBJECT(cpu), minus_features, false, er=
-rp)) {
-+        return;
-     }
-=20
-     if (!kvm_enabled() || !cpu->expose_kvm) {
-@@ -3440,11 +3333,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, E=
-rror **errp)
-     if (env->cpuid_xlevel2 =3D=3D UINT32_MAX) {
-         env->cpuid_xlevel2 =3D env->cpuid_min_xlevel2;
-     }
+-    SPARCCPU *cpu;
+-    ObjectClass *oc;
+-    char *str, *name;
 -
--out:
--    if (local_err !=3D NULL) {
--        error_propagate(errp, local_err);
+-    str = g_strdup(cpu_model);
+-    name = strtok(str, ",");
+-    oc = cpu_class_by_name(TYPE_SPARC_CPU, name);
+-    if (oc == NULL) {
+-        g_free(str);
+-        return NULL;
 -    }
+-    g_free(str);
+-
+-    cpu = SPARC_CPU(object_new(object_class_get_name(oc)));
+-
+-    if (cpu_sparc_register(cpu, cpu_model) < 0) {
+-        object_unref(OBJECT(cpu));
+-        return NULL;
+-    }
+-
+-    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+-
+-    return cpu;
++    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
  }
-=20
- /*
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index 50a55ec..14e28f7 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -45,3 +45,4 @@ util-obj-y +=3D qht.o
- util-obj-y +=3D range.o
- util-obj-y +=3D stats64.o
- util-obj-y +=3D systemd.o
-+util-obj-$(CONFIG_LEGACY_CPU_FEATURES) +=3D legacy_cpu_features_parser.o
-diff --git a/util/legacy_cpu_features_parser.c b/util/legacy_cpu_features=
-_parser.c
-new file mode 100644
-index 0000000..f2e3b81
---- /dev/null
-+++ b/util/legacy_cpu_features_parser.c
-@@ -0,0 +1,153 @@
-+/* Support for legacy -cpu cpu,features CLI option with +-feat syntax,
-+ * used by x86/sparc targets
-+ *
-+ * Author: Andreas F=C3=A4rber <afaerber@suse.de>
-+ * Author: Andre Przywara <andre.przywara@amd.com>
-+ * Author: Eduardo Habkost <ehabkost@redhat.com>
-+ * Author: Igor Mammedov <imammedo@redhat.com>
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ * Author: Markus Armbruster <armbru@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License alo=
-ng
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+#include "qom/cpu.h"
-+#include "qemu/error-report.h"
-+#include "hw/qdev-properties.h"
-+
-+/* DO NOT USE WITH NEW CODE */
-+int cpu_legacy_apply_features(Object *obj, GList *features, bool enable,
-+                              Error **errp)
-+{
-+    GList *l;
-+    Error *local_err =3D NULL;
-+
-+    for (l =3D features; l; l =3D l->next) {
-+        const char *prop =3D l->data;
-+        object_property_set_bool(obj, enable, prop, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return 1;
-+        }
-+    }
-+    return 0;
-+}
-+
-+static inline void feat2prop(char *s)
-+{
-+    while ((s =3D strchr(s, '_'))) {
-+        *s =3D '-';
-+    }
-+}
-+
-+static gint compare_string(gconstpointer a, gconstpointer b)
-+{
-+    return g_strcmp0(a, b);
-+}
-+
-+/* DO NOT USE WITH NEW CODE
-+ * Parse "+feature,-feature,feature=3Dfoo" CPU feature string
-+ */
-+void cpu_legacy_parse_featurestr(const char *typename, char *features,
-+                                 GList **plus_features, GList **minus_fe=
-atures,
-+                                 Error **errp)
-+{
-+    char *featurestr; /* Single 'key=3Dvalue" string being parsed */
-+    static bool cpu_globals_initialized;
-+    bool ambiguous =3D false;
-+
-+    if (cpu_globals_initialized) {
+ 
+ void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+@@ -529,107 +501,6 @@ static void print_features(FILE *f, fprintf_function cpu_fprintf,
+     }
+ }
+ 
+-static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features)
+-{
+-    unsigned int i;
+-
+-    for (i = 0; i < ARRAY_SIZE(feature_name); i++) {
+-        if (feature_name[i] && !strcmp(flagname, feature_name[i])) {
+-            *features |= 1 << i;
+-            return;
+-        }
+-    }
+-    error_report("CPU feature %s not found", flagname);
+-}
+-
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp)
+-{
+-    SPARCCPU *cpu = SPARC_CPU(cs);
+-    sparc_def_t *cpu_def = &cpu->env.def;
+-    char *featurestr;
+-    uint32_t plus_features = 0;
+-    uint32_t minus_features = 0;
+-    uint64_t iu_version;
+-    uint32_t fpu_version, mmu_version, nwindows;
+-
+-    featurestr = features ? strtok(features, ",") : NULL;
+-    while (featurestr) {
+-        char *val;
+-
+-        if (featurestr[0] == '+') {
+-            add_flagname_to_bitmaps(featurestr + 1, &plus_features);
+-        } else if (featurestr[0] == '-') {
+-            add_flagname_to_bitmaps(featurestr + 1, &minus_features);
+-        } else if ((val = strchr(featurestr, '='))) {
+-            *val = 0; val++;
+-            if (!strcmp(featurestr, "iu_version")) {
+-                char *err;
+-
+-                iu_version = strtoll(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->iu_version = iu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "iu_version %" PRIx64 "\n", iu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "fpu_version")) {
+-                char *err;
+-
+-                fpu_version = strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->fpu_version = fpu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "fpu_version %x\n", fpu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "mmu_version")) {
+-                char *err;
+-
+-                mmu_version = strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->mmu_version = mmu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "mmu_version %x\n", mmu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "nwindows")) {
+-                char *err;
+-
+-                nwindows = strtol(val, &err, 0);
+-                if (!*val || *err || nwindows > MAX_NWINDOWS ||
+-                    nwindows < MIN_NWINDOWS) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->nwindows = nwindows;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "nwindows %d\n", nwindows);
+-#endif
+-            } else {
+-                error_setg(errp, "unrecognized feature %s", featurestr);
+-                return;
+-            }
+-        } else {
+-            error_setg(errp, "feature string `%s' not in format "
+-                             "(+feature|-feature|feature=xyz)", featurestr);
+-            return;
+-        }
+-        featurestr = strtok(NULL, ",");
+-    }
+-    cpu_def->features |= plus_features;
+-    cpu_def->features &= ~minus_features;
+-#ifdef DEBUG_FEATURES
+-    print_features(stderr, fprintf, cpu_def->features, NULL);
+-#endif
+-}
+-
+ void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+     unsigned int i;
+@@ -806,6 +677,14 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
+     SPARCCPU *cpu = SPARC_CPU(dev);
+     CPUSPARCState *env = &cpu->env;
+ 
++    if (cpu_legacy_apply_features(OBJECT(cpu), plus_features, true, errp)) {
 +        return;
 +    }
-+    cpu_globals_initialized =3D true;
 +
-+    if (!features) {
++    if (cpu_legacy_apply_features(OBJECT(cpu), minus_features, false, errp)) {
 +        return;
 +    }
 +
-+    for (featurestr =3D strtok(features, ",");
-+         featurestr;
-+         featurestr =3D strtok(NULL, ",")) {
-+        const char *name;
-+        const char *val =3D NULL;
-+        char *eq =3D NULL;
-+        char num[32];
-+        GlobalProperty *prop;
-+
-+        /* Compatibility syntax: */
-+        if (featurestr[0] =3D=3D '+') {
-+            *plus_features =3D g_list_append(*plus_features,
-+                                           g_strdup(featurestr + 1));
-+            continue;
-+        } else if (featurestr[0] =3D=3D '-') {
-+            *minus_features =3D g_list_append(*minus_features,
-+                                            g_strdup(featurestr + 1));
-+            continue;
-+        }
-+
-+        eq =3D strchr(featurestr, '=3D');
-+        if (eq) {
-+            *eq++ =3D 0;
-+            val =3D eq;
-+        } else {
-+            val =3D "on";
-+        }
-+
-+        feat2prop(featurestr);
-+        name =3D featurestr;
-+
-+        if (g_list_find_custom(*plus_features, name, compare_string)) {
-+            error_report("warning: Ambiguous CPU model string. "
-+                         "Don't mix both \"+%s\" and \"%s=3D%s\"",
-+                         name, name, val);
-+            ambiguous =3D true;
-+        }
-+        if (g_list_find_custom(*minus_features, name, compare_string)) {
-+            error_report("warning: Ambiguous CPU model string. "
-+                         "Don't mix both \"-%s\" and \"%s=3D%s\"",
-+                         name, name, val);
-+            ambiguous =3D true;
-+        }
-+
-+        /* Special case: */
-+        if (!strcmp(name, "tsc-freq")) {
-+            int ret;
-+            uint64_t tsc_freq;
-+
-+            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq);
-+            if (ret < 0 || tsc_freq > INT64_MAX) {
-+                error_setg(errp, "bad numerical value %s", val);
-+                return;
-+            }
-+            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
-+            val =3D num;
-+            name =3D "tsc-frequency";
-+        }
-+
-+        prop =3D g_new0(typeof(*prop), 1);
-+        prop->driver =3D typename;
-+        prop->property =3D g_strdup(name);
-+        prop->value =3D g_strdup(val);
-+        prop->errp =3D &error_fatal;
-+        qdev_prop_register_global(prop);
-+    }
-+
-+    if (ambiguous) {
-+        error_report("warning: Compatibility of ambiguous CPU model "
-+                     "strings won't be kept on future QEMU versions");
-+    }
-+}
---=20
+ #if defined(CONFIG_USER_ONLY)
+     if ((env->def.features & CPU_FEATURE_FLOAT)) {
+         env->def.features |= CPU_FEATURE_FLOAT128;
+@@ -932,6 +811,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+     cc->reset = sparc_cpu_reset;
+ 
+     cc->class_by_name = sparc_cpu_class_by_name;
++    cc->parse_features = sparc_cpu_parse_features;
+     cc->has_work = sparc_cpu_has_work;
+     cc->do_interrupt = sparc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
+-- 
 2.7.4
