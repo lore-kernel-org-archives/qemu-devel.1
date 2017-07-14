@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dVxNi-0006UA-9U
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:59:31 -0400
+	(envelope-from <ppandit@redhat.com>) id 1dVxOy-0007bb-OW
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dVxNd-0000LA-Fl
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:59:30 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:41115
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dVxNd-0000Ke-9F
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 05:59:25 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Message-ID: <6d3baced-070b-908a-95b0-7784e2f0ca4e@ilande.co.uk>
-Date: Fri, 14 Jul 2017 10:59:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 0/2] pci: allow PCI bus slots to be
- marked as reserved
+	(envelope-from <ppandit@redhat.com>) id 1dVxOy-0000uI-3I
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:00:48 -0400
+From: P J P <ppandit@redhat.com>
+Date: Fri, 14 Jul 2017 15:30:29 +0530
+Message-Id: <20170714100029.26288-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] ide: check BlockBackend object in
+ ide_cancel_dma_sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +18,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, marcel@redhat.com
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, Chensongnian <chensongnian@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 11/07/17 22:44, Mark Cave-Ayland wrote:
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-> For some machines it is impossible to plug devices into a particular PCI bus
-> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the root
-> bus behind which all devices must be plugged. Ignoring this rule will cause
-> problems with interrupt routing since the interrupt numbers are calculated
-> based upon PCI bridge id and secondary PCI bus slot id.
-> 
-> This patchset adds a new slot_reserved_mask property to PCIBus which is a
-> bitmask used to indicate whether PCI bus slots are reserved, i.e. they cannot
-> be used for hot or cold plugging on a particular PCI bus.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
-> v2:
-> - Rename dev_reserved_mask to slot_reserved_mask as suggested by Marcel
-> - Squash patches 2 and 3 together
-> 
-> 
-> Mark Cave-Ayland (2):
->   pci: move check for existing devfn into new pci_bus_devfn_available()
->     helper
->   pci: add reserved slot check to do_pci_register_device()
-> 
->  hw/pci/pci.c             |   34 ++++++++++++++++++++++++++++++----
->  include/hw/pci/pci_bus.h |    1 +
->  2 files changed, 31 insertions(+), 4 deletions(-)
+When cancelling pending DMA requests in ide_cancel_dma_sync,
+the s->blk object could be null, leading to a null dereference.
+Add check to avoid it.
 
-Ping? Any further feedback on the v2 version? My latest set of sun4u
-patches is dependent upon this patchset and it's freeze coming up next week!
+Reported-by: Chensongnian <chensongnian@huawei.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/ide/core.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-
-ATB,
-
-Mark.
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 0b48b64..04474b3 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -681,8 +681,10 @@ void ide_cancel_dma_sync(IDEState *s)
+ #ifdef DEBUG_IDE
+         printf("%s: draining all remaining requests", __func__);
+ #endif
+-        blk_drain(s->blk);
+-        assert(s->bus->dma->aiocb == NULL);
++        if (s->blk) {
++            blk_drain(s->blk);
++            assert(s->bus->dma->aiocb == NULL);
++        }
+     }
+ }
+ 
+-- 
+2.9.4
