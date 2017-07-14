@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVte1-0004zO-T4
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:00:07 -0400
+	(envelope-from <famz@redhat.com>) id 1dVtkq-0007AL-Iz
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dVtdx-0003Oa-8v
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:00:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39984)
+	(envelope-from <famz@redhat.com>) id 1dVtkp-0000N5-DM
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:07:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dVtdw-0003Nt-Ju
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:00:01 -0400
-References: <1499964378-24344-1-git-send-email-mst@redhat.com>
-	<c491c6ee-67ed-e7a0-4294-b128f63d6841@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <415ee774-cab4-f48a-c081-c2158de35b50@redhat.com>
-Date: Fri, 14 Jul 2017 07:59:54 +0200
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dVtkp-0000Ld-3z
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 02:07:07 -0400
+Date: Fri, 14 Jul 2017 14:07:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170714060702.GD18687@lemon>
+References: <AT5PR84MB0164562E6BDB62601F376F87A0AD0@AT5PR84MB0164.NAMPRD84.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-In-Reply-To: <c491c6ee-67ed-e7a0-4294-b128f63d6841@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: switch pxe and vm gen id tests to
- use kvm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AT5PR84MB0164562E6BDB62601F376F87A0AD0@AT5PR84MB0164.NAMPRD84.PROD.OUTLOOK.COM>
+Subject: Re: [Qemu-devel] Poor 8K random IO performance inside the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Ben Warren <ben@skyportsystems.com>, Peter Maydell <peter.maydell@linaro.org>
+To: "Nagarajan, Padhu (HPE Storage)" <padhu@hpe.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 13.07.2017 19:00, Paolo Bonzini wrote:
-> On 13/07/2017 18:47, Michael S. Tsirkin wrote:
->> Speed up tests on host systems with kvm support.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Thomas Huth <thuth@redhat.com>
->> Cc: Laurent Vivier <lvivier@redhat.com>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>
->> This is on top of my previous patch fixing vmgenid.
->>
->> PPC PXE test is reported to be especially slow - does anyone care to t=
-ry
->> it and measure whether this helps?
->>
->>  tests/pxe-test.c     | 2 +-
->>  tests/vmgenid-test.c | 2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
->> index 34282d3..cf6e225 100644
->> --- a/tests/pxe-test.c
->> +++ b/tests/pxe-test.c
->> @@ -25,7 +25,7 @@ static void test_pxe_one(const char *params, bool ip=
-v6)
->>  {
->>      char *args;
->> =20
->> -    args =3D g_strdup_printf("-machine accel=3Dtcg -nodefaults -boot =
-order=3Dn "
->> +    args =3D g_strdup_printf("-machine accel=3Dkvm:tcg -nodefaults -b=
-oot order=3Dn "
->>                             "-netdev user,id=3D" NETNAME ",tftp=3D./,b=
-ootfile=3D%s,"
->>                             "ipv4=3D%s,ipv6=3D%s %s", disk, ipv6 ? "of=
-f" : "on",
->>                             ipv6 ? "on" : "off", params);
->> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
->> index 0556ba2..6477dcc 100644
->> --- a/tests/vmgenid-test.c
->> +++ b/tests/vmgenid-test.c
->> @@ -132,7 +132,7 @@ static char disk[] =3D "tests/vmgenid-test-disk-XX=
-XXXX";
->> =20
->>  static char *guid_cmd_strdup(const char *guid)
->>  {
->> -    return g_strdup_printf("-machine accel=3Dtcg "
->> +    return g_strdup_printf("-machine accel=3Dkvm:tcg "
->>                             "-device vmgenid,id=3Dtestvgid,guid=3D%s "
->>                             "-drive id=3Dhd0,if=3Dnone,file=3D%s,forma=
-t=3Draw "
->>                             "-device ide-hd,drive=3Dhd0 ",
->=20
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+On Fri, 07/14 04:28, Nagarajan, Padhu (HPE Storage) wrote:
+> During an 8K random-read fio benchmark, we observed poor performance inside
+> the guest in comparison to the performance seen on the host block device. The
+> table below shows the IOPS on the host and inside the guest with both
+> virtioscsi (scsimq) and virtioblk (blkmq).
+> 
+> -----------------------------------
+> config        | IOPS  | fio gst hst
+> -----------------------------------
+> host-q32-t1   | 79478 | 401     271
+> scsimq-q8-t4  | 45958 | 693 639 351
+> blkmq-q8-t4   | 49247 | 647 589 308
+> -----------------------------------
+> host-q48-t1   | 85599 | 559     291
+> scsimq-q12-t4 | 50237 | 952 807 358
+> blkmq-q12-t4  | 54016 | 885 786 329
+> -----------------------------------
+> fio gst hst => latencies in usecs, as
+>                seen by fio, guest and
+>                host block layers.
 
-NACK.
+Out of curisoty, how are gst and hst collected here? It's interesting why hst
+(q32-t1) is better than (q8-t4).
 
-It's not that simple. If you do it like this, you then suddenly get
-these ugly '"kvm" accelerator not found' messages during "make check"
-which we really should avoid.
+> q8-t4 => qdepth=8, numjobs=4
+> host  => fio run directly on the host
+> scsimq,blkmq => fio run inside the guest
+> 
+> Shouldn't we get a much better performance inside the guest ?
+> 
+> When fio inside the guest was generating 32 outstanding IOs, iostat on the
+> host shows avgqu-sz of only 16. For 48 outstanding IOs inside the guest,
+> avgqu-sz on the host was only marginally better.
+> 
+> qemu command line: qemu-system-x86_64 -L /usr/share/seabios/ -name
+> node1,debug-threads=on -name node1 -S -machine pc,accel=kvm,usb=off -cpu
+> SandyBridge -m 7680 -realtime mlock=off -smp 4,sockets=4,cores=1,threads=1
+> -object iothread,id=iothread1 -object iothread,id=iothread2 -object
+> iothread,id=iothread3 -object iothread,id=iothread4 -uuid XX -nographic
+> -no-user-config -nodefaults -chardev
+> socket,id=charmonitor,path=/var/lib/libvirt/qemu/node1.monitor,server,nowait
+> -mon chardev=charmonitor,id=monitor,mode=control -rtc base=utc,driftfix=slew
+> -global kvm-pit.lost_tick_policy=discard -no-hpet -no-shutdown -boot strict=on
+> -device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 -device
+> lsi,id=scsi0,bus=pci.0,addr=0x6 -device
+> virtio-scsi-pci,ioeventfd=on,num_queues=4,iothread=iothread2,id=scsi1,bus=pci.0,addr=0x7
+> -device
+> virtio-scsi-pci,ioeventfd=on,num_queues=4,iothread=iothread2,id=scsi2,bus=pci.0,addr=0x8
+> -drive file=rhel7.qcow2,if=none,id=drive-virtio-disk0,format=qcow2 -device
+> virtio-blk-pci,ioeventfd=on,num-queues=4,iothread=iothread1,scsi=off,bus=pci.0,addr=0x4,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1
+> -drive
+> file=/dev/sdc,if=none,id=drive-virtio-disk1,format=raw,cache=none,aio=native
+> -device
+> virtio-blk-pci,ioeventfd=on,num-queues=4,iothread=iothread1,iothread=iothread1,scsi=off,bus=pci.0,addr=0x17,drive=drive-virtio-disk1,id=virtio-disk1
 
-Laurent suggested some better ideas a couple of months ago, but I think
-the common sense was rather "unit tests should always use TCG" at that
-point in time:
+num-queues here will not make much of a difference with current implementation
+in QEMU because they all get processed in the same iothread.
 
- https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg00400.html
+> -drive
+> file=/dev/sdc,if=none,id=drive-scsi1-0-0-0,format=raw,cache=none,aio=native
+> -device
+> scsi-hd,bus=scsi1.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi1-0-0-0,id=scsi1-0-0-0
+> -netdev tap,fd=24,id=hostnet0,vhost=on,vhostfd=25 -device
+> virtio-net-pci,netdev=hostnet0,id=net0,mac=XXX,bus=pci.0,addr=0x2 -netdev
+> tap,fd=26,id=hostnet1,vhost=on,vhostfd=27 -device
+> virtio-net-pci,netdev=hostnet1,id=net1,mac=YYY,bus=pci.0,multifunction=on,addr=0x15
+> -netdev tap,fd=28,id=hostnet2,vhost=on,vhostfd=29 -device
+> virtio-net-pci,netdev=hostnet2,id=net2,mac=ZZZ,bus=pci.0,multifunction=on,addr=0x16
+> -chardev pty,id=charserial0 -device isa-serial,chardev=charserial0,id=serial0
+> -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x3 -msg timestamp=on
+> 
+> fio command line: /tmp/fio --time_based --ioengine=libaio --randrepeat=1
+> --direct=1 --invalidate=1 --verify=0 --offset=0 --verify_fatal=0
+> --group_reporting --numjobs=$jobs --name=randread --rw=randread --blocksize=8K
+> --iodepth=$qd --runtime=60 --filename={/dev/vdb or /dev/sda}
+> 
+> # qemu-system-x86_64 --version
+> QEMU emulator version 2.8.0(Debian 1:2.8+dfsg-3~bpo8+1)
+> Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+> 
+> The guest was running RHEL 7.3 and the host was Debian 8.
+> 
+> Any thoughts on what could be happening here ?
 
-Well, now that we've got the "--disable-tcg" configure option, we should
-maybe start to reconsider that ;-)
+While there could be things that can be optimized/tuned, the results are not too
+surprising to me. You have fast disks here so the overhead is more obvious.
 
-So I'm fine with the patch if you also include Laurent's patch to shut
-up the error message:
-
- https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg00395.html
-
- Thomas
+Fam
