@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVa-0003y8-FX
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:47 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dVzWW-0005Cz-6T
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVZ-00044I-C9
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:46 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Fri, 14 Jul 2017 07:14:49 -0500
-Message-Id: <20170714121457.10322-13-eblake@redhat.com>
-In-Reply-To: <20170714121457.10322-1-eblake@redhat.com>
-References: <20170714121457.10322-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 12/20] qed: Switch to .bdrv_co_block_status()
+	(envelope-from <no-reply@patchew.org>) id 1dVzWS-0004tG-6N
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:44 -0400
+Resent-Message-Id: <E1dVzWS-0004tG-6N@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150003458708.75.17469343830014450222@5d477a5b5989>
+In-Reply-To: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 14 Jul 2017 05:16:27 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] ARM: implement MPS2 board (with 2
+ FPGA flavours)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,80 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, f4bug@amsat.org, patches@linaro.org
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the qed driver accordingly.  There is no intent
-to optimize based on the mapping flag for this format.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
----
-v2: rebase to mapping flag, fix mask in qed_is_allocated_cb
----
- block/qed.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
-
-diff --git a/block/qed.c b/block/qed.c
-index 86cad21..a80195c 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -677,7 +677,7 @@ typedef struct {
-     Coroutine *co;
-     uint64_t pos;
-     int64_t status;
--    int *pnum;
-+    int64_t *pnum;
-     BlockDriverState **file;
- } QEDIsAllocatedCB;
-
-@@ -685,10 +685,10 @@ static void qed_is_allocated_cb(void *opaque, int ret, uint64_t offset, size_t l
- {
-     QEDIsAllocatedCB *cb = opaque;
-     BDRVQEDState *s = cb->bs->opaque;
--    *cb->pnum = len / BDRV_SECTOR_SIZE;
-+    *cb->pnum = len;
-     switch (ret) {
-     case QED_CLUSTER_FOUND:
--        offset |= qed_offset_into_cluster(s, cb->pos);
-+        offset |= qed_offset_into_cluster(s, cb->pos) & BDRV_BLOCK_OFFSET_MASK;
-         cb->status = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
-         *cb->file = cb->bs->file->bs;
-         break;
-@@ -710,16 +710,18 @@ static void qed_is_allocated_cb(void *opaque, int ret, uint64_t offset, size_t l
-     }
- }
-
--static int64_t coroutine_fn bdrv_qed_co_get_block_status(BlockDriverState *bs,
--                                                 int64_t sector_num,
--                                                 int nb_sectors, int *pnum,
--                                                 BlockDriverState **file)
-+static int64_t coroutine_fn bdrv_qed_co_block_status(BlockDriverState *bs,
-+                                                     bool mapping,
-+                                                     int64_t pos,
-+                                                     int64_t bytes,
-+                                                     int64_t *pnum,
-+                                                     BlockDriverState **file)
- {
-     BDRVQEDState *s = bs->opaque;
--    size_t len = (size_t)nb_sectors * BDRV_SECTOR_SIZE;
-+    size_t len;
-     QEDIsAllocatedCB cb = {
-         .bs = bs,
--        .pos = (uint64_t)sector_num * BDRV_SECTOR_SIZE,
-+        .pos = pos,
-         .status = BDRV_BLOCK_OFFSET_MASK,
-         .pnum = pnum,
-         .file = file,
-@@ -1541,7 +1543,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_child_perm          = bdrv_format_default_perms,
-     .bdrv_create              = bdrv_qed_create,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
--    .bdrv_co_get_block_status = bdrv_qed_co_get_block_status,
-+    .bdrv_co_block_status     = bdrv_qed_co_block_status,
-     .bdrv_co_readv            = bdrv_qed_co_readv,
-     .bdrv_co_writev           = bdrv_qed_co_writev,
-     .bdrv_co_pwrite_zeroes    = bdrv_qed_co_pwrite_zeroes,
--- 
-2.9.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDAwMjk0ODctMTQ4MjItMS1naXQtc2VuZC1lbWFpbC1wZXRlci5tYXlkZWxs
+QGxpbmFyby5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzldIEFSTTogaW1w
+bGVtZW50IE1QUzIgYm9hcmQgKHdpdGggMiBGUEdBIGZsYXZvdXJzKQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+ZjNiNzUxMSBNQUlOVEFJTkVSUzogQWRkIGVudHJpZXMgZm9yIE1QUzIgYm9hcmQKN2IyNjU4ZiBo
+dy9hcm0vbXBzMjogQWRkIGV0aGVybmV0CjYyYzIyOTAgaHcvYXJtL21wczI6IEFkZCBTQ0MKZWY1
+MzFmZSBody9taXNjL21wczJfc2NjOiBJbXBsZW1lbnQgTVBTMiBTZXJpYWwgQ29tbXVuaWNhdGlv
+biBDb250cm9sbGVyCjE0MTBjMjUgaHcvYXJtL21wczI6IEFkZCB0aW1lcnMKYmU3MzM4NSBody9j
+aGFyL2Ntc2RrLWFwYi10aW1lcjogSW1wbGVtZW50IENNU0RLIEFQQiB0aW1lciBkZXZpY2UKZmU3
+ZDVhZiBody9hcm0vbXBzMjogQWRkIFVBUlRzCmQ5ZjYyMmEgaHcvY2hhci9jbXNkay1hcGItdWFy
+dC5jOiBJbXBsZW1lbnQgQ01TREsgQVBCIFVBUlQKMWQ2ZjNjNiBody9hcm0vbXBzMjogSW1wbGVt
+ZW50IHNrZWxldG9uIG1wczItYW4zODUgYW5kIG1wczItYW41MTEgYm9hcmQgbW9kZWxzCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IGh3L2FybS9tcHMyOiBJbXBsZW1l
+bnQgc2tlbGV0b24gbXBzMi1hbjM4NSBhbmQgbXBzMi1hbjUxMSBib2FyZCBtb2RlbHMuLi4KRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3MjogRklMRTogaHcvYXJtL21wczIuYzoyMjoK
+KyAqICAgaHR0cHM6Ly9kZXZlbG9wZXIuYXJtLmNvbS9wcm9kdWN0cy9zeXN0ZW0tZGVzaWduL2Rl
+dmVsb3BtZW50LWJvYXJkcy9jb3J0ZXgtbS1wcm90b3R5cGluZy1zeXN0ZW0KCnRvdGFsOiAxIGVy
+cm9ycywgMCB3YXJuaW5ncywgMjgyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvOTogaHcvY2hhci9jbXNkay1hcGIt
+dWFydC5jOiBJbXBsZW1lbnQgQ01TREsgQVBCIFVBUlQuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBj
+aGFyYWN0ZXJzCiM1NzogRklMRTogaHcvY2hhci9jbXNkay1hcGItdWFydC5jOjE1OgorICogaHR0
+cHM6Ly9kZXZlbG9wZXIuYXJtLmNvbS9wcm9kdWN0cy9zeXN0ZW0tZGVzaWduL3N5c3RlbS1kZXNp
+Z24ta2l0cy9jb3J0ZXgtbS1zeXN0ZW0tZGVzaWduLWtpdAoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA1MDcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy85OiBody9hcm0vbXBzMjogQWRkIFVBUlRzLi4uCkNo
+ZWNraW5nIFBBVENIIDQvOTogaHcvY2hhci9jbXNkay1hcGItdGltZXI6IEltcGxlbWVudCBDTVNE
+SyBBUEIgdGltZXIgZGV2aWNlLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTY6
+IEZJTEU6IGh3L3RpbWVyL2Ntc2RrLWFwYi10aW1lci5jOjE1OgorICogaHR0cHM6Ly9kZXZlbG9w
+ZXIuYXJtLmNvbS9wcm9kdWN0cy9zeXN0ZW0tZGVzaWduL3N5c3RlbS1kZXNpZ24ta2l0cy9jb3J0
+ZXgtbS1zeXN0ZW0tZGVzaWduLWtpdAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzEg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
+Y2tpbmcgUEFUQ0ggNS85OiBody9hcm0vbXBzMjogQWRkIHRpbWVycy4uLgpDaGVja2luZyBQQVRD
+SCA2Lzk6IGh3L21pc2MvbXBzMl9zY2M6IEltcGxlbWVudCBNUFMyIFNlcmlhbCBDb21tdW5pY2F0
+aW9uIENvbnRyb2xsZXIuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2OTogRklM
+RTogaHcvbWlzYy9tcHMyLXNjYy5jOjE2OgorICogaHR0cDovL2luZm9jZW50ZXIuYXJtLmNvbS9o
+ZWxwL2luZGV4LmpzcD90b3BpYz0vY29tLmFybS5kb2MuMTAwMTEyXzAxMDBfMDNfZW4vaW5kZXgu
+aHRtbAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMx
+MDQ6IEZJTEU6IGh3L21pc2MvbXBzMi1zY2MuYzo1MToKK3N0YXRpYyBib29sIHNjY19jZmdfd3Jp
+dGUoTVBTMlNDQyAqcywgdW5zaWduZWQgZnVuY3Rpb24sCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzNzkgbGluZXMgY2hl
+Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
+Q0ggNy85OiBody9hcm0vbXBzMjogQWRkIFNDQy4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IGh3L2Fy
+bS9tcHMyOiBBZGQgZXRoZXJuZXQuLi4KQ2hlY2tpbmcgUEFUQ0ggOS85OiBNQUlOVEFJTkVSUzog
+QWRkIGVudHJpZXMgZm9yIE1QUzIgYm9hcmQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
