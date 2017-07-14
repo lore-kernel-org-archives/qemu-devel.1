@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVxdo-0005bu-DF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dVxih-0002BL-Nr
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVxdm-0007NZ-QQ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42384)
+	(envelope-from <pbonzini@redhat.com>) id 1dVxid-00024N-O4
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:21:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVxdm-0007NL-Gd
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:16:06 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 14 Jul 2017 11:15:49 +0100
-Message-Id: <20170714101549.28665-3-berrange@redhat.com>
-In-Reply-To: <20170714101549.28665-1-berrange@redhat.com>
-References: <20170714101549.28665-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] docs: document deprecated features in
- appendix
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dVxid-00022X-E9
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:21:07 -0400
+References: <1499342940-56739-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<221951d9-92f0-b8f2-06b0-cf49e9fc19be@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ee5623ec-b8a7-4e34-45e0-50f52da02ed9@redhat.com>
+Date: Fri, 14 Jul 2017 12:20:57 +0200
+MIME-Version: 1.0
+In-Reply-To: <221951d9-92f0-b8f2-06b0-cf49e9fc19be@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/13] chardevice hotswap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,211 +28,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Denis V. Lunev" <den@virtuozzo.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, amit@kernel.org, mst@redhat.com
 
-The deprecation of features in QEMU is totally adhoc currently,
-with no way for the user to get a list of what is deprecated
-in each release. This adds an appendix to the doc that records
-when each deprecation was made and provides text explaining
-what to use instead, if anything.
+On 14/07/2017 11:29, Denis V. Lunev wrote:
+> On 07/06/2017 03:08 PM, Anton Nefedov wrote:
+>> Changed in v6:
+>>   - patch 3: chr_lock mutex removed (as discussed, thread safety can be left to
+>>     the front-ends, and the front-ends currently supported are good as is).
+>>   - patch 5 now includes related changes for serial and virtio-serial 
+>>   - patch 13 commit message extended
+>>
+>> ========
+>>
+>> Changed in v5:
+>>   - rebased
+>>   - patch 6 fixed (wouldn't compile until patch 7 (broken by previous rebase))
+>>   - patch 11 commit message added
+>>
+>> ========
+>>
+>> Changed in v4:
+>>   - rebased on top of the latest chardev changes
+>>   - remarks applied
+>>   - patch 1 fixed so it works with alias names
+>>
+>> ========
+>>
+>> Changed in v3:
+>>   - minor remarks to patch 1 applied
+>>   - patch 3: avoid using bottom-half, handle syncronously
+>>     As mentioned, it gets thing complicated and is only a problem for
+>>     a monitor-connected chardev hotswap and that is not supported for now
+>>   - tests added (patches 6-9)
+>>
+>> ========
+>>
+>> This serie is a v2 of the February submit
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg01989.html
+>>
+>> The interface is changed as requested and the changes are slightly reworked
+>> and split into separate patches.
+>>
+>> ========
+>>
+>> The patchset adds support of the character device change without
+>> a frontend device removal.
+>> Yet isa-serial and virtio-serial frontends are supported.
+>>
+>> The feature can be helpful for e.g. Windows debug allowing to
+>> establish connection to a live VM from VM with WinDbg.
+>>
+>> Anton Nefedov (13):
+>>   char: move QemuOpts->ChardevBackend translation to a separate func
+>>   char: add backend hotswap handler
+>>   char: chardevice hotswap
+>>   char: forbid direct chardevice access for hotswap devices
+>>   char: avoid chardevice direct access
+>>   test-char: destroy chardev-udp after test
+>>   test-char: split char_udp_test
+>>   test-char: split char_file_test
+>>   test-char: add hotswap test
+>>   hmp: add hmp analogue for qmp-chardev-change
+>>   virtio-console: chardev hotswap support
+>>   serial: move TIOCM update to a separate function
+>>   serial: chardev hotswap support
+>>
+>>  include/chardev/char-fe.h   |  22 ++++
+>>  include/chardev/char.h      |  19 +++
+>>  hmp.h                       |   1 +
+>>  backends/rng-egd.c          |   2 +-
+>>  chardev/char-fe.c           |  16 ++-
+>>  chardev/char-mux.c          |   1 +
+>>  chardev/char.c              | 164 +++++++++++++++++++++-----
+>>  gdbstub.c                   |   2 +-
+>>  hmp-commands.hx             |  18 ++-
+>>  hmp.c                       |  34 ++++++
+>>  hw/arm/pxa2xx.c             |   3 +-
+>>  hw/arm/strongarm.c          |   4 +-
+>>  hw/char/bcm2835_aux.c       |   2 +-
+>>  hw/char/cadence_uart.c      |   4 +-
+>>  hw/char/debugcon.c          |   4 +-
+>>  hw/char/digic-uart.c        |   2 +-
+>>  hw/char/escc.c              |   8 +-
+>>  hw/char/etraxfs_ser.c       |   2 +-
+>>  hw/char/exynos4210_uart.c   |   4 +-
+>>  hw/char/grlib_apbuart.c     |   4 +-
+>>  hw/char/imx_serial.c        |   2 +-
+>>  hw/char/ipoctal232.c        |   4 +-
+>>  hw/char/lm32_juart.c        |   2 +-
+>>  hw/char/lm32_uart.c         |   2 +-
+>>  hw/char/mcf_uart.c          |   2 +-
+>>  hw/char/milkymist-uart.c    |   2 +-
+>>  hw/char/parallel.c          |   2 +-
+>>  hw/char/pl011.c             |   2 +-
+>>  hw/char/sclpconsole-lm.c    |   4 +-
+>>  hw/char/sclpconsole.c       |   4 +-
+>>  hw/char/serial.c            |  63 +++++++---
+>>  hw/char/sh_serial.c         |   4 +-
+>>  hw/char/spapr_vty.c         |   4 +-
+>>  hw/char/stm32f2xx_usart.c   |   3 +-
+>>  hw/char/terminal3270.c      |   4 +-
+>>  hw/char/virtio-console.c    |  35 +++++-
+>>  hw/char/xen_console.c       |   4 +-
+>>  hw/char/xilinx_uartlite.c   |   2 +-
+>>  hw/ipmi/ipmi_bmc_extern.c   |   4 +-
+>>  hw/mips/boston.c            |   2 +-
+>>  hw/mips/mips_malta.c        |   2 +-
+>>  hw/misc/ivshmem.c           |   6 +-
+>>  hw/usb/ccid-card-passthru.c |   6 +-
+>>  hw/usb/dev-serial.c         |   7 +-
+>>  hw/usb/redirect.c           |   7 +-
+>>  monitor.c                   |   4 +-
+>>  net/colo-compare.c          |  10 +-
+>>  net/filter-mirror.c         |   8 +-
+>>  net/slirp.c                 |   2 +-
+>>  net/vhost-user.c            |   7 +-
+>>  qapi-schema.json            |  40 +++++++
+>>  qtest.c                     |   2 +-
+>>  tests/test-char.c           | 275 ++++++++++++++++++++++++++++++++------------
+>>  tests/test-hmp.c            |   1 +
+>>  tests/vhost-user-test.c     |   2 +-
+>>  55 files changed, 647 insertions(+), 199 deletions(-)
+>>
+> ping
 
-Since there has been no formal policy around removal of deprecated
-features in the past, any deprecations prior to 2.10.0 are to be
-treated as if they had been made at the 2.10.0 release. Thus the
-earliest that existing deprecations will be deleted is the start
-of the 2.12.0 cycle.
+I've already sent a pull request. :)
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-doc.texi | 168 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 168 insertions(+)
-
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index f067015d4b..c06cab26b7 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -39,6 +39,7 @@
- * QEMU User space emulator::
- * Implementation notes::
- * Support lifetime::
-+* Deprecated features::
- * License::
- * Index::
- @end menu
-@@ -3165,6 +3166,173 @@ support machine types from many previous versions.
- The supported lifetime for versioned machine types is 12 releases,
- which is equivalent to 4 years worth of previous QEMU releases.
- 
-+@node Deprecated features
-+@appendix Deprecated features
-+
-+The following sections provide a list of all features currently
-+marked as deprecated.
-+
-+Prior to the 2.10.0 release there was no official policy on how
-+long features would be deprecated prior to their removal, nor
-+any documented list of which features were deprecated. Thus
-+any features deprecated prior to 2.10.0 will be treated as if
-+they were first deprecated in the 2.10.0 release.
-+
-+@section System emulator command line arguments
-+
-+@subsection -drive boot=on|off (since 1.3.0)
-+
-+The ``boot=on|off'' option to the ``-drive'' argument is
-+ignored. Applications should use the ``bootindex=N'' parameter
-+to set an absolute ordering between devices instead.
-+
-+@subsection -tdf (since 1.3.0)
-+
-+The ``-tdf'' argument is ignored. The behaviour implemented
-+by this argument is now the default when using the KVM PIT,
-+but can be requested explicitly using
-+``-global kvm-pit.lost_tick_policy=slew''.
-+
-+@subsection -no-kvm-pit-reinjection (since 1.3.0)
-+
-+The ``-no-kvm-pit-reinjection'' argument is now a
-+synonym for setting ``-global kvm-pit.lost_tick_policy=discard''.
-+
-+@subsection -no-kvm-irqchip (since 1.3.0)
-+
-+The ``-no-kvm-irqchip'' argument is now a synonym for
-+setting ``-machine kernel_irqchip=off''.
-+
-+@subsection -no-kvm-pit (since 1.3.0)
-+
-+The ``-no-kvm-pit'' argument is ignored. It is no longer
-+possible to disable the KVM PIT directly.
-+
-+@subsection -no-kvm (since 1.3.0)
-+
-+The ``-no-kvm'' argument is now a synonym for setting
-+``-machine accel=tcg''.
-+
-+@subsection -monitor default=on (since 2.4.0)
-+
-+The ``default'' option to the ``-monitor'' argument is
-+now ignored. When multiple monitors were enabled, it
-+indicated which monitor would receive log messages
-+from the various subsystems. This feature is no longer
-+required as messages are now only sent to the monitor
-+in response to explicitly monitor commands.
-+
-+@subsection -vnc tls (since 2.5.0)
-+
-+The ``-vnc tls'' argument is now a synonym for setting
-+``-object tls-creds-anon,id=tls0'' combined with
-+``-vnc tls-creds=tls0'
-+
-+@subsection -vnc x509 (since 2.5.0)
-+
-+The ``-vnc x509=/path/to/certs'' argument is now a
-+synonym for setting
-+``-object tls-creds-x509,dir=/path/to/certs,id=tls0,verify-peer=no''
-+combined with ``-vnc tls-creds=tls0'
-+
-+@subsection -vnc x509verify (since 2.5.0)
-+
-+The ``-vnc x509verify=/path/to/certs'' argument is now a
-+synonym for setting
-+``-object tls-creds-x509,dir=/path/to/certs,id=tls0,verify-peer=yes''
-+combined with ``-vnc tls-creds=tls0'
-+
-+@subsection -tftp (since 2.6.0)
-+
-+The ``-tftp /some/dir'' argument is now a synonym for setting
-+the ``-netdev user,tftp=/some/dir' argument. The new syntax
-+allows different settings to be provided per NIC.
-+
-+@subsection -bootp (since 2.6.0)
-+
-+The ``-bootp /some/file'' argument is now a synonym for setting
-+the ``-netdev user,bootp=/some/file' argument. The new syntax
-+allows different settings to be provided per NIC.
-+
-+@subsection -redir (since 2.6.0)
-+
-+The ``-redir ARGS'' argument is now a synonym for setting
-+the ``-netdev user,hostfwd=ARGS'' argument instead. The new
-+syntax allows different settings to be provided per NIC.
-+
-+@subsection -smb (since 2.6.0)
-+
-+The ``-smb /some/dir'' argument is now a synonym for setting
-+the ``-netdev user,smb=/some/dir'' argument instead. The new
-+syntax allows different settings to be provided per NIC.
-+
-+@subsection -net channel (since 2.6.0)
-+
-+The ``--net channel,ARGS'' argument is now a synonym for setting
-+the ``-netdev user,guestfwd=ARGS'' argument instead.
-+
-+@subsection -net vlan (since 2.9.0)
-+
-+The ``-net van=NN'' argument is partially replaced with the
-+new ``-netdev'' argument. The remaining use cases will no
-+longer be directly supported in QEMU.
-+
-+@subsection -drive if=scsi (since 2.9.0)
-+
-+The ``-drive if=scsi'' argument is replaced by the the
-+``-device BUS-TYPE'' argument combined with ``-drive if=none''.
-+
-+@subsection -net dump (since 2.10.0)
-+
-+The ``--net dump'' argument is now replaced with the
-+``-object filter-dump'' argument which works in combination
-+with the modern ``-netdev`` backends instead.
-+
-+@subsection -hdachs (since 2.10.0)
-+
-+The ``-hdachs'' argument is now a synonym for setting
-+the ``cyls'', ``heads'', ``secs'', and ``trans'' properties
-+on the ``ide-hd'' device using the ``-device'' argument.
-+The new syntax allows different settings to be provided
-+per disk.
-+
-+@subsection -usbdevice (since 2.10.0)
-+
-+The ``-usbdevice DEV'' argument is now a synonym for setting
-+the ``-device usb-DEV'' argument instead. The deprecated syntax
-+would automatically enable USB support on the machine type.
-+If using the new syntax, USB support must be explicitly
-+enabled via the ``-machine usb=on'' argument.
-+
-+@section qemu-img command line arguments
-+
-+@subsection convert -s (since 2.0.0)
-+
-+The ``convert -s snapshot_id_or_name'' argument is obsoleted
-+by the ``convert -l snapshot_param'' argument instead.
-+
-+@section System emulator human monitor commands
-+
-+@subsection usb_add (since 2.10.0)
-+
-+The ``usb_add'' command is replaced by the ``device_add'' command.
-+
-+@subsection usb_del (since 2.10.0)
-+
-+The ``usb_del'' command is replaced by the ``device_del'' command.
-+
-+@section System emulator devices
-+
-+@subsection ivshmem (since 2.6.0)
-+
-+The ``ivshmem'' device type is replaced by either the ``ivshmem-plain''
-+or ``ivshmem-doorbell`` device types.
-+
-+@subsection spapr-pci-vfio-host-bridge (since 2.6.0)
-+
-+The ``spapr-pci-vfio-host-bridge'' device type is replaced by
-+the ``spapr-pci-host-bridge'' device type.
-+
- @node License
- @appendix License
- 
--- 
-2.13.0
+Paolo
