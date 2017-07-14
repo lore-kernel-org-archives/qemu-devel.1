@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVxsW-0003mb-P0
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:31:21 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dVxsk-0003xj-Ob
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dVxsV-0007ki-Pt
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:31:20 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri, 14 Jul 2017 11:31:05 +0100
-Message-Id: <20170714103105.5781-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] qcow: fix memory leaks related to encryption
+	(envelope-from <stefanha@redhat.com>) id 1dVxsh-0007om-KN
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:31:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dVxsh-0007oS-De
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:31:31 -0400
+Date: Fri, 14 Jul 2017 11:31:26 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170714103126.GH27446@stefanha-x1.localdomain>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+	<20170713110237.6712-9-lprosek@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fmEUq8M7S0s+Fl0V"
+Content-Disposition: inline
+In-Reply-To: <20170713110237.6712-9-lprosek@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 8/8] virtio-crypto: use virtqueue_error
+ for errors with queue context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,89 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
-Fix leak of the 'encryptopts' string, which was mistakenly
-declared const.
 
-Fix leak of QemuOpts entry which should not have been deleted
-from the opts array.
+--fmEUq8M7S0s+Fl0V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reported by: coverity
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- block/qcow.c  | 5 +++--
- block/qcow2.c | 7 ++++---
- 2 files changed, 7 insertions(+), 5 deletions(-)
+On Thu, Jul 13, 2017 at 01:02:37PM +0200, Ladi Prosek wrote:
+> virtqueue_error includes queue index in the error output and is preferred
+> for errors that pertain to a virtqueue rather than to the device as a who=
+le.
+>=20
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>  hw/virtio/virtio-crypto.c | 56 ++++++++++++++++++++++++-----------------=
+------
+>  1 file changed, 29 insertions(+), 27 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 66827d6f24..c08cdc4a7b 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -768,7 +768,7 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     Error *local_err = NULL;
-     int ret;
-     BlockBackend *qcow_blk;
--    const char *encryptfmt = NULL;
-+    char *encryptfmt = NULL;
-     QDict *options;
-     QDict *encryptopts = NULL;
-     QCryptoBlockCreateOptions *crypto_opts = NULL;
-@@ -793,7 +793,7 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-             goto cleanup;
-         }
-     } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
--        encryptfmt = "aes";
-+        encryptfmt = g_strdup("aes");
-     }
- 
-     ret = bdrv_create_file(filename, opts, &local_err);
-@@ -908,6 +908,7 @@ exit:
-     blk_unref(qcow_blk);
- cleanup:
-     QDECREF(encryptopts);
-+    g_free(encryptfmt);
-     qcrypto_block_free(crypto);
-     qapi_free_QCryptoBlockCreateOptions(crypto_opts);
-     g_free(backing_file);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index c144ea5620..75d3e3c731 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2905,7 +2905,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     int version;
-     uint64_t refcount_bits;
-     int refcount_order;
--    const char *encryptfmt = NULL;
-+    char *encryptfmt = NULL;
-     Error *local_err = NULL;
-     int ret;
- 
-@@ -2916,14 +2916,14 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
-     backing_fmt = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
-     encryptfmt = qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT_FORMAT);
-     if (encryptfmt) {
--        if (qemu_opt_get_del(opts, BLOCK_OPT_ENCRYPT)) {
-+        if (qemu_opt_get(opts, BLOCK_OPT_ENCRYPT)) {
-             error_setg(errp, "Options " BLOCK_OPT_ENCRYPT " and "
-                        BLOCK_OPT_ENCRYPT_FORMAT " are mutually exclusive");
-             ret = -EINVAL;
-             goto finish;
-         }
-     } else if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
--        encryptfmt = "aes";
-+        encryptfmt = g_strdup("aes");
-     }
-     cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
-     if (local_err) {
-@@ -2983,6 +2983,7 @@ static int qcow2_create(const char *filename, QemuOpts *opts, Error **errp)
- finish:
-     g_free(backing_file);
-     g_free(backing_fmt);
-+    g_free(encryptfmt);
-     g_free(buf);
-     return ret;
- }
--- 
-2.13.0
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--fmEUq8M7S0s+Fl0V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZaJ1+AAoJEJykq7OBq3PITtcIAJ2C5ZNYO+RJjV1KtwMQ5B97
+1DvWldk4H7yX//BYY9gkFp3C5pTNRYkNcOFTeocbR8/Ko9vDZQg9cWLnh4thD+pA
+P0+K/mdtL+Ps1QhOgNXad/lGXq9J6b/GwvVmvWleGD8elAzKBr02L2hwlIACfjt+
+KGkTK7PGeBMxd0x69rhLCdtUx7XEgtLKvsSktfwcygVI+UybD7LvmycbKGKPgg59
+SUE75tAJ9J72xe08lYqdhJXogqdB1AzpB1vJM9rKkmpQcg80t0Lv2qSQo3/zyoTQ
+0PYrEmDHBRpq0mYZ+VFPwMaaDO+YQtV3dHXEbP8bbei6khxYN5CnUa9KXBkrlls=
+=8LGi
+-----END PGP SIGNATURE-----
+
+--fmEUq8M7S0s+Fl0V--
