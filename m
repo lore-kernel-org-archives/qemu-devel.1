@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw2-0001Co-2f
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:03 -0400
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw2-0001Ef-JH
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvy-0007q0-H0
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyw0-0007ru-Rp
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:02 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33745)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dVyvy-0007pV-8V
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:58 -0400
-Received: by mail-pf0-x244.google.com with SMTP id e199so10743801pfh.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:38:58 -0700 (PDT)
+	id 1dVyw0-0007rQ-JW
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:39:00 -0400
+Received: by mail-pf0-x244.google.com with SMTP id q85so10728750pfq.2
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:39:00 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 07:38:33 -0400
-Message-Id: <1500032321-13951-12-git-send-email-longpeng.mike@gmail.com>
+Date: Fri, 14 Jul 2017 07:38:35 -0400
+Message-Id: <1500032321-13951-14-git-send-email-longpeng.mike@gmail.com>
 In-Reply-To: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
 References: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 11/18] crypto: hmac: add hmac driver
- framework
+Subject: [Qemu-devel] [PATCH v5 13/18] crypto: cipher: add afalg-backend
+ cipher support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,404 +32,59 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-1) makes the public APIs in hmac-nettle/gcrypt/glib static,
-   and rename them with "nettle/gcrypt/glib" prefix.
+Adds afalg-backend cipher support: introduces some private APIs
+firstly, and then intergrates them into qcrypto_cipher_afalg_driver.
 
-2) introduces hmac framework, including QCryptoHmacDriver
-   and new public APIs.
-
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/hmac-gcrypt.c  | 51 ++++++++++++-----------------------
- crypto/hmac-glib.c    | 75 +++++++++++++++++++++------------------------------
- crypto/hmac-nettle.c  | 52 ++++++++++++-----------------------
- crypto/hmac.c         | 44 ++++++++++++++++++++++++++++++
- crypto/hmacpriv.h     | 36 +++++++++++++++++++++++++
- include/crypto/hmac.h |  1 +
- 6 files changed, 145 insertions(+), 114 deletions(-)
- create mode 100644 crypto/hmacpriv.h
+ crypto/Makefile.objs  |   1 +
+ crypto/afalgpriv.h    |   9 ++
+ crypto/cipher-afalg.c | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/cipher.c       |  23 ++++-
+ crypto/cipherpriv.h   |  16 ++++
+ 5 files changed, 271 insertions(+), 4 deletions(-)
+ create mode 100644 crypto/cipher-afalg.c
 
-diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
-index 372ad7f..76ca61b 100644
---- a/crypto/hmac-gcrypt.c
-+++ b/crypto/hmac-gcrypt.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "crypto/hmac.h"
-+#include "hmacpriv.h"
- #include <gcrypt.h>
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index 2be5a3a..d2e8fa8 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -11,6 +11,7 @@ crypto-obj-y += aes.o
+ crypto-obj-y += desrfb.o
+ crypto-obj-y += cipher.o
+ crypto-obj-$(CONFIG_AF_ALG) += afalg.o
++crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
+ crypto-obj-y += tlscreds.o
+ crypto-obj-y += tlscredsanon.o
+ crypto-obj-y += tlscredsx509.o
+diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
+index 76118cf..d0941d4 100644
+--- a/crypto/afalgpriv.h
++++ b/crypto/afalgpriv.h
+@@ -19,6 +19,15 @@
+ #define SALG_TYPE_LEN_MAX 14
+ #define SALG_NAME_LEN_MAX 64
  
- static int qcrypto_hmac_alg_map[QCRYPTO_HASH_ALG__MAX] = {
-@@ -42,10 +43,9 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
- 
--static QCryptoHmacGcrypt *
--qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
--                     const uint8_t *key, size_t nkey,
--                     Error **errp)
-+void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                           const uint8_t *key, size_t nkey,
-+                           Error **errp)
- {
-     QCryptoHmacGcrypt *ctx;
-     gcry_error_t err;
-@@ -81,27 +81,24 @@ error:
-     return NULL;
- }
- 
--void qcrypto_hmac_free(QCryptoHmac *hmac)
-+static void
-+qcrypto_gcrypt_hmac_ctx_free(QCryptoHmac *hmac)
- {
-     QCryptoHmacGcrypt *ctx;
- 
--    if (!hmac) {
--        return;
--    }
--
-     ctx = hmac->opaque;
-     gcry_mac_close(ctx->handle);
- 
-     g_free(ctx);
--    g_free(hmac);
- }
- 
--int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
--                        const struct iovec *iov,
--                        size_t niov,
--                        uint8_t **result,
--                        size_t *resultlen,
--                        Error **errp)
-+static int
-+qcrypto_gcrypt_hmac_bytesv(QCryptoHmac *hmac,
-+                           const struct iovec *iov,
-+                           size_t niov,
-+                           uint8_t **result,
-+                           size_t *resultlen,
-+                           Error **errp)
- {
-     QCryptoHmacGcrypt *ctx;
-     gcry_error_t err;
-@@ -147,21 +144,7 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-     return 0;
- }
- 
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
--{
--    QCryptoHmac *hmac;
--    QCryptoHmacGcrypt *ctx;
--
--    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
--    if (!ctx) {
--        return NULL;
--    }
--
--    hmac = g_new0(QCryptoHmac, 1);
--    hmac->alg = alg;
--    hmac->opaque = ctx;
--
--    return hmac;
--}
-+QCryptoHmacDriver qcrypto_hmac_lib_driver = {
-+    .hmac_bytesv = qcrypto_gcrypt_hmac_bytesv,
-+    .hmac_free = qcrypto_gcrypt_hmac_ctx_free,
-+};
-diff --git a/crypto/hmac-glib.c b/crypto/hmac-glib.c
-index f0ccfd6..8cf6b22 100644
---- a/crypto/hmac-glib.c
-+++ b/crypto/hmac-glib.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "crypto/hmac.h"
-+#include "hmacpriv.h"
- 
- /* Support for HMAC Algos has been added in GLib 2.30 */
- #if GLIB_CHECK_VERSION(2, 30, 0)
-@@ -49,10 +50,9 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
- 
--static QCryptoHmacGlib *
--qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
--                     const uint8_t *key, size_t nkey,
--                     Error **errp)
-+void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                           const uint8_t *key, size_t nkey,
-+                           Error **errp)
- {
-     QCryptoHmacGlib *ctx;
- 
-@@ -78,27 +78,24 @@ error:
-     return NULL;
- }
- 
--void qcrypto_hmac_free(QCryptoHmac *hmac)
-+static void
-+qcrypto_glib_hmac_ctx_free(QCryptoHmac *hmac)
- {
-     QCryptoHmacGlib *ctx;
- 
--    if (!hmac) {
--        return;
--    }
--
-     ctx = hmac->opaque;
-     g_hmac_unref(ctx->ghmac);
- 
-     g_free(ctx);
--    g_free(hmac);
- }
- 
--int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
--                        const struct iovec *iov,
--                        size_t niov,
--                        uint8_t **result,
--                        size_t *resultlen,
--                        Error **errp)
-+static int
-+qcrypto_glib_hmac_bytesv(QCryptoHmac *hmac,
-+                         const struct iovec *iov,
-+                         size_t niov,
-+                         uint8_t **result,
-+                         size_t *resultlen,
-+                         Error **errp)
- {
-     QCryptoHmacGlib *ctx;
-     int i, ret;
-@@ -129,25 +126,6 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-     return 0;
- }
- 
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
--{
--    QCryptoHmac *hmac;
--    QCryptoHmacGlib *ctx;
--
--    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
--    if (!ctx) {
--        return NULL;
--    }
--
--    hmac = g_new0(QCryptoHmac, 1);
--    hmac->alg = alg;
--    hmac->opaque = ctx;
--
--    return hmac;
--}
--
- #else
- 
- bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-@@ -155,26 +133,33 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
- 
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
-+void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                           const uint8_t *key, size_t nkey,
-+                           Error **errp)
- {
-     return NULL;
- }
- 
--void qcrypto_hmac_free(QCryptoHmac *hmac)
-+static void
-+qcrypto_glib_hmac_ctx_free(QCryptoHmac *hmac)
- {
-     return;
- }
- 
--int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
--                        const struct iovec *iov,
--                        size_t niov,
--                        uint8_t **result,
--                        size_t *resultlen,
--                        Error **errp)
-+static int
-+qcrypto_glib_hmac_bytesv(QCryptoHmac *hmac,
-+                         const struct iovec *iov,
-+                         size_t niov,
-+                         uint8_t **result,
-+                         size_t *resultlen,
-+                         Error **errp)
- {
-     return -1;
- }
- 
- #endif
++#ifndef SOL_ALG
++#define SOL_ALG 279
++#endif
 +
-+QCryptoHmacDriver qcrypto_hmac_lib_driver = {
-+    .hmac_bytesv = qcrypto_glib_hmac_bytesv,
-+    .hmac_free = qcrypto_glib_hmac_ctx_free,
-+};
-diff --git a/crypto/hmac-nettle.c b/crypto/hmac-nettle.c
-index 000dfd9..1d5a915 100644
---- a/crypto/hmac-nettle.c
-+++ b/crypto/hmac-nettle.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "crypto/hmac.h"
-+#include "hmacpriv.h"
- #include <nettle/hmac.h>
- 
- typedef void (*qcrypto_nettle_hmac_setkey)(void *ctx,
-@@ -97,10 +98,9 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
- 
--static QCryptoHmacNettle *
--qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
--                     const uint8_t *key, size_t nkey,
--                     Error **errp)
-+void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                           const uint8_t *key, size_t nkey,
-+                           Error **errp)
- {
-     QCryptoHmacNettle *ctx;
- 
-@@ -117,26 +117,22 @@ qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-     return ctx;
- }
- 
--void qcrypto_hmac_free(QCryptoHmac *hmac)
-+static void
-+qcrypto_nettle_hmac_ctx_free(QCryptoHmac *hmac)
- {
-     QCryptoHmacNettle *ctx;
- 
--    if (!hmac) {
--        return;
--    }
--
-     ctx = hmac->opaque;
--
-     g_free(ctx);
--    g_free(hmac);
- }
- 
--int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
--                        const struct iovec *iov,
--                        size_t niov,
--                        uint8_t **result,
--                        size_t *resultlen,
--                        Error **errp)
-+static int
-+qcrypto_nettle_hmac_bytesv(QCryptoHmac *hmac,
-+                           const struct iovec *iov,
-+                           size_t niov,
-+                           uint8_t **result,
-+                           size_t *resultlen,
-+                           Error **errp)
- {
-     QCryptoHmacNettle *ctx;
-     int i;
-@@ -169,21 +165,7 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-     return 0;
- }
- 
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
--{
--    QCryptoHmac *hmac;
--    QCryptoHmacNettle *ctx;
--
--    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
--    if (!ctx) {
--        return NULL;
--    }
--
--    hmac = g_new0(QCryptoHmac, 1);
--    hmac->alg = alg;
--    hmac->opaque = ctx;
--
--    return hmac;
--}
-+QCryptoHmacDriver qcrypto_hmac_lib_driver = {
-+    .hmac_bytesv = qcrypto_nettle_hmac_bytesv,
-+    .hmac_free = qcrypto_nettle_hmac_ctx_free,
-+};
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 5750405..a4690e3 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -12,9 +12,22 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "crypto/hmac.h"
-+#include "hmacpriv.h"
- 
- static const char hex[] = "0123456789abcdef";
- 
-+int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-+                        const struct iovec *iov,
-+                        size_t niov,
-+                        uint8_t **result,
-+                        size_t *resultlen,
-+                        Error **errp)
-+{
-+    QCryptoHmacDriver *drv = hmac->driver;
++#define AFALG_TYPE_CIPHER "skcipher"
 +
-+    return drv->hmac_bytesv(hmac, iov, niov, result, resultlen, errp);
-+}
++#define ALG_OPTYPE_LEN 4
++#define ALG_MSGIV_LEN(len) (sizeof(struct af_alg_iv) + (len))
 +
- int qcrypto_hmac_bytes(QCryptoHmac *hmac,
-                        const char *buf,
-                        size_t len,
-@@ -70,3 +83,34 @@ int qcrypto_hmac_digest(QCryptoHmac *hmac,
+ typedef struct QCryptoAFAlg QCryptoAFAlg;
  
-     return qcrypto_hmac_digestv(hmac, &iov, 1, digest, errp);
- }
-+
-+QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-+                              const uint8_t *key, size_t nkey,
-+                              Error **errp)
-+{
-+    QCryptoHmac *hmac;
-+    void *ctx;
-+
-+    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
-+    if (!ctx) {
-+        return NULL;
-+    }
-+
-+    hmac = g_new0(QCryptoHmac, 1);
-+    hmac->alg = alg;
-+    hmac->opaque = ctx;
-+    hmac->driver = (void *)&qcrypto_hmac_lib_driver;
-+
-+    return hmac;
-+}
-+
-+void qcrypto_hmac_free(QCryptoHmac *hmac)
-+{
-+    QCryptoHmacDriver *drv;
-+
-+    if (hmac) {
-+        drv = hmac->driver;
-+        drv->hmac_free(hmac);
-+        g_free(hmac);
-+    }
-+}
-diff --git a/crypto/hmacpriv.h b/crypto/hmacpriv.h
+ struct QCryptoAFAlg {
+diff --git a/crypto/cipher-afalg.c b/crypto/cipher-afalg.c
 new file mode 100644
-index 0000000..2be389a
+index 0000000..01343b2
 --- /dev/null
-+++ b/crypto/hmacpriv.h
-@@ -0,0 +1,36 @@
++++ b/crypto/cipher-afalg.c
+@@ -0,0 +1,226 @@
 +/*
-+ * QEMU Crypto hmac driver supports
++ * QEMU Crypto af_alg-backend cipher support
 + *
 + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 + *
@@ -439,42 +94,294 @@ index 0000000..2be389a
 + * This work is licensed under the terms of the GNU GPL, version 2 or
 + * (at your option) any later version.  See the COPYING file in the
 + * top-level directory.
-+ *
 + */
++#include "qemu/osdep.h"
++#include "qemu/sockets.h"
++#include "qemu-common.h"
++#include "qapi/error.h"
++#include "crypto/cipher.h"
++#include "cipherpriv.h"
 +
-+#ifndef QCRYPTO_HMACPRIV_H
-+#define QCRYPTO_HMACPRIV_H
 +
-+typedef struct QCryptoHmacDriver QCryptoHmacDriver;
++static char *
++qcrypto_afalg_cipher_format_name(QCryptoCipherAlgorithm alg,
++                                 QCryptoCipherMode mode,
++                                 Error **errp)
++{
++    char *name;
++    const char *alg_name;
++    const char *mode_name;
 +
-+struct QCryptoHmacDriver {
-+    int (*hmac_bytesv)(QCryptoHmac *hmac,
-+                       const struct iovec *iov,
-+                       size_t niov,
-+                       uint8_t **result,
-+                       size_t *resultlen,
-+                       Error **errp);
++    switch (alg) {
++    case QCRYPTO_CIPHER_ALG_AES_128:
++    case QCRYPTO_CIPHER_ALG_AES_192:
++    case QCRYPTO_CIPHER_ALG_AES_256:
++        alg_name = "aes";
++        break;
++    case QCRYPTO_CIPHER_ALG_CAST5_128:
++        alg_name = "cast5";
++        break;
++    case QCRYPTO_CIPHER_ALG_SERPENT_128:
++    case QCRYPTO_CIPHER_ALG_SERPENT_192:
++    case QCRYPTO_CIPHER_ALG_SERPENT_256:
++        alg_name = "serpent";
++        break;
++    case QCRYPTO_CIPHER_ALG_TWOFISH_128:
++    case QCRYPTO_CIPHER_ALG_TWOFISH_192:
++    case QCRYPTO_CIPHER_ALG_TWOFISH_256:
++        alg_name = "twofish";
++        break;
 +
-+    void (*hmac_free)(QCryptoHmac *hmac);
++    default:
++        error_setg(errp, "Unsupported cipher algorithm %d", alg);
++        return NULL;
++    }
++
++    mode_name = QCryptoCipherMode_lookup[mode];
++    name = g_strdup_printf("%s(%s)", mode_name, alg_name);
++
++    return name;
++}
++
++QCryptoAFAlg *
++qcrypto_afalg_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                             QCryptoCipherMode mode,
++                             const uint8_t *key,
++                             size_t nkey, Error **errp)
++{
++    QCryptoAFAlg *afalg;
++    size_t expect_niv;
++    char *name;
++
++    name = qcrypto_afalg_cipher_format_name(alg, mode, errp);
++    if (!name) {
++        return NULL;
++    }
++
++    afalg = qcrypto_afalg_comm_alloc(AFALG_TYPE_CIPHER, name, errp);
++    if (!afalg) {
++        g_free(name);
++        return NULL;
++    }
++
++    g_free(name);
++
++    /* setkey */
++    if (qemu_setsockopt(afalg->tfmfd, SOL_ALG, ALG_SET_KEY, key,
++                        nkey) != 0) {
++        error_setg_errno(errp, errno, "Set key failed");
++        qcrypto_afalg_comm_free(afalg);
++        return NULL;
++    }
++
++    /* prepare msg header */
++    afalg->msg = g_new0(struct msghdr, 1);
++    afalg->msg->msg_controllen += CMSG_SPACE(ALG_OPTYPE_LEN);
++    expect_niv = qcrypto_cipher_get_iv_len(alg, mode);
++    if (expect_niv) {
++        afalg->msg->msg_controllen += CMSG_SPACE(ALG_MSGIV_LEN(expect_niv));
++    }
++    afalg->msg->msg_control = g_new0(uint8_t, afalg->msg->msg_controllen);
++
++    /* We use 1st msghdr for crypto-info and 2nd msghdr for IV-info */
++    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
++    afalg->cmsg->cmsg_type = ALG_SET_OP;
++    afalg->cmsg->cmsg_len = CMSG_SPACE(ALG_OPTYPE_LEN);
++    if (expect_niv) {
++        afalg->cmsg = CMSG_NXTHDR(afalg->msg, afalg->cmsg);
++        afalg->cmsg->cmsg_type = ALG_SET_IV;
++        afalg->cmsg->cmsg_len = CMSG_SPACE(ALG_MSGIV_LEN(expect_niv));
++    }
++    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
++
++    return afalg;
++}
++
++static int
++qcrypto_afalg_cipher_setiv(QCryptoCipher *cipher,
++                           const uint8_t *iv,
++                           size_t niv, Error **errp)
++{
++    struct af_alg_iv *alg_iv;
++    size_t expect_niv;
++    QCryptoAFAlg *afalg = cipher->opaque;
++
++    expect_niv = qcrypto_cipher_get_iv_len(cipher->alg, cipher->mode);
++    if (niv != expect_niv) {
++        error_setg(errp, "Set IV len(%zu) not match expected(%zu)",
++                   niv, expect_niv);
++        return -1;
++    }
++
++    /* move ->cmsg to next msghdr, for IV-info */
++    afalg->cmsg = CMSG_NXTHDR(afalg->msg, afalg->cmsg);
++
++    /* build setiv msg */
++    afalg->cmsg->cmsg_level = SOL_ALG;
++    alg_iv = (struct af_alg_iv *)CMSG_DATA(afalg->cmsg);
++    alg_iv->ivlen = niv;
++    memcpy(alg_iv->iv, iv, niv);
++
++    return 0;
++}
++
++static int
++qcrypto_afalg_cipher_op(QCryptoAFAlg *afalg,
++                        const void *in, void *out,
++                        size_t len, bool do_encrypt,
++                        Error **errp)
++{
++    uint32_t *type = NULL;
++    struct iovec iov;
++    size_t ret, rlen, done = 0;
++    uint32_t origin_controllen;
++
++    origin_controllen = afalg->msg->msg_controllen;
++    /* movev ->cmsg to first header, for crypto-info */
++    afalg->cmsg = CMSG_FIRSTHDR(afalg->msg);
++
++    /* build encrypt msg */
++    afalg->cmsg->cmsg_level = SOL_ALG;
++    afalg->msg->msg_iov = &iov;
++    afalg->msg->msg_iovlen = 1;
++    type = (uint32_t *)CMSG_DATA(afalg->cmsg);
++    if (do_encrypt) {
++        *type = ALG_OP_ENCRYPT;
++    } else {
++        *type = ALG_OP_DECRYPT;
++    }
++
++    do {
++        iov.iov_base = (void *)in + done;
++        iov.iov_len = len - done;
++
++        /* send info to AF_ALG core */
++        ret = sendmsg(afalg->opfd, afalg->msg, 0);
++        if (ret == -1) {
++            error_setg_errno(errp, errno, "Send data to AF_ALG core failed");
++            return -1;
++        }
++
++        /* encrypto && get result */
++        rlen = read(afalg->opfd, out, ret);
++        if (rlen == -1) {
++            error_setg_errno(errp, errno, "Get result from AF_ALG core failed");
++            return -1;
++        }
++        assert(rlen == ret);
++
++        /* do not update IV for following chunks */
++        afalg->msg->msg_controllen = 0;
++        done += ret;
++    } while (done < len);
++
++    afalg->msg->msg_controllen = origin_controllen;
++
++    return 0;
++}
++
++static int
++qcrypto_afalg_cipher_encrypt(QCryptoCipher *cipher,
++                             const void *in, void *out,
++                             size_t len, Error **errp)
++{
++    return qcrypto_afalg_cipher_op(cipher->opaque, in, out,
++                                   len, true, errp);
++}
++
++static int
++qcrypto_afalg_cipher_decrypt(QCryptoCipher *cipher,
++                             const void *in, void *out,
++                             size_t len, Error **errp)
++{
++    return qcrypto_afalg_cipher_op(cipher->opaque, in, out,
++                                   len, false, errp);
++}
++
++static void qcrypto_afalg_comm_ctx_free(QCryptoCipher *cipher)
++{
++    qcrypto_afalg_comm_free(cipher->opaque);
++}
++
++struct QCryptoCipherDriver qcrypto_cipher_afalg_driver = {
++    .cipher_encrypt = qcrypto_afalg_cipher_encrypt,
++    .cipher_decrypt = qcrypto_afalg_cipher_decrypt,
++    .cipher_setiv = qcrypto_afalg_cipher_setiv,
++    .cipher_free = qcrypto_afalg_comm_ctx_free,
 +};
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index 0a3d2e5..a487270 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -163,18 +163,33 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   Error **errp)
+ {
+     QCryptoCipher *cipher;
+-    void *ctx;
++    void *ctx = NULL;
++    Error *err2 = NULL;
++    QCryptoCipherDriver *drv;
 +
-+extern void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                                  const uint8_t *key, size_t nkey,
-+                                  Error **errp);
-+extern QCryptoHmacDriver qcrypto_hmac_lib_driver;
-+
++#ifdef CONFIG_AF_ALG
++    ctx = qcrypto_afalg_cipher_ctx_new(alg, mode, key, nkey, &err2);
++    if (ctx) {
++        drv = &qcrypto_cipher_afalg_driver;
++    }
 +#endif
-diff --git a/include/crypto/hmac.h b/include/crypto/hmac.h
-index 0d3acd7..5e88905 100644
---- a/include/crypto/hmac.h
-+++ b/include/crypto/hmac.h
-@@ -18,6 +18,7 @@ typedef struct QCryptoHmac QCryptoHmac;
- struct QCryptoHmac {
-     QCryptoHashAlgorithm alg;
-     void *opaque;
-+    void *driver;
+ 
+-    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+     if (!ctx) {
+-        return NULL;
++        ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
++        if (!ctx) {
++            error_free(err2);
++            return NULL;
++        }
++
++        drv = &qcrypto_cipher_lib_driver;
++        error_free(err2);
+     }
+ 
+     cipher = g_new0(QCryptoCipher, 1);
+     cipher->alg = alg;
+     cipher->mode = mode;
+     cipher->opaque = ctx;
+-    cipher->driver = (void *)&qcrypto_cipher_lib_driver;
++    cipher->driver = (void *)drv;
+ 
+     return cipher;
+ }
+diff --git a/crypto/cipherpriv.h b/crypto/cipherpriv.h
+index 4af5e85..77da4c2 100644
+--- a/crypto/cipherpriv.h
++++ b/crypto/cipherpriv.h
+@@ -15,6 +15,8 @@
+ #ifndef QCRYPTO_CIPHERPRIV_H
+ #define QCRYPTO_CIPHERPRIV_H
+ 
++#include "qapi-types.h"
++
+ typedef struct QCryptoCipherDriver QCryptoCipherDriver;
+ 
+ struct QCryptoCipherDriver {
+@@ -37,4 +39,18 @@ struct QCryptoCipherDriver {
+     void (*cipher_free)(QCryptoCipher *cipher);
  };
  
- /**
++#ifdef CONFIG_AF_ALG
++
++#include "afalgpriv.h"
++
++extern QCryptoAFAlg *
++qcrypto_afalg_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                             QCryptoCipherMode mode,
++                             const uint8_t *key,
++                             size_t nkey, Error **errp);
++
++extern struct QCryptoCipherDriver qcrypto_cipher_afalg_driver;
++
++#endif
++
+ #endif
 -- 
 1.8.3.1
