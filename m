@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1dW623-0006h2-91
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:13:48 -0400
+	(envelope-from <mst@redhat.com>) id 1dW65k-0008AM-3O
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:17:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1dW621-0004Zs-D7
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:13:43 -0400
+	(envelope-from <mst@redhat.com>) id 1dW65g-0006o3-S8
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:17:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dW65g-0006na-IC
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:17:28 -0400
+Date: Fri, 14 Jul 2017 22:17:13 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170714181523-mutt-send-email-mst@kernel.org>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	<20170714123023.GA2624@dhcp22.suse.cz>
 MIME-Version: 1.0
-References: <CAPuOgO2q9nNtoPOYuXSWDxBVVsXcWEMbMboLT4OdpXA_Dq5O=Q@mail.gmail.com>
-	<7a891962-9c57-7668-e2fd-69e5e13b9078@redhat.com>
-In-Reply-To: <7a891962-9c57-7668-e2fd-69e5e13b9078@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Fri, 14 Jul 2017 19:13:24 +0000
-Message-ID: <CAMr-obtga00C5cKS63T_5RW99hK2W1nKMDba4cnTGH8dVYrXaA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Supporting unsafe create when backing file is not
- accessible
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170714123023.GA2624@dhcp22.suse.cz>
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +29,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Ala Hino <ahino@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>, John Snow Huston <jsnow@redhat.com>
+To: Michal Hocko <mhocko@kernel.org>
+Cc: Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On Wed, Jul 12, 2017 at 5:40 PM Eric Blake <eblake@redhat.com> wrote:
+On Fri, Jul 14, 2017 at 02:30:23PM +0200, Michal Hocko wrote:
+> On Wed 12-07-17 20:40:19, Wei Wang wrote:
+> > This patch adds support for reporting blocks of pages on the free list
+> > specified by the caller.
+> > 
+> > As pages can leave the free list during this call or immediately
+> > afterwards, they are not guaranteed to be free after the function
+> > returns. The only guarantee this makes is that the page was on the free
+> > list at some point in time after the function has been invoked.
+> > 
+> > Therefore, it is not safe for caller to use any pages on the returned
+> > block or to discard data that is put there after the function returns.
+> > However, it is safe for caller to discard data that was in one of these
+> > pages before the function was invoked.
+> 
+> I do not understand what is the point of such a function and how it is
+> used because the patch doesn't give us any user (I haven't checked other
+> patches yet).
+> 
+> But just from the semantic point of view this sounds like a horrible
+> idea. The only way to get a free block of pages is to call the page
+> allocator. I am tempted to give it Nack right on those grounds but I
+> would like to hear more about what you actually want to achieve.
 
-> On 07/12/2017 03:56 AM, Ala Hino wrote:
-> > Hi,
-> >
-> > We encountered a performance issue when creating a volume for a running
-> VM
-> > and we'd like to share the info with you. The root cause of the issue is
-> in
-> > our code but we found a workaround that relies on qemu-img create
-> > undocumented behavior.
-> >
-> > During our tests, we found that in order to create a volume with a
-> backing
-> > file, the baking file has to be valid and accessible.
->
-> In general, that's a good thing. But you're also right that it is nice
-> to have a mode where the backing file is not probed.
->
-> > This requires us to
-> > activate the entire chain before creating the volume, and deactivate the
-> > chain after the operation completes. Activating and deactivating the
-> chain
-> > are expensive operations that we prefer to avoid when possible. Below is
-> > the command we use to create volumes:
-> >
-> > qemu-img create -f qcow2 -o compat=1.1 -b
-> > 8a28cda2-548d-47da-bbba-faa81284f6ba -F raw
-> >
-> /rhev/data-center/e6b272af-84cb-43fc-ae5b-7fe18bc469a2/f47c980a-fd76-44a9-8b78-00d3ab2ffd2f/images/2ff0a3c0-f145-4f83-b668-fc0c39ba191f/d3b69657-892f-499c-9ac3-9c443ead7d9b
-> > 1073741824
-> >
-> > We also found that when providing the size and the backing format for
-> qemu,
-> > qemu doesn't open the backing chain, and in this case we don't have to
-> > activate/deactivate the entire chain - exactly the behavior we wish to
-> have.
->
-> Yes, that is currently the case. You are correct that patches have been
-> proposed to tighten things so that we would probe the existence of the
-> backing file in more cases (even when the size is provided); and that if
-> we do so, we'd also have to provide a backdoor for creating an image
-> without probing the backing file.  But it is also the case that you can
-> create an image with NO backing file, and then use 'qemu-img rebase -u'
-> to add the backing file after the fact, without waiting for any proposed
-> patches to land.
->
-> > We we'd like to get your confirmation of the above behavior as it isn't
-> > documented, and whether it can be documented.
->
-> The fact that you are asking does mean that we should revive John's
-> proposed patches, in some form or another.
->
+Basically it's a performance hint to the hypervisor.
+For example, these pages would be good candidates to
+move around as they are not mapped into any running
+applications.
 
-Eric, we are more concerned about using the current qemu version.
+As such, it's important not to slow down other parts of the system too
+much - otherwise we are speeding up one part of the system while we slow
+down other parts of it, which is why it's trying to drop the lock as
+soon a possible.
 
-We can use the fact that providing both size and backing format,
-qemu does not open the backing file, but this is not documented, and
-we don't want to base oVirt code on undocumented behavior.
+As long as hypervisor does not assume it can drop these pages, and as
+long it's correct in most cases.  we are OK even if the hint is slightly
+wrong because hypervisor notifications are racing with allocations.
 
-What we would like to have is:
-- qemu blessing for using this undocumented behaviour
-- and documenting this behavior in qemu-img(1)
+There are patches to do more tricks - if hypervisor tracks all
+memory writes we might actually use this hint to discard data -
+but that is just implementation detail.
 
-With this we can fix https://bugzilla.redhat.com/1395941
-<https://bugzilla.redhat.com/show_bug.cgi?id=1395941>
-now, instead of waiting for qemu 2.10.
 
-For future version, having a explicit way to allow unsafe create
-is of course better.
-
-Nir
-
->
-> > In addition, we are aware of https://bugzilla.redhat.com/1213786, where
-> a
-> > -u (unsafe) option is planned to be added (see comment #4 in the BZ). Can
-> > you please confirm that once that support is released, it won't break
-> > existing, i.e. code that provides size and backing format assuming that
-> > "unsafe" create is supported?
->
-> If we tighten things to require the backing file to exist unless -u is
-> provided, then providing the size alone will no longer be sufficient to
-> prevent the probe - you'd have to use -u to prevent the probe, or change
-> your workflow to create the image without a backing file then add in the
-> backing information via 'qemu-img rebase -u'.
->
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266 <(919)%20301-3266>
-> Virtualization:  qemu.org | libvirt.org
->
->
+> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > ---
+> >  include/linux/mm.h |  5 +++
+> >  mm/page_alloc.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 101 insertions(+)
+> > 
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index 46b9ac5..76cb433 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -1835,6 +1835,11 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
+> >  		unsigned long zone_start_pfn, unsigned long *zholes_size);
+> >  extern void free_initmem(void);
+> >  
+> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
+> > +extern int report_unused_page_block(struct zone *zone, unsigned int order,
+> > +				    unsigned int migratetype,
+> > +				    struct page **page);
+> > +#endif
+> >  /*
+> >   * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
+> >   * into the buddy system. The freed pages will be poisoned with pattern
+> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > index 64b7d82..8b3c9dd 100644
+> > --- a/mm/page_alloc.c
+> > +++ b/mm/page_alloc.c
+> > @@ -4753,6 +4753,102 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
+> >  	show_swap_cache_info();
+> >  }
+> >  
+> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
+> > +
+> > +/*
+> > + * Heuristically get a page block in the system that is unused.
+> > + * It is possible that pages from the page block are used immediately after
+> > + * report_unused_page_block() returns. It is the caller's responsibility
+> > + * to either detect or prevent the use of such pages.
+> > + *
+> > + * The free list to check: zone->free_area[order].free_list[migratetype].
+> > + *
+> > + * If the caller supplied page block (i.e. **page) is on the free list, offer
+> > + * the next page block on the list to the caller. Otherwise, offer the first
+> > + * page block on the list.
+> > + *
+> > + * Note: it is not safe for caller to use any pages on the returned
+> > + * block or to discard data that is put there after the function returns.
+> > + * However, it is safe for caller to discard data that was in one of these
+> > + * pages before the function was invoked.
+> > + *
+> > + * Return 0 when a page block is found on the caller specified free list.
+> > + */
+> > +int report_unused_page_block(struct zone *zone, unsigned int order,
+> > +			     unsigned int migratetype, struct page **page)
+> > +{
+> > +	struct zone *this_zone;
+> > +	struct list_head *this_list;
+> > +	int ret = 0;
+> > +	unsigned long flags;
+> > +
+> > +	/* Sanity check */
+> > +	if (zone == NULL || page == NULL || order >= MAX_ORDER ||
+> > +	    migratetype >= MIGRATE_TYPES)
+> > +		return -EINVAL;
+> > +
+> > +	/* Zone validity check */
+> > +	for_each_populated_zone(this_zone) {
+> > +		if (zone == this_zone)
+> > +			break;
+> > +	}
+> > +
+> > +	/* Got a non-existent zone from the caller? */
+> > +	if (zone != this_zone)
+> > +		return -EINVAL;
+> 
+> Huh, what do you check for here? Why don't you simply
+> populated_zone(zone)?
+> 
+> > +
+> > +	spin_lock_irqsave(&this_zone->lock, flags);
+> > +
+> > +	this_list = &zone->free_area[order].free_list[migratetype];
+> > +	if (list_empty(this_list)) {
+> > +		*page = NULL;
+> > +		ret = 1;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/* The caller is asking for the first free page block on the list */
+> > +	if ((*page) == NULL) {
+> > +		*page = list_first_entry(this_list, struct page, lru);
+> > +		ret = 0;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * The page block passed from the caller is not on this free list
+> > +	 * anymore (e.g. a 1MB free page block has been split). In this case,
+> > +	 * offer the first page block on the free list that the caller is
+> > +	 * asking for.
+> > +	 */
+> > +	if (PageBuddy(*page) && order != page_order(*page)) {
+> > +		*page = list_first_entry(this_list, struct page, lru);
+> > +		ret = 0;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * The page block passed from the caller has been the last page block
+> > +	 * on the list.
+> > +	 */
+> > +	if ((*page)->lru.next == this_list) {
+> > +		*page = NULL;
+> > +		ret = 1;
+> > +		goto out;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Finally, fall into the regular case: the page block passed from the
+> > +	 * caller is still on the free list. Offer the next one.
+> > +	 */
+> > +	*page = list_next_entry((*page), lru);
+> > +	ret = 0;
+> > +out:
+> > +	spin_unlock_irqrestore(&this_zone->lock, flags);
+> > +	return ret;
+> > +}
+> > +EXPORT_SYMBOL(report_unused_page_block);
+> > +
+> > +#endif
+> > +
+> >  static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
+> >  {
+> >  	zoneref->zone = zone;
+> > -- 
+> > 2.7.4
+> > 
+> > --
+> > To unsubscribe, send a message with 'unsubscribe linux-mm' in
+> > the body to majordomo@kvack.org.  For more info on Linux MM,
+> > see: http://www.linux-mm.org/ .
+> > Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+> 
+> -- 
+> Michal Hocko
+> SUSE Labs
