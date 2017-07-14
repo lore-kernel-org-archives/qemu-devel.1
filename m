@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvr-0000uP-Th
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvr-0000uO-Sw
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvq-0007jV-4j
+	(envelope-from <longpeng.mike@gmail.com>) id 1dVyvm-0007hN-TJ
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:51 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36068)
+Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:35516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dVyvp-0007j3-Sm
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:50 -0400
-Received: by mail-pf0-x241.google.com with SMTP id z6so10753719pfk.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:38:49 -0700 (PDT)
+	id 1dVyvm-0007g5-Kr
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 07:38:46 -0400
+Received: by mail-pg0-x22b.google.com with SMTP id j186so44535574pge.2
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 04:38:45 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 07:38:26 -0400
-Message-Id: <1500032321-13951-5-git-send-email-longpeng.mike@gmail.com>
-In-Reply-To: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
-References: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 04/18] crypto: cipher: introduce
- qcrypto_cipher_ctx_new for builtin-backend
+Date: Fri, 14 Jul 2017 07:38:22 -0400
+Message-Id: <1500032321-13951-1-git-send-email-longpeng.mike@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/18]  crypto: add afalg-backend support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,196 +32,172 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
-builtin-backend impls.
+The AF_ALG socket family is the userspace interface for linux
+crypto API, users can use it to access hardware accelerators.
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+This patchset adds a afalg-backend for qemu crypto subsystem. Currently
+when performs encrypt/decrypt, we'll try afalg-backend first and will
+back to libiary-backend if it failed.
+
+In the next step, It would support a command parameter to specifies
+which backends prefer to and some other improvements.
+
+I measured the performance about the afalg-backend impls, I tested
+how many data could be encrypted in 5 seconds.
+
+NOTE: If we use specific hardware crypto cards, I think afalg-backend
+      would even faster.
+
+test-environment: Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
+
+*sha256*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 93.03                       185.87
+1024                146.32                      201.78
+2048                213.32                      210.93
+4096                275.48                      215.26
+8192                321.77                      217.49
+16384               349.60                      219.26
+32768               363.59                      219.73
+65536               375.79                      219.99
+
+*hmac(sha256)*
+chunk_size(bytes)   MB/sec(afalg:sha256-ssse3)  MB/sec(nettle)
+512                 71.26                       165.55
+1024                117.43                      189.15
+2048                180.96                      203.24
+4096                247.60                      211.38
+8192                301.99                      215.65
+16384               340.79                      218.22
+32768               365.51                      219.49
+65536               377.92                      220.24
+
+*cbc(aes128)*
+chunk_size(bytes)   MB/sec(afalg:cbc-aes-aesni)  MB/sec(nettle)
+512                 371.76                       188.41
+1024                559.86                       189.64
+2048                768.66                       192.11
+4096                939.15                       192.40
+8192                1029.48                      192.49
+16384               1072.79                      190.52
+32768               1109.38                      190.41
+65536               1102.38                      190.40
+
 ---
- crypto/cipher-builtin.c | 101 ++++++++++++++++++++++++++----------------------
- 1 file changed, 55 insertions(+), 46 deletions(-)
+Changes since v4:
+    - remove 'name' field in 'struct CryptoAFAlg'. [Daniel]
+    - add error handling for read() returning less than requested. [Daniel]
+    - use iov_send_recv to recv msg in hash-afalg.c. [Daniel]
+    - refactor hmac benchmark as suggestion. [Daniel]
 
-diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
-index b4bc2b9..4ecd15e 100644
---- a/crypto/cipher-builtin.c
-+++ b/crypto/cipher-builtin.c
-@@ -235,23 +235,24 @@ static int qcrypto_cipher_setiv_aes(QCryptoCipher *cipher,
- 
- 
- 
--static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
--                                   const uint8_t *key, size_t nkey,
--                                   Error **errp)
-+static QCryptoCipherBuiltin *
-+qcrypto_cipher_init_aes(QCryptoCipherMode mode,
-+                        const uint8_t *key, size_t nkey,
-+                        Error **errp)
- {
-     QCryptoCipherBuiltin *ctxt;
- 
--    if (cipher->mode != QCRYPTO_CIPHER_MODE_CBC &&
--        cipher->mode != QCRYPTO_CIPHER_MODE_ECB &&
--        cipher->mode != QCRYPTO_CIPHER_MODE_XTS) {
-+    if (mode != QCRYPTO_CIPHER_MODE_CBC &&
-+        mode != QCRYPTO_CIPHER_MODE_ECB &&
-+        mode != QCRYPTO_CIPHER_MODE_XTS) {
-         error_setg(errp, "Unsupported cipher mode %s",
--                   QCryptoCipherMode_lookup[cipher->mode]);
--        return -1;
-+                   QCryptoCipherMode_lookup[mode]);
-+        return NULL;
-     }
- 
-     ctxt = g_new0(QCryptoCipherBuiltin, 1);
- 
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
-+    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-         if (AES_set_encrypt_key(key, nkey * 4, &ctxt->state.aes.key.enc) != 0) {
-             error_setg(errp, "Failed to set encryption key");
-             goto error;
-@@ -291,13 +292,11 @@ static int qcrypto_cipher_init_aes(QCryptoCipher *cipher,
-     ctxt->encrypt = qcrypto_cipher_encrypt_aes;
-     ctxt->decrypt = qcrypto_cipher_decrypt_aes;
- 
--    cipher->opaque = ctxt;
--
--    return 0;
-+    return ctxt;
- 
-  error:
-     g_free(ctxt);
--    return -1;
-+    return NULL;
- }
- 
- 
-@@ -370,16 +369,17 @@ static int qcrypto_cipher_setiv_des_rfb(QCryptoCipher *cipher,
- }
- 
- 
--static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
--                                       const uint8_t *key, size_t nkey,
--                                       Error **errp)
-+static QCryptoCipherBuiltin *
-+qcrypto_cipher_init_des_rfb(QCryptoCipherMode mode,
-+                            const uint8_t *key, size_t nkey,
-+                            Error **errp)
- {
-     QCryptoCipherBuiltin *ctxt;
- 
--    if (cipher->mode != QCRYPTO_CIPHER_MODE_ECB) {
-+    if (mode != QCRYPTO_CIPHER_MODE_ECB) {
-         error_setg(errp, "Unsupported cipher mode %s",
--                   QCryptoCipherMode_lookup[cipher->mode]);
--        return -1;
-+                   QCryptoCipherMode_lookup[mode]);
-+        return NULL;
-     }
- 
-     ctxt = g_new0(QCryptoCipherBuiltin, 1);
-@@ -394,9 +394,7 @@ static int qcrypto_cipher_init_des_rfb(QCryptoCipher *cipher,
-     ctxt->encrypt = qcrypto_cipher_encrypt_des_rfb;
-     ctxt->decrypt = qcrypto_cipher_decrypt_des_rfb;
- 
--    cipher->opaque = ctxt;
--
--    return 0;
-+    return ctxt;
- }
- 
- 
-@@ -426,12 +424,13 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
- }
- 
- 
--QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
--                                  QCryptoCipherMode mode,
--                                  const uint8_t *key, size_t nkey,
--                                  Error **errp)
-+static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
-+                                                    QCryptoCipherMode mode,
-+                                                    const uint8_t *key,
-+                                                    size_t nkey,
-+                                                    Error **errp)
- {
--    QCryptoCipher *cipher;
-+    QCryptoCipherBuiltin *ctxt;
- 
-     switch (mode) {
-     case QCRYPTO_CIPHER_MODE_ECB:
-@@ -444,39 +443,27 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         return NULL;
-     }
- 
--    cipher = g_new0(QCryptoCipher, 1);
--    cipher->alg = alg;
--    cipher->mode = mode;
--
-     if (!qcrypto_cipher_validate_key_length(alg, mode, nkey, errp)) {
--        goto error;
-+        return NULL;
-     }
- 
--    switch (cipher->alg) {
-+    switch (alg) {
-     case QCRYPTO_CIPHER_ALG_DES_RFB:
--        if (qcrypto_cipher_init_des_rfb(cipher, key, nkey, errp) < 0) {
--            goto error;
--        }
-+        ctxt = qcrypto_cipher_init_des_rfb(mode, key, nkey, errp);
-         break;
-     case QCRYPTO_CIPHER_ALG_AES_128:
-     case QCRYPTO_CIPHER_ALG_AES_192:
-     case QCRYPTO_CIPHER_ALG_AES_256:
--        if (qcrypto_cipher_init_aes(cipher, key, nkey, errp) < 0) {
--            goto error;
--        }
-+        ctxt = qcrypto_cipher_init_aes(mode, key, nkey, errp);
-         break;
-     default:
-         error_setg(errp,
-                    "Unsupported cipher algorithm %s",
--                   QCryptoCipherAlgorithm_lookup[cipher->alg]);
--        goto error;
-+                   QCryptoCipherAlgorithm_lookup[alg]);
-+        return NULL;
-     }
- 
--    return cipher;
--
-- error:
--    g_free(cipher);
--    return NULL;
-+    return ctxt;
- }
- 
- void qcrypto_cipher_free(QCryptoCipher *cipher)
-@@ -537,3 +524,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
- 
-     return ctxt->setiv(cipher, iv, niv, errp);
- }
-+
-+
-+QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-+                                  QCryptoCipherMode mode,
-+                                  const uint8_t *key, size_t nkey,
-+                                  Error **errp)
-+{
-+    QCryptoCipher *cipher;
-+    QCryptoCipherBuiltin *ctxt;
-+
-+    ctxt = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
-+    if (!ctxt) {
-+        return NULL;
-+    }
-+
-+    cipher = g_new0(QCryptoCipher, 1);
-+    cipher->alg = alg;
-+    cipher->mode = mode;
-+    cipher->opaque = ctxt;
-+
-+    return cipher;
-+}
+Changes since v3:
+    - add "Reviewed-by: Daniel P. Berrange <address@hidden>" in
+      commit messages of PATCH 1/2/3/4/5/7/8/9/10/11.
+    - PATCH 12: use strlen() instead of qemu_strnlen() in 
+qcrypto_afalg_build_saddr(). [Daniel]
+    - PATCH 12: rather than indenting the entire method, just return immediately
+                if afalg=NULL. [Daniel]
+    - PATCH 13: use g_strdup_printf() instead of g_new0+snprintf() and remove
+                redundant bounds check in qcrypto_afalg_cipher_format_name(). 
+[Daniel]
+    - PATCH 13: s/except_niv/expect_niv  s/origin_contorllen/origin_controllen. 
+[Daniel]
+    - PATCH 13: use '%zu' to print 'size_t' in qcrypto_afalg_cipher_setiv(). 
+[Daniel]
+    - PATCH 13: remove qcrypto_cipher_using_afalg_drv(). [Daniel]
+    - PATCH 13: refactor the qcrypto_cipher_new() as Daniel's suggestion. 
+[Daniel]
+    - PATCH 13: correct the ->cmsg initialization int 
+qcrypto_afalg_cipher_ctx_new() to
+                avoid different behaviour in test_cipher_null_iv(). [Daniel]
+    - PATCH 14: use g_strdup_printf() instead of g_new0+snprintf() and remove
+                edundant bounds check in qcrypto_afalg_hash_format_name(). 
+[Daniel]
+    - PATCH 14: s/except_len/expect_len. [Daniel]
+    - PATCH 14: free 'errp' if afalg_driver.hash_bytesv() failed. [Daniel]
+    - PATCH 14: maybe some afalg errors should be treated as fatal, but we
+                have no idea yet, so add a "TODO" comment.
+    - PATCH 15: refactor the qcrypto_hmac_new() as Daniel's suggestion. [Daniel]
+
+Changes since v2:
+    - init sockaddr_alg object when it's defined. [Gonglei]
+    - fix some superfluous initialization. [Gonglei]
+    - s/opeartion/operation/g in crypto/afalgpriv.h. [Gonglei]
+    - check 'niv' in qcrypto_afalg_cipher_setiv. [Gonglei]
+
+Changes since v1:
+    - use "make check-speed" to testing the performance. [Daniel]
+    - put private definations into crypto/***priv.h. [Daniel]
+    - remove afalg socket from qapi-schema, put them into crypto/. [Daniel]
+    - some Error report change. [Daniel]
+    - s/QCryptoAfalg/QCryptoAFAlg. [Daniel]
+    - use snprintf with bounds checking instead of sprintf. [Daniel]
+    - use "qcrypto_afalg_" prefix and "qcrypto_nettle(gcrypt,glib,builtin)_" 
+prefix. [Daniel]
+    - add testing results in cover-letter. [Gonglei]
+
+---
+Longpeng(Mike) (18):
+  crypto: cipher: introduce context free function
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for gcrypt-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for nettle-backend
+  crypto: cipher: introduce qcrypto_cipher_ctx_new for builtin-backend
+  crypto: cipher: add cipher driver framework
+  crypto: hash: add hash driver framework
+  crypto: hmac: move crypto/hmac.h into include/crypto/
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for gcrypt-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for nettle-backend
+  crypto: hmac: introduce qcrypto_hmac_ctx_new for glib-backend
+  crypto: hmac: add hmac driver framework
+  crypto: introduce some common functions for af_alg backend
+  crypto: cipher: add afalg-backend cipher support
+  crypto: hash: add afalg-backend hash support
+  crypto: hmac: add af_alg-backend hmac support
+  tests: crypto: add cipher speed benchmark support
+  tests: crypto: add hash speed benchmark support
+  tests: crypto: add hmac speed benchmark support
+
+ configure                       |  22 ++++
+ crypto/Makefile.objs            |   3 +
+ crypto/afalg.c                  | 116 +++++++++++++++++++++
+ crypto/afalgpriv.h              |  64 ++++++++++++
+ crypto/cipher-afalg.c           | 226 ++++++++++++++++++++++++++++++++++++++++
+ crypto/cipher-builtin.c         | 125 +++++++++++-----------
+ crypto/cipher-gcrypt.c          | 105 ++++++++++---------
+ crypto/cipher-nettle.c          |  84 ++++++++-------
+ crypto/cipher.c                 |  80 ++++++++++++++
+ crypto/cipherpriv.h             |  56 ++++++++++
+ crypto/hash-afalg.c             | 214 +++++++++++++++++++++++++++++++++++++
+ crypto/hash-gcrypt.c            |  19 ++--
+ crypto/hash-glib.c              |  19 ++--
+ crypto/hash-nettle.c            |  19 ++--
+ crypto/hash.c                   |  30 ++++++
+ crypto/hashpriv.h               |  39 +++++++
+ crypto/hmac-gcrypt.c            |  42 ++++----
+ crypto/hmac-glib.c              |  63 ++++++-----
+ crypto/hmac-nettle.c            |  42 ++++----
+ crypto/hmac.c                   |  58 +++++++++++
+ crypto/hmac.h                   | 166 -----------------------------
+ crypto/hmacpriv.h               |  48 +++++++++
+ include/crypto/cipher.h         |   1 +
+ include/crypto/hmac.h           | 167 +++++++++++++++++++++++++++++
+ tests/Makefile.include          |  13 ++-
+ tests/benchmark-crypto-cipher.c |  88 ++++++++++++++++
+ tests/benchmark-crypto-hash.c   |  67 ++++++++++++
+ tests/benchmark-crypto-hmac.c   |  82 +++++++++++++++
+ 28 files changed, 1647 insertions(+), 411 deletions(-)
+ create mode 100644 crypto/afalg.c
+ create mode 100644 crypto/afalgpriv.h
+ create mode 100644 crypto/cipher-afalg.c
+ create mode 100644 crypto/cipherpriv.h
+ create mode 100644 crypto/hash-afalg.c
+ create mode 100644 crypto/hashpriv.h
+ delete mode 100644 crypto/hmac.h
+ create mode 100644 crypto/hmacpriv.h
+ create mode 100644 include/crypto/hmac.h
+ create mode 100644 tests/benchmark-crypto-cipher.c
+ create mode 100644 tests/benchmark-crypto-hash.c
+ create mode 100644 tests/benchmark-crypto-hmac.c
+
 -- 
 1.8.3.1
