@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x8-0005Nk-Kg
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:37 -0400
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4xB-0005Qg-8Q
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x7-0003Jb-DD
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:34 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36668)
+	(envelope-from <longpeng.mike@gmail.com>) id 1dW4x9-0003M7-Nh
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:37 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33172)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <longpeng.mike@gmail.com>)
-	id 1dW4x7-0003JA-5M
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:33 -0400
-Received: by mail-pg0-x241.google.com with SMTP id y129so11394675pgy.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:33 -0700 (PDT)
+	id 1dW4x9-0003LF-FV
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:04:35 -0400
+Received: by mail-pf0-x243.google.com with SMTP id e199so11743221pfh.0
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 11:04:35 -0700 (PDT)
 From: longpeng.mike@gmail.com
-Date: Fri, 14 Jul 2017 14:04:07 -0400
-Message-Id: <1500055451-14041-15-git-send-email-longpeng.mike@gmail.com>
+Date: Fri, 14 Jul 2017 14:04:09 -0400
+Message-Id: <1500055451-14041-17-git-send-email-longpeng.mike@gmail.com>
 In-Reply-To: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
 References: <1500055451-14041-1-git-send-email-longpeng.mike@gmail.com>
-Subject: [Qemu-devel] [PATCH v6 14/18] crypto: hash: add afalg-backend hash
- support
+Subject: [Qemu-devel] [PATCH v6 16/18] tests: crypto: add cipher speed
+ benchmark support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +32,81 @@ Cc: qemu-devel@nongnu.org, arei.gonglei@huawei.com, weidong.huang@huawei.com, "L
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Adds afalg-backend hash support: introduces some private APIs
-firstly, and then intergrates them into qcrypto_hash_afalg_driver.
+Now we have two qcrypto backends, libiary-backend and afalg-backend,
+but which one is faster? This patch add a cipher speed benchmark, it
+helps us to measure the performance by using "make check-speed" or
+using "./tests/benchmark-crypto-cipher" directly.
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- crypto/Makefile.objs |   1 +
- crypto/afalgpriv.h   |   1 +
- crypto/hash-afalg.c  | 136 +++++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/hash.c        |  17 +++++++
- crypto/hashpriv.h    |   8 +++
- 5 files changed, 163 insertions(+)
- create mode 100644 crypto/hash-afalg.c
+ tests/Makefile.include          |  9 ++++-
+ tests/benchmark-crypto-cipher.c | 88 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 95 insertions(+), 2 deletions(-)
+ create mode 100644 tests/benchmark-crypto-cipher.c
 
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index d2e8fa8..2b99e08 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -12,6 +12,7 @@ crypto-obj-y += desrfb.o
- crypto-obj-y += cipher.o
- crypto-obj-$(CONFIG_AF_ALG) += afalg.o
- crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
-+crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
- crypto-obj-y += tlscreds.o
- crypto-obj-y += tlscredsanon.o
- crypto-obj-y += tlscredsx509.o
-diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
-index d0941d4..f6550b5 100644
---- a/crypto/afalgpriv.h
-+++ b/crypto/afalgpriv.h
-@@ -24,6 +24,7 @@
- #endif
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 42e17e2..2f34c60 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
+ check-unit-y += tests/test-crypto-hash$(EXESUF)
+ check-unit-y += tests/test-crypto-hmac$(EXESUF)
+ check-unit-y += tests/test-crypto-cipher$(EXESUF)
++check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
+ check-unit-y += tests/test-crypto-secret$(EXESUF)
+ check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
+ check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlssession$(EXESUF)
+@@ -532,6 +533,7 @@ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+ 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
+ 	$(test-qom-obj-y)
++benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
+ test-block-obj-y = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+@@ -635,6 +637,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+ tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+ tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+ tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
++tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+ tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
+ tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
  
- #define AFALG_TYPE_CIPHER "skcipher"
-+#define AFALG_TYPE_HASH "hash"
+@@ -803,6 +806,7 @@ check-help:
+ 	@echo " make check-qtest-TARGET   Run qtest tests for given target"
+ 	@echo " make check-qtest          Run qtest tests"
+ 	@echo " make check-unit           Run qobject tests"
++	@echo " make check-speed          Run qobject speed tests"
+ 	@echo " make check-qapi-schema    Run QAPI schema tests"
+ 	@echo " make check-block          Run block tests"
+ 	@echo " make check-report.html    Generates an HTML test report"
+@@ -833,8 +837,8 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+ 	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
+ 	done,)
  
- #define ALG_OPTYPE_LEN 4
- #define ALG_MSGIV_LEN(len) (sizeof(struct af_alg_iv) + (len))
-diff --git a/crypto/hash-afalg.c b/crypto/hash-afalg.c
+-.PHONY: $(patsubst %, check-%, $(check-unit-y))
+-$(patsubst %, check-%, $(check-unit-y)): check-%: %
++.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
++$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
+ 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command, \
+ 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
+@@ -893,6 +897,7 @@ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-unit: $(patsubst %,check-%, $(check-unit-y))
++check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+ check: check-qapi-schema check-unit check-qtest
+ check-clean:
+diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-cipher.c
 new file mode 100644
-index 0000000..70ab414
+index 0000000..c6a4092
 --- /dev/null
-+++ b/crypto/hash-afalg.c
-@@ -0,0 +1,136 @@
++++ b/tests/benchmark-crypto-cipher.c
+@@ -0,0 +1,88 @@
 +/*
-+ * QEMU Crypto af_alg-backend hash support
++ * QEMU Crypto cipher speed benchmark
 + *
 + * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
 + *
@@ -88,173 +118,80 @@ index 0000000..70ab414
 + * top-level directory.
 + */
 +#include "qemu/osdep.h"
-+#include "qemu/iov.h"
-+#include "qemu/sockets.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "crypto/hash.h"
-+#include "hashpriv.h"
++#include "crypto/init.h"
++#include "crypto/cipher.h"
 +
-+static char *
-+qcrypto_afalg_hash_format_name(QCryptoHashAlgorithm alg,
-+                               Error **errp)
++static void test_cipher_speed(const void *opaque)
 +{
-+    char *name;
-+    const char *alg_name;
++    QCryptoCipher *cipher;
++    Error *err = NULL;
++    double total = 0.0;
++    size_t chunk_size = (size_t)opaque;
++    uint8_t *key = NULL, *iv = NULL;
++    uint8_t *plaintext = NULL, *ciphertext = NULL;
++    size_t nkey = qcrypto_cipher_get_key_len(QCRYPTO_CIPHER_ALG_AES_128);
++    size_t niv = qcrypto_cipher_get_iv_len(QCRYPTO_CIPHER_ALG_AES_128,
++                                           QCRYPTO_CIPHER_MODE_CBC);
 +
-+    switch (alg) {
-+    case QCRYPTO_HASH_ALG_MD5:
-+        alg_name = "md5";
-+        break;
-+    case QCRYPTO_HASH_ALG_SHA1:
-+        alg_name = "sha1";
-+        break;
-+    case QCRYPTO_HASH_ALG_SHA224:
-+        alg_name = "sha224";
-+        break;
-+    case QCRYPTO_HASH_ALG_SHA256:
-+        alg_name = "sha256";
-+        break;
-+    case QCRYPTO_HASH_ALG_SHA384:
-+        alg_name = "sha384";
-+        break;
-+    case QCRYPTO_HASH_ALG_SHA512:
-+        alg_name = "sha512";
-+        break;
-+    case QCRYPTO_HASH_ALG_RIPEMD160:
-+        alg_name = "rmd160";
-+        break;
++    key = g_new0(uint8_t, nkey);
++    memset(key, g_test_rand_int(), nkey);
 +
-+    default:
-+        error_setg(errp, "Unsupported hash algorithm %d", alg);
-+        return NULL;
-+    }
++    iv = g_new0(uint8_t, niv);
++    memset(iv, g_test_rand_int(), niv);
 +
-+    name = g_strdup_printf("%s", alg_name);
++    ciphertext = g_new0(uint8_t, chunk_size);
 +
-+    return name;
++    plaintext = g_new0(uint8_t, chunk_size);
++    memset(plaintext, g_test_rand_int(), chunk_size);
++
++    cipher = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_128,
++                                QCRYPTO_CIPHER_MODE_CBC,
++                                key, nkey, &err);
++    g_assert(cipher != NULL);
++
++    g_assert(qcrypto_cipher_setiv(cipher,
++                                  iv, niv,
++                                  &err) == 0);
++
++    g_test_timer_start();
++    do {
++        g_assert(qcrypto_cipher_encrypt(cipher,
++                                        plaintext,
++                                        ciphertext,
++                                        chunk_size,
++                                        &err) == 0);
++        total += chunk_size;
++    } while (g_test_timer_elapsed() < 5.0);
++
++    total /= 1024 * 1024; /* to MB */
++
++    g_print("cbc(aes128): ");
++    g_print("Testing chunk_size %ld bytes ", chunk_size);
++    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
++    g_print("%.2f MB/sec\n", total / g_test_timer_last());
++
++    qcrypto_cipher_free(cipher);
++    g_free(plaintext);
++    g_free(ciphertext);
++    g_free(iv);
++    g_free(key);
 +}
 +
-+static QCryptoAFAlg *
-+qcrypto_afalg_hash_ctx_new(QCryptoHashAlgorithm alg, Error **errp)
++int main(int argc, char **argv)
 +{
-+    QCryptoAFAlg *afalg;
-+    char *name;
++    size_t i;
++    char name[64];
 +
-+    name = qcrypto_afalg_hash_format_name(alg, errp);
-+    if (!name) {
-+        return NULL;
++    g_test_init(&argc, &argv, NULL);
++    g_assert(qcrypto_init(NULL) == 0);
++
++    for (i = 512; i <= (64 * 1204); i *= 2) {
++        memset(name, 0 , sizeof(name));
++        snprintf(name, sizeof(name), "/crypto/cipher/speed-%lu", i);
++        g_test_add_data_func(name, (void *)i, test_cipher_speed);
 +    }
 +
-+    afalg = qcrypto_afalg_comm_alloc(AFALG_TYPE_HASH, name, errp);
-+    if (!afalg) {
-+        g_free(name);
-+        return NULL;
-+    }
-+
-+    g_free(name);
-+
-+    return afalg;
++    return g_test_run();
 +}
-+
-+static int
-+qcrypto_afalg_hash_bytesv(QCryptoHashAlgorithm alg,
-+                          const struct iovec *iov,
-+                          size_t niov, uint8_t **result,
-+                          size_t *resultlen,
-+                          Error **errp)
-+{
-+    QCryptoAFAlg *afalg;
-+    struct iovec outv;
-+    int ret = 0;
-+    const int expect_len = qcrypto_hash_digest_len(alg);
-+
-+    if (*resultlen == 0) {
-+        *resultlen = expect_len;
-+        *result = g_new0(uint8_t, *resultlen);
-+    } else if (*resultlen != expect_len) {
-+        error_setg(errp,
-+                   "Result buffer size %zu is not match hash %d",
-+                   *resultlen, expect_len);
-+        return -1;
-+    }
-+
-+    afalg = qcrypto_afalg_hash_ctx_new(alg, errp);
-+    if (!afalg) {
-+        return -1;
-+    }
-+
-+    /* send data to kernel's crypto core */
-+    ret = iov_send_recv(afalg->opfd, iov, niov,
-+                        0, iov_size(iov, niov), true);
-+    if (ret < 0) {
-+        error_setg_errno(errp, errno, "Send data to afalg-core failed");
-+        goto out;
-+    }
-+
-+    /* hash && get result */
-+    outv.iov_base = *result;
-+    outv.iov_len = *resultlen;
-+    ret = iov_send_recv(afalg->opfd, &outv, 1,
-+                        0, iov_size(&outv, 1), false);
-+    if (ret < 0) {
-+        error_setg_errno(errp, errno, "Recv result from afalg-core failed");
-+    } else {
-+        ret = 0;
-+    }
-+
-+out:
-+    qcrypto_afalg_comm_free(afalg);
-+    return ret;
-+}
-+
-+QCryptoHashDriver qcrypto_hash_afalg_driver = {
-+    .hash_bytesv = qcrypto_afalg_hash_bytesv,
-+};
-diff --git a/crypto/hash.c b/crypto/hash.c
-index c43fd87..ac59c63 100644
---- a/crypto/hash.c
-+++ b/crypto/hash.c
-@@ -46,6 +46,23 @@ int qcrypto_hash_bytesv(QCryptoHashAlgorithm alg,
-                         size_t *resultlen,
-                         Error **errp)
- {
-+#ifdef CONFIG_AF_ALG
-+    int ret;
-+
-+    ret = qcrypto_hash_afalg_driver.hash_bytesv(alg, iov, niov,
-+                                                result, resultlen,
-+                                                errp);
-+    if (ret == 0) {
-+        return ret;
-+    }
-+
-+    /*
-+     * TODO:
-+     * Maybe we should treat some afalg errors as fatal
-+     */
-+    error_free(*errp);
-+#endif
-+
-     return qcrypto_hash_lib_driver.hash_bytesv(alg, iov, niov,
-                                                result, resultlen,
-                                                errp);
-diff --git a/crypto/hashpriv.h b/crypto/hashpriv.h
-index 5e505e0..cee26cc 100644
---- a/crypto/hashpriv.h
-+++ b/crypto/hashpriv.h
-@@ -28,4 +28,12 @@ struct QCryptoHashDriver {
- 
- extern QCryptoHashDriver qcrypto_hash_lib_driver;
- 
-+#ifdef CONFIG_AF_ALG
-+
-+#include "afalgpriv.h"
-+
-+extern QCryptoHashDriver qcrypto_hash_afalg_driver;
-+
-+#endif
-+
- #endif
 -- 
 1.8.3.1
