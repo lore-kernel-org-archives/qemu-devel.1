@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dW3lF-0007Zv-BR
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dW3lj-0007oz-8F
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dW3lC-0000UT-AM
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:13 -0400
-Received: from mail-qk0-x231.google.com ([2607:f8b0:400d:c09::231]:33296)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dW3lC-0000UI-5G
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:10 -0400
-Received: by mail-qk0-x231.google.com with SMTP id a66so66075499qkb.0
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 09:48:10 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-	<150002073981.22386.9870422422367410100.stgit@frigg.lan>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <01ac89ab-c7b0-3ada-b8bf-9f033cf90f15@twiddle.net>
-Date: Fri, 14 Jul 2017 06:48:02 -1000
+	(envelope-from <eblake@redhat.com>) id 1dW3li-0000f7-4E
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:48:43 -0400
+References: <20170713010555.6769-1-eblake@redhat.com>
+	<20170713010555.6769-15-eblake@redhat.com>
+	<6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6f6250a1-6fac-25b6-5b22-56a3e0f2df85@redhat.com>
+Date: Fri, 14 Jul 2017 11:48:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <150002073981.22386.9870422422367410100.stgit@frigg.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v13 03/26] target: [tcg] Add generic
- translation framework
+In-Reply-To: <6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM"
+Subject: Re: [Qemu-devel] [PATCH v5 14/18] qcow2: Switch qcow2_measure() to
+ byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 07/13/2017 10:25 PM, Lluís Vilanova wrote:
-> +        /* Pass breakpoint hits to target for further processing */
-> +        if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
-> +            CPUBreakpoint *bp;
-> +            QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
-> +                if (bp->pc == db->pc_next) {
-> +                    if (ops->breakpoint_check(db, cpu, bp)) {
-> +                        break;
-> +                    }
-> +                }
-> +            }
-> +
-> +            if (db->is_jmp == DISAS_NORETURN) {
-> +                break;
-> +            }
-> +        }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <6f6250a1-6fac-25b6-5b22-56a3e0f2df85@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 14/18] qcow2: Switch qcow2_measure() to
+ byte-based iteration
+References: <20170713010555.6769-1-eblake@redhat.com>
+ <20170713010555.6769-15-eblake@redhat.com>
+ <6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
+In-Reply-To: <6559006f-9b07-a969-aca0-036477dc52c6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You should accept any != DISAS_NEXT value here.
-(1) Because DISAS_NEXT == 0 and it's the quickest test, and
-(2) If you *require* NORETURN here, then you've also got to
-convert some of the backends to not use DISAS_TARGET_N, which
-as of [07/26] target/i386: [tcg] Port to breakpoint_check, I
-haven't seen happen.
+On 07/13/2017 01:49 PM, John Snow wrote:
+>=20
+>=20
+> On 07/12/2017 09:05 PM, Eric Blake wrote:
+>> This is new code, but it is easier to read if it makes passes over
+>> the image using bytes rather than sectors (and will get easier in
+>> the future when bdrv_get_block_status is converted to byte-based).
+>>
+>> While at it, fix a bug in the computation of nb_sectors using MAX
+>> rather than MIN and thus always passing INT_MAX (thankfully, the
+>> bug was harmless, as bdrv_get_block_status_above() clamps its
+>> answers according to image size).
+>>
+>=20
+> Well, unless ssize was >=3D 2^40, and then it wouldn't have chosen
+> INT_MAX, right!?
+
+But then it would have wrapped the value around while assigning it to
+'int nb_sectors'.  I suppose for some very-interesting size images, you
+could get nb_sectors to turn into a negative value?  At any rate, it's
+good the bug was short-lived.
+
+>=20
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJZaPXeAAoJEKeha0olJ0NqdEcH/3XKe8ShfQEUwhJDbp+vDlD+
+t+hPwr+OwTu2+pfpNOP5HCVN2/shGwYbyJDz5VeKFLSwbcXNaL8epQw0IPBhdZN4
+QpI5su47TsbGZ9sxT3usMzBQ5WIjTTtVSfJSvqte6zYrsm2o8JOcNB9Oz+R8n1ti
+31rSE0AVk/0+BW/ceOyxaX/xkZNDX9P9uHlVs3UfctRsfdD0yWtynKBroHQYTS0e
+blQT9z3HLwjNLh6J1imLGVUK0shIYBcrM129zP+2PVASaP8VpuPhaVa6AIHlvqP5
+d1RLsseseeJbH4u2+7rZUVUkR1v4xoF50zgy5Mo8rCVP/t+4T9eLZ7VMa6jbg8w=
+=L3AK
+-----END PGP SIGNATURE-----
+
+--7lFutaHxMkD1IKLGpCfTmMxFfPnsNiuTM--
