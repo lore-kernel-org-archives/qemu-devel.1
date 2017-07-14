@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVwBG-0002Xc-T5
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:42:35 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dVwBo-00033L-5g
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:43:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVwBD-00044p-M1
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:42:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dVwBn-0004Hn-E5
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:43:08 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
-	<20170713163219.9024-25-marcandre.lureau@redhat.com>
+	<20170713163219.9024-26-marcandre.lureau@redhat.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <6ebfc33d-8a4e-2bc6-f53a-3421db2c9936@twiddle.net>
-Date: Thu, 13 Jul 2017 22:42:24 -1000
+Message-ID: <fc3967b7-3efe-6ebc-74a6-2a86faa77942@twiddle.net>
+Date: Thu, 13 Jul 2017 22:42:58 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170713163219.9024-25-marcandre.lureau@redhat.com>
+In-Reply-To: <20170713163219.9024-26-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 24/29] kvm: use DIV_ROUND_UP
+Subject: Re: [Qemu-devel] [PATCH v2 25/29] decnumber: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,7 +34,7 @@ On 07/13/2017 06:32 AM, Marc-André Lureau wrote:
 > 
 > Signed-off-by: Marc-André Lureau<marcandre.lureau@redhat.com>
 > ---
->   linux-headers/asm-x86/kvm.h | 2 +-
+>   libdecnumber/decNumber.c | 2 +-
 >   1 file changed, 1 insertion(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
