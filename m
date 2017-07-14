@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dW65k-0008AM-3O
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:17:33 -0400
+	(envelope-from <mst@redhat.com>) id 1dW67p-0001wJ-W5
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:19:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dW65g-0006o3-S8
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:17:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50466)
+	(envelope-from <mst@redhat.com>) id 1dW67o-0007qR-MZ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:19:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62299)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dW65g-0006na-IC
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:17:28 -0400
-Date: Fri, 14 Jul 2017 22:17:13 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dW67o-0007pG-9a
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 15:19:40 -0400
+Date: Fri, 14 Jul 2017 22:19:35 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170714181523-mutt-send-email-mst@kernel.org>
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
-	<20170714123023.GA2624@dhcp22.suse.cz>
+Message-ID: <20170714221903-mutt-send-email-mst@kernel.org>
+References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
+	<20170714182012.4595-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170714123023.GA2624@dhcp22.suse.cz>
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+In-Reply-To: <20170714182012.4595-2-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/8] vmgenid: replace
+ x-write-pointer-available hack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,195 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Hocko <mhocko@kernel.org>
-Cc: Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, Ben Warren <ben@skyportsystems.com>
 
-On Fri, Jul 14, 2017 at 02:30:23PM +0200, Michal Hocko wrote:
-> On Wed 12-07-17 20:40:19, Wei Wang wrote:
-> > This patch adds support for reporting blocks of pages on the free list
-> > specified by the caller.
-> > 
-> > As pages can leave the free list during this call or immediately
-> > afterwards, they are not guaranteed to be free after the function
-> > returns. The only guarantee this makes is that the page was on the free
-> > list at some point in time after the function has been invoked.
-> > 
-> > Therefore, it is not safe for caller to use any pages on the returned
-> > block or to discard data that is put there after the function returns.
-> > However, it is safe for caller to discard data that was in one of these
-> > pages before the function was invoked.
-> 
-> I do not understand what is the point of such a function and how it is
-> used because the patch doesn't give us any user (I haven't checked other
-> patches yet).
-> 
-> But just from the semantic point of view this sounds like a horrible
-> idea. The only way to get a free block of pages is to call the page
-> allocator. I am tempted to give it Nack right on those grounds but I
-> would like to hear more about what you actually want to achieve.
+On Fri, Jul 14, 2017 at 08:20:04PM +0200, Marc-Andr=E9 Lureau wrote:
+> This compat property sole function is to prevent the device from being
+> instantiated. Instead of requiring an extra compat property, check if
+> fw_cfg has DMA enabled.
+>=20
+> fw_cfg is a built-in device that is initialized very early by the
+> machine init code.  We have at least one other device that also
+> assumes fw_cfg_find() can be safely used on realize: pvpanic.
+>=20
+> This has the additional benefit of handling other cases properly, like:
+>=20
+>   $ qemu-system-x86_64 -device vmgenid -machine none
+>   qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write suppo=
+rt in fw_cfg, which this machine type does not provide
+>   $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.9 -global f=
+w_cfg.dma_enabled=3Doff
+>   qemu-system-x86_64: -device vmgenid: vmgenid requires DMA write suppo=
+rt in fw_cfg, which this machine type does not provide
+>   $ qemu-system-x86_64 -device vmgenid -machine pc-i440fx-2.6 -global f=
+w_cfg.dma_enabled=3Don
+>   [boots normally]
+>=20
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Ben Warren <ben@skyportsystems.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Basically it's a performance hint to the hypervisor.
-For example, these pages would be good candidates to
-move around as they are not mapped into any running
-applications.
+Why tree would you like to merge this through?
+If it's mine pls copy me on all patches in the set.
 
-As such, it's important not to slow down other parts of the system too
-much - otherwise we are speeding up one part of the system while we slow
-down other parts of it, which is why it's trying to drop the lock as
-soon a possible.
-
-As long as hypervisor does not assume it can drop these pages, and as
-long it's correct in most cases.  we are OK even if the hint is slightly
-wrong because hypervisor notifications are racing with allocations.
-
-There are patches to do more tricks - if hypervisor tracks all
-memory writes we might actually use this hint to discard data -
-but that is just implementation detail.
-
-
-> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > ---
-> >  include/linux/mm.h |  5 +++
-> >  mm/page_alloc.c    | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 101 insertions(+)
-> > 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 46b9ac5..76cb433 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -1835,6 +1835,11 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
-> >  		unsigned long zone_start_pfn, unsigned long *zholes_size);
-> >  extern void free_initmem(void);
-> >  
-> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
-> > +extern int report_unused_page_block(struct zone *zone, unsigned int order,
-> > +				    unsigned int migratetype,
-> > +				    struct page **page);
-> > +#endif
-> >  /*
-> >   * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
-> >   * into the buddy system. The freed pages will be poisoned with pattern
-> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> > index 64b7d82..8b3c9dd 100644
-> > --- a/mm/page_alloc.c
-> > +++ b/mm/page_alloc.c
-> > @@ -4753,6 +4753,102 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
-> >  	show_swap_cache_info();
-> >  }
-> >  
-> > +#if IS_ENABLED(CONFIG_VIRTIO_BALLOON)
-> > +
-> > +/*
-> > + * Heuristically get a page block in the system that is unused.
-> > + * It is possible that pages from the page block are used immediately after
-> > + * report_unused_page_block() returns. It is the caller's responsibility
-> > + * to either detect or prevent the use of such pages.
-> > + *
-> > + * The free list to check: zone->free_area[order].free_list[migratetype].
-> > + *
-> > + * If the caller supplied page block (i.e. **page) is on the free list, offer
-> > + * the next page block on the list to the caller. Otherwise, offer the first
-> > + * page block on the list.
-> > + *
-> > + * Note: it is not safe for caller to use any pages on the returned
-> > + * block or to discard data that is put there after the function returns.
-> > + * However, it is safe for caller to discard data that was in one of these
-> > + * pages before the function was invoked.
-> > + *
-> > + * Return 0 when a page block is found on the caller specified free list.
-> > + */
-> > +int report_unused_page_block(struct zone *zone, unsigned int order,
-> > +			     unsigned int migratetype, struct page **page)
-> > +{
-> > +	struct zone *this_zone;
-> > +	struct list_head *this_list;
-> > +	int ret = 0;
-> > +	unsigned long flags;
-> > +
-> > +	/* Sanity check */
-> > +	if (zone == NULL || page == NULL || order >= MAX_ORDER ||
-> > +	    migratetype >= MIGRATE_TYPES)
-> > +		return -EINVAL;
-> > +
-> > +	/* Zone validity check */
-> > +	for_each_populated_zone(this_zone) {
-> > +		if (zone == this_zone)
-> > +			break;
-> > +	}
-> > +
-> > +	/* Got a non-existent zone from the caller? */
-> > +	if (zone != this_zone)
-> > +		return -EINVAL;
-> 
-> Huh, what do you check for here? Why don't you simply
-> populated_zone(zone)?
-> 
-> > +
-> > +	spin_lock_irqsave(&this_zone->lock, flags);
-> > +
-> > +	this_list = &zone->free_area[order].free_list[migratetype];
-> > +	if (list_empty(this_list)) {
-> > +		*page = NULL;
-> > +		ret = 1;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/* The caller is asking for the first free page block on the list */
-> > +	if ((*page) == NULL) {
-> > +		*page = list_first_entry(this_list, struct page, lru);
-> > +		ret = 0;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/*
-> > +	 * The page block passed from the caller is not on this free list
-> > +	 * anymore (e.g. a 1MB free page block has been split). In this case,
-> > +	 * offer the first page block on the free list that the caller is
-> > +	 * asking for.
-> > +	 */
-> > +	if (PageBuddy(*page) && order != page_order(*page)) {
-> > +		*page = list_first_entry(this_list, struct page, lru);
-> > +		ret = 0;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/*
-> > +	 * The page block passed from the caller has been the last page block
-> > +	 * on the list.
-> > +	 */
-> > +	if ((*page)->lru.next == this_list) {
-> > +		*page = NULL;
-> > +		ret = 1;
-> > +		goto out;
-> > +	}
-> > +
-> > +	/*
-> > +	 * Finally, fall into the regular case: the page block passed from the
-> > +	 * caller is still on the free list. Offer the next one.
-> > +	 */
-> > +	*page = list_next_entry((*page), lru);
-> > +	ret = 0;
-> > +out:
-> > +	spin_unlock_irqrestore(&this_zone->lock, flags);
-> > +	return ret;
-> > +}
-> > +EXPORT_SYMBOL(report_unused_page_block);
-> > +
-> > +#endif
-> > +
-> >  static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
-> >  {
-> >  	zoneref->zone = zone;
-> > -- 
-> > 2.7.4
-> > 
-> > --
-> > To unsubscribe, send a message with 'unsubscribe linux-mm' in
-> > the body to majordomo@kvack.org.  For more info on Linux MM,
-> > see: http://www.linux-mm.org/ .
-> > Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
-> 
-> -- 
-> Michal Hocko
-> SUSE Labs
+> ---
+>  include/hw/acpi/bios-linker-loader.h |  2 ++
+>  include/hw/compat.h                  |  4 ----
+>  hw/acpi/bios-linker-loader.c         | 10 ++++++++++
+>  hw/acpi/vmgenid.c                    |  9 +--------
+>  4 files changed, 13 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/include/hw/acpi/bios-linker-loader.h b/include/hw/acpi/bio=
+s-linker-loader.h
+> index efe17b0b9c..a711dbced8 100644
+> --- a/include/hw/acpi/bios-linker-loader.h
+> +++ b/include/hw/acpi/bios-linker-loader.h
+> @@ -7,6 +7,8 @@ typedef struct BIOSLinker {
+>      GArray *file_list;
+>  } BIOSLinker;
+> =20
+> +bool bios_linker_loader_can_write_pointer(void);
+> +
+>  BIOSLinker *bios_linker_loader_init(void);
+> =20
+>  void bios_linker_loader_alloc(BIOSLinker *linker,
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 08f36004da..f414786604 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -150,10 +150,6 @@
+>          .driver   =3D "fw_cfg_io",\
+>          .property =3D "dma_enabled",\
+>          .value    =3D "off",\
+> -    },{\
+> -        .driver   =3D "vmgenid",\
+> -        .property =3D "x-write-pointer-available",\
+> -        .value    =3D "off",\
+>      },
+> =20
+>  #define HW_COMPAT_2_3 \
+> diff --git a/hw/acpi/bios-linker-loader.c b/hw/acpi/bios-linker-loader.=
+c
+> index 046183a0f1..d16b8bbcb1 100644
+> --- a/hw/acpi/bios-linker-loader.c
+> +++ b/hw/acpi/bios-linker-loader.c
+> @@ -168,6 +168,16 @@ bios_linker_find_file(const BIOSLinker *linker, co=
+nst char *name)
+>      return NULL;
+>  }
+> =20
+> +/*
+> + * board code must realize fw_cfg first, as a fixed device, before
+> + * another device realize function call bios_linker_loader_can_write_p=
+ointer()
+> + */
+> +bool bios_linker_loader_can_write_pointer(void)
+> +{
+> +    FWCfgState *fw_cfg =3D fw_cfg_find();
+> +    return fw_cfg && fw_cfg_dma_enabled(fw_cfg);
+> +}
+> +
+>  /*
+>   * bios_linker_loader_alloc: ask guest to load file into guest memory.
+>   *
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index a32b847fe0..ab5da293fd 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -205,17 +205,11 @@ static void vmgenid_handle_reset(void *opaque)
+>      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
+>  }
+> =20
+> -static Property vmgenid_properties[] =3D {
+> -    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
+> -                     write_pointer_available, true),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>  {
+>      VmGenIdState *vms =3D VMGENID(dev);
+> =20
+> -    if (!vms->write_pointer_available) {
+> +    if (!bios_linker_loader_can_write_pointer()) {
+>          error_setg(errp, "%s requires DMA write support in fw_cfg, "
+>                     "which this machine type does not provide", VMGENID=
+_DEVICE);
+>          return;
+> @@ -239,7 +233,6 @@ static void vmgenid_device_class_init(ObjectClass *=
+klass, void *data)
+>      dc->vmsd =3D &vmstate_vmgenid;
+>      dc->realize =3D vmgenid_realize;
+>      dc->hotpluggable =3D false;
+> -    dc->props =3D vmgenid_properties;
+> =20
+>      object_class_property_add_str(klass, VMGENID_GUID, NULL,
+>                                    vmgenid_set_guid, NULL);
+> --=20
+> 2.13.1.395.gf7b71de06
