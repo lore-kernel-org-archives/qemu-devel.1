@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2K-0003MX-H1
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1dVy2j-0003kt-Ng
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dVy2H-0003QZ-46
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dVy2G-0003Og-Py
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:25 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6EAcdWP118783
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:23 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bpsv8dtfp-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:41:23 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 14 Jul 2017 11:41:20 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 14 Jul 2017 12:40:54 +0200
-In-Reply-To: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500028867-134709-28-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PULL 27/40] pc-bios/s390-ccw: Add virtio-net driver
- code
+	(envelope-from <berrange@redhat.com>) id 1dVy2g-0003Za-HY
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55476)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dVy2g-0003ZJ-Bp
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 06:41:50 -0400
+Date: Fri, 14 Jul 2017 11:41:27 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170714104127.GA28095@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+	<20170713110237.6712-2-lprosek@redhat.com>
+	<20170713133206.GA18623@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170713133206.GA18623@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce
+ error_report_nolf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,238 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Ladi Prosek <lprosek@redhat.com>, casasfernando@hotmail.com, mst@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
-From: Thomas Huth <thuth@redhat.com>
+On Thu, Jul 13, 2017 at 02:32:06PM +0100, Stefan Hajnoczi wrote:
+> On Thu, Jul 13, 2017 at 01:02:30PM +0200, Ladi Prosek wrote:
+> > +/*
+> > + * Print an error message to current monitor if we have one, else to stderr.
+> > + * Format arguments like sprintf().  The resulting message should be a
+> > + * single phrase, with no trailing punctuation.  The no-LF version allows
+> > + * additional text to be appended with error_printf() or error_vprintf().
+> > + * Make sure to always close with a newline after all text is printed.
+> > + * Prepends the current location.
+> > + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+> > + */
+> > +void error_report_nolf(const char *fmt, ...)
+> > +{
+> > +    va_list ap;
+> > +
+> > +    va_start(ap, fmt);
+> > +    error_vreport_nolf(fmt, ap);
+> > +    va_end(ap);
+> >  }
+> 
+> Each call to this function prepends the timestamp, so it cannot really
+> be used for a sequence of prints in a single line.
+> 
+> It's a little ugly but I expected something along the lines of
+> g_strdup_vprintf() in virtio_error():
+> 
+>   char *msg;
+> 
+>   va_start(ap, fmt);
+>   msg = g_strdup_vprintf(fmt, ap);
+>   va_end(ap);
+> 
+>   error_report("%s: %s", DEVICE(vdev)->id, msg);
+> 
+>   g_free(msg);
 
-The driver provides the recv() and send() functions which will
-be required by SLOF's libnet code for receiving and sending
-packets.
+You could get the same thing by turning virtio_Error into a macro with
+a few games. Rename the current method to virtio_error_impl() and then
+define:
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1499863793-18627-11-git-send-email-thuth@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- pc-bios/s390-ccw/netboot.mak  |   2 +-
- pc-bios/s390-ccw/virtio-net.c | 135 ++++++++++++++++++++++++++++++++++++++++++
- pc-bios/s390-ccw/virtio.c     |   5 ++
- pc-bios/s390-ccw/virtio.h     |  12 +++-
- 4 files changed, 151 insertions(+), 3 deletions(-)
- create mode 100644 pc-bios/s390-ccw/virtio-net.c
+  #define virtio_error(dev, fmt, ...) \
+     virtio_error_impl(dev, "%s: " fmt, DEVICE(dev)->id, __VA_ARGS__)
 
-diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index 44b7645..eb70430 100644
---- a/pc-bios/s390-ccw/netboot.mak
-+++ b/pc-bios/s390-ccw/netboot.mak
-@@ -1,7 +1,7 @@
- 
- SLOF_DIR := $(SRC_PATH)/roms/SLOF
- 
--NETOBJS := start.o sclp.o virtio.o netmain.o libc.a
-+NETOBJS := start.o sclp.o virtio.o virtio-net.o netmain.o libc.a
- 
- LIBC_INC := -nostdinc -I$(SLOF_DIR)/lib/libc/include
- LIBNET_INC := -I$(SLOF_DIR)/lib/libnet
-diff --git a/pc-bios/s390-ccw/virtio-net.c b/pc-bios/s390-ccw/virtio-net.c
-new file mode 100644
-index 0000000..ff7f4da
---- /dev/null
-+++ b/pc-bios/s390-ccw/virtio-net.c
-@@ -0,0 +1,135 @@
-+/*
-+ * Virtio-net driver for the s390-ccw firmware
-+ *
-+ * Copyright 2017 Thomas Huth, Red Hat Inc.
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or (at your
-+ * option) any later version.
-+ */
-+
-+#include <stdint.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <sys/socket.h>
-+#include <ethernet.h>
-+#include "s390-ccw.h"
-+#include "virtio.h"
-+
-+#ifndef DEBUG_VIRTIO_NET
-+#define DEBUG_VIRTIO_NET 0
-+#endif
-+
-+#define VIRTIO_NET_F_MAC_BIT  (1 << 5)
-+
-+#define VQ_RX 0         /* Receive queue */
-+#define VQ_TX 1         /* Transmit queue */
-+
-+struct VirtioNetHdr {
-+    uint8_t flags;
-+    uint8_t gso_type;
-+    uint16_t hdr_len;
-+    uint16_t gso_size;
-+    uint16_t csum_start;
-+    uint16_t csum_offset;
-+    /*uint16_t num_buffers;*/ /* Only with VIRTIO_NET_F_MRG_RXBUF or VIRTIO1 */
-+};
-+typedef struct VirtioNetHdr VirtioNetHdr;
-+
-+static uint16_t rx_last_idx;  /* Last index in receive queue "used" ring */
-+
-+int virtio_net_init(void *mac_addr)
-+{
-+    VDev *vdev = virtio_get_device();
-+    VRing *rxvq = &vdev->vrings[VQ_RX];
-+    void *buf;
-+    int i;
-+
-+    vdev->guest_features[0] = VIRTIO_NET_F_MAC_BIT;
-+    virtio_setup_ccw(vdev);
-+
-+    IPL_assert(vdev->guest_features[0] & VIRTIO_NET_F_MAC_BIT,
-+               "virtio-net device does not support the MAC address feature");
-+    memcpy(mac_addr, vdev->config.net.mac, ETH_ALEN);
-+
-+    for (i = 0; i < 64; i++) {
-+        buf = malloc(ETH_MTU_SIZE + sizeof(VirtioNetHdr));
-+        IPL_assert(buf != NULL, "Can not allocate memory for receive buffers");
-+        vring_send_buf(rxvq, buf, ETH_MTU_SIZE + sizeof(VirtioNetHdr),
-+                       VRING_DESC_F_WRITE);
-+    }
-+    vring_notify(rxvq);
-+
-+    return 0;
-+}
-+
-+int send(int fd, const void *buf, int len, int flags)
-+{
-+    VirtioNetHdr tx_hdr;
-+    VDev *vdev = virtio_get_device();
-+    VRing *txvq = &vdev->vrings[VQ_TX];
-+
-+    /* Set up header - we do not use anything special, so simply clear it */
-+    memset(&tx_hdr, 0, sizeof(tx_hdr));
-+
-+    vring_send_buf(txvq, &tx_hdr, sizeof(tx_hdr), VRING_DESC_F_NEXT);
-+    vring_send_buf(txvq, (void *)buf, len, VRING_HIDDEN_IS_CHAIN);
-+    while (!vr_poll(txvq)) {
-+        yield();
-+    }
-+    if (drain_irqs(txvq->schid)) {
-+        puts("send: drain irqs failed");
-+        return -1;
-+    }
-+
-+    return len;
-+}
-+
-+int recv(int fd, void *buf, int maxlen, int flags)
-+{
-+    VDev *vdev = virtio_get_device();
-+    VRing *rxvq = &vdev->vrings[VQ_RX];
-+    int len, id;
-+    uint8_t *pkt;
-+
-+    if (rx_last_idx == rxvq->used->idx) {
-+        return 0;
-+    }
-+
-+    len = rxvq->used->ring[rx_last_idx % rxvq->num].len - sizeof(VirtioNetHdr);
-+    if (len > maxlen) {
-+        puts("virtio-net: Receive buffer too small");
-+        len = maxlen;
-+    }
-+    id = rxvq->used->ring[rx_last_idx % rxvq->num].id % rxvq->num;
-+    pkt = (uint8_t *)(rxvq->desc[id].addr + sizeof(VirtioNetHdr));
-+
-+#if DEBUG_VIRTIO_NET   /* Dump packet */
-+    int i;
-+    printf("\nbuf %p: len=%i\n", (void *)rxvq->desc[id].addr, len);
-+    for (i = 0; i < 64; i++) {
-+        printf(" %02x", pkt[i]);
-+        if ((i % 16) == 15) {
-+            printf("\n");
-+        }
-+    }
-+    printf("\n");
-+#endif
-+
-+    /* Copy data to destination buffer */
-+    memcpy(buf, pkt, len);
-+
-+    /* Mark buffer as available to the host again */
-+    rxvq->avail->ring[rxvq->avail->idx % rxvq->num] = id;
-+    rxvq->avail->idx = rxvq->avail->idx + 1;
-+    vring_notify(rxvq);
-+
-+    /* Move index to next entry */
-+    rx_last_idx = rx_last_idx + 1;
-+
-+    return len;
-+}
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index 18fc5d1..c890a03 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -266,6 +266,11 @@ void virtio_setup_ccw(VDev *vdev)
-     run_ccw(vdev, CCW_CMD_VDEV_RESET, NULL, 0);
- 
-     switch (vdev->senseid.cu_model) {
-+    case VIRTIO_ID_NET:
-+        vdev->nr_vqs = 2;
-+        vdev->cmd_vr_idx = 0;
-+        cfg_size = sizeof(vdev->config.net);
-+        break;
-     case VIRTIO_ID_BLOCK:
-         vdev->nr_vqs = 1;
-         vdev->cmd_vr_idx = 0;
-diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
-index a00a320..19fceb6 100644
---- a/pc-bios/s390-ccw/virtio.h
-+++ b/pc-bios/s390-ccw/virtio.h
-@@ -11,8 +11,6 @@
- #ifndef VIRTIO_H
- #define VIRTIO_H
- 
--#include "s390-ccw.h"
--
- /* Status byte for guest to report progress, and synchronize features. */
- /* We have seen device and processed generic fields (VIRTIO_CONFIG_F_VIRTIO) */
- #define VIRTIO_CONFIG_S_ACKNOWLEDGE     1
-@@ -227,6 +225,13 @@ struct ScsiDevice {
- };
- typedef struct ScsiDevice ScsiDevice;
- 
-+struct VirtioNetConfig {
-+    uint8_t mac[6];
-+    /* uint16_t status; */               /* Only with VIRTIO_NET_F_STATUS */
-+    /* uint16_t max_virtqueue_pairs; */  /* Only with VIRTIO_NET_F_MQ */
-+};
-+typedef struct VirtioNetConfig VirtioNetConfig;
-+
- struct VDev {
-     int nr_vqs;
-     VRing *vrings;
-@@ -239,6 +244,7 @@ struct VDev {
-     union {
-         VirtioBlkConfig blk;
-         VirtioScsiConfig scsi;
-+        VirtioNetConfig net;
-     } config;
-     ScsiDevice *scsi_device;
-     bool is_cdrom;
-@@ -273,4 +279,6 @@ int vring_wait_reply(void);
- int virtio_run(VDev *vdev, int vqid, VirtioCmd *cmd);
- void virtio_setup_ccw(VDev *vdev);
- 
-+int virtio_net_init(void *mac_addr);
-+
- #endif /* VIRTIO_H */
+Regards,
+Daniel
 -- 
-2.7.4
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
