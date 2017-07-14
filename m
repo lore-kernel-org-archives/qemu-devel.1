@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dW58K-000051-Iy
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:16:09 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dW5CR-0003wl-59
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dW58F-00037o-Ji
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:16:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60948)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dW5CM-0005tn-NT
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:20:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49322)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dW58F-00036F-9h
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:16:03 -0400
-Date: Fri, 14 Jul 2017 12:15:55 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170714121555.7e64d849@w520.home>
-In-Reply-To: <A2975661238FB949B60364EF0F2C2574390A7C4F@shsmsx102.ccr.corp.intel.com>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
-	<cc330a8f-e087-9b6f-2a40-38b58688d300@arm.com>
-	<20170702100659.GA22053@gmail.com>
-	<0e4f2dd4-d553-b1b7-7bec-fe0ff5242c54@arm.com>
-	<20170703103115.GB22053@gmail.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D25919@SHSMSX101.ccr.corp.intel.com>
-	<1d63c1ae-ca10-0f9d-91de-0d9c9823c104@arm.com>
-	<20170705112816.56554f65@w520.home>
-	<A2975661238FB949B60364EF0F2C2574390A7C4F@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dW5CM-0005t4-Dh
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 14:20:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8BBFCC0DAFE9
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 18:20:16 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 14 Jul 2017 20:20:03 +0200
+Message-Id: <20170714182012.4595-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 7/8] VFIO: Add new IOCTL for IOMMU TLB
- invalidate propagation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/8] KASLR kernel dump support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,114 +31,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>, "Lan,
-	Tianyu" <tianyu.lan@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, Joerg Roedel <joro@8bytes.org>
+To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, anderson@redhat.com, berrange@redhat.com, ehabkost@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, 14 Jul 2017 08:58:02 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+Recent linux kernels enable KASLR to randomize phys/virt memory
+addresses. This series aims to provide enough information in qemu
+dumps so that crash utility can work with randomized kernel too (it
+hasn't been tested on other archs than x86 though, help welcome).
 
-> Hi Alex,
-> 
-> Against to the opaque open, I'd like to propose the following definition
-> based on the existing comments. Pls note that I've merged the pasid
-> table binding and iommu tlb invalidation into a single IOCTL and make
-> different flags to indicate the iommu operations. Per Kevin's comments,
-> there may be iommu invalidation for guest IOVA tlb, so I renamed the
-> IOCTL and data structure to be non-svm specific. Pls kindly have a review,
-> so that we can make the opaque open closed and move forward. Surely,
-> comments and ideas are welcomed. And for the scope and flags definition
-> in struct iommu_tlb_invalidate, it's also welcomed to give your ideas on it.
-> 
-> 1. Add a VFIO IOCTL for iommu operations from user-space
-> 
-> #define VFIO_IOMMU_OP_IOCTL _IO(VFIO_TYPE, VFIO_BASE + 24)
-> 
-> Corresponding data structure:
-> struct vfio_iommu_operation_info {
-> 	__u32	argsz;
-> #define VFIO_IOMMU_BIND_PASIDTBL	(1 << 0) /* Bind PASID Table */
-> #define VFIO_IOMMU_BIND_PASID	(1 << 1) /* Bind PASID from userspace driver*/
-> #define VFIO_IOMMU_BIND_PGTABLE	(1 << 2) /* Bind guest mmu page table */
-> #define VFIO_IOMMU_INVAL_IOTLB	(1 << 3) /* Invalidate iommu tlb */
-> 	__u32	flag;
-> 	__u32	length; // length of the data[] part in byte
-> 	__u8	data[]; // stores the data for iommu op indicated by flag field
-> };
+The vmcoreinfo device is an emulated ACPI device that exposes a 4k
+memory range to the guest to store various informations useful to
+debug the guest OS. (it is greatly inspired by the VMGENID device
+implementation). The version field with value 0 is meant to give
+paddr/size of the VMCOREINFO ELF PT_NOTE, other values can be used for
+different purposes or OSes. (note: some wanted to see pvpanic somehow
+merged with this device, I have no clear idea how to do that, nor do I
+think this is a good idea since the devices are quite different, used
+at different time for different purposes. And it can be done as a
+future iteration if it is appropriate, feel free to send patches)
 
-If we're doing a generic "Ops" ioctl, then we should have an "op" field
-which is defined by an enum.  It doesn't make sense to use flags for
-this, for example can we set multiple flag bits?  If not then it's not
-a good use for a bit field.  I'm also not sure I understand the value
-of the "length" field, can't it always be calculated from argsz?
+Crash 7.1.9 will parse the "phys_base" value from the VMCOREINFO note,
+and thus will work with KASLR-dump produced by this series.
 
-> For iommu tlb invalidation from userspace, the "__u8 data[]" stores
-> data which would be parsed by the "struct iommu_tlb_invalidate" defined
-> below.
-> 
-> 2. Definitions in include/uapi/linux/iommu.h(newly added header file)
-> 
-> /* IOMMU model definition for iommu operations from userspace */
-> enum iommu_model {
-> 	INTLE_IOMMU,
-> 	ARM_SMMU,
-> 	AMD_IOMMU,
-> 	SPAPR_IOMMU,
-> 	S390_IOMMU,
-> };
-> 
-> struct iommu_tlb_invalidate {
-> 	__u32	scope;
-> /* pasid-selective invalidation described by @pasid */
-> #define IOMMU_INVALIDATE_PASID	(1 << 0)
-> /* address-selevtive invalidation described by (@vaddr, @size) */
-> #define IOMMU_INVALIDATE_VADDR	(1 << 1)
+By priority, VMCOREINFO "phys_base" value is the most accurate. If not
+available, qemu will keep the current guessed value.
 
-Again, is a bit field appropriate here, can a user set both bits?
+The series implements the VMCOREINFO note addition in qemu ELF/kdump,
+as well as the python scripts/dump-guest-memory.py.
 
-> 	__u32	flags;
-> /*  targets non-pasid mappings, @pasid is not valid */
-> #define IOMMU_INVALIDATE_NO_PASID	(1 << 0)
-> /* indicating that the pIOMMU doesn't need to invalidate
-> 	all intermediate tables cached as part of the PTE for
-> 	vaddr, only the last-level entry (pte). This is a hint. */
-> #define IOMMU_INVALIDATE_VADDR_LEAF	(1 << 1)
+To test:
 
-Are we venturing into vendor specific attributes here?
+Compile and run a guest kernel with CONFIG_RANDOMIZE_BASE=3Dy.
 
-> 	__u32	pasid;
-> 	__u64	vaddr;
-> 	__u64	size;
-> 	enum iommu_model model;
+Run qemu with -device vmcoreinfo.
 
-How does a user learn which model(s) are supported by the interface?
-How do they learn which ops are supported?  Perhaps a good use for one
-of those flag bits in the outer data structure is "probe".
+Load the experimental vmcoreinfo module in guest
+https://github.com/elmarco/vmgenid-test/blob/master/qemuvmci-test.c.
 
-> 	/*
-> 	 Vendor may have different HW version and thus the
-> 	 data part of this structure differs, use sub_version
-> 	 to indicate such difference.
-> 	 */
-> 	__u322 sub_version;
+Produce an ELF dump:
+{ "execute": "dump-guest-memory", "arguments": { "protocol": "file:dump",=
+ "paging": false } }
 
-Not sure I see the value of this vs creating an INTEL_IOMMUv2 entry in
-the model enum.
+Produce a kdump:
+{ "execute": "dump-guest-memory", "arguments": { "protocol": "file:dump",=
+ "paging": false, "format": "kdump-zlib" } }
 
-> 	__u64 length; // length of the data[] part in byte
+Or with (gdb) dump-guest-memory, with scripts/dump-guest-memory.py script=
+.
 
-Questionably useful vs calculating from argsz again , but it certainly
-doesn't need to be a qword :-o
+Analyze with crash >=3D 7.1.9
+$ crash vmlinux dump
 
-> 	__u8	data[];
-> };
-> 
-> For Intel, the data structue is:
-> struct intel_iommu_invalidate_data {
-> 	__u64 low;
-> 	__u64 high;
-> }
+v4: from Laszlo review
+- switch to warn_report*()
+- update test to follow vmgenid and use boot-sector infrastructure
+- fix range checks in the python script
+- add vmcoreinfo_get() stub
 
-high/low what?  This is a pretty weak uapi definition.  Thanks,
+v3: from Laszlo review
+- change vmcoreinfo offset to 36
+- reset err to null after report
+- use PRIu32
+- change name_size and desc_size against MAX_VMCOREINFO_SIZE
+- python code simplification
+- check boundaries of blocks in phys_memory_read()
+- fix some vmgi vs vmci names
+- add more comments in code
+- fix comment indentation
+- add r-b tags
 
-Alex
+v2: from Laszlo review
+- vmci: fix guest endianess handling
+- vmci: fix wrong sizeof()
+- vmci: add back reset logic from vmgenid
+- dump: have 1MB size limit for vmcoreinfo
+- dump: fix potential off-by-1 buffer manipulation
+- dump: use temporary variable for qemu_strtou64
+- dump: fixed VMCOREINFO duplication in kdump
+- update gdb script to not call into qemu process
+- update MAINTAINERS with some new files
+
+Marc-Andr=C3=A9 Lureau (8):
+  vmgenid: replace x-write-pointer-available hack
+  acpi: add vmcoreinfo device
+  stubs: add vmcoreinfo_get() stub
+  tests: add simple vmcoreinfo test
+  dump: add vmcoreinfo ELF note
+  kdump: add vmcoreinfo ELF note
+  scripts/dump-guest-memory.py: add vmcoreinfo
+  MAINTAINERS: add Dump maintainers
+
+ scripts/dump-guest-memory.py         |  47 ++++++++
+ include/hw/acpi/aml-build.h          |   1 +
+ include/hw/acpi/bios-linker-loader.h |   2 +
+ include/hw/acpi/vmcoreinfo.h         |  37 ++++++
+ include/hw/compat.h                  |   4 -
+ include/sysemu/dump.h                |   2 +
+ dump.c                               | 154 +++++++++++++++++++++++++
+ hw/acpi/aml-build.c                  |   2 +
+ hw/acpi/bios-linker-loader.c         |  10 ++
+ hw/acpi/vmcoreinfo.c                 | 211 +++++++++++++++++++++++++++++=
+++++++
+ hw/acpi/vmgenid.c                    |   9 +-
+ hw/i386/acpi-build.c                 |  14 +++
+ stubs/vmcoreinfo.c                   |   9 ++
+ tests/vmcoreinfo-test.c              | 141 +++++++++++++++++++++++
+ MAINTAINERS                          |   9 ++
+ default-configs/arm-softmmu.mak      |   1 +
+ default-configs/i386-softmmu.mak     |   1 +
+ default-configs/x86_64-softmmu.mak   |   1 +
+ docs/specs/vmcoreinfo.txt            | 138 +++++++++++++++++++++++
+ hw/acpi/Makefile.objs                |   1 +
+ stubs/Makefile.objs                  |   1 +
+ tests/Makefile.include               |   2 +
+ 22 files changed, 785 insertions(+), 12 deletions(-)
+ create mode 100644 include/hw/acpi/vmcoreinfo.h
+ create mode 100644 hw/acpi/vmcoreinfo.c
+ create mode 100644 stubs/vmcoreinfo.c
+ create mode 100644 tests/vmcoreinfo-test.c
+ create mode 100644 docs/specs/vmcoreinfo.txt
+
+--=20
+2.13.1.395.gf7b71de06
