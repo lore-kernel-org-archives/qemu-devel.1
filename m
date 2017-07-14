@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVj-00048h-4I
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzW0-0004bk-DM
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dVzVi-0004Da-BB
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:15:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dVzVw-0004V4-IA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 08:16:12 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 14 Jul 2017 07:14:52 -0500
-Message-Id: <20170714121457.10322-16-eblake@redhat.com>
+Date: Fri, 14 Jul 2017 07:14:56 -0500
+Message-Id: <20170714121457.10322-20-eblake@redhat.com>
 In-Reply-To: <20170714121457.10322-1-eblake@redhat.com>
 References: <20170714121457.10322-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 15/20] vdi: Avoid bitrot of debugging code
+Subject: [Qemu-devel] [PATCH v2 19/20] vvfat: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +21,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, Max Reitz <mreitz@redhat.com>
 
-Rework the debug define so that we always get -Wformat checking,
-even when debugging is disabled.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Update the vvfat driver accordingly.  Note that we
+can rely on the block driver having already clamped limits to our
+block size, and simplify accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 ---
-v2: no change
+v2: rebase to earlier changes, simplify
 ---
- block/vdi.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ block/vvfat.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/block/vdi.c b/block/vdi.c
-index 2b6e8fa..dc36685 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -86,12 +86,18 @@
- #define DEFAULT_CLUSTER_SIZE (1 * MiB)
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 4fd28e1..844aa26 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3062,15 +3062,13 @@ vvfat_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+     return ret;
+ }
 
- #if defined(CONFIG_VDI_DEBUG)
--#define logout(fmt, ...) \
--                fprintf(stderr, "vdi\t%-24s" fmt, __func__, ##__VA_ARGS_=
-_)
-+#define VDI_DEBUG 1
- #else
--#define logout(fmt, ...) ((void)0)
-+#define VDI_DEBUG 0
- #endif
+-static int64_t coroutine_fn vvfat_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *n, BlockDriverState **file)
++static int64_t coroutine_fn vvfat_co_block_status(BlockDriverState *bs,
++                                                  bool mapping,
++                                                  int64_t offset,
++                                                  int64_t bytes, int64_t *n,
++                                                  BlockDriverState **file)
+ {
+-    *n = bs->total_sectors - sector_num;
+-    if (*n > nb_sectors) {
+-        *n = nb_sectors;
+-    } else if (*n < 0) {
+-        return 0;
+-    }
++    *n = bytes;
+     return BDRV_BLOCK_DATA;
+ }
 
-+#define logout(fmt, ...) \
-+    do {                                                                =
-\
-+        if (VDI_DEBUG) {                                                =
-\
-+            fprintf(stderr, "vdi\t%-24s" fmt, __func__, ##__VA_ARGS__); =
-\
-+        }                                                               =
-\
-+    } while (0)
-+
- /* Image signature. */
- #define VDI_SIGNATURE 0xbeda107f
+@@ -3224,7 +3222,7 @@ static BlockDriver bdrv_vvfat = {
 
---=20
+     .bdrv_co_preadv         = vvfat_co_preadv,
+     .bdrv_co_pwritev        = vvfat_co_pwritev,
+-    .bdrv_co_get_block_status = vvfat_co_get_block_status,
++    .bdrv_co_block_status   = vvfat_co_block_status,
+ };
+
+ static void bdrv_vvfat_init(void)
+-- 
 2.9.4
