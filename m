@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53239)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dW3O8-0001qP-4w
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:24:22 -0400
+	id 1dW3T4-0005vR-Qz
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dW3O7-0007MO-A2
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:24:20 -0400
+	id 1dW3T2-0000U1-8Z
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 12:29:26 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1500029487-14822-1-git-send-email-peter.maydell@linaro.org>
-	<1500029487-14822-10-git-send-email-peter.maydell@linaro.org>
+	<1500029487-14822-3-git-send-email-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f84687b9-0c64-dbfd-6823-948bf0c20755@amsat.org>
-Date: Fri, 14 Jul 2017 13:24:15 -0300
+Message-ID: <5ffe6736-841e-a451-f0e6-c32b36302a0c@amsat.org>
+Date: Fri, 14 Jul 2017 13:29:19 -0300
 MIME-Version: 1.0
-In-Reply-To: <1500029487-14822-10-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1500029487-14822-3-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] MAINTAINERS: Add entries for MPS2
- board
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/9] hw/char/cmsdk-apb-uart.c: Implement
+ CMSDK APB UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +32,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Alistair Francis <alistair.francis@xilinx.com>
 
+Hi Peter,
+
 On 07/14/2017 07:51 AM, Peter Maydell wrote:
-> Add entries to the MAINTAINERS file for the new MPS2
-> board and devices.
-> 
-> Since the CMSDK devices are not specific to the MPS2 board,
-> extend the existing 'PrimeCell' section to cover CMSDK
-> devices as well; in both cases these are devices implemented
-> by ARM and provided as RTL that may be used in multiple
-> SoCs and boards.
+> Implement a model of the simple "APB UART" provided in
+> the Cortex-M System Design Kit (CMSDK).
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->   MAINTAINERS | 14 +++++++++++++-
->   1 file changed, 13 insertions(+), 1 deletion(-)
+>   hw/char/Makefile.objs            |   1 +
+>   include/hw/char/cmsdk-apb-uart.h |  78 ++++++++
+>   hw/char/cmsdk-apb-uart.c         | 402 +++++++++++++++++++++++++++++++++++++++
+>   default-configs/arm-softmmu.mak  |   2 +
+>   hw/char/trace-events             |   9 +
+>   5 files changed, 492 insertions(+)
+>   create mode 100644 include/hw/char/cmsdk-apb-uart.h
+>   create mode 100644 hw/char/cmsdk-apb-uart.c
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9529c94..10f5cd6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -380,7 +380,7 @@ F: hw/*/allwinner*
->   F: include/hw/*/allwinner*
->   F: hw/arm/cubieboard.c
+> diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+> index 55fcb68..1bcd37e 100644
+> --- a/hw/char/Makefile.objs
+> +++ b/hw/char/Makefile.objs
+> @@ -19,6 +19,7 @@ obj-$(CONFIG_DIGIC) += digic-uart.o
+>   obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+>   obj-$(CONFIG_RASPI) += bcm2835_aux.o
 >   
-> -ARM PrimeCell
-> +ARM PrimeCell and CMSDK devices
->   M: Peter Maydell <peter.maydell@linaro.org>
->   L: qemu-arm@nongnu.org
->   S: Maintained
-> @@ -394,6 +394,10 @@ F: hw/intc/pl190.c
->   F: hw/sd/pl181.c
->   F: hw/timer/pl031.c
->   F: include/hw/arm/primecell.h
-> +F: hw/timer/cmsdk-apb-timer.c
-> +F: include/hw/timer/cmsdk-apb-timer.h
-> +F: hw/char/cmsdk-apb-uart.c
-> +F: include/hw/char/cmsdk-apb-uart.h
+> +common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+>   common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
+>   common-obj-$(CONFIG_ISA_DEBUG) += debugcon.o
+>   common-obj-$(CONFIG_GRLIB) += grlib_apbuart.o
+[...]> diff --git a/default-configs/arm-softmmu.mak 
+b/default-configs/arm-softmmu.mak
+> index bfd2a88..d128e9d 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -96,6 +96,8 @@ CONFIG_STM32F2XX_ADC=y
+>   CONFIG_STM32F2XX_SPI=y
+>   CONFIG_STM32F205_SOC=y
 >   
->   ARM cores
->   M: Peter Maydell <peter.maydell@linaro.org>
-> @@ -455,6 +459,14 @@ S: Maintained
->   F: hw/arm/integratorcp.c
->   F: hw/misc/arm_integrator_debug.c
->   
-> +MPS2
-> +M: Peter Maydell <peter.maydell@linaro.org>
-> +L: qemu-arm@nongnu.org
-> +S: Maintained
-> +F: hw/arm/mps2.c
-> +F: hw/misc/mps2-scc.c
-> +F: include/hw/misc/mps2-scc.h
+> +CONFIG_CMSDK_APB_UART=y
+
+I'd prefer:
+
+CONFIG_CMSDK_APB_UART=$(CONFIG_MPS2)
+
 > +
->   Musicpal
->   M: Jan Kiszka <jan.kiszka@web.de>
->   L: qemu-arm@nongnu.org
-> 
+>   CONFIG_VERSATILE_PCI=y
+>   CONFIG_VERSATILE_I2C=y
+[...]
