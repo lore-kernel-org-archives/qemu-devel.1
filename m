@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVw1j-0001cr-4S
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:32:43 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dVw2o-0002SK-C1
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dVw1i-0007Ci-97
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:32:43 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
-	<20170713163219.9024-9-marcandre.lureau@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a5b0eec8-9682-b352-191b-288d1d375bf7@twiddle.net>
-Date: Thu, 13 Jul 2017 22:32:29 -1000
-MIME-Version: 1.0
-In-Reply-To: <20170713163219.9024-9-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/29] qcow2: use DIV_ROUND_UP
+	(envelope-from <pm215@archaic.org.uk>) id 1dVw2n-0007bz-HK
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:33:50 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37562)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dVw2n-0007bK-Ae
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 04:33:49 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Jul 2017 09:33:42 +0100
+Message-Id: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/3] Fix NetBSD build (don't build ivshmem
+ tools)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org, "open list:qcow2" <qemu-block@nongnu.org>, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kamil Rytarowski <n54@gmx.com>, Markus Armbruster <armbru@redhat.com>
 
-On 07/13/2017 06:31 AM, Marc-André Lureau wrote:
-> I used the clang-tidy qemu-round check to generate the fix:
-> https://github.com/elmarco/clang-tools-extra
-> 
-> Signed-off-by: Marc-André Lureau<marcandre.lureau@redhat.com>
-> ---
->   block/qcow2-cluster.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+This patchset fixes the build on NetBSD by making sure we only
+build the ivshmem-client and ivshmem-server tools if the host OS
+actually supports ivshmem. (Previously we were only gating building
+of the within-QEMU ivshmem PCI device.)
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Most of this patchset is the work of Kamil Rytarowski; I just
+split it up into easily-reviewable patches and fixed a few bugs.
 
+Tested on Linux, on NetBSD, and on Linux with a '--disable-linux-user
+--disable-system' config (which was the one that was failing with
+our previous attempt to fix this bug).
 
-r~
+NB: we still have some things we need to fix to be able to put
+NetBSD into the build-test set. The next issue is that 'make check'
+fails with
+
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM % 255 + 1))} gtester -k --verbose -m=quick tests/check-qdict
+sh: arith: syntax error: "RANDOM % 255 + 1"
+
+likely because we're using a bashism there.
+
+thanks
+-- PMM
+
+Kamil Rytarowski (2):
+  configure: Use an explicit CONFIG_IVSHMEM rather than CONFIG_EVENTFD
+  configure: Don't build ivshmem tools unless CONFIG_IVSHMEM is set
+
+Peter Maydell (1):
+  configure: Rename CONFIG_IVSHMEM to CONFIG_IVSHMEM_DEVICE
+
+ configure               | 11 +++++++++++
+ Makefile                |  2 ++
+ Makefile.objs           |  4 ++--
+ hw/misc/Makefile.objs   |  2 +-
+ tests/Makefile.include  |  4 ++--
+ default-configs/pci.mak |  2 +-
+ 6 files changed, 19 insertions(+), 6 deletions(-)
+
+-- 
+2.7.4
