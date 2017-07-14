@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dW0OP-0006Wo-Qz
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:12:26 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW0Rx-0001Ux-OA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dW0OP-00029w-2y
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:12:25 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:34312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dW0OO-00029c-Tf
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:12:25 -0400
-Received: by mail-wm0-x235.google.com with SMTP id 70so9710410wmo.1
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 06:12:24 -0700 (PDT)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW0Ru-0003F8-Iq
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:16:05 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:17918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dW0Ru-0003B9-83
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 09:16:02 -0400
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170714122221.pyx2pwubtaylqdu6@postretch>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <e059cf44-53df-4d5f-3257-cc9b6be775df@huawei.com>
+Date: Fri, 14 Jul 2017 15:15:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
-References: <1500027028-4127-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Jul 2017 14:12:03 +0100
-Message-ID: <CAFEAcA_sDjJ4LS844atmeth2bxg_2H1FmnAa1t7P=zHApd+bzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 00/55] Misc patches for QEMU 2.10 soft
- freeze
+In-Reply-To: <20170714122221.pyx2pwubtaylqdu6@postretch>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
 
-On 14 July 2017 at 11:10, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 49bcce4b9c11759678fd223aefb48691c4959d4f:
->
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-07-12' into staging (2017-07-13 16:56:06 +0100)
->
-> are available in the git repository at:
->
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 68c761e19c2ea453f880dbbd04e867d34d1468b8:
->
->   spapr_rng: Convert to DEFINE_PROP_LINK (2017-07-14 12:04:43 +0200)
->
-> ----------------------------------------------------------------
-> * gdbstub fixes (Alex)
-> * IOMMU MemoryRegion subclass (Alexey)
-> * Chardev hotswap (Anton)
-> * NBD_OPT_GO support (Eric)
-> * Misc bugfixes
-> * DEFINE_PROP_LINK (minus the ARM patches - Fam)
-> * MAINTAINERS updates (Philippe)
+Hi Manos,
 
-Applied, thanks.
+Thanks for sharing the link to your code patch.
 
--- PMM
+On 7/14/2017 2:22 PM, Manos Pitsidianakis wrote:
+> Hello Pradeep, you might be interested in my work on refactoring the
+> block layer's throttling interface in my series:
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04191.html
+Sure will have a look.
+> In this series you copy the existing legacy interface we want to get rid
+> of. I think it will be easier work for you to use the changes introduced
+> in my patches when they are merged.
+So, should I wait till they are in?. Actually my throttle patches for 
+fsdev are already upstream (2.9). Now I am just introducing the qmp/hmp 
+interfaces for the same.
+> Have you thought about using throttle groups? It'd mean many devices
+> sharing the same limits. This way the interfaces can be unified.  Please
+> read docs/throttle.txt and see if it would be useful for you.
+
+I have read about the throttle group, last year when I was implementing 
+the throttle feature for fsdev.My open source work depends on the 
+projects I/my group work on. So, when I have more bandwidth work on 
+those, I will surely take it up. Throttle group option may be useful 
+feature even in case of fsdev devices.
+
+Regards,
+Pradeep
