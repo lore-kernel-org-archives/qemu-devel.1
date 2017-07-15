@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dWAjq-0005Rj-TA
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:15:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dWAr6-0007KB-Fe
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dWAjp-0001zr-RF
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:15:14 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Sat, 15 Jul 2017 00:14:43 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2014F2C8A@DGGEMA503-MBS.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <rth7680@gmail.com>) id 1dWAr1-0003uo-IG
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:22:44 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWAr1-0003uQ-Bo
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:22:39 -0400
+Received: by mail-qt0-x241.google.com with SMTP id v31so11868310qtb.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 17:22:37 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170710204521.2058-1-rth@twiddle.net>
+	<20170710204521.2058-2-rth@twiddle.net>
+	<20170714210105.mchifmgphjjmaehz@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <dba696e6-5e94-dedc-417e-c5723880454e@twiddle.net>
+Date: Fri, 14 Jul 2017 14:22:30 -1000
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] ACPI: Add new ACPI structures and
- macros
+In-Reply-To: <20170714210105.mchifmgphjjmaehz@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] target/s390x: Implement CSST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "james.morse@arm.com" <james.morse@arm.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Gaozhihui <zhihui.gao@huawei.com>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, david@redhat.com
 
-SGkgTWljaGFlbA0KICBUaGFua3MgZm9yIHlvdXIgY29tbWVudHMuDQoNCj4gLS0tLS3pgq7ku7bl
-jp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IE1pY2hhZWwgUy4gVHNpcmtpbiBbbWFpbHRvOm1zdEBy
-ZWRoYXQuY29tXQ0KPiDkuLvpopg6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDEvM10gQUNQ
-STogQWRkIG5ldyBBQ1BJIHN0cnVjdHVyZXMgYW5kDQo+IG1hY3Jvcw0KPiANCj4gT24gVGh1LCBK
-dWwgMTMsIDIwMTcgYXQgMDg6MDA6MjZQTSArMDgwMCwgZ2VuZ2RvbmdqaXUgd3JvdGU6DQo+ID4g
-ICAgTGFzemxvLCBJIHBhc3RlZCBNaWNoYWVsJ3MgY29tbWVudHMgaGVyZSwgYXMgc2hvd24gYmVs
-b3cuIE1pY2hhZWwNCj4gPiBzYWlkIHRoZSBkZWZpbml0aW9uIHNob3VsZCB1c2UgYnVpbGRfYXBw
-ZW5kX2ludF9ub3ByZWZpeCB0byBhZGQgZGF0YS4NCj4gPiBidXQgSSB0aGluayBpdCBtYXkgbm90
-IGdvb2QsIGJlY3Vhc2UgdGhlIHNlY3Rpb24NCj4gPiAiVUVGSV9DUEVSX1NFQ19QTEFURk9STV9N
-RU0iIGlzIHJ1bnRpbWUgcmVjb3JkZWQgYXMgQ1BFUiwNCj4gDQo+IE9uZSB0aGluZyBJIHdhbnRl
-ZCB0byB1bmRlcnN0YW5kIGlzIGhvdyBhcmUgcmFjZXMgYXZvaWRlZC4gRS5nLiB3aGF0IGlmIHlv
-dSBhcmUNCj4gaW4gdGhlIHByb2Nlc3Mgb2Ygd3JpdGluZyBvdXQgQ1BFUiBhbmQgZ3Vlc3QgcmVh
-ZHMgaXQuDQo+IEkgdHJpZWQgdG8gZmluZCB3aGVyZSBpcyB0aGlzIGZ1bmN0aW9uIHdyaXRpbmcg
-Q1BFUiBjYWxsZWQgYW5kIGNvdWxkbid0Lg0KPiBDYW4geW91IGNsYXJpZnkgcGxzPw0KDQpNaWNo
-YWVsLCBJIHVuZGVyc3RhbmQgeW91ciBpZGVhLiBZb3Ugd2FudCB0byBzZWUgdGhlIHJlYWQtd3Jp
-dGUgcmFjZSBjb25kaXRpb24uDQp0aGlzIGZ1bmN0aW9uIHdyaXRpbmcgQ1BFUiBpcyBjYWxsZWQg
-aW4gYW5vdGhlciBzZXJpZXMgb2YgcGF0Y2hlcy4gQmVjYXVzZSB0aGV5IGFyZSBuZWVkZWQNCnRv
-IGJlIHJldmlldyB0b2dldGhlciB3aXRoIEtWTSBrZXJuZWwsIHNvIEkgcHV0IGl0IGluIGFub3Ro
-ZXIgc2VyaWVzLg0KSSBjbGFyaWZ5IHRoZSBtZXRob2QgdG8gYXZvaWQgdGhlIHJlYWQtd3JpdGUg
-cmFjZSBjb25kaXRpb24NCg0KQUNQSSA2LjEsICJHZW5lcmljIEhhcmR3YXJlIEVycm9yIFNvdXJj
-ZSB2ZXJzaW9uIDIgKEdIRVN2MiAtIFR5cGUgMTApIiBoYXMgbWVudGlvbmVkIHRoZSBhdm9pZCBt
-ZXRob2QuDQpGb3IgR0hFU3YyIGVycm9yIHNvdXJjZXMsIHRoZSBPUyBtdXN0IGFja25vd2xlZGdl
-IHRoZSBjb25zdW1wdGlvbiBvZiB0aGUgRXJyb3IgU3RhdHVzIEJsb2NrIGJ5IHdyaXRpbmcgdG8g
-dGhlIOKAnFJlYWQgQWNrIFJlZ2lzdGVy4oCdIGxpc3RlZCBpbiB0aGUgR0hFU3YyIHN0cnVjdHVy
-ZQ0KDQpUaGVzZSBhcmUgdGhlIHN0ZXBzIHRoZSBPUyBtdXN0IHRha2Ugb25jZSBkZXRlY3Rpbmcg
-YW4gZXJyb3IgZnJvbSBhIHBhcnRpY3VsYXIgR0hFU3YyIGVycm9yIHNvdXJjZToNCuKAoiBPUyBk
-ZXRlY3RzIGVycm9yICh2aWEgaW50ZXJydXB0L2V4Y2VwdGlvbiBvciBwb2xsaW5nIHRoZSBibG9j
-ayBzdGF0dXMpDQrigKIgT1MgY29waWVzIHRoZSBlcnJvciBzdGF0dXMgYmxvY2sNCuKAoiBPUyBj
-bGVhcnMgdGhlIGJsb2NrIHN0YXR1cyBmaWVsZCBvZiB0aGUgZXJyb3Igc3RhdHVzIGJsb2NrDQri
-gKIgT1MgYWNrbm93bGVkZ2VzIHRoZSBlcnJvciB2aWEgUmVhZCBBY2sgcmVnaXN0ZXIuIEZvciBl
-eGFtcGxlOg0K4oCUT1MgcmVhZHMgdGhlIFJlYWQgQWNrIHJlZ2lzdGVyIO+DqCBYDQrigJRPUyB3
-cml0ZXMg74OoICgoIFggJiBSZWFkQWNrUHJlc2VydmUpIHwgUmVhZEFja1dyaXRlKQ0KDQpTbyBp
-biB0aGUgUWVtdSwgYmVmb3JlIFFlbXUgd3JpdGVzIHRoZSBuZXh0IENQRVIsIGl0IG5lZWRzIHRv
-IGNoZWNrIHRoZSAiUmVhZCBBY2sgcmVnaXN0ZXIiLiBJZiB0aGUgIlJlYWQgQWNrIFJlZ2lzdGVy
-IiBkb2VzIG5vdCBiZWVuIHdyaXR0ZW4gd2l0aCB0aGUgcmVzcG9uc2UsIFFlbXUgd2lsbCB3YWl0
-IHVudGlsIA0KT1MgcmVzcG9uZHMgdGhlICJSZWFkIEFjayBSZWdpc3RlciIsIHNvIGNhbiBhdm9p
-ZCB0aGUgcmVhZC13cml0ZSByYWNlIGNvbmRpdGlvbi4NCg0KSW4gbXkgcGF0Y2gsIGl0IG1pc3Nl
-cyB0aGUgY2hlY2sgdG8gIlJlYWQgQWNrIFJlZ2lzdGVyIiB0byBhdm9pZCB0aGUgcmVhZC13cml0
-ZSByYWNlIGNvbmRpdGlvbi4gSSB3aWxsIGFkZCB0aGUgY29kZSBpbiB0aGUgbmV4dCBjb2RlIHZl
-cnNpb24uIA0KPiANCj4gPiBub3QgYSBBQ1BJL0hFU1QNCj4gPiB0YWJsZSBtZW1iZXIsIHNvIGl0
-IGlzIG5vdCBnZW5lcmF0ZWQgd2hlbiBzeXN0ZW0gYm9vdCB1cC4gT24gdGhlIG90aGVyDQo+ID4g
-aGFuZCxVRUZJX0NQRVJfU0VDX1BMQVRGT1JNX01FTSBkZWZpbml0aW9uIGlzIGZyb20gVUVGSSBz
-cGVjIDIuNiwNCj4gTi4yLjIgU2VjdGlvbiBEZXNjcmlwdG9yOiB7MHhBNUJDMTExNCwgMHg2RjY0
-LCAweDRFREUsIHsweEI4LCAweDYzLCAweDNFLA0KPiAweDgzLCAweEVELCAweDdDLCAweDgzLCAw
-eEIxfX0uDQo+ID4gaWYgdXNlICBidWlsZF9hcHBlbmRfaW50X25vcHJlZml4IHRvIGFkZCwgbWF5
-IGNvbmZ1c2Ugb3RoZXJzLg0KPiANCj4gUmlnaHQgYnV0IEFDUEkvSEVTVCBnZW5lcmF0aW9uIGNv
-dWxkIHVzZSBjbGVhbnVwLCBhbmQNCj4gYnVpbGRfYXBwZW5kX2ludF9ub3ByZWZpeCB3b3VsZCBi
-ZSBhIG5pY2Ugd2F5IHRvIGRvIGl0Lg0KDQpPaywgSSB3aWxsIGZvbGxvdyB5b3VyIG1ldGhvZCB0
-byBkbyBpdC4gVGhhbmtzIGZvciB0aGUgc3VnZ2VzdGlvbi4NCg0KDQo+IA0KPiAtLQ0KPiBNU1QN
-Cg==
+On 07/14/2017 11:01 AM, Aurelien Jarno wrote:
+>> +    if (parallel_cpus) {
+>> +        int mask = 0;
+>> +#if !defined(CONFIG_ATOMIC64)
+>> +        mask = -8;
+>> +#elif !defined(CONFIG_ATOMIC128)
+>> +        mask = -16;
+>> +#endif
+>> +        if (((4 << fc) | (1 << sc)) & mask) {
+>> +            cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+>> +        }
+>> +    }
+> 
+> This doesn't look correct. For a 16-byte store, ie sc = 4, and with
+> ATOMIC128 support, ie mask = -16, the condition is true.
+
+That's WITHOUT atomic128 support that mask = -16.
+If we have atomic128, then mask = 0.
+
+>> +            if (parallel_cpus) {
+>> +#ifdef CONFIG_USER_ONLY
+>> +                uint32_t *haddr = g2h(a1);
+>> +                ov = atomic_cmpxchg__nocheck(haddr, cv, nv);
+>> +#else
+>> +                TCGMemOpIdx oi = make_memop_idx(MO_TEUL | MO_ALIGN, mem_idx);
+>> +                ov = helper_atomic_cmpxchgl_be_mmu(env, a1, cv, nv, oi, ra);
+>> +#endif
+> 
+> Not a problem with the patch itself, but how complicated would it be to
+> make helper_atomic_cmpxchgl_be_mmu (just like the o version) available
+> also in user mode? That would make less #ifdef in the backends.
+
+Dunno.  Probably not too bad.  I have wondered about doing that, as these sorts 
+of functions are quite ugly to write.
+
+
+r~
