@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dWVMc-0004On-OI
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:16:39 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dWVUe-0006fM-Nu
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dWVMX-00006M-Mt
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:16:38 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:46395)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1dWVMX-0008Sz-Ez
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:16:33 -0400
-References: <20170707022111.21836-1-rth@twiddle.net>
-	<20170707022111.21836-7-rth@twiddle.net>
-	<20170715221412.3yprwf5i3te4gdxa@aurel32.net>
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <c45e78e8-007e-4f0d-508d-74c6987a93af@physik.fu-berlin.de>
-Date: Sun, 16 Jul 2017 00:16:25 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dWVUd-0005i2-N2
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:24:56 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170715132841.9865-1-hpoussin@reactos.org>
+	<20170715132841.9865-5-hpoussin@reactos.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3f675ff1-e6ce-a6b2-f63c-4b063871a215@amsat.org>
+Date: Sat, 15 Jul 2017 19:24:45 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170715221412.3yprwf5i3te4gdxa@aurel32.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170715132841.9865-5-hpoussin@reactos.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space
- atomics
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] vvfat: initialize memory after
+ allocating it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 07/16/2017 12:14 AM, Aurelien Jarno wrote:
-> Do you have actually have a good documentation about gUSA? I have found
-> a few documents (some of them in Japanese), the most complete one being
-> the LinuxTag paper. The ABI is also described in the kernel and the
-> glibc. That said I am missing the following informations:
-> - What kind of instructions are allowed in the atomic sequence? Your
->   patch takes into account branches, but are there allowed? used in
->   practice? What about FP instructions?
-> - Does the atomic sequence is actually allowed to cross pages?
-> - Is there any alignement required? The paper mention adding a nop to
->   gUSA_exchange_and_add to align the end point to 4 bytes.
+Hi Hervé,
 
-The best person to answer this is Yutaka Niibe as he is actually the
-person who came up with the design. I'll drop him a message and see
-if he can join the discussion.
+On 07/15/2017 10:28 AM, Hervé Poussineau wrote:
+> This prevents some host to guest memory content leaks.
+> 
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
+> 
+> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> ---
+>   block/vvfat.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index afc6170a69..7340decef3 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -115,6 +115,7 @@ static inline int array_ensure_allocated(array_t* array, int index)
+>           array->pointer = g_realloc(array->pointer, new_size);
+>           if (!array->pointer)
+>               return -1;
 
-Adrian
+isn't it safer:
 
--- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer - glaubitz@debian.org
-`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+if (likely(new_size > array->size)) {
+
+> +        memset(array->pointer + array->size, 0, new_size - array->size);
+
+}
+
+?
+
+>           array->size = new_size;
+>           array->next = index + 1;
+>       }
+> 
+
+Regards,
+
+Phil.
