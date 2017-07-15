@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWJcO-0004t1-Em
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 05:44:09 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dWK7D-0007ad-Fu
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 06:16:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWJcL-0003gr-CK
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 05:44:08 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35011)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWJcL-0003gg-6A
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 05:44:05 -0400
-Received: by mail-pg0-x241.google.com with SMTP id d193so13341581pgc.2
-	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 02:44:05 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 14 Jul 2017 23:42:43 -1000
-Message-Id: <20170715094243.28371-35-rth@twiddle.net>
+	(envelope-from <no-reply@patchew.org>) id 1dWK7A-0003LA-8E
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 06:15:59 -0400
+Resent-Message-Id: <E1dWK7A-0003LA-8E@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dWK7A-0003L6-03
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 06:15:56 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150011373305.78.14079709321094500182@5d477a5b5989>
 In-Reply-To: <20170715094243.28371-1-rth@twiddle.net>
-References: <20170715094243.28371-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v14 34/34] target/arm: Perform per-insn
- cross-page check only for Thumb
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 15 Jul 2017 03:15:33 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v14 00/34] Generic translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: vilanova@ac.upc.edu, cota@braap.org, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, cota@braap.org, alex.bennee@linaro.org, vilanova@ac.upc.edu, crosthwaite.peter@gmail.com
 
-ARM is a fixed-length ISA and we can compute the page crossing
-condition exactly once during init_disas_context.
-
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/arm/translate.c | 57 +++++++++++++++++++++++++++++---------------------
- 1 file changed, 33 insertions(+), 24 deletions(-)
-
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d7c3c10..5b6368f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11850,6 +11850,13 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
-         max_insns = 1;
-     }
- 
-+    /* ARM is a fixed-length ISA.  Bound the number of insns to execute
-+       to those left on the page.  */
-+    if (!dc->thumb) {
-+        int bound = (dc->next_page_start - dc->base.pc_first) / 4;
-+        max_insns = MIN(max_insns, bound);
-+    }
-+
-     cpu_F0s = tcg_temp_new_i32();
-     cpu_F1s = tcg_temp_new_i32();
-     cpu_F0d = tcg_temp_new_i64();
-@@ -11978,29 +11985,8 @@ static bool arm_pre_translate_insn(DisasContext *dc)
-     return false;
- }
- 
--static void arm_post_translate_insn(CPUARMState *env, DisasContext *dc)
-+static void arm_post_translate_insn(DisasContext *dc)
- {
--    /* Translation stops when a conditional branch is encountered.
--     * Otherwise the subsequent code could get translated several times.
--     * Also stop translation when a page boundary is reached.  This
--     * ensures prefetch aborts occur at the right place.
--     *
--     * We want to stop the TB if the next insn starts in a new page,
--     * or if it spans between this page and the next. This means that
--     * if we're looking at the last halfword in the page we need to
--     * see if it's a 16-bit Thumb insn (which will fit in this TB)
--     * or a 32-bit Thumb insn (which won't).
--     * This is to avoid generating a silly TB with a single 16-bit insn
--     * in it at the end of this page (which would execute correctly
--     * but isn't very efficient).
--     */
--    if (dc->base.is_jmp == DISAS_NEXT
--        && (dc->pc >= dc->next_page_start
--            || (dc->pc >= dc->next_page_start - 3
--                && insn_crosses_page(env, dc)))) {
--        dc->base.is_jmp = DISAS_TOO_MANY;
--    }
--
-     if (dc->condjmp && !dc->base.is_jmp) {
-         gen_set_label(dc->condlabel);
-         dc->condjmp = 0;
-@@ -12023,7 +12009,10 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-     dc->pc += 4;
-     disas_arm_insn(dc, insn);
- 
--    arm_post_translate_insn(env, dc);
-+    /* ARM is a fixed-length ISA.  We performed the cross-page check
-+       in init_disas_context by adjusting max_insns.  */
-+
-+    arm_post_translate_insn(dc);
- }
- 
- static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-@@ -12047,7 +12036,27 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         }
-     }
- 
--    arm_post_translate_insn(env, dc);
-+    /* Thumb is a variable-length ISA.  Stop translation when the next insn
-+     * will touch a new page.  This ensures that prefetch aborts occur at
-+     * the right place.
-+     *
-+     * We want to stop the TB if the next insn starts in a new page,
-+     * or if it spans between this page and the next. This means that
-+     * if we're looking at the last halfword in the page we need to
-+     * see if it's a 16-bit Thumb insn (which will fit in this TB)
-+     * or a 32-bit Thumb insn (which won't).
-+     * This is to avoid generating a silly TB with a single 16-bit insn
-+     * in it at the end of this page (which would execute correctly
-+     * but isn't very efficient).
-+     */
-+    if (dc->base.is_jmp == DISAS_NEXT
-+        && (dc->pc >= dc->next_page_start
-+            || (dc->pc >= dc->next_page_start - 3
-+                && insn_crosses_page(env, dc)))) {
-+        dc->base.is_jmp = DISAS_TOO_MANY;
-+    }
-+
-+    arm_post_translate_insn(dc);
- }
- 
- static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
--- 
-2.9.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA3MTUwOTQyNDMuMjgzNzEtMS1ydGhAdHdpZGRsZS5uZXQKU3ViamVjdDogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCB2MTQgMDAvMzRdIEdlbmVyaWMgdHJhbnNsYXRpb24gZnJhbWV3b3JrClR5cGU6IHNl
+cmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
+MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
+ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
+ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
+aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
+JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
+dGNoZXcvMjAxNzA3MTAyMDQ1MjEuMjA1OC0xLXJ0aEB0d2lkZGxlLm5ldCAtPiBwYXRjaGV3LzIw
+MTcwNzEwMjA0NTIxLjIwNTgtMS1ydGhAdHdpZGRsZS5uZXQKICogW25ldyB0YWddICAgICAgICAg
+cGF0Y2hldy8yMDE3MDcxNTA5NDI0My4yODM3MS0xLXJ0aEB0d2lkZGxlLm5ldCAtPiBwYXRjaGV3
+LzIwMTcwNzE1MDk0MjQzLjI4MzcxLTEtcnRoQHR3aWRkbGUubmV0ClN3aXRjaGVkIHRvIGEgbmV3
+IGJyYW5jaCAndGVzdCcKM2YyZTcwZSB0YXJnZXQvYXJtOiBQZXJmb3JtIHBlci1pbnNuIGNyb3Nz
+LXBhZ2UgY2hlY2sgb25seSBmb3IgVGh1bWIKMjRlOTM1MCB0YXJnZXQvYXJtOiBTcGxpdCBvdXQg
+dGh1bWJfdHJfdHJhbnNsYXRlX2luc24KMjUzZGQwZCB0YXJnZXQvYXJtOiBNb3ZlIHNzIGNoZWNr
+IHRvIGluaXRfZGlzYXNfY29udGV4dAo5YTc3ZTUyIHRhcmdldC9hcm06IFthNjRdIE1vdmUgcGFn
+ZSBhbmQgc3MgY2hlY2tzIHRvIGluaXRfZGlzYXNfY29udGV4dAphNmNiYzlhIHRhcmdldC9hcm06
+IFt0Y2ddIFBvcnQgdG8gZ2VuZXJpYyB0cmFuc2xhdGlvbiBmcmFtZXdvcmsKM2QzOGNlMiB0YXJn
+ZXQvYXJtOiBbdGNnLCBhNjRdIFBvcnQgdG8gZGlzYXNfbG9nCmVkZGI0MGUgdGFyZ2V0L2FybTog
+W3RjZ10gUG9ydCB0byBkaXNhc19sb2cKNGMzMzcyOCB0YXJnZXQvYXJtOiBbdGNnLCBhNjRdIFBv
+cnQgdG8gdGJfc3RvcAo2OTA0NDk1IHRhcmdldC9hcm06IFt0Y2ddIFBvcnQgdG8gdGJfc3RvcAo4
+NzRkNDA4IHRhcmdldC9hcm06IFt0Y2csIGE2NF0gUG9ydCB0byB0cmFuc2xhdGVfaW5zbgpiNmJk
+MjhkIHRhcmdldC9hcm06IFt0Y2ddIFBvcnQgdG8gdHJhbnNsYXRlX2luc24KZDU3NTkzMyB0YXJn
+ZXQvYXJtOiBbdGNnLCBhNjRdIFBvcnQgdG8gYnJlYWtwb2ludF9jaGVjawpkNzllOWU1IHRhcmdl
+dC9hcm06IFt0Y2csIGE2NF0gUG9ydCB0byBpbnNuX3N0YXJ0CmEzNGRhN2EgdGFyZ2V0L2FybTog
+W3RjZ10gUG9ydCB0byBpbnNuX3N0YXJ0CjhlNjc3MGMgdGFyZ2V0L2FybTogW3RjZ10gUG9ydCB0
+byB0Yl9zdGFydApmNjNmMzE0IHRhcmdldC9hcm06IFt0Y2csIGE2NF0gUG9ydCB0byBpbml0X2Rp
+c2FzX2NvbnRleHQKYzgxZmNkNCB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0IHRvIGluaXRfZGlzYXNf
+Y29udGV4dAo5NzQ5YjNlIHRhcmdldC9hcm06IFt0Y2ddIFBvcnQgdG8gRGlzYXNDb250ZXh0QmFz
+ZQozYjBlNGI1IHRhcmdldC9pMzg2OiBbdGNnXSBQb3J0IHRvIGdlbmVyaWMgdHJhbnNsYXRpb24g
+ZnJhbWV3b3JrCmY5ZWQ3YTUgdGFyZ2V0L2kzODY6IFt0Y2ddIFBvcnQgdG8gZGlzYXNfbG9nCjk3
+ZmI4MTQgdGFyZ2V0L2kzODY6IFt0Y2ddIFBvcnQgdG8gdGJfc3RvcAo3ZWM5YzBjIHRhcmdldC9p
+Mzg2OiBbdGNnXSBQb3J0IHRvIHRyYW5zbGF0ZV9pbnNuCjViNThhZTcgdGFyZ2V0L2kzODY6IFt0
+Y2ddIFBvcnQgdG8gYnJlYWtwb2ludF9jaGVjawo2OGJmMjZhIHRhcmdldC9pMzg2OiBbdGNnXSBQ
+b3J0IHRvIGluc25fc3RhcnQKNmU3MGVhMSB0YXJnZXQvaTM4NjogW3RjZ10gUG9ydCB0byBpbml0
+X2Rpc2FzX2NvbnRleHQKMGMzZDcyMCB0YXJnZXQvaTM4NjogW3RjZ10gUG9ydCB0byBEaXNhc0Nv
+bnRleHRCYXNlCjIyNzI1ODggdGNnOiBBZGQgZ2VuZXJpYyB0cmFuc2xhdGlvbiBmcmFtZXdvcmsK
+YjVhNTM3YSB0YXJnZXQvYXJtOiBTZXQgaXNfam1wIHByb3Blcmx5IGFmdGVyIHNpbmdsZS1zdGVw
+cGluZwo3ZmQ0YmQxIHRhcmdldC9hcm06IERlbGF5IGNoZWNrIGZvciBtYWdpYyBrZXJuZWwgcGFn
+ZQoyM2RiZTg1IHRhcmdldDogW3RjZ10gVXNlIGEgZ2VuZXJpYyBlbnVtIGZvciBESVNBU18gdmFs
+dWVzCjU0YjRmNmQgdGFyZ2V0L2FybTogVXNlIERJU0FTX05PUkVUVVJOCmMyZTFkYzMgdGFyZ2V0
+L2kzODY6IFVzZSBnZW5lcmljIERJU0FTXyogZW51bWVyYXRvcnMKMjkwMGEzMyB0Y2c6IEFkZCBn
+ZW5lcmljIERJU0FTX05PUkVUVVJOCjQyZDA3Y2EgUGFzcyBnZW5lcmljIENQVVN0YXRlIHRvIGdl
+bl9pbnRlcm1lZGlhdGVfY29kZSgpCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzM0OiBQYXNzIGdlbmVyaWMgQ1BVU3RhdGUgdG8gZ2VuX2ludGVybWVkaWF0ZV9jb2RlKCku
+Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEyNTogRklMRTogdGFyZ2V0L2Fy
+bS90cmFuc2xhdGUuaDoxNTg6CitzdGF0aWMgaW5saW5lIHZvaWQgZ2VuX2ludGVybWVkaWF0ZV9j
+b2RlX2E2NChDUFVTdGF0ZSAqY3B1LCBUcmFuc2xhdGlvbkJsb2NrICp0YikKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgMzAzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi8zNDogdGNnOiBBZGQgZ2VuZXJpYyBE
+SVNBU19OT1JFVFVSTi4uLgpDaGVja2luZyBQQVRDSCAzLzM0OiB0YXJnZXQvaTM4NjogVXNlIGdl
+bmVyaWMgRElTQVNfKiBlbnVtZXJhdG9ycy4uLgpDaGVja2luZyBQQVRDSCA0LzM0OiB0YXJnZXQv
+YXJtOiBVc2UgRElTQVNfTk9SRVRVUk4uLi4KQ2hlY2tpbmcgUEFUQ0ggNS8zNDogdGFyZ2V0OiBb
+dGNnXSBVc2UgYSBnZW5lcmljIGVudW0gZm9yIERJU0FTXyB2YWx1ZXMuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNi8zNDogdGFyZ2V0L2FybTogRGVsYXkgY2hlY2sgZm9yIG1hZ2ljIGtlcm5lbCBwYWdlLi4u
+CkNoZWNraW5nIFBBVENIIDcvMzQ6IHRhcmdldC9hcm06IFNldCBpc19qbXAgcHJvcGVybHkgYWZ0
+ZXIgc2luZ2xlLXN0ZXBwaW5nLi4uCkNoZWNraW5nIFBBVENIIDgvMzQ6IHRjZzogQWRkIGdlbmVy
+aWMgdHJhbnNsYXRpb24gZnJhbWV3b3JrLi4uCkNoZWNraW5nIFBBVENIIDkvMzQ6IHRhcmdldC9p
+Mzg2OiBbdGNnXSBQb3J0IHRvIERpc2FzQ29udGV4dEJhc2UuLi4KV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzQ4NzogRklMRTogdGFyZ2V0L2kzODYvdHJhbnNsYXRlLmM6ODUxMzoK
+KyAgICAgICAgICAgICAgICAhPSAoKGRjLT5iYXNlLnBjX25leHQgKyBUQVJHRVRfTUFYX0lOU05f
+U0laRSAtIDEpICYgVEFSR0VUX1BBR0VfTUFTSykKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM1Mjc6IEZJTEU6IHRhcmdldC9pMzg2L3RyYW5zbGF0ZS5jOjg1NTE6CisgICAgICAg
+IGxvZ190YXJnZXRfZGlzYXMoY3MsIGRjLT5iYXNlLnBjX2ZpcnN0LCBkYy0+YmFzZS5wY19uZXh0
+IC0gZGMtPmJhc2UucGNfZmlyc3QsCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDQ3OCBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNr
+aW5nIFBBVENIIDEwLzM0OiB0YXJnZXQvaTM4NjogW3RjZ10gUG9ydCB0byBpbml0X2Rpc2FzX2Nv
+bnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMzQ6IHRhcmdldC9pMzg2OiBbdGNnXSBQb3J0IHRv
+IGluc25fc3RhcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMzQ6IHRhcmdldC9pMzg2OiBbdGNnXSBQ
+b3J0IHRvIGJyZWFrcG9pbnRfY2hlY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMzQ6IHRhcmdldC9p
+Mzg2OiBbdGNnXSBQb3J0IHRvIHRyYW5zbGF0ZV9pbnNuLi4uCkNoZWNraW5nIFBBVENIIDE0LzM0
+OiB0YXJnZXQvaTM4NjogW3RjZ10gUG9ydCB0byB0Yl9zdG9wLi4uCkNoZWNraW5nIFBBVENIIDE1
+LzM0OiB0YXJnZXQvaTM4NjogW3RjZ10gUG9ydCB0byBkaXNhc19sb2cuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTYvMzQ6IHRhcmdldC9pMzg2OiBbdGNnXSBQb3J0IHRvIGdlbmVyaWMgdHJhbnNsYXRpb24g
+ZnJhbWV3b3JrLi4uCkNoZWNraW5nIFBBVENIIDE3LzM0OiB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0
+IHRvIERpc2FzQ29udGV4dEJhc2UuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzU1OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzozNTE6CisgICAgaWYgKHMtPmJh
+c2Uuc2luZ2xlc3RlcF9lbmFibGVkIHx8IHMtPnNzX2FjdGl2ZSB8fCAocy0+YmFzZS50Yi0+Y2Zs
+YWdzICYgQ0ZfTEFTVF9JTykpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMy
+MjI6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jOjExMjIzOgorICAgIGRjLT5tbXVf
+aWR4ID0gY29yZV90b19hcm1fbW11X2lkeChlbnYsIEFSTV9UQkZMQUdfTU1VSURYKGRjLT5iYXNl
+LnRiLT5mbGFncykpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyNzg6IEZJTEU6
+IHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jOjExMjg5OgorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgaW5jbHVkZWQgaW4gW2RjLT5iYXNlLnRiLT5wYywgZGMtPmJhc2UudGItPnBjICsgZGMt
+PmJhc2UudGItPnNpemUpIGluIG9yZGVyCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMjkxOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzoxMTMwMToKKyAgICAgICAg
+aWYgKGRjLT5iYXNlLm51bV9pbnNucyA9PSBtYXhfaW5zbnMgJiYgKGRjLT5iYXNlLnRiLT5jZmxh
+Z3MgJiBDRl9MQVNUX0lPKSkgewoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzc4MTogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUuYzoxMjA5
+NjoKKyAgICAgICAgc3dpdGNoKGRjLT5iYXNlLmlzX2ptcCkgewoKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzg1NDogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUuaDoxNTk6Citz
+dGF0aWMgaW5saW5lIHZvaWQgZ2VuX2ludGVybWVkaWF0ZV9jb2RlX2E2NChEaXNhc0NvbnRleHRC
+YXNlICpkYiwgQ1BVU3RhdGUgKmNwdSwKCnRvdGFsOiAyIGVycm9ycywgNCB3YXJuaW5ncywgNzYy
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDE4LzM0OiB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0IHRvIGluaXRfZGlzYXNf
+Y29udGV4dC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzU6IEZJTEU6IHRh
+cmdldC9hcm0vdHJhbnNsYXRlLmM6MTE4MTA6CisgICAgZGMtPm1tdV9pZHggPSBjb3JlX3RvX2Fy
+bV9tbXVfaWR4KGVudiwgQVJNX1RCRkxBR19NTVVJRFgoZGMtPmJhc2UudGItPmZsYWdzKSk7Cgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEyOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDE5LzM0OiB0YXJnZXQv
+YXJtOiBbdGNnLCBhNjRdIFBvcnQgdG8gaW5pdF9kaXNhc19jb250ZXh0Li4uCkNoZWNraW5nIFBB
+VENIIDIwLzM0OiB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0IHRvIHRiX3N0YXJ0Li4uCkNoZWNraW5n
+IFBBVENIIDIxLzM0OiB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0IHRvIGluc25fc3RhcnQuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMjIvMzQ6IHRhcmdldC9hcm06IFt0Y2csIGE2NF0gUG9ydCB0byBpbnNuX3N0
+YXJ0Li4uCkNoZWNraW5nIFBBVENIIDIzLzM0OiB0YXJnZXQvYXJtOiBbdGNnLCBhNjRdIFBvcnQg
+dG8gYnJlYWtwb2ludF9jaGVjay4uLgpDaGVja2luZyBQQVRDSCAyNC8zNDogdGFyZ2V0L2FybTog
+W3RjZ10gUG9ydCB0byB0cmFuc2xhdGVfaW5zbi4uLgpDaGVja2luZyBQQVRDSCAyNS8zNDogdGFy
+Z2V0L2FybTogW3RjZywgYTY0XSBQb3J0IHRvIHRyYW5zbGF0ZV9pbnNuLi4uCkNoZWNraW5nIFBB
+VENIIDI2LzM0OiB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0IHRvIHRiX3N0b3AuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMjcvMzQ6IHRhcmdldC9hcm06IFt0Y2csIGE2NF0gUG9ydCB0byB0Yl9zdG9wLi4uCkNo
+ZWNraW5nIFBBVENIIDI4LzM0OiB0YXJnZXQvYXJtOiBbdGNnXSBQb3J0IHRvIGRpc2FzX2xvZy4u
+LgpDaGVja2luZyBQQVRDSCAyOS8zNDogdGFyZ2V0L2FybTogW3RjZywgYTY0XSBQb3J0IHRvIGRp
+c2FzX2xvZy4uLgpDaGVja2luZyBQQVRDSCAzMC8zNDogdGFyZ2V0L2FybTogW3RjZ10gUG9ydCB0
+byBnZW5lcmljIHRyYW5zbGF0aW9uIGZyYW1ld29yay4uLgpDaGVja2luZyBQQVRDSCAzMS8zNDog
+dGFyZ2V0L2FybTogW2E2NF0gTW92ZSBwYWdlIGFuZCBzcyBjaGVja3MgdG8gaW5pdF9kaXNhc19j
+b250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDMyLzM0OiB0YXJnZXQvYXJtOiBNb3ZlIHNzIGNoZWNr
+IHRvIGluaXRfZGlzYXNfY29udGV4dC4uLgpDaGVja2luZyBQQVRDSCAzMy8zNDogdGFyZ2V0L2Fy
+bTogU3BsaXQgb3V0IHRodW1iX3RyX3RyYW5zbGF0ZV9pbnNuLi4uCkNoZWNraW5nIFBBVENIIDM0
+LzM0OiB0YXJnZXQvYXJtOiBQZXJmb3JtIHBlci1pbnNuIGNyb3NzLXBhZ2UgY2hlY2sgb25seSBm
+b3IgVGh1bWIuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQGZyZWVsaXN0cy5vcmc=
