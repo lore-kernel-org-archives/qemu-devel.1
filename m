@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dWAYV-0000Sg-CZ
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:03:32 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dWAjq-0005Rj-TA
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dWAYS-0005FP-9g
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:03:31 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36141)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dWAYR-0005Ez-VN
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:03:28 -0400
-Received: by mail-pg0-x242.google.com with SMTP id y129so12119047pgy.3
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 17:03:26 -0700 (PDT)
-References: <20170711053218.6700-1-aik@ozlabs.ru>
-	<20170714151740.60394531@w520.home>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <77ddd257-99ba-07bc-e6e6-eb33b6eeda77@ozlabs.ru>
-Date: Sat, 15 Jul 2017 10:03:20 +1000
+	(envelope-from <gengdongjiu@huawei.com>) id 1dWAjp-0001zr-RF
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:15:14 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Sat, 15 Jul 2017 00:14:43 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2014F2C8A@DGGEMA503-MBS.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20170714151740.60394531@w520.home>
-Content-Type: text/plain; charset=koi8-r
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3] vfio-pci,
- ppc64/spapr: Reorder group-to-container attaching
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] ACPI: Add new ACPI structures and
+ macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +22,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Zhaoshenglong <zhaoshenglong@huawei.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "james.morse@arm.com" <james.morse@arm.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Gaozhihui <zhihui.gao@huawei.com>
 
-On 15/07/17 07:17, Alex Williamson wrote:
-> On Tue, 11 Jul 2017 15:32:18 +1000
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> 
->> At the moment VFIO PCI device initialization works as follows:
->> vfio_realize
->> 	vfio_get_group
->> 		vfio_connect_container
->> 			register memory listeners (1)
->> 			update QEMU groups lists
->> 		vfio_kvm_device_add_group
->>
->> Then (example for pseries) the machine reset hook triggers region_add()
->> for all regions where listeners from (1) are listening:
->>
->> ppc_spapr_reset
->> 	spapr_phb_reset
->> 		spapr_tce_table_enable
->> 			memory_region_add_subregion
->> 				vfio_listener_region_add
->> 					vfio_spapr_create_window
->>
->> This scheme works fine until we need to handle VFIO PCI device hotplug
->> and we want to enable PPC64/sPAPR in-kernel TCE acceleration on,
->> i.e. after PCI hotplug we need a place to call
->> ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
->> Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
->> (from VFIOGroup), vfio_listener_region_add() seems to be the only place
->> for this ioctl().
->>
->> However this only works during boot time because the machine reset
->> happens strictly after all devices are finalized. When hotplug happens,
->> vfio_listener_region_add() is called when a memory listener is registered
->> but when this happens:
->> 1. new group is not added to the container->group_list yet;
->> 2. VFIO KVM device is unaware of the new IOMMU group.
->>
->> This moves bits around to have all necessary VFIO infrastructure
->> in place for both initial startup and hotplug cases.
-> 
-> 
-> Wow, for a fairly straight forward patch this changelog is brutal.  Can
-> this be summarized as "Register vfio groups with kvm prior to memory
-> listener registration such that kvm-vfio pseudo device ioctls are
-> available during the region_add callback"?  If so I'll queue this up
-> for a pull request prior to soft freeze.  Thanks,
-
-
-It just could have looked like an unnecessary change, hence this changelog.
-Since it is straight forward, I am ok with your shorter version as well.
-Thanks.
-
-
-
-> 
-> Alex
-> 
->  
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>
->>
->> This is an independend part of a bigger patchset to enable in-kernel
->> acceleration of TCE operations. While I stuck with IOMMU MR QOM-fication,
->> let's try to parallel patchset pieces' review/acceptance.
->>
->> ---
->> Changes:
->> v3:
->> * rebased on current upstream
->>
->> v2:
->> * moved container->initialized back to its correct location
->> * added missing QLIST_REMOVE()
->> ---
->>  hw/vfio/common.c | 19 +++++++++++--------
->>  1 file changed, 11 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 2965b68e5d..4e75dc8c56 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -1107,6 +1107,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>          goto free_container_exit;
->>      }
->>  
->> +    vfio_kvm_device_add_group(group);
->> +
->> +    QLIST_INIT(&container->group_list);
->> +    QLIST_INSERT_HEAD(&space->containers, container, next);
->> +
->> +    group->container = container;
->> +    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
->> +
->>      container->listener = vfio_memory_listener;
->>  
->>      memory_listener_register(&container->listener, container->space->as);
->> @@ -1120,14 +1128,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>  
->>      container->initialized = true;
->>  
->> -    QLIST_INIT(&container->group_list);
->> -    QLIST_INSERT_HEAD(&space->containers, container, next);
->> -
->> -    group->container = container;
->> -    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
->> -
->>      return 0;
->>  listener_release_exit:
->> +    QLIST_REMOVE(group, container_next);
->> +    QLIST_REMOVE(container, next);
->> +    vfio_kvm_device_del_group(group);
->>      vfio_listener_release(container);
->>  
->>  free_container_exit:
->> @@ -1232,8 +1237,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
->>  
->>      QLIST_INSERT_HEAD(&vfio_group_list, group, next);
->>  
->> -    vfio_kvm_device_add_group(group);
->> -
->>      return group;
->>  
->>  close_fd_exit:
-> 
-
-
--- 
-Alexey
+SGkgTWljaGFlbA0KICBUaGFua3MgZm9yIHlvdXIgY29tbWVudHMuDQoNCj4gLS0tLS3pgq7ku7bl
+jp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IE1pY2hhZWwgUy4gVHNpcmtpbiBbbWFpbHRvOm1zdEBy
+ZWRoYXQuY29tXQ0KPiDkuLvpopg6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDEvM10gQUNQ
+STogQWRkIG5ldyBBQ1BJIHN0cnVjdHVyZXMgYW5kDQo+IG1hY3Jvcw0KPiANCj4gT24gVGh1LCBK
+dWwgMTMsIDIwMTcgYXQgMDg6MDA6MjZQTSArMDgwMCwgZ2VuZ2RvbmdqaXUgd3JvdGU6DQo+ID4g
+ICAgTGFzemxvLCBJIHBhc3RlZCBNaWNoYWVsJ3MgY29tbWVudHMgaGVyZSwgYXMgc2hvd24gYmVs
+b3cuIE1pY2hhZWwNCj4gPiBzYWlkIHRoZSBkZWZpbml0aW9uIHNob3VsZCB1c2UgYnVpbGRfYXBw
+ZW5kX2ludF9ub3ByZWZpeCB0byBhZGQgZGF0YS4NCj4gPiBidXQgSSB0aGluayBpdCBtYXkgbm90
+IGdvb2QsIGJlY3Vhc2UgdGhlIHNlY3Rpb24NCj4gPiAiVUVGSV9DUEVSX1NFQ19QTEFURk9STV9N
+RU0iIGlzIHJ1bnRpbWUgcmVjb3JkZWQgYXMgQ1BFUiwNCj4gDQo+IE9uZSB0aGluZyBJIHdhbnRl
+ZCB0byB1bmRlcnN0YW5kIGlzIGhvdyBhcmUgcmFjZXMgYXZvaWRlZC4gRS5nLiB3aGF0IGlmIHlv
+dSBhcmUNCj4gaW4gdGhlIHByb2Nlc3Mgb2Ygd3JpdGluZyBvdXQgQ1BFUiBhbmQgZ3Vlc3QgcmVh
+ZHMgaXQuDQo+IEkgdHJpZWQgdG8gZmluZCB3aGVyZSBpcyB0aGlzIGZ1bmN0aW9uIHdyaXRpbmcg
+Q1BFUiBjYWxsZWQgYW5kIGNvdWxkbid0Lg0KPiBDYW4geW91IGNsYXJpZnkgcGxzPw0KDQpNaWNo
+YWVsLCBJIHVuZGVyc3RhbmQgeW91ciBpZGVhLiBZb3Ugd2FudCB0byBzZWUgdGhlIHJlYWQtd3Jp
+dGUgcmFjZSBjb25kaXRpb24uDQp0aGlzIGZ1bmN0aW9uIHdyaXRpbmcgQ1BFUiBpcyBjYWxsZWQg
+aW4gYW5vdGhlciBzZXJpZXMgb2YgcGF0Y2hlcy4gQmVjYXVzZSB0aGV5IGFyZSBuZWVkZWQNCnRv
+IGJlIHJldmlldyB0b2dldGhlciB3aXRoIEtWTSBrZXJuZWwsIHNvIEkgcHV0IGl0IGluIGFub3Ro
+ZXIgc2VyaWVzLg0KSSBjbGFyaWZ5IHRoZSBtZXRob2QgdG8gYXZvaWQgdGhlIHJlYWQtd3JpdGUg
+cmFjZSBjb25kaXRpb24NCg0KQUNQSSA2LjEsICJHZW5lcmljIEhhcmR3YXJlIEVycm9yIFNvdXJj
+ZSB2ZXJzaW9uIDIgKEdIRVN2MiAtIFR5cGUgMTApIiBoYXMgbWVudGlvbmVkIHRoZSBhdm9pZCBt
+ZXRob2QuDQpGb3IgR0hFU3YyIGVycm9yIHNvdXJjZXMsIHRoZSBPUyBtdXN0IGFja25vd2xlZGdl
+IHRoZSBjb25zdW1wdGlvbiBvZiB0aGUgRXJyb3IgU3RhdHVzIEJsb2NrIGJ5IHdyaXRpbmcgdG8g
+dGhlIOKAnFJlYWQgQWNrIFJlZ2lzdGVy4oCdIGxpc3RlZCBpbiB0aGUgR0hFU3YyIHN0cnVjdHVy
+ZQ0KDQpUaGVzZSBhcmUgdGhlIHN0ZXBzIHRoZSBPUyBtdXN0IHRha2Ugb25jZSBkZXRlY3Rpbmcg
+YW4gZXJyb3IgZnJvbSBhIHBhcnRpY3VsYXIgR0hFU3YyIGVycm9yIHNvdXJjZToNCuKAoiBPUyBk
+ZXRlY3RzIGVycm9yICh2aWEgaW50ZXJydXB0L2V4Y2VwdGlvbiBvciBwb2xsaW5nIHRoZSBibG9j
+ayBzdGF0dXMpDQrigKIgT1MgY29waWVzIHRoZSBlcnJvciBzdGF0dXMgYmxvY2sNCuKAoiBPUyBj
+bGVhcnMgdGhlIGJsb2NrIHN0YXR1cyBmaWVsZCBvZiB0aGUgZXJyb3Igc3RhdHVzIGJsb2NrDQri
+gKIgT1MgYWNrbm93bGVkZ2VzIHRoZSBlcnJvciB2aWEgUmVhZCBBY2sgcmVnaXN0ZXIuIEZvciBl
+eGFtcGxlOg0K4oCUT1MgcmVhZHMgdGhlIFJlYWQgQWNrIHJlZ2lzdGVyIO+DqCBYDQrigJRPUyB3
+cml0ZXMg74OoICgoIFggJiBSZWFkQWNrUHJlc2VydmUpIHwgUmVhZEFja1dyaXRlKQ0KDQpTbyBp
+biB0aGUgUWVtdSwgYmVmb3JlIFFlbXUgd3JpdGVzIHRoZSBuZXh0IENQRVIsIGl0IG5lZWRzIHRv
+IGNoZWNrIHRoZSAiUmVhZCBBY2sgcmVnaXN0ZXIiLiBJZiB0aGUgIlJlYWQgQWNrIFJlZ2lzdGVy
+IiBkb2VzIG5vdCBiZWVuIHdyaXR0ZW4gd2l0aCB0aGUgcmVzcG9uc2UsIFFlbXUgd2lsbCB3YWl0
+IHVudGlsIA0KT1MgcmVzcG9uZHMgdGhlICJSZWFkIEFjayBSZWdpc3RlciIsIHNvIGNhbiBhdm9p
+ZCB0aGUgcmVhZC13cml0ZSByYWNlIGNvbmRpdGlvbi4NCg0KSW4gbXkgcGF0Y2gsIGl0IG1pc3Nl
+cyB0aGUgY2hlY2sgdG8gIlJlYWQgQWNrIFJlZ2lzdGVyIiB0byBhdm9pZCB0aGUgcmVhZC13cml0
+ZSByYWNlIGNvbmRpdGlvbi4gSSB3aWxsIGFkZCB0aGUgY29kZSBpbiB0aGUgbmV4dCBjb2RlIHZl
+cnNpb24uIA0KPiANCj4gPiBub3QgYSBBQ1BJL0hFU1QNCj4gPiB0YWJsZSBtZW1iZXIsIHNvIGl0
+IGlzIG5vdCBnZW5lcmF0ZWQgd2hlbiBzeXN0ZW0gYm9vdCB1cC4gT24gdGhlIG90aGVyDQo+ID4g
+aGFuZCxVRUZJX0NQRVJfU0VDX1BMQVRGT1JNX01FTSBkZWZpbml0aW9uIGlzIGZyb20gVUVGSSBz
+cGVjIDIuNiwNCj4gTi4yLjIgU2VjdGlvbiBEZXNjcmlwdG9yOiB7MHhBNUJDMTExNCwgMHg2RjY0
+LCAweDRFREUsIHsweEI4LCAweDYzLCAweDNFLA0KPiAweDgzLCAweEVELCAweDdDLCAweDgzLCAw
+eEIxfX0uDQo+ID4gaWYgdXNlICBidWlsZF9hcHBlbmRfaW50X25vcHJlZml4IHRvIGFkZCwgbWF5
+IGNvbmZ1c2Ugb3RoZXJzLg0KPiANCj4gUmlnaHQgYnV0IEFDUEkvSEVTVCBnZW5lcmF0aW9uIGNv
+dWxkIHVzZSBjbGVhbnVwLCBhbmQNCj4gYnVpbGRfYXBwZW5kX2ludF9ub3ByZWZpeCB3b3VsZCBi
+ZSBhIG5pY2Ugd2F5IHRvIGRvIGl0Lg0KDQpPaywgSSB3aWxsIGZvbGxvdyB5b3VyIG1ldGhvZCB0
+byBkbyBpdC4gVGhhbmtzIGZvciB0aGUgc3VnZ2VzdGlvbi4NCg0KDQo+IA0KPiAtLQ0KPiBNU1QN
+Cg==
