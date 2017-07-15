@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dWHb9-0000hI-17
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:34:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dWHlh-0004hd-3r
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:45:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dWHb2-0008GJ-LS
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:34:43 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:38181)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dWHb2-0008Fi-98
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:34:36 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-	<150002073981.22386.9870422422367410100.stgit@frigg.lan>
-	<01ac89ab-c7b0-3ada-b8bf-9f033cf90f15@twiddle.net>
-Date: Sat, 15 Jul 2017 10:34:20 +0300
-In-Reply-To: <01ac89ab-c7b0-3ada-b8bf-9f033cf90f15@twiddle.net> (Richard
-	Henderson's message of "Fri, 14 Jul 2017 06:48:02 -1000")
-Message-ID: <87pod2b1c3.fsf@frigg.lan>
+	(envelope-from <peter.maydell@linaro.org>) id 1dWHlf-0004Sl-Q0
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:45:36 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:32943)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dWHlf-0004SF-ES
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:45:35 -0400
+Received: by mail-wr0-x233.google.com with SMTP id u110so11386068wrb.0
+	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 00:45:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170715024202.GH17539@umbus.fritz.box>
+References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
+	<CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
+	<20170715024202.GH17539@umbus.fritz.box>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 15 Jul 2017 08:45:13 +0100
+Message-ID: <CAFEAcA_8nhPXE6y0PnYdQfjwqhqFMzg0wGL=KxgD_xb5jnZnfA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v13 03/26] target: [tcg] Add generic
- translation framework
+Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
 
-Richard Henderson writes:
+On 15 July 2017 at 03:42, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Fri, Jul 14, 2017 at 04:13:05PM +0100, Peter Maydell wrote:
+>> Hi. I'm afraid this fails to build on the w32 compiler:
+>>   CC      ppc64-softmmu/hw/ppc/spapr.o
+>> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
+>> =E2=80=98spapr_get_resize_hpt=E2=80=99:
+>> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2642:1: error:
+>> control reaches end of non-void functio
+>> n [-Werror=3Dreturn-type]
+>>  }
+>
+> Drat.  Is there an easy way to test compile for w32?
 
-> On 07/13/2017 10:25 PM, Llu=C3=ADs Vilanova wrote:
->> +        /* Pass breakpoint hits to target for further processing */
->> +        if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
->> +            CPUBreakpoint *bp;
->> +            QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
->> +                if (bp->pc =3D=3D db->pc_next) {
->> +                    if (ops->breakpoint_check(db, cpu, bp)) {
->> +                        break;
->> +                    }
->> +                }
->> +            }
->> +
->> +            if (db->is_jmp =3D=3D DISAS_NORETURN) {
->> +                break;
->> +            }
->> +        }
+I have a cross-compiler set up on an Ubuntu host; you
+can do it on Redhat hosts too; instructions on the wiki
+somewhere I think.
 
-> You should accept any !=3D DISAS_NEXT value here.
-> (1) Because DISAS_NEXT =3D=3D 0 and it's the quickest test, and
-> (2) If you *require* NORETURN here, then you've also got to
-> convert some of the backends to not use DISAS_TARGET_N, which
-> as of [07/26] target/i386: [tcg] Port to breakpoint_check, I
-> haven't seen happen.
+In this case I think you're either getting caught by the
+age of the compiler or because this set of w32 headers
+have a bug where assert() doesn't get marked as fatal
+somehow, so it might or might not manifest on other
+w32 cross build setups.
 
-No, arm has cases with both DISAS_TARGET_N and DISAS_NORETURN, where both e=
-nd
-the bp check loop, but only DISAS_NORETURN breaks the translation loop (the
-previous goto done_generating).
+> Yes, seems good.  Should I resend, or will you adjust in place?
 
-And i386 has no DISAS_NORETURN simply because that's not the behaviour in i=
-ts
-original code.
+You'll need to resend -- I can't modify signed pull reqs.
+
+thanks
+-- PMM
