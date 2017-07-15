@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWD23-0007Bo-2R
+	(envelope-from <dgibson@ozlabs.org>) id 1dWD23-0007Br-6K
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 22:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWD22-0002WP-3q
+	(envelope-from <dgibson@ozlabs.org>) id 1dWD22-0002WU-3r
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 22:42:11 -0400
-Date: Sat, 15 Jul 2017 12:39:43 +1000
+Date: Sat, 15 Jul 2017 12:42:02 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170715023943.GG17539@umbus.fritz.box>
+Message-ID: <20170715024202.GH17539@umbus.fritz.box>
 References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
-	<CAFEAcA9H7td0EogiAcp3rL6CB46fvq8fJbDBCZw1R3Z8Ch0AvA@mail.gmail.com>
+	<CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8bBEDOJVaa9YlTAt"
+	protocol="application/pgp-signature"; boundary="e5bfZ/T2xnjpUIbw"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9H7td0EogiAcp3rL6CB46fvq8fJbDBCZw1R3Z8Ch0AvA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,12 +28,12 @@ To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
 
 
---8bBEDOJVaa9YlTAt
-Content-Type: text/plain; charset=us-ascii
+--e5bfZ/T2xnjpUIbw
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 14, 2017 at 11:25:01AM +0100, Peter Maydell wrote:
+On Fri, Jul 14, 2017 at 04:13:05PM +0100, Peter Maydell wrote:
 > On 14 July 2017 at 07:15, David Gibson <david@gibson.dropbear.id.au> wrot=
 e:
 > > The following changes since commit 49bcce4b9c11759678fd223aefb48691c495=
@@ -70,14 +70,44 @@ e:
 > >
 > > There are also a handful of unrelated fixes.
 >=20
-> I see Alex Graf's update to the e500 u-boot image didn't make
-> it in to this -- are you planning to send that separately
-> or should I pick it up directly? (I definitely would like to
-> see that in the 2.10 release, because it fixes a problem where
-> our u-boot sources are (a) very old and (b) not even the version
-> corresponding to the binary blob we ship...)
+> Hi. I'm afraid this fails to build on the w32 compiler:
+>   CC      ppc64-softmmu/hw/ppc/spapr.o
+> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
+> =E2=80=98spapr_get_resize_hpt=E2=80=99:
+> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2642:1: error:
+> control reaches end of non-void functio
+> n [-Werror=3Dreturn-type]
+>  }
 
-Oh, I didn't spot that one.  Can you take it directly?
+Drat.  Is there an easy way to test compile for w32?
+
+>  ^
+>=20
+> The compiler is confused (it doesn't realise that "assert(0)"
+> cannot return), but you can make it happier like this:
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 09b6ff0..68f936c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2638,7 +2638,7 @@ static char *spapr_get_resize_hpt(Object *obj,
+> Error **errp)
+>      case SPAPR_RESIZE_HPT_REQUIRED:
+>          return g_strdup("required");
+>      }
+> -    assert(0);
+> +    g_assert_not_reached();
+>  }
+>=20
+>  static void spapr_set_resize_hpt(Object *obj, const char *value, Error *=
+*errp)
+>=20
+>=20
+> I think g_assert_not_reached() is easier to read anyway; I
+> always have to think for a moment about whether assert(0)
+> or assert(1) is the "always assert" condition...
+
+Yes, seems good.  Should I resend, or will you adjust in place?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -85,24 +115,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8bBEDOJVaa9YlTAt
+--e5bfZ/T2xnjpUIbw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllpgG8ACgkQbDjKyiDZ
-s5Kexw/+KdIBH75dXmCItBPGcldSl6bRaEA6LnrP3mfQhO8DOuzxKFjRV9WobT3f
-xFdrL4ELDUoSEgR5WUJfouGbNlQ081p2mPBAGiXdg7Tl6Z2UEZ+y9rTie+tYDvRz
-HMuvX6Z4X8iTUuINXH6u3eNu8rjd8F81AeNq84FU9z/lQg7gEmMh9BmRYijO65oG
-mRap4KtFCuacR2HNOJ8rp3v+HRAxQfrfyfu67Y7PKk+EBEn1sWFesAbUiTOME2UQ
-IZF3x+xY4Y7Bs21i2BuGjdiNsTeemkZZm39mOo8v+NK7LGShASj8djrd0AeYMzQq
-yGI7hEZFT1MjRCCN8KP/yPQgQ09mSxHuZHpa/pf56CPgUXB8iyzh7MR9XKnJQjtn
-XooCixD39KmJJDXii8uHBBAufLuykSaqvjjaAxwwz/SYp37WyLlzo7H9Bi4glq8Z
-TblWVvj3U9jLKSfUB5J9yf6uejywm36yNG5l+Jq4HghqXyJiKP8YzGoY5Z8p1QPj
-MMOMavNJrsMGsZkn+8G0rtZX5nQonu3jo0y2/HXuu9ZOYLmc93TJtr0OkZEYVav5
-SSwpM9FwvGNnhlIb9VI8yl+NEnAgM9GSlk88nAtr0XqCSR2Iq3rNzJzqhSViuPhd
-+v3YuKD/PWhh9vlKlYTYN+TfDql1aqOQAkXvBEA87y3cytqdg3w=
-=1SSi
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllpgPoACgkQbDjKyiDZ
+s5JKgQ//YRhLi0u4BJ3yNUpagX+r2+7MsOie6u9X1DQ6XqXtWbJueRTd8NFYUcST
+jD5Ewf577v3UShCHpIfHeWYUcjaV3lXC2Gyuh7bcIYBdVbWzFkw3dtbXEOODOgYT
+1U78nQPJ0rKTPFgoZPt63lvhdcAewtlSSS2BuKyxh6qMA+qndFkkROdFgNK4BS2W
+12Z9ODDtFlWUcjKlhBwhFwpiRnRvtOcndD2VxzAIcNlTHeSZs9kEEuKQN7jLvGmu
+9ZsROWGvjk3pTj6e5aRzkAdRewpcvriX/XR/Dh2jvyD9cuKZJWpjb1cQqp6NN8UN
+1F8+fYVA5QRZid5wud0gShTCnMrt16KrRmPQe700Mf1qZDkkt8VBrm4ByuwFVh3p
+GsLERlMA1IuIXcmd8DjHXcERP3KlL9IiUd7llYpVxEk2ojN/1xgE8I0BNihk7H00
+oQJtvmPlIUZrNkRVOa/33IkeBx+J543NesAwf+8IpG7JXmtCOsgc3J/wnxJqLAIi
+jipdYhxz8cA1wL4OyHeA0MtmRzkjH5gNcoL62gbpwaXvXMqLzE0/PphxETQU4BqR
+/P4Xn8xReIauhgY7s5fB8Ub6bg6toplPe1KKcnr1rbV0L66NOcUfpnJGQ6OLYoD/
+OMFL7bqDcbydiSGWKAjlg5XQ90QRRkEJu8HR0Md3m68DTWEdfK8=
+=Swpu
 -----END PGP SIGNATURE-----
 
---8bBEDOJVaa9YlTAt--
+--e5bfZ/T2xnjpUIbw--
