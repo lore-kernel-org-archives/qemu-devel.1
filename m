@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dWMDv-00059u-Vs
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dWMDw-0005AU-TR
 	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 08:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dWMDv-00064g-3y
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 08:31:03 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:52266)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dWMDv-000654-V9
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 08:31:04 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:52277)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dWMDu-00064D-TJ
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dWMDv-00064n-NL
 	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 08:31:03 -0400
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sat, 15 Jul 2017 14:30:57 +0200
-Message-Id: <20170715123057.8529-5-samuel.thibault@ens-lyon.org>
+Date: Sat, 15 Jul 2017 14:30:54 +0200
+Message-Id: <20170715123057.8529-2-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20170715123057.8529-1-samuel.thibault@ens-lyon.org>
 References: <20170715123057.8529-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PULL 4/4] slirp: Handle error returns from sosendoob()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/4] slirp: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +27,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-sosendoob() can return a failure code, but all its callers ignore it.
-This is OK in sbappend(), as the comment there states -- we will try
-again later in sowrite(). Add a (void) cast to tell Coverity so.
-In sowrite() we do need to check the return value -- we should handle
-a write failure in sosendoob() the same way we handle a write failure
-for the normal data.
+I used the clang-tidy qemu-round check to generate the fix:
+https://github.com/elmarco/clang-tools-extra
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- slirp/sbuf.c   |  2 +-
- slirp/socket.c | 23 +++++++++++++++++------
- 2 files changed, 18 insertions(+), 7 deletions(-)
+ slirp/ip6.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/slirp/sbuf.c b/slirp/sbuf.c
-index 10119d3ad5..912f235f65 100644
---- a/slirp/sbuf.c
-+++ b/slirp/sbuf.c
-@@ -91,7 +91,7 @@ sbappend(struct socket *so, struct mbuf *m)
- 	if (so->so_urgc) {
- 		sbappendsb(&so->so_rcv, m);
- 		m_free(m);
--		sosendoob(so);
-+		(void)sosendoob(so);
- 		return;
- 	}
- 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index a17caa9fa7..ecec0295a9 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -404,7 +404,15 @@ sowrite(struct socket *so)
- 	DEBUG_ARG("so = %p", so);
- 
- 	if (so->so_urgc) {
--		sosendoob(so);
-+		uint32_t expected = so->so_urgc;
-+		if (sosendoob(so) < expected) {
-+			/* Treat a short write as a fatal error too,
-+			 * rather than continuing on and sending the urgent
-+			 * data as if it were non-urgent and leaving the
-+			 * so_urgc count wrong.
-+			 */
-+			goto err_disconnected;
-+		}
- 		if (sb->sb_cc == 0)
- 			return 0;
- 	}
-@@ -448,11 +456,7 @@ sowrite(struct socket *so)
- 		return 0;
- 
- 	if (nn <= 0) {
--		DEBUG_MISC((dfd, " --- sowrite disconnected, so->so_state = %x, errno = %d\n",
--			so->so_state, errno));
--		sofcantsendmore(so);
--		tcp_sockclosed(sototcpcb(so));
--		return -1;
-+		goto err_disconnected;
- 	}
- 
- #ifndef HAVE_READV
-@@ -479,6 +483,13 @@ sowrite(struct socket *so)
- 		sofcantsendmore(so);
- 
- 	return nn;
-+
-+err_disconnected:
-+	DEBUG_MISC((dfd, " --- sowrite disconnected, so->so_state = %x, errno = %d\n",
-+		    so->so_state, errno));
-+	sofcantsendmore(so);
-+	tcp_sockclosed(sototcpcb(so));
-+	return -1;
- }
- 
- /*
--- 
+diff --git a/slirp/ip6.h b/slirp/ip6.h
+index 0908855f0f..b1bea43b3c 100644
+--- a/slirp/ip6.h
++++ b/slirp/ip6.h
+@@ -57,9 +57,9 @@ static inline bool in6_equal_mach(const struct in6_addr=
+ *a,
+                                   const struct in6_addr *b,
+                                   int prefix_len)
+ {
+-    if (memcmp(&(a->s6_addr[(prefix_len + 7) / 8]),
+-               &(b->s6_addr[(prefix_len + 7) / 8]),
+-               16 - (prefix_len + 7) / 8) !=3D 0) {
++    if (memcmp(&(a->s6_addr[DIV_ROUND_UP(prefix_len, 8)]),
++               &(b->s6_addr[DIV_ROUND_UP(prefix_len, 8)]),
++               16 - DIV_ROUND_UP(prefix_len, 8)) !=3D 0) {
+         return 0;
+     }
+=20
+--=20
 2.13.2
