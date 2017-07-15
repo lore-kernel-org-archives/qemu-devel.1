@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dWN8R-00043a-8A
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 09:29:28 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dWO5j-0003iE-Jz
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 10:30:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dWN8Q-00038B-CZ
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 09:29:27 -0400
-From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat, 15 Jul 2017 15:28:41 +0200
-Message-Id: <20170715132841.9865-5-hpoussin@reactos.org>
-In-Reply-To: <20170715132841.9865-1-hpoussin@reactos.org>
-References: <20170715132841.9865-1-hpoussin@reactos.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/4] vvfat: initialize memory after allocating
- it
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dWO5g-0001QZ-Ce
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 10:30:43 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:33917)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dWO5f-0001Ni-NY
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 10:30:40 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Sun, 16 Jul 2017 06:44:01 +0800
+Message-Id: <1500158641-23033-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH]  qga-win32: remove a redundancy code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +21,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-This prevents some host to guest memory content leaks.
+In the first line of run_agent,it has set ga_state = s,don't need
+set ga_state = s again behind.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
-
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- block/vvfat.c | 1 +
- 1 file changed, 1 insertion(+)
+ qga/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index afc6170a69..7340decef3 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -115,6 +115,7 @@ static inline int array_ensure_allocated(array_t* arr=
-ay, int index)
-         array->pointer =3D g_realloc(array->pointer, new_size);
-         if (!array->pointer)
-             return -1;
-+        memset(array->pointer + array->size, 0, new_size - array->size);
-         array->size =3D new_size;
-         array->next =3D index + 1;
-     }
---=20
-2.11.0
+diff --git a/qga/main.c b/qga/main.c
+index 405c129..dcd6104 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -1314,7 +1314,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+     ga_command_state_init(s, s->command_state);
+     ga_command_state_init_all(s->command_state);
+     json_message_parser_init(&s->parser, process_event);
+-    ga_state = s;
++
+ #ifndef _WIN32
+     if (!register_signal_handlers()) {
+         g_critical("failed to register signal handlers");
+-- 
+1.8.3.1
