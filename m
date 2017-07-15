@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dWV0R-0007cT-FP
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 17:53:44 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dWVKV-0003kR-9J
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:14:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dWV0O-0000aN-D0
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 17:53:43 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dWV0O-0000Zy-8C
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 17:53:40 -0400
-Received: by mail-qk0-x244.google.com with SMTP id a66so15493397qkb.0
-	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 14:53:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-17-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <213399f0-e894-5667-595c-669bfd7ca791@amsat.org>
-Date: Sat, 15 Jul 2017 18:53:35 -0300
+	(envelope-from <aurelien@aurel32.net>) id 1dWVKT-00070T-7y
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:14:27 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:49068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dWVKS-0006vu-TM
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 18:14:25 -0400
+Date: Sun, 16 Jul 2017 00:14:12 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170715221412.3yprwf5i3te4gdxa@aurel32.net>
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-7-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1500040339-119465-17-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 16/28] nios2: replace cpu_nios2_init() with
- cpu_generic_init()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170707022111.21836-7-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space
+ atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,89 +29,321 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-On 07/14/2017 10:52 AM, Igor Mammedov wrote:
-> cpu_nios2_init() always falls back to TYPE_NIOS2_CPU object
-> regardless of cpu_model. Put fallback logic into
-> nios2_cpu_class_by_name() which would translate any cpu_model
-> into TYPE_NIOS2_CPU class and replace cpu_nios2_init()
-> with cpu_generic_init()
+On 2017-07-06 16:20, Richard Henderson wrote:
+> For uniprocessors, SH4 uses optimistic restartable atomic sequences.
+> Upon an interrupt, a real kernel would simply notice magic values in
+> the registers and reset the PC to the start of the sequence.
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> For QEMU, we cannot do this in quite the same way.  Instead, we notice
+> the normal start of such a sequence (mov #-x,r15), and start a new TB
+> that can be executed under cpu_exec_step_atomic.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Do you have actually have a good documentation about gUSA? I have found
+a few documents (some of them in Japanese), the most complete one being
+the LinuxTag paper. The ABI is also described in the kernel and the
+glibc. That said I am missing the following informations:
+- What kind of instructions are allowed in the atomic sequence? Your
+  patch takes into account branches, but are there allowed? used in
+  practice? What about FP instructions?
+- Does the atomic sequence is actually allowed to cross pages?
+- Is there any alignement required? The paper mention adding a nop to
+  gUSA_exchange_and_add to align the end point to 4 bytes.
 
+Depending on that you patch can probably be simplified.
+
+Overall it looks good, however please find some comments below.
+
+
+> Reported-by: Bruno Haible  <bruno@clisp.org>
+> LP: https://bugs.launchpad.net/bugs/1701971
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 > ---
-> CC: Chris Wulff <crwulff@gmail.com>
-> CC: Marek Vasut <marex@denx.de>
-> ---
->   target/nios2/cpu.h        | 3 +--
->   hw/nios2/10m50_devboard.c | 2 +-
->   target/nios2/cpu.c        | 9 +++------
->   3 files changed, 5 insertions(+), 9 deletions(-)
+>  target/sh4/cpu.h       |  18 +++++--
+>  target/sh4/helper.h    |   1 +
+>  target/sh4/op_helper.c |   6 +++
+>  target/sh4/translate.c | 131 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  4 files changed, 148 insertions(+), 8 deletions(-)
 > 
-> diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-> index 13931f3..50d803a 100644
-> --- a/target/nios2/cpu.h
-> +++ b/target/nios2/cpu.h
-> @@ -212,7 +212,6 @@ static inline Nios2CPU *nios2_env_get_cpu(CPUNios2State *env)
->   #define ENV_OFFSET offsetof(Nios2CPU, env)
->   
->   void nios2_tcg_init(void);
-> -Nios2CPU *cpu_nios2_init(const char *cpu_model);
->   void nios2_cpu_do_interrupt(CPUState *cs);
->   int cpu_nios2_signal_handler(int host_signum, void *pinfo, void *puc);
->   void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUNios2State *env);
-> @@ -229,7 +228,7 @@ void nios2_check_interrupts(CPUNios2State *env);
->   #define TARGET_PHYS_ADDR_SPACE_BITS 32
->   #define TARGET_VIRT_ADDR_SPACE_BITS 32
->   
-> -#define cpu_init(cpu_model) CPU(cpu_nios2_init(cpu_model))
-> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
->   
->   #define cpu_gen_code cpu_nios2_gen_code
->   #define cpu_signal_handler cpu_nios2_signal_handler
-> diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
-> index 051be73..c8aa116 100644
-> --- a/hw/nios2/10m50_devboard.c
-> +++ b/hw/nios2/10m50_devboard.c
-> @@ -75,7 +75,7 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
->                                   phys_ram_alias);
->   
->       /* Create CPU -- FIXME */
-> -    cpu = cpu_nios2_init("nios2");
-> +    cpu = NIOS2_CPU(cpu_generic_init(TYPE_NIOS2_CPU, "nios2"));
->   
->       /* Register: CPU interrupt controller (PIC) */
->       cpu_irq = nios2_cpu_pic_init(cpu);
-> diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
-> index d56bb72..5b02fb6 100644
-> --- a/target/nios2/cpu.c
-> +++ b/target/nios2/cpu.c
-> @@ -83,13 +83,9 @@ static void nios2_cpu_initfn(Object *obj)
->       }
->   }
->   
-> -Nios2CPU *cpu_nios2_init(const char *cpu_model)
-> +static ObjectClass *nios2_cpu_class_by_name(const char *cpu_model)
->   {
-> -    Nios2CPU *cpu = NIOS2_CPU(object_new(TYPE_NIOS2_CPU));
+> diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+> index da31805..e3abb6a 100644
+> --- a/target/sh4/cpu.h
+> +++ b/target/sh4/cpu.h
+> @@ -98,7 +98,18 @@
+>  
+>  #define TB_FLAG_PENDING_MOVCA  (1 << 3)
+>  
+> -#define TB_FLAG_ENVFLAGS_MASK  DELAY_SLOT_MASK
+> +#define GUSA_SHIFT             4
+> +#ifdef CONFIG_USER_ONLY
+> +#define GUSA_EXCLUSIVE         (1 << 12)
+> +#define GUSA_MASK              ((0xff << GUSA_SHIFT) | GUSA_EXCLUSIVE)
+> +#else
+> +/* Provide dummy versions of the above to allow tests against tbflags
+> +   to be elided while avoiding ifdefs.  */
+> +#define GUSA_EXCLUSIVE         0
+> +#define GUSA_MASK              0
+> +#endif
+> +
+> +#define TB_FLAG_ENVFLAGS_MASK  (DELAY_SLOT_MASK | GUSA_MASK)
+>  
+>  typedef struct tlb_t {
+>      uint32_t vpn;		/* virtual page number */
+> @@ -390,8 +401,9 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
+>                                          target_ulong *cs_base, uint32_t *flags)
+>  {
+>      *pc = env->pc;
+> -    *cs_base = 0;
+> -    *flags = env->flags                                        /* Bits  0-2 */
+> +    /* For a gUSA region, notice the end of the region.  */
+> +    *cs_base = env->flags & GUSA_MASK ? env->gregs[0] : 0;
+> +    *flags = env->flags /* TB_FLAG_ENVFLAGS_MASK: bits 0-2, 4-12 */
+>              | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
+>              | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
+>              | (env->sr & (1u << SR_FD))                        /* Bit 15 */
+> diff --git a/target/sh4/helper.h b/target/sh4/helper.h
+> index 767a6d5..6c6fa04 100644
+> --- a/target/sh4/helper.h
+> +++ b/target/sh4/helper.h
+> @@ -6,6 +6,7 @@ DEF_HELPER_1(raise_slot_fpu_disable, noreturn, env)
+>  DEF_HELPER_1(debug, noreturn, env)
+>  DEF_HELPER_1(sleep, noreturn, env)
+>  DEF_HELPER_2(trapa, noreturn, env, i32)
+> +DEF_HELPER_1(exclusive, noreturn, env)
+>  
+>  DEF_HELPER_3(movcal, void, env, i32, i32)
+>  DEF_HELPER_1(discard_movcal_backup, void, env)
+> diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
+> index c3d19b1..8513f38 100644
+> --- a/target/sh4/op_helper.c
+> +++ b/target/sh4/op_helper.c
+> @@ -115,6 +115,12 @@ void helper_trapa(CPUSH4State *env, uint32_t tra)
+>      raise_exception(env, 0x160, 0);
+>  }
+>  
+> +void helper_exclusive(CPUSH4State *env)
+> +{
+> +    /* We do not want cpu_restore_state to run.  */
+> +    cpu_loop_exit_atomic(ENV_GET_CPU(env), 0);
+> +}
+> +
+>  void helper_movcal(CPUSH4State *env, uint32_t address, uint32_t value)
+>  {
+>      if (cpu_sh4_is_cached (env, address))
+> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+> index cf53cd6..653c06c 100644
+> --- a/target/sh4/translate.c
+> +++ b/target/sh4/translate.c
+> @@ -235,7 +235,9 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+>      if (unlikely(ctx->singlestep_enabled)) {
+>          return false;
+>      }
 > -
-> -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
-> -
-> -    return cpu;
-> +    return object_class_by_name(TYPE_NIOS2_CPU);
->   }
->   
->   static void nios2_cpu_realizefn(DeviceState *dev, Error **errp)
-> @@ -203,6 +199,7 @@ static void nios2_cpu_class_init(ObjectClass *oc, void *data)
->       ncc->parent_reset = cc->reset;
->       cc->reset = nios2_cpu_reset;
->   
-> +    cc->class_by_name = nios2_cpu_class_by_name;
->       cc->has_work = nios2_cpu_has_work;
->       cc->do_interrupt = nios2_cpu_do_interrupt;
->       cc->cpu_exec_interrupt = nios2_cpu_exec_interrupt;
-> 
+> +    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+> +        return false;
+> +    }
+>  #ifndef CONFIG_USER_ONLY
+>      return (ctx->tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
+>  #else
+> @@ -278,6 +280,28 @@ static void gen_conditional_jump(DisasContext * ctx,
+>  				 target_ulong ift, target_ulong ifnott)
+>  {
+>      TCGLabel *l1 = gen_new_label();
+> +
+> +    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+> +        /* When in an exclusive region, we must continue to the end.
+> +           Therefore, exit the region on a taken branch, but otherwise
+> +           fall through to the next instruction.  */
+> +        uint32_t taken;
+> +        TCGCond cond;
+> +
+> +        if (ift == ctx->pc + 2) {
+> +            taken = ifnott;
+> +            cond = TCG_COND_NE;
+> +        } else {
+> +            taken = ift;
+> +            cond = TCG_COND_EQ;
+> +        }
+> +        tcg_gen_brcondi_i32(cond, cpu_sr_t, 0, l1);
+> +        tcg_gen_movi_i32(cpu_flags, ctx->envflags & ~GUSA_MASK);
+> +        gen_goto_tb(ctx, 0, taken);
+> +        gen_set_label(l1);
+> +        return;
+> +    }
+> +
+
+This looks fine. I guess this can be improved in a another patch by
+changing the caller to pass a single target address and if the condition
+is true or false. This would avoid having to detect that here, and would
+not make the code below more complicated.
+
+>      gen_save_cpu_state(ctx, false);
+>      tcg_gen_brcondi_i32(TCG_COND_NE, cpu_sr_t, 0, l1);
+>      gen_goto_tb(ctx, 0, ifnott);
+> @@ -289,13 +313,26 @@ static void gen_conditional_jump(DisasContext * ctx,
+>  /* Delayed conditional jump (bt or bf) */
+>  static void gen_delayed_conditional_jump(DisasContext * ctx)
+>  {
+> -    TCGLabel *l1;
+> -    TCGv ds;
+> +    TCGLabel *l1 = gen_new_label();
+> +    TCGv ds = tcg_temp_new();
+>  
+> -    l1 = gen_new_label();
+> -    ds = tcg_temp_new();
+>      tcg_gen_mov_i32(ds, cpu_delayed_cond);
+>      tcg_gen_discard_i32(cpu_delayed_cond);
+> +
+> +    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+> +        /* When in an exclusive region, we must continue to the end.
+> +           Therefore, exit the region on a taken branch, but otherwise
+> +           fall through to the next instruction.  */
+> +        tcg_gen_brcondi_i32(TCG_COND_EQ, ds, 0, l1);
+> +
+> +        /* Leave the gUSA region.  */
+> +        tcg_gen_movi_i32(cpu_flags, ctx->envflags & ~GUSA_MASK);
+> +        gen_jump(ctx);
+> +
+> +        gen_set_label(l1);
+> +        return;
+> +    }
+> +
+>      tcg_gen_brcondi_i32(TCG_COND_NE, ds, 0, l1);
+>      gen_goto_tb(ctx, 1, ctx->pc + 2);
+>      gen_set_label(l1);
+> @@ -480,6 +517,15 @@ static void _decode_opc(DisasContext * ctx)
+>  	}
+>  	return;
+>      case 0xe000:		/* mov #imm,Rn */
+> +#ifdef CONFIG_USER_ONLY
+> +        /* Detect the start of a gUSA region.  If so, update envflags
+> +           and end the TB.  This will allow us to see the end of the
+> +           region (stored in R0) in the next TB.  */
+> +        if (B11_8 == 15 && B7_0s < 0) {
+> +            ctx->envflags = deposit32(ctx->envflags, GUSA_SHIFT, 8, B7_0s);
+> +            ctx->bstate = BS_STOP;
+> +        }
+> +#endif
+>
+>  	tcg_gen_movi_i32(REG(B11_8), B7_0s);
+>  	return;
+>      case 0x9000:		/* mov.w @(disp,PC),Rn */
+> @@ -1814,6 +1860,18 @@ static void decode_opc(DisasContext * ctx)
+>      if (old_flags & DELAY_SLOT_MASK) {
+>          /* go out of the delay slot */
+>          ctx->envflags &= ~DELAY_SLOT_MASK;
+> +
+> +        /* When in an exclusive region, we must continue to the end
+> +           for conditional branches.  */
+> +        if (ctx->tbflags & GUSA_EXCLUSIVE
+> +            && old_flags & DELAY_SLOT_CONDITIONAL) {
+> +            gen_delayed_conditional_jump(ctx);
+> +            return;
+> +        }
+> +        /* Otherwise this is probably an invalid gUSA region.
+> +           Drop the GUSA bits so the next TB doesn't see them.  */
+> +        ctx->envflags &= ~GUSA_MASK;
+> +
+>          tcg_gen_movi_i32(cpu_flags, ctx->envflags);
+>          ctx->bstate = BS_BRANCH;
+>          if (old_flags & DELAY_SLOT_CONDITIONAL) {
+> @@ -1821,9 +1879,60 @@ static void decode_opc(DisasContext * ctx)
+>          } else {
+>              gen_jump(ctx);
+>  	}
+> +    }
+> +}
+>  
+> +#ifdef CONFIG_USER_ONLY
+> +/* For uniprocessors, SH4 uses optimistic restartable atomic sequences.
+> +   Upon an interrupt, a real kernel would simply notice magic values in
+> +   the registers and reset the PC to the start of the sequence.
+> +
+> +   For QEMU, we cannot do this in quite the same way.  Instead, we notice
+> +   the normal start of such a sequence (mov #-x,r15).  While we can handle
+> +   any sequence via cpu_exec_step_atomic, we can recognize the "normal"
+> +   sequences and transform them into atomic operations as seen by the host.
+> +*/
+> +static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+> +{
+> +    uint32_t pc = ctx->pc;
+> +    uint32_t pc_end = ctx->tb->cs_base;
+> +    int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
+> +    int max_insns = (pc_end - pc) / 2;
+> +
+> +    if (pc != pc_end + backup || max_insns < 2) {
+> +        /* This is a malformed gUSA region.  Don't do anything special,
+> +           since the interpreter is likely to get confused.  */
+> +        ctx->envflags &= ~GUSA_MASK;
+> +        return 0;
+> +    }
+>
+> +    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+> +        /* Regardless of single-stepping or the end of the page,
+> +           we must complete execution of the gUSA region while
+> +           holding the exclusive lock.  */
+> +        *pmax_insns = max_insns;
+> +        return 0;
+>      }
+
+What are the consequence of not stopping the translation when crossing
+the page in user mode? If it doesn't have any, we should probably change
+the code to never stop when crossing pages.
+
+> +    qemu_log_mask(LOG_UNIMP, "Unrecognized gUSA sequence %08x-%08x\n",
+> +                  pc, pc_end);
+> +
+> +    /* Restart with the EXCLUSIVE bit set, within a TB run via
+> +       cpu_exec_step_atomic holding the exclusive lock.  */
+> +    tcg_gen_insn_start(pc, ctx->envflags);
+> +    ctx->envflags |= GUSA_EXCLUSIVE;
+> +    gen_save_cpu_state(ctx, false);
+> +    gen_helper_exclusive(cpu_env);
+> +    ctx->bstate = BS_EXCP;
+> +
+> +    /* We're not executing an instruction, but we must report one for the
+> +       purposes of accounting within the TB.  We might as well report the
+> +       entire region consumed via ctx->pc so that it's immediately available
+> +       in the disassembly dump.  */
+> +    ctx->pc = pc_end;
+> +    return 1;
+>  }
+> +#endif
+>  
+>  void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>  {
+> @@ -1869,6 +1978,12 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>      gen_tb_start(tb);
+>      num_insns = 0;
+>  
+> +#ifdef CONFIG_USER_ONLY
+> +    if (ctx.tbflags & GUSA_MASK) {
+> +        num_insns = decode_gusa(&ctx, env, &max_insns);
+> +    }
+> +#endif
+> +
+>      while (ctx.bstate == BS_NONE
+>             && num_insns < max_insns
+>             && !tcg_op_buf_full()) {
+> @@ -1899,6 +2014,12 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+>      if (tb->cflags & CF_LAST_IO) {
+>          gen_io_end();
+>      }
+> +
+> +    if (ctx.tbflags & GUSA_EXCLUSIVE) {
+> +        /* Ending the region of exclusivity.  Clear the bits.  */
+> +        ctx.envflags &= ~GUSA_MASK;
+> +    }
+> +
+
+IIUC this assumes the number of instructions in the sequence is always
+executed. I guess this is not correct if the TCG op buffer is full. Some
+non-privileged instructions might also stop the translation, but they
+are all FPU instructions, so I guess the section is simply not valid in
+that case.
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
