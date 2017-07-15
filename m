@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWD23-0007Br-6K
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 22:42:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWD23-0007CX-QJ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 22:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWD22-0002WU-3r
+	(envelope-from <dgibson@ozlabs.org>) id 1dWD22-0002Wm-9N
 	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 22:42:11 -0400
-Date: Sat, 15 Jul 2017 12:42:02 +1000
+Date: Sat, 15 Jul 2017 12:36:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170715024202.GH17539@umbus.fritz.box>
-References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
-	<CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
+Message-ID: <20170715023604.GF17539@umbus.fritz.box>
+References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-29-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="e5bfZ/T2xnjpUIbw"
+	protocol="application/pgp-signature"; boundary="cz6wLo+OExbGG7q/"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
+In-Reply-To: <1500040339-119465-29-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 28/28] ppc: replace cpu_ppc_init() with
+ cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +25,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org
 
 
---e5bfZ/T2xnjpUIbw
-Content-Type: text/plain; charset=utf-8
+--cz6wLo+OExbGG7q/
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 14, 2017 at 04:13:05PM +0100, Peter Maydell wrote:
-> On 14 July 2017 at 07:15, David Gibson <david@gibson.dropbear.id.au> wrot=
-e:
-> > The following changes since commit 49bcce4b9c11759678fd223aefb48691c495=
-9d4f:
-> >
-> >   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-07-1=
-2' into staging (2017-07-13 16:56:06 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170714
-> >
-> > for you to fetch changes up to e11134d2ac7744569d7c387102368c507d340c30:
-> >
-> >   pseries: Allow HPT resizing with KVM (2017-07-14 09:28:30 +1000)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue 2017-07-14
-> >
-> > Two major batches in this set, rather than the usual collection of
-> > assorted fixes.
-> >
-> >     * More DRC cleanup.  This gets the state management into a state
-> >       which should fix many of the hotplug+migration problems we've
-> >       had.  Plus it gets the migration stream format into something
-> >       well defined and pretty minimal which we can reasonably support
-> >       into the future.
-> >
-> >     * Hashed Page Table resizing.  It's been a while since this was
-> >       posted, but it's been through several previous rounds of review.
-> >       The kernel parts (both guest and host) are merged in 4.11, so
-> >       this is the only remaining piece left to allow resizing of the
-> >       HPT in a running guest.
-> >
-> > There are also a handful of unrelated fixes.
+On Fri, Jul 14, 2017 at 03:52:19PM +0200, Igor Mammedov wrote:
+> it's just a wrapper, drop it and use cpu_generic_init() directly
 >=20
-> Hi. I'm afraid this fails to build on the w32 compiler:
->   CC      ppc64-softmmu/hw/ppc/spapr.o
-> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
-> =E2=80=98spapr_get_resize_hpt=E2=80=99:
-> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2642:1: error:
-> control reaches end of non-void functio
-> n [-Werror=3Dreturn-type]
->  }
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Drat.  Is there an easy way to test compile for w32?
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
->  ^
+> ---
+> CC: Alexander Graf <agraf@suse.de>
+> CC: David Gibson <david@gibson.dropbear.id.au>
+> CC: "Herv=E9 Poussineau" <hpoussin@reactos.org>
+> CC: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> CC: qemu-ppc@nongnu.org
+> ---
+>  target/ppc/cpu.h            | 3 +--
+>  hw/ppc/e500.c               | 3 ++-
+>  hw/ppc/mac_newworld.c       | 3 ++-
+>  hw/ppc/mac_oldworld.c       | 3 ++-
+>  hw/ppc/ppc440_bamboo.c      | 2 +-
+>  hw/ppc/ppc4xx_devs.c        | 2 +-
+>  hw/ppc/prep.c               | 5 +++--
+>  hw/ppc/virtex_ml507.c       | 2 +-
+>  target/ppc/translate_init.c | 5 -----
+>  9 files changed, 13 insertions(+), 15 deletions(-)
 >=20
-> The compiler is confused (it doesn't realise that "assert(0)"
-> cannot return), but you can make it happier like this:
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 09b6ff0..68f936c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2638,7 +2638,7 @@ static char *spapr_get_resize_hpt(Object *obj,
-> Error **errp)
->      case SPAPR_RESIZE_HPT_REQUIRED:
->          return g_strdup("required");
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 6ee2a26..696cbeb 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1276,7 +1276,6 @@ extern const struct VMStateDescription vmstate_ppc_=
+cpu;
+>  #endif
+> =20
+>  /***********************************************************************=
+******/
+> -PowerPCCPU *cpu_ppc_init(const char *cpu_model);
+>  void ppc_translate_init(void);
+>  const char *ppc_cpu_lookup_alias(const char *alias);
+>  /* you can call this signal handler from your SIGBUS and SIGSEGV
+> @@ -1353,7 +1352,7 @@ static inline uint64_t ppc_dump_gpr(CPUPPCState *en=
+v, int gprn)
+>  int ppc_dcr_read (ppc_dcr_t *dcr_env, int dcrn, uint32_t *valp);
+>  int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val);
+> =20
+> -#define cpu_init(cpu_model) CPU(cpu_ppc_init(cpu_model))
+> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_POWERPC_CPU, cpu_model)
+> =20
+>  #define cpu_signal_handler cpu_ppc_signal_handler
+>  #define cpu_list ppc_cpu_list
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 62f1857..f0596f3 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -819,7 +819,8 @@ void ppce500_init(MachineState *machine, PPCE500Param=
+s *params)
+>          CPUState *cs;
+>          qemu_irq *input;
+> =20
+> -        cpu =3D cpu_ppc_init(machine->cpu_model);
+> +        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu =3D=3D NULL) {
+>              fprintf(stderr, "Unable to initialize CPU!\n");
+>              exit(1);
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index bae1c0a..72c98e9 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -187,7 +187,8 @@ static void ppc_core99_init(MachineState *machine)
+>  #endif
 >      }
-> -    assert(0);
-> +    g_assert_not_reached();
+>      for (i =3D 0; i < smp_cpus; i++) {
+> -        cpu =3D cpu_ppc_init(machine->cpu_model);
+> +        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu =3D=3D NULL) {
+>              fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+>              exit(1);
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 97bb854..6fc2a19 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -116,7 +116,8 @@ static void ppc_heathrow_init(MachineState *machine)
+>      if (machine->cpu_model =3D=3D NULL)
+>          machine->cpu_model =3D "G3";
+>      for (i =3D 0; i < smp_cpus; i++) {
+> -        cpu =3D cpu_ppc_init(machine->cpu_model);
+> +        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu =3D=3D NULL) {
+>              fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+>              exit(1);
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index 9d997bf..ca26398 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -186,7 +186,7 @@ static void bamboo_init(MachineState *machine)
+>      if (machine->cpu_model =3D=3D NULL) {
+>          machine->cpu_model =3D "440EP";
+>      }
+> -    cpu =3D cpu_ppc_init(machine->cpu_model);
+> +    cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
+model));
+>      if (cpu =3D=3D NULL) {
+>          fprintf(stderr, "Unable to initialize CPU!\n");
+>          exit(1);
+> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+> index e7f413e..6b38ed7 100644
+> --- a/hw/ppc/ppc4xx_devs.c
+> +++ b/hw/ppc/ppc4xx_devs.c
+> @@ -56,7 +56,7 @@ PowerPCCPU *ppc4xx_init(const char *cpu_model,
+>      CPUPPCState *env;
+> =20
+>      /* init CPUs */
+> -    cpu =3D cpu_ppc_init(cpu_model);
+> +    cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+>      if (cpu =3D=3D NULL) {
+>          fprintf(stderr, "Unable to find PowerPC %s CPU definition\n",
+>                  cpu_model);
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 36d3dcd..00f3321 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -520,7 +520,8 @@ static void ppc_prep_init(MachineState *machine)
+>      if (machine->cpu_model =3D=3D NULL)
+>          machine->cpu_model =3D "602";
+>      for (i =3D 0; i < smp_cpus; i++) {
+> -        cpu =3D cpu_ppc_init(machine->cpu_model);
+> +        cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu =3D=3D NULL) {
+>              fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+>              exit(1);
+> @@ -724,7 +725,7 @@ static void ibm_40p_init(MachineState *machine)
+>      if (!machine->cpu_model) {
+>          machine->cpu_model =3D "604";
+>      }
+> -    cpu =3D cpu_ppc_init(machine->cpu_model);
+> +    cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
+model));
+>      if (!cpu) {
+>          error_report("could not initialize CPU '%s'",
+>                       machine->cpu_model);
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index fdbcf22..d5fdc16 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -96,7 +96,7 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_s=
+ize,
+>      CPUPPCState *env;
+>      qemu_irq *irqs;
+> =20
+> -    cpu =3D cpu_ppc_init(cpu_model);
+> +    cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+>      if (cpu =3D=3D NULL) {
+>          fprintf(stderr, "Unable to initialize CPU!\n");
+>          exit(1);
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 783bf98..b4eaabb 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10250,11 +10250,6 @@ const char *ppc_cpu_lookup_alias(const char *ali=
+as)
+>      return NULL;
 >  }
->=20
->  static void spapr_set_resize_hpt(Object *obj, const char *value, Error *=
-*errp)
->=20
->=20
-> I think g_assert_not_reached() is easier to read anyway; I
-> always have to think for a moment about whether assert(0)
-> or assert(1) is the "always assert" condition...
-
-Yes, seems good.  Should I resend, or will you adjust in place?
+> =20
+> -PowerPCCPU *cpu_ppc_init(const char *cpu_model)
+> -{
+> -    return POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+> -}
+> -
+>  PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
+>  {
+>      ObjectClass *oc =3D OBJECT_CLASS(pcc);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -115,24 +215,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---e5bfZ/T2xnjpUIbw
+--cz6wLo+OExbGG7q/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllpgPoACgkQbDjKyiDZ
-s5JKgQ//YRhLi0u4BJ3yNUpagX+r2+7MsOie6u9X1DQ6XqXtWbJueRTd8NFYUcST
-jD5Ewf577v3UShCHpIfHeWYUcjaV3lXC2Gyuh7bcIYBdVbWzFkw3dtbXEOODOgYT
-1U78nQPJ0rKTPFgoZPt63lvhdcAewtlSSS2BuKyxh6qMA+qndFkkROdFgNK4BS2W
-12Z9ODDtFlWUcjKlhBwhFwpiRnRvtOcndD2VxzAIcNlTHeSZs9kEEuKQN7jLvGmu
-9ZsROWGvjk3pTj6e5aRzkAdRewpcvriX/XR/Dh2jvyD9cuKZJWpjb1cQqp6NN8UN
-1F8+fYVA5QRZid5wud0gShTCnMrt16KrRmPQe700Mf1qZDkkt8VBrm4ByuwFVh3p
-GsLERlMA1IuIXcmd8DjHXcERP3KlL9IiUd7llYpVxEk2ojN/1xgE8I0BNihk7H00
-oQJtvmPlIUZrNkRVOa/33IkeBx+J543NesAwf+8IpG7JXmtCOsgc3J/wnxJqLAIi
-jipdYhxz8cA1wL4OyHeA0MtmRzkjH5gNcoL62gbpwaXvXMqLzE0/PphxETQU4BqR
-/P4Xn8xReIauhgY7s5fB8Ub6bg6toplPe1KKcnr1rbV0L66NOcUfpnJGQ6OLYoD/
-OMFL7bqDcbydiSGWKAjlg5XQ90QRRkEJu8HR0Md3m68DTWEdfK8=
-=Swpu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllpf5IACgkQbDjKyiDZ
+s5KzYw/+LrPI/Y/4BjyMdyAbtboxt5a4Z7NY0BjmXTHvuO76RILgFfcUQqgHLXlP
+ukZENJBmwql6ek3uR6TMsqFbxR6ExWZZIYpLyGsyTsLOlpHrIUEe3Urr8ktMpWxi
+SePcBELKtQfvQJfrK70s5ilSYW2GdafbOMOd8vldl407JVXg8L4IoAEygHwPYleT
+TxdohuKsnD8aJ6MWm8yMCjiWst+hK8tvgTH3jfb36CNlBLW6S1Djqoud2VN50oE5
+0MAmC8Hi8gyhrTzSPop8qC2CPhXwdXjuA6sXNq4B3xZZMZQoAisLrIxYI4IEOUAm
+ck0H+DyZeuzJubLBsdb2QoPXyb6a8UY9yQh8109mDhBjgSIZcBnNrmtEm+f3/9lm
+9F+8leyM2gqoXA80ns5VBK1OcGi6L9C/311a3FcWuuTYLFbMiHwp86iRIAVPVedq
+Ura4i/6DouA6f0w8NMC3i3znXD7zRbZKaXznO7YHx15UvlFvT40WWF7cstZeamtu
+c1x+rSU9mkupRCfrSdtg7mZu0HwkLL16dQtSxsLG/bysBV8FvSyC0oaLBkrO3Dlg
+ycpaVbvsb5RRGwswIsXogX82jhfSVNu88Udxvk3FzouNusoAMcYwBzOMk1MRwQ7Q
+5vM08+7kxny57x0jlyg8dmAle4EtscIeQoD72yn4wZq+GlMazAg=
+=Ffx9
 -----END PGP SIGNATURE-----
 
---e5bfZ/T2xnjpUIbw--
+--cz6wLo+OExbGG7q/--
