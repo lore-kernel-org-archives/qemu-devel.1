@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dWGGw-0002fm-DY
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 02:09:47 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dWGH8-0002jY-2w
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 02:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dWGGs-0006Ym-3K
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 02:09:46 -0400
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:50236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1dWGGr-0006V5-HD
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 02:09:42 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dWGH4-0006e7-8g
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 02:09:58 -0400
 References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-4-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-29-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <e0196f5f-4b93-f7f5-f064-e0786050f4f8@reactos.org>
-Date: Sat, 15 Jul 2017 08:09:12 +0200
+Message-ID: <7e676758-18a5-62a1-b155-f02bcf226ed2@reactos.org>
+Date: Sat, 15 Jul 2017 08:09:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <1500040339-119465-4-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1500040339-119465-29-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/28] mips: replace cpu_mips_init() with
+Subject: Re: [Qemu-devel] [PATCH 28/28] ppc: replace cpu_ppc_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,151 +25,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-ppc@nongnu.org
 
-Le 14/07/2017 à 15:51, Igor Mammedov a écrit :
-> now cpu_mips_init() reimplements subset of cpu_generic_init()
-> tasks, so just drop it and use cpu_generic_init() directly.
+Le 14/07/2017 à 15:52, Igor Mammedov a écrit :
+> it's just a wrapper, drop it and use cpu_generic_init() directly
 >
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 
 > ---
-> CC: Aurelien Jarno <aurelien@aurel32.net>
-> CC: Yongbok Kim <yongbok.kim@imgtec.com>
+> CC: Alexander Graf <agraf@suse.de>
+> CC: David Gibson <david@gibson.dropbear.id.au>
 > CC: "Hervé Poussineau" <hpoussin@reactos.org>
+> CC: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> CC: qemu-ppc@nongnu.org
 > ---
->  target/mips/cpu.h       |  3 +--
->  hw/mips/cps.c           |  2 +-
->  hw/mips/mips_fulong2e.c |  2 +-
->  hw/mips/mips_jazz.c     |  2 +-
->  hw/mips/mips_malta.c    |  2 +-
->  hw/mips/mips_mipssim.c  |  2 +-
->  hw/mips/mips_r4k.c      |  2 +-
->  target/mips/translate.c | 17 -----------------
->  8 files changed, 7 insertions(+), 25 deletions(-)
+>  target/ppc/cpu.h            | 3 +--
+>  hw/ppc/e500.c               | 3 ++-
+>  hw/ppc/mac_newworld.c       | 3 ++-
+>  hw/ppc/mac_oldworld.c       | 3 ++-
+>  hw/ppc/ppc440_bamboo.c      | 2 +-
+>  hw/ppc/ppc4xx_devs.c        | 2 +-
+>  hw/ppc/prep.c               | 5 +++--
+>  hw/ppc/virtex_ml507.c       | 2 +-
+>  target/ppc/translate_init.c | 5 -----
+>  9 files changed, 13 insertions(+), 15 deletions(-)
 >
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 7c2e0bf..efc8025 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -865,10 +865,9 @@ enum {
->  #define CPU_INTERRUPT_WAKE CPU_INTERRUPT_TGT_INT_0
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 6ee2a26..696cbeb 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1276,7 +1276,6 @@ extern const struct VMStateDescription vmstate_ppc_cpu;
+>  #endif
 >
->  void mips_tcg_init(void);
-> -MIPSCPU *cpu_mips_init(const char *cpu_model);
->  int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
+>  /*****************************************************************************/
+> -PowerPCCPU *cpu_ppc_init(const char *cpu_model);
+>  void ppc_translate_init(void);
+>  const char *ppc_cpu_lookup_alias(const char *alias);
+>  /* you can call this signal handler from your SIGBUS and SIGSEGV
+> @@ -1353,7 +1352,7 @@ static inline uint64_t ppc_dump_gpr(CPUPPCState *env, int gprn)
+>  int ppc_dcr_read (ppc_dcr_t *dcr_env, int dcrn, uint32_t *valp);
+>  int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val);
 >
-> -#define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
-> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
->  bool cpu_supports_cps_smp(const char *cpu_model);
->  bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
->  void cpu_set_exception_base(int vp_index, target_ulong address);
-> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-> index 4ef337d..708899c 100644
-> --- a/hw/mips/cps.c
-> +++ b/hw/mips/cps.c
-> @@ -71,7 +71,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
->      bool itu_present = false;
+> -#define cpu_init(cpu_model) CPU(cpu_ppc_init(cpu_model))
+> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_POWERPC_CPU, cpu_model)
 >
->      for (i = 0; i < s->num_vp; i++) {
-> -        cpu = cpu_mips_init(s->cpu_model);
-> +        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, s->cpu_model));
+>  #define cpu_signal_handler cpu_ppc_signal_handler
+>  #define cpu_list ppc_cpu_list
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index 62f1857..f0596f3 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -819,7 +819,8 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+>          CPUState *cs;
+>          qemu_irq *input;
+>
+> -        cpu = cpu_ppc_init(machine->cpu_model);
+> +        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
 >          if (cpu == NULL) {
->              error_setg(errp, "%s: CPU initialization failed",  __func__);
->              return;
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index dbe2805..02a1712 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -277,7 +277,7 @@ static void mips_fulong2e_init(MachineState *machine)
->      if (cpu_model == NULL) {
->          cpu_model = "Loongson-2E";
->      }
-> -    cpu = cpu_mips_init(cpu_model);
-> +    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
->      if (cpu == NULL) {
->          fprintf(stderr, "Unable to find CPU definition\n");
->          exit(1);
-> diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-> index 1cef581..ee58c44 100644
-> --- a/hw/mips/mips_jazz.c
-> +++ b/hw/mips/mips_jazz.c
-> @@ -151,7 +151,7 @@ static void mips_jazz_init(MachineState *machine,
->      if (cpu_model == NULL) {
->          cpu_model = "R4000";
->      }
-> -    cpu = cpu_mips_init(cpu_model);
-> +    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
->      if (cpu == NULL) {
->          fprintf(stderr, "Unable to find CPU definition\n");
->          exit(1);
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 95cdabb..21dd2c3 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -928,7 +928,7 @@ static void create_cpu_without_cps(const char *cpu_model,
->      int i;
->
->      for (i = 0; i < smp_cpus; i++) {
-> -        cpu = cpu_mips_init(cpu_model);
-> +        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
->          if (cpu == NULL) {
->              fprintf(stderr, "Unable to find CPU definition\n");
+>              fprintf(stderr, "Unable to initialize CPU!\n");
 >              exit(1);
-> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> index 1b91195..80e2bab 100644
-> --- a/hw/mips/mips_mipssim.c
-> +++ b/hw/mips/mips_mipssim.c
-> @@ -162,7 +162,7 @@ mips_mipssim_init(MachineState *machine)
->          cpu_model = "24Kf";
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index bae1c0a..72c98e9 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -187,7 +187,8 @@ static void ppc_core99_init(MachineState *machine)
 >  #endif
 >      }
-> -    cpu = cpu_mips_init(cpu_model);
-> +    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
->      if (cpu == NULL) {
->          fprintf(stderr, "Unable to find CPU definition\n");
->          exit(1);
-> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-> index f4de9fc..81dba5e 100644
-> --- a/hw/mips/mips_r4k.c
-> +++ b/hw/mips/mips_r4k.c
-> @@ -191,7 +191,7 @@ void mips_r4k_init(MachineState *machine)
->          cpu_model = "24Kf";
->  #endif
+>      for (i = 0; i < smp_cpus; i++) {
+> -        cpu = cpu_ppc_init(machine->cpu_model);
+> +        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu == NULL) {
+>              fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+>              exit(1);
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 97bb854..6fc2a19 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -116,7 +116,8 @@ static void ppc_heathrow_init(MachineState *machine)
+>      if (machine->cpu_model == NULL)
+>          machine->cpu_model = "G3";
+>      for (i = 0; i < smp_cpus; i++) {
+> -        cpu = cpu_ppc_init(machine->cpu_model);
+> +        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu == NULL) {
+>              fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+>              exit(1);
+> diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+> index 9d997bf..ca26398 100644
+> --- a/hw/ppc/ppc440_bamboo.c
+> +++ b/hw/ppc/ppc440_bamboo.c
+> @@ -186,7 +186,7 @@ static void bamboo_init(MachineState *machine)
+>      if (machine->cpu_model == NULL) {
+>          machine->cpu_model = "440EP";
 >      }
-> -    cpu = cpu_mips_init(cpu_model);
-> +    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
+> -    cpu = cpu_ppc_init(machine->cpu_model);
+> +    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_model));
 >      if (cpu == NULL) {
->          fprintf(stderr, "Unable to find CPU definition\n");
+>          fprintf(stderr, "Unable to initialize CPU!\n");
 >          exit(1);
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index ae7ca80..ad4242f 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -20191,23 +20191,6 @@ void mips_tcg_init(void)
+> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+> index e7f413e..6b38ed7 100644
+> --- a/hw/ppc/ppc4xx_devs.c
+> +++ b/hw/ppc/ppc4xx_devs.c
+> @@ -56,7 +56,7 @@ PowerPCCPU *ppc4xx_init(const char *cpu_model,
+>      CPUPPCState *env;
 >
->  #include "translate_init.c"
+>      /* init CPUs */
+> -    cpu = cpu_ppc_init(cpu_model);
+> +    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+>      if (cpu == NULL) {
+>          fprintf(stderr, "Unable to find PowerPC %s CPU definition\n",
+>                  cpu_model);
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 36d3dcd..00f3321 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -520,7 +520,8 @@ static void ppc_prep_init(MachineState *machine)
+>      if (machine->cpu_model == NULL)
+>          machine->cpu_model = "602";
+>      for (i = 0; i < smp_cpus; i++) {
+> -        cpu = cpu_ppc_init(machine->cpu_model);
+> +        cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+> +                                           machine->cpu_model));
+>          if (cpu == NULL) {
+>              fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+>              exit(1);
+> @@ -724,7 +725,7 @@ static void ibm_40p_init(MachineState *machine)
+>      if (!machine->cpu_model) {
+>          machine->cpu_model = "604";
+>      }
+> -    cpu = cpu_ppc_init(machine->cpu_model);
+> +    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_model));
+>      if (!cpu) {
+>          error_report("could not initialize CPU '%s'",
+>                       machine->cpu_model);
+> diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+> index fdbcf22..d5fdc16 100644
+> --- a/hw/ppc/virtex_ml507.c
+> +++ b/hw/ppc/virtex_ml507.c
+> @@ -96,7 +96,7 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_size,
+>      CPUPPCState *env;
+>      qemu_irq *irqs;
 >
-> -MIPSCPU *cpu_mips_init(const char *cpu_model)
+> -    cpu = cpu_ppc_init(cpu_model);
+> +    cpu = POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+>      if (cpu == NULL) {
+>          fprintf(stderr, "Unable to initialize CPU!\n");
+>          exit(1);
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 783bf98..b4eaabb 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10250,11 +10250,6 @@ const char *ppc_cpu_lookup_alias(const char *alias)
+>      return NULL;
+>  }
+>
+> -PowerPCCPU *cpu_ppc_init(const char *cpu_model)
 > -{
-> -    ObjectClass *oc;
-> -    MIPSCPU *cpu;
-> -
-> -    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
-> -    if (oc == NULL) {
-> -        return NULL;
-> -    }
-> -
-> -    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
-> -
-> -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
-> -
-> -    return cpu;
+> -    return POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
 > -}
 > -
->  bool cpu_supports_cps_smp(const char *cpu_model)
+>  PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc)
 >  {
->      const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
+>      ObjectClass *oc = OBJECT_CLASS(pcc);
 >
