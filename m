@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dWAJO-00047U-6M
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:47:55 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dWAYV-0000Sg-CZ
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dWAJM-0006dE-Sy
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:47:54 -0400
-Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:35272)
+	(envelope-from <aik@ozlabs.ru>) id 1dWAYS-0005FP-9g
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:03:31 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dWAJM-0006c0-Fi
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 19:47:52 -0400
-Received: by mail-lf0-x22a.google.com with SMTP id b207so61130874lfg.2
-	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 16:47:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dWAYR-0005Ez-VN
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 20:03:28 -0400
+Received: by mail-pg0-x242.google.com with SMTP id y129so12119047pgy.3
+	for <qemu-devel@nongnu.org>; Fri, 14 Jul 2017 17:03:26 -0700 (PDT)
+References: <20170711053218.6700-1-aik@ozlabs.ru>
+	<20170714151740.60394531@w520.home>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <77ddd257-99ba-07bc-e6e6-eb33b6eeda77@ozlabs.ru>
+Date: Sat, 15 Jul 2017 10:03:20 +1000
 MIME-Version: 1.0
-In-Reply-To: <20170715023159-mutt-send-email-mst@kernel.org>
-References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
-	<20170714182012.4595-3-marcandre.lureau@redhat.com>
-	<20170714222023-mutt-send-email-mst@kernel.org>
-	<5d31f22d-e0ae-92f4-ea17-690419f72944@redhat.com>
-	<20170714230852-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJW1pCqJMN3JmGunFKswNnR=J74+Z_m5Lj5WYT2Z1ZoPQ@mail.gmail.com>
-	<20170715012551-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJP2DSo-khn+do0YG_ALDXrqBi6wEPH=m+W59rPfRTuiA@mail.gmail.com>
-	<20170715023159-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 15 Jul 2017 01:47:50 +0200
-Message-ID: <CAJ+F1C+F+HjHxzrq0usibfYUidpBW8DQUS72pDAv7xC6O14t3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/8] acpi: add vmcoreinfo device
+In-Reply-To: <20170714151740.60394531@w520.home>
+Content-Type: text/plain; charset=koi8-r
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3] vfio-pci,
+ ppc64/spapr: Reorder group-to-container attaching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,150 +31,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Dave Anderson <anderson@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Sat, Jul 15, 2017 at 1:40 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Sat, Jul 15, 2017 at 01:30:56AM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
+On 15/07/17 07:17, Alex Williamson wrote:
+> On Tue, 11 Jul 2017 15:32:18 +1000
+> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> 
+>> At the moment VFIO PCI device initialization works as follows:
+>> vfio_realize
+>> 	vfio_get_group
+>> 		vfio_connect_container
+>> 			register memory listeners (1)
+>> 			update QEMU groups lists
+>> 		vfio_kvm_device_add_group
 >>
->> On Sat, Jul 15, 2017 at 1:09 AM Michael S. Tsirkin <mst@redhat.com> wrot=
-e:
->> >
->> > On Sat, Jul 15, 2017 at 12:12:06AM +0200, Marc-Andr=C3=A9 Lureau wrote=
-:
->> > > Hi
->> > >
->> > > On Fri, Jul 14, 2017 at 10:17 PM, Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->> > > > On Fri, Jul 14, 2017 at 10:04:31PM +0200, Laszlo Ersek wrote:
->> > > >> > It worries me that the format of this seems completely undefine=
-d
->> > > >> > except in the patchset cover letter.
->> > > >> > I don't think we should merge this before it is.
->> > > >>
->> > > >> I'm not sure what you mean, this patch adds "docs/specs/vmcoreinf=
-o.txt".
->> > > >> That file is the first level contract between the guest firmware
->> > > >> (generally, via the linker/loader), the guest kernel driver
->> > > >> (specifically), and QEMU (also specifically).
->> > > >>
->> > > >> The second level contract is the guest kernel's vmcoreinfo ELF no=
-te
->> > > >> (which is pointed-to by the first level contract). The layout of =
-that is
->> > > >> specified elsewhere indeed (I don't think it belongs here).
->> > > >>
->> > > >> We've taken care not to trust anything coming from the guest kern=
-el.
->> > > >>
->> > > >> Can you clarify please?
->> > > >>
->> > > >> Thanks
->> > > >> Laszlo
->> > > >
->> > > > All there is is this:
->> > > >
->> > > > +Version 0 content:
->> > > > +
->> > > > + uint64 paddr:
->> > > > +  Physical address of the Linux vmcoreinfo ELF note.
->> > > > + uint32 size:
->> > > > +  Size of the vmcoreinfo ELF note.
->> > > >
->> > > > It isn't defined here what is the Linux vmcoreinfo ELF note.
->> > > > You want a bit more info so people trying to use it know where to =
-start
->> > > > and what they can get out of it.
->> > >
->> > > QEMU is not responsible for the content of the ELF note. All there i=
-s afaik is:
->> > >
->> > > https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-kernel-vm=
-coreinfo
->> > >
->> > > The rest you need to dig in the kernel code and git history I think.
->> >
->> > We need to do a good enough job to at least make it possible for peopl=
-e
->> > to make use of it without reading your python code.
->> >
->> > Documentation/kdump/kdump.txt has a bit more information.
->> >
->> >         All of the necessary information about the system kernel's cor=
-e image is
->> >         encoded in the ELF format, and stored in a reserved area of me=
-mory
->> >         before a crash. The physical address of the start of the ELF h=
-eader is
->> >         passed to the dump-capture kernel through the elfcorehdr=3D bo=
-ot
->> >         parameter. Optionally the size of the ELF header can also be p=
-assed
->> >         when using the elfcorehdr=3D[size[KMG]@]offset[KMG] syntax.
->> >
->> >
->> >         With the dump-capture kernel, you can access the memory image =
-through
->> >         /proc/vmcore. This exports the dump as an ELF-format file that=
- you can
->> >         write out using file copy commands such as cp or scp. Further,=
- you can
->> >         use analysis tools such as the GNU Debugger (GDB) and the Cras=
-h tool to
->> >         debug the dump file. This method ensures that the dump pages a=
-re correctly
->> >         ordered.
->> >
->> > I know where to find it but most people likely won't be able to.
->> >
+>> Then (example for pseries) the machine reset hook triggers region_add()
+>> for all regions where listeners from (1) are listening:
 >>
->> What do you learn from that regarding vmcoreinfo? That is it being
->> used by kdump? and that you can use gdb/crash, that we already use to
->> analyse our dumps.
->
-> Some things I learn:
->
-> That its written by a dump-capture kernel (so you need to set one up
-> if you want it to work!).
+>> ppc_spapr_reset
+>> 	spapr_phb_reset
+>> 		spapr_tce_table_enable
+>> 			memory_region_add_subregion
+>> 				vfio_listener_region_add
+>> 					vfio_spapr_create_window
+>>
+>> This scheme works fine until we need to handle VFIO PCI device hotplug
+>> and we want to enable PPC64/sPAPR in-kernel TCE acceleration on,
+>> i.e. after PCI hotplug we need a place to call
+>> ioctl(vfio_kvm_device_fd, KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE).
+>> Since the ioctl needs a LIOBN fd (from sPAPRTCETable) and a IOMMU group fd
+>> (from VFIOGroup), vfio_listener_region_add() seems to be the only place
+>> for this ioctl().
+>>
+>> However this only works during boot time because the machine reset
+>> happens strictly after all devices are finalized. When hotplug happens,
+>> vfio_listener_region_add() is called when a memory listener is registered
+>> but when this happens:
+>> 1. new group is not added to the container->group_list yet;
+>> 2. VFIO KVM device is unaware of the new IOMMU group.
+>>
+>> This moves bits around to have all necessary VFIO infrastructure
+>> in place for both initial startup and hotplug cases.
+> 
+> 
+> Wow, for a fairly straight forward patch this changelog is brutal.  Can
+> this be summarized as "Register vfio groups with kvm prior to memory
+> listener registration such that kvm-vfio pseudo device ioctls are
+> available during the region_add callback"?  If so I'll queue this up
+> for a pull request prior to soft freeze.  Thanks,
 
-I don't follow you, you don't need a dump-capture kernel / kdump to
-have the vmcoreinfo note.
 
->
-> That it's an ELF-format file, that one can use analysis tools such as
-> the GNU Debugger (GDB) and the Crash tool to debug the dump file.
+It just could have looked like an unnecessary change, hence this changelog.
+Since it is straight forward, I am ok with your shorter version as well.
+Thanks.
 
-Well, that's what kdump does, but qemu is the one making the dump in
-our case. Quite irrelevant for us.
 
->
-> There's more info scattered in other places.
->
-> Why do you get to document it? Because you are the one exposing it
-> across the hypervisor/vm boundary where it will need to be
-> understood by people/tools not running within guest.
->
-> So "just read the script in qemu source" is not how an interface
-> should be documented.
 
-I don't understand the issue, it's a kernel ELF note that qemu passes
-for dump/crash tools in the dump headers/sections.
-
->
->> >
->> > BTW why does it pass ELF header size? Any idea?
+> 
+> Alex
+> 
+>  
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> ---
 >>
 >>
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commi=
-t/?id=3Dd3bf37955d46718ee1a7f1fc69f953d2328ba7c2
->
-> Right but I mean, ELF header has two options: 32 and 64 bit, that's all.
->
-> --
-> MST
+>> This is an independend part of a bigger patchset to enable in-kernel
+>> acceleration of TCE operations. While I stuck with IOMMU MR QOM-fication,
+>> let's try to parallel patchset pieces' review/acceptance.
+>>
+>> ---
+>> Changes:
+>> v3:
+>> * rebased on current upstream
+>>
+>> v2:
+>> * moved container->initialized back to its correct location
+>> * added missing QLIST_REMOVE()
+>> ---
+>>  hw/vfio/common.c | 19 +++++++++++--------
+>>  1 file changed, 11 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 2965b68e5d..4e75dc8c56 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -1107,6 +1107,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>>          goto free_container_exit;
+>>      }
+>>  
+>> +    vfio_kvm_device_add_group(group);
+>> +
+>> +    QLIST_INIT(&container->group_list);
+>> +    QLIST_INSERT_HEAD(&space->containers, container, next);
+>> +
+>> +    group->container = container;
+>> +    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+>> +
+>>      container->listener = vfio_memory_listener;
+>>  
+>>      memory_listener_register(&container->listener, container->space->as);
+>> @@ -1120,14 +1128,11 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+>>  
+>>      container->initialized = true;
+>>  
+>> -    QLIST_INIT(&container->group_list);
+>> -    QLIST_INSERT_HEAD(&space->containers, container, next);
+>> -
+>> -    group->container = container;
+>> -    QLIST_INSERT_HEAD(&container->group_list, group, container_next);
+>> -
+>>      return 0;
+>>  listener_release_exit:
+>> +    QLIST_REMOVE(group, container_next);
+>> +    QLIST_REMOVE(container, next);
+>> +    vfio_kvm_device_del_group(group);
+>>      vfio_listener_release(container);
+>>  
+>>  free_container_exit:
+>> @@ -1232,8 +1237,6 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+>>  
+>>      QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+>>  
+>> -    vfio_kvm_device_add_group(group);
+>> -
+>>      return group;
+>>  
+>>  close_fd_exit:
+> 
 
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+-- 
+Alexey
