@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWQuP-0006WL-Ev
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:31:14 -0400
+	(envelope-from <tim3385@gmail.com>) id 1dWRA7-0007Kj-M1
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:47:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWQuN-0000v9-L0
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:31:13 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36582)
+	(envelope-from <tim3385@gmail.com>) id 1dWRA4-0001Dr-Ki
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:47:27 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36371)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWQuN-0000uy-F4
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:31:11 -0400
-Received: by mail-pf0-x244.google.com with SMTP id k24so866159pfj.3
-	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 10:31:11 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Sat, 15 Jul 2017 07:30:50 -1000
-Message-Id: <20170715173050.31018-9-rth@twiddle.net>
-In-Reply-To: <20170715173050.31018-1-rth@twiddle.net>
-References: <20170715173050.31018-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 8/8] target/s390x: Fix risbg handling
+	(Exim 4.71) (envelope-from <tim3385@gmail.com>) id 1dWRA4-0001D7-DD
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:47:24 -0400
+Received: by mail-pf0-x242.google.com with SMTP id k24so893635pfj.3
+	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 10:47:22 -0700 (PDT)
+Received: from ryzenwin10 ([119.28.19.150]) by smtp.gmail.com with ESMTPSA id
+	133sm21002137pgc.19.2017.07.15.10.47.19 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sat, 15 Jul 2017 10:47:20 -0700 (PDT)
+Date: Sun, 16 Jul 2017 01:47:18 +0800
+From: "tim3385" <tim3385@gmail.com>
+Message-ID: <emc_869082b03c5b4653b73dbe4571a1ebc0@pc.loc>
+References: <emc_869082b03c5b4653b73dbe4571a1ebc0@pc.loc>
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] =?utf-8?q?Could_you_please_create_an_account?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +32,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: qemu-devel <qemu-devel@nongnu.org>
 
-The rotation is to the left, but extract shifts to the right.
-The computation of the extract parameters needs adjusting.
-
-For the entry condition, simplify
-
-	64 - rot + len <= 64
-	-rot + len <= 0
-	len <= rot
-
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
-Reported-by: David Hildenbrand <david@redhat.com>
-Suggested-by: Aurelien Jarno <aurelien@aurel32.net>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/s390x/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index b46f4c8..1dffcee 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3479,8 +3479,8 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
-     }
- 
-     /* In some cases we can implement this with extract.  */
--    if (imask == 0 && pos == 0 && len > 0 && rot + len <= 64) {
--        tcg_gen_extract_i64(o->out, o->in2, rot, len);
-+    if (imask == 0 && pos == 0 && len > 0 && len <= rot) {
-+        tcg_gen_extract_i64(o->out, o->in2, 64 - rot, len);
-         return NO_EXIT;
-     }
- 
--- 
-2.9.4
+SGVsbG8gYWxsLAoKwqAgwqAgwqAgQ291bGQgeW91IHBsZWFzZSBjcmVhdGUgYW4gYWNjb3VudCBm
+b3IgbWU/CgphY2NvdW50OiB0aW0zMzg1CmVtYWlsOiDCoHRpbTMzODVAZ21haWwuY29twqAKCnRo
+YW5rcwoKYmVzdApEb25nIEhhbwpTZW50IGZyb20gWW9NYWlsIGZvciBHbWFpbA==
