@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tblodt@icloud.com>) id 1dWDrn-0005PJ-Qg
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 23:35:41 -0400
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1dWDwl-0007A9-4E
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 23:40:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tblodt@icloud.com>) id 1dWDrk-0005U0-CV
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 23:35:39 -0400
-Received: from st13p21im-asmtp003.me.com ([17.164.152.25]:53694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tblodt@icloud.com>) id 1dWDrk-0005TM-4Y
-	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 23:35:36 -0400
-Received: from process-dkim-sign-daemon.st13p21im-asmtp003.me.com by
-	st13p21im-asmtp003.me.com
-	(Oracle Communications Messaging Server 7.0.5.38.0 64bit (built Feb 26
-	2016)) id <0OT401D0048GTJ00@st13p21im-asmtp003.me.com> for
-	qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:35:31 +0000 (GMT)
-Received: from icloud.com ([127.0.0.1]) by st13p21im-asmtp003.me.com
-	(Oracle Communications Messaging Server 7.0.5.38.0 64bit (built Feb 26
-	2016))
-	with ESMTPSA id <0OT401BHK4N40940@st13p21im-asmtp003.me.com> for
-	qemu-devel@nongnu.org; Sat, 15 Jul 2017 03:35:31 +0000 (GMT)
-From: Theodore Dubois <tblodt@icloud.com>
-Content-type: text/plain; charset=us-ascii
-Content-transfer-encoding: 7bit
-MIME-version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Fri, 14 Jul 2017 20:35:26 -0700
-References: <D5741445-7EFD-4AF1-8DB2-E4AFA93CBB1A@icloud.com>
-In-reply-to: <D5741445-7EFD-4AF1-8DB2-E4AFA93CBB1A@icloud.com>
-Message-id: <43AE448E-B7B2-490F-8ADB-DC1361512608@icloud.com>
-Subject: Re: [Qemu-devel] [PATCH] test-i386: Make x86 test program compile
- on clang
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1dWDwk-00074d-2r
+	for qemu-devel@nongnu.org; Fri, 14 Jul 2017 23:40:47 -0400
+MIME-Version: 1.0
+In-Reply-To: <1500086333.2865.102.camel@au1.ibm.com>
+References: <20170714040437.22034-1-nikunj@linux.vnet.ibm.com>
+	<1500086333.2865.102.camel@au1.ibm.com>
+From: Nikunj Dadhania <nikunj.dadhania@gmail.com>
+Date: Sat, 15 Jul 2017 09:10:42 +0530
+Message-ID: <CALAZu3-3i-uvGDedB_MdUaLEqJyck5sU_cPVLOuBbBwMkMVkBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr: ignore decr
+ interrupts when MSR_EE is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,110 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: benh@au1.ibm.com
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, bharata@linux.vnet.ibm.com, clg@kaod.org
 
-ping http://patchwork.ozlabs.org/patch/786393/
+On 15-Jul-2017 8:10 AM, "Benjamin Herrenschmidt" <benh@au1.ibm.com> wrote:
 
-~Theodore
+On Fri, 2017-07-14 at 09:34 +0530, Nikunj A Dadhania wrote:
+> Rebooting a SMP TCG guest is broken for both single/multi threaded TCG.
+>
+> When reset happens, all the CPUs are in halted state. First CPU is
+brought out
+> of reset and secondary CPUs would be initialized by the guest kernel
+using a
+> rtas call start-cpu.
+>
+> However, in case of TCG, decrementer interrupts keep on coming and waking
+the
+> secondary CPUs up.
+>
+> These secondary CPUs would see the decrementer interrupt pending, which
+makes
+> cpu::has_work() to bring them out of wait loop and start executing
+> tcg_exec_cpu().
+>
+> The problem with this is all the CPUs wake up and start booting SLOF
+image,
+> causing the following exception(4 CPUs TCG VM):
 
-> On Jul 10, 2017, at 1:57 PM, Theodore Dubois <tblodt@icloud.com> wrote:
-> 
-> Clang's assembler is slightly incompatible with GCC's assembler, which
-> caused the program to not compile on Clang for these reasons:
-> 
->  - The "q" constraint was specified for an argument to the set
->    instruction, which didn't work because Clang chose the esi register,
->    which has no 8-bit form on i386.
->  - Clang doesn't support size suffixes on the loop instructions.
->  - Clang requires a size suffix on the fist instruction.
->  - Clang doesn't support specifying segment prefixes before the
->    instruction, and requires specifying them on the address.
->  - The arguments to the bound instruction are in the wrong order on
->    Clang. https://bugs.llvm.org/show_bug.cgi?id=27653
-> 
-> Signed-off-by: Theodore Dubois <tblodt@icloud.com>
-> ---
-> tests/tcg/test-i386.c | 20 ++++++++++++++++----
-> 1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tests/tcg/test-i386.c b/tests/tcg/test-i386.c
-> index 0f7b943b0c..dcb8e4876e 100644
-> --- a/tests/tcg/test-i386.c
-> +++ b/tests/tcg/test-i386.c
-> @@ -369,7 +369,7 @@ void test_lea(void)
->     asm("movl $0, %0\n\t"\
->         "cmpl %2, %1\n\t"\
->         "set" JCC " %b0\n\t"\
-> -        : "=r" (res)\
-> +        : "=q" (res)\
->         : "r" (v1), "r" (v2));\
->     printf("%-10s %d\n", "set" JCC, res);\
->  if (TEST_CMOV) {\
-> @@ -491,15 +491,23 @@ void test_loop(void)
-> 
-> #if !defined(__x86_64__)
->     TEST_LOOP("jcxz");
-> +#if !defined(__clang__)
->     TEST_LOOP("loopw");
->     TEST_LOOP("loopzw");
->     TEST_LOOP("loopnzw");
-> #endif
-> +#endif
-> 
->     TEST_LOOP("jecxz");
-> +#if !defined(__clang__)
->     TEST_LOOP("loopl");
->     TEST_LOOP("loopzl");
->     TEST_LOOP("loopnzl");
-> +#else
-> +    TEST_LOOP("loop");
-> +    TEST_LOOP("loopz");
-> +    TEST_LOOP("loopnz");
-> +#endif
-> }
-> 
-> #undef CC_MASK
-> @@ -867,7 +875,7 @@ void test_fcvt(double a)
->         uint16_t val16;
->         val16 = (fpuc & ~0x0c00) | (i << 10);
->         asm volatile ("fldcw %0" : : "m" (val16));
-> -        asm volatile ("fist %0" : "=m" (wa) : "t" (a));
-> +        asm volatile ("fists %0" : "=m" (wa) : "t" (a));
->         asm volatile ("fistl %0" : "=m" (ia) : "t" (a));
->         asm volatile ("fistpll %0" : "=m" (lla) : "t" (a) : "st");
->         asm volatile ("frndint ; fstl %0" : "=m" (ra) : "t" (a));
-> @@ -1318,12 +1326,12 @@ void test_segs(void)
->     seg_data1[1] = 0xaa;
->     seg_data2[1] = 0x55;
-> 
-> -    asm volatile ("fs movzbl 0x1, %0" : "=r" (res));
-> +    asm volatile ("movzbl %%fs:0x1, %0" : "=r" (res));
->     printf("FS[1] = %02x\n", res);
-> 
->     asm volatile ("pushl %%gs\n"
->                   "movl %1, %%gs\n"
-> -                  "gs movzbl 0x1, %0\n"
-> +                  "movzbl %%gs:0x1, %0\n"
->                   "popl %%gs\n"
->                   : "=r" (res)
->                   : "r" (MK_SEL(2)));
-> @@ -1764,7 +1772,11 @@ void test_exceptions(void)
->         /* bound exception */
->         tab[0] = 1;
->         tab[1] = 10;
-> +#if defined(__clang__)
-> +        asm volatile ("bound %1, %0" : : "r" (11), "m" (tab[0]));
-> +#else
->         asm volatile ("bound %0, %1" : : "r" (11), "m" (tab[0]));
-> +#endif
->     }
-> #endif
-> 
-> -- 
-> 2.13.2
-> 
-> 
-> 
-> ~Theodore
-> 
-> 
+This patch isn't right....
+
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -8536,7 +8536,8 @@ static bool cpu_has_work_POWER7(CPUState *cs)
+>          }
+>          if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
+>              (env->spr[SPR_LPCR] & LPCR_P7_PECE1)) {
+> -            return true;
+> +            /* Return true only when MSR_EE is enabled */
+> +            return msr_ee;
+>          }
+
+No, the HW will not check MSR_EE, in fact, MSR_EE can purposefully be
+left off and we might expect a wakeup still.
+
+
+Here we had a decr timer callback which is started during machine init and
+remains on even during reset.
+
+In case of HW, does the decr stop on reset?
+
+
+I think the right fix is for reset to clear the LPCR PECE bits.
+
+
+Ok, let me try that out.
+
+Regards
+Nikunj
