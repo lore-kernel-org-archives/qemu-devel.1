@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWRHL-0002TY-3X
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:54:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dWRRl-000572-Nw
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 14:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWRHK-0006f2-F8
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 13:54:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dWRRh-0004eq-EW
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 14:05:41 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33154)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWRRh-0004e1-8K
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 14:05:37 -0400
+Received: by mail-pg0-x243.google.com with SMTP id 123so2687879pgd.0
+	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 11:05:37 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <150002001195.22386.4679134058536830996.stgit@frigg.lan>
-	<150002534291.22386.13499916738708680298.stgit@frigg.lan>
-	<28a48f7c-930a-389b-b39d-64c43654cd04@twiddle.net>
-	<87a846b0al.fsf@frigg.lan>
+References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-13-git-send-email-imammedo@redhat.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <f2e2da5e-0790-4c30-d398-8937c43c1ec4@twiddle.net>
-Date: Sat, 15 Jul 2017 07:54:43 -1000
+Message-ID: <b0c4a3f8-fa31-97c6-e54c-d7755bfe8973@twiddle.net>
+Date: Sat, 15 Jul 2017 08:05:31 -1000
 MIME-Version: 1.0
-In-Reply-To: <87a846b0al.fsf@frigg.lan>
+In-Reply-To: <1500040339-119465-13-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v13 22/26] target/arm: [tcg] Port to tb_stop
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 12/28] alpha: replace cpu_alpha_init() with
+ cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,21 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-On 07/14/2017 09:56 PM, Lluís Vilanova wrote:
-> Richard Henderson writes:
+On 07/14/2017 03:52 AM, Igor Mammedov wrote:
+> cpu_alpha_init() used to provide default fallback if invalid
+> (i.e. non existent) cpu_model were provided.
 > 
->> On 07/13/2017 11:42 PM, Lluís Vilanova wrote:
->>> -        dc->base.is_jmp = DISAS_SKIP;
->>> +        dc->base.is_jmp = DISAS_NORETURN;
+> dp264 machine provides its own default so sole user of fallback
+> is [bsd|linux]-user targets which specifies 'any' cpu model that
+> fallbacks to "ev67" in cpu_alpha_init(). Push fallback handling
+> into alpha_cpu_class_by_name() and replace cpu_alpha_init() with
+> cpu_generic_init().
 > 
->> Really should fold this back into the patch that introduced SKIP temporarily.
+> Signed-off-by: Igor Mammedov<imammedo@redhat.com>
+> ---
+> PS:
+>    tested only linux-user as I don't have bsd box to test on
 > 
-> Sorry, I don't understand what you mean.
+> CC: Richard Henderson<rth@twiddle.net>
+> CC: Riku Voipio<riku.voipio@iki.fi>
+> CC: Laurent Vivier<laurent@vivier.eu>
+> ---
+>   target/alpha/cpu.h |  4 +---
+>   hw/alpha/dp264.c   |  8 ++++++--
+>   target/alpha/cpu.c | 20 +++++---------------
+>   3 files changed, 12 insertions(+), 20 deletions(-)
 
-DISAS_SKIP should never exist in the patch set.  You should simply use NORETURN 
-in the places that you first used SKIP.
+Acked-by: Richard Henderson <rth@twiddle.net>
 
 
-r~
+r
