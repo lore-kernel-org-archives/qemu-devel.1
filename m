@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWp7v-0000TK-L9
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:22:48 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dWpK0-0004bh-4l
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWp7s-00010G-HN
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:22:47 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:47363
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dWp7s-0000zd-A3
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:22:44 -0400
-References: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<6d3baced-070b-908a-95b0-7784e2f0ca4e@ilande.co.uk>
-	<2f0d3ed6-5aa3-851e-3e9f-c08532ca1120@redhat.com>
-	<b8946b8c-6409-e904-451f-5bf4eeb50595@ilande.co.uk>
-	<85b75513-9516-db30-cf56-cb1542d494c4@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <0bf6be3a-50cc-1166-53c5-272b3c919393@ilande.co.uk>
-Date: Sun, 16 Jul 2017 20:22:30 +0100
+	(envelope-from <rth7680@gmail.com>) id 1dWpJx-00083D-31
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:35:16 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:35698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWpJw-00082y-US
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:35:13 -0400
+Received: by mail-io0-x243.google.com with SMTP id 84so6050315iop.2
+	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 12:35:12 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-7-rth@twiddle.net>
+	<20170715221412.3yprwf5i3te4gdxa@aurel32.net>
+	<65cb9165-42a1-9648-7519-0bd893c1ac13@twiddle.net>
+	<20170716151802.cmaz3zhucqlgaq5r@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e19112df-a491-2e34-61a7-3a514622df3e@twiddle.net>
+Date: Sun, 16 Jul 2017 09:35:05 -1000
 MIME-Version: 1.0
-In-Reply-To: <85b75513-9516-db30-cf56-cb1542d494c4@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170716151802.cmaz3zhucqlgaq5r@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv2 0/2] pci: allow PCI bus slots to be
- marked as reserved
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space
+ atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-On 16/07/17 08:28, Marcel Apfelbaum wrote:
+On 07/16/2017 05:18 AM, Aurelien Jarno wrote:
+> That said for further improvements did you consider decoding the gUSA
+> section in a helper. It might avoid having to emulate the atomic
+> sequence with 3 TBs in the worst case (the original one, the one to
+> decode the sequence and the one holding the exclusive lock). The helper
+> should directly have access to the r0 value, can decode the atomic
+> sequence and translate it into a call to the corresponding atomic
+> helpers. In the best case that means the sequence can be done in the
+> same TB. In the worst case, where the gUSA sequence is not recognized
+> it means two TB.
 
->>> As in prev version, other than the minor comment
->>> on replacing "if (...) return true; else return false"
->>> with the actual value, I am OK with it.
->>
->> Okay great! So change pci_bus_devfn_available() to something like this?
->>
->> static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
->> {
->>      return !(bus->devices[devfn]);
->> }
->>
-> 
-> Yes, thanks.
+I did not consider decoding the sequence in a helper.
 
-Great, I'll send a v3 with the above modification shortly.
+I do want to cache the result in a TB, so that when we execute the atomic 
+sequence for a second time we do not have to re-interpret it.  And I don't see 
+how to do that with a helper.
 
->>> I believe Michael asked to see the series using this feature,
->>> can you add a link to it, or post it with the dependency on this one?
->>
->> Sure, I posted the link earlier in the week:
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03045.html.
->> Or more specifically:
->>
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03041.html
->>
-> 
-> Hi Michael,
-> Can you please have a look to the above patch using
-> the 'reserved slots' patch?
+I *could* remember a mova into R0 earlier within the same block that performs 
+the mov #imm,r15.  It's not guaranteed to be in the same TB, but looking 
+through dumps from debian unstable it's highly likely.
 
-I should add that if this patch isn't suitable for freeze then it's
-likely I'll drop the sun4u patchset for 2.10 since otherwise using
--device places devices on the PCI root bus.
+That could end up with the atomic sequence in the same TB that set SP, or with 
+the EXCP_ATOMIC exception in the same TB.
 
-For existing users this means that the machine will start up with their
-existing command lines but any extra devices added on the command line
-via -device, e.g. virtio will be silently broken because the interrupt
-routing is incorrect.
-
-At least with this patch the user will get an error, and thus it's easy
-to update the wiki to explain that moving forward it is necessary to add
-"bus=pciB" for extra devices to function correctly.
+If it's ok with you, I'd prefer to handle that as a follow up.  We would still 
+have to have the current setup as a backup just in case the mova isn't visible.
 
 
-ATB,
-
-Mark.
+r~
