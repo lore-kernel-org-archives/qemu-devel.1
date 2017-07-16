@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWdJc-00063O-MP
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 02:46:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWdR1-0007zv-PA
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 02:53:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWdJZ-0003zb-JZ
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 02:46:04 -0400
-Date: Sun, 16 Jul 2017 16:45:42 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dWdR0-00010r-Ta
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 02:53:43 -0400
+Date: Sun, 16 Jul 2017 16:53:27 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170716064542.GO17539@umbus.fritz.box>
-References: <20170711035620.4232-1-aik@ozlabs.ru>
-	<20170711035620.4232-3-aik@ozlabs.ru>
+Message-ID: <20170716065327.GP17539@umbus.fritz.box>
+References: <20170714061521.28300-1-david@gibson.dropbear.id.au>
+	<CAFEAcA8kQF3xS6=uQiXf6FSbP56xmStPN9SoqWy1cmzMFFUpOQ@mail.gmail.com>
+	<20170715024202.GH17539@umbus.fritz.box>
+	<CAFEAcA_8nhPXE6y0PnYdQfjwqhqFMzg0wGL=KxgD_xb5jnZnfA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ugCSa1rMkiCAmd9S"
+	protocol="application/pgp-signature"; boundary="MM5RgFPKyuP3gDcV"
 Content-Disposition: inline
-In-Reply-To: <20170711035620.4232-3-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu v9 2/2] memory/iommu: introduce
- IOMMUMemoryRegionClass
+In-Reply-To: <CAFEAcA_8nhPXE6y0PnYdQfjwqhqFMzg0wGL=KxgD_xb5jnZnfA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/18] ppc-for-2.10 queue 20170714
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, sbobroff@au1.ibm.com, Laurent Vivier <lvivier@redhat.com>
 
 
---ugCSa1rMkiCAmd9S
-Content-Type: text/plain; charset=us-ascii
+--MM5RgFPKyuP3gDcV
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 11, 2017 at 01:56:20PM +1000, Alexey Kardashevskiy wrote:
-> This finishes QOM'fication of IOMMUMemoryRegion by introducing
-> a IOMMUMemoryRegionClass. This also provides a fastpath analog for
-> IOMMU_MEMORY_REGION_GET_CLASS().
+On Sat, Jul 15, 2017 at 08:45:13AM +0100, Peter Maydell wrote:
+> On 15 July 2017 at 03:42, David Gibson <david@gibson.dropbear.id.au> wrot=
+e:
+> > On Fri, Jul 14, 2017 at 04:13:05PM +0100, Peter Maydell wrote:
+> >> Hi. I'm afraid this fails to build on the w32 compiler:
+> >>   CC      ppc64-softmmu/hw/ppc/spapr.o
+> >> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c: In function
+> >> =E2=80=98spapr_get_resize_hpt=E2=80=99:
+> >> /home/petmay01/linaro/qemu-for-merges/hw/ppc/spapr.c:2642:1: error:
+> >> control reaches end of non-void functio
+> >> n [-Werror=3Dreturn-type]
+> >>  }
+> >
+> > Drat.  Is there an easy way to test compile for w32?
 >=20
-> This makes IOMMUMemoryRegion an abstract class.
+> I have a cross-compiler set up on an Ubuntu host; you
+> can do it on Redhat hosts too; instructions on the wiki
+> somewhere I think.
+
+Ah, thanks, found them.
+
+> In this case I think you're either getting caught by the
+> age of the compiler or because this set of w32 headers
+> have a bug where assert() doesn't get marked as fatal
+> somehow, so it might or might not manifest on other
+> w32 cross build setups.
+
+Ah, right.
+
+> > Yes, seems good.  Should I resend, or will you adjust in place?
 >=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> You'll need to resend -- I can't modify signed pull reqs.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Ah, yes of course.
 
-with the exception of one miniscule nit:
-
-[snip]
-> +/**
-> + * memory_region_get_iommu_class_nocheck: returns iommu memory region cl=
-ass
-> + *   if an iommu or NULL if not
-> + *
-> + * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an i=
-ommu,
-
-Typo                                      ^
+I've also realised one of the patches breaks make check on Travis OSX
+builds for reasons I haven't quite fathomed yet.  Investigating.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -64,24 +79,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ugCSa1rMkiCAmd9S
+--MM5RgFPKyuP3gDcV
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllrC5QACgkQbDjKyiDZ
-s5LkzBAA5r+iH/hBvck5DDaccWrc7led5VV71oI1i20mHZmte2zFxh0uFd0xrmVT
-WdKItWIp7LrlvOJoU+RV1KxTrtc7jCjSR2369tBPAnL5bI9iaBOfIM57I3lBrGzM
-DdOhaifX2mUZHujuhzJZUJ3Bz/6bdTbRnnZ3OQIWBsLhofyBR/U2xEW9eLXpF/OJ
-fcSe+kX+CePbQ4cHRVSRg+sXidj+Ohf/4hrozqwGXiOK9cvzkjBr4WUEkY1gcCce
-G/RKWEkWBxQADLAgzeNmMGj91YQASAh3sXv/2c70ZZPaDtSLxfsX4ktWx8jY7S6C
-kivFEGZQoGl6CSgs1wtiNPbNGNpm71Lqq4IGuKtptJUpVAVaF5CXw990/mHZjYuU
-gj4O6NpP1SR1tQQSNS7B/NAUyrsnsC4nF/4qIBGLYhbJJnKshc1bSulqnQHYjFq+
-OxHMzGsFZHpEPo7ayUeMwO+HqI8EYUlarF6gjnOpuWXxgxjeVTqW2WVr7bKyCKXQ
-ptw5chUKcF5NceMGvl5cH2QMwuBScsHrosRUwQWoQvVBK3fHSMyQxUBpbecDmDJ/
-jEnOy7zMcJJFFLWkP1I1PaaeR//bR1cCg9YjM1XqcpmFv4uNCJ2AqJBnhWQ+XocV
-cscqyWWzOpN1dJ+4ShA3FR7DZMg3qb/+DRakv8y0nvMYkvxFxGE=
-=8DDm
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllrDWcACgkQbDjKyiDZ
+s5IDgA//ehZUoZKT8hwrQVbVcN1FNKHoglbO4CIslt1fxvzwRf7zTlagSBw3bHdG
+zYZICdn47USbSjZmr8ylpPQgOE5zJKmDw+o4PQwsQdglP+HR6tCpUNXA45/cwVC0
+UlosPOPTKlx++9XJXtLqZ921qaekjySvERXPg+1+GcGxDiLsZlpPAvzAuirG10zx
+3N3LXeRw0/40PIZnUP0mQA9jFcRdoF36jFSC3SaMfdHnDjoJEnCcD8WRYtEaK4cu
+mKQRJWBqgpvxrF4NbexrudQhjy309aCxdcsSGewAgEzP0wTAUNYQJct6FbCdvnA3
+NwQvMSiF8tvZSuAFae7fU3TG7QZrjqfxzEmqlgeLXbK/wR/uBbjSwc7OiC5GotmR
+k6C1pCxzI/hI46dVUZM+/OnDErAXENcoyq+nK6wddZfdRlTKfYT6ykrNYIlySW6/
+XKmqYyn809zwbq2ugg/6dT4C//0UucxY2f0KH63304dd1vfu0qyUPEH/FxLRcnKg
+AHWA99A+Kv/KbGKdLKP2WzZ24on152v6rSQgL6WDBbG4xPucX2bZKB3++FSHOJ8e
+KlT3LjVhJOXAzetWk2X1B/rffwjZ80DF9By5oag1U9aqJigxr4MzbxplzO0myCF5
+C8LT0erB2vSpgH9gefWB4E5DQRCQ1UFF3jtzVFvwChbAiN7mvvY=
+=g4hh
 -----END PGP SIGNATURE-----
 
---ugCSa1rMkiCAmd9S--
+--MM5RgFPKyuP3gDcV--
