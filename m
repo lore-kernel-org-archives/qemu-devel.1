@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWZL1-00042B-1j
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 22:31:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dWZNa-0004lF-9E
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 22:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dWZKw-0002T4-3j
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 22:31:15 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:36409)
+	(envelope-from <rth7680@gmail.com>) id 1dWZNV-00048H-CG
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 22:33:54 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWZKv-0002ST-SQ
-	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 22:31:10 -0400
-Received: by mail-pg0-x244.google.com with SMTP id y129so15195449pgy.3
-	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 19:31:08 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dWZNV-00047u-5n
+	for qemu-devel@nongnu.org; Sat, 15 Jul 2017 22:33:49 -0400
+Received: by mail-pf0-x241.google.com with SMTP id e199so15512194pfh.0
+	for <qemu-devel@nongnu.org>; Sat, 15 Jul 2017 19:33:48 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20170707022111.21836-1-rth@twiddle.net>
-	<20170707022111.21836-7-rth@twiddle.net>
-	<20170715221412.3yprwf5i3te4gdxa@aurel32.net>
+	<20170707022111.21836-10-rth@twiddle.net>
+	<20170715225934.lap5cnukiyotqrqs@aurel32.net>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <65cb9165-42a1-9648-7519-0bd893c1ac13@twiddle.net>
-Date: Sat, 15 Jul 2017 16:30:59 -1000
+Message-ID: <00736ea7-4c08-2f01-3271-1a669110a4a9@twiddle.net>
+Date: Sat, 15 Jul 2017 16:33:44 -1000
 MIME-Version: 1.0
-In-Reply-To: <20170715221412.3yprwf5i3te4gdxa@aurel32.net>
+In-Reply-To: <20170715225934.lap5cnukiyotqrqs@aurel32.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space
- atomics
+Subject: Re: [Qemu-devel] [PATCH v2 09/27] linux-user/sh4: Clean env->flags
+ on signal boundaries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +36,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Aurelien Jarno <aurelien@aurel32.net>
 Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-On 07/15/2017 12:14 PM, Aurelien Jarno wrote:
+On 07/15/2017 12:59 PM, Aurelien Jarno wrote:
 > On 2017-07-06 16:20, Richard Henderson wrote:
->> For uniprocessors, SH4 uses optimistic restartable atomic sequences.
->> Upon an interrupt, a real kernel would simply notice magic values in
->> the registers and reset the PC to the start of the sequence.
->>
->> For QEMU, we cannot do this in quite the same way.  Instead, we notice
->> the normal start of such a sequence (mov #-x,r15), and start a new TB
->> that can be executed under cpu_exec_step_atomic.
+>> If a signal is delivered during the execution of a delay slot,
+>> or a gUSA region, clear those bits from the environment so that
+>> the signal handler does not start in that same state.
 > 
-> Do you have actually have a good documentation about gUSA? I have found
-> a few documents (some of them in Japanese), the most complete one being
-> the LinuxTag paper. The ABI is also described in the kernel and the
-> glibc. That said I am missing the following informations:
+> How are signals delivered in linux-user? At least in system mode we
+> forbid interrupts in the delay slot (see commit 5c6f3eb7db), as the
+> manual clearly declare them as indivisible. Maybe the same should be
+> done for linux-user?
 
-Kernel sources and glibc are good.  The description in GCC is pretty good as well:
+Signals get queued, and delivered eventually.  I don't believe that we do 
+anything to check that "signals can't be delivered yet" like we do in system mode.
 
-https://gcc.gnu.org/viewcvs/gcc/trunk/gcc/config/sh/sync.md?revision=243994&view=markup#l53
-
-> - What kind of instructions are allowed in the atomic sequence? Your
->    patch takes into account branches, but are there allowed? used in
->    practice? What about FP instructions?
-
-Any sequence that can be restarted.
-
-> - Does the atomic sequence is actually allowed to cross pages?
-
-I don't see why not.  It would be restarted on a page fault, but assuming that 
-a process can have 2 pages in ram doesn't seem onerous.
-
-> - Is there any alignement required? The paper mention adding a nop to
->    gUSA_exchange_and_add to align the end point to 4 bytes.
-
-That's about the mov.l instruction that computes the address.
-
-
-> This looks fine. I guess this can be improved in a another patch by
-> changing the caller to pass a single target address and if the condition
-> is true or false. This would avoid having to detect that here, and would
-> not make the code below more complicated.
-
-Sure.
-
->> +    if (ctx->tbflags & GUSA_EXCLUSIVE) {
->> +        /* Regardless of single-stepping or the end of the page,
->> +           we must complete execution of the gUSA region while
->> +           holding the exclusive lock.  */
->> +        *pmax_insns = max_insns;
->> +        return 0;
->>       }
+>> +    regs->flags &= ~(DELAY_SLOT_MASK | GUSA_MASK);
+>>   }
+>>   
+>>   static void setup_frame(int sig, struct target_sigaction *ka,
 > 
-> What are the consequence of not stopping the translation when crossing
-> the page in user mode? If it doesn't have any, we should probably change
-> the code to never stop when crossing pages.
+> Why not using TB_FLAG_ENVFLAGS_MASK introduced earlier in this patch
+> series?
 
-The only consequence is recognizing a segv "too early".  It's a quirk that, 
-frankly, I'm willing to accept.
-
->> +    if (ctx.tbflags & GUSA_EXCLUSIVE) {
->> +        /* Ending the region of exclusivity.  Clear the bits.  */
->> +        ctx.envflags &= ~GUSA_MASK;
->> +    }
->> +
-> 
-> IIUC this assumes the number of instructions in the sequence is always
-> executed. I guess this is not correct if the TCG op buffer is full. Some
-> non-privileged instructions might also stop the translation, but they
-> are all FPU instructions, so I guess the section is simply not valid in
-> that case.
-
-The TCG op buffer is always empty when we begin the sequence.  Since we're 
-limited to 128 bytes, or 64 instructions, I'm not concerned about running out. 
-I attempt to make sure that all of the paths out -- like exceptions and 
-branches -- that don't do what we want have GUSA state zapped.
-
-At which point ya gets what ya gets.  Not atomic, but not really wrong either.
+I really want to clear these two sets.  I didn't want to assume that 
+ENVFLAGS_MASK would never contain anything else.
 
 
 r~
