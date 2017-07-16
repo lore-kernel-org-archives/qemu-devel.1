@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dWdz1-0005io-JQ
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 03:28:52 -0400
+	(envelope-from <dmitry@daynix.com>) id 1dWevh-000897-L4
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 04:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dWdyy-0001bt-F9
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 03:28:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dWdyy-0001Y4-5o
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 03:28:48 -0400
-References: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<6d3baced-070b-908a-95b0-7784e2f0ca4e@ilande.co.uk>
-	<2f0d3ed6-5aa3-851e-3e9f-c08532ca1120@redhat.com>
-	<b8946b8c-6409-e904-451f-5bf4eeb50595@ilande.co.uk>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <85b75513-9516-db30-cf56-cb1542d494c4@redhat.com>
-Date: Sun, 16 Jul 2017 10:28:48 +0300
-MIME-Version: 1.0
-In-Reply-To: <b8946b8c-6409-e904-451f-5bf4eeb50595@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv2 0/2] pci: allow PCI bus slots to be
- marked as reserved
+	(envelope-from <dmitry@daynix.com>) id 1dWeve-0008Mj-Fc
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 04:29:29 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35072)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dWeve-0008LC-7K
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 04:29:26 -0400
+Received: by mail-wm0-x244.google.com with SMTP id u23so17828634wma.2
+	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 01:29:24 -0700 (PDT)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Date: Sun, 16 Jul 2017 11:29:17 +0300
+Message-Id: <20170716082917.720-1-dmitry@daynix.com>
+Subject: [Qemu-devel] [PATCH] pci: honor PCI_COMMAND_MEMORY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Sameeh Jubran <sameeh@daynix.com>
 
-On 14/07/2017 13:37, Mark Cave-Ayland wrote:
-> On 14/07/17 11:25, Marcel Apfelbaum wrote:
-> 
->> On 14/07/2017 12:59, Mark Cave-Ayland wrote:
->>> On 11/07/17 22:44, Mark Cave-Ayland wrote:
->>>
->>>> For some machines it is impossible to plug devices into a particular
->>>> PCI bus
->>>> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the
->>>> root
->>>> bus behind which all devices must be plugged. Ignoring this rule will
->>>> cause
->>>> problems with interrupt routing since the interrupt numbers are
->>>> calculated
->>>> based upon PCI bridge id and secondary PCI bus slot id.
->>>>
->>>> This patchset adds a new slot_reserved_mask property to PCIBus which
->>>> is a
->>>> bitmask used to indicate whether PCI bus slots are reserved, i.e.
->>>> they cannot
->>>> be used for hot or cold plugging on a particular PCI bus.
->>>>
->>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>>
->>>> v2:
->>>> - Rename dev_reserved_mask to slot_reserved_mask as suggested by Marcel
->>>> - Squash patches 2 and 3 together
->>>>
->>>>
->>>> Mark Cave-Ayland (2):
->>>>     pci: move check for existing devfn into new pci_bus_devfn_available()
->>>>       helper
->>>>     pci: add reserved slot check to do_pci_register_device()
->>>>
->>>>    hw/pci/pci.c             |   34 ++++++++++++++++++++++++++++++----
->>>>    include/hw/pci/pci_bus.h |    1 +
->>>>    2 files changed, 31 insertions(+), 4 deletions(-)
->>>
->>> Ping? Any further feedback on the v2 version? My latest set of sun4u
->>> patches is dependent upon this patchset and it's freeze coming up next
->>> week!
->>>
->>
+According to PCI spec. bit 1 of command
+register (PCI_COMMAND_MEMORY) controls
+a device's response to memory space accesses.
+A value of 0 disables the device response.
+A value of 1 allows the device to respond
+to memory space accesses.
 
-Hi Mark,
+Current behavior introduced by commit
 
->> Hi,
->>
->> As in prev version, other than the minor comment
->> on replacing "if (...) return true; else return false"
->> with the actual value, I am OK with it.
-> 
-> Okay great! So change pci_bus_devfn_available() to something like this?
-> 
-> static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
-> {
->      return !(bus->devices[devfn]);
-> }
-> 
+  commit 1c380f9460522f32c8dd2577b2a53d518ec91c6d
+  Author: Avi Kivity <avi@redhat.com>
+  Date:   Wed Oct 3 17:42:58 2012 +0200
 
-Yes, thanks.
+      pci: honor PCI_COMMAND_MASTER
 
->> I believe Michael asked to see the series using this feature,
->> can you add a link to it, or post it with the dependency on this one?
-> 
-> Sure, I posted the link earlier in the week:
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03045.html.
-> Or more specifically:
-> 
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03041.html
-> 
+is to ignore device memory space accesses unless
+bit 2 (PCI_COMMAND_MASTER) is set.
 
-Hi Michael,
-Can you please have a look to the above patch using
-the 'reserved slots' patch?
+Aforementioned commit introduced regression of
+Windows hibernation (S4) functionality support
+because on resume Windows kernel sets bits 0 and 1
+(PCI_COMMAND_MEMORY | PCI_COMMAND_IO) of boot
+device's (piix3-ide in our specific case) command
+register and tries to work with the device.
 
-Thanks,
-Marcel
+Since PCI_COMMAND_MASTER bit is not set, device
+does not answer and Windows fails to resume from
+hibernation.
 
-> 
-> ATB,
-> 
-> Mark.
-> 
+As a result following BSOD happens:
+
+  BugCheck A0, {10e, a, aa00, 418}
+
+  Probably caused by : ntkrnlmp.exe ( nt!PopHiberChecksumHiberFileData+b346 )
+
+  Followup:     MachineOwner
+  ---------
+
+  0: kd> !analyze -v
+  *******************************************************************************
+  *                                                                             *
+  *                        Bugcheck Analysis                                    *
+  *                                                                             *
+  *******************************************************************************
+
+  INTERNAL_POWER_ERROR (a0)
+  The power policy manager experienced a fatal error.
+  Arguments:
+  Arg1: 000000000000010e, The disk subsystem returned corrupt data while reading from the
+      hibernation file.
+  Arg2: 000000000000000a
+  Arg3: 000000000000aa00, Incorrect checksum
+  Arg4: 0000000000000418, Previous disk read's checksum
+
+According to our tests this problem happens at least on
+Windows 8/8.1/2012/2012R2/10/2016.
+
+This patch solves https://bugzilla.redhat.com/show_bug.cgi?id=988351
+
+Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
+---
+ hw/pci/pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 0c6f74a..10af82f 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -480,7 +480,7 @@ static int get_pci_config_device(QEMUFile *f, void *pv, size_t size,
+ 
+     memory_region_set_enabled(&s->bus_master_enable_region,
+                               pci_get_word(s->config + PCI_COMMAND)
+-                              & PCI_COMMAND_MASTER);
++                              & (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY));
+ 
+     g_free(config);
+     return 0;
+@@ -1356,7 +1356,7 @@ void pci_default_write_config(PCIDevice *d, uint32_t addr, uint32_t val_in, int
+         pci_update_irq_disabled(d, was_irq_disabled);
+         memory_region_set_enabled(&d->bus_master_enable_region,
+                                   pci_get_word(d->config + PCI_COMMAND)
+-                                    & PCI_COMMAND_MASTER);
++                                  & (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY));
+     }
+ 
+     msi_write_config(d, addr, val_in, l);
+-- 
+2.9.4
