@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWmRi-0003W1-Iq
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 12:31:04 -0400
+	(envelope-from <marcel@redhat.com>) id 1dWmqZ-0003xt-Un
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 12:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWmRf-00068p-Ep
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 12:31:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dWmRf-000683-8u
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 12:30:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dWmRe-00049X-2k
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 16:30:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0CB822E8195
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 16:30:58 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1dWmqV-0003a2-29
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 12:56:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dWmqU-0003Zb-Or
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 12:56:38 -0400
+References: <20170716082917.720-1-dmitry@daynix.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <09ea0b99-783f-263c-fd47-801c933fb398@redhat.com>
+Date: Sun, 16 Jul 2017 19:56:31 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Jul 2017 16:23:14 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1704658 <1704658@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150022185647.5906.17655055691802268187.malonedeb@gac.canonical.com>
-Message-Id: <150022219457.6469.8920259422420791099.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1704658] Re: O_CLOEXEC not handled in dup3 system
- call in user mode
+In-Reply-To: <20170716082917.720-1-dmitry@daynix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pci: honor PCI_COMMAND_MEMORY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +27,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dmitry Fleytman <dmitry@daynix.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Sameeh Jubran <sameeh@daynix.com>
 
-I see this bug for hppa, sparc64.
-I don't see it for m68k, mips, mips64, powerpc, powerpc64.
-Most likely because the binary values of O_CLOEXEC on hppa and sparc64 are =
-different than on other platforms. Looking in the glibc source code:
+On 16/07/2017 11:29, Dmitry Fleytman wrote:
+> According to PCI spec. bit 1 of command
+> register (PCI_COMMAND_MEMORY) controls
+> a device's response to memory space accesses.
+> A value of 0 disables the device response.
+> A value of 1 allows the device to respond
+> to memory space accesses.
+>
 
-$ grep -r 'define.*O_CLOEXEC' glibc
-glibc/bits/fcntl.h:# define O_CLOEXEC   0x00400000      /* Set close_on_exe=
-c.  */
-glibc/sysdeps/mach/hurd/bits/fcntl.h:# define O_CLOEXEC 0x00400000 /* Set F=
-D_CLOEXEC.  */
-glibc/sysdeps/unix/sysv/linux/sparc/bits/fcntl.h:#define __O_CLOEXEC    0x4=
-00000 /* Set close_on_exit.  */
-glibc/sysdeps/unix/sysv/linux/bits/fcntl-linux.h:# define __O_CLOEXEC   020=
-00000
-glibc/sysdeps/unix/sysv/linux/bits/fcntl-linux.h:# define O_CLOEXEC     __O=
-_CLOEXEC     /* Set close_on_exec.  */
-glibc/sysdeps/unix/sysv/linux/hppa/bits/fcntl.h:#define __O_CLOEXEC     010=
-000000 /* Set close_on_exec.  */
-glibc/sysdeps/unix/sysv/linux/microblaze/bits/fcntl.h:#define __O_CLOEXEC  =
-      02000000       /* Set close_on_exec.  */
-glibc/sysdeps/unix/sysv/linux/alpha/bits/fcntl.h:#define __O_CLOEXEC    010=
-000000 /* Set close_on_exec.  */
-glibc/sysdeps/nacl/bits/fcntl.h:# define O_CLOEXEC      02000000        /* =
-Set close_on_exec.  */
+Hi Dmitry,
 
-So, what's missing is probably that the O_CLOEXEC of the target platform
-gets mapped to O_CLOEXEC of the host platform, during the dup3 system
-call emulation.
 
--- =
+> Current behavior introduced by commit
+> 
+>    commit 1c380f9460522f32c8dd2577b2a53d518ec91c6d
+>    Author: Avi Kivity <avi@redhat.com>
+>    Date:   Wed Oct 3 17:42:58 2012 +0200
+> 
+>        pci: honor PCI_COMMAND_MASTER
+> 
+> is to ignore device memory space accesses unless
+> bit 2 (PCI_COMMAND_MASTER) is set.
+> 
+> Aforementioned commit introduced regression of
+> Windows hibernation (S4) functionality support
+> because on resume Windows kernel sets bits 0 and 1
+> (PCI_COMMAND_MEMORY | PCI_COMMAND_IO) of boot
+> device's (piix3-ide in our specific case) command
+> register and tries to work with the device.
+> > Since PCI_COMMAND_MASTER bit is not set, device
+> does not answer and Windows fails to resume from
+> hibernation.
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1704658
+As far as I am aware "Bus master" is needed for a device
+to start PCI transactions, while PCI_COMMAND_MEMORY/IO
+controls the device ability to respond to memory/IO accesses,
+not to start them.
+If "Bus master" is needed for DMA access or MSI, the OS should
+explicitly set the  PCI_COMMAND_MASTER, right?
 
-Title:
-  O_CLOEXEC not handled in dup3 system call in user mode
 
-Status in QEMU:
-  New
 
-Bug description:
-  In qemu user mode, for hppa and sparc64 targets, the parameter of the
-  dup3 is not passed correctly when it contains the O_CLOEXEC flag.
+> As a result following BSOD happens:
+> 
+>    BugCheck A0, {10e, a, aa00, 418}
+> 
+>    Probably caused by : ntkrnlmp.exe ( nt!PopHiberChecksumHiberFileData+b346 )
+> 
+>    Followup:     MachineOwner
+>    ---------
+> 
+>    0: kd> !analyze -v
+>    *******************************************************************************
+>    *                                                                             *
+>    *                        Bugcheck Analysis                                    *
+>    *                                                                             *
+>    *******************************************************************************
+> 
+>    INTERNAL_POWER_ERROR (a0)
+>    The power policy manager experienced a fatal error.
+>    Arguments:
+>    Arg1: 000000000000010e, The disk subsystem returned corrupt data while reading from the
+>        hibernation file.
+>    Arg2: 000000000000000a
+>    Arg3: 000000000000aa00, Incorrect checksum
+>    Arg4: 0000000000000418, Previous disk read's checksum
+> 
 
-  When the attached program runs, the expected output is:
-  errno=3D9=3DEBADF
+Does piix3-ide fail to respond to IO/MEM accesses if
+PCI_COMMAND_MASTER is not set? Or is it a DMA issue?
 
-  How to reproduce on hppa:
-  - Compile the program: hppa-linux-gnu-gcc-5 -O -Wall -static testdup3.c -=
-o testdup3-hppa
-  - Set environment variables for running qemu-hppa.
-  - ~/inst-qemu/2.9.0/bin/qemu-hppa testdup3-hppa
-  errno=3D22=3DEINVAL
-  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
 
-  How to reproduce on sparc64:
-  - Compile the program: sparc64-linux-gnu-gcc-5 -O -Wall -static testdup3.=
-c -o testdup3-sparc64
-  - Set environment variables for running qemu-sparc64.
-  - ~/inst-qemu/2.9.0/bin/qemu-sparc64 testdup3-sparc64
-  errno=3D22=3DEINVAL
-  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
+Thanks,
+Marcel
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1704658/+subscriptions
+> According to our tests this problem happens at least on
+> Windows 8/8.1/2012/2012R2/10/2016.
+> 
+> This patch solves https://bugzilla.redhat.com/show_bug.cgi?id=988351
+> 
+> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
+> ---
+>   hw/pci/pci.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 0c6f74a..10af82f 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -480,7 +480,7 @@ static int get_pci_config_device(QEMUFile *f, void *pv, size_t size,
+>   
+>       memory_region_set_enabled(&s->bus_master_enable_region,
+>                                 pci_get_word(s->config + PCI_COMMAND)
+> -                              & PCI_COMMAND_MASTER);
+> +                              & (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY));
+>   
+>       g_free(config);
+>       return 0;
+> @@ -1356,7 +1356,7 @@ void pci_default_write_config(PCIDevice *d, uint32_t addr, uint32_t val_in, int
+>           pci_update_irq_disabled(d, was_irq_disabled);
+>           memory_region_set_enabled(&d->bus_master_enable_region,
+>                                     pci_get_word(d->config + PCI_COMMAND)
+> -                                    & PCI_COMMAND_MASTER);
+> +                                  & (PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY));
+>       }
+>   
+>       msi_write_config(d, addr, val_in, l);
+> 
