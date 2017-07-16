@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWbCV-0000fJ-GA
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 00:30:36 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1dWcHu-0004Ol-Dk
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 01:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWbCS-0006Aq-8C
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 00:30:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54187)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dWbCS-0006Ac-1z
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 00:30:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dWbCO-0006r0-Ng
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 04:30:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 638932E819E
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 04:30:28 +0000 (UTC)
+	(envelope-from <hpoussin@reactos.org>) id 1dWcHr-0006FP-8P
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 01:40:14 -0400
+Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:38870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+	id 1dWcHq-0006DN-Jj
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 01:40:11 -0400
+References: <20170715132841.9865-1-hpoussin@reactos.org>
+	<20170715132841.9865-5-hpoussin@reactos.org>
+	<3f675ff1-e6ce-a6b2-f63c-4b063871a215@amsat.org>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <5dfb4f95-6557-d42e-6779-90f679b3d701@reactos.org>
+Date: Sun, 16 Jul 2017 07:39:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Jul 2017 04:17:37 -0000
-From: Launchpad Bug Tracker <1286253@bugs.launchpad.net>
-Reply-To: Bug 1286253 <1286253@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140228174019.12875.25127.malonedeb@wampee.canonical.com>
-Message-Id: <150017865725.6173.2666937946036433905.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1286253] Re: virtio-net acceleration features not
- set when plugged into backend dynamically
+In-Reply-To: <3f675ff1-e6ce-a6b2-f63c-4b063871a215@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] vvfat: initialize memory after
+ allocating it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Le 16/07/2017 à 00:24, Philippe Mathieu-Daudé a écrit :
+> Hi Hervé,
+>
+> On 07/15/2017 10:28 AM, Hervé Poussineau wrote:
+>> This prevents some host to guest memory content leaks.
+>>
+>> Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
+>>
+>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+>> ---
+>>   block/vvfat.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/block/vvfat.c b/block/vvfat.c
+>> index afc6170a69..7340decef3 100644
+>> --- a/block/vvfat.c
+>> +++ b/block/vvfat.c
+>> @@ -115,6 +115,7 @@ static inline int array_ensure_allocated(array_t* array, int index)
+>>           array->pointer = g_realloc(array->pointer, new_size);
+>>           if (!array->pointer)
+>>               return -1;
+>
+> isn't it safer:
+>
+> if (likely(new_size > array->size)) {
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Not really, because the code is:
+     if((index + 1) * array->item_size > array->size) {
+         int new_size = (index + 32) * array->item_size;
+         array->pointer = g_realloc(array->pointer, new_size);
+         if (!array->pointer)
+             return -1;
+         array->size = new_size;
+         array->next = index + 1;
+     }
 
--- =
+array->size is the size (in bytes) of the previous array.
+new_size is (index + 32) * item_size
+And, due to the "if", we know that (index + 1) * item_size > array->size.
+So, new_size > array->size.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1286253
-
-Title:
-  virtio-net acceleration features not set when plugged into backend
-  dynamically
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  When using indpendent transport and backend in this case virtio-net-
-  device transport, none of the acceleration features are set after
-  guest probes the transport the backend is plugged into. For virtio-net
-  this leads to low throughput/performance.  This holds true for
-  virtio-mmio, PCI transports and most likely for others as well (CCW,
-  S390) and other backends
-
-  Command to run:
-  ./qemu-system-arm -enable-kvm -smp 2 -kernel zImage -dtb ./guest-a15.dtb =
--m 512 -M vexpress-a15 -cpu cortex-a15 -nographic \
-        -append "root=3D/dev/vda rw console=3DttyAMA0 rootwait" -drive if=
-=3Dnone,file=3D/mnt/gauss.root,id=3Dvm1 \
-        -device virtio-blk-device,drive=3Dvm1 -netdev type=3Dtap,id=3Dnet0,=
-ifname=3Dtap0 \
-        -device virtio-net-device,netdev=3Dnet0,mac=3D"52:54:00:12:34:58"
-
-  For x86 same virtio command for network.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1286253/+subscriptions
+>
+>> +        memset(array->pointer + array->size, 0, new_size - array->size);
+>
+> }
+>
+> ?
+>
+>>           array->size = new_size;
+>>           array->next = index + 1;
+>>       }
+>>
+>
+> Regards,
+>
+> Phil.
+>
