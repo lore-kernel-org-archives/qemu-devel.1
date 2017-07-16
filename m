@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmZ-0001Ah-90
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:52 -0400
+	(envelope-from <cota@braap.org>) id 1dWpmZ-0001Af-05
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmU-0008H6-Nc
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:47 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48037)
+	(envelope-from <cota@braap.org>) id 1dWpmU-0008Gc-Ef
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:46 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36725)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmU-0008G4-J0
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmU-0008FJ-6c
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:42 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun, 16 Jul 2017 16:03:51 -0400
-Message-Id: <1500235468-15341-9-git-send-email-cota@braap.org>
+Date: Sun, 16 Jul 2017 16:03:46 -0400
+Message-Id: <1500235468-15341-4-git-send-email-cota@braap.org>
 In-Reply-To: <1500235468-15341-1-git-send-email-cota@braap.org>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 08/45] tcg/i386: constify
- tcg_target_callee_save_regs
+Subject: [Qemu-devel] [PATCH v2 03/45] cputlb: bring back tlb_flush_count
+ under !TLB_DEBUG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
+Commit f0aff0f124 ("cputlb: add assert_cpu_is_self checks") buried
+the increment of tlb_flush_count under TLB_DEBUG. This results in
+"info jit" always (mis)reporting 0 TLB flushes when !TLB_DEBUG.
+
+Besides, under MTTCG tlb_flush_count is updated by several threads,
+so in order not to lose counts we'd either have to use atomic ops
+or distribute the counter, which is more scalable.
+
+This patch does the latter by embedding tlb_flush_count in CPUArchState.
+The global count is then easily obtained by iterating over the CPU list.
+
+Note that this change also requires updating the accessors to
+tlb_flush_count to use atomic_read/set whenever there may be conflicting
+accesses (as defined in C11) to it.
+
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/i386/tcg-target.inc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/exec/cpu-defs.h   |  1 +
+ include/exec/cputlb.h     |  3 +--
+ accel/tcg/cputlb.c        | 17 ++++++++++++++---
+ accel/tcg/translate-all.c |  2 +-
+ 4 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 01e3b4e..06df01a 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -2514,7 +2514,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     return NULL;
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index bc8e7f8..e43ff83 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -137,6 +137,7 @@ typedef struct CPUIOTLBEntry {
+     CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
+     CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
+     CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
++    size_t tlb_flush_count;                                             \
+     target_ulong tlb_flush_addr;                                        \
+     target_ulong tlb_flush_mask;                                        \
+     target_ulong vtlb_index;                                            \
+diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+index 3f94178..c91db21 100644
+--- a/include/exec/cputlb.h
++++ b/include/exec/cputlb.h
+@@ -23,7 +23,6 @@
+ /* cputlb.c */
+ void tlb_protect_code(ram_addr_t ram_addr);
+ void tlb_unprotect_code(ram_addr_t ram_addr);
+-extern int tlb_flush_count;
+-
++size_t tlb_flush_count(void);
+ #endif
+ #endif
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 85635ae..9377110 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -92,8 +92,18 @@ static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
+     }
  }
  
--static int tcg_target_callee_save_regs[] = {
-+static const int tcg_target_callee_save_regs[] = {
- #if TCG_TARGET_REG_BITS == 64
-     TCG_REG_RBP,
-     TCG_REG_RBX,
+-/* statistics */
+-int tlb_flush_count;
++size_t tlb_flush_count(void)
++{
++    CPUState *cpu;
++    size_t count = 0;
++
++    CPU_FOREACH(cpu) {
++        CPUArchState *env = cpu->env_ptr;
++
++        count += atomic_read(&env->tlb_flush_count);
++    }
++    return count;
++}
+ 
+ /* This is OK because CPU architectures generally permit an
+  * implementation to drop entries from the TLB at any time, so
+@@ -112,7 +122,8 @@ static void tlb_flush_nocheck(CPUState *cpu)
+     }
+ 
+     assert_cpu_is_self(cpu);
+-    tlb_debug("(count: %d)\n", tlb_flush_count++);
++    atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
++    tlb_debug("(count: %zu)\n", tlb_flush_count());
+ 
+     tb_lock();
+ 
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 090ebad..3ee69e5 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1916,7 +1916,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
+             atomic_read(&tcg_ctx.tb_ctx.tb_flush_count));
+     cpu_fprintf(f, "TB invalidate count %d\n",
+             tcg_ctx.tb_ctx.tb_phys_invalidate_count);
+-    cpu_fprintf(f, "TLB flush count     %d\n", tlb_flush_count);
++    cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
+     tcg_dump_info(f, cpu_fprintf);
+ 
+     tb_unlock();
 -- 
 2.7.4
