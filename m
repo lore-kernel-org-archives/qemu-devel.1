@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmb-0001Aw-RY
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:57 -0400
+	(envelope-from <cota@braap.org>) id 1dWpmg-0001D5-05
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmV-0008K9-QN
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:49 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:57525)
+	(envelope-from <cota@braap.org>) id 1dWpma-0008RO-4j
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:53 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:34053)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmV-0008JT-M4
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:43 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmZ-0008Qp-T6
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:47 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun, 16 Jul 2017 16:04:01 -0400
-Message-Id: <1500235468-15341-19-git-send-email-cota@braap.org>
+Date: Sun, 16 Jul 2017 16:04:22 -0400
+Message-Id: <1500235468-15341-40-git-send-email-cota@braap.org>
 In-Reply-To: <1500235468-15341-1-git-send-email-cota@braap.org>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 18/45] target/m68k: check CF_PARALLEL
- instead of parallel_cpus
+Subject: [Qemu-devel] [PATCH v2 39/45] osdep: move
+ qemu_real_host_page_size/mask to osdep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,130 +27,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Thereby decoupling the resulting translated code from the current state
-of the system.
+These only depend on the host and therefore belong in the common
+osdep, not in a target-dependent object.
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- target/m68k/helper.h    |  2 ++
- target/m68k/op_helper.c | 32 ++++++++++++++++++++++++++++----
- target/m68k/translate.c | 12 ++++++++++--
- 3 files changed, 40 insertions(+), 6 deletions(-)
+ include/exec/cpu-all.h | 2 --
+ include/qemu/osdep.h   | 8 ++++++++
+ exec.c                 | 5 +----
+ util/osdep.c           | 9 +++++++++
+ 4 files changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/target/m68k/helper.h b/target/m68k/helper.h
-index 475a1f2..137ef48 100644
---- a/target/m68k/helper.h
-+++ b/target/m68k/helper.h
-@@ -10,7 +10,9 @@ DEF_HELPER_4(divsll, void, env, int, int, s32)
- DEF_HELPER_2(set_sr, void, env, i32)
- DEF_HELPER_3(movec, void, env, i32, i32)
- DEF_HELPER_4(cas2w, void, env, i32, i32, i32)
-+DEF_HELPER_4(cas2w_parallel, void, env, i32, i32, i32)
- DEF_HELPER_4(cas2l, void, env, i32, i32, i32)
-+DEF_HELPER_4(cas2l_parallel, void, env, i32, i32, i32)
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index ffe43d5..778031c 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -229,8 +229,6 @@ extern int target_page_bits;
+ /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
+  * when intptr_t is 32-bit and we are aligning a long long.
+  */
+-extern uintptr_t qemu_real_host_page_size;
+-extern intptr_t qemu_real_host_page_mask;
+ extern uintptr_t qemu_host_page_size;
+ extern intptr_t qemu_host_page_mask;
  
- #define dh_alias_fp ptr
- #define dh_ctype_fp FPReg *
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 7b5126c..061d468 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -361,7 +361,8 @@ void HELPER(divsll)(CPUM68KState *env, int numr, int regr, int32_t den)
-     env->dregs[numr] = quot;
- }
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 8559634..3cb36e6 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -483,6 +483,14 @@ char *qemu_get_pid_name(pid_t pid);
+  */
+ pid_t qemu_fork(Error **errp);
  
--void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-+static void do_cas2w(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2,
-+                     bool parallel)
- {
-     uint32_t Dc1 = extract32(regs, 9, 3);
-     uint32_t Dc2 = extract32(regs, 6, 3);
-@@ -374,7 +375,7 @@ void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-     int16_t l1, l2;
-     uintptr_t ra = GETPC();
- 
--    if (parallel_cpus) {
-+    if (parallel) {
-         /* Tell the main loop we need to serialize this insn.  */
-         cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
-     } else {
-@@ -399,7 +400,19 @@ void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-     env->dregs[Dc2] = deposit32(env->dregs[Dc2], 0, 16, l2);
- }
- 
--void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-+void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-+{
-+    do_cas2w(env, regs, a1, a2, false);
-+}
++void real_host_page_size_init(void);
 +
-+void HELPER(cas2w_parallel)(CPUM68KState *env, uint32_t regs, uint32_t a1,
-+                            uint32_t a2)
-+{
-+    do_cas2w(env, regs, a1, a2, true);
-+}
++/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
++ * when intptr_t is 32-bit and we are aligning a long long.
++ */
++extern uintptr_t qemu_real_host_page_size;
++extern intptr_t qemu_real_host_page_mask;
 +
-+static void do_cas2l(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2,
-+                     bool parallel)
+ extern int qemu_icache_linesize;
+ extern int qemu_dcache_linesize;
+ 
+diff --git a/exec.c b/exec.c
+index adc160f..135dcbc 100644
+--- a/exec.c
++++ b/exec.c
+@@ -120,8 +120,6 @@ int use_icount;
+ 
+ uintptr_t qemu_host_page_size;
+ intptr_t qemu_host_page_mask;
+-uintptr_t qemu_real_host_page_size;
+-intptr_t qemu_real_host_page_mask;
+ 
+ bool set_preferred_target_page_bits(int bits)
  {
-     uint32_t Dc1 = extract32(regs, 9, 3);
-     uint32_t Dc2 = extract32(regs, 6, 3);
-@@ -416,7 +429,7 @@ void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-     TCGMemOpIdx oi;
+@@ -3608,8 +3606,7 @@ void page_size_init(void)
+ {
+     /* NOTE: we can always suppose that qemu_host_page_size >=
+        TARGET_PAGE_SIZE */
+-    qemu_real_host_page_size = getpagesize();
+-    qemu_real_host_page_mask = -(intptr_t)qemu_real_host_page_size;
++    real_host_page_size_init();
+     if (qemu_host_page_size == 0) {
+         qemu_host_page_size = qemu_real_host_page_size;
+     }
+diff --git a/util/osdep.c b/util/osdep.c
+index a2863c8..90f4f11 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -46,6 +46,9 @@ extern int madvise(caddr_t, size_t, int);
+ #define QEMU_GETLK F_GETLK
  #endif
  
--    if (parallel_cpus) {
-+    if (parallel) {
-         /* We're executing in a parallel context -- must be atomic.  */
- #ifdef CONFIG_ATOMIC64
-         uint64_t c, u, l;
-@@ -470,6 +483,17 @@ void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
-     env->dregs[Dc2] = l2;
++uintptr_t qemu_real_host_page_size;
++intptr_t qemu_real_host_page_mask;
++
+ static bool fips_enabled = false;
+ 
+ static const char *hw_version = QEMU_HW_VERSION;
+@@ -65,6 +68,12 @@ int socket_set_nodelay(int fd)
+     return qemu_setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &v, sizeof(v));
  }
  
-+void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
++void real_host_page_size_init(void)
 +{
-+    do_cas2l(env, regs, a1, a2, false);
++    qemu_real_host_page_size = getpagesize();
++    qemu_real_host_page_mask = -(intptr_t)qemu_real_host_page_size;
 +}
 +
-+void HELPER(cas2l_parallel)(CPUM68KState *env, uint32_t regs, uint32_t a1,
-+                            uint32_t a2)
-+{
-+    do_cas2l(env, regs, a1, a2, true);
-+}
-+
- struct bf_data {
-     uint32_t addr;
-     uint32_t bofs;
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 3a519b7..5cfa25f 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -2308,7 +2308,11 @@ DISAS_INSN(cas2w)
-                          (REG(ext1, 6) << 3) |
-                          (REG(ext2, 0) << 6) |
-                          (REG(ext1, 0) << 9));
--    gen_helper_cas2w(cpu_env, regs, addr1, addr2);
-+    if (s->tb->cflags & CF_PARALLEL) {
-+        gen_helper_cas2w_parallel(cpu_env, regs, addr1, addr2);
-+    } else {
-+        gen_helper_cas2w(cpu_env, regs, addr1, addr2);
-+    }
-     tcg_temp_free(regs);
- 
-     /* Note that cas2w also assigned to env->cc_op.  */
-@@ -2354,7 +2358,11 @@ DISAS_INSN(cas2l)
-                          (REG(ext1, 6) << 3) |
-                          (REG(ext2, 0) << 6) |
-                          (REG(ext1, 0) << 9));
--    gen_helper_cas2l(cpu_env, regs, addr1, addr2);
-+    if (s->tb->cflags & CF_PARALLEL) {
-+        gen_helper_cas2l_parallel(cpu_env, regs, addr1, addr2);
-+    } else {
-+        gen_helper_cas2l(cpu_env, regs, addr1, addr2);
-+    }
-     tcg_temp_free(regs);
- 
-     /* Note that cas2l also assigned to env->cc_op.  */
+ int qemu_madvise(void *addr, size_t len, int advice)
+ {
+     if (advice == QEMU_MADV_INVALID) {
 -- 
 2.7.4
