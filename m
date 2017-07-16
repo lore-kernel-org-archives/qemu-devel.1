@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dWcHu-0004Ol-Dk
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 01:40:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWdJc-00063O-MP
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 02:46:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dWcHr-0006FP-8P
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 01:40:14 -0400
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:38870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1dWcHq-0006DN-Jj
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 01:40:11 -0400
-References: <20170715132841.9865-1-hpoussin@reactos.org>
-	<20170715132841.9865-5-hpoussin@reactos.org>
-	<3f675ff1-e6ce-a6b2-f63c-4b063871a215@amsat.org>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <5dfb4f95-6557-d42e-6779-90f679b3d701@reactos.org>
-Date: Sun, 16 Jul 2017 07:39:45 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1dWdJZ-0003zb-JZ
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 02:46:04 -0400
+Date: Sun, 16 Jul 2017 16:45:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170716064542.GO17539@umbus.fritz.box>
+References: <20170711035620.4232-1-aik@ozlabs.ru>
+	<20170711035620.4232-3-aik@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <3f675ff1-e6ce-a6b2-f63c-4b063871a215@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] vvfat: initialize memory after
- allocating it
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ugCSa1rMkiCAmd9S"
+Content-Disposition: inline
+In-Reply-To: <20170711035620.4232-3-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu v9 2/2] memory/iommu: introduce
+ IOMMUMemoryRegionClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org
 
-Le 16/07/2017 à 00:24, Philippe Mathieu-Daudé a écrit :
-> Hi Hervé,
->
-> On 07/15/2017 10:28 AM, Hervé Poussineau wrote:
->> This prevents some host to guest memory content leaks.
->>
->> Fixes: https://bugs.launchpad.net/qemu/+bug/1599539
->>
->> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
->> ---
->>   block/vvfat.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/block/vvfat.c b/block/vvfat.c
->> index afc6170a69..7340decef3 100644
->> --- a/block/vvfat.c
->> +++ b/block/vvfat.c
->> @@ -115,6 +115,7 @@ static inline int array_ensure_allocated(array_t* array, int index)
->>           array->pointer = g_realloc(array->pointer, new_size);
->>           if (!array->pointer)
->>               return -1;
->
-> isn't it safer:
->
-> if (likely(new_size > array->size)) {
 
-Not really, because the code is:
-     if((index + 1) * array->item_size > array->size) {
-         int new_size = (index + 32) * array->item_size;
-         array->pointer = g_realloc(array->pointer, new_size);
-         if (!array->pointer)
-             return -1;
-         array->size = new_size;
-         array->next = index + 1;
-     }
+--ugCSa1rMkiCAmd9S
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-array->size is the size (in bytes) of the previous array.
-new_size is (index + 32) * item_size
-And, due to the "if", we know that (index + 1) * item_size > array->size.
-So, new_size > array->size.
+On Tue, Jul 11, 2017 at 01:56:20PM +1000, Alexey Kardashevskiy wrote:
+> This finishes QOM'fication of IOMMUMemoryRegion by introducing
+> a IOMMUMemoryRegionClass. This also provides a fastpath analog for
+> IOMMU_MEMORY_REGION_GET_CLASS().
+>=20
+> This makes IOMMUMemoryRegion an abstract class.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
->
->> +        memset(array->pointer + array->size, 0, new_size - array->size);
->
-> }
->
-> ?
->
->>           array->size = new_size;
->>           array->next = index + 1;
->>       }
->>
->
-> Regards,
->
-> Phil.
->
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+with the exception of one miniscule nit:
+
+[snip]
+> +/**
+> + * memory_region_get_iommu_class_nocheck: returns iommu memory region cl=
+ass
+> + *   if an iommu or NULL if not
+> + *
+> + * Returns pointer to IOMMUMemoryRegioniClass if a memory region is an i=
+ommu,
+
+Typo                                      ^
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ugCSa1rMkiCAmd9S
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllrC5QACgkQbDjKyiDZ
+s5LkzBAA5r+iH/hBvck5DDaccWrc7led5VV71oI1i20mHZmte2zFxh0uFd0xrmVT
+WdKItWIp7LrlvOJoU+RV1KxTrtc7jCjSR2369tBPAnL5bI9iaBOfIM57I3lBrGzM
+DdOhaifX2mUZHujuhzJZUJ3Bz/6bdTbRnnZ3OQIWBsLhofyBR/U2xEW9eLXpF/OJ
+fcSe+kX+CePbQ4cHRVSRg+sXidj+Ohf/4hrozqwGXiOK9cvzkjBr4WUEkY1gcCce
+G/RKWEkWBxQADLAgzeNmMGj91YQASAh3sXv/2c70ZZPaDtSLxfsX4ktWx8jY7S6C
+kivFEGZQoGl6CSgs1wtiNPbNGNpm71Lqq4IGuKtptJUpVAVaF5CXw990/mHZjYuU
+gj4O6NpP1SR1tQQSNS7B/NAUyrsnsC4nF/4qIBGLYhbJJnKshc1bSulqnQHYjFq+
+OxHMzGsFZHpEPo7ayUeMwO+HqI8EYUlarF6gjnOpuWXxgxjeVTqW2WVr7bKyCKXQ
+ptw5chUKcF5NceMGvl5cH2QMwuBScsHrosRUwQWoQvVBK3fHSMyQxUBpbecDmDJ/
+jEnOy7zMcJJFFLWkP1I1PaaeR//bR1cCg9YjM1XqcpmFv4uNCJ2AqJBnhWQ+XocV
+cscqyWWzOpN1dJ+4ShA3FR7DZMg3qb/+DRakv8y0nvMYkvxFxGE=
+=8DDm
+-----END PGP SIGNATURE-----
+
+--ugCSa1rMkiCAmd9S--
