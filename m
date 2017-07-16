@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amit@kernel.org>) id 1dWpUL-0006WG-6v
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:45:58 -0400
+	(envelope-from <cota@braap.org>) id 1dWpmZ-0001Ag-8L
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amit@kernel.org>) id 1dWpUK-00057f-9S
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:45:57 -0400
-Date: Sun, 16 Jul 2017 21:45:50 +0200
-From: Amit Shah <amit@kernel.org>
-Message-ID: <20170716194550.GB2964@grmbl.mre>
-References: <20170713163219.9024-1-marcandre.lureau@redhat.com>
-	<20170713163219.9024-18-marcandre.lureau@redhat.com>
+	(envelope-from <cota@braap.org>) id 1dWpmU-0008GR-Dz
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:47 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:34963)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmU-0008FI-6g
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:42 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Sun, 16 Jul 2017 16:03:44 -0400
+Message-Id: <1500235468-15341-2-git-send-email-cota@braap.org>
+In-Reply-To: <1500235468-15341-1-git-send-email-cota@braap.org>
+References: <1500235468-15341-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170713163219.9024-18-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 17/29] virtio-serial: use DIV_ROUND_UP
+Subject: [Qemu-devel] [PATCH v2 01/45] vl: fix breakage of -tb-size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, peter.maydell@linaro.org, Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On (Thu) 13 Jul 2017 [18:32:07], Marc-AndrÈ Lureau wrote:
-> I used the clang-tidy qemu-round check to generate the fix:
-> https://github.com/elmarco/clang-tools-extra
-> 
-> Signed-off-by: Marc-AndrÈ Lureau <marcandre.lureau@redhat.com>
+Commit e7b161d573 ("vl: add tcg_enabled() for tcg related code") adds
+a check to exit the program when !tcg_enabled() while parsing the -tb-size
+flag.
 
-Reviewed-by: Amit Shah <amit@kernel.org>
+It turns out that when the -tb-size flag is evaluated, tcg_enabled() can
+only return 0, since it is set (or not) much later by configure_accelerator().
 
-		Amit
+Fix it by unconditionally exiting if the flag is passed to a QEMU binary
+built with !CONFIG_TCG.
+
+Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Benn√©e <alex.bennee@linaro.org>
+Tested-by: Alex Benn√©e <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ vl.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/vl.c b/vl.c
+index d17c863..9ece570 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3933,10 +3933,10 @@ int main(int argc, char **argv, char **envp)
+                 configure_rtc(opts);
+                 break;
+             case QEMU_OPTION_tb_size:
+-                if (!tcg_enabled()) {
+-                    error_report("TCG is disabled");
+-                    exit(1);
+-                }
++#ifndef CONFIG_TCG
++                error_report("TCG is disabled");
++                exit(1);
++#endif
+                 if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
+                     error_report("Invalid argument to -tb-size");
+                     exit(1);
 -- 
-http://log.amitshah.net/
+2.7.4
