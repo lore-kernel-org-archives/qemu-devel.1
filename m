@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWhbc-0003XS-L2
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1dWhbc-0003XR-KZ
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWhbY-0002hG-Iu
+	(envelope-from <bounces@canonical.com>) id 1dWhbY-0002hL-KC
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49086)
+Received: from indium.canonical.com ([91.189.90.7]:49093)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dWhbY-0002gr-Cs
+	id 1dWhbY-0002h4-DL
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dWhbX-0004qQ-1X
+	id 1dWhbX-0004qQ-K8
 	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 11:20:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0A03E2E8194
+	by loganberry.canonical.com (Postfix) with ESMTP id 91DB32E800F
 	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 11:20:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Jul 2017 11:11:59 -0000
+Date: Sun, 16 Jul 2017 11:13:00 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1704638 <1704638@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150020341429.6222.13732739204722487038.malonedeb@gac.canonical.com>
-Message-Id: <150020351933.6115.6443448612828080198.malone@gac.canonical.com>
+Message-Id: <150020358075.24967.46752544548874439.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1704638] Re: weak symbol access makes qemu in
  user mode hang for mips, mips64
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Statically compiled test program for mips"
-   https://bugs.launchpad.net/qemu/+bug/1704638/+attachment/4915584/+files/=
-testpthsigmask-mips
+** Attachment added: "Statically compiled test program for mips64"
+   https://bugs.launchpad.net/qemu/+bug/1704638/+attachment/4915585/+files/=
+testpthsigmask-mips64
 
 -- =
 
