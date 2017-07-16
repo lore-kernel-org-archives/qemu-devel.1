@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWhbc-0003XR-KZ
+	(envelope-from <bounces@canonical.com>) id 1dWhbc-0003XQ-KE
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dWhbY-0002hL-KC
+	(envelope-from <bounces@canonical.com>) id 1dWhbY-0002hS-Lo
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49093)
+Received: from indium.canonical.com ([91.189.90.7]:49085)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dWhbY-0002h4-DL
+	id 1dWhbY-0002gs-Cx
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 07:20:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dWhbX-0004qQ-K8
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 11:20:51 +0000
+	id 1dWhbW-0004q4-BP
+	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 11:20:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 91DB32E800F
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 11:20:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4FE302E8193
+	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 11:20:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Jul 2017 11:13:00 -0000
+Date: Sun, 16 Jul 2017 11:10:14 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1704638 <1704638@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150020341429.6222.13732739204722487038.malonedeb@gac.canonical.com>
-Message-Id: <150020358075.24967.46752544548874439.malone@soybean.canonical.com>
+Message-Id: <150020341429.6222.13732739204722487038.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1704638] Re: weak symbol access makes qemu in
+Subject: [Qemu-devel] [Bug 1704638] [NEW] weak symbol access makes qemu in
  user mode hang for mips, mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,9 +38,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Statically compiled test program for mips64"
-   https://bugs.launchpad.net/qemu/+bug/1704638/+attachment/4915585/+files/=
-testpthsigmask-mips64
+Public bug reported:
+
+A program that is statically linked and invokes a weak pointer should
+crash (because the weak pointer evaluates to NULL).
+
+With qemu in user mode, for mips and mips64, it hangs. The process needs
+to be killed with "kill -9".
+
+How to reproduce for mips:
+- Compile the program: mips-linux-gnu-gcc-5 -O -Wall -static -o testpthsigm=
+ask-mips testpthsigmask.c -pthread
+- Set environment variables for running qemu-mips.
+- ~/inst-qemu/2.9.0/bin/qemu-mips testpthsigmask-mips
+
+How to reproduce for mips64:
+- Compile the program: mips64-linux-gnuabi64-gcc-5 -O -Wall -static -o test=
+pthsigmask-mips64 testpthsigmask.c -lpthread
+- Set environment variables for running qemu-mips64.
+- ~/inst-qemu/2.9.0/bin/qemu-mips64 testpthsigmask-mips64
+
+When I attach gdb to the process, I see that it is hanging inside
+'gen_intermediate_code':
+
+$ gdb /home/bruno/inst-qemu/2.9.0/bin/qemu-mips 9726
+...
+Reading symbols from /home/bruno/inst-qemu/2.9.0/bin/qemu-mips...done.
+Attaching to program: /home/bruno/inst-qemu/2.9.0/bin/qemu-mips, process 97=
+26
+...
+(gdb) info threads
+  Id   Target Id         Frame =
+
+* 1    Thread 0x7f1e7e535740 (LWP 9726) "qemu-mips" __lll_lock_wait () at .=
+./sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
+  2    Thread 0x7f1e7d0ad700 (LWP 9727) "qemu-mips" syscall () at ../sysdep=
+s/unix/sysv/linux/x86_64/syscall.S:38
+(gdb) where
+#0  __lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:=
+135
+#1  0x00007f1e7d6f1dbd in __GI___pthread_mutex_lock (mutex=3Dmutex@entry=3D=
+0x55de1c7ff830 <tcg_ctx+272>) at ../nptl/pthread_mutex_lock.c:80
+#2  0x000055de1c527199 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x55de1c7f=
+f830 <tcg_ctx+272>)
+    at /media/develdata/devel/build/qemu-2.9.0/util/qemu-thread-posix.c:60
+#3  0x000055de1c435083 in tb_lock () at /media/develdata/devel/build/qemu-2=
+.9.0/translate-all.c:167
+#4  cpu_restore_state (cpu=3Dcpu@entry=3D0x55de1e915cb0, retaddr=3Dretaddr@=
+entry=3D94412445741769) at /media/develdata/devel/build/qemu-2.9.0/translat=
+e-all.c:350
+#5  0x000055de1c4658d0 in handle_cpu_signal (old_set=3D0x7ffe5ffd8ea8, is_w=
+rite=3D0, address=3D0, pc=3D94412445741767)
+    at /media/develdata/devel/build/qemu-2.9.0/user-exec.c:124
+#6  cpu_mips_signal_handler (host_signum=3Dhost_signum@entry=3D11, pinfo=3D=
+pinfo@entry=3D0x7ffe5ffd8eb0, puc=3Dpuc@entry=3D0x7ffe5ffd8d80)
+    at /media/develdata/devel/build/qemu-2.9.0/user-exec.c:229
+#7  0x000055de1c4803be in host_signal_handler (host_signum=3D11, info=3D0x7=
+ffe5ffd8eb0, puc=3D0x7ffe5ffd8d80)
+    at /media/develdata/devel/build/qemu-2.9.0/linux-user/signal.c:646
+#8  <signal handler called>
+#9  __bswap_32 (__bsx=3D<optimized out>) at /usr/include/x86_64-linux-gnu/b=
+its/byteswap.h:47
+#10 bswap32 (x=3D<optimized out>) at /media/develdata/devel/build/qemu-2.9.=
+0/include/qemu/bswap.h:21
+#11 ldl_be_p (ptr=3D<optimized out>) at /media/develdata/devel/build/qemu-2=
+.9.0/include/qemu/bswap.h:434
+#12 cpu_ldl_code (env=3D0x55de1e91df48, ptr=3D0) at /media/develdata/devel/=
+build/qemu-2.9.0/include/exec/cpu_ldst_useronly_template.h:68
+#13 gen_intermediate_code (env=3Denv@entry=3D0x55de1e91df48, tb=3Dtb@entry=
+=3D0x7f1e7b288e58)
+    at /media/develdata/devel/build/qemu-2.9.0/target/mips/translate.c:19962
+#14 0x000055de1c4352e6 in tb_gen_code (cpu=3Dcpu@entry=3D0x55de1e915cb0, pc=
+=3Dpc@entry=3D0, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=3D162, cf=
+lags=3D<optimized out>, =
+
+    cflags@entry=3D0) at /media/develdata/devel/build/qemu-2.9.0/translate-=
+all.c:1295
+#15 0x000055de1c436a7a in tb_find (tb_exit=3D0, last_tb=3D0x0, cpu=3D<optim=
+ized out>) at /media/develdata/devel/build/qemu-2.9.0/cpu-exec.c:365
+#16 cpu_exec (cpu=3D<optimized out>) at /media/develdata/devel/build/qemu-2=
+.9.0/cpu-exec.c:673
+#17 0x000055de1c466278 in cpu_loop (env=3D0x55de1e91df48) at /media/develda=
+ta/devel/build/qemu-2.9.0/linux-user/main.c:2236
+#18 0x000055de1c433103 in main (argc=3D<optimized out>, argv=3D0x7ffe5ffd9d=
+e8, envp=3D<optimized out>)
+    at /media/develdata/devel/build/qemu-2.9.0/linux-user/main.c:4860
+(gdb) thread 2
+[Switching to thread 2 (Thread 0x7f1e7d0ad700 (LWP 9727))]
+#0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+38      ../sysdeps/unix/sysv/linux/x86_64/syscall.S: Datei oder Verzeichnis=
+ nicht gefunden.
+(gdb) where
+#0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+#1  0x000055de1c527605 in qemu_futex_wait (val=3D<optimized out>, f=3D<opti=
+mized out>) at /media/develdata/devel/build/qemu-2.9.0/include/qemu/futex.h=
+:26
+#2  qemu_event_wait (ev=3Dev@entry=3D0x55de1e82c124 <rcu_call_ready_event>)=
+ at /media/develdata/devel/build/qemu-2.9.0/util/qemu-thread-posix.c:399
+#3  0x000055de1c52d41e in call_rcu_thread (opaque=3D<optimized out>) at /me=
+dia/develdata/devel/build/qemu-2.9.0/util/rcu.c:249
+#4  0x00007f1e7d6ef6ba in start_thread (arg=3D0x7f1e7d0ad700) at pthread_cr=
+eate.c:333
+#5  0x00007f1e7d4253dd in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:109
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "Test program"
+   https://bugs.launchpad.net/bugs/1704638/+attachment/4915583/+files/testp=
+thsigmask.c
 
 -- =
 
