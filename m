@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWq8t-0003yG-24
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:27:52 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dWrKS-0000Rt-LF
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 17:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWq8q-0006Oq-AQ
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:27:51 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:47569
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <aurelien@aurel32.net>) id 1dWrKR-0007nZ-Gt
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 17:43:52 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:56806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dWq8q-0006NS-38
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:27:48 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 16 Jul 2017 21:27:33 +0100
-Message-Id: <1500236854-28271-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1500236854-28271-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1500236854-28271-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCHv3 1/2] pci: move check for existing devfn into
- new pci_bus_devfn_available() helper
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dWrKR-0007nV-Ba
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 17:43:51 -0400
+Date: Sun, 16 Jul 2017 23:43:45 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170716214345.n4ehbjkfq454bvwh@aurel32.net>
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-7-rth@twiddle.net>
+	<20170715221412.3yprwf5i3te4gdxa@aurel32.net>
+	<65cb9165-42a1-9648-7519-0bd893c1ac13@twiddle.net>
+	<20170716151802.cmaz3zhucqlgaq5r@aurel32.net>
+	<e19112df-a491-2e34-61a7-3a514622df3e@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e19112df-a491-2e34-61a7-3a514622df3e@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space
+ atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, marcel@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-Also touch up the logic in do_pci_register_device() accordingly.
+On 2017-07-16 09:35, Richard Henderson wrote:
+> On 07/16/2017 05:18 AM, Aurelien Jarno wrote:
+> > That said for further improvements did you consider decoding the gUSA
+> > section in a helper. It might avoid having to emulate the atomic
+> > sequence with 3 TBs in the worst case (the original one, the one to
+> > decode the sequence and the one holding the exclusive lock). The helper
+> > should directly have access to the r0 value, can decode the atomic
+> > sequence and translate it into a call to the corresponding atomic
+> > helpers. In the best case that means the sequence can be done in the
+> > same TB. In the worst case, where the gUSA sequence is not recognized
+> > it means two TB.
+> 
+> I did not consider decoding the sequence in a helper.
+> 
+> I do want to cache the result in a TB, so that when we execute the atomic
+> sequence for a second time we do not have to re-interpret it.  And I don't
+> see how to do that with a helper.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/pci/pci.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Indeed, if the same atomic code is used often it might be better to have
+it cached. That said it's only true for TB that are recognized, as IIRC
+TB with the exclusive lock are not cached.
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 0c6f74a..efc9c86 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -951,6 +951,11 @@ uint16_t pci_requester_id(PCIDevice *dev)
-     return pci_req_id_cache_extract(&dev->requester_id_cache);
- }
- 
-+static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
-+{
-+    return !(bus->devices[devfn]);
-+}
-+
- /* -1 for devfn means auto assign */
- static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
-                                          const char *name, int devfn,
-@@ -974,14 +979,15 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
-     if (devfn < 0) {
-         for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
-             devfn += PCI_FUNC_MAX) {
--            if (!bus->devices[devfn])
-+            if (pci_bus_devfn_available(bus, devfn)) {
-                 goto found;
-+            }
-         }
-         error_setg(errp, "PCI: no slot/function available for %s, all in use",
-                    name);
-         return NULL;
-     found: ;
--    } else if (bus->devices[devfn]) {
-+    } else if (!pci_bus_devfn_available(bus, devfn)) {
-         error_setg(errp, "PCI: slot %d function %d not available for %s,"
-                    " in use by %s",
-                    PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+> I *could* remember a mova into R0 earlier within the same block that
+> performs the mov #imm,r15.  It's not guaranteed to be in the same TB, but
+> looking through dumps from debian unstable it's highly likely.
+> 
+> That could end up with the atomic sequence in the same TB that set SP, or
+> with the EXCP_ATOMIC exception in the same TB.
+
+That would be a nice improvement indeed.
+
+> If it's ok with you, I'd prefer to handle that as a follow up.  We would
+> still have to have the current setup as a backup just in case the mova isn't
+> visible.
+
+Yes, of course. I am fine with this version of the patch (hence the
+R-b). I was just giving the ideas I got when reviewing this patch before
+I forget about them.
+
+Aurelien
+
 -- 
-1.7.10.4
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
