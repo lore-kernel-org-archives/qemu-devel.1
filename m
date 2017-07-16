@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmb-0001Ar-GR
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:53 -0400
+	(envelope-from <cota@braap.org>) id 1dWpmb-0001Ao-GR
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmW-0008N2-Hq
+	(envelope-from <cota@braap.org>) id 1dWpmW-0008Mr-Cy
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:49 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41485)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:44391)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmW-0008Mj-E5
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmW-0008LR-8e
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:44 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun, 16 Jul 2017 16:04:06 -0400
-Message-Id: <1500235468-15341-24-git-send-email-cota@braap.org>
+Date: Sun, 16 Jul 2017 16:04:05 -0400
+Message-Id: <1500235468-15341-23-git-send-email-cota@braap.org>
 In-Reply-To: <1500235468-15341-1-git-send-email-cota@braap.org>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 23/45] translate-all: define and use
- DEBUG_TB_FLUSH_GATE
+Subject: [Qemu-devel] [PATCH v2 22/45] cpu-exec: lookup/generate TB outside
+ exclusive region during step_atomic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +27,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-This gets rid of some ifdef checks while ensuring that the debug code
-is compiled, which prevents bit rot.
+Now that all code generation has been converted to check CF_PARALLEL, we can
+generate !CF_PARALLEL code without having yet set !parallel_cpus --
+and therefore without having to be in the exclusive region during
+cpu_exec_step_atomic.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+While at it, merge cpu_exec_step into cpu_exec_step_atomic.
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ accel/tcg/cpu-exec.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 80ac85a..c38448c 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -65,6 +65,12 @@
- /* make various TB consistency checks */
- /* #define DEBUG_TB_CHECK */
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index efe5c85..23e6d2c 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -226,7 +226,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+ }
+ #endif
  
-+#ifdef DEBUG_TB_FLUSH
-+#define DEBUG_TB_FLUSH_GATE 1
-+#else
-+#define DEBUG_TB_FLUSH_GATE 0
-+#endif
+-static void cpu_exec_step(CPUState *cpu)
++void cpu_exec_step_atomic(CPUState *cpu)
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
+     TranslationBlock *tb;
+@@ -239,16 +239,26 @@ static void cpu_exec_step(CPUState *cpu)
+         if (tb == NULL) {
+             mmap_lock();
+             tb_lock();
+-            tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
++            tb = tb_htable_lookup(cpu, pc, cs_base, flags, mask_cf(cflags));
++            if (likely(tb == NULL)) {
++                tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
++            }
+             tb_unlock();
+             mmap_unlock();
+         }
+ 
++        start_exclusive();
 +
- #if !defined(CONFIG_USER_ONLY)
- /* TB consistency checks only implemented for usermode emulation.  */
- #undef DEBUG_TB_CHECK
-@@ -899,13 +905,13 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-         goto done;
++        /* Since we got here, we know that parallel_cpus must be true.  */
++        parallel_cpus = false;
+         cc->cpu_exec_enter(cpu);
+         /* execute the generated code */
+         trace_exec_tb(tb, pc);
+         cpu_tb_exec(cpu, tb);
+         cc->cpu_exec_exit(cpu);
++        parallel_cpus = true;
++
++        end_exclusive();
+     } else {
+         /* We may have exited due to another problem here, so we need
+          * to reset any tb_locks we may have taken but didn't release.
+@@ -262,18 +272,6 @@ static void cpu_exec_step(CPUState *cpu)
      }
+ }
  
--#if defined(DEBUG_TB_FLUSH)
--    printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%ld\n",
--           (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
--           tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
--           ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)) /
--           tcg_ctx.tb_ctx.nb_tbs : 0);
--#endif
-+    if (DEBUG_TB_FLUSH_GATE) {
-+        printf("qemu: flush code_size=%td nb_tbs=%d avg_tb_size=%td\n",
-+               tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
-+               tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
-+               (tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer) /
-+               tcg_ctx.tb_ctx.nb_tbs : 0);
-+    }
-     if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
-         > tcg_ctx.code_gen_buffer_size) {
-         cpu_abort(cpu, "Internal error: code buffer overflow\n");
+-void cpu_exec_step_atomic(CPUState *cpu)
+-{
+-    start_exclusive();
+-
+-    /* Since we got here, we know that parallel_cpus must be true.  */
+-    parallel_cpus = false;
+-    cpu_exec_step(cpu);
+-    parallel_cpus = true;
+-
+-    end_exclusive();
+-}
+-
+ struct tb_desc {
+     target_ulong pc;
+     target_ulong cs_base;
 -- 
 2.7.4
