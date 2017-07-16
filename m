@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWoy8-0006Sp-4h
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:12:41 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWp7v-0000TK-L9
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:22:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWoy5-0002pG-2B
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:12:40 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:47350
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dWp7s-00010G-HN
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:22:47 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:47363
 	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dWoy4-0002lc-QL
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:12:36 -0400
-References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170714180907.GM6020@localhost.localdomain>
-	<9584b0c7-96f4-f000-e53f-93accd8a39ad@redhat.com>
-	<20170714185616.GQ6020@localhost.localdomain>
+	id 1dWp7s-0000zd-A3
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 15:22:44 -0400
+References: <1499809473-28481-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<6d3baced-070b-908a-95b0-7784e2f0ca4e@ilande.co.uk>
+	<2f0d3ed6-5aa3-851e-3e9f-c08532ca1120@redhat.com>
+	<b8946b8c-6409-e904-451f-5bf4eeb50595@ilande.co.uk>
+	<85b75513-9516-db30-cf56-cb1542d494c4@redhat.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
-Date: Sun, 16 Jul 2017 20:12:13 +0100
+Message-ID: <0bf6be3a-50cc-1166-53c5-272b3c919393@ilande.co.uk>
+Date: Sun, 16 Jul 2017 20:22:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170714185616.GQ6020@localhost.localdomain>
+In-Reply-To: <85b75513-9516-db30-cf56-cb1542d494c4@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and
- fw_cfg types into fw_cfg.h
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv2 0/2] pci: allow PCI bus slots to be
+ marked as reserved
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
 
-On 14/07/17 19:56, Eduardo Habkost wrote:
+On 16/07/17 08:28, Marcel Apfelbaum wrote:
 
->>> Why do you need the full struct declaration to be exposed in the
->>> header?
+>>> As in prev version, other than the minor comment
+>>> on replacing "if (...) return true; else return false"
+>>> with the actual value, I am OK with it.
 >>
->> Different board code wants to hook up "comb_iomem" manually to different
->> address spaces, so they need to access the field directly. This is the
->> ultimate goal of the entire exercise, IIRC.
-
-Yes, that is correct (and I believe is mentioned in the cover letter, too).
-
->>> The memory regions are supposed to be visible as QOM
->>> children to the fw_cfg device, already.
+>> Okay great! So change pci_bus_devfn_available() to something like this?
 >>
->> I don't understand this. How else can board code work with "comb_iomem"
->> than described above? If there is a way, I agree it would be preferable.
+>> static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
+>> {
+>>      return !(bus->devices[devfn]);
+>> }
+>>
 > 
-> object_resolve_path_component(fw_cfg, "fwcfg[0]") and
-> object_resolve_path_component(fw_cfg, "fwcfg.dma[0]") should
-> return fw_cfg->comb_iomem and fw_cfg->dma_iomem, respectively.
+> Yes, thanks.
+
+Great, I'll send a v3 with the above modification shortly.
+
+>>> I believe Michael asked to see the series using this feature,
+>>> can you add a link to it, or post it with the dependency on this one?
+>>
+>> Sure, I posted the link earlier in the week:
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03045.html.
+>> Or more specifically:
+>>
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03041.html
+>>
 > 
-> I don't know why those names were chosen, though.  Probably it's
-> a good idea to call object_property_add_child() manually with
-> more appropriate names inside the fw_cfg code instead of letting
-> memory_region_init() pick the child name.
+> Hi Michael,
+> Can you please have a look to the above patch using
+> the 'reserved slots' patch?
 
-That's interesting. I did a grep of the codebase for
-object_resolve_path_component and struggled to find an instance where it
-was being used to provide access to a MemoryRegion. Even if it's an
-available feature, it's certainly not one that is widely known about.
+I should add that if this patch isn't suitable for freeze then it's
+likely I'll drop the sun4u patchset for 2.10 since otherwise using
+-device places devices on the PCI root bus.
 
-In terms of the patch, is the v9 revision suitable for commit or does
-this constitute a NACK?
+For existing users this means that the machine will start up with their
+existing command lines but any extra devices added on the command line
+via -device, e.g. virtio will be silently broken because the interrupt
+routing is incorrect.
+
+At least with this patch the user will get an error, and thus it's easy
+to update the wiki to explain that moving forward it is necessary to add
+"bus=pciB" for extra devices to function correctly.
 
 
 ATB,
