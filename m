@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmZ-0001Af-05
+	(envelope-from <cota@braap.org>) id 1dWpmY-0001Ac-SR
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmU-0008Gc-Ef
+	(envelope-from <cota@braap.org>) id 1dWpmU-0008GK-FK
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:46 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36725)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51385)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmU-0008FJ-6c
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmU-0008FM-6v
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:42 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun, 16 Jul 2017 16:03:46 -0400
-Message-Id: <1500235468-15341-4-git-send-email-cota@braap.org>
+Date: Sun, 16 Jul 2017 16:03:47 -0400
+Message-Id: <1500235468-15341-5-git-send-email-cota@braap.org>
 In-Reply-To: <1500235468-15341-1-git-send-email-cota@braap.org>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/45] cputlb: bring back tlb_flush_count
- under !TLB_DEBUG
+Subject: [Qemu-devel] [PATCH v2 04/45] tcg: fix corruption of code_time
+ profiling counter upon tb_flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +30,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Commit f0aff0f124 ("cputlb: add assert_cpu_is_self checks") buried
-the increment of tlb_flush_count under TLB_DEBUG. This results in
-"info jit" always (mis)reporting 0 TLB flushes when !TLB_DEBUG.
+Whenever there is an overflow in code_gen_buffer (e.g. we run out
+of space in it and have to flush it), the code_time profiling counter
+ends up with an invalid value (that is, code_time -= profile_getclock(),
+without later on getting += profile_getclock() due to the goto).
 
-Besides, under MTTCG tlb_flush_count is updated by several threads,
-so in order not to lose counts we'd either have to use atomic ops
-or distribute the counter, which is more scalable.
+Fix it by using the ti variable, so that we only update code_time
+when there is no overflow. Note that in case there is an overflow
+we fail to account for the elapsed coding time, but this is quite rare
+so we can probably live with it.
 
-This patch does the latter by embedding tlb_flush_count in CPUArchState.
-The global count is then easily obtained by iterating over the CPU list.
+"info jit" before/after, roughly at the same time during debian-arm bootup:
 
-Note that this change also requires updating the accessors to
-tlb_flush_count to use atomic_read/set whenever there may be conflicting
-accesses (as defined in C11) to it.
+- before:
+Statistics:
+TB flush count      1
+TB invalidate count 4665
+TLB flush count     998
+JIT cycles          -615191529184601 (-256329.804 s at 2.4 GHz)
+translated TBs      302310 (aborted=0 0.0%)
+avg ops/TB          48.4 max=438
+deleted ops/TB      8.54
+avg temps/TB        32.31 max=38
+avg host code/TB    361.5
+avg search data/TB  24.5
+cycles/op           -42014693.0
+cycles/in byte      -121444900.2
+cycles/out byte     -5629031.1
+cycles/search byte     -83114481.0
+  gen_interm time   -0.0%
+  gen_code time     100.0%
+optim./code time    -0.0%
+liveness/code time  -0.0%
+cpu_restore count   6236
+  avg cycles        110.4
+
+- after:
+Statistics:
+TB flush count      1
+TB invalidate count 4665
+TLB flush count     1010
+JIT cycles          1996899624 (0.832 s at 2.4 GHz)
+translated TBs      297961 (aborted=0 0.0%)
+avg ops/TB          48.5 max=438
+deleted ops/TB      8.56
+avg temps/TB        32.31 max=38
+avg host code/TB    361.8
+avg search data/TB  24.5
+cycles/op           138.2
+cycles/in byte      398.4
+cycles/out byte     18.5
+cycles/search byte     273.1
+  gen_interm time   14.0%
+  gen_code time     86.0%
+optim./code time    19.4%
+liveness/code time  10.3%
+cpu_restore count   6372
+  avg cycles        111.0
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/cpu-defs.h   |  1 +
- include/exec/cputlb.h     |  3 +--
- accel/tcg/cputlb.c        | 17 ++++++++++++++---
- accel/tcg/translate-all.c |  2 +-
- 4 files changed, 17 insertions(+), 6 deletions(-)
+ accel/tcg/translate-all.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index bc8e7f8..e43ff83 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -137,6 +137,7 @@ typedef struct CPUIOTLBEntry {
-     CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
-     CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
-     CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
-+    size_t tlb_flush_count;                                             \
-     target_ulong tlb_flush_addr;                                        \
-     target_ulong tlb_flush_mask;                                        \
-     target_ulong vtlb_index;                                            \
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index 3f94178..c91db21 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
-@@ -23,7 +23,6 @@
- /* cputlb.c */
- void tlb_protect_code(ram_addr_t ram_addr);
- void tlb_unprotect_code(ram_addr_t ram_addr);
--extern int tlb_flush_count;
--
-+size_t tlb_flush_count(void);
- #endif
- #endif
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 85635ae..9377110 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -92,8 +92,18 @@ static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
-     }
- }
- 
--/* statistics */
--int tlb_flush_count;
-+size_t tlb_flush_count(void)
-+{
-+    CPUState *cpu;
-+    size_t count = 0;
-+
-+    CPU_FOREACH(cpu) {
-+        CPUArchState *env = cpu->env_ptr;
-+
-+        count += atomic_read(&env->tlb_flush_count);
-+    }
-+    return count;
-+}
- 
- /* This is OK because CPU architectures generally permit an
-  * implementation to drop entries from the TLB at any time, so
-@@ -112,7 +122,8 @@ static void tlb_flush_nocheck(CPUState *cpu)
-     }
- 
-     assert_cpu_is_self(cpu);
--    tlb_debug("(count: %d)\n", tlb_flush_count++);
-+    atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
-+    tlb_debug("(count: %zu)\n", tlb_flush_count());
- 
-     tb_lock();
- 
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 090ebad..3ee69e5 100644
+index 3ee69e5..63f8538 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -1916,7 +1916,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-             atomic_read(&tcg_ctx.tb_ctx.tb_flush_count));
-     cpu_fprintf(f, "TB invalidate count %d\n",
-             tcg_ctx.tb_ctx.tb_phys_invalidate_count);
--    cpu_fprintf(f, "TLB flush count     %d\n", tlb_flush_count);
-+    cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
-     tcg_dump_info(f, cpu_fprintf);
+@@ -1300,7 +1300,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+ #ifdef CONFIG_PROFILER
+     tcg_ctx.tb_count++;
+     tcg_ctx.interm_time += profile_getclock() - ti;
+-    tcg_ctx.code_time -= profile_getclock();
++    ti = profile_getclock();
+ #endif
  
-     tb_unlock();
+     /* ??? Overflow could be handled better here.  In particular, we
+@@ -1318,7 +1318,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     }
+ 
+ #ifdef CONFIG_PROFILER
+-    tcg_ctx.code_time += profile_getclock();
++    tcg_ctx.code_time += profile_getclock() - ti;
+     tcg_ctx.code_in_len += tb->size;
+     tcg_ctx.code_out_len += gen_code_size;
+     tcg_ctx.search_out_len += search_size;
 -- 
 2.7.4
