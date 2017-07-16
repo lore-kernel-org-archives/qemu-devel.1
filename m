@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmf-0001CQ-5O
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:59 -0400
+	(envelope-from <cota@braap.org>) id 1dWpmf-0001CW-Ay
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dWpmZ-0008Qz-Nd
+	(envelope-from <cota@braap.org>) id 1dWpma-0008Rc-As
 	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:53 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48583)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:56025)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpmZ-0008Q2-Fp
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:47 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dWpma-0008R5-54
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 16:04:48 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Sun, 16 Jul 2017 16:04:20 -0400
-Message-Id: <1500235468-15341-38-git-send-email-cota@braap.org>
+Date: Sun, 16 Jul 2017 16:04:23 -0400
+Message-Id: <1500235468-15341-41-git-send-email-cota@braap.org>
 In-Reply-To: <1500235468-15341-1-git-send-email-cota@braap.org>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 37/45] tcg: introduce **tcg_ctxs to keep
- track of all TCGContext's
+Subject: [Qemu-devel] [PATCH v2 40/45] osdep: introduce
+ qemu_mprotect_rwx/none
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +27,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Groundwork for supporting multiple TCG contexts.
-
-Note that having n_tcg_ctxs is unnecessary. However, it is
-convenient to have it, since it will simplify iterating over the
-array: we'll have just a for loop instead of having to iterate
-over a NULL-terminated array (which would require n+1 elems)
-or having to check with ifdef's for usermode/softmmu.
-
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- tcg/tcg.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ include/qemu/osdep.h |  2 ++
+ util/osdep.c         | 40 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index f907c47..8094278 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -115,6 +115,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- static void tcg_out_tb_init(TCGContext *s);
- static bool tcg_out_tb_finalize(TCGContext *s);
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 3cb36e6..dcecfbc 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -348,6 +348,8 @@ void sigaction_invoke(struct sigaction *action,
+ #endif
  
-+static TCGContext **tcg_ctxs;
-+static unsigned int n_tcg_ctxs;
+ int qemu_madvise(void *addr, size_t len, int advice);
++int qemu_mprotect_rwx(void *addr, size_t size);
++int qemu_mprotect_none(void *addr, size_t size);
  
- static TCGRegSet tcg_target_available_regs[2];
- static TCGRegSet tcg_target_call_clobber_regs;
-@@ -323,6 +325,13 @@ static GHashTable *helper_table;
- static int indirect_reg_alloc_order[ARRAY_SIZE(tcg_target_reg_alloc_order)];
- static void process_op_defs(TCGContext *s);
- 
-+static void tcg_ctxs_init(TCGContext *s)
-+{
-+    tcg_ctxs = g_new(TCGContext *, 1);
-+    tcg_ctxs[0] = s;
-+    n_tcg_ctxs = 1;
-+}
-+
- void tcg_context_init(TCGContext *s)
- {
-     int op, total_args, n, i;
-@@ -381,6 +390,7 @@ void tcg_context_init(TCGContext *s)
-         indirect_reg_alloc_order[i] = tcg_target_reg_alloc_order[i];
-     }
- 
-+    tcg_ctxs_init(s);
-     tcg_ctx = s;
+ int qemu_open(const char *name, int flags, ...);
+ int qemu_close(int fd);
+diff --git a/util/osdep.c b/util/osdep.c
+index 90f4f11..85df97e 100644
+--- a/util/osdep.c
++++ b/util/osdep.c
+@@ -90,6 +90,46 @@ int qemu_madvise(void *addr, size_t len, int advice)
+ #endif
  }
  
++static int qemu_mprotect__osdep(void *addr, size_t size, int prot)
++{
++    void *start = QEMU_ALIGN_PTR_DOWN(addr, qemu_real_host_page_size);
++    void *end = QEMU_ALIGN_PTR_UP(addr + size, qemu_real_host_page_size);
++#ifdef _WIN32
++    DWORD old_protect;
++
++    if (!VirtualProtect(start, end - start, prot, &old_protect)) {
++        error_report("%s: VirtualProtect failed with error code %d",
++                     __func__, GetLastError());
++        return -1;
++    }
++    return 0;
++#else
++    if (mprotect(start, end - start, prot)) {
++        error_report("%s: mprotect failed: %s", __func__, strerror(errno));
++        return -1;
++    }
++    return 0;
++#endif
++}
++
++int qemu_mprotect_rwx(void *addr, size_t size)
++{
++#ifdef _WIN32
++    return qemu_mprotect__osdep(addr, size, PAGE_EXECUTE_READWRITE);
++#else
++    return qemu_mprotect__osdep(addr, size, PROT_READ | PROT_WRITE | PROT_EXEC);
++#endif
++}
++
++int qemu_mprotect_none(void *addr, size_t size)
++{
++#ifdef _WIN32
++    return qemu_mprotect__osdep(addr, size, PAGE_NOACCESS);
++#else
++    return qemu_mprotect__osdep(addr, size, PROT_NONE);
++#endif
++}
++
+ #ifndef _WIN32
+ /*
+  * Dups an fd and sets the flags
 -- 
 2.7.4
