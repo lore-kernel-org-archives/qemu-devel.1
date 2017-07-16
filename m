@@ -1,42 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dWimG-0007ox-W3
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 08:36:02 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dWlJA-0003ma-00
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 11:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dWimD-0004nX-RE
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 08:36:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51144)
+	(envelope-from <aurelien@aurel32.net>) id 1dWlJ8-0005D3-HE
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 11:18:08 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:54460)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dWimD-0004n9-HS
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 08:35:57 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6GCYJ0Z076020
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 08:35:55 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bqec729xd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 08:35:55 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Sun, 16 Jul 2017 13:35:52 +0100
-References: <20170711004303.3902-1-ehabkost@redhat.com>
-	<20170711004303.3902-3-ehabkost@redhat.com>
-	<6c43bf15-772e-2f8c-737c-6789d8ae28f2@linux.vnet.ibm.com>
-	<20170712184805.GJ6020@localhost.localdomain>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Sun, 16 Jul 2017 14:35:49 +0200
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dWlJ8-0005CZ-AB
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 11:18:06 -0400
+Date: Sun, 16 Jul 2017 17:18:02 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170716151802.cmaz3zhucqlgaq5r@aurel32.net>
+References: <20170707022111.21836-1-rth@twiddle.net>
+	<20170707022111.21836-7-rth@twiddle.net>
+	<20170715221412.3yprwf5i3te4gdxa@aurel32.net>
+	<65cb9165-42a1-9648-7519-0bd893c1ac13@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170712184805.GJ6020@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <93527f47-ad79-9c5b-d7ed-d33a089a024c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] test-qdev-global-props: Test global
- property ordering
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65cb9165-42a1-9648-7519-0bd893c1ac13@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 06/27] target/sh4: Handle user-space
+ atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,123 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
+On 2017-07-15 16:30, Richard Henderson wrote:
+> On 07/15/2017 12:14 PM, Aurelien Jarno wrote:
+> > On 2017-07-06 16:20, Richard Henderson wrote:
+> > > For uniprocessors, SH4 uses optimistic restartable atomic sequences.
+> > > Upon an interrupt, a real kernel would simply notice magic values in
+> > > the registers and reset the PC to the start of the sequence.
+> > > 
+> > > For QEMU, we cannot do this in quite the same way.  Instead, we notice
+> > > the normal start of such a sequence (mov #-x,r15), and start a new TB
+> > > that can be executed under cpu_exec_step_atomic.
+> > 
+> > Do you have actually have a good documentation about gUSA? I have found
+> > a few documents (some of them in Japanese), the most complete one being
+> > the LinuxTag paper. The ABI is also described in the kernel and the
+> > glibc. That said I am missing the following informations:
+> 
+> Kernel sources and glibc are good.  The description in GCC is pretty good as well:
+> 
+> https://gcc.gnu.org/viewcvs/gcc/trunk/gcc/config/sh/sync.md?revision=243994&view=markup#l53
 
+Thanks for the pointer.
 
-On 07/12/2017 08:48 PM, Eduardo Habkost wrote:
-> On Wed, Jul 12, 2017 at 08:06:14PM +0200, Halil Pasic wrote:
->>
->>
->> On 07/11/2017 02:43 AM, Eduardo Habkost wrote:
->>> Test case to detect the bug fixed by commit
->>> "qdev: fix the order compat and global properties are applied".
->>>
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->>
->> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>
->> Please see below nevertheless.
->>
->>> ---
->>>  tests/test-qdev-global-props.c | 33 +++++++++++++++++++++++++++++++++
->>>  1 file changed, 33 insertions(+)
->>>
->>> diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
->>> index 48e5b73..ef2951f 100644
->>> --- a/tests/test-qdev-global-props.c
->>> +++ b/tests/test-qdev-global-props.c
->>> @@ -33,6 +33,8 @@
->>>  #define STATIC_TYPE(obj) \
->>>      OBJECT_CHECK(MyType, (obj), TYPE_STATIC_PROPS)
->>>
->>> +#define TYPE_SUBCLASS "static_prop_subtype"
->>> +
->>>  #define PROP_DEFAULT 100
->>>
->>>  typedef struct MyType {
->>> @@ -63,6 +65,11 @@ static const TypeInfo static_prop_type = {
->>>      .class_init = static_prop_class_init,
->>>  };
->>>
->>> +static const TypeInfo subclass_type = {
->>> +    .name = TYPE_SUBCLASS,
->>> +    .parent = TYPE_STATIC_PROPS,
->>> +};
->>> +
->>>  /* Test simple static property setting to default value */
->>>  static void test_static_prop_subprocess(void)
->>>  {
->>> @@ -279,12 +286,35 @@ static void test_dynamic_globalprop_nouser(void)
->>>      g_test_trap_assert_stdout("");
->>>  }
->>>
->>> +/* Test if global props affecting subclasses are applied in the right order */
->>
->> Now that I think about it this is affecting an  external and
->> (end-)user facing interface. You say this is the right order.
->> Based on what is this the right order? Do we need to update some
->> documentation too?
+> > - What kind of instructions are allowed in the atomic sequence? Your
+> >    patch takes into account branches, but are there allowed? used in
+> >    practice? What about FP instructions?
 > 
-> -global documentation is already very poor, as you have noticed:
-> 
->>
->> I've checked out the user manual. There we talk about 'driver' but
->> I could not find a spot where 'driver' is explained.
-> 
-> Yes.  For that reason, it looks like there's nothing to be
-> updated on the existing (poor) documentation.  I will re-read it
-> to be sure.
-> 
+> Any sequence that can be restarted.
 
-I don't agree. IMHO poor is reason enough to update.
+Ok. So I guess it means a sequence with branch taken or not taken is
+possible. The same way I guess that another instruction than a mov to
+set a negative stack pointer and start the sequence is also possible,
+also not emitted by glibc or gcc.
 
->>
->> If I would have to translate between user manual terminology and
->> code terminology, I would say a driver is a not abstract class
->> inheriting from device. If that's right I wonder if it should
->> be allowed for a non-abstract class inheriting from device to
->> inherit form another non-abstract class.
-> 
-> We could, but this wouldn't save us from having to decide what to
-> do if people are already using those non-abstract superclasses
-> with -global.  e.g.: "-global spapr-pci-host-bridge.FOO=BAR"
-> (spapr-pci-host-bridge is the parent of spapr-pci-vfio-host-bridge).
-> 
-> This means a new rule like this would necessarily break
-> command-line compatibility.  Probably not a blocker in the
-> spapr-pci-host-bridge case, but to me it looks like the rule
-> would cause more problems than it would solve.
+Therefore we should consider this patchset to cover 99% of the
+most common case. Of course the 1% remaining cases are not handled as
+atomic, but besides that kept being correctly emulated.
 
-We are already breaking the command line compatibility with this
-series aren't we?
+> > - Does the atomic sequence is actually allowed to cross pages?
+> 
+> I don't see why not.  It would be restarted on a page fault, but assuming
+> that a process can have 2 pages in ram doesn't seem onerous.
 
-You may be right about the cause more problems than it solves though.
-I may end up thinking some more about this (or forgetting about it).
+Ok. Same comment as above.
+
+> > - Is there any alignement required? The paper mention adding a nop to
+> >    gUSA_exchange_and_add to align the end point to 4 bytes.
 > 
->>
->> Another question is -global with an abstract class seems to be
->> accepted on the command line. Is that an undocumented feature?
+> That's about the mov.l instruction that computes the address.
+
+I guess you mean mova. That make senses, and actually doesn't impact
+QEMU.
+ 
+> > This looks fine. I guess this can be improved in a another patch by
+> > changing the caller to pass a single target address and if the condition
+> > is true or false. This would avoid having to detect that here, and would
+> > not make the code below more complicated.
 > 
-> Considering that we never documented that "driver" could be a
-> superclass, that's true: it is an undocumented feature.
+> Sure.
 > 
-> However, it is a feature people are likely to be relying upon, to
-> configure a feature on all devices of a given type.
+> > > +    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+> > > +        /* Regardless of single-stepping or the end of the page,
+> > > +           we must complete execution of the gUSA region while
+> > > +           holding the exclusive lock.  */
+> > > +        *pmax_insns = max_insns;
+> > > +        return 0;
+> > >       }
+> > 
+> > What are the consequence of not stopping the translation when crossing
+> > the page in user mode? If it doesn't have any, we should probably change
+> > the code to never stop when crossing pages.
+> 
+> The only consequence is recognizing a segv "too early".  It's a quirk that,
+> frankly, I'm willing to accept.
+
+Ok.
+
+> > > +    if (ctx.tbflags & GUSA_EXCLUSIVE) {
+> > > +        /* Ending the region of exclusivity.  Clear the bits.  */
+> > > +        ctx.envflags &= ~GUSA_MASK;
+> > > +    }
+> > > +
+> > 
+> > IIUC this assumes the number of instructions in the sequence is always
+> > executed. I guess this is not correct if the TCG op buffer is full. Some
+> > non-privileged instructions might also stop the translation, but they
+> > are all FPU instructions, so I guess the section is simply not valid in
+> > that case.
+> 
+> The TCG op buffer is always empty when we begin the sequence.  Since we're
+> limited to 128 bytes, or 64 instructions, I'm not concerned about running
+> out. I attempt to make sure that all of the paths out -- like exceptions and
+> branches -- that don't do what we want have GUSA state zapped.
+> 
+> At which point ya gets what ya gets.  Not atomic, but not really wrong either.
 > 
 
-Nod. I do however see a difference between abstract and non-abstract.
+Thanks for all the details, things are much clearer now. Therefore:
 
-> 
->>
->> Sorry for expanding the front. I also trying to figure out the design
->> for my own benefit.
-> 
-> Your comments and suggestions are very welcome, thanks!
-> 
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 
-Thanks!
 
-Regards,
-Halil
+That said for further improvements did you consider decoding the gUSA
+section in a helper. It might avoid having to emulate the atomic
+sequence with 3 TBs in the worst case (the original one, the one to
+decode the sequence and the one holding the exclusive lock). The helper
+should directly have access to the r0 value, can decode the atomic 
+sequence and translate it into a call to the corresponding atomic
+helpers. In the best case that means the sequence can be done in the
+same TB. In the worst case, where the gUSA sequence is not recognized
+it means two TB.
+
+I am might have forgotten something though.
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
