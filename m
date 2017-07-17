@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dXBRf-0000vY-Kc
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:12:40 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dXBVI-0002Iv-Pr
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:16:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dXBRe-0006bT-Kl
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:12:39 -0400
-References: <20170717151207.24919-1-mreitz@redhat.com>
-	<c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ce2f1e11-202b-6941-e5b5-f72cdb2824a0@redhat.com>
-Date: Mon, 17 Jul 2017 21:12:29 +0200
-MIME-Version: 1.0
-In-Reply-To: <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu"
-Subject: Re: [Qemu-devel] [PATCH] block/vvfat: Fix compiler warning with gcc
- 7
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dXBVF-00008P-VP
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:16:24 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:50528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dXBVF-000065-1U
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:16:21 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Tue, 18 Jul 2017 00:45:36 +0530
+Message-Id: <1500318936-14106-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH v6] Add manpage for QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +24,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <ce2f1e11-202b-6941-e5b5-f72cdb2824a0@redhat.com>
-Subject: Re: [PATCH] block/vvfat: Fix compiler warning with gcc 7
-References: <20170717151207.24919-1-mreitz@redhat.com>
- <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
-In-Reply-To: <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+qemu-backup will be a command-line tool for performing full and
+incremental disk backups on running VMs. It is intended as a
+reference implementation for management stack and backup developers
+to see QEMU's backup features in action. The following commit is an
+initial implementation of manpage listing the commands which the
+backup tool will support. The manpage wil be build along with other
+docs when configure is provided with --enable-docs flag in the
+location contrib/backup in build directory.
 
-On 2017-07-17 20:40, Herv=E9 Poussineau wrote:
-> Le 17/07/2017 =E0 17:12, Max Reitz a =E9crit :
->> gcc 7 complains that the sprintf() might write a null byte beyond the
->> end of the tail buffer.  That is wrong, but we can silence it by makin=
-g
->> i unsigned (it can never be negative anyway, see the if condition righ=
-t
->> before).  For some reason, this allows gcc to suddenly accurately
->> calculate the range of i so we can give the tail[] array the exact siz=
-e
->> it needs to have (which is 8 bytes) without gcc complaining.
->>
->> In addition, let us convert the sprintf() to snprintf(), because that =
-is
->> always nicer, and add an assertion about the range of the return value=
+Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+---
+ Makefile                        |  14 +++--
+ contrib/backup/qemu-backup.texi | 135 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 145 insertions(+), 4 deletions(-)
+ create mode 100644 contrib/backup/qemu-backup.texi
 
->> afterwards so we can see that "8 - len" will never be negative and thu=
-s
->> "entry->name + MIN(j, 8 - len)" will never be out of bounds.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/vvfat.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/vvfat.c b/block/vvfat.c
->> index 6b11596..a9e207f 100644
->> --- a/block/vvfat.c
->> +++ b/block/vvfat.c
->> @@ -549,7 +549,7 @@ static direntry_t
->> *create_short_filename(BDRVVVFATState *s,
->>      const gchar *p, *last_dot =3D NULL;
->>      gunichar c;
->>      bool lossy_conversion =3D false;
->> -    char tail[11];
->> +    char tail[8];
->>
->>      if (!entry) {
->>          return NULL;
->> @@ -614,7 +614,8 @@ static direntry_t
->> *create_short_filename(BDRVVVFATState *s,
->>      for (i =3D lossy_conversion ? 1 : 0; i < 999999; i++) {
->>          direntry_t *entry1;
->>          if (i > 0) {
->> -            int len =3D sprintf(tail, "~%d", i);
->> +            int len =3D snprintf(tail, sizeof(tail), "~%u", (unsigned=
-)i);
->> +            assert(len <=3D 7);
->=20
-> As i is on minimum between 0 or 1 and on maximum equal at 999999, does
-> it work if you change the type of i from int to unsigned int?
-> That way, you probably won't need the cast to unsigned in the s(n)print=
-f.
-
-Hm... It works in a way, but then gcc likes to think tail[] needs to be
-9 bytes long (for whatever reason). So... It works in a sense, but not
-quite as well.
-
-So I'm not quite sure which way is better. :-)
-
-Max
-
-
---mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEvBAEBCAAZBQJZbQwdEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQIz6
-B/9+HUtK5H+Fxu/uvh9ByQTvKhaHMMeaMV1Uyo4hNYqhKrJ3hlNaBNlLyGtM/otl
-bNEI3E6V/V8slI6pgKOXDMpRLSpcomnG1SyrhLadiHO0yZw22b9MOdgJy70jUG/+
-XX5rkUkJq4EGYhJc9/+WOpse5TI8TsKsJ61Qb5knj8RsymL/PBpnL5HZOp/DYlgh
-VIhlpJC+fAqI07hSs3xTpYcXuP8c8e938gmyygKjytF2CwHnqx6v9Ce1mnh2Q2eY
-ef+8EIZGdXBGxd3ssYHGPoxiL0AJGPMo9jg9zu+BFyyqn9fLz2cGoqRkYKHOJo6I
-ATkAvrg5qJ/Pv3CvVLQSLC5P
-=UoBA
------END PGP SIGNATURE-----
-
---mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu--
+diff --git a/Makefile b/Makefile
+index 16a0430..500c6e8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -209,6 +209,7 @@ ifdef BUILD_DOCS
+ DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
+ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+ DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
++DOCS+=contrib/backup/qemu-backup.html contrib/backup/qemu-backup.txt
+ ifdef CONFIG_VIRTFS
+ DOCS+=fsdev/virtfs-proxy-helper.1
+ endif
+@@ -508,6 +509,8 @@ VERSION ?= $(shell cat VERSION)
+ 
+ dist: qemu-$(VERSION).tar.bz2
+ 
++qemu-backup.8: contrib/backup/qemu-backup.texi
++
+ qemu-%.tar.bz2:
+ 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+ 
+@@ -719,16 +722,19 @@ fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
+ qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
+ qemu-ga.8: qemu-ga.texi
+ 
+-html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+-info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
+-pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+-txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
++html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html contrib/backup/qemu-backup.html
++info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info contrib/backup/qemu-backup.info
++pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf contrib/backup/qemu-backup.pdf
++txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt contrib/backup/qemu-backup.txt
+ 
+ qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
+ 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
+ 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
+ 	qemu-monitor-info.texi
+ 
++contrib/backup/qemu-backup.html contrib/backup/qemu-backup.pdf contrib/backup/qemu-backup.txt contrib/backup/qemu-backup.info: \
++	contrib/backup/qemu-backup.texi
++
+ docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
+     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
+     docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7: \
+diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup.texi
+new file mode 100644
+index 0000000..ba9f9ec
+--- /dev/null
++++ b/contrib/backup/qemu-backup.texi
+@@ -0,0 +1,135 @@
++\input texinfo
++@setfilename qemu-backup
++
++@documentlanguage en
++@documentencoding UTF-8
++
++@settitle QEMU Backup Tool
++@copying
++
++Copyright @copyright{} 2017 The QEMU Project developers
++@end copying
++@ifinfo
++@direntry
++* QEMU: (QEMU-backup).    Man page for QEMU Backup Tool.
++@end direntry
++@end ifinfo
++@iftex
++@titlepage
++@sp 7
++@center @titlefont{QEMU Backup Tool}
++@sp 1
++@sp 3
++@end titlepage
++@end iftex
++@ifnottex
++@node Top
++@top Short Sample
++
++@menu
++* Name::
++* Synopsis::
++* List of Commands::
++* Command Parameters::
++* Command Descriptions::
++* License::
++@end menu
++
++@end ifnottex
++
++@node Name
++@chapter Name
++
++QEMU disk backup tool.
++
++@node Synopsis
++@chapter Synopsis
++
++qemu-backup command [command options].
++
++@node  List of Commands
++@chapter  List of Commands
++@itemize
++@item qemu-backup guest add --guest guestname --qmp socketpath [--tcp]
++@item qemu-backup guest list
++@item qemu-backup drive add --id driveid --guest guestname --target target
++@item qemu-backup drive add --all --guest guestname --target target
++@item qemu-backup drive list --guest guestname
++@item qemu-backup backup [--inc] --guest guestname
++@item qemu-backup restore --guest guestname
++@item qemu-backup guest remove --guest guestname
++@item qemu-backup drive remove --guest guestname --id driveid
++@end itemize
++@node  Command Parameters
++@chapter  Command Parameters
++@itemize
++@item --all: Add all the drives present in a guest which are suitable for backup.
++@item --guest: Name of the guest.
++@item --id: id of guest or drive.
++@item --inc: (Optional) For incremental backup.
++@item --qmp: Path of qmp socket.
++@item --target: Destination path on which you want your backup to be made.
++@item --tcp: (Optional) Specifies TCP socket.
++@end itemize
++
++@node  Command Descriptions
++@chapter  Command Descriptions
++@itemize
++@item qemu-backup guest add --guest guestname --qmp socketpath [--tcp]
++This command adds a guest to the configuration file given its path to qmp socket.
++
++example:
++qemu-backup guest add --id=fedora --qmp=/var/run/qemu/fedora.sock
++
++qemu-backup guest add --id=fedora --qmp=localhost:4444 --tcp
++
++@item qemu-backup guest list
++This commands lists the names of guests which are added to configuration file.
++
++@item qemu-backup drive add --guest guestname --id driveid --target target
++This command adds different drives for backup in a particular guest by giving the name of drive to be backed up and target imagefile in which we want to store the drive backup.
++
++example: qemu-backup drive add --guest=fedora --id=root --target=/backup/root.img
++
++@item qemu-backup drive add --all --guest guestname --destination destination
++This command adds all the drives of the guest for backup other than CDROM drive and read-only drives. Here all the backup drives will have the same names as original drives and target will be the destination folder.
++
++example: qemu-backup drive add --all --guest fedora --destination =/backup/fedora/
++
++@item qemu-backup drive list --guest guestname
++This commands gives the names of the drive present in a guest which are added for backup.
++
++example: qemu-backup drive list --guest=fedora
++
++@item qemu-backup backup --guest guestname
++
++This command makes the backup of the drives, in their respective given destinations. The ids of drive and their destinations are taken from the configuration file.
++
++example: qemu-backup backup --guest=fedora
++
++@item qemu-backup restore --guest guestname
++This command is needed if we want to restore the backup. It will list the commands to be run for performing the same but will not perform any action.
++
++example: qemu-backup restore --guest=fedora
++
++@item qemu-backup guest remove --guest guestname
++This command removes the guest from the configuration file.
++
++example: qemu-backup guest remove --guest=fedora
++
++@item qemu-backup drive remove --guest guestname --id driveid
++This command helps remove a drive which is set for backup in configuration of given host.
++
++example: drive remove --guest=fedora --id=root
++
++
++@end itemize
++
++@node License
++@appendix License
++QEMU is a trademark of Fabrice Bellard.
++QEMU is released under the
++@url{https://www.gnu.org/licenses/gpl-2.0.txt,GNU General Public License},
++version 2. Parts of QEMU have specific licenses, see file
++@url{http://git.qemu.org/?p=qemu.git;a=blob_plain;f=LICENSE,LICENSE}.
++@bye
+-- 
+2.7.4
