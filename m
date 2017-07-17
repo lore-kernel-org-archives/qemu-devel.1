@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX3BQ-0005vf-Id
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:23:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1dX3ET-0007QC-TI
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:26:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX3BM-0002RC-IA
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:23:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42082)
+	(envelope-from <berrange@redhat.com>) id 1dX3EG-0005Gi-BI
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:26:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX3BM-0002Qo-D6
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:23:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B53D2F86CD
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:23:15 +0000 (UTC)
-Message-ID: <1500286994.12570.1.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 12:23:14 +0200
-In-Reply-To: <4fb5a60b-8f4e-81ec-020e-3d3ba3690418@redhat.com>
-References: <20170712072305.29233-1-kraxel@redhat.com>
-	<4fb5a60b-8f4e-81ec-020e-3d3ba3690418@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] keymaps: fr-ca: add missing keys
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dX3EG-0005GO-5X
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:26:16 -0400
+Date: Mon, 17 Jul 2017 11:26:07 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170717102607.GI3640@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170717063521.GA7393@lemon>
+	<20170717090531.GA7163@stefanha-x1.localdomain>
+	<CAFEAcA8kt71pbxggfLdP3-WCc8u8v5iijZBksMSq6Yss2ydgiw@mail.gmail.com>
+	<20170717093944.GA18516@lemon>
+	<CAFEAcA-hzAq=fP6Pndre3b4truxJFV3go0C91d702pMsLGZRrg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-hzAq=fP6Pndre3b4truxJFV3go0C91d702pMsLGZRrg@mail.gmail.com>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 2017-07-17 at 11:44 +0200, Thomas Huth wrote:
-> On 12.07.2017 09:23, Gerd Hoffmann wrote:
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > ---
-> > =C2=A0pc-bios/keymaps/fr-ca | 2 ++
-> > =C2=A01 file changed, 2 insertions(+)
-> >=20
-> > diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
-> > index b645208e42..030f56a78e 100644
-> > --- a/pc-bios/keymaps/fr-ca
-> > +++ b/pc-bios/keymaps/fr-ca
-> > @@ -48,3 +48,5 @@ parenleft 0xa shift
-> > =C2=A0parenright 0xb shift
-> > =C2=A0underscore 0xc shift
-> > =C2=A0plus 0xd shift
-> > +minus 0xc
-> > +equal 0xd
-> >=20
->=20
-> Is that the fix for https://bugs.launchpad.net/qemu/+bug/533613 ?
+On Mon, Jul 17, 2017 at 11:06:12AM +0100, Peter Maydell wrote:
+> On 17 July 2017 at 10:39, Fam Zheng <famz@redhat.com> wrote:
+> > On Mon, 07/17 10:28, Peter Maydell wrote:
+> >> Ideally we'd streamline our make process to not produce so much
+> >> irrelevant output :-)
+> >
+> > Does that mean to make "quite-command" absolutely quiet if V=1 is not specified?
+> 
+> The current 'quiet' mode is not quite aimed at the same purpose:
+> it's good for interactive use where you don't want the long detail
+> of command lines but you do want some periodic indication of
+> progress through the compile. For entirely noninteractive
+> setups like travis and patchew there's no need to produce
+> what is in effect a rather verbose progress bar...
 
-No.
+For unattended automated systems though, I think running with V=1 is
+preferrable to quiet mode. When you don't have direct access to the
+test system to reproduce systems, every bit of information that you
+can get from the logs is potentially useful, including full compiler
+args. The flipside is that in other cases the verbose output can
+obscure the error messages you are after - depends what your're trying
+to debug - code problems vs build system problems.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1446565
+Perhaps it would be best to extract stderr separately. ie run with V=1
+and have a full log that contains stdout+stderr as normal, but have a
+second log which only contains stderr contents to make it easier to
+see the error / warning messages in isolation from the "noise".
 
-cheers,
-  Gerd
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
