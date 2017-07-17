@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXEIc-0007XR-P3
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXEId-0007Xl-1Y
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXEIb-00022p-L1
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXEIb-00022y-Ph
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:31 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Jul 2017 17:15:14 -0500
-Message-Id: <20170717221516.7692-2-eblake@redhat.com>
+Date: Mon, 17 Jul 2017 17:15:16 -0500
+Message-Id: <20170717221516.7692-4-eblake@redhat.com>
 In-Reply-To: <20170717221516.7692-1-eblake@redhat.com>
 References: <20170717221516.7692-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 1/3] nbd: Fix iotests failure due to changed
- client error message
+Subject: [Qemu-devel] [PULL 3/3] nbd: Fix server reply to
+ NBD_OPT_EXPORT_NAME of older clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,89 +21,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Commit 8ecaeae8 changed the way the client requests an NBD export,
-and in the process also changed the resulting error message when
-the export is not present, breaking a couple of iotests.  The error
-message is now directly given by the server (a failed NBD_OPT_GO)
-instead of implied by the client (after exhausting NBD_OPT_LIST),
-but looking at the testsuite changes, it proves worthwhile to
-reword the error message to be slightly less verbose (as this is
-one particular error message likely to be hit by a user).
+A typo in commit 23e099c set the size of buf[] used in response
+to NBD_OPT_EXPORT_NAME according to the length needed for old-style
+negotiation (4 bytes of flag information) instead of the intended
+2 bytes used in new style.  If the client doesn't enable
+NBD_FLAG_C_NO_ZEROES, then the server sends two bytes too many,
+and is then out of sync in response to the client's next command
+(the bug is masked when modern qemu is the client, since we enable
+the no zeroes flag).
 
-Note that the error message is now sensitive to which binary is
-running the server as well as the client (since the expected
-output is replaying a message received from the server - for that
-matter, it depends on a server new enough to understand NBD_OPT_GO);
-in general iotests are run on client and server from the same source
-code base so the default setup will pass; but if it proves
-problematic for people overriding QEMU_PROG, QEMU_IMG_PROG,
-QEMU_IO_PROG, and QEMU_NBD_PROG to point across multiple builds for
-cross-version integration testing, we may have to later tweak or
-sanitize the output somehow.
+While touching this code, add some more defines to nbd_internal.h
+rather than having quite so many magic numbers in the .c; also,
+use "" initialization rather than memset(), and tweak the oldstyle
+negotiation to better match the spec description of the layout
+(since the spec is big-endian, skipping two bytes as 0 followed by
+writing a 2-byte flag is the same as writing a zero-extended 4-byte
+flag), to make it a bit easier to follow compared to the spec.
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
+[checkpatch.pl has some false positives in the comments]
+
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170717142310.17048-1-eblake@redhat.com>
-Tested-by: John Snow <jsnow@redhat.com>
+Message-Id: <20170717192635.17880-3-eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- nbd/client.c               | 5 ++---
- tests/qemu-iotests/140.out | 3 ++-
- tests/qemu-iotests/143.out | 3 ++-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ nbd/nbd-internal.h |  8 ++++++--
+ nbd/server.c       | 18 ++++++++++--------
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index c3ee9f36b1..846bdc394c 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -232,8 +232,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-         break;
+diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
+index 4065bc68ac..396ddb4d3e 100644
+--- a/nbd/nbd-internal.h
++++ b/nbd/nbd-internal.h
+@@ -38,9 +38,13 @@
+  */
 
-     case NBD_REP_ERR_UNKNOWN:
--        error_setg(errp, "Requested export not available for option %" PRIx32
--                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
-+        error_setg(errp, "Requested export not available");
-         break;
+ /* Size of all NBD_OPT_*, without payload */
+-#define NBD_REQUEST_SIZE        (4 + 2 + 2 + 8 + 8 + 4)
++#define NBD_REQUEST_SIZE            (4 + 2 + 2 + 8 + 8 + 4)
+ /* Size of all NBD_REP_* sent in answer to most NBD_OPT_*, without payload */
+-#define NBD_REPLY_SIZE          (4 + 4 + 8)
++#define NBD_REPLY_SIZE              (4 + 4 + 8)
++/* Size of reply to NBD_OPT_EXPORT_NAME */
++#define NBD_REPLY_EXPORT_NAME_SIZE  (8 + 2 + 124)
++/* Size of oldstyle negotiation */
++#define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
 
-     case NBD_REP_ERR_SHUTDOWN:
-@@ -253,7 +252,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-     }
+ #define NBD_REQUEST_MAGIC       0x25609513
+ #define NBD_REPLY_MAGIC         0x67446698
+diff --git a/nbd/server.c b/nbd/server.c
+index 49ed57455c..82a78bf439 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -283,12 +283,16 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
+                                             Error **errp)
+ {
+     char name[NBD_MAX_NAME_SIZE + 1];
+-    char buf[8 + 4 + 124] = "";
++    char buf[NBD_REPLY_EXPORT_NAME_SIZE] = "";
+     size_t len;
+     int ret;
 
-     if (msg) {
--        error_append_hint(errp, "%s\n", msg);
-+        error_append_hint(errp, "server reported: %s\n", msg);
-     }
+     /* Client sends:
+         [20 ..  xx]   export name (length bytes)
++       Server replies:
++        [ 0 ..   7]   size
++        [ 8 ..   9]   export flags
++        [10 .. 133]   reserved     (0) [unless no_zeroes]
+      */
+     trace_nbd_negotiate_handle_export_name();
+     if (length >= sizeof(name)) {
+@@ -800,22 +804,21 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
+  */
+ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+ {
+-    char buf[8 + 8 + 8 + 128];
++    char buf[NBD_OLDSTYLE_NEGOTIATE_SIZE] = "";
+     int ret;
+     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
+                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
+                               NBD_FLAG_SEND_WRITE_ZEROES);
+     bool oldStyle;
 
-  cleanup:
-diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
-index 0689b2b41c..7295b3d975 100644
---- a/tests/qemu-iotests/140.out
-+++ b/tests/qemu-iotests/140.out
-@@ -8,7 +8,8 @@ wrote 65536/65536 bytes at offset 0
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
--can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: No export with name 'drv' available
-+can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: Requested export not available
-+server reported: export 'drv' not present
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
-diff --git a/tests/qemu-iotests/143.out b/tests/qemu-iotests/143.out
-index 0978b8985a..1c7fb45543 100644
---- a/tests/qemu-iotests/143.out
-+++ b/tests/qemu-iotests/143.out
-@@ -1,7 +1,8 @@
- QA output created by 143
- {"return": {}}
- {"return": {}}
--can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: No export with name 'no_such_export' available
-+can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: Requested export not available
-+server reported: export 'no_such_export' not present
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
+-    /* Old style negotiation header without options
++    /* Old style negotiation header, no room for options
+         [ 0 ..   7]   passwd       ("NBDMAGIC")
+         [ 8 ..  15]   magic        (NBD_CLIENT_MAGIC)
+         [16 ..  23]   size
+-        [24 ..  25]   server flags (0)
+-        [26 ..  27]   export flags
++        [24 ..  27]   export flags (zero-extended)
+         [28 .. 151]   reserved     (0)
+
+-       New style negotiation header with options
++       New style negotiation header, client can send options
+         [ 0 ..   7]   passwd       ("NBDMAGIC")
+         [ 8 ..  15]   magic        (NBD_OPTS_MAGIC)
+         [16 ..  17]   server flags (0)
+@@ -825,7 +828,6 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+     qio_channel_set_blocking(client->ioc, false, NULL);
+
+     trace_nbd_negotiate_begin();
+-    memset(buf, 0, sizeof(buf));
+     memcpy(buf, "NBDMAGIC", 8);
+
+     oldStyle = client->exp != NULL && !client->tlscreds;
+@@ -834,7 +836,7 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+                                       client->exp->nbdflags | myflags);
+         stq_be_p(buf + 8, NBD_CLIENT_MAGIC);
+         stq_be_p(buf + 16, client->exp->size);
+-        stw_be_p(buf + 26, client->exp->nbdflags | myflags);
++        stl_be_p(buf + 24, client->exp->nbdflags | myflags);
+
+         if (nbd_write(client->ioc, buf, sizeof(buf), errp) < 0) {
+             error_prepend(errp, "write failed: ");
 -- 
 2.13.3
