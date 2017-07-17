@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dX2MX-0002Id-2l
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:46 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX2Mk-0002US-Jb
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dX2MT-0004Wk-1W
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:45 -0400
-Received: from mail-ua0-f169.google.com ([209.85.217.169]:36048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dX2MS-0004WS-O8
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:40 -0400
-Received: by mail-ua0-f169.google.com with SMTP id 35so41117031uax.3
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:30:40 -0700 (PDT)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX2Mg-0004ek-1d
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:58 -0400
+Received: from [59.151.112.132] (port=37996 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX2Mf-0004e1-4A
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:53 -0400
+References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<20170714121040.GC2091@work-vm>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <3d3a3ab5-5fff-ed4a-c88c-7e1595cd94c1@cn.fujitsu.com>
+Date: Mon, 17 Jul 2017 17:33:20 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170717085804.GC3640@redhat.com>
-References: <20170713110237.6712-1-lprosek@redhat.com>
-	<20170713110237.6712-2-lprosek@redhat.com>
-	<20170713133206.GA18623@stefanha-x1.localdomain>
-	<20170714104127.GA28095@redhat.com>
-	<CABdb7341GwdRQA1B54zcZTrVNaZt57OWSwCY098spF-bJom=fw@mail.gmail.com>
-	<20170717085804.GC3640@redhat.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Mon, 17 Jul 2017 11:30:39 +0200
-Message-ID: <CABdb735nXO6y06bUKHhEDWp7XMNJZ3q3ih-TF+cV50kbrcsvCA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce
- error_report_nolf
+In-Reply-To: <20170714121040.GC2091@work-vm>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V2 1/4] net/colo-compare.c: Add checkpoint
+ min period to optimize performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +30,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-On Mon, Jul 17, 2017 at 10:58 AM, Daniel P. Berrange
-<berrange@redhat.com> wrote:
-> On Mon, Jul 17, 2017 at 08:54:18AM +0200, Ladi Prosek wrote:
->> On Fri, Jul 14, 2017 at 12:41 PM, Daniel P. Berrange
->> <berrange@redhat.com> wrote:
->> > On Thu, Jul 13, 2017 at 02:32:06PM +0100, Stefan Hajnoczi wrote:
->> >> On Thu, Jul 13, 2017 at 01:02:30PM +0200, Ladi Prosek wrote:
->> >> > +/*
->> >> > + * Print an error message to current monitor if we have one, else to stderr.
->> >> > + * Format arguments like sprintf().  The resulting message should be a
->> >> > + * single phrase, with no trailing punctuation.  The no-LF version allows
->> >> > + * additional text to be appended with error_printf() or error_vprintf().
->> >> > + * Make sure to always close with a newline after all text is printed.
->> >> > + * Prepends the current location.
->> >> > + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
->> >> > + */
->> >> > +void error_report_nolf(const char *fmt, ...)
->> >> > +{
->> >> > +    va_list ap;
->> >> > +
->> >> > +    va_start(ap, fmt);
->> >> > +    error_vreport_nolf(fmt, ap);
->> >> > +    va_end(ap);
->> >> >  }
->> >>
->> >> Each call to this function prepends the timestamp, so it cannot really
->> >> be used for a sequence of prints in a single line.
->> >>
->> >> It's a little ugly but I expected something along the lines of
->> >> g_strdup_vprintf() in virtio_error():
->> >>
->> >>   char *msg;
->> >>
->> >>   va_start(ap, fmt);
->> >>   msg = g_strdup_vprintf(fmt, ap);
->> >>   va_end(ap);
->> >>
->> >>   error_report("%s: %s", DEVICE(vdev)->id, msg);
->> >>
->> >>   g_free(msg);
->> >
->> > You could get the same thing by turning virtio_Error into a macro with
->> > a few games. Rename the current method to virtio_error_impl() and then
->> > define:
->> >
->> >   #define virtio_error(dev, fmt, ...) \
->> >      virtio_error_impl(dev, "%s: " fmt, DEVICE(dev)->id, __VA_ARGS__)
+
+
+On 07/14/2017 08:10 PM, Dr. David Alan Gilbert wrote:
+> * Zhang Chen (zhangchen.fnst@cn.fujitsu.com) wrote:
+>> If colo-compare find out the first different packet that means
+>> the following packet almost is different. we needn't do a lot
+>> of checkpoint in this time, so we set the no-need-checkpoint
+>> peroid, default just set 3 second.
 >>
->> Neat! I think I'll stick with a function though. This doesn't allocate
->> but it adds a little bit of code to each call site which has the
->> potential of slowing down the fast no-error path (I have no data, just
->> the general keeping-the-code-compact-is-good principle). Holler if you
->> disagree!
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   net/colo-compare.c | 13 ++++++++++++-
+>>   1 file changed, 12 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index 6d500e1..0f8e198 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -40,6 +40,9 @@
+>>   /* TODO: Should be configurable */
+>>   #define REGULAR_PACKET_CHECK_MS 3000
+>>   
+>> +/* TODO: Should be configurable */
+> Yes it should!
 >
-> IMHO that would be uneccessary optimization, particular since this is in
-> the error scenario and so is not performance critical to normal operation.
+>> +#define CHECKPOINT_MIN_TIME 3000
+>> +
+>>   /*
+>>     + CompareState ++
+>>     |               |
+>> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+>>       Packet *pkt = NULL;
+>>       GList *result = NULL;
+>>       int ret;
+>> +    static int64_t checkpoint_time_ms;
+>>   
+>>       while (!g_queue_is_empty(&conn->primary_list) &&
+>>              !g_queue_is_empty(&conn->secondary_list)) {
+>> @@ -494,7 +498,14 @@ static void colo_compare_connection(void *opaque, void *user_data)
+>>                */
+>>               trace_colo_compare_main("packet different");
+>>               g_queue_push_tail(&conn->primary_list, pkt);
+>> -            /* TODO: colo_notify_checkpoint();*/
+>> +
+>> +            if (pkt->creation_ms - checkpoint_time_ms > CHECKPOINT_MIN_TIME) {
+>> +                /*
+>> +                 * TODO: Notify colo frame to do checkpoint.
+>> +                 * colo_compare_inconsistent_notify();
+>> +                 */
+>> +                checkpoint_time_ms = pkt->creation_ms;
+>> +            }
+> You need to be careful how this interacts with the actual start of the
+> checkpoint.   Lets say you have two miscompared packets close to each
+> other:
+>
+>
+>      miscompare!
+>           checkpoint
+>      miscompare!
+>           ignore it because it was close to the 1st one
+>
+>     That means we never trigger the 2nd checkpoint and it'll carry on
+> until the maximum checkpoint length.
+>
+>     But also, I think you need to consider what happens to future packets
+> being compared; you can't release any packets now until the checkpoint
+> as soon as you know there's a miscompare.
 
-Yeah, what I mean is that code getting bigger may have negative impact
-even if it doesn't execute - it takes up space in caches and such.
-Maybe it's an overkill but some of this common virtio code is pretty
-low-level and every cache line counts. Actually, I'm tempted to wrap
-the error conditions in virtio.c in unlikely() so the compiler knows
-it's not part of normal operation. Thanks!
+We need some time to do the checkpoint, and in this period we can ignore
+the miscompare to get better performance. Like that:
 
-> Regards,
-> Daniel
+currently:
+
+     miscompare!
+          notify checkpoint
+     miscompare!
+          notify checkpoint
+     miscompare!
+          notify checkpoint
+     miscompare!
+          notify checkpoint
+     vm_stop and do checkpoint
+
+     vm_start and finish checkpoint
+
+     vm_stop and do checkpoint
+
+     vm_start and finish checkpoint
+
+     vm_stop and do checkpoint
+
+     vm_start and finish checkpoint
+
+     vm_stop and do checkpoint
+
+     vm_start and finish checkpoint
+
+
+running normally.
+
+
+after:
+
+     miscompare!
+          notify checkpoint
+     miscompare!
+          ignore
+     miscompare!
+          ignore
+     miscompare!
+          ignore
+     vm_stop and do checkpoint
+
+     vm_start and finish checkpoint
+
+running normally.
+
+
+
+Thanks
+Zhang Chen
+  
+
+
+>
+> Dave
+>
+>>               break;
+>
+>>           }
+>>       }
+>> -- 
+>> 2.7.4
+>>
+>>
+>>
+>>
 > --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+> .
+>
+
+-- 
+Thanks
+Zhang Chen
