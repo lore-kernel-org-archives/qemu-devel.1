@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXAjt-0001Gu-C3
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:27:26 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dXApa-00044M-Az
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:33:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXAjs-0000wd-LU
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:27:25 -0400
-References: <20170714183224.7209-1-eblake@redhat.com>
-	<20170714183224.7209-2-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <71f74f61-6b8d-06a8-e962-e6cfbbb59ec5@redhat.com>
-Date: Mon, 17 Jul 2017 14:27:18 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dXApX-0003nV-O9
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:33:18 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:58102)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dXApX-0003mW-Gx
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:33:15 -0400
+Date: Mon, 17 Jul 2017 13:33:08 -0500
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170717183308.nmknfuotjkampxgr@var.youpi.perso.aquilenet.fr>
+References: <20170717120326.27967-1-ppandit@redhat.com>
+	<20170717144811.emvnjxsuulj6e3hw@var.youpi.perso.aquilenet.fr>
+	<CAH4rwTL3H3_LJL3rmy+qkUJo6vKB+tx-ULp66CX+vhV9R7a=Fg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170714183224.7209-2-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] nbd: Trace client command
- being sent
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH4rwTL3H3_LJL3rmy+qkUJo6vKB+tx-ULp66CX+vhV9R7a=Fg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] slirp: check len against dhcp options
+ array end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,15 +29,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: Reno Robert <renorobert@gmail.com>
+Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-
-
-On 07/14/2017 02:32 PM, Eric Blake wrote:
-> Make the client trace slightly more legible by including the name
-> of the command being sent.
+Reno Robert, on lun. 17 juil. 2017 23:10:02 +0530, wrote:
+> +            if (p + len > p_end) {
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Shouldn't this be (p + len >= p_end) ?
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+No: if p_end-p is 1, len being 1 is fine.
+ 
+Samuel
