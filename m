@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWx1j-0000uA-MD
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:56 -0400
+	(envelope-from <famz@redhat.com>) id 1dWx1n-0000wm-Hi
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWx1d-0004dx-Is
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56094)
+	(envelope-from <famz@redhat.com>) id 1dWx1m-0004jh-Nl
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWx1d-0004dp-9P
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:49 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWx1m-0004jP-HM
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:58 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 17 Jul 2017 11:48:20 +0800
-Message-Id: <20170717034825.1524-11-famz@redhat.com>
+Date: Mon, 17 Jul 2017 11:48:24 +0800
+Message-Id: <20170717034825.1524-15-famz@redhat.com>
 In-Reply-To: <20170717034825.1524-1-famz@redhat.com>
 References: <20170717034825.1524-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 10/15] sheepdog: add queue_lock
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 14/15] docker.py: Improve subprocess exit code
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,115 +30,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+A few error handlings are missing because we ignore the subprocess exit
+code, for example "docker build" errors are currently ignored.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170629132749.997-11-pbonzini@redhat.com>
+Introduce _do_check() aside the existing _do() method and use it in a
+few places.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170712075528.22770-3-famz@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/sheepdog.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ tests/docker/docker.py | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index b7b7e6b..abb2e79 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -390,6 +390,7 @@ struct BDRVSheepdogState {
-     QLIST_HEAD(inflight_aio_head, AIOReq) inflight_aio_head;
-     QLIST_HEAD(failed_aio_head, AIOReq) failed_aio_head;
- 
-+    CoMutex queue_lock;
-     CoQueue overlapping_queue;
-     QLIST_HEAD(inflight_aiocb_head, SheepdogAIOCB) inflight_aiocb_head;
- };
-@@ -488,7 +489,7 @@ static void wait_for_overlapping_aiocb(BDRVSheepdogState *s, SheepdogAIOCB *acb)
- retry:
-     QLIST_FOREACH(cb, &s->inflight_aiocb_head, aiocb_siblings) {
-         if (AIOCBOverlapping(acb, cb)) {
--            qemu_co_queue_wait(&s->overlapping_queue, NULL);
-+            qemu_co_queue_wait(&s->overlapping_queue, &s->queue_lock);
-             goto retry;
-         }
-     }
-@@ -525,8 +526,10 @@ static void sd_aio_setup(SheepdogAIOCB *acb, BDRVSheepdogState *s,
-         return;
-     }
- 
-+    qemu_co_mutex_lock(&s->queue_lock);
-     wait_for_overlapping_aiocb(s, acb);
-     QLIST_INSERT_HEAD(&s->inflight_aiocb_head, acb, aiocb_siblings);
-+    qemu_co_mutex_unlock(&s->queue_lock);
- }
- 
- static SocketAddress *sd_socket_address(const char *path,
-@@ -785,6 +788,7 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
-      * have to move all the inflight requests to the failed queue before
-      * resend_aioreq() is called.
-      */
-+    qemu_co_mutex_lock(&s->queue_lock);
-     QLIST_FOREACH_SAFE(aio_req, &s->inflight_aio_head, aio_siblings, next) {
-         QLIST_REMOVE(aio_req, aio_siblings);
-         QLIST_INSERT_HEAD(&s->failed_aio_head, aio_req, aio_siblings);
-@@ -794,8 +798,11 @@ static coroutine_fn void reconnect_to_sdog(void *opaque)
-     while (!QLIST_EMPTY(&s->failed_aio_head)) {
-         aio_req = QLIST_FIRST(&s->failed_aio_head);
-         QLIST_REMOVE(aio_req, aio_siblings);
-+        qemu_co_mutex_unlock(&s->queue_lock);
-         resend_aioreq(s, aio_req);
-+        qemu_co_mutex_lock(&s->queue_lock);
-     }
-+    qemu_co_mutex_unlock(&s->queue_lock);
- }
- 
- /*
-@@ -887,7 +894,10 @@ static void coroutine_fn aio_read_response(void *opaque)
-     */
-     s->co_recv = NULL;
- 
-+    qemu_co_mutex_lock(&s->queue_lock);
-     QLIST_REMOVE(aio_req, aio_siblings);
-+    qemu_co_mutex_unlock(&s->queue_lock);
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index f5ac86b..ee40ca0 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -117,6 +117,11 @@ class Docker(object):
+             kwargs["stdout"] =3D DEVNULL
+         return subprocess.call(self._command + cmd, **kwargs)
+=20
++    def _do_check(self, cmd, quiet=3DTrue, **kwargs):
++        if quiet:
++            kwargs["stdout"] =3D DEVNULL
++        return subprocess.check_call(self._command + cmd, **kwargs)
 +
-     switch (rsp.result) {
-     case SD_RES_SUCCESS:
-         break;
-@@ -1307,7 +1317,9 @@ static void coroutine_fn add_aio_request(BDRVSheepdogState *s, AIOReq *aio_req,
-     uint64_t old_oid = aio_req->base_oid;
-     bool create = aio_req->create;
- 
-+    qemu_co_mutex_lock(&s->queue_lock);
-     QLIST_INSERT_HEAD(&s->inflight_aio_head, aio_req, aio_siblings);
-+    qemu_co_mutex_unlock(&s->queue_lock);
- 
-     if (!nr_copies) {
-         error_report("bug");
-@@ -1678,6 +1690,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     bs->total_sectors = s->inode.vdi_size / BDRV_SECTOR_SIZE;
-     pstrcpy(s->name, sizeof(s->name), vdi);
-     qemu_co_mutex_init(&s->lock);
-+    qemu_co_mutex_init(&s->queue_lock);
-     qemu_co_queue_init(&s->overlapping_queue);
-     qemu_opts_del(opts);
-     g_free(buf);
-@@ -2438,12 +2451,16 @@ static void coroutine_fn sd_co_rw_vector(SheepdogAIOCB *acb)
- 
- static void sd_aio_complete(SheepdogAIOCB *acb)
- {
-+    BDRVSheepdogState *s;
-     if (acb->aiocb_type == AIOCB_FLUSH_CACHE) {
-         return;
-     }
- 
-+    s = acb->s;
-+    qemu_co_mutex_lock(&s->queue_lock);
-     QLIST_REMOVE(acb, aiocb_siblings);
--    qemu_co_queue_restart_all(&acb->s->overlapping_queue);
-+    qemu_co_queue_restart_all(&s->overlapping_queue);
-+    qemu_co_mutex_unlock(&s->queue_lock);
- }
- 
- static coroutine_fn int sd_co_writev(BlockDriverState *bs, int64_t sector_num,
--- 
+     def _do_kill_instances(self, only_known, only_active=3DTrue):
+         cmd =3D ["ps", "-q"]
+         if not only_active:
+@@ -175,14 +180,14 @@ class Docker(object):
+                                     extra_files_cksum)))
+         tmp_df.flush()
+=20
+-        self._do(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+-                 [docker_dir],
+-                 quiet=3Dquiet)
++        self._do_check(["build", "-t", tag, "-f", tmp_df.name] + argv + =
+\
++                       [docker_dir],
++                       quiet=3Dquiet)
+=20
+     def update_image(self, tag, tarball, quiet=3DTrue):
+         "Update a tagged image using "
+=20
+-        self._do(["build", "-t", tag, "-"], quiet=3Dquiet, stdin=3Dtarba=
+ll)
++        self._do_check(["build", "-t", tag, "-"], quiet=3Dquiet, stdin=3D=
+tarball)
+=20
+     def image_matches_dockerfile(self, tag, dockerfile):
+         try:
+@@ -195,9 +200,9 @@ class Docker(object):
+         label =3D uuid.uuid1().hex
+         if not keep:
+             self._instances.append(label)
+-        ret =3D self._do(["run", "--label",
+-                        "com.qemu.instance.uuid=3D" + label] + cmd,
+-                       quiet=3Dquiet)
++        ret =3D self._do_check(["run", "--label",
++                             "com.qemu.instance.uuid=3D" + label] + cmd,
++                             quiet=3Dquiet)
+         if not keep:
+             self._instances.remove(label)
+         return ret
+--=20
 2.9.4
