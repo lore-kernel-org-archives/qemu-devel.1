@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXB6u-0003Li-8U
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dXB6w-0003NU-0O
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXB6p-0003gm-4v
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40382)
+	(envelope-from <ehabkost@redhat.com>) id 1dXB6v-0003nI-3O
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXB6o-0003fv-Rt
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:07 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXB6u-0003m2-Q4
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:13 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 17 Jul 2017 15:50:42 -0300
-Message-Id: <20170717185051.18740-7-ehabkost@redhat.com>
+Date: Mon, 17 Jul 2017 15:50:45 -0300
+Message-Id: <20170717185051.18740-10-ehabkost@redhat.com>
 In-Reply-To: <20170717185051.18740-1-ehabkost@redhat.com>
 References: <20170717185051.18740-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 06/15] qom: Fix ambiguous path detection when
- ambiguous=NULL
+Subject: [Qemu-devel] [PULL 09/15] fw_cfg: move QOM type defines and fw_cfg
+ types into fw_cfg.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,102 +27,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-object_resolve_path*() ambiguous path detection breaks when
-ambiguous==NULL and the object tree have 3 objects of the same type and
-only 2 of them are under the same parent.  e.g.:
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
- /container/obj1 (TYPE_FOO)
- /container/obj2 (TYPE_FOO)
- /obj2 (TYPE_FOO)
+By exposing FWCfgIoState and FWCfgMemState internals we allow the possibility
+for the internal MemoryRegion fields to be mapped by name for boards that wish
+to wire up the fw_cfg device themselves.
 
-With the above tree, object_resolve_path_type("", TYPE_FOO, NULL) will
-incorrectly return /obj2, because the search inside "/container" will
-return NULL, and the match at "/obj2" won't be detected as ambiguous.
-
-Fix that by always calling object_resolve_partial_path() with a non-NULL
-ambiguous parameter.
-
-Test case included.
-
-Reported-by: Igor Mammedov <imammedo@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170707213052.13087-3-ehabkost@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qom/object.c               | 17 ++++++++---------
- tests/check-qom-proplist.c |  3 +++
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ include/hw/nvram/fw_cfg.h | 50 +++++++++++++++++++++++++++++++++++++++++++++++
+ include/qemu/typedefs.h   |  1 +
+ hw/nvram/fw_cfg.c         | 49 +---------------------------------------------
+ 3 files changed, 52 insertions(+), 48 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index dfdbd50..fe6e744 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1712,15 +1712,13 @@ static Object *object_resolve_partial_path(Object *parent,
-                                             typename, ambiguous);
-         if (found) {
-             if (obj) {
--                if (ambiguous) {
--                    *ambiguous = true;
--                }
-+                *ambiguous = true;
-                 return NULL;
-             }
-             obj = found;
-         }
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index b980cba..b77ea48 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -1,8 +1,19 @@
+ #ifndef FW_CFG_H
+ #define FW_CFG_H
  
--        if (ambiguous && *ambiguous) {
-+        if (*ambiguous) {
-             return NULL;
-         }
-     }
-@@ -1729,7 +1727,7 @@ static Object *object_resolve_partial_path(Object *parent,
- }
++#include "qemu/typedefs.h"
+ #include "exec/hwaddr.h"
+ #include "hw/nvram/fw_cfg_keys.h"
++#include "hw/sysbus.h"
++#include "sysemu/dma.h"
++
++#define TYPE_FW_CFG     "fw_cfg"
++#define TYPE_FW_CFG_IO  "fw_cfg_io"
++#define TYPE_FW_CFG_MEM "fw_cfg_mem"
++
++#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
++#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
++#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
  
- Object *object_resolve_path_type(const char *path, const char *typename,
--                                 bool *ambiguous)
-+                                 bool *ambiguousp)
- {
-     Object *obj;
-     gchar **parts;
-@@ -1738,11 +1736,12 @@ Object *object_resolve_path_type(const char *path, const char *typename,
-     assert(parts);
+ typedef struct FWCfgFile {
+     uint32_t  size;        /* file size */
+@@ -35,6 +46,45 @@ typedef struct FWCfgDmaAccess {
  
-     if (parts[0] == NULL || strcmp(parts[0], "") != 0) {
--        if (ambiguous) {
--            *ambiguous = false;
--        }
-+        bool ambiguous = false;
-         obj = object_resolve_partial_path(object_get_root(), parts,
--                                          typename, ambiguous);
-+                                          typename, &ambiguous);
-+        if (ambiguousp) {
-+            *ambiguousp = ambiguous;
-+        }
-     } else {
-         obj = object_resolve_abs_path(object_get_root(), parts, typename, 1);
-     }
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index f6e7823..432b665 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -593,14 +593,17 @@ static void test_qom_partial_path(void)
-     ambiguous = false;
-     g_assert(!object_resolve_path_type("", TYPE_DUMMY, &ambiguous));
-     g_assert(ambiguous);
-+    g_assert(!object_resolve_path_type("", TYPE_DUMMY, NULL));
+ typedef void (*FWCfgReadCallback)(void *opaque);
  
-     ambiguous = false;
-     g_assert(!object_resolve_path("obj2", &ambiguous));
-     g_assert(ambiguous);
-+    g_assert(!object_resolve_path("obj2", NULL));
++struct FWCfgState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    uint16_t file_slots;
++    FWCfgEntry *entries[2];
++    int *entry_order;
++    FWCfgFiles *files;
++    uint16_t cur_entry;
++    uint32_t cur_offset;
++    Notifier machine_ready;
++
++    int fw_cfg_order_override;
++
++    bool dma_enabled;
++    dma_addr_t dma_addr;
++    AddressSpace *dma_as;
++    MemoryRegion dma_iomem;
++};
++
++struct FWCfgIoState {
++    /*< private >*/
++    FWCfgState parent_obj;
++    /*< public >*/
++
++    MemoryRegion comb_iomem;
++};
++
++struct FWCfgMemState {
++    /*< private >*/
++    FWCfgState parent_obj;
++    /*< public >*/
++
++    MemoryRegion ctl_iomem, data_iomem;
++    uint32_t data_width;
++    MemoryRegionOps wide_data_ops;
++};
++
+ /**
+  * fw_cfg_add_bytes:
+  * @s: fw_cfg device being modified
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index b191591..7b0d4e7 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -30,6 +30,7 @@ typedef struct DisplaySurface DisplaySurface;
+ typedef struct DriveInfo DriveInfo;
+ typedef struct Error Error;
+ typedef struct EventNotifier EventNotifier;
++typedef struct FWCfgEntry FWCfgEntry;
+ typedef struct FWCfgIoState FWCfgIoState;
+ typedef struct FWCfgMemState FWCfgMemState;
+ typedef struct FWCfgState FWCfgState;
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 97c7677..5bd9044 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -37,14 +37,6 @@
  
-     ambiguous = false;
-     g_assert(object_resolve_path("obj1", &ambiguous) == obj1);
-     g_assert(!ambiguous);
-+    g_assert(object_resolve_path("obj1", NULL) == obj1);
+ #define FW_CFG_FILE_SLOTS_DFLT 0x20
  
-     object_unparent(obj2b);
-     object_unparent(cont1);
+-#define TYPE_FW_CFG     "fw_cfg"
+-#define TYPE_FW_CFG_IO  "fw_cfg_io"
+-#define TYPE_FW_CFG_MEM "fw_cfg_mem"
+-
+-#define FW_CFG(obj)     OBJECT_CHECK(FWCfgState,    (obj), TYPE_FW_CFG)
+-#define FW_CFG_IO(obj)  OBJECT_CHECK(FWCfgIoState,  (obj), TYPE_FW_CFG_IO)
+-#define FW_CFG_MEM(obj) OBJECT_CHECK(FWCfgMemState, (obj), TYPE_FW_CFG_MEM)
+-
+ /* FW_CFG_VERSION bits */
+ #define FW_CFG_VERSION      0x01
+ #define FW_CFG_VERSION_DMA  0x02
+@@ -58,51 +50,12 @@
+ 
+ #define FW_CFG_DMA_SIGNATURE 0x51454d5520434647ULL /* "QEMU CFG" */
+ 
+-typedef struct FWCfgEntry {
++struct FWCfgEntry {
+     uint32_t len;
+     bool allow_write;
+     uint8_t *data;
+     void *callback_opaque;
+     FWCfgReadCallback read_callback;
+-} FWCfgEntry;
+-
+-struct FWCfgState {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    /*< public >*/
+-
+-    uint16_t file_slots;
+-    FWCfgEntry *entries[2];
+-    int *entry_order;
+-    FWCfgFiles *files;
+-    uint16_t cur_entry;
+-    uint32_t cur_offset;
+-    Notifier machine_ready;
+-
+-    int fw_cfg_order_override;
+-
+-    bool dma_enabled;
+-    dma_addr_t dma_addr;
+-    AddressSpace *dma_as;
+-    MemoryRegion dma_iomem;
+-};
+-
+-struct FWCfgIoState {
+-    /*< private >*/
+-    FWCfgState parent_obj;
+-    /*< public >*/
+-
+-    MemoryRegion comb_iomem;
+-};
+-
+-struct FWCfgMemState {
+-    /*< private >*/
+-    FWCfgState parent_obj;
+-    /*< public >*/
+-
+-    MemoryRegion ctl_iomem, data_iomem;
+-    uint32_t data_width;
+-    MemoryRegionOps wide_data_ops;
+ };
+ 
+ #define JPG_FILE 0
 -- 
 2.9.4
