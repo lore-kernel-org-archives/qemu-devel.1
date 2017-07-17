@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1dX0lV-00010d-Iy
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:48:26 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dX18N-0005KK-1l
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1dX0lQ-0006P1-Mp
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:48:25 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1dX0lQ-0006Ov-Fz
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:48:20 -0400
-Received: by mail-pg0-x242.google.com with SMTP id y129so18575646pgy.3
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 00:48:20 -0700 (PDT)
-References: <8E78D212B8C25246BE4CE7EA0E645FE501066958@dggemi503-mbs.china.huawei.com>
-	<d521a766-26c9-a5ab-3d80-9da47a2bc89e@gmail.com>
-	<8E78D212B8C25246BE4CE7EA0E645FE501067051@dggemi503-mbs.china.huawei.com>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <36075496-773e-e412-6e19-f332d158be53@gmail.com>
-Date: Mon, 17 Jul 2017 15:48:27 +0800
-MIME-Version: 1.0
-In-Reply-To: <8E78D212B8C25246BE4CE7EA0E645FE501067051@dggemi503-mbs.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Question] Seabios HANGs when mmio wirte in a
- nested vmware host wtih virito-scsi controller
+	(envelope-from <lprosek@redhat.com>) id 1dX18J-0001HQ-So
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:12:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dX18J-0001GM-MX
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:11:59 -0400
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 17 Jul 2017 10:11:43 +0200
+Message-Id: <20170717081152.17153-1-lprosek@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/9] virtio: enhance virtio_error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +21,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xulei (Stone)" <stone.xulei@huawei.com>, "seabios@seabios.org" <seabios@seabios.org>, qemu-devel <qemu-devel@nongnu.org>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, mst <mst@redhat.com>, jasowang <jasowang@redhat.com>, xiaoguangrong <xiaoguangrong@tencent.com>, Kevin O'Connor <kevin@koconnor.net>, kraxel <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
+Output like "Virtqueue size exceeded" is not much useful in identifying the
+culprit. This series beefs up virtio_error to print the virtio device name
+and id, and introduces virtqueue_error which additionally includes the index
+of the virtqueue where the error occured.
 
+Patches 1 to 3 lay the groundwork, patches 4 to 8 convert virtio devices to
+use virtqueue_error instead of virtio_error. Patch 9 adds virtio_error and
+virtqueue_error to the list of error funcs in checkpatch.pl.
 
-On 07/17/2017 03:34 PM, Xulei (Stone) wrote:
-> 
->     On 07/17/2017 11:13 AM, Xulei (Stone) wrote:
-> 
->      >>                              |--virtio_queue_empty
->      >>
->      >> Then, kmod falls in infinite loop in handle EPT_MISCONFIG.
->      >> As far as i know, when kvm enters guest after handling EPT_MISCONFIG, seabios should return
->      >> from mmio write and wait for virtio backend(qemu) to handle this mmio writing.
->      >> What puzzles me:
->      >> 1) i can not understand why kvm runs in infinite loop and seabios does not return from writew.
-> 
->        >From the trace in L1 guest, it did not hang in KVM, as it went into guest mode normally.
-> 
->      >> 2) kvm nested kvm is ok. But vmware nested kvm is not ok. This problem has anything related
->      >>     with vmware?
->      >>
-> 
->      > It is the issue in vmware, i guess the RIP register is not handled correctly.
->      > BTW, does kvm unit tests run well on nested vmware?
-> 
->     Sadly, kvm unit tests run fail on nested vmware and make the  CentOS 7.3(with kmod 4.4.11) crashed...
-> 
+v1->v2:
+* Modified virtio_error and added virtqueue_error (Stefan)
+* Now also printing device id (Stefan)
+* Went over all virtio_error call sites and converted them to virtqueue_error
+  as appropriate; added virtio device maintainers to cc
 
-Well, so that should be reported to vmware. :-)
+v2->v3:
+* Removed patch 1 (Stefan, Markus)
+* Split patch 3 into 2 (adds virtqueue_error) and 3 (makes virtio.c call it)
+  (Cornelia)
+* Added patch 9 to modify $qemu_error_funcs in checkpatch.pl (Greg)
+* s/includes queue index/includes the queue index/ in patch 3-9 commit
+  messages (Cornelia)
+* Fixed virtio_get_device_id to return empty string instead of NULL if the
+  device doesn't have an id (Stefan)
+* Simplified the change in virtio-crypto.c to use vcrypto->ctrl_vq instead
+  of propagating the vq pointer in function arguments (Cornelia, Gonglei)
+
+Ladi Prosek (9):
+  virtio: enhance virtio_error messages
+  virtio: introduce virtqueue_error
+  virtio: use virtqueue_error for errors with queue context
+  virtio-9p: use virtqueue_error for errors with queue context
+  virtio-blk: use virtqueue_error for errors with queue context
+  virtio-net: use virtqueue_error for errors with queue context
+  virtio-scsi: use virtqueue_error for errors with queue context
+  virtio-crypto: use virtqueue_error for errors with queue context
+  checkpatch: add virtio_error and virtqueue_error to error funcs
+
+ hw/9pfs/virtio-9p-device.c |  37 ++++++--------
+ hw/block/virtio-blk.c      |   6 +--
+ hw/net/virtio-net.c        |  24 ++++-----
+ hw/scsi/virtio-scsi.c      |   2 +-
+ hw/virtio/virtio-crypto.c  |  49 ++++++++++---------
+ hw/virtio/virtio.c         | 119 +++++++++++++++++++++++++++++++--------------
+ include/hw/virtio/virtio.h |   1 +
+ scripts/checkpatch.pl      |   4 +-
+ 8 files changed, 143 insertions(+), 99 deletions(-)
+
+-- 
+2.9.3
