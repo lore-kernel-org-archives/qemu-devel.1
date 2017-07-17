@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX4QF-0007Sz-ED
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:42:44 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dX4RF-0007yL-AY
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX4QC-0003D9-BU
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:42:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50986)
+	(envelope-from <kraxel@redhat.com>) id 1dX4RC-0003wM-8S
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:43:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47585)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dX4QC-0003CE-2C
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:42:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX4RC-0003vl-2O
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:43:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D47EB4E047
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 11:42:38 +0000 (UTC)
-References: <20170717101632.23247-1-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <93718068-720c-36b3-a18a-6af1d185039c@redhat.com>
-Date: Mon, 17 Jul 2017 06:42:34 -0500
+	by mx1.redhat.com (Postfix) with ESMTPS id 10308319B4C
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 11:43:41 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 17 Jul 2017 13:43:32 +0200
+Message-Id: <20170717114332.2941-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170717101632.23247-1-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi"
-Subject: Re: [Qemu-devel] [PATCH] add scripts/git.orderfile
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] keymaps: fr-ca: more fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <93718068-720c-36b3-a18a-6af1d185039c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] add scripts/git.orderfile
-References: <20170717101632.23247-1-kraxel@redhat.com>
-In-Reply-To: <20170717101632.23247-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Fixes: https://bugs.launchpad.net/qemu/+bug/533613
+Cc: Thomas Huth <thuth@redhat.com>
+Suggested-by: J=C3=A9r=C3=B4me Poulin
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ pc-bios/keymaps/fr-ca | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-On 07/17/2017 05:16 AM, Gerd Hoffmann wrote:
-> Based on a old patch by Laszlo.
-> Time to get this in ...
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  scripts/git.orderfile | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
->  create mode 100644 scripts/git.orderfile
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
-> new file mode 100644
-> index 0000000000..ac699700b1
-> --- /dev/null
-> +++ b/scripts/git.orderfile
-> @@ -0,0 +1,29 @@
-> +#
-> +# order file for git, to produce patches which are easier to review
-> +# by diffing the important stuff like interface changes first.
-> +#
-> +# one-off usage:
-> +#   git diff -O scripts/git.orderfile ...
-> +#
-> +# add to git config:
-> +#   git config diff.orderFile scripts/git.orderfile
-> +#
-> +
-> +# Documentation
-> +docs/*
-> +*.texi
-> +
-> +# build system
-> +configure
-> +Makefile*
-> +*.mak
-> +
-> +# qapi schema
-> +*.json
-> +
-> +# headers
-> +*.h
-> +
-> +# code
-> +*.c
-> +
->=20
-
+diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
+index 030f56a78e..b177d074c9 100644
+--- a/pc-bios/keymaps/fr-ca
++++ b/pc-bios/keymaps/fr-ca
+@@ -3,6 +3,8 @@
+ include common
+ map 0xc0c
+=20
++numbersign 0x29
++bar 0x29
+ backslash 0x29 altgr
+ plusminus 0x2 altgr
+ at 0x3 altgr
+@@ -10,7 +12,6 @@ sterling 0x4 altgr
+ cent 0x5 altgr
+ currency 0x6 altgr
+ notsign 0x7 altgr
+-bar 0x29 shift
+ twosuperior 0x9 altgr
+ threesuperior 0xa altgr
+ onequarter 0xb altgr
+@@ -38,6 +39,10 @@ dead_cedilla 0x1b
+ dead_diaeresis 0x1b shift
+ exclam 0x2 shift
+ quotedbl 0x3 shift
++comma 0x33
++apostrophe 0x33 shift
++period 0x34
++period 0x34 shift
+ slash 0x4 shift
+ dollar 0x5 shift
+ percent 0x6 shift
+@@ -49,4 +54,7 @@ parenright 0xb shift
+ underscore 0xc shift
+ plus 0xd shift
+ minus 0xc
++underscore 0xc shift
+ equal 0xd
++semicolon 0x27
++colon 0x27 shift
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJZbKKqAAoJEKeha0olJ0NqxokH/36GVLdJgylSpZQp3SrVUc7e
-LtHAqNsDxf7oW8GTPnRf0Msl0uV/7ykzYO6TuE3LJLwIuukJVG1thjiehf7yp7cO
-jOW1BSgxz431KDZcBLJ3lEPXmv0uR94zJ1Dlqb3qfgcV0PrgorTzsWAODMX3Fvk7
-FenmuHYuucP2CBaWsAiBFq8yaSt86jSRNHbdxVuDOU+fG5dULZzyViu6mI2P9Kme
-xvrlvugKQP/9etjDcrJW2VwFgVRir1MYfmAD4EOA0ELxG4qpqRAaD4J8AFtwySVO
-erODnukw9ydLH5XBb09YPdsVMo+835+0TViV/bpkuBmUy1ivz2XfTAPD1OBP5Qk=
-=CX7T
------END PGP SIGNATURE-----
-
---f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi--
+2.9.3
