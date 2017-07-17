@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX33d-00010k-HJ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:15:18 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dX34G-0001NF-TB
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX33c-0000FC-Gy
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:15:17 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX33c-0000DV-9a
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:15:16 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id f67so78553907wmh.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 03:15:16 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170715123057.8529-1-samuel.thibault@ens-lyon.org>
-References: <20170715123057.8529-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 11:14:54 +0100
-Message-ID: <CAFEAcA_2DESu-EaXkgyC1zpe6aPkHUQ=m+6RnQ8f+jh5BinTSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/4] slirp updates
+	(envelope-from <kraxel@redhat.com>) id 1dX34C-0000s1-8a
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:15:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38490)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX34C-0000pI-25
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:15:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D8F4980460
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:15:50 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 17 Jul 2017 12:15:47 +0200
+Message-Id: <20170717101547.22295-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] add editorconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 15 July 2017 at 13:30, Samuel Thibault <samuel.thibault@ens-lyon.org> wr=
-ote:
-> warning: redirection vers https://people.debian.org/~sthibault/qemu.git/
-> The following changes since commit 4871b51b9241b10f4fd8e04bbb21577886795e=
-25:
->
->   vmgenid-test: use boot-sector infrastructure (2017-07-14 17:03:03 +0100=
-)
->
-> are available in the git repository at:
->
->   http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to 75cb298d905030fca897ea1d80e409c7f7e3e5ea:
->
->   slirp: Handle error returns from sosendoob() (2017-07-15 14:28:25 +0200=
-)
->
-> ----------------------------------------------------------------
-> slirp updates
->
-> ----------------------------------------------------------------
-> Marc-Andr=C3=A9 Lureau (1):
->       slirp: use DIV_ROUND_UP
->
-> Peter Maydell (3):
->       slirp: fork_exec(): Don't close() a negative number in fork_exec()
->       slirp: Handle error returns from slirp_send() in sosendoob()
->       slirp: Handle error returns from sosendoob()
->
->  slirp/ip6.h    |  6 +++---
->  slirp/misc.c   |  4 +++-
->  slirp/sbuf.c   |  2 +-
->  slirp/socket.c | 52 +++++++++++++++++++++++++++++++++++-----------------
->  4 files changed, 42 insertions(+), 22 deletions(-)
+Add a .editorconfig file for qemu.  Specifies the indent and tab style
+for various files (C code and Makefiles for starters).  Most popular
+editors support this either natively or via plugin.
 
-Applied, thanks.
+Check http://editorconfig.org/ for details.
 
--- PMM
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ .editorconfig | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+ create mode 100644 .editorconfig
+
+diff --git a/.editorconfig b/.editorconfig
+new file mode 100644
+index 0000000000..b2022e391a
+--- /dev/null
++++ b/.editorconfig
+@@ -0,0 +1,15 @@
++# http://editorconfig.org
++root = true
++
++[*]
++end_of_line = lf
++insert_final_newline = true
++charset = utf-8
++
++[Makefile*]
++indent_style = tab
++indent_size = 8
++
++[*.{c,h}]
++indent_style = space
++indent_size = 4
+-- 
+2.9.3
