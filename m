@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX699-0005c2-9E
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:33:12 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dX69f-00062G-5c
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX696-0006Gj-5P
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:33:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50146)
+	(envelope-from <stefanha@redhat.com>) id 1dX69c-0006Wi-2U
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:33:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dX695-0006GB-SA
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:33:08 -0400
-References: <20170717132110.29962-1-lvivier@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e19af7a0-53cb-9ca6-c593-a4e4567eca39@redhat.com>
-Date: Mon, 17 Jul 2017 08:33:01 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dX69b-0006WW-Ra
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:33:39 -0400
+Date: Mon, 17 Jul 2017 14:33:32 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170717133332.GP7163@stefanha-x1.localdomain>
+References: <1500151401-30863-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<20170717071835.GD22872@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20170717132110.29962-1-lvivier@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0LjMXu7hQ0WiHCihmJmXoUM0eq2hcHWCA"
-Subject: Re: [Qemu-devel] [PATCH] accel: cleanup error output
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="PdAWLd+WEPmMbsbx"
+Content-Disposition: inline
+In-Reply-To: <20170717071835.GD22872@lemon>
+Subject: Re: [Qemu-devel] [RFC] RFC on Backup tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-devel@nongnu.org, jsnow@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0LjMXu7hQ0WiHCihmJmXoUM0eq2hcHWCA
-From: Eric Blake <eblake@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Ben Warren <ben@skyportsystems.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <e19af7a0-53cb-9ca6-c593-a4e4567eca39@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] accel: cleanup error output
-References: <20170717132110.29962-1-lvivier@redhat.com>
-In-Reply-To: <20170717132110.29962-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--PdAWLd+WEPmMbsbx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 07/17/2017 08:21 AM, Laurent Vivier wrote:
-> Only emit "XXX accelerator not found", if there are not
-> further accelerators listed. eg
+On Mon, Jul 17, 2017 at 03:18:35PM +0800, Fam Zheng wrote:
+> On Sun, 07/16 02:13, Ishani Chugh wrote:
+> > +"""
+> > +This file is an implementation of backup tool
+> > +"""
+> > +from argparse import ArgumentParser
+> > +import os
+> > +import errno
+> > +from socket import error as socket_error
+> > +import configparser
 >=20
->    accel=3Dkvm:tcg
+> Python2 has ConfigParser while python3 has configparser. Please be specif=
+ic
+> about the python compatibility level of this script - my system (Fedora) =
+has
+> python2 as /usr/bin/python, so the shebang and your example command in the
+> commit message don't really work. "six" module can handle python 2/3
+> differentiations, or you can use '#!/usr/bin/env python2' to specify a py=
+thon
+> version explicitly.
+
+I haven't compared Python 2 ConfigParser and Python 3 configparser in
+detail, but I they have a common API subset.  It should be possible to
+do something like:
+
+  try:
+      from configparser import ConfigParser # Python 3
+  except ImportError:
+      from ConfigParser import ConfigParser # Python 2
+
+> > +from qmp import QEMUMonitorProtocol
+> > +
+> > +
+> > +class BackupTool(object):
+> > +    """BackupTool Class"""
+> > +    def __init__(self, config_file=3D'backup.ini'):
 >=20
-> doesn't print a "KVM accelerator not found" warning
-> when it falls back to tcg, but a
->=20
->    accel=3Dkvm
->=20
-> prints a warning, since no fallback is given.
->=20
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  accel/accel.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+> Is it better to put this in a more predictable place such as
+> "$HOME/.qemu-backup.ini" and/or make it a command line option?
 
+Yes, it's common to take a configuration file path on the command-line
+with a default value of $HOME/.program-name if no command-line option
+was given.
 
-> @@ -110,7 +110,8 @@ void configure_accelerator(MachineState *ms)
-> =20
->      if (!accel_initialised) {
->          if (!init_failed) {
-> -            fprintf(stderr, "No accelerator found!\n");
-> +            fprintf(stderr, "-machine accel=3D%s: No accelerator found=
-!\n",
-
-It may be worth dropping the '!', as we tend not to shout at the user;
-but whether or not you tweak that,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---0LjMXu7hQ0WiHCihmJmXoUM0eq2hcHWCA
+--PdAWLd+WEPmMbsbx
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllsvI0ACgkQp6FrSiUn
-Q2pRpggAlqZ0B95qvOFUEm8whdhT5IwV7XeO6zjcXeuBirAU2SXcc+wjsrSZbRxF
-oj10UdiP+JNRniCirksF+pVhh/9fxlAHX5TldKnvMmNZPcTZ8Ngvu8pKhJ0cfLmg
-PJnS6rgqlSKZUyq4HrWa/oTq1VjZW3BFqfWNo4+nW5voFUuVc5AuDJklOCuoiPqf
-KVoB9kAF2tYeCrrA2xyRwQTRiyRfUl/sEIHOf551E/FA6NVoMMo5gVwUQlgWapKa
-sjgmxtiPCwoVMnfDPQm+tf07P6WhBifYtjH0GfnRaB28sV3Q5w93iBV5UT6HNpSJ
-TbEOLTwHhhI3/tdcjwCrVddVTipzYg==
-=2Iar
+iQEcBAEBAgAGBQJZbLysAAoJEJykq7OBq3PIvlEH/2nCEpxDbLdyeuBPzPS7GQeb
+oGTCy24AEeweh0Agwn9ouuyezbKWu/EBPPYl7d/9xWyymRYdESnz9J0g7/zCzbHf
+lwXyWc+a1J/vsCUEgmDgC7GP4QCW+K+/i3msm2Ra95nMTzvCK5LnwJ4qGHHkMvWg
+qIRu1QRY4ZhxJyJfhRbnYXUR9FjHDNlOK4Q8v26cVkHjmXyJk24kMDQZ3Oz2SIVm
+FMY6x+dZsf7qTbGOG2C+ccoKJXM/TLPHWKDPlaeZ6gJ71zw7UkOBmIfy2KYYjds5
+sFDzAQs3gAwPb1SNc5jUr+tzupKywst++zAhW3bVVAgBPb0RZc3YHoH6cxYlyNw=
+=kLrE
 -----END PGP SIGNATURE-----
 
---0LjMXu7hQ0WiHCihmJmXoUM0eq2hcHWCA--
+--PdAWLd+WEPmMbsbx--
