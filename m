@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <javierm@redhat.com>) id 1dX1xZ-000883-6Y
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:58 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dX1yH-0000J2-1X
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <javierm@redhat.com>) id 1dX1xV-0004LW-V0
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <javierm@redhat.com>) id 1dX1xV-0004Kj-LI
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:53 -0400
-References: <eef9a031-36e9-0443-1d73-30a49df02e9a@redhat.com>
-From: Javier Martinez Canillas <javierm@redhat.com>
-Message-ID: <1c955fdc-90d5-4bdd-3518-815595bbfd70@redhat.com>
-Date: Mon, 17 Jul 2017 11:04:44 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dX1yD-00050x-Jy
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:05:40 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dX1yC-0004zb-VU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:05:37 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id b134so40806225wma.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:05:35 -0700 (PDT)
+Date: Mon, 17 Jul 2017 10:05:31 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170717090531.GA7163@stefanha-x1.localdomain>
+References: <20170717063521.GA7393@lemon>
 MIME-Version: 1.0
-In-Reply-To: <eef9a031-36e9-0443-1d73-30a49df02e9a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] investigating TPM for OVMF-on-QEMU
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
+Content-Disposition: inline
+In-Reply-To: <20170717063521.GA7393@lemon>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Jiewen Yao <jiewen.yao@intel.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Peter Jones <pjones@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Amarnath Valluri <amarnath.valluri@intel.com>
-Cc: edk2-devel-01 <edk2-devel@lists.01.org>, qemu devel list <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hello Laszlo,
 
-Thanks a lot for the great summary.
+--/9DWx/yDrRhgMJTb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 07/14/2017 08:04 PM, Laszlo Ersek wrote:
+On Mon, Jul 17, 2017 at 02:35:21PM +0800, Fam Zheng wrote:
+> Q1: In the worst case, you get four individual auto replies from patchew. Is
+> that too many? Do you prefer one reply with all the results concatenated into
+> one?
 
-[snip]
+I'd like to avoid situations where one of the failure emails is sent
+hours after the others, because it's possible that the patch series
+author has already sent the next (still broken) revision by that time.
+The simplest way to avoid that is by sending just one email.
 
-> 
->      Here I should mention some ACPI and hardware aspects. Under TPM1
->      (whose ACPI table was called "TCPA"), the TPM events (measurements
->      I think) were logged in a reserved memory area described by the
->      TCPA table. Under TPM2, the "TPM2" ACPI table does no such thing,
->      it only helps identify the communication characteristics of the
->      device, and the event log itself is accessible to the OS boot
->      loader via the EFI_TCG2_PROTOCOL.
-> 
->      (If you are curious how a legacy BIOS boot loader is supposed to
->      read the event log from a TPM2-only device (no "TCPA" table): I
->      don't have the slightest clue.)
->
+> Q2: Some think the full log in the mail body is more than necessary. Is it
+> better or worse if it is a "tail -n 200" of the log in the body and the full log
+> attached?
 
-The latest "TCG ACPI Specification" draft from February 27, 2017 mentions that
-the TPM2 table contains the LAML and LASA fields for the TPM event logs memory
-area. But as Stefan pointed out this is just a draft, and has this disclaimer:
+tail output and a link to the full logs would be nice.  Often there is a
+lot of irrelevant output.
 
-"Work in Progress:
-This document is an intermediate draft for comment only and is subject to change
-without notice. Readers should not design products based on this document."
+--/9DWx/yDrRhgMJTb
+Content-Type: application/pgp-signature; name="signature.asc"
 
-So I think that will be supported in the future (if the draft doesn't change and
-is published).
- 
->      I'm not sure about the exact characteristics of the virtual TPM
->      that Stefan's swtpm project:
-> 
->        https://github.com/stefanberger/swtpm
-> 
->      combined with Amarnath's pending QEMU patches:
-> 
->        http://mid.mail-archive.com/1496666711-14630-1-git-send-email-amarnath.valluri@intel.com
-> 
->      will expose to the guest. What I do know is that the current QEMU
->      solution, which mostly forwards a physical (host) TPM to the guest,
->      produces a "TPM2" ACPI table if said host TPM device is TPM2. The
->      "TPM2" table is exposed to the guest OS with OVMF's help, and has
->      the following fields:
-> 
->      - address of control area: zero
->      - start method: 6 (TIS plus Cancel)
->      - platform specific params: none.
-> 
->      This implies that neither ACPI activation (method 2) nor Command
->      Response Buffer activation (method 7) nor a combination of these
->      two (method 8) is available in QEMU.
-> 
+-----BEGIN PGP SIGNATURE-----
 
-Even when QEMU always exposes a start method 6 (TIS + cancel) in its TPM2 table
-to the guest, pass-through works when the host TPM advertises a different start
-method.
+iQEcBAEBAgAGBQJZbH3bAAoJEJykq7OBq3PIbPwIAJCrlY/7YZXz/0yidA/StUhx
+CDz7l7aKP1nbx+XxUz3Ufom8vMnQqFL0AMHnUS1jVMdwihQwmUGYXFLgWPEPFjGR
+5e5fAM3fkOzoeL2HpAMM/ADyxyAWqOj/Wser/UWKydsSvKvUC70PLWebgA130IH9
+9c+hvf8ns0T2aLwm/gdR7EnOYAR36ZpDJq2wM/A0zY0ctYbtX/H1tlha7ap2vdhT
+vqM5E82NHd702fw5X+fxEqTZy/M7msfjBGAHPF8s/eJx85K6Z61FsoyK0P4ONvfb
+FiU3gFODWuJB8eaJOqQ16g+EWTzve9EWeHXvYDd/ul+woaSMnySgjey8D92R7u0=
+=BEng
+-----END PGP SIGNATURE-----
 
-For example I've a laptop with an Intel PTT fTPM and the start method is 2, but
-I'm able to access the host TPM2 from the guest using the Linux tpm_tis driver.
-
-> 
->      In brief, by not including these two modules, we avoid a "TPM2"
->      ACPI table duplication. We also turn off the Memory Overwrite
->      Request and Physical Presence Interface features -- which are both
->      optional, as far as I can see, and very messy for OVMF's platform
->      code.
-> 
-
-Agreed.
-
-> (3) Drivers (and features) that are *not in edk2/SecurityPkg/Tcg:
-> 
->     The Intel whitepaper discusses (and Peter also mentioned earlier)
->     "dTPM" versus "fTPM".
-> 
->     "dTPM" is basically TPM provided in publicly specified hardware,
->     where the firmware can offer support, such as EFI_TCG2_PROTOCOL, but
->     the OS can also directly drive the hardware. This is what QEMU
->     offers with the TIS+Cancel start method (value 6). (The "Command
->     Response Buffer" start method (value 7) would also qualify as
->     "dTPM"). When the platform provides "dTPM", the _DSM method
->     described above *may* be offered, but it is not required.
-> 
->     "fTPM" is where the hardware is completely hidden from the OS, and
->     is implemented fully in firmware. The corresponding start method
->     values are 2 ("ACPI") and 8 ("ACPI with CRB"). In this case, the
->     _DSM method is *required*.
-> 
->     To my understanding, edk2 contains no "fTPM" implementation. The
->     in-tree drivers recognize hardware that describes itself as
->     TIS+Cancel (6) or CRB (7). Pure ACPI variants are neither recognized
->     nor offered.
-> 
-
-That's my understanding as well. I see that the Valley View 2 / Minnowboard Max
-platform pkg (Vlv2TbltDevicePkg) as references to fTPM and a FTPM_ENABLE var to
-enable it, but IIUC the fTPM driver is distributed as proprietary binary files:
-
-https://firmware.intel.com/projects/minnowboard-max
-
->     I think TIS+Cancel / dTPM is the best match: the emulated TPM has to
->     be implemented in virtual hardware (not just faked within the guest,
->     in RAM), so that QEMU can secure the sensitive stuff from guest
->     kernel level access.
-> 
-
-Agreed.
-
-Best regards,
--- 
-Javier Martinez Canillas
-Software Engineer - Desktop Hardware Enablement
-Red Hat
+--/9DWx/yDrRhgMJTb--
