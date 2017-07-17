@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dX9M0-0008Qx-5D
+	(envelope-from <borntraeger@de.ibm.com>) id 1dX9M0-0008Qv-2i
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dX9Lv-0005EF-74
+	(envelope-from <borntraeger@de.ibm.com>) id 1dX9Lv-0005E7-6R
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:58:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55213
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dX9Lv-0005Dj-25
+	id 1dX9Lu-0005DI-TH
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:58:35 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6HGsOgb115396
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 12:58:34 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2brqc6u0m9-1
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6HGn45M118829
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 12:58:33 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2brqy9sbtg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 12:58:33 -0400
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 17 Jul 2017 17:58:32 +0100
+	Mon, 17 Jul 2017 17:58:30 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 17 Jul 2017 18:58:26 +0200
+Date: Mon, 17 Jul 2017 18:58:25 +0200
 In-Reply-To: <1500310706-36211-1-git-send-email-borntraeger@de.ibm.com>
 References: <1500310706-36211-1-git-send-email-borntraeger@de.ibm.com>
-Message-Id: <1500310706-36211-3-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] s390x/cpumodel: z14 cpu models
+Message-Id: <1500310706-36211-2-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/2] linux header sync against v4.13-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,102 +38,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
-
-This patch introduces the CPU model for z14, along with all base and
-optional features.
-
-Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- target/s390x/cpu_models.c   |  1 +
- target/s390x/gen-features.c | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+ linux-headers/asm-x86/kvm_para.h | 1 +
+ linux-headers/linux/kvm.h        | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index c654279..e2ccc32 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -75,6 +75,7 @@ static S390CPUDef s390_cpu_defs[] = {
-     CPUDEF_INIT(0x2964, 13, 1, 47, 0x08000000U, "z13", "IBM z13 GA1"),
-     CPUDEF_INIT(0x2964, 13, 2, 47, 0x08000000U, "z13.2", "IBM z13 GA2"),
-     CPUDEF_INIT(0x2965, 13, 2, 47, 0x08000000U, "z13s", "IBM z13s GA1"),
-+    CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
- };
+diff --git a/linux-headers/asm-x86/kvm_para.h b/linux-headers/asm-x86/kvm_para.h
+index 3a53979..cefa127 100644
+--- a/linux-headers/asm-x86/kvm_para.h
++++ b/linux-headers/asm-x86/kvm_para.h
+@@ -67,6 +67,7 @@ struct kvm_clock_pairing {
  
- void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat)
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index af14b11..118a95e 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -338,6 +338,14 @@ static uint16_t base_GEN13_GA1[] = {
+ #define KVM_ASYNC_PF_ENABLED			(1 << 0)
+ #define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
++#define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
  
- #define base_GEN13_GA2 EmptyFeat
+ /* Operations for KVM_HC_MMU_OP */
+ #define KVM_MMU_OP_WRITE_PTE            1
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 43e2d82..7971a4f 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -927,6 +927,8 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_CMMA_MIGRATION 145
+ #define KVM_CAP_PPC_FWNMI 146
+ #define KVM_CAP_PPC_SMT_POSSIBLE 147
++#define KVM_CAP_HYPERV_SYNIC2 148
++#define KVM_CAP_HYPERV_VP_INDEX 149
  
-+static uint16_t base_GEN14_GA1[] = {
-+    S390_FEAT_ENTROPY_ENC_COMP,
-+    S390_FEAT_MISC_INSTRUCTION_EXT,
-+    S390_FEAT_SEMAPHORE_ASSIST,
-+    S390_FEAT_TIME_SLICE_INSTRUMENTATION,
-+    S390_FEAT_ORDER_PRESERVING_COMPRESSION,
-+};
-+
- /* Full features (in order of release)
-  * Automatically includes corresponding base features.
-  * Full features are all features this hardware supports even if kvm/QEMU do not
-@@ -442,6 +450,23 @@ static uint16_t full_GEN13_GA1[] = {
+ #ifdef KVM_CAP_IRQ_ROUTING
  
- #define full_GEN13_GA2 EmptyFeat
+@@ -1351,7 +1353,7 @@ struct kvm_s390_ucas_mapping {
+ /* Available with KVM_CAP_X86_SMM */
+ #define KVM_SMI                   _IO(KVMIO,   0xb7)
+ /* Available with KVM_CAP_S390_CMMA_MIGRATION */
+-#define KVM_S390_GET_CMMA_BITS      _IOW(KVMIO, 0xb8, struct kvm_s390_cmma_log)
++#define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
+ #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
  
-+static uint16_t full_GEN14_GA1[] = {
-+    S390_FEAT_INSTRUCTION_EXEC_PROT,
-+    S390_FEAT_GUARDED_STORAGE,
-+    S390_FEAT_VECTOR_PACKED_DECIMAL,
-+    S390_FEAT_VECTOR_ENH,
-+    S390_FEAT_MULTIPLE_EPOCH,
-+    S390_FEAT_TEST_PENDING_EXT_INTERRUPTION,
-+    S390_FEAT_INSERT_REFERENCE_BITS_MULT,
-+    S390_FEAT_GROUP_MSA_EXT_6,
-+    S390_FEAT_GROUP_MSA_EXT_7,
-+    S390_FEAT_GROUP_MSA_EXT_8,
-+    S390_FEAT_CMM_NT,
-+    S390_FEAT_HPMA2,
-+    S390_FEAT_SIE_KSS,
-+    S390_FEAT_ORDER_PRESERVING_COMPRESSION,
-+};
-+
- /* Default features (in order of release)
-  * Automatically includes corresponding base features.
-  * Default features are all features this version of QEMU supports for this
-@@ -502,6 +527,18 @@ static uint16_t default_GEN13_GA1[] = {
- 
- #define default_GEN13_GA2 EmptyFeat
- 
-+static uint16_t default_GEN14_GA1[] = {
-+    S390_FEAT_ADAPTER_INT_SUPPRESSION,
-+    S390_FEAT_INSTRUCTION_EXEC_PROT,
-+    S390_FEAT_GUARDED_STORAGE,
-+    S390_FEAT_VECTOR_PACKED_DECIMAL,
-+    S390_FEAT_VECTOR_ENH,
-+    S390_FEAT_GROUP_MSA_EXT_6,
-+    S390_FEAT_GROUP_MSA_EXT_7,
-+    S390_FEAT_GROUP_MSA_EXT_8,
-+    S390_FEAT_SIE_KSS,
-+};
-+
- /****** END FEATURE DEFS ******/
- 
- #define _YEARS  "2016"
-@@ -559,6 +596,7 @@ static CpuFeatDefSpec CpuFeatDef[] = {
-     CPU_FEAT_INITIALIZER(GEN12_GA2),
-     CPU_FEAT_INITIALIZER(GEN13_GA1),
-     CPU_FEAT_INITIALIZER(GEN13_GA2),
-+    CPU_FEAT_INITIALIZER(GEN14_GA1),
- };
- 
- #define FEAT_GROUP_INITIALIZER(_name)                  \
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
 -- 
 2.7.4
