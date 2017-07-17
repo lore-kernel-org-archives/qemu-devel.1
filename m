@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxL-0002ao-Al
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxO-0002e0-98
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxJ-0001ZT-C8
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxL-0001c2-U9
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:38 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 17 Jul 2017 16:56:19 +1000
-Message-Id: <20170717065621.4688-20-david@gibson.dropbear.id.au>
+Date: Mon, 17 Jul 2017 16:56:12 +1000
+Message-Id: <20170717065621.4688-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20170717065621.4688-1-david@gibson.dropbear.id.au>
 References: <20170717065621.4688-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 19/21] pseries: Allow HPT resizing with KVM
+Subject: [Qemu-devel] [PULL 12/21] spapr: Implement DR-indicator for
+ physical DRCs only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,274 +23,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-So far, qemu implements the PAPR Hash Page Table (HPT) resizing extension
-with TCG.  The same implementation will work with KVM PR, but we don't
-currently allow that.  For KVM HV we can only implement resizing with the
-assistance of the host kernel, which needs a new capability and ioctl()s.
+According to PAPR, the DR-indicator should only be valid for physical DRCs,
+not logical DRCs.  At the moment we implement it for all DRCs, so restrict
+it to physical ones only.
 
-This patch adds support for testing the new KVM capability and implementing
-the resize in terms of KVM facilities when necessary.  If we're running on
-a kernel which doesn't have the new capability flag at all, we fall back to
-testing for PR vs. HV KVM using the same hack that we already use in a
-number of places for older kernels.
+We move the state to the physical DRC subclass, which means adding some
+QOM boilerplate to handle the newly distinct type.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr_hcall.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++
- target/ppc/kvm.c     | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- target/ppc/kvm_ppc.h | 21 ++++++++++++++++
- 3 files changed, 152 insertions(+), 2 deletions(-)
+ hw/ppc/spapr_drc.c         | 67 +++++++++++++++++++++++++++++++++++++++++++---
+ include/hw/ppc/spapr_drc.h | 13 ++++++---
+ 2 files changed, 72 insertions(+), 8 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 436f5e2b22..72ea5a8247 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -426,6 +426,44 @@ static void cancel_hpt_prepare(sPAPRMachineState *spapr)
-     free_pending_hpt(pending);
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 11b9fa534b..0ffcec6fb2 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -478,7 +478,6 @@ static const VMStateDescription vmstate_spapr_drc = {
+     .needed = spapr_drc_needed,
+     .fields  = (VMStateField []) {
+         VMSTATE_UINT32(state, sPAPRDRConnector),
+-        VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -575,10 +574,63 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     dk->user_creatable = false;
  }
  
-+/* Convert a return code from the KVM ioctl()s implementing resize HPT
-+ * into a PAPR hypercall return code */
-+static target_ulong resize_hpt_convert_rc(int ret)
++static bool drc_physical_needed(void *opaque)
 +{
-+    if (ret >= 100000) {
-+        return H_LONG_BUSY_ORDER_100_SEC;
-+    } else if (ret >= 10000) {
-+        return H_LONG_BUSY_ORDER_10_SEC;
-+    } else if (ret >= 1000) {
-+        return H_LONG_BUSY_ORDER_1_SEC;
-+    } else if (ret >= 100) {
-+        return H_LONG_BUSY_ORDER_100_MSEC;
-+    } else if (ret >= 10) {
-+        return H_LONG_BUSY_ORDER_10_MSEC;
-+    } else if (ret > 0) {
-+        return H_LONG_BUSY_ORDER_1_MSEC;
-+    }
++    sPAPRDRCPhysical *drcp = (sPAPRDRCPhysical *)opaque;
++    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(drcp);
 +
-+    switch (ret) {
-+    case 0:
-+        return H_SUCCESS;
-+    case -EPERM:
-+        return H_AUTHORITY;
-+    case -EINVAL:
-+        return H_PARAMETER;
-+    case -ENXIO:
-+        return H_CLOSED;
-+    case -ENOSPC:
-+        return H_PTEG_FULL;
-+    case -EBUSY:
-+        return H_BUSY;
-+    case -ENOMEM:
-+        return H_NO_MEM;
-+    default:
-+        return H_HARDWARE;
++    if ((drc->dev && (drcp->dr_indicator == SPAPR_DR_INDICATOR_ACTIVE))
++        || (!drc->dev && (drcp->dr_indicator == SPAPR_DR_INDICATOR_INACTIVE))) {
++        return false;
++    }
++    return true;
++}
++
++static const VMStateDescription vmstate_spapr_drc_physical = {
++    .name = "spapr_drc/physical",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = drc_physical_needed,
++    .fields  = (VMStateField []) {
++        VMSTATE_UINT32(dr_indicator, sPAPRDRCPhysical),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void drc_physical_reset(void *opaque)
++{
++    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(opaque);
++    sPAPRDRCPhysical *drcp = SPAPR_DRC_PHYSICAL(drc);
++
++    if (drc->dev) {
++        drcp->dr_indicator = SPAPR_DR_INDICATOR_ACTIVE;
++    } else {
++        drcp->dr_indicator = SPAPR_DR_INDICATOR_INACTIVE;
 +    }
 +}
 +
- static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-                                          sPAPRMachineState *spapr,
-                                          target_ulong opcode,
-@@ -435,6 +473,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-     int shift = args[1];
-     sPAPRPendingHPT *pending = spapr->pending_hpt;
-     uint64_t current_ram_size = MACHINE(spapr)->ram_size;
-+    int rc;
- 
-     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-         return H_AUTHORITY;
-@@ -464,6 +503,11 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-         return H_RESOURCE;
-     }
- 
-+    rc = kvmppc_resize_hpt_prepare(cpu, flags, shift);
-+    if (rc != -ENOSYS) {
-+        return resize_hpt_convert_rc(rc);
-+    }
++static void realize_physical(DeviceState *d, Error **errp)
++{
++    sPAPRDRCPhysical *drcp = SPAPR_DRC_PHYSICAL(d);
++    Error *local_err = NULL;
 +
-     if (pending) {
-         /* something already in progress */
-         if (pending->shift == shift) {
-@@ -659,6 +703,11 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
- 
-     trace_spapr_h_resize_hpt_commit(flags, shift);
- 
-+    rc = kvmppc_resize_hpt_commit(cpu, flags, shift);
-+    if (rc != -ENOSYS) {
-+        return resize_hpt_convert_rc(rc);
-+    }
-+
-     if (flags != 0) {
-         return H_PARAMETER;
-     }
-@@ -684,6 +733,13 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-         spapr->htab = pending->hpt;
-         spapr->htab_shift = pending->shift;
- 
-+        if (kvm_enabled()) {
-+            /* For KVM PR, update the HPT pointer */
-+            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
-+                | (spapr->htab_shift - 18);
-+            kvmppc_update_sdr1(sdr1);
-+        }
-+
-         pending->hpt = NULL; /* so it's not free()d */
-     }
- 
-@@ -1494,11 +1550,21 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-         }
- 
-         if (spapr->htab_shift < maxshift) {
-+            CPUState *cs;
-+
-             /* Guest doesn't know about HPT resizing, so we
-              * pre-emptively resize for the maximum permitted RAM.  At
-              * the point this is called, nothing should have been
-              * entered into the existing HPT */
-             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
-+            CPU_FOREACH(cs) {
-+                if (kvm_enabled()) {
-+                    /* For KVM PR, update the HPT pointer */
-+                    target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
-+                        | (spapr->htab_shift - 18);
-+                    kvmppc_update_sdr1(sdr1);
-+                }
-+            }
-         }
-     }
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8bafd1e932..85713795de 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -89,6 +89,7 @@ static int cap_fixup_hcalls;
- static int cap_htm;             /* Hardware transactional memory support */
- static int cap_mmu_radix;
- static int cap_mmu_hash_v3;
-+static int cap_resize_hpt;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -145,6 +146,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
-     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
-+    cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
- 
-     if (!cap_interrupt_level) {
-         fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
-@@ -2714,11 +2716,72 @@ int kvmppc_enable_hwrng(void)
- void kvmppc_check_papr_resize_hpt(Error **errp)
- {
-     if (!kvm_enabled()) {
--        return;
-+        return; /* No KVM, we're good */
-+    }
-+
-+    if (cap_resize_hpt) {
-+        return; /* Kernel has explicit support, we're good */
-     }
- 
--    /* TODO: Check for resize-capable KVM implementations */
-+    /* Otherwise fallback on looking for PR KVM */
-+    if (kvmppc_is_pr(kvm_state)) {
++    realize(d, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
 +        return;
 +    }
- 
-     error_setg(errp,
-                "Hash page table resizing not available with this KVM version");
- }
 +
-+int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift)
-+{
-+    CPUState *cs = CPU(cpu);
-+    struct kvm_ppc_resize_hpt rhpt = {
-+        .flags = flags,
-+        .shift = shift,
-+    };
-+
-+    if (!cap_resize_hpt) {
-+        return -ENOSYS;
-+    }
-+
-+    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_PREPARE, &rhpt);
++    vmstate_register(DEVICE(drcp), spapr_drc_index(SPAPR_DR_CONNECTOR(drcp)),
++                     &vmstate_spapr_drc_physical, drcp);
++    qemu_register_reset(drc_physical_reset, drcp);
 +}
 +
-+int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
-+{
-+    CPUState *cs = CPU(cpu);
-+    struct kvm_ppc_resize_hpt rhpt = {
-+        .flags = flags,
-+        .shift = shift,
-+    };
-+
-+    if (!cap_resize_hpt) {
-+        return -ENOSYS;
-+    }
-+
-+    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
-+}
-+
-+static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
-+{
-+    target_ulong sdr1 = arg.target_ptr;
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+
-+    /* This is just for the benefit of PR KVM */
-+    cpu_synchronize_state(cs);
-+    env->spr[SPR_SDR1] = sdr1;
-+    if (kvmppc_put_books_sregs(cpu) < 0) {
-+        error_report("Unable to update SDR1 in KVM");
-+        exit(1);
-+    }
-+}
-+
-+void kvmppc_update_sdr1(target_ulong sdr1)
-+{
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
-+    }
-+}
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 9be706c5c9..6bc6fb3e2d 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -64,6 +64,9 @@ int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
- void kvmppc_check_papr_resize_hpt(Error **errp);
-+int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
-+int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
-+void kvmppc_update_sdr1(target_ulong sdr1);
- 
- bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
- 
-@@ -302,6 +305,24 @@ static inline void kvmppc_check_papr_resize_hpt(Error **errp)
+ static void spapr_drc_physical_class_init(ObjectClass *k, void *data)
  {
-     return;
- }
-+
-+static inline int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu,
-+                                            target_ulong flags, int shift)
-+{
-+    return -ENOSYS;
-+}
-+
-+static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
-+                                           target_ulong flags, int shift)
-+{
-+    return -ENOSYS;
-+}
-+
-+static inline void kvmppc_update_sdr1(target_ulong sdr1)
-+{
-+    abort();
-+}
-+
- #endif
++    DeviceClass *dk = DEVICE_CLASS(k);
+     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
  
- #ifndef CONFIG_KVM
++    dk->realize = realize_physical;
+     drck->dr_entity_sense = physical_entity_sense;
+     drck->isolate = drc_isolate_physical;
+     drck->unisolate = drc_unisolate_physical;
+@@ -640,6 +692,7 @@ static const TypeInfo spapr_dr_connector_info = {
+ static const TypeInfo spapr_drc_physical_info = {
+     .name          = TYPE_SPAPR_DRC_PHYSICAL,
+     .parent        = TYPE_SPAPR_DR_CONNECTOR,
++    .instance_size = sizeof(sPAPRDRCPhysical),
+     .class_init    = spapr_drc_physical_class_init,
+     .abstract      = true,
+ };
+@@ -878,12 +931,18 @@ static uint32_t rtas_set_dr_indicator(uint32_t idx, uint32_t state)
+ {
+     sPAPRDRConnector *drc = spapr_drc_by_index(idx);
+ 
+-    if (!drc) {
+-        return RTAS_OUT_PARAM_ERROR;
++    if (!drc || !object_dynamic_cast(OBJECT(drc), TYPE_SPAPR_DRC_PHYSICAL)) {
++        return RTAS_OUT_NO_SUCH_INDICATOR;
++    }
++    if ((state != SPAPR_DR_INDICATOR_INACTIVE)
++        && (state != SPAPR_DR_INDICATOR_ACTIVE)
++        && (state != SPAPR_DR_INDICATOR_IDENTIFY)
++        && (state != SPAPR_DR_INDICATOR_ACTION)) {
++        return RTAS_OUT_PARAM_ERROR; /* bad state parameter */
+     }
+ 
+     trace_spapr_drc_set_dr_indicator(idx, state);
+-    drc->dr_indicator = state;
++    SPAPR_DRC_PHYSICAL(drc)->dr_indicator = state;
+     return RTAS_OUT_SUCCESS;
+ }
+ 
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 9d4fd41d22..a7958d0a8d 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -33,7 +33,7 @@
+ #define SPAPR_DRC_PHYSICAL_CLASS(klass) \
+         OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, \
+                            TYPE_SPAPR_DRC_PHYSICAL)
+-#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
++#define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(sPAPRDRCPhysical, (obj), \
+                                              TYPE_SPAPR_DRC_PHYSICAL)
+ 
+ #define TYPE_SPAPR_DRC_LOGICAL "spapr-drc-logical"
+@@ -198,9 +198,6 @@ typedef struct sPAPRDRConnector {
+     uint32_t id;
+     Object *owner;
+ 
+-    /* DR-indicator */
+-    uint32_t dr_indicator;
+-
+     uint32_t state;
+ 
+     /* RTAS ibm,configure-connector state */
+@@ -232,6 +229,14 @@ typedef struct sPAPRDRConnectorClass {
+     void (*release)(DeviceState *dev);
+ } sPAPRDRConnectorClass;
+ 
++typedef struct sPAPRDRCPhysical {
++    /*< private >*/
++    sPAPRDRConnector parent;
++
++    /* DR-indicator */
++    uint32_t dr_indicator;
++} sPAPRDRCPhysical;
++
+ static inline bool spapr_drc_hotplugged(DeviceState *dev)
+ {
+     return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
 -- 
 2.13.3
