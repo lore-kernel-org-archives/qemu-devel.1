@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXEv1-0003be-UE
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:55:12 -0400
+	(envelope-from <cota@braap.org>) id 1dXEwp-0004U7-CU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXEuy-0003WA-Sp
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:55:12 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35253)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXEuy-0003Vs-O4
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:55:08 -0400
-Received: by mail-qk0-x241.google.com with SMTP id z22so508355qka.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 15:55:08 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1500235468-15341-1-git-send-email-cota@braap.org>
-	<1500235468-15341-11-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <92056605-c95b-b19b-0216-5d83be64e13d@twiddle.net>
-Date: Mon, 17 Jul 2017 12:55:03 -1000
+	(envelope-from <cota@braap.org>) id 1dXEwm-0004ob-AG
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:57:03 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:55727)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXEwm-0004mm-2z
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:57:00 -0400
+Date: Mon, 17 Jul 2017 18:56:57 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170717225657.GA30851@flamenco>
+References: <20170715094243.28371-1-rth@twiddle.net>
+	<20170715094243.28371-2-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1500235468-15341-11-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/45] translate-all: guarantee that
- tb_hash only holds valid TBs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170715094243.28371-2-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v14 01/34] Pass generic CPUState to
+ gen_intermediate_code()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, vilanova@ac.upc.edu, alex.bennee@linaro.org, crosthwaite.peter@gmail.com, pbonzini@redhat.com
 
-On 07/16/2017 10:03 AM, Emilio G. Cota wrote:
-> @@ -1073,13 +1073,17 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
->   
->       assert_tb_locked();
->   
-> -    atomic_set(&tb->invalid, true);
-> -
->       /* remove the TB from the hash list */
->       phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
->       h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
->       qht_remove(&tcg_ctx.tb_ctx.htable, tb, h);
->   
-> +    /*
-> +     * Mark the TB as invalid *after* it's been removed from tb_hash, which
-> +     * eliminates the need to check this bit on lookups.
-> +     */
-> +    tb->invalid = true;
+On Fri, Jul 14, 2017 at 23:42:10 -1000, Richard Henderson wrote:
+> From: Lluís Vilanova <vilanova@ac.upc.edu>
+> 
+> Needed to implement a target-agnostic gen_intermediate_code() in the
+> future.
+> 
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> Reviewed-by: Alex Benneé <alex.benee@linaro.org>
 
-I believe you need atomic_store_release here.  Previously we were relying on 
-the lock acquisition in qht_remove to provide the required memory barrier.
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-We definitely need to make sure this reaches memory before we zap the TB in the 
-CPU_FOREACH loop.
-
-
-r~
+		E.
