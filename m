@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX6SW-0004VR-2A
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:53:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1dX6Tk-0005e4-7J
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX6SS-0003Gc-6Q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:53:12 -0400
-References: <20170707203049.534-1-eblake@redhat.com>
-	<20170707203049.534-8-eblake@redhat.com>
-	<20170717083110.GA5301@noname.redhat.com>
-	<922ec9d2-383d-c673-a667-dcc2ca2f61fd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9a30b584-1a53-8aa5-fd71-80fbecb1e67a@redhat.com>
-Date: Mon, 17 Jul 2017 08:52:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1dX6Tg-0003eu-Av
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:54:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dX6Tg-0003eP-13
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:54:24 -0400
+References: <20170717132110.29962-1-lvivier@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <aae6fdcd-93d3-c75c-5401-10e1bc37e7e9@redhat.com>
+Date: Mon, 17 Jul 2017 15:54:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <922ec9d2-383d-c673-a667-dcc2ca2f61fd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="u1DE74LXJQvht0rubgdsQMWgtF3LrrQQv"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 7/9] nbd: Implement
- NBD_OPT_GO on client
+In-Reply-To: <20170717132110.29962-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] accel: cleanup error output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Daniel P . Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u1DE74LXJQvht0rubgdsQMWgtF3LrrQQv
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, marcandre.lureau@redhat.com, pbonzini@redhat.com
-Message-ID: <9a30b584-1a53-8aa5-fd71-80fbecb1e67a@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 7/9] nbd: Implement
- NBD_OPT_GO on client
-References: <20170707203049.534-1-eblake@redhat.com>
- <20170707203049.534-8-eblake@redhat.com>
- <20170717083110.GA5301@noname.redhat.com>
- <922ec9d2-383d-c673-a667-dcc2ca2f61fd@redhat.com>
-In-Reply-To: <922ec9d2-383d-c673-a667-dcc2ca2f61fd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 17.07.2017 15:21, Laurent Vivier wrote:
+> Only emit "XXX accelerator not found", if there are not
+> further accelerators listed. eg
+> 
+>    accel=kvm:tcg
+> 
+> doesn't print a "KVM accelerator not found" warning
+> when it falls back to tcg, but a
+> 
+>    accel=kvm
+> 
+> prints a warning, since no fallback is given.
+> 
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  accel/accel.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/accel/accel.c b/accel/accel.c
+> index fa85844..ababeb8 100644
+> --- a/accel/accel.c
+> +++ b/accel/accel.c
+> @@ -69,19 +69,20 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+>  
+>  void configure_accelerator(MachineState *ms)
+>  {
+> -    const char *p;
+> +    const char *accel, *p;
+>      char buf[10];
+>      int ret;
+>      bool accel_initialised = false;
+>      bool init_failed = false;
+>      AccelClass *acc = NULL;
+>  
+> -    p = qemu_opt_get(qemu_get_machine_opts(), "accel");
+> -    if (p == NULL) {
+> +    accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+> +    if (accel == NULL) {
+>          /* Use the default "accelerator", tcg */
+> -        p = "tcg";
+> +        accel = "tcg";
+>      }
+>  
+> +    p = accel;
+>      while (!accel_initialised && *p != '\0') {
+>          if (*p == ':') {
+>              p++;
+> @@ -89,7 +90,6 @@ void configure_accelerator(MachineState *ms)
+>          p = get_opt_name(buf, sizeof(buf), p, ':');
+>          acc = accel_find(buf);
+>          if (!acc) {
+> -            fprintf(stderr, "\"%s\" accelerator not found.\n", buf);
+>              continue;
+>          }
+>          if (acc->available && !acc->available()) {
+> @@ -110,7 +110,8 @@ void configure_accelerator(MachineState *ms)
+>  
+>      if (!accel_initialised) {
+>          if (!init_failed) {
+> -            fprintf(stderr, "No accelerator found!\n");
+> +            fprintf(stderr, "-machine accel=%s: No accelerator found!\n",
+> +                    accel);
+>          }
+>          exit(1);
+>      }
 
-On 07/17/2017 06:41 AM, Eric Blake wrote:
+Maybe use error_report() instead of fprintf(stderr, ...) ?
 
->> This breaks qemu-iotests 140 and 143:
->=20
+Apart from that, looks fine to me, so feel free to add my:
 
->> -can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: No export wi=
-th name 'drv' available
->> +can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: Requested ex=
-port not available for option 7 (go)
->> +export 'drv' not present
->>
->> We could just update the reference output, but I actually believe the
->> old error message was better.
->=20
-> One line is indeed better than two; I'm still playing with the easiest
-> way to get the desired output.
-
-The fact that output is two lines is because the client is now replaying
-the server's error message (something that was not previously possible,
-prior to NBD_OPT_GO).  Dropping that information may not hurt in this
-case, but it's nice to show the server's message when one is present.
-Maybe I can change this to:
-
-can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: Requested export=
-
-not available
-server reported: export 'drv' not present
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---u1DE74LXJQvht0rubgdsQMWgtF3LrrQQv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllswTsACgkQp6FrSiUn
-Q2pF4QgAhLHWPR8JKAcULIw/8uW8gBVUk3HXlhBmBBZ7S0HlJF29SW8hOFeDiu9y
-Hqz52YiHbs47mXGbZQDMT1X4+QtfpuFyxKBBJoMoLudXqay85BO+KLk4+5mlRy+u
-YCeQIzRbnJm0jJnZgG6M90Ymcj/FU8IjMscMb2bqqPzNi5gYKt7S2t5qK78jesk7
-XbsgjZ8obt2I0n9t3KdmeJv2k9DI7kropy6TwQf+IyKjEEKUeZ2/PpwUHLaYyCIV
-bGw5uoO4pDRRnHkiGkUfzgdyApS4ACw3OcAygdyvX3PPCRFVM4LVEdPRE9qdhBve
-dyVCKTlVelT1rVSxZ5mDHXMF7ORZgQ==
-=AMGP
------END PGP SIGNATURE-----
-
---u1DE74LXJQvht0rubgdsQMWgtF3LrrQQv--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
