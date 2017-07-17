@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dX3O1-0004Bg-AX
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:36:22 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dX3RK-000509-GH
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:39:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dX3O0-0005jN-7w
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:36:21 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35459)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dX3Nz-0005hB-W9
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:36:20 -0400
-Received: by mail-lf0-x243.google.com with SMTP id z78so12849993lff.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 03:36:17 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1dX3RH-0007iN-9D
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:39:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39270)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dX3RH-0007i8-33
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:39:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D7D8356C2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:39:41 +0000 (UTC)
+Date: Mon, 17 Jul 2017 12:39:37 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170717103937.GD5301@noname.redhat.com>
+References: <20170717063521.GA7393@lemon>
 MIME-Version: 1.0
-References: <20170717101700.23552-1-kraxel@redhat.com>
-In-Reply-To: <20170717101700.23552-1-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 17 Jul 2017 10:36:06 +0000
-Message-ID: <CAJ+F1C+1pVwXxAH=g_5hx25VXBeMU7irpvkJ+guaqMEc7yS2Ag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] add scripts/indent.sh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170717063521.GA7393@lemon>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi
+Am 17.07.2017 um 08:35 hat Fam Zheng geschrieben:
+> Hi all,
+> 
+> Today I've included a fourth type of the automatic patchew replies: FreeBSD.
+> 
+> So far we have these tests running by patchew on each patch series:
+> 
+>   * Docker tests
+>     Basically it is
+>         make docker-test-quick@centos6 \
+>              docker-test-build@min-glib \
+>              docker-test-mingw@fedora"
+> 
+>   * checkpatch.pl
+>     Each patch is fed to ./scripts/checkpatch.pl and all errors are reported.
+> 
+>   * s390x
+>     It runs on a machine shared by Fedora team, basically only "./configure and
+>     make", because "make check" hanging is tricky to deal with from an
+>     automation perspective. (Ideas?)
+> 
+>   * FreeBSD
+>     Like s390x.
+> 
+> Q1: In the worst case, you get four individual auto replies from patchew. Is
+> that too many? Do you prefer one reply with all the results concatenated into
+> one?
 
-On Mon, Jul 17, 2017 at 12:18 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+checkpatch.pl is different enough from the other build/test errors that
+I would prefer keeping a separate reply for that one.
 
-> Script to reformat sources in qemu style.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
+But it seems that if your code doesn't compile (e.g. with different
+configure options than on the developer's machine), chances are that all
+three other tests fail, and then one reply for all of them is good
+enough.
 
-A quite powerful approach would be to use clang-format:
-https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg01278.html
+> Q2: Some think the full log in the mail body is more than necessary. Is it
+> better or worse if it is a "tail -n 200" of the log in the body and the full log
+> attached?
 
-It comes with a bunch of editor integration and scripts. My config could
-use a bit more tweaking though, I haven't been using it for a while, and
-newer version have more options.
+If you would attach the full log anyway, I'd say keep it in the body.
+The other option is what others proposed in this thread, 'tail -n 200'
+in the body and then include just a link to the full log in a web
+interface.
 
+> Q3: What other tests do maintainers want? Different hosts? Different configure
+> combinations?
 
-> ---
->  scripts/indent.sh | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->  create mode 100755 scripts/indent.sh
->
-> diff --git a/scripts/indent.sh b/scripts/indent.sh
-> new file mode 100755
-> index 0000000000..8f045ecb1d
-> --- /dev/null
-> +++ b/scripts/indent.sh
-> @@ -0,0 +1,11 @@
-> +#!/bin/sh
-> +#
-> +# indent wrapper script, with args to format
-> +# source code according to qemu coding style.
-> +#
-> +indent --ignore-profile        \
-> +       --k-and-r-style         \
-> +       --line-length 80        \
-> +       --indent-level 4        \
-> +       --no-tabs               \
-> +       "$@"
-> --
-> 2.9.3
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Would running qemu-iotests (at least the 'quick' group) be possible or
+would that take too many resources?
+
+Only today I noticed again that two recently merged pull requests broke
+qemu-iotests cases, so I must assume that apart from some block
+maintainers, nobody runs it regularly.
+
+Kevin
