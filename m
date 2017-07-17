@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXBJ7-0006R2-HE
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:03:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dXBRf-0000vY-Kc
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXBJ6-0007jI-O7
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:03:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXBJ6-0007ig-IE
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:03:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7EBD1356D6
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 19:03:47 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1500279971-13875-10-git-send-email-peterx@redhat.com> (Peter
-	Xu's message of "Mon, 17 Jul 2017 16:26:09 +0800")
-References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
-	<1500279971-13875-10-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 17 Jul 2017 21:03:47 +0200
-Message-ID: <87h8yanawc.fsf@secure.laptop>
+	(envelope-from <mreitz@redhat.com>) id 1dXBRe-0006bT-Kl
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:12:39 -0400
+References: <20170717151207.24919-1-mreitz@redhat.com>
+	<c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ce2f1e11-202b-6941-e5b5-f72cdb2824a0@redhat.com>
+Date: Mon, 17 Jul 2017 21:12:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] migration: provide
- migrate_caps_check()
+In-Reply-To: <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu"
+Subject: Re: [Qemu-devel] [PATCH] block/vvfat: Fix compiler warning with gcc
+ 7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,24 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> Abstract helper function to check migration capabilities (from the old
-> qmp_migrate_set_capabilities).  Prepare to be used somewhere else.
->
-> There is side effect on the change: when applying the capabilities, we
-> were skipping the invalid ones, but still applying the valid ones (if
-> they are provided in the same QMP request). After this refactoring,
-> we'll ignore all the capabilities if we detected invalid setup along the
-> way. However, I don't think it is a problem since general users should
-> not provide anything invalid after all.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu
+From: Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <ce2f1e11-202b-6941-e5b5-f72cdb2824a0@redhat.com>
+Subject: Re: [PATCH] block/vvfat: Fix compiler warning with gcc 7
+References: <20170717151207.24919-1-mreitz@redhat.com>
+ <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
+In-Reply-To: <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+On 2017-07-17 20:40, Herv=E9 Poussineau wrote:
+> Le 17/07/2017 =E0 17:12, Max Reitz a =E9crit :
+>> gcc 7 complains that the sprintf() might write a null byte beyond the
+>> end of the tail buffer.  That is wrong, but we can silence it by makin=
+g
+>> i unsigned (it can never be negative anyway, see the if condition righ=
+t
+>> before).  For some reason, this allows gcc to suddenly accurately
+>> calculate the range of i so we can give the tail[] array the exact siz=
+e
+>> it needs to have (which is 8 bytes) without gcc complaining.
+>>
+>> In addition, let us convert the sprintf() to snprintf(), because that =
+is
+>> always nicer, and add an assertion about the range of the return value=
 
-I think that the "caveat" that we used to set the valid capabilities in
-one message is just undefined behaviour.  I preffer the new semmantics
-anyways.
+>> afterwards so we can see that "8 - len" will never be negative and thu=
+s
+>> "entry->name + MIN(j, 8 - len)" will never be out of bounds.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/vvfat.c | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/vvfat.c b/block/vvfat.c
+>> index 6b11596..a9e207f 100644
+>> --- a/block/vvfat.c
+>> +++ b/block/vvfat.c
+>> @@ -549,7 +549,7 @@ static direntry_t
+>> *create_short_filename(BDRVVVFATState *s,
+>>      const gchar *p, *last_dot =3D NULL;
+>>      gunichar c;
+>>      bool lossy_conversion =3D false;
+>> -    char tail[11];
+>> +    char tail[8];
+>>
+>>      if (!entry) {
+>>          return NULL;
+>> @@ -614,7 +614,8 @@ static direntry_t
+>> *create_short_filename(BDRVVVFATState *s,
+>>      for (i =3D lossy_conversion ? 1 : 0; i < 999999; i++) {
+>>          direntry_t *entry1;
+>>          if (i > 0) {
+>> -            int len =3D sprintf(tail, "~%d", i);
+>> +            int len =3D snprintf(tail, sizeof(tail), "~%u", (unsigned=
+)i);
+>> +            assert(len <=3D 7);
+>=20
+> As i is on minimum between 0 or 1 and on maximum equal at 999999, does
+> it work if you change the type of i from int to unsigned int?
+> That way, you probably won't need the cast to unsigned in the s(n)print=
+f.
+
+Hm... It works in a way, but then gcc likes to think tail[] needs to be
+9 bytes long (for whatever reason). So... It works in a sense, but not
+quite as well.
+
+So I'm not quite sure which way is better. :-)
+
+Max
+
+
+--mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEvBAEBCAAZBQJZbQwdEhxtcmVpdHpAcmVkaGF0LmNvbQAKCRD0B9sAYdXPQIz6
+B/9+HUtK5H+Fxu/uvh9ByQTvKhaHMMeaMV1Uyo4hNYqhKrJ3hlNaBNlLyGtM/otl
+bNEI3E6V/V8slI6pgKOXDMpRLSpcomnG1SyrhLadiHO0yZw22b9MOdgJy70jUG/+
+XX5rkUkJq4EGYhJc9/+WOpse5TI8TsKsJ61Qb5knj8RsymL/PBpnL5HZOp/DYlgh
+VIhlpJC+fAqI07hSs3xTpYcXuP8c8e938gmyygKjytF2CwHnqx6v9Ce1mnh2Q2eY
+ef+8EIZGdXBGxd3ssYHGPoxiL0AJGPMo9jg9zu+BFyyqn9fLz2cGoqRkYKHOJo6I
+ATkAvrg5qJ/Pv3CvVLQSLC5P
+=UoBA
+-----END PGP SIGNATURE-----
+
+--mn4SmEjwj0T3d3w3g4qcS1JB67plrXAtu--
