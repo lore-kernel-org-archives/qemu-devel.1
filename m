@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX3zM-00076C-Td
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:14:57 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dX40V-0007yi-F2
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX3zL-00067K-Ro
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:14:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43874)
+	(envelope-from <kraxel@redhat.com>) id 1dX40R-0006t6-8s
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:16:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX3zL-00065y-Ml
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:14:55 -0400
-Message-ID: <1500290093.12570.6.camel@redhat.com>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX40R-0006sb-2L
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:16:03 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 13:14:53 +0200
-In-Reply-To: <CAJ+F1C+yg2jzSZf4PM8L=5-NBwgg25buHjTS-FBT2hF4jzpkxQ@mail.gmail.com>
-References: <20170717101700.23552-1-kraxel@redhat.com>
-	<CAJ+F1C+1pVwXxAH=g_5hx25VXBeMU7irpvkJ+guaqMEc7yS2Ag@mail.gmail.com>
-	<1500288560.12570.3.camel@redhat.com>
-	<CAJ+F1C+yg2jzSZf4PM8L=5-NBwgg25buHjTS-FBT2hF4jzpkxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Mon, 17 Jul 2017 13:15:49 +0200
+Message-Id: <20170717111549.31511-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] add scripts/indent.sh
+Subject: [Qemu-devel] [PATCH] keymaps: fr-ca: more fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, 533613@bugs.launchpad.net, Thomas Huth <thuth@redhat.com>
 
-On Mon, 2017-07-17 at 10:58 +0000, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Jul 17, 2017 at 12:49 PM Gerd Hoffmann <kraxel@redhat.com>
-> wrote:
-> > On Mon, 2017-07-17 at 10:36 +0000, Marc-Andr=C3=A9 Lureau wrote:
-> > > Hi
-> > >
-> > > On Mon, Jul 17, 2017 at 12:18 PM Gerd Hoffmann <kraxel@redhat.com
-> > >
-> > > wrote:
-> > > > Script to reformat sources in qemu style.
-> > > >
-> > > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > >
-> > > A quite powerful approach would be to use clang-format: https://l
-> > ists
-> > > .gnu.org/archive/html/qemu-devel/2015-10/msg01278.html=C2=A0
-> > >
-> > > It comes with a bunch of editor integration and scripts. My
-> > config
-> > > could use a bit more tweaking though, I haven't been using it for
-> > a
-> > > while, and newer version have more options.
-> >=20
-> > Hmm, I want reformat all audio stuff to qemu code style some day,
-> > the
-> > current situation where patches are either break qemu code style or
-> > lead to mixed-style in the audio source files isn't very good.
-> >=20
-> > I don't mind much which tool we use for that, I picked indent
-> > mostly
-> > because I know that one.=C2=A0 If clang-format can do that too, fine
-> > with
-> > me.=C2=A0 I'm missing documentation though, there is no man-page and
-> > there
-> > isn't anything in /usr/share/doc/clang-3.4.2 either ...
->=20
-> Afaik, most of clang-tools documentation is only in html. The most
-> recent version is online at
-> https://clang.llvm.org/docs/ClangFormat.html &
-> https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+Cc: 533613@bugs.launchpad.net
+Cc: Thomas Huth <thuth@redhat.com>
+Suggested-by: J=C3=A9r=C3=B4me Poulin
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ pc-bios/keymaps/fr-ca | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-Can you add those links as comments to the .clang-format file?
-
-cheers,
-  Gerd
+diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
+index 030f56a78e..2e540d596c 100644
+--- a/pc-bios/keymaps/fr-ca
++++ b/pc-bios/keymaps/fr-ca
+@@ -3,6 +3,8 @@
+ include common
+ map 0xc0c
+=20
++numbersign 0x29
++bar 0x29
+ backslash 0x29 altgr
+ plusminus 0x2 altgr
+ at 0x3 altgr
+@@ -10,7 +12,6 @@ sterling 0x4 altgr
+ cent 0x5 altgr
+ currency 0x6 altgr
+ notsign 0x7 altgr
+-bar 0x29 shift
+ twosuperior 0x9 altgr
+ threesuperior 0xa altgr
+ onequarter 0xb altgr
+@@ -38,6 +39,10 @@ dead_cedilla 0x1b
+ dead_diaeresis 0x1b shift
+ exclam 0x2 shift
+ quotedbl 0x3 shift
++comma 0x33
++apostrophe 0x33 shift
++period 0x34
++period 0x34 shift
+ slash 0x4 shift
+ dollar 0x5 shift
+ percent 0x6 shift
+@@ -48,5 +53,8 @@ parenleft 0xa shift
+ parenright 0xb shift
+ underscore 0xc shift
+ plus 0xd shift
+-minus 0xc
+-equal 0xd
++minus 0x0c
++underscore 0x0c shift
++equal 0x0d
++semicolon 0x27
++colon 0x27 shift
+--=20
+2.9.3
