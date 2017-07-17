@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX2UJ-0007SU-ON
+	(envelope-from <kraxel@redhat.com>) id 1dX2UJ-0007ST-OY
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX2UF-0000kR-Uj
+	(envelope-from <kraxel@redhat.com>) id 1dX2UH-0000lj-Cc
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8355)
+Received: from mx1.redhat.com ([209.132.183.28]:52700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX2UF-0000k7-Ns
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:43 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX2UH-0000ka-3U
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 11839C0587E8
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 09:38:44 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 11:38:37 +0200
-Message-Id: <20170717093839.15341-2-kraxel@redhat.com>
+Date: Mon, 17 Jul 2017 11:38:38 +0200
+Message-Id: <20170717093839.15341-3-kraxel@redhat.com>
 In-Reply-To: <20170717093839.15341-1-kraxel@redhat.com>
 References: <20170717093839.15341-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/3] vnc: Set default kbd delay to 10ms
+Subject: [Qemu-devel] [PULL 2/3] hmp: Update info vnc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +30,193 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Alexander Graf <agraf@suse.de>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The current VNC default keyboard delay is 1ms. With that we're constantly
-typing faster than the guest receives keyboard events from an XHCI attached
-USB HID device.
+The QMP query-vnc interfaces have gained a lot more information that
+the HMP interfaces hasn't got yet. Update it.
 
-The default keyboard delay time in the input layer however is 10ms. I don't know
-how that number came to be, but empirical tests on some OpenQA driven ARM
-systems show that 10ms really is a reasonable default number for the delay.
+Note the output format has changed, but this is HMP so that's OK.
 
-This patch moves the VNC delay also to 10ms. That way our default is much
-safer (good!) and also consistent with the input layer default (also good!).
+In particular, this now includes client information for reverse
+connections:
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 1499863425-103133-1-git-send-email-agraf@suse.de
+-vnc :0
+(qemu) info vnc
+default:
+  Server: 0.0.0.0:5900 (ipv4)
+    Auth: none (Sub: none)
+
+  (Now connect a client)
+
+(qemu) info vnc
+default:
+  Server: 0.0.0.0:5900 (ipv4)
+    Auth: none (Sub: none)
+  Client: 127.0.0.1:51828 (ipv4)
+    x509_dname: none
+    sasl_username: none
+
+-vnc localhost:7000,reverse
+(qemu) info vnc
+default:
+  Client: ::1:7000 (ipv6)
+    x509_dname: none
+    sasl_username: none
+  Auth: none (Sub: none)
+
+-vnc :1,password,id=pass -vnc localhost:7000,reverse
+(qemu) info vnc
+default:
+  Client: ::1:7000 (ipv6)
+    x509_dname: none
+    sasl_username: none
+  Auth: none (Sub: none)
+rev:
+  Server: 0.0.0.0:5901 (ipv4)
+    Auth: vnc (Sub: none)
+  Client: 127.0.0.1:53616 (ipv4)
+    x509_dname: none
+    sasl_username: none
+
+This was originally RH bz 1461682
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-id: 20170711154414.21111-1-dgilbert@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc.c        | 2 +-
- qemu-options.hx | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hmp.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 73 insertions(+), 31 deletions(-)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 26136f5d29..eb91559b6b 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3808,7 +3808,7 @@ void vnc_display_open(const char *id, Error **errp)
+diff --git a/hmp.c b/hmp.c
+index dee40284c1..3e1e766593 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -600,50 +600,92 @@ void hmp_info_blockstats(Monitor *mon, const QDict *qdict)
+     qapi_free_BlockStatsList(stats_list);
+ }
+ 
++/* Helper for hmp_info_vnc_clients, _servers */
++static void hmp_info_VncBasicInfo(Monitor *mon, VncBasicInfo *info,
++                                  const char *name)
++{
++    monitor_printf(mon, "  %s: %s:%s (%s%s)\n",
++                   name,
++                   info->host,
++                   info->service,
++                   NetworkAddressFamily_lookup[info->family],
++                   info->websocket ? " (Websocket)" : "");
++}
++
++/* Helper displaying and auth and crypt info */
++static void hmp_info_vnc_authcrypt(Monitor *mon, const char *indent,
++                                   VncPrimaryAuth auth,
++                                   VncVencryptSubAuth *vencrypt)
++{
++    monitor_printf(mon, "%sAuth: %s (Sub: %s)\n", indent,
++                   VncPrimaryAuth_lookup[auth],
++                   vencrypt ? VncVencryptSubAuth_lookup[*vencrypt] : "none");
++}
++
++static void hmp_info_vnc_clients(Monitor *mon, VncClientInfoList *client)
++{
++    while (client) {
++        VncClientInfo *cinfo = client->value;
++
++        hmp_info_VncBasicInfo(mon, qapi_VncClientInfo_base(cinfo), "Client");
++        monitor_printf(mon, "    x509_dname: %s\n",
++                       cinfo->has_x509_dname ?
++                       cinfo->x509_dname : "none");
++        monitor_printf(mon, "    sasl_username: %s\n",
++                       cinfo->has_sasl_username ?
++                       cinfo->sasl_username : "none");
++
++        client = client->next;
++    }
++}
++
++static void hmp_info_vnc_servers(Monitor *mon, VncServerInfo2List *server)
++{
++    while (server) {
++        VncServerInfo2 *sinfo = server->value;
++        hmp_info_VncBasicInfo(mon, qapi_VncServerInfo2_base(sinfo), "Server");
++        hmp_info_vnc_authcrypt(mon, "    ", sinfo->auth,
++                               sinfo->has_vencrypt ? &sinfo->vencrypt : NULL);
++        server = server->next;
++    }
++}
++
+ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+ {
+-    VncInfo *info;
++    VncInfo2List *info2l;
+     Error *err = NULL;
+-    VncClientInfoList *client;
+ 
+-    info = qmp_query_vnc(&err);
++    info2l = qmp_query_vnc_servers(&err);
+     if (err) {
+         error_report_err(err);
+         return;
+     }
+-
+-    if (!info->enabled) {
+-        monitor_printf(mon, "Server: disabled\n");
+-        goto out;
+-    }
+-
+-    monitor_printf(mon, "Server:\n");
+-    if (info->has_host && info->has_service) {
+-        monitor_printf(mon, "     address: %s:%s\n", info->host, info->service);
+-    }
+-    if (info->has_auth) {
+-        monitor_printf(mon, "        auth: %s\n", info->auth);
++    if (!info2l) {
++        monitor_printf(mon, "None\n");
++        return;
      }
  
-     lock_key_sync = qemu_opt_get_bool(opts, "lock-key-sync", true);
--    key_delay_ms = qemu_opt_get_number(opts, "key-delay-ms", 1);
-+    key_delay_ms = qemu_opt_get_number(opts, "key-delay-ms", 10);
-     sasl = qemu_opt_get_bool(opts, "sasl", false);
- #ifndef CONFIG_VNC_SASL
-     if (sasl) {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 76b1c67737..6909285e85 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1753,7 +1753,7 @@ spec but is traditional QEMU behavior.
- @item key-delay-ms
+-    if (!info->has_clients || info->clients == NULL) {
+-        monitor_printf(mon, "Client: none\n");
+-    } else {
+-        for (client = info->clients; client; client = client->next) {
+-            monitor_printf(mon, "Client:\n");
+-            monitor_printf(mon, "     address: %s:%s\n",
+-                           client->value->host,
+-                           client->value->service);
+-            monitor_printf(mon, "  x509_dname: %s\n",
+-                           client->value->x509_dname ?
+-                           client->value->x509_dname : "none");
+-            monitor_printf(mon, "    username: %s\n",
+-                           client->value->has_sasl_username ?
+-                           client->value->sasl_username : "none");
++    while (info2l) {
++        VncInfo2 *info = info2l->value;
++        monitor_printf(mon, "%s:\n", info->id);
++        hmp_info_vnc_servers(mon, info->server);
++        hmp_info_vnc_clients(mon, info->clients);
++        if (!info->server) {
++            /* The server entry displays its auth, we only
++             * need to display in the case of 'reverse' connections
++             * where there's no server.
++             */
++            hmp_info_vnc_authcrypt(mon, "  ", info->auth,
++                               info->has_vencrypt ? &info->vencrypt : NULL);
++        }
++        if (info->has_display) {
++            monitor_printf(mon, "  Display: %s\n", info->display);
+         }
++        info2l = info2l->next;
+     }
  
- Set keyboard delay, for key down and key up events, in milliseconds.
--Default is 1.  Keyboards are low-bandwidth devices, so this slowdown
-+Default is 10.  Keyboards are low-bandwidth devices, so this slowdown
- can help the device and guest to keep up and not lose events in case
- events are arriving in bulk.  Possible causes for the latter are flaky
- network connections, or scripts for automated testing.
+-out:
+-    qapi_free_VncInfo(info);
++    qapi_free_VncInfo2List(info2l);
++
+ }
+ 
+ #ifdef CONFIG_SPICE
 -- 
 2.9.3
