@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX3ld-0008DA-PN
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:00:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dX3oD-0000ge-8a
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:03:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX3lc-0005dK-VI
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:00:45 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37479)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX3lc-0005dC-O8
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:00:44 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id b134so43892282wma.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 04:00:44 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dX3oA-0007Qp-MZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:03:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dX3oA-0007QV-Ga
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:03:22 -0400
+Date: Mon, 17 Jul 2017 13:03:11 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170717130311.4e9d7238@nial.brq.redhat.com>
+In-Reply-To: <c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
+References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170714180907.GM6020@localhost.localdomain>
+	<9584b0c7-96f4-f000-e53f-93accd8a39ad@redhat.com>
+	<20170714185616.GQ6020@localhost.localdomain>
+	<c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170717102053.GH3640@redhat.com>
-References: <20170717063521.GA7393@lemon>
-	<b718f71c-5208-298a-4fb9-0c2fea3146ec@redhat.com>
-	<20170717102053.GH3640@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 12:00:22 +0100
-Message-ID: <CAFEAcA9fzkk6mC+Bz4jNd+7M8nq0xpooVFDNeVb0VcqGDadB8Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and
+ fw_cfg types into fw_cfg.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com
 
-On 17 July 2017 at 11:20, Daniel P. Berrange <berrange@redhat.com> wrote:
-> I'm a little concerned about the fact that we've now got three different
-> sets of tests that are being run on pull requests. There are the tests
-> that Peter runs on various combinations at time of merge, the tests run
-> by patchw at time of submissions, and the tests run by travis after
-> merge. Each of them is covering a different set of scenarios with only
-> partial overlap between them.
+On Sun, 16 Jul 2017 20:12:13 +0100
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
 
-I agree -- I have my ad-hoc test system not because I enjoy
-collecting random things to run tests on but because we don't
-have an automated system that does what I need:
- * wide coverage, focusing on oddball host architectures and OSes
- * ability to ssh in to a machine where tests have broken if need be
- * decently fast to complete a test run (travis is terrible for this)
+> On 14/07/17 19:56, Eduardo Habkost wrote:
+> 
+> >>> Why do you need the full struct declaration to be exposed in the
+> >>> header?  
+> >>
+> >> Different board code wants to hook up "comb_iomem" manually to different
+> >> address spaces, so they need to access the field directly. This is the
+> >> ultimate goal of the entire exercise, IIRC.  
+> 
+> Yes, that is correct (and I believe is mentioned in the cover letter, too).
+> 
+> >>> The memory regions are supposed to be visible as QOM
+> >>> children to the fw_cfg device, already.  
+> >>
+> >> I don't understand this. How else can board code work with "comb_iomem"
+> >> than described above? If there is a way, I agree it would be preferable.  
+> > 
+> > object_resolve_path_component(fw_cfg, "fwcfg[0]") and
+> > object_resolve_path_component(fw_cfg, "fwcfg.dma[0]") should
+> > return fw_cfg->comb_iomem and fw_cfg->dma_iomem, respectively.
+> > 
+> > I don't know why those names were chosen, though.  Probably it's
+> > a good idea to call object_property_add_child() manually with
+> > more appropriate names inside the fw_cfg code instead of letting
+> > memory_region_init() pick the child name.  
+> 
+> That's interesting. I did a grep of the codebase for
+> object_resolve_path_component and struggled to find an instance where it
+> was being used to provide access to a MemoryRegion. Even if it's an
+> available feature, it's certainly not one that is widely known about.
+Agreed,
 
-Note that "fast to complete a test run for me" is in conflict with
-"usable by anybody who wants to submit a pull request" :-)
+we haven't used suggested approach before and I don't see
+benefits it will bring in fwcfg case.
 
-thanks
--- PMM
+Eduardo,
+
+Could you just apply v9, which seems to be good enough and
+does the intended job before 2.10 goes into soft-freeze?
+we always could do object_resolve_path_component() on top
+if it makes sense.
+
+
+> 
+> In terms of the patch, is the v9 revision suitable for commit or does
+> this constitute a NACK?
+> 
+> 
+> ATB,
+> 
+> Mark.
