@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dWwGJ-0006ZV-2t
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:59:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1dWwNB-00008s-GZ
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dWwGF-0007Vb-5Y
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:59:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51832)
+	(envelope-from <peterx@redhat.com>) id 1dWwN8-0004I0-7t
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:07:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dWwGE-0007Ug-Sd
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:59:51 -0400
-Date: Mon, 17 Jul 2017 10:59:44 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dWwN8-0004Gi-1l
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:06:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B60984E4D6
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 03:06:56 +0000 (UTC)
+Date: Mon, 17 Jul 2017 11:06:57 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170717025944.GR27284@pxdev.xzpeter.org>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-17-dgilbert@redhat.com>
-	<20170711033159.GE21344@pxdev.xzpeter.org>
-	<20170714171554.GF2091@work-vm>
+Message-ID: <20170717030657.GS27284@pxdev.xzpeter.org>
+References: <1499842423-21101-1-git-send-email-peterx@redhat.com>
+	<20170712190558.GK6020@localhost.localdomain>
+	<20170714050423.GM27284@pxdev.xzpeter.org>
+	<20170714160110.GF6020@localhost.localdomain>
+	<20170714163210.GE2091@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170714171554.GF2091@work-vm>
-Subject: Re: [Qemu-devel] [RFC 16/29] vhost+postcopy: Stash RAMBlock and
- offset
+In-Reply-To: <20170714163210.GE2091@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 0/3] migration: export cap/params to qdev
+ props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +38,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Fri, Jul 14, 2017 at 06:15:54PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Wed, Jun 28, 2017 at 08:00:34PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, Jul 14, 2017 at 05:32:10PM +0100, Dr. David Alan Gilbert wrote:
+> * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > On Fri, Jul 14, 2017 at 01:04:23PM +0800, Peter Xu wrote:
+> > > On Wed, Jul 12, 2017 at 04:05:58PM -0300, Eduardo Habkost wrote:
+> > > > On Wed, Jul 12, 2017 at 02:53:40PM +0800, Peter Xu wrote:
+> > > > [...]
+> > > > > These properties should only be used for debugging/testing purpose,
+> > > > > and we should not guarantee any interface compatibility for them (just
+> > > > > like HMP).
+> > > > 
+> > > > If we don't guarantee compatibility, the property names need to
+> > > > be prefixed with "x-".
 > > > 
-> > > Stash the RAMBlock and offset for later use looking up
-> > > addresses.
+> > > Indeed. Sorry I missed that.
 > > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  hw/virtio/trace-events |  1 +
-> > >  hw/virtio/vhost-user.c | 11 +++++++++++
-> > >  2 files changed, 12 insertions(+)
-> > > 
-> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > > index f7be340a45..1fd194363a 100644
-> > > --- a/hw/virtio/trace-events
-> > > +++ b/hw/virtio/trace-events
-> > > @@ -3,6 +3,7 @@
-> > >  # hw/virtio/vhost-user.c
-> > >  vhost_user_postcopy_listen(void) ""
-> > >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:%"PRIx64" for hva: %"PRIx64" reply %d region %d"
-> > > +vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:%"PRIx64" GPA:%"PRIx64" QVA/userspace:%"PRIx64" RB offset:%"PRIx64
-> > >  
-> > >  # hw/virtio/virtio.c
-> > >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > > index 6be3e7ff2d..3185af7a45 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -133,6 +133,11 @@ struct vhost_user {
-> > >      NotifierWithReturn postcopy_notifier;
-> > >      struct PostCopyFD  postcopy_fd;
-> > >      uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
-> > > +    RAMBlock          *region_rb[VHOST_MEMORY_MAX_NREGIONS];
-> > > +    /* The offset from the start of the RAMBlock to the start of the
-> > > +     * vhost region.
-> > > +     */
-> > > +    ram_addr_t         region_rb_offset[VHOST_MEMORY_MAX_NREGIONS];
+> > > But I'd say it is slightly awkward to add "x-" for all these (for me,
+> > > "x-" means more like "this is not stable and experimental, use it
+> > > carefully", while this does not suite for this series). Maybe I can
+> > > just remove this sentence in commit log (I think I am just a little
+> > > bit frightened by the compatibility problems)...
 > > 
-> > Here the array size is VHOST_MEMORY_MAX_NREGIONS, while...
-> > 
-> > >  };
-> > >  
-> > >  static bool ioeventfd_enabled(void)
-> > > @@ -324,8 +329,14 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
-> > >          assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-> > >          mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
-> > >                                       &offset);
-> > > +        u->region_rb_offset[i] = offset;
-> > > +        u->region_rb[i] = mr->ram_block;
-> > 
-> > ... can i>=VHOST_MEMORY_MAX_NREGIONS here? Or do we only need to note
-> > this down if fd > 0 below?  Thanks,
+> > "x-" in property names doesn't mean "experimental", but just "not
+> > part of the stable interface".  If you have the tiniest doubt
+> > about command-line compatibility, I think it won't hurt to use
+> > "x-".
 > 
-> I don't *think* so - I mean:
->     for (i = 0; i < dev->mem->nregions; ++i) {
+> We have:
+>     DEFINE_PROP_MIG_CAP("xbzrle", MIGRATION_CAPABILITY_XBZRLE),
 > 
-> so if that's the maximum number of regions and that's the number of
-> regions we should be safe???
+> so we could easily do:
+>     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+> 
+> to ensure that all of the things we expose as props here have
+> that added fealing of uncertainty but don't change what migration
+> parameters see.
 
-That's my concern - looks like dev->mem->nregions can be bigger than
-that? At least I didn't really see a restriction on its size. The size
-is changed in following stack:
+I was thinking to ask either you or Juan on what you would like for
+this, looks like I got the answer now. :-) Let me add "x-" to them.
 
-  vhost_region_add
-    vhost_set_memory
-      vhost_dev_assign_memory
+> 
+> 
+> (It's a shame we have to have those lists manually, there are so
+> many manual places for each parameter and capability)
 
-And it's dynamic extended, without checks.
-
-Indeed in the function vhost_user_set_mem_table() we have:
-
-    int fds[VHOST_MEMORY_MAX_NREGIONS];
-
-But we are safe iiuc because we also have assertions to protect:
-
-    assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
-    fds[fd_num++] = fd;
-
-Do we at least need that assert?
-
-Thanks,
+Temporarily I think it's still okay. But indeed you are right.
 
 -- 
 Peter Xu
