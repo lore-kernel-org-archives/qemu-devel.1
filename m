@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX7zi-0004lA-Bl
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:31:35 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dX88R-0006m5-CM
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:40:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX7zh-0004NB-IJ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:31:34 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36980)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX7zh-0004MV-9U
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:31:33 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id b134so52013476wma.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 08:31:33 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1dX88O-0007gz-9H
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:40:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dX88O-0007gN-2y
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:40:32 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Mon, 17 Jul 2017 16:40:24 +0100
+Message-Id: <20170717154026.32697-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170717092923.12317-1-kraxel@redhat.com>
-References: <20170717092923.12317-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 16:31:11 +0100
-Message-ID: <CAFEAcA8_NGPJcZ9pgizn9N8Bc=ObJ1PVZNzXYpJtSiBdmHJ4dQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/3] Audio 20170717 patches
+Subject: [Qemu-devel] [PULL 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 17 July 2017 at 10:29, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 6e2c46334385c7e295ac883c801c81b4925fb5=
-4f:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-70711' into staging (2017-07-13 10:47:10 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/audio-20170717-pull-request
->
-> for you to fetch changes up to 639b49ef9a4dc9555ed6aaefa8dfda621e4165cf:
->
->   audio/adlib: remove limitation of one adlib card (2017-07-17 11:09:02 +=
-0200)
->
-> ----------------------------------------------------------------
-> audio: fixes for 2.10
->
-> ----------------------------------------------------------------
->
-> Herv=C3=A9 Poussineau (2):
->   audio/fmopl: modify timer callback to give opaque and channel
->     parameters in two arguments
->   audio/adlib: remove limitation of one adlib card
->
-> Peng Hao (1):
->   audio: st_rate_flow exist a infinite loop
->
->  audio/rate_template.h |  6 ++++++
->  hw/audio/fmopl.h      |  7 ++++---
->  hw/audio/adlib.c      | 14 +++-----------
->  hw/audio/fmopl.c      | 18 +++++++++++++-----
->  4 files changed, 26 insertions(+), 19 deletions(-)
+The following changes since commit 4871b51b9241b10f4fd8e04bbb21577886795e=
+25:
 
-Applied, thanks.
+  vmgenid-test: use boot-sector infrastructure (2017-07-14 17:03:03 +0100=
+)
 
--- PMM
+are available in the git repository at:
+
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to 593ed6f0a3c827a13a274e47f6fa980344234f9c:
+
+  block: fix shadowed variable in bdrv_co_pdiscard (2017-07-17 15:58:37 +=
+0100)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Alistair Francis (1):
+  util/aio-win32: Only select on what we are actually waiting for
+
+Denis V. Lunev (1):
+  block: fix shadowed variable in bdrv_co_pdiscard
+
+ block/io.c       |  1 -
+ util/aio-win32.c | 13 ++++++++++---
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+--=20
+2.9.4
