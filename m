@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX3ag-0000db-9L
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:49:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dX3bP-00012R-LN
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX3ad-0005Qr-4W
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:49:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX3ac-0005Qk-UY
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:49:23 -0400
-Message-ID: <1500288560.12570.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 12:49:20 +0200
-In-Reply-To: <CAJ+F1C+1pVwXxAH=g_5hx25VXBeMU7irpvkJ+guaqMEc7yS2Ag@mail.gmail.com>
-References: <20170717101700.23552-1-kraxel@redhat.com>
-	<CAJ+F1C+1pVwXxAH=g_5hx25VXBeMU7irpvkJ+guaqMEc7yS2Ag@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dX3bO-0005xu-Vz
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:50:11 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dX3bO-0005xN-Pa
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:50:10 -0400
+Received: by mail-wr0-x231.google.com with SMTP id w4so20415779wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 03:50:10 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170717103937.GD5301@noname.redhat.com>
+References: <20170717063521.GA7393@lemon>
+	<20170717103937.GD5301@noname.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 11:49:49 +0100
+Message-ID: <CAFEAcA9zoauJw-CnNxtec48VOr6onXiCZ8BV8JJwk7ZeOLxnUw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] add scripts/indent.sh
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, 2017-07-17 at 10:36 +0000, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Jul 17, 2017 at 12:18 PM Gerd Hoffmann <kraxel@redhat.com>
-> wrote:
-> > Script to reformat sources in qemu style.
-> >=20
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->=20
-> A quite powerful approach would be to use clang-format: https://lists
-> .gnu.org/archive/html/qemu-devel/2015-10/msg01278.html=C2=A0
->=20
-> It comes with a bunch of editor integration and scripts. My config
-> could use a bit more tweaking though, I haven't been using it for a
-> while, and newer version have more options.
+On 17 July 2017 at 11:39, Kevin Wolf <kwolf@redhat.com> wrote:
+> Only today I noticed again that two recently merged pull requests broke
+> qemu-iotests cases, so I must assume that apart from some block
+> maintainers, nobody runs it regularly.
 
-Hmm, I want reformat all audio stuff to qemu code style some day, the
-current situation where patches are either break qemu code style or
-lead to mixed-style in the audio source files isn't very good.
+If "make check" doesn't run it, it doesn't get run :-)
+I actually looked into trying to run qemu-iotests tests
+for the recent patches I sent for vpc and vmdk image format
+handler fixes, but I couldn't get it to do anything sensible
+and I couldn't find any documentation, so I gave up and
+assumed that "make check" plus manual testing was good enough...
 
-I don't mind much which tool we use for that, I picked indent mostly
-because I know that one.  If clang-format can do that too, fine with
-me.  I'm missing documentation though, there is no man-page and there
-isn't anything in /usr/share/doc/clang-3.4.2 either ...
-
-cheers,
-  Gerd
+thanks
+-- PMM
