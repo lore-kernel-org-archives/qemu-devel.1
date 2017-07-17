@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dX35T-0002Bx-Qn
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:17:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dX37c-0003iP-LZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dX35O-0001dP-Pu
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:17:11 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dX35O-0001ck-JG
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:17:06 -0400
-Received: by mail-wm0-x229.google.com with SMTP id t70so10706676wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 03:17:06 -0700 (PDT)
-Date: Mon, 17 Jul 2017 11:17:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170717101703.GH7163@stefanha-x1.localdomain>
-References: <20170713190116.21608-1-dgilbert@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dX37b-0005zt-Nk
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:19:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dX37b-0005wM-IK
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:19:23 -0400
+Date: Mon, 17 Jul 2017 12:19:06 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170717101906.GC5301@noname.redhat.com>
+References: <1499952476-3454-1-git-send-email-armbru@redhat.com>
+	<1499952476-3454-7-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gKijDXBCEH69PxaN"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170713190116.21608-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vl.c/exit: pause cpus before closing block
- devices
+In-Reply-To: <1499952476-3454-7-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 6/9] Convert error_report() to warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jsnow@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Rob Herring <robh@kernel.org>, Josh Durgin <jdurgin@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Marcel Apfelbaum <marcel@redhat.com>, Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Lieven <pl@kamp.de>, Greg Kurz <groug@kaod.org>, Alistair Francis <alistair.francis@xilinx.com>, Peter Chubb <peter.chubb@nicta.com.au>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>
 
+Am 13.07.2017 um 15:27 hat Markus Armbruster geschrieben:
+> From: Alistair Francis <alistair.francis@xilinx.com>
+> 
+> Convert all uses of error_report("warning:"... to use warn_report()
+> instead. This helps standardise on a single method of printing warnings
+> to the user.
+> 
+> All of the warnings were changed using these two commands:
+>     find ./* -type f -exec sed -i \
+>       's|error_report(".*warning[,:] |warn_report("|Ig' {} +
+> 
+> Indentation fixed up manually afterwards.
+> 
+> The test-qdev-global-props test case was manually updated to ensure that
+> this patch passes make check (as the test cases are case sensitive).
 
---gKijDXBCEH69PxaN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch broke qemu-iotests 051 because it neglected to update the
+reference output. Not sure if a change of the message was even intended,
+but with a error location prefix, the order changes:
 
-On Thu, Jul 13, 2017 at 08:01:16PM +0100, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> There's a rare exit seg if the guest is accessing
-> IO during exit.
-> It's always hitting the atomic_inc(&bs->in_flight) with a NULL
-> bs. This was added recently in 99723548  but I don't see it
-> as the cause.
->=20
-> Flip vl.c around so we pause the cpus before closing the block devices,
-> that way we shouldn't have anything trying to access them when
-> they're gone.
->=20
-> This was originally Red Hat bz https://bugzilla.redhat.com/show_bug.cgi?i=
-d=3D1451015
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reported-by: Cong Li <coli@redhat.com>
->=20
-> --
-> This is a very rare race, I'll leave it running in a loop to see if
-> we hit anything else and to check this really fixes it.
->=20
-> I do worry if there are other cases that can trigger this - e.g.
-> hot-unplug or ejecting a CD.
->=20
-> ---
->  vl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+-(qemu) QEMU_PROG: -drive if=scsi,media=cdrom: warning: bus=0,unit=0 is deprecated with this machine type
++(qemu) warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Personally, I would expect the error location or at least the program
+name to come first even for warnings.
 
---gKijDXBCEH69PxaN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZbI6fAAoJEJykq7OBq3PITXUIALUPkey9PSvSi6/xMsTWLCLa
-8qM5zv2sA+EUiW+11ZLZkK4vdeB0R3eldHOSG6iLuiaytUmMSUq78i3lovpZLUS1
-GRbklnHb7DO511+sOFAEpfVQ7TlRzFjjEisi1YA+unKwjjKdTsZrcreooODJfsFL
-THZyOsHMbaKGeZMjVxJ12wAa1xQza5Zujnz7HwFceSHMUcF8txm2gCa0rnYD0Llz
-r1LUFkzdlvIIvvp09iklIRuDlQ+nSmvEEp6PAt09x5ZKHPdHH8yJTwvF6RJXluh3
-0+OyTafoXImNQkD5wGqQXf26ttGd9FyR33OEaLAJZDyqqvVlnO7M2Lpf+obM1qI=
-=VJOS
------END PGP SIGNATURE-----
-
---gKijDXBCEH69PxaN--
+Kevin
