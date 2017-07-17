@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dX5Rf-00024F-Vv
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:48:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dX5U9-00047X-Nr
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dX5Rb-00047c-9A
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:48:16 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37713)
+	(envelope-from <peter.maydell@linaro.org>) id 1dX5U9-00056o-0c
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:50:49 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dX5Ra-00045y-OQ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:48:11 -0400
-Received: by mail-wm0-x236.google.com with SMTP id b134so46835145wma.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 05:48:09 -0700 (PDT)
-From: Dmitry Fleytman <dmitry@daynix.com>
-Message-Id: <5FFD3164-EECD-4077-97DC-13924DEDFA61@daynix.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Mon, 17 Jul 2017 15:48:03 +0300
-In-Reply-To: <09ea0b99-783f-263c-fd47-801c933fb398@redhat.com>
-References: <20170716082917.720-1-dmitry@daynix.com>
-	<09ea0b99-783f-263c-fd47-801c933fb398@redhat.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] pci: honor PCI_COMMAND_MEMORY
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dX5U8-00056L-OU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:50:48 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id 12so6383658wrb.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 05:50:48 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170717065621.4688-1-david@gibson.dropbear.id.au>
+References: <20170717065621.4688-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 13:50:27 +0100
+Message-ID: <CAFEAcA-p2maYu=wDM_uwfOTWDffh+ZGtLNtaQqpp6js=nuafpA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/21] ppc-for-2.10 queue 20170717
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,132 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, Sameeh Jubran <sameeh@daynix.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On 16 Jul 2017, at 19:56 PM, Marcel Apfelbaum <marcel@redhat.com> wrote:
->=20
-> On 16/07/2017 11:29, Dmitry Fleytman wrote:
->> According to PCI spec. bit 1 of command
->> register (PCI_COMMAND_MEMORY) controls
->> a device's response to memory space accesses.
->> A value of 0 disables the device response.
->> A value of 1 allows the device to respond
->> to memory space accesses.
->>=20
->=20
-> Hi Dmitry,
+On 17 July 2017 at 07:56, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 4871b51b9241b10f4fd8e04bbb21577886795e25:
+>
+>   vmgenid-test: use boot-sector infrastructure (2017-07-14 17:03:03 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170717
+>
+> for you to fetch changes up to 346ebfc6fbf1a0c07cbdfc52beef0f0b9b5180d4:
+>
+>   target/ppc: fix CPU hotplug when radix is enabled (TCG) (2017-07-17 15:07:05 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2017-07-17
+>
+> This pull requests supersedes the one from 2017-07-14.  That one had a
+> couple of subtle regressions: there was a build error for mingw32, and
+> an instance_size which was theoretically wrong everywhere, but only
+> actually bit on the Travis OSX build.
+>
+> There are two major batches in this set, rather than the usual
+> collection of assorted fixes.
+>
+>     * More DRC cleanup.  This gets the state management into a state
+>       which should fix many of the hotplug+migration problems we've
+>       had.  Plus it gets the migration stream format into something
+>       well defined and pretty minimal which we can reasonably support
+>       into the future.
+>
+>     * Hashed Page Table resizing.  It's been a while since this was
+>       posted, but it's been through several previous rounds of review.
+>       The kernel parts (both guest and host) are merged in 4.11, so
+>       this is the only remaining piece left to allow resizing of the
+>       HPT in a running guest.
+>
+> There are also a handful of unrelated fixes.
+>
 
-Hi Marcel,
+Applied, thanks.
 
->=20
->=20
->> Current behavior introduced by commit
->>   commit 1c380f9460522f32c8dd2577b2a53d518ec91c6d
->>   Author: Avi Kivity <avi@redhat.com>
->>   Date:   Wed Oct 3 17:42:58 2012 +0200
->>       pci: honor PCI_COMMAND_MASTER
->> is to ignore device memory space accesses unless
->> bit 2 (PCI_COMMAND_MASTER) is set.
->> Aforementioned commit introduced regression of
->> Windows hibernation (S4) functionality support
->> because on resume Windows kernel sets bits 0 and 1
->> (PCI_COMMAND_MEMORY | PCI_COMMAND_IO) of boot
->> device's (piix3-ide in our specific case) command
->> register and tries to work with the device.
->> > Since PCI_COMMAND_MASTER bit is not set, device
->> does not answer and Windows fails to resume from
->> hibernation.
->=20
-> As far as I am aware "Bus master" is needed for a device
-> to start PCI transactions, while PCI_COMMAND_MEMORY/IO
-> controls the device ability to respond to memory/IO accesses,
-> not to start them.
-> If "Bus master" is needed for DMA access or MSI, the OS should
-> explicitly set the  PCI_COMMAND_MASTER, right?
->=20
->=20
->=20
->> As a result following BSOD happens:
->>   BugCheck A0, {10e, a, aa00, 418}
->>   Probably caused by : ntkrnlmp.exe ( =
-nt!PopHiberChecksumHiberFileData+b346 )
->>   Followup:     MachineOwner
->>   ---------
->>   0: kd> !analyze -v
->>   =
-**************************************************************************=
-*****
->>   *                                                                   =
-          *
->>   *                        Bugcheck Analysis                          =
-          *
->>   *                                                                   =
-          *
->>   =
-**************************************************************************=
-*****
->>   INTERNAL_POWER_ERROR (a0)
->>   The power policy manager experienced a fatal error.
->>   Arguments:
->>   Arg1: 000000000000010e, The disk subsystem returned corrupt data =
-while reading from the
->>       hibernation file.
->>   Arg2: 000000000000000a
->>   Arg3: 000000000000aa00, Incorrect checksum
->>   Arg4: 0000000000000418, Previous disk read's checksum
->=20
-> Does piix3-ide fail to respond to IO/MEM accesses if
-> PCI_COMMAND_MASTER is not set? Or is it a DMA issue?
->=20
-
-It is a DMA issue.
-
-After some additional research I see that this patch is wrong, please =
-ignore it.
-
-Windows expects DMA transfers from device but does not set
-bus master bit in PCI command register.
-
-Am I understand correctly that there are no special cases for
-IDE controllers, i.e. bus master bit must be set by SW same
-way as for other PCI devices?
-
-Thanks,
-Dmitry.
-
->=20
-> Thanks,
-> Marcel
->=20
->> According to our tests this problem happens at least on
->> Windows 8/8.1/2012/2012R2/10/2016.
->> This patch solves https://bugzilla.redhat.com/show_bug.cgi?id=3D988351
->> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
->> ---
->>  hw/pci/pci.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->> index 0c6f74a..10af82f 100644
->> --- a/hw/pci/pci.c
->> +++ b/hw/pci/pci.c
->> @@ -480,7 +480,7 @@ static int get_pci_config_device(QEMUFile *f, =
-void *pv, size_t size,
->>        memory_region_set_enabled(&s->bus_master_enable_region,
->>                                pci_get_word(s->config + PCI_COMMAND)
->> -                              & PCI_COMMAND_MASTER);
->> +                              & (PCI_COMMAND_MASTER | =
-PCI_COMMAND_MEMORY));
->>        g_free(config);
->>      return 0;
->> @@ -1356,7 +1356,7 @@ void pci_default_write_config(PCIDevice *d, =
-uint32_t addr, uint32_t val_in, int
->>          pci_update_irq_disabled(d, was_irq_disabled);
->>          memory_region_set_enabled(&d->bus_master_enable_region,
->>                                    pci_get_word(d->config + =
-PCI_COMMAND)
->> -                                    & PCI_COMMAND_MASTER);
->> +                                  & (PCI_COMMAND_MASTER | =
-PCI_COMMAND_MEMORY));
->>      }
->>        msi_write_config(d, addr, val_in, l);
+-- PMM
