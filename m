@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dX7C3-0001Fq-65
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:40:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dX7FA-00021Y-8a
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dX7By-0005sL-Bs
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:40:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6075)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dX7By-0005rf-5x
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:40:10 -0400
-Date: Mon, 17 Jul 2017 15:39:57 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170717143957.GS7163@stefanha-x1.localdomain>
-References: <1500114070-181004-1-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dX7F4-0007P5-QA
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:43:28 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dX7F4-0007Oc-Iq
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:43:22 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id b134so50486492wma.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:43:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wnBGVoaGQwxWUIo6"
-Content-Disposition: inline
-In-Reply-To: <1500114070-181004-1-git-send-email-arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [RFC 0/3] cryptodev: add vhost support
+In-Reply-To: <20170717090423.11433-1-kraxel@redhat.com>
+References: <20170717090423.11433-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 15:43:00 +0100
+Message-ID: <CAFEAcA-7wKjqjv9hXF1eGiLO-d-USLJazDCoBqL1pr7UX2PQ6w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Ipxe patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, weidong.huang@huawei.com, roy.fan.zhang@intel.com, xin.zeng@intel.com, linqiangmin@huawei.com, marcandre.lureau@redhat.com, pasic@linux.vnet.ibm.com, longpeng2@huawei.com, jianjay.zhou@huawei.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 17 July 2017 at 10:04, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 6e2c46334385c7e295ac883c801c81b4925fb54f:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170711' into staging (2017-07-13 10:47:10 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/ipxe-pull-request
+>
+> for you to fetch changes up to 18375b5c1655d3ce0c5029404a4c993ac04c9d09:
+>
+>   ipxe: update to commit 0600d3ae94 (2017-07-17 11:00:28 +0200)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
 
---wnBGVoaGQwxWUIo6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Applied, thanks.
 
-On Sat, Jul 15, 2017 at 06:21:07PM +0800, Gonglei wrote:
-> And the Intel guys are working on the DPDK vhost-crypto
-> implementation. So let us push the cryptodev-vhost-user
-> backend upstream so that the whole process can be
-> accelerated.
-
-I guess you want to use this?
-http://dpdk.org/doc/guides/cryptodevs/qat.html
-
-That makes sense.  I just wanted to share the link in case anyone else
-is wondering how DPDK helps crypto.
-
-Stefan
-
---wnBGVoaGQwxWUIo6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZbMw9AAoJEJykq7OBq3PIdNkH/itJ6AhX++WmV2irY2ciB0av
-IZRUlcDFbxMW93Jq1vph/Be3rIzX8WGQ/k58yxUrMkluxCRiCe9Fgmi0GvPYaCNB
-fOAd3FVV7V0tStRNsOG3GiaegeL9kwxB2BVPijLAkyLf0SK/tL42mKxKgKls9bJ0
-i0SYTcFexm4vR+YFCuK2e6ylE13BYYTjDCbmntLBvDw4JBRfRTYCZFtZi7Ns9MUD
-9j/deaYM9bhZG56nYVcK9qidT1zJywOcs1r6Jl61RBySQL7KudTdo0xzWYNYlYmG
-xR528xwkrVAmXFRV+NzyGF3/EN+81c8HMBj7KKr88s97De2qVijqiCgfWTgEDqs=
-=D60l
------END PGP SIGNATURE-----
-
---wnBGVoaGQwxWUIo6--
+-- PMM
