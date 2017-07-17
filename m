@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxH-0002a1-At
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxJ-0002a7-Sq
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxG-0001Wd-6f
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxJ-0001Z3-2j
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:33 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 17 Jul 2017 16:56:04 +1000
-Message-Id: <20170717065621.4688-5-david@gibson.dropbear.id.au>
+Date: Mon, 17 Jul 2017 16:56:07 +1000
+Message-Id: <20170717065621.4688-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20170717065621.4688-1-david@gibson.dropbear.id.au>
 References: <20170717065621.4688-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 04/21] spapr: Treat devices added before inbound
- migration as coldplugged
+Subject: [Qemu-devel] [PULL 07/21] spapr: Abort on delete failure in
+ spapr_drc_release()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,189 +21,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, Laurent Vivier <lvivier@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+We currently ignore errors from the object_property_del() in
+spapr_drc_release().  But the only way that could fail is if the property
+doesn't exist, in which case it's a bug that we're in spapr_drc_release()
+at all.  So change from ignoring to abort()ing on errors.
 
-When migrating a guest which has already had devices hotplugged,
-libvirt typically starts the destination qemu with -incoming defer,
-adds those hotplugged devices with qmp, then initiates the incoming
-migration.
-
-This causes problems for the management of spapr DRC state.  Because
-the device is treated as hotplugged, it goes into a DRC state for a
-device immediately after it's plugged, but before the guest has
-acknowledged its presence.  However, chances are the guest on the
-source machine *has* acknowledged the device's presence and configured
-it.
-
-If the source has fully configured the device, then DRC state won't be
-sent in the migration stream: for maximum migration compatibility with
-earlier versions we don't migrate DRCs in coldplug-equivalent state.
-That means that the DRC effectively changes state over the migrate,
-causing problems later on.
-
-In addition, logging hotplug events for these devices isn't what we
-want because a) those events should already have been issued on the
-source host and b) the event queue should get wiped out by the
-incoming state anyway.
-
-In short, what we really want is to treat devices added before an
-incoming migration as if they were coldplugged.
-
-To do this, we first add a spapr_drc_hotplugged() helper which
-determines if the device is hotplugged in the sense relevant for DRC
-state management.  We only send hotplug events when this is true.
-Second, when we add a device which isn't hotplugged in this sense, we
-force a reset of the DRC state - this ensures the DRC is in a
-coldplug-equivalent state (there isn't usually a system reset between
-these device adds and the incoming migration).
-
-This is based on an earlier patch by Laurent Vivier, cleaned up and
-extended.
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c             | 24 ++++++++++++++++--------
- hw/ppc/spapr_drc.c         |  9 ++++++---
- hw/ppc/spapr_pci.c         |  4 +++-
- include/hw/ppc/spapr_drc.h |  8 ++++++++
- 4 files changed, 33 insertions(+), 12 deletions(-)
+ hw/ppc/spapr_drc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 8528c30ad7..cb61d3d36b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2636,6 +2636,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-     int i, fdt_offset, fdt_size;
-     void *fdt;
-     uint64_t addr = addr_start;
-+    bool hotplugged = spapr_drc_hotplugged(dev);
-     Error *local_err = NULL;
- 
-     for (i = 0; i < nr_lmbs; i++) {
-@@ -2659,12 +2660,15 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-             error_propagate(errp, local_err);
-             return;
-         }
-+        if (!hotplugged) {
-+            spapr_drc_reset(drc);
-+        }
-         addr += SPAPR_MEMORY_BLOCK_SIZE;
-     }
-     /* send hotplug notification to the
-      * guest only in case of hotplugged memory
-      */
--    if (dev->hotplugged) {
-+    if (hotplugged) {
-         if (dedicated_hp_event_source) {
-             drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
-                                   addr_start / SPAPR_MEMORY_BLOCK_SIZE);
-@@ -2998,6 +3002,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     int smt = kvmppc_smt_threads();
-     CPUArchId *core_slot;
-     int index;
-+    bool hotplugged = spapr_drc_hotplugged(dev);
- 
-     core_slot = spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index);
-     if (!core_slot) {
-@@ -3018,15 +3023,18 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-             error_propagate(errp, local_err);
-             return;
-         }
--    }
- 
--    if (dev->hotplugged) {
--        /*
--         * Send hotplug notification interrupt to the guest only in case
--         * of hotplugged CPUs.
--         */
--        spapr_hotplug_req_add_by_index(drc);
-+        if (hotplugged) {
-+            /*
-+             * Send hotplug notification interrupt to the guest only
-+             * in case of hotplugged CPUs.
-+             */
-+            spapr_hotplug_req_add_by_index(drc);
-+        } else {
-+            spapr_drc_reset(drc);
-+        }
-     }
-+
-     core_slot->cpu = OBJECT(dev);
- 
-     if (smc->pre_2_10_has_unused_icps) {
 diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 7f71c77015..31181dab1d 100644
+index 7f872a4803..fd5614094d 100644
 --- a/hw/ppc/spapr_drc.c
 +++ b/hw/ppc/spapr_drc.c
-@@ -412,10 +412,8 @@ static bool release_pending(sPAPRDRConnector *drc)
-     return drc->awaiting_release;
+@@ -367,7 +367,7 @@ static void spapr_drc_release(sPAPRDRConnector *drc)
+     g_free(drc->fdt);
+     drc->fdt = NULL;
+     drc->fdt_start_offset = 0;
+-    object_property_del(OBJECT(drc), "device", NULL);
++    object_property_del(OBJECT(drc), "device", &error_abort);
+     drc->dev = NULL;
  }
- 
--static void drc_reset(void *opaque)
-+void spapr_drc_reset(sPAPRDRConnector *drc)
- {
--    sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(opaque);
--
-     trace_spapr_drc_reset(spapr_drc_index(drc));
- 
-     g_free(drc->ccs);
-@@ -447,6 +445,11 @@ static void drc_reset(void *opaque)
-     }
- }
- 
-+static void drc_reset(void *opaque)
-+{
-+    spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
-+}
-+
- static bool spapr_drc_needed(void *opaque)
- {
-     sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index a52dcf8ec0..1e84c552d8 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1443,7 +1443,9 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
-     /* If this is function 0, signal hotplug for all the device functions.
-      * Otherwise defer sending the hotplug event.
-      */
--    if (plugged_dev->hotplugged && PCI_FUNC(pdev->devfn) == 0) {
-+    if (!spapr_drc_hotplugged(plugged_dev)) {
-+        spapr_drc_reset(drc);
-+    } else if (PCI_FUNC(pdev->devfn) == 0) {
-         int i;
- 
-         for (i = 0; i < 8; i++) {
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index d15e9eb3b4..715016b052 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -15,6 +15,7 @@
- 
- #include <libfdt.h>
- #include "qom/object.h"
-+#include "sysemu/sysemu.h"
- #include "hw/qdev.h"
- 
- #define TYPE_SPAPR_DR_CONNECTOR "spapr-dr-connector"
-@@ -223,6 +224,13 @@ typedef struct sPAPRDRConnectorClass {
-     bool (*release_pending)(sPAPRDRConnector *drc);
- } sPAPRDRConnectorClass;
- 
-+static inline bool spapr_drc_hotplugged(DeviceState *dev)
-+{
-+    return dev->hotplugged && !runstate_check(RUN_STATE_INMIGRATE);
-+}
-+
-+void spapr_drc_reset(sPAPRDRConnector *drc);
-+
- uint32_t spapr_drc_index(sPAPRDRConnector *drc);
- sPAPRDRConnectorType spapr_drc_type(sPAPRDRConnector *drc);
  
 -- 
 2.13.3
