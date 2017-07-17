@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX3bP-00012R-LN
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:50:12 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dX3dW-0001za-3R
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:52:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX3bO-0005xu-Vz
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:50:11 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX3bO-0005xN-Pa
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:50:10 -0400
-Received: by mail-wr0-x231.google.com with SMTP id w4so20415779wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 03:50:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170717103937.GD5301@noname.redhat.com>
-References: <20170717063521.GA7393@lemon>
-	<20170717103937.GD5301@noname.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 11:49:49 +0100
-Message-ID: <CAFEAcA9zoauJw-CnNxtec48VOr6onXiCZ8BV8JJwk7ZeOLxnUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
+	(envelope-from <kchamart@redhat.com>) id 1dX3dV-0007T9-3W
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:52:22 -0400
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Date: Mon, 17 Jul 2017 12:52:03 +0200
+Message-Id: <20170717105205.32639-1-kchamart@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 0/2] Rewrite 'live-block-ops.txt';
+ convert 'bitmaps.md' to rST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +18,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: berto@igalia.com, armbru@redhat.com, eblake@redhat.com, kwolf@redhat.com, jsnow@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
 
-On 17 July 2017 at 11:39, Kevin Wolf <kwolf@redhat.com> wrote:
-> Only today I noticed again that two recently merged pull requests broke
-> qemu-iotests cases, so I must assume that apart from some block
-> maintainers, nobody runs it regularly.
+v7: Address feedback from Eric; add his 'Reviewed-by' on both patches; 
+    also retain John Snow's 'Reviewed-by' on bitmaps.rst
+v6: https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg02188.html
+v5: https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg01368.html
+v4: https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg06395.html
 
-If "make check" doesn't run it, it doesn't get run :-)
-I actually looked into trying to run qemu-iotests tests
-for the recent patches I sent for vpc and vmdk image format
-handler fixes, but I couldn't get it to do anything sensible
-and I couldn't find any documentation, so I gave up and
-assumed that "make check" plus manual testing was good enough...
+Rewrite the 'live-block-ops.txt' document (after renaming it to
+'live-block-operations.rst') in reStructuredText (rST) format.  Given
+upstream QEMU's desire[*] to take advantage of the Sphinx + rST
+framework to gerate its documentation:
 
-thanks
--- PMM
+    "Based on experience from the Linux kernel, QEMU's docs pipeline is
+    going to be based on Sphinx [...] Sphinx is extensible and it is
+    easy to add new input formats and input directives."
+
+And as part of review, John Snow suggested[+] to link to the
+'bitmaps.md' document.  So while at it, convert the 'bitmaps.md'
+document also into rST syntax.
+
+Then, moved both the documents ('live-block-operations.rst', and
+'bitmaps.rst') to 'qemu/docs/interop' directory.  (Paolo explained the
+term "interop" as: "management & interoperability with QEMU".)
+
+That's the result of this series:
+
+(1) Rewrite the 'live-block-ops.txt' document (for details, refer the
+    commit message of the patch) in rST.
+
+    Sphinx-generted HTML rendering:
+
+        https://kashyapc.fedorapeople.org/v7-QEMU-Docs/_build/html/docs/live-block-operations.html
+
+(2) Convert the 'bitmaps.md' document to rST, as discussed on this[+]
+    thread.
+
+
+[*] http://wiki.qemu.org/Features/Documentation
+[+] https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05428.html
+
+
+Kashyap Chamarthy (2):
+  bitmaps.md: Convert to rST; move it into 'interop' dir
+  live-block-ops.txt: Rename, rewrite, and improve it
+
+ docs/devel/bitmaps.md                  |  505 ---------------
+ docs/interop/bitmaps.rst               |  555 ++++++++++++++++
+ docs/interop/live-block-operations.rst | 1088 ++++++++++++++++++++++++++++++++
+ docs/live-block-ops.txt                |   72 ---
+ 4 files changed, 1643 insertions(+), 577 deletions(-)
+ delete mode 100644 docs/devel/bitmaps.md
+ create mode 100644 docs/interop/bitmaps.rst
+ create mode 100644 docs/interop/live-block-operations.rst
+ delete mode 100644 docs/live-block-ops.txt
+
+-- 
+2.9.4
