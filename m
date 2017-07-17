@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dX52Z-0000ot-CE
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:20 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dX52b-0000r3-It
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dX52Y-0008Cq-Fa
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39070)
+	(envelope-from <jasowang@redhat.com>) id 1dX52a-0008Et-Q9
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dX52Y-0008CH-9w
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:18 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dX52a-0008Ec-Ja
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:20 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 17 Jul 2017 20:21:40 +0800
-Message-Id: <1500294105-13713-10-git-send-email-jasowang@redhat.com>
+Date: Mon, 17 Jul 2017 20:21:41 +0800
+Message-Id: <1500294105-13713-11-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1500294105-13713-1-git-send-email-jasowang@redhat.com>
 References: <1500294105-13713-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 09/14] net/colo.c: Add vnet packet parse feature
- in colo-proxy
+Subject: [Qemu-devel] [PULL 10/14] net/colo-compare.c: Add vnet packet's
+ tcp/udp/icmp compare
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,41 @@ Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-Make colo-compare and filter-rewriter can parse vnet packet.
+COLO-Proxy just focus on packet payload, so we skip vnet header.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/colo.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/colo-compare.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/colo.c b/net/colo.c
-index 180eaed..28ce7c8 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -43,11 +43,11 @@ int parse_packet_early(Packet *pkt)
- {
-     int network_length;
-     static const uint8_t vlan[] = {0x81, 0x00};
--    uint8_t *data = pkt->data;
-+    uint8_t *data = pkt->data + pkt->vnet_hdr_len;
-     uint16_t l3_proto;
-     ssize_t l2hdr_len = eth_get_l2_hdr_length(data);
- 
--    if (pkt->size < ETH_HLEN) {
-+    if (pkt->size < ETH_HLEN + pkt->vnet_hdr_len) {
-         trace_colo_proxy_main("pkt->size < ETH_HLEN");
-         return 1;
-     }
-@@ -73,7 +73,7 @@ int parse_packet_early(Packet *pkt)
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 95911a2..ca67c68 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -201,8 +201,11 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+                                    sec_ip_src, sec_ip_dst);
      }
  
-     network_length = pkt->ip->ip_hl * 4;
--    if (pkt->size < l2hdr_len + network_length) {
-+    if (pkt->size < l2hdr_len + network_length + pkt->vnet_hdr_len) {
-         trace_colo_proxy_main("pkt->size < network_header + network_length");
-         return 1;
-     }
++    offset = ppkt->vnet_hdr_len + offset;
++
+     if (ppkt->size == spkt->size) {
+-        return memcmp(ppkt->data + offset, spkt->data + offset,
++        return memcmp(ppkt->data + offset,
++                      spkt->data + offset,
+                       spkt->size - offset);
+     } else {
+         trace_colo_compare_main("Net packet size are not the same");
+@@ -261,8 +264,9 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+      */
+     if (ptcp->th_off > 5) {
+         ptrdiff_t tcp_offset;
++
+         tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
+-                     + (ptcp->th_off * 4);
++                     + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
+         res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
+     } else if (ptcp->th_sum == stcp->th_sum) {
+         res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
 -- 
 2.7.4
