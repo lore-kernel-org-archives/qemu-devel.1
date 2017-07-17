@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dWzhi-00073L-8G
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:40:27 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dWzki-0007eG-M9
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dWzhd-00027i-O7
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:40:26 -0400
-Received: from [59.151.112.132] (port=51094 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dWzhd-00020X-Bn
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:40:21 -0400
-References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<80774faf-ebc4-4ffa-feb6-211b63495339@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <b3bfd799-e2f0-9ea3-27c5-8de6c2426322@cn.fujitsu.com>
-Date: Mon, 17 Jul 2017 14:42:33 +0800
+	(envelope-from <lprosek@redhat.com>) id 1dWzkd-0003ek-Rv
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:43:32 -0400
+Received: from mail-ua0-f180.google.com ([209.85.217.180]:35242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dWzkd-0003eT-OE
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:43:27 -0400
+Received: by mail-ua0-f180.google.com with SMTP id 64so6276279uae.2
+	for <qemu-devel@nongnu.org>; Sun, 16 Jul 2017 23:43:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <80774faf-ebc4-4ffa-feb6-211b63495339@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V2 1/4] net/colo-compare.c: Add checkpoint
- min period to optimize performance
+In-Reply-To: <87vamuckq2.fsf@dusky.pond.sub.org>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+	<20170713110237.6712-2-lprosek@redhat.com>
+	<20170713133206.GA18623@stefanha-x1.localdomain>
+	<CABdb735h_vjCsHR+5reKxdHXLZkzfiCiW0qr=xoxXyYJ=1Y3Mw@mail.gmail.com>
+	<20170714102551.GB27446@stefanha-x1.localdomain>
+	<87vamuckq2.fsf@dusky.pond.sub.org>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 17 Jul 2017 08:43:25 +0200
+Message-ID: <CABdb7372PdGn-X=4oUxhHv0nbMDKRXH=ihJ53LFxnu7TcdecAA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce
+ error_report_nolf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +33,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Greg Kurz <groug@kaod.org>, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
-
-
-On 07/14/2017 11:22 AM, Jason Wang wrote:
+On Sat, Jul 15, 2017 at 7:50 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
 >
->
-> On 2017年07月13日 13:52, Zhang Chen wrote:
->> If colo-compare find out the first different packet that means
->> the following packet almost is different. we needn't do a lot
->> of checkpoint in this time, so we set the no-need-checkpoint
->> peroid, default just set 3 second.
+>> On Thu, Jul 13, 2017 at 03:48:02PM +0200, Ladi Prosek wrote:
+>>> On Thu, Jul 13, 2017 at 3:32 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>>> > On Thu, Jul 13, 2017 at 01:02:30PM +0200, Ladi Prosek wrote:
+>>> >> +/*
+>>> >> + * Print an error message to current monitor if we have one, else to stderr.
+>>> >> + * Format arguments like sprintf().  The resulting message should be a
+>>> >> + * single phrase, with no trailing punctuation.  The no-LF version allows
+>>> >> + * additional text to be appended with error_printf() or error_vprintf().
+>>> >> + * Make sure to always close with a newline after all text is printed.
+>>> >> + * Prepends the current location.
+>>> >> + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+>>> >> + */
+>>> >> +void error_report_nolf(const char *fmt, ...)
+>>> >> +{
+>>> >> +    va_list ap;
+>>> >> +
+>>> >> +    va_start(ap, fmt);
+>>> >> +    error_vreport_nolf(fmt, ap);
+>>> >> +    va_end(ap);
+>>> >>  }
+>>> >
+>>> > Each call to this function prepends the timestamp, so it cannot really
+>>> > be used for a sequence of prints in a single line.
+>>>
+>>> True, the _nolf means "does not append \n" rather than "can be called
+>>> repeatedly". You would use error_printf() / error_vprintf() for
+>>> subsequent prints, as mentioned in the comment above this function.
+>>>
+>>> > It's a little ugly but I expected something along the lines of
+>>> > g_strdup_vprintf() in virtio_error():
+>>> >
+>>> >   char *msg;
+>>> >
+>>> >   va_start(ap, fmt);
+>>> >   msg = g_strdup_vprintf(fmt, ap);
+>>> >   va_end(ap);
+>>> >
+>>> >   error_report("%s: %s", DEVICE(vdev)->id, msg);
+>>> >
+>>> >   g_free(msg);
+>>> >
+>>> > https://developer.gnome.org/glib/stable/glib-String-Utility-Functions.html#g-strdup-vprintf
+>>>
+>>> I wanted to avoid the memory allocation, that's all. Not for
+>>> performance, obviously, but to increase the chances that it will come
+>>> through and always look the same if the process is under memory
+>>> pressure, the heap corrupted or otherwise in a bad state.
+>>>
+>>> Both approaches look about the same ugly to me but I can certainly
+>>> change it to the one you're suggesting.
 >>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/colo-compare.c | 13 ++++++++++++-
->>   1 file changed, 12 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 6d500e1..0f8e198 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -40,6 +40,9 @@
->>   /* TODO: Should be configurable */
->>   #define REGULAR_PACKET_CHECK_MS 3000
->>   +/* TODO: Should be configurable */
->> +#define CHECKPOINT_MIN_TIME 3000
->> +
->>   /*
->>     + CompareState ++
->>     |               |
->> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, 
->> void *user_data)
->>       Packet *pkt = NULL;
->>       GList *result = NULL;
->>       int ret;
->> +    static int64_t checkpoint_time_ms;
+>> The chance that error_report_nolf() will be used incorrectly is high.
 >
-> Let's avoid static variable here since we support more than one 
-> compare instance.
+> Concur.
+>
+> When malloc() starts to fail or crash, the process is basically screwed.
+> This should be rare.  Keeping error paths simple to improve the chances
+> of a useful error message getting through before the process dies is a
+> laudable idea anyway.  But:
+>
+> * When timestamps are enabled, error_vreport() already allocates.
+>
+> * When error messages go to the monitor, monitor_vprintf() already
+>   allocates().
+>
+> We could get rid of both allocations with some effort.  Wouldn't affect
+> the interface.  Until we do, avoiding another small allocation is
+> unlikely to help.
 
-OK, I will add the "checkpoint_time_ms" to CompareState.
+Makes sense. v3 will have what you guys suggest. Thanks!
 
-Thanks
-Zhang Chen
-
->
-> Thanks
->
->>         while (!g_queue_is_empty(&conn->primary_list) &&
->>              !g_queue_is_empty(&conn->secondary_list)) {
->> @@ -494,7 +498,14 @@ static void colo_compare_connection(void 
->> *opaque, void *user_data)
->>                */
->>               trace_colo_compare_main("packet different");
->>               g_queue_push_tail(&conn->primary_list, pkt);
->> -            /* TODO: colo_notify_checkpoint();*/
->> +
->> +            if (pkt->creation_ms - checkpoint_time_ms > 
->> CHECKPOINT_MIN_TIME) {
->> +                /*
->> +                 * TODO: Notify colo frame to do checkpoint.
->> +                 * colo_compare_inconsistent_notify();
->> +                 */
->> +                checkpoint_time_ms = pkt->creation_ms;
->> +            }
->>               break;
->>           }
->>       }
->
->
->
-> .
->
-
--- 
-Thanks
-Zhang Chen
+>> Performance isn't a big concern for printing error messages.  That's why
+>> I suggest a single error_report() call instead.
