@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWx1N-0000NY-Oj
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:34 -0400
+	(envelope-from <famz@redhat.com>) id 1dWx1P-0000Qa-1i
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWx1K-0004VU-LA
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56456)
+	(envelope-from <famz@redhat.com>) id 1dWx1N-0004WO-T8
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWx1K-0004Tn-Ea
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:30 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWx1N-0004Vx-Kq
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:33 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 17 Jul 2017 11:48:10 +0800
-Message-Id: <20170717034825.1524-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/15] Block and testing patches
+Date: Mon, 17 Jul 2017 11:48:12 +0800
+Message-Id: <20170717034825.1524-3-famz@redhat.com>
+In-Reply-To: <20170717034825.1524-1-famz@redhat.com>
+References: <20170717034825.1524-1-famz@redhat.com>
+Subject: [Qemu-devel] [PULL 02/15] coroutine-lock: add
+ qemu_co_rwlock_downgrade and qemu_co_rwlock_upgrade
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +27,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The following changes since commit 4871b51b9241b10f4fd8e04bbb21577886795e=
-25:
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-  vmgenid-test: use boot-sector infrastructure (2017-07-14 17:03:03 +0100=
-)
+These functions are more efficient in the presence of contention.
+qemu_co_rwlock_downgrade also guarantees not to block, which may
+be useful in some algorithms too.
 
-are available in the git repository at:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20170629132749.997-3-pbonzini@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ include/qemu/coroutine.h   | 18 ++++++++++++++++++
+ util/qemu-coroutine-lock.c | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
 
-  git://github.com/famz/qemu.git tags/block-and-testing-pull-request
-
-for you to fetch changes up to 978373143cf9965a6ae1dec73b046fbf3d9f9689:
-
-  travis: add no-TCG build (2017-07-17 11:34:20 +0800)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Daniel P. Berrange (1):
-  docker: Don't enable networking as a side-effect of DEBUG=3D1
-
-Fam Zheng (2):
-  docker.py: Drop infile parameter
-  docker.py: Improve subprocess exit code handling
-
-Paolo Bonzini (12):
-  qcow2: call CoQueue APIs under CoMutex
-  coroutine-lock: add qemu_co_rwlock_downgrade and
-    qemu_co_rwlock_upgrade
-  vdi: make it thread-safe
-  vpc: make it thread-safe
-  vvfat: make it thread-safe
-  qed: move tail of qed_aio_write_main to qed_aio_write_{cow, alloc}
-  block: invoke .bdrv_drain callback in coroutine context and from
-    AioContext
-  qed: introduce bdrv_qed_init_state
-  qed: protect table cache with CoMutex
-  sheepdog: add queue_lock
-  ssh: support I/O from any AioContext
-  travis: add no-TCG build
-
- .travis.yml                   |   3 +
- block/io.c                    |  42 ++++++--
- block/qcow2.c                 |   4 +-
- block/qed-cluster.c           |   4 +-
- block/qed-l2-cache.c          |   6 ++
- block/qed-table.c             |  24 +++--
- block/qed.c                   | 218 ++++++++++++++++++++++++++----------=
-------
- block/qed.h                   |  11 ++-
- block/sheepdog.c              |  21 +++-
- block/ssh.c                   |  24 +++--
- block/vdi.c                   |  48 +++++-----
- block/vpc.c                   |  20 ++--
- block/vvfat.c                 |   8 +-
- include/block/block_int.h     |   2 +-
- include/qemu/coroutine.h      |  18 ++++
- tests/docker/Makefile.include |   5 +-
- tests/docker/docker.py        |  23 +++--
- util/qemu-coroutine-lock.c    |  35 +++++++
- 18 files changed, 355 insertions(+), 161 deletions(-)
-
---=20
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index a4509bd..9aff9a7 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -229,6 +229,24 @@ void qemu_co_rwlock_init(CoRwlock *lock);
+ void qemu_co_rwlock_rdlock(CoRwlock *lock);
+ 
+ /**
++ * Write Locks the CoRwlock from a reader.  This is a bit more efficient than
++ * @qemu_co_rwlock_unlock followed by a separate @qemu_co_rwlock_wrlock.
++ * However, if the lock cannot be upgraded immediately, control is transferred
++ * to the caller of the current coroutine.  Also, @qemu_co_rwlock_upgrade
++ * only overrides CoRwlock fairness if there are no concurrent readers, so
++ * another writer might run while @qemu_co_rwlock_upgrade blocks.
++ */
++void qemu_co_rwlock_upgrade(CoRwlock *lock);
++
++/**
++ * Downgrades a write-side critical section to a reader.  Downgrading with
++ * @qemu_co_rwlock_downgrade never blocks, unlike @qemu_co_rwlock_unlock
++ * followed by @qemu_co_rwlock_rdlock.  This makes it more efficient, but
++ * may also sometimes be necessary for correctness.
++ */
++void qemu_co_rwlock_downgrade(CoRwlock *lock);
++
++/**
+  * Write Locks the mutex. If the lock cannot be taken immediately because
+  * of a parallel reader, control is transferred to the caller of the current
+  * coroutine.
+diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+index b44b5d5..846ff91 100644
+--- a/util/qemu-coroutine-lock.c
++++ b/util/qemu-coroutine-lock.c
+@@ -402,6 +402,21 @@ void qemu_co_rwlock_unlock(CoRwlock *lock)
+     qemu_co_mutex_unlock(&lock->mutex);
+ }
+ 
++void qemu_co_rwlock_downgrade(CoRwlock *lock)
++{
++    Coroutine *self = qemu_coroutine_self();
++
++    /* lock->mutex critical section started in qemu_co_rwlock_wrlock or
++     * qemu_co_rwlock_upgrade.
++     */
++    assert(lock->reader == 0);
++    lock->reader++;
++    qemu_co_mutex_unlock(&lock->mutex);
++
++    /* The rest of the read-side critical section is run without the mutex.  */
++    self->locks_held++;
++}
++
+ void qemu_co_rwlock_wrlock(CoRwlock *lock)
+ {
+     qemu_co_mutex_lock(&lock->mutex);
+@@ -416,3 +431,23 @@ void qemu_co_rwlock_wrlock(CoRwlock *lock)
+      * There is no need to update self->locks_held.
+      */
+ }
++
++void qemu_co_rwlock_upgrade(CoRwlock *lock)
++{
++    Coroutine *self = qemu_coroutine_self();
++
++    qemu_co_mutex_lock(&lock->mutex);
++    assert(lock->reader > 0);
++    lock->reader--;
++    lock->pending_writer++;
++    while (lock->reader) {
++        qemu_co_queue_wait(&lock->queue, &lock->mutex);
++    }
++    lock->pending_writer--;
++
++    /* The rest of the write-side critical section is run with
++     * the mutex taken, similar to qemu_co_rwlock_wrlock.  Do
++     * not account for the lock twice in self->locks_held.
++     */
++    self->locks_held--;
++}
+-- 
 2.9.4
