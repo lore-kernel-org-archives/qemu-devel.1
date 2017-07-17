@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dX5Oh-00080C-NV
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:12 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dX5Oi-00081G-4X
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dX5Og-0002Ku-HT
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dX5Oh-0002Lw-AQ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:12 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37640)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dX5Og-0002Ci-BY
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:10 -0400
+	id 1dX5Oh-0002Ci-4g
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:11 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dX5OS-0003S8-LD
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:44:56 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dX5OR-0003RN-LY
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:44:55 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 13:44:39 +0100
-Message-Id: <1500295494-8991-4-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 13:44:37 +0100
+Message-Id: <1500295494-8991-2-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1500295494-8991-1-git-send-email-peter.maydell@linaro.org>
 References: <1500295494-8991-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/18] target/arm: Make Cortex-M3 and M4 default
- to 8 PMSA regions
+Subject: [Qemu-devel] [PULL 01/18] qdev-properties.h: Explicitly set the
+ default value for arraylen properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +33,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The Cortex-M3 and M4 CPUs always have 8 PMSA MPU regions (this isn't
-a configurable option for the hardware).  Make the default value of
-the pmsav7-dregion property be set per-cpu, so we don't need to have
-every user of these CPUs set it manually.  (The existing default of
-16 is correct for the other PMSAv7 core, the Cortex-R5.)
-
-This fixes a bug where we were creating the M3 and M4 with
-too many regions; most guest software would not notice or
-care, though, since it would just not use the registers
-associated with the unexpected extra regions.
+In DEFINE_PROP_ARRAY, because we use a PropertyInfo (qdev_prop_arraylen)
+which has a .set_default_value member we will set the field to a default
+value. That default value will be zero, by the C rule that struct
+initialization sets unmentioned members to zero if at least one member
+is initialized. However it's clearer to state it explicitly.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-id: 1499788408-10096-4-git-send-email-peter.maydell@linaro.org
+Message-id: 1499788408-10096-2-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ include/hw/qdev-properties.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 28a9141..96d1f84 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -543,8 +543,15 @@ static Property arm_cpu_has_pmu_property =
- static Property arm_cpu_has_mpu_property =
-             DEFINE_PROP_BOOL("has-mpu", ARMCPU, has_mpu, true);
- 
-+/* This is like DEFINE_PROP_UINT32 but it doesn't set the default value,
-+ * because the CPU initfn will have already set cpu->pmsav7_dregion to
-+ * the right value for that particular CPU type, and we don't want
-+ * to override that with an incorrect constant value.
-+ */
- static Property arm_cpu_pmsav7_dregion_property =
--            DEFINE_PROP_UINT32("pmsav7-dregion", ARMCPU, pmsav7_dregion, 16);
-+            DEFINE_PROP_UNSIGNED_NODEFAULT("pmsav7-dregion", ARMCPU,
-+                                           pmsav7_dregion,
-+                                           qdev_prop_uint32, uint32_t);
- 
- static void arm_cpu_post_init(Object *obj)
- {
-@@ -1054,6 +1061,7 @@ static void cortex_m3_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V7);
-     set_feature(&cpu->env, ARM_FEATURE_M);
-     cpu->midr = 0x410fc231;
-+    cpu->pmsav7_dregion = 8;
- }
- 
- static void cortex_m4_initfn(Object *obj)
-@@ -1064,6 +1072,7 @@ static void cortex_m4_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_M);
-     set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
-     cpu->midr = 0x410fc240; /* r0p0 */
-+    cpu->pmsav7_dregion = 8;
- }
- static void arm_v7m_class_init(ObjectClass *oc, void *data)
- {
-@@ -1112,6 +1121,7 @@ static void cortex_r5_initfn(Object *obj)
-     cpu->id_isar4 = 0x0010142;
-     cpu->id_isar5 = 0x0;
-     cpu->mp_is_up = true;
-+    cpu->pmsav7_dregion = 16;
-     define_arm_cp_regs(cpu, cortexr5_cp_reginfo);
- }
- 
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index f6692d5..12c0c7b 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -111,6 +111,7 @@ extern const PropertyInfo qdev_prop_link;
+                           _arrayfield, _arrayprop, _arraytype) {        \
+         .name = (PROP_ARRAY_LEN_PREFIX _name),                          \
+         .info = &(qdev_prop_arraylen),                                  \
++        .defval.u = 0,                                                  \
+         .offset = offsetof(_state, _field)                              \
+             + type_check(uint32_t, typeof_field(_state, _field)),       \
+         .arrayinfo = &(_arrayprop),                                     \
 -- 
 2.7.4
