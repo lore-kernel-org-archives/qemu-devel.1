@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxK-0002aC-5U
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxL-0002ac-1q
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxG-0001Wl-EU
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxJ-0001ZI-9l
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:35 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 17 Jul 2017 16:56:02 +1000
-Message-Id: <20170717065621.4688-3-david@gibson.dropbear.id.au>
+Date: Mon, 17 Jul 2017 16:56:09 +1000
+Message-Id: <20170717065621.4688-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170717065621.4688-1-david@gibson.dropbear.id.au>
 References: <20170717065621.4688-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 02/21] spapr: migrate pending_events of spapr
- state
+Subject: [Qemu-devel] [PULL 09/21] spapr: Cleanups relating to DRC
+ awaiting_release field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,378 +21,215 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+'awaiting_release' indicates that the host has requested an unplug of the
+device attached to the DRC, but the guest has not (yet) put the device
+into a state where it is safe to complete removal.
 
-In racing situations between hotplug events and migration operation,
-a rtas hotplug event could have not yet be delivered to the source
-guest when migration is started. In this case the pending_events of
-spapr state need be transmitted to the target so that the hotplug
-event can be finished on the target.
+1. Rename it to 'unplug_requested' which to me at least is clearer
 
-To achieve the minimal VMSD possible to migrate the pending_events list,
-this patch makes the changes in spapr_events.c:
+2. Remove the ->release_pending() method used to check this from outside
+spapr_drc.c.  The method only plausibly has one implementation, so use
+a plain function (spapr_drc_unplug_requested()) instead.
 
-- 'log_type' of sPAPREventLogEntry struct deleted. This information can be
-derived by inspecting the rtas_error_log summary field. A new function
-called 'spapr_event_log_entry_type' was added to retrieve the type of
-a given sPAPREventLogEntry.
+3. Remove it from the migration stream.  Attempting to migrate mid-unplug
+is broken not just for spapr - in general management has no good way to
+determine if the device should be present on the destination or not.  So,
+until that's fixed, there's no point adding extra things to the stream.
 
-- sPAPREventLogEntry, epow_log_full and hp_log_full were redesigned. The
-only data we're going to migrate in the VMSD is the event log data itself,
-which can be divided in two parts: a rtas_error_log header and an extended
-event log field. The rtas_error_log header contains information about the
-size of the extended log field, which can be used inside VMSD as the size
-parameter of the VBUFFER_ALOC field that will store it. To allow this use,
-the header.extended_length field must be exposed inline to the VMSD instead
-of embedded into a 'data' field that holds everything. With this in mind,
-the following changes were done:
-
-    * a new 'header' field was added to sPAPREventLogEntry. This field holds a
-a struct rtas_error_log inline.
-    * the declaration of the 'rtas_error_log' struct was moved to spapr.h
-to be visible to the VMSD macros.
-    * 'data' field of sPAPREventLogEntry was renamed to 'extended_log' and
-now holds only the contents of the extended event log.
-   *  'struct rtas_error_log hdr' were taken away from both epow_log_full
-and hp_log_full. This information is now available at the header field of
-sPAPREventLogEntry.
-   * epow_log_full and hp_log_full were renamed to epow_extended_log and
-hp_extended_log respectively. This rename makes it clearer to understand
-the new purpose of both structures: hold the information of an extended
-event log field.
-    * spapr_powerdown_req and spapr_hotplug_req_event now creates a
-sPAPREventLogEntry structure that contains the full rtas log entry.
-    * rtas_event_log_queue and rtas_event_log_dequeue now receives a
-sPAPREventLogEntry pointer as a parameter instead of a void pointer.
-
-- the endianess of the sPAPREventLogEntry header is now native instead
-of be32. We can use the fields in native endianess internally and write
-them in be32 in the guest physical memory inside 'check_exception'. This
-allows the VMSD inside spapr.c to read the correct size of the
-entended_log field.
-
-- inside spapr.c, pending_events is put in a subsection in the spapr state
-VMSD to make sure migration across different versions is not broken.
-
-A small change in rtas_event_log_queue and rtas_event_log_dequeue were also
-made: instead of calling qdev_get_machine(), both functions now receive
-a pointer to the sPAPRMachineState. This pointer is already available in
-the callers of these functions and we don't need to waste resources
-calling qdev() again.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c         | 32 ++++++++++++++++
- hw/ppc/spapr_events.c  | 99 +++++++++++++++++++++++++++-----------------------
- include/hw/ppc/spapr.h |  9 ++++-
- 3 files changed, 92 insertions(+), 48 deletions(-)
+ hw/ppc/spapr_drc.c         | 26 +++++++++-----------------
+ hw/ppc/spapr_pci.c         |  6 ++----
+ include/hw/ppc/spapr_drc.h | 11 ++++++-----
+ 3 files changed, 17 insertions(+), 26 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 16638ce80c..b451d856b8 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1517,6 +1517,37 @@ static bool version_before_3(void *opaque, int version_id)
-     return version_id < 3;
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 15a3d00049..03ef75c70c 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -66,7 +66,7 @@ static uint32_t drc_isolate_physical(sPAPRDRConnector *drc)
+      * configured state, as suggested by the state diagram from PAPR+
+      * 2.7, 13.4
+      */
+-    if (drc->awaiting_release) {
++    if (drc->unplug_requested) {
+         uint32_t drc_index = spapr_drc_index(drc);
+         if (drc->configured) {
+             trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+@@ -116,7 +116,7 @@ static uint32_t drc_isolate_logical(sPAPRDRConnector *drc)
+      * actually being unplugged, fail the isolation request here.
+      */
+     if (spapr_drc_type(drc) == SPAPR_DR_CONNECTOR_TYPE_LMB
+-        && !drc->awaiting_release) {
++        && !drc->unplug_requested) {
+         return RTAS_OUT_HW_ERROR;
+     }
+ 
+@@ -130,7 +130,7 @@ static uint32_t drc_isolate_logical(sPAPRDRConnector *drc)
+      * configured state, as suggested by the state diagram from PAPR+
+      * 2.7, 13.4
+      */
+-    if (drc->awaiting_release) {
++    if (drc->unplug_requested) {
+         uint32_t drc_index = spapr_drc_index(drc);
+         if (drc->configured) {
+             trace_spapr_drc_set_isolation_state_finalizing(drc_index);
+@@ -170,7 +170,7 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+     if (!drc->dev) {
+         return RTAS_OUT_NO_SUCH_INDICATOR;
+     }
+-    if (drc->awaiting_release) {
++    if (drc->unplug_requested) {
+         /* Don't allow the guest to move a device away from UNUSABLE
+          * state when we want to unplug it */
+         return RTAS_OUT_NO_SUCH_INDICATOR;
+@@ -184,7 +184,7 @@ static uint32_t drc_set_usable(sPAPRDRConnector *drc)
+ static uint32_t drc_set_unusable(sPAPRDRConnector *drc)
+ {
+     drc->allocation_state = SPAPR_DR_ALLOCATION_STATE_UNUSABLE;
+-    if (drc->awaiting_release) {
++    if (drc->unplug_requested) {
+         uint32_t drc_index = spapr_drc_index(drc);
+         trace_spapr_drc_set_allocation_state_finalizing(drc_index);
+         spapr_drc_detach(drc);
+@@ -363,7 +363,7 @@ static void spapr_drc_release(sPAPRDRConnector *drc)
+ 
+     drck->release(drc->dev);
+ 
+-    drc->awaiting_release = false;
++    drc->unplug_requested = false;
+     g_free(drc->fdt);
+     drc->fdt = NULL;
+     drc->fdt_start_offset = 0;
+@@ -375,7 +375,7 @@ void spapr_drc_detach(sPAPRDRConnector *drc)
+ {
+     trace_spapr_drc_detach(spapr_drc_index(drc));
+ 
+-    drc->awaiting_release = true;
++    drc->unplug_requested = true;
+ 
+     if (drc->isolation_state != SPAPR_DR_ISOLATION_STATE_ISOLATED) {
+         trace_spapr_drc_awaiting_isolated(spapr_drc_index(drc));
+@@ -391,11 +391,6 @@ void spapr_drc_detach(sPAPRDRConnector *drc)
+     spapr_drc_release(drc);
  }
  
-+static bool spapr_pending_events_needed(void *opaque)
-+{
-+    sPAPRMachineState *spapr = (sPAPRMachineState *)opaque;
-+    return !QTAILQ_EMPTY(&spapr->pending_events);
-+}
-+
-+static const VMStateDescription vmstate_spapr_event_entry = {
-+    .name = "spapr_event_log_entry",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(header.summary, sPAPREventLogEntry),
-+        VMSTATE_UINT32(header.extended_length, sPAPREventLogEntry),
-+        VMSTATE_VBUFFER_ALLOC_UINT32(extended_log, sPAPREventLogEntry, 0,
-+                                     NULL, header.extended_length),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_spapr_pending_events = {
-+    .name = "spapr_pending_events",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_pending_events_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_QTAILQ_V(pending_events, sPAPRMachineState, 1,
-+                         vmstate_spapr_event_entry, sPAPREventLogEntry, next),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static bool spapr_ov5_cas_needed(void *opaque)
+-static bool release_pending(sPAPRDRConnector *drc)
+-{
+-    return drc->awaiting_release;
+-}
+-
+ void spapr_drc_reset(sPAPRDRConnector *drc)
  {
-     sPAPRMachineState *spapr = opaque;
-@@ -1615,6 +1646,7 @@ static const VMStateDescription vmstate_spapr = {
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_spapr_ov5_cas,
-         &vmstate_spapr_patb_entry,
-+        &vmstate_spapr_pending_events,
-         NULL
+     trace_spapr_drc_reset(spapr_drc_index(drc));
+@@ -406,7 +401,7 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+     /* immediately upon reset we can safely assume DRCs whose devices
+      * are pending removal can be safely removed.
+      */
+-    if (drc->awaiting_release) {
++    if (drc->unplug_requested) {
+         spapr_drc_release(drc);
+     }
+ 
+@@ -454,7 +449,7 @@ static bool spapr_drc_needed(void *opaque)
+     case SPAPR_DR_CONNECTOR_TYPE_LMB:
+         rc = !((drc->isolation_state == SPAPR_DR_ISOLATION_STATE_UNISOLATED) &&
+                (drc->allocation_state == SPAPR_DR_ALLOCATION_STATE_USABLE) &&
+-               drc->configured && !drc->awaiting_release);
++               drc->configured);
+         break;
+     case SPAPR_DR_CONNECTOR_TYPE_PHB:
+     case SPAPR_DR_CONNECTOR_TYPE_VIO:
+@@ -474,7 +469,6 @@ static const VMStateDescription vmstate_spapr_drc = {
+         VMSTATE_UINT32(allocation_state, sPAPRDRConnector),
+         VMSTATE_UINT32(dr_indicator, sPAPRDRConnector),
+         VMSTATE_BOOL(configured, sPAPRDRConnector),
+-        VMSTATE_BOOL(awaiting_release, sPAPRDRConnector),
+         VMSTATE_END_OF_LIST()
      }
  };
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 587a3dacb2..ce41e74665 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -42,8 +42,7 @@
- #include "hw/ppc/spapr_ovec.h"
- #include <libfdt.h>
- 
--struct rtas_error_log {
--    uint32_t summary;
-+/* Macros related to rtas_error_log struct defined in spapr.h */
- #define RTAS_LOG_VERSION_MASK                   0xff000000
- #define   RTAS_LOG_VERSION_6                    0x06000000
- #define RTAS_LOG_SEVERITY_MASK                  0x00e00000
-@@ -85,8 +84,6 @@ struct rtas_error_log {
- #define   RTAS_LOG_TYPE_ECC_CORR                0x0000000a
- #define   RTAS_LOG_TYPE_EPOW                    0x00000040
- #define   RTAS_LOG_TYPE_HOTPLUG                 0x000000e5
--    uint32_t extended_length;
--} QEMU_PACKED;
- 
- struct rtas_event_log_v6 {
-     uint8_t b0;
-@@ -166,8 +163,7 @@ struct rtas_event_log_v6_epow {
-     uint64_t reason_code;
- } QEMU_PACKED;
- 
--struct epow_log_full {
--    struct rtas_error_log hdr;
-+struct epow_extended_log {
-     struct rtas_event_log_v6 v6hdr;
-     struct rtas_event_log_v6_maina maina;
-     struct rtas_event_log_v6_mainb mainb;
-@@ -205,8 +201,7 @@ struct rtas_event_log_v6_hp {
-     union drc_identifier drc_id;
- } QEMU_PACKED;
- 
--struct hp_log_full {
--    struct rtas_error_log hdr;
-+struct hp_extended_log {
-     struct rtas_event_log_v6 v6hdr;
-     struct rtas_event_log_v6_maina maina;
-     struct rtas_event_log_v6_mainb mainb;
-@@ -341,25 +336,26 @@ static int rtas_event_log_to_irq(sPAPRMachineState *spapr, int log_type)
-     return source->irq;
- }
- 
--static void rtas_event_log_queue(int log_type, void *data)
-+static uint32_t spapr_event_log_entry_type(sPAPREventLogEntry *entry)
+@@ -565,11 +559,9 @@ static void spapr_dr_connector_instance_init(Object *obj)
+ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
  {
--    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
--    sPAPREventLogEntry *entry = g_new(sPAPREventLogEntry, 1);
-+    return entry->header.summary & RTAS_LOG_TYPE_MASK;
-+}
+     DeviceClass *dk = DEVICE_CLASS(k);
+-    sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_CLASS(k);
  
--    g_assert(data);
--    entry->log_type = log_type;
--    entry->data = data;
-+static void rtas_event_log_queue(sPAPRMachineState *spapr,
-+                                 sPAPREventLogEntry *entry)
+     dk->realize = realize;
+     dk->unrealize = unrealize;
+-    drck->release_pending = release_pending;
+     /*
+      * Reason: it crashes FIXME find and document the real reason
+      */
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 092a2f5f3d..6ecdf29d28 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1476,7 +1476,6 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+ {
+     sPAPRPHBState *phb = SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
+     PCIDevice *pdev = PCI_DEVICE(plugged_dev);
+-    sPAPRDRConnectorClass *drck;
+     sPAPRDRConnector *drc = spapr_phb_get_pci_drc(phb, pdev);
+ 
+     if (!phb->dr_enabled) {
+@@ -1488,8 +1487,7 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+     g_assert(drc);
+     g_assert(drc->dev == plugged_dev);
+ 
+-    drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+-    if (!drck->release_pending(drc)) {
++    if (!spapr_drc_unplug_requested(drc)) {
+         PCIBus *bus = PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
+         uint32_t slotnr = PCI_SLOT(pdev->devfn);
+         sPAPRDRConnector *func_drc;
+@@ -1505,7 +1503,7 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+                 func_drck = SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
+                 state = func_drck->dr_entity_sense(func_drc);
+                 if (state == SPAPR_DR_ENTITY_SENSE_PRESENT
+-                    && !func_drck->release_pending(func_drc)) {
++                    && !spapr_drc_unplug_requested(func_drc)) {
+                     error_setg(errp,
+                                "PCI: slot %d, function %d still present. "
+                                "Must unplug all non-0 functions first.",
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index fc8b721639..5fa502e465 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -199,10 +199,9 @@ typedef struct sPAPRDRConnector {
+     bool configured;
+     sPAPRConfigureConnectorState *ccs;
+ 
+-    bool awaiting_release;
+-
+     /* device pointer, via link property */
+     DeviceState *dev;
++    bool unplug_requested;
+ } sPAPRDRConnector;
+ 
+ typedef struct sPAPRDRConnectorClass {
+@@ -218,9 +217,6 @@ typedef struct sPAPRDRConnectorClass {
+     uint32_t (*isolate)(sPAPRDRConnector *drc);
+     uint32_t (*unisolate)(sPAPRDRConnector *drc);
+     void (*release)(DeviceState *dev);
+-
+-    /* QEMU interfaces for managing hotplug operations */
+-    bool (*release_pending)(sPAPRDRConnector *drc);
+ } sPAPRDRConnectorClass;
+ 
+ static inline bool spapr_drc_hotplugged(DeviceState *dev)
+@@ -244,4 +240,9 @@ void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
+                       int fdt_start_offset, Error **errp);
+ void spapr_drc_detach(sPAPRDRConnector *drc);
+ 
++static inline bool spapr_drc_unplug_requested(sPAPRDRConnector *drc)
 +{
-     QTAILQ_INSERT_TAIL(&spapr->pending_events, entry, next);
- }
- 
--static sPAPREventLogEntry *rtas_event_log_dequeue(uint32_t event_mask)
-+static sPAPREventLogEntry *rtas_event_log_dequeue(sPAPRMachineState *spapr,
-+                                                  uint32_t event_mask)
- {
--    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     sPAPREventLogEntry *entry = NULL;
- 
-     QTAILQ_FOREACH(entry, &spapr->pending_events, next) {
-         const sPAPREventSource *source =
--            rtas_event_log_to_source(spapr, entry->log_type);
-+            rtas_event_log_to_source(spapr,
-+                                     spapr_event_log_entry_type(entry));
- 
-         if (source->mask & event_mask) {
-             break;
-@@ -380,7 +376,8 @@ static bool rtas_event_log_contains(uint32_t event_mask)
- 
-     QTAILQ_FOREACH(entry, &spapr->pending_events, next) {
-         const sPAPREventSource *source =
--            rtas_event_log_to_source(spapr, entry->log_type);
-+            rtas_event_log_to_source(spapr,
-+                                     spapr_event_log_entry_type(entry));
- 
-         if (source->mask & event_mask) {
-             return true;
-@@ -428,27 +425,30 @@ static void spapr_init_maina(struct rtas_event_log_v6_maina *maina,
- static void spapr_powerdown_req(Notifier *n, void *opaque)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+    sPAPREventLogEntry *entry;
-     struct rtas_error_log *hdr;
-     struct rtas_event_log_v6 *v6hdr;
-     struct rtas_event_log_v6_maina *maina;
-     struct rtas_event_log_v6_mainb *mainb;
-     struct rtas_event_log_v6_epow *epow;
--    struct epow_log_full *new_epow;
-+    struct epow_extended_log *new_epow;
- 
-+    entry = g_new(sPAPREventLogEntry, 1);
-     new_epow = g_malloc0(sizeof(*new_epow));
--    hdr = &new_epow->hdr;
-+    entry->extended_log = new_epow;
++    return drc->unplug_requested;
++}
 +
-+    hdr = &entry->header;
-     v6hdr = &new_epow->v6hdr;
-     maina = &new_epow->maina;
-     mainb = &new_epow->mainb;
-     epow = &new_epow->epow;
- 
--    hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
--                               | RTAS_LOG_SEVERITY_EVENT
--                               | RTAS_LOG_DISPOSITION_NOT_RECOVERED
--                               | RTAS_LOG_OPTIONAL_PART_PRESENT
--                               | RTAS_LOG_TYPE_EPOW);
--    hdr->extended_length = cpu_to_be32(sizeof(*new_epow)
--                                       - sizeof(new_epow->hdr));
-+    hdr->summary = RTAS_LOG_VERSION_6
-+                       | RTAS_LOG_SEVERITY_EVENT
-+                       | RTAS_LOG_DISPOSITION_NOT_RECOVERED
-+                       | RTAS_LOG_OPTIONAL_PART_PRESENT
-+                       | RTAS_LOG_TYPE_EPOW;
-+    hdr->extended_length = sizeof(*new_epow);
- 
-     spapr_init_v6hdr(v6hdr);
-     spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
-@@ -468,7 +468,7 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
-     epow->event_modifier = RTAS_LOG_V6_EPOW_MODIFIER_NORMAL;
-     epow->extended_modifier = RTAS_LOG_V6_EPOW_XMODIFIER_PARTITION_SPECIFIC;
- 
--    rtas_event_log_queue(RTAS_LOG_TYPE_EPOW, new_epow);
-+    rtas_event_log_queue(spapr, entry);
- 
-     qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
-                                  rtas_event_log_to_irq(spapr,
-@@ -480,28 +480,31 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-                                     union drc_identifier *drc_id)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
--    struct hp_log_full *new_hp;
-+    sPAPREventLogEntry *entry;
-+    struct hp_extended_log *new_hp;
-     struct rtas_error_log *hdr;
-     struct rtas_event_log_v6 *v6hdr;
-     struct rtas_event_log_v6_maina *maina;
-     struct rtas_event_log_v6_mainb *mainb;
-     struct rtas_event_log_v6_hp *hp;
- 
--    new_hp = g_malloc0(sizeof(struct hp_log_full));
--    hdr = &new_hp->hdr;
-+    entry = g_new(sPAPREventLogEntry, 1);
-+    new_hp = g_malloc0(sizeof(struct hp_extended_log));
-+    entry->extended_log = new_hp;
-+
-+    hdr = &entry->header;
-     v6hdr = &new_hp->v6hdr;
-     maina = &new_hp->maina;
-     mainb = &new_hp->mainb;
-     hp = &new_hp->hp;
- 
--    hdr->summary = cpu_to_be32(RTAS_LOG_VERSION_6
--                               | RTAS_LOG_SEVERITY_EVENT
--                               | RTAS_LOG_DISPOSITION_NOT_RECOVERED
--                               | RTAS_LOG_OPTIONAL_PART_PRESENT
--                               | RTAS_LOG_INITIATOR_HOTPLUG
--                               | RTAS_LOG_TYPE_HOTPLUG);
--    hdr->extended_length = cpu_to_be32(sizeof(*new_hp)
--                                       - sizeof(new_hp->hdr));
-+    hdr->summary = RTAS_LOG_VERSION_6
-+                       | RTAS_LOG_SEVERITY_EVENT
-+                       | RTAS_LOG_DISPOSITION_NOT_RECOVERED
-+                       | RTAS_LOG_OPTIONAL_PART_PRESENT
-+                       | RTAS_LOG_INITIATOR_HOTPLUG
-+                       | RTAS_LOG_TYPE_HOTPLUG;
-+    hdr->extended_length = sizeof(*new_hp);
- 
-     spapr_init_v6hdr(v6hdr);
-     spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
-@@ -551,7 +554,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-             cpu_to_be32(drc_id->count_indexed.index);
-     }
- 
--    rtas_event_log_queue(RTAS_LOG_TYPE_HOTPLUG, new_hp);
-+    rtas_event_log_queue(spapr, entry);
- 
-     qemu_irq_pulse(xics_get_qirq(XICS_FABRIC(spapr),
-                                  rtas_event_log_to_irq(spapr,
-@@ -625,10 +628,10 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                             target_ulong args,
-                             uint32_t nret, target_ulong rets)
- {
-+    CPUState *cs = CPU(cpu);
-     uint32_t mask, buf, len, event_len;
-     uint64_t xinfo;
-     sPAPREventLogEntry *event;
--    struct rtas_error_log *hdr;
-     int i;
- 
-     if ((nargs < 6) || (nargs > 7) || nret != 1) {
-@@ -644,21 +647,25 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-         xinfo |= (uint64_t)rtas_ld(args, 6) << 32;
-     }
- 
--    event = rtas_event_log_dequeue(mask);
-+    event = rtas_event_log_dequeue(spapr, mask);
-     if (!event) {
-         goto out_no_events;
-     }
- 
--    hdr = event->data;
--    event_len = be32_to_cpu(hdr->extended_length) + sizeof(*hdr);
-+    event_len = event->header.extended_length + sizeof(event->header);
- 
-     if (event_len < len) {
-         len = event_len;
-     }
- 
--    cpu_physical_memory_write(buf, event->data, len);
-+    stl_be_phys(cs->as, buf, event->header.summary);
-+    stl_be_phys(cs->as, buf + sizeof(event->header.summary),
-+                event->header.extended_length);
-+    cpu_physical_memory_write(buf + sizeof(event->header),
-+                              event->extended_log,
-+                              event->header.extended_length);
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
--    g_free(event->data);
-+    g_free(event->extended_log);
-     g_free(event);
- 
-     /* according to PAPR+, the IRQ must be left asserted, or re-asserted, if
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 5f708eec23..2718b90db7 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -606,9 +606,14 @@ struct sPAPRTCETable {
- 
- sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
- 
-+struct rtas_error_log {
-+    uint32_t summary;
-+    uint32_t extended_length;
-+} QEMU_PACKED;
-+
- struct sPAPREventLogEntry {
--    int log_type;
--    void *data;
-+    struct rtas_error_log header;
-+    void *extended_log;
-     QTAILQ_ENTRY(sPAPREventLogEntry) next;
- };
- 
+ #endif /* HW_SPAPR_DRC_H */
 -- 
 2.13.3
