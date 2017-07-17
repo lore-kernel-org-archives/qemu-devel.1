@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX2LN-0001NB-6l
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:29:34 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dX2MX-0002Id-2l
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX2LI-0003gy-PU
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:29:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49174)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX2LI-0003gO-JS
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:29:28 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 11:29:23 +0200
-Message-Id: <20170717092923.12317-4-kraxel@redhat.com>
-In-Reply-To: <20170717092923.12317-1-kraxel@redhat.com>
-References: <20170717092923.12317-1-kraxel@redhat.com>
+	(envelope-from <lprosek@redhat.com>) id 1dX2MT-0004Wk-1W
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:45 -0400
+Received: from mail-ua0-f169.google.com ([209.85.217.169]:36048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dX2MS-0004WS-O8
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:30:40 -0400
+Received: by mail-ua0-f169.google.com with SMTP id 35so41117031uax.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:30:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/3] audio/adlib: remove limitation of one adlib
- card
+In-Reply-To: <20170717085804.GC3640@redhat.com>
+References: <20170713110237.6712-1-lprosek@redhat.com>
+	<20170713110237.6712-2-lprosek@redhat.com>
+	<20170713133206.GA18623@stefanha-x1.localdomain>
+	<20170714104127.GA28095@redhat.com>
+	<CABdb7341GwdRQA1B54zcZTrVNaZt57OWSwCY098spF-bJom=fw@mail.gmail.com>
+	<20170717085804.GC3640@redhat.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Mon, 17 Jul 2017 11:30:39 +0200
+Message-ID: <CABdb735nXO6y06bUKHhEDWp7XMNJZ3q3ih-TF+cV50kbrcsvCA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] qemu-error: introduce
+ error_report_nolf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Fernando_Casas_Sch=C3=B6ssow?= <casasfernando@hotmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
-From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+On Mon, Jul 17, 2017 at 10:58 AM, Daniel P. Berrange
+<berrange@redhat.com> wrote:
+> On Mon, Jul 17, 2017 at 08:54:18AM +0200, Ladi Prosek wrote:
+>> On Fri, Jul 14, 2017 at 12:41 PM, Daniel P. Berrange
+>> <berrange@redhat.com> wrote:
+>> > On Thu, Jul 13, 2017 at 02:32:06PM +0100, Stefan Hajnoczi wrote:
+>> >> On Thu, Jul 13, 2017 at 01:02:30PM +0200, Ladi Prosek wrote:
+>> >> > +/*
+>> >> > + * Print an error message to current monitor if we have one, else to stderr.
+>> >> > + * Format arguments like sprintf().  The resulting message should be a
+>> >> > + * single phrase, with no trailing punctuation.  The no-LF version allows
+>> >> > + * additional text to be appended with error_printf() or error_vprintf().
+>> >> > + * Make sure to always close with a newline after all text is printed.
+>> >> > + * Prepends the current location.
+>> >> > + * It's wrong to call this in a QMP monitor.  Use error_setg() there.
+>> >> > + */
+>> >> > +void error_report_nolf(const char *fmt, ...)
+>> >> > +{
+>> >> > +    va_list ap;
+>> >> > +
+>> >> > +    va_start(ap, fmt);
+>> >> > +    error_vreport_nolf(fmt, ap);
+>> >> > +    va_end(ap);
+>> >> >  }
+>> >>
+>> >> Each call to this function prepends the timestamp, so it cannot really
+>> >> be used for a sequence of prints in a single line.
+>> >>
+>> >> It's a little ugly but I expected something along the lines of
+>> >> g_strdup_vprintf() in virtio_error():
+>> >>
+>> >>   char *msg;
+>> >>
+>> >>   va_start(ap, fmt);
+>> >>   msg = g_strdup_vprintf(fmt, ap);
+>> >>   va_end(ap);
+>> >>
+>> >>   error_report("%s: %s", DEVICE(vdev)->id, msg);
+>> >>
+>> >>   g_free(msg);
+>> >
+>> > You could get the same thing by turning virtio_Error into a macro with
+>> > a few games. Rename the current method to virtio_error_impl() and then
+>> > define:
+>> >
+>> >   #define virtio_error(dev, fmt, ...) \
+>> >      virtio_error_impl(dev, "%s: " fmt, DEVICE(dev)->id, __VA_ARGS__)
+>>
+>> Neat! I think I'll stick with a function though. This doesn't allocate
+>> but it adds a little bit of code to each call site which has the
+>> potential of slowing down the fast no-error path (I have no data, just
+>> the general keeping-the-code-compact-is-good principle). Holler if you
+>> disagree!
+>
+> IMHO that would be uneccessary optimization, particular since this is in
+> the error scenario and so is not performance critical to normal operation.
 
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20170621043401.19842-3-hpoussin@reactos.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/audio/adlib.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+Yeah, what I mean is that code getting bigger may have negative impact
+even if it doesn't execute - it takes up space in caches and such.
+Maybe it's an overkill but some of this common virtio code is pretty
+low-level and every cache line counts. Actually, I'm tempted to wrap
+the error conditions in virtio.c in unlikely() so the compiler knows
+it's not part of normal operation. Thanks!
 
-diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
-index be4203476a..97b876c7e0 100644
---- a/hw/audio/adlib.c
-+++ b/hw/audio/adlib.c
-@@ -74,8 +74,6 @@ typedef struct {
-     PortioList port_list;
- } AdlibState;
-=20
--static AdlibState *glob_adlib;
--
- static void adlib_stop_opl_timer (AdlibState *s, size_t n)
- {
-     OPLTimerOver (s->opl, n);
-@@ -132,7 +130,7 @@ static uint32_t adlib_read(void *opaque, uint32_t npo=
-rt)
-=20
- static void timer_handler (void *opaque, int c, double interval_Sec)
- {
--    AdlibState *s =3D glob_adlib;
-+    AdlibState *s =3D opaque;
-     unsigned n =3D c & 1;
- #ifdef DEBUG
-     double interval;
-@@ -259,19 +257,13 @@ static void adlib_realizefn (DeviceState *dev, Erro=
-r **errp)
-     AdlibState *s =3D ADLIB(dev);
-     struct audsettings as;
-=20
--    if (glob_adlib) {
--        error_setg (errp, "Cannot create more than 1 adlib device");
--        return;
--    }
--    glob_adlib =3D s;
--
-     s->opl =3D OPLCreate (3579545, s->freq);
-     if (!s->opl) {
-         error_setg (errp, "OPLCreate %d failed", s->freq);
-         return;
-     }
-     else {
--        OPLSetTimerHandler (s->opl, timer_handler, 0);
-+        OPLSetTimerHandler(s->opl, timer_handler, s);
-         s->enabled =3D 1;
-     }
-=20
---=20
-2.9.3
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
