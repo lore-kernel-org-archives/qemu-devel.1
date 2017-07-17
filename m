@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dX7RU-0004Wg-EQ
+	(envelope-from <aurelien@aurel32.net>) id 1dX7RU-0004Wu-LV
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:56:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dX7RT-0005U3-KU
+	(envelope-from <aurelien@aurel32.net>) id 1dX7RT-0005U0-LF
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:56:12 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:35360)
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:35368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dX7RT-0005TR-EV
+	id 1dX7RT-0005TS-Dh
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:56:11 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Mon, 17 Jul 2017 16:55:56 +0200
-Message-Id: <20170717145556.14142-3-aurelien@aurel32.net>
+Date: Mon, 17 Jul 2017 16:55:55 +0200
+Message-Id: <20170717145556.14142-2-aurelien@aurel32.net>
 In-Reply-To: <20170717145556.14142-1-aurelien@aurel32.net>
 References: <20170717145556.14142-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PULL 2/2] target/mips: optimize WSBH, DSBH and DSHD
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 1/2] mips: set CP0 Debug DExcCode for SDBBP
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +29,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Aurelien Jarno <aurelien@aurel32.net>
 
-Use the same mask to avoid having to load two different constants.
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Suggested-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+This patch fixes setting DExcCode field of CP0 Debug register
+when SDBBP instruction is executed. According to EJTAG specification,
+this field must be set to the value 9 (Bp).
+
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Message-id: 20170502120350.3368.92338.stgit@PASHA-ISP
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/mips/translate.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ target/mips/helper.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index befb87f814..fe44f2f807 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4572,12 +4572,14 @@ static void gen_bshfl (DisasContext *ctx, uint32_t op2, int rt, int rd)
-     case OPC_WSBH:
-         {
-             TCGv t1 = tcg_temp_new();
-+            TCGv t2 = tcg_const_tl(0x00FF00FF);
- 
-             tcg_gen_shri_tl(t1, t0, 8);
--            tcg_gen_andi_tl(t1, t1, 0x00FF00FF);
-+            tcg_gen_and_tl(t1, t1, t2);
-+            tcg_gen_and_tl(t0, t0, t2);
-             tcg_gen_shli_tl(t0, t0, 8);
--            tcg_gen_andi_tl(t0, t0, ~0x00FF00FF);
-             tcg_gen_or_tl(t0, t0, t1);
-+            tcg_temp_free(t2);
-             tcg_temp_free(t1);
-             tcg_gen_ext32s_tl(cpu_gpr[rd], t0);
-         }
-@@ -4592,27 +4594,31 @@ static void gen_bshfl (DisasContext *ctx, uint32_t op2, int rt, int rd)
-     case OPC_DSBH:
-         {
-             TCGv t1 = tcg_temp_new();
-+            TCGv t2 = tcg_const_tl(0x00FF00FF00FF00FFULL);
- 
-             tcg_gen_shri_tl(t1, t0, 8);
--            tcg_gen_andi_tl(t1, t1, 0x00FF00FF00FF00FFULL);
-+            tcg_gen_and_tl(t1, t1, t2);
-+            tcg_gen_and_tl(t0, t0, t2);
-             tcg_gen_shli_tl(t0, t0, 8);
--            tcg_gen_andi_tl(t0, t0, ~0x00FF00FF00FF00FFULL);
-             tcg_gen_or_tl(cpu_gpr[rd], t0, t1);
-+            tcg_temp_free(t2);
-             tcg_temp_free(t1);
-         }
-         break;
-     case OPC_DSHD:
-         {
-             TCGv t1 = tcg_temp_new();
-+            TCGv t2 = tcg_const_tl(0x0000FFFF0000FFFFULL);
- 
-             tcg_gen_shri_tl(t1, t0, 16);
--            tcg_gen_andi_tl(t1, t1, 0x0000FFFF0000FFFFULL);
-+            tcg_gen_and_tl(t1, t1, t2);
-+            tcg_gen_and_tl(t0, t0, t2);
-             tcg_gen_shli_tl(t0, t0, 16);
--            tcg_gen_andi_tl(t0, t0, ~0x0000FFFF0000FFFFULL);
-             tcg_gen_or_tl(t0, t0, t1);
-             tcg_gen_shri_tl(t1, t0, 32);
-             tcg_gen_shli_tl(t0, t0, 32);
-             tcg_gen_or_tl(cpu_gpr[rd], t0, t1);
-+            tcg_temp_free(t2);
-             tcg_temp_free(t1);
-         }
-         break;
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index e359ca3b44..166f0d1243 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -627,6 +627,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
+         goto set_DEPC;
+     case EXCP_DBp:
+         env->CP0_Debug |= 1 << CP0DB_DBp;
++        /* Setup DExcCode - SDBBP instruction */
++        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
+         goto set_DEPC;
+     case EXCP_DDBS:
+         env->CP0_Debug |= 1 << CP0DB_DDBS;
 -- 
 2.11.0
