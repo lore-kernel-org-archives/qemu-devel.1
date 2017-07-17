@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dWveN-0005mE-Ly
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:20:45 -0400
+	(envelope-from <famz@redhat.com>) id 1dWvvh-0000OE-5s
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1dWveL-0003Y3-PR
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:20:43 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Mon, 17 Jul 2017 02:20:28 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190D3A25B@SHSMSX101.ccr.corp.intel.com>
-References: <1496851287-9428-1-git-send-email-eric.auger@redhat.com>
-	<AM5PR0401MB2545AFD256A96420ACC44CD89ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<14c83c14-1e7e-f142-77b0-fa8c873e2d41@redhat.com>
-	<AM5PR0401MB2545C0E76C4BE6F82FE376D09ACE0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<6f22079e-4b4b-6476-77be-51ec83104c0d@redhat.com>
-	<AM5PR0401MB25459FDAA8C9AFA52503AAE99AC40@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-	<589f1642-775c-4805-74ac-bf67eb504733@arm.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D25AEB@SHSMSX101.ccr.corp.intel.com>
-	<19a85866-1e72-58b9-d120-8b5e5b809e90@arm.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D2B865@SHSMSX101.ccr.corp.intel.com>
-	<1c78deea-a1c9-2ef7-113a-f6be93888560@arm.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D3834F@SHSMSX101.ccr.corp.intel.com>
-	<bc006783-3667-07ec-995a-6a7e9000daaa@arm.com>
-In-Reply-To: <bc006783-3667-07ec-995a-6a7e9000daaa@arm.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 0/8] VIRTIO-IOMMU device
+	(envelope-from <famz@redhat.com>) id 1dWvvg-0001Wj-Bv
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 22:38:37 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 17 Jul 2017 10:38:19 +0800
+Message-Id: <20170717023824.18796-2-famz@redhat.com>
+In-Reply-To: <20170717023824.18796-1-famz@redhat.com>
+References: <20170717023824.18796-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 1/6] armv7m: Convert bitband.source-mamory
+ to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +20,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-PiBGcm9tOiBKZWFuLVBoaWxpcHBlIEJydWNrZXIgW21haWx0bzpqZWFuLXBoaWxpcHBlLmJydWNr
-ZXJAYXJtLmNvbV0NCj4gU2VudDogRnJpZGF5LCBKdWx5IDE0LCAyMDE3IDc6MjYgUE0NCj4gDQo+
-IE9uIDE0LzA3LzE3IDA4OjIwLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPj4gRnJvbTogSmVhbi1Q
-aGlsaXBwZSBCcnVja2VyIFttYWlsdG86amVhbi1waGlsaXBwZS5icnVja2VyQGFybS5jb21dDQo+
-ID4+IFNlbnQ6IEZyaWRheSwgSnVseSA3LCAyMDE3IDExOjE1IFBNDQo+ID4+DQo+ID4+IE9uIDA3
-LzA3LzE3IDA3OjIxLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPj4+IHNvcnJ5IEkgZGlkbid0IHF1
-aXRlIGdldCB0aGlzIHBhcnQsIGFuZCBoZXJlIGlzIG15IHVuZGVyc3RhbmRpbmc6DQo+ID4+Pg0K
-PiA+Pj4gR3Vlc3QgcHJvZ3JhbXMgdklPTU1VIHRvIG1hcCBhIGdJT1ZBICh1c2VkIGJ5IE1TSSB0
-byBhIEdQQQ0KPiA+Pj4gb2YgZG9vcmJlbGwgcmVnaXN0ZXIgb2YgdmlydHVhbCBpcnFjaGlwLiB2
-SU9NTVUgdGhlbg0KPiA+Pj4gdHJpZ2dlcnMgVkZJTyBtYXAvdW5tYXAgdG8gdXBkYXRlIHBoeXNp
-Y2FsIElPTU1VIHBhZ2UNCj4gPj4+IHRhYmxlIGZvciBnSU9WQSAtPiBIUEEgb2YgcmVhbCBkb29y
-YmVsbCBvZiBwaHlzaWNhbCBpcnFjaGlwDQo+ID4+DQo+ID4+IEF0IHRoZSBtb21lbnQgKG5vbi1T
-Vk0pLCBwaHlzaWNhbCBhbmQgdmlydHVhbCBNU0kgZG9vcmJlbGwgYXJlDQo+IGNvbXBsZXRlbHkN
-Cj4gPj4gZGlzc29jaWF0ZWQuIFZGSU8gaXRzZWxmIG1hcHMgdGhlIGRvb3JiZWxsIEdQQS0+SFBB
-IGR1cmluZyBjb250YWluZXINCj4gPj4gaW5pdGlhbGl6YXRpb24uIFRoZSBHUEEsIGNob3NlbiBh
-cmJpdHJhcmlseSBieSB0aGUgaG9zdCwgaXMgdGhlbiByZW1vdmVkDQo+ID4+IGZyb20gdGhlIGd1
-ZXN0IEdQQSBzcGFjZS4NCj4gPg0KPiA+IGdvdCB5b3UuIEkgYWxzbyBnb3Qgc29tZSBiYXNpYyB1
-bmRlcnN0YW5kaW5nIGZyb20gYmVsb3cgbGluay4gOi0pDQo+ID4NCj4gPiBodHRwczovL3d3dy5s
-aW5hcm8ub3JnL2Jsb2cvY29yZS1kdW1wL2t2bS1wY2llbXNpLXBhc3N0aHJvdWdoLQ0KPiBhcm1h
-cm02NC8NCj4gPg0KPiA+Pg0KPiA+PiBXaGVuIHRoZSBndWVzdCBwcm9ncmFtcyB0aGUgdklPTU1V
-IHRvIG1hcCBhIGdJT1ZBIHRvIHRoZSB2aXJ0dWFsDQo+IGlycWNoaXANCj4gPj4gZG9vcmJlbGws
-IEkgc3VwcG9zZSBRZW11IHdpbGwgbm90aWNlIHRoYXQgdGhlIEdQQSBkb2Vzbid0IGNvcnJlc3Bv
-bmQgdG8NCj4gPj4gUkFNIGFuZCB3aWxsIHdpdGhob2xkIHNlbmRpbmcgYSBWRklPX0lPTU1VX01B
-UF9ETUEgcmVxdWVzdC4NCj4gPj4NCj4gPj4gKEZvciBTVk0gSSBkb24ndCB3YW50IHRvIGdvIGlu
-dG8gdGhlIGRldGFpbHMganVzdCBub3csIGJ1dCB3ZSB3aWxsDQo+ID4+IHByb2JhYmx5IG5lZWQg
-YSBzZXBhcmF0ZSBWRklPIG1lY2hhbmlzbSB0byB1cGRhdGUgdGhlIHBoeXNpY2FsIE1TSS1YDQo+
-ID4+IHRhYmxlcyB3aXRoIHdoYXRldmVyIGdJT1ZBIHRoZSBndWVzdCBtYXBwZWQgaW4gaXRzIHBy
-aXZhdGUgc3RhZ2UtMSBwYWdlDQo+ID4+IHRhYmxlcy4pDQo+ID4NCj4gPiBJIGd1ZXNzIHRoZXJl
-IG1heSBiZSBlaXRoZXIgYSB0ZXJtaW5vbG9neSBkaWZmZXJlbmNlIG9yIGEgaGFyZHdhcmUNCj4g
-PiBkaWZmZXJlbmNlIGhlcmUsIHNpbmNlIEkgbm90ZWQgeW91IG1lbnRpb25lZCBJT1ZBIHdpdGgg
-c3RhZ2UtMQ0KPiA+IG11bHRpcGxlIHRpbWVzLg0KPiA+DQo+ID4gRm9yIEludGVsIFZULWQ6DQo+
-ID4NCj4gPiAtIHN0YWdlLTEgaXMgb25seSBmb3IgVkEgdHJhbnNsYXRpb24sIHRhZ2dlZCB3aXRo
-IFBBU0lEDQo+ID4gLSBzdGFnZS0yIGNhbiBiZSB1c2VkIGZvciBJT1ZBIHRyYW5zbGF0aW9uIG9u
-IGJhcmUgbWV0YWwgb3IgR1BBL2dJT1ZBDQo+ID4gdHJhbnNsYXRpb24gaW4gdmlydHVhbGl6YXRp
-b24sIHcvbyBQQVNJRCB0YWdnZWQNCj4gDQo+IFRoZSB0ZXJtaW5vbG9neSBpcyBpbmRlZWQgYSBi
-aXQgY29uZnVzaW5nLCBhbmQgdGhlIGhhcmR3YXJlIHNsaWdodGx5DQo+IGRpZmZlcmVudC4gRm9y
-IG1lIElPVkEgaXMgdGhlIGFkZHJlc3MgdXNlZCBhcyBpbnB1dCBvZiB0aGUgcElPTU1VLCBQQSBp
-cw0KPiB0aGUgb3V0cHV0IGFkZHJlc3MsIGFuZCBHUEEgb25seSBleGlzdHMgaWYgdGhlcmUgaXMg
-c3RhZ2UtMSArIHN0YWdlLTIuIFNvDQo+IEkgdGhpbmsgd2hhdCBJIG1lYW50IGJ5IGdJT1ZBIGFi
-b3ZlIHdhcyBWQSBpbiB5b3VyIGRlc2NyaXB0aW9uLg0KDQpJbiBMaW51eCBrZXJuZWwgSU9WQSBz
-cGVjaWZpY2FsbHkgcmVmZXJzIHRvIGEgcHNldWRvIGFkZHJlc3Mgc3BhY2UNCnJlbWFwcGVkIHRv
-IFBBIChlLmcuIGZyb20gcGNpX21hcCkgd2hpbGUgVkEgaXMgZm9yIHJlYWwgQ1BVIHZpcnR1YWwg
-DQphZGRyZXNzIChzby1jYWxsZWQgU1ZNKS4gZWl0aGVyIElPVkEgb3IgVkEgY2FuIGJlIGlucHV0
-IHRvIHBJT01NVQ0KYmFzZWQgb24gZGlmZmVyZW50IHVzYWdlcy4gV2hlbiBydW5uaW5nIGluc2lk
-ZSBhIFZNLCB0aGVuIGlucHV0DQphZGRyZXNzZXMgYmVjb21lIGdJT1ZBIG9yIEdWQS4gV2hhdCBh
-Ym91dCBmb2xsb3dpbmcgdGhpcyBjb252ZW50aW9uDQpoZXJlIGFuZCBpbiBmdXR1cmUgZGlzY3Vz
-c2lvbnMsIHRob3VnaCBJIGFncmVlIGNvbmNlcHR1YWxseSBJT1ZBIGNhbiANCnJlcHJlc2VudCBh
-bnkgaW5wdXQgb2YgcElPTU1VPyA6LSkNCg0KPiANCj4gSSB1bmRlcnN0YW5kIHlvdXIgInN0YWdl
-LTEiIGFuZCAic3RhZ2UtMiIgYXJlIG5hbWVkICJmaXJzdC1sZXZlbCIgYW5kDQo+ICJzZWNvbmQg
-bGV2ZWwiIGluIHRoZSBWVC1kIHNwZWM/DQoNCnllcywgVlQtZCB1c2VzIGZpcnN0L3NlY29uZCBs
-ZXZlbC4NCg0KPiANCj4gSWYgSSByZWFkIHRoZSBWVC1kIHNwZWMgY29ycmVjdGx5LCBJIHRoaW5r
-IHRoZSBtYWluIGRpZmZlcmVuY2Ugb24gQVJNIFNNTVUNCj4gaXMgdGhhdCBzdGFnZS0yIGFsd2F5
-cyBmb2xsb3dzIHN0YWdlLTEgdHJhbnNsYXRpb24sIGJ1dCBlaXRoZXIgc3RhZ2UgbWF5DQo+IGJl
-IGRpc2FibGVkIChvciBib3RoLCBmb3IgYnlwYXNzIG1vZGUpLiBUaGVyZSBpcyBubyBtb2RlIGxp
-a2UgaW4gVlQtZCwNCj4gd2hlcmUgbm9uLVBBU0lEIHRyYW5zYWN0aW9ucyBnbyBvbmx5IHRocm91
-Z2ggc3RhZ2UtMiBhbmQgUEFTSUQNCj4gdHJhbnNhY3Rpb25zIGdvIG9ubHkgdGhyb3VnaCBzdGFn
-ZS0xLiBJIGJlbGlldmUgdGhpcyBpcyAoTkVTVEU9MCwNCj4gVD0wMDBiLzAwMWIpIGluIHRoZSBF
-eHRlbmRlZC1Db250ZXh0LUVudHJ5Lg0KPiANCj4gU29tZXRoaW5nIGVxdWl2YWxlbnQgaW4gU01N
-VSBpcyBkaXNhYmxpbmcgc3RhZ2UtMiBhbmQgdXNpbmcgdGhlIGVudHJ5IDAgaW4NCj4gdGhlIFBB
-U0lEIHRhYmxlIGZvciBub24tUEFTSUQgdHJhZmZpYy4gSW4gdGhpcyBtb2RlLCB0cmFmZmljIHRo
-YXQgdXNlcw0KPiBQQVNJRCMwIHdvdWxkIGJlIGFib3J0ZWQuIFNvIHVzaW5nIHlvdXIgdGVybXMs
-IHRoZSBTTU1VIGNhbiBoYXZlIFZBcw0KPiBhbmQNCj4gSU9WQXMgYmUgdHJhbnNsYXRlZCBieSBz
-dGFnZS0xIGFuZCB0aGVuLCBpZiBlbmFibGVkLCBiZSB0cmFuc2xhdGVkIGJ5DQo+IHN0YWdlLTIg
-YXMgd2VsbC4NCj4gDQoNCkNsZWFyIHRvIG1lLiBUaGFua3MgZm9yIGV4cGxhbmF0aW9uLg0KDQpL
-ZXZpbg0K
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ hw/arm/armv7m.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index c8a11f2..8efc4e8 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -97,12 +97,6 @@ static void bitband_init(Object *obj)
+     BitBandState *s = BITBAND(obj);
+     SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+ 
+-    object_property_add_link(obj, "source-memory",
+-                             TYPE_MEMORY_REGION,
+-                             (Object **)&s->source_memory,
+-                             qdev_prop_allow_set_link_before_realize,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
+-                             &error_abort);
+     memory_region_init_io(&s->iomem, obj, &bitband_ops, s,
+                           "bitband", 0x02000000);
+     sysbus_init_mmio(dev, &s->iomem);
+@@ -349,6 +343,8 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+ 
+ static Property bitband_properties[] = {
+     DEFINE_PROP_UINT32("base", BitBandState, base, 0),
++    DEFINE_PROP_LINK("source-memory", BitBandState, source_memory,
++                     TYPE_MEMORY_REGION, MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-- 
+2.9.4
