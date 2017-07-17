@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX8pM-0002hz-Aj
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:24:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dX8so-0003Vh-Jj
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:28:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX8pI-0006EB-Df
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:24:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dX8pI-0006Dg-7D
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:24:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8A0E267C2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 16:24:50 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1500279971-13875-2-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Mon, 17 Jul 2017 16:26:01 +0800")
-References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
-	<1500279971-13875-2-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 17 Jul 2017 18:24:41 +0200
-Message-ID: <87h8yb116e.fsf@secure.mitica>
+	(envelope-from <peter.maydell@linaro.org>) id 1dX8sn-00006F-Cz
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:28:30 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:36878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dX8sn-00005b-4Z
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:28:29 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id b134so53681783wma.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 09:28:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/11] qdev: provide DEFINE_PROP_INT64()
+In-Reply-To: <8ebbc85e-5b44-1f49-296f-4be51405d521@redhat.com>
+References: <1499187763-8211-1-git-send-email-peter.maydell@linaro.org>
+	<3c48839d-063b-36f6-1620-16042a1b451d@redhat.com>
+	<CAFEAcA-xkd94VTVOuOvXeowb92TPose4y8LKB5o56UyRMNXsfw@mail.gmail.com>
+	<8ebbc85e-5b44-1f49-296f-4be51405d521@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 17:28:07 +0100
+Message-ID: <CAFEAcA_XnK62m9bSm8FOOfAgd+SrKT7nw9y3EAVEzYTg4WWAkw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new utility function
+ memory_region_allocate_aux_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +32,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr
-	. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> We have merely all the stuff, but this one is missing. Add it in.
+On 6 July 2017 at 15:56, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Am going to use this new helper for MigrationParameters fields, since
-> most of them are int64_t.
 >
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> CC: Peter Xu <peterx@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> On 06/07/2017 16:52, Peter Maydell wrote:
+>> On 5 July 2017 at 13:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>
+>>>
+>>> On 04/07/2017 19:02, Peter Maydell wrote:
+>>>> Many board models and several devices need to create auxiliary
+>>>> regions of RAM (in addition to the main lump of 'system' memory),
+>>>> to model static RAMs, video memory, ROMs, etc. Currently they do
+>>>> this with a sequence like:
+>>>>        memory_region_init_ram(sram, NULL, "sram", 0x10000, &error_fatal);
+>>>>        vmstate_register_ram_global(sram);
+>>>
+>>> Instead of vmstate_register_ram_global, you should use
+>>>
+>>>     vmstate_register_ram(mr, owner);
+>>>
+>>> You should even do it for all memory regions, probably.
+>>
+>> This sounds like a good thing, but it's awkward for migration
+>> compatibility, because these callers to memory_region_init_ram()
+>> don't call vmstate_register_ram():
+>>
+>> hw/arm/highbank.c (a bug)
+>> hw/mips/mips_malta.c (region is ro)
+>> hw/net/dp3893x.c (prom, ro, contains mac address)
+>> hw/pci-host/xilinx-pcie.c (dummy region; migrating wouldn't hurt)
+>> backends/hostmem-ram.c (bug, or is migration handled elsewhere?)
+>
+> It's handled by memory_region_allocate_system_memory.
+>
+>> and if we add an implicit call then we break migration compat
+>> for those boards/devices.
+>
+> Forward migration should still work.  The backwards-incompatible part
+> would be that unused memory backend objects would have to be present on
+> the destination as well when migrating.  I think it's acceptable.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Migration compatibility turns out not to be quite this simple.
+What seems to happen is that the migration code migrates *all*
+RAMBlocks, named or otherwise, and fails migration if it
+can't match up the names. So you can have one (1) region for
+which you forgot to call vmstate_register_ram(), and that will
+work (it gets the "" empty string name). If you have more than
+one then they'll get confused, especially if they have different
+sizes, and loading the VM state will fail.
+
+>>> Only memory_region_init_ram_device_ptr (which sets mr->ram_device) must
+>>> not call vmstate_register_ram.  This is a bit ugly because it requires
+>>> inlining memory_region_init_ram_ptr into it.
+>>>
+>>> memory_region_init_ram_from_fd probably needs to be excluded, as well,
+>>> based on its sole user.
+
+Note that the above means that since these do create RAMBlocks
+their contents *will* be getting migrated.
+
+>> Callers of memory_region_init_ram_ptr() which don't call
+>> vmstate_register_ram():
+>> hw/misc/mmio_interface.c
+>>  -- seems to be an implementation detail of the exceute-from-device
+>>     support so maybe it doesn't need migration support ??
+> I think so...
+
+I think we need to look rather more closely at how this code
+works with migration...
+
+thanks
+-- PMM
