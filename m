@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dX7Kc-00062v-KO
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:49:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dX7Ke-00064e-50
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:49:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dX7KX-0002Ao-Uq
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:49:06 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35602)
+	(envelope-from <alex.bennee@linaro.org>) id 1dX7Kd-0002EK-B0
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:49:08 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36092)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dX7KX-0002A0-Or
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:49:01 -0400
-Received: by mail-wm0-x229.google.com with SMTP id w126so78418734wme.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:49:01 -0700 (PDT)
+	id 1dX7Kd-0002Dm-4G
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:49:07 -0400
+Received: by mail-wm0-x233.google.com with SMTP id t70so17889308wmt.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:49:06 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 17 Jul 2017 15:48:32 +0100
-Message-Id: <20170717144848.11793-8-alex.bennee@linaro.org>
+Date: Mon, 17 Jul 2017 15:48:37 +0100
+Message-Id: <20170717144848.11793-13-alex.bennee@linaro.org>
 In-Reply-To: <20170717144848.11793-1-alex.bennee@linaro.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 07/23] docker: debian/s390x no more in
- unstable, now available in Stretch
+Subject: [Qemu-devel] [PATCH v1 12/23] docker: enable virgl to extend code
+ coverage on amd64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,65 +36,38 @@ Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsa
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[AJB: mv, comments in dockerfile]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                      |  1 +
- tests/docker/dockerfiles/debian-s390x-cross.docker | 20 ++++++++++----------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ tests/docker/dockerfiles/debian-amd64.docker | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 72bb52ad7b..84dce49655 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -59,6 +59,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- docker-image-debian-armhf-cross: docker-image-debian9
- docker-image-debian-arm64-cross: docker-image-debian9
- docker-image-debian-mipsel-cross: docker-image-debian9
-+docker-image-debian-s390x-cross: docker-image-debian9
- 
- # Expand all the pre-requistes for each docker image and test combination
- $(foreach i,$(DOCKER_IMAGES), \
-diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
-index cfc354ce5d..18fe813aa7 100644
---- a/tests/docker/dockerfiles/debian-s390x-cross.docker
-+++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-@@ -1,27 +1,27 @@
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
+index 2ab76120a4..360ecf0360 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -1,7 +1,8 @@
  #
- # Docker s390 cross-compiler target
+ # Docker x86_64 target
  #
--# This docker target is based on stretch (testing) as the stable build
--# doesn't have the cross compiler available.
-+# This docker target builds on the debian Stretch base image.
+-# This docker target builds on the debian Stretch base image.
++# This docker target builds on the debian Stretch base image. Further
++# libraries which are not widely available are installed by hand.
  #
--FROM debian:testing-slim
--
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
-+FROM qemu:debian9
- 
- # Add the s390x architecture
- RUN dpkg --add-architecture s390x
- 
- # Grab the updated list of packages
- RUN apt update && apt dist-upgrade -yy
--RUN apt install -yy build-essential clang
--RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
--RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
+ FROM qemu:debian9
+ MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+@@ -16,3 +17,12 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         librdmacm-dev \
+         libsnappy-dev \
+         libvte-dev
++
++# virgl
 +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
 +    apt-get install -y --no-install-recommends \
-+        binutils-multiarch \
-+        gcc-multilib-s390x-linux-gnu
-+
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get build-dep -yy -a s390x qemu
- 
- # Specify the cross prefix for this image (see tests/docker/common.rc)
- ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
- 
--RUN DEBIAN_FRONTEND=noninteractive \
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
-         glusterfs-common:s390x \
-         libbz2-dev:s390x \
++        libegl1-mesa-dev \
++        libepoxy-dev \
++        libgbm-dev
++RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virglrenderer
++RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx --disable-tests && make install
 -- 
 2.13.0
