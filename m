@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWx1P-0000Qa-1i
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:36 -0400
+	(envelope-from <famz@redhat.com>) id 1dWx1Q-0000VX-QI
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWx1N-0004WO-T8
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42296)
+	(envelope-from <famz@redhat.com>) id 1dWx1P-0004Xi-OD
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWx1N-0004Vx-Kq
-	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:33 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWx1P-0004XH-FL
+	for qemu-devel@nongnu.org; Sun, 16 Jul 2017 23:48:35 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 17 Jul 2017 11:48:12 +0800
-Message-Id: <20170717034825.1524-3-famz@redhat.com>
+Date: Mon, 17 Jul 2017 11:48:13 +0800
+Message-Id: <20170717034825.1524-4-famz@redhat.com>
 In-Reply-To: <20170717034825.1524-1-famz@redhat.com>
 References: <20170717034825.1524-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 02/15] coroutine-lock: add
- qemu_co_rwlock_downgrade and qemu_co_rwlock_upgrade
+Subject: [Qemu-devel] [PULL 03/15] vdi: make it thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +28,121 @@ Cc: Peter Maydell <peter.maydell@linaro.org>
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-These functions are more efficient in the presence of contention.
-qemu_co_rwlock_downgrade also guarantees not to block, which may
-be useful in some algorithms too.
+The VirtualBox driver is using a mutex to order all allocating writes,
+but it is not protecting accesses to the bitmap because they implicitly
+happen under the AioContext mutex.  Change this to use a CoRwlock
+explicitly.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20170629132749.997-3-pbonzini@redhat.com>
+Message-Id: <20170629132749.997-4-pbonzini@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- include/qemu/coroutine.h   | 18 ++++++++++++++++++
- util/qemu-coroutine-lock.c | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ block/vdi.c | 48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index a4509bd..9aff9a7 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -229,6 +229,24 @@ void qemu_co_rwlock_init(CoRwlock *lock);
- void qemu_co_rwlock_rdlock(CoRwlock *lock);
+diff --git a/block/vdi.c b/block/vdi.c
+index 2b6e8fa..8da5dfc 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -172,7 +172,7 @@ typedef struct {
+     /* VDI header (converted to host endianness). */
+     VdiHeader header;
  
- /**
-+ * Write Locks the CoRwlock from a reader.  This is a bit more efficient than
-+ * @qemu_co_rwlock_unlock followed by a separate @qemu_co_rwlock_wrlock.
-+ * However, if the lock cannot be upgraded immediately, control is transferred
-+ * to the caller of the current coroutine.  Also, @qemu_co_rwlock_upgrade
-+ * only overrides CoRwlock fairness if there are no concurrent readers, so
-+ * another writer might run while @qemu_co_rwlock_upgrade blocks.
-+ */
-+void qemu_co_rwlock_upgrade(CoRwlock *lock);
-+
-+/**
-+ * Downgrades a write-side critical section to a reader.  Downgrading with
-+ * @qemu_co_rwlock_downgrade never blocks, unlike @qemu_co_rwlock_unlock
-+ * followed by @qemu_co_rwlock_rdlock.  This makes it more efficient, but
-+ * may also sometimes be necessary for correctness.
-+ */
-+void qemu_co_rwlock_downgrade(CoRwlock *lock);
-+
-+/**
-  * Write Locks the mutex. If the lock cannot be taken immediately because
-  * of a parallel reader, control is transferred to the caller of the current
-  * coroutine.
-diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-index b44b5d5..846ff91 100644
---- a/util/qemu-coroutine-lock.c
-+++ b/util/qemu-coroutine-lock.c
-@@ -402,6 +402,21 @@ void qemu_co_rwlock_unlock(CoRwlock *lock)
-     qemu_co_mutex_unlock(&lock->mutex);
- }
+-    CoMutex write_lock;
++    CoRwlock bmap_lock;
  
-+void qemu_co_rwlock_downgrade(CoRwlock *lock)
-+{
-+    Coroutine *self = qemu_coroutine_self();
+     Error *migration_blocker;
+ } BDRVVdiState;
+@@ -485,7 +485,7 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail_free_bmap;
+     }
+ 
+-    qemu_co_mutex_init(&s->write_lock);
++    qemu_co_rwlock_init(&s->bmap_lock);
+ 
+     return 0;
+ 
+@@ -557,7 +557,9 @@ vdi_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                n_bytes, offset);
+ 
+         /* prepare next AIO request */
++        qemu_co_rwlock_rdlock(&s->bmap_lock);
+         bmap_entry = le32_to_cpu(s->bmap[block_index]);
++        qemu_co_rwlock_unlock(&s->bmap_lock);
+         if (!VDI_IS_ALLOCATED(bmap_entry)) {
+             /* Block not allocated, return zeros, no need to wait. */
+             qemu_iovec_memset(qiov, bytes_done, 0, n_bytes);
+@@ -595,6 +597,7 @@ vdi_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+     uint32_t block_index;
+     uint32_t offset_in_block;
+     uint32_t n_bytes;
++    uint64_t data_offset;
+     uint32_t bmap_first = VDI_UNALLOCATED;
+     uint32_t bmap_last = VDI_UNALLOCATED;
+     uint8_t *block = NULL;
+@@ -614,10 +617,19 @@ vdi_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                n_bytes, offset);
+ 
+         /* prepare next AIO request */
++        qemu_co_rwlock_rdlock(&s->bmap_lock);
+         bmap_entry = le32_to_cpu(s->bmap[block_index]);
+         if (!VDI_IS_ALLOCATED(bmap_entry)) {
+             /* Allocate new block and write to it. */
+             uint64_t data_offset;
++            qemu_co_rwlock_upgrade(&s->bmap_lock);
++            bmap_entry = le32_to_cpu(s->bmap[block_index]);
++            if (VDI_IS_ALLOCATED(bmap_entry)) {
++                /* A concurrent allocation did the work for us.  */
++                qemu_co_rwlock_downgrade(&s->bmap_lock);
++                goto nonallocating_write;
++            }
 +
-+    /* lock->mutex critical section started in qemu_co_rwlock_wrlock or
-+     * qemu_co_rwlock_upgrade.
-+     */
-+    assert(lock->reader == 0);
-+    lock->reader++;
-+    qemu_co_mutex_unlock(&lock->mutex);
-+
-+    /* The rest of the read-side critical section is run without the mutex.  */
-+    self->locks_held++;
-+}
-+
- void qemu_co_rwlock_wrlock(CoRwlock *lock)
- {
-     qemu_co_mutex_lock(&lock->mutex);
-@@ -416,3 +431,23 @@ void qemu_co_rwlock_wrlock(CoRwlock *lock)
-      * There is no need to update self->locks_held.
-      */
- }
-+
-+void qemu_co_rwlock_upgrade(CoRwlock *lock)
-+{
-+    Coroutine *self = qemu_coroutine_self();
-+
-+    qemu_co_mutex_lock(&lock->mutex);
-+    assert(lock->reader > 0);
-+    lock->reader--;
-+    lock->pending_writer++;
-+    while (lock->reader) {
-+        qemu_co_queue_wait(&lock->queue, &lock->mutex);
-+    }
-+    lock->pending_writer--;
-+
-+    /* The rest of the write-side critical section is run with
-+     * the mutex taken, similar to qemu_co_rwlock_wrlock.  Do
-+     * not account for the lock twice in self->locks_held.
-+     */
-+    self->locks_held--;
-+}
+             bmap_entry = s->header.blocks_allocated;
+             s->bmap[block_index] = cpu_to_le32(bmap_entry);
+             s->header.blocks_allocated++;
+@@ -635,30 +647,18 @@ vdi_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+             memset(block + offset_in_block + n_bytes, 0,
+                    s->block_size - n_bytes - offset_in_block);
+ 
+-            /* Note that this coroutine does not yield anywhere from reading the
+-             * bmap entry until here, so in regards to all the coroutines trying
+-             * to write to this cluster, the one doing the allocation will
+-             * always be the first to try to acquire the lock.
+-             * Therefore, it is also the first that will actually be able to
+-             * acquire the lock and thus the padded cluster is written before
+-             * the other coroutines can write to the affected area. */
+-            qemu_co_mutex_lock(&s->write_lock);
++            /* Write the new block under CoRwLock write-side protection,
++             * so this full-cluster write does not overlap a partial write
++             * of the same cluster, issued from the "else" branch.
++             */
+             ret = bdrv_pwrite(bs->file, data_offset, block, s->block_size);
+-            qemu_co_mutex_unlock(&s->write_lock);
++            qemu_co_rwlock_unlock(&s->bmap_lock);
+         } else {
+-            uint64_t data_offset = s->header.offset_data +
+-                                   (uint64_t)bmap_entry * s->block_size +
+-                                   offset_in_block;
+-            qemu_co_mutex_lock(&s->write_lock);
+-            /* This lock is only used to make sure the following write operation
+-             * is executed after the write issued by the coroutine allocating
+-             * this cluster, therefore we do not need to keep it locked.
+-             * As stated above, the allocating coroutine will always try to lock
+-             * the mutex before all the other concurrent accesses to that
+-             * cluster, therefore at this point we can be absolutely certain
+-             * that that write operation has returned (there may be other writes
+-             * in flight, but they do not concern this very operation). */
+-            qemu_co_mutex_unlock(&s->write_lock);
++nonallocating_write:
++            data_offset = s->header.offset_data +
++                           (uint64_t)bmap_entry * s->block_size +
++                           offset_in_block;
++            qemu_co_rwlock_unlock(&s->bmap_lock);
+ 
+             qemu_iovec_reset(&local_qiov);
+             qemu_iovec_concat(&local_qiov, qiov, bytes_done, n_bytes);
 -- 
 2.9.4
