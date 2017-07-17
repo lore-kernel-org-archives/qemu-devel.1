@@ -1,15 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX6vi-00018N-3s
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:23:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dX6yx-0002S4-AW
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX6vh-0007p4-78
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:23:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dX6yw-0000ZW-K0
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:26:43 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Jul 2017 09:23:10 -0500
-Message-Id: <20170717142310.17048-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] nbd: Fix iotests failure due to changed client
- error message
+Date: Mon, 17 Jul 2017 09:26:20 -0500
+Message-Id: <20170717142620.6970-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] iotests: Remove a few tests from 'quick' group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,82 +18,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, berrange@redhat.com, Kevin Wolf <kwolf@redhat.com>
 
-Commit 8ecaeae8 changed the way the client requests an NBD export,
-and in the process also changed the resulting error message when
-the export is not present, breaking a couple of iotests.  The error
-message is now directly given by the server (a failed NBD_OPT_GO)
-instead of implied by the client (after exhausting NBD_OPT_LIST),
-but looking at the testsuite changes, it proves worthwhile to
-reword the error message to be slightly less verbose (as this is
-one particular error message likely to be hit by a user).
+A run of './check -qcow2 -g quick' on my machine produced only
+two tests that took longer than 5 seconds; 178 took 18, and
+189 took 7.  Remove them from the quick group.
 
-Note that the error message is now sensitive to which binary is
-running the server as well as the client (since the expected
-output is replaying a message received from the server); in
-general iotests are run on client and server from the same source
-code base, but if it proves problematic in practice, we'll have
-to tweak or sanitize the output somehow.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/client.c               | 5 ++---
- tests/qemu-iotests/140.out | 3 ++-
- tests/qemu-iotests/143.out | 3 ++-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/group | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/nbd/client.c b/nbd/client.c
-index 4c12fffcbf..509ed5e4ba 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -232,8 +232,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-         break;
-
-     case NBD_REP_ERR_UNKNOWN:
--        error_setg(errp, "Requested export not available for option %" PRIx32
--                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
-+        error_setg(errp, "Requested export not available");
-         break;
-
-     case NBD_REP_ERR_SHUTDOWN:
-@@ -253,7 +252,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
-     }
-
-     if (msg) {
--        error_append_hint(errp, "%s\n", msg);
-+        error_append_hint(errp, "server reported: %s\n", msg);
-     }
-
-  cleanup:
-diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
-index 0689b2b41c..7295b3d975 100644
---- a/tests/qemu-iotests/140.out
-+++ b/tests/qemu-iotests/140.out
-@@ -8,7 +8,8 @@ wrote 65536/65536 bytes at offset 0
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
--can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: No export with name 'drv' available
-+can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: Requested export not available
-+server reported: export 'drv' not present
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
-diff --git a/tests/qemu-iotests/143.out b/tests/qemu-iotests/143.out
-index 0978b8985a..1c7fb45543 100644
---- a/tests/qemu-iotests/143.out
-+++ b/tests/qemu-iotests/143.out
-@@ -1,7 +1,8 @@
- QA output created by 143
- {"return": {}}
- {"return": {}}
--can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: No export with name 'no_such_export' available
-+can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: Requested export not available
-+server reported: export 'no_such_export' not present
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 2aba585287..01f12d6781 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -175,11 +175,11 @@
+ 175 auto quick
+ 176 rw auto backing
+ 177 rw auto quick
+-178 auto quick
++178 auto
+ 179 rw auto quick
+ 181 rw auto migration
+ 182 rw auto quick
+ 183 rw auto migration
+ 185 rw auto
+ 188 rw auto quick
+-189 rw auto quick
++189 rw auto
 -- 
 2.13.3
