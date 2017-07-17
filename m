@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXASd-0008M7-6S
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:09:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXATh-0000cO-QZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXASZ-0001Bc-PF
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:09:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49464)
+	(envelope-from <eblake@redhat.com>) id 1dXATg-0002AY-HF
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:10:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXASZ-0001Ap-GK
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:09:31 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83BCD2F86C5
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 18:09:30 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 17 Jul 2017 15:09:26 -0300
-Message-Id: <20170717180926.14924-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on alternate
- conflict
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXATf-00029V-Qq
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:10:40 -0400
+References: <20170407143847.GM2138@work-vm>
+	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+	<20170717164641.GA31820@work-vm>
+	<a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+	<CAFEAcA9Dc1_1t-N-gYiUsW+FY9-2ZNsKqBFY-WMF9Z-SeXsjiw@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <661f1ccf-6bba-7fd2-c0aa-e8b90066dad4@redhat.com>
+Date: Mon, 17 Jul 2017 13:10:35 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9Dc1_1t-N-gYiUsW+FY9-2ZNsKqBFY-WMF9Z-SeXsjiw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DLeCRoimjpDmBQGJi8jMLNjuLHmG4m61a"
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,156 +34,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The conflict check added by commit c0644771 ("qapi: Reject
-alternates that can't work with keyval_parse()") doesn't work
-with the following declaration:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DLeCRoimjpDmBQGJi8jMLNjuLHmG4m61a
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <661f1ccf-6bba-7fd2-c0aa-e8b90066dad4@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+References: <20170407143847.GM2138@work-vm>
+ <1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+ <1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+ <6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+ <39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+ <20170717164641.GA31820@work-vm>
+ <a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+ <CAFEAcA9Dc1_1t-N-gYiUsW+FY9-2ZNsKqBFY-WMF9Z-SeXsjiw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9Dc1_1t-N-gYiUsW+FY9-2ZNsKqBFY-WMF9Z-SeXsjiw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  { 'alternate': 'Alt',
-    'data': { 'one': 'bool',
-              'two': 'str' } }
+On 07/17/2017 12:36 PM, Peter Maydell wrote:
+> On 17 July 2017 at 18:29, Eric Blake <eblake@redhat.com> wrote:
+>> On 07/17/2017 11:46 AM, Dr. David Alan Gilbert wrote:
+>>
+>>>> +++ w/hw/usb/bus.c
+>>>> @@ -407,8 +407,9 @@ void usb_register_companion(const char *masterbu=
+s,
+>>>> USBPort *ports[],
+>>>>  void usb_port_location(USBPort *downstream, USBPort *upstream, int =
+portnr)
+>>>>  {
+>>>>      if (upstream) {
+>>>> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d=
+",
+>>>> -                 upstream->path, portnr);
+>>>> +        int l =3D snprintf(downstream->path, sizeof(downstream->pat=
+h),
+>>>> "%s.%d",
+>>>> +                         upstream->path, portnr);
+>>>> +        assert(l < sizeof(downstream->path));
+>>>
+>>> You may find this doesn't help in some windows builds;  the assert
+>>> functions aren't always marked as noreturn (because they pop up a dia=
+log
+>>> that asks you whether you want to run into a debugger etc).
+>>
+>> How would it not help?  Are we using gcc 7 on windows builds?
+>=20
+> At some point in the future we are likely to, because my
+> w32/w64 test setups use the Ubuntu gcc-mingw-w64-x86-64
+> packages, and so as I upgrade my desktop they will move
+> forward to newer gcc versions. (More generally our users
+> may do so before me ;-))
 
-It crashes with:
+So, does gcc's warning actually depend on the no-return-ness of the
+assert() statement added here?
 
-  Traceback (most recent call last):
-    File "./scripts/qapi-types.py", line 295, in <module>
-      schema = QAPISchema(input_file)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
-      self.exprs = check_exprs(parser.exprs)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
-      check_alternate(expr, info)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
-      % (name, key, types_seen[qtype]))
-  KeyError: 'QTYPE_QSTRING'
+Would there be anything wrong with making osdep.h do this on mingw:
 
-This happens because the previously-seen conflicting member
-('one') can't be found at types_seen[qtype], but at
-types_seen['QTYPE_BOOL'].
+#include <assert.h>
+#undef assert
+#define assert(expr) g_assert(expr)
 
-Fix the bug by moving the error check to the same loop that adds
-new items to types_seen, raising an exception if types_seen[qt]
-is already set.
+so that we can reliably get no-return handling that we desire, without
+having to audit lots of other code?
 
-Add two additional test cases that can detect the bug.
+>=20
+> We should be consistent -- if we can't trust assert() to
+> be marked nonreturn, as it seems we can't, then we shouldn't
+> write new code that assumes it always is, even if today
+> it doesn't happen to bite us on the compiler/host combinations
+> we're testing right now.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* Fix mistake on *.err files (wrong line number on error message)
----
- scripts/qapi.py                                       | 8 ++++----
- tests/Makefile.include                                | 2 ++
- tests/qapi-schema/alternate-conflict-bool-string.err  | 1 +
- tests/qapi-schema/alternate-conflict-bool-string.exit | 1 +
- tests/qapi-schema/alternate-conflict-bool-string.json | 4 ++++
- tests/qapi-schema/alternate-conflict-bool-string.out  | 0
- tests/qapi-schema/alternate-conflict-num-string.err   | 1 +
- tests/qapi-schema/alternate-conflict-num-string.exit  | 1 +
- tests/qapi-schema/alternate-conflict-num-string.json  | 4 ++++
- tests/qapi-schema/alternate-conflict-num-string.out   | 0
- tests/qapi-schema/alternate-multi-conflict.json       | 0
- 11 files changed, 18 insertions(+), 4 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.err
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.json
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.out
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.err
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.json
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.out
- create mode 100644 tests/qapi-schema/alternate-multi-conflict.json
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 84e2eb4..a9c12e5 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -824,11 +824,11 @@ def check_alternate(expr, info):
-             else:
-                 conflicting.add('QTYPE_QNUM')
-                 conflicting.add('QTYPE_QBOOL')
--        if conflicting & set(types_seen):
--            raise QAPISemError(info, "Alternate '%s' member '%s' can't "
--                               "be distinguished from member '%s'"
--                               % (name, key, types_seen[qtype]))
-         for qt in conflicting:
-+            if qt in types_seen:
-+                raise QAPISemError(info, "Alternate '%s' member '%s' can't "
-+                                   "be distinguished from member '%s'"
-+                                   % (name, key, types_seen[qt]))
-             types_seen[qt] = key
- 
- 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index cfbb689..16d7a3a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -346,6 +346,8 @@ qapi-schema += alternate-conflict-dict.json
- qapi-schema += alternate-conflict-enum-bool.json
- qapi-schema += alternate-conflict-enum-int.json
- qapi-schema += alternate-conflict-string.json
-+qapi-schema += alternate-conflict-bool-string.json
-+qapi-schema += alternate-conflict-num-string.json
- qapi-schema += alternate-empty.json
- qapi-schema += alternate-nested.json
- qapi-schema += alternate-unknown.json
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.err b/tests/qapi-schema/alternate-conflict-bool-string.err
-new file mode 100644
-index 0000000..e52fee7
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-bool-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.exit b/tests/qapi-schema/alternate-conflict-bool-string.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.json b/tests/qapi-schema/alternate-conflict-bool-string.json
-new file mode 100644
-index 0000000..0544de1
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.json
-@@ -0,0 +1,4 @@
-+# alternate branches of 'str' type conflict with all scalar types
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'bool',
-+            'two': 'str' } }
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.out b/tests/qapi-schema/alternate-conflict-bool-string.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.err b/tests/qapi-schema/alternate-conflict-num-string.err
-new file mode 100644
-index 0000000..5ba3827
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-num-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.exit b/tests/qapi-schema/alternate-conflict-num-string.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.json b/tests/qapi-schema/alternate-conflict-num-string.json
-new file mode 100644
-index 0000000..ae90144
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.json
-@@ -0,0 +1,4 @@
-+# alternate branches of 'str' type conflict with all scalar types
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'number',
-+            'two': 'str' } }
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/alternate-multi-conflict.json b/tests/qapi-schema/alternate-multi-conflict.json
-new file mode 100644
-index 0000000..e69de29
--- 
-2.9.4
+
+--DLeCRoimjpDmBQGJi8jMLNjuLHmG4m61a
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlls/ZsACgkQp6FrSiUn
+Q2oMwwf/VwTaJdQ9WQVosSJ9cY14c5OMUZ9Bp4GET9bA8PEvrFgFC5YNUk1ohJoK
+1pmhgbTgveCvDO3PdWLbKtvmMe2wqZuumuThr0FJOdhxPDzbrTg+wTNLsbePNydD
+izIVqMnsjTAY9SsbYoyCamWUygjExb5zrDvxyZH/PbTarAOwL6k1WQCqkg1VZIud
+iz19epaNgOlIM7UutELsnoXGqQ0AtPivf2JjQRDczeAbeHrVJuE7bQQvJ4ToHYP1
+d9X8rLhJceJepd8JK/pbCfG8Y9kfhZs7WInUQAAwhAOWhFP+JwtxqZ6Y2vKULLwl
+XU0UWIJCJFbim8K9VSFKkttDy82CaQ==
+=AAtM
+-----END PGP SIGNATURE-----
+
+--DLeCRoimjpDmBQGJi8jMLNjuLHmG4m61a--
