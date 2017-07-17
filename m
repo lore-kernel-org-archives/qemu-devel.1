@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX6pH-0005KJ-Dt
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:16:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dX6vi-00018N-3s
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:23:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX6pE-0004eB-4x
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48266)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX6pD-0004dp-V5
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:16:40 -0400
-Message-ID: <1500300997.12570.8.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 16:16:37 +0200
-In-Reply-To: <39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
-References: <20170407143847.GM2138@work-vm>
-	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
-	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
-	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
-	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+	(envelope-from <eblake@redhat.com>) id 1dX6vh-0007p4-78
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:23:22 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 17 Jul 2017 09:23:10 -0500
+Message-Id: <20170717142310.17048-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] nbd: Fix iotests failure due to changed client
+ error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +18,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "Dr. David Alan
-	Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-  Hi,
+Commit 8ecaeae8 changed the way the client requests an NBD export,
+and in the process also changed the resulting error message when
+the export is not present, breaking a couple of iotests.  The error
+message is now directly given by the server (a failed NBD_OPT_GO)
+instead of implied by the client (after exhausting NBD_OPT_LIST),
+but looking at the testsuite changes, it proves worthwhile to
+reword the error message to be slightly less verbose (as this is
+one particular error message likely to be hit by a user).
 
-> FWIW, most of these have been fixed in the meantime; the only
-> remaining
-> hack I had to add was:
->=20
-> diff --git i/hw/usb/bus.c w/hw/usb/bus.c
-> index 5939b273b9..bce011058b 100644
-> --- i/hw/usb/bus.c
-> +++ w/hw/usb/bus.c
-> @@ -407,8 +407,9 @@ void usb_register_companion(const char
-> *masterbus,
-> USBPort *ports[],
-> =C2=A0void usb_port_location(USBPort *downstream, USBPort *upstream, in=
-t
-> portnr)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (upstream) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0snprintf(downstream->p=
-ath, sizeof(downstream->path),
-> "%s.%d",
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0upstream->path, portnr);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int l =3D snprintf(dow=
-nstream->path, sizeof(downstream->path),
-> "%s.%d",
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0upstream->path, portnr);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0assert(l < sizeof(down=
-stream->path));
+Note that the error message is now sensitive to which binary is
+running the server as well as the client (since the expected
+output is replaying a message received from the server); in
+general iotests are run on client and server from the same source
+code base, but if it proves problematic in practice, we'll have
+to tweak or sanitize the output somehow.
 
-Approach looks ok to me.
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/client.c               | 5 ++---
+ tests/qemu-iotests/140.out | 3 ++-
+ tests/qemu-iotests/143.out | 3 ++-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-Maximum hub chain length is 5, number of ports hubs is limited too,
-you'll never need more that two digits for port numbers.  So 2*5 plus 4
-connecting dots =3D> 14 chars is the max strlen.  path size is 16, so it
-will fit, including the terminating \0.
+diff --git a/nbd/client.c b/nbd/client.c
+index 4c12fffcbf..509ed5e4ba 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -232,8 +232,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
+         break;
 
-Trying things like "assert(portnr <=3D 99)" have no effect on the
-possible string length calculated by gcc7.
+     case NBD_REP_ERR_UNKNOWN:
+-        error_setg(errp, "Requested export not available for option %" PRIx32
+-                   " (%s)", reply->option, nbd_opt_lookup(reply->option));
++        error_setg(errp, "Requested export not available");
+         break;
 
-cheers,
-  Gerd
+     case NBD_REP_ERR_SHUTDOWN:
+@@ -253,7 +252,7 @@ static int nbd_handle_reply_err(QIOChannel *ioc, nbd_opt_reply *reply,
+     }
+
+     if (msg) {
+-        error_append_hint(errp, "%s\n", msg);
++        error_append_hint(errp, "server reported: %s\n", msg);
+     }
+
+  cleanup:
+diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+index 0689b2b41c..7295b3d975 100644
+--- a/tests/qemu-iotests/140.out
++++ b/tests/qemu-iotests/140.out
+@@ -8,7 +8,8 @@ wrote 65536/65536 bytes at offset 0
+ read 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": {}}
+-can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: No export with name 'drv' available
++can't open device nbd+unix:///drv?socket=TEST_DIR/nbd: Requested export not available
++server reported: export 'drv' not present
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+diff --git a/tests/qemu-iotests/143.out b/tests/qemu-iotests/143.out
+index 0978b8985a..1c7fb45543 100644
+--- a/tests/qemu-iotests/143.out
++++ b/tests/qemu-iotests/143.out
+@@ -1,7 +1,8 @@
+ QA output created by 143
+ {"return": {}}
+ {"return": {}}
+-can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: No export with name 'no_such_export' available
++can't open device nbd+unix:///no_such_export?socket=TEST_DIR/nbd: Requested export not available
++server reported: export 'no_such_export' not present
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+ *** done
+-- 
+2.13.3
