@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXDG4-0003GZ-TI
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:08:49 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXDWC-00086k-VY
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXDG3-0000Uj-Ma
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:08:48 -0400
-References: <20170717192635.17880-1-eblake@redhat.com>
-	<20170717192635.17880-3-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2cd61de1-e169-4aee-b91c-04960727278e@redhat.com>
-Date: Mon, 17 Jul 2017 17:08:39 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170717192635.17880-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] nbd: Fix server reply to
- NBD_OPT_EXPORT_NAME of older clients
+	(envelope-from <rth7680@gmail.com>) id 1dXDWA-0003On-2B
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:25:28 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34275)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXDW9-0003OM-TG
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:25:25 -0400
+Received: by mail-qt0-x244.google.com with SMTP id 19so293220qty.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 14:25:25 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Mon, 17 Jul 2017 11:24:38 -1000
+Message-Id: <20170717212446.15268-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PULL v2 0/8] target/s390x tcg improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,140 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
+
+Instructions implementing another missing facility,
+getting us a bit closer to being able to upgrade the
+default tcg cpu.
+
+Plus one bug fix for an existing instruction that
+isn't used unless we upgrade the tcg cpu.
+
+v2: Adjust the CSST patch to work when CONFIG_ATOMIC64
+is not defined, as seen with clang 3.8.
 
 
+r~
 
-On 07/17/2017 03:26 PM, Eric Blake wrote:
-> A typo in commit 23e099c set the size of buf[] used in response
-> to NBD_OPT_EXPORT_NAME according to the length needed for old-style
-> negotiation (4 bytes of flag information) instead of the intended
-> 2 bytes used in new style.  If the client doesn't enable
-> NBD_FLAG_C_NO_ZEROES, then the server sends two bytes too many,
-> and is then out of sync in response to the client's next command
-> (the bug is masked when modern qemu is the client, since we enable
-> the no zeroes flag).
-> 
-> While touching this code, add some more defines to nbd_internal.h
-> rather than having quite so many magic numbers in the .c; also,
-> use "" initialization rather than memset(), and tweak the oldstyle
-> negotiation to better match the spec description of the layout
-> (since the spec is big-endian, skipping two bytes as 0 followed by
-> writing a 2-byte flag is the same as writing a zero-extended 4-byte
-> flag), to make it a bit easier to follow compared to the spec.
-> 
-> [checkpatch.pl has some false positives in the comments]
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v2: defines rather than magic numbers [John]
-> ---
->  nbd/nbd-internal.h |  8 ++++++--
->  nbd/server.c       | 18 ++++++++++--------
->  2 files changed, 16 insertions(+), 10 deletions(-)
-> 
-> diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-> index 4065bc68ac..396ddb4d3e 100644
-> --- a/nbd/nbd-internal.h
-> +++ b/nbd/nbd-internal.h
-> @@ -38,9 +38,13 @@
->   */
-> 
->  /* Size of all NBD_OPT_*, without payload */
-> -#define NBD_REQUEST_SIZE        (4 + 2 + 2 + 8 + 8 + 4)
-> +#define NBD_REQUEST_SIZE            (4 + 2 + 2 + 8 + 8 + 4)
->  /* Size of all NBD_REP_* sent in answer to most NBD_OPT_*, without payload */
-> -#define NBD_REPLY_SIZE          (4 + 4 + 8)
-> +#define NBD_REPLY_SIZE              (4 + 4 + 8)
-> +/* Size of reply to NBD_OPT_EXPORT_NAME */
-> +#define NBD_REPLY_EXPORT_NAME_SIZE  (8 + 2 + 124)
-> +/* Size of oldstyle negotiation */
-> +#define NBD_OLDSTYLE_NEGOTIATE_SIZE (8 + 8 + 8 + 4 + 124)
-> 
->  #define NBD_REQUEST_MAGIC       0x25609513
->  #define NBD_REPLY_MAGIC         0x67446698
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 49ed57455c..82a78bf439 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -283,12 +283,16 @@ static int nbd_negotiate_handle_export_name(NBDClient *client, uint32_t length,
->                                              Error **errp)
->  {
->      char name[NBD_MAX_NAME_SIZE + 1];
-> -    char buf[8 + 4 + 124] = "";
-> +    char buf[NBD_REPLY_EXPORT_NAME_SIZE] = "";
->      size_t len;
->      int ret;
-> 
->      /* Client sends:
->          [20 ..  xx]   export name (length bytes)
-> +       Server replies:
-> +        [ 0 ..   7]   size
-> +        [ 8 ..   9]   export flags
-> +        [10 .. 133]   reserved     (0) [unless no_zeroes]
 
-Alright, there's the 8, 2, 124.
+The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
 
->       */
->      trace_nbd_negotiate_handle_export_name();
->      if (length >= sizeof(name)) {
-> @@ -800,22 +804,21 @@ static int nbd_negotiate_options(NBDClient *client, uint16_t myflags,
->   */
->  static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
->  {
-> -    char buf[8 + 8 + 8 + 128];
-> +    char buf[NBD_OLDSTYLE_NEGOTIATE_SIZE] = "";
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request' into staging (2017-07-17 17:54:17 +0100)
 
-huh, TIL.
+are available in the git repository at:
 
->      int ret;
->      const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
->                                NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
->                                NBD_FLAG_SEND_WRITE_ZEROES);
->      bool oldStyle;
-> 
-> -    /* Old style negotiation header without options
-> +    /* Old style negotiation header, no room for options
->          [ 0 ..   7]   passwd       ("NBDMAGIC")
->          [ 8 ..  15]   magic        (NBD_CLIENT_MAGIC)
->          [16 ..  23]   size
-> -        [24 ..  25]   server flags (0)
-> -        [26 ..  27]   export flags
-> +        [24 ..  27]   export flags (zero-extended)
->          [28 .. 151]   reserved     (0)
+  git://github.com/rth7680/qemu.git tags/pull-s390-20170717
 
-And there's the 8, 8, 8, 4, 124.
+for you to fetch changes up to dbdaaff43adc49f1debd935b1fd58e2b47ba7676:
 
-> 
-> -       New style negotiation header with options
-> +       New style negotiation header, client can send options
->          [ 0 ..   7]   passwd       ("NBDMAGIC")
->          [ 8 ..  15]   magic        (NBD_OPTS_MAGIC)
->          [16 ..  17]   server flags (0)
-> @@ -825,7 +828,6 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
->      qio_channel_set_blocking(client->ioc, false, NULL);
-> 
->      trace_nbd_negotiate_begin();
-> -    memset(buf, 0, sizeof(buf));
->      memcpy(buf, "NBDMAGIC", 8);
-> 
->      oldStyle = client->exp != NULL && !client->tlscreds;
-> @@ -834,7 +836,7 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
->                                        client->exp->nbdflags | myflags);
->          stq_be_p(buf + 8, NBD_CLIENT_MAGIC);
->          stq_be_p(buf + 16, client->exp->size);
-> -        stw_be_p(buf + 26, client->exp->nbdflags | myflags);
-> +        stl_be_p(buf + 24, client->exp->nbdflags | myflags);
+  target/s390x: Fix risbg handling (2017-07-17 14:13:17 -0700)
 
-Makes sense to me.
+----------------------------------------------------------------
+Queued s390x tcg patches, v2
 
-> 
->          if (nbd_write(client->ioc, buf, sizeof(buf), errp) < 0) {
->              error_prepend(errp, "write failed: ");
-> 
+----------------------------------------------------------------
+David Hildenbrand (1):
+      target/s390x: Allow to enable "idtes" feature for TCG
 
-Thanks,
+Richard Henderson (7):
+      target/s390x: Implement CSST
+      target/s390x: Implement CONVERT UNICODE insns
+      target/s390x: Tidy SRST
+      target/s390x: Implement SRSTU
+      target/s390x: Implement TRTR
+      target/s390x: Mark ETF3 and ETF3_ENH facilities as available
+      target/s390x: Fix risbg handling
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+ target/s390x/helper.h      |  11 +-
+ target/s390x/cpu_models.c  |   5 +
+ target/s390x/mem_helper.c  | 585 +++++++++++++++++++++++++++++++++++++++++++--
+ target/s390x/translate.c   |  99 +++++++-
+ target/s390x/insn-data.def |  21 +-
+ 5 files changed, 696 insertions(+), 25 deletions(-)
