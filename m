@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dX7Rx-0004wo-VI
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:56:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dX7Sa-0005WH-6W
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dX7Ru-0005iA-4H
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:56:42 -0400
-Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:33866)
+	(envelope-from <alex.bennee@linaro.org>) id 1dX7SZ-0005si-Cb
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:20 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36430)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dX7Rt-0005i2-VV
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:56:38 -0400
-Received: by mail-io0-x232.google.com with SMTP id r36so44563609ioi.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:56:37 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <d29a9fe675f1faa36f8cb0fdb1b90aea@walle.cc>
-Date: Mon, 17 Jul 2017 10:56:35 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4FE60F15-93AE-49AA-A909-66D8B9D058B8@gmail.com>
-References: <038DD9E8-EB5A-4575-BAF9-ED62D31700E0@gmail.com>
-	<d29a9fe675f1faa36f8cb0fdb1b90aea@walle.cc>
-Subject: Re: [Qemu-devel] New documentation for the LatticeMicro32 target
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dX7SZ-0005sU-5P
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:19 -0400
+Received: by mail-wr0-x232.google.com with SMTP id y43so2319827wrd.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:57:18 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 17 Jul 2017 15:48:43 +0100
+Message-Id: <20170717144848.11793-19-alex.bennee@linaro.org>
+In-Reply-To: <20170717144848.11793-1-alex.bennee@linaro.org>
+References: <20170717144848.11793-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 18/23] shippable: add x86_64 targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> On Jul 17, 2017, at 1:40 AM, Michael Walle <michael@walle.cc> wrote:
->=20
-> Am 2017-07-09 17:39, schrieb Programmingkid:
->> I just made a documentation page for the LatticeMicro32 target. I =
-need
->> to know its current status, how much of this system is implemented,
->> what software runs on it. If anyone could supply more information =
-that
->> would be appreciated. Pictures of this target running would be great
->> as well. Thanks.
->> Here is the page: =
-http://wiki.qemu.org/Documentation/Platforms/LatticeMico32
->=20
-> Hi,
->=20
-> thank you for your efforts. I have to admit that the current status is =
-unknown.
->=20
-> I've just compiled the latest head and it looks like the BQL is =
-missing for the interrupt helpers. I'll post a patch soon. With the =
-patch, the basic stuff is working but there seems to be an issue with =
-OpenGL.
->=20
-> You can read the quickstart instructions at:
-> http://milkymist.walle.cc/README.qemu
->=20
-> The flash image isn't working because it will boot right into the =
-visualization mode, which is using the OpenGL stuff. The "-kernel =
-flickernoise" method is working though. You can get the flickernoise =
-binary at:
-> http://milkymist.walle.cc/updates/current/flickernoise
->=20
-> Besides the milkymist emulation, there is plain lm32 emulation based =
-on the Lattice reference design which should be ok, because the tests =
-are working (=EF=BF=BCmake -C tests/tcg/lm32 check)
->=20
-> -michael
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[AJB: minor tweak to name]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .shippable.yml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thank you for all this information. It has been added to the wiki page.=20=
+diff --git a/.shippable.yml b/.shippable.yml
+index 189d193da5..1f92ace8f7 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -5,6 +5,8 @@ env:
+   global:
+     - LC_ALL=C
+   matrix:
++    - IMAGE=debian-amd64
++      TARGET_LIST=x86_64-softmmu,x86_64-linux-user
+     - IMAGE=debian-armel-cross
+       TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
+     - IMAGE=debian-armhf-cross
+-- 
+2.13.0
