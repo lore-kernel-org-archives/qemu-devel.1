@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dXAxR-0007uI-O1
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:41:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXB4s-0001of-7Y
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dXAxN-0003L0-GB
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:41:25 -0400
-References: <20170717151207.24919-1-mreitz@redhat.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <c8ff1dc0-e1a1-73eb-a5d1-11ed50eff148@reactos.org>
-Date: Mon, 17 Jul 2017 20:40:15 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dXB4o-0001L5-25
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:49:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39506)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXB4n-0001Je-Pt
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:49:02 -0400
+Date: Mon, 17 Jul 2017 19:48:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170717184854.GC31820@work-vm>
+References: <20170407143847.GM2138@work-vm>
+	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+	<20170717164641.GA31820@work-vm>
+	<a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+	<CAFEAcA9Dc1_1t-N-gYiUsW+FY9-2ZNsKqBFY-WMF9Z-SeXsjiw@mail.gmail.com>
+	<661f1ccf-6bba-7fd2-c0aa-e8b90066dad4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170717151207.24919-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] block/vvfat: Fix compiler warning with gcc
- 7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <661f1ccf-6bba-7fd2-c0aa-e8b90066dad4@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +35,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Le 17/07/2017 à 17:12, Max Reitz a écrit :
-> gcc 7 complains that the sprintf() might write a null byte beyond the
-> end of the tail buffer.  That is wrong, but we can silence it by making
-> i unsigned (it can never be negative anyway, see the if condition right
-> before).  For some reason, this allows gcc to suddenly accurately
-> calculate the range of i so we can give the tail[] array the exact size
-> it needs to have (which is 8 bytes) without gcc complaining.
->
-> In addition, let us convert the sprintf() to snprintf(), because that is
-> always nicer, and add an assertion about the range of the return value
-> afterwards so we can see that "8 - len" will never be negative and thus
-> "entry->name + MIN(j, 8 - len)" will never be out of bounds.
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/vvfat.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/block/vvfat.c b/block/vvfat.c
-> index 6b11596..a9e207f 100644
-> --- a/block/vvfat.c
-> +++ b/block/vvfat.c
-> @@ -549,7 +549,7 @@ static direntry_t *create_short_filename(BDRVVVFATState *s,
->      const gchar *p, *last_dot = NULL;
->      gunichar c;
->      bool lossy_conversion = false;
-> -    char tail[11];
-> +    char tail[8];
->
->      if (!entry) {
->          return NULL;
-> @@ -614,7 +614,8 @@ static direntry_t *create_short_filename(BDRVVVFATState *s,
->      for (i = lossy_conversion ? 1 : 0; i < 999999; i++) {
->          direntry_t *entry1;
->          if (i > 0) {
-> -            int len = sprintf(tail, "~%d", i);
-> +            int len = snprintf(tail, sizeof(tail), "~%u", (unsigned)i);
-> +            assert(len <= 7);
+* Eric Blake (eblake@redhat.com) wrote:
+> On 07/17/2017 12:36 PM, Peter Maydell wrote:
+> > On 17 July 2017 at 18:29, Eric Blake <eblake@redhat.com> wrote:
+> >> On 07/17/2017 11:46 AM, Dr. David Alan Gilbert wrote:
+> >>
+> >>>> +++ w/hw/usb/bus.c
+> >>>> @@ -407,8 +407,9 @@ void usb_register_companion(const char *masterbu=
+s,
+> >>>> USBPort *ports[],
+> >>>>  void usb_port_location(USBPort *downstream, USBPort *upstream, int =
+portnr)
+> >>>>  {
+> >>>>      if (upstream) {
+> >>>> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d=
+",
+> >>>> -                 upstream->path, portnr);
+> >>>> +        int l =3D snprintf(downstream->path, sizeof(downstream->pat=
+h),
+> >>>> "%s.%d",
+> >>>> +                         upstream->path, portnr);
+> >>>> +        assert(l < sizeof(downstream->path));
+> >>>
+> >>> You may find this doesn't help in some windows builds;  the assert
+> >>> functions aren't always marked as noreturn (because they pop up a dia=
+log
+> >>> that asks you whether you want to run into a debugger etc).
+> >>
+> >> How would it not help?  Are we using gcc 7 on windows builds?
+> >=20
+> > At some point in the future we are likely to, because my
+> > w32/w64 test setups use the Ubuntu gcc-mingw-w64-x86-64
+> > packages, and so as I upgrade my desktop they will move
+> > forward to newer gcc versions. (More generally our users
+> > may do so before me ;-))
+>=20
+> So, does gcc's warning actually depend on the no-return-ness of the
+> assert() statement added here?
 
-As i is on minimum between 0 or 1 and on maximum equal at 999999, does it work if you change the type of i from int to unsigned int?
-That way, you probably won't need the cast to unsigned in the s(n)printf.
+I'm not sure in this case, I'd hit it previously though, see my comment
+=66rom 2015 in:
+   https://sourceforge.net/p/mingw-w64/bugs/306/
 
->              memcpy(entry->name + MIN(j, 8 - len), tail, len);
->          }
->          for (entry1 = array_get(&(s->directory), directory_start);
->
+> Would there be anything wrong with making osdep.h do this on mingw:
+>=20
+> #include <assert.h>
+> #undef assert
+> #define assert(expr) g_assert(expr)
+>=20
+> so that we can reliably get no-return handling that we desire, without
+> having to audit lots of other code?
+
+It's a bit nasty, but hmm.
+I only just about trust glib not to change, all of the fancier g_assert
+variants can return, but g_assert is still safe.
+
+Dave
+
+> >=20
+> > We should be consistent -- if we can't trust assert() to
+> > be marked nonreturn, as it seems we can't, then we shouldn't
+> > write new code that assumes it always is, even if today
+> > it doesn't happen to bite us on the compiler/host combinations
+> > we're testing right now.
+>=20
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>=20
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
