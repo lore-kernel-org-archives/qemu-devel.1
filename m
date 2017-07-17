@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dX1HS-00045P-9z
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:21:27 -0400
+	(envelope-from <marcel@redhat.com>) id 1dX1JY-0005E5-Qx
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dX1HN-0006yS-DV
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:21:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60448)
+	(envelope-from <marcel@redhat.com>) id 1dX1JT-0008RW-4R
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:23:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52225)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dX1HN-0006xG-6s
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:21:21 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dX1JS-0008RD-RN
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:23:31 -0400
 References: <1500236854-28271-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1500236854-28271-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1500236854-28271-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <5e2e3456-9294-765a-d113-9caa83bc4b2b@redhat.com>
-Date: Mon, 17 Jul 2017 11:21:11 +0300
+Message-ID: <004bd530-8510-2a97-b0cc-db864b39a19f@redhat.com>
+Date: Mon, 17 Jul 2017 11:23:23 +0300
 MIME-Version: 1.0
-In-Reply-To: <1500236854-28271-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1500236854-28271-3-git-send-email-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv3 1/2] pci: move check for existing devfn
- into new pci_bus_devfn_available() helper
+Subject: Re: [Qemu-devel] [PATCHv3 2/2] pci: add reserved slot check to
+ do_pci_register_device()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
 
 On 16/07/2017 23:27, Mark Cave-Ayland wrote:
-> Also touch up the logic in do_pci_register_device() accordingly.
+> Add a new slot_reserved_mask bitmask to PCIBus indicating whether or not each
+> PCI slot on the bus is reserved. Ensure that it is initialised to zero to
+> maintain the existing behaviour that all slots are available by default, and
+> add the additional check with appropriate error reporting to
+> do_pci_register_device().
 > 
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->   hw/pci/pci.c |   10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
+>   hw/pci/pci.c             |   18 +++++++++++++++---
+>   include/hw/pci/pci_bus.h |    1 +
+>   2 files changed, 16 insertions(+), 3 deletions(-)
 > 
 > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 0c6f74a..efc9c86 100644
+> index efc9c86..41591dc 100644
 > --- a/hw/pci/pci.c
 > +++ b/hw/pci/pci.c
-> @@ -951,6 +951,11 @@ uint16_t pci_requester_id(PCIDevice *dev)
->       return pci_req_id_cache_extract(&dev->requester_id_cache);
+> @@ -371,6 +371,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
+>   {
+>       assert(PCI_FUNC(devfn_min) == 0);
+>       bus->devfn_min = devfn_min;
+> +    bus->slot_reserved_mask = 0x0;
+>       bus->address_space_mem = address_space_mem;
+>       bus->address_space_io = address_space_io;
+>   
+> @@ -956,6 +957,11 @@ static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
+>       return !(bus->devices[devfn]);
 >   }
 >   
-> +static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
+> +static bool pci_bus_devfn_reserved(PCIBus *bus, int devfn)
 > +{
-> +    return !(bus->devices[devfn]);
+> +    return bus->slot_reserved_mask & (1UL << PCI_SLOT(devfn));
 > +}
 > +
 >   /* -1 for devfn means auto assign */
 >   static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
 >                                            const char *name, int devfn,
-> @@ -974,14 +979,15 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+> @@ -979,14 +985,20 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
 >       if (devfn < 0) {
 >           for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
 >               devfn += PCI_FUNC_MAX) {
-> -            if (!bus->devices[devfn])
-> +            if (pci_bus_devfn_available(bus, devfn)) {
+> -            if (pci_bus_devfn_available(bus, devfn)) {
+> +            if (pci_bus_devfn_available(bus, devfn) &&
+> +                   !pci_bus_devfn_reserved(bus, devfn)) {
 >                   goto found;
-> +            }
+>               }
 >           }
->           error_setg(errp, "PCI: no slot/function available for %s, all in use",
->                      name);
+> -        error_setg(errp, "PCI: no slot/function available for %s, all in use",
+> -                   name);
+> +        error_setg(errp, "PCI: no slot/function available for %s, all in use "
+> +                   "or reserved", name);
 >           return NULL;
 >       found: ;
-> -    } else if (bus->devices[devfn]) {
-> +    } else if (!pci_bus_devfn_available(bus, devfn)) {
+> +    } else if (pci_bus_devfn_reserved(bus, devfn)) {
+> +        error_setg(errp, "PCI: slot %d function %d not available for %s,"
+> +                   " reserved",
+> +                   PCI_SLOT(devfn), PCI_FUNC(devfn), name);
+> +        return NULL;
+>       } else if (!pci_bus_devfn_available(bus, devfn)) {
 >           error_setg(errp, "PCI: slot %d function %d not available for %s,"
 >                      " in use by %s",
->                      PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+> index 5484a9b..bc34fd0 100644
+> --- a/include/hw/pci/pci_bus.h
+> +++ b/include/hw/pci/pci_bus.h
+> @@ -23,6 +23,7 @@ struct PCIBus {
+>       PCIIOMMUFunc iommu_fn;
+>       void *iommu_opaque;
+>       uint8_t devfn_min;
+> +    uint32_t slot_reserved_mask;
+>       pci_set_irq_fn set_irq;
+>       pci_map_irq_fn map_irq;
+>       pci_route_irq_fn route_intx_to_irq;
 > 
 
 Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
