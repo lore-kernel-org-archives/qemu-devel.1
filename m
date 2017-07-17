@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX1uh-0005ox-E2
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:00 -0400
+	(envelope-from <peterx@redhat.com>) id 1dX1vK-00066g-Pw
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX1ug-00036g-DV
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:01:59 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX1ug-00034k-7G
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:01:58 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id a10so8160381wrd.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:01:56 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_e6mnkTAZZ+9incvBuhTgt7tj3k_WMHhMLrB6X01v-MQ@mail.gmail.com>
-References: <1499438577-7674-1-git-send-email-peter.maydell@linaro.org>
-	<438bc671-4d94-9efc-540a-151be39583e2@redhat.com>
-	<CAFEAcA_e6mnkTAZZ+9incvBuhTgt7tj3k_WMHhMLrB6X01v-MQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 10:01:34 +0100
-Message-ID: <CAFEAcA8day+cHHEe0Tq2s7g_SmMh6MukWt_OMsdKNeax+9j=Vg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/11] Make memory_region_init_ram() and
- friends handle migration
+	(envelope-from <peterx@redhat.com>) id 1dX1vK-0003PZ-3N
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33472)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dX1vJ-0003PL-T5
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD74C5F7B0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 09:02:36 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 17 Jul 2017 17:02:28 +0800
+Message-Id: <1500282150-28190-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/2] VT-d: some enhancements on iotlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-On 14 July 2017 at 18:01, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 10 July 2017 at 11:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 07/07/2017 16:42, Peter Maydell wrote:
->>> This patchset changes the memory region functions
->>>  - memory_region_init_ram()
->>>  - memory_region_init_rom()
->>>  - memory_region_init_rom_device()
->>> to all automatically register the backing memory they allocate
->>> for migration using vmstate_register_ram(). Renamed functions
->>>  - memory_region_init_ram_nomigrate()
->>>  - memory_region_init_rom_nomigrate()
->>>  - memory_region_init_rom_device_nomigrate()
->>> are provided which only do the MR init, for the oddball
->>> cases which want to manage migration of the backing memory
->>> themselves (and to avoid behavioural changes for callers
->>> which weren't managing correctly migration themselves...)
->>>
->>> The idea is based on discussion from a previous patchset:
->>>  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00764.html
->>>
->>> The series includes a largish coccinelle-scripted patch and a
->>> few by-hand conversions which change callsites which previously
->>> manually created the region and registered its backing ram in
->>> two separate steps to use the new functions.
->>>
->>> This series does not include any patches to fix bugs like:
->>>  * caller forgot to call vmstate_register_ram() so region
->>>    is not actually migrated (eg hw/arm/highbank.c)
->>>  * caller used vmstate_register_ram_global() even though it is
->>>    a device, so you can't create 2 copies of the device (eg sm501)
->>> because I wanted to stick to strictly no-behaviour-change
->>> for this patch -- we can fix the bugs separately (fixes will
->>> tend to imply migration compat breaks so can only be done
->>> for some boards.) Most of the remaining callers of the
->>> _nomigrate functions are buggy, I think (and a demonstration
->>> that our current API does not score well on the "hard to
->>> get wrong by accident" scale).
->>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->
-> Thanks. I'm going to apply this directly to master (so then
-> I can check that nothing has got applied to it since which
-> uses the old semantics for these functions; nothing in
-> fact has.)
+v4:
+- removed patch 2 (x-iotlb-size patch) and patch 4 (mru list for
+  iotlb) [mst]
+- used VTD_PAGE_SIZE_4K for patch 1 [Jason]
 
-...now applied (with the minor comment fixes requested).
+v3:
+- fix issue reported by patchew on style
 
-thanks
--- PMM
+v2:
+- rebase to master
+- removed all "info iommu" patches for now
+  (is it bad to introduce new HMP commands without QMP? I thought not,
+   but in case I missed anything, please kindly let me know...)
+
+Patch 1: fixes a very rare PT path issue on iova value. It didn't
+break anything since it's merely not touched (only if when IOMMU
+enabled, then set one device to PT), but still better fix it.
+
+Patch 2: introduce "x-iotlb-size" to tune iotlb size, or to turn it
+off (e.g., when we want to measure how iotlb affects one payload).
+
+Patch 3: some refine on iotlb entry.
+
+Patch 4: implemented MRU list algorithm for iotlb.
+
+Please review. Thanks,
+
+Peter Xu (2):
+  intel_iommu: fix iova for pt
+  intel_iommu: use access_flags for iotlb
+
+ hw/i386/intel_iommu.c          | 19 +++++++++----------
+ hw/i386/intel_iommu_internal.h |  1 -
+ include/hw/i386/intel_iommu.h  |  3 +--
+ 3 files changed, 10 insertions(+), 13 deletions(-)
+
+-- 
+2.7.4
