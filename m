@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX6JN-0004pJ-EU
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:43:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1dX6Me-0007sN-OH
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX6JM-0005cJ-71
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:43:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52286)
+	(envelope-from <thuth@redhat.com>) id 1dX6Md-0000LR-HN
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:47:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59094)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dX6JL-0005bh-UQ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:43:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E063A7EBDD
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 13:43:42 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 17 Jul 2017 15:42:38 +0200
-Message-Id: <20170717134238.1966-18-quintela@redhat.com>
-In-Reply-To: <20170717134238.1966-1-quintela@redhat.com>
-References: <20170717134238.1966-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 17/17] migration: Flush receive queue
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dX6Md-0000KN-Bc
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:47:07 -0400
+References: <20170717133444.16743-1-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <04a388b6-9adc-8552-51ae-014996bf04c5@redhat.com>
+Date: Mon, 17 Jul 2017 15:46:55 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170717133444.16743-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] keymaps: fr-ca: more fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,176 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?B?SsOpcsO0bWUgUG91bGlu?= <jeromepoulin@gmail.com>
 
-Each time that we sync the bitmap, it is a possiblity that we receive
-a page that is being processed by a different thread.  We fix this
-problem just making sure that we wait for all receiving threads to
-finish its work before we procedeed with the next stage.
+On 17.07.2017 15:34, Gerd Hoffmann wrote:
+> Fixes: https://bugs.launchpad.net/qemu/+bug/533613
+> Cc: Thomas Huth <thuth@redhat.com>
+> Suggested-by: J=C3=A9r=C3=B4me Poulin <jeromepoulin@gmail.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  pc-bios/keymaps/fr-ca | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
+> index 030f56a78e..13a0306762 100644
+> --- a/pc-bios/keymaps/fr-ca
+> +++ b/pc-bios/keymaps/fr-ca
+> @@ -10,6 +10,7 @@ sterling 0x4 altgr
+>  cent 0x5 altgr
+>  currency 0x6 altgr
+>  notsign 0x7 altgr
+> +numbersign 0x29
+>  bar 0x29 shift
+>  twosuperior 0x9 altgr
+>  threesuperior 0xa altgr
+> @@ -38,6 +39,10 @@ dead_cedilla 0x1b
+>  dead_diaeresis 0x1b shift
+>  exclam 0x2 shift
+>  quotedbl 0x3 shift
+> +comma 0x33
+> +apostrophe 0x33 shift
+> +period 0x34
+> +period 0x34 shift
+>  slash 0x4 shift
+>  dollar 0x5 shift
+>  percent 0x6 shift
+> @@ -47,6 +52,9 @@ asterisk 0x9 shift
+>  parenleft 0xa shift
+>  parenright 0xb shift
+>  underscore 0xc shift
+> -plus 0xd shift
+>  minus 0xc
+> +underscore 0xc shift
+>  equal 0xd
+> +plus 0xd shift
+> +semicolon 0x27
+> +colon 0x27 shift
 
-We are low on page flags, so we use a combination that is not valid to
-emit that message:  MULTIFD_PAGE and COMPRESSED.
+I don't have a fr-ca keyboard, but at least from having a quick look at
+it, the patch looks now fine to me.
 
-I tried to make a migration command for it, but it don't work because
-we sync the bitmap sometimes when we have already sent the beggining
-of the section, so I just added a new page flag.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 56 insertions(+), 1 deletion(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index c78b286..bffe204 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -71,6 +71,12 @@
- #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
- #define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
- 
-+/* We are getting low on pages flags, so we start using combinations
-+   When we need to flush a page, we sent it as
-+   RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_COMPRESS_PAGE
-+   We don't allow that combination
-+*/
-+
- static inline bool is_zero_range(uint8_t *p, uint64_t size)
- {
-     return buffer_is_zero(p, size);
-@@ -193,6 +199,9 @@ struct RAMState {
-     uint64_t iterations_prev;
-     /* Iterations since start */
-     uint64_t iterations;
-+    /* Indicates if we have synced the bitmap and we need to assure that
-+       target has processeed all previous pages */
-+    bool multifd_needs_flush;
-     /* protects modification of the bitmap */
-     uint64_t migration_dirty_pages;
-     /* number of dirty bits in the bitmap */
-@@ -363,7 +372,6 @@ static void compress_threads_save_setup(void)
- 
- /* Multiple fd's */
- 
--
- typedef struct {
-     int num;
-     int size;
-@@ -595,9 +603,11 @@ struct MultiFDRecvParams {
-     QIOChannel *c;
-     QemuSemaphore ready;
-     QemuSemaphore sem;
-+    QemuCond cond_sync;
-     QemuMutex mutex;
-     /* proteced by param mutex */
-     bool quit;
-+    bool sync;
-     multifd_pages_t pages;
-     bool done;
- };
-@@ -637,6 +647,7 @@ void multifd_load_cleanup(void)
-         qemu_thread_join(&p->thread);
-         qemu_mutex_destroy(&p->mutex);
-         qemu_sem_destroy(&p->sem);
-+        qemu_cond_destroy(&p->cond_sync);
-         socket_recv_channel_destroy(p->c);
-         g_free(p);
-         multifd_recv_state->params[i] = NULL;
-@@ -675,6 +686,10 @@ static void *multifd_recv_thread(void *opaque)
-                 return NULL;
-             }
-             p->done = true;
-+            if (p->sync) {
-+                qemu_cond_signal(&p->cond_sync);
-+                p->sync = false;
-+            }
-             qemu_mutex_unlock(&p->mutex);
-             qemu_sem_post(&p->ready);
-             continue;
-@@ -724,9 +739,11 @@ gboolean multifd_new_channel(QIOChannel *ioc)
-     qemu_mutex_init(&p->mutex);
-     qemu_sem_init(&p->sem, 0);
-     qemu_sem_init(&p->ready, 0);
-+    qemu_cond_init(&p->cond_sync);
-     p->quit = false;
-     p->id = id;
-     p->done = false;
-+    p->sync = false;
-     multifd_init_group(&p->pages);
-     p->c = ioc;
-     atomic_set(&multifd_recv_state->params[id], p);
-@@ -792,6 +809,27 @@ static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
-     qemu_sem_post(&p->sem);
- }
- 
-+static int multifd_flush(void)
-+{
-+    int i, thread_count;
-+
-+    if (!migrate_use_multifd()) {
-+        return 0;
-+    }
-+    thread_count = migrate_multifd_threads();
-+    for (i = 0; i < thread_count; i++) {
-+        MultiFDRecvParams *p = multifd_recv_state->params[i];
-+
-+        qemu_mutex_lock(&p->mutex);
-+        while (!p->done) {
-+            p->sync = true;
-+            qemu_cond_wait(&p->cond_sync, &p->mutex);
-+        }
-+        qemu_mutex_unlock(&p->mutex);
-+    }
-+    return 0;
-+}
-+
- /**
-  * save_page_header: write page header to wire
-  *
-@@ -809,6 +847,12 @@ static size_t save_page_header(RAMState *rs, QEMUFile *f,  RAMBlock *block,
- {
-     size_t size, len;
- 
-+    if (rs->multifd_needs_flush &&
-+        (offset & RAM_SAVE_FLAG_MULTIFD_PAGE)) {
-+        offset |= RAM_SAVE_FLAG_ZERO;
-+        rs->multifd_needs_flush = false;
-+    }
-+
-     if (block == rs->last_sent_block) {
-         offset |= RAM_SAVE_FLAG_CONTINUE;
-     }
-@@ -2496,6 +2540,9 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- 
-     if (!migration_in_postcopy()) {
-         migration_bitmap_sync(rs);
-+        if (migrate_use_multifd()) {
-+            rs->multifd_needs_flush = true;
-+        }
-     }
- 
-     ram_control_before_iterate(f, RAM_CONTROL_FINISH);
-@@ -2538,6 +2585,9 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-         qemu_mutex_lock_iothread();
-         rcu_read_lock();
-         migration_bitmap_sync(rs);
-+        if (migrate_use_multifd()) {
-+            rs->multifd_needs_flush = true;
-+        }
-         rcu_read_unlock();
-         qemu_mutex_unlock_iothread();
-         remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
-@@ -3012,6 +3062,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-             break;
-         }
- 
-+        if ((flags & (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO))
-+                  == (RAM_SAVE_FLAG_MULTIFD_PAGE | RAM_SAVE_FLAG_ZERO)) {
-+            multifd_flush();
-+            flags = flags & ~RAM_SAVE_FLAG_ZERO;
-+        }
-         if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-                      RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
-                      RAM_SAVE_FLAG_MULTIFD_PAGE)) {
--- 
-2.9.4
+ Thanks,
+  Thomas
