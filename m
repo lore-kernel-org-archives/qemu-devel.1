@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX1x7-0007om-Q2
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:31 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dX1xA-0007qf-5I
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX1x4-00048p-J7
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:29 -0400
-Received: from [59.151.112.132] (port=6713 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX1x3-00047d-Km
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:26 -0400
-References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1499925175-21218-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<5468b372-eec3-1969-e927-236859a6b079@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <79fc29f3-b08f-c3c1-4006-3a0167010c2d@cn.fujitsu.com>
-Date: Mon, 17 Jul 2017 17:06:45 +0800
-MIME-Version: 1.0
-In-Reply-To: <5468b372-eec3-1969-e927-236859a6b079@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V2 3/4] net/colo-compare.c: Optimize
- unpredictable tcp options comparison
+	(envelope-from <kraxel@redhat.com>) id 1dX1x6-0004A1-Si
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX1x6-00048y-N6
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EDFD880476
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 09:04:26 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 17 Jul 2017 11:04:22 +0200
+Message-Id: <20170717090423.11433-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Ipxe patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+The following changes since commit 6e2c46334385c7e295ac883c801c81b4925fb54f:
 
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170711' into staging (2017-07-13 10:47:10 +0100)
 
-On 07/14/2017 11:33 AM, Jason Wang wrote:
->
->
-> On 2017年07月13日 13:52, Zhang Chen wrote:
->> When network is busy, some tcp options(like sack) will unpredictable
->> occur in primary side or secondary side. it will make packet size
->> not same, but the two packet's payload is identical. colo just
->> care about packet payload, so we skip the option field.
->
-> A question is, if SACK were not same, does it mean e.g some packet 
-> were lost just for primary or secondary? If yes, we will be out of 
-> sync soon. Is it really better to delay the checkpoint here?
+are available in the git repository at:
 
-The SACK is designed to optimize TCP fast retransmit, but in COLO 
-situation, this TCP options field
-will make COLO-compare trigger checkpoint frequently, and we use normal 
-TCP ACK to do retransmit job
-will get better performance. In the worst situation, some skipped TCP 
-options will make primary and secondary
-send different packet after that, it will trigger checkpoint very soon. 
-So, I think we no need care
-the SACK field in COLO situation.
+  git://git.kraxel.org/qemu tags/ipxe-pull-request
 
-Thanks
-Zhang Chen
+for you to fetch changes up to 18375b5c1655d3ce0c5029404a4c993ac04c9d09:
 
+  ipxe: update to commit 0600d3ae94 (2017-07-17 11:00:28 +0200)
 
->
-> Thanks
->
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/colo-compare.c | 34 +++++++++++++++++++++++++---------
->>   1 file changed, 25 insertions(+), 9 deletions(-)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 2caeb80..6406c4a 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -183,7 +183,10 @@ static int packet_enqueue(CompareState *s, int 
->> mode)
->>    * return:    0  means packet same
->>    *            > 0 || < 0 means packet different
->>    */
->> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, 
->> int offset)
->> +static int colo_packet_compare_common(Packet *ppkt,
->> +                                      Packet *spkt,
->> +                                      int poffset,
->> +                                      int soffset)
->>   {
->>       if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
->>           char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], 
->> sec_ip_dst[20];
->> @@ -198,9 +201,10 @@ static int colo_packet_compare_common(Packet 
->> *ppkt, Packet *spkt, int offset)
->>                                      sec_ip_src, sec_ip_dst);
->>       }
->>   -    if (ppkt->size == spkt->size) {
->> -        return memcmp(ppkt->data + offset, spkt->data + offset,
->> -                      spkt->size - offset);
->> +    if (ppkt->size == spkt->size || poffset != soffset) {
->> +        return memcmp(ppkt->data + poffset,
->> +                      spkt->data + soffset,
->> +                      spkt->size - soffset);
->>       } else {
->>           trace_colo_compare_main("Net packet size are not the same");
->>           return -1;
->> @@ -263,12 +267,22 @@ static int colo_packet_compare_tcp(Packet 
->> *spkt, Packet *ppkt)
->>        * so we just need skip this field.
->>        */
->>       if (ptcp->th_off > 5) {
->> -        ptrdiff_t tcp_offset;
->> -        tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->> +        ptrdiff_t ptcp_offset, stcp_offset;
->> +
->> +        ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->>                        + (ptcp->th_off * 4);
->> -        res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
->> +        stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
->> +                     + (stcp->th_off * 4);
->> +
->> +        /*
->> +         * When network is busy, some tcp options(like sack) will 
->> unpredictable
->> +         * occur in primary side or secondary side. it will make 
->> packet size
->> +         * not same, but the two packet's payload is identical. colo 
->> just
->> +         * care about packet payload, so we skip the option field.
->> +         */
->> +        res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, 
->> stcp_offset);
->>       } else if (ptcp->th_sum == stcp->th_sum) {
->> -        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->> +        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN, 
->> ETH_HLEN);
->>       } else {
->>           res = -1;
->>       }
->> @@ -328,6 +342,7 @@ static int colo_packet_compare_udp(Packet *spkt, 
->> Packet *ppkt)
->>        * the ip payload here.
->>        */
->>       ret = colo_packet_compare_common(ppkt, spkt,
->> +                                     network_header_length + ETH_HLEN,
->>                                        network_header_length + 
->> ETH_HLEN);
->>         if (ret) {
->> @@ -365,6 +380,7 @@ static int colo_packet_compare_icmp(Packet *spkt, 
->> Packet *ppkt)
->>        * the ip payload here.
->>        */
->>       if (colo_packet_compare_common(ppkt, spkt,
->> +                                   network_header_length + ETH_HLEN,
->>                                      network_header_length + 
->> ETH_HLEN)) {
->>           trace_colo_compare_icmp_miscompare("primary pkt size",
->>                                              ppkt->size);
->> @@ -402,7 +418,7 @@ static int colo_packet_compare_other(Packet 
->> *spkt, Packet *ppkt)
->>                                      sec_ip_src, sec_ip_dst);
->>       }
->>   -    return colo_packet_compare_common(ppkt, spkt, 0);
->> +    return colo_packet_compare_common(ppkt, spkt, 0, 0);
->>   }
->>     static int colo_old_packet_check_one(Packet *pkt, int64_t 
->> *check_time)
->
->
->
-> .
->
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (1):
+  ipxe: update to commit 0600d3ae94
+
+ pc-bios/efi-e1000.rom    | Bin 209920 -> 240128 bytes
+ pc-bios/efi-e1000e.rom   | Bin 209920 -> 240128 bytes
+ pc-bios/efi-eepro100.rom | Bin 209920 -> 240128 bytes
+ pc-bios/efi-ne2k_pci.rom | Bin 208896 -> 238080 bytes
+ pc-bios/efi-pcnet.rom    | Bin 208896 -> 238080 bytes
+ pc-bios/efi-rtl8139.rom  | Bin 212480 -> 241664 bytes
+ pc-bios/efi-virtio.rom   | Bin 212480 -> 242176 bytes
+ pc-bios/efi-vmxnet3.rom  | Bin 206848 -> 236032 bytes
+ roms/ipxe                |   2 +-
+ 9 files changed, 1 insertion(+), 1 deletion(-)
 
 -- 
-Thanks
-Zhang Chen
+2.9.3
