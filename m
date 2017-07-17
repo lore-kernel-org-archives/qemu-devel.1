@@ -1,41 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dXAXE-0003tp-4U
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:14:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXAXd-0004E9-4z
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dXAXA-0004Vu-Qb
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:14:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51318)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dXAXA-0004UU-H0
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:14:16 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6HIE3qm109521
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 14:14:15 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2brr4am5h6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 14:14:15 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 17 Jul 2017 12:14:14 -0600
-References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-	<1500028867-134709-35-git-send-email-borntraeger@de.ibm.com>
-	<a0ad09dd-62aa-88f1-68b0-418199a1ae81@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 17 Jul 2017 20:14:06 +0200
+	(envelope-from <eblake@redhat.com>) id 1dXAXZ-0004oM-Q2
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:14:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXAXZ-0004nm-H1
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:14:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 761462F86EE
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 18:14:40 +0000 (UTC)
+References: <20170717180926.14924-1-ehabkost@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <22df757f-6c8c-9ea9-ef3f-e60a301c6ff5@redhat.com>
+Date: Mon, 17 Jul 2017 13:14:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <a0ad09dd-62aa-88f1-68b0-418199a1ae81@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <58bdd968-0c2e-fbb7-1727-c2c894ca3af3@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 34/40] s390x/cpumodel: wire up new hardware
- features
+In-Reply-To: <20170717180926.14924-1-ehabkost@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xp9TR7dVa4GALmnPDfHL128vfJ3Axx6kJ"
+Subject: Re: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on
+ alternate conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,27 +34,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 07/17/2017 07:30 PM, David Hildenbrand wrote:
-> On 14.07.2017 12:41, Christian Borntraeger wrote:
->> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
->>
->> Some new guest features have been introduced recently. Let's wire
->> them up in the CPU model.
->>
->> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
->> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> Acked-by: Cornelia Huck <cohuck@redhat.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> [split patch]
->> ---
-> 
-> Would it make sense to add further checks to check_consistency?
-> 
-> I think e.g. vx extensions should rely on vx. I can't see a new PoP out
-> there, so I can't check.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xp9TR7dVa4GALmnPDfHL128vfJ3Axx6kJ
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Message-ID: <22df757f-6c8c-9ea9-ef3f-e60a301c6ff5@redhat.com>
+Subject: Re: [PATCH v2] qapi: Fix error handling code on alternate conflict
+References: <20170717180926.14924-1-ehabkost@redhat.com>
+In-Reply-To: <20170717180926.14924-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, the vx extensions depend on vx and it makes sense to have a dependeny for
-both extension.
+On 07/17/2017 01:09 PM, Eduardo Habkost wrote:
+> The conflict check added by commit c0644771 ("qapi: Reject
+> alternates that can't work with keyval_parse()") doesn't work
+> with the following declaration:
+>=20
+>   { 'alternate': 'Alt',
+>     'data': { 'one': 'bool',
+>               'two': 'str' } }
+>=20
+> It crashes with:
+>=20
+>   Traceback (most recent call last):
+>     File "./scripts/qapi-types.py", line 295, in <module>
+>       schema =3D QAPISchema(input_file)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468,=
+ in __init__
+>       self.exprs =3D check_exprs(parser.exprs)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, =
+in check_exprs
+>       check_alternate(expr, info)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, =
+in check_alternate
+>       % (name, key, types_seen[qtype]))
+>   KeyError: 'QTYPE_QSTRING'
+>=20
+> This happens because the previously-seen conflicting member
+> ('one') can't be found at types_seen[qtype], but at
+> types_seen['QTYPE_BOOL'].
+>=20
+> Fix the bug by moving the error check to the same loop that adds
+> new items to types_seen, raising an exception if types_seen[qt]
+> is already set.
+>=20
+> Add two additional test cases that can detect the bug.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+
+If this misses tomorrow's freeze deadline, it's borderline for inclusion
+in 2.10 (it does not change the qemu binary proper, but rather fixes a
+build tool crash, where the crash is only provoked by bad input and we
+won't have any bad input at the time of the freeze) - I'll leave it up
+to Markus on whether to take now or defer to 2.11.  But either way:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--xp9TR7dVa4GALmnPDfHL128vfJ3Axx6kJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlls/o0ACgkQp6FrSiUn
+Q2pMvAf+I9XAB7pIBlzAxzMXxzyjufjKeHSGd7Ro228xVYde3DDQ/z2Xawmtq087
+AEf3x5IagBXQE/0m2fwDDSzGZ9M9FDOUTOMv5kmABSkrznT8dHrGG3LKf9pK+Vjy
+bhueH6OaeXRYlnAmueKEOzXje5kYs0R81uMIrlDIf4BlioEdkmjQDKMM+UAgbA5T
+GS6GavbtksFPcByowxG91MsCVKAdNlL/PITwrbpyd6Rr1bvm+wzIr/Ez5Fp357ZG
+VrLSCVbLFf6QC1LarfuxYhRLhskG3IUzo2c+xb6uigaPzqji6E/Z9eXqa6uurrPq
+4ZFdm+Gt9H/wXZtx+swqwPw6Zbj0Rw==
+=9lwK
+-----END PGP SIGNATURE-----
+
+--xp9TR7dVa4GALmnPDfHL128vfJ3Axx6kJ--
