@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dX43i-0000Nw-3I
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:19:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1dX46f-00013g-J3
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dX43b-0000NK-G1
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:19:26 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33548)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dX43b-0000LZ-4t
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:19:19 -0400
-Received: by mail-lf0-x241.google.com with SMTP id t72so12945880lff.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 04:19:18 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dX46c-0002Zz-CE
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:22:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dX46c-0002Zi-6G
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:22:26 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 20F27356D9
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 11:22:25 +0000 (UTC)
+References: <20170717111549.31511-1-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <45f5f80e-06ac-19d7-6a32-068117f94327@redhat.com>
+Date: Mon, 17 Jul 2017 13:22:20 +0200
 MIME-Version: 1.0
-References: <1500288755-76809-1-git-send-email-anton.nefedov@virtuozzo.com>
-In-Reply-To: <1500288755-76809-1-git-send-email-anton.nefedov@virtuozzo.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 17 Jul 2017 11:19:06 +0000
-Message-ID: <CAJ+F1CKTaKQCVe8WsV2kYWx1nPuJUpcOZAUUPvXRwq0DiJry7Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20170717111549.31511-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] char: don't exit on hmp 'chardev-add help'
+Subject: Re: [Qemu-devel] [PATCH] keymaps: fr-ca: more fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@virtuozzo.com, dgilbert@redhat.com
-
-Hi
-
-On Mon, Jul 17, 2017 at 12:56 PM Anton Nefedov <anton.nefedov@virtuozzo.com=
->
-wrote:
-
-> qemu_chr_new_from_opts() is used from both vl.c and hmp,
-> and it is quite confusing to see qemu suddenly exit after receiving a hel=
-p
-> option in hmp.
->
-> Create a separate function for printing help and let different callers
-> react accordingly.
->
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->
----
->  include/chardev/char.h |  9 +++++++++
->  chardev/char.c         | 27 +++++++++++++++++++--------
->  vl.c                   |  4 ++++
->  3 files changed, 32 insertions(+), 8 deletions(-)
->
-> diff --git a/include/chardev/char.h b/include/chardev/char.h
-> index 1604ea9..461962b 100644
-> --- a/include/chardev/char.h
-> +++ b/include/chardev/char.h
-> @@ -59,6 +59,15 @@ struct Chardev {
->  };
->
->  /**
-> + * @qemu_chr_help:
-> + *
-> + * Print available chardevice backends if 'asked for help' in @opts
-> + *
-> + * Returns: true if there was a help option
-> + */
-> +bool qemu_chr_help(QemuOpts *opts);
-> +
-> +/**
->   * @qemu_chr_new_from_opts:
->   *
->   * Create a new character backend from a QemuOpts list.
-> diff --git a/chardev/char.c b/chardev/char.c
-> index c34b44a..19833fe 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -604,14 +604,9 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
-> Error **errp)
->      return backend;
->  }
->
-> -Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
-> +bool qemu_chr_help(QemuOpts *opts)
->  {
-> -    const ChardevClass *cc;
-> -    Chardev *chr =3D NULL;
-> -    ChardevBackend *backend =3D NULL;
-> -    const char *name =3D chardev_alias_translate(qemu_opt_get(opts,
-> "backend"));
-> -    const char *id =3D qemu_opts_id(opts);
-> -    char *bid =3D NULL;
-> +    const char *name =3D qemu_opt_get(opts, "backend");
->
->      if (name && is_help_option(name)) {
->          GString *str =3D g_string_new("");
-> @@ -620,7 +615,23 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Erro=
-r
-> **errp)
->
->          error_report("Available chardev backend types: %s", str->str);
->          g_string_free(str, true);
-> -        exit(0);
-> +        return true;
-> +    }
-> +
-> +    return false;
-> +}
-> +
-> +Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
-> +{
-> +    const ChardevClass *cc;
-> +    Chardev *chr =3D NULL;
-> +    ChardevBackend *backend =3D NULL;
-> +    const char *name =3D chardev_alias_translate(qemu_opt_get(opts,
-> "backend"));
-> +    const char *id =3D qemu_opts_id(opts);
-> +    char *bid =3D NULL;
-> +
-> +    if (qemu_chr_help(opts)) {
-> +        return NULL;
->      }
->
->      if (id =3D=3D NULL) {
-> diff --git a/vl.c b/vl.c
-> index fb6b2ef..7cad539 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2344,6 +2344,10 @@ static int chardev_init_func(void *opaque, QemuOpt=
-s
-> *opts, Error **errp)
->  {
->      Error *local_err =3D NULL;
->
-> +    if (qemu_chr_help(opts)) {
-> +        exit(0);
-> +    }
-> +
->      qemu_chr_new_from_opts(opts, &local_err);
->
-
-It is a bit intriguing to have qemu_chr_help() in two code paths here, but
-since it should exit at first, it's not a big deal imho.
-
- Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
 
+If you'd like to do me a favour, please put the URL to the Launchpad bug
+into the commit message - then it is later easier to close the bug with
+the scripts/show-fixed-bugs.sh script.
 
->      if (local_err) {
->          error_report_err(local_err);
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+On 17.07.2017 13:15, Gerd Hoffmann wrote:
+> Cc: 533613@bugs.launchpad.net
+> Cc: Thomas Huth <thuth@redhat.com>
+> Suggested-by: J=C3=A9r=C3=B4me Poulin
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  pc-bios/keymaps/fr-ca | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
+> index 030f56a78e..2e540d596c 100644
+> --- a/pc-bios/keymaps/fr-ca
+> +++ b/pc-bios/keymaps/fr-ca
+> @@ -3,6 +3,8 @@
+>  include common
+>  map 0xc0c
+> =20
+> +numbersign 0x29
+> +bar 0x29
+>  backslash 0x29 altgr
+>  plusminus 0x2 altgr
+>  at 0x3 altgr
+> @@ -10,7 +12,6 @@ sterling 0x4 altgr
+>  cent 0x5 altgr
+>  currency 0x6 altgr
+>  notsign 0x7 altgr
+> -bar 0x29 shift
+>  twosuperior 0x9 altgr
+>  threesuperior 0xa altgr
+>  onequarter 0xb altgr
+> @@ -38,6 +39,10 @@ dead_cedilla 0x1b
+>  dead_diaeresis 0x1b shift
+>  exclam 0x2 shift
+>  quotedbl 0x3 shift
+> +comma 0x33
+> +apostrophe 0x33 shift
+> +period 0x34
+> +period 0x34 shift
+>  slash 0x4 shift
+>  dollar 0x5 shift
+>  percent 0x6 shift
+> @@ -48,5 +53,8 @@ parenleft 0xa shift
+>  parenright 0xb shift
+>  underscore 0xc shift
+>  plus 0xd shift
+> -minus 0xc
+> -equal 0xd
+> +minus 0x0c
+
+The other values don't use a leading 0 in the hex value, so I'd maybe
+keep the "0xc" instead of "0x0c" here?
+
+> +underscore 0x0c shift
+> +equal 0x0d
+
+dito
+
+> +semicolon 0x27
+> +colon 0x27 shift
+>=20
