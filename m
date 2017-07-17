@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxP-0002gD-Rh
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxP-0002gG-Sf
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxM-0001d5-JX
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxM-0001cp-9P
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:39 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 17 Jul 2017 16:56:11 +1000
-Message-Id: <20170717065621.4688-12-david@gibson.dropbear.id.au>
+Date: Mon, 17 Jul 2017 16:56:18 +1000
+Message-Id: <20170717065621.4688-19-david@gibson.dropbear.id.au>
 In-Reply-To: <20170717065621.4688-1-david@gibson.dropbear.id.au>
 References: <20170717065621.4688-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/21] spapr: Remove
- sPAPRConfigureConnectorState sub-structure
+Subject: [Qemu-devel] [PULL 18/21] pseries: Use smaller default hash page
+ tables when guest can resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,227 +23,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-Most of the time, the state of a DRC object is contained in the single
-'state' variable.  However, during the transition from UNISOLATE to
-CONFIGURED state requires multiple calls to the ibm,configure-connector
-RTAS call to retrieve the device tree for the attached device.  We need
-some extra state to keep track of where we're up to in delivering the
-device tree information to the guest.
+We've now implemented a PAPR extension allowing PAPR guest to resize
+their hash page table (HPT) during runtime.
 
-Currently that extra state is in a sPAPRConfigureConnectorState
-substructure which is only allocated when we're in the middle of the
-configure connector process.  That sounds like a good idea, but the extra
-state is only two integers - on many platforms that will take up the same
-room as the (maybe NULL) ccs pointer even before malloc() overhead.  Plus
-it's another object whose lifetime we need to manage.  In short, it's not
-worth it.
+This patch makes use of that facility to allocate smaller HPTs by default.
+Specifically when a guest is aware of the HPT resize facility, qemu sizes
+the HPT to the initial memory size, rather than the maximum memory size on
+the assumption that the guest will resize its HPT if necessary for hot
+plugged memory.
 
-So, fold the sPAPRConfigureConnectorState substructure directly into the
-DRC object.
+When the initial memory size is much smaller than the maximum memory size
+(a common configuration with e.g. oVirt / RHEV) then this can save
+significant memory on the HPT.
 
-Previously the structure was allocated lazily when the configure-connector
-call discovers it's not there.  Now, we need to initialize the subfields
-pre-emptively, as soon as we enter UNISOLATE state.
+If the guest does *not* advertise HPT resize awareness when it makes the
+ibm,client-architecture-support call, qemu resizes the HPT for maxmimum
+memory size (unless it's been configured not to allow such guests at all).
 
-Although it's not strictly necessary (the field values should only ever
-be consulted when in UNISOLATE state), we try to keep them at -1 when in
-other states, as a debugging aid.
+For now we make that reallocation assuming the guest has not yet used the
+HPT at all.  That's true in practice, but not, strictly, an architectural
+or PAPR requirement.  If we need to in future we can fix this by having
+the client-architecture-support call reboot the guest with the revised
+HPT size (the client-architecture-support call is explicitly permitted to
+trigger a reboot in this way).
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
-Tested-by: Daniel Barboza <danielhb@linux.vnet.ibm.com>
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/spapr_drc.c         | 56 +++++++++++++++-------------------------------
- include/hw/ppc/spapr_drc.h | 16 +++++--------
- 2 files changed, 24 insertions(+), 48 deletions(-)
+ hw/ppc/spapr.c              | 23 ++++++++++++++++++-----
+ hw/ppc/spapr_hcall.c        | 29 +++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h      |  2 ++
+ include/hw/ppc/spapr_ovec.h |  1 +
+ 4 files changed, 50 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 37d7ae7930..11b9fa534b 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -59,14 +59,6 @@ static uint32_t drc_isolate_physical(sPAPRDRConnector *drc)
-         g_assert_not_reached();
-     }
- 
--    /* if the guest is configuring a device attached to this DRC, we
--     * should reset the configuration state at this point since it may
--     * no longer be reliable (guest released device and needs to start
--     * over, or unplug occurred so the FDT is no longer valid)
--     */
--    g_free(drc->ccs);
--    drc->ccs = NULL;
--
-     drc->state = SPAPR_DRC_STATE_PHYSICAL_POWERON;
- 
-     if (drc->unplug_requested) {
-@@ -99,6 +91,8 @@ static uint32_t drc_unisolate_physical(sPAPRDRConnector *drc)
-     }
- 
-     drc->state = SPAPR_DRC_STATE_PHYSICAL_UNISOLATE;
-+    drc->ccs_offset = drc->fdt_start_offset;
-+    drc->ccs_depth = 0;
- 
-     return RTAS_OUT_SUCCESS;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 3a925ef18a..68f936c4f8 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1288,8 +1288,8 @@ void spapr_free_hpt(sPAPRMachineState *spapr)
+     close_htab_fd(spapr);
  }
-@@ -117,14 +111,6 @@ static uint32_t drc_isolate_logical(sPAPRDRConnector *drc)
-         g_assert_not_reached();
-     }
  
--    /* if the guest is configuring a device attached to this DRC, we
--     * should reset the configuration state at this point since it may
--     * no longer be reliable (guest released device and needs to start
--     * over, or unplug occurred so the FDT is no longer valid)
--     */
--    g_free(drc->ccs);
--    drc->ccs = NULL;
--
-     /*
-      * Fail any requests to ISOLATE the LMB DRC if this LMB doesn't
-      * belong to a DIMM device that is marked for removal.
-@@ -176,6 +162,9 @@ static uint32_t drc_unisolate_logical(sPAPRDRConnector *drc)
-     g_assert(drc->dev);
+-static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+-                                 Error **errp)
++void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
++                          Error **errp)
+ {
+     long rc;
  
-     drc->state = SPAPR_DRC_STATE_LOGICAL_UNISOLATE;
-+    drc->ccs_offset = drc->fdt_start_offset;
-+    drc->ccs_depth = 0;
+@@ -1337,9 +1337,17 @@ static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+ 
+ void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
+ {
+-    spapr_reallocate_hpt(spapr,
+-                     spapr_hpt_shift_for_ramsize(MACHINE(spapr)->maxram_size),
+-                     &error_fatal);
++    int hpt_shift;
 +
-     return RTAS_OUT_SUCCESS;
- }
- 
-@@ -441,9 +430,6 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
- 
-     trace_spapr_drc_reset(spapr_drc_index(drc));
- 
--    g_free(drc->ccs);
--    drc->ccs = NULL;
--
-     /* immediately upon reset we can safely assume DRCs whose devices
-      * are pending removal can be safely removed.
-      */
-@@ -457,6 +443,9 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
-     } else {
-         drc->state = drck->empty_state;
-     }
++    if ((spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED)
++        || (spapr->cas_reboot
++            && !spapr_ovec_test(spapr->ov5_cas, OV5_HPT_RESIZE))) {
++        hpt_shift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->maxram_size);
++    } else {
++        hpt_shift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->ram_size);
++    }
++    spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
 +
-+    drc->ccs_offset = -1;
-+    drc->ccs_depth = -1;
- }
+     if (spapr->vrma_adjust) {
+         spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
+                                           spapr->htab_shift);
+@@ -2254,6 +2262,11 @@ static void ppc_spapr_init(MachineState *machine)
+         spapr_ovec_set(spapr->ov5, OV5_HP_EVT);
+     }
  
- static void drc_reset(void *opaque)
-@@ -1005,7 +994,6 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-     uint32_t drc_index;
-     sPAPRDRConnector *drc;
-     sPAPRDRConnectorClass *drck;
--    sPAPRConfigureConnectorState *ccs;
-     sPAPRDRCCResponse resp = SPAPR_DR_CC_RESPONSE_CONTINUE;
-     int rc;
++    /* advertise support for HPT resizing */
++    if (spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) {
++        spapr_ovec_set(spapr->ov5, OV5_HPT_RESIZE);
++    }
++
+     /* init CPUs */
+     if (machine->cpu_model == NULL) {
+         machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index f69ce4f60c..436f5e2b22 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1473,6 +1473,35 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     guest_radix = spapr_ovec_test(ov5_guest, OV5_MMU_RADIX_300);
+     spapr_ovec_clear(ov5_guest, OV5_MMU_RADIX_300);
  
-@@ -1035,25 +1023,18 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
++    /*
++     * HPT resizing is a bit of a special case, because when enabled
++     * we assume an HPT guest will support it until it says it
++     * doesn't, instead of assuming it won't support it until it says
++     * it does.  Strictly speaking that approach could break for
++     * guests which don't make a CAS call, but those are so old we
++     * don't care about them.  Without that assumption we'd have to
++     * make at least a temporary allocation of an HPT sized for max
++     * memory, which could be impossibly difficult under KVM HV if
++     * maxram is large.
++     */
++    if (!guest_radix && !spapr_ovec_test(ov5_guest, OV5_HPT_RESIZE)) {
++        int maxshift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->maxram_size);
++
++        if (spapr->resize_hpt == SPAPR_RESIZE_HPT_REQUIRED) {
++            error_report(
++                "h_client_architecture_support: Guest doesn't support HPT resizing, but resize-hpt=required");
++            exit(1);
++        }
++
++        if (spapr->htab_shift < maxshift) {
++            /* Guest doesn't know about HPT resizing, so we
++             * pre-emptively resize for the maximum permitted RAM.  At
++             * the point this is called, nothing should have been
++             * entered into the existing HPT */
++            spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
++        }
++    }
++
+     /* NOTE: there are actually a number of ov5 bits where input from the
+      * guest is always zero, and the platform/QEMU enables them independently
+      * of guest input. To model these properly we'd want some sort of mask,
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 3dd62d81f6..2a303a705c 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -660,6 +660,8 @@ void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
+                                                uint32_t count, uint32_t index);
+ void spapr_cpu_parse_features(sPAPRMachineState *spapr);
+ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
++void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
++                          Error **errp);
  
-     drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
+ /* CPU and LMB DRC release callbacks. */
+ void spapr_core_release(DeviceState *dev);
+diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
+index 0b464e22e7..9edfa5ff75 100644
+--- a/include/hw/ppc/spapr_ovec.h
++++ b/include/hw/ppc/spapr_ovec.h
+@@ -50,6 +50,7 @@ typedef struct sPAPROptionVector sPAPROptionVector;
+ #define OV5_DRCONF_MEMORY       OV_BIT(2, 2)
+ #define OV5_FORM1_AFFINITY      OV_BIT(5, 0)
+ #define OV5_HP_EVT              OV_BIT(6, 5)
++#define OV5_HPT_RESIZE          OV_BIT(6, 7)
+ #define OV5_XIVE_EXPLOIT        OV_BIT(23, 7)
  
--    ccs = drc->ccs;
--    if (!ccs) {
--        ccs = g_new0(sPAPRConfigureConnectorState, 1);
--        ccs->fdt_offset = drc->fdt_start_offset;
--        drc->ccs = ccs;
--    }
--
-     do {
-         uint32_t tag;
-         const char *name;
-         const struct fdt_property *prop;
-         int fdt_offset_next, prop_len;
- 
--        tag = fdt_next_tag(drc->fdt, ccs->fdt_offset, &fdt_offset_next);
-+        tag = fdt_next_tag(drc->fdt, drc->ccs_offset, &fdt_offset_next);
- 
-         switch (tag) {
-         case FDT_BEGIN_NODE:
--            ccs->fdt_depth++;
--            name = fdt_get_name(drc->fdt, ccs->fdt_offset, NULL);
-+            drc->ccs_depth++;
-+            name = fdt_get_name(drc->fdt, drc->ccs_offset, NULL);
- 
-             /* provide the name of the next OF node */
-             wa_offset = CC_VAL_DATA_OFFSET;
-@@ -1062,23 +1043,22 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-             resp = SPAPR_DR_CC_RESPONSE_NEXT_CHILD;
-             break;
-         case FDT_END_NODE:
--            ccs->fdt_depth--;
--            if (ccs->fdt_depth == 0) {
-+            drc->ccs_depth--;
-+            if (drc->ccs_depth == 0) {
-                 uint32_t drc_index = spapr_drc_index(drc);
- 
-                 /* done sending the device tree, move to configured state */
-                 trace_spapr_drc_set_configured(drc_index);
-                 drc->state = drck->ready_state;
--                g_free(ccs);
--                drc->ccs = NULL;
--                ccs = NULL;
-+                drc->ccs_offset = -1;
-+                drc->ccs_depth = -1;
-                 resp = SPAPR_DR_CC_RESPONSE_SUCCESS;
-             } else {
-                 resp = SPAPR_DR_CC_RESPONSE_PREV_PARENT;
-             }
-             break;
-         case FDT_PROP:
--            prop = fdt_get_property_by_offset(drc->fdt, ccs->fdt_offset,
-+            prop = fdt_get_property_by_offset(drc->fdt, drc->ccs_offset,
-                                               &prop_len);
-             name = fdt_string(drc->fdt, fdt32_to_cpu(prop->nameoff));
- 
-@@ -1103,8 +1083,8 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
-             /* keep seeking for an actionable tag */
-             break;
-         }
--        if (ccs) {
--            ccs->fdt_offset = fdt_offset_next;
-+        if (drc->ccs_offset >= 0) {
-+            drc->ccs_offset = fdt_offset_next;
-         }
-     } while (resp == SPAPR_DR_CC_RESPONSE_CONTINUE);
- 
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 4ceaaf0eff..9d4fd41d22 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -191,12 +191,6 @@ typedef enum {
-     SPAPR_DRC_STATE_PHYSICAL_CONFIGURED = 8,
- } sPAPRDRCState;
- 
--/* rtas-configure-connector state */
--typedef struct sPAPRConfigureConnectorState {
--    int fdt_offset;
--    int fdt_depth;
--} sPAPRConfigureConnectorState;
--
- typedef struct sPAPRDRConnector {
-     /*< private >*/
-     DeviceState parent;
-@@ -209,14 +203,16 @@ typedef struct sPAPRDRConnector {
- 
-     uint32_t state;
- 
--    /* configure-connector state */
--    void *fdt;
--    int fdt_start_offset;
--    sPAPRConfigureConnectorState *ccs;
-+    /* RTAS ibm,configure-connector state */
-+    /* (only valid in UNISOLATE state) */
-+    int ccs_offset;
-+    int ccs_depth;
- 
-     /* device pointer, via link property */
-     DeviceState *dev;
-     bool unplug_requested;
-+    void *fdt;
-+    int fdt_start_offset;
- } sPAPRDRConnector;
- 
- typedef struct sPAPRDRConnectorClass {
+ /* ISA 3.00 MMU features: */
 -- 
 2.13.3
