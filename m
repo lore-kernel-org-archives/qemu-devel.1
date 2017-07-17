@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dX3r9-0001tg-12
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:06:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dX3uL-0002sU-1i
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dX3r5-0000nv-0Q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:06:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39382)
+	(envelope-from <dgilbert@redhat.com>) id 1dX3uG-0002n3-S5
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:09:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dX3r4-0000mB-Qa
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:06:22 -0400
-Date: Mon, 17 Jul 2017 12:06:14 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170717110614.GK3640@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170717063521.GA7393@lemon>
-	<b718f71c-5208-298a-4fb9-0c2fea3146ec@redhat.com>
-	<20170717102053.GH3640@redhat.com>
-	<CAFEAcA9fzkk6mC+Bz4jNd+7M8nq0xpooVFDNeVb0VcqGDadB8Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9fzkk6mC+Bz4jNd+7M8nq0xpooVFDNeVb0VcqGDadB8Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dX3uG-0002mk-MG
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:09:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BE73885541
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 11:09:39 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 17 Jul 2017 12:09:30 +0100
+Message-Id: <20170717110936.23314-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/6] A bunch of RDMA fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Mon, Jul 17, 2017 at 12:00:22PM +0100, Peter Maydell wrote:
-> On 17 July 2017 at 11:20, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > I'm a little concerned about the fact that we've now got three different
-> > sets of tests that are being run on pull requests. There are the tests
-> > that Peter runs on various combinations at time of merge, the tests run
-> > by patchw at time of submissions, and the tests run by travis after
-> > merge. Each of them is covering a different set of scenarios with only
-> > partial overlap between them.
-> 
-> I agree -- I have my ad-hoc test system not because I enjoy
-> collecting random things to run tests on but because we don't
-> have an automated system that does what I need:
->  * wide coverage, focusing on oddball host architectures and OSes
->  * ability to ssh in to a machine where tests have broken if need be
->  * decently fast to complete a test run (travis is terrible for this)
-> 
-> Note that "fast to complete a test run for me" is in conflict with
-> "usable by anybody who wants to submit a pull request" :-)
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Not neccessarily. It does mean though that if we had an automated test
-system, we would have to reserve some portion of hardware resources for
-exclusively jobs triggered by the person responsible for git master and
-stable branch merges, so that it can never get delayed by a backlog of
-jobs from the mailing list.
+  This is a bunch of RDMA fixes, the first is a race
+I spotted a while ago that you don't hit during normal
+operation; the rest are to do with migration failure and
+cancellation that I started looking at because of lp1545052 which
+is a failure to recover on the source if the destination
+fails.
+ 
+  I'm pretty sure there are other cases where the source
+might hang waiting for a failed destination; particularly
+if the destination hangs rather than fails completely;
+one I know of is waiting for the event after the rdma_disconnect
+but I don't have a good fix for it.  Suggestions welcome.
+ 
+v4
+  Fix more error paths in qemu_rdma_block_for_wrid - often
+  the 'ret' wasn't set. Fix that and also fix the case we
+  add to also set the ret. Spotted by Peter.
 
-OpenStack has this kind of CI system - they have 2 separate job queues,
-one testing all patches submitted for code review, and one queue only
-processing patches for merge, so the former can't negatively impact the
-progress of the latter. Availability of (money/sponsorship for) hardware
-though is an obvious limiting factor here.
+Dr. David Alan Gilbert (6):
+  migration/rdma: Fix race on source
+  migration: Close file on failed migration load
+  migration/rdma: fix qemu_rdma_block_for_wrid error paths
+  migration/rdma: Allow cancelling while waiting for wrid
+  migration/rdma: Safely convert control types
+  migration/rdma: Send error during cancelling
 
-Regards,
-Daniel
+ migration/migration.c |   1 +
+ migration/rdma.c      | 137 ++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 101 insertions(+), 37 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.0
