@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX7rB-0000YL-8L
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:22:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dX7ru-0000vp-9U
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX7rA-00005O-Ar
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:22:45 -0400
-References: <20170717151207.24919-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1c8802d4-d8e3-1a9e-d5e9-885f8ef050f3@redhat.com>
-Date: Mon, 17 Jul 2017 10:22:37 -0500
+	(envelope-from <imammedo@redhat.com>) id 1dX7rt-0000IM-8U
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:23:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dX7rs-0000Hx-VU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:23:29 -0400
+Date: Mon, 17 Jul 2017 17:23:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170717172322.54bd6888@nial.brq.redhat.com>
+In-Reply-To: <f32dbe33-4a99-cf79-e41c-4a1accacda64@suse.de>
+References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-15-git-send-email-imammedo@redhat.com>
+	<5bec6275-8e15-16c7-8d23-2975a563c78f@twiddle.net>
+	<20170717124146.5ae39d2b@nial.brq.redhat.com>
+	<f32dbe33-4a99-cf79-e41c-4a1accacda64@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20170717151207.24919-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rvEtU8vXrxeXBVHejM8HIC4qtl719kOLT"
-Subject: Re: [Qemu-devel] [PATCH] block/vvfat: Fix compiler warning with gcc
- 7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 14/28] m68k: replace cpu_m68k_init() with
+ cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
+To: Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Thomas Huth <huth@tuxfamily.org>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rvEtU8vXrxeXBVHejM8HIC4qtl719kOLT
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?=
- <hpoussin@reactos.org>, qemu-devel@nongnu.org
-Message-ID: <1c8802d4-d8e3-1a9e-d5e9-885f8ef050f3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/vvfat: Fix compiler warning with gcc 7
-References: <20170717151207.24919-1-mreitz@redhat.com>
-In-Reply-To: <20170717151207.24919-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 17 Jul 2017 17:05:15 +0200
+Andreas F=C3=A4rber <afaerber@suse.de> wrote:
 
-On 07/17/2017 10:12 AM, Max Reitz wrote:
-> gcc 7 complains that the sprintf() might write a null byte beyond the
-> end of the tail buffer.  That is wrong, but we can silence it by making=
-
-> i unsigned (it can never be negative anyway, see the if condition right=
-
-> before).  For some reason, this allows gcc to suddenly accurately
-> calculate the range of i so we can give the tail[] array the exact size=
-
-> it needs to have (which is 8 bytes) without gcc complaining.
+> Am 17.07.2017 um 12:41 schrieb Igor Mammedov:
+> > On Sat, 15 Jul 2017 08:08:58 -1000
+> > Richard Henderson <rth@twiddle.net> wrote:
+> >  =20
+> >> On 07/14/2017 03:52 AM, Igor Mammedov wrote: =20
+> >>> @@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, =
+Error **errp)
+> >>>       M68kCPUClass *mcc =3D M68K_CPU_GET_CLASS(dev);
+> >>>       Error *local_err =3D NULL;
+> >>>  =20
+> >>> +    register_m68k_insns(&cpu->env);
+> >>> +   =20
+> >>
+> >> I think it would make more sense to do this during m68k_tcg_init.
+> >> =20
+> > it seems that m68k_cpu_initfn accesses 'env' via some global,
+> > while cpu_mk68k_init() used to access concrete pointer of just created =
+cpu,
+> >=20
+> > how about moving register_m68k_insns() to m68k_cpu_initfn(), instead?
+> > it should be equivalent to what cpu_mk68k_init() used to do. =20
 >=20
-> In addition, let us convert the sprintf() to snprintf(), because that i=
-s
-> always nicer, and add an assertion about the range of the return value
-> afterwards so we can see that "8 - len" will never be negative and thus=
+> As a general note, realize should be re-entrant. Can't tell from the
+> above diff whether that is the case here.
+Looking at
 
-> "entry->name + MIN(j, 8 - len)" will never be out of bounds.
+void register_m68k_insns (CPUM68KState *env)                               =
+     =20
+{                                                                          =
+     =20
+    /* Build the opcode table only once to avoid                           =
+     =20
+       multithreading issues. */                                           =
+     =20
+    if (opcode_table[0] !=3D NULL) {                                       =
+       =20
+        return;                                                            =
+     =20
+    }
+
+it is save to use multiple times,
+
+also looking further in it:
+
+#define BASE(name, opcode, mask) \                                         =
+     =20
+    register_opcode(disas_##name, 0x##opcode, 0x##mask)                    =
+     =20
+#define INSN(name, opcode, mask, feature) do { \                           =
+     =20
+    if (m68k_feature(env, M68K_FEATURE_##feature)) \                       =
+     =20
+        BASE(name, opcode, mask); \                                        =
+     =20
+    } while(0)                                                             =
+     =20
+    BASE(undef,     0000, 0000);                                           =
+     =20
+    INSN(arith_im,  0080, fff8, CF_ISA_A);
+
+INSN macro depends on enabled features, it might work with current code that
+has no user settable features but it will break once that is available.
+
+So I retract my suggestion to move register_m68k_insns() into m68k_cpu_init=
+fn()
+and keep it as it's in this patch (in m68k_cpu_realizefn()),
+that way features theoretically set between initfn(and m68k_tcg_init) and r=
+ealize() will
+have effect on created cpu and we won't have to fix it in future.
+
+> Regards,
+> Andreas
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/vvfat.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rvEtU8vXrxeXBVHejM8HIC4qtl719kOLT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlls1j0ACgkQp6FrSiUn
-Q2oVoggAiyjzlkYHcLyyhFIiNbN5h1pXqLFYbaOP/WWFq7njAt1OHH0Fx3PEVxOA
-v11SjD8WqJ6zCsIMOVy5ctX3AXixnkBmchW5jn9jz5T4BPwsmjASgzY+73AoDmFW
-OwgQEEhOOg9OLMvvHRWffMwwn6fKlndhO42237fl7m+ZwjiHCK6Aw8ikGxfwE24Z
-/GkxT8FTYMLwkG7gE2xDB7QnkB9zqcJ096Z34QYWLDT5rSp/PZbHBfPCuD8dIcSn
-bD/IdU0s+0O+DRVacCzya49hX+PmmpxHJWBNIN34O0GSYhfKvrzf+Ft9kxrAPICs
-H/RU6P4OdNGFKDtpe06Zim1wB62CSQ==
-=TE8n
------END PGP SIGNATURE-----
-
---rvEtU8vXrxeXBVHejM8HIC4qtl719kOLT--
