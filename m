@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dX5Oc-0007r2-Kd
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dX5Od-0007tJ-Pc
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dX5Ob-0002Df-Dz
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:06 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37640)
+	(envelope-from <pm215@archaic.org.uk>) id 1dX5Oc-0002Ef-NS
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:07 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37639)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dX5Ob-0002Ci-7G
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:05 -0400
+	id 1dX5Oc-00029H-Ew
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:45:06 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1dX5OZ-0003Xh-U6
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:45:03 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dX5OX-0003VV-57
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:45:01 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 13:44:54 +0100
-Message-Id: <1500295494-8991-19-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 13:44:48 +0100
+Message-Id: <1500295494-8991-13-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1500295494-8991-1-git-send-email-peter.maydell@linaro.org>
 References: <1500295494-8991-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 18/18] MAINTAINERS: Add entries for MPS2 board
+Subject: [Qemu-devel] [PULL 12/18] hw/arm/mps2: Add UARTs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +29,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Add entries to the MAINTAINERS file for the new MPS2
-board and devices.
+Add the UARTs to the MPS2 board models.
 
-Since the CMSDK devices are not specific to the MPS2 board,
-extend the existing 'PrimeCell' section to cover CMSDK
-devices as well; in both cases these are devices implemented
-by ARM and provided as RTL that may be used in multiple
-SoCs and boards.
+Unfortunately the details of the wiring of the interrupts through
+various OR gates differ between AN511 and AN385 so this can't
+be purely a data-driven difference.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 1500029487-14822-10-git-send-email-peter.maydell@linaro.org
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: 1500029487-14822-4-git-send-email-peter.maydell@linaro.org
 ---
- MAINTAINERS | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ hw/arm/mps2.c            | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/char/cmsdk-apb-uart.c |  2 +-
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b9aa878..5ea273f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -375,7 +375,7 @@ F: hw/*/allwinner*
- F: include/hw/*/allwinner*
- F: hw/arm/cubieboard.c
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 22b33ff..9c8fa77 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -27,9 +27,12 @@
+ #include "qemu/error-report.h"
+ #include "hw/arm/arm.h"
+ #include "hw/arm/armv7m.h"
++#include "hw/or-irq.h"
+ #include "hw/boards.h"
+ #include "exec/address-spaces.h"
++#include "sysemu/sysemu.h"
+ #include "hw/misc/unimp.h"
++#include "hw/char/cmsdk-apb-uart.h"
  
--ARM PrimeCell
-+ARM PrimeCell and CMSDK devices
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
-@@ -389,6 +389,10 @@ F: hw/intc/pl190.c
- F: hw/sd/pl181.c
- F: hw/timer/pl031.c
- F: include/hw/arm/primecell.h
-+F: hw/timer/cmsdk-apb-timer.c
-+F: include/hw/timer/cmsdk-apb-timer.h
-+F: hw/char/cmsdk-apb-uart.c
-+F: include/hw/char/cmsdk-apb-uart.h
+ typedef enum MPS2FPGAType {
+     FPGA_AN385,
+@@ -205,6 +208,91 @@ static void mps2_common_init(MachineState *machine)
+     create_unimplemented_device("Ethernet", 0x40200000, 0x00100000);
+     create_unimplemented_device("VGA", 0x41000000, 0x0200000);
  
- ARM cores
- M: Peter Maydell <peter.maydell@linaro.org>
-@@ -450,6 +454,14 @@ S: Maintained
- F: hw/arm/integratorcp.c
- F: hw/misc/arm_integrator_debug.c
- 
-+MPS2
-+M: Peter Maydell <peter.maydell@linaro.org>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/arm/mps2.c
-+F: hw/misc/mps2-scc.c
-+F: include/hw/misc/mps2-scc.h
++    switch (mmc->fpga_type) {
++    case FPGA_AN385:
++    {
++        /* The overflow IRQs for UARTs 0, 1 and 2 are ORed together.
++         * Overflow for UARTs 4 and 5 doesn't trigger any interrupt.
++         */
++        Object *orgate;
++        DeviceState *orgate_dev;
++        int i;
 +
- Musicpal
- M: Jan Kiszka <jan.kiszka@web.de>
- L: qemu-arm@nongnu.org
++        orgate = object_new(TYPE_OR_IRQ);
++        object_property_set_int(orgate, 6, "num-lines", &error_fatal);
++        object_property_set_bool(orgate, true, "realized", &error_fatal);
++        orgate_dev = DEVICE(orgate);
++        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
++
++        for (i = 0; i < 5; i++) {
++            static const hwaddr uartbase[] = {0x40004000, 0x40005000,
++                                              0x40006000, 0x40007000,
++                                              0x40009000};
++            Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
++            /* RX irq number; TX irq is always one greater */
++            static const int uartirq[] = {0, 2, 4, 18, 20};
++            qemu_irq txovrint = NULL, rxovrint = NULL;
++
++            if (i < 3) {
++                txovrint = qdev_get_gpio_in(orgate_dev, i * 2);
++                rxovrint = qdev_get_gpio_in(orgate_dev, i * 2 + 1);
++            }
++
++            cmsdk_apb_uart_create(uartbase[i],
++                                  qdev_get_gpio_in(armv7m, uartirq[i] + 1),
++                                  qdev_get_gpio_in(armv7m, uartirq[i]),
++                                  txovrint, rxovrint,
++                                  NULL,
++                                  uartchr, SYSCLK_FRQ);
++        }
++        break;
++    }
++    case FPGA_AN511:
++    {
++        /* The overflow IRQs for all UARTs are ORed together.
++         * Tx and Rx IRQs for each UART are ORed together.
++         */
++        Object *orgate;
++        DeviceState *orgate_dev;
++        int i;
++
++        orgate = object_new(TYPE_OR_IRQ);
++        object_property_set_int(orgate, 10, "num-lines", &error_fatal);
++        object_property_set_bool(orgate, true, "realized", &error_fatal);
++        orgate_dev = DEVICE(orgate);
++        qdev_connect_gpio_out(orgate_dev, 0, qdev_get_gpio_in(armv7m, 12));
++
++        for (i = 0; i < 5; i++) {
++            /* system irq numbers for the combined tx/rx for each UART */
++            static const int uart_txrx_irqno[] = {0, 2, 45, 46, 56};
++            static const hwaddr uartbase[] = {0x40004000, 0x40005000,
++                                              0x4002c000, 0x4002d000,
++                                              0x4002e000};
++            Chardev *uartchr = i < MAX_SERIAL_PORTS ? serial_hds[i] : NULL;
++            Object *txrx_orgate;
++            DeviceState *txrx_orgate_dev;
++
++            txrx_orgate = object_new(TYPE_OR_IRQ);
++            object_property_set_int(txrx_orgate, 2, "num-lines", &error_fatal);
++            object_property_set_bool(txrx_orgate, true, "realized",
++                                     &error_fatal);
++            txrx_orgate_dev = DEVICE(txrx_orgate);
++            qdev_connect_gpio_out(txrx_orgate_dev, 0,
++                                  qdev_get_gpio_in(armv7m, uart_txrx_irqno[i]));
++            cmsdk_apb_uart_create(uartbase[i],
++                                  qdev_get_gpio_in(txrx_orgate_dev, 0),
++                                  qdev_get_gpio_in(txrx_orgate_dev, 1),
++                                  qdev_get_gpio_in(orgate_dev, 0),
++                                  qdev_get_gpio_in(orgate_dev, 1),
++                                  NULL,
++                                  uartchr, SYSCLK_FRQ);
++        }
++        break;
++    }
++    default:
++        g_assert_not_reached();
++    }
++
+     system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
+ 
+     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+diff --git a/hw/char/cmsdk-apb-uart.c b/hw/char/cmsdk-apb-uart.c
+index ab34729..1ad1e14 100644
+--- a/hw/char/cmsdk-apb-uart.c
++++ b/hw/char/cmsdk-apb-uart.c
+@@ -339,7 +339,7 @@ static void cmsdk_apb_uart_realize(DeviceState *dev, Error **errp)
+      * an event handler to deal with CHR_EVENT_BREAK.
+      */
+     qemu_chr_fe_set_handlers(&s->chr, uart_can_receive, uart_receive,
+-                             NULL, s, NULL, true);
++                             NULL, NULL, s, NULL, true);
+ }
+ 
+ static int cmsdk_apb_uart_post_load(void *opaque, int version_id)
 -- 
 2.7.4
