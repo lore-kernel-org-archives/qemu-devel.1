@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXB77-0003Wq-I0
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXBE8-0001lo-Qa
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXB76-0003xI-D2
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58828)
+	(envelope-from <dgilbert@redhat.com>) id 1dXBE5-0002rm-Gk
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:58:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXB76-0003wP-3q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:51:24 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 17 Jul 2017 15:50:51 -0300
-Message-Id: <20170717185051.18740-16-ehabkost@redhat.com>
-In-Reply-To: <20170717185051.18740-1-ehabkost@redhat.com>
-References: <20170717185051.18740-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 15/15] qmp: Include parent type on
- 'qom-list-types' output
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXBE5-0002r3-7Z
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:58:37 -0400
+Date: Mon, 17 Jul 2017 19:58:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170717185830.GD31820@work-vm>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,196 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, quintela@redhat.com
 
-Include name of parent type of each type on 'qom-list-types' output.
+* Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
+> On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> 
+> > On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> > wrote:
+> > > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> > > Paolo suggested offline that we send a pull request for this series.
+> > > Here it is, I've run it through my testsuite + tested the LQSPI testcase
+> > > on Zynq.
+> >
+> > > ----------------------------------------------------------------
+> > > mmio-exec.for-upstream
+> > >
+> > > ----------------------------------------------------------------
+> > > KONRAD Frederic (7):
+> > >       cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+> > >       cputlb: move get_page_addr_code
+> > >       cputlb: fix the way get_page_addr_code fills the tlb
+> > >       qdev: add MemoryRegion property
+> > >       introduce mmio_interface
+> > >       exec: allow to get a pointer for some mmio memory region
+> > >       xilinx_spips: allow mmio execution
+> >
+> > Hi Edgar -- can you or Fred explain how this code interacts with
+> > VM migration? The mmio-interface device creates a RAM memory
+> > region with memory_region_init_ram_ptr(), but it doesn't call
+> > vmstate_register_ram(). On the other hand the core migration code
+> > will try to migrate the contents of the RAMBlock anyway, just
+> > without a name.
+> >
+> > It's not clear to me how this works, and it would be nice to
+> > get it clear so that we can make any necessary fixes before the
+> > 2.10 release hits and we lose the opportunity to make any
+> > migration-compatibility-breaking changes.
+> >
+> > thanks
+> > -- PMM
+> >
+> 
+> Hi Peter,
+> 
+> These temporary regions should be read-only and treated as temporary caches
+> AFAIU things.
+> I would say that they don't need to be migrated. After migration, the new
+> VM will recreate the ram areas from device backing.
+> 
+> Is there a way we can prevent migration of the RAMBlock?
 
-Without this, there's no way to figure out the parents of a given type
-without making additional 'qom-list-types' queries.
+Not yet, I think we'd have to:
+   a) Add a flag to the RAMBlock
+   b) Set it/clear it on registration
+   c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
+   d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
+   cases) with the RAMBLOCK_FOREACH_MIGRATABLE
+   e) Worry about the corner cases!
 
-In addition to the test case for the new feature, update the
-abstract-interface test case to use the new field and avoid the
-"qom-list-types implements=object" trick.
+I've got a few worries about what happens when the kernel tries to
+do dirty yncing - I'm not sure if we have to change anything on that
+interface to skip those RAMBlocks.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170707122215.8819-4-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- qapi-schema.json               |  4 +-
- qmp.c                          |  5 +++
- tests/device-introspect-test.c | 84 +++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 82 insertions(+), 11 deletions(-)
+Dave
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 6486690..8b015be 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3054,10 +3054,12 @@
- # @abstract: the type is abstract and can't be directly instantiated.
- #            Omitted if false. (since 2.10)
- #
-+# @parent: Name of parent type, if any (since 2.10)
-+#
- # Since: 1.1
- ##
- { 'struct': 'ObjectTypeInfo',
--  'data': { 'name': 'str', '*abstract': 'bool' } }
-+  'data': { 'name': 'str', '*abstract': 'bool', '*parent': 'str' } }
- 
- ##
- # @qom-list-types:
-diff --git a/qmp.c b/qmp.c
-index 7a9de06..b86201e 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -430,10 +430,15 @@ static void qom_list_types_tramp(ObjectClass *klass, void *data)
- {
-     ObjectTypeInfoList *e, **pret = data;
-     ObjectTypeInfo *info;
-+    ObjectClass *parent = object_class_get_parent(klass);
- 
-     info = g_malloc0(sizeof(*info));
-     info->name = g_strdup(object_class_get_name(klass));
-     info->has_abstract = info->abstract = object_class_is_abstract(klass);
-+    if (parent) {
-+        info->has_parent = true;
-+        info->parent = g_strdup(object_class_get_name(parent));
-+    }
- 
-     e = g_malloc0(sizeof(*e));
-     e->value = info;
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 78d4811..f7162c0 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -45,6 +45,40 @@ static QList *qom_list_types(const char *implements, bool abstract)
-     return ret;
- }
- 
-+/* Build a name -> ObjectTypeInfo index from a ObjectTypeInfo list */
-+static QDict *qom_type_index(QList *types)
-+{
-+    QDict *index = qdict_new();
-+    QListEntry *e;
-+
-+    QLIST_FOREACH_ENTRY(types, e) {
-+        QDict *d = qobject_to_qdict(qlist_entry_obj(e));
-+        const char *name = qdict_get_str(d, "name");
-+        QINCREF(d);
-+        qdict_put(index, name, d);
-+    }
-+    return index;
-+}
-+
-+/* Check if @parent is present in the parent chain of @type */
-+static bool qom_has_parent(QDict *index, const char *type, const char *parent)
-+{
-+    while (type) {
-+        QDict *d = qdict_get_qdict(index, type);
-+        const char *p = d && qdict_haskey(d, "parent") ?
-+                        qdict_get_str(d, "parent") :
-+                        NULL;
-+
-+        if (!strcmp(type, parent)) {
-+            return true;
-+        }
-+
-+        type = p;
-+    }
-+
-+    return false;
-+}
-+
- /* Find an entry on a list returned by qom-list-types */
- static QDict *type_list_find(QList *types, const char *name)
- {
-@@ -103,6 +137,30 @@ static void test_device_intro_list(void)
-     qtest_end();
- }
- 
-+/*
-+ * Ensure all entries returned by qom-list-types implements=<parent>
-+ * have <parent> as a parent.
-+ */
-+static void test_qom_list_parents(const char *parent)
-+{
-+    QList *types;
-+    QListEntry *e;
-+    QDict *index;
-+
-+    types = qom_list_types(parent, true);
-+    index = qom_type_index(types);
-+
-+    QLIST_FOREACH_ENTRY(types, e) {
-+        QDict *d = qobject_to_qdict(qlist_entry_obj(e));
-+        const char *name = qdict_get_str(d, "name");
-+
-+        g_assert(qom_has_parent(index, name, parent));
-+    }
-+
-+    QDECREF(types);
-+    QDECREF(index);
-+}
-+
- static void test_qom_list_fields(void)
- {
-     QList *all_types;
-@@ -125,6 +183,10 @@ static void test_qom_list_fields(void)
-         g_assert(abstract == expected_abstract);
-     }
- 
-+    test_qom_list_parents("object");
-+    test_qom_list_parents("device");
-+    test_qom_list_parents("sys-bus-device");
-+
-     QDECREF(all_types);
-     QDECREF(non_abstract);
-     qtest_end();
-@@ -167,23 +229,25 @@ static void test_device_intro_concrete(void)
- static void test_abstract_interfaces(void)
- {
-     QList *all_types;
--    QList *obj_types;
-     QListEntry *e;
-+    QDict *index;
- 
-     qtest_start(common_args);
--    /*
--     * qom-list-types implements=interface returns all types that
--     * implement _any_ interface (not just interface types), but
--     * we can filter them out because interfaces don't implement
--     * the "object" type.
--     */
-+
-     all_types = qom_list_types("interface", true);
--    obj_types = qom_list_types("object", true);
-+    index = qom_type_index(all_types);
- 
-     QLIST_FOREACH_ENTRY(all_types, e) {
-         QDict *d = qobject_to_qdict(qlist_entry_obj(e));
-+        const char *name = qdict_get_str(d, "name");
- 
--        if (type_list_find(obj_types, qdict_get_str(d, "name"))) {
-+        /*
-+         * qom-list-types implements=interface returns all types
-+         * that implement _any_ interface (not just interface
-+         * types), so skip the ones that don't have "interface"
-+         * on the parent type chain.
-+         */
-+        if (!qom_has_parent(index, name, "interface")) {
-             /* Not an interface type */
-             continue;
-         }
-@@ -192,7 +256,7 @@ static void test_abstract_interfaces(void)
-     }
- 
-     QDECREF(all_types);
--    QDECREF(obj_types);
-+    QDECREF(index);
-     qtest_end();
- }
- 
--- 
-2.9.4
+> Cheers,
+> Edgar
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
