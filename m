@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXARJ-0007Xa-Cu
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:08:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dXASd-0008M7-6S
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXARI-0000ab-Hv
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:08:13 -0400
-References: <20170717142620.6970-1-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <433f7790-bfbf-d0a1-a117-b57fb078b70e@redhat.com>
-Date: Mon, 17 Jul 2017 14:07:58 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170717142620.6970-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Remove a few tests
- from 'quick' group
+	(envelope-from <ehabkost@redhat.com>) id 1dXASZ-0001Bc-PF
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:09:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49464)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXASZ-0001Ap-GK
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:09:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 83BCD2F86C5
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 18:09:30 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 17 Jul 2017 15:09:26 -0300
+Message-Id: <20170717180926.14924-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on alternate
+ conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +28,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+The conflict check added by commit c0644771 ("qapi: Reject
+alternates that can't work with keyval_parse()") doesn't work
+with the following declaration:
 
+  { 'alternate': 'Alt',
+    'data': { 'one': 'bool',
+              'two': 'str' } }
 
-On 07/17/2017 10:26 AM, Eric Blake wrote:
-> A run of './check -qcow2 -g quick' on my machine produced only
-> two tests that took longer than 5 seconds; 178 took 18, and
-> 189 took 7.  Remove them from the quick group.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/group | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 2aba585287..01f12d6781 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -175,11 +175,11 @@
->  175 auto quick
->  176 rw auto backing
->  177 rw auto quick
-> -178 auto quick
-> +178 auto
->  179 rw auto quick
->  181 rw auto migration
->  182 rw auto quick
->  183 rw auto migration
->  185 rw auto
->  188 rw auto quick
-> -189 rw auto quick
-> +189 rw auto
-> 
+It crashes with:
 
-Seems about as scientific as the existing methods used to define the
-quick group, so why not?
+  Traceback (most recent call last):
+    File "./scripts/qapi-types.py", line 295, in <module>
+      schema = QAPISchema(input_file)
+    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
+      self.exprs = check_exprs(parser.exprs)
+    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
+      check_alternate(expr, info)
+    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
+      % (name, key, types_seen[qtype]))
+  KeyError: 'QTYPE_QSTRING'
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+This happens because the previously-seen conflicting member
+('one') can't be found at types_seen[qtype], but at
+types_seen['QTYPE_BOOL'].
+
+Fix the bug by moving the error check to the same loop that adds
+new items to types_seen, raising an exception if types_seen[qt]
+is already set.
+
+Add two additional test cases that can detect the bug.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Changes v1 -> v2:
+* Fix mistake on *.err files (wrong line number on error message)
+---
+ scripts/qapi.py                                       | 8 ++++----
+ tests/Makefile.include                                | 2 ++
+ tests/qapi-schema/alternate-conflict-bool-string.err  | 1 +
+ tests/qapi-schema/alternate-conflict-bool-string.exit | 1 +
+ tests/qapi-schema/alternate-conflict-bool-string.json | 4 ++++
+ tests/qapi-schema/alternate-conflict-bool-string.out  | 0
+ tests/qapi-schema/alternate-conflict-num-string.err   | 1 +
+ tests/qapi-schema/alternate-conflict-num-string.exit  | 1 +
+ tests/qapi-schema/alternate-conflict-num-string.json  | 4 ++++
+ tests/qapi-schema/alternate-conflict-num-string.out   | 0
+ tests/qapi-schema/alternate-multi-conflict.json       | 0
+ 11 files changed, 18 insertions(+), 4 deletions(-)
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.out
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.out
+ create mode 100644 tests/qapi-schema/alternate-multi-conflict.json
+
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 84e2eb4..a9c12e5 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -824,11 +824,11 @@ def check_alternate(expr, info):
+             else:
+                 conflicting.add('QTYPE_QNUM')
+                 conflicting.add('QTYPE_QBOOL')
+-        if conflicting & set(types_seen):
+-            raise QAPISemError(info, "Alternate '%s' member '%s' can't "
+-                               "be distinguished from member '%s'"
+-                               % (name, key, types_seen[qtype]))
+         for qt in conflicting:
++            if qt in types_seen:
++                raise QAPISemError(info, "Alternate '%s' member '%s' can't "
++                                   "be distinguished from member '%s'"
++                                   % (name, key, types_seen[qt]))
+             types_seen[qt] = key
+ 
+ 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index cfbb689..16d7a3a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -346,6 +346,8 @@ qapi-schema += alternate-conflict-dict.json
+ qapi-schema += alternate-conflict-enum-bool.json
+ qapi-schema += alternate-conflict-enum-int.json
+ qapi-schema += alternate-conflict-string.json
++qapi-schema += alternate-conflict-bool-string.json
++qapi-schema += alternate-conflict-num-string.json
+ qapi-schema += alternate-empty.json
+ qapi-schema += alternate-nested.json
+ qapi-schema += alternate-unknown.json
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.err b/tests/qapi-schema/alternate-conflict-bool-string.err
+new file mode 100644
+index 0000000..e52fee7
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-bool-string.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-conflict-bool-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.exit b/tests/qapi-schema/alternate-conflict-bool-string.exit
+new file mode 100644
+index 0000000..d00491f
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-bool-string.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.json b/tests/qapi-schema/alternate-conflict-bool-string.json
+new file mode 100644
+index 0000000..0544de1
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-bool-string.json
+@@ -0,0 +1,4 @@
++# alternate branches of 'str' type conflict with all scalar types
++{ 'alternate': 'Alt',
++  'data': { 'one': 'bool',
++            'two': 'str' } }
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.out b/tests/qapi-schema/alternate-conflict-bool-string.out
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.err b/tests/qapi-schema/alternate-conflict-num-string.err
+new file mode 100644
+index 0000000..5ba3827
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-num-string.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-conflict-num-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.exit b/tests/qapi-schema/alternate-conflict-num-string.exit
+new file mode 100644
+index 0000000..d00491f
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-num-string.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.json b/tests/qapi-schema/alternate-conflict-num-string.json
+new file mode 100644
+index 0000000..ae90144
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-num-string.json
+@@ -0,0 +1,4 @@
++# alternate branches of 'str' type conflict with all scalar types
++{ 'alternate': 'Alt',
++  'data': { 'one': 'number',
++            'two': 'str' } }
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/qapi-schema/alternate-multi-conflict.json b/tests/qapi-schema/alternate-multi-conflict.json
+new file mode 100644
+index 0000000..e69de29
+-- 
+2.9.4
