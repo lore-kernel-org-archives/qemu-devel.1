@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX0b9-0006bM-0Q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:37:44 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dX0lV-00010d-Iy
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX0b4-0000uV-FS
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:37:43 -0400
-Received: from [59.151.112.132] (port=36823 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX0b4-0000t2-2L
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:37:38 -0400
-References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1499925175-21218-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<174a3db3-6a14-edbb-641a-e93746c51861@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <7ac18343-fc01-8029-2264-617fdde6d6b2@cn.fujitsu.com>
-Date: Mon, 17 Jul 2017 15:39:58 +0800
+	(envelope-from <guangrong.xiao@gmail.com>) id 1dX0lQ-0006P1-Mp
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:48:25 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:36698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1dX0lQ-0006Ov-Fz
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 03:48:20 -0400
+Received: by mail-pg0-x242.google.com with SMTP id y129so18575646pgy.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 00:48:20 -0700 (PDT)
+References: <8E78D212B8C25246BE4CE7EA0E645FE501066958@dggemi503-mbs.china.huawei.com>
+	<d521a766-26c9-a5ab-3d80-9da47a2bc89e@gmail.com>
+	<8E78D212B8C25246BE4CE7EA0E645FE501067051@dggemi503-mbs.china.huawei.com>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <36075496-773e-e412-6e19-f332d158be53@gmail.com>
+Date: Mon, 17 Jul 2017 15:48:27 +0800
 MIME-Version: 1.0
-In-Reply-To: <174a3db3-6a14-edbb-641a-e93746c51861@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <8E78D212B8C25246BE4CE7EA0E645FE501067051@dggemi503-mbs.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH V2 2/4] net/colo-compare.c: Compare the tcp
- packets that has the same sequence number
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Question] Seabios HANGs when mmio wirte in a
+ nested vmware host wtih virito-scsi controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Xulei (Stone)" <stone.xulei@huawei.com>, "seabios@seabios.org" <seabios@seabios.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, mst <mst@redhat.com>, jasowang <jasowang@redhat.com>, xiaoguangrong <xiaoguangrong@tencent.com>, Kevin O'Connor <kevin@koconnor.net>, kraxel <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>
 
 
 
-On 07/14/2017 11:25 AM, Jason Wang wrote:
->
->
-> On 2017年07月13日 13:52, Zhang Chen wrote:
->> If primary packet's sequence number not same with secondary packet's
->> sequence number, no need to compare the packet other field.
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   net/colo-compare.c | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 0f8e198..2caeb80 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -222,6 +222,12 @@ static int colo_packet_compare_tcp(Packet *spkt, 
->> Packet *ppkt)
->>       ptcp = (struct tcphdr *)ppkt->transport_header;
->>       stcp = (struct tcphdr *)spkt->transport_header;
->>   +    if ((ptcp->th_flags & TH_SYN) != TH_SYN &&
->> +        ptcp->th_seq != stcp->th_seq) {
->> +        trace_colo_compare_main("colo_packet_compare_tcp seq not 
->> same");
->> +        return -1;
->> +    }
->> +
->>       /*
->>        * The 'identification' field in the IP header is *very* random
->>        * it almost never matches.  Fudge this by ignoring differences in
->
-> Do we have any statistics numbers for this?
+On 07/17/2017 03:34 PM, Xulei (Stone) wrote:
+> 
+>     On 07/17/2017 11:13 AM, Xulei (Stone) wrote:
+> 
+>      >>                              |--virtio_queue_empty
+>      >>
+>      >> Then, kmod falls in infinite loop in handle EPT_MISCONFIG.
+>      >> As far as i know, when kvm enters guest after handling EPT_MISCONFIG, seabios should return
+>      >> from mmio write and wait for virtio backend(qemu) to handle this mmio writing.
+>      >> What puzzles me:
+>      >> 1) i can not understand why kvm runs in infinite loop and seabios does not return from writew.
+> 
+>        >From the trace in L1 guest, it did not hang in KVM, as it went into guest mode normally.
+> 
+>      >> 2) kvm nested kvm is ok. But vmware nested kvm is not ok. This problem has anything related
+>      >>     with vmware?
+>      >>
+> 
+>      > It is the issue in vmware, i guess the RIP register is not handled correctly.
+>      > BTW, does kvm unit tests run well on nested vmware?
+> 
+>     Sadly, kvm unit tests run fail on nested vmware and make the  CentOS 7.3(with kmod 4.4.11) crashed...
+> 
 
-Rethink about this patch, I will remove it in next version and send a 
-independent
-patch in the future.
-Because in FTP get test, primary guest send lots of packet differ to 
-secondary guest's,
-the packet payload are not same, but the total payload are same.
-I think I have to buffer some packet's payload depend on sequence number 
-for comparison?
-Any idea about this?
-
-Thanks
-Zhang Chen
-
->
-> Thanks
->
->
->
-
--- 
-Thanks
-Zhang Chen
+Well, so that should be reported to vmware. :-)
