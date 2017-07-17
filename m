@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXECL-0005Uh-AS
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:09:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXEIa-0007VU-Gd
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXECK-0005Ba-EF
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:09:01 -0400
-References: <20170717192635.17880-1-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dXEIV-0001wj-GV
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXEIV-0001vo-BS
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:15:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D387C057EC9
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 22:15:22 +0000 (UTC)
+Received: from red.redhat.com (ovpn-120-160.rdu2.redhat.com [10.10.120.160])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A83EB7088E
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 22:15:21 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <d81b08ad-8115-dd97-9577-e8a9cf35b322@redhat.com>
-Date: Mon, 17 Jul 2017 17:08:48 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170717192635.17880-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9"
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] NBD fixes before softfreeze
+Date: Mon, 17 Jul 2017 17:15:13 -0500
+Message-Id: <20170717221516.7692-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.10 0/3] NBD patches for 2.10 soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +31,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- qemu-block@nongnu.org
-Message-ID: <d81b08ad-8115-dd97-9577-e8a9cf35b322@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] NBD fixes before softfreeze
-References: <20170717192635.17880-1-eblake@redhat.com>
-In-Reply-To: <20170717192635.17880-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
 
-On 07/17/2017 02:26 PM, Eric Blake wrote:
-> Paolo's inclusion of my NBD series in his miscellaneous tree
-> ended up with a couple of bugs that were pointed out in the
-> thread after the pull request was first created; these are the
-> fixes.  They are small enough that I don't mind using maintainer
-> status to bundle them up as a PULL request for NBD sometime on
-> Monday (in order to make soft freeze), whether or not they've
-> been reviewed by then; but of course, review is appreciated.
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01983.html
-> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01981.html
->=20
-> since v1:
-> - more defines and comments to make patch 2 more legible [John]
->=20
-> 001/2:[----] [--] 'nbd: Trace client command being sent'
-> 002/2:[0026] [FC] 'nbd: Fix server reply to NBD_OPT_EXPORT_NAME of olde=
-r clients'
->=20
-> Eric Blake (2):
->   nbd: Trace client command being sent
->   nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request' into staging (2017-07-17 17:54:17 +0100)
 
-Thanks; queued on my NBD branch:
-git://repo.or.cz/qemu/ericb.git nbd
+are available in the git repository at:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-07-17
 
+for you to fetch changes up to 5f66d060dbc37214c9d70305710c3e34c4531d7c:
 
---86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients (2017-07-17 17:06:46 -0500)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+----------------------------------------------------------------
+nbd patches for 2017-07-17
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlltNXAACgkQp6FrSiUn
-Q2rJLAf+P6OiafUp861RxpfsR0UG41suYwVqIoPjlyQWsZyjMAxaCrUMbPwXCsnx
-GJMyK0kDV6FhSL4NKb7GNNKzPucMJzf1AIRowr/dP+DlScKHhopXaeyoFuAp/S+q
-7YzVv6XLKnsPccETiJ6YTIeBToGI5BFMqkH9vJDn4JekcjGwo8hg1BTpeY6gSiOw
-6778F+ryMP89EMIhuLqVa5LmO7WArCk4a++nFQi0kQji5IM+ORMvFXbPmlHUycag
-9tQMw4kR0OAUWZjVVPKvKIpXXzDm5LAhRsvzbatlGUyzxwtjTXx0kY8YE0EP28zb
-0O8iOG6fpVhpzEGVcqhulJylb6MNqg==
-=HaBE
------END PGP SIGNATURE-----
+- Eric Blake: nbd: Fix iotests failure due to changed client error message
+- Eric Blake: [0/2] NBD fixes before softfreeze
 
---86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9--
+----------------------------------------------------------------
+Eric Blake (3):
+      nbd: Fix iotests failure due to changed client error message
+      nbd: Trace client command being sent
+      nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients
+
+ nbd/nbd-internal.h         |  8 ++++++--
+ nbd/client.c               |  8 ++++----
+ nbd/server.c               | 18 ++++++++++--------
+ nbd/trace-events           |  2 +-
+ tests/qemu-iotests/140.out |  3 ++-
+ tests/qemu-iotests/143.out |  3 ++-
+ 6 files changed, 25 insertions(+), 17 deletions(-)
+
+Eric Blake (3):
+  nbd: Fix iotests failure due to changed client error message
+  nbd: Trace client command being sent
+  nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients
+
+ nbd/nbd-internal.h         |  8 ++++++--
+ nbd/client.c               |  8 ++++----
+ nbd/server.c               | 18 ++++++++++--------
+ nbd/trace-events           |  2 +-
+ tests/qemu-iotests/140.out |  3 ++-
+ tests/qemu-iotests/143.out |  3 ++-
+ 6 files changed, 25 insertions(+), 17 deletions(-)
+
+-- 
+2.13.3
