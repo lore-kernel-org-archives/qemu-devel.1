@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dX5J3-0005GD-Vj
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:39:22 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dX5NC-0006yO-Eg
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dX5J3-0007po-45
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:39:22 -0400
-Date: Mon, 17 Jul 2017 14:39:01 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170717123901.GH5301@noname.redhat.com>
-References: <CAPuOgO2q9nNtoPOYuXSWDxBVVsXcWEMbMboLT4OdpXA_Dq5O=Q@mail.gmail.com>
-	<7a891962-9c57-7668-e2fd-69e5e13b9078@redhat.com>
-	<CAMr-obtga00C5cKS63T_5RW99hK2W1nKMDba4cnTGH8dVYrXaA@mail.gmail.com>
-	<07dfafaa-884c-9b86-cf37-dbdc454d2b91@redhat.com>
-	<20170717121910.GG5301@noname.redhat.com>
-	<cd8a80fe-4ac9-5f34-ce1f-d512eee7f703@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dX5N7-0001YB-Kz
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:43:38 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34198)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dX5N7-0001Xz-GW
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:43:33 -0400
+Received: by mail-qt0-x243.google.com with SMTP id 19so2164565qty.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 05:43:33 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170717114332.2941-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a72f84d2-b8aa-72e7-8e38-0d7e65ff35b1@amsat.org>
+Date: Mon, 17 Jul 2017 09:43:29 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gj572EiMnwbLXET9"
-Content-Disposition: inline
-In-Reply-To: <cd8a80fe-4ac9-5f34-ce1f-d512eee7f703@redhat.com>
-Subject: Re: [Qemu-devel] Supporting unsafe create when backing file is not
- accessible
+In-Reply-To: <20170717114332.2941-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] keymaps: fr-ca: more fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, Ala Hino <ahino@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-discuss@nongnu.org, Nir Soffer <nsoffer@redhat.com>, John Snow Huston <jsnow@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?B?SsOpcsO0bWUgUG91bGlu?= <jeromepoulin@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
+Cc: Jérôme
 
---gj572EiMnwbLXET9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'd expect Jérôme email in this tag but since this is not a 
+Signed-off-by that should be ok.
 
-Am 17.07.2017 um 14:25 hat Eric Blake geschrieben:
-> On 07/17/2017 07:19 AM, Kevin Wolf wrote:
->=20
-> > While I think adding -u today is reasonably realistic, I'm doubtful that
-> > we can get an introspection mechanism in place today. Perhaps we can
-> > declare it a bug fix, but I'd rather not rush something like that.
-> >=20
-> > How does libvirt detect qemu-img features today? Just try and then check
-> > the error message?
->=20
-> Yeah, when it comes to non-advertised feature detection, the best you
-> can do is try using the feature, and fall back to the older approach if
-> the feature was not present (this approach only works for features that
-> gracefully fail without side effects when attempted on older versions,
-> but fortunately that's the case for most true feature additions).
+On 07/17/2017 08:43 AM, Gerd Hoffmann wrote:
+> Fixes: https://bugs.launchpad.net/qemu/+bug/533613
+> Cc: Thomas Huth <thuth@redhat.com>
+> Suggested-by: Jérôme Poulin
 
-Yes, for adding a new option like -u this should work.
+Jérôme Poulin <jeromepoulin@gmail.com>
 
-> And note that creating an image without a backing file, then using
-> 'qemu-img rebase -u' to give it a backing image without probing the
-> backing image, IS currently documented and supported (so we DO have a
-> safe fallback, regardless of when 'qemu-img create -u ... size' actually
-> lands).
-
-I thought so, too, but in fact this is not documented behaviour (yet):
-
-   Unsafe mode
-
-   qemu-img uses the unsafe mode if "-u" is specified. In this mode,
-   only the backing file name and format of filename is changed without
-   any checks on the file contents. The user must take care of
-   specifying the correct new backing file, or the guest-visible content
-   of the image will be corrupted.
-
-   This mode is useful for renaming or moving the backing file to
-   somewhere else.  It can be used without an accessible old backing
-   file, i.e. you can use it to fix an image whose backing file has
-   already been moved/renamed.
-
-So we explicitly allow the old backing file to be missing, and we
-guarantee that rebase -u doesn't check the image content, but we don't
-say anything yet about whether the new backing file must exist.
-
-As this is already unsafe mode, I think for rebase we can indeed just
-clarify the documentation.
-
-Kevin
-
---gj572EiMnwbLXET9
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZbK/lAAoJEH8JsnLIjy/WGpYP/Ru2jbGjY/Lb8gnuT6H/niGh
-NdzULuG2J13M8mbAJ2O/wPV6BoK3Yxa6Lp4A79pwneh8k75/lTkDUkRYIJLauG4l
-1vLGomsBdcFv3ecfJXWRhSGMRI3cEkSxW8xwbWHpioECI+B+GuZ7n6RgGKYwPsR2
-v+2gnIyxSgirTFCkJvsi6kTF2H9+NerrHDNJp4ksCOBRRPecCDcS38J8Qn3ACnni
-mFfA1KlhgJwjPmBSledKTZ4a2ELFeBF70gPzNmoheNPXAD8xtNlfgv88YftURqXk
-Bn3/frm0pJmwCzLA4u5ooCM2X6vwbUpVsAX3bWi6766WvQUgCnupCaSMFVyO4PdN
-NIk8RkjzID10A5jwzfCnkzGDMoxojAMJZRPZwJ8seen6yoGiWYmL88zYgeIP7uWl
-wV2J6hrCgHkZi4el5RXz2lieecGWlvi7p7pqdzSagO2jeKNFv/zxwKUSAo3CLx/n
-JhnVoUGRS2d0oGA+O4GxNmdlK8qER0sNtnZX53McwaCAoCz2mxDrmbS9sG9pYvaf
-QCvCVyGhqGcot/rNKrSaBjy1qiKXcV/hqosvSvchAx0BfY7cA8NXwyXiJbwCsk/A
-vaD1kAYSVjeVKaFLcPaYUrXXh76F9qkx26LmsWWJ3Dp6vjKbpnmOtfC/5AZYNYBD
-uliJ/Fk5DuVRJ07qT63q
-=E8S5
------END PGP SIGNATURE-----
-
---gj572EiMnwbLXET9--
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   pc-bios/keymaps/fr-ca | 10 +++++++++-
+>   1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
+> index 030f56a78e..b177d074c9 100644
+> --- a/pc-bios/keymaps/fr-ca
+> +++ b/pc-bios/keymaps/fr-ca
+> @@ -3,6 +3,8 @@
+>   include common
+>   map 0xc0c
+>   
+> +numbersign 0x29
+> +bar 0x29
+>   backslash 0x29 altgr
+>   plusminus 0x2 altgr
+>   at 0x3 altgr
+> @@ -10,7 +12,6 @@ sterling 0x4 altgr
+>   cent 0x5 altgr
+>   currency 0x6 altgr
+>   notsign 0x7 altgr
+> -bar 0x29 shift
+>   twosuperior 0x9 altgr
+>   threesuperior 0xa altgr
+>   onequarter 0xb altgr
+> @@ -38,6 +39,10 @@ dead_cedilla 0x1b
+>   dead_diaeresis 0x1b shift
+>   exclam 0x2 shift
+>   quotedbl 0x3 shift
+> +comma 0x33
+> +apostrophe 0x33 shift
+> +period 0x34
+> +period 0x34 shift
+>   slash 0x4 shift
+>   dollar 0x5 shift
+>   percent 0x6 shift
+> @@ -49,4 +54,7 @@ parenright 0xb shift
+>   underscore 0xc shift
+>   plus 0xd shift
+>   minus 0xc
+> +underscore 0xc shift
+>   equal 0xd
+> +semicolon 0x27
+> +colon 0x27 shift
+> 
