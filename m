@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dX26a-00059F-29
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:14:16 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dX26x-0005KI-6u
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dX26W-0002qI-Mo
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:14:15 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dX26W-0002q1-GF
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:14:12 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id w126so69742863wme.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:14:12 -0700 (PDT)
-Date: Mon, 17 Jul 2017 10:14:09 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170717091409.GC7163@stefanha-x1.localdomain>
-References: <emc_869082b03c5b4653b73dbe4571a1ebc0@pc.loc>
-	<emc_869082b03c5b4653b73dbe4571a1ebc0@pc.loc>
+	(envelope-from <kchamart@redhat.com>) id 1dX26w-00035J-Fk
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:14:39 -0400
+Date: Mon, 17 Jul 2017 11:14:27 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170717091427.dgtnnwjnmft2vmcg@eukaryote>
+References: <1499674503-21551-1-git-send-email-kchamart@redhat.com>
+	<1499674503-21551-3-git-send-email-kchamart@redhat.com>
+	<0bb4f016-989a-04cf-4bb2-e28ae5c74820@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Md/poaVZ8hnGTzuv"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <emc_869082b03c5b4653b73dbe4571a1ebc0@pc.loc>
-Subject: Re: [Qemu-devel] Could you please create an account
+In-Reply-To: <0bb4f016-989a-04cf-4bb2-e28ae5c74820@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] live-block-ops.txt: Rename, rewrite,
+ and improve it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tim3385 <tim3385@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, berto@igalia.com
 
+On Tue, Jul 11, 2017 at 10:03:29AM -0500, Eric Blake wrote:
 
---Md/poaVZ8hnGTzuv
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[...]
 
-On Sun, Jul 16, 2017 at 01:47:18AM +0800, tim3385 wrote:
-> =A0 =A0 =A0 Could you please create an account for me?
+> Overall, looking good!  Content-wise, I think we have a good document,
+> and it was just a few spelling errors and grammar suggestions, minor
+> enough that I'm comfortable with you adding:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Done, please see private email.
+All your suggestions from this thread sound good to me, and I've
+incorporated them in the upcoming v7.
 
-Stefan
+Thank you for your thorough review and the R-b.
 
---Md/poaVZ8hnGTzuv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZbH/hAAoJEJykq7OBq3PIS8EH+wUCCKhufMxLZT4sD1YcEj8F
-6vs5XLA5F8cVwlhYQUtNa4wTylWWlyNt9y4QPepqiw01/jEkk2T7W3I73baVq3t5
-eLE4PiACsCCu/YN5yyRzF4YPQRXaccQDBlsDUl/p/R/BTVrnOfSg4o6FDtKJ+msv
-2oHFOQuCQ6rA5r5beJKPORrvX2wlqRnzb2URyLUkQ78h7MkaF/02yZiPudLN76nQ
-xTA/a3Jt2EQinbb/n/mTTAEgrfhC1l6NF+v5uGV2omDMVwDDjN2e4h/c4zwsTHa5
-yzYpmi8G0dkLsihaMoAde3qgQoutvNfHYFKXWIpwHezzr+c0enqguAFmiVa/V5w=
-=ystG
------END PGP SIGNATURE-----
-
---Md/poaVZ8hnGTzuv--
+-- 
+/kashyap
