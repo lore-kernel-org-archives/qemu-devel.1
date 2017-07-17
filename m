@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dX1vR-0006A8-Vb
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:47 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX1x7-0007om-Q2
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dX1vO-0003RE-R9
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dX1vO-0003R2-IJ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:02:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7961861B86
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 09:02:41 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 17 Jul 2017 17:02:30 +0800
-Message-Id: <1500282150-28190-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1500282150-28190-1-git-send-email-peterx@redhat.com>
-References: <1500282150-28190-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/2] intel_iommu: use access_flags for iotlb
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX1x4-00048p-J7
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:29 -0400
+Received: from [59.151.112.132] (port=6713 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dX1x3-00047d-Km
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:04:26 -0400
+References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499925175-21218-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<5468b372-eec3-1969-e927-236859a6b079@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <79fc29f3-b08f-c3c1-4006-3a0167010c2d@cn.fujitsu.com>
+Date: Mon, 17 Jul 2017 17:06:45 +0800
+MIME-Version: 1.0
+In-Reply-To: <5468b372-eec3-1969-e927-236859a6b079@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V2 3/4] net/colo-compare.c: Optimize
+ unpredictable tcp options comparison
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +30,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-It was cached by read/write separately. Let's merge them.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c         | 15 +++++++--------
- include/hw/i386/intel_iommu.h |  3 +--
- 2 files changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index e0b0498..a7bf87a 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -237,8 +237,7 @@ out:
- 
- static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
-                              uint16_t domain_id, hwaddr addr, uint64_t slpte,
--                             bool read_flags, bool write_flags,
--                             uint32_t level)
-+                             uint8_t access_flags, uint32_t level)
- {
-     VTDIOTLBEntry *entry = g_malloc(sizeof(*entry));
-     uint64_t *key = g_malloc(sizeof(*key));
-@@ -253,8 +252,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
-     entry->gfn = gfn;
-     entry->domain_id = domain_id;
-     entry->slpte = slpte;
--    entry->read_flags = read_flags;
--    entry->write_flags = write_flags;
-+    entry->access_flags = access_flags;
-     entry->mask = vtd_slpt_level_page_mask(level);
-     *key = vtd_get_iotlb_key(gfn, source_id, level);
-     g_hash_table_replace(s->iotlb, key, entry);
-@@ -1087,6 +1085,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-     bool is_fpd_set = false;
-     bool reads = true;
-     bool writes = true;
-+    uint8_t access_flags;
-     VTDIOTLBEntry *iotlb_entry;
- 
-     /*
-@@ -1101,8 +1100,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-         trace_vtd_iotlb_page_hit(source_id, addr, iotlb_entry->slpte,
-                                  iotlb_entry->domain_id);
-         slpte = iotlb_entry->slpte;
--        reads = iotlb_entry->read_flags;
--        writes = iotlb_entry->write_flags;
-+        access_flags = iotlb_entry->access_flags;
-         page_mask = iotlb_entry->mask;
-         goto out;
-     }
-@@ -1172,13 +1170,14 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-     }
- 
-     page_mask = vtd_slpt_level_page_mask(level);
-+    access_flags = IOMMU_ACCESS_FLAG(reads, writes);
-     vtd_update_iotlb(s, source_id, VTD_CONTEXT_ENTRY_DID(ce.hi), addr, slpte,
--                     reads, writes, level);
-+                     access_flags, level);
- out:
-     entry->iova = addr & page_mask;
-     entry->translated_addr = vtd_get_slpte_addr(slpte) & page_mask;
-     entry->addr_mask = ~page_mask;
--    entry->perm = IOMMU_ACCESS_FLAG(reads, writes);
-+    entry->perm = access_flags;
-     return true;
- 
- error:
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 08d8a26..ac15e6b 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -103,8 +103,7 @@ struct VTDIOTLBEntry {
-     uint16_t domain_id;
-     uint64_t slpte;
-     uint64_t mask;
--    bool read_flags;
--    bool write_flags;
-+    uint8_t access_flags;
- };
- 
- /* VT-d Source-ID Qualifier types */
+On 07/14/2017 11:33 AM, Jason Wang wrote:
+>
+>
+> On 2017年07月13日 13:52, Zhang Chen wrote:
+>> When network is busy, some tcp options(like sack) will unpredictable
+>> occur in primary side or secondary side. it will make packet size
+>> not same, but the two packet's payload is identical. colo just
+>> care about packet payload, so we skip the option field.
+>
+> A question is, if SACK were not same, does it mean e.g some packet 
+> were lost just for primary or secondary? If yes, we will be out of 
+> sync soon. Is it really better to delay the checkpoint here?
+
+The SACK is designed to optimize TCP fast retransmit, but in COLO 
+situation, this TCP options field
+will make COLO-compare trigger checkpoint frequently, and we use normal 
+TCP ACK to do retransmit job
+will get better performance. In the worst situation, some skipped TCP 
+options will make primary and secondary
+send different packet after that, it will trigger checkpoint very soon. 
+So, I think we no need care
+the SACK field in COLO situation.
+
+Thanks
+Zhang Chen
+
+
+>
+> Thanks
+>
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   net/colo-compare.c | 34 +++++++++++++++++++++++++---------
+>>   1 file changed, 25 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index 2caeb80..6406c4a 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -183,7 +183,10 @@ static int packet_enqueue(CompareState *s, int 
+>> mode)
+>>    * return:    0  means packet same
+>>    *            > 0 || < 0 means packet different
+>>    */
+>> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, 
+>> int offset)
+>> +static int colo_packet_compare_common(Packet *ppkt,
+>> +                                      Packet *spkt,
+>> +                                      int poffset,
+>> +                                      int soffset)
+>>   {
+>>       if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>>           char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], 
+>> sec_ip_dst[20];
+>> @@ -198,9 +201,10 @@ static int colo_packet_compare_common(Packet 
+>> *ppkt, Packet *spkt, int offset)
+>>                                      sec_ip_src, sec_ip_dst);
+>>       }
+>>   -    if (ppkt->size == spkt->size) {
+>> -        return memcmp(ppkt->data + offset, spkt->data + offset,
+>> -                      spkt->size - offset);
+>> +    if (ppkt->size == spkt->size || poffset != soffset) {
+>> +        return memcmp(ppkt->data + poffset,
+>> +                      spkt->data + soffset,
+>> +                      spkt->size - soffset);
+>>       } else {
+>>           trace_colo_compare_main("Net packet size are not the same");
+>>           return -1;
+>> @@ -263,12 +267,22 @@ static int colo_packet_compare_tcp(Packet 
+>> *spkt, Packet *ppkt)
+>>        * so we just need skip this field.
+>>        */
+>>       if (ptcp->th_off > 5) {
+>> -        ptrdiff_t tcp_offset;
+>> -        tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
+>> +        ptrdiff_t ptcp_offset, stcp_offset;
+>> +
+>> +        ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
+>>                        + (ptcp->th_off * 4);
+>> -        res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
+>> +        stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
+>> +                     + (stcp->th_off * 4);
+>> +
+>> +        /*
+>> +         * When network is busy, some tcp options(like sack) will 
+>> unpredictable
+>> +         * occur in primary side or secondary side. it will make 
+>> packet size
+>> +         * not same, but the two packet's payload is identical. colo 
+>> just
+>> +         * care about packet payload, so we skip the option field.
+>> +         */
+>> +        res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, 
+>> stcp_offset);
+>>       } else if (ptcp->th_sum == stcp->th_sum) {
+>> -        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
+>> +        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN, 
+>> ETH_HLEN);
+>>       } else {
+>>           res = -1;
+>>       }
+>> @@ -328,6 +342,7 @@ static int colo_packet_compare_udp(Packet *spkt, 
+>> Packet *ppkt)
+>>        * the ip payload here.
+>>        */
+>>       ret = colo_packet_compare_common(ppkt, spkt,
+>> +                                     network_header_length + ETH_HLEN,
+>>                                        network_header_length + 
+>> ETH_HLEN);
+>>         if (ret) {
+>> @@ -365,6 +380,7 @@ static int colo_packet_compare_icmp(Packet *spkt, 
+>> Packet *ppkt)
+>>        * the ip payload here.
+>>        */
+>>       if (colo_packet_compare_common(ppkt, spkt,
+>> +                                   network_header_length + ETH_HLEN,
+>>                                      network_header_length + 
+>> ETH_HLEN)) {
+>>           trace_colo_compare_icmp_miscompare("primary pkt size",
+>>                                              ppkt->size);
+>> @@ -402,7 +418,7 @@ static int colo_packet_compare_other(Packet 
+>> *spkt, Packet *ppkt)
+>>                                      sec_ip_src, sec_ip_dst);
+>>       }
+>>   -    return colo_packet_compare_common(ppkt, spkt, 0);
+>> +    return colo_packet_compare_common(ppkt, spkt, 0, 0);
+>>   }
+>>     static int colo_old_packet_check_one(Packet *pkt, int64_t 
+>> *check_time)
+>
+>
+>
+> .
+>
+
 -- 
-2.7.4
+Thanks
+Zhang Chen
