@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX8ht-000880-LX
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:17:14 -0400
+	(envelope-from <quintela@redhat.com>) id 1dX8l8-00015q-OX
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:20:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX8ho-0002Aq-UD
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:17:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44212)
+	(envelope-from <quintela@redhat.com>) id 1dX8l3-0004Dr-Qi
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:20:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dX8ho-0002AV-Ox
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:17:08 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dX8l3-0004DH-KZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:20:29 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72B03D0A8B
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 16:17:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 87C29C0587F4
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 16:20:28 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170714115736.13693-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Fri, 14 Jul 2017 12:57:33 +0100")
-References: <20170714115736.13693-1-dgilbert@redhat.com>
-	<20170714115736.13693-3-dgilbert@redhat.com>
+In-Reply-To: <20170717110936.23314-6-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Mon, 17 Jul 2017 12:09:35 +0100")
+References: <20170717110936.23314-1-dgilbert@redhat.com>
+	<20170717110936.23314-6-dgilbert@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Mon, 17 Jul 2017 18:16:58 +0200
-Message-ID: <87pocz11j9.fsf@secure.mitica>
+Date: Mon, 17 Jul 2017 18:20:23 +0200
+Message-ID: <87lgnn11dk.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] migration: Close file on failed
- migration load
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] migration/rdma: Safely convert
+ control types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,10 +41,12 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Closing the file before exit on a failure allows
-> the source to cleanup better, especially with RDMA.
+> control_desc[] is an array of strings that correspond to a
+> series of message types; they're used only for error messages, but if
+> the message type is seriously broken then we could go off the end of
+> the array.
 >
-> Partial fix for https://bugs.launchpad.net/qemu/+bug/1545052
+> Convert the array to a function control_desc() that bound checks.
 >
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > Reviewed-by: Peter Xu <peterx@redhat.com>
