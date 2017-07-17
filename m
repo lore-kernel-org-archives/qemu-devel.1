@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXC16-0006eb-NK
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:49:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXC6S-0000Ki-IG
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXC15-0007mF-Mk
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:49:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXC15-0007lt-GN
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:49:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 71B02C057EC9
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 19:49:14 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170717110936.23314-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Mon, 17 Jul 2017 12:09:32 +0100")
-References: <20170717110936.23314-1-dgilbert@redhat.com>
-	<20170717110936.23314-3-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 17 Jul 2017 21:49:14 +0200
-Message-ID: <878tjmn8sl.fsf@secure.laptop>
+	(envelope-from <peter.maydell@linaro.org>) id 1dXC6R-0001TN-Mu
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:54:48 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:32870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXC6R-0001Sp-E8
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:54:47 -0400
+Received: by mail-wr0-x230.google.com with SMTP id a10so75696wrd.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 12:54:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] migration: Close file on failed
- migration load
+In-Reply-To: <150031508104.84.12286168773897053556@5d477a5b5989>
+References: <20170717101700.23552-1-kraxel@redhat.com>
+	<150031508104.84.12286168773897053556@5d477a5b5989>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Jul 2017 20:54:25 +0100
+Message-ID: <CAFEAcA_N0ZTnw29=Ldk4zLfqawnHNT5N7K91hQWj_JBdzw4vaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] add scripts/indent.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +29,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Fam Zheng <famz@redhat.com>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Closing the file before exit on a failure allows
-> the source to cleanup better, especially with RDMA.
->
-> Partial fix for https://bugs.launchpad.net/qemu/+bug/1545052
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+On 17 July 2017 at 19:11,  <no-reply@patchew.org> wrote:
+> This series seems to have some coding style problems.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Very ironic :-)
 
-Also to this version.
+thanks
+-- PMM
