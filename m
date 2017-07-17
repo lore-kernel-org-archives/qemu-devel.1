@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ray.kinsella@intel.com>) id 1dXDuZ-0001HM-9S
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:50:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXECL-0005Uh-AS
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:09:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ray.kinsella@intel.com>) id 1dXDuU-000462-9X
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:50:38 -0400
-Received: from mga04.intel.com ([192.55.52.120]:22744)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ray.kinsella@intel.com>)
-	id 1dXDuT-00045I-V5
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 17:50:34 -0400
-From: "Kinsella, Ray" <ray.kinsella@intel.com>
-Date: Mon, 17 Jul 2017 21:50:29 +0000
-Message-ID: <767EFADFF809234DB6CAABD6D2F93847C5D31539@IRSMSX107.ger.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1dXECK-0005Ba-EF
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 18:09:01 -0400
+References: <20170717192635.17880-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d81b08ad-8115-dd97-9577-e8a9cf35b322@redhat.com>
+Date: Mon, 17 Jul 2017 17:08:48 -0500
 MIME-Version: 1.0
-Subject: [Qemu-devel] >256 Virtio-net-pci hotplug Devices
+In-Reply-To: <20170717192635.17880-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9"
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] NBD fixes before softfreeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "marcel@redhat.com" <marcel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org
 
-Hi folks,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
+ qemu-block@nongnu.org
+Message-ID: <d81b08ad-8115-dd97-9577-e8a9cf35b322@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] NBD fixes before softfreeze
+References: <20170717192635.17880-1-eblake@redhat.com>
+In-Reply-To: <20170717192635.17880-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I am trying to create a VM that supports hot-plugging a large number of vir=
-tio-net-pci device,=20
-up to 1000 devices initially.
+On 07/17/2017 02:26 PM, Eric Blake wrote:
+> Paolo's inclusion of my NBD series in his miscellaneous tree
+> ended up with a couple of bugs that were pointed out in the
+> thread after the pull request was first created; these are the
+> fixes.  They are small enough that I don't mind using maintainer
+> status to bundle them up as a PULL request for NBD sometime on
+> Monday (in order to make soft freeze), whether or not they've
+> been reviewed by then; but of course, review is appreciated.
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01983.html
+> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01981.html
+>=20
+> since v1:
+> - more defines and comments to make patch 2 more legible [John]
+>=20
+> 001/2:[----] [--] 'nbd: Trace client command being sent'
+> 002/2:[0026] [FC] 'nbd: Fix server reply to NBD_OPT_EXPORT_NAME of olde=
+r clients'
+>=20
+> Eric Blake (2):
+>   nbd: Trace client command being sent
+>   nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients
 
->From the docs (see below) and from playing with QEMU, it looks like there a=
-re two options.
-Both with limitations.
+Thanks; queued on my NBD branch:
+git://repo.or.cz/qemu/ericb.git nbd
 
-PCI Express switch
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-It looks like using a PCI Express switch hierarchy is not an option due to =
-bus exhaustion.=20
-Each downstream port creates a separate bus and each downstream port only s=
-upports hot-plugging a single device.
-So this gives us a max of 256-ish buses/devices pairs.
 
-PCI Root Ports
+--86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-The other option is use a flatter hierarchy, with a number of multi-functio=
-n PCI Root Ports hanging off 'pcie.0'.
-However each 'PCI Root Port' can support hot-plugging a single device.=20
-So this method really becomes a function of how many free address we have o=
-n 'pci.0'.
-If we make room for say 16 multifunction devices, we get 16*8 ... 128
-So ultimately, this will approach will give us a similar to number to using=
- a switch.=20
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Is there another method?
-( pxb-pcie doesn't support hotplug for instance, and only a single pcie dom=
-ain is supported qemu )
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlltNXAACgkQp6FrSiUn
+Q2rJLAf+P6OiafUp861RxpfsR0UG41suYwVqIoPjlyQWsZyjMAxaCrUMbPwXCsnx
+GJMyK0kDV6FhSL4NKb7GNNKzPucMJzf1AIRowr/dP+DlScKHhopXaeyoFuAp/S+q
+7YzVv6XLKnsPccETiJ6YTIeBToGI5BFMqkH9vJDn4JekcjGwo8hg1BTpeY6gSiOw
+6778F+ryMP89EMIhuLqVa5LmO7WArCk4a++nFQi0kQji5IM+ORMvFXbPmlHUycag
+9tQMw4kR0OAUWZjVVPKvKIpXXzDm5LAhRsvzbatlGUyzxwtjTXx0kY8YE0EP28zb
+0O8iOG6fpVhpzEGVcqhulJylb6MNqg==
+=HaBE
+-----END PGP SIGNATURE-----
 
-Thanks,
-
-Ray K
-
-Pcie.txt,=20
-( https://github.com/qemu/qemu/blob/master/docs/pcie.txt )
-Q35 preso
-( http://wiki.qemu.org/images/4/4e/Q35.pdf )
-
-=20
+--86CcHVinoRE5NBEGVw8xQGD9s61s2L4k9--
