@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX9jZ-0003dz-KN
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:23:02 -0400
+	(envelope-from <david@redhat.com>) id 1dX9kE-00041g-2A
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX9jY-0003lH-QT
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:23:01 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX9jY-0003ks-J1
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:23:00 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id w4so26062119wrb.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:23:00 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1dX9kB-00041f-Pk
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:23:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51594)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dX9kB-00040U-J2
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:23:39 -0400
+References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
+	<1500028867-134709-33-git-send-email-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7c021c65-3824-3c87-2bc6-c8045da1513a@redhat.com>
+Date: Mon, 17 Jul 2017 19:23:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170717164641.GA31820@work-vm>
-References: <20170407143847.GM2138@work-vm>
-	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
-	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
-	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
-	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
-	<20170717164641.GA31820@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 18:22:38 +0100
-Message-ID: <CAFEAcA9ew+gRR2rUyKHmRoeEc+2gF7QWv68OKRpuW-my_VPswA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+In-Reply-To: <1500028867-134709-33-git-send-email-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 32/40] s390x/cpumodel: add zpci,
+ aen and ais facilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 17 July 2017 at 17:46, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> You may find this doesn't help in some windows builds;  the assert
-> functions aren't always marked as noreturn (because they pop up a dialog
-> that asks you whether you want to run into a debugger etc).
 
-Oh, is that why?
+> +    /* Try to enable AIS facility */
+> +    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> +
+>      qemu_mutex_init(&qemu_sigp_mutex);
+>  
+>      return 0;
+> @@ -2635,6 +2638,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>          set_bit(S390_FEAT_CMM, model->features);
+>      }
+>  
+> +    /* set zpci and aen facilities */
 
-In any case, we rely on g_assert() and friends from glib being
-definitely marked noreturn, so we could use them instead.
+This comment is not helpful. This should rather say something like "we
+emulate a zPCI bus in QEMU, therefore we don't depend on the host
+capabilities"
 
-thanks
--- PMM
+> +    set_bit(S390_FEAT_ZPCI, model->features);
+> +    set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
+> +
+>      if (s390_known_cpu_type(cpu_type)) {
+>          /* we want the exact model, even if some features are missing */
+>          model->def = s390_find_cpu_def(cpu_type, ibc_gen(unblocked_ibc),
+> 
+
+-- 
+
+Thanks,
+
+David
