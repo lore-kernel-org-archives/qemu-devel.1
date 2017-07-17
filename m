@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWzcx-00061U-D4
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:35:32 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dWzhi-00073L-8G
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:40:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dWzcs-00084S-CU
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:35:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dWzcs-00083o-6X
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:35:26 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D968A83F47
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 06:35:24 +0000 (UTC)
-Received: from localhost (ovpn-12-94.pek2.redhat.com [10.72.12.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 499CE600CA
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 06:35:23 +0000 (UTC)
-Date: Mon, 17 Jul 2017 14:35:21 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170717063521.GA7393@lemon>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dWzhd-00027i-O7
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:40:26 -0400
+Received: from [59.151.112.132] (port=51094 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dWzhd-00020X-Bn
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:40:21 -0400
+References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499925175-21218-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<80774faf-ebc4-4ffa-feb6-211b63495339@redhat.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <b3bfd799-e2f0-9ea3-27c5-8de6c2426322@cn.fujitsu.com>
+Date: Mon, 17 Jul 2017 14:42:33 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] Status and RFC of patchew testings on QEMU
+In-Reply-To: <80774faf-ebc4-4ffa-feb6-211b63495339@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH V2 1/4] net/colo-compare.c: Add checkpoint
+ min period to optimize performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hi all,
 
-Today I've included a fourth type of the automatic patchew replies: FreeBSD.
 
-So far we have these tests running by patchew on each patch series:
+On 07/14/2017 11:22 AM, Jason Wang wrote:
+>
+>
+> On 2017年07月13日 13:52, Zhang Chen wrote:
+>> If colo-compare find out the first different packet that means
+>> the following packet almost is different. we needn't do a lot
+>> of checkpoint in this time, so we set the no-need-checkpoint
+>> peroid, default just set 3 second.
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   net/colo-compare.c | 13 ++++++++++++-
+>>   1 file changed, 12 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>> index 6d500e1..0f8e198 100644
+>> --- a/net/colo-compare.c
+>> +++ b/net/colo-compare.c
+>> @@ -40,6 +40,9 @@
+>>   /* TODO: Should be configurable */
+>>   #define REGULAR_PACKET_CHECK_MS 3000
+>>   +/* TODO: Should be configurable */
+>> +#define CHECKPOINT_MIN_TIME 3000
+>> +
+>>   /*
+>>     + CompareState ++
+>>     |               |
+>> @@ -455,6 +458,7 @@ static void colo_compare_connection(void *opaque, 
+>> void *user_data)
+>>       Packet *pkt = NULL;
+>>       GList *result = NULL;
+>>       int ret;
+>> +    static int64_t checkpoint_time_ms;
+>
+> Let's avoid static variable here since we support more than one 
+> compare instance.
 
-  * Docker tests
-    Basically it is
-        make docker-test-quick@centos6 \
-             docker-test-build@min-glib \
-             docker-test-mingw@fedora"
+OK, I will add the "checkpoint_time_ms" to CompareState.
 
-  * checkpatch.pl
-    Each patch is fed to ./scripts/checkpatch.pl and all errors are reported.
+Thanks
+Zhang Chen
 
-  * s390x
-    It runs on a machine shared by Fedora team, basically only "./configure and
-    make", because "make check" hanging is tricky to deal with from an
-    automation perspective. (Ideas?)
+>
+> Thanks
+>
+>>         while (!g_queue_is_empty(&conn->primary_list) &&
+>>              !g_queue_is_empty(&conn->secondary_list)) {
+>> @@ -494,7 +498,14 @@ static void colo_compare_connection(void 
+>> *opaque, void *user_data)
+>>                */
+>>               trace_colo_compare_main("packet different");
+>>               g_queue_push_tail(&conn->primary_list, pkt);
+>> -            /* TODO: colo_notify_checkpoint();*/
+>> +
+>> +            if (pkt->creation_ms - checkpoint_time_ms > 
+>> CHECKPOINT_MIN_TIME) {
+>> +                /*
+>> +                 * TODO: Notify colo frame to do checkpoint.
+>> +                 * colo_compare_inconsistent_notify();
+>> +                 */
+>> +                checkpoint_time_ms = pkt->creation_ms;
+>> +            }
+>>               break;
+>>           }
+>>       }
+>
+>
+>
+> .
+>
 
-  * FreeBSD
-    Like s390x.
-
-Q1: In the worst case, you get four individual auto replies from patchew. Is
-that too many? Do you prefer one reply with all the results concatenated into
-one?
-
-Q2: Some think the full log in the mail body is more than necessary. Is it
-better or worse if it is a "tail -n 200" of the log in the body and the full log
-attached?
-
-Q3: What other tests do maintainers want? Different hosts? Different configure
-combinations?
-
-Q4: Any other improvements/features you want? (E.g. some documentation? :)
-
-Fam
+-- 
+Thanks
+Zhang Chen
