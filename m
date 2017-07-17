@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dX9kc-0004GG-6O
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dX9kj-0004L2-02
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dX9kY-0004CE-T0
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:06 -0400
-Received: from mail-lf0-f51.google.com ([209.85.215.51]:33892)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dX9kY-0004BK-LV
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:02 -0400
-Received: by mail-lf0-f51.google.com with SMTP id t72so89759377lff.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:24:01 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1dX9kf-0004Fd-NE
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dX9kf-0004FM-Gf
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:09 -0400
+Date: Mon, 17 Jul 2017 14:24:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170717172404.GS6020@localhost.localdomain>
+References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170714180907.GM6020@localhost.localdomain>
+	<9584b0c7-96f4-f000-e53f-93accd8a39ad@redhat.com>
+	<20170714185616.GQ6020@localhost.localdomain>
+	<c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20170717154026.32697-2-stefanha@redhat.com>
-References: <20170717154026.32697-1-stefanha@redhat.com>
-	<20170717154026.32697-2-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 17 Jul 2017 19:23:40 +0200
-Message-ID: <CABgObfZFzYpHNKZJXxbndgtn_Ya5D5AsrcwXs8E4johNE7VfOQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 1/2] util/aio-win32: Only select on what we
- are actually waiting for
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and
+ fw_cfg types into fw_cfg.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
 
-> +        if (io_read) {
-> +            bitmask |= FD_READ | FD_ACCEPT | FD_CLOSE;
-> +        }
-> +
-> +        if (io_write) {
-> +            bitmask |= FD_WRITE | FD_CONNECT;
-> +        }
-> +
->          event = event_notifier_get_handle(&ctx->notifier);
-> -        WSAEventSelect(node->pfd.fd, event,
-> -                       FD_READ | FD_ACCEPT | FD_CLOSE |
-> -                       FD_CONNECT | FD_WRITE | FD_OOB);
-> +        WSAEventSelect(node->pfd.fd, event, bitmask);
->      }
->
+On Sun, Jul 16, 2017 at 08:12:13PM +0100, Mark Cave-Ayland wrote:
+> On 14/07/17 19:56, Eduardo Habkost wrote:
+> 
+> >>> Why do you need the full struct declaration to be exposed in the
+> >>> header?
+> >>
+> >> Different board code wants to hook up "comb_iomem" manually to different
+> >> address spaces, so they need to access the field directly. This is the
+> >> ultimate goal of the entire exercise, IIRC.
+> 
+> Yes, that is correct (and I believe is mentioned in the cover letter, too).
+> 
+> >>> The memory regions are supposed to be visible as QOM
+> >>> children to the fw_cfg device, already.
+> >>
+> >> I don't understand this. How else can board code work with "comb_iomem"
+> >> than described above? If there is a way, I agree it would be preferable.
+> > 
+> > object_resolve_path_component(fw_cfg, "fwcfg[0]") and
+> > object_resolve_path_component(fw_cfg, "fwcfg.dma[0]") should
+> > return fw_cfg->comb_iomem and fw_cfg->dma_iomem, respectively.
+> > 
+> > I don't know why those names were chosen, though.  Probably it's
+> > a good idea to call object_property_add_child() manually with
+> > more appropriate names inside the fw_cfg code instead of letting
+> > memory_region_init() pick the child name.
+> 
+> That's interesting. I did a grep of the codebase for
+> object_resolve_path_component and struggled to find an instance where it
+> was being used to provide access to a MemoryRegion. Even if it's an
+> available feature, it's certainly not one that is widely known about.
+> 
+> In terms of the patch, is the v9 revision suitable for commit or does
+> this constitute a NACK?
 
-As noticed by Eric, if the same socket is in use via both aio-win32 and
-another GSource, or via multiple AioContexts, this would break because
-there is only one WSAEventSelect mask for each socket handle.
+It's not a NACK.  Using QOM properties instead of direct struct
+access may be nice (I'm not 100% sure, either), but not required.
 
-It is probably not going to break anything in the case of aio-win32, but I
-think it is worth at least a comment. And because WSAEventSelect is
-edge-triggered (e.g. an FD_WRITE event doesn't trigger again until the next
-write) it shouldn't be that bad for performance.  If there's time to revert
-this patch, I think it would be preferable.
-
-Paolo
+-- 
+Eduardo
