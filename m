@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dX1JY-0005E5-Qx
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:23:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1dX1MB-0006Lw-Ok
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dX1JT-0008RW-4R
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:23:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52225)
+	(envelope-from <peterx@redhat.com>) id 1dX1M6-0001hh-SD
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:26:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dX1JS-0008RD-RN
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:23:31 -0400
-References: <1500236854-28271-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1500236854-28271-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <004bd530-8510-2a97-b0cc-db864b39a19f@redhat.com>
-Date: Mon, 17 Jul 2017 11:23:23 +0300
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dX1M6-0001hZ-M5
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 04:26:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B0F74356C2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 08:26:13 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 17 Jul 2017 16:26:00 +0800
+Message-Id: <1500279971-13875-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1500236854-28271-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv3 2/2] pci: add reserved slot check to
- do_pci_register_device()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/11] migration: export cap/params to qdev
+ props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 16/07/2017 23:27, Mark Cave-Ayland wrote:
-> Add a new slot_reserved_mask bitmask to PCIBus indicating whether or not each
-> PCI slot on the bus is reserved. Ensure that it is initialised to zero to
-> maintain the existing behaviour that all slots are available by default, and
-> add the additional check with appropriate error reporting to
-> do_pci_register_device().
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   hw/pci/pci.c             |   18 +++++++++++++++---
->   include/hw/pci/pci_bus.h |    1 +
->   2 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index efc9c86..41591dc 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -371,6 +371,7 @@ static void pci_bus_init(PCIBus *bus, DeviceState *parent,
->   {
->       assert(PCI_FUNC(devfn_min) == 0);
->       bus->devfn_min = devfn_min;
-> +    bus->slot_reserved_mask = 0x0;
->       bus->address_space_mem = address_space_mem;
->       bus->address_space_io = address_space_io;
->   
-> @@ -956,6 +957,11 @@ static bool pci_bus_devfn_available(PCIBus *bus, int devfn)
->       return !(bus->devices[devfn]);
->   }
->   
-> +static bool pci_bus_devfn_reserved(PCIBus *bus, int devfn)
-> +{
-> +    return bus->slot_reserved_mask & (1UL << PCI_SLOT(devfn));
-> +}
-> +
->   /* -1 for devfn means auto assign */
->   static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->                                            const char *name, int devfn,
-> @@ -979,14 +985,20 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->       if (devfn < 0) {
->           for(devfn = bus->devfn_min ; devfn < ARRAY_SIZE(bus->devices);
->               devfn += PCI_FUNC_MAX) {
-> -            if (pci_bus_devfn_available(bus, devfn)) {
-> +            if (pci_bus_devfn_available(bus, devfn) &&
-> +                   !pci_bus_devfn_reserved(bus, devfn)) {
->                   goto found;
->               }
->           }
-> -        error_setg(errp, "PCI: no slot/function available for %s, all in use",
-> -                   name);
-> +        error_setg(errp, "PCI: no slot/function available for %s, all in use "
-> +                   "or reserved", name);
->           return NULL;
->       found: ;
-> +    } else if (pci_bus_devfn_reserved(bus, devfn)) {
-> +        error_setg(errp, "PCI: slot %d function %d not available for %s,"
-> +                   " reserved",
-> +                   PCI_SLOT(devfn), PCI_FUNC(devfn), name);
-> +        return NULL;
->       } else if (!pci_bus_devfn_available(bus, devfn)) {
->           error_setg(errp, "PCI: slot %d function %d not available for %s,"
->                      " in use by %s",
-> diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-> index 5484a9b..bc34fd0 100644
-> --- a/include/hw/pci/pci_bus.h
-> +++ b/include/hw/pci/pci_bus.h
-> @@ -23,6 +23,7 @@ struct PCIBus {
->       PCIIOMMUFunc iommu_fn;
->       void *iommu_opaque;
->       uint8_t devfn_min;
-> +    uint32_t slot_reserved_mask;
->       pci_set_irq_fn set_irq;
->       pci_map_irq_fn map_irq;
->       pci_route_irq_fn route_intx_to_irq;
-> 
+v2:
+- extended the series from 3 -> 11 patches
+- renamed all the properties with "x-" prefix
+- handled the cap/param check for these new properties (mostly patch
+  4-11, but it contains lots of refactorings in general)
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+We have the MigrationState as QDev now (which seems crazy). Let's
+continue to benefit.
 
-Thanks,
-Marcel
+This series is exporting all migration capabilities/params as global
+parameters. Then we can do something like this:
+
+  qemu -global migration.postcopy-ram=3Dtrue \
+       -global migration.max-bandwidth=3D4096
+
+The values will be inited just like we typed these values into HMP
+monitor. It'll simplify lots of migration scripts.
+
+The changes are fairly straightforward. One tiny loss is that we still
+don't support:
+
+  -global migration.max-bandwidth=3D1g
+
+...just like what we did in HMP:
+
+  migrate_set_speed 1g
+
+...while we need to use:
+
+  -global migration.max-bandwidth=3D1073741824
+
+However that should only be used in scripts, and that's good enough
+imho.
+
+These properties should only be used for debugging/testing purpose,
+and we should not guarantee any interface compatibility for them (just
+like HMP).
+
+Please review. Thanks.
+
+Peter Xu (11):
+  qdev: provide DEFINE_PROP_INT64()
+  migration: export parameters to props
+  migration: export capabilities to props
+  qom: call parent first on post_init()
+  migration: introduce migrate_params_check()
+  migration: provide migrate_params_apply()
+  migration: check global params for validity
+  migration: remove check against colo support
+  migration: provide migrate_caps_check()
+  migration: provide migrate_cap_add()
+  migration: check global caps for validity
+
+ hw/core/qdev-properties.c    |  32 +++++
+ include/hw/qdev-properties.h |   3 +
+ include/migration/colo.h     |   1 -
+ migration/colo.c             |   5 -
+ migration/migration.c        | 272 ++++++++++++++++++++++++++++++++++---=
+------
+ qom/object.c                 |   8 +-
+ 6 files changed, 253 insertions(+), 68 deletions(-)
+
+--=20
+2.7.4
