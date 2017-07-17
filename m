@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dX7Sf-0005bv-Go
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dX7Sk-0005fR-LZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dX7Se-0005v5-FB
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:25 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36454)
+	(envelope-from <alex.bennee@linaro.org>) id 1dX7Sj-0005x2-8X
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:30 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36475)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dX7Se-0005ug-9E
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:24 -0400
-Received: by mail-wr0-x233.google.com with SMTP id y43so2321141wrd.3
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:57:24 -0700 (PDT)
+	id 1dX7Sj-0005wZ-1G
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 10:57:29 -0400
+Received: by mail-wr0-x236.google.com with SMTP id y43so2322260wrd.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 07:57:28 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 17 Jul 2017 15:48:46 +0100
-Message-Id: <20170717144848.11793-22-alex.bennee@linaro.org>
+Date: Mon, 17 Jul 2017 15:48:42 +0100
+Message-Id: <20170717144848.11793-18-alex.bennee@linaro.org>
 In-Reply-To: <20170717144848.11793-1-alex.bennee@linaro.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 21/23] docker: add qemu:debian-jessie based
- on outdated jessie release
+Subject: [Qemu-devel] [PATCH v1 17/23] shippable: add ppc64el targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +37,21 @@ From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian8.docker | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian8.docker
+ .shippable.yml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
-new file mode 100644
-index 0000000000..ea9083633a
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian8.docker
-@@ -0,0 +1,31 @@
-+#
-+# Docker multiarch cross-compiler target
-+#
-+# This docker target is builds on Debian and Emdebian's cross compiler targets
-+# to build distro with a selection of cross compilers for building test binaries.
-+#
-+# On its own you can't build much but the docker-foo-cross targets
-+# build on top of the base debian image.
-+#
-+FROM debian:jessie-slim
-+MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
-+
-+# Setup some basic tools we need
-+RUN apt update
-+RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        clang \
-+        curl \
-+        flex \
-+        git \
-+        pkg-config \
-+        python-minimal
-+
-+# Duplicate deb line as deb-src, setup Emdebian
-+RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list && \
-+    echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list && \
-+    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+diff --git a/.shippable.yml b/.shippable.yml
+index abcaf6f4d4..189d193da5 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -16,6 +16,8 @@ env:
+     # mips64el-softmmu disabled due to libfdt problem
+     - IMAGE=debian-mipsel-cross
+       TARGET_LIST=mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
++    - IMAGE=debian-ppc64el-cross
++      TARGET_LIST=ppc64-softmmu,ppc64-linux-user,ppc64abi32-linux-user
+ build:
+   pre_ci:
+     - make docker-image-${IMAGE} V=1
 -- 
 2.13.0
