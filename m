@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX4RF-0007yL-AY
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:43:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dX4YZ-0001M5-AD
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX4RC-0003wM-8S
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:43:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47585)
+	(envelope-from <cohuck@redhat.com>) id 1dX4YW-0002SH-8s
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:51:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX4RC-0003vl-2O
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:43:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 10308319B4C
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 11:43:41 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 13:43:32 +0200
-Message-Id: <20170717114332.2941-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dX4YW-0002PZ-2S
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:51:16 -0400
+Date: Mon, 17 Jul 2017 13:51:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170717135107.62ab0bd8@gondolin>
+In-Reply-To: <20170717081152.17153-2-lprosek@redhat.com>
+References: <20170717081152.17153-1-lprosek@redhat.com>
+	<20170717081152.17153-2-lprosek@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] keymaps: fr-ca: more fixups
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/9] virtio: enhance virtio_error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, armbru@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/533613
-Cc: Thomas Huth <thuth@redhat.com>
-Suggested-by: J=C3=A9r=C3=B4me Poulin
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- pc-bios/keymaps/fr-ca | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+On Mon, 17 Jul 2017 10:11:44 +0200
+Ladi Prosek <lprosek@redhat.com> wrote:
 
-diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
-index 030f56a78e..b177d074c9 100644
---- a/pc-bios/keymaps/fr-ca
-+++ b/pc-bios/keymaps/fr-ca
-@@ -3,6 +3,8 @@
- include common
- map 0xc0c
-=20
-+numbersign 0x29
-+bar 0x29
- backslash 0x29 altgr
- plusminus 0x2 altgr
- at 0x3 altgr
-@@ -10,7 +12,6 @@ sterling 0x4 altgr
- cent 0x5 altgr
- currency 0x6 altgr
- notsign 0x7 altgr
--bar 0x29 shift
- twosuperior 0x9 altgr
- threesuperior 0xa altgr
- onequarter 0xb altgr
-@@ -38,6 +39,10 @@ dead_cedilla 0x1b
- dead_diaeresis 0x1b shift
- exclam 0x2 shift
- quotedbl 0x3 shift
-+comma 0x33
-+apostrophe 0x33 shift
-+period 0x34
-+period 0x34 shift
- slash 0x4 shift
- dollar 0x5 shift
- percent 0x6 shift
-@@ -49,4 +54,7 @@ parenright 0xb shift
- underscore 0xc shift
- plus 0xd shift
- minus 0xc
-+underscore 0xc shift
- equal 0xd
-+semicolon 0x27
-+colon 0x27 shift
---=20
-2.9.3
+> Output like "Virtqueue size exceeded" is not much useful in identifying the
+
+s/much/very/
+
+> culprit. This commit adds virtio device name (e.g. "virtio-input") and id
+> if set (e.g. "mouse0") to all virtio error messages to improve debuggability.
+> 
+> Some virtio devices (virtio-scsi, virtio-serial) insert a bus between the
+> proxy object and the virtio backends, so a helper function is added to walk
+> the object hierarchy and find the right proxy object to extract the id from.
+> 
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+>  hw/virtio/virtio.c | 30 ++++++++++++++++++++++++++++--
+>  1 file changed, 28 insertions(+), 2 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
