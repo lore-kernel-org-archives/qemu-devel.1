@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX7iR-0002cP-Qk
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:13:44 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dX7mi-00061K-Ia
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX7iO-0004oJ-JM
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:13:43 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 17 Jul 2017 10:13:34 -0500
-Message-Id: <20170717151334.17954-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <programmingkidx@gmail.com>) id 1dX7mf-0006gK-Aa
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:18:08 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:33624)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dX7mf-0006g2-53
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 11:18:05 -0400
+Received: by mail-io0-x241.google.com with SMTP id z62so7718203ioi.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 08:18:05 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <4FE60F15-93AE-49AA-A909-66D8B9D058B8@gmail.com>
+Date: Mon, 17 Jul 2017 11:18:02 -0400
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] usb: Fix build with newer gcc
+Message-Id: <78CE661B-5A4B-4F93-A1FA-819F5CC4C02B@gmail.com>
+References: <038DD9E8-EB5A-4575-BAF9-ED62D31700E0@gmail.com>
+	<d29a9fe675f1faa36f8cb0fdb1b90aea@walle.cc>
+	<4FE60F15-93AE-49AA-A909-66D8B9D058B8@gmail.com>
+Subject: Re: [Qemu-devel] New documentation for the LatticeMicro32 target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,57 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, kraxel@redhat.com, qemu-trivial@nongnu.org
+To: Michael Walle <michael@walle.cc>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-gcc 7 is pickier about our sources:
 
-hw/usb/bus.c: In function =E2=80=98usb_port_location=E2=80=99:
-hw/usb/bus.c:410:66: error: =E2=80=98%d=E2=80=99 directive output may be =
-truncated writing between 1 and 11 bytes into a region of size between 0 =
-and 15 [-Werror=3Dformat-truncation=3D]
-         snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
-                                                                  ^~
-hw/usb/bus.c:410:9: note: =E2=80=98snprintf=E2=80=99 output between 3 and=
- 28 bytes into a destination of size 16
-         snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  upstream->path, portnr);
-                  ~~~~~~~~~~~~~~~~~~~~~~~
+> On Jul 17, 2017, at 10:56 AM, Programmingkid =
+<programmingkidx@gmail.com> wrote:
+>=20
+>=20
+>> On Jul 17, 2017, at 1:40 AM, Michael Walle <michael@walle.cc> wrote:
+>>=20
+>> Am 2017-07-09 17:39, schrieb Programmingkid:
+>>> I just made a documentation page for the LatticeMicro32 target. I =
+need
+>>> to know its current status, how much of this system is implemented,
+>>> what software runs on it. If anyone could supply more information =
+that
+>>> would be appreciated. Pictures of this target running would be great
+>>> as well. Thanks.
+>>> Here is the page: =
+http://wiki.qemu.org/Documentation/Platforms/LatticeMico32
+>>=20
+>> Hi,
+>>=20
+>> thank you for your efforts. I have to admit that the current status =
+is unknown.
+>>=20
+>> I've just compiled the latest head and it looks like the BQL is =
+missing for the interrupt helpers. I'll post a patch soon. With the =
+patch, the basic stuff is working but there seems to be an issue with =
+OpenGL.
+>>=20
+>> You can read the quickstart instructions at:
+>> http://milkymist.walle.cc/README.qemu
+>>=20
+>> The flash image isn't working because it will boot right into the =
+visualization mode, which is using the OpenGL stuff. The "-kernel =
+flickernoise" method is working though. You can get the flickernoise =
+binary at:
+>> http://milkymist.walle.cc/updates/current/flickernoise
+>>=20
+>> Besides the milkymist emulation, there is plain lm32 emulation based =
+on the Lattice reference design which should be ok, because the tests =
+are working (=EF=BF=BCmake -C tests/tcg/lm32 check)
+>>=20
+>> -michael
+>=20
+> Thank you for all this information. It has been added to the wiki =
+page.=20
+>=20
 
-But we know that there are at most 5 levels of USB hubs, with at
-most two digits per level; that plus the separating dots means we
-use at most 15 bytes (including trailing NUL) of our 16-byte field.
-Adding an assertion to show gcc that we checked for truncation is
-enough to shut up the false-positive warning.
+I just tried qemu-system-lm32 and it crashed.
 
-Inspired by an idea by Dr. David Alan Gilbert <dgilbert@redhat.com>.
+Command-line: qemu-system-lm32 -M milkymist -kernel flickernoise
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- hw/usb/bus.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Error message: audio: Failed to create voice `mm_ac97.in'
+**
+ERROR: /accel/tcg/tcg-all.c:42:tcg_handle_interrupt: assertion failed: =
+(qemu_mutex_iothread_locked())
+Abort trap: 6
 
-diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-index 5939b273b9..d910f849e7 100644
---- a/hw/usb/bus.c
-+++ b/hw/usb/bus.c
-@@ -407,8 +407,10 @@ void usb_register_companion(const char *masterbus, U=
-SBPort *ports[],
- void usb_port_location(USBPort *downstream, USBPort *upstream, int portn=
-r)
- {
-     if (upstream) {
--        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
--                 upstream->path, portnr);
-+        int l =3D snprintf(downstream->path, sizeof(downstream->path), "=
-%s.%d",
-+                         upstream->path, portnr);
-+        /* Max string is nn.nn.nn.nn.nn, which fits in 16 bytes */
-+        assert(l < sizeof(downstream->path));
-         downstream->hubcount =3D upstream->hubcount + 1;
-     } else {
-         snprintf(downstream->path, sizeof(downstream->path), "%d", portn=
-r);
---=20
-2.13.3
+Host: Mac OS 10.12.5=
