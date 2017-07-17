@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXBE8-0001lo-Qa
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:58:42 -0400
+	(envelope-from <quintela@redhat.com>) id 1dXBGZ-0004WT-7j
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXBE5-0002rm-Gk
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:58:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54604)
+	(envelope-from <quintela@redhat.com>) id 1dXBGW-0005ba-0S
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:01:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXBE5-0002r3-7Z
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 14:58:37 -0400
-Date: Mon, 17 Jul 2017 19:58:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170717185830.GD31820@work-vm>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXBGV-0005ak-Po
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 15:01:07 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A7E2C04D28B
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 19:01:06 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1500279971-13875-7-git-send-email-peterx@redhat.com> (Peter Xu's
+	message of "Mon, 17 Jul 2017 16:26:06 +0800")
+References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
+	<1500279971-13875-7-git-send-email-peterx@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 17 Jul 2017 21:01:06 +0200
+Message-ID: <87lgnmnb0t.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] migration: provide
+ migrate_params_apply()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +35,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, quintela@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-* Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
-> On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> 
-> > On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> > wrote:
-> > > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> > > Paolo suggested offline that we send a pull request for this series.
-> > > Here it is, I've run it through my testsuite + tested the LQSPI testcase
-> > > on Zynq.
-> >
-> > > ----------------------------------------------------------------
-> > > mmio-exec.for-upstream
-> > >
-> > > ----------------------------------------------------------------
-> > > KONRAD Frederic (7):
-> > >       cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
-> > >       cputlb: move get_page_addr_code
-> > >       cputlb: fix the way get_page_addr_code fills the tlb
-> > >       qdev: add MemoryRegion property
-> > >       introduce mmio_interface
-> > >       exec: allow to get a pointer for some mmio memory region
-> > >       xilinx_spips: allow mmio execution
-> >
-> > Hi Edgar -- can you or Fred explain how this code interacts with
-> > VM migration? The mmio-interface device creates a RAM memory
-> > region with memory_region_init_ram_ptr(), but it doesn't call
-> > vmstate_register_ram(). On the other hand the core migration code
-> > will try to migrate the contents of the RAMBlock anyway, just
-> > without a name.
-> >
-> > It's not clear to me how this works, and it would be nice to
-> > get it clear so that we can make any necessary fixes before the
-> > 2.10 release hits and we lose the opportunity to make any
-> > migration-compatibility-breaking changes.
-> >
-> > thanks
-> > -- PMM
-> >
-> 
-> Hi Peter,
-> 
-> These temporary regions should be read-only and treated as temporary caches
-> AFAIU things.
-> I would say that they don't need to be migrated. After migration, the new
-> VM will recreate the ram areas from device backing.
-> 
-> Is there a way we can prevent migration of the RAMBlock?
+Peter Xu <peterx@redhat.com> wrote:
+> Abstracted from qmp_migrate_set_parameters().
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Not yet, I think we'd have to:
-   a) Add a flag to the RAMBlock
-   b) Set it/clear it on registration
-   c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
-   d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
-   cases) with the RAMBLOCK_FOREACH_MIGRATABLE
-   e) Worry about the corner cases!
-
-I've got a few worries about what happens when the kernel tries to
-do dirty yncing - I'm not sure if we have to change anything on that
-interface to skip those RAMBlocks.
-
-Dave
-
-> Cheers,
-> Edgar
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Juan Quintela <quintela@redhat.com>
