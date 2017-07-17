@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxL-0002ap-Bv
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxL-0002ao-Al
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dWzxJ-0001ZR-BR
+	(envelope-from <dgibson@ozlabs.org>) id 1dWzxJ-0001ZT-C8
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:56:35 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 17 Jul 2017 16:56:03 +1000
-Message-Id: <20170717065621.4688-4-david@gibson.dropbear.id.au>
+Date: Mon, 17 Jul 2017 16:56:19 +1000
+Message-Id: <20170717065621.4688-20-david@gibson.dropbear.id.au>
 In-Reply-To: <20170717065621.4688-1-david@gibson.dropbear.id.au>
 References: <20170717065621.4688-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/21] spapr: Minor cleanups to events handling
+Subject: [Qemu-devel] [PULL 19/21] pseries: Allow HPT resizing with KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,197 +22,274 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sjitindarsingh@gmail.com, David Gibson <david@gibson.dropbear.id.au>
 
-The rtas_error_log structure is marked packed, which strongly suggests its
-precise layout is important to match an external interface.  Along with
-that one could expect it to have a fixed endianness to match the same
-interface.  That used to be the case - matching the layout of PAPR RTAS
-event format and requiring BE fields.
+So far, qemu implements the PAPR Hash Page Table (HPT) resizing extension
+with TCG.  The same implementation will work with KVM PR, but we don't
+currently allow that.  For KVM HV we can only implement resizing with the
+assistance of the host kernel, which needs a new capability and ioctl()s.
 
-Now, however, it's only used embedded within sPAPREventLogEntry with the
-fields in native order, since they're processed internally.
-
-Clear that up by removing the nested structure in sPAPREventLogEntry.
-struct rtas_error_log is moved back to spapr_events.c where it is used as
-a temporary to help convert the fields in sPAPREventLogEntry to the correct
-in memory format when delivering an event to the guest.
+This patch adds support for testing the new KVM capability and implementing
+the resize in terms of KVM facilities when necessary.  If we're running on
+a kernel which doesn't have the new capability flag at all, we fall back to
+testing for PR vs. HV KVM using the same hack that we already use in a
+number of places for older kernels.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c         |  6 +++---
- hw/ppc/spapr_events.c  | 45 ++++++++++++++++++++++-----------------------
- include/hw/ppc/spapr.h |  6 +-----
- 3 files changed, 26 insertions(+), 31 deletions(-)
+ hw/ppc/spapr_hcall.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/ppc/kvm.c     | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ target/ppc/kvm_ppc.h | 21 ++++++++++++++++
+ 3 files changed, 152 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b451d856b8..8528c30ad7 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1528,10 +1528,10 @@ static const VMStateDescription vmstate_spapr_event_entry = {
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(header.summary, sPAPREventLogEntry),
--        VMSTATE_UINT32(header.extended_length, sPAPREventLogEntry),
-+        VMSTATE_UINT32(summary, sPAPREventLogEntry),
-+        VMSTATE_UINT32(extended_length, sPAPREventLogEntry),
-         VMSTATE_VBUFFER_ALLOC_UINT32(extended_log, sPAPREventLogEntry, 0,
--                                     NULL, header.extended_length),
-+                                     NULL, extended_length),
-         VMSTATE_END_OF_LIST()
-     },
- };
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index ce41e74665..f952b78237 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -42,7 +42,6 @@
- #include "hw/ppc/spapr_ovec.h"
- #include <libfdt.h>
- 
--/* Macros related to rtas_error_log struct defined in spapr.h */
- #define RTAS_LOG_VERSION_MASK                   0xff000000
- #define   RTAS_LOG_VERSION_6                    0x06000000
- #define RTAS_LOG_SEVERITY_MASK                  0x00e00000
-@@ -85,6 +84,11 @@
- #define   RTAS_LOG_TYPE_EPOW                    0x00000040
- #define   RTAS_LOG_TYPE_HOTPLUG                 0x000000e5
- 
-+struct rtas_error_log {
-+    uint32_t summary;
-+    uint32_t extended_length;
-+} QEMU_PACKED;
-+
- struct rtas_event_log_v6 {
-     uint8_t b0;
- #define RTAS_LOG_V6_B0_VALID                          0x80
-@@ -338,7 +342,7 @@ static int rtas_event_log_to_irq(sPAPRMachineState *spapr, int log_type)
- 
- static uint32_t spapr_event_log_entry_type(sPAPREventLogEntry *entry)
- {
--    return entry->header.summary & RTAS_LOG_TYPE_MASK;
-+    return entry->summary & RTAS_LOG_TYPE_MASK;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 436f5e2b22..72ea5a8247 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -426,6 +426,44 @@ static void cancel_hpt_prepare(sPAPRMachineState *spapr)
+     free_pending_hpt(pending);
  }
  
- static void rtas_event_log_queue(sPAPRMachineState *spapr,
-@@ -426,7 +430,6 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     sPAPREventLogEntry *entry;
--    struct rtas_error_log *hdr;
-     struct rtas_event_log_v6 *v6hdr;
-     struct rtas_event_log_v6_maina *maina;
-     struct rtas_event_log_v6_mainb *mainb;
-@@ -437,18 +440,17 @@ static void spapr_powerdown_req(Notifier *n, void *opaque)
-     new_epow = g_malloc0(sizeof(*new_epow));
-     entry->extended_log = new_epow;
++/* Convert a return code from the KVM ioctl()s implementing resize HPT
++ * into a PAPR hypercall return code */
++static target_ulong resize_hpt_convert_rc(int ret)
++{
++    if (ret >= 100000) {
++        return H_LONG_BUSY_ORDER_100_SEC;
++    } else if (ret >= 10000) {
++        return H_LONG_BUSY_ORDER_10_SEC;
++    } else if (ret >= 1000) {
++        return H_LONG_BUSY_ORDER_1_SEC;
++    } else if (ret >= 100) {
++        return H_LONG_BUSY_ORDER_100_MSEC;
++    } else if (ret >= 10) {
++        return H_LONG_BUSY_ORDER_10_MSEC;
++    } else if (ret > 0) {
++        return H_LONG_BUSY_ORDER_1_MSEC;
++    }
++
++    switch (ret) {
++    case 0:
++        return H_SUCCESS;
++    case -EPERM:
++        return H_AUTHORITY;
++    case -EINVAL:
++        return H_PARAMETER;
++    case -ENXIO:
++        return H_CLOSED;
++    case -ENOSPC:
++        return H_PTEG_FULL;
++    case -EBUSY:
++        return H_BUSY;
++    case -ENOMEM:
++        return H_NO_MEM;
++    default:
++        return H_HARDWARE;
++    }
++}
++
+ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+                                          sPAPRMachineState *spapr,
+                                          target_ulong opcode,
+@@ -435,6 +473,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+     int shift = args[1];
+     sPAPRPendingHPT *pending = spapr->pending_hpt;
+     uint64_t current_ram_size = MACHINE(spapr)->ram_size;
++    int rc;
  
--    hdr = &entry->header;
-     v6hdr = &new_epow->v6hdr;
-     maina = &new_epow->maina;
-     mainb = &new_epow->mainb;
-     epow = &new_epow->epow;
- 
--    hdr->summary = RTAS_LOG_VERSION_6
-+    entry->summary = RTAS_LOG_VERSION_6
-                        | RTAS_LOG_SEVERITY_EVENT
-                        | RTAS_LOG_DISPOSITION_NOT_RECOVERED
-                        | RTAS_LOG_OPTIONAL_PART_PRESENT
-                        | RTAS_LOG_TYPE_EPOW;
--    hdr->extended_length = sizeof(*new_epow);
-+    entry->extended_length = sizeof(*new_epow);
- 
-     spapr_init_v6hdr(v6hdr);
-     spapr_init_maina(maina, 3 /* Main-A, Main-B and EPOW */);
-@@ -482,7 +484,6 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     sPAPREventLogEntry *entry;
-     struct hp_extended_log *new_hp;
--    struct rtas_error_log *hdr;
-     struct rtas_event_log_v6 *v6hdr;
-     struct rtas_event_log_v6_maina *maina;
-     struct rtas_event_log_v6_mainb *mainb;
-@@ -492,19 +493,18 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
-     new_hp = g_malloc0(sizeof(struct hp_extended_log));
-     entry->extended_log = new_hp;
- 
--    hdr = &entry->header;
-     v6hdr = &new_hp->v6hdr;
-     maina = &new_hp->maina;
-     mainb = &new_hp->mainb;
-     hp = &new_hp->hp;
- 
--    hdr->summary = RTAS_LOG_VERSION_6
--                       | RTAS_LOG_SEVERITY_EVENT
--                       | RTAS_LOG_DISPOSITION_NOT_RECOVERED
--                       | RTAS_LOG_OPTIONAL_PART_PRESENT
--                       | RTAS_LOG_INITIATOR_HOTPLUG
--                       | RTAS_LOG_TYPE_HOTPLUG;
--    hdr->extended_length = sizeof(*new_hp);
-+    entry->summary = RTAS_LOG_VERSION_6
-+        | RTAS_LOG_SEVERITY_EVENT
-+        | RTAS_LOG_DISPOSITION_NOT_RECOVERED
-+        | RTAS_LOG_OPTIONAL_PART_PRESENT
-+        | RTAS_LOG_INITIATOR_HOTPLUG
-+        | RTAS_LOG_TYPE_HOTPLUG;
-+    entry->extended_length = sizeof(*new_hp);
- 
-     spapr_init_v6hdr(v6hdr);
-     spapr_init_maina(maina, 3 /* Main-A, Main-B, HP */);
-@@ -628,10 +628,10 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                             target_ulong args,
-                             uint32_t nret, target_ulong rets)
- {
--    CPUState *cs = CPU(cpu);
-     uint32_t mask, buf, len, event_len;
-     uint64_t xinfo;
-     sPAPREventLogEntry *event;
-+    struct rtas_error_log header;
-     int i;
- 
-     if ((nargs < 6) || (nargs > 7) || nret != 1) {
-@@ -652,18 +652,17 @@ static void check_exception(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-         goto out_no_events;
+     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+         return H_AUTHORITY;
+@@ -464,6 +503,11 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+         return H_RESOURCE;
      }
  
--    event_len = event->header.extended_length + sizeof(event->header);
-+    event_len = event->extended_length + sizeof(header);
++    rc = kvmppc_resize_hpt_prepare(cpu, flags, shift);
++    if (rc != -ENOSYS) {
++        return resize_hpt_convert_rc(rc);
++    }
++
+     if (pending) {
+         /* something already in progress */
+         if (pending->shift == shift) {
+@@ -659,6 +703,11 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
  
-     if (event_len < len) {
-         len = event_len;
+     trace_spapr_h_resize_hpt_commit(flags, shift);
+ 
++    rc = kvmppc_resize_hpt_commit(cpu, flags, shift);
++    if (rc != -ENOSYS) {
++        return resize_hpt_convert_rc(rc);
++    }
++
+     if (flags != 0) {
+         return H_PARAMETER;
+     }
+@@ -684,6 +733,13 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+         spapr->htab = pending->hpt;
+         spapr->htab_shift = pending->shift;
+ 
++        if (kvm_enabled()) {
++            /* For KVM PR, update the HPT pointer */
++            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
++                | (spapr->htab_shift - 18);
++            kvmppc_update_sdr1(sdr1);
++        }
++
+         pending->hpt = NULL; /* so it's not free()d */
      }
  
--    stl_be_phys(cs->as, buf, event->header.summary);
--    stl_be_phys(cs->as, buf + sizeof(event->header.summary),
--                event->header.extended_length);
--    cpu_physical_memory_write(buf + sizeof(event->header),
--                              event->extended_log,
--                              event->header.extended_length);
-+    header.summary = cpu_to_be32(event->summary);
-+    header.extended_length = cpu_to_be32(event->extended_length);
-+    cpu_physical_memory_write(buf, &header, sizeof(header));
-+    cpu_physical_memory_write(buf + sizeof(header), event->extended_log,
-+                              event->extended_length);
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-     g_free(event->extended_log);
-     g_free(event);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 2718b90db7..2ddec025d2 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -606,13 +606,9 @@ struct sPAPRTCETable {
+@@ -1494,11 +1550,21 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+         }
  
- sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
+         if (spapr->htab_shift < maxshift) {
++            CPUState *cs;
++
+             /* Guest doesn't know about HPT resizing, so we
+              * pre-emptively resize for the maximum permitted RAM.  At
+              * the point this is called, nothing should have been
+              * entered into the existing HPT */
+             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
++            CPU_FOREACH(cs) {
++                if (kvm_enabled()) {
++                    /* For KVM PR, update the HPT pointer */
++                    target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
++                        | (spapr->htab_shift - 18);
++                    kvmppc_update_sdr1(sdr1);
++                }
++            }
+         }
+     }
  
--struct rtas_error_log {
-+struct sPAPREventLogEntry {
-     uint32_t summary;
-     uint32_t extended_length;
--} QEMU_PACKED;
--
--struct sPAPREventLogEntry {
--    struct rtas_error_log header;
-     void *extended_log;
-     QTAILQ_ENTRY(sPAPREventLogEntry) next;
- };
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 8bafd1e932..85713795de 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -89,6 +89,7 @@ static int cap_fixup_hcalls;
+ static int cap_htm;             /* Hardware transactional memory support */
+ static int cap_mmu_radix;
+ static int cap_mmu_hash_v3;
++static int cap_resize_hpt;
+ 
+ static uint32_t debug_inst_opcode;
+ 
+@@ -145,6 +146,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
++    cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
+ 
+     if (!cap_interrupt_level) {
+         fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
+@@ -2714,11 +2716,72 @@ int kvmppc_enable_hwrng(void)
+ void kvmppc_check_papr_resize_hpt(Error **errp)
+ {
+     if (!kvm_enabled()) {
+-        return;
++        return; /* No KVM, we're good */
++    }
++
++    if (cap_resize_hpt) {
++        return; /* Kernel has explicit support, we're good */
+     }
+ 
+-    /* TODO: Check for resize-capable KVM implementations */
++    /* Otherwise fallback on looking for PR KVM */
++    if (kvmppc_is_pr(kvm_state)) {
++        return;
++    }
+ 
+     error_setg(errp,
+                "Hash page table resizing not available with this KVM version");
+ }
++
++int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift)
++{
++    CPUState *cs = CPU(cpu);
++    struct kvm_ppc_resize_hpt rhpt = {
++        .flags = flags,
++        .shift = shift,
++    };
++
++    if (!cap_resize_hpt) {
++        return -ENOSYS;
++    }
++
++    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_PREPARE, &rhpt);
++}
++
++int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
++{
++    CPUState *cs = CPU(cpu);
++    struct kvm_ppc_resize_hpt rhpt = {
++        .flags = flags,
++        .shift = shift,
++    };
++
++    if (!cap_resize_hpt) {
++        return -ENOSYS;
++    }
++
++    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
++}
++
++static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
++{
++    target_ulong sdr1 = arg.target_ptr;
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++
++    /* This is just for the benefit of PR KVM */
++    cpu_synchronize_state(cs);
++    env->spr[SPR_SDR1] = sdr1;
++    if (kvmppc_put_books_sregs(cpu) < 0) {
++        error_report("Unable to update SDR1 in KVM");
++        exit(1);
++    }
++}
++
++void kvmppc_update_sdr1(target_ulong sdr1)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
++    }
++}
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 9be706c5c9..6bc6fb3e2d 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -64,6 +64,9 @@ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+ void kvmppc_check_papr_resize_hpt(Error **errp);
++int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
++int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
++void kvmppc_update_sdr1(target_ulong sdr1);
+ 
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+ 
+@@ -302,6 +305,24 @@ static inline void kvmppc_check_papr_resize_hpt(Error **errp)
+ {
+     return;
+ }
++
++static inline int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu,
++                                            target_ulong flags, int shift)
++{
++    return -ENOSYS;
++}
++
++static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
++                                           target_ulong flags, int shift)
++{
++    return -ENOSYS;
++}
++
++static inline void kvmppc_update_sdr1(target_ulong sdr1)
++{
++    abort();
++}
++
+ #endif
+ 
+ #ifndef CONFIG_KVM
 -- 
 2.13.3
