@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dX9o6-0006jS-Ei
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:27:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1dX9pd-0008AQ-Es
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:29:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dX9o5-0005sk-Ch
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:27:42 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dX9o5-0005rk-34
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:27:41 -0400
-Received: by mail-wr0-x242.google.com with SMTP id 40so3209512wrw.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:27:39 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dX9pa-0006VN-3J
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:29:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dX9pZ-0006UR-Qm
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:29:14 -0400
+References: <20170407143847.GM2138@work-vm>
+	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+	<20170717164641.GA31820@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+Date: Mon, 17 Jul 2017 12:29:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 18 Jul 2017 00:27:37 +0700
-Message-ID: <CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+In-Reply-To: <20170717164641.GA31820@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AkGIoq79O0frcGLXVncVxnx8aiar4HCIT"
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AkGIoq79O0frcGLXVncVxnx8aiar4HCIT
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+References: <20170407143847.GM2138@work-vm>
+ <1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+ <1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+ <6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+ <39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+ <20170717164641.GA31820@work-vm>
+In-Reply-To: <20170717164641.GA31820@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> > Paolo suggested offline that we send a pull request for this series.
-> > Here it is, I've run it through my testsuite + tested the LQSPI testcase
-> > on Zynq.
->
-> > ----------------------------------------------------------------
-> > mmio-exec.for-upstream
-> >
-> > ----------------------------------------------------------------
-> > KONRAD Frederic (7):
-> >       cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
-> >       cputlb: move get_page_addr_code
-> >       cputlb: fix the way get_page_addr_code fills the tlb
-> >       qdev: add MemoryRegion property
-> >       introduce mmio_interface
-> >       exec: allow to get a pointer for some mmio memory region
-> >       xilinx_spips: allow mmio execution
->
-> Hi Edgar -- can you or Fred explain how this code interacts with
-> VM migration? The mmio-interface device creates a RAM memory
-> region with memory_region_init_ram_ptr(), but it doesn't call
-> vmstate_register_ram(). On the other hand the core migration code
-> will try to migrate the contents of the RAMBlock anyway, just
-> without a name.
->
-> It's not clear to me how this works, and it would be nice to
-> get it clear so that we can make any necessary fixes before the
-> 2.10 release hits and we lose the opportunity to make any
-> migration-compatibility-breaking changes.
->
-> thanks
-> -- PMM
->
+On 07/17/2017 11:46 AM, Dr. David Alan Gilbert wrote:
 
-Hi Peter,
+>> +++ w/hw/usb/bus.c
+>> @@ -407,8 +407,9 @@ void usb_register_companion(const char *masterbus,=
 
-These temporary regions should be read-only and treated as temporary caches
-AFAIU things.
-I would say that they don't need to be migrated. After migration, the new
-VM will recreate the ram areas from device backing.
+>> USBPort *ports[],
+>>  void usb_port_location(USBPort *downstream, USBPort *upstream, int po=
+rtnr)
+>>  {
+>>      if (upstream) {
+>> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",=
 
-Is there a way we can prevent migration of the RAMBlock?
+>> -                 upstream->path, portnr);
+>> +        int l =3D snprintf(downstream->path, sizeof(downstream->path)=
+,
+>> "%s.%d",
+>> +                         upstream->path, portnr);
+>> +        assert(l < sizeof(downstream->path));
+>=20
+> You may find this doesn't help in some windows builds;  the assert
+> functions aren't always marked as noreturn (because they pop up a dialo=
+g
+> that asks you whether you want to run into a debugger etc).
 
-Cheers,
-Edgar
+How would it not help?  Are we using gcc 7 on windows builds?  Adding
+the assert is enough to shut up new gcc; old gcc was already silent; and
+if mingw is still on old gcc, it doesn't matter whether assert() is
+marked noreturn for what this patch is doing.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AkGIoq79O0frcGLXVncVxnx8aiar4HCIT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlls8+QACgkQp6FrSiUn
+Q2pYxQf/aFGg67Y6l1fzxcS+19Fbe8LTf+LMvzahhCQ/0V6DWgz14N/ByLAX+U6Q
+3U+lU04Xe/aIxqZl+9+zOZWjK7p4Y5Cskf4n6slAbOg6G/kGkjQ85dRe7SlrA81V
+V73m+GyNE3f/NLXoZ6CVWYt6ADIBPyYvHb7yNXA5JJEWYE+XZm5Yt3K5xSEuwHhP
+/EtdxZ5CXffCVilPEwV5u6hI1x8YnRstepbL3O2q0sr1xUnaC8XEitQjKRTa6dkR
+lK5Ie/siDPY+585LzvA0N3LWa92qxEXJi2v76rX6U+d4jDXRiWqozMlhyRmZnDGw
+eJIaUBJznONO5MVWuHhMh9m4z7j3nw==
+=GYuV
+-----END PGP SIGNATURE-----
+
+--AkGIoq79O0frcGLXVncVxnx8aiar4HCIT--
