@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1dWymM-00040F-1q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 01:41:11 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dWzWC-0003n8-KJ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:28:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1dWymI-0002eT-V8
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 01:41:10 -0400
-Received: from ssl.serverraum.org ([213.133.101.245]:40791)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1dWymI-0002cj-KO
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 01:41:06 -0400
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Mon, 17 Jul 2017 07:40:57 +0200
-From: Michael Walle <michael@walle.cc>
-In-Reply-To: <038DD9E8-EB5A-4575-BAF9-ED62D31700E0@gmail.com>
-References: <038DD9E8-EB5A-4575-BAF9-ED62D31700E0@gmail.com>
-Message-ID: <d29a9fe675f1faa36f8cb0fdb1b90aea@walle.cc>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] New documentation for the LatticeMicro32 target
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dWzWB-0004WN-LJ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 02:28:32 -0400
+Message-ID: <1500272899.2284.0.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Mon, 17 Jul 2017 16:28:19 +1000
+In-Reply-To: <1500048838-16802-1-git-send-email-clg@kaod.org>
+References: <1500048838-16802-1-git-send-email-clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: fix CPU hotplug when radix is
+ enabled (TCG)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Am 2017-07-09 17:39, schrieb Programmingkid:
-> I just made a documentation page for the LatticeMicro32 target. I need
-> to know its current status, how much of this system is implemented,
-> what software runs on it. If anyone could supply more information that
-> would be appreciated. Pictures of this target running would be great
-> as well. Thanks.
->=20
-> Here is the page:=20
-> http://wiki.qemu.org/Documentation/Platforms/LatticeMico32
+On Fri, 2017-07-14 at 18:13 +0200, Cédric Le Goater wrote:
+> But when a guest initializes radix mode, it issues a
+> H_REGISTER_PROC_TBL
+> to update the LPCR of all CPUs. Hot-plugged CPUs inherit from the
+> same
+> setting under KVM but not under TCG. So, Let's check for radix and
+> update
+> the default LPCR to keep new CPUs in sync.
+> 
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
 
-Hi,
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-thank you for your efforts. I have to admit that the current status is=20
-unknown.
+> ---
+>  target/ppc/translate_init.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/ppc/translate_init.c
+> b/target/ppc/translate_init.c
+> index 8b9807665dd5..8776e9b0f8fa 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -9014,8 +9014,16 @@ void cpu_ppc_set_papr(PowerPCCPU *cpu,
+> PPCVirtualHypervisor *vhyp)
+>          /* By default we choose legacy mode and switch to new hash
+> or radix
+>           * when a register process table hcall is made. So disable
+> process
+>           * tables and guest translation shootdown by default
+> +         *
+> +         * Hot-plugged CPUs inherit from the guest radix setting
+> under
+> +         * KVM but not under TCG. Update the default LPCR to keep
+> new
+> +         * CPUs in sync when radix is enabled.
+>           */
+> -        lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
+> +        if (ppc64_radix_guest(cpu)) {
+> +            lpcr->default_value |= LPCR_UPRT | LPCR_GTSE;
 
-I've just compiled the latest head and it looks like the BQL is missing=20
-for the interrupt helpers. I'll post a patch soon. With the patch, the=20
-basic stuff is working but there seems to be an issue with OpenGL.
+Since we can't do radix without GTSE, I guess for now at least RADIX
+implies GTSE.
 
-You can read the quickstart instructions at:
-http://milkymist.walle.cc/README.qemu
-
-The flash image isn't working because it will boot right into the=20
-visualization mode, which is using the OpenGL stuff. The "-kernel=20
-flickernoise" method is working though. You can get the flickernoise=20
-binary at:
-http://milkymist.walle.cc/updates/current/flickernoise
-
-Besides the milkymist emulation, there is plain lm32 emulation based on=20
-the Lattice reference design which should be ok, because the tests are=20
-working (=EF=BF=BCmake -C tests/tcg/lm32 check)
-
--michael
+> +        } else {
+> +            lpcr->default_value &= ~(LPCR_UPRT | LPCR_GTSE);
+> +        }
+>          lpcr->default_value |= LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
+> LPCR_DEE |
+>                                 LPCR_OEE;
+>          break;
