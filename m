@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX9ze-0005Wg-NJ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:39:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dXA3p-0006bJ-Gw
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dX9zd-0003t3-TB
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:39:38 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35223)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dX9zd-0003sV-Ms
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:39:37 -0400
-Received: by mail-wm0-x236.google.com with SMTP id w126so83076173wme.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:39:37 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1dXA3m-0005tb-Td
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:43:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41210)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXA3m-0005st-Kl
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:43:54 -0400
+Date: Mon, 17 Jul 2017 14:43:48 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170717174348.GV6020@localhost.localdomain>
+References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170714180907.GM6020@localhost.localdomain>
+	<9584b0c7-96f4-f000-e53f-93accd8a39ad@redhat.com>
+	<20170714185616.GQ6020@localhost.localdomain>
+	<c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
+	<20170717130311.4e9d7238@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170717094011.15905-1-kraxel@redhat.com>
-References: <20170717094011.15905-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 17 Jul 2017 18:39:15 +0100
-Message-ID: <CAFEAcA-7qJV1kxT5DYHoG6Psgpz5NSWmSNu0FE5ZE=9nKJwSrw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Usb 20170717 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170717130311.4e9d7238@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and
+ fw_cfg types into fw_cfg.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com
 
-On 17 July 2017 at 10:40, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 6e2c46334385c7e295ac883c801c81b4925fb54f:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170711' into staging (2017-07-13 10:47:10 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/usb-20170717-pull-request
->
-> for you to fetch changes up to 2a7f2630684ee556a394a354d64159a4470c0151:
->
->   ehci: add sanity check for maxframes (2017-07-17 11:39:08 +0200)
->
-> ----------------------------------------------------------------
-> ehci fix for 2.10
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (1):
->   ehci: add sanity check for maxframes
->
->  hw/usb/hcd-ehci.c | 5 +++++
->  1 file changed, 5 insertions(+)
+On Mon, Jul 17, 2017 at 01:03:11PM +0200, Igor Mammedov wrote:
+> On Sun, 16 Jul 2017 20:12:13 +0100
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+> 
+> > On 14/07/17 19:56, Eduardo Habkost wrote:
+> > 
+> > >>> Why do you need the full struct declaration to be exposed in the
+> > >>> header?  
+> > >>
+> > >> Different board code wants to hook up "comb_iomem" manually to different
+> > >> address spaces, so they need to access the field directly. This is the
+> > >> ultimate goal of the entire exercise, IIRC.  
+> > 
+> > Yes, that is correct (and I believe is mentioned in the cover letter, too).
+> > 
+> > >>> The memory regions are supposed to be visible as QOM
+> > >>> children to the fw_cfg device, already.  
+> > >>
+> > >> I don't understand this. How else can board code work with "comb_iomem"
+> > >> than described above? If there is a way, I agree it would be preferable.  
+> > > 
+> > > object_resolve_path_component(fw_cfg, "fwcfg[0]") and
+> > > object_resolve_path_component(fw_cfg, "fwcfg.dma[0]") should
+> > > return fw_cfg->comb_iomem and fw_cfg->dma_iomem, respectively.
+> > > 
+> > > I don't know why those names were chosen, though.  Probably it's
+> > > a good idea to call object_property_add_child() manually with
+> > > more appropriate names inside the fw_cfg code instead of letting
+> > > memory_region_init() pick the child name.  
+> > 
+> > That's interesting. I did a grep of the codebase for
+> > object_resolve_path_component and struggled to find an instance where it
+> > was being used to provide access to a MemoryRegion. Even if it's an
+> > available feature, it's certainly not one that is widely known about.
+> Agreed,
+> 
+> we haven't used suggested approach before and I don't see
+> benefits it will bring in fwcfg case.
+> 
+> Eduardo,
+> 
+> Could you just apply v9, which seems to be good enough and
+> does the intended job before 2.10 goes into soft-freeze?
+> we always could do object_resolve_path_component() on top
+> if it makes sense.
 
-Applied, thanks.
+I was hoping Michael would apply it (as fw_cfg is currently
+closer to PC code than to i386 or machine core).  But I can apply
+it if he didn't queue it yet.
 
--- PMM
+-- 
+Eduardo
