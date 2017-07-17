@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX6An-0006cJ-89
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:34:54 -0400
+	(envelope-from <cuiyudaniu@gmail.com>) id 1dX2o9-0002an-Pe
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX6Al-00074v-5z
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:34:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX6Ak-00074c-Vi
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:34:51 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EFF54356F6
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 13:34:49 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 15:34:44 +0200
-Message-Id: <20170717133444.16743-1-kraxel@redhat.com>
+	(envelope-from <cuiyudaniu@gmail.com>) id 1dX2o9-0006Bg-23
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:59:17 -0400
+Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:36203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <cuiyudaniu@gmail.com>)
+	id 1dX2o8-00069O-NU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:59:17 -0400
+Received: by mail-lf0-x22c.google.com with SMTP id h22so82177764lfk.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:59:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] keymaps: fr-ca: more fixups
+From: yu cui <cuiyudaniu@gmail.com>
+Date: Mon, 17 Jul 2017 17:59:13 +0800
+Message-ID: <CAPyyD3-X4XzHNDs2DD=hNR2y8eM9GkwfH3qqgzLZp+25D=82FA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] CR3 difference by virsh and c program in Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +27,17 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/533613
-Cc: Thomas Huth <thuth@redhat.com>
-Suggested-by: J=C3=A9r=C3=B4me Poulin <jeromepoulin@gmail.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- pc-bios/keymaps/fr-ca | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Hello,
 
-diff --git a/pc-bios/keymaps/fr-ca b/pc-bios/keymaps/fr-ca
-index 030f56a78e..13a0306762 100644
---- a/pc-bios/keymaps/fr-ca
-+++ b/pc-bios/keymaps/fr-ca
-@@ -10,6 +10,7 @@ sterling 0x4 altgr
- cent 0x5 altgr
- currency 0x6 altgr
- notsign 0x7 altgr
-+numbersign 0x29
- bar 0x29 shift
- twosuperior 0x9 altgr
- threesuperior 0xa altgr
-@@ -38,6 +39,10 @@ dead_cedilla 0x1b
- dead_diaeresis 0x1b shift
- exclam 0x2 shift
- quotedbl 0x3 shift
-+comma 0x33
-+apostrophe 0x33 shift
-+period 0x34
-+period 0x34 shift
- slash 0x4 shift
- dollar 0x5 shift
- percent 0x6 shift
-@@ -47,6 +52,9 @@ asterisk 0x9 shift
- parenleft 0xa shift
- parenright 0xb shift
- underscore 0xc shift
--plus 0xd shift
- minus 0xc
-+underscore 0xc shift
- equal 0xd
-+plus 0xd shift
-+semicolon 0x27
-+colon 0x27 shift
---=20
-2.9.3
+I tried virsh command, it seems CR3 value returns by qemu and dmesg by a c
+program in Guest is not same ?
+The command is :
+virsh -c qemu:///system qemu-monitor-command instance-0000009d
+
+When Guest is 4GB,  CR3 in guest is like "cr3 = 0x39a54000", while qemu
+returns "cr3 = 0x0000000139a54000", with a gap of 4GB(0x0000000100000000).
+When Guest is 8GB,  CR3 in guest is like "cr3 = 0x39a54000", while qemu
+returns "cr3 = 0x0000000239a54000", with a gap of 8GB(0x0000000200000000).
+
+So, it seems that CR3qemu = PysicalMem + CR3guest. Is it a bug?
