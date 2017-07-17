@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dX2r4-0003Gb-Jq
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:02:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dX2rP-0003QC-Kf
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:02:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dX2r1-00088G-FO
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:02:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44066)
+	(envelope-from <dgilbert@redhat.com>) id 1dX2rM-0008J1-FV
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:02:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dX2r1-00087a-5Q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:02:15 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B49017A169
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:02:13 +0000 (UTC)
-Date: Mon, 17 Jul 2017 11:02:06 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170717100206.GF3640@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170717063521.GA7393@lemon>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dX2rM-0008Ii-6Z
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 06:02:36 -0400
+Date: Mon, 17 Jul 2017 11:02:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170717100230.GE2106@work-vm>
+References: <1499925175-21218-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1499925175-21218-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<174a3db3-6a14-edbb-641a-e93746c51861@redhat.com>
+	<7ac18343-fc01-8029-2264-617fdde6d6b2@cn.fujitsu.com>
+	<20170717085505.GD2106@work-vm>
+	<9acbc01a-e3a5-40ff-5059-bea5569680ba@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170717063521.GA7393@lemon>
-Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
+In-Reply-To: <9acbc01a-e3a5-40ff-5059-bea5569680ba@cn.fujitsu.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2 2/4] net/colo-compare.c: Compare the tcp
+ packets that has the same sequence number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +33,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-On Mon, Jul 17, 2017 at 02:35:21PM +0800, Fam Zheng wrote:
-> Hi all,
-> 
-> Today I've included a fourth type of the automatic patchew replies: FreeBSD.
-> 
-> So far we have these tests running by patchew on each patch series:
-> 
->   * Docker tests
->     Basically it is
->         make docker-test-quick@centos6 \
->              docker-test-build@min-glib \
->              docker-test-mingw@fedora"
-> 
->   * checkpatch.pl
->     Each patch is fed to ./scripts/checkpatch.pl and all errors are reported.
-> 
->   * s390x
->     It runs on a machine shared by Fedora team, basically only "./configure and
->     make", because "make check" hanging is tricky to deal with from an
->     automation perspective. (Ideas?)
-> 
->   * FreeBSD
->     Like s390x.
-> 
-> Q1: In the worst case, you get four individual auto replies from patchew. Is
-> that too many? Do you prefer one reply with all the results concatenated into
-> one?
+* Zhang Chen (zhangchen.fnst@cn.fujitsu.com) wrote:
+>=20
+>=20
+> On 07/17/2017 04:55 PM, Dr. David Alan Gilbert wrote:
+> > * Zhang Chen (zhangchen.fnst@cn.fujitsu.com) wrote:
+> > >=20
+> > > On 07/14/2017 11:25 AM, Jason Wang wrote:
+> > > >=20
+> > > > On 2017=E5=B9=B407=E6=9C=8813=E6=97=A5 13:52, Zhang Chen wrote:
+> > > > > If primary packet's sequence number not same with secondary pac=
+ket's
+> > > > > sequence number, no need to compare the packet other field.
+> > > > >=20
+> > > > > Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> > > > > ---
+> > > > >    net/colo-compare.c | 6 ++++++
+> > > > >    1 file changed, 6 insertions(+)
+> > > > >=20
+> > > > > diff --git a/net/colo-compare.c b/net/colo-compare.c
+> > > > > index 0f8e198..2caeb80 100644
+> > > > > --- a/net/colo-compare.c
+> > > > > +++ b/net/colo-compare.c
+> > > > > @@ -222,6 +222,12 @@ static int colo_packet_compare_tcp(Packet
+> > > > > *spkt, Packet *ppkt)
+> > > > >        ptcp =3D (struct tcphdr *)ppkt->transport_header;
+> > > > >        stcp =3D (struct tcphdr *)spkt->transport_header;
+> > > > >    +    if ((ptcp->th_flags & TH_SYN) !=3D TH_SYN &&
+> > > > > +        ptcp->th_seq !=3D stcp->th_seq) {
+> > > > > +        trace_colo_compare_main("colo_packet_compare_tcp seq n=
+ot
+> > > > > same");
+> > > > > +        return -1;
+> > > > > +    }
+> > > > > +
+> > > > >        /*
+> > > > >         * The 'identification' field in the IP header is *very*=
+ random
+> > > > >         * it almost never matches.  Fudge this by ignoring diff=
+erences in
+> > > > Do we have any statistics numbers for this?
+> > > Rethink about this patch, I will remove it in next version and send=
+ a
+> > > independent
+> > > patch in the future.
+> > > Because in FTP get test, primary guest send lots of packet differ t=
+o
+> > > secondary guest's,
+> > > the packet payload are not same, but the total payload are same.
+> > Do you mean that the TCP stream is the same but the packet sizes are
+> > different due to different fragmentation?
+>=20
+> Yes, like that:
+> We send this payload: "1234567890".
+>=20
+> primary:
+> pkt1 payload:"123"
+> pkt2 payload:"4567890"
+>=20
+> secondary:
+> pkt1 payload:"1234567890"
 
-The risk with combining everything into one reply is that if only one of the
-four test systems fails / hangs / gets very backlogged, you're going to
-delay reporting of failures from all four systems. Personally, I would like
-to see any failure reported as soon as it happens, without waiting to see
-if other things fail or pass.
+Yes; I think it comes down to very fine grain timing and interaction
+with nagling; if the guest is that bit slower in generating the output,
+the network code will decide to send it.
 
-> Q2: Some think the full log in the mail body is more than necessary. Is it
-> better or worse if it is a "tail -n 200" of the log in the body and the full log
-> attached?
+> >=20
+> > > I think I have to buffer some packet's payload depend on sequence n=
+umber for
+> > > comparison?
+> > > Any idea about this?
+> > The original COLO discussions ~2-3 years ago talked about performing =
+TCP
+> > reassembly and comparing the TCP stream; not a simple task.
+> >=20
+> > But the version I worked with also had the rewrite of the sequence
+> > numbers on the secondary to cause them to match even with the same
+> > fragmentation - but that doesn't seem to be upstream yet.
+>=20
+> In current qemu upstream we use filter-rewriter to rewrite the sequence
+> numbers on the secondary, but we can not avoid different fragmentation =
+in
+> two side.
+> Any comments about guarantee the primary side and the secondary side ha=
+ve
+> the same fragmentation?
 
-The mails are rather large alredy. It is common with Jenkins to only report
-the tail of the logs, and then provide a hyperlink to a web site with the
-complete log. This avoids bloating everyone's INBOXs with many 100 KB of
-logs.
+I don't think you can; the only choice is to perform the comparison
+after de-fragmentation - or to do the same thing by building your own
+reassembly.
 
-> Q3: What other tests do maintainers want? Different hosts? Different configure
-> combinations?
-> 
-> Q4: Any other improvements/features you want? (E.g. some documentation? :)
+Dave
 
-Sometimes the test system seems to get pretty backlogged and there's no
-way of knowing this, as its indistinguishable from the situation where
-it doesn't send results because everything passed.
-
-I'd like to see a web page that provides a list of all mail threads that
-the test system has queued, with status of which jobs and running, and
-once completed, provides the full logs.
-
-That way we can quickly check whether patchw has started processing a
-particular series or not.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Thanks
+> Zhang Chen
+>=20
+> >=20
+> > Dave
+> >=20
+> > > Thanks
+> > > Zhang Chen
+> > >=20
+> > > > Thanks
+> > > >=20
+> > > >=20
+> > > >=20
+> > > --=20
+> > > Thanks
+> > > Zhang Chen
+> > >=20
+> > >=20
+> > >=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+> >=20
+> > .
+> >=20
+>=20
+> --=20
+> Thanks
+> Zhang Chen
+>=20
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
