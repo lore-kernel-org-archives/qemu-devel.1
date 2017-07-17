@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dX3oD-0000ge-8a
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:03:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1dX3r9-0001tg-12
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dX3oA-0007Qp-MZ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:03:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36380)
+	(envelope-from <berrange@redhat.com>) id 1dX3r5-0000nv-0Q
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:06:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dX3oA-0007QV-Ga
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:03:22 -0400
-Date: Mon, 17 Jul 2017 13:03:11 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170717130311.4e9d7238@nial.brq.redhat.com>
-In-Reply-To: <c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
-References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170714180907.GM6020@localhost.localdomain>
-	<9584b0c7-96f4-f000-e53f-93accd8a39ad@redhat.com>
-	<20170714185616.GQ6020@localhost.localdomain>
-	<c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dX3r4-0000mB-Qa
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:06:22 -0400
+Date: Mon, 17 Jul 2017 12:06:14 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170717110614.GK3640@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170717063521.GA7393@lemon>
+	<b718f71c-5208-298a-4fb9-0c2fea3146ec@redhat.com>
+	<20170717102053.GH3640@redhat.com>
+	<CAFEAcA9fzkk6mC+Bz4jNd+7M8nq0xpooVFDNeVb0VcqGDadB8Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and
- fw_cfg types into fw_cfg.h
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9fzkk6mC+Bz4jNd+7M8nq0xpooVFDNeVb0VcqGDadB8Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Sun, 16 Jul 2017 20:12:13 +0100
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+On Mon, Jul 17, 2017 at 12:00:22PM +0100, Peter Maydell wrote:
+> On 17 July 2017 at 11:20, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > I'm a little concerned about the fact that we've now got three different
+> > sets of tests that are being run on pull requests. There are the tests
+> > that Peter runs on various combinations at time of merge, the tests run
+> > by patchw at time of submissions, and the tests run by travis after
+> > merge. Each of them is covering a different set of scenarios with only
+> > partial overlap between them.
+> 
+> I agree -- I have my ad-hoc test system not because I enjoy
+> collecting random things to run tests on but because we don't
+> have an automated system that does what I need:
+>  * wide coverage, focusing on oddball host architectures and OSes
+>  * ability to ssh in to a machine where tests have broken if need be
+>  * decently fast to complete a test run (travis is terrible for this)
+> 
+> Note that "fast to complete a test run for me" is in conflict with
+> "usable by anybody who wants to submit a pull request" :-)
 
-> On 14/07/17 19:56, Eduardo Habkost wrote:
-> 
-> >>> Why do you need the full struct declaration to be exposed in the
-> >>> header?  
-> >>
-> >> Different board code wants to hook up "comb_iomem" manually to different
-> >> address spaces, so they need to access the field directly. This is the
-> >> ultimate goal of the entire exercise, IIRC.  
-> 
-> Yes, that is correct (and I believe is mentioned in the cover letter, too).
-> 
-> >>> The memory regions are supposed to be visible as QOM
-> >>> children to the fw_cfg device, already.  
-> >>
-> >> I don't understand this. How else can board code work with "comb_iomem"
-> >> than described above? If there is a way, I agree it would be preferable.  
-> > 
-> > object_resolve_path_component(fw_cfg, "fwcfg[0]") and
-> > object_resolve_path_component(fw_cfg, "fwcfg.dma[0]") should
-> > return fw_cfg->comb_iomem and fw_cfg->dma_iomem, respectively.
-> > 
-> > I don't know why those names were chosen, though.  Probably it's
-> > a good idea to call object_property_add_child() manually with
-> > more appropriate names inside the fw_cfg code instead of letting
-> > memory_region_init() pick the child name.  
-> 
-> That's interesting. I did a grep of the codebase for
-> object_resolve_path_component and struggled to find an instance where it
-> was being used to provide access to a MemoryRegion. Even if it's an
-> available feature, it's certainly not one that is widely known about.
-Agreed,
+Not neccessarily. It does mean though that if we had an automated test
+system, we would have to reserve some portion of hardware resources for
+exclusively jobs triggered by the person responsible for git master and
+stable branch merges, so that it can never get delayed by a backlog of
+jobs from the mailing list.
 
-we haven't used suggested approach before and I don't see
-benefits it will bring in fwcfg case.
+OpenStack has this kind of CI system - they have 2 separate job queues,
+one testing all patches submitted for code review, and one queue only
+processing patches for merge, so the former can't negatively impact the
+progress of the latter. Availability of (money/sponsorship for) hardware
+though is an obvious limiting factor here.
 
-Eduardo,
-
-Could you just apply v9, which seems to be good enough and
-does the intended job before 2.10 goes into soft-freeze?
-we always could do object_resolve_path_component() on top
-if it makes sense.
-
-
-> 
-> In terms of the patch, is the v9 revision suitable for commit or does
-> this constitute a NACK?
-> 
-> 
-> ATB,
-> 
-> Mark.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
