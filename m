@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dX6W2-0007pL-Jq
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:56:51 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1dX6Xp-0000w9-IZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dX6Vy-0004np-N9
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:56:50 -0400
-Received: from mail-he1eur01on0125.outbound.protection.outlook.com
-	([104.47.0.125]:35072
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
-	id 1dX6Vx-0004mk-Pg
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:56:46 -0400
-References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <382ad117-4a3e-6737-c93e-c2ca4cb20789@virtuozzo.com>
-Date: Mon, 17 Jul 2017 16:56:34 +0300
+	(envelope-from <tgolembi@redhat.com>) id 1dX6Xl-0005MU-KW
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:58:41 -0400
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:35712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dX6Xl-0005Lm-DS
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 09:58:37 -0400
+Received: by mail-wm0-f51.google.com with SMTP id w126so76929676wme.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 06:58:36 -0700 (PDT)
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Date: Mon, 17 Jul 2017 15:58:33 +0200
+Message-Id: <8c99564250c916aa0bd3484071bbb0f1ad4d8cf3.1500299896.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] qemu-ga: check if utmpx.h is available on the
+ system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: amit@kernel.org, mst@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-On 07.07.2017 17:21, Pavel Butsykin wrote:
-> We should guarantee that RAM will not be modified while VM has a stopped
-> state, otherwise it can lead to negative consequences during post-copy
-> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
-> source side will not be modified as this could lead to non-consistent vm state
-> on the destination side. Also RAM access during postcopy-ram migration with
-> enabled release-ram capability can lead to sad consequences.
-> 
-> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
-> in the guest memory.
-> 
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> ---
->   hw/char/virtio-console.c          | 21 +++++++++++++++++++++
->   hw/char/virtio-serial-bus.c       |  7 +++++++
->   include/hw/virtio/virtio-serial.h |  3 +++
->   3 files changed, 31 insertions(+)
-> 
-> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-> index 0cb1668c8a..b55905892e 100644
-> --- a/hw/char/virtio-console.c
-> +++ b/hw/char/virtio-console.c
-> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
->       }
->   }
->   
-> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
-> +{
-> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
-> +
-> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
-> +        return;
-> +    }
-> +
-> +    if (enable) {
-> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-> +
-> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-> +                                 k->is_console ? NULL : chr_event,
-> +                                 vcon, NULL, false);
-> +    } else {
-> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
-> +                                 NULL, NULL, NULL, false);
-> +    }
-> +}
-> +
->   static void virtconsole_realize(DeviceState *dev, Error **errp)
->   {
->       VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
-> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
->       k->unrealize = virtconsole_unrealize;
->       k->have_data = flush_buf;
->       k->set_guest_connected = set_guest_connected;
-> +    k->enable_backend = virtconsole_enable_backend;
->       k->guest_writable = guest_writable;
->       dc->props = virtserialport_properties;
->   }
-> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-> index f5bc173844..f0f18c8e7c 100644
-> --- a/hw/char/virtio-serial-bus.c
-> +++ b/hw/char/virtio-serial-bus.c
-> @@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
->       if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
->           guest_reset(vser);
->       }
-> +
-> +    QTAILQ_FOREACH(port, &vser->ports, next) {
-> +        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-> +        if (vsc->enable_backend) {
-> +            vsc->enable_backend(port, vdev->vm_running);
-> +        }
-> +    }
->   }
->   
->   static void vser_reset(VirtIODevice *vdev)
-> diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
-> index b19c44727f..12657a9f39 100644
-> --- a/include/hw/virtio/virtio-serial.h
-> +++ b/include/hw/virtio/virtio-serial.h
-> @@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
->           /* Guest opened/closed device. */
->       void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
->   
-> +    /* Enable/disable backend for virtio serial port */
-> +    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
-> +
->           /* Guest is now ready to accept data (virtqueues set up). */
->       void (*guest_ready)(VirtIOSerialPort *port);
->   
-> 
+Commit 161a56a9065 added command guest-get-users and requires the
+utmpx.h (defined by POSIX) to work. It is however not always available
+(e.g. on OpenBSD) therefor a check for its existence is necessary.
 
-ping
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+---
+ configure            | 19 +++++++++++++++++++
+ qga/commands-posix.c | 17 ++++++++++++++++-
+ 2 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index a3f0522e8f..e8798cec79 100755
+--- a/configure
++++ b/configure
+@@ -4915,6 +4915,21 @@ if compile_prog "" "" ; then
+ fi
+ 
+ ##########################################
++# check for utmpx.h, it is missing e.g. on OpenBSD
++
++have_utmpx=no
++cat > $TMPC << EOF
++#include <utmpx.h>
++struct utmpx user_info;
++int main(void) {
++    return 0;
++}
++EOF
++if compile_prog "" "" ; then
++    have_utmpx=yes
++fi
++
++##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+ 
+@@ -5959,6 +5974,10 @@ if test "$have_static_assert" = "yes" ; then
+   echo "CONFIG_STATIC_ASSERT=y" >> $config_host_mak
+ fi
+ 
++if test "$have_utmpx" = "yes" ; then
++  echo "HAVE_UTMPX=y" >> $config_host_mak
++fi
++
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
+ #                                     a thread we have a handle to
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index d8e412275e..e7a047e4c2 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -15,7 +15,6 @@
+ #include <sys/ioctl.h>
+ #include <sys/wait.h>
+ #include <dirent.h>
+-#include <utmpx.h>
+ #include "qga/guest-agent-core.h"
+ #include "qga-qmp-commands.h"
+ #include "qapi/qmp/qerror.h"
+@@ -25,6 +24,10 @@
+ #include "qemu/base64.h"
+ #include "qemu/cutils.h"
+ 
++#ifdef HAVE_UTMPX
++#include <utmpx.h>
++#endif
++
+ #ifndef CONFIG_HAS_ENVIRON
+ #ifdef __APPLE__
+ #include <crt_externs.h>
+@@ -2519,6 +2522,8 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
+ #endif
+ }
+ 
++#ifdef HAVE_UTMPX
++
+ #define QGA_MICRO_SECOND_TO_SECOND 1000000
+ 
+ static double ga_get_login_time(struct utmpx *user_info)
+@@ -2577,3 +2582,13 @@ GuestUserList *qmp_guest_get_users(Error **err)
+     g_hash_table_destroy(cache);
+     return head;
+ }
++
++#else
++
++GuestUserList *qmp_guest_get_users(Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++    return NULL;
++}
++
++#endif
+-- 
+2.13.1
