@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dX2Uz-0008AC-Io
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:30 -0400
+	(envelope-from <famz@redhat.com>) id 1dX2VM-0000ET-K0
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dX2Uv-0001Aj-Lf
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:29 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35043)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dX2Uv-0001Ab-F0
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:25 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id w126so70359499wme.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:39:25 -0700 (PDT)
-References: <20170711031000.24844-1-f4bug@amsat.org>
-	<20170711031000.24844-19-f4bug@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170711031000.24844-19-f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 10:39:22 +0100
-Message-ID: <87eftf8ks5.fsf@linaro.org>
+	(envelope-from <famz@redhat.com>) id 1dX2VI-0001LU-La
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36742)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dX2VI-0001LD-FL
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:48 -0400
+Date: Mon, 17 Jul 2017 17:39:44 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170717093944.GA18516@lemon>
+References: <20170717063521.GA7393@lemon>
+	<20170717090531.GA7163@stefanha-x1.localdomain>
+	<CAFEAcA8kt71pbxggfLdP3-WCc8u8v5iijZBksMSq6Yss2ydgiw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 18/18] shippable: restrict builds to
- master/staging and shippable* branches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8kt71pbxggfLdP3-WCc8u8v5iijZBksMSq6Yss2ydgiw@mail.gmail.com>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On Mon, 07/17 10:28, Peter Maydell wrote:
+> On 17 July 2017 at 10:05, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > On Mon, Jul 17, 2017 at 02:35:21PM +0800, Fam Zheng wrote:
+> >> Q1: In the worst case, you get four individual auto replies from patchew. Is
+> >> that too many? Do you prefer one reply with all the results concatenated into
+> >> one?
+> >
+> > I'd like to avoid situations where one of the failure emails is sent
+> > hours after the others, because it's possible that the patch series
+> > author has already sent the next (still broken) revision by that time.
+> > The simplest way to avoid that is by sending just one email.
+> >
+> >> Q2: Some think the full log in the mail body is more than necessary. Is it
+> >> better or worse if it is a "tail -n 200" of the log in the body and the full log
+> >> attached?
+> >
+> > tail output and a link to the full logs would be nice.  Often there is a
+> > lot of irrelevant output.
+> 
+> Ideally we'd streamline our make process to not produce so much
+> irrelevant output :-)
 
-Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+Does that mean to make "quite-command" absolutely quiet if V=1 is not specified?
+;-)
 
-Why? Don't this stop people testing their feature branches?
-
-
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  .shippable.yml | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/.shippable.yml b/.shippable.yml
-> index 4c8a85941f..1f05d934e4 100644
-> --- a/.shippable.yml
-> +++ b/.shippable.yml
-> @@ -1,6 +1,11 @@
->  language: c
->  git:
->     submodules: false
-> +branches:
-> +  only:
-> +    - master
-> +    - staging
-> +    - shippable*
->  env:
->    global:
->      - LC_ALL=C
-
-
---
-Alex Bennée
+Fam
