@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dX52N-0000dx-Nt
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:08 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dX52R-0000hF-2h
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dX52M-00083A-Mj
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47676)
+	(envelope-from <jasowang@redhat.com>) id 1dX52Q-000868-2v
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dX52M-00082e-Cp
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:06 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dX52P-00085H-Pv
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 08:22:10 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 17 Jul 2017 20:21:36 +0800
-Message-Id: <1500294105-13713-6-git-send-email-jasowang@redhat.com>
+Date: Mon, 17 Jul 2017 20:21:37 +0800
+Message-Id: <1500294105-13713-7-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1500294105-13713-1-git-send-email-jasowang@redhat.com>
 References: <1500294105-13713-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 05/14] net/filter-mirror.c: Add new option to
- enable vnet support for filter-redirector
+Subject: [Qemu-devel] [PULL 06/14] net/colo.c: Make vnet_hdr_len as packet
+ property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +29,91 @@ Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-We add the vnet_hdr_support option for filter-redirector, default is disabled.
-If you use virtio-net-pci net driver or other driver needs vnet_hdr, please enable it.
-Because colo-compare or other modules needs the vnet_hdr_len to parse
-packet, we add this new option send the len to others.
-You can use it for example:
--object filter-redirector,id=r0,netdev=hn0,queue=tx,outdev=red0,vnet_hdr_support
+We can use this property flush and send packet with vnet_hdr_len.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/filter-mirror.c | 23 +++++++++++++++++++++++
- qemu-options.hx     |  6 +++---
- 2 files changed, 26 insertions(+), 3 deletions(-)
+ net/colo-compare.c    | 8 ++++++--
+ net/colo.c            | 3 ++-
+ net/colo.h            | 4 +++-
+ net/filter-rewriter.c | 2 +-
+ 4 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index 32ecdb3..90e2c92 100644
---- a/net/filter-mirror.c
-+++ b/net/filter-mirror.c
-@@ -368,6 +368,22 @@ static void filter_redirector_set_outdev(Object *obj,
-     s->outdev = g_strdup(value);
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index ea9bccc..9c2b1ea 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -121,9 +121,13 @@ static int packet_enqueue(CompareState *s, int mode)
+     Connection *conn;
+ 
+     if (mode == PRIMARY_IN) {
+-        pkt = packet_new(s->pri_rs.buf, s->pri_rs.packet_len);
++        pkt = packet_new(s->pri_rs.buf,
++                         s->pri_rs.packet_len,
++                         s->pri_rs.vnet_hdr_len);
+     } else {
+-        pkt = packet_new(s->sec_rs.buf, s->sec_rs.packet_len);
++        pkt = packet_new(s->sec_rs.buf,
++                         s->sec_rs.packet_len,
++                         s->sec_rs.vnet_hdr_len);
+     }
+ 
+     if (parse_packet_early(pkt)) {
+diff --git a/net/colo.c b/net/colo.c
+index 8cc166b..180eaed 100644
+--- a/net/colo.c
++++ b/net/colo.c
+@@ -153,13 +153,14 @@ void connection_destroy(void *opaque)
+     g_slice_free(Connection, conn);
  }
  
-+static bool filter_redirector_get_vnet_hdr(Object *obj, Error **errp)
-+{
-+    MirrorState *s = FILTER_REDIRECTOR(obj);
-+
-+    return s->vnet_hdr;
-+}
-+
-+static void filter_redirector_set_vnet_hdr(Object *obj,
-+                                           bool value,
-+                                           Error **errp)
-+{
-+    MirrorState *s = FILTER_REDIRECTOR(obj);
-+
-+    s->vnet_hdr = value;
-+}
-+
- static void filter_mirror_init(Object *obj)
+-Packet *packet_new(const void *data, int size)
++Packet *packet_new(const void *data, int size, int vnet_hdr_len)
  {
-     MirrorState *s = FILTER_MIRROR(obj);
-@@ -383,10 +399,17 @@ static void filter_mirror_init(Object *obj)
+     Packet *pkt = g_slice_new(Packet);
  
- static void filter_redirector_init(Object *obj)
- {
-+    MirrorState *s = FILTER_REDIRECTOR(obj);
-+
-     object_property_add_str(obj, "indev", filter_redirector_get_indev,
-                             filter_redirector_set_indev, NULL);
-     object_property_add_str(obj, "outdev", filter_redirector_get_outdev,
-                             filter_redirector_set_outdev, NULL);
-+
-+    s->vnet_hdr = false;
-+    object_property_add_bool(obj, "vnet_hdr_support",
-+                             filter_redirector_get_vnet_hdr,
-+                             filter_redirector_set_vnet_hdr, NULL);
+     pkt->data = g_memdup(data, size);
+     pkt->size = size;
+     pkt->creation_ms = qemu_clock_get_ms(QEMU_CLOCK_HOST);
++    pkt->vnet_hdr_len = vnet_hdr_len;
+ 
+     return pkt;
  }
+diff --git a/net/colo.h b/net/colo.h
+index 7c524f3..caedb0d 100644
+--- a/net/colo.h
++++ b/net/colo.h
+@@ -43,6 +43,8 @@ typedef struct Packet {
+     int size;
+     /* Time of packet creation, in wall clock ms */
+     int64_t creation_ms;
++    /* Get vnet_hdr_len from filter */
++    uint32_t vnet_hdr_len;
+ } Packet;
  
- static void filter_mirror_fini(Object *obj)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9eee712..b86c09e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4253,11 +4253,11 @@ queue @var{all|rx|tx} is an option that can be applied to any netfilter.
+ typedef struct ConnectionKey {
+@@ -82,7 +84,7 @@ Connection *connection_get(GHashTable *connection_track_table,
+                            ConnectionKey *key,
+                            GQueue *conn_list);
+ void connection_hashtable_reset(GHashTable *connection_track_table);
+-Packet *packet_new(const void *data, int size);
++Packet *packet_new(const void *data, int size, int vnet_hdr_len);
+ void packet_destroy(void *opaque, void *user_data);
  
- filter-mirror on netdev @var{netdevid},mirror net packet to chardev@var{chardevid}, if it has the vnet_hdr_support flag, filter-mirror will mirror packet with vnet_hdr_len.
+ #endif /* QEMU_COLO_PROXY_H */
+diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
+index afa06e8..63256c7 100644
+--- a/net/filter-rewriter.c
++++ b/net/filter-rewriter.c
+@@ -158,7 +158,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
+     char *buf = g_malloc0(size);
  
--@item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},
--outdev=@var{chardevid}[,queue=@var{all|rx|tx}]
-+@item -object filter-redirector,id=@var{id},netdev=@var{netdevid},indev=@var{chardevid},outdev=@var{chardevid},queue=@var{all|rx|tx}[,vnet_hdr_support]
+     iov_to_buf(iov, iovcnt, 0, buf, size);
+-    pkt = packet_new(buf, size);
++    pkt = packet_new(buf, size, 0);
+     g_free(buf);
  
- filter-redirector on netdev @var{netdevid},redirect filter's net packet to chardev
--@var{chardevid},and redirect indev's packet to filter.
-+@var{chardevid},and redirect indev's packet to filter.if it has the vnet_hdr_support flag,
-+filter-redirector will redirect packet with vnet_hdr_len.
- Create a filter-redirector we need to differ outdev id from indev id, id can not
- be the same. we can just use indev or outdev, but at least one of indev or outdev
- need to be specified.
+     /*
 -- 
 2.7.4
