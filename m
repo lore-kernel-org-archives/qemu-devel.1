@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX9ME-000052-Pe
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:58:59 -0400
+	(envelope-from <mst@redhat.com>) id 1dX9NJ-0000xU-1d
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dX9M9-0005O5-5L
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:58:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56036)
+	(envelope-from <mst@redhat.com>) id 1dX9NE-0006KA-5s
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:00:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dX9M8-0005NG-Vv
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:58:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 849F6C04B329
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 16:58:47 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1500279971-13875-4-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Mon, 17 Jul 2017 16:26:03 +0800")
-References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
-	<1500279971-13875-4-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 17 Jul 2017 18:58:44 +0200
-Message-ID: <878tjn0zln.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dX9NE-0006Jb-0K
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 12:59:56 -0400
+Date: Mon, 17 Jul 2017 19:59:52 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170717195300-mutt-send-email-mst@kernel.org>
+References: <20170716082917.720-1-dmitry@daynix.com>
+	<09ea0b99-783f-263c-fd47-801c933fb398@redhat.com>
+	<5FFD3164-EECD-4077-97DC-13924DEDFA61@daynix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 03/11] migration: export capabilities to
- props
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5FFD3164-EECD-4077-97DC-13924DEDFA61@daynix.com>
+Subject: Re: [Qemu-devel] [PATCH] pci: honor PCI_COMMAND_MEMORY
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Dmitry Fleytman <dmitry@daynix.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Sameeh Jubran <sameeh@daynix.com>
 
-Peter Xu <peterx@redhat.com> wrote:
-> Do the same thing to migration capabilities, just like what we did in
-> previous patch for migration parameters.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On Mon, Jul 17, 2017 at 03:48:03PM +0300, Dmitry Fleytman wrote:
+> Am I understand correctly that there are no special cases for
+> IDE controllers, i.e. bus master bit must be set by SW same
+> way as for other PCI devices?
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Bus mastering is typically enabled by the driver.
+E.g. under linux:
+
+static int virtio_pci_restore(struct device *dev)
+{
+        struct pci_dev *pci_dev = to_pci_dev(dev);
+        struct virtio_pci_device *vp_dev = pci_get_drvdata(pci_dev);
+        int ret;
+
+        ret = pci_enable_device(pci_dev);
+        if (ret)
+                return ret;
+
+        pci_set_master(pci_dev);
+        return virtio_device_restore(&vp_dev->vdev);
+}
 
 
-A pitty that the preprocessor is not able to pass to uppercase ...
+As an exception, in case of BIOS booting using device ROM, it is set by
+the ROM. E.g. src/hw/virtio-pci.c:
 
-> +#define DEFINE_PROP_MIG_CAP(name, x)             \
-> +    DEFINE_PROP_BOOL(name, MigrationState, enabled_capabilities[x], false)
+    vp_reset(vp);
+    pci_enable_busmaster(pci);
+    vp_set_status(vp, VIRTIO_CONFIG_S_ACKNOWLEDGE |
+                  VIRTIO_CONFIG_S_DRIVER );
 
-#define DEFINE_PROP_MIG_CAP(name)             \
-    DEFINE_PROP_BOOL(#name, MigrationState,
-    enabled_capabilities[MIGRATION_CAPABILITY_##name], false)
+
+-- 
+MST
