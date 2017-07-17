@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX2UJ-0007ST-OY
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dX2Uz-0008AC-Io
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dX2UH-0000lj-Cc
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dX2UH-0000ka-3U
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:38:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 11839C0587E8
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 09:38:44 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 17 Jul 2017 11:38:38 +0200
-Message-Id: <20170717093839.15341-3-kraxel@redhat.com>
-In-Reply-To: <20170717093839.15341-1-kraxel@redhat.com>
-References: <20170717093839.15341-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] hmp: Update info vnc
+	(envelope-from <alex.bennee@linaro.org>) id 1dX2Uv-0001Aj-Lf
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:29 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35043)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dX2Uv-0001Ab-F0
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 05:39:25 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id w126so70359499wme.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 02:39:25 -0700 (PDT)
+References: <20170711031000.24844-1-f4bug@amsat.org>
+	<20170711031000.24844-19-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170711031000.24844-19-f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 10:39:22 +0100
+Message-ID: <87eftf8ks5.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 18/18] shippable: restrict builds to
+ master/staging and shippable* branches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,194 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The QMP query-vnc interfaces have gained a lot more information that
-the HMP interfaces hasn't got yet. Update it.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-Note the output format has changed, but this is HMP so that's OK.
+Why? Don't this stop people testing their feature branches?
 
-In particular, this now includes client information for reverse
-connections:
 
--vnc :0
-(qemu) info vnc
-default:
-  Server: 0.0.0.0:5900 (ipv4)
-    Auth: none (Sub: none)
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  .shippable.yml | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/.shippable.yml b/.shippable.yml
+> index 4c8a85941f..1f05d934e4 100644
+> --- a/.shippable.yml
+> +++ b/.shippable.yml
+> @@ -1,6 +1,11 @@
+>  language: c
+>  git:
+>     submodules: false
+> +branches:
+> +  only:
+> +    - master
+> +    - staging
+> +    - shippable*
+>  env:
+>    global:
+>      - LC_ALL=C
 
-  (Now connect a client)
 
-(qemu) info vnc
-default:
-  Server: 0.0.0.0:5900 (ipv4)
-    Auth: none (Sub: none)
-  Client: 127.0.0.1:51828 (ipv4)
-    x509_dname: none
-    sasl_username: none
-
--vnc localhost:7000,reverse
-(qemu) info vnc
-default:
-  Client: ::1:7000 (ipv6)
-    x509_dname: none
-    sasl_username: none
-  Auth: none (Sub: none)
-
--vnc :1,password,id=pass -vnc localhost:7000,reverse
-(qemu) info vnc
-default:
-  Client: ::1:7000 (ipv6)
-    x509_dname: none
-    sasl_username: none
-  Auth: none (Sub: none)
-rev:
-  Server: 0.0.0.0:5901 (ipv4)
-    Auth: vnc (Sub: none)
-  Client: 127.0.0.1:53616 (ipv4)
-    x509_dname: none
-    sasl_username: none
-
-This was originally RH bz 1461682
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-id: 20170711154414.21111-1-dgilbert@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hmp.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 73 insertions(+), 31 deletions(-)
-
-diff --git a/hmp.c b/hmp.c
-index dee40284c1..3e1e766593 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -600,50 +600,92 @@ void hmp_info_blockstats(Monitor *mon, const QDict *qdict)
-     qapi_free_BlockStatsList(stats_list);
- }
- 
-+/* Helper for hmp_info_vnc_clients, _servers */
-+static void hmp_info_VncBasicInfo(Monitor *mon, VncBasicInfo *info,
-+                                  const char *name)
-+{
-+    monitor_printf(mon, "  %s: %s:%s (%s%s)\n",
-+                   name,
-+                   info->host,
-+                   info->service,
-+                   NetworkAddressFamily_lookup[info->family],
-+                   info->websocket ? " (Websocket)" : "");
-+}
-+
-+/* Helper displaying and auth and crypt info */
-+static void hmp_info_vnc_authcrypt(Monitor *mon, const char *indent,
-+                                   VncPrimaryAuth auth,
-+                                   VncVencryptSubAuth *vencrypt)
-+{
-+    monitor_printf(mon, "%sAuth: %s (Sub: %s)\n", indent,
-+                   VncPrimaryAuth_lookup[auth],
-+                   vencrypt ? VncVencryptSubAuth_lookup[*vencrypt] : "none");
-+}
-+
-+static void hmp_info_vnc_clients(Monitor *mon, VncClientInfoList *client)
-+{
-+    while (client) {
-+        VncClientInfo *cinfo = client->value;
-+
-+        hmp_info_VncBasicInfo(mon, qapi_VncClientInfo_base(cinfo), "Client");
-+        monitor_printf(mon, "    x509_dname: %s\n",
-+                       cinfo->has_x509_dname ?
-+                       cinfo->x509_dname : "none");
-+        monitor_printf(mon, "    sasl_username: %s\n",
-+                       cinfo->has_sasl_username ?
-+                       cinfo->sasl_username : "none");
-+
-+        client = client->next;
-+    }
-+}
-+
-+static void hmp_info_vnc_servers(Monitor *mon, VncServerInfo2List *server)
-+{
-+    while (server) {
-+        VncServerInfo2 *sinfo = server->value;
-+        hmp_info_VncBasicInfo(mon, qapi_VncServerInfo2_base(sinfo), "Server");
-+        hmp_info_vnc_authcrypt(mon, "    ", sinfo->auth,
-+                               sinfo->has_vencrypt ? &sinfo->vencrypt : NULL);
-+        server = server->next;
-+    }
-+}
-+
- void hmp_info_vnc(Monitor *mon, const QDict *qdict)
- {
--    VncInfo *info;
-+    VncInfo2List *info2l;
-     Error *err = NULL;
--    VncClientInfoList *client;
- 
--    info = qmp_query_vnc(&err);
-+    info2l = qmp_query_vnc_servers(&err);
-     if (err) {
-         error_report_err(err);
-         return;
-     }
--
--    if (!info->enabled) {
--        monitor_printf(mon, "Server: disabled\n");
--        goto out;
--    }
--
--    monitor_printf(mon, "Server:\n");
--    if (info->has_host && info->has_service) {
--        monitor_printf(mon, "     address: %s:%s\n", info->host, info->service);
--    }
--    if (info->has_auth) {
--        monitor_printf(mon, "        auth: %s\n", info->auth);
-+    if (!info2l) {
-+        monitor_printf(mon, "None\n");
-+        return;
-     }
- 
--    if (!info->has_clients || info->clients == NULL) {
--        monitor_printf(mon, "Client: none\n");
--    } else {
--        for (client = info->clients; client; client = client->next) {
--            monitor_printf(mon, "Client:\n");
--            monitor_printf(mon, "     address: %s:%s\n",
--                           client->value->host,
--                           client->value->service);
--            monitor_printf(mon, "  x509_dname: %s\n",
--                           client->value->x509_dname ?
--                           client->value->x509_dname : "none");
--            monitor_printf(mon, "    username: %s\n",
--                           client->value->has_sasl_username ?
--                           client->value->sasl_username : "none");
-+    while (info2l) {
-+        VncInfo2 *info = info2l->value;
-+        monitor_printf(mon, "%s:\n", info->id);
-+        hmp_info_vnc_servers(mon, info->server);
-+        hmp_info_vnc_clients(mon, info->clients);
-+        if (!info->server) {
-+            /* The server entry displays its auth, we only
-+             * need to display in the case of 'reverse' connections
-+             * where there's no server.
-+             */
-+            hmp_info_vnc_authcrypt(mon, "  ", info->auth,
-+                               info->has_vencrypt ? &info->vencrypt : NULL);
-+        }
-+        if (info->has_display) {
-+            monitor_printf(mon, "  Display: %s\n", info->display);
-         }
-+        info2l = info2l->next;
-     }
- 
--out:
--    qapi_free_VncInfo(info);
-+    qapi_free_VncInfo2List(info2l);
-+
- }
- 
- #ifdef CONFIG_SPICE
--- 
-2.9.3
+--
+Alex Bennée
