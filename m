@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dWxTB-0006Mj-NB
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 00:17:19 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dWxkW-0000cJ-NC
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 00:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dWxT7-0004Bf-6k
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 00:17:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46529)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dWxT6-000488-TM
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 00:17:13 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6H4DckZ088293
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 00:17:10 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bqdcrbx22-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 00:17:10 -0400
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 17 Jul 2017 14:17:08 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Mon, 17 Jul 2017 09:46:39 +0530
-Message-Id: <20170717041639.16137-1-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3] spapr: disable decrementer during reset
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dWxkT-0005um-Jk
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 00:35:12 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1500158641-23033-1-git-send-email-peng.hao2@zte.com.cn>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <953bc962-9929-c933-e0df-678a7e6a4c60@amsat.org>
+Date: Mon, 17 Jul 2017 01:35:05 -0300
+MIME-Version: 1.0
+In-Reply-To: <1500158641-23033-1-git-send-email-peng.hao2@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qga-win32: remove a redundancy code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,105 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Peng Hao <peng.hao2@zte.com.cn>, mdroth@linux.vnet.ibm.com, qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-Rebooting a SMP TCG guest is broken for both single/multi threaded TCG.
+Cc'ing qemu-trivial
 
-When reset happens, all the CPUs are in halted state. First CPU is brought out
-of reset and secondary CPUs would be initialized by the guest kernel using a
-rtas call start-cpu.
+On 07/15/2017 07:44 PM, Peng Hao wrote:
+> In the first line of run_agent,it has set ga_state = s,don't need
+> set ga_state = s again behind.
+> 
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 
-However, in case of TCG, decrementer interrupts keep on coming and waking the
-secondary CPUs up.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-These secondary CPUs would see the decrementer interrupt pending, which makes
-cpu::has_work() to bring them out of wait loop and start executing
-tcg_exec_cpu().
-
-The problem with this is all the CPUs wake up and start booting SLOF image,
-causing the following exception(4 CPUs TCG VM):
-
-[   81.440850] reboot: Restarting system
-
-SLOF
-S
-SLOF
-SLOFLOF[0[0m **********************************************************************
-QEMU Starting
- Build Date = Mar  3 2017 13:29:19
- FW Version = git-66d250ef0fd06bb8
-[0m **********************************************************************
-QEMU Starting
- Build Date = Mar  3 2017 13:29:19
- FW Version = git-66d250ef0fd06bb8
-[0m *************************************m**********[?25l **********************************************************************
-QEMU Starting
- Build Date = Mar  3 2017 13:29:19
- FW Version = git-66d250ef0fd06bb8
-***********************
-QEMU Starting
- Build Date = Mar  3 2017 13:29:19
- FW Version = git-66d250ef0fd06bb8
-ERROR: Flatten device tree not available!
-
- exception 300
-SRR0 = 00000000000060e4  SRR1 = 800000008000000000000000
-SPRG2 = 0000000000400000  SPRG3 = 0000000000004bd8
-ERROR: Flatten device tree not available!
-
- exception 300
-SRR0 = 00000000000060e4  SRR1 = 800000008000000000000000
-SPRG2 = 0000000000400000  SPRG3 = 0000000000004bd8
-
-During reset, disable decrementer interrupt for secondary CPUs and enable them
-when the secondary CPUs are brought online by rtas start-cpu call.
-
-Reported-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- hw/ppc/spapr_cpu_core.c | 9 +++++++++
- hw/ppc/spapr_rtas.c     | 8 ++++++++
- 2 files changed, 17 insertions(+)
-
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index ea278ce..bbfe8c2 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -87,6 +87,15 @@ static void spapr_cpu_reset(void *opaque)
- 
-     env->spr[SPR_HIOR] = 0;
- 
-+    /* Disable DECR for secondary cpus */
-+    if (cs != first_cpu) {
-+        if (env->mmu_model == POWERPC_MMU_3_00) {
-+            env->spr[SPR_LPCR] &= ~LPCR_DEE;
-+        } else {
-+            /* P7 and P8 both have same bit for DECR */
-+            env->spr[SPR_LPCR] &= ~LPCR_P8_PECE3;
-+        }
-+    }
-     /*
-      * This is a hack for the benefit of KVM PR - it abuses the SDR1
-      * slot in kvm_sregs to communicate the userspace address of the
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 94a2799..4623d1d 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -174,6 +174,14 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMachineState *spapr,
-         kvm_cpu_synchronize_state(cs);
- 
-         env->msr = (1ULL << MSR_SF) | (1ULL << MSR_ME);
-+
-+        /* Enable DECR interrupt */
-+        if (env->mmu_model == POWERPC_MMU_3_00) {
-+            env->spr[SPR_LPCR] |= LPCR_DEE;
-+        } else {
-+            /* P7 and P8 both have same bit for DECR */
-+            env->spr[SPR_LPCR] |= LPCR_P8_PECE3;
-+        }
-         env->nip = start;
-         env->gpr[3] = r3;
-         cs->halted = 0;
--- 
-2.9.3
+> ---
+>   qga/main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qga/main.c b/qga/main.c
+> index 405c129..dcd6104 100644
+> --- a/qga/main.c
+> +++ b/qga/main.c
+> @@ -1314,7 +1314,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
+>       ga_command_state_init(s, s->command_state);
+>       ga_command_state_init_all(s->command_state);
+>       json_message_parser_init(&s->parser, process_event);
+> -    ga_state = s;
+> +
+>   #ifndef _WIN32
+>       if (!register_signal_handlers()) {
+>           g_critical("failed to register signal handlers");
+> 
