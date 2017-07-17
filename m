@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX4Ov-0006tg-D5
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:41:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dX4QF-0007Sz-ED
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dX4Ou-0002Be-9L
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:41:21 -0400
-References: <20170707203049.534-1-eblake@redhat.com>
-	<20170707203049.534-8-eblake@redhat.com>
-	<20170717083110.GA5301@noname.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dX4QC-0003D9-BU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:42:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dX4QC-0003CE-2C
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 07:42:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D47EB4E047
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 11:42:38 +0000 (UTC)
+References: <20170717101632.23247-1-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <922ec9d2-383d-c673-a667-dcc2ca2f61fd@redhat.com>
-Date: Mon, 17 Jul 2017 06:41:09 -0500
+Message-ID: <93718068-720c-36b3-a18a-6af1d185039c@redhat.com>
+Date: Mon, 17 Jul 2017 06:42:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170717083110.GA5301@noname.redhat.com>
+In-Reply-To: <20170717101632.23247-1-kraxel@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="iAvPIJaCpui3MedgOwdRpmC3aoS0hrRUs"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 7/9] nbd: Implement
- NBD_OPT_GO on client
+	boundary="f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi"
+Subject: Re: [Qemu-devel] [PATCH] add scripts/git.orderfile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +33,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org, marcandre.lureau@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iAvPIJaCpui3MedgOwdRpmC3aoS0hrRUs
+--f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi
 From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, vsementsov@virtuozzo.com,
- den@virtuozzo.com, qemu-block@nongnu.org, marcandre.lureau@redhat.com
-Message-ID: <922ec9d2-383d-c673-a667-dcc2ca2f61fd@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v5 7/9] nbd: Implement NBD_OPT_GO on client
-References: <20170707203049.534-1-eblake@redhat.com>
- <20170707203049.534-8-eblake@redhat.com>
- <20170717083110.GA5301@noname.redhat.com>
-In-Reply-To: <20170717083110.GA5301@noname.redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <93718068-720c-36b3-a18a-6af1d185039c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] add scripts/git.orderfile
+References: <20170717101632.23247-1-kraxel@redhat.com>
+In-Reply-To: <20170717101632.23247-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/17/2017 03:31 AM, Kevin Wolf wrote:
-> Am 07.07.2017 um 22:30 hat Eric Blake geschrieben:
->> NBD_OPT_EXPORT_NAME is lousy: per the NBD protocol, any failure
->> requires the server to close the connection rather than report an
->> error to us.  Therefore, upstream NBD recently added NBD_OPT_GO as
->> the improved version of the option that does what we want [1]: it
->> reports sane errors on failures, and on success provides at least
->> as much info as NBD_OPT_EXPORT_NAME.
->>
+On 07/17/2017 05:16 AM, Gerd Hoffmann wrote:
+> Based on a old patch by Laszlo.
+> Time to get this in ...
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  scripts/git.orderfile | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+>  create mode 100644 scripts/git.orderfile
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 >=20
-> This breaks qemu-iotests 140 and 143:
-
-Urrgh, and I even ran into it locally last week after posting my v1, and
-had it on my list to fix before posting v2, when Paolo committed my v1
-to make softfreeze before going on PTO this week. I will post the fix
-later today (I already have a couple other NBD patches pending, so my
-plan is to submit a PULL request by the end of my day with all of the
-fixes).
-
+> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
+> new file mode 100644
+> index 0000000000..ac699700b1
+> --- /dev/null
+> +++ b/scripts/git.orderfile
+> @@ -0,0 +1,29 @@
+> +#
+> +# order file for git, to produce patches which are easier to review
+> +# by diffing the important stuff like interface changes first.
+> +#
+> +# one-off usage:
+> +#   git diff -O scripts/git.orderfile ...
+> +#
+> +# add to git config:
+> +#   git config diff.orderFile scripts/git.orderfile
+> +#
+> +
+> +# Documentation
+> +docs/*
+> +*.texi
+> +
+> +# build system
+> +configure
+> +Makefile*
+> +*.mak
+> +
+> +# qapi schema
+> +*.json
+> +
+> +# headers
+> +*.h
+> +
+> +# code
+> +*.c
+> +
 >=20
-> -can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: No export wit=
-h name 'drv' available
-> +can't open device nbd+unix:///drv?socket=3DTEST_DIR/nbd: Requested exp=
-ort not available for option 7 (go)
-> +export 'drv' not present
->=20
-> We could just update the reference output, but I actually believe the
-> old error message was better.
-
-One line is indeed better than two; I'm still playing with the easiest
-way to get the desired output.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -83,7 +102,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---iAvPIJaCpui3MedgOwdRpmC3aoS0hrRUs
+--f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -93,13 +112,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJZbKJVAAoJEKeha0olJ0NqJDcH/Ake6gIRZzHBxRu7MK8/P1Ma
-4IbP7DZjyIOsm1YsJuNzLxmKZZgnGS+zVOE8C1Ku66Hzx+kCEywUXHrDkL2A4l8F
-JFcyWLqA8fy6RPRkSunGDwG7dEnT/NSWTtvvPs3kRU8YJ9vwd24v1wOcbcWAiQM3
-puvg6ZnHgXhEphbl5WaV9RYs3dAiaC9RjpbaagOMfLBHvNp9LGKKIfFL1CNQUjbr
-1S9c0blRj3rPxsTg1q6LZk2TLQiD2Fnxut6TLPzPJeXljVnSjrhNopa0G9aHIXls
-duz6zOpcW4mbXvTWZuL1N+2xN8abNykVUcbel6vDfSod1ywHrh3onLFKdxrJF2o=
-=OS0f
+iQEcBAEBCAAGBQJZbKKqAAoJEKeha0olJ0NqxokH/36GVLdJgylSpZQp3SrVUc7e
+LtHAqNsDxf7oW8GTPnRf0Msl0uV/7ykzYO6TuE3LJLwIuukJVG1thjiehf7yp7cO
+jOW1BSgxz431KDZcBLJ3lEPXmv0uR94zJ1Dlqb3qfgcV0PrgorTzsWAODMX3Fvk7
+FenmuHYuucP2CBaWsAiBFq8yaSt86jSRNHbdxVuDOU+fG5dULZzyViu6mI2P9Kme
+xvrlvugKQP/9etjDcrJW2VwFgVRir1MYfmAD4EOA0ELxG4qpqRAaD4J8AFtwySVO
+erODnukw9ydLH5XBb09YPdsVMo+835+0TViV/bpkuBmUy1ivz2XfTAPD1OBP5Qk=
+=CX7T
 -----END PGP SIGNATURE-----
 
---iAvPIJaCpui3MedgOwdRpmC3aoS0hrRUs--
+--f5QcJwfPDrT7EODWBbOQb1eh1xAhSHuLi--
