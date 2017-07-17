@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dX9kj-0004L2-02
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:13 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dX9o6-0006jS-Ei
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:27:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dX9kf-0004Fd-NE
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52210)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dX9kf-0004FM-Gf
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:24:09 -0400
-Date: Mon, 17 Jul 2017 14:24:04 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170717172404.GS6020@localhost.localdomain>
-References: <1500025208-14827-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1500025208-14827-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170714180907.GM6020@localhost.localdomain>
-	<9584b0c7-96f4-f000-e53f-93accd8a39ad@redhat.com>
-	<20170714185616.GQ6020@localhost.localdomain>
-	<c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1dX9o5-0005sk-Ch
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:27:42 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33223)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1dX9o5-0005rk-34
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 13:27:41 -0400
+Received: by mail-wr0-x242.google.com with SMTP id 40so3209512wrw.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 10:27:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c838ca67-24a3-aff3-2a42-0f106fa2d898@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv9 3/3] fw_cfg: move QOM type defines and
- fw_cfg types into fw_cfg.h
+In-Reply-To: <CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Tue, 18 Jul 2017 00:27:37 +0700
+Message-ID: <CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Laszlo Ersek <lersek@redhat.com>, peter.maydell@linaro.org, mst@redhat.com, somlo@cmu.edu, qemu-devel@nongnu.org, rjones@redhat.com, imammedo@redhat.com, pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Sun, Jul 16, 2017 at 08:12:13PM +0100, Mark Cave-Ayland wrote:
-> On 14/07/17 19:56, Eduardo Habkost wrote:
-> 
-> >>> Why do you need the full struct declaration to be exposed in the
-> >>> header?
-> >>
-> >> Different board code wants to hook up "comb_iomem" manually to different
-> >> address spaces, so they need to access the field directly. This is the
-> >> ultimate goal of the entire exercise, IIRC.
-> 
-> Yes, that is correct (and I believe is mentioned in the cover letter, too).
-> 
-> >>> The memory regions are supposed to be visible as QOM
-> >>> children to the fw_cfg device, already.
-> >>
-> >> I don't understand this. How else can board code work with "comb_iomem"
-> >> than described above? If there is a way, I agree it would be preferable.
-> > 
-> > object_resolve_path_component(fw_cfg, "fwcfg[0]") and
-> > object_resolve_path_component(fw_cfg, "fwcfg.dma[0]") should
-> > return fw_cfg->comb_iomem and fw_cfg->dma_iomem, respectively.
-> > 
-> > I don't know why those names were chosen, though.  Probably it's
-> > a good idea to call object_property_add_child() manually with
-> > more appropriate names inside the fw_cfg code instead of letting
-> > memory_region_init() pick the child name.
-> 
-> That's interesting. I did a grep of the codebase for
-> object_resolve_path_component and struggled to find an instance where it
-> was being used to provide access to a MemoryRegion. Even if it's an
-> available feature, it's certainly not one that is widely known about.
-> 
-> In terms of the patch, is the v9 revision suitable for commit or does
-> this constitute a NACK?
+On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-It's not a NACK.  Using QOM properties instead of direct struct
-access may be nice (I'm not 100% sure, either), but not required.
+> On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> wrote:
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> > Paolo suggested offline that we send a pull request for this series.
+> > Here it is, I've run it through my testsuite + tested the LQSPI testcase
+> > on Zynq.
+>
+> > ----------------------------------------------------------------
+> > mmio-exec.for-upstream
+> >
+> > ----------------------------------------------------------------
+> > KONRAD Frederic (7):
+> >       cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+> >       cputlb: move get_page_addr_code
+> >       cputlb: fix the way get_page_addr_code fills the tlb
+> >       qdev: add MemoryRegion property
+> >       introduce mmio_interface
+> >       exec: allow to get a pointer for some mmio memory region
+> >       xilinx_spips: allow mmio execution
+>
+> Hi Edgar -- can you or Fred explain how this code interacts with
+> VM migration? The mmio-interface device creates a RAM memory
+> region with memory_region_init_ram_ptr(), but it doesn't call
+> vmstate_register_ram(). On the other hand the core migration code
+> will try to migrate the contents of the RAMBlock anyway, just
+> without a name.
+>
+> It's not clear to me how this works, and it would be nice to
+> get it clear so that we can make any necessary fixes before the
+> 2.10 release hits and we lose the opportunity to make any
+> migration-compatibility-breaking changes.
+>
+> thanks
+> -- PMM
+>
 
--- 
-Eduardo
+Hi Peter,
+
+These temporary regions should be read-only and treated as temporary caches
+AFAIU things.
+I would say that they don't need to be migrated. After migration, the new
+VM will recreate the ram areas from device backing.
+
+Is there a way we can prevent migration of the RAMBlock?
+
+Cheers,
+Edgar
