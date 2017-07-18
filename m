@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXTw1-0004gs-Jf
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:57:14 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXTwy-0005ap-UA
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:58:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXTvy-0001Kw-8E
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:57:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXTvx-0001KT-TH
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:57:10 -0400
-References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <93a523dc-0cf4-c73b-518d-ef48e9f8ca64@redhat.com>
-Date: Tue, 18 Jul 2017 09:57:07 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXTww-0001sb-Pd
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:58:13 -0400
+Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:35088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXTww-0001sN-J3
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:58:10 -0400
+Received: by mail-io0-x244.google.com with SMTP id f1so1011768ioj.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:58:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj"
-Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20170718142455.32676-9-cohuck@redhat.com>
+References: <20170718142455.32676-1-cohuck@redhat.com>
+	<20170718142455.32676-9-cohuck@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 18 Jul 2017 11:58:08 -0300
+Message-ID: <CAAdtpL4TGurYS3tO1RbbJ78HrMRg+AyUmFf_+WhfkTdXLp0cOA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH RFC v2 8/9] s390x/kvm: msi route fixup for
+ non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, zyimin@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj
-From: Eric Blake <eblake@redhat.com>
-To: Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Message-ID: <93a523dc-0cf4-c73b-518d-ef48e9f8ca64@redhat.com>
-Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
-References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-In-Reply-To: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Cornelia,
 
-On 07/17/2017 10:01 PM, Jing Liu wrote:
-> Hi all,
->=20
-> Do you anybody have iotests failure: 188, 189 and 087 of the latest qem=
-u
-> upsteam?
->=20
-> I just wondered if it has something wrong with my test machines because=
+On Tue, Jul 18, 2017 at 11:24 AM, Cornelia Huck <cohuck@redhat.com> wrote:
+> If we don't provide pci, we cannot have a pci device for which we
+> have to translate to adapter routes: just return -ENODEV.
+>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  target/s390x/kvm.c | 33 +++++++++++++++++++--------------
+>  1 file changed, 19 insertions(+), 14 deletions(-)
+>
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 60688888c3..df0e5af151 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2424,22 +2424,27 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>      uint32_t idx = data >> ZPCI_MSI_VEC_BITS;
+>      uint32_t vec = data & ZPCI_MSI_VEC_MASK;
+>
+> -    pbdev = s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+> -    if (!pbdev) {
+> -        DPRINTF("add_msi_route no dev\n");
+> -        return -ENODEV;
+> -    }
+> +    if (s390_has_feat(S390_FEAT_ZPCI)) {
+> +        pbdev = s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+> +        if (!pbdev) {
+> +            DPRINTF("add_msi_route no dev\n");
+> +            return -ENODEV;
+> +        }
+>
+> -    pbdev->routes.adapter.ind_offset = vec;
+> +        pbdev->routes.adapter.ind_offset = vec;
+>
+> -    route->type = KVM_IRQ_ROUTING_S390_ADAPTER;
+> -    route->flags = 0;
+> -    route->u.adapter.summary_addr = pbdev->routes.adapter.summary_addr;
+> -    route->u.adapter.ind_addr = pbdev->routes.adapter.ind_addr;
+> -    route->u.adapter.summary_offset = pbdev->routes.adapter.summary_offset;
+> -    route->u.adapter.ind_offset = pbdev->routes.adapter.ind_offset;
+> -    route->u.adapter.adapter_id = pbdev->routes.adapter.adapter_id;
+> -    return 0;
+> +        route->type = KVM_IRQ_ROUTING_S390_ADAPTER;
+> +        route->flags = 0;
+> +        route->u.adapter.summary_addr = pbdev->routes.adapter.summary_addr;
+> +        route->u.adapter.ind_addr = pbdev->routes.adapter.ind_addr;
+> +        route->u.adapter.summary_offset = pbdev->routes.adapter.summary_offset;
+> +        route->u.adapter.ind_offset = pbdev->routes.adapter.ind_offset;
+> +        route->u.adapter.adapter_id = pbdev->routes.adapter.adapter_id;
+> +        return 0;
+> +    } else {
+> +        DPRINTF("fixup_msi_route on non-pci machine?!\n");
+> +        return -ENODEV;
+> +    }
+>  }
+>
+>  int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
+> --
+> 2.13.3
 
-> I have different results with two machines.
+What about inverting the check?
 
-It might help to show the ./check command line you are using, as well as
-the errors you are getting.  Right now, master is failing on 51, 140,
-and 143 when I test across './check -raw', './check -qcow2', and
-'./check nbd', but not the three you mention.  But the iotests framework
-allows a lot more combinations of testing (and we probably have some
-lurking testsuite bugs on some of the more exotic combinations).
++    if (!s390_has_feat(S390_FEAT_ZPCI)) {
++        DPRINTF("fixup_msi_route on non-pci machine?!\n");
++        return -ENODEV;
++    }
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluIcMACgkQp6FrSiUn
-Q2oqHgf/Rng5CvU58F9ezgJKENoCcBs9wmc26L2YBlxPku2yzTmyt0rsb/HTLa7q
-u81f3er1HhiDlvxLBuhpRpI0vbmxLtPqQQQqjWKV1kAFF1RrKIZJc1hMZwoEJOFo
-Z1PRRvwdiQk3ZrlUsuS1s1Vgo00JZcemvBoPP1fbvyqNya1bBnVUf9UwgQT0PiDS
-Y15izV6Q2WSLUWXG1zyK9L2KDp/YOn3UK42UdHTisoDhtNJMIg+P29KdrQZ+7yef
-m9wJjGFEFkfshBEQf7heW77kJ/Igyz7THRT1vqk0AiE/oNe655V2dqd3ZSPQ/Jod
-bbCnt24noNeC6rsKwqzw230UAoPzRg==
-=rnd6
------END PGP SIGNATURE-----
-
---KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj--
+Phil.
