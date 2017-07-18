@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXZdU-00026N-7U
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:29 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dXZdh-0002Ck-4x
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXZdT-00023a-Eu
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:28 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35831)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXZdT-000230-7o
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:27 -0400
-Received: by mail-wr0-x236.google.com with SMTP id w4so45433579wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:02:26 -0700 (PDT)
+	(envelope-from <aurelien@aurel32.net>) id 1dXZdc-0002C5-DU
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:41 -0400
+Received: from hall.aurel32.net ([163.172.24.10]:46324)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dXZdc-0002BL-6r
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:36 -0400
+Date: Tue, 18 Jul 2017 23:02:34 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170718210234.m3bgvlx2s2at4krx@aurel32.net>
+References: <20170718200255.31647-1-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <1500369144-143949-1-git-send-email-borntraeger@de.ibm.com>
-References: <1500369144-143949-1-git-send-email-borntraeger@de.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jul 2017 22:02:05 +0100
-Message-ID: <CAFEAcA-Sfn+Y8M0rkJAnYBFCLocNSeZeWzmhFLA5BtNMJfvPYw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] two more s390 changes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170718200255.31647-1-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v3 00/30] target/sh4 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On 18 July 2017 at 10:12, Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> Peter,
-> now that z14 was announced here is the z14 cpu model together with
-> the linux header update.
->
-> The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request' into staging (2017-07-17 17:54:17 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/borntraeger/qemu.git tags/s390x-20170718
->
-> for you to fetch changes up to cc28a5949bb54df070c38ab505ee2c14385e53d0:
->
->   s390x/cpumodel: z14 cpu models (2017-07-18 10:55:16 +0200)
->
-> ----------------------------------------------------------------
-> s390: add z14 cpu model
->
-> - add a CPU model for the IBM z14 which was announced on July 17th 2017
-> - update linux headers to 4.13-rc0 to get a fix for an ioctl definition
->
-> ----------------------------------------------------------------
-> Christian Borntraeger (1):
->       linux header sync against v4.13-rc1
->
-> Jason J. Herne (1):
->       s390x/cpumodel: z14 cpu models
->
+On 2017-07-18 10:02, Richard Henderson wrote:
+> The big ticket item in this series is the support for
+> user-space atomics.  But a lot of other cleanup has
+> crept in as well.
+> 
+> Changes since v2 incorporate feedback from Aurelien.
+> I've tried to remember to add individual changelogs
+> to the patches, but I may have forgotten some.
+> 
+> I do now include the linux-user reserved_va changes
+> that I posted subsequent to posting v2.
+> 
+> I believe there are only 4 patches that have not 
+> seen a Reviewed-by yet.
 
-Applied, thanks.
+Thanks for this new version. I have applied patches 2-27 to my tree. I
+believe the patch 1 doesn't provide the correct (corner case) behaviour
+in system mode. As for the last 3 patches, given they touch non-sh4
+specific part of linux-user, I guess they should at least be acked by
+a linux-user maintainer.
 
--- PMM
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
