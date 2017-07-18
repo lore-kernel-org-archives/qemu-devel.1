@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ7E-000587-9r
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ7F-00059C-K9
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ7D-0006PV-9Z
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:32 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36303)
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ7E-0006QM-QE
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:33 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34751)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dXQ7D-0006P7-36
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:31 -0400
-Received: by mail-wr0-x229.google.com with SMTP id y43so23370112wrd.3
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:52:30 -0700 (PDT)
+	id 1dXQ7E-0006Q0-KY
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:32 -0400
+Received: by mail-wr0-x233.google.com with SMTP id 12so23474495wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:52:32 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 18 Jul 2017 11:44:56 +0100
-Message-Id: <20170718104513.23947-16-alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:45:07 +0100
+Message-Id: <20170718104513.23947-27-alex.bennee@linaro.org>
 In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
 References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 15/32] docker: enable gcrypt to extend code
- coverage on amd64
+Subject: [Qemu-devel] [PULL 26/32] docker: add debian/mips64el image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,16 +36,53 @@ From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 71bcfc14d5..eb13f06ed1 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -34,3 +34,6 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
- RUN git clone https://github.com/luigirizzo/netmap.git /usr/src/netmap
- RUN cd /usr/src/netmap/LINUX && ./configure --no-drivers --no-apps --kernel-dir=$(ls -d /usr/src/linux-headers-*-amd64) && make install
- ENV QEMU_CONFIGURE_OPTS --enable-netmap
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index e0807c0917..5a8283674a 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -63,6 +63,7 @@ docker-image-debian-armel-cross: docker-image-debian9
+ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-arm64-cross: docker-image-debian9
+ docker-image-debian-mips-cross: docker-image-debian9
++docker-image-debian-mips64el-cross: docker-image-debian9
+ docker-image-debian-powerpc-cross: docker-image-debian8
+ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian-mips64el-cross.docker b/tests/docker/dockerfiles/debian-mips64el-cross.docker
+new file mode 100644
+index 0000000000..fd2aafeb01
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-mips64el-cross.docker
+@@ -0,0 +1,30 @@
++#
++# Docker mips64el cross-compiler target
++#
++# This docker target builds on the debian Stretch base image.
++#
 +
-+# gcrypt
-+ENV QEMU_CONFIGURE_OPTS $QEMU_CONFIGURE_OPTS --enable-gcrypt
++FROM qemu:debian9
++
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++# Add the foreign architecture we want and install dependencies
++RUN dpkg --add-architecture mips64el && \
++    apt-get update
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        gcc-mips64el-linux-gnuabi64
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get build-dep -yy -a mips64el qemu
++
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=mips64el-linux-gnuabi64-
++
++# Install extra libraries to increase code coverage
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        libbz2-dev:mips64el \
++        liblzo2-dev:mips64el \
++        librdmacm-dev:mips64el \
++        libsnappy-dev:mips64el
 -- 
 2.13.0
