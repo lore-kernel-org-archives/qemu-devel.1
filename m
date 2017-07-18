@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dXRDh-0001ix-Oh
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:03:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXRFP-0003g4-Gf
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:05:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dXRDb-0000rs-Qq
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:03:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54010)
+	(envelope-from <eblake@redhat.com>) id 1dXRFM-0002VL-Ci
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:05:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dXRDb-0000rR-L5
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:03:11 -0400
-Date: Tue, 18 Jul 2017 20:02:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170718120250.GD27284@pxdev.xzpeter.org>
-References: <1499429683-73361-1-git-send-email-agraf@suse.de>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXRFM-0002TR-3s
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:05:00 -0400
+References: <20170602150150.258222-1-vsementsov@virtuozzo.com>
+	<20170602150150.258222-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a880cbcb-9a16-bbd3-cda7-28e68bc21b34@redhat.com>
+Date: Tue, 18 Jul 2017 07:04:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1499429683-73361-1-git-send-email-agraf@suse.de>
-Subject: Re: [Qemu-devel] [PATCH] migration: Make analyze-migration script
- target-page-size aware
+In-Reply-To: <20170602150150.258222-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qHU3niRfpDgoBcHmAEDd9tBJ34KkGS1hN"
+Subject: Re: [Qemu-devel] [PATCH v2 03/12] nbd/server: get rid of
+ nbd_negotiate_read and friends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +29,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
 
-On Fri, Jul 07, 2017 at 02:14:43PM +0200, Alexander Graf wrote:
-> The configuration section has a new subsection to transmit the target page
-> size along with the migration stream. The analyze migration script needs
-> to learn about that to read configuration streams that were triggering
-> this subsection to get transmitted.
-> 
-> With this patch applied, I can successfully analyze migration streams
-> on AArch64 again.
-> 
-> Signed-off-by: Alexander Graf <agraf@suse.de>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qHU3niRfpDgoBcHmAEDd9tBJ34KkGS1hN
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org
+Message-ID: <a880cbcb-9a16-bbd3-cda7-28e68bc21b34@redhat.com>
+Subject: Re: [PATCH v2 03/12] nbd/server: get rid of nbd_negotiate_read and
+ friends
+References: <20170602150150.258222-1-vsementsov@virtuozzo.com>
+ <20170602150150.258222-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20170602150150.258222-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 06/02/2017 10:01 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Functions nbd_negotiate_{read,write,drop_sync} were introduced in
+> 1a6245a5b, when nbd_rwv (was nbd_wr_sync) was working through
+> qemu_co_sendv_recvv (the path is nbd_wr_sync -> qemu_co_{recv/send} ->
+> qemu_co_send_recv -> qemu_co_sendv_recvv), which just yields, without
+> setting any handlers. But starting from ff82911cd nbd_rwv (was
+> nbd_wr_syncv) works through qio_channel_yield() which sets handlers, so=
+
+> watchers are redundant in nbd_negotiate_{read,write,drop_sync}, then,
+> let's just use nbd_{read,write,drop} functions.
+>=20
+> Functions nbd_{read,write,drop} has errp parameter, which is unused in
+> this patch. This will be fixed later.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  scripts/analyze-migration.py | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration.py
-> index 1455387..02784f2 100755
-> --- a/scripts/analyze-migration.py
-> +++ b/scripts/analyze-migration.py
-> @@ -254,12 +254,25 @@ class HTABSection(object):
->  
->  
->  class ConfigurationSection(object):
-> +    QEMU_VM_SUBSECTION    = 0x05
-> +
->      def __init__(self, file):
->          self.file = file
->  
->      def read(self):
->          name_len = self.file.read32()
->          name = self.file.readstr(len = name_len)
-> +        oldpos = self.file.tell()
-> +        if self.file.read8() == self.QEMU_VM_SUBSECTION:
+>  nbd/server.c | 107 ++++++++++++---------------------------------------=
+--------
+>  1 file changed, 22 insertions(+), 85 deletions(-)
 
-Here name_len missing?
+I did not realize it at the time, but this patch plugs a
+denial-of-service security hole against malicious clients that were able
+to trigger an assertion failure in the server by sending garbage during
+negotiation; which was a regression introduced in the mentioned commit
+ff82911cd.  This has now been assigned the identifier CVE-2017-7539
 
-               name_len = self.file.read8()
+The fact that we have now had 4 CVEs against qemu's NBD implementation
+in the last year means we are not doing a very good job of unit testing
+either the server or the client against a malicious partner; I'm still
+trying to figure out ways that we can improve our testsuite coverage
+(testing that a sane client can still connect happens during
+qemu-iotests, but most of our CVEs have happened due to poor reactions
+to out-of-spec clients).
 
-(though all of them are going to be threw away...)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> +            name = self.file.readstr()
-> +            version_id = self.file.read32()
-> +            if name == "configuration/target-page-bits":
-> +                target_page_size = self.file.read32()
-> +            else:
-> +                raise Exception("Unknown config subsection: %s" % name)
-> +        else:
-> +            # No subsection following, forget that we ever read anything
-> +            self.file.seek(oldpos)
 
-I guess we need self.file.file.seek(oldpos) here? Since otherwise on
-x86 we'll get:
+--qHU3niRfpDgoBcHmAEDd9tBJ34KkGS1hN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Traceback (most recent call last):
-  File "./analyze-migration.py", line 615, in <module>
-    dump.read(dump_memory = args.memory)
-  File "./analyze-migration.py", line 542, in read
-    section.read()
-  File "./analyze-migration.py", line 275, in read
-    self.file.seek(oldpos)
-AttributeError: 'MigrationFile' object has no attribute 'seek'
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Thanks,
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllt+WcACgkQp6FrSiUn
+Q2qCrQgAre/bLBVAT/Jq9duHe6fQUR/Z17EfnXGMUxShcaYl6HW5kZWBV7AuVUq7
+fKulZBVFXWyK2AkckIKGMTiRAwH1Bn83xTVGP0L/oDux4vswW0/QsW4p8PYyGdL4
+dOxSc/I87LYDpuhhhJp3gtUcNeJcR1ygl5sKLyj9wK9gBCvz7eujbrD7BVam208x
+t89M+k9EIy5a56pZs80YpR89VeWIjLqMRNNtNvMRFkeywY4jXKGWYsjo1fKdOv6W
+na5WvNYfp6+HaBoNYKMvOdadxKYxBAdpYxPkfW2/IWbcJIxFsshmrIVTKoyYfsoW
+if82EZqMl1YxfY5OCo6wrHr3bIDnxQ==
+=QhJI
+-----END PGP SIGNATURE-----
 
--- 
-Peter Xu
+--qHU3niRfpDgoBcHmAEDd9tBJ34KkGS1hN--
