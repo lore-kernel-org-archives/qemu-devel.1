@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGW-0005oV-4n
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:09 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGX-0005pr-Jg
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGS-00032n-S1
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33191
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGU-00033S-GD
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39485
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dXQGS-00032f-MQ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:04 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1dXQGU-00033J-9p
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:06 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6IAwm77135296
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:03 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bs4ff5b6a-1
+	v6IAwsJk047903
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:05 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bs6nd8q57-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:03 -0400
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:05 -0400
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 07:02:03 -0400
+	Tue, 18 Jul 2017 05:02:04 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 06:01:36 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 0/8] qemu-ga patch queue
+Date: Tue, 18 Jul 2017 06:01:37 -0500
+In-Reply-To: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Message-Id: <1500375704-28002-2-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL v2 1/8] qga-win: fix installation on localized
+ windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,64 +40,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Daniel Rempel <daniel@daynix.com>, Sameeh Jubran <sjubran@redhat.com>
 
-The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3e=
-b2:
+From: Daniel Rempel <daniel@daynix.com>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-req=
-uest' into staging (2017-07-17 17:54:17 +0100)
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1357789
+Replace hardcoded user and group names ("Administrators", "SYSTEM") with the ones acquired from system. Windows uses localized strings for these names and it may cause the installation to fail.
+Windows has Well-known SIDs for "Administrators" group and "SYSTEM" user so they were used to identify required users and groups.
+Well-known SIDs: https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 
-are available in the git repository at:
+Signed-off-by: Daniel Rempel <daniel@daynix.com>
+Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+Reviewed-by: Sameeh Jubran <sameeh@daynix.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ qga/vss-win32/install.cpp | 35 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
 
-  git://github.com/mdroth/qemu.git tags/qga-pull-2017-07-17-v2-tag
-
-for you to fetch changes up to 339ca68bef9f30dd18e84b7d92398327e3f819a3:
-
-  test-qga: add test for guest-get-osinfo (2017-07-18 05:49:01 -0500)
-
-----------------------------------------------------------------
-qemu-ga patch queue
-
-* new command: qemu-get-osinfo
-* build fix for OpenBSD
-* better error-reporting for failure on keyfile dump
-* remove redundant initialization of qa_state global
-* include libpcre in w32 package
-* w32 localization fixes for service installation/registration
-
-v2:
-* fix build issue with older GCCs introduced with guest_get_osinfo
-* relocated some declarations in guest_get_osinfo
-
-----------------------------------------------------------------
-Daniel Rempel (1):
-      qga-win: fix installation on localized windows
-
-Marc-Andr=C3=A9 Lureau (1):
-      qga: report error on keyfile dump error
-
-Peng Hao (1):
-      qga-win32: remove a redundancy code
-
-Thomas Lamprecht (1):
-      qemu-ga: add missing libpcre to MSI build
-
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (4):
-      qemu-ga: check if utmpx.h is available on the system
-      qemu-ga: add guest-get-osinfo command
-      test-qga: pass environemnt to qemu-ga
-      test-qga: add test for guest-get-osinfo
-
- configure                      |  19 ++++
- qga/commands-posix.c           | 157 ++++++++++++++++++++++++++++++++-
- qga/commands-win32.c           | 191 +++++++++++++++++++++++++++++++++++=
-++++++
- qga/installer/qemu-ga.wxs      |   4 +
- qga/main.c                     |   9 +-
- qga/qapi-schema.json           |  65 ++++++++++++++
- qga/vss-win32/install.cpp      |  35 +++++++-
- tests/data/test-qga-os-release |   7 ++
- tests/test-qga.c               |  64 +++++++++++++-
- 9 files changed, 542 insertions(+), 9 deletions(-)
- create mode 100644 tests/data/test-qga-os-release
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index f41fcdf..ba7c94e 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -18,6 +18,9 @@
+ #include <wbemidl.h>
+ #include <comdef.h>
+ #include <comutil.h>
++#include <sddl.h>
++
++#define BUFFER_SIZE 1024
+ 
+ extern HINSTANCE g_hinstDll;
+ 
+@@ -135,6 +138,27 @@ out:
+     return hr;
+ }
+ 
++/* Acquire group or user name by SID */
++static HRESULT getNameByStringSID(
++    const wchar_t *sid, LPWSTR buffer, LPDWORD bufferLen)
++{
++    HRESULT hr = S_OK;
++    PSID psid = NULL;
++    SID_NAME_USE groupType;
++    DWORD domainNameLen = BUFFER_SIZE;
++    wchar_t domainName[BUFFER_SIZE];
++
++    chk(ConvertStringSidToSidW(sid, &psid));
++    LookupAccountSidW(NULL, psid, buffer, bufferLen,
++                domainName, &domainNameLen, &groupType);
++    hr = HRESULT_FROM_WIN32(GetLastError());
++
++    LocalFree(psid);
++
++out:
++    return hr;
++}
++
+ /* Find and iterate QGA VSS provider in COM+ Application Catalog */
+ static HRESULT QGAProviderFind(
+     HRESULT (*found)(ICatalogCollection *, int, void *), void *arg)
+@@ -216,6 +240,10 @@ STDAPI COMRegister(void)
+     CHAR dllPath[MAX_PATH], tlbPath[MAX_PATH];
+     bool unregisterOnFailure = false;
+     int count = 0;
++    DWORD bufferLen = BUFFER_SIZE;
++    wchar_t buffer[BUFFER_SIZE];
++    const wchar_t *administratorsGroupSID = L"S-1-5-32-544";
++    const wchar_t *systemUserSID = L"S-1-5-18";
+ 
+     if (!g_hinstDll) {
+         errmsg(E_FAIL, "Failed to initialize DLL");
+@@ -284,11 +312,12 @@ STDAPI COMRegister(void)
+ 
+     /* Setup roles of the applicaion */
+ 
++    chk(getNameByStringSID(administratorsGroupSID, buffer, &bufferLen));
+     chk(pApps->GetCollection(_bstr_t(L"Roles"), key,
+                              (IDispatch **)pRoles.replace()));
+     chk(pRoles->Populate());
+     chk(pRoles->Add((IDispatch **)pObj.replace()));
+-    chk(put_Value(pObj, L"Name",        L"Administrators"));
++    chk(put_Value(pObj, L"Name", buffer));
+     chk(put_Value(pObj, L"Description", L"Administrators group"));
+     chk(pRoles->SaveChanges(&n));
+     chk(pObj->get_Key(&key));
+@@ -303,8 +332,10 @@ STDAPI COMRegister(void)
+     chk(GetAdminName(&name));
+     chk(put_Value(pObj, L"User", _bstr_t(".\\") + name));
+ 
++    bufferLen = BUFFER_SIZE;
++    chk(getNameByStringSID(systemUserSID, buffer, &bufferLen));
+     chk(pUsersInRole->Add((IDispatch **)pObj.replace()));
+-    chk(put_Value(pObj, L"User", L"SYSTEM"));
++    chk(put_Value(pObj, L"User", buffer));
+     chk(pUsersInRole->SaveChanges(&n));
+ 
+ out:
+-- 
+2.7.4
