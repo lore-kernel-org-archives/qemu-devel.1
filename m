@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXatD-000864-PE
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:48 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXatC-0004VF-SZ
+	(envelope-from <sstabellini@kernel.org>) id 1dXatD-00085T-1A
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39856)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <sstabellini@kernel.org>) id 1dXatC-0004Sv-2B
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dXatC-0004St-KE
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:46 -0400
+	id 1dXatB-0004Rn-Rw
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:45 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 18 Jul 2017 15:22:39 -0700
-Message-Id: <1500416562-27337-4-git-send-email-sstabellini@kernel.org>
+Date: Tue, 18 Jul 2017 15:22:37 -0700
+Message-Id: <1500416562-27337-2-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1500416562-27337-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
 	<1500416562-27337-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL for-2.10 4/7] xen: move physmap saving into a
- separate function
+Subject: [Qemu-devel] [PULL for-2.10 2/7] xen_pt_msi.c: Check for
+ xen_host_pci_get_* failures in xen_pt_msix_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +27,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Non-functional change.
+Check the return status of the xen_host_pci_get_* functions we call in
+xen_pt_msix_init(), and fail device init if the reads failed rather than
+ploughing ahead. (Spotted by Coverity: CID 777338.)
 
-Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
-Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/i386/xen/xen-hvm.c | 57 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 31 insertions(+), 26 deletions(-)
+ hw/xen/xen_pt_msi.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 3d951a3..277919e 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -304,6 +304,36 @@ static hwaddr xen_phys_offset_to_gaddr(hwaddr start_addr,
-     return start_addr;
- }
+diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+index 62add06..ff9a79f 100644
+--- a/hw/xen/xen_pt_msi.c
++++ b/hw/xen/xen_pt_msi.c
+@@ -535,7 +535,11 @@ int xen_pt_msix_init(XenPCIPassthroughState *s, uint32_t base)
+         return -1;
+     }
  
-+static int xen_save_physmap(XenIOState *state, XenPhysmap *physmap)
-+{
-+    char path[80], value[17];
-+
-+    snprintf(path, sizeof(path),
-+            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
-+            xen_domid, (uint64_t)physmap->phys_offset);
-+    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->start_addr);
-+    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
-+        return -1;
+-    xen_host_pci_get_word(hd, base + PCI_MSIX_FLAGS, &control);
++    rc = xen_host_pci_get_word(hd, base + PCI_MSIX_FLAGS, &control);
++    if (rc) {
++        XEN_PT_ERR(d, "Failed to read PCI_MSIX_FLAGS field\n");
++        return rc;
 +    }
-+    snprintf(path, sizeof(path),
-+            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
-+            xen_domid, (uint64_t)physmap->phys_offset);
-+    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)physmap->size);
-+    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
-+        return -1;
-+    }
-+    if (physmap->name) {
-+        snprintf(path, sizeof(path),
-+                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
-+                xen_domid, (uint64_t)physmap->phys_offset);
-+        if (!xs_write(state->xenstore, 0, path,
-+                      physmap->name, strlen(physmap->name))) {
-+            return -1;
-+        }
-+    }
-+    return 0;
-+}
-+
- static int xen_add_to_physmap(XenIOState *state,
-                               hwaddr start_addr,
-                               ram_addr_t size,
-@@ -315,7 +345,6 @@ static int xen_add_to_physmap(XenIOState *state,
-     XenPhysmap *physmap = NULL;
-     hwaddr pfn, start_gpfn;
-     hwaddr phys_offset = memory_region_get_ram_addr(mr);
--    char path[80], value[17];
-     const char *mr_name;
+     total_entries = control & PCI_MSIX_FLAGS_QSIZE;
+     total_entries += 1;
  
-     if (get_physmapping(state, start_addr, size)) {
-@@ -367,31 +396,7 @@ go_physmap:
-                                    start_addr >> TARGET_PAGE_BITS,
-                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
-                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
--
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    if (mr_name) {
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
--                xen_domid, (uint64_t)phys_offset);
--        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
--            return -1;
--        }
--    }
--
--    return 0;
-+    return xen_save_physmap(state, physmap);
- }
+@@ -554,7 +558,11 @@ int xen_pt_msix_init(XenPCIPassthroughState *s, uint32_t base)
+                            + XC_PAGE_SIZE - 1)
+                           & XC_PAGE_MASK);
  
- static int xen_remove_from_physmap(XenIOState *state,
+-    xen_host_pci_get_long(hd, base + PCI_MSIX_TABLE, &table_off);
++    rc = xen_host_pci_get_long(hd, base + PCI_MSIX_TABLE, &table_off);
++    if (rc) {
++        XEN_PT_ERR(d, "Failed to read PCI_MSIX_TABLE field\n");
++        goto error_out;
++    }
+     bar_index = msix->bar_index = table_off & PCI_MSIX_FLAGS_BIRMASK;
+     table_off = table_off & ~PCI_MSIX_FLAGS_BIRMASK;
+     msix->table_base = s->real_device.io_regions[bar_index].base_addr;
 -- 
 1.9.1
