@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dXGAM-0003Q0-AR
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:15:07 -0400
+	(envelope-from <cota@braap.org>) id 1dXGLy-0006HB-4E
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dXGAL-0001c5-ER
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:15:06 -0400
-Date: Mon, 17 Jul 2017 20:14:58 -0400
+	(envelope-from <cota@braap.org>) id 1dXGLu-0001SV-3a
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:27:06 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:42905)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXGLt-0001S9-Ss
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:27:02 -0400
+Date: Mon, 17 Jul 2017 20:27:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170718001458.GF30851@flamenco>
-References: <20170711175937.23140-1-alex.bennee@linaro.org>
-	<20170711175937.23140-7-alex.bennee@linaro.org>
+Message-ID: <20170718002700.GA7414@flamenco>
+References: <1500235468-15341-1-git-send-email-cota@braap.org>
+	<1500235468-15341-11-git-send-email-cota@braap.org>
+	<92056605-c95b-b19b-0216-5d83be64e13d@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170711175937.23140-7-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v3 6/6] target/arm: use DISAS_EXIT for eret
- handling
+In-Reply-To: <92056605-c95b-b19b-0216-5d83be64e13d@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 10/45] translate-all: guarantee that
+ tb_hash only holds valid TBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, rth@twiddle.net, qemu-devel@nongnu.org, Etienne Carriere <etienne.carriere@linaro.org>, Joakim Bech <joakim.bech@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Jul 11, 2017 at 18:59:37 +0100, Alex Bennée wrote:
-> Previously DISAS_JUMP did ensure this but with the optimisation of
-> 8a6b28c7 (optimize indirect branches) we might not leave the loop.
-> This means if any pending interrupts are cleared by changing IRQ flags
-> we might never get around to servicing them. You usually notice this
-> by seeing the lookup_tb_ptr() helper gainfully chaining TBs together
-> while cpu->interrupt_request remains high and the exit_request has not
-> been set.
+On Mon, Jul 17, 2017 at 12:55:03 -1000, Richard Henderson wrote:
+> On 07/16/2017 10:03 AM, Emilio G. Cota wrote:
+> >@@ -1073,13 +1073,17 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+> >      assert_tb_locked();
+> >-    atomic_set(&tb->invalid, true);
+> >-
+> >      /* remove the TB from the hash list */
+> >      phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+> >      h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
+> >      qht_remove(&tcg_ctx.tb_ctx.htable, tb, h);
+> >+    /*
+> >+     * Mark the TB as invalid *after* it's been removed from tb_hash, which
+> >+     * eliminates the need to check this bit on lookups.
+> >+     */
+> >+    tb->invalid = true;
 > 
-> This breaks amongst other things the OPTEE test suite which executes
-> an eret from the secure world after a non-secure world IRQ has gone
-> pending which then never gets serviced.
+> I believe you need atomic_store_release here.  Previously we were relying on
+> the lock acquisition in qht_remove to provide the required memory barrier.
 > 
-> Instead of using the previously implied semantics of DISAS_JUMP we use
-> DISAS_EXIT which will always exit the run-loop.
-> 
-> CC: Etienne Carriere <etienne.carriere@linaro.org>
-> CC: Joakim Bech <joakim.bech@linaro.org>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Emilio G. Cota <cota@braap.org>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+> We definitely need to make sure this reaches memory before we zap the TB in
+> the CPU_FOREACH loop.
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+After this patch tb->invalid is only read/set with tb_lock held, so no need for
+atomics while accessing it.
 
 		E.
