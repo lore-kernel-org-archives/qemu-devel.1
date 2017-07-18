@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXarW-0006vB-HB
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:21:03 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dXatC-000855-Fq
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXarS-0007dE-JE
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:21:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39676)
+	(envelope-from <sstabellini@kernel.org>) id 1dXatB-0004S1-Hf
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dXarS-0007Z8-DN
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:20:58 -0400
-Date: Tue, 18 Jul 2017 15:20:56 -0700 (PDT)
+	id 1dXatB-0004Qd-CV
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:45 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PULL for-2.0 0/7] please pull xen-20170718-tag
+Date: Tue, 18 Jul 2017 15:22:36 -0700
+Message-Id: <1500416562-27337-1-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
+Subject: [Qemu-devel] [PULL for-2.10 1/7] hw/xen: Set emu_mask for
+ igd_opregion register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +26,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Xiong Zhang <xiong.y.zhang@intel.com>
 
-The following changes since commit f9dada2baabb639feb988b3a564df7a06d214e18:
+From: Xiong Zhang <xiong.y.zhang@intel.com>
 
-  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-07-18 20:29:36 +0100)
+In igd passthrough environment, guest could only access opregion at the
+first bootup time. Once guest shutdown, later guest couldn't access
+opregion anymore.
+This is because qemu set emulated guest opregion base address to host
+register. Later guest get a wrong host opregion base address, and couldn't
+access it anymore.
 
-are available in the git repository at:
+This patch set emu_mask for igd_opregion register, so guest won't set
+guest opregion base address to host.
 
+Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/xen/xen_pt_config_init.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-  git://xenbits.xen.org/people/sstabellini/qemu-dm.git tags/xen-20170718-tag
-
-for you to fetch changes up to 331b5189d756d431b1d18ae7097527ba3d3ea809:
-
-  xen: don't use xenstore to save/restore physmap anymore (2017-07-18 14:16:52 -0700)
-
-----------------------------------------------------------------
-Xen 2017/07/18
-
-----------------------------------------------------------------
-Igor Druzhinin (4):
-      xen: move physmap saving into a separate function
-      xen/mapcache: add an ability to create dummy mappings
-      xen/mapcache: introduce xen_replace_cache_entry()
-      xen: don't use xenstore to save/restore physmap anymore
-
-Peter Maydell (1):
-      xen_pt_msi.c: Check for xen_host_pci_get_* failures in xen_pt_msix_init()
-
-Stefano Stabellini (1):
-      xen-platform: separate unplugging of NVMe disks
-
-Xiong Zhang (1):
-      hw/xen: Set emu_mask for igd_opregion register
-
- configure                     |  18 +++++++
- hw/i386/xen/xen-hvm.c         | 105 +++++++++++++++++++++++-------------
- hw/i386/xen/xen-mapcache.c    | 121 ++++++++++++++++++++++++++++++++++++++----
- hw/i386/xen/xen_platform.c    |  47 +++++++++++-----
- hw/xen/xen_pt_config_init.c   |   1 +
- hw/xen/xen_pt_msi.c           |  12 ++++-
- include/hw/xen/xen_common.h   |  15 ++++++
- include/sysemu/xen-mapcache.h |  11 +++-
- 8 files changed, 267 insertions(+), 63 deletions(-)
+diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
+index 6f18366..1f04ec5 100644
+--- a/hw/xen/xen_pt_config_init.c
++++ b/hw/xen/xen_pt_config_init.c
+@@ -1535,6 +1535,7 @@ static XenPTRegInfo xen_pt_emu_reg_igd_opregion[] = {
+         .offset     = 0x0,
+         .size       = 4,
+         .init_val   = 0,
++        .emu_mask   = 0xFFFFFFFF,
+         .u.dw.read   = xen_pt_intel_opregion_read,
+         .u.dw.write  = xen_pt_intel_opregion_write,
+     },
+-- 
+1.9.1
