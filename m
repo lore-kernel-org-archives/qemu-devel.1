@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0W-0007gd-Sy
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0a-0007jb-5t
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0V-0003FU-TP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:36 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:32851)
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0Y-0003Gz-RA
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:40 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36377)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dXQ0V-0003F5-Mq
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:35 -0400
-Received: by mail-wr0-x234.google.com with SMTP id a10so23441737wrd.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:45:35 -0700 (PDT)
+	id 1dXQ0Y-0003GS-BP
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:38 -0400
+Received: by mail-wr0-x235.google.com with SMTP id y43so23116799wrd.3
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:45:38 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 18 Jul 2017 11:44:52 +0100
-Message-Id: <20170718104513.23947-12-alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:45:01 +0100
+Message-Id: <20170718104513.23947-21-alex.bennee@linaro.org>
 In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
 References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/32] docker: add debian/ppc64el based on
- Stretch
+Subject: [Qemu-devel] [PULL 20/32] docker: add qemu:debian-jessie based on
+ outdated jessie release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +37,47 @@ From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index db66b6f802..553465ef6d 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -60,6 +60,7 @@ docker-image-debian-armel-cross: docker-image-debian9
- docker-image-debian-armhf-cross: docker-image-debian9
- docker-image-debian-arm64-cross: docker-image-debian9
- docker-image-debian-mipsel-cross: docker-image-debian9
-+docker-image-debian-ppc64el-cross: docker-image-debian9
- docker-image-debian-s390x-cross: docker-image-debian9
- 
- # Expand all the pre-requistes for each docker image and test combination
-diff --git a/tests/docker/dockerfiles/debian-ppc64el-cross.docker b/tests/docker/dockerfiles/debian-ppc64el-cross.docker
+diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
 new file mode 100644
-index 0000000000..f44a35880a
+index 0000000000..3d09b4b462
 --- /dev/null
-+++ b/tests/docker/dockerfiles/debian-ppc64el-cross.docker
-@@ -0,0 +1,25 @@
++++ b/tests/docker/dockerfiles/debian8.docker
+@@ -0,0 +1,36 @@
 +#
-+# Docker ppc64el cross-compiler target
++# Docker multiarch cross-compiler target
 +#
-+# This docker target builds on the debian Stretch base image.
++# This docker target is builds on Debian and Emdebian's cross compiler targets
++# to build distro with a selection of cross compilers for building test binaries.
 +#
-+FROM qemu:debian9
++# On its own you can't build much but the docker-foo-cross targets
++# build on top of the base debian image.
++#
++FROM debian:jessie-slim
 +
-+# Add the foreign architecture we want and install dependencies
-+RUN dpkg --add-architecture ppc64el && \
-+    apt update
-+RUN apt install -yy crossbuild-essential-ppc64el
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
 +
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get build-dep -yy -a ppc64el qemu
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
 +
-+# Specify the cross prefix for this image (see tests/docker/common.rc)
-+ENV QEMU_CONFIGURE_OPTS --cross-prefix=powerpc64le-linux-gnu-
-+
-+# Install extra libraries to increase code coverage
++# Setup some basic tools we need
++RUN apt-get update && \
++    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
 +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
 +    apt-get install -y --no-install-recommends \
-+        libbz2-dev:ppc64el \
-+        liblzo2-dev:ppc64el \
-+        librdmacm-dev:ppc64el \
-+        libsnappy-dev:ppc64el
++        bison \
++        binutils-multiarch \
++        build-essential \
++        ca-certificates \
++        clang \
++        curl \
++        flex \
++        git \
++        gnupg \
++        pkg-config \
++        python-minimal
++
++# Setup Emdebian [emdebian-archive-keyring]
++RUN echo "deb http://emdebian.org/tools/debian/ jessie main" > /etc/apt/sources.list.d/emdebian.list && \
++    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
 -- 
 2.13.0
