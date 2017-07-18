@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXZSG-0003NS-CH
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXZdU-00026N-7U
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXZSD-00018J-3B
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dXZSC-00014t-Mp
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dXZSA-00026j-Bg
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5762F2E808D
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:46 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1dXZdT-00023a-Eu
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:28 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35831)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXZdT-000230-7o
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:02:27 -0400
+Received: by mail-wr0-x236.google.com with SMTP id w4so45433579wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:02:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Jul 2017 20:34:15 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1705118] [NEW] qemu user mode does not support
- catching SIGSEGV on some architectures
+In-Reply-To: <1500369144-143949-1-git-send-email-borntraeger@de.ibm.com>
+References: <1500369144-143949-1-git-send-email-borntraeger@de.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Jul 2017 22:02:05 +0100
+Message-ID: <CAFEAcA-Sfn+Y8M0rkJAnYBFCLocNSeZeWzmhFLA5BtNMJfvPYw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] two more s390 changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,150 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Public bug reported:
+On 18 July 2017 at 10:12, Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> Peter,
+> now that z14 was announced here is the z14 cpu model together with
+> the linux header update.
+>
+> The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request' into staging (2017-07-17 17:54:17 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/borntraeger/qemu.git tags/s390x-20170718
+>
+> for you to fetch changes up to cc28a5949bb54df070c38ab505ee2c14385e53d0:
+>
+>   s390x/cpumodel: z14 cpu models (2017-07-18 10:55:16 +0200)
+>
+> ----------------------------------------------------------------
+> s390: add z14 cpu model
+>
+> - add a CPU model for the IBM z14 which was announced on July 17th 2017
+> - update linux headers to 4.13-rc0 to get a fix for an ioctl definition
+>
+> ----------------------------------------------------------------
+> Christian Borntraeger (1):
+>       linux header sync against v4.13-rc1
+>
+> Jason J. Herne (1):
+>       s390x/cpumodel: z14 cpu models
+>
 
-The documentation
-<https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
-qemu in user mode supports POSIX signal handling.
+Applied, thanks.
 
-Catching SIGSEGV according to POSIX, however, does not work on
-  ppc, ppc64, ppc64le, s390x, sparc64.
-It does work, however, on
-  aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
-
-How to reproduce:
-The attached program runs fine (exits with code 0) on
-  - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
-  - real hardware Linux/PowerPC64LE,
-  - qemu-system-s390x emulated Linux/s390x,
-  - real hardware Linux/SPARC64.
-$ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
-0
-
-For ppc:
-$ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-ppc
-$ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
-$ echo $?
-3
-
-For ppc64:
-$ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
-pc64
-$ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
-$ echo $?
-3
-
-For ppc64le:
-$ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
--ppc64le
-$ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
-$ echo $?
-3
-
-For s390x:
-$ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s390x
-$ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
-$ echo $?
-3
-$ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390X_=
-COMPAT -o testsigsegv-s390x-a
-$ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
-$ echo $?
-0
-So, the test fails here because the Linux/s390x kernel omits the least
-significant 12 bits of the fault address in the 'si_addr' field. But
-qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
-the complete fault address in the 'si_addr' field.
-
-For sparc64:
-$ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-spa=
-rc64
-$ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
-Segmentation fault (core dumped)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "source code of test program"
-   https://bugs.launchpad.net/bugs/1705118/+attachment/4917116/+files/tests=
-igsegv.c
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1705118
-
-Title:
-  qemu user mode does not support catching SIGSEGV on some architectures
-
-Status in QEMU:
-  New
-
-Bug description:
-  The documentation
-  <https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
-  qemu in user mode supports POSIX signal handling.
-
-  Catching SIGSEGV according to POSIX, however, does not work on
-    ppc, ppc64, ppc64le, s390x, sparc64.
-  It does work, however, on
-    aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
-
-  How to reproduce:
-  The attached program runs fine (exits with code 0) on
-    - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
-    - real hardware Linux/PowerPC64LE,
-    - qemu-system-s390x emulated Linux/s390x,
-    - real hardware Linux/SPARC64.
-  $ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
-  0
-
-  For ppc:
-  $ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
-pc
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
-  $ echo $?
-  3
-
-  For ppc64:
-  $ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
--ppc64
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
-  $ echo $?
-  3
-
-  For ppc64le:
-  $ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigse=
-gv-ppc64le
-  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
-  $ echo $?
-  3
-
-  For s390x:
-  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s39=
-0x
-  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
-  $ echo $?
-  3
-  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390=
-X_COMPAT -o testsigsegv-s390x-a
-  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
-  $ echo $?
-  0
-  So, the test fails here because the Linux/s390x kernel omits the least
-  significant 12 bits of the fault address in the 'si_addr' field. But
-  qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
-  the complete fault address in the 'si_addr' field.
-
-  For sparc64:
-  $ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s=
-parc64
-  $ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
-  Segmentation fault (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1705118/+subscriptions
+-- PMM
