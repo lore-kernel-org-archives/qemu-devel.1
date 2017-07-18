@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dXSXF-0000WA-5j
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:27:34 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dXSZL-0002aS-Le
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:29:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dXSXC-0000Fu-1Y
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:27:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dXSXB-0000FF-OV
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:27:29 -0400
-Date: Tue, 18 Jul 2017 15:27:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170718152726.1f1b0bff@nial.brq.redhat.com>
-In-Reply-To: <20170712162058.10538-5-ehabkost@redhat.com>
-References: <20170712162058.10538-1-ehabkost@redhat.com>
-	<20170712162058.10538-5-ehabkost@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dXSZK-00017f-9o
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:29:43 -0400
+Received: from mail-lf0-x230.google.com ([2a00:1450:4010:c07::230]:35839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dXSZJ-00017B-Uz
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:29:42 -0400
+Received: by mail-lf0-x230.google.com with SMTP id w198so13566871lff.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 06:29:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] target/i386: Don't use
- x86_cpu_load_def() on "max" CPU model
+In-Reply-To: <20170715021021-mutt-send-email-mst@kernel.org>
+References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
+	<20170714222705-mutt-send-email-mst@kernel.org>
+	<71fd872e-ca59-169d-07fb-5e304713fa84@redhat.com>
+	<20170715011517-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CJZ2p_i-SCi-s5=-xcmg4wORv6B_7kjCyRGb5r8oDBWCQ@mail.gmail.com>
+	<20170715021021-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 18 Jul 2017 06:29:39 -0700
+Message-ID: <CAJ+F1CLciE6piWiAo=5r-J6jPQnvj-LWxxbTHsY5d=o-VW7Bsg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] KASLR kernel dump support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +34,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Ladi Prosek <lprosek@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dave Anderson <anderson@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, 12 Jul 2017 13:20:58 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Hi
 
-> When commit 0bacd8b3046f ('i386: Don't set CPUClass::cpu_def on
-> "max" model') removed the CPUClass::cpu_def field, we kept using
-> the x86_cpu_load_def() helper directly in max_x86_cpu_initfn(),
-> emulating the previous behavior when CPUClass::cpu_def was set.
-> 
-> However, x86_cpu_load_def() is intended to help initialization of
-> CPU models from the builtin_x86_defs table, and does lots of
-> other steps that are not necessary for "max".
-> 
-> One of the things x86_cpu_load_def() do is to set the properties
-> listed at tcg_default_props/kvm_default_props.  We must not do
-> that on the "max" CPU model, otherwise under KVM we will
-> incorrectly report all KVM features as always available, and the
-> "svm" feature as always unavailable.  The latter caused the bug
-> reported at:
-Maybe add that all available features for 'max' are set later at realize() time
-to ones actually supported by host.
+On Fri, Jul 14, 2017 at 4:29 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Sat, Jul 15, 2017 at 12:31:36AM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi
+>>
+>> On Sat, Jul 15, 2017 at 12:23 AM, Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+>> > On Fri, Jul 14, 2017 at 10:21:43PM +0200, Laszlo Ersek wrote:
+>> >> On 07/14/17 21:59, Michael S. Tsirkin wrote:
+>> >> > On Fri, Jul 14, 2017 at 08:20:03PM +0200, Marc-Andr=C3=A9 Lureau wr=
+ote:
+>> >> >> Recent linux kernels enable KASLR to randomize phys/virt memory
+>> >> >> addresses. This series aims to provide enough information in qemu
+>> >> >> dumps so that crash utility can work with randomized kernel too (i=
+t
+>> >> >> hasn't been tested on other archs than x86 though, help welcome).
+>> >> >>
+>> >> >> The vmcoreinfo device is an emulated ACPI device that exposes a 4k
+>> >> >> memory range to the guest to store various informations useful to
+>> >> >> debug the guest OS. (it is greatly inspired by the VMGENID device
+>> >> >> implementation). The version field with value 0 is meant to give
+>> >> >> paddr/size of the VMCOREINFO ELF PT_NOTE, other values can be used=
+ for
+>> >> >> different purposes or OSes. (note: some wanted to see pvpanic some=
+how
+>> >> >> merged with this device, I have no clear idea how to do that, nor =
+do I
+>> >> >> think this is a good idea since the devices are quite different, u=
+sed
+>> >> >> at different time for different purposes. And it can be done as a
+>> >> >> future iteration if it is appropriate, feel free to send patches)
+>> >> >
+>> >> > First, I think you underestimate the difficulty of maintaining
+>> >> > compatibility.
+>> >> >
+>> >> > Second, this seems racy - how do you know when is guest done writin=
+g out
+>> >> > the data?
+>> >>
+>> >> What data exactly?
+>> >>
+>> >> The guest kernel module points the fields in the "vmcoreinfo page" to
+>> >> the then-existent vmcoreinfo ELF note. At that point, the ELF note is
+>> >> complete.
+>> >
+>> > When does this happen?
+>>
+>> Very early boot afaik. But the exact details on when to expose it is
+>> left to the kernel side. For now, it's a test module I load manually.
+>>
+>> >
+>> >> If we catch the guest with a dump request while the kernel module is
+>> >> setting up the fields (i.e., the fields are not consistent), then we'=
+ll
+>> >> catch that in our sanity checks, and the note won't be extracted.
+>> >
+>> > Are there assumptions about e.g. in which order pa and size
+>> > are written out then? Atomicity of these writes?
+>>
+>> I expect it to be atomic, but as Laszlo said, the code should be quite
+>> careful when trying to read the data.
+>
+> Same when writing it out.  Worth documenting too.
+>
+>> >
+>> >> This
+>> >> is no different from the case when you simply dump the guest RAM befo=
+re
+>> >> the module got invoked.
+>> >>
+>> >> > Given you have very little data to export (PA, size - do
+>> >> > you even need size?)
+>> >>
+>> >> Yes, it tells us in advance how much memory to allocate before we cop=
+y
+>> >> out the vmcoreinfo ELF note (and we enforce a sanity limit on the siz=
+e).
+>> >>
+>> >> > - how about just using an ACPI method do it,
+>> >>
+>> >> Do what exactly?
+>> >
+>> > Pass address + size to host - that's what the interface is doing,
+>> > isn't it?
+>> >
+>>
+>>
+>> The memory region is meant to be usable for other OS, or to export
+>> more details in the future.
+>
+> That's the issue. You will never be able to increment version
+> just to add more data because that will break old hypervisors.
 
-Also while looking at it, I've noticed that:
-x86_cpu_load_def()
-  ...
-      if (kvm_enabled()) {                                                         
-        if (!kvm_irqchip_in_kernel()) {                                          
-            x86_cpu_change_kvm_default("x2apic", "off");                         
-        }
+Could you be more explicit on what will break?
 
-and
+>
+>> I think if we add a method, it would be to
+>> tell qemu that the memory has been written, but it may still be
+>> corrupted at the time we read it. So I am not sure it will really help
+>
+> So don't. Just pass PA and size to method as arguments and let it figure
+> out how to pass it to QEMU. To extend, you will simply add another
+> method - which one is present tells you what does hypervisor
+> support, which one is called tells you what does guest support.
+>
+> What to do there internally? I don't mind it if it sticks this data
+> in reserved memory like you did here. And then you won't need to
+> reserve a full 4K, just a couple of bytes as it will be safe to extend.
+>
 
-kvm_arch_get_supported_cpuid() also having
-        if (!kvm_irqchip_in_kernel()) {                                          
-            ret &= ~CPUID_EXT_X2APIC;                                            
-        } 
+I can see how for example nvdimm methods are implemented, there is a
+memory region reserved for data exchange, and an IO NTFY to give qemu
+execution context. Is this how we should design the interface?
 
-so do we really need this duplication in x86_cpu_load_def()?
+I would like to hear from Ladi how he intended to use the device in
+the future, and if he would also prefer ACPI methods and what those
+methods should be.
 
-> 
->   https://bugzilla.redhat.com/show_bug.cgi?id=1467599
->   ("Unable to start domain: the CPU is incompatible with host CPU:
->   Host CPU does not provide required features: svm")
-> 
-> Replace x86_cpu_load_def() with simple object_property_set*()
-> calls.  In addition to fixing the above bug, this makes the KVM
-> branch in max_x86_cpu_initfn() very similar to the existing TCG
-> branch.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/cpu.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index e2cd157..62d8021 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1596,15 +1596,21 @@ static void max_x86_cpu_initfn(Object *obj)
->      cpu->max_features = true;
->  
->      if (kvm_enabled()) {
-> -        X86CPUDefinition host_cpudef = { };
-> -        uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
-> +        char vendor[CPUID_VENDOR_SZ + 1] = { 0 };
-> +        char model_id[CPUID_MODEL_ID_SZ + 1] = { 0 };
-> +        int family, model, stepping;
->  
-> -        host_vendor_fms(host_cpudef.vendor, &host_cpudef.family,
-> -                        &host_cpudef.model, &host_cpudef.stepping);
-> +        host_vendor_fms(vendor, &family, &model, &stepping);
->  
-> -        cpu_x86_fill_model_id(host_cpudef.model_id);
-> +        cpu_x86_fill_model_id(model_id);
->  
-> -        x86_cpu_load_def(cpu, &host_cpudef, &error_abort);
-this looses 
-   env->features[FEAT_1_ECX] |= CPUID_EXT_HYPERVISOR;
-but it looks like kvm_arch_get_supported_cpuid() will take care of it later
-at realize() time.
+>>
+>> >> > instead of exporting a physical addess and storing address there.  =
+This
+>> >> > way you can add more methods as you add functionality.
+>> >>
+>> >> I'm not saying this is a bad idea (especially because I don't fully
+>> >> understand your point), but I will say that I'm quite sad that you ar=
+e
+>> >> sending Marc-Andr=C3=A9 back to the drawing board after he posted v4 =
+-- also
+>> >> invalidating my review efforts. :/
+>> >>
+>> >> Laszlo
+>> >
+>> > You are right, I should have looked at this sooner. Early RFC
+>> > suggested writing into fw cfg directly. I couldn't find any
+>> > discussion around this - why was this abandoned?
+>>
+>> Violation (or rather abuse) of layers iirc
+>
+> Hmm.  I tried to find discussion about that and failed.  It is available
+> through QEMU0002 in ACPI - would it be OK if guests went through that?
 
-> +        object_property_set_str(OBJECT(cpu), vendor, "vendor", &error_abort);
-> +        object_property_set_int(OBJECT(cpu), family, "family", &error_abort);
-> +        object_property_set_int(OBJECT(cpu), model, "model", &error_abort);
-> +        object_property_set_int(OBJECT(cpu), stepping, "stepping",
-> +                                &error_abort);
-> +        object_property_set_str(OBJECT(cpu), model_id, "model-id",
-> +                                &error_abort);
->  
->          env->cpuid_min_level =
->              kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
+I wouldn't mind, although merging functionality in a single device
+isn't what I would think of first. I guess Ladi would be happier with
+a single device. I suppose it shouldn't break drivers if we had
+memory, io, methods etc to the device?
+
+Laszlo, what do you think if we add vmcoreinfo methods to QEMU0002?
+
+> I do not mind the extra indirection so much, but I don't think
+> host/guest interface compatibility issues are fully thought through.
+>
+>>
+>>
+>> --
+>> Marc-Andr=C3=A9 Lureau
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
