@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXRZ5-0000M8-F3
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:25:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXRb6-0000yy-1e
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXRZ1-0005pP-EQ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:25:23 -0400
-Resent-Message-Id: <E1dXRZ1-0005pP-EQ@eggs.gnu.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150038070139.87.12548999960381103627@5d477a5b5989>
-In-Reply-To: <20170718003422.4497-1-jsnow@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dXRb4-0006ek-Vx
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:27:28 -0400
+References: <20170718003422.4497-1-jsnow@redhat.com>
+	<20170718003422.4497-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <042edc3e-2d55-7f06-b389-6d3753bda76b@redhat.com>
+Date: Tue, 18 Jul 2017 07:27:14 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 18 Jul 2017 05:25:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] qemu-img: Check for backing image
- if specified during create
+In-Reply-To: <20170718003422.4497-2-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UoPTuuBODO9QOF6ISBPw6BhfbpWu8xEbo"
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] blockdev: move BDRV_O_NO_BACKING
+ option forward
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2NSAwLzJdIHFlbXUtaW1nOiBDaGVjayBmb3IgYmFja2luZyBpbWFnZSBp
-ZiBzcGVjaWZpZWQgZHVyaW5nIGNyZWF0ZQpNZXNzYWdlLWlkOiAyMDE3MDcxODAwMzQyMi40NDk3
-LTEtanNub3dAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
-QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
-aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
-IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
-Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
-MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwNzE3MTQ1NTU2LjE0MTQyLTEt
-YXVyZWxpZW5AYXVyZWwzMi5uZXQgLT4gcGF0Y2hldy8yMDE3MDcxNzE0NTU1Ni4xNDE0Mi0xLWF1
-cmVsaWVuQGF1cmVsMzIubmV0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2ViZGM5
-OCBxZW11LWltZzogQ2hlY2sgZm9yIGJhY2tpbmcgaW1hZ2UgaWYgc3BlY2lmaWVkIGR1cmluZyBj
-cmVhdGUKOGJjNDI5MyBibG9ja2RldjogbW92ZSBCRFJWX09fTk9fQkFDS0lORyBvcHRpb24gZm9y
-d2FyZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yOiBibG9ja2Rldjog
-bW92ZSBCRFJWX09fTk9fQkFDS0lORyBvcHRpb24gZm9yd2FyZC4uLgpDaGVja2luZyBQQVRDSCAy
-LzI6IHFlbXUtaW1nOiBDaGVjayBmb3IgYmFja2luZyBpbWFnZSBpZiBzcGVjaWZpZWQgZHVyaW5n
-IGNyZWF0ZS4uLgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xp
-bmVzCiMxMDM6IEZJTEU6IGJsb2NrLmM6NDQzMjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICJUaGlzIG1heSBiZWNvbWUgYW4gZXJyb3IgaW4gZnV0dXJlIHZlcnNpb25zLlxuIik7Cgp0
-b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIyMiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UoPTuuBODO9QOF6ISBPw6BhfbpWu8xEbo
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <042edc3e-2d55-7f06-b389-6d3753bda76b@redhat.com>
+Subject: Re: [PATCH v5 1/2] blockdev: move BDRV_O_NO_BACKING option forward
+References: <20170718003422.4497-1-jsnow@redhat.com>
+ <20170718003422.4497-2-jsnow@redhat.com>
+In-Reply-To: <20170718003422.4497-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/17/2017 07:34 PM, John Snow wrote:
+> For both external_snapshot_prepare and qmp_drive_mirror, we eventually
+> append the option BDRV_O_NO_BACKING. However, we generally do so after
+> we create the image.
+>=20
+> To accommodate image creation wanting to verify that a backing file
+> exists or not, add this option prior to create to override checking
+> the existence of the backing file. This prevents QEMU from trying to
+> re-open a backing file that's already in use (thanks to qcow2 locking).=
+
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  blockdev.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--UoPTuuBODO9QOF6ISBPw6BhfbpWu8xEbo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllt/qMACgkQp6FrSiUn
+Q2rifggAh3T0hGjGE2HRu4nOpVgqFLEOk2LQ4sKeVgmqeSn82M64sJHkfFA41kiC
+0utp4T2QtEh2dBXY67ZS2jrA/lrLgvlFqQgQTaiXz7Nhrczgh/JBei2Iu0D52yV1
+oBHKv5Kj+ep4oReTld7LcEoI3PJY1cgdxOHnoRVD/aWcaYhkVSU8T111yrHxQpMk
+pmiMp251eJ64MyxuyOSiLgXuo/9YrZqo0y0/N+yBvDR6mdcXY5gvd9e/Rh0E6KCW
+tgKEUVCcXs4qIiv5JH9YRZpcp6cYZpeRI72n1PXDPz/y4LGBaFPUTYYjpz7g18cr
+IrUV1UptwCz7+4BVszDGy3UVf+Cyrw==
+=Pxwl
+-----END PGP SIGNATURE-----
+
+--UoPTuuBODO9QOF6ISBPw6BhfbpWu8xEbo--
