@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXFxQ-0001mP-DA
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:01:45 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXFxp-00022V-MR
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXFxN-0001WB-6d
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:01:44 -0400
-Received: from mail-qk0-x233.google.com ([2607:f8b0:400d:c09::233]:33887)
+	(envelope-from <rth7680@gmail.com>) id 1dXFxo-0001kT-SA
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:09 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXFxN-0001Vx-2p
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:01:41 -0400
-Received: by mail-qk0-x233.google.com with SMTP id t2so1283654qkc.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:01:40 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXFxo-0001kG-Nq
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:08 -0400
+Received: by mail-qt0-x241.google.com with SMTP id h15so654459qte.2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:02:08 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
-	<1500235468-15341-24-git-send-email-cota@braap.org>
+	<1500235468-15341-25-git-send-email-cota@braap.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <1a55ca19-d092-4b91-90d0-cf2a194f4b87@twiddle.net>
-Date: Mon, 17 Jul 2017 14:01:35 -1000
+Message-ID: <ce2548be-de95-c610-4ea5-9ba46ffa87d3@twiddle.net>
+Date: Mon, 17 Jul 2017 14:02:03 -1000
 MIME-Version: 1.0
-In-Reply-To: <1500235468-15341-24-git-send-email-cota@braap.org>
+In-Reply-To: <1500235468-15341-25-git-send-email-cota@braap.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 23/45] translate-all: define and use
- DEBUG_TB_FLUSH_GATE
+Subject: Re: [Qemu-devel] [PATCH v2 24/45] exec-all: introduce
+ TB_PAGE_ADDR_FMT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,14 +35,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
 On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
-> This gets rid of some ifdef checks while ensuring that the debug code
-> is compiled, which prevents bit rot.
+> And fix the following warning when DEBUG_TB_INVALIDATE is enabled
+> in translate-all.c:
 > 
-> Suggested-by: Alex Bennée<alex.bennee@linaro.org>
+>    CC      mipsn32-linux-user/accel/tcg/translate-all.o
+> /data/src/qemu/accel/tcg/translate-all.c: In function ‘tb_alloc_page’:
+> /data/src/qemu/accel/tcg/translate-all.c:1201:16: error: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘tb_page_addr_t {aka unsigned int}’ [-Werror=format=]
+>           printf("protecting code page: 0x" TARGET_FMT_lx "\n",
+>                  ^
+> cc1: all warnings being treated as errors
+> /data/src/qemu/rules.mak:66: recipe for target 'accel/tcg/translate-all.o' failed
+> make[1]: *** [accel/tcg/translate-all.o] Error 1
+> Makefile:328: recipe for target 'subdir-mipsn32-linux-user' failed
+> make: *** [subdir-mipsn32-linux-user] Error 2
+> cota@flamenco:/data/src/qemu/build ((18f3fe1...) *$)$
+> 
 > Signed-off-by: Emilio G. Cota<cota@braap.org>
 > ---
->   accel/tcg/translate-all.c | 20 +++++++++++++-------
->   1 file changed, 13 insertions(+), 7 deletions(-)
+>   include/exec/exec-all.h   | 2 ++
+>   accel/tcg/translate-all.c | 3 +--
+>   2 files changed, 3 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 
