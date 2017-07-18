@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXTlJ-0002Cu-2K
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:46:10 -0400
+	(envelope-from <david@redhat.com>) id 1dXToH-00054s-MR
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:49:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXTlF-0002OI-9k
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:46:09 -0400
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-16-f4bug@amsat.org>
-	<CAJ+F1CJh-pX4rvuZKCzYiDE+8Spruan-w73qZk+=BWsLFG5OAg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <bdc516ce-f893-1b93-d01a-b648fedd704d@redhat.com>
-Date: Tue, 18 Jul 2017 16:46:01 +0200
+	(envelope-from <david@redhat.com>) id 1dXToG-0004R7-Sa
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:49:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dXToG-0004Qo-Ld
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:49:12 -0400
+References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
+	<1500028867-134709-33-git-send-email-borntraeger@de.ibm.com>
+	<7c021c65-3824-3c87-2bc6-c8045da1513a@redhat.com>
+	<72ab0789-292f-4e7b-16c5-6a44956c83d8@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <92ad75f6-a9d4-6315-103d-892031318e71@redhat.com>
+Date: Tue, 18 Jul 2017 16:49:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJh-pX4rvuZKCzYiDE+8Spruan-w73qZk+=BWsLFG5OAg@mail.gmail.com>
+In-Reply-To: <72ab0789-292f-4e7b-16c5-6a44956c83d8@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 15/29] microblaze: use QEMU_IS_ALIGNED macro
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 32/40] s390x/cpumodel: add zpci,
+ aen and ais facilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu trival <qemu-trivial@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 18.07.2017 13:08, Marc-Andr=C3=A9 Lureau wrote:
-> On Mon, Jul 17, 2017 at 11:09 PM, Philippe Mathieu-Daud=C3=A9
-> <f4bug@amsat.org> wrote:
->> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osd=
-ep.cocci
->> (also added braces to satisfy checkpatch)
-[...]
->> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_help=
-er.c
->> index 1e07e21c1c..41ab52fb7a 100644
->> --- a/target/microblaze/op_helper.c
->> +++ b/target/microblaze/op_helper.c
->> @@ -108,8 +108,9 @@ void helper_debug(CPUMBState *env)
->>               (env->sregs[SR_MSR] & MSR_IE));
->>      for (i =3D 0; i < 32; i++) {
->>          qemu_log("r%2.2d=3D%8.8x ", i, env->regs[i]);
->> -        if ((i + 1) % 4 =3D=3D 0)
->> +        if (QEMU_IS_ALIGNED(i + 1, 4)) {
->>              qemu_log("\n");
->> +        }
->>      }
->>      qemu_log("\n\n");
->>  }
->> diff --git a/target/microblaze/translate.c b/target/microblaze/transla=
-te.c
->> index cb65d1e129..ae7b3c71b0 100644
->> --- a/target/microblaze/translate.c
->> +++ b/target/microblaze/translate.c
->> @@ -1839,9 +1839,10 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, f=
-printf_function cpu_fprintf,
+On 17.07.2017 20:12, Christian Borntraeger wrote:
+> On 07/17/2017 07:23 PM, David Hildenbrand wrote:
 >>
->>      for (i =3D 0; i < 32; i++) {
->>          cpu_fprintf(f, "r%2.2d=3D%8.8x ", i, env->regs[i]);
->> -        if ((i + 1) % 4 =3D=3D 0)
->> +        if (QEMU_IS_ALIGNED(i + 1, 4)) {
->>              cpu_fprintf(f, "\n");
->>          }
->> +    }
->>      cpu_fprintf(f, "\n\n");
->>  }
+>>> +    /* Try to enable AIS facility */
+>>> +    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+>>> +
+>>>      qemu_mutex_init(&qemu_sigp_mutex);
+>>>  
+>>>      return 0;
+>>> @@ -2635,6 +2638,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>>>          set_bit(S390_FEAT_CMM, model->features);
+>>>      }
+>>>  
+>>> +    /* set zpci and aen facilities */
+>>
+>> This comment is not helpful. This should rather say something like "we
+>> emulate a zPCI bus in QEMU, therefore we don't depend on the host
+>> capabilities"
+> 
+> Yes, you are right, that seems better. Can you send a patch? 
 
-I'd also vote to keep the original code here ... it's about pretty
-printing, not about checking the alignment of addresses.
+Yes, will do.
 
- Thomas
+-- 
+
+Thanks,
+
+David
