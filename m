@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1dXNT6-0004Me-AX
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:02:57 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dXNVV-0005J8-5v
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:05:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1dXNT1-00034R-GP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:02:56 -0400
-Message-ID: <1500364961.11997.10.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Tue, 18 Jul 2017 10:02:41 +0200
-In-Reply-To: <68cfb52b-d4cc-1980-e6f5-a454baf4e2e5@linux.vnet.ibm.com>
-References: <149910050540.26371.12575732020425703531.stgit@bahia.lan>
-	<20170704072901.GA2180@umbus.fritz.box>
-	<20170704104722.499d4e86@bahia.lan>
-	<1499856934.13989.38.camel@redhat.com>
-	<68cfb52b-d4cc-1980-e6f5-a454baf4e2e5@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr: make default PHB optionnal
+	(envelope-from <lvivier@redhat.com>) id 1dXNVQ-00054m-8s
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:05:25 -0400
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Tue, 18 Jul 2017 10:05:13 +0200
+Message-Id: <20170718080513.22522-1-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH] spapr/htab: fix savevm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +17,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, libvir-list@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, sbobroff@redhat.com
 
-On Wed, 2017-07-12 at 17:09 +0530, Shivaprasad G Bhat wrote:
-> Setting numa_node for emulated devices is the benefit for now. On x86, =
-I
-> figured there is
-> no way to set the numa_node for the root controller and the emulated
-> devices sitting there
-> all have numa_node set to -1. Only the devices on the pxb can have a
-> sensible value specified.
-> Does it mean, the emulated devices/drivers don't care about the
-> numa_node they are on?
->=C2=A0
-> Would it be fine on PPC to disallow setting the NUMA node for the
-> default PHB because that is where
-> all the emulated devices sit ?
+Commit 3a38429 ("spapr: Add a "no HPT" encoding to HTAB migration stream")
+allows to migrate an empty HPT, but doesn't mark correctly the
+end of the migration stream.
 
-I was not aware of that limitation for x86 guests.
+The end condition (value returned by htab_save_iterate() and
+ htab_save_complete()) should be 1, whereas in 3a38429 they
+return 0.
 
-If that's the case, then I would say it's perfectly okay to
-just disallow setting the NUMA node for the default PHB, at
-least for the time being.
+The problem can be reproduced with QEMU monitor command "savevm":
+the command never stops and the disk image grows without limit.
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+Fixes: 3a38429748aa4f74abaecf16c4c087e8a325e12a
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/ppc/spapr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 970093e..fa01511 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1827,7 +1827,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
+     /* Iteration header */
+     if (!spapr->htab_shift) {
+         qemu_put_be32(f, -1);
+-        return 0;
++        return 1;
+     } else {
+         qemu_put_be32(f, 0);
+     }
+@@ -1866,7 +1866,7 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
+     /* Iteration header */
+     if (!spapr->htab_shift) {
+         qemu_put_be32(f, -1);
+-        return 0;
++        return 1;
+     } else {
+         qemu_put_be32(f, 0);
+     }
+-- 
+2.9.4
