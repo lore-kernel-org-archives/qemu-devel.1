@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dXWfj-0007Xa-Lo
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXWfp-0007b8-HP
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dXWfg-0003bV-Ju
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:35 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39135)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXWfg-0003ak-DY
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:32 -0400
-Date: Tue, 18 Jul 2017 13:52:31 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170718175231.GB31298@flamenco>
-References: <1500235468-15341-1-git-send-email-cota@braap.org>
-	<1500235468-15341-46-git-send-email-cota@braap.org>
-	<04004f7a-0e84-1b51-bc93-97c70213541d@twiddle.net>
+	(envelope-from <dgilbert@redhat.com>) id 1dXWfo-0003hP-D5
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:41 -0400
+Date: Tue, 18 Jul 2017 18:52:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170718175229.GF2106@work-vm>
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+	<1500385286-21142-11-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <04004f7a-0e84-1b51-bc93-97c70213541d@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2 45/45] tcg: enable multiple TCG contexts
- in softmmu
+In-Reply-To: <1500385286-21142-11-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 10/10] migration: Use JSON null
+ instead of "" to reset parameter to default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +24,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com
 
-On Mon, Jul 17, 2017 at 19:25:14 -1000, Richard Henderson wrote:
-> On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
-> >+
-> >+    /* claim the first free pointer in tcg_ctxs and increment n_tcg_ctxs */
-> >+    for (i = 0; i < smp_cpus; i++) {
-> >+        if (atomic_cmpxchg(&tcg_ctxs[i], NULL, s) == NULL) {
-> >+            unsigned int n;
-> >+
-> >+            n = atomic_fetch_inc(&n_tcg_ctxs);
+* Markus Armbruster (armbru@redhat.com) wrote:
+> migrate-set-parameters sets migration parameters according to is
+> arguments like this:
 > 
-> Surely this is too much effort.  The increment on n_tcg_ctxs is sufficient
-> to produce an index for assignment.  We never free the contexts...
+> * Present means "set the parameter to this value"
 > 
-> Which also suggests that it might be better to avoid an indirection in
-> tcg_ctxs and allocate all of the structures in one big block?  I.e.
+> * Absent means "leave the parameter unchanged"
 > 
-> TCGContext *tcg_ctxs;
-> 
-> // At the end of tcg_context_init.
-> #ifdef CONFIG_USER_ONLY
->     tcg_ctxs = s;
-> #else
->     // No need to zero; we'll completely overwrite each structure
->     // during tcg_register_thread.
->     tcg_ctxs = g_new(TCGContext, smp_cpus);
-> #endif
+> * Except for parameters tls_creds and tls_hostname, "" means "reset
+>   the parameter to its default value
 
-The primary reason is that at this point we don't know yet whether
-we'll need smp_cpus contexts or just one context (!mttcg), since
-qemu_tcg_mttcg_enabled() is set up after this function is called
-(the path is: vl.c -> configure_accelerator() -> tcg_init_context ->
-this function; quite a bit later, qemu_tcg_configure() is
-called, setting up the bool behind qemu_tcg_mttcg_enabled().)
+Is this really what's happening? IMHO the tls_creds and tls_hostname
+behaviour isn't that "" resets to the default, it just is the default.
+I don't think there's anything special cased for tls_creds and
+tls_hostname in the existing code.    It's this patch that's
+adding more special casing.
 
-A secondary reason is to avoid false sharing of cachelines. But
-it seems quite unlikely that the last cacheline of TCGContext
-will ever be used, so this isn't really an issue.
+(I'm not going to nack this, but I just don't get why it's such a big
+deal)
 
-		E.
+Dave
+
+
+> The first two are perfectly normal: presence of the parameter makes
+> the command do something.
+> 
+> The third one overloads the parameter with a second meaning.  The
+> overloading is *implicit*, i.e. it's not visible in the types.  Works
+> here, because "" is neither a valid TLS credentials ID, nor a valid
+> host name.
+> 
+> Pressing argument values the schema accepts, but are semantically
+> invalid, into service to mean "reset to default" is not general, as
+> suitable invalid values need not exist.  I also find it ugly.
+> 
+> To clean this up, we could add a separate flag argument to ask for
+> "reset to default", or add a distinct value to @tls_creds and
+> @tls_hostname.  This commit implements the latter: add JSON null to
+> the values of @tls_creds and @tls_hostname, deprecate "".
+> 
+> Because we're so close to the 2.10 freeze, implement it in the
+> stupidest way possible: have qmp_migrate_set_parameters() rewrite null
+> to "" before anything else can see the null.  The proper way to do it
+> would be rewriting "" to null, but that requires fixing up code to
+> work with null.  Add TODO comments for that.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hmp.c                 |  8 ++++++--
+>  migration/migration.c | 18 ++++++++++++++++--
+>  qapi-schema.json      | 11 +++++++++--
+>  3 files changed, 31 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 0a5de75..40ebeef 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1541,11 +1541,15 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>                  break;
+>              case MIGRATION_PARAMETER_TLS_CREDS:
+>                  p->has_tls_creds = true;
+> -                visit_type_str(v, param, &p->tls_creds, &err);
+> +                p->tls_creds = g_new0(StrOrNull, 1);
+> +                p->tls_creds->type = QTYPE_QSTRING;
+> +                visit_type_str(v, param, &p->tls_creds->u.s, &err);
+>                  break;
+>              case MIGRATION_PARAMETER_TLS_HOSTNAME:
+>                  p->has_tls_hostname = true;
+> -                visit_type_str(v, param, &p->tls_hostname, &err);
+> +                p->tls_hostname = g_new0(StrOrNull, 1);
+> +                p->tls_hostname->type = QTYPE_QSTRING;
+> +                visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+>                  break;
+>              case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+>                  p->has_max_bandwidth = true;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index f6a9443..e2cfb99 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -703,6 +703,20 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+>                      "x_checkpoint_delay",
+>                      "is invalid, it should be positive");
+>      }
+> +    /* TODO Rewrite "" to null instead */
+> +    if (params->has_tls_creds
+> +        && params->tls_creds->type == QTYPE_QNULL) {
+> +        QDECREF(params->tls_creds->u.n);
+> +        params->tls_creds->type = QTYPE_QSTRING;
+> +        params->tls_creds->u.s = strdup("");
+> +    }
+> +    /* TODO Rewrite "" to null instead */
+> +    if (params->has_tls_hostname
+> +        && params->tls_hostname->type == QTYPE_QNULL) {
+> +        QDECREF(params->tls_hostname->u.n);
+> +        params->tls_hostname->type = QTYPE_QSTRING;
+> +        params->tls_hostname->u.s = strdup("");
+> +    }
+>  
+>      /*
+>       * TODO if we fuse MigrateSetParameters back into
+> @@ -726,11 +740,11 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+>      }
+>      if (params->has_tls_creds) {
+>          g_free(s->parameters.tls_creds);
+> -        s->parameters.tls_creds = g_strdup(params->tls_creds);
+> +        s->parameters.tls_creds = g_strdup(params->tls_creds->u.s);
+>      }
+>      if (params->has_tls_hostname) {
+>          g_free(s->parameters.tls_hostname);
+> -        s->parameters.tls_hostname = g_strdup(params->tls_hostname);
+> +        s->parameters.tls_hostname = g_strdup(params->tls_hostname->u.s);
+>      }
+>      if (params->has_max_bandwidth) {
+>          s->parameters.max_bandwidth = params->max_bandwidth;
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index b5ec942..247af24 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -116,6 +116,13 @@
+>  { 'command': 'qmp_capabilities' }
+>  
+>  ##
+> +# @StrOrNull:
+> +##
+> +{ 'alternate': 'StrOrNull',
+> +  'data': { 's': 'str',
+> +            'n': 'null' } }
+> +
+> +##
+>  # @LostTickPolicy:
+>  #
+>  # Policy for handling lost ticks in timer devices.
+> @@ -1098,8 +1105,8 @@
+>              '*decompress-threads': 'int',
+>              '*cpu-throttle-initial': 'int',
+>              '*cpu-throttle-increment': 'int',
+> -            '*tls-creds': 'str',
+> -            '*tls-hostname': 'str',
+> +            '*tls-creds': 'StrOrNull',
+> +            '*tls-hostname': 'StrOrNull',
+>              '*max-bandwidth': 'int',
+>              '*downtime-limit': 'int',
+>              '*x-checkpoint-delay': 'int',
+> -- 
+> 2.7.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
