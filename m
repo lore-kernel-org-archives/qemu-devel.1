@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXTd6-0001Sa-L9
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:37:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1dXTdR-0001lk-FR
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXTd0-0003u9-HG
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:37:40 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:61591)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXTd0-0003s9-Af
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:37:34 -0400
-References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
-	<ffb745754ddd4f389935cfb2ad4b6f3e560a2655.1500378931.git-series.james.hogan@imgtec.com>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <e984e34b-24fd-9033-460d-d9c2499e0c65@imgtec.com>
-Date: Tue, 18 Jul 2017 15:37:12 +0100
+	(envelope-from <thuth@redhat.com>) id 1dXTdQ-0004Hf-NU
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:38:01 -0400
+References: <20170718061005.29518-1-f4bug@amsat.org>
+	<20170718061005.29518-17-f4bug@amsat.org>
+	<501136f163a5ab92df3d839360483774@walle.cc>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f8dcb381-0935-bf7a-55a7-79d24f51e1dc@redhat.com>
+Date: Tue, 18 Jul 2017 16:37:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <ffb745754ddd4f389935cfb2ad4b6f3e560a2655.1500378931.git-series.james.hogan@imgtec.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/14] target/mips: Fix MIPS64 MFC0
- UserLocal on BE host
+In-Reply-To: <501136f163a5ab92df3d839360483774@walle.cc>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 16/29] lm32: use QEMU_IS_ALIGNED macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <petar.jovanovic@imgtec.com>
+To: Michael Walle <michael@walle.cc>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philippe.mathieu.daude@gmail.com>, qemu-devel@nongnu.org
 
+On 18.07.2017 13:42, Michael Walle wrote:
+> Am 2017-07-18 08:09, schrieb Philippe Mathieu-Daud=C3=A9:
+>> Applied using the Coccinelle semantic patch
+>> scripts/coccinelle/use_osdep.cocci
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
+> QEMU_IS_ALIGNED() sounds like it is used to check if a memory access is
+> aligned. Although it does the same, the line in question is used for
+> formatted output. I'm not sure if this macro should be used here.
 
++1
 
-On 18/07/2017 12:55, James Hogan wrote:
-> Using MFC0 to read CP0_UserLocal uses tcg_gen_ld32s_tl, however
-> CP0_UserLocal is a target_ulong. On a big endian host with a MIPS64
-> target this reads and sign extends the more significant half of the
-> 64-bit register.
-> 
-> Fix this by using ld_tl to load the whole target_ulong and ext32s_tl to
-> sign extend it, as done for various other target_ulong COP0 registers.
-> 
-> Fixes: d279279e2b5c ("target-mips: implement UserLocal Register")
-> Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Petar Jovanovic <petar.jovanovic@imgtec.com>
-> ---
-> Changes in v2:
-> - New patch.
-> ---
->  target/mips/translate.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 3022f349cb2a..556aba969a12 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -5138,8 +5138,9 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
->              goto cp0_unimplemented;
->          case 2:
->              CP0_CHECK(ctx->ulri);
-> -            tcg_gen_ld32s_tl(arg, cpu_env,
-> -                             offsetof(CPUMIPSState, active_tc.CP0_UserLocal));
-> +            tcg_gen_ld_tl(arg, cpu_env,
-> +                          offsetof(CPUMIPSState, active_tc.CP0_UserLocal));
-> +            tcg_gen_ext32s_tl(arg, arg);
->              rn = "UserLocal";
->              break;
->          default:
-> 
+I think we should not replace every usage of % blindly. It does really
+look wrong in this case here.
 
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
-
-Regards,
-Yongbok
+ Thomas
