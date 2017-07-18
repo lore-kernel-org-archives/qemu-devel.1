@@ -1,46 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXIkt-0000vv-Nr
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:01:00 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXIoA-0001dk-RE
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXIkq-0001eC-NQ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:00:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liujbjl@linux.vnet.ibm.com>)
-	id 1dXIkq-0001bY-E3
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:00:56 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6I2wrpp007057
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:53 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2brqyade31-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:53 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <liujbjl@linux.vnet.ibm.com>;
-	Mon, 17 Jul 2017 23:00:52 -0400
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
-	[9.57.199.106])
-	by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v6I30nBU18350150
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:00:49 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8EBB828046
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:43 -0400 (EDT)
-Received: from liujing-mac.local (unknown [9.197.255.127])
-	by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP id E878B2803D
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:41 -0400 (EDT)
-From: Jing Liu <liujbjl@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 11:01:00 +0800
+	(envelope-from <rth7680@gmail.com>) id 1dXIo7-0003aV-Nl
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:04:22 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXIo7-0003Zw-Gg
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:04:19 -0400
+Received: by mail-pf0-x244.google.com with SMTP id e199so1016513pfh.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 20:04:19 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170714001819.1660-1-rth@twiddle.net>
+	<20170714001819.1660-4-rth@twiddle.net>
+	<20170718015303.GA20247@flamenco>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <e77606fb-0303-beb4-f4e7-3c0120e938c3@twiddle.net>
+Date: Mon, 17 Jul 2017 17:04:11 -1000
 MIME-Version: 1.0
+In-Reply-To: <20170718015303.GA20247@flamenco>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-Subject: [Qemu-devel] Question for iotests 188, 189 and 087
+Subject: Re: [Qemu-devel] [PATCH 3/8] target/alpha: Merge several flag bytes
+ into ENV->FLAGS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,17 +33,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-Hi all,
+On 07/17/2017 03:53 PM, Emilio G. Cota wrote:
+> On Thu, Jul 13, 2017 at 14:18:14 -1000, Richard Henderson wrote:
+>> The flags are arranged such that we can manipulate them either
+>> a whole, or as individual bytes.  The computation within
+>> cpu_get_tb_cpu_state is now reduced to a single load and mask.
+>>
+>> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>   target/alpha/cpu.h       | 70 +++++++++++++++++--------------------
+>>   hw/alpha/dp264.c         |  1 -
+>>   linux-user/main.c        | 25 +++++++------
+>>   target/alpha/cpu.c       |  7 ++--
+>>   target/alpha/helper.c    | 12 +++----
+>>   target/alpha/machine.c   | 10 ++----
+>>   target/alpha/translate.c | 91 +++++++++++++++++++++++++++++++-----------------
+>>   7 files changed, 117 insertions(+), 99 deletions(-)
+>>
+>> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+>> index aa83417..e95be2b 100644
+>> --- a/target/alpha/cpu.h
+>> +++ b/target/alpha/cpu.h
+>> @@ -242,13 +242,11 @@ struct CPUAlphaState {
+>>       uint8_t fpcr_dyn_round;
+>>       uint8_t fpcr_flush_to_zero;
+>>   
+>> -    /* The Internal Processor Registers.  Some of these we assume always
+>> -       exist for use in user-mode.  */
+>> -    uint8_t ps;
+>> -    uint8_t intr_flag;
+>> -    uint8_t pal_mode;
+>> -    uint8_t fen;
+>> +    /* Mask of PALmode, Processor State et al.  Most of this gets copied
+>> +       into the TranslatorBlock flags and controls code generation.  */
+>> +    uint32_t flags;
+> 
+> Did you consider doing something like the appended? I don't like it
+> because it messes with endianness, which is always a pain. But it
+> lets you preserve the code that only touches the u8's as-is; this
+> comes at the price of requiring a fast-path swap in big-endian hosts.
+> 
+> An alternative would be to store the u8's in an order dependent on
+> the endianness of the host -- but that would break vmstate saving,
+> I guess.
+> 
+> 		Emilio
+> 
+> ---8<---
+> 
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index aa83417..22c52ac 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -244,10 +244,15 @@ struct CPUAlphaState {
+>   
+>       /* The Internal Processor Registers.  Some of these we assume always
+>          exist for use in user-mode.  */
+> -    uint8_t ps;
+> -    uint8_t intr_flag;
+> -    uint8_t pal_mode;
+> -    uint8_t fen;
+> +    union {
+> +        struct {
+> +            uint8_t pal_mode;
+> +            uint8_t ps;
+> +            uint8_t intr_flag;
+> +            uint8_t fen;
+> +        };
+> +        uint32_t flags;
+> +    };
 
-Do you anybody have iotests failure: 188, 189 and 087 of the latest qemu 
-upsteam?
+I did consider this.
 
-I just wondered if it has something wrong with my test machines because 
-I have different results with two machines.
+Doing things this way requires that I consider host endianness when forming the 
+bit masks.  As opposed to only needing to consider host endianness while 
+computing byte offsets within the translator.
 
 
-Thanks.
-
-Jing
+r~
