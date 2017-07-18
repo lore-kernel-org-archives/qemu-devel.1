@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXWRB-0000E1-74
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:37:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXWWe-0002qW-1y
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXWRA-0001oB-4R
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:37:33 -0400
-Date: Tue, 18 Jul 2017 18:37:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170718173719.GE2106@work-vm>
+	(envelope-from <eblake@redhat.com>) id 1dXWWd-0005Iz-1J
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:43:12 -0400
 References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<1500385286-21142-8-git-send-email-armbru@redhat.com>
+	<1500385286-21142-10-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <52d3cf1a-1a1c-1f6f-f7e1-c794f5367097@redhat.com>
+Date: Tue, 18 Jul 2017 12:42:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1500385286-21142-8-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 07/10] migration: Clean up around
- tls_creds, tls_hostname
+In-Reply-To: <1500385286-21142-10-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pssXxLNwbLQdQdepx6jIRn6FfhAac9J8A"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 09/10] migration: Unshare
+ MigrationParameters struct for now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,107 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Optional MigrationParameters members tls_creds and tls_hostname can't
-> actually be absent outside qmp_migrate_set_parameters() since commit
-> 4af245d (v2.9.0).
-> 
-> Note that commit 4af245d reverted the part of commit de63ab6 (v2.8.0)
-> that made tls_creds and tls_hostname absent instead of "" in the value
-> of query-migrate-parameters, even though commit de63ab6 called that a
-> mistake.  What a mess.
-> 
-> Drop the redundant tests for presence, and update documentation.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pssXxLNwbLQdQdepx6jIRn6FfhAac9J8A
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+Message-ID: <52d3cf1a-1a1c-1f6f-f7e1-c794f5367097@redhat.com>
+Subject: Re: [PATCH for-2.10 09/10] migration: Unshare MigrationParameters
+ struct for now
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+ <1500385286-21142-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1500385286-21142-10-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/18/2017 08:41 AM, Markus Armbruster wrote:
+> Commit de63ab6 "migrate: Share common MigrationParameters struct"
+> reused MigrationParameters for the arguments of
+> migrate-set-parameters, with the following rationale:
+>=20
+>     It is rather verbose, and slightly error-prone, to repeat
+>     the same set of parameters for input (migrate-set-parameters)
+>     as for output (query-migrate-parameters), where the only
+>     difference is whether the members are optional.  We can just
+>     document that the optional members will always be present
+>     on output, and then share a common struct between both
+>     commands.  The next patch can then reduce the amount of
+>     code needed on input.
+>=20
+> I need to unshare them to correct a design flaw in a stupid, but
+> minimally invasive way, in the next commit.  We can restore the
+> sharing when we redo that patch in a less stupid way.  Add a suitable
+> TODO comment.
+>=20
+> Note that I revert only the sharing part of commit de63ab6, not the
+> part that made the members of query-migrate-parameters' result
+> optional.  The schema (and thus introspection) remains inaccurate for
+> query-migrate-parameters.  If we decide not to restore the sharing, we
+> should revert that part, too.
+>=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
 > ---
->  hmp.c                 |  6 ++++--
->  migration/migration.c |  4 ++--
->  qapi-schema.json      | 11 +++++------
->  3 files changed, 11 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hmp.c b/hmp.c
-> index 2993586..2b2db3c 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -313,12 +313,14 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
->          monitor_printf(mon, "%s: %" PRId64 "\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT],
->              params->cpu_throttle_increment);
-> +        assert(params->has_tls_creds);
->          monitor_printf(mon, "%s: '%s'\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
-> -            params->has_tls_creds ? params->tls_creds : "");
-> +            params->tls_creds);
-> +        assert(params->has_tls_hostname);
->          monitor_printf(mon, "%s: '%s'\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
-> -            params->has_tls_hostname ? params->tls_hostname : "");
-> +            params->tls_hostname);
->          assert(params->has_max_bandwidth);
->          monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
->              MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH],
-> diff --git a/migration/migration.c b/migration/migration.c
-> index a0db40d..bae9808 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -438,9 +438,9 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
->      params->cpu_throttle_initial = s->parameters.cpu_throttle_initial;
->      params->has_cpu_throttle_increment = true;
->      params->cpu_throttle_increment = s->parameters.cpu_throttle_increment;
-> -    params->has_tls_creds = !!s->parameters.tls_creds;
-> +    params->has_tls_creds = true;
->      params->tls_creds = g_strdup(s->parameters.tls_creds);
-> -    params->has_tls_hostname = !!s->parameters.tls_hostname;
-> +    params->has_tls_hostname = true;
->      params->tls_hostname = g_strdup(s->parameters.tls_hostname);
->      params->has_max_bandwidth = true;
->      params->max_bandwidth = s->parameters.max_bandwidth;
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 485767f..7b75cf1 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1054,9 +1054,7 @@
->  # @MigrationParameters:
->  #
->  # Optional members can be omitted on input ('migrate-set-parameters')
-> -# but most members will always be present on output
-> -# ('query-migrate-parameters'), with the exception of tls-creds and
-> -# tls-hostname.
-> +# but members will always be present on output.
->  #
->  # @compress-level: compression level
->  #
-> @@ -1077,10 +1075,10 @@
->  #             channel. On the outgoing side of the migration, the credentials
->  #             must be for a 'client' endpoint, while for the incoming side the
->  #             credentials must be for a 'server' endpoint. Setting this
-> -#             will enable TLS for all migrations. The default is unset,
-> -#             resulting in unsecured migration at the QEMU level. (Since 2.7)
-> +#             to a non-empty string enables TLS for all migrations.
->  #             An empty string means that QEMU will use plain text mode for
-> -#             migration, rather than TLS (Since 2.9)
-> +#             migration, rather than TLS (Since 2.7)
-> +#             Note: 2.8 reports this by omitting tls-creds instead.
->  #
->  # @tls-hostname: hostname of the target host for the migration. This
->  #                is required when using x509 based TLS credentials and the
-> @@ -1090,6 +1088,7 @@
->  #                certificate identity can be validated. (Since 2.7)
->  #                An empty string means that QEMU will use the hostname
->  #                associated with the migration URI, if any. (Since 2.9)
-> +#                Note: 2.8 reports this by omitting tls-hostname instead.
->  #
->  # @max-bandwidth: to set maximum speed for migration. maximum speed in
->  #                 bytes per second. (Since 2.8)
-> -- 
-> 2.7.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  hmp.c                 |  4 +--
+>  migration/migration.c | 12 +++++---
+>  qapi-schema.json      | 85 +++++++++++++++++++++++++++++++++++++++++++=
++++-----
+>  3 files changed, 87 insertions(+), 14 deletions(-)
+
+No fun, but when you're up against a release deadline, it beats the
+alternative of baking in a design flaw longer than we want.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+A possible alternative: make a common base class with most of the
+members (those that aren't related to tls), then two subclasses, one
+with output semantics, one with input semantics, for the tls members.
+You share a bit more code that way (and could still QAPI_CLONE the
+common base-class members).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--pssXxLNwbLQdQdepx6jIRn6FfhAac9J8A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluSJYACgkQp6FrSiUn
+Q2puXwf8Cdxmekdhdicp2WPhzsS3Xb5tfevX7nWUvaw+cxndv15nDZ1Czi/Kuewz
+6QCn9amtE1d8CF1k1+2KjwB2/9FtTdOw2PnRpYZVtBg8psjNkXwXhriStPVU9RwI
+Y806WmZG4sOU/wUt1gWTCSL4dHQxXmgiPrrf0iQx/sHdi97ArBO1wRfirwhrHbwi
+Pk0FdLFFT4dRmXHn3geR6tt0MCHlyuqJaXdUIkCrUz4XJeIll37uMW35BJs8FvK/
+dRFE0qpwXa7Z2f3qcuRfusYXTnfdxag5ixLc7WVbYOosXM/1qnYs4WxstUoyLaDl
+4LWONbXZaWq+hoBd1LG5JWOSG3qTqA==
+=KF3F
+-----END PGP SIGNATURE-----
+
+--pssXxLNwbLQdQdepx6jIRn6FfhAac9J8A--
