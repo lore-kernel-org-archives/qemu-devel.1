@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXZSH-0003NY-Uy
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1dXZSG-0003NS-CH
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXZSD-00017s-1h
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40556)
+	(envelope-from <bounces@canonical.com>) id 1dXZSD-00018J-3B
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40552)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dXZSC-000156-Mt
+	id 1dXZSC-00014t-Mp
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dXZSA-000283-VP
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:47 +0000
+	id 1dXZSA-00026j-Bg
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EB32E2E8086
+	by loganberry.canonical.com (Postfix) with ESMTP id 5762F2E808D
 	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Jul 2017 20:35:21 -0000
+Date: Tue, 18 Jul 2017 20:34:15 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
-Message-Id: <150041012179.5906.7913580425745549975.malone@gac.canonical.com>
+Message-Id: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1705118] Re: qemu user mode does not support
+Subject: [Qemu-devel] [Bug 1705118] [NEW] qemu user mode does not support
  catching SIGSEGV on some architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,9 +38,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Statically compiled test program for ppc64"
-   https://bugs.launchpad.net/qemu/+bug/1705118/+attachment/4917118/+files/=
-testsigsegv-ppc64
+Public bug reported:
+
+The documentation
+<https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
+qemu in user mode supports POSIX signal handling.
+
+Catching SIGSEGV according to POSIX, however, does not work on
+  ppc, ppc64, ppc64le, s390x, sparc64.
+It does work, however, on
+  aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
+
+How to reproduce:
+The attached program runs fine (exits with code 0) on
+  - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
+  - real hardware Linux/PowerPC64LE,
+  - qemu-system-s390x emulated Linux/s390x,
+  - real hardware Linux/SPARC64.
+$ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
+0
+
+For ppc:
+$ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-ppc
+$ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
+$ echo $?
+3
+
+For ppc64:
+$ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
+pc64
+$ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
+$ echo $?
+3
+
+For ppc64le:
+$ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
+-ppc64le
+$ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
+$ echo $?
+3
+
+For s390x:
+$ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s390x
+$ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
+$ echo $?
+3
+$ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390X_=
+COMPAT -o testsigsegv-s390x-a
+$ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
+$ echo $?
+0
+So, the test fails here because the Linux/s390x kernel omits the least
+significant 12 bits of the fault address in the 'si_addr' field. But
+qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
+the complete fault address in the 'si_addr' field.
+
+For sparc64:
+$ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-spa=
+rc64
+$ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
+Segmentation fault (core dumped)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "source code of test program"
+   https://bugs.launchpad.net/bugs/1705118/+attachment/4917116/+files/tests=
+igsegv.c
 
 -- =
 
