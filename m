@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXPLj-0003ho-13
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:03:27 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXPWp-0000iP-Sh
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXPLf-0002FK-Vw
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:03:27 -0400
-Date: Tue, 18 Jul 2017 12:03:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170718120319.2f54ffa5@gondolin>
-In-Reply-To: <20170718115840.3017dd18@gondolin>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-12-f4bug@amsat.org>
-	<20170718115840.3017dd18@gondolin>
+	(envelope-from <berrange@redhat.com>) id 1dXPWm-0006FR-Nb
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:14:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXPWm-0006FI-Gp
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:14:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A88AC04B30E
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 10:14:51 +0000 (UTC)
+Date: Tue, 18 Jul 2017 11:14:44 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170718101444.GG11927@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170717063521.GA7393@lemon>
+	<20170717103937.GD5301@noname.redhat.com>
+	<20170717232850.GF2585@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/29] s390x/sclp: use QEMU_IS_ALIGNED macro
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170717232850.GF2585@lemon>
+Subject: Re: [Qemu-devel] Status and RFC of patchew testings on QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: qemu-trivial@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 18 Jul 2017 11:58:40 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Tue, Jul 18, 2017 at 07:28:50AM +0800, Fam Zheng wrote:
+> On Mon, 07/17 12:39, Kevin Wolf wrote:
+>  
+> > > Q3: What other tests do maintainers want? Different hosts? Different configure
+> > > combinations?
+> > 
+> > Would running qemu-iotests (at least the 'quick' group) be possible or
+> > would that take too many resources?
+> 
+> As long as it can be done in several minutes on the test machine, we should be
+> good.
+> 
+> > 
+> > Only today I noticed again that two recently merged pull requests broke
+> > qemu-iotests cases, so I must assume that apart from some block
+> > maintainers, nobody runs it regularly.
+> > 
+> 
+> This has been on my list for a long time, the difficulty has been the frequent
+> breakage - I need to enable it when all tests pass, maybe 2.10 freeze is a good
+> time.
 
-> On Tue, 18 Jul 2017 03:09:47 -0300
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
->=20
-> > Applied using the Coccinelle semantic patch scripts/coccinelle/use_osde=
-p.cocci
-> >=20
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  hw/s390x/sclp.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> > index 9253dbbc64..0a207c7345 100644
-> > --- a/hw/s390x/sclp.c
-> > +++ b/hw/s390x/sclp.c
-> > @@ -237,7 +237,7 @@ static void assign_storage(SCLPDevice *sclp, SCCB *=
-sccb)
-> >      }
-> >      assign_addr =3D (assign_info->rn - 1) * mhd->rzm;
-> > =20
-> > -    if ((assign_addr % MEM_SECTION_SIZE =3D=3D 0) &&
-> > +    if (QEMU_IS_ALIGNED(assign_addr, MEM_SECTION_SIZE) &&
-> >          (assign_addr >=3D mhd->padded_ram_size)) {
-> >          /* Re-use existing memory region if found */
-> >          mr =3D memory_region_find(sysmem, assign_addr, 1).mr;
-> > @@ -297,7 +297,7 @@ static void unassign_storage(SCLPDevice *sclp, SCCB=
- *sccb)
-> >      unassign_addr =3D (assign_info->rn - 1) * mhd->rzm;
-> > =20
-> >      /* if the addr is a multiple of 256 MB */
-> > -    if ((unassign_addr % MEM_SECTION_SIZE =3D=3D 0) &&
-> > +    if (QEMU_IS_ALIGNED(unassign_addr, MEM_SECTION_SIZE) &&
-> >          (unassign_addr >=3D mhd->padded_ram_size)) {
-> >          mhd->standby_state_map[(unassign_addr -
-> >                             mhd->padded_ram_size) / MEM_SECTION_SIZE] =
-=3D 0; =20
->=20
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
+IME the I/O tests runs for  raw & qcow2  formats are pretty stable in
+general - the current breakage is the first I've noticed in a while.
+So I'd certainly encourage enabling those two formats immediately, once
+the current regresison is fix.
 
-Oh, and I assume this will go through trivial, right?
+I also had patches merged recently that should fix it for 'qcow' and 'luks'
+formats too, so it'd be good to get those enabled for actively testing
+too.
+
+The pain point I've seen come with a few tests that are sensitive to load
+due to hidden race conditions. Tracking those down & fixing them is likely
+only practical once we are actively running them on every patch, since it
+needs a high volume of runs to expose the problems.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
