@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dXa8p-0006ug-R4
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:34:52 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXaAt-00084Q-6M
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dXa8m-00025i-Na
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:34:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dXa8m-00025L-HP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:34:48 -0400
-Date: Wed, 19 Jul 2017 00:34:44 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170718235254-mutt-send-email-mst@kernel.org>
-References: <20170716082917.720-1-dmitry@daynix.com>
-	<09ea0b99-783f-263c-fd47-801c933fb398@redhat.com>
-	<5FFD3164-EECD-4077-97DC-13924DEDFA61@daynix.com>
-	<20170717195300-mutt-send-email-mst@kernel.org>
-	<06941EB3-4E1A-435D-869E-8FC9E5C46EE7@daynix.com>
+	(envelope-from <rth7680@gmail.com>) id 1dXaAp-0003N4-VL
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:36:59 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36259)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXaAp-0003Mv-Pf
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:36:55 -0400
+Received: by mail-qk0-x243.google.com with SMTP id d136so4037182qkg.3
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:36:55 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170718200255.31647-1-rth@twiddle.net>
+	<20170718200255.31647-2-rth@twiddle.net>
+	<20170718201906.grxwco4ztzgzalzb@aurel32.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <910e6a15-e2ac-e473-f2f5-2070e604f80e@twiddle.net>
+Date: Tue, 18 Jul 2017 11:36:48 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06941EB3-4E1A-435D-869E-8FC9E5C46EE7@daynix.com>
-Subject: Re: [Qemu-devel] [PATCH] pci: honor PCI_COMMAND_MEMORY
+In-Reply-To: <20170718201906.grxwco4ztzgzalzb@aurel32.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/30] target/sh4: Use cmpxchg for movco
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dmitry Fleytman <dmitry@daynix.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Sameeh Jubran <sameeh@daynix.com>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Jul 18, 2017 at 10:23:06AM +0300, Dmitry Fleytman wrote:
-> On 17 Jul 2017, at 19:59 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+On 07/18/2017 10:19 AM, Aurelien Jarno wrote:
+> On 2017-07-18 10:02, Richard Henderson wrote:
+>> As for other targets, cmpxchg isn't quite right for ll/sc,
+>> suffering from an ABA race, but is sufficient to implement
+>> portable atomic operations.
+>>
+>> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>>
+>> ---
+>> V2: Clear lock_addr in rte, do_interrupt, syscall entry, & signal delivery.
+>>      Fix movli to tollerate overlap between R0 and REG(B11_8).
+>> ---
+>>   target/sh4/cpu.h       |  3 ++-
+>>   linux-user/main.c      |  1 +
+>>   linux-user/signal.c    |  2 ++
+>>   target/sh4/helper.c    |  2 +-
+>>   target/sh4/translate.c | 72 +++++++++++++++++++++++++++++---------------------
+>>   5 files changed, 48 insertions(+), 32 deletions(-)
 > 
+> I still believe that for the system case, we should implement the
+> behaviour described in the manual, that is setting ldst to 1 in movli
+> and clearing it in an interrupt. Otherwise the plainly silly following
+> instruction sequence will give different results than on real silicon:
 > 
->     On Mon, Jul 17, 2017 at 03:48:03PM +0300, Dmitry Fleytman wrote:
+>      movli.l   @r1,r0
+>      add       #4, r1
+>      movco.l   r0, @r1
 > 
->         Am I understand correctly that there are no special cases for
->         IDE controllers, i.e. bus master bit must be set by SW same
->         way as for other PCI devices?
-> 
-> 
->     Bus mastering is typically enabled by the driver.
->     E.g. under linux:
-> 
->     static int virtio_pci_restore(struct device *dev)
->     {
->            struct pci_dev *pci_dev = to_pci_dev(dev);
->            struct virtio_pci_device *vp_dev = pci_get_drvdata(pci_dev);
->            int ret;
-> 
->            ret = pci_enable_device(pci_dev);
->            if (ret)
->                    return ret;
-> 
->            pci_set_master(pci_dev);
->            return virtio_device_restore(&vp_dev->vdev);
->     }
-> 
-> 
->     As an exception, in case of BIOS booting using device ROM, it is set by
->     the ROM. E.g. src/hw/virtio-pci.c:
-> 
->        vp_reset(vp);
->        pci_enable_busmaster(pci);
->        vp_set_status(vp, VIRTIO_CONFIG_S_ACKNOWLEDGE |
->                      VIRTIO_CONFIG_S_DRIVER );
-> 
-> 
-> 
-> Thanks, Michael.
-> 
-> After some more investigations, there are additional interesting details.
-> 
-> First of all, resume from hibernation succeeds without USB host controller
-> (-usbtablet).
-> 
-> I did tracing of PCI configuration space writes and here is what I see:
+> Yes, this is plainly silly to use movli/movco to copy data, but we have
+> also implemented silly behaviour for other CPUs. For the user case it's
+> different, we don't have real choice, plus we know that it will be used
+> to execute linux binaries, which are more likely to have a sane usage of
+> atomic instructions.
 
-All I can say is uhci confuses windows somehow.
-Try another type of controller?
+Ok, I guess I didn't understand your last comment.
+But now the "ifdeffing" portion of that makes sense.
 
 
->     --
->     MST
-> 
-> 
+r~
