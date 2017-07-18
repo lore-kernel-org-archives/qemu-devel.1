@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43360)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXKYL-0004iu-0l
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:56:12 -0400
+	id 1dXKYR-0004os-Ox
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:56:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXKYJ-0004Iw-Sd
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:56:09 -0400
+	id 1dXKYR-0004OO-2i
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:56:15 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXKYQ-0004Ny-Ub
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:56:15 -0400
+Received: by mail-qt0-x244.google.com with SMTP id 50so155786qtz.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:56:14 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 18 Jul 2017 01:55:35 -0300
-Message-Id: <20170718045540.16322-6-f4bug@amsat.org>
+Date: Tue, 18 Jul 2017 01:55:37 -0300
+Message-Id: <20170718045540.16322-8-f4bug@amsat.org>
 In-Reply-To: <20170718045540.16322-1-f4bug@amsat.org>
 References: <20170718045540.16322-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 05/10] target/ppc: optimize various
- functions using extract op
+Subject: [Qemu-devel] [PATCH v5 07/10] target/sparc: optimize
+ gen_op_mulscc() using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,171 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
 
 Done with the Coccinelle semantic patch from commit 58daf05d07dd
 (see scripts/coccinelle/tcg_gen_extract.cocci)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
-Richard: maybe you need to update 58daf05d07dd to your commit...
 
- target/ppc/translate.c              | 21 +++++++--------------
- target/ppc/translate/vsx-impl.inc.c | 24 ++++++++----------------
- 2 files changed, 15 insertions(+), 30 deletions(-)
+Richard: are you ok squashing it with previous commit?
+         maybe you need to update 58daf05d07dd to your commit...
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index c0cd64d927..de271af52b 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -873,8 +873,7 @@ static inline void gen_op_arith_add(DisasContext *ctx, TCGv ret, TCGv arg1,
-             }
-             tcg_gen_xor_tl(cpu_ca, t0, t1);        /* bits changed w/ carry */
-             tcg_temp_free(t1);
--            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);   /* extract bit 32 */
--            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-+            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
-             if (is_isa300(ctx)) {
-                 tcg_gen_mov_tl(cpu_ca32, cpu_ca);
-             }
-@@ -1404,8 +1403,7 @@ static inline void gen_op_arith_subf(DisasContext *ctx, TCGv ret, TCGv arg1,
-             tcg_temp_free(inv1);
-             tcg_gen_xor_tl(cpu_ca, t0, t1);         /* bits changes w/ carry */
-             tcg_temp_free(t1);
--            tcg_gen_shri_tl(cpu_ca, cpu_ca, 32);    /* extract bit 32 */
--            tcg_gen_andi_tl(cpu_ca, cpu_ca, 1);
-+            tcg_gen_extract_tl(cpu_ca, cpu_ca, 32, 1);
-             if (is_isa300(ctx)) {
-                 tcg_gen_mov_tl(cpu_ca32, cpu_ca);
-             }
-@@ -4336,8 +4334,7 @@ static void gen_mfsrin(DisasContext *ctx)
+ target/sparc/translate.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index 962ce08f80..67a83b77cc 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -634,8 +634,7 @@ static inline void gen_op_mulscc(TCGv dst, TCGv src1, TCGv src2)
+     // env->y = (b2 << 31) | (env->y >> 1);
+     tcg_gen_andi_tl(r_temp, cpu_cc_src, 0x1);
+     tcg_gen_shli_tl(r_temp, r_temp, 31);
+-    tcg_gen_shri_tl(t0, cpu_y, 1);
+-    tcg_gen_andi_tl(t0, t0, 0x7fffffff);
++    tcg_gen_extract_tl(t0, cpu_y, 1, 31);
+     tcg_gen_or_tl(t0, t0, r_temp);
+     tcg_gen_andi_tl(cpu_y, t0, 0xffffffff);
  
-     CHK_SV;
-     t0 = tcg_temp_new();
--    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
--    tcg_gen_andi_tl(t0, t0, 0xF);
-+    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
-     gen_helper_load_sr(cpu_gpr[rD(ctx->opcode)], cpu_env, t0);
-     tcg_temp_free(t0);
- #endif /* defined(CONFIG_USER_ONLY) */
-@@ -4368,8 +4365,7 @@ static void gen_mtsrin(DisasContext *ctx)
-     CHK_SV;
- 
-     t0 = tcg_temp_new();
--    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
--    tcg_gen_andi_tl(t0, t0, 0xF);
-+    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
-     gen_helper_store_sr(cpu_env, t0, cpu_gpr[rD(ctx->opcode)]);
-     tcg_temp_free(t0);
- #endif /* defined(CONFIG_USER_ONLY) */
-@@ -4403,8 +4399,7 @@ static void gen_mfsrin_64b(DisasContext *ctx)
- 
-     CHK_SV;
-     t0 = tcg_temp_new();
--    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
--    tcg_gen_andi_tl(t0, t0, 0xF);
-+    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
-     gen_helper_load_sr(cpu_gpr[rD(ctx->opcode)], cpu_env, t0);
-     tcg_temp_free(t0);
- #endif /* defined(CONFIG_USER_ONLY) */
-@@ -4435,8 +4430,7 @@ static void gen_mtsrin_64b(DisasContext *ctx)
- 
-     CHK_SV;
-     t0 = tcg_temp_new();
--    tcg_gen_shri_tl(t0, cpu_gpr[rB(ctx->opcode)], 28);
--    tcg_gen_andi_tl(t0, t0, 0xF);
-+    tcg_gen_extract_tl(t0, cpu_gpr[rB(ctx->opcode)], 28, 4);
-     gen_helper_store_sr(cpu_env, t0, cpu_gpr[rS(ctx->opcode)]);
-     tcg_temp_free(t0);
- #endif /* defined(CONFIG_USER_ONLY) */
-@@ -5414,8 +5408,7 @@ static void gen_mfsri(DisasContext *ctx)
-     CHK_SV;
-     t0 = tcg_temp_new();
-     gen_addr_reg_index(ctx, t0);
--    tcg_gen_shri_tl(t0, t0, 28);
--    tcg_gen_andi_tl(t0, t0, 0xF);
-+    tcg_gen_extract_tl(t0, t0, 28, 4);
-     gen_helper_load_sr(cpu_gpr[rd], cpu_env, t0);
-     tcg_temp_free(t0);
-     if (ra != 0 && ra != rd)
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 7f12908029..85ed135d44 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1248,8 +1248,7 @@ static void gen_xsxexpdp(DisasContext *ctx)
-         gen_exception(ctx, POWERPC_EXCP_VSXU);
-         return;
-     }
--    tcg_gen_shri_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52);
--    tcg_gen_andi_i64(rt, rt, 0x7FF);
-+    tcg_gen_extract_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52, 11);
- }
- 
- static void gen_xsxexpqp(DisasContext *ctx)
-@@ -1262,8 +1261,7 @@ static void gen_xsxexpqp(DisasContext *ctx)
-         gen_exception(ctx, POWERPC_EXCP_VSXU);
-         return;
-     }
--    tcg_gen_shri_i64(xth, xbh, 48);
--    tcg_gen_andi_i64(xth, xth, 0x7FFF);
-+    tcg_gen_extract_i64(xth, xbh, 48, 15);
-     tcg_gen_movi_i64(xtl, 0);
- }
- 
-@@ -1323,8 +1321,7 @@ static void gen_xsxsigdp(DisasContext *ctx)
-     zr = tcg_const_i64(0);
-     nan = tcg_const_i64(2047);
- 
--    tcg_gen_shri_i64(exp, cpu_vsrh(xB(ctx->opcode)), 52);
--    tcg_gen_andi_i64(exp, exp, 0x7FF);
-+    tcg_gen_extract_i64(exp, cpu_vsrh(xB(ctx->opcode)), 52, 11);
-     tcg_gen_movi_i64(t0, 0x0010000000000000);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
-@@ -1352,8 +1349,7 @@ static void gen_xsxsigqp(DisasContext *ctx)
-     zr = tcg_const_i64(0);
-     nan = tcg_const_i64(32767);
- 
--    tcg_gen_shri_i64(exp, cpu_vsrh(rB(ctx->opcode) + 32), 48);
--    tcg_gen_andi_i64(exp, exp, 0x7FFF);
-+    tcg_gen_extract_i64(exp, cpu_vsrh(rB(ctx->opcode) + 32), 48, 15);
-     tcg_gen_movi_i64(t0, 0x0001000000000000);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
-@@ -1448,10 +1444,8 @@ static void gen_xvxexpdp(DisasContext *ctx)
-         gen_exception(ctx, POWERPC_EXCP_VSXU);
-         return;
-     }
--    tcg_gen_shri_i64(xth, xbh, 52);
--    tcg_gen_andi_i64(xth, xth, 0x7FF);
--    tcg_gen_shri_i64(xtl, xbl, 52);
--    tcg_gen_andi_i64(xtl, xtl, 0x7FF);
-+    tcg_gen_extract_i64(xth, xbh, 52, 11);
-+    tcg_gen_extract_i64(xtl, xbl, 52, 11);
- }
- 
- GEN_VSX_HELPER_2(xvxsigsp, 0x00, 0x04, 0, PPC2_ISA300)
-@@ -1474,16 +1468,14 @@ static void gen_xvxsigdp(DisasContext *ctx)
-     zr = tcg_const_i64(0);
-     nan = tcg_const_i64(2047);
- 
--    tcg_gen_shri_i64(exp, xbh, 52);
--    tcg_gen_andi_i64(exp, exp, 0x7FF);
-+    tcg_gen_extract_i64(exp, xbh, 52, 11);
-     tcg_gen_movi_i64(t0, 0x0010000000000000);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
-     tcg_gen_andi_i64(xth, xbh, 0x000FFFFFFFFFFFFF);
-     tcg_gen_or_i64(xth, xth, t0);
- 
--    tcg_gen_shri_i64(exp, xbl, 52);
--    tcg_gen_andi_i64(exp, exp, 0x7FF);
-+    tcg_gen_extract_i64(exp, xbl, 52, 11);
-     tcg_gen_movi_i64(t0, 0x0010000000000000);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-     tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
 -- 
 2.13.2
