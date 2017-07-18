@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQ70-0004yQ-Ui
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ77-00052a-55
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQ70-0006Gg-82
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ76-0006Kf-Gd
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:25 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dXQ76-0006Jn-98
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:24 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id w4so23075319wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:52:24 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:45:10 +0100
+Message-Id: <20170718104513.23947-30-alex.bennee@linaro.org>
+In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
+References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-30-f4bug@amsat.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-30-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 18 Jul 2017 03:52:13 -0700
-Message-ID: <CAJ+F1CLMxo1x8w_eiP7XKk1KXGnBN0z1ZTqMc2L7BmkSpE+N8g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 29/29] tests/qapi: use ARRAY_SIZE macro
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 29/32] shippable: add win32/64 targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu trival <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, "open list:-----------------..." <qemu-devel@nongnu.org>
 
-On Mon, Jul 17, 2017 at 11:10 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.=
-cocci
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-
-> ---
->  tests/test-string-output-visitor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/test-string-output-visitor.c b/tests/test-string-outpu=
-t-visitor.c
-> index e736db3af8..f0902dd49e 100644
-> --- a/tests/test-string-output-visitor.c
-> +++ b/tests/test-string-output-visitor.c
-> @@ -97,7 +97,7 @@ static void test_visitor_out_intList(TestOutputVisitorD=
-ata *data,
->      Error *err =3D NULL;
->      char *str;
->
-> -    for (i =3D 0; i < sizeof(value) / sizeof(value[0]); i++) {
-> +    for (i =3D 0; i < ARRAY_SIZE(value); i++) {
->          *tmp =3D g_malloc0(sizeof(**tmp));
->          (*tmp)->value =3D value[i];
->          tmp =3D &(*tmp)->next;
-> --
-> 2.13.2
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/.shippable.yml b/.shippable.yml
+index 53b43b349f..dd4bbc84b1 100644
+--- a/.shippable.yml
++++ b/.shippable.yml
+@@ -7,6 +7,10 @@ env:
+   matrix:
+     - IMAGE=debian-amd64
+       TARGET_LIST=x86_64-softmmu,x86_64-linux-user
++    - IMAGE=debian-win32-cross
++      TARGET_LIST=arm-softmmu,i386-softmmu,lm32-softmmu
++    - IMAGE=debian-win64-cross
++      TARGET_LIST=aarch64-softmmu,sparc64-softmmu,x86_64-softmmu
+     - IMAGE=debian-armel-cross
+       TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
+     - IMAGE=debian-armhf-cross
+-- 
+2.13.0
