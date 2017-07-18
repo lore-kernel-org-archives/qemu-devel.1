@@ -1,37 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dXL3S-0006mu-CQ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:28:19 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dXL52-00005h-MT
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dXL3P-0008GX-6E
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:28:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44341
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dXL4z-0000ng-Ho
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:29:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53303
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1dXL3P-0008GJ-0r
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:28:15 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6I5O9aT101401
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:28:14 -0400
-Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bsbm29emf-1
+	id 1dXL4z-0000nN-CQ
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:29:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6I5TbPX045196
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:29:52 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bsa8s48yb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:28:14 -0400
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:29:52 -0400
 Received: from localhost
-	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 15:28:11 +1000
+	Tue, 18 Jul 2017 15:29:49 +1000
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 In-Reply-To: <20170718044619.GC3140@umbus.fritz.box>
 References: <20170717041639.16137-1-nikunj@linux.vnet.ibm.com>
 	<20170718044619.GC3140@umbus.fritz.box>
-Date: Tue, 18 Jul 2017 10:56:07 +0530
+Date: Tue, 18 Jul 2017 10:53:01 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <8760eqe2og.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Message-Id: <877ez6e2tm.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 Subject: Re: [Qemu-devel] [PATCH v3] spapr: disable decrementer during reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
