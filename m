@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:61000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXXEJ-00018j-Oe
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:28:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXXN3-0003hd-Sh
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXXEI-0008EA-NT
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:28:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXXN2-0003n4-RT
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:37:21 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<1500385286-21142-7-git-send-email-armbru@redhat.com>
-	<6bf7ff84-5286-fd21-c9a8-f25f2e37df50@redhat.com>
-Date: Tue, 18 Jul 2017 20:28:10 +0200
-In-Reply-To: <6bf7ff84-5286-fd21-c9a8-f25f2e37df50@redhat.com> (Eric Blake's
-	message of "Tue, 18 Jul 2017 12:34:49 -0500")
-Message-ID: <87o9shk3b9.fsf@dusky.pond.sub.org>
+	<1500385286-21142-11-git-send-email-armbru@redhat.com>
+	<1aa2bff6-8798-cfd4-e969-b98064dd7d4c@redhat.com>
+Date: Tue, 18 Jul 2017 20:37:12 +0200
+In-Reply-To: <1aa2bff6-8798-cfd4-e969-b98064dd7d4c@redhat.com> (Eric Blake's
+	message of "Tue, 18 Jul 2017 12:46:35 -0500")
+Message-ID: <87inipk2w7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.10 06/10] hmp: Clean up and simplify
- hmp_migrate_set_parameter()
+Subject: Re: [Qemu-devel] [PATCH for-2.10 10/10] migration: Use JSON null
+ instead of "" to reset parameter to default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +31,94 @@ Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, quintela@red
 Eric Blake <eblake@redhat.com> writes:
 
 > On 07/18/2017 08:41 AM, Markus Armbruster wrote:
->> The bulk of hmp_migrate_set_parameter()'s code sets one member of
->> MigrationParameters according to the command's arguments.  It uses a
->> string visitor for integer and boolean members, but not for string and
->> size members.  It calls visit_type_bool() right away, but delays
->> visit_type_int() some.  The delaying requires a flag variable and a
->> bit of trickery: we set all integer members instead of just the one we
->> want, and rely on the has_FOOs to mask the unwanted ones.
+>> migrate-set-parameters sets migration parameters according to is
+>> arguments like this:
 >> 
->> Clean this up as follows.  Don't delay calling visit_type_int().  Use
->> the string visitor for strings, too.  This involves extra allocations
->> and cleanup, but doing them is simpler and cleaner than avoiding them.
+>> * Present means "set the parameter to this value"
 >> 
->> Sadly, using the string visitor for sizes isn't possible, because it
->> defaults to Bytes rather than Mebibytes.  Add a comment explaining
->> that.
+>> * Absent means "leave the parameter unchanged"
+>> 
+>> * Except for parameters tls_creds and tls_hostname, "" means "reset
+>>   the parameter to its default value
+>> 
+>> The first two are perfectly normal: presence of the parameter makes
+>> the command do something.
+>> 
+>> The third one overloads the parameter with a second meaning.  The
+>> overloading is *implicit*, i.e. it's not visible in the types.  Works
+>> here, because "" is neither a valid TLS credentials ID, nor a valid
+>> host name.
+>> 
+>> Pressing argument values the schema accepts, but are semantically
+>> invalid, into service to mean "reset to default" is not general, as
+>> suitable invalid values need not exist.  I also find it ugly.
+>> 
+>> To clean this up, we could add a separate flag argument to ask for
+>> "reset to default", or add a distinct value to @tls_creds and
+>> @tls_hostname.  This commit implements the latter: add JSON null to
+>> the values of @tls_creds and @tls_hostname, deprecate "".
+>> 
+>> Because we're so close to the 2.10 freeze, implement it in the
+>> stupidest way possible: have qmp_migrate_set_parameters() rewrite null
+>> to "" before anything else can see the null.  The proper way to do it
+>> would be rewriting "" to null, but that requires fixing up code to
+>> work with null.  Add TODO comments for that.
 >> 
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>  hmp.c | 78 ++++++++++++++++++++++++++++---------------------------------------
->>  1 file changed, 32 insertions(+), 46 deletions(-)
->>
->
-> Diffstat says it's cleaner.
->
->>              case MIGRATION_PARAMETER_MAX_BANDWIDTH:
->> -                p.has_max_bandwidth = true;
->> +                p->has_max_bandwidth = true;
->> +                /*
->> +                 * Can't use visit_type_size() here, because it
->> +                 * defaults to Bytes rather than Mebibytes.
->> +                 */
->>                  ret = qemu_strtosz_MiB(valuestr, NULL, &valuebw);
->
-> Can we munge valuestr (if it has a suffix, leave it alone; if it has
-> none, tack on "M"), and then call the size visitor as usual?
-
-We could, but I expect it to be more complicated than this inline copy.
-
-A possible alternative is adding flags to string_input_visitor_new().  I
-suspect that will also be more complicated once you add tests.  Keeping
-non-standard suffixes somewhat bothersome will at least help prevent
-more of them.
-
->>                  if (ret < 0 || valuebw > INT64_MAX
->>                      || (size_t)valuebw != valuebw) {
->>                      error_setg(&err, "Invalid size %s", valuestr);
->> -                    goto cleanup;
->> +                    break;
->>                  }
->
-> But for now, the inline version works.
-
->> -                /* Set all integers; only one has_FOO will be set, and
->> -                 * the code ignores the remaining values */
->> -                p.compress_level = valueint;
->> -                p.compress_threads = valueint;
->> -                p.decompress_threads = valueint;
->> -                p.cpu_throttle_initial = valueint;
->> -                p.cpu_throttle_increment = valueint;
->> -                p.downtime_limit = valueint;
->> -                p.x_checkpoint_delay = valueint;
->> +            if (err) {
->> +                goto cleanup;
->>              }
+>> +++ b/qapi-schema.json
+>> @@ -116,6 +116,13 @@
+>>  { 'command': 'qmp_capabilities' }
 >>  
->> -            qmp_migrate_set_parameters(&p, &err);
+>>  ##
+>> +# @StrOrNull:
 >
-> The old code is calling qmp_migrate_set_parameters() once per loop
-> iteration, because it could only parse one integer per loop.
+> A little light on the documentation.
 >
->> +            qmp_migrate_set_parameters(p, &err);
+>> +##
+>> +{ 'alternate': 'StrOrNull',
+>> +  'data': { 's': 'str',
+>> +            'n': 'null' } }
+>> +
+>> +##
+>>  # @LostTickPolicy:
+>>  #
+>>  # Policy for handling lost ticks in timer devices.
+>> @@ -1098,8 +1105,8 @@
+>>              '*decompress-threads': 'int',
+>>              '*cpu-throttle-initial': 'int',
+>>              '*cpu-throttle-increment': 'int',
+>> -            '*tls-creds': 'str',
+>> -            '*tls-hostname': 'str',
+>> +            '*tls-creds': 'StrOrNull',
+>> +            '*tls-hostname': 'StrOrNull',
+>>              '*max-bandwidth': 'int',
+>>              '*downtime-limit': 'int',
+>>              '*x-checkpoint-delay': 'int',
 >
-> But couldn't you now sink this below the loop, and call it only once
-> after all members are parsed?  Can be a separate patch, though.
+> By splitting input from output, you guarantee that 'null' won't appear
+> in the output and break an unsuspecting client, but that new clients can
+> introspect the existence of null and use that instead of "" on input.
 
-The whole switch could sink along.  Left for another day.
+Yes.
+
+We don't want null in output.  My unsharing makes that syntactically
+impossible.  Nice bonus, not why I went that route.  I did because it
+reduces code churn quite a bit, which is what we need right now.
+
+Likewise, we don't want absent members in output.  The sharing (commit
+de63ab6) made that syntactically possible.  My unsharing doesn't make it
+impossible, because it refrains from removing the '*' from
+MigrationParameters.
+
+If we decide not to restore the sharing, we should make absent members
+syntactically impossible.
+
+If we decice to restore the sharing, null in output will become
+syntactically possible.
+
+We'll have to pick our poison: tighter schema or more concise schema.
+We picked concise last time.
 
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
