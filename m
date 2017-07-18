@@ -1,38 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dXTV0-0002Zw-Mz
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:29:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXTbf-0000ER-0p
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dXTUy-0006q9-2g
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:29:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dXTUx-0006pt-PV
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:29:16 -0400
-Date: Tue, 18 Jul 2017 08:29:07 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170718082907.69893dda@w520.home>
-In-Reply-To: <d0abeefc-adcf-85c3-f5d9-8c90a18f8011@arm.com>
-References: <1493201525-14418-1-git-send-email-yi.l.liu@intel.com>
-	<1493201525-14418-8-git-send-email-yi.l.liu@intel.com>
-	<cc330a8f-e087-9b6f-2a40-38b58688d300@arm.com>
-	<20170702100659.GA22053@gmail.com>
-	<0e4f2dd4-d553-b1b7-7bec-fe0ff5242c54@arm.com>
-	<20170703103115.GB22053@gmail.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D190D25919@SHSMSX101.ccr.corp.intel.com>
-	<1d63c1ae-ca10-0f9d-91de-0d9c9823c104@arm.com>
-	<20170705112816.56554f65@w520.home>
-	<A2975661238FB949B60364EF0F2C2574390A7C4F@shsmsx102.ccr.corp.intel.com>
-	<20170714121555.7e64d849@w520.home>
-	<A2975661238FB949B60364EF0F2C2574390A906A@shsmsx102.ccr.corp.intel.com>
-	<20170717164515.2491b3bf@w520.home>
-	<d0abeefc-adcf-85c3-f5d9-8c90a18f8011@arm.com>
+	(envelope-from <eblake@redhat.com>) id 1dXTbd-0002jt-VN
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:36:11 -0400
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+	<1500385286-21142-3-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7d0832cf-34c8-9c21-f6fd-104738331f14@redhat.com>
+Date: Tue, 18 Jul 2017 09:36:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 7/8] VFIO: Add new IOCTL for IOMMU TLB
- invalidate propagation
+In-Reply-To: <1500385286-21142-3-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qxrq0F5HbJjptewRvb65VKgUlv4r4io29"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 02/10] qapi: Use QNull for a more
+ regular visit_type_null()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,45 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Raj, Ashok" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>, Joerg Roedel <joro@8bytes.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-On Tue, 18 Jul 2017 10:38:40 +0100
-Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qxrq0F5HbJjptewRvb65VKgUlv4r4io29
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+Message-ID: <7d0832cf-34c8-9c21-f6fd-104738331f14@redhat.com>
+Subject: Re: [PATCH for-2.10 02/10] qapi: Use QNull for a more regular
+ visit_type_null()
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+ <1500385286-21142-3-git-send-email-armbru@redhat.com>
+In-Reply-To: <1500385286-21142-3-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 17/07/17 23:45, Alex Williamson wrote:
-> [..]
-> >>>
-> >>> How does a user learn which model(s) are supported by the interface?
-> >>> How do they learn which ops are supported?  Perhaps a good use for one of those
-> >>> flag bits in the outer data structure is "probe".    
-> >>
-> >> My initial plan to user fills it, if the underlying HW doesn't support the
-> >> model, it refuses to service it. User should get a failure and stop to use
-> >> it. But your suggestion to have a probe or kinds of query makes sense.
-> >> How about we add one more operation for such purpose? Besides the
-> >> supported model query, I'd like to add more. E.g the HW IOMMU capabilities.  
-> > 
-> > We also have VFIO_IOMMU_GET_INFO where the structure can be extended
-> > for missing capabilities.  Depending on the capability you want to
-> > describe, this might be a better, existing interface for it.  
-> 
-> It might become hairy when physical IOMMUs start supporting multiple
-> formats, or when we want to describe multiple page table formats in
-> addition to PASID tables. I was wondering if sysfs iommu_group would be
-> better suited for this kind of hardware description with variable-length
-> properties, but a new ioctl-based probing mechanism would work as well.
+On 07/18/2017 08:41 AM, Markus Armbruster wrote:
+> Make visit_type_null() take an @obj argument like its buddies.  This
+> helps keeing the next commit simple.
 
-Would different groups have different properties?  Perhaps it's related
-to the iommu hardware unit supporting the device, which could host one
-or more groups.  Each device already has a link to its iommu where we
-could add info (/sys/class/iommu/).
- 
-> Other things that we'll want to describe are fault reporting capability
-> and PASID range, which would fit better in vfio_device_info.
+s/keeing/keep/
 
-Why?  The per device PASID info is in a PCI capability, so wouldn't
-this be iommu info?  Isn't the fault reporting also via the iommu?
-Thanks,
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Alex
+> +++ b/qapi/qobject-output-visitor.c
+> @@ -187,7 +187,8 @@ static void qobject_output_type_any(Visitor *v, con=
+st char *name,
+>      qobject_output_add_obj(qov, name, *obj);
+>  }
+> =20
+> -static void qobject_output_type_null(Visitor *v, const char *name, Err=
+or **errp)
+> +static void qobject_output_type_null(Visitor *v, const char *name,
+> +                                     QNull **obj, Error **errp)
+>  {
+>      QObjectOutputVisitor *qov =3D to_qov(v);
+>      qobject_output_add(qov, name, qnull());
+
+would it be any better to call qobject_output_add(qov, name,
+QINCREF(*obj)) here, to ensure we are indeed passing in an appropriate
+QNull reference?  But your patch is at least self-consistent in stating
+we ignore obj in output visitors.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--qxrq0F5HbJjptewRvb65VKgUlv4r4io29
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluHNIACgkQp6FrSiUn
+Q2rNpQgAkfQcQAMx5kMYMgrzNamC7qG51tw3RpkXZsiRdQS1dsr2E5FI1oprqQrd
+p3ZAhYzSIaPcO9glfNUbCQn9x1uuPctSqQI8rLsKKDL3Jo1zhvRhfBkqOf2qg9V9
+Q8mP3rE8CJGO5PtJMckSIe5nMEVfHPbGx0zhL9yUTqJYpYQLk6gEF4APMxrBhcGm
+DeWcfLTKQl5n2DLNC+gIIV866n7eLoGNatbXAtHPpCJIbvr4VbtLuzvBFqFnRPpi
+8HcJrbleCgtW938fOIWTEPSJvBddMj01QOjZDKBoHUh97agx1t2I3PQqDqjRBkG3
+ySxmn4vgfI9J3IJqI6s8xFk3xaMsKg==
+=F4Mj
+-----END PGP SIGNATURE-----
+
+--qxrq0F5HbJjptewRvb65VKgUlv4r4io29--
