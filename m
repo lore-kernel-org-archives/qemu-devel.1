@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34184)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRy-0001DE-8D
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:19 -0400
+	id 1dXGS0-0001F8-3W
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRu-0005HL-8N
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:18 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34572)
+	id 1dXGRx-0005Je-OZ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:20 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36687)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRu-0005HB-3m
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:14 -0400
-Received: by mail-qk0-x244.google.com with SMTP id q66so733702qki.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:33:14 -0700 (PDT)
+	id 1dXGRx-0005JS-KW
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:17 -0400
+Received: by mail-qt0-x244.google.com with SMTP id l55so710479qtl.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:33:17 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 21:31:46 -0300
-Message-Id: <20170718003159.10200-19-f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 21:31:47 -0300
+Message-Id: <20170718003159.10200-20-f4bug@amsat.org>
 In-Reply-To: <20170718003159.10200-1-f4bug@amsat.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 	<20170718003159.10200-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 18/31] shippable: add ppc64el targets
+Subject: [Qemu-devel] [PATCH v2 19/31] shippable: add x86_64 targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,23 +38,24 @@ To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@red
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[AJB: minor tweak to name]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
  .shippable.yml | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/.shippable.yml b/.shippable.yml
-index abcaf6f4d4..189d193da5 100644
+index 189d193da5..1f92ace8f7 100644
 --- a/.shippable.yml
 +++ b/.shippable.yml
-@@ -16,6 +16,8 @@ env:
-     # mips64el-softmmu disabled due to libfdt problem
-     - IMAGE=debian-mipsel-cross
-       TARGET_LIST=mipsel-softmmu,mipsel-linux-user,mips64el-linux-user
-+    - IMAGE=debian-ppc64el-cross
-+      TARGET_LIST=ppc64-softmmu,ppc64-linux-user,ppc64abi32-linux-user
- build:
-   pre_ci:
-     - make docker-image-${IMAGE} V=1
+@@ -5,6 +5,8 @@ env:
+   global:
+     - LC_ALL=C
+   matrix:
++    - IMAGE=debian-amd64
++      TARGET_LIST=x86_64-softmmu,x86_64-linux-user
+     - IMAGE=debian-armel-cross
+       TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
+     - IMAGE=debian-armhf-cross
 -- 
 2.13.2
