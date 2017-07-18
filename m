@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXNBo-0007JZ-2g
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:45:05 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dXNKX-0002Dx-U6
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXNBl-0004gH-0O
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:45:04 -0400
-Received: from ivanoab5.miniserver.com ([78.31.111.25]:42316
-	helo=www.kot-begemot.co.uk)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
-	id 1dXNBk-0004fH-QQ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:45:00 -0400
-References: <20170718060627.2107-1-anton.ivanov@cambridgegreys.com>
-	<20170718072713.GC11927@redhat.com>
-From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Message-ID: <46cbdab9-bc39-e277-a018-fcac227cc877@cambridgegreys.com>
-Date: Tue, 18 Jul 2017 08:44:48 +0100
+	(envelope-from <aurelien@aurel32.net>) id 1dXNKU-0007lk-R6
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:54:05 -0400
+Received: from hall.aurel32.net ([163.172.24.10]:40170)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dXNKU-0007lC-Jq
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:54:02 -0400
+Date: Tue, 18 Jul 2017 09:51:35 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170718075135.hjjuqz6upbe73473@aurel32.net>
+References: <20170707022111.21836-1-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170718072713.GC11927@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Unified Socket Transport
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170707022111.21836-1-rth@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 00/27] target/sh4 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
 
-OK.
+On 2017-07-06 16:20, Richard Henderson wrote:
+> This fixes two problems with atomic operations on sh4,
+> including an attempt at supporting the user-space atomics
+> technique used by most sh-linux-user binaries.
+> 
+> Changes since v1:
+>   * Rebase on Aurelien's recent sh4 patchset.
+>   * Patch 3,5 split out of patch 6.
+>   * Patch 4 fixes the sh4-softmmu problem that Aurelien reported.
+>   * Handle more cases of atomic_fetch_op seen in debian images.
+>   * More cleanups for register banking.
+>   * Fix for 64-bit fp memory operations.
+>   * Tidy illegal instruction checks.
+>   * Implement fpchg (missing from sh4a)
+>   * Implement fsrra (had a nop implementation)
+>   * Use tcg_gen_lookup_and_goto_ptr for simple branches.
 
-I can split it into series before next submission.
+I have finally finished reviewing all patches, how do you want to
+proceed from there? Do you want to post a new version or should I just
+pick your patches and apply the small fixes that are needed?
 
-A.
-
-
-On 18/07/17 08:27, Daniel P. Berrange wrote:
-> On Tue, Jul 18, 2017 at 07:06:27AM +0100, anton.ivanov@cambridgegreys.com wrote:
->> From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
->>
->> 1. Creates a common recvmmsg backend for socket transports
->> 2. Migrates L2TPv3 to the new backend
->> 3. Adds gre socket transport - a vm can attach directly to GRE
->> 4. Adds raw socket transport - a vm can attach directly to an
->> Ethernet interface
->> 5. Adds simplistic static VXLAN tunnel transport (no
->> control plane).
->> 6. Sets up some of the infrastructure for future addition of
->> sendmmsg
-> This list of features is a really strong sign that you should split
-> this patch up into a patch series with multiple commits, each commit
-> adding / changing a single feature. Especially keep refactoring of
-> existing code completely separate from adding of new features.
->
-> Regards,
-> Daniel
+Aurelien
 
 -- 
-Anton R. Ivanov
-
-Cambridge Greys Limited, England and Wales company No 10273661
-http://www.cambridgegreys.com/
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
