@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXSTD-00050P-Vv
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:23:24 -0400
+	(envelope-from <wang.yi59@zte.com.cn>) id 1dXHMr-0007uc-UY
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:32:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXSTD-0006og-7Y
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:23:24 -0400
-MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <045101d2ffaf$ef4b60e0$cde222a0$@d-silva.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-8-f4bug@amsat.org>
-	<045101d2ffaf$ef4b60e0$cde222a0$@d-silva.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 18 Jul 2017 10:23:19 -0300
-Message-ID: <CAAdtpL7MibpdNtmc-vJAGhjVh-FKpy0RzQkL=DCHr+WSnXqF7g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 07/29] ds1338: use QEMU_IS_ALIGNED macro
+	(envelope-from <wang.yi59@zte.com.cn>) id 1dXHMo-0000Od-TJ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:32:06 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:35289)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yi59@zte.com.cn>) id 1dXHMo-0000MD-9n
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:32:02 -0400
+From: Yi Wang <wang.yi59@zte.com.cn>
+Date: Mon, 17 Jul 2017 21:49:37 -0400
+Message-Id: <1500342577-12486-1-git-send-email-wang.yi59@zte.com.cn>
+Subject: [Qemu-devel]  [PATCH v2] hmp: allow cpu index for "info lapic"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +21,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alastair D'Silva <alastair@d-silva.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <cminyard@mvista.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: wang.yi59@zte.com.cn, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
 
-On Tue, Jul 18, 2017 at 7:23 AM, Alastair D'Silva <alastair@d-silva.org> wrote:
-> I'm not sure this makes sense - we're dealing with time here.
+Add [vcpu] index support for hmp command "info lapic", which is
+useful when debugging ipi and so on. Current behavior is not
+changed when the parameter isn't specified.
 
-Indeed, thanks for your review!
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
+---
+ hmp-commands-info.hx  | 6 +++---
+ target/i386/monitor.c | 8 +++++++-
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
->> --- a/hw/timer/ds1338.c
->> +++ b/hw/timer/ds1338.c
->> @@ -65,7 +65,7 @@ static void capture_current_time(DS1338State *s)
->>      s->nvram[1] = to_bcd(now.tm_min);
->>      if (s->nvram[2] & HOURS_12) {
->>          int tmp = now.tm_hour;
->> -        if (tmp % 12 == 0) {
->> +        if (QEMU_IS_ALIGNED(tmp, 12)) {
->>              tmp += 12;
->>          }
->>          if (tmp <= 12) {
->> @@ -154,7 +154,7 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
->>                  if (data & HOURS_PM) {
->>                      tmp += 12;
->>                  }
->> -                if (tmp % 12 == 0) {
->> +                if (QEMU_IS_ALIGNED(tmp, 12)) {
->>                      tmp -= 12;
->>                  }
->>                  now.tm_hour = tmp;
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index d9df238..c534b03 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -115,9 +115,9 @@ ETEXI
+ #if defined(TARGET_I386)
+     {
+         .name       = "lapic",
+-        .args_type  = "",
+-        .params     = "",
+-        .help       = "show local apic state",
++        .args_type  = "vcpu:i?",
++        .params     = "[vcpu]",
++        .help       = "show local apic state (vcpu: vCPU to read, default is 0)",
+         .cmd        = hmp_info_local_apic,
+     },
+ #endif
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 77ead60..813005e 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -632,8 +632,14 @@ const MonitorDef *target_monitor_defs(void)
+ 
+ void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
+ {
+-    CPUState *cs = mon_get_cpu();
++    CPUState *cs;
+ 
++    if (qdict_haskey(qdict, "vcpu")) {
++        int index = qdict_get_try_int(qdict, "vcpu", 0);
++        cs = qemu_get_cpu(index);
++    } else {
++        cs = mon_get_cpu();
++    }
+     if (!cs) {
+         monitor_printf(mon, "No CPU available\n");
+         return;
+-- 
+1.8.3.1
