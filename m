@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dXHMr-0007uc-UY
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:32:07 -0400
+	(envelope-from <pizhi0616@gmail.com>) id 1dXN6F-00060v-PZ
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dXHMo-0000Od-TJ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:32:06 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:35289)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yi59@zte.com.cn>) id 1dXHMo-0000MD-9n
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:32:02 -0400
-From: Yi Wang <wang.yi59@zte.com.cn>
-Date: Mon, 17 Jul 2017 21:49:37 -0400
-Message-Id: <1500342577-12486-1-git-send-email-wang.yi59@zte.com.cn>
-Subject: [Qemu-devel]  [PATCH v2] hmp: allow cpu index for "info lapic"
+	(envelope-from <pizhi0616@gmail.com>) id 1dXN6F-0001hV-1K
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:39:19 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33189)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pizhi0616@gmail.com>) id 1dXN6E-0001gg-Pd
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:39:18 -0400
+Received: by mail-wr0-x234.google.com with SMTP id a10so16381443wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 00:39:17 -0700 (PDT)
+MIME-Version: 1.0
+From: =?UTF-8?B?55qu5pm6?= <pizhi0616@gmail.com>
+Date: Tue, 18 Jul 2017 15:39:15 +0800
+Message-ID: <CAC0nwATQ-YKmYHyvOQeEmA8u=BvVrC8q20=Ogmr+TFaWRiRUfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] ask a question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,56 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
-Cc: wang.yi59@zte.com.cn, Liu.Jianjun3@zte.com.cn, liu.yunh@zte.com.cn
+To: qemu-devel@nongnu.org
 
-Add [vcpu] index support for hmp command "info lapic", which is
-useful when debugging ipi and so on. Current behavior is not
-changed when the parameter isn't specified.
+hi qemu-devel=EF=BC=8CI want to know why should add the migration blockers =
+to
+prevent live migration in peer mode=EF=BC=8Cif I drop the patch=EF=BC=8CWha=
+t other
+disadvantages will it bring=EF=BC=9F
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
----
- hmp-commands-info.hx  | 6 +++---
- target/i386/monitor.c | 8 +++++++-
- 2 files changed, 10 insertions(+), 4 deletions(-)
+Looking forward to your reply=E3=80=82
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index d9df238..c534b03 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -115,9 +115,9 @@ ETEXI
- #if defined(TARGET_I386)
-     {
-         .name       = "lapic",
--        .args_type  = "",
--        .params     = "",
--        .help       = "show local apic state",
-+        .args_type  = "vcpu:i?",
-+        .params     = "[vcpu]",
-+        .help       = "show local apic state (vcpu: vCPU to read, default is 0)",
-         .cmd        = hmp_info_local_apic,
-     },
- #endif
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 77ead60..813005e 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -632,8 +632,14 @@ const MonitorDef *target_monitor_defs(void)
- 
- void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
- {
--    CPUState *cs = mon_get_cpu();
-+    CPUState *cs;
- 
-+    if (qdict_haskey(qdict, "vcpu")) {
-+        int index = qdict_get_try_int(qdict, "vcpu", 0);
-+        cs = qemu_get_cpu(index);
-+    } else {
-+        cs = mon_get_cpu();
-+    }
-     if (!cs) {
-         monitor_printf(mon, "No CPU available\n");
-         return;
--- 
-1.8.3.1
+thanks=EF=BC=81
+pizhi
+
+
+commit 38e0735eb76a1479917ef3501a208d4f70998494
+Author: Anthony Liguori <aliguori@us.ibm.com>
+Date:   Mon Nov 14 15:09:44 2011 -0600
+
+    ivshmem: use migration blockers to prevent live migration in peer mode
+(v2)
+
+    Now when you try to migrate with ivshmem, you get a proper QMP error:
+
+    (qemu) migrate tcp:localhost:1025
+    Migration is disabled when using feature 'peer mode' in device 'ivshmem=
+'
+    (qemu)
+
+    Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
