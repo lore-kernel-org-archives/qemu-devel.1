@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXNgc-0000RO-3m
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:16:55 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dXNj0-0001KD-Ar
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXNgb-0001gl-71
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:16:54 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXNgb-0001gd-1F
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:16:53 -0400
-Received: by mail-wr0-x230.google.com with SMTP id a10so17812356wrd.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:16:52 -0700 (PDT)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dXNix-0002c3-75
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:19:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38572
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dXNix-0002bq-1Q
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:19:19 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6I8J2QQ089133
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 04:19:18 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bs3d49g7g-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 04:19:18 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 18 Jul 2017 02:19:17 -0600
+References: <1500310706-36211-1-git-send-email-borntraeger@de.ibm.com>
+	<1500310706-36211-3-git-send-email-borntraeger@de.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 18 Jul 2017 10:19:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170717121127.25154-1-stefanha@redhat.com>
-References: <20170717121127.25154-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jul 2017 09:16:31 +0100
-Message-ID: <CAFEAcA8wgS75DbLsFcFMyB=3EX+AL1Ju2QmF4dpyLMMAgwaAfQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/7] Tracing patches
+In-Reply-To: <1500310706-36211-3-git-send-email-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+Message-Id: <fbb40bfe-a3d9-c2b5-a7ca-3b451488b838@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/cpumodel: z14 cpu models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +43,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
 
-On 17 July 2017 at 13:11, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> The following changes since commit 4871b51b9241b10f4fd8e04bbb21577886795e=
-25:
->
->   vmgenid-test: use boot-sector infrastructure (2017-07-14 17:03:03 +0100=
-)
->
-> are available in the git repository at:
->
->   git://github.com/stefanha/qemu.git tags/tracing-pull-request
->
-> for you to fetch changes up to 304187c51cfe1ffda1afc9b86c4ccae1cbac68cb:
->
->   trace: update old trace events in docs (2017-07-17 13:11:13 +0100)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
->
-> Llu=C3=ADs Vilanova (6):
->   trace: Allocate cpu->trace_dstate in place
->   trace: [tcg] Delay changes to dynamic state when translating
->   exec: [tcg] Use different TBs according to the vCPU's dynamic tracing
->     state
->   trace: [tcg] Do not generate TCG code to trace dynamically-disabled
->     events
->   trace: [tcg, trivial] Re-align generated code
->   trace: [trivial] Statically enable all guest events
->
-> Stefan Hajnoczi (1):
->   trace: update old trace events in docs
->
+On 07/17/2017 06:58 PM, Christian Borntraeger wrote:
+> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+> 
+> This patch introduces the CPU model for z14, along with all base and
+> optional features.
+> 
+> Signed-off-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/cpu_models.c   |  1 +
+>  target/s390x/gen-features.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index c654279..e2ccc32 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -75,6 +75,7 @@ static S390CPUDef s390_cpu_defs[] = {
+>      CPUDEF_INIT(0x2964, 13, 1, 47, 0x08000000U, "z13", "IBM z13 GA1"),
+>      CPUDEF_INIT(0x2964, 13, 2, 47, 0x08000000U, "z13.2", "IBM z13 GA2"),
+>      CPUDEF_INIT(0x2965, 13, 2, 47, 0x08000000U, "z13s", "IBM z13s GA1"),
+> +    CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+>  };
+> 
+>  void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat)
+> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+> index af14b11..118a95e 100644
+> --- a/target/s390x/gen-features.c
+> +++ b/target/s390x/gen-features.c
+> @@ -338,6 +338,14 @@ static uint16_t base_GEN13_GA1[] = {
+> 
+>  #define base_GEN13_GA2 EmptyFeat
+> 
+> +static uint16_t base_GEN14_GA1[] = {
+> +    S390_FEAT_ENTROPY_ENC_COMP,
+> +    S390_FEAT_MISC_INSTRUCTION_EXT,
+> +    S390_FEAT_SEMAPHORE_ASSIST,
+> +    S390_FEAT_TIME_SLICE_INSTRUMENTATION,
+> +    S390_FEAT_ORDER_PRESERVING_COMPRESSION,
+> +};
+> +
+>  /* Full features (in order of release)
+>   * Automatically includes corresponding base features.
+>   * Full features are all features this hardware supports even if kvm/QEMU do not
+> @@ -442,6 +450,23 @@ static uint16_t full_GEN13_GA1[] = {
+> 
+>  #define full_GEN13_GA2 EmptyFeat
+> 
+> +static uint16_t full_GEN14_GA1[] = {
+> +    S390_FEAT_INSTRUCTION_EXEC_PROT,
+> +    S390_FEAT_GUARDED_STORAGE,
+> +    S390_FEAT_VECTOR_PACKED_DECIMAL,
+> +    S390_FEAT_VECTOR_ENH,
+> +    S390_FEAT_MULTIPLE_EPOCH,
+> +    S390_FEAT_TEST_PENDING_EXT_INTERRUPTION,
+> +    S390_FEAT_INSERT_REFERENCE_BITS_MULT,
+> +    S390_FEAT_GROUP_MSA_EXT_6,
+> +    S390_FEAT_GROUP_MSA_EXT_7,
+> +    S390_FEAT_GROUP_MSA_EXT_8,
+> +    S390_FEAT_CMM_NT,
+> +    S390_FEAT_HPMA2,
+> +    S390_FEAT_SIE_KSS,
+> +    S390_FEAT_ORDER_PRESERVING_COMPRESSION,
 
-Applied, thanks.
-
--- PMM
+Just realized that this is redundant.
+since ORDER_PRESERVING is also part of the base model, I will remove it here in
+my pull request.
