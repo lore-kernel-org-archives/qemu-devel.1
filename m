@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXV3A-00019H-1R
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:08:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXV48-0001vO-Es
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXV38-0007qZ-T8
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:08:39 -0400
-Date: Tue, 18 Jul 2017 17:08:25 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170718160825.GW11927@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1dXV45-0000MP-8N
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:09:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXV45-0000Ly-29
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:09:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B86BB7CB97
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 16:09:35 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170714190827.4083-1-eblake@redhat.com>
+Date: Tue, 18 Jul 2017 18:09:33 +0200
+In-Reply-To: <20170714190827.4083-1-eblake@redhat.com> (Eric Blake's message
+	of "Fri, 14 Jul 2017 14:08:22 -0500")
+Message-ID: <87a841raki.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 00/10] Correct two minor QMP
- interface design flaws
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/5] random qapi cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Jul 18, 2017 at 03:41:16PM +0200, Markus Armbruster wrote:
-> blockdev-add and migrate-set-parameters overload empty strings to mean
-> something entirely different.  See my memo "qapi: Stop abusing
-> "special" values for something entirely different" for details.
-> 
->     Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
->     https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
-> 
-> This series deprecates these usages of "" in favour of JSON null.
-> Because we're so close to the 2.10 freeze, the implementation is
-> intentionally stupid: rewrite null to "" at first opportunity.  The
-> proper way to do it would be rewriting "" to null, but that requires
-> fixing up code to work with null.  There are TODO comments for that.
-> I'm willing to take care of them in the next development cycle.
+Eric Blake <eblake@redhat.com> writes:
 
-I tested the migrate-set-parameters QMP command with this applied and
-I can still pass "" as the tls-hostname.
+> Trying to flush some of the random patches I have lying around
+> locally.  Some of these may have been posted to the list before,
+> perhaps as part of larger series, but I didn't bother to research
+> which parts came from where.
+>
+> I'm not sure if this is in time for softfreeze; and if not, I'm
+> not sure how much is appropriate during freeze vs. being deferred
+> to 2.11.
 
-When using query-migrate-parameters we still see "" too.
-
-So from POV of avoiding regressions for existing usage, we look OK
-here.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+A quick peek makes me think this series could in early during freeze,
+because it consists of documentation fixes, test enhancements and really
+simple bug fixes.
