@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXGTB-0002KB-Cv
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:34 -0400
+	(envelope-from <cota@braap.org>) id 1dXGTD-0002M0-1M
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXGTA-00061O-Hj
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:33 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Mon, 17 Jul 2017 20:34:20 -0400
-Message-Id: <20170718003422.4497-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 0/2] qemu-img: Check for backing image if
- specified during create
+	(envelope-from <cota@braap.org>) id 1dXGT8-000600-Vp
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:35 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41121)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXGT8-0005zd-Rl
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:30 -0400
+Date: Mon, 17 Jul 2017 20:34:29 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170718003429.GC7414@flamenco>
+References: <1500235468-15341-1-git-send-email-cota@braap.org>
+	<1500235468-15341-22-git-send-email-cota@braap.org>
+	<05b969cf-a6a0-eb3c-f9ec-0c536dbe9491@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05b969cf-a6a0-eb3c-f9ec-0c536dbe9491@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 21/45] tcg: check CF_PARALLEL instead of
+ parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,50 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-We do not currently guarantee that QEMU will or will not open a
-backing file when creating a new overlay file. Presently, QEMU will
-not open that file if you provide a filesize, because it has no reason
-to want to open it in that case.
+On Mon, Jul 17, 2017 at 13:55:42 -1000, Richard Henderson wrote:
+> On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
+> >Thereby decoupling the resulting translated code from the current state
+> >of the system.
+> >
+> >The tb->cflags field is not passed to tcg generation functions. So
+> >we add a bit to TCGContext, storing there whether CF_PARALLEL is set
+> >before translating every TB.
+> >
+> >Most architectures have <= 32 registers, which results in a 4-byte hole
+> >in TCGContext. Use this hole for the bit we need; use a uint8_t instead
+> >of a bool, since a bool might take more than one byte in some systems.
+> 
+> I would much rather use bool.
+> 
+> (1) I don't care about OSX and its broken ABI,
+> (2) Even then OSX still *works*.
 
-This series makes the contract more explicit: if '-u' is provided to
-create, we will not open the backing image regardless, erroring out if
-a size was not provided.
+Will do.
 
-In the other case, if '-u' is not provided, we now endeavor to open the
-backing image if possible to check that it exists. For now, if a size
-is provided and the image does not exist, QEMU will only warn to maintain
-compatibility with legacy behavior.
+> Otherwise,
 
-In the future, QEMU may treat the operation as a failure if '-u' was not
-provided.
+Missing R-b tag?
 
-Tests are amended primarily to pass the '-u' flag where it makes sense;
-which is when creating overlays for objects already open by QEMU. These
-will now generally fail to succeed because of image locking. In this
-case, they only warn instead of fail, but this keeps the output cleaner.
-
-Test 111 is updated to accommodate a new error message.
-082, 085, 139, 156 and 158 add '-u' just to suppress warnings.
-
-John Snow (2):
-  blockdev: move BDRV_O_NO_BACKING option forward
-  qemu-img: Check for backing image if specified during create
-
- block.c                    | 96 +++++++++++++++++++++++++---------------------
- blockdev.c                 | 11 +++---
- qemu-img-cmds.hx           |  4 +-
- qemu-img.c                 | 16 +++++---
- tests/qemu-iotests/082     |  4 +-
- tests/qemu-iotests/082.out |  4 +-
- tests/qemu-iotests/085     |  2 +-
- tests/qemu-iotests/111.out |  1 +
- tests/qemu-iotests/139     |  2 +-
- tests/qemu-iotests/156     |  2 +-
- tests/qemu-iotests/158     |  2 +-
- 11 files changed, 81 insertions(+), 63 deletions(-)
-
--- 
-2.9.4
+		E.
