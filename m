@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXOlx-0005Ib-5s
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:26:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1dXOsx-0007Oj-Na
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXOlt-0003A1-48
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:26:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXOls-00039V-Ta
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:26:25 -0400
-Date: Tue, 18 Jul 2017 11:26:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170718112619.6f455bc2@gondolin>
-In-Reply-To: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
-References: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1dXOst-0006vZ-J4
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:33:43 -0400
+References: <20170718080513.22522-1-lvivier@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <eab73293-7f62-d79e-1b46-2786d4a3df9f@redhat.com>
+Date: Tue, 18 Jul 2017 11:33:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170718080513.22522-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] vfio-ccw bugfixs
+Subject: Re: [Qemu-devel] [PATCH] spapr/htab: fix savevm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, sbobroff@redhat.com
 
-On Tue, 18 Jul 2017 03:49:24 +0200
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+On 18.07.2017 10:05, Laurent Vivier wrote:
+> Commit 3a38429 ("spapr: Add a "no HPT" encoding to HTAB migration stream")
+> allows to migrate an empty HPT, but doesn't mark correctly the
+> end of the migration stream.
+> 
+> The end condition (value returned by htab_save_iterate() and
+>  htab_save_complete()) should be 1, whereas in 3a38429 they
+> return 0.
+> 
+> The problem can be reproduced with QEMU monitor command "savevm":
+> the command never stops and the disk image grows without limit.
+> 
+> Fixes: 3a38429748aa4f74abaecf16c4c087e8a325e12a
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  hw/ppc/spapr.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 970093e..fa01511 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1827,7 +1827,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
+>      /* Iteration header */
+>      if (!spapr->htab_shift) {
+>          qemu_put_be32(f, -1);
+> -        return 0;
+> +        return 1;
+>      } else {
+>          qemu_put_be32(f, 0);
+>      }
+> @@ -1866,7 +1866,7 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
+>      /* Iteration header */
+>      if (!spapr->htab_shift) {
+>          qemu_put_be32(f, -1);
+> -        return 0;
+> +        return 1;
+>      } else {
+>          qemu_put_be32(f, 0);
+>      }
+> 
 
-> Dear Conny,
-> 
-> Here we got two bugfix patches for vfio-ccw:
-> - fix commit 7da624e2 which missed to initialize a new introduced
->   pointer for the vfio-ccw case
-> - fix a memory allocation that used a wrong size for an irq info
->   variable
-> 
-> Dong Jia Shi (1):
->   vfio/ccw: fix initialization of the Object DeviceState pointer in the
->     common base-device
-> 
-> Jing Zhang (1):
->   vfio/ccw: allocate irq info with the right size
-> 
->  hw/vfio/ccw.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
+I think you only need to change htab_save_iterate(), but not
+htab_save_complete(), don't you? "1" does not seem to have any real
+meaning for the *save_complete functions, as far as I can see.
 
-Thanks, queued to my s390-next branch.
-
-As these are bugfixes, I'll send a pullreq next week.
+ Thomas
