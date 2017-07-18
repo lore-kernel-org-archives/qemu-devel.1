@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXOsx-0007Oj-Na
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:33:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXOuN-0008Tf-Td
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXOst-0006vZ-J4
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:33:43 -0400
-References: <20170718080513.22522-1-lvivier@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <eab73293-7f62-d79e-1b46-2786d4a3df9f@redhat.com>
-Date: Tue, 18 Jul 2017 11:33:34 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dXOuM-0007XJ-Qq
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:35:11 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34792)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXOuM-0007Vv-Kb
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 05:35:10 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id 12so20576499wrb.1
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 02:35:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170718080513.22522-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr/htab: fix savevm
+In-Reply-To: <1500294105-13713-1-git-send-email-jasowang@redhat.com>
+References: <1500294105-13713-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Jul 2017 10:34:47 +0100
+Message-ID: <CAFEAcA9PXMb2yDfwS_w62Am0OrHBg6qbqjFTNU=5x_ajagTx-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/14] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, sbobroff@redhat.com
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 18.07.2017 10:05, Laurent Vivier wrote:
-> Commit 3a38429 ("spapr: Add a "no HPT" encoding to HTAB migration stream")
-> allows to migrate an empty HPT, but doesn't mark correctly the
-> end of the migration stream.
-> 
-> The end condition (value returned by htab_save_iterate() and
->  htab_save_complete()) should be 1, whereas in 3a38429 they
-> return 0.
-> 
-> The problem can be reproduced with QEMU monitor command "savevm":
-> the command never stops and the disk image grows without limit.
-> 
-> Fixes: 3a38429748aa4f74abaecf16c4c087e8a325e12a
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  hw/ppc/spapr.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 970093e..fa01511 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1827,7 +1827,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
->      /* Iteration header */
->      if (!spapr->htab_shift) {
->          qemu_put_be32(f, -1);
-> -        return 0;
-> +        return 1;
->      } else {
->          qemu_put_be32(f, 0);
->      }
-> @@ -1866,7 +1866,7 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
->      /* Iteration header */
->      if (!spapr->htab_shift) {
->          qemu_put_be32(f, -1);
-> -        return 0;
-> +        return 1;
->      } else {
->          qemu_put_be32(f, 0);
->      }
-> 
+On 17 July 2017 at 13:21, Jason Wang <jasowang@redhat.com> wrote:
+> The following changes since commit 6632f6ff96f0537fc34cdc00c760656fc62e23c5:
+>
+>   Merge remote-tracking branch 'remotes/famz/tags/block-and-testing-pull-request' into staging (2017-07-17 11:46:36 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 189ae6bb5ce1f5a322f8691d00fe942ba43dd601:
+>
+>   virtio-net: fix offload ctrl endian (2017-07-17 20:13:56 +0800)
+>
+> ----------------------------------------------------------------
+>
+> - fix virtio-net ctrl offload endian
+> - vnet header support for variou COLO netfilters and compare thread
+>
+> ----------------------------------------------------------------
+> Jason Wang (1):
+>       virtio-net: fix offload ctrl endian
+>
+> Michal Privoznik (1):
+>       virtion-net: Prefer is_power_of_2()
+>
+> Zhang Chen (12):
+>       net: Add vnet_hdr_len arguments in NetClientState
+>       net/net.c: Add vnet_hdr support in SocketReadState
+>       net/filter-mirror.c: Introduce parameter for filter_send()
+>       net/filter-mirror.c: Make filter mirror support vnet support.
+>       net/filter-mirror.c: Add new option to enable vnet support for filter-redirector
+>       net/colo.c: Make vnet_hdr_len as packet property
+>       net/colo-compare.c: Introduce parameter for compare_chr_send()
+>       net/colo-compare.c: Make colo-compare support vnet_hdr_len
+>       net/colo.c: Add vnet packet parse feature in colo-proxy
+>       net/colo-compare.c: Add vnet packet's tcp/udp/icmp compare
+>       net/filter-rewriter.c: Make filter-rewriter support vnet_hdr_len
+>       docs/colo-proxy.txt: Update colo-proxy usage of net driver with vnet_header
 
-I think you only need to change htab_save_iterate(), but not
-htab_save_complete(), don't you? "1" does not seem to have any real
-meaning for the *save_complete functions, as far as I can see.
+Applied, thanks.
 
- Thomas
+-- PMM
