@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXVdF-0004s6-KO
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:45:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXVlw-0008Gf-KR
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXVdE-00017N-Dt
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:45:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXVlv-0004fI-PC
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:54:56 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:35486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXVlv-0004f2-Ia
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:54:55 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id w4so36664524wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 09:54:55 -0700 (PDT)
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <1500395194-21455-2-git-send-email-peter.maydell@linaro.org>
-References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
-	<1500395194-21455-2-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 18 Jul 2017 13:45:52 -0300
-Message-ID: <CAAdtpL7WjJWC1KT2fuZv=b2obT9dJwPgYp=QQK0agdVNhhn=tw@mail.gmail.com>
+In-Reply-To: <20170717203658.15922.21967.stgit@gimli.home>
+References: <20170717203658.15922.21967.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Jul 2017 17:54:33 +0100
+Message-ID: <CAFEAcA9e6efAotHsiFuHED5c1NApLNSy2gYr1OAaMbT05Sxmmg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/4] bsd-user/mmap.c: Move
- __thread attribute to right place
+Subject: Re: [Qemu-devel] [PULL 0/1] VFIO fixes 2017-07-17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, patches@linaro.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 17 July 2017 at 21:39, Alex Williamson <alex.williamson@redhat.com> wrote:
+> The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request'
+> into staging (2017-07-17 17:54:17 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-updates-20170717.0
+>
+> for you to fetch changes up to 8c37faa475f35d158622422788fe8e5aef3118e1:
+>
+>   vfio-pci, ppc64/spapr: Reorder group-to-container attaching (2017-07-17
+> 12:39:09 -0600)
+>
+> ----------------------------------------------------------------
+> VFIO fixes 2017-07-17
+>
+>  - Init re-order to better support hot-add on SPAR (Alexey Kardashevskiy)
+>
+> ----------------------------------------------------------------
+> Alexey Kardashevskiy (1):
+>       vfio-pci, ppc64/spapr: Reorder group-to-container attaching
+>
+>  hw/vfio/common.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
 
-Le 18 juil. 2017 1:29 PM, "Peter Maydell" <peter.maydell@linaro.org> a
-=C3=A9crit :
+Applied, thanks.
 
-> Avoid a compiler warning on OpenBSD:
-> bsd-user/mmap.c:28:1: warning: '__thread' is not at beginning of
-> declaration [-Wold-style-declaration]
-> by moving the __thread attribute to its proper place.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  bsd-user/mmap.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
-> index 7f2018e..20cd29d 100644
-> --- a/bsd-user/mmap.c
-> +++ b/bsd-user/mmap.c
-> @@ -25,7 +25,7 @@
->  //#define DEBUG_MMAP
->
->  static pthread_mutex_t mmap_mutex =3D PTHREAD_MUTEX_INITIALIZER;
-> -static int __thread mmap_lock_count;
-> +static __thread int mmap_lock_count;
->
->  void mmap_lock(void)
->  {
-> --
-> 2.7.4
->
->
->
+-- PMM
