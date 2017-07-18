@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQ7H-0005Cl-9q
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:36 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ7J-0005Ii-Fd
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQ7G-0006RF-E1
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ7I-0006SE-Ic
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:37 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:32936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dXQ7I-0006Rv-Bz
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:52:36 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id a10so23705214wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:52:36 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:45:11 +0100
+Message-Id: <20170718104513.23947-31-alex.bennee@linaro.org>
+In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
+References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-28-f4bug@amsat.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-28-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 18 Jul 2017 03:52:26 -0700
-Message-ID: <CAJ+F1CKN2UUrEzq2Ut+HWWgFnYtuZ8opOF5TF5GqM-289UKLGQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 27/29] tests/hbitmap: use ARRAY_SIZE macro
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 30/32] docker: add debian Ports base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu trival <qemu-trivial@nongnu.org>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, QEMU <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, "open list:-----------------..." <qemu-devel@nongnu.org>
 
-On Mon, Jul 17, 2017 at 11:10 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.=
-cocci
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-
-> ---
->  tests/test-hbitmap.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-> index 1acb353889..628e72122b 100644
-> --- a/tests/test-hbitmap.c
-> +++ b/tests/test-hbitmap.c
-> @@ -813,7 +813,7 @@ static void test_hbitmap_serialize_basic(TestHBitmapD=
-ata *data,
->      size_t buf_size;
->      uint8_t *buf;
->      uint64_t positions[] =3D { 0, 1, L1 - 1, L1, L2 - 1, L2, L2 + 1, L3 =
-- 1 };
-> -    int num_positions =3D sizeof(positions) / sizeof(positions[0]);
-> +    int num_positions =3D ARRAY_SIZE(positions);
->
->      hbitmap_test_init(data, L3, 0);
->      g_assert(hbitmap_is_serializable(data->hb));
-> @@ -838,7 +838,7 @@ static void test_hbitmap_serialize_part(TestHBitmapDa=
-ta *data,
->      size_t buf_size;
->      uint8_t *buf;
->      uint64_t positions[] =3D { 0, 1, L1 - 1, L1, L2 - 1, L2, L2 + 1, L3 =
-- 1 };
-> -    int num_positions =3D sizeof(positions) / sizeof(positions[0]);
-> +    int num_positions =3D ARRAY_SIZE(positions);
->
->      hbitmap_test_init(data, L3, 0);
->      buf_size =3D L2;
-> @@ -880,7 +880,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmap=
-Data *data,
->      int64_t next;
->      uint64_t min_l1 =3D MAX(L1, 64);
->      uint64_t positions[] =3D { 0, min_l1, L2, L3 - min_l1};
-> -    int num_positions =3D sizeof(positions) / sizeof(positions[0]);
-> +    int num_positions =3D ARRAY_SIZE(positions);
->
->      hbitmap_test_init(data, L3, 0);
->
-> --
-> 2.13.2
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/tests/docker/dockerfiles/debian-ports.docker b/tests/docker/dockerfiles/debian-ports.docker
+new file mode 100644
+index 0000000000..fba224f760
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-ports.docker
+@@ -0,0 +1,35 @@
++#
++# Docker multiarch cross-compiler target
++#
++# This docker target is builds on Debian Ports cross compiler targets
++# to build distro with a selection of cross compilers for building test binaries.
++#
++# On its own you can't build much but the docker-foo-cross targets
++# build on top of the base debian image.
++#
++FROM debian:unstable
++
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++RUN echo "deb [arch=amd64] http://deb.debian.org/debian unstable main" > /etc/apt/sources.list
++
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed -ne "s/^deb\ \(\[.*\]\ \)\?\(.*\)/deb-src \2/p" >> /etc/apt/sources.list
++
++# Setup some basic tools we need
++RUN apt-get update && \
++    DEBIAN_FRONTEND=noninteractive apt-get install -yy eatmydata
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        clang \
++        debian-ports-archive-keyring \
++        flex \
++        git \
++        pkg-config \
++        psmisc \
++        python \
++        texinfo \
++        $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
+-- 
+2.13.0
