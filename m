@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dXQOI-0005WP-4X
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:10:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQUU-0003jE-3b
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dXQOD-0006x2-6g
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:10:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQUP-0001Li-Cr
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:16:34 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:32895)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dXQUP-0001LE-6M
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:16:29 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id a10so24615684wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 04:16:29 -0700 (PDT)
 References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-20-f4bug@amsat.org>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <61936111-d9d8-a472-1689-bf7c0bd32779@msgid.tls.msk.ru>
-Date: Tue, 18 Jul 2017 14:09:54 +0300
+	<20170718061005.29518-27-f4bug@amsat.org>
+	<CAJ+F1C+WsdUp3Vtx+-FZ9g7URSAQuJWb6h7-w6yJXM+4TKQNjA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAJ+F1C+WsdUp3Vtx+-FZ9g7URSAQuJWb6h7-w6yJXM+4TKQNjA@mail.gmail.com>
+Date: Tue, 18 Jul 2017 12:16:25 +0100
+Message-ID: <87bmoi806u.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-20-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 19/29] disas: use QEMU_IS_ALIGNED macro
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 26/29] tests/tcg: use ARRAY_SIZE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu trival <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-18.07.2017 09:09, Philippe Mathieu-Daud=C3=A9 wrote:
 
-> @@ -151,7 +151,7 @@ static int print_insn_objdump(bfd_vma pc, disassemb=
-le_info *info,
->      info->read_memory_func(pc, buf, n, info);
-> =20
->      for (i =3D 0; i < n; ++i) {
-> -        if (i % 32 =3D=3D 0) {
-> +        if (QEMU_IS_ALIGNED(i, 32)) {
->              info->fprintf_func(info->stream, "\n%s: ", prefix);
->          }
->          info->fprintf_func(info->stream, "%02x", buf[i]);
+Marc-André Lureau <marcandre.lureau@gmail.com> writes:
 
-This does not seem to be related to _alignment_ per se, it is
-just formatting, 32 entries per line, so that output looks
-more-or less compact and stays readable.  To me it is a
-strange move, not so much logical.
+> Hi
+>
+> On Mon, Jul 17, 2017 at 11:10 PM, Philippe Mathieu-Daudé
+> <f4bug@amsat.org> wrote:
+>> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.cocci
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  tests/tcg/alpha/test-cond.c | 2 +-
+>>  tests/tcg/alpha/test-ovf.c  | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>
+> I think those do not include osdep.h
+>
+> (sigh, tests/tcg would need some love ;)
 
-It doesn't matter much either way, but with IS_ALIGNED, to me
-at least, it looks a bit less logical than now.
+Pranith has had a couple of revs at this:
 
-Thanks,
+  Subject: [PATCH v5 00/19] Cleanup of TCG tests
+  Date: Thu,  1 Dec 2016 00:14:14 -0500
+  Message-Id: <20161201051433.17168-1-bobby.prani@gmail.com>
 
-/mjt
+We have the cross-compilers available as a fallback via docker although
+not every one can seamlessly use it for building stuff. Is getting a
+working cross-compiler setup too much of a hurdle fore those that want
+to build cross-arch tests?
+
+>
+>> diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
+>> index 74adffaa69..e5596f10b8 100644
+>> --- a/tests/tcg/alpha/test-cond.c
+>> +++ b/tests/tcg/alpha/test-cond.c
+>> @@ -77,7 +77,7 @@ int main (void)
+>>  {
+>>    int i;
+>>
+>> -  for (i = 0; i < sizeof (vectors)/sizeof(vectors[0]); i++)
+>> +  for (i = 0; i < ARRAY_SIZE(vectors); i++)
+>>      if ((*vectors[i].func)(vectors[i].v) != vectors[i].r) {
+>>        write(1, "Failed\n", 7);
+>>        return 1;
+>> diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
+>> index 01c80e7525..43fc6ebb2e 100644
+>> --- a/tests/tcg/alpha/test-ovf.c
+>> +++ b/tests/tcg/alpha/test-ovf.c
+>> @@ -20,7 +20,7 @@ int main (void)
+>>  {
+>>    int i;
+>>
+>> -  for (i = 0; i < sizeof (vectors)/sizeof(vectors[0]); i++)
+>> +  for (i = 0; i < ARRAY_SIZE(vectors); i++)
+>>      if ((*vectors[i].func)(vectors[i].a, vectors[i].b) != vectors[i].r) {
+>>        write(1, "Failed\n", 7);
+>>      }
+>> --
+>> 2.13.2
+>>
+>>
+
+
+--
+Alex Bennée
