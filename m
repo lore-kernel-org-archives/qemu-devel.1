@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXGSf-0001yl-Uu
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dXGTB-0002KA-CF
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXGSb-0005jd-UB
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41076)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dXGSb-0005jF-NJ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:57 -0400
-References: <DM2PR21MB0060B20A50AEEC8B6816154C9EA00@DM2PR21MB0060.namprd21.prod.outlook.com>
+	(envelope-from <jsnow@redhat.com>) id 1dXGTA-00060z-Do
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:34:33 -0400
 From: John Snow <jsnow@redhat.com>
-Message-ID: <1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
-Date: Mon, 17 Jul 2017 20:33:55 -0400
-MIME-Version: 1.0
-In-Reply-To: <DM2PR21MB0060B20A50AEEC8B6816154C9EA00@DM2PR21MB0060.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Disable image locking for snapshot drive?
+Date: Mon, 17 Jul 2017 20:34:21 -0400
+Message-Id: <20170718003422.4497-2-jsnow@redhat.com>
+In-Reply-To: <20170718003422.4497-1-jsnow@redhat.com>
+References: <20170718003422.4497-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 1/2] blockdev: move BDRV_O_NO_BACKING option
+ forward
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +20,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, John Snow <jsnow@redhat.com>
 
+For both external_snapshot_prepare and qmp_drive_mirror, we eventually
+append the option BDRV_O_NO_BACKING. However, we generally do so after
+we create the image.
 
+To accommodate image creation wanting to verify that a backing file
+exists or not, add this option prior to create to override checking
+the existence of the backing file. This prevents QEMU from trying to
+re-open a backing file that's already in use (thanks to qcow2 locking).
 
-On 07/17/2017 07:30 PM, Andrew Baumann via Qemu-devel wrote:
-> Hi all,
-> 
-> I'm running a recent Linux build of qemu on Windows Subsystem for Linux (WSL) which doesn't appear to implement file locking:
-> 
-> $ qemu-system-aarch64 ... -drive file=test.vhdx,if=none,id=hd0 -device virtio-blk-pci,drive=hd0
-> qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to unlock byte 100
-> qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to unlock byte 100
-> qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to lock byte 100
-> 
-> That's no big deal; I can switch it off:
-> 
-> $ qemu-system-aarch64 ... -drive file=test.vhdx,if=none,file.locking=off,id=hd0 ...
-> (all good)
-> 
-> But how can I do the same for a snapshot drive?
-> 
-> $ qemu-system-aarch64 ... -drive file=test.vhdx,if=none,file.locking=off,id=hd0 -snapshot ...
-> qemu-system-aarch64: -drive file=test.vhdx,if=none,file.locking=off,id=hd0: Failed to unlock byte 100
-> qemu-system-aarch64: -drive file=test.vhdx,if=none,file.locking=off,id=hd0: Failed to unlock byte 100
-> qemu-system-aarch64: -drive file=test.vhdx,if=none,file.locking=off,id=hd0: Could not create temporary overlay '/var/tmp/vl.o83dxn': Failed to lock byte 100
-> 
-> (I also tried the snapshot=on drive option with similar results.)
-> 
-> Thanks,
-> Andrew
-> 
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ blockdev.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Looks like the shorthand "-snapshot" doesn't let you specify any further
-options, which is a bummer.
-
-You may need to do something a little more manual, and create your own
-temporary overlay, and launch QEMU pointing to that overlay instead.
-
-That sounds like a bit of a hassle.
-
-Can we compile locking support out of QEMU instead for this platform? Or
-is there a runtime option for disabling it globally?
+diff --git a/blockdev.c b/blockdev.c
+index 7f53cc8..6469f16 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1710,7 +1710,8 @@ static void external_snapshot_prepare(BlkActionState *common,
+         }
+ 
+         flags = state->old_bs->open_flags;
+-        flags &= ~(BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING | BDRV_O_COPY_ON_READ);
++        flags &= ~(BDRV_O_SNAPSHOT | BDRV_O_COPY_ON_READ);
++        flags |= BDRV_O_NO_BACKING;
+ 
+         /* create new image w/backing file */
+         mode = s->has_mode ? s->mode : NEW_IMAGE_MODE_ABSOLUTE_PATHS;
+@@ -1735,8 +1736,6 @@ static void external_snapshot_prepare(BlkActionState *common,
+             qdict_put_str(options, "node-name", snapshot_node_name);
+         }
+         qdict_put_str(options, "driver", format);
+-
+-        flags |= BDRV_O_NO_BACKING;
+     }
+ 
+     state->new_bs = bdrv_open(new_image_file, snapshot_ref, options, flags,
+@@ -3548,6 +3547,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         backing_mode = MIRROR_OPEN_BACKING_CHAIN;
+     }
+ 
++    /* Don't open backing image in create() */
++    flags |= BDRV_O_NO_BACKING;
++
+     if ((arg->sync == MIRROR_SYNC_MODE_FULL || !source)
+         && arg->mode != NEW_IMAGE_MODE_EXISTING)
+     {
+@@ -3587,8 +3589,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+     /* Mirroring takes care of copy-on-write using the source's backing
+      * file.
+      */
+-    target_bs = bdrv_open(arg->target, NULL, options,
+-                          flags | BDRV_O_NO_BACKING, errp);
++    target_bs = bdrv_open(arg->target, NULL, options, flags, errp);
+     if (!target_bs) {
+         goto out;
+     }
+-- 
+2.9.4
