@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dXaPm-0005kY-BK
+	(envelope-from <aurelien@aurel32.net>) id 1dXaPn-0005mR-NI
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dXaPk-00040R-FB
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:22 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:48474)
+	(envelope-from <aurelien@aurel32.net>) id 1dXaPk-000411-IN
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:23 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:48436)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dXaOY-0003V7-3C
+	id 1dXaOY-0003Uy-2t
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:20 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Tue, 18 Jul 2017 23:50:24 +0200
-Message-Id: <20170718215050.3812-6-aurelien@aurel32.net>
+Date: Tue, 18 Jul 2017 23:50:50 +0200
+Message-Id: <20170718215050.3812-32-aurelien@aurel32.net>
 In-Reply-To: <20170718215050.3812-1-aurelien@aurel32.net>
 References: <20170718215050.3812-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PULL 05/31] target/sh4: return result of fcmp using
- TCG
+Subject: [Qemu-devel] [PULL 31/31] target/sh4: Use
+ tcg_gen_lookup_and_goto_ptr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,129 +26,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
-Since that the T bit of the SR register is mapped using a TGC global,
-it's better to return the value through TCG than writing it directly. It
-allows to declare the helpers with the flag TCG_CALL_NO_WG.
+From: Richard Henderson <rth@twiddle.net>
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <20170702202814.27793-5-aurelien@aurel32.net>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+Message-Id: <20170718200255.31647-28-rth@twiddle.net>
+[aurel32: fix whitespace]
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/helper.h    |  8 ++++----
- target/sh4/op_helper.c | 16 ++++++++--------
- target/sh4/translate.c | 10 ++++++----
- 3 files changed, 18 insertions(+), 16 deletions(-)
+ target/sh4/translate.c | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/target/sh4/helper.h b/target/sh4/helper.h
-index d2398922dd..767a6d5209 100644
---- a/target/sh4/helper.h
-+++ b/target/sh4/helper.h
-@@ -21,10 +21,10 @@ DEF_HELPER_FLAGS_3(fadd_DT, TCG_CALL_NO_WG, f64, env, f64, f64)
- DEF_HELPER_FLAGS_2(fcnvsd_FT_DT, TCG_CALL_NO_WG, f64, env, f32)
- DEF_HELPER_FLAGS_2(fcnvds_DT_FT, TCG_CALL_NO_WG, f32, env, f64)
- 
--DEF_HELPER_3(fcmp_eq_FT, void, env, f32, f32)
--DEF_HELPER_3(fcmp_eq_DT, void, env, f64, f64)
--DEF_HELPER_3(fcmp_gt_FT, void, env, f32, f32)
--DEF_HELPER_3(fcmp_gt_DT, void, env, f64, f64)
-+DEF_HELPER_FLAGS_3(fcmp_eq_FT, TCG_CALL_NO_WG, i32, env, f32, f32)
-+DEF_HELPER_FLAGS_3(fcmp_eq_DT, TCG_CALL_NO_WG, i32, env, f64, f64)
-+DEF_HELPER_FLAGS_3(fcmp_gt_FT, TCG_CALL_NO_WG, i32, env, f32, f32)
-+DEF_HELPER_FLAGS_3(fcmp_gt_DT, TCG_CALL_NO_WG, i32, env, f64, f64)
- DEF_HELPER_FLAGS_3(fdiv_FT, TCG_CALL_NO_WG, f32, env, f32, f32)
- DEF_HELPER_FLAGS_3(fdiv_DT, TCG_CALL_NO_WG, f64, env, f64, f64)
- DEF_HELPER_FLAGS_2(float_FT, TCG_CALL_NO_WG, f32, env, i32)
-diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-index 64206cf803..c3d19b1f61 100644
---- a/target/sh4/op_helper.c
-+++ b/target/sh4/op_helper.c
-@@ -268,44 +268,44 @@ float64 helper_fadd_DT(CPUSH4State *env, float64 t0, float64 t1)
-     return t0;
- }
- 
--void helper_fcmp_eq_FT(CPUSH4State *env, float32 t0, float32 t1)
-+uint32_t helper_fcmp_eq_FT(CPUSH4State *env, float32 t0, float32 t1)
- {
-     int relation;
- 
-     set_float_exception_flags(0, &env->fp_status);
-     relation = float32_compare(t0, t1, &env->fp_status);
-     update_fpscr(env, GETPC());
--    env->sr_t = (relation == float_relation_equal);
-+    return relation == float_relation_equal;
- }
- 
--void helper_fcmp_eq_DT(CPUSH4State *env, float64 t0, float64 t1)
-+uint32_t helper_fcmp_eq_DT(CPUSH4State *env, float64 t0, float64 t1)
- {
-     int relation;
- 
-     set_float_exception_flags(0, &env->fp_status);
-     relation = float64_compare(t0, t1, &env->fp_status);
-     update_fpscr(env, GETPC());
--    env->sr_t = (relation == float_relation_equal);
-+    return relation == float_relation_equal;
- }
- 
--void helper_fcmp_gt_FT(CPUSH4State *env, float32 t0, float32 t1)
-+uint32_t helper_fcmp_gt_FT(CPUSH4State *env, float32 t0, float32 t1)
- {
-     int relation;
- 
-     set_float_exception_flags(0, &env->fp_status);
-     relation = float32_compare(t0, t1, &env->fp_status);
-     update_fpscr(env, GETPC());
--    env->sr_t = (relation == float_relation_greater);
-+    return relation == float_relation_greater;
- }
- 
--void helper_fcmp_gt_DT(CPUSH4State *env, float64 t0, float64 t1)
-+uint32_t helper_fcmp_gt_DT(CPUSH4State *env, float64 t0, float64 t1)
- {
-     int relation;
- 
-     set_float_exception_flags(0, &env->fp_status);
-     relation = float64_compare(t0, t1, &env->fp_status);
-     update_fpscr(env, GETPC());
--    env->sr_t = (relation == float_relation_greater);
-+    return relation == float_relation_greater;
- }
- 
- float64 helper_fcnvsd_FT_DT(CPUSH4State *env, float32 t0)
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 9360522a98..4c3512f62f 100644
+index ce84fbb966..498bb99dc1 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -1077,10 +1077,10 @@ static void _decode_opc(DisasContext * ctx)
-                     gen_helper_fdiv_DT(fp0, cpu_env, fp0, fp1);
-                     break;
-                 case 0xf004:		/* fcmp/eq Rm,Rn */
--                    gen_helper_fcmp_eq_DT(cpu_env, fp0, fp1);
-+                    gen_helper_fcmp_eq_DT(cpu_sr_t, cpu_env, fp0, fp1);
-                     return;
-                 case 0xf005:		/* fcmp/gt Rm,Rn */
--                    gen_helper_fcmp_gt_DT(cpu_env, fp0, fp1);
-+                    gen_helper_fcmp_gt_DT(cpu_sr_t, cpu_env, fp0, fp1);
-                     return;
-                 }
- 		gen_store_fpr64(fp0, DREG(B11_8));
-@@ -1109,11 +1109,13 @@ static void _decode_opc(DisasContext * ctx)
-                                        cpu_fregs[FREG(B7_4)]);
-                     break;
-                 case 0xf004:		/* fcmp/eq Rm,Rn */
--                    gen_helper_fcmp_eq_FT(cpu_env, cpu_fregs[FREG(B11_8)],
-+                    gen_helper_fcmp_eq_FT(cpu_sr_t, cpu_env,
-+                                          cpu_fregs[FREG(B11_8)],
-                                           cpu_fregs[FREG(B7_4)]);
-                     return;
-                 case 0xf005:		/* fcmp/gt Rm,Rn */
--                    gen_helper_fcmp_gt_FT(cpu_env, cpu_fregs[FREG(B11_8)],
-+                    gen_helper_fcmp_gt_FT(cpu_sr_t, cpu_env,
-+                                          cpu_fregs[FREG(B11_8)],
-                                           cpu_fregs[FREG(B7_4)]);
-                     return;
-                 }
+@@ -230,12 +230,15 @@ static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
+     }
+ }
+ 
++static inline bool use_exit_tb(DisasContext *ctx)
++{
++    return (ctx->tbflags & GUSA_EXCLUSIVE) != 0;
++}
++
+ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+ {
+-    if (unlikely(ctx->singlestep_enabled)) {
+-        return false;
+-    }
+-    if (ctx->tbflags & GUSA_EXCLUSIVE) {
++    /* Use a direct jump if in same page and singlestep not enabled */
++    if (unlikely(ctx->singlestep_enabled || use_exit_tb(ctx))) {
+         return false;
+     }
+ #ifndef CONFIG_USER_ONLY
+@@ -248,28 +251,35 @@ static inline bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+ {
+     if (use_goto_tb(ctx, dest)) {
+-	/* Use a direct jump if in same page and singlestep not enabled */
+         tcg_gen_goto_tb(n);
+         tcg_gen_movi_i32(cpu_pc, dest);
+         tcg_gen_exit_tb((uintptr_t)ctx->tb + n);
+     } else {
+         tcg_gen_movi_i32(cpu_pc, dest);
+-        if (ctx->singlestep_enabled)
++        if (ctx->singlestep_enabled) {
+             gen_helper_debug(cpu_env);
+-        tcg_gen_exit_tb(0);
++        } else if (use_exit_tb(ctx)) {
++            tcg_gen_exit_tb(0);
++        } else {
++            tcg_gen_lookup_and_goto_ptr(cpu_pc);
++        }
+     }
+ }
+ 
+ static void gen_jump(DisasContext * ctx)
+ {
+-    if (ctx->delayed_pc == (uint32_t) - 1) {
++    if (ctx->delayed_pc == -1) {
+ 	/* Target is not statically known, it comes necessarily from a
+ 	   delayed jump as immediate jump are conditinal jumps */
+ 	tcg_gen_mov_i32(cpu_pc, cpu_delayed_pc);
+         tcg_gen_discard_i32(cpu_delayed_pc);
+-	if (ctx->singlestep_enabled)
++        if (ctx->singlestep_enabled) {
+             gen_helper_debug(cpu_env);
+-	tcg_gen_exit_tb(0);
++        } else if (use_exit_tb(ctx)) {
++            tcg_gen_exit_tb(0);
++        } else {
++            tcg_gen_lookup_and_goto_ptr(cpu_pc);
++        }
+     } else {
+ 	gen_goto_tb(ctx, 0, ctx->delayed_pc);
+     }
 -- 
 2.11.0
