@@ -1,50 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dXSkP-0008E4-LY
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:11 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXSko-000085-QW
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dXSkK-000764-NH
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1dXSkK-00075O-Cq
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:04 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6IDe5xA070651
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 09:41:01 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bsbxb6qq8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 09:41:01 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 07:41:00 -0600
-Received: from b03ledav003.gho.boulder.ibm.com
-	(b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-	by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v6IDev1g65339476
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 06:40:57 -0700
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E858E6A054
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:40:57 -0600 (MDT)
-Received: from sbct-3.watson.ibm.com (unknown [9.2.141.158])
-	by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP id D00AC6A048
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:40:57 -0600 (MDT)
-References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
-	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
-	<CAJ+F1C+MYV+GLpGD0RZJ9gWXchfcbjrbDHQ5OsxuZ6W=chzBEw@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 09:40:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXSkn-0007Ms-Gu
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:34 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+MYV+GLpGD0RZJ9gWXchfcbjrbDHQ5OsxuZ6W=chzBEw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <d3a45e88-3c10-3b45-a0c1-325f59a73f36@linux.vnet.ibm.com>
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <87bmoi806u.fsf@linaro.org>
+References: <20170718061005.29518-1-f4bug@amsat.org>
+	<20170718061005.29518-27-f4bug@amsat.org>
+	<CAJ+F1C+WsdUp3Vtx+-FZ9g7URSAQuJWb6h7-w6yJXM+4TKQNjA@mail.gmail.com>
+	<87bmoi806u.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 18 Jul 2017 10:41:29 -0300
+Message-ID: <CAAdtpL7HcwwpCNjVxpaX=nB72LS_CJjU=VdS_aH0EM6i8QVBOw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
+Subject: Re: [Qemu-devel] [PATCH 26/29] tests/tcg: use ARRAY_SIZE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,34 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, qemu trival <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 07/18/2017 08:08 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+On Tue, Jul 18, 2017 at 8:16 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
 >
-> On Tue, Jul 18, 2017 at 1:49 AM, Amarnath Valluri
-> <amarnath.valluri@intel.com> wrote:
->> This change introduces a new TPM backend driver that can communicate w=
-ith
->> swtpm(software TPM emulator) using unix domain socket interface.
->>
->> Swtpm uses two unix sockets, one for plain TPM commands and responses,=
- and one
->> for out-of-band control messages.
->>
->> The swtpm and associated tools can be found here:
->>      https://github.com/stefanberger/swtpm
->>
->> The swtpm's control channel protocol specification can be found here:
->>      https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specif=
-ication
-> I am afraid this isn't enough yet.
+> Pranith has had a couple of revs at this:
+>
+>   Subject: [PATCH v5 00/19] Cleanup of TCG tests
+>   Date: Thu,  1 Dec 2016 00:14:14 -0500
+>   Message-Id: <20161201051433.17168-1-bobby.prani@gmail.com>
+>
+> We have the cross-compilers available as a fallback via docker although
+> not every one can seamlessly use it for building stuff. Is getting a
+> working cross-compiler setup too much of a hurdle fore those that want
+> to build cross-arch tests?
 
+I have a WiP branch using qemu to cross-run tests it _works_ funny but
+when it fails it is not funny to understand what is really buggy...
+/to be continued.../
 
-I'll put a pointer to this here on that page so that content isn't=20
-replicated multiple times.
-
-https://github.com/stefanberger/swtpm/blob/master/man/man3/swtpm_ioctls.p=
-od
-
-    Stefan
+Phil.
