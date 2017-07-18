@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXZ7W-00056w-A0
+	(envelope-from <armbru@redhat.com>) id 1dXZ7W-000576-TA
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXZ7U-00018G-R9
+	(envelope-from <armbru@redhat.com>) id 1dXZ7V-00018l-38
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45032)
+Received: from mx1.redhat.com ([209.132.183.28]:60396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXZ7U-00017h-IP
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXZ7U-00017w-PE
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:24 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9250D61BBB
+	by mx1.redhat.com (Postfix) with ESMTPS id C1CFA7CE0B
 	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:23 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-60.ams2.redhat.com
 	[10.36.116.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3420E5F912
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 63AF9600CC
 	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Jul 2017 22:29:15 +0200
-Message-Id: <1500409760-20730-6-git-send-email-armbru@redhat.com>
+Date: Tue, 18 Jul 2017 22:29:19 +0200
+Message-Id: <1500409760-20730-10-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500409760-20730-1-git-send-email-armbru@redhat.com>
 References: <1500409760-20730-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 05/10] block: Use JSON null instead of "" to
- disable backing file
+Subject: [Qemu-devel] [PULL 09/10] migration: Unshare MigrationParameters
+ struct for now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,169 +36,226 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-BlockdevRef is an alternate of BlockdevOptions (inline definition) and
-str (reference to an existing block device by name).  BlockdevRef
-value "" is special: "no block device should be referenced."  It's
-actually interpreted that way in just one place: optional member
-@backing of COW formats.  Semantics:
+Commit de63ab6 "migrate: Share common MigrationParameters struct"
+reused MigrationParameters for the arguments of
+migrate-set-parameters, with the following rationale:
 
-* Present means "use this block device" as backing storage
+    It is rather verbose, and slightly error-prone, to repeat
+    the same set of parameters for input (migrate-set-parameters)
+    as for output (query-migrate-parameters), where the only
+    difference is whether the members are optional.  We can just
+    document that the optional members will always be present
+    on output, and then share a common struct between both
+    commands.  The next patch can then reduce the amount of
+    code needed on input.
 
-* Absent means "default to the one stored in the image"
+I need to unshare them to correct a design flaw in a stupid, but
+minimally invasive way, in the next commit.  We can restore the
+sharing when we redo that patch in a less stupid way.  Add a suitable
+TODO comment.
 
-* Except "" means "don't use backing storage at all"
-
-The first two are perfectly normal: when the parameter is absent, it
-defaults to an implied value, but the value's meaning is the same.
-
-The third one overloads the parameter with a second meaning.  The
-overloading is *implicit*, i.e. it's not visible in the types.  Works
-here, because "" is not a value block device ID.
-
-Pressing argument values the schema accepts, but are semantically
-invalid, into service to mean "do something else entirely" is not
-general, as suitable invalid values need not exist.  I also find it
-ugly.
-
-To clean this up, we could add a separate flag argument to suppress
-@backing, or add a distinct value to @backing.  This commit implements
-the latter: add JSON null to the values of @backing, deprecate "".
-
-Because we're so close to the 2.10 freeze, implement it in the
-stupidest way possible: have qmp_blockdev_add() rewrite null to ""
-before anything else can see the null.  Works, because BlockdevRef
-occurs only within arguments of blockdev-add.  The proper way to do it
-would be rewriting "" to null, preferably in a cleaner way, but that
-requires fixing up code to work with null.  Add a TODO comment for
-that.
+Note that I revert only the sharing part of commit de63ab6, not the
+part that made the members of query-migrate-parameters' result
+optional.  The schema (and thus introspection) remains inaccurate for
+query-migrate-parameters.  If we decide not to restore the sharing, we
+should revert that part, too.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- blockdev.c             | 14 ++++++++++++++
- qapi/block-core.json   | 29 ++++++++++++++++++++++-------
- tests/qemu-iotests/085 |  2 +-
- tests/qemu-iotests/139 |  2 +-
- 4 files changed, 38 insertions(+), 9 deletions(-)
+ hmp.c                 |  4 +--
+ migration/migration.c | 12 +++++---
+ qapi-schema.json      | 85 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 87 insertions(+), 14 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 9c6dd27..1c42699 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3886,6 +3886,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
-     QObject *obj;
-     Visitor *v = qobject_output_visitor_new(&obj);
-     QDict *qdict;
-+    const QDictEntry *ent;
-     Error *local_err = NULL;
+diff --git a/hmp.c b/hmp.c
+index 2b2db3c..0a5de75 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1511,7 +1511,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     const char *param = qdict_get_str(qdict, "parameter");
+     const char *valuestr = qdict_get_str(qdict, "value");
+     Visitor *v = string_input_visitor_new(valuestr);
+-    MigrationParameters *p = g_new0(MigrationParameters, 1);
++    MigrateSetParameters *p = g_new0(MigrateSetParameters, 1);
+     uint64_t valuebw = 0;
+     Error *err = NULL;
+     int i, ret;
+@@ -1589,7 +1589,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     }
  
-     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-@@ -3899,6 +3900,19 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
- 
-     qdict_flatten(qdict);
- 
-+    /*
-+     * Rewrite "backing": null to "backing": ""
-+     * TODO Rewrite "" to null instead, and perhaps not even here
-+     */
-+    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
-+        char *dot = strrchr(ent->key, '.');
-+
-+        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
-+            && qobject_type(ent->value) == QTYPE_QNULL) {
-+            qdict_put(qdict, ent->key, qstring_new());
-+        }
-+    }
-+
-     if (!qdict_get_try_str(qdict, "node-name")) {
-         error_setg(errp, "'node-name' must be specified for the root node");
-         goto fail;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c437aa5..4088041 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2266,15 +2266,14 @@
- # besides their data source and an optional backing file.
- #
- # @backing:     reference to or definition of the backing file block
--#               device (if missing, taken from the image file content). It is
--#               allowed to pass an empty string here in order to disable the
--#               default backing file.
-+#               device, null disables the backing file entirely.
-+#               Defaults to the backing file stored the image file.
- #
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsGenericCOWFormat',
-   'base': 'BlockdevOptionsGenericFormat',
--  'data': { '*backing': 'BlockdevRef' } }
-+  'data': { '*backing': 'BlockdevRefOrNull' } }
- 
- ##
- # @Qcow2OverlapCheckMode:
-@@ -3113,9 +3112,7 @@
- # Reference to a block device.
- #
- # @definition:      defines a new block device inline
--# @reference:       references the ID of an existing block device. An
--#                   empty string means that no block device should be
--#                   referenced.
-+# @reference:       references the ID of an existing block device
- #
- # Since: 2.9
- ##
-@@ -3124,6 +3121,24 @@
-             'reference': 'str' } }
- 
- ##
-+# @BlockdevRefOrNull:
-+#
-+# Reference to a block device.
-+#
-+# @definition:      defines a new block device inline
-+# @reference:       references the ID of an existing block device.
-+#                   An empty string means that no block device should
-+#                   be referenced.  Deprecated; use null instead.
-+# @null:            No block device should be referenced (since 2.10)
-+#
-+# Since: 2.9
-+##
-+{ 'alternate': 'BlockdevRefOrNull',
-+  'data': { 'definition': 'BlockdevOptions',
-+            'reference': 'str',
-+            'null': 'null' } }
-+
-+##
- # @blockdev-add:
- #
- # Creates a new block device. If the @id option is given at the top level, a
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index b97adcd..76e10aa 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -106,7 +106,7 @@ function add_snapshot_image()
-     snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
-     _make_test_img -b "${base_image}" "$size"
-     mv "${TEST_IMG}" "${snapshot_file}"
--    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
-+    do_blockdev_add "$1" "'backing': null, " "${snapshot_file}"
+  cleanup:
+-    qapi_free_MigrationParameters(p);
++    qapi_free_MigrateSetParameters(p);
+     visit_free(v);
+     if (err) {
+         error_report_err(err);
+diff --git a/migration/migration.c b/migration/migration.c
+index d0a1d13..f6a9443 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -644,7 +644,7 @@ void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+     }
  }
  
- # ${1}: unique identifier for the snapshot filename
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 175d8f0..b2f14db 100644
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -69,7 +69,7 @@ class TestBlockdevDel(iotests.QMPTestCase):
-                          '-b', base_img, new_img, '1M')
-         opts = {'driver': iotests.imgfmt,
-                 'node-name': node,
--                'backing': '',
-+                'backing': None,
-                 'file': {'driver': 'file',
-                          'filename': new_img}}
-         result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
+-void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
++void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+ {
+     MigrationState *s = migrate_get_current();
+ 
+@@ -704,7 +704,11 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
+                     "is invalid, it should be positive");
+     }
+ 
+-    /* TODO use QAPI_CLONE() instead of duplicating it inline */
++    /*
++     * TODO if we fuse MigrateSetParameters back into
++     * MigrationParameters, use QAPI_CLONE() instead of duplicating it
++     * inline
++     */
+     if (params->has_compress_level) {
+         s->parameters.compress_level = params->compress_level;
+     }
+@@ -1165,7 +1169,7 @@ int64_t qmp_query_migrate_cache_size(Error **errp)
+ 
+ void qmp_migrate_set_speed(int64_t value, Error **errp)
+ {
+-    MigrationParameters p = {
++    MigrateSetParameters p = {
+         .has_max_bandwidth = true,
+         .max_bandwidth = value,
+     };
+@@ -1185,7 +1189,7 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+     value *= 1000; /* Convert to milliseconds */
+     value = MAX(0, MIN(INT64_MAX, value));
+ 
+-    MigrationParameters p = {
++    MigrateSetParameters p = {
+         .has_downtime_limit = true,
+         .downtime_limit = value,
+     };
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 7b75cf1..b5ec942 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1035,6 +1035,77 @@
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ] }
+ 
+ ##
++# @MigrateSetParameters:
++#
++# @compress-level: compression level
++#
++# @compress-threads: compression thread count
++#
++# @decompress-threads: decompression thread count
++#
++# @cpu-throttle-initial: Initial percentage of time guest cpus are
++#                        throttled when migration auto-converge is activated.
++#                        The default value is 20. (Since 2.7)
++#
++# @cpu-throttle-increment: throttle percentage increase each time
++#                          auto-converge detects that migration is not making
++#                          progress. The default value is 10. (Since 2.7)
++#
++# @tls-creds: ID of the 'tls-creds' object that provides credentials
++#             for establishing a TLS connection over the migration data
++#             channel. On the outgoing side of the migration, the credentials
++#             must be for a 'client' endpoint, while for the incoming side the
++#             credentials must be for a 'server' endpoint. Setting this
++#             to a non-empty string enables TLS for all migrations.
++#             An empty string means that QEMU will use plain text mode for
++#             migration, rather than TLS (Since 2.9)
++#             Previously (since 2.7), this was reported by omitting
++#             tls-creds instead.
++#
++# @tls-hostname: hostname of the target host for the migration. This
++#                is required when using x509 based TLS credentials and the
++#                migration URI does not already include a hostname. For
++#                example if using fd: or exec: based migration, the
++#                hostname must be provided so that the server's x509
++#                certificate identity can be validated. (Since 2.7)
++#                An empty string means that QEMU will use the hostname
++#                associated with the migration URI, if any. (Since 2.9)
++#                Previously (since 2.7), this was reported by omitting
++#                tls-hostname instead.
++#
++# @max-bandwidth: to set maximum speed for migration. maximum speed in
++#                 bytes per second. (Since 2.8)
++#
++# @downtime-limit: set maximum tolerated downtime for migration. maximum
++#                  downtime in milliseconds (Since 2.8)
++#
++# @x-checkpoint-delay: the delay time between two COLO checkpoints. (Since 2.8)
++#
++# @block-incremental: Affects how much storage is migrated when the
++# 	block migration capability is enabled.  When false, the entire
++# 	storage backing chain is migrated into a flattened image at
++# 	the destination; when true, only the active qcow2 layer is
++# 	migrated and the destination must already have access to the
++# 	same backing chain as was used on the source.  (since 2.10)
++#
++# Since: 2.4
++##
++# TODO either fuse back into MigrationParameters, or make
++# MigrationParameters members mandatory
++{ 'struct': 'MigrateSetParameters',
++  'data': { '*compress-level': 'int',
++            '*compress-threads': 'int',
++            '*decompress-threads': 'int',
++            '*cpu-throttle-initial': 'int',
++            '*cpu-throttle-increment': 'int',
++            '*tls-creds': 'str',
++            '*tls-hostname': 'str',
++            '*max-bandwidth': 'int',
++            '*downtime-limit': 'int',
++            '*x-checkpoint-delay': 'int',
++            '*block-incremental': 'bool' } }
++
++##
+ # @migrate-set-parameters:
+ #
+ # Set various migration parameters.
+@@ -1048,13 +1119,12 @@
+ #
+ ##
+ { 'command': 'migrate-set-parameters', 'boxed': true,
+-  'data': 'MigrationParameters' }
++  'data': 'MigrateSetParameters' }
+ 
+ ##
+ # @MigrationParameters:
+ #
+-# Optional members can be omitted on input ('migrate-set-parameters')
+-# but members will always be present on output.
++# The optional members aren't actually optional.
+ #
+ # @compress-level: compression level
+ #
+@@ -1063,19 +1133,18 @@
+ # @decompress-threads: decompression thread count
+ #
+ # @cpu-throttle-initial: Initial percentage of time guest cpus are
+-#                        throttledwhen migration auto-converge is activated.
+-#                        The default value is 20. (Since 2.7)
++#                        throttled when migration auto-converge is activated.
++#                        (Since 2.7)
+ #
+ # @cpu-throttle-increment: throttle percentage increase each time
+ #                          auto-converge detects that migration is not making
+-#                          progress. The default value is 10. (Since 2.7)
++#                          progress. (Since 2.7)
+ #
+ # @tls-creds: ID of the 'tls-creds' object that provides credentials
+ #             for establishing a TLS connection over the migration data
+ #             channel. On the outgoing side of the migration, the credentials
+ #             must be for a 'client' endpoint, while for the incoming side the
+-#             credentials must be for a 'server' endpoint. Setting this
+-#             to a non-empty string enables TLS for all migrations.
++#             credentials must be for a 'server' endpoint.
+ #             An empty string means that QEMU will use plain text mode for
+ #             migration, rather than TLS (Since 2.7)
+ #             Note: 2.8 reports this by omitting tls-creds instead.
 -- 
 2.7.5
