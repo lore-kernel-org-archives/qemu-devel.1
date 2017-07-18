@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXWfB-0007Bl-JX
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:02 -0400
+	(envelope-from <cota@braap.org>) id 1dXWfj-0007Xa-Lo
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXWf8-0003E9-I6
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:01 -0400
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-11-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <53a83027-dde9-9728-90ab-b90a92484445@redhat.com>
-Date: Tue, 18 Jul 2017 12:51:55 -0500
+	(envelope-from <cota@braap.org>) id 1dXWfg-0003bV-Ju
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:35 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39135)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXWfg-0003ak-DY
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:52:32 -0400
+Date: Tue, 18 Jul 2017 13:52:31 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170718175231.GB31298@flamenco>
+References: <1500235468-15341-1-git-send-email-cota@braap.org>
+	<1500235468-15341-46-git-send-email-cota@braap.org>
+	<04004f7a-0e84-1b51-bc93-97c70213541d@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-11-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CM9t1M1VfFXhBtVqgWMjdV2wBqgBxI6Uv"
-Subject: Re: [Qemu-devel] [PATCH 10/29] net/rocker: use QEMU_IS_ALIGNED macro
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04004f7a-0e84-1b51-bc93-97c70213541d@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 45/45] tcg: enable multiple TCG contexts
+ in softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
 Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CM9t1M1VfFXhBtVqgWMjdV2wBqgBxI6Uv
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-trivial@nongnu.org, Jiri Pirko <jiri@resnulli.us>,
- Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <53a83027-dde9-9728-90ab-b90a92484445@redhat.com>
-Subject: Re: [PATCH 10/29] net/rocker: use QEMU_IS_ALIGNED macro
-References: <20170718061005.29518-1-f4bug@amsat.org>
- <20170718061005.29518-11-f4bug@amsat.org>
-In-Reply-To: <20170718061005.29518-11-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jul 17, 2017 at 19:25:14 -1000, Richard Henderson wrote:
+> On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
+> >+
+> >+    /* claim the first free pointer in tcg_ctxs and increment n_tcg_ctxs */
+> >+    for (i = 0; i < smp_cpus; i++) {
+> >+        if (atomic_cmpxchg(&tcg_ctxs[i], NULL, s) == NULL) {
+> >+            unsigned int n;
+> >+
+> >+            n = atomic_fetch_inc(&n_tcg_ctxs);
+> 
+> Surely this is too much effort.  The increment on n_tcg_ctxs is sufficient
+> to produce an index for assignment.  We never free the contexts...
+> 
+> Which also suggests that it might be better to avoid an indirection in
+> tcg_ctxs and allocate all of the structures in one big block?  I.e.
+> 
+> TCGContext *tcg_ctxs;
+> 
+> // At the end of tcg_context_init.
+> #ifdef CONFIG_USER_ONLY
+>     tcg_ctxs = s;
+> #else
+>     // No need to zero; we'll completely overwrite each structure
+>     // during tcg_register_thread.
+>     tcg_ctxs = g_new(TCGContext, smp_cpus);
+> #endif
 
-On 07/18/2017 01:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osde=
-p.cocci
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/net/rocker/rocker.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-> index 4f0f6d71e5..55228f2f52 100644
-> --- a/hw/net/rocker/rocker.c
-> +++ b/hw/net/rocker/rocker.c
-> @@ -1419,7 +1419,7 @@ static int pci_rocker_init(PCIDevice *dev)
->              desc_ring_set_consume(ring, cmd_consume, ROCKER_MSIX_VEC_C=
-MD);
->          } else if (i =3D=3D ROCKER_RING_EVENT) {
->              desc_ring_set_consume(ring, NULL, ROCKER_MSIX_VEC_EVENT);
-> -        } else if (i % 2 =3D=3D 0) {
-> +        } else if (QEMU_IS_ALIGNED(i, 2)) {
->              desc_ring_set_consume(ring, tx_consume,
->                                    ROCKER_MSIX_VEC_TX((i - 2) / 2));
->          } else if (i % 2 =3D=3D 1) {
->=20
+The primary reason is that at this point we don't know yet whether
+we'll need smp_cpus contexts or just one context (!mttcg), since
+qemu_tcg_mttcg_enabled() is set up after this function is called
+(the path is: vl.c -> configure_accelerator() -> tcg_init_context ->
+this function; quite a bit later, qemu_tcg_configure() is
+called, setting up the bool behind qemu_tcg_mttcg_enabled().)
 
-Given the if chain, I think you don't want this one.
+A secondary reason is to avoid false sharing of cachelines. But
+it seems quite unlikely that the last cacheline of TCGContext
+will ever be used, so this isn't really an issue.
 
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---CM9t1M1VfFXhBtVqgWMjdV2wBqgBxI6Uv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluSrsACgkQp6FrSiUn
-Q2pGTAgAqomevxNLRzvDQs6shE+VwqMTWgiwNjEdSLqdSaGCinByVPrcfex2zRR6
-5vGJhFYJRF3lPXcSDiv5S5hdSGwfz+2GR2VLDhUH1fZRN0nk4Hz5LesER4pJ7GP1
-Lb8iTFKSfoduuBZwPbfMZRbvMAfEGtvwmb2XcFJKsir69Ew+a3jV0GNblNCLyBUT
-uzjv8GbXKCeVhOp3Llovo1EesMw4eDzF5wNPXoqWJt5OtyQZbW1VW2JWkH8iQUVF
-WKml0xlk8U95EVYgz0WF1XrF6uEiDUhV7FL9akIVWC3BkTl43t0TSnccoaFYnW0w
-7nvfmNEsP4vXB5gxC2XRLc8abWKWMQ==
-=XfeF
------END PGP SIGNATURE-----
-
---CM9t1M1VfFXhBtVqgWMjdV2wBqgBxI6Uv--
+		E.
