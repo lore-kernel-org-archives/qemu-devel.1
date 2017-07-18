@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXUKq-0005pV-9u
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:22:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXUO0-0000Pz-3I
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:26:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXUKn-0000Bk-4r
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:22:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58055)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXUKm-0000At-Ri
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:22:49 -0400
-Date: Tue, 18 Jul 2017 17:22:44 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170718172244.75fa5d73@gondolin>
-In-Reply-To: <CAAdtpL4TGurYS3tO1RbbJ78HrMRg+AyUmFf_+WhfkTdXLp0cOA@mail.gmail.com>
-References: <20170718142455.32676-1-cohuck@redhat.com>
-	<20170718142455.32676-9-cohuck@redhat.com>
-	<CAAdtpL4TGurYS3tO1RbbJ78HrMRg+AyUmFf_+WhfkTdXLp0cOA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1dXUNz-0003CG-0W
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:26:08 -0400
+References: <20170718061005.29518-1-f4bug@amsat.org>
+	<20170718061005.29518-6-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a0274cb0-072d-534a-607a-924ecda631f5@redhat.com>
+Date: Tue, 18 Jul 2017 10:25:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v2 8/9] s390x/kvm: msi route fixup for
- non-pci
+In-Reply-To: <20170718061005.29518-6-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AQwUI17HplluBpDIm7D6cB8qlphsK8guu"
+Subject: Re: [Qemu-devel] [PATCH 05/29] block: use QEMU_IS_ALIGNED macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, zyimin@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue, 18 Jul 2017 11:58:08 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AQwUI17HplluBpDIm7D6cB8qlphsK8guu
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <a0274cb0-072d-534a-607a-924ecda631f5@redhat.com>
+Subject: Re: [PATCH 05/29] block: use QEMU_IS_ALIGNED macro
+References: <20170718061005.29518-1-f4bug@amsat.org>
+ <20170718061005.29518-6-f4bug@amsat.org>
+In-Reply-To: <20170718061005.29518-6-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Hi Cornelia,
+On 07/18/2017 01:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osde=
+p.cocci
 >=20
-> On Tue, Jul 18, 2017 at 11:24 AM, Cornelia Huck <cohuck@redhat.com> wrote:
-> > If we don't provide pci, we cannot have a pci device for which we
-> > have to translate to adapter routes: just return -ENODEV.
-> >
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  target/s390x/kvm.c | 33 +++++++++++++++++++--------------
-> >  1 file changed, 19 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> > index 60688888c3..df0e5af151 100644
-> > --- a/target/s390x/kvm.c
-> > +++ b/target/s390x/kvm.c
-> > @@ -2424,22 +2424,27 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_rou=
-ting_entry *route,
-> >      uint32_t idx =3D data >> ZPCI_MSI_VEC_BITS;
-> >      uint32_t vec =3D data & ZPCI_MSI_VEC_MASK;
-> >
-> > -    pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
-> > -    if (!pbdev) {
-> > -        DPRINTF("add_msi_route no dev\n");
-> > -        return -ENODEV;
-> > -    }
-> > +    if (s390_has_feat(S390_FEAT_ZPCI)) {
-> > +        pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
-> > +        if (!pbdev) {
-> > +            DPRINTF("add_msi_route no dev\n");
-> > +            return -ENODEV;
-> > +        }
-> >
-> > -    pbdev->routes.adapter.ind_offset =3D vec;
-> > +        pbdev->routes.adapter.ind_offset =3D vec;
-> >
-> > -    route->type =3D KVM_IRQ_ROUTING_S390_ADAPTER;
-> > -    route->flags =3D 0;
-> > -    route->u.adapter.summary_addr =3D pbdev->routes.adapter.summary_ad=
-dr;
-> > -    route->u.adapter.ind_addr =3D pbdev->routes.adapter.ind_addr;
-> > -    route->u.adapter.summary_offset =3D pbdev->routes.adapter.summary_=
-offset;
-> > -    route->u.adapter.ind_offset =3D pbdev->routes.adapter.ind_offset;
-> > -    route->u.adapter.adapter_id =3D pbdev->routes.adapter.adapter_id;
-> > -    return 0;
-> > +        route->type =3D KVM_IRQ_ROUTING_S390_ADAPTER;
-> > +        route->flags =3D 0;
-> > +        route->u.adapter.summary_addr =3D pbdev->routes.adapter.summar=
-y_addr;
-> > +        route->u.adapter.ind_addr =3D pbdev->routes.adapter.ind_addr;
-> > +        route->u.adapter.summary_offset =3D pbdev->routes.adapter.summ=
-ary_offset;
-> > +        route->u.adapter.ind_offset =3D pbdev->routes.adapter.ind_offs=
-et;
-> > +        route->u.adapter.adapter_id =3D pbdev->routes.adapter.adapter_=
-id;
-> > +        return 0;
-> > +    } else {
-> > +        DPRINTF("fixup_msi_route on non-pci machine?!\n");
-> > +        return -ENODEV;
-> > +    }
-> >  }
-> >
-> >  int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
-> > --
-> > 2.13.3 =20
->=20
-> What about inverting the check?
->=20
-> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> +        DPRINTF("fixup_msi_route on non-pci machine?!\n");
-> +        return -ENODEV;
-> +    }
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  block/io.c          | 4 ++--
+>  block/qcow2-cache.c | 2 +-
+>  block/vhdx-log.c    | 2 +-
+>  block/vvfat.c       | 2 +-
+>  4 files changed, 5 insertions(+), 5 deletions(-)
 
-I usually prefer the more common branch on top, but (1) this causes
-more changes in this case and (2) I'm not so sure if zpci on really is
-the common case...
+The first three look okay,
+
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -454,7 +454,7 @@ static direntry_t *create_long_filename(BDRVVVFATSt=
+ate *s, const char *filename)
+>          entry=3Darray_get(&(s->directory),s->directory.next-1-(i/26));=
+
+>          if (i >=3D 2 * length + 2) {
+>              entry->name[offset] =3D 0xff;
+> -        } else if (i % 2 =3D=3D 0) {
+> +        } else if (QEMU_IS_ALIGNED(i, 2)) {
+>              entry->name[offset] =3D longname[i / 2] & 0xff;
+>          } else {
+>              entry->name[offset] =3D longname[i / 2] >> 8;
+
+but this one looks a bit odd.  Code-wise, it's identical, but
+semantically, this doesn't feel like an alignment check, so much as an
+even-or-odd check.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AQwUI17HplluBpDIm7D6cB8qlphsK8guu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluKH8ACgkQp6FrSiUn
+Q2p1gggAsGdkoMZMENu35D8Gap/CfqSTH4DKstyfRDuYxvl69sxI4sMkkd/VljKe
+2SGizJTyNlPo9KMzwsAjDtoUiQp+z3gyjtlR5HQVAUjRr8NhRkZGAQ06r7I8uP08
+WcoPZSAfTh2oz0Q7SFgUwwM76bR56U6Va43xGW2AG6hSgYl35KQZgiX8B4Z4Bo66
+EmmuKS6FigkpoyV924k5DSZnoNhrIJEit/w4xLhj6oqx5WUWLE8ibZEGORrh8cnY
+Nyq4Vju8dQ0HR520eJLbgR42CUdoMdmRTf1rwfPcv6c0X5xTSYv9IxFMyhd0vtWO
+xd+TPZwGZpDTcWxTiTi3DRUjb5YD1Q==
+=ulSt
+-----END PGP SIGNATURE-----
+
+--AQwUI17HplluBpDIm7D6cB8qlphsK8guu--
