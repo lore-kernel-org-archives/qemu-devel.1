@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:61000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXXN3-0003hd-Sh
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:37:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXXPB-0004wv-B5
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXXN2-0003n4-RT
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:37:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXXPA-0005HU-FC
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:39:33 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
 	<1500385286-21142-11-git-send-email-armbru@redhat.com>
 	<1aa2bff6-8798-cfd4-e969-b98064dd7d4c@redhat.com>
-Date: Tue, 18 Jul 2017 20:37:12 +0200
+Date: Tue, 18 Jul 2017 20:39:25 +0200
 In-Reply-To: <1aa2bff6-8798-cfd4-e969-b98064dd7d4c@redhat.com> (Eric Blake's
 	message of "Tue, 18 Jul 2017 12:46:35 -0500")
-Message-ID: <87inipk2w7.fsf@dusky.pond.sub.org>
+Message-ID: <87d18xk2si.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH for-2.10 10/10] migration: Use JSON null
@@ -74,52 +74,8 @@ Eric Blake <eblake@redhat.com> writes:
 >> +# @StrOrNull:
 >
 > A little light on the documentation.
->
->> +##
->> +{ 'alternate': 'StrOrNull',
->> +  'data': { 's': 'str',
->> +            'n': 'null' } }
->> +
->> +##
->>  # @LostTickPolicy:
->>  #
->>  # Policy for handling lost ticks in timer devices.
->> @@ -1098,8 +1105,8 @@
->>              '*decompress-threads': 'int',
->>              '*cpu-throttle-initial': 'int',
->>              '*cpu-throttle-increment': 'int',
->> -            '*tls-creds': 'str',
->> -            '*tls-hostname': 'str',
->> +            '*tls-creds': 'StrOrNull',
->> +            '*tls-hostname': 'StrOrNull',
->>              '*max-bandwidth': 'int',
->>              '*downtime-limit': 'int',
->>              '*x-checkpoint-delay': 'int',
->
-> By splitting input from output, you guarantee that 'null' won't appear
-> in the output and break an unsuspecting client, but that new clients can
-> introspect the existence of null and use that instead of "" on input.
 
-Yes.
+Care to suggest improvements?  I figure the schema is obvious enough
+without any, but the generated documentation could perhaps use some.
 
-We don't want null in output.  My unsharing makes that syntactically
-impossible.  Nice bonus, not why I went that route.  I did because it
-reduces code churn quite a bit, which is what we need right now.
-
-Likewise, we don't want absent members in output.  The sharing (commit
-de63ab6) made that syntactically possible.  My unsharing doesn't make it
-impossible, because it refrains from removing the '*' from
-MigrationParameters.
-
-If we decide not to restore the sharing, we should make absent members
-syntactically impossible.
-
-If we decice to restore the sharing, null in output will become
-syntactically possible.
-
-We'll have to pick our poison: tighter schema or more concise schema.
-We picked concise last time.
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+[...]
