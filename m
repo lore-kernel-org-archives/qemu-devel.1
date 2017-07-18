@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dXYbn-0003Rd-8l
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:56:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXYi4-0005jC-Dp
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dXYbi-0000sn-Ce
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:56:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36558
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dXYbi-0000sP-5c
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:56:34 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6IJsI8h007657
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 15:56:33 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bsm69cvf0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 15:56:32 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 18 Jul 2017 13:56:32 -0600
-References: <20170718142455.32676-1-cohuck@redhat.com>
-	<20170718142455.32676-5-cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 18 Jul 2017 21:56:26 +0200
+	(envelope-from <armbru@redhat.com>) id 1dXYi3-0004Ce-MV
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:08 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+	<1500385286-21142-4-git-send-email-armbru@redhat.com>
+	<e6f2611e-ff9f-450c-a438-e740c2b57ece@redhat.com>
+	<c61aee5a-a094-50c3-67c3-c39e72095710@redhat.com>
+	<87y3rlrct2.fsf@dusky.pond.sub.org>
+	<87lgnlcyz7.fsf@dusky.pond.sub.org>
+	<e69c0e46-8470-c994-0caa-3498d1f429c2@redhat.com>
+Date: Tue, 18 Jul 2017 22:02:57 +0200
+In-Reply-To: <e69c0e46-8470-c994-0caa-3498d1f429c2@redhat.com> (Eric Blake's
+	message of "Tue, 18 Jul 2017 14:47:01 -0500")
+Message-ID: <87wp75a4y6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170718142455.32676-5-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-IE
-Content-Transfer-Encoding: 7bit
-Message-Id: <5f8a2315-9224-f20c-7524-11f9a8ac8efd@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 4/9] s390x/pci: do not advertise pci
- on non-pci builds
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.10 03/10] qapi: Introduce a first
+ class 'null' type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,39 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, mreitz@redhat.com
 
-On 07/18/2017 04:24 PM, Cornelia Huck wrote:
-> Only set the zpci and aen feature bits on builds that actually
-> support pci.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  target/s390x/kvm.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 831492f9a2..880eccd58a 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2685,8 +2685,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->      }
-> 
->      /* set zpci and aen facilities */
-> +#ifdef CONFIG_PCI
->      set_bit(S390_FEAT_ZPCI, model->features);
->      set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
-> +#endif
-> 
->      if (s390_known_cpu_type(cpu_type)) {
->          /* we want the exact model, even if some features are missing */
-> 
+Eric Blake <eblake@redhat.com> writes:
 
-Not strictly necessary but do you also want to ifdef this
+> On 07/18/2017 02:43 PM, Markus Armbruster wrote:
+>> Markus Armbruster <armbru@redhat.com> writes:
+>> 
+>>> Eric Blake <eblake@redhat.com> writes:
+>>>
+>>>> On 07/18/2017 09:53 AM, Eric Blake wrote:
+>>>>> On 07/18/2017 08:41 AM, Markus Armbruster wrote:
+>>>>>> I expect the 'null' type to be useful mostly for members of alternate
+>>>>>> types.
+>>>>>>
+>>>>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>>>>> ---
+>>>>>
+>>>>
+>>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>>
+>>>> Actually, do we need to update any qapi docs to mention the new builtin
+>>>> type?
+>>>
+>>> Yes, we do.  I'll give it a shot.
+>> 
+>> Incremental patch appended.  May I keep your R-by?
+>> 
+>> 
+>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+>> index 52e3874..6d8e00c 100644
+>> --- a/docs/devel/qapi-code-gen.txt
+>> +++ b/docs/devel/qapi-code-gen.txt
+>> @@ -283,6 +283,7 @@ The following types are predefined, and map to C as follows:
+>>                         accepts size suffixes
+>>    bool      bool       JSON true or false
+>>    any       QObject *  any JSON value
+>> +  null      QNull *    JSON null
+>>    QType     QType      JSON string matching enum QType values
+>
+> I might have grouped 'null' next to 'bool', but your layout is also
+> okay.  Yes, my R-b is still valid with this addition.
 
- kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
-
-call?
-
-If not you could actually even allow AEN but not PCI for !CONFIG_PCI.
+I like your order better; lines swapped.  Thanks!
