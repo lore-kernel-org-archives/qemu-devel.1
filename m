@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dXHkI-0006TF-CD
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:56:19 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dXHp3-0007kh-7c
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dXHkF-0007XM-9m
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:56:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33844)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dXHkF-0007Wq-0E
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:56:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AF05C61D0F
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:56:13 +0000 (UTC)
-Date: Tue, 18 Jul 2017 09:56:06 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170718015606.GA27284@pxdev.xzpeter.org>
-References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
-	<1500279971-13875-8-git-send-email-peterx@redhat.com>
-	<20170717182505.GA6020@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170717182505.GA6020@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 07/11] migration: check global params
- for validity
+	(envelope-from <aik@ozlabs.ru>) id 1dXHp0-0001ip-7d
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:01:13 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Tue, 18 Jul 2017 12:00:33 +1000
+Message-Id: <20170718020033.8819-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] spapr_pci: Fix obsolete comment about
+ MSIX encoding in addr/data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +18,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Mon, Jul 17, 2017 at 03:25:05PM -0300, Eduardo Habkost wrote:
-> On Mon, Jul 17, 2017 at 04:26:07PM +0800, Peter Xu wrote:
-> > Adding validity check for the migration parameters passed in via global
-> > properties.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/migration.c | 34 ++++++++++++++++++++++++++++++++++
-> >  1 file changed, 34 insertions(+)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 8c65054..5a7f22c 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -2109,6 +2109,39 @@ static void migration_instance_init(Object *obj)
-> >      ms->parameters.tls_hostname = g_strdup("");
-> >  }
-> >  
-> > +static void migration_instance_post_init(Object *obj)
-> > +{
-> > +    MigrationState *ms = (MigrationState *)obj;
-> > +    Error *err = NULL;
-> > +    MigrationParameters params = {
-> > +        .has_compress_level = true,
-> > +        .compress_level = ms->parameters.compress_level,
-> > +        .has_compress_threads = true,
-> > +        .compress_threads = ms->parameters.compress_threads,
-> > +        .has_decompress_threads = true,
-> > +        .decompress_threads = ms->parameters.decompress_threads,
-> > +        .has_cpu_throttle_initial = true,
-> > +        .cpu_throttle_initial = ms->parameters.cpu_throttle_initial,
-> > +        .has_cpu_throttle_increment = true,
-> > +        .cpu_throttle_increment = ms->parameters.cpu_throttle_increment,
-> > +        .has_max_bandwidth = true,
-> > +        .max_bandwidth = ms->parameters.max_bandwidth,
-> > +        .has_downtime_limit = true,
-> > +        .downtime_limit = ms->parameters.downtime_limit,
-> > +        .has_x_checkpoint_delay = true,
-> > +        .x_checkpoint_delay = ms->parameters.x_checkpoint_delay,
-> > +        .has_block_incremental = true,
-> > +        .block_incremental = ms->parameters.block_incremental,
-> > +    };
-> > +
-> > +    /* We have applied all the migration properties... */
-> > +
-> > +    if (!migrate_params_check(&params, &err)) {
-> 
-> Why not just:
->   if (!migrate_params_check(&ms->parameters, &err))
-> ?
-> 
-> If the ms->parameters.has_* fields are not set to true anywhere,
-> we can set them to true in instance_init.
+f1c2dc7c866a "spapr-pci: rework MSI/MSIX" (07/2013) changed MSIX encoding
+but forgot to change the comment so this changes it.
 
-Sure.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ hw/ppc/spapr_pci.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> 
-> (This would also also us to use QAPI_CLONE in
-> qmp_query_migrate_parameters() instead of manually copying each
-> field.
-> 
-> 
-> > +        error_report_err(err);
-> > +        exit(1);
-> > +    }
-> > +}
-> 
-> On real devices, this is normally done on realize (which has
-> proper error reporting).  We never realize the TYPE_MIGRATION
-> object because it's not a real device, though.
-
-Hmm...
-
-> 
-> Doing error checks on post_init feels fragile, as the only way
-> errors can be handled is triggering exit(1) in the middle of an
-> object_new() call.
-> 
-> As we have only one place where the TYPE_MIGRATION object is
-> created, I suggest calling migrate_params_check() inside
-> migration_object_init().
-
-... How about I just provide a realize() for it? Then I can drop the
-QOM patch 4, also, I can keep the checks along with the object itself.
-
-Thanks,
-
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index a52dcf8ec0..4b895c5a2a 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -723,9 +723,7 @@ static PCIINTxRoute spapr_route_intx_pin_to_irq(void *opaque, int pin)
+ /*
+  * MSI/MSIX memory region implementation.
+  * The handler handles both MSI and MSIX.
+- * For MSI-X, the vector number is encoded as a part of the address,
+- * data is set to 0.
+- * For MSI, the vector number is encoded in least bits in data.
++ * The vector number is encoded in least bits in data.
+  */
+ static void spapr_msi_write(void *opaque, hwaddr addr,
+                             uint64_t data, unsigned size)
 -- 
-Peter Xu
+2.11.0
