@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dXIu2-00033Z-HC
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:10:27 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXJ1T-0004N9-Rw
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dXItz-0007J8-Ap
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:10:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53672)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dXItz-0007Im-4E
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:10:23 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D844C356E4
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:10:21 +0000 (UTC)
-Date: Tue, 18 Jul 2017 11:10:21 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170718031021.GC27284@pxdev.xzpeter.org>
-References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
-	<1500279971-13875-11-git-send-email-peterx@redhat.com>
-	<87vamryohn.fsf@secure.mitica>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXJ1Q-0006nW-N3
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:18:07 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:36679)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXJ1Q-0006n5-J9
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:18:04 -0400
+Received: by mail-qk0-x242.google.com with SMTP id d136so1027861qkg.3
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 20:18:04 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170512233843.27713-1-f4bug@amsat.org>
+	<20170512233843.27713-7-f4bug@amsat.org>
+	<16f76ae2-4cc2-ac89-065c-5158539ca2e6@twiddle.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2d11390a-2adc-e40a-6b5c-7c6ee4e7401d@amsat.org>
+Date: Tue, 18 Jul 2017 00:18:00 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87vamryohn.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v2 10/11] migration: provide
- migrate_cap_add()
+In-Reply-To: <16f76ae2-4cc2-ac89-065c-5158539ca2e6@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 6/6] target/sparc: optimize various
+ functions using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +37,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On Mon, Jul 17, 2017 at 07:14:44PM +0200, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > Abstracted from migrate_set_block_enabled() to allocate
-> > MigrationCapabilityStatusList properly.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> 
-> 
-> Nitpick
-> 
-> > -void migrate_set_block_enabled(bool value, Error **errp)
-> > +static MigrationCapabilityStatusList *migrate_cap_add(
-> > +    MigrationCapabilityStatusList *head,
-> 
-> We have a parameter called head
-> 
-> > +    MigrationCapability index,
-> > +    bool state)
-> >  {
-> >      MigrationCapabilityStatusList *cap;
-> >  
-> >      cap = g_new0(MigrationCapabilityStatusList, 1);
-> >      cap->value = g_new0(MigrationCapabilityStatus, 1);
-> > -    cap->value->capability = MIGRATION_CAPABILITY_BLOCK;
-> > -    cap->value->state = value;
-> > +    cap->value->capability = index;
-> > +    cap->value->state = state;
-> > +    cap->next = head;
-> > +
-> > +    return cap;
-> 
-> 
-> But we don't do the *head = cap?
-> 
-> Pelhaps is better to call it "next" or "list"?
+On 05/12/2017 09:08 PM, Richard Henderson wrote:
+> On 05/12/2017 04:38 PM, Philippe Mathieu-Daudé wrote:
+[...]
+>>   static inline void gen_op_add_cc(TCGv dst, TCGv src1, TCGv src2)
+>> @@ -638,8 +634,7 @@ static inline void gen_op_mulscc(TCGv dst, TCGv 
+>> src1, TCGv src2)
+>>       // env->y = (b2 << 31) | (env->y >> 1);
+>>       tcg_gen_andi_tl(r_temp, cpu_cc_src, 0x1);
+>>       tcg_gen_shli_tl(r_temp, r_temp, 31);
+>> -    tcg_gen_shri_tl(t0, cpu_y, 1);
+>> -    tcg_gen_andi_tl(t0, t0, 0x7fffffff);
+>> +    tcg_gen_extract_tl(t0, cpu_y, 1, 31);
+>>       tcg_gen_or_tl(t0, t0, r_temp);
+>>       tcg_gen_andi_tl(cpu_y, t0, 0xffffffff);
 
-It's the (old) head, but sure. :)
+So this 0xffffffff mask is incorrect and should be 0x7fffffff?
 
-Thanks,
-
--- 
-Peter Xu
+> 
+> But this should use
+> 
+>    tcg_gen_extract_tl(cpu_y, cpu_y, 1, 31);
+>    tcg_gen_deposit_tl(cpu_y, cpu_y, cpu_cc_src, 31, 1);
+> 
+> 
+> r~
