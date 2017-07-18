@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33775)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRK-0000fI-MT
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:39 -0400
+	id 1dXGRN-0000hR-FQ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRJ-0004tu-PX
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:38 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:32989)
+	id 1dXGRM-0004vH-Gx
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:41 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRJ-0004th-LK
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:37 -0400
-Received: by mail-qk0-x242.google.com with SMTP id a66so734460qkb.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:32:37 -0700 (PDT)
+	id 1dXGRM-0004v4-Cm
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:40 -0400
+Received: by mail-qk0-x242.google.com with SMTP id q66so732567qki.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:32:40 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 21:31:34 -0300
-Message-Id: <20170718003159.10200-7-f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 21:31:35 -0300
+Message-Id: <20170718003159.10200-8-f4bug@amsat.org>
 In-Reply-To: <20170718003159.10200-1-f4bug@amsat.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 	<20170718003159.10200-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 06/31] docker: add common packages to debian
- base
+Subject: [Qemu-devel] [PATCH v2 07/31] docker: debian/s390x no more in
+ unstable, now available in Stretch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,25 +41,63 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian9.docker | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tests/docker/Makefile.include                      |  1 +
+ tests/docker/dockerfiles/debian-s390x-cross.docker | 20 ++++++++++----------
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-index c74f71283c..6b6bf41421 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -18,8 +18,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt install -y --no-install-recommends \
-         bison \
-+        binutils-multiarch \
-         build-essential \
-         ca-certificates \
-         clang \
-         flex \
--        git
-+        git \
-+        pkg-config \
-+        python-minimal
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 72bb52ad7b..84dce49655 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -59,6 +59,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-arm64-cross: docker-image-debian9
+ docker-image-debian-mipsel-cross: docker-image-debian9
++docker-image-debian-s390x-cross: docker-image-debian9
+ 
+ # Expand all the pre-requistes for each docker image and test combination
+ $(foreach i,$(DOCKER_IMAGES), \
+diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
+index cfc354ce5d..667e428a4c 100644
+--- a/tests/docker/dockerfiles/debian-s390x-cross.docker
++++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
+@@ -1,27 +1,27 @@
+ #
+ # Docker s390 cross-compiler target
+ #
+-# This docker target is based on stretch (testing) as the stable build
+-# doesn't have the cross compiler available.
++# This docker target builds on the debian Stretch base image.
+ #
+-FROM debian:testing-slim
+-
+-# Duplicate deb line as deb-src
+-RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
++FROM qemu:debian9
+ 
+ # Add the s390x architecture
+ RUN dpkg --add-architecture s390x
+ 
+ # Grab the updated list of packages
+ RUN apt update && apt dist-upgrade -yy
+-RUN apt install -yy build-essential clang
+-RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
+-RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        gcc-multilib-s390x-linux-gnu
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get build-dep -yy -a s390x qemu
+ 
+ # Specify the cross prefix for this image (see tests/docker/common.rc)
+ ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
+ 
+-RUN DEBIAN_FRONTEND=noninteractive \
++# Install extra libraries to increase code coverage
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+         glusterfs-common:s390x \
+         libbz2-dev:s390x \
 -- 
 2.13.2
