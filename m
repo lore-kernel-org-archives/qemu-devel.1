@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXZSG-0003NU-DJ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1dXZSI-0003Ns-93
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXZSD-00018a-5J
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40571)
+	(envelope-from <bounces@canonical.com>) id 1dXZSD-000180-2n
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40555)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dXZSC-00015y-U4
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:49 -0400
+	id 1dXZSC-000153-Ml
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:50:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dXZSC-00026s-0a
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:48 +0000
+	id 1dXZSB-00026m-BK
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 033D32E8047
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 53E6B2E8080
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:50:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 18 Jul 2017 20:36:55 -0000
+Date: Tue, 18 Jul 2017 20:35:56 -0000
 From: Bruno Haible <bruno@clisp.org>
 Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
-Message-Id: <150041021566.6509.8837352991144962453.malone@gac.canonical.com>
+Message-Id: <150041015654.26197.10278203410371218302.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1705118] Re: qemu user mode does not support
  catching SIGSEGV on some architectures
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "Statically compiled test program for sparc64"
-   https://bugs.launchpad.net/qemu/+bug/1705118/+attachment/4917121/+files/=
-testsigsegv-sparc64
+** Attachment added: "Statically compiled test program for ppc64le"
+   https://bugs.launchpad.net/qemu/+bug/1705118/+attachment/4917119/+files/=
+testsigsegv-ppc64le
 
 -- =
 
