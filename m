@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXWa4-000581-Re
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:46:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXWen-0006vh-QK
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXWa3-0008Al-MP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:46:44 -0400
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<1500385286-21142-11-git-send-email-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dXWek-0002tT-OF
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 13:51:37 -0400
+References: <20170718061005.29518-1-f4bug@amsat.org>
+	<20170718061005.29518-10-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1aa2bff6-8798-cfd4-e969-b98064dd7d4c@redhat.com>
-Date: Tue, 18 Jul 2017 12:46:35 -0500
+Message-ID: <6818fd68-0741-76f0-4d2c-a4d975e9d131@redhat.com>
+Date: Tue, 18 Jul 2017 12:51:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <1500385286-21142-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <20170718061005.29518-10-f4bug@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="SBeaXFBiFGv6kXw3384Mxr1o1iC5na5ce"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 10/10] migration: Use JSON null
- instead of "" to reset parameter to default
+	boundary="V45CnDOBNvOtN7p6GFp9PhWlkgxJdAvEN"
+Subject: Re: [Qemu-devel] [PATCH 09/29] net: use QEMU_IS_ALIGNED macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SBeaXFBiFGv6kXw3384Mxr1o1iC5na5ce
+--V45CnDOBNvOtN7p6GFp9PhWlkgxJdAvEN
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
- qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
-Message-ID: <1aa2bff6-8798-cfd4-e969-b98064dd7d4c@redhat.com>
-Subject: Re: [PATCH for-2.10 10/10] migration: Use JSON null instead of "" to
- reset parameter to default
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
- <1500385286-21142-11-git-send-email-armbru@redhat.com>
-In-Reply-To: <1500385286-21142-11-git-send-email-armbru@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-trivial@nongnu.org, Dmitry Fleytman <dmitry@daynix.com>,
+ Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <6818fd68-0741-76f0-4d2c-a4d975e9d131@redhat.com>
+Subject: Re: [PATCH 09/29] net: use QEMU_IS_ALIGNED macro
+References: <20170718061005.29518-1-f4bug@amsat.org>
+ <20170718061005.29518-10-f4bug@amsat.org>
+In-Reply-To: <20170718061005.29518-10-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 07/18/2017 08:41 AM, Markus Armbruster wrote:
-> migrate-set-parameters sets migration parameters according to is
-> arguments like this:
+On 07/18/2017 01:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osde=
+p.cocci
 >=20
-> * Present means "set the parameter to this value"
->=20
-> * Absent means "leave the parameter unchanged"
->=20
-> * Except for parameters tls_creds and tls_hostname, "" means "reset
->   the parameter to its default value
->=20
-> The first two are perfectly normal: presence of the parameter makes
-> the command do something.
->=20
-> The third one overloads the parameter with a second meaning.  The
-> overloading is *implicit*, i.e. it's not visible in the types.  Works
-> here, because "" is neither a valid TLS credentials ID, nor a valid
-> host name.
->=20
-> Pressing argument values the schema accepts, but are semantically
-> invalid, into service to mean "reset to default" is not general, as
-> suitable invalid values need not exist.  I also find it ugly.
->=20
-> To clean this up, we could add a separate flag argument to ask for
-> "reset to default", or add a distinct value to @tls_creds and
-> @tls_hostname.  This commit implements the latter: add JSON null to
-> the values of @tls_creds and @tls_hostname, deprecate "".
->=20
-> Because we're so close to the 2.10 freeze, implement it in the
-> stupidest way possible: have qmp_migrate_set_parameters() rewrite null
-> to "" before anything else can see the null.  The proper way to do it
-> would be rewriting "" to null, but that requires fixing up code to
-> work with null.  Add TODO comments for that.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
-> +++ b/qapi-schema.json
-> @@ -116,6 +116,13 @@
->  { 'command': 'qmp_capabilities' }
+>  net/eth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/net/eth.c b/net/eth.c
+> index 5b9ba26a56..187a6812f6 100644
+> --- a/net/eth.c
+> +++ b/net/eth.c
+> @@ -332,7 +332,7 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size=
+_t l2hdr_len,
+>          uint16_t frag_off_units =3D frag_offset / IP_FRAG_UNIT_SIZE;
+>          uint16_t new_ip_off;
 > =20
->  ##
-> +# @StrOrNull:
+> -        assert(frag_offset % IP_FRAG_UNIT_SIZE =3D=3D 0);
+> +        assert(QEMU_IS_ALIGNED(frag_offset, IP_FRAG_UNIT_SIZE));
+>          assert((frag_off_units & ~IP_OFFMASK) =3D=3D 0);
 
-A little light on the documentation.
-
-> +##
-> +{ 'alternate': 'StrOrNull',
-> +  'data': { 's': 'str',
-> +            'n': 'null' } }
-> +
-> +##
->  # @LostTickPolicy:
->  #
->  # Policy for handling lost ticks in timer devices.
-> @@ -1098,8 +1105,8 @@
->              '*decompress-threads': 'int',
->              '*cpu-throttle-initial': 'int',
->              '*cpu-throttle-increment': 'int',
-> -            '*tls-creds': 'str',
-> -            '*tls-hostname': 'str',
-> +            '*tls-creds': 'StrOrNull',
-> +            '*tls-hostname': 'StrOrNull',
->              '*max-bandwidth': 'int',
->              '*downtime-limit': 'int',
->              '*x-checkpoint-delay': 'int',
-
-By splitting input from output, you guarantee that 'null' won't appear
-in the output and break an unsuspecting client, but that new clients can
-introspect the existence of null and use that instead of "" on input.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This line is also a candidate for using the macro, albeit in the form
+QEMU_IS_ALIGNED(frag_off_units, IP_OFFMASK + 1), which might not make as
+much sense (but it DOES re-visit my question of whether the coccinelle
+script should be taught more patterns)
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -121,7 +75,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---SBeaXFBiFGv6kXw3384Mxr1o1iC5na5ce
+--V45CnDOBNvOtN7p6GFp9PhWlkgxJdAvEN
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -130,14 +84,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluSXsACgkQp6FrSiUn
-Q2pegQf+MaZ+B5GpPMJhbYEIqKzxW/psl9u0jjtob+prHXWWecidyyu65NvYhU0F
-qImcxXw5Sltl1SI0FyXUZ/dLE87HUC3GinDbOxdu/jxw1P38JcCh3MpRtj+Xn8gY
-u8A/K2GNqajKrf1M2znWIdItQSPq6bPm0L+VhxLV0sjyNRmNRBOnv2m99IjyjYcv
-lx2J0XZvIdFcvmyPJC029VluE36XXSJJ9o/mIpDedIR5T04h5VLbWmvzBMNU4jZt
-x6fyTKBqZuM53YJ3oYoJ2Db+bPSNSzRFN6qosHou446qwtWhsJ8HAz6/6lBRxNcH
-EOhE+9NKAYb3c0eQiIT6yY3sQD0NFg==
-=wmTg
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluSqIACgkQp6FrSiUn
+Q2q6igf/egf/6v3M4wV/mYbWLqTbfbEZ5u9oCR+6s+zT52/+VUmPPUR9efHh5J9S
+Y2zqzj6ytEmrUIiYv7NAKVe9RxM0sad3GoPJEvfb9jdAw8nPERSE4bcquX9IfBoa
+ARU51sK4b4004suxZ+2yQXa3/DpkvkFPZdASJB/lrbvloF7DIPrNEGESg3FdnV4M
+HCEVqNf1qlY4H7MikPQ5M/cZOZEPKB5dAOEN2WXj4qyRevRb7zVKdiTE/YDebJAC
+H1ag3b1QvG03NCLFLy35amrokpnXa4G4PU4mAqpdQBxooCO6lJEiwIygzZ0Z2tZW
+fN8WLWzbjtwK9RvhT5Tn7yPxDl9z4A==
+=qKtd
 -----END PGP SIGNATURE-----
 
---SBeaXFBiFGv6kXw3384Mxr1o1iC5na5ce--
+--V45CnDOBNvOtN7p6GFp9PhWlkgxJdAvEN--
