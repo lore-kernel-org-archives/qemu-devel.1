@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXYjh-00078g-St
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXYlO-0000m5-UC
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXYjc-0005Fz-Tu
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:49 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34369)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXYjc-0005Ft-Ow
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:44 -0400
-Received: by mail-qt0-x241.google.com with SMTP id 19so3683564qty.1
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 13:04:44 -0700 (PDT)
+	(envelope-from <rth7680@gmail.com>) id 1dXYlN-0006RQ-Vt
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:06:34 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170718045540.16322-1-f4bug@amsat.org>
+	<20170718045540.16322-4-f4bug@amsat.org>
+	<628617ba-12f6-97ad-6818-1d7d0c63f558@twiddle.net>
+	<20170718071452.4hlhpelfposv6eye@aurel32.net>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 18 Jul 2017 10:02:54 -1000
-Message-Id: <20170718200255.31647-30-rth@twiddle.net>
-In-Reply-To: <20170718200255.31647-1-rth@twiddle.net>
-References: <20170718200255.31647-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v3 29/30] linux-user: Tidy and enforce
- reserved_va initialization
+Message-ID: <3290e6b0-a5ec-e5bd-e911-1ace6a401e61@twiddle.net>
+Date: Tue, 18 Jul 2017 10:06:20 -1000
+MIME-Version: 1.0
+In-Reply-To: <20170718071452.4hlhpelfposv6eye@aurel32.net>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 03/10] target/arm: optimize aarch64
+ rev16() using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,145 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Laurent Vivier <laurent@vivier.eu>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-We had a check using TARGET_VIRT_ADDR_SPACE_BITS to make sure
-that the allocation coming in from the command-line option was
-not too large, but that didn't include target-specific knowledge
-about other restrictions on user-space.
+On 07/17/2017 09:14 PM, Aurelien Jarno wrote:
+> On 2017-07-17 20:25, Richard Henderson wrote:
+>> On 07/17/2017 06:55 PM, Philippe Mathieu-Daudé wrote:
+>>> Aurelien Jarno denoted this function could be implemented more effectively using
+>>> the aarch32 rev16() pattern.
+>>>     [http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg03180.html]
+>>>
+>>> Done with the Coccinelle semantic patch from commit 58daf05d07dd
+>>>       (see scripts/coccinelle/tcg_gen_extract.cocci)
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>> I'm dropping this patch and replacing it with the much smaller code
+>> mentioned in the message quoted above.
+> 
+> In that case, could you also get the corresponding aarch32 patch:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg03887.html
+> 
+> It has already been reviewed.
+> 
+Done.
 
-Remove several target-specific hacks in linux-user/main.c.
 
-For MIPS and Nios, we can replace them with proper adjustments
-to the respective target's TARGET_VIRT_ADDR_SPACE_BITS definition.
-
-For ARM, we had no existing ifdef but I suspect that the current
-default value of 0xf7000000 was chosen with this in mind.  Define
-a workable value in linux-user/arm/, and also document why the
-special case is required.
-
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- linux-user/arm/target_cpu.h |  4 ++++
- target/mips/mips-defs.h     |  6 +++++-
- target/nios2/cpu.h          |  6 +++++-
- linux-user/main.c           | 38 +++++++++++++++++++++++++-------------
- 4 files changed, 39 insertions(+), 15 deletions(-)
-
-diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
-index d888219..c4f79eb 100644
---- a/linux-user/arm/target_cpu.h
-+++ b/linux-user/arm/target_cpu.h
-@@ -19,6 +19,10 @@
- #ifndef ARM_TARGET_CPU_H
- #define ARM_TARGET_CPU_H
- 
-+/* We need to be able to map the commpage.
-+   See validate_guest_space in linux-user/elfload.c.  */
-+#define MAX_RESERVED_VA  0xfff00000ul
-+
- static inline void cpu_clone_regs(CPUARMState *env, target_ulong newsp)
- {
-     if (newsp) {
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 047554e..d239069 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -15,7 +15,11 @@
- #else
- #define TARGET_LONG_BITS 32
- #define TARGET_PHYS_ADDR_SPACE_BITS 40
--#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+# ifdef CONFIG_USER_ONLY
-+#  define TARGET_VIRT_ADDR_SPACE_BITS 31
-+# else
-+#  define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#endif
- #endif
- 
- /* Masks used to mark instructions to indicate which ISA level they
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index 13931f3..da3f637 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -227,7 +227,11 @@ qemu_irq *nios2_cpu_pic_init(Nios2CPU *cpu);
- void nios2_check_interrupts(CPUNios2State *env);
- 
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
--#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#ifdef CONFIG_USER_ONLY
-+# define TARGET_VIRT_ADDR_SPACE_BITS 31
-+#else
-+# define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#endif
- 
- #define cpu_init(cpu_model) CPU(cpu_nios2_init(cpu_model))
- 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 30f0ae1..7693a62 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -60,23 +60,38 @@ do {                                                                    \
-     }                                                                   \
- } while (0)
- 
--#if (TARGET_LONG_BITS == 32) && (HOST_LONG_BITS == 64)
- /*
-  * When running 32-on-64 we should make sure we can fit all of the possible
-  * guest address space into a contiguous chunk of virtual host memory.
-  *
-  * This way we will never overlap with our own libraries or binaries or stack
-  * or anything else that QEMU maps.
-+ *
-+ * Many cpus reserve the high bit (or more than one for some 64-bit cpus)
-+ * of the address for the kernel.  Some cpus rely on this and user space
-+ * uses the high bit(s) for pointer tagging and the like.  For them, we
-+ * must preserve the expected address space.
-  */
--# if defined(TARGET_MIPS) || defined(TARGET_NIOS2)
--/*
-- * MIPS only supports 31 bits of virtual address space for user space.
-- * Nios2 also only supports 31 bits.
-- */
--unsigned long reserved_va = 0x77000000;
-+#ifndef MAX_RESERVED_VA
-+# if HOST_LONG_BITS > TARGET_VIRT_ADDR_SPACE_BITS
-+#  if TARGET_VIRT_ADDR_SPACE_BITS == 32 && \
-+      (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
-+/* There are a number of places where we assign reserved_va to a variable
-+   of type abi_ulong and expect it to fit.  Avoid the last page.  */
-+#   define MAX_RESERVED_VA  (0xfffffffful & TARGET_PAGE_MASK)
-+#  else
-+#   define MAX_RESERVED_VA  (1ul << TARGET_VIRT_ADDR_SPACE_BITS)
-+#  endif
- # else
--unsigned long reserved_va = 0xf7000000;
-+#  define MAX_RESERVED_VA  0
- # endif
-+#endif
-+
-+/* That said, reserving *too* much vm space via mmap can run into problems
-+   with rlimits, oom due to page table creation, etc.  We will still try it,
-+   if directed by the command-line option, but not by default.  */
-+#if HOST_LONG_BITS == 64 && TARGET_VIRT_ADDR_SPACE_BITS <= 32
-+unsigned long reserved_va = MAX_RESERVED_VA;
- #else
- unsigned long reserved_va;
- #endif
-@@ -3976,11 +3991,8 @@ static void handle_arg_reserved_va(const char *arg)
-         unsigned long unshifted = reserved_va;
-         p++;
-         reserved_va <<= shift;
--        if (((reserved_va >> shift) != unshifted)
--#if HOST_LONG_BITS > TARGET_VIRT_ADDR_SPACE_BITS
--            || (reserved_va > (1ul << TARGET_VIRT_ADDR_SPACE_BITS))
--#endif
--            ) {
-+        if (reserved_va >> shift != unshifted
-+            || (MAX_RESERVED_VA && reserved_va > MAX_RESERVED_VA)) {
-             fprintf(stderr, "Reserved virtual address too big\n");
-             exit(EXIT_FAILURE);
-         }
--- 
-2.9.4
+r~
