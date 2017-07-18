@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXUHl-0003HK-0J
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:19:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dXUII-0003qW-0B
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXUHh-0005l5-Sp
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:19:41 -0400
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-4-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <72dfc5e2-8335-ec66-7e86-19ed72366a85@redhat.com>
-Date: Tue, 18 Jul 2017 10:19:32 -0500
+	(envelope-from <cohuck@redhat.com>) id 1dXUIE-0006E5-TM
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:20:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXUIE-0006Cv-Mv
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:20:10 -0400
+Date: Tue, 18 Jul 2017 17:20:05 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170718172005.4f68c81c@gondolin>
+In-Reply-To: <77385052-7626-acdc-fa2b-8085e15f778d@redhat.com>
+References: <20170718142455.32676-1-cohuck@redhat.com>
+	<20170718142455.32676-2-cohuck@redhat.com>
+	<77385052-7626-acdc-fa2b-8085e15f778d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-4-f4bug@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g"
-Subject: Re: [Qemu-devel] [PATCH 03/29] qemu-img: use QEMU_IS_ALIGNED macro
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/9] kvm: remove hard dependency on
+ pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <72dfc5e2-8335-ec66-7e86-19ed72366a85@redhat.com>
-Subject: Re: [PATCH 03/29] qemu-img: use QEMU_IS_ALIGNED macro
-References: <20170718061005.29518-1-f4bug@amsat.org>
- <20170718061005.29518-4-f4bug@amsat.org>
-In-Reply-To: <20170718061005.29518-4-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 18 Jul 2017 17:00:22 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-On 07/18/2017 01:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osde=
-p.cocci
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  qemu-img.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 18.07.2017 16:24, Cornelia Huck wrote:
+> > The msi routing code in kvm calls some pci functions: provide
+> > some stubs to enable builds without pci.
+> > 
+> > Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
+> > Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  hw/pci/pci-stub.c | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+> > index ecad664946..bc228ce91e 100644
+> > --- a/hw/pci/pci-stub.c
+> > +++ b/hw/pci/pci-stub.c
+> > @@ -23,6 +23,7 @@
+> >  #include "monitor/monitor.h"
+> >  #include "qapi/qmp/qerror.h"
+> >  #include "hw/pci/pci.h"
+> > +#include "hw/pci/msi.h"
+> >  #include "qmp-commands.h"
+> >  #include "hw/pci/msi.h"
+> >  
+> > @@ -38,3 +39,14 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
+> >  {
+> >      monitor_printf(mon, "PCI devices not supported\n");
+> >  }
+> > +
+> > +/* kvm-all wants this */
+> > +MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
+> > +{
+> > +    assert(false);
+> > +}
+> > +
+> > +uint16_t pci_requester_id(PCIDevice *dev)
+> > +{
+> > +    assert(false);
+> > +}
+> >   
+> 
+> Would it be feasible to move the offending code from kvm-all.c into a
+> new file called kvm-pci.c instead which then only gets compiled for
+> CONFIG_PCI=y ? I think that would be a cleaner solution ...
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 182e697f81..6f5f956302 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3804,7 +3804,7 @@ static void bench_cb(void *opaque, int ret)
->          b->in_flight--;
-> =20
->          /* Time for flush? Drain queue if requested, then flush */
-> -        if (b->flush_interval && remaining % b->flush_interval =3D=3D =
-0) {
-> +        if (b->flush_interval && QEMU_IS_ALIGNED(remaining, b->flush_i=
-nterval)) {
->              if (!b->in_flight || !b->drain_on_flush) {
->                  BlockCompletionFunc *cb;
-> =20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluJwQACgkQp6FrSiUn
-Q2pUmwgAlKSFZ7RVihHoGpqEhpjzlD+2MRUU52NE/WiW3PFuUp80C/0xq+oKr/CM
-qMo3z/JLBHXnQVQlZGm/mPOhAhJvPyfPVQrQs7uIvybSGRRwQ1I4nd9hVjR4Q7qX
-W6rGmOUB4pKKCO/kGQgCyXGbwS/aYoXk7AyGxljCtJy6DuBMXjyZYCl79jh1I1VA
-RmHMxBkdMxbJGeqFZ0LeEibZTEQ4OD9WOb2DkCtM5voOWDu0oXSAAvJlWMSyYdi5
-eITRs0j3VeMErkM1MIouSTPs6WUfGmKc1SwDzFU8FXNm4EJCxg4lVVClhhbvViSj
-pYN9C3FHeoip5fKHrnjxSBEsh48XMQ==
-=bEd/
------END PGP SIGNATURE-----
-
---OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g--
+msi(x) seems to have gotten a bit entangled with the kvm code (maybe
+even before the two commits I mentioned above - but it must have worked
+fine before we added zpci...) I'd rather just use this quick fix for
+now and do a proper separation on top.
