@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXSku-0000B6-W2
+	(envelope-from <armbru@redhat.com>) id 1dXSku-0000B0-Tn
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007Ss-4u
+	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007TY-Bh
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:40 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Jul 2017 15:41:19 +0200
-Message-Id: <1500385286-21142-4-git-send-email-armbru@redhat.com>
+Date: Tue, 18 Jul 2017 15:41:22 +0200
+Message-Id: <1500385286-21142-7-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500385286-21142-1-git-send-email-armbru@redhat.com>
 References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 03/10] qapi: Introduce a first class
- 'null' type
+Subject: [Qemu-devel] [PATCH for-2.10 06/10] hmp: Clean up and simplify
+ hmp_migrate_set_parameter()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,140 +23,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-I expect the 'null' type to be useful mostly for members of alternate
-types.
+The bulk of hmp_migrate_set_parameter()'s code sets one member of
+MigrationParameters according to the command's arguments.  It uses a
+string visitor for integer and boolean members, but not for string and
+size members.  It calls visit_type_bool() right away, but delays
+visit_type_int() some.  The delaying requires a flag variable and a
+bit of trickery: we set all integer members instead of just the one we
+want, and rely on the has_FOOs to mask the unwanted ones.
+
+Clean this up as follows.  Don't delay calling visit_type_int().  Use
+the string visitor for strings, too.  This involves extra allocations
+and cleanup, but doing them is simpler and cleaner than avoiding them.
+
+Sadly, using the string visitor for sizes isn't possible, because it
+defaults to Bytes rather than Mebibytes.  Add a comment explaining
+that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/qobject.h              |  4 ++--
- include/qemu/typedefs.h                 |  1 +
- scripts/qapi.py                         |  5 ++++-
- tests/qapi-schema/qapi-schema-test.json |  3 ++-
- tests/qapi-schema/qapi-schema-test.out  |  1 +
- tests/test-qobject-input-visitor.c      |  5 +++++
- tests/test-qobject-output-visitor.c     | 10 ++++++++++
- 7 files changed, 25 insertions(+), 4 deletions(-)
+ hmp.c | 78 ++++++++++++++++++++++++++++---------------------------------------
+ 1 file changed, 32 insertions(+), 46 deletions(-)
 
-diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index 3543b55..eab29ed 100644
---- a/include/qapi/qmp/qobject.h
-+++ b/include/qapi/qmp/qobject.h
-@@ -93,9 +93,9 @@ static inline QType qobject_type(const QObject *obj)
-     return obj->type;
- }
+diff --git a/hmp.c b/hmp.c
+index 6d32c40..2993586 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1509,90 +1509,75 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     const char *param = qdict_get_str(qdict, "parameter");
+     const char *valuestr = qdict_get_str(qdict, "value");
+     Visitor *v = string_input_visitor_new(valuestr);
++    MigrationParameters *p = g_new0(MigrationParameters, 1);
+     uint64_t valuebw = 0;
+-    int64_t valueint = 0;
+-    bool valuebool = false;
+     Error *err = NULL;
+-    bool use_int_value = false;
+     int i, ret;
  
--typedef struct QNull {
-+struct QNull {
-     QObject base;
--} QNull;
-+};
+     for (i = 0; i < MIGRATION_PARAMETER__MAX; i++) {
+         if (strcmp(param, MigrationParameter_lookup[i]) == 0) {
+-            MigrationParameters p = { 0 };
+             switch (i) {
+             case MIGRATION_PARAMETER_COMPRESS_LEVEL:
+-                p.has_compress_level = true;
+-                use_int_value = true;
++                p->has_compress_level = true;
++                visit_type_int(v, param, &p->compress_level, &err);
+                 break;
+             case MIGRATION_PARAMETER_COMPRESS_THREADS:
+-                p.has_compress_threads = true;
+-                use_int_value = true;
++                p->has_compress_threads = true;
++                visit_type_int(v, param, &p->compress_threads, &err);
+                 break;
+             case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
+-                p.has_decompress_threads = true;
+-                use_int_value = true;
++                p->has_decompress_threads = true;
++                visit_type_int(v, param, &p->decompress_threads, &err);
+                 break;
+             case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+-                p.has_cpu_throttle_initial = true;
+-                use_int_value = true;
++                p->has_cpu_throttle_initial = true;
++                visit_type_int(v, param, &p->cpu_throttle_initial, &err);
+                 break;
+             case MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT:
+-                p.has_cpu_throttle_increment = true;
+-                use_int_value = true;
++                p->has_cpu_throttle_increment = true;
++                visit_type_int(v, param, &p->cpu_throttle_increment, &err);
+                 break;
+             case MIGRATION_PARAMETER_TLS_CREDS:
+-                p.has_tls_creds = true;
+-                p.tls_creds = (char *) valuestr;
++                p->has_tls_creds = true;
++                visit_type_str(v, param, &p->tls_creds, &err);
+                 break;
+             case MIGRATION_PARAMETER_TLS_HOSTNAME:
+-                p.has_tls_hostname = true;
+-                p.tls_hostname = (char *) valuestr;
++                p->has_tls_hostname = true;
++                visit_type_str(v, param, &p->tls_hostname, &err);
+                 break;
+             case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+-                p.has_max_bandwidth = true;
++                p->has_max_bandwidth = true;
++                /*
++                 * Can't use visit_type_size() here, because it
++                 * defaults to Bytes rather than Mebibytes.
++                 */
+                 ret = qemu_strtosz_MiB(valuestr, NULL, &valuebw);
+                 if (ret < 0 || valuebw > INT64_MAX
+                     || (size_t)valuebw != valuebw) {
+                     error_setg(&err, "Invalid size %s", valuestr);
+-                    goto cleanup;
++                    break;
+                 }
+-                p.max_bandwidth = valuebw;
++                p->max_bandwidth = valuebw;
+                 break;
+             case MIGRATION_PARAMETER_DOWNTIME_LIMIT:
+-                p.has_downtime_limit = true;
+-                use_int_value = true;
++                p->has_downtime_limit = true;
++                visit_type_int(v, param, &p->downtime_limit, &err);
+                 break;
+             case MIGRATION_PARAMETER_X_CHECKPOINT_DELAY:
+-                p.has_x_checkpoint_delay = true;
+-                use_int_value = true;
++                p->has_x_checkpoint_delay = true;
++                visit_type_int(v, param, &p->x_checkpoint_delay, &err);
+                 break;
+             case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
+-                p.has_block_incremental = true;
+-                visit_type_bool(v, param, &valuebool, &err);
+-                if (err) {
+-                    goto cleanup;
+-                }
+-                p.block_incremental = valuebool;
++                p->has_block_incremental = true;
++                visit_type_bool(v, param, &p->block_incremental, &err);
+                 break;
+             }
  
- extern QNull qnull_;
+-            if (use_int_value) {
+-                visit_type_int(v, param, &valueint, &err);
+-                if (err) {
+-                    goto cleanup;
+-                }
+-                /* Set all integers; only one has_FOO will be set, and
+-                 * the code ignores the remaining values */
+-                p.compress_level = valueint;
+-                p.compress_threads = valueint;
+-                p.decompress_threads = valueint;
+-                p.cpu_throttle_initial = valueint;
+-                p.cpu_throttle_increment = valueint;
+-                p.downtime_limit = valueint;
+-                p.x_checkpoint_delay = valueint;
++            if (err) {
++                goto cleanup;
+             }
  
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 2706aab..ba69bd8 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -87,6 +87,7 @@ typedef struct QEMUSGList QEMUSGList;
- typedef struct QEMUTimer QEMUTimer;
- typedef struct QEMUTimerListGroup QEMUTimerListGroup;
- typedef struct QObject QObject;
-+typedef struct QNull QNull;
- typedef struct RAMBlock RAMBlock;
- typedef struct Range Range;
- typedef struct SerialState SerialState;
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 84e2eb4..8aa2775 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -20,6 +20,7 @@ import sys
- from ordereddict import OrderedDict
+-            qmp_migrate_set_parameters(&p, &err);
++            qmp_migrate_set_parameters(p, &err);
+             break;
+         }
+     }
+@@ -1602,6 +1587,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+     }
  
- builtin_types = {
-+    'null':     'QTYPE_QNULL',
-     'str':      'QTYPE_QSTRING',
-     'int':      'QTYPE_QNUM',
-     'number':   'QTYPE_QNUM',
-@@ -1056,6 +1057,7 @@ class QAPISchemaType(QAPISchemaEntity):
- 
-     def alternate_qtype(self):
-         json2qtype = {
-+            'null':    'QTYPE_QNULL',
-             'string':  'QTYPE_QSTRING',
-             'number':  'QTYPE_QNUM',
-             'int':     'QTYPE_QNUM',
-@@ -1515,7 +1517,8 @@ class QAPISchema(object):
-                   ('uint64', 'int',     'uint64_t'),
-                   ('size',   'int',     'uint64_t'),
-                   ('bool',   'boolean', 'bool'),
--                  ('any',    'value',   'QObject' + pointer_suffix)]:
-+                  ('any',    'value',   'QObject' + pointer_suffix),
-+                  ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type = QAPISchemaObjectType(
-             'q_empty', None, None, None, [], None)
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index 91ffb26..c72dbd8 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -93,7 +93,8 @@
- { 'struct': 'WrapAlternate',
-   'data': { 'alt': 'UserDefAlternate' } }
- { 'alternate': 'UserDefAlternate',
--  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int' } }
-+  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int',
-+            'n': 'null' } }
- 
- { 'struct': 'UserDefC',
-   'data': { 'string1': 'str', 'string2': 'str' } }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index b88b8aa..3b1e908 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -64,6 +64,7 @@ alternate UserDefAlternate
-     case udfu: UserDefFlatUnion
-     case e: EnumOne
-     case i: int
-+    case n: null
- object UserDefB
-     member intb: int optional=False
-     member a-b: bool optional=True
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index f98caf9..f451844 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -583,6 +583,11 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
-     g_assert_cmpint(tmp->u.e, ==, ENUM_ONE_VALUE1);
-     qapi_free_UserDefAlternate(tmp);
- 
-+    v = visitor_input_test_init(data, "null");
-+    visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-+    g_assert_cmpint(tmp->type, ==, QTYPE_QNULL);
-+    qapi_free_UserDefAlternate(tmp);
-+
-     v = visitor_input_test_init(data, "{'integer':1, 'string':'str', "
-                                 "'enum1':'value1', 'boolean':true}");
-     visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
-index 8f1fcd4..7eb1620 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -424,6 +424,16 @@ static void test_visitor_out_alternate(TestOutputVisitorData *data,
- 
-     visitor_reset(data);
-     tmp = g_new0(UserDefAlternate, 1);
-+    tmp->type = QTYPE_QNULL;
-+    tmp->u.n = qnull();
-+
-+    visit_type_UserDefAlternate(data->ov, NULL, &tmp, &error_abort);
-+    g_assert_cmpint(qobject_type(visitor_get(data)), ==, QTYPE_QNULL);
-+
-+    qapi_free_UserDefAlternate(tmp);
-+
-+    visitor_reset(data);
-+    tmp = g_new0(UserDefAlternate, 1);
-     tmp->type = QTYPE_QDICT;
-     tmp->u.udfu.integer = 1;
-     tmp->u.udfu.string = g_strdup("str");
+  cleanup:
++    qapi_free_MigrationParameters(p);
+     visit_free(v);
+     if (err) {
+         error_report_err(err);
 -- 
 2.7.5
