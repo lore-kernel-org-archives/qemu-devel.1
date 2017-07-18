@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alastair@d-silva.org>) id 1dXQBB-0000v0-Q5
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:56:38 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQBP-00016w-VX
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alastair@d-silva.org>) id 1dXQB8-0008Km-OG
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:56:37 -0400
-From: "Alastair D'Silva" <alastair@d-silva.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-8-f4bug@amsat.org>
-In-Reply-To: <20170718061005.29518-8-f4bug@amsat.org>
-Date: Tue, 18 Jul 2017 20:23:42 +1000
-Message-ID: <045101d2ffaf$ef4b60e0$cde222a0$@d-silva.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQBP-0008PI-3h
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:56:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+In-Reply-To: <20170718061005.29518-27-f4bug@amsat.org>
+References: <20170718061005.29518-1-f4bug@amsat.org>
+	<20170718061005.29518-27-f4bug@amsat.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 18 Jul 2017 03:56:47 -0700
+Message-ID: <CAJ+F1C+WsdUp3Vtx+-FZ9g7URSAQuJWb6h7-w6yJXM+4TKQNjA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-au
-Subject: Re: [Qemu-devel] [PATCH 07/29] ds1338: use QEMU_IS_ALIGNED macro
+Subject: Re: [Qemu-devel] [PATCH 26/29] tests/tcg: use ARRAY_SIZE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, 'Peter Maydell' <peter.maydell@linaro.org>, 'Corey Minyard' <cminyard@mvista.com>
-Cc: qemu-devel@nongnu.org, 'Eric Blake' <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu trival <qemu-trivial@nongnu.org>, Richard Henderson <rth@twiddle.net>, QEMU <qemu-devel@nongnu.org>
 
-I'm not sure this makes sense - we're dealing with time here.
+Hi
 
---=20
-Alastair D'Silva           mob: 0423 762 819
-skype: alastair_dsilva     msn: alastair@d-silva.org
-blog: http://alastair.d-silva.org    Twitter: @EvilDeece
-
-
-
-> -----Original Message-----
-> From: Philippe Mathieu-Daud=C3=A9 =
-[mailto:philippe.mathieu.daude@gmail.com]
-> On Behalf Of Philippe Mathieu-Daud=C3=A9
-> Sent: Tuesday, 18 July 2017 4:10 PM
-> To: qemu-trivial@nongnu.org; Peter Maydell <peter.maydell@linaro.org>;
-> Alastair D'Silva <alastair@d-silva.org>; Corey Minyard
-> <cminyard@mvista.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>; =
-qemu-devel@nongnu.org;
-> Eric Blake <eblake@redhat.com>
-> Subject: [PATCH 07/29] ds1338: use QEMU_IS_ALIGNED macro
->=20
-> Applied using the Coccinelle semantic patch
-> scripts/coccinelle/use_osdep.cocci
->=20
+On Mon, Jul 17, 2017 at 11:10 PM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.=
+cocci
+>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/timer/ds1338.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c index
-> 3849b74a68..a77fe14514 100644
-> --- a/hw/timer/ds1338.c
-> +++ b/hw/timer/ds1338.c
-> @@ -65,7 +65,7 @@ static void capture_current_time(DS1338State *s)
->      s->nvram[1] =3D to_bcd(now.tm_min);
->      if (s->nvram[2] & HOURS_12) {
->          int tmp =3D now.tm_hour;
-> -        if (tmp % 12 =3D=3D 0) {
-> +        if (QEMU_IS_ALIGNED(tmp, 12)) {
->              tmp +=3D 12;
->          }
->          if (tmp <=3D 12) {
-> @@ -154,7 +154,7 @@ static int ds1338_send(I2CSlave *i2c, uint8_t =
-data)
->                  if (data & HOURS_PM) {
->                      tmp +=3D 12;
->                  }
-> -                if (tmp % 12 =3D=3D 0) {
-> +                if (QEMU_IS_ALIGNED(tmp, 12)) {
->                      tmp -=3D 12;
->                  }
->                  now.tm_hour =3D tmp;
+>  tests/tcg/alpha/test-cond.c | 2 +-
+>  tests/tcg/alpha/test-ovf.c  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+
+I think those do not include osdep.h
+
+(sigh, tests/tcg would need some love ;)
+
+> diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
+> index 74adffaa69..e5596f10b8 100644
+> --- a/tests/tcg/alpha/test-cond.c
+> +++ b/tests/tcg/alpha/test-cond.c
+> @@ -77,7 +77,7 @@ int main (void)
+>  {
+>    int i;
+>
+> -  for (i =3D 0; i < sizeof (vectors)/sizeof(vectors[0]); i++)
+> +  for (i =3D 0; i < ARRAY_SIZE(vectors); i++)
+>      if ((*vectors[i].func)(vectors[i].v) !=3D vectors[i].r) {
+>        write(1, "Failed\n", 7);
+>        return 1;
+> diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
+> index 01c80e7525..43fc6ebb2e 100644
+> --- a/tests/tcg/alpha/test-ovf.c
+> +++ b/tests/tcg/alpha/test-ovf.c
+> @@ -20,7 +20,7 @@ int main (void)
+>  {
+>    int i;
+>
+> -  for (i =3D 0; i < sizeof (vectors)/sizeof(vectors[0]); i++)
+> +  for (i =3D 0; i < ARRAY_SIZE(vectors); i++)
+>      if ((*vectors[i].func)(vectors[i].a, vectors[i].b) !=3D vectors[i].r=
+) {
+>        write(1, "Failed\n", 7);
+>      }
 > --
 > 2.13.2
->=20
->=20
-> ---
-> This email has been checked for viruses by AVG.
-> http://www.avg.com
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
