@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXatD-00085T-1A
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dXatE-00086o-Q8
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXatC-0004Sv-2B
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39828)
+	(envelope-from <sstabellini@kernel.org>) id 1dXatD-0004WT-KC
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39870)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dXatB-0004Rn-Rw
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:45 -0400
+	id 1dXatD-0004VB-BY
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 18 Jul 2017 15:22:37 -0700
-Message-Id: <1500416562-27337-2-git-send-email-sstabellini@kernel.org>
+Date: Tue, 18 Jul 2017 15:22:40 -0700
+Message-Id: <1500416562-27337-5-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1500416562-27337-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
 	<1500416562-27337-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL for-2.10 2/7] xen_pt_msi.c: Check for
- xen_host_pci_get_* failures in xen_pt_msix_init()
+Subject: [Qemu-devel] [PULL for-2.10 5/7] xen/mapcache: add an ability to
+ create dummy mappings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +27,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Igor Druzhinin <igor.druzhinin@citrix.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Igor Druzhinin <igor.druzhinin@citrix.com>
 
-Check the return status of the xen_host_pci_get_* functions we call in
-xen_pt_msix_init(), and fail device init if the reads failed rather than
-ploughing ahead. (Spotted by Coverity: CID 777338.)
+Dummys are simple anonymous mappings that are placed instead
+of regular foreign mappings in certain situations when we need
+to postpone the actual mapping but still have to give a
+memory region to QEMU to play with.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This is planned to be used for restore on Xen.
+
+Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/xen/xen_pt_msi.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ hw/i386/xen/xen-mapcache.c | 44 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 36 insertions(+), 8 deletions(-)
 
-diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-index 62add06..ff9a79f 100644
---- a/hw/xen/xen_pt_msi.c
-+++ b/hw/xen/xen_pt_msi.c
-@@ -535,7 +535,11 @@ int xen_pt_msix_init(XenPCIPassthroughState *s, uint32_t base)
-         return -1;
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index e60156c..39cb511 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -53,6 +53,8 @@ typedef struct MapCacheEntry {
+     uint8_t *vaddr_base;
+     unsigned long *valid_mapping;
+     uint8_t lock;
++#define XEN_MAPCACHE_ENTRY_DUMMY (1 << 0)
++    uint8_t flags;
+     hwaddr size;
+     struct MapCacheEntry *next;
+ } MapCacheEntry;
+@@ -150,7 +152,8 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
+ 
+ static void xen_remap_bucket(MapCacheEntry *entry,
+                              hwaddr size,
+-                             hwaddr address_index)
++                             hwaddr address_index,
++                             bool dummy)
+ {
+     uint8_t *vaddr_base;
+     xen_pfn_t *pfns;
+@@ -177,11 +180,25 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+         pfns[i] = (address_index << (MCACHE_BUCKET_SHIFT-XC_PAGE_SHIFT)) + i;
      }
  
--    xen_host_pci_get_word(hd, base + PCI_MSIX_FLAGS, &control);
-+    rc = xen_host_pci_get_word(hd, base + PCI_MSIX_FLAGS, &control);
-+    if (rc) {
-+        XEN_PT_ERR(d, "Failed to read PCI_MSIX_FLAGS field\n");
-+        return rc;
-+    }
-     total_entries = control & PCI_MSIX_FLAGS_QSIZE;
-     total_entries += 1;
+-    vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
+-                                      nb_pfn, pfns, err);
+-    if (vaddr_base == NULL) {
+-        perror("xenforeignmemory_map");
+-        exit(-1);
++    if (!dummy) {
++        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
++                                           PROT_READ | PROT_WRITE,
++                                           nb_pfn, pfns, err);
++        if (vaddr_base == NULL) {
++            perror("xenforeignmemory_map");
++            exit(-1);
++        }
++    } else {
++        /*
++         * We create dummy mappings where we are unable to create a foreign
++         * mapping immediately due to certain circumstances (i.e. on resume now)
++         */
++        vaddr_base = mmap(NULL, size, PROT_READ | PROT_WRITE,
++                          MAP_ANON | MAP_SHARED, -1, 0);
++        if (vaddr_base == NULL) {
++            perror("mmap");
++            exit(-1);
++        }
+     }
  
-@@ -554,7 +558,11 @@ int xen_pt_msix_init(XenPCIPassthroughState *s, uint32_t base)
-                            + XC_PAGE_SIZE - 1)
-                           & XC_PAGE_MASK);
+     entry->vaddr_base = vaddr_base;
+@@ -190,6 +207,12 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+     entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
+             BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
  
--    xen_host_pci_get_long(hd, base + PCI_MSIX_TABLE, &table_off);
-+    rc = xen_host_pci_get_long(hd, base + PCI_MSIX_TABLE, &table_off);
-+    if (rc) {
-+        XEN_PT_ERR(d, "Failed to read PCI_MSIX_TABLE field\n");
-+        goto error_out;
++    if (dummy) {
++        entry->flags |= XEN_MAPCACHE_ENTRY_DUMMY;
++    } else {
++        entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
 +    }
-     bar_index = msix->bar_index = table_off & PCI_MSIX_FLAGS_BIRMASK;
-     table_off = table_off & ~PCI_MSIX_FLAGS_BIRMASK;
-     msix->table_base = s->real_device.io_regions[bar_index].base_addr;
++
+     ram_block_notify_add(entry->vaddr_base, entry->size);
+     bitmap_zero(entry->valid_mapping, nb_pfn);
+     for (i = 0; i < nb_pfn; i++) {
+@@ -211,6 +234,7 @@ static uint8_t *xen_map_cache_unlocked(hwaddr phys_addr, hwaddr size,
+     hwaddr cache_size = size;
+     hwaddr test_bit_size;
+     bool translated = false;
++    bool dummy = false;
+ 
+ tryagain:
+     address_index  = phys_addr >> MCACHE_BUCKET_SHIFT;
+@@ -262,14 +286,14 @@ tryagain:
+     if (!entry) {
+         entry = g_malloc0(sizeof (MapCacheEntry));
+         pentry->next = entry;
+-        xen_remap_bucket(entry, cache_size, address_index);
++        xen_remap_bucket(entry, cache_size, address_index, dummy);
+     } else if (!entry->lock) {
+         if (!entry->vaddr_base || entry->paddr_index != address_index ||
+                 entry->size != cache_size ||
+                 !test_bits(address_offset >> XC_PAGE_SHIFT,
+                     test_bit_size >> XC_PAGE_SHIFT,
+                     entry->valid_mapping)) {
+-            xen_remap_bucket(entry, cache_size, address_index);
++            xen_remap_bucket(entry, cache_size, address_index, dummy);
+         }
+     }
+ 
+@@ -282,6 +306,10 @@ tryagain:
+             translated = true;
+             goto tryagain;
+         }
++        if (!dummy && runstate_check(RUN_STATE_INMIGRATE)) {
++            dummy = true;
++            goto tryagain;
++        }
+         trace_xen_map_cache_return(NULL);
+         return NULL;
+     }
 -- 
 1.9.1
