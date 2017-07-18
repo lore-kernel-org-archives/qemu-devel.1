@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7S-0003xy-HJ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:57 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7T-0003zF-R0
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7O-0005JZ-Re
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:50 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:48521)
+	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7Q-0005KO-GB
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:51 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:18675)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7O-0005JC-IV
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:46 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7Q-0005Jw-1Z
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:48 -0400
 From: James Hogan <james.hogan@imgtec.com>
-Date: Tue, 18 Jul 2017 12:55:55 +0100
-Message-ID: <34b839029829b3b63887a8a3a5937f475ba1d7aa.1500378931.git-series.james.hogan@imgtec.com>
+Date: Tue, 18 Jul 2017 12:55:56 +0100
+Message-ID: <b551b2d487039c2e1165e9c732a9fa36bf6497f0.1500378931.git-series.james.hogan@imgtec.com>
 In-Reply-To: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
 References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 10/14] target/mips: Add an MMU mode for ERL
+Subject: [Qemu-devel] [PATCH 11/14] target/mips: Add segmentation control
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +29,286 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: qemu-devel@nongnu.org, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-The segmentation control feature allows a legacy memory segment to
-become unmapped uncached at error level (according to CP0_Status.ERL),
-and in fact the user segment is already treated in this way by QEMU.
+The optional segmentation control registers CP0_SegCtl0, CP0_SegCtl1 &
+CP0_SegCtl2 control the behaviour and required privilege of the legacy
+virtual memory segments.
 
-Add a new MMU mode for this state so that QEMU's mappings don't persist
-between ERL=0 and ERL=1.
+Add them to the CP0 interface so they can be read and written when
+CP0_Config3.SC=1, and initialise them to describe the standard legacy
+layout so they can be used in future patches regardless of whether they
+are exposed to the guest.
 
 Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: Aurelien Jarno <aurelien@aurel32.net>
 ---
 Changes in v2:
-- Add ERL case to log output where cpu_mmu_index() is now used in
-  op_helper.c
+- Use ld_tl and ext32s_tl rather than ld32s_tl to avoid big endian host,
+  MIPS64 target issues (Yongbok).
+- Add missing break in DMFC0 CP0_SegCtl2 case.
 ---
- target/mips/cpu.h       | 17 +++++++++++++----
- target/mips/op_helper.c |  4 ++++
- 2 files changed, 17 insertions(+), 4 deletions(-)
+ target/mips/cpu.h       | 30 ++++++++++++++-
+ target/mips/helper.h    |  3 +-
+ target/mips/machine.c   |  7 ++-
+ target/mips/op_helper.c | 24 +++++++++++-
+ target/mips/translate.c | 88 ++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 150 insertions(+), 2 deletions(-)
 
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 3cf167611599..c24b1f64c685 100644
+index c24b1f64c685..74f6a5b09806 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -134,7 +134,7 @@ struct CPUMIPSFPUContext {
- #define FP_UNIMPLEMENTED  32
- };
+@@ -306,6 +306,36 @@ struct CPUMIPSState {
+ #define CP0PG_XIE 30
+ #define CP0PG_ELPA 29
+ #define CP0PG_IEC 27
++    target_ulong CP0_SegCtl0;
++    target_ulong CP0_SegCtl1;
++    target_ulong CP0_SegCtl2;
++#define CP0SC_PA        9
++#define CP0SC_PA_MASK   (0x7FULL << CP0SC_PA)
++#define CP0SC_PA_1GMASK (0x7EULL << CP0SC_PA)
++#define CP0SC_AM        4
++#define CP0SC_AM_MASK   (0x7ULL << CP0SC_AM)
++#define CP0SC_AM_UK     0ULL
++#define CP0SC_AM_MK     1ULL
++#define CP0SC_AM_MSK    2ULL
++#define CP0SC_AM_MUSK   3ULL
++#define CP0SC_AM_MUSUK  4ULL
++#define CP0SC_AM_USK    5ULL
++#define CP0SC_AM_UUSK   7ULL
++#define CP0SC_EU        3
++#define CP0SC_EU_MASK   (1ULL << CP0SC_EU)
++#define CP0SC_C         0
++#define CP0SC_C_MASK    (0x7ULL << CP0SC_C)
++#define CP0SC_MASK      (CP0SC_C_MASK | CP0SC_EU_MASK | CP0SC_AM_MASK | \
++                         CP0SC_PA_MASK)
++#define CP0SC_1GMASK    (CP0SC_C_MASK | CP0SC_EU_MASK | CP0SC_AM_MASK | \
++                         CP0SC_PA_1GMASK)
++#define CP0SC0_MASK     (CP0SC_MASK | (CP0SC_MASK << 16))
++#define CP0SC1_XAM      59
++#define CP0SC1_XAM_MASK (0x7ULL << CP0SC1_XAM)
++#define CP0SC1_MASK     (CP0SC_MASK | (CP0SC_MASK << 16) | CP0SC1_XAM_MASK)
++#define CP0SC2_XR       56
++#define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
++#define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
+     int32_t CP0_Wired;
+     int32_t CP0_SRSConf0_rw_bitmask;
+     int32_t CP0_SRSConf0;
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 60efa01194a0..5f492348ddfa 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -115,6 +115,9 @@ DEF_HELPER_2(mtc0_entrylo1, void, env, tl)
+ DEF_HELPER_2(mtc0_context, void, env, tl)
+ DEF_HELPER_2(mtc0_pagemask, void, env, tl)
+ DEF_HELPER_2(mtc0_pagegrain, void, env, tl)
++DEF_HELPER_2(mtc0_segctl0, void, env, tl)
++DEF_HELPER_2(mtc0_segctl1, void, env, tl)
++DEF_HELPER_2(mtc0_segctl2, void, env, tl)
+ DEF_HELPER_2(mtc0_wired, void, env, tl)
+ DEF_HELPER_2(mtc0_srsconf0, void, env, tl)
+ DEF_HELPER_2(mtc0_srsconf1, void, env, tl)
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 91e31a7c2fe8..898825de3b9c 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -211,8 +211,8 @@ const VMStateDescription vmstate_tlb = {
  
--#define NB_MMU_MODES 3
-+#define NB_MMU_MODES 4
- #define TARGET_INSN_START_EXTRA_WORDS 2
- 
- typedef struct CPUMIPSMVPContext CPUMIPSMVPContext;
-@@ -551,7 +551,7 @@ struct CPUMIPSState {
- #define EXCP_INST_NOTAVAIL 0x2 /* No valid instruction word for BadInstr */
-     uint32_t hflags;    /* CPU State */
-     /* TMASK defines different execution modes */
--#define MIPS_HFLAG_TMASK  0xF5807FF
-+#define MIPS_HFLAG_TMASK  0x1F5807FF
- #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
-     /* The KSU flags must be the lowest bits in hflags. The flag order
-        must be the same as defined for CP0 Status. This allows to use
-@@ -601,6 +601,7 @@ struct CPUMIPSState {
- #define MIPS_HFLAG_FRE   0x2000000 /* FRE enabled */
- #define MIPS_HFLAG_ELPA  0x4000000
- #define MIPS_HFLAG_ITC_CACHE  0x8000000 /* CACHE instr. operates on ITC tag */
-+#define MIPS_HFLAG_ERL   0x10000000 /* error level flag */
-     target_ulong btarget;        /* Jump / branch target               */
-     target_ulong bcond;          /* Branch condition (if needed)       */
- 
-@@ -698,11 +699,16 @@ extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
- #define MMU_MODE0_SUFFIX _kernel
- #define MMU_MODE1_SUFFIX _super
- #define MMU_MODE2_SUFFIX _user
-+#define MMU_MODE3_SUFFIX _error
- #define MMU_USER_IDX 2
- 
- static inline int hflags_mmu_index(uint32_t hflags)
- {
--    return hflags & MIPS_HFLAG_KSU;
-+    if (hflags & MIPS_HFLAG_ERL) {
-+        return 3; /* ERL */
-+    } else {
-+        return hflags & MIPS_HFLAG_KSU;
-+    }
- }
- 
- static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
-@@ -971,7 +977,10 @@ static inline void compute_hflags(CPUMIPSState *env)
-                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
-                      MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
--                     MIPS_HFLAG_ELPA);
-+                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-+    if (env->CP0_Status & (1 << CP0St_ERL)) {
-+        env->hflags |= MIPS_HFLAG_ERL;
-+    }
-     if (!(env->CP0_Status & (1 << CP0St_EXL)) &&
-         !(env->CP0_Status & (1 << CP0St_ERL)) &&
-         !(env->hflags & MIPS_HFLAG_DM)) {
+ const VMStateDescription vmstate_mips_cpu = {
+     .name = "cpu",
+-    .version_id = 9,
+-    .minimum_version_id = 9,
++    .version_id = 10,
++    .minimum_version_id = 10,
+     .post_load = cpu_post_load,
+     .fields = (VMStateField[]) {
+         /* Active TC */
+@@ -252,6 +252,9 @@ const VMStateDescription vmstate_mips_cpu = {
+         VMSTATE_UINTTL(env.CP0_Context, MIPSCPU),
+         VMSTATE_INT32(env.CP0_PageMask, MIPSCPU),
+         VMSTATE_INT32(env.CP0_PageGrain, MIPSCPU),
++        VMSTATE_UINTTL(env.CP0_SegCtl0, MIPSCPU),
++        VMSTATE_UINTTL(env.CP0_SegCtl1, MIPSCPU),
++        VMSTATE_UINTTL(env.CP0_SegCtl2, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Wired, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf0, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf1, MIPSCPU),
 diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 94172bcfe32a..e3531b6e84b0 100644
+index e3531b6e84b0..d0bf819fa9fd 100644
 --- a/target/mips/op_helper.c
 +++ b/target/mips/op_helper.c
-@@ -67,6 +67,7 @@ static inline type do_##name(CPUMIPSState *env, target_ulong addr,      \
-     case 1: return (type) cpu_##insn##_super_ra(env, addr, retaddr);    \
-     default:                                                            \
-     case 2: return (type) cpu_##insn##_user_ra(env, addr, retaddr);     \
-+    case 3: return (type) cpu_##insn##_error_ra(env, addr, retaddr);    \
-     }                                                                   \
+@@ -1320,6 +1320,30 @@ void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
+     restore_pamask(env);
  }
+ 
++void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
++{
++    CPUState *cs = CPU(mips_env_get_cpu(env));
++
++    env->CP0_SegCtl0 = arg1 & CP0SC0_MASK;
++    tlb_flush(cs);
++}
++
++void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
++{
++    CPUState *cs = CPU(mips_env_get_cpu(env));
++
++    env->CP0_SegCtl1 = arg1 & CP0SC1_MASK;
++    tlb_flush(cs);
++}
++
++void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
++{
++    CPUState *cs = CPU(mips_env_get_cpu(env));
++
++    env->CP0_SegCtl2 = arg1 & CP0SC2_MASK;
++    tlb_flush(cs);
++}
++
+ void helper_mtc0_wired(CPUMIPSState *env, target_ulong arg1)
+ {
+     if (env->insn_flags & ISA_MIPS32R6) {
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index ac9023443112..5c39fddfc410 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -1450,6 +1450,7 @@ typedef struct DisasContext {
+     uint64_t PAMask;
+     bool mvh;
+     bool eva;
++    bool sc;
+     int CP0_LLAddr_shift;
+     bool ps;
+     bool vp;
+@@ -5226,6 +5227,24 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageGrain));
+             rn = "PageGrain";
+             break;
++        case 2:
++            CP0_CHECK(ctx->sc);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl0));
++            tcg_gen_ext32s_tl(arg, arg);
++            rn = "SegCtl0";
++            break;
++        case 3:
++            CP0_CHECK(ctx->sc);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl1));
++            tcg_gen_ext32s_tl(arg, arg);
++            rn = "SegCtl1";
++            break;
++        case 4:
++            CP0_CHECK(ctx->sc);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
++            tcg_gen_ext32s_tl(arg, arg);
++            rn = "SegCtl2";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -5880,6 +5899,21 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             rn = "PageGrain";
+             ctx->bstate = BS_STOP;
+             break;
++        case 2:
++            CP0_CHECK(ctx->sc);
++            gen_helper_mtc0_segctl0(cpu_env, arg);
++            rn = "SegCtl0";
++            break;
++        case 3:
++            CP0_CHECK(ctx->sc);
++            gen_helper_mtc0_segctl1(cpu_env, arg);
++            rn = "SegCtl1";
++            break;
++        case 4:
++            CP0_CHECK(ctx->sc);
++            gen_helper_mtc0_segctl2(cpu_env, arg);
++            rn = "SegCtl2";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -6541,6 +6575,21 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageGrain));
+             rn = "PageGrain";
+             break;
++        case 2:
++            CP0_CHECK(ctx->sc);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl0));
++            rn = "SegCtl0";
++            break;
++        case 3:
++            CP0_CHECK(ctx->sc);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl1));
++            rn = "SegCtl1";
++            break;
++        case 4:
++            CP0_CHECK(ctx->sc);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
++            rn = "SegCtl2";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7177,6 +7226,21 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_pagegrain(cpu_env, arg);
+             rn = "PageGrain";
+             break;
++        case 2:
++            CP0_CHECK(ctx->sc);
++            gen_helper_mtc0_segctl0(cpu_env, arg);
++            rn = "SegCtl0";
++            break;
++        case 3:
++            CP0_CHECK(ctx->sc);
++            gen_helper_mtc0_segctl1(cpu_env, arg);
++            rn = "SegCtl1";
++            break;
++        case 4:
++            CP0_CHECK(ctx->sc);
++            gen_helper_mtc0_segctl2(cpu_env, arg);
++            rn = "SegCtl2";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -20133,6 +20197,7 @@ void gen_intermediate_code(CPUMIPSState *env, struct TranslationBlock *tb)
+     ctx.PAMask = env->PAMask;
+     ctx.mvh = (env->CP0_Config5 >> CP0C5_MVH) & 1;
+     ctx.eva = (env->CP0_Config5 >> CP0C5_EVA) & 1;
++    ctx.sc = (env->CP0_Config3 >> CP0C3_SC) & 1;
+     ctx.CP0_LLAddr_shift = env->CP0_LLAddr_shift;
+     ctx.cmgcr = (env->CP0_Config3 >> CP0C3_CMGCR) & 1;
+     /* Restore delay slot state from the tb context.  */
+@@ -20619,6 +20684,29 @@ void cpu_state_reset(CPUMIPSState *env)
+             env->tcs[0].CP0_TCStatus = (1 << CP0TCSt_A);
+         }
+     }
++
++    /*
++     * Configure default legacy segmentation control. We use this regardless of
++     * whether segmentation control is presented to the guest.
++     */
++    /* KSeg3 (seg0 0xE0000000..0xFFFFFFFF) */
++    env->CP0_SegCtl0 =   (CP0SC_AM_MK << CP0SC_AM);
++    /* KSeg2 (seg1 0xC0000000..0xDFFFFFFF) */
++    env->CP0_SegCtl0 |= ((CP0SC_AM_MSK << CP0SC_AM)) << 16;
++    /* KSeg1 (seg2 0xA0000000..0x9FFFFFFF) */
++    env->CP0_SegCtl1 =   (0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) |
++                         (2 << CP0SC_C);
++    /* KSeg0 (seg3 0x80000000..0x9FFFFFFF) */
++    env->CP0_SegCtl1 |= ((0 << CP0SC_PA) | (CP0SC_AM_UK << CP0SC_AM) |
++                         (3 << CP0SC_C)) << 16;
++    /* USeg (seg4 0x40000000..0x7FFFFFFF) */
++    env->CP0_SegCtl2 =   (2 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
++                         (1 << CP0SC_EU) | (2 << CP0SC_C);
++    /* USeg (seg5 0x00000000..0x3FFFFFFF) */
++    env->CP0_SegCtl2 |= ((0 << CP0SC_PA) | (CP0SC_AM_MUSK << CP0SC_AM) |
++                         (1 << CP0SC_EU) | (2 << CP0SC_C)) << 16;
++    /* XKPhys (note, SegCtl2.XR = 0, so XAM won't be used) */
++    env->CP0_SegCtl1 |= (CP0SC_AM_UK << CP0SC1_XAM);
  #endif
-@@ -94,6 +95,7 @@ static inline void do_##name(CPUMIPSState *env, target_ulong addr,      \
-     case 1: cpu_##insn##_super_ra(env, addr, val, retaddr); break;      \
-     default:                                                            \
-     case 2: cpu_##insn##_user_ra(env, addr, val, retaddr); break;       \
-+    case 3: cpu_##insn##_error_ra(env, addr, val, retaddr); break;      \
-     }                                                                   \
- }
- #endif
-@@ -1451,6 +1453,7 @@ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
-                 val, val & env->CP0_Cause & CP0Ca_IP_mask,
-                 env->CP0_Cause);
-         switch (cpu_mmu_index(env, false)) {
-+        case 3: qemu_log(", ERL\n"); break;
-         case MIPS_HFLAG_UM: qemu_log(", UM\n"); break;
-         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
-         case MIPS_HFLAG_KM: qemu_log("\n"); break;
-@@ -2245,6 +2248,7 @@ static void debug_post_eret(CPUMIPSState *env)
-         if (env->hflags & MIPS_HFLAG_DM)
-             qemu_log(" DEPC " TARGET_FMT_lx, env->CP0_DEPC);
-         switch (cpu_mmu_index(env, false)) {
-+        case 3: qemu_log(", ERL\n"); break;
-         case MIPS_HFLAG_UM: qemu_log(", UM\n"); break;
-         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
-         case MIPS_HFLAG_KM: qemu_log("\n"); break;
+     if ((env->insn_flags & ISA_MIPS32R6) &&
+         (env->active_fpu.fcr0 & (1 << FCR0_F64))) {
 -- 
 git-series 0.8.10
