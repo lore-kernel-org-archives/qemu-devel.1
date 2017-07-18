@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXYic-00062x-Ie
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:43 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXYie-000648-Gd
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXYiX-0004Nl-N8
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:42 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35088)
+	(envelope-from <rth7680@gmail.com>) id 1dXYid-0004Sz-Bj
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:44 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:32930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXYiX-0004M5-HJ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:37 -0400
-Received: by mail-qt0-x241.google.com with SMTP id p25so2577092qtp.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 13:03:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXYid-0004SQ-7H
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:03:43 -0400
+Received: by mail-qk0-x242.google.com with SMTP id u126so2854574qka.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 13:03:43 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 18 Jul 2017 10:02:25 -1000
-Message-Id: <20170718200255.31647-1-rth@twiddle.net>
+Date: Tue, 18 Jul 2017 10:02:28 -1000
+Message-Id: <20170718200255.31647-4-rth@twiddle.net>
+In-Reply-To: <20170718200255.31647-1-rth@twiddle.net>
+References: <20170718200255.31647-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 00/30] target/sh4 improvements
+Subject: [Qemu-devel] [PATCH v3 03/30] target/sh4: Introduce
+ TB_FLAG_ENVFLAGS_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +33,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net
 
-The big ticket item in this series is the support for
-user-space atomics.  But a lot of other cleanup has
-crept in as well.
+We'll be putting more things into this bitmask soon.
+Let's have a name that covers all possible uses.
 
-Changes since v2 incorporate feedback from Aurelien.
-I've tried to remember to add individual changelogs
-to the patches, but I may have forgotten some.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ target/sh4/cpu.h       | 4 +++-
+ target/sh4/translate.c | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-I do now include the linux-user reserved_va changes
-that I posted subsequent to posting v2.
-
-I believe there are only 4 patches that have not 
-seen a Reviewed-by yet.
-
-
-r~
-
-
-Richard Henderson (30):
-  target/sh4: Use cmpxchg for movco
-  target/sh4: Consolidate end-of-TB tests
-  target/sh4: Introduce TB_FLAG_ENVFLAGS_MASK
-  target/sh4: Keep env->flags clean
-  target/sh4: Adjust TB_FLAG_PENDING_MOVCA
-  target/sh4: Handle user-space atomics
-  target/sh4: Recognize common gUSA sequences
-  linux-user/sh4: Notice gUSA regions during signal delivery
-  linux-user/sh4: Clean env->flags on signal boundaries
-  target/sh4: Hoist register bank selection
-  target/sh4: Unify cpu_fregs into FREG
-  target/sh4: Pass DisasContext to fpr64 routines
-  target/sh4: Hoist fp register bank selection
-  target/sh4: Eliminate unused XREG macro
-  target/sh4: Merge DREG into fpr64 routines
-  target/sh4: Load/store Dr as 64-bit quantities
-  target/sh4: Simplify 64-bit fp reg-reg move
-  target/sh4: Unify code for CHECK_NOT_DELAY_SLOT
-  target/sh4: Unify code for CHECK_PRIVILEGED
-  target/sh4: Unify code for CHECK_FPU_ENABLED
-  target/sh4: Tidy misc illegal insn checks
-  target/sh4: Introduce CHECK_FPSCR_PR_*
-  target/sh4: Introduce CHECK_SH4A
-  target/sh4: Implement fpchg
-  target/sh4: Add missing FPSCR.PR == 0 checks
-  target/sh4: Implement fsrra
-  target/sh4: Use tcg_gen_lookup_and_goto_ptr
-  tcg: Fix off-by-one in assert in page_set_flags
-  linux-user: Tidy and enforce reserved_va initialization
-  linux-user/sh4: Reduce TARGET_VIRT_ADDR_SPACE_BITS to 31
-
- linux-user/arm/target_cpu.h |   4 +
- target/mips/mips-defs.h     |   6 +-
- target/nios2/cpu.h          |   6 +-
- target/sh4/cpu.h            |  33 +-
- target/sh4/helper.h         |   2 +
- accel/tcg/translate-all.c   |   2 +-
- linux-user/main.c           |  39 +-
- linux-user/signal.c         |  33 ++
- target/sh4/cpu.c            |   2 +-
- target/sh4/helper.c         |   2 +-
- target/sh4/op_helper.c      |  22 +
- target/sh4/translate.c      | 975 ++++++++++++++++++++++++++++++++------------
- 12 files changed, 839 insertions(+), 287 deletions(-)
-
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index b15116e..240ed36 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -96,6 +96,8 @@
+ #define DELAY_SLOT_CONDITIONAL (1 << 1)
+ #define DELAY_SLOT_RTE         (1 << 2)
+ 
++#define TB_FLAG_ENVFLAGS_MASK  DELAY_SLOT_MASK
++
+ typedef struct tlb_t {
+     uint32_t vpn;		/* virtual page number */
+     uint32_t ppn;		/* physical page number */
+@@ -389,7 +391,7 @@ static inline void cpu_get_tb_cpu_state(CPUSH4State *env, target_ulong *pc,
+ {
+     *pc = env->pc;
+     *cs_base = 0;
+-    *flags = (env->flags & DELAY_SLOT_MASK)                    /* Bits  0- 2 */
++    *flags = (env->flags & TB_FLAG_ENVFLAGS_MASK) /* Bits  0-2 */
+             | (env->fpscr & (FPSCR_FR | FPSCR_SZ | FPSCR_PR))  /* Bits 19-21 */
+             | (env->sr & ((1u << SR_MD) | (1u << SR_RB)))      /* Bits 29-30 */
+             | (env->sr & (1u << SR_FD))                        /* Bit 15 */
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 8740ee3..998860a 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -225,7 +225,7 @@ static inline void gen_save_cpu_state(DisasContext *ctx, bool save_pc)
+     if (ctx->delayed_pc != (uint32_t) -1) {
+         tcg_gen_movi_i32(cpu_delayed_pc, ctx->delayed_pc);
+     }
+-    if ((ctx->tbflags & DELAY_SLOT_MASK) != ctx->envflags) {
++    if ((ctx->tbflags & TB_FLAG_ENVFLAGS_MASK) != ctx->envflags) {
+         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
+     }
+ }
+@@ -1831,7 +1831,7 @@ void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *tb)
+     pc_start = tb->pc;
+     ctx.pc = pc_start;
+     ctx.tbflags = (uint32_t)tb->flags;
+-    ctx.envflags = tb->flags & DELAY_SLOT_MASK;
++    ctx.envflags = tb->flags & TB_FLAG_ENVFLAGS_MASK;
+     ctx.bstate = BS_NONE;
+     ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
+     /* We don't know if the delayed pc came from a dynamic or static branch,
 -- 
 2.9.4
