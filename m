@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34017)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRm-00012q-A5
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:07 -0400
+	id 1dXGRo-00014j-Ae
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRk-0005Aa-5q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:06 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33018)
+	id 1dXGRn-0005EA-G8
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:08 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34093)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRk-0005AK-2u
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:04 -0400
-Received: by mail-qk0-x244.google.com with SMTP id a66so735410qkb.0
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:33:04 -0700 (PDT)
+	id 1dXGRn-0005E1-C8
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:33:07 -0400
+Received: by mail-qt0-x244.google.com with SMTP id 19so731859qty.1
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:33:07 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 21:31:43 -0300
-Message-Id: <20170718003159.10200-16-f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 21:31:44 -0300
+Message-Id: <20170718003159.10200-17-f4bug@amsat.org>
 In-Reply-To: <20170718003159.10200-1-f4bug@amsat.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 	<20170718003159.10200-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 15/31] docker: enable gcrypt to extend code
- coverage on amd64
+Subject: [Qemu-devel] [PATCH v2 16/31] docker: enable nettle to extend code
+ coverage on arm64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,19 +41,19 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/debian-amd64.docker | 3 +++
+ tests/docker/dockerfiles/debian-arm64-cross.docker | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 71bcfc14d5..eb13f06ed1 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -34,3 +34,6 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
- RUN git clone https://github.com/luigirizzo/netmap.git /usr/src/netmap
- RUN cd /usr/src/netmap/LINUX && ./configure --no-drivers --no-apps --kernel-dir=$(ls -d /usr/src/linux-headers-*-amd64) && make install
- ENV QEMU_CONFIGURE_OPTS --enable-netmap
+diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
+index 6ed12a3f6e..877d863475 100644
+--- a/tests/docker/dockerfiles/debian-arm64-cross.docker
++++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
+@@ -24,3 +24,6 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         librdmacm-dev:arm64 \
+         libsnappy-dev:arm64 \
+         libxen-dev:arm64
 +
-+# gcrypt
-+ENV QEMU_CONFIGURE_OPTS $QEMU_CONFIGURE_OPTS --enable-gcrypt
++# nettle
++ENV QEMU_CONFIGURE_OPTS $QEMU_CONFIGURE_OPTS --enable-nettle
 -- 
 2.13.2
