@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1dXMPx-0007zv-PR
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:55:38 -0400
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXMT7-0000dA-1u
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1dXMPx-0008Ug-3F
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:55:37 -0400
-Date: Tue, 18 Jul 2017 12:25:25 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <20170717160503.GL5301@noname.redhat.com>
-Message-ID: <alpine.LFD.2.20.1707181221260.2603@wniryva>
-References: <20170717130130.29211-1-ppandit@redhat.com>
-	<20170717160503.GL5301@noname.redhat.com>
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXMT4-0001df-1X
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:58:53 -0400
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:42305
+	helo=www.kot-begemot.co.uk)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
+	id 1dXMT3-0001ct-R0
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:58:49 -0400
+References: <150035832794.84.14057146505821937127@5d477a5b5989>
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Message-ID: <1f324fe7-d49a-58f8-8e1d-3c8376115551@cambridgegreys.com>
+Date: Tue, 18 Jul 2017 07:58:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v1] ide: check BlockBackend
- object in ide_cancel_dma_sync
+In-Reply-To: <150035832794.84.14057146505821937127@5d477a5b5989>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Unified Socket Transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,23 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Chensongnian <chensongnian@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, jasowang@redhat.com
 
-  Hello Kevin,
+Apologies, some bits of the second stage (sendmmsg) got in by mistake 
+and broke the patch.
 
-+-- On Mon, 17 Jul 2017, Kevin Wolf wrote --+
-| I think Stefan didn't only mean a stack trace, but an actual instruction
-| how to reproduce this. VM configuration, what actions to take, etc.
-| 
-| In fact, I will add that we will probably want a qtest case as a
-| regression test anyway, and tests are always great for describing how to
-| reproduce a problem, too.
+I will re-submit it later today including the proposed documentation, 
+help and man page changes.
 
-It was found via a fuzzing exercise; I've requested a reproducer from original 
-reporter, will try to create a qtest once it's available.
+A.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+On 18/07/17 07:12, no-reply@patchew.org wrote:
+> Hi,
+>
+> This series failed build test on s390x host. Please find the details below.
+>
+> Type: series
+> Message-id: 20170718060627.2107-1-anton.ivanov@cambridgegreys.com
+> Subject: [Qemu-devel] [PATCH] Unified Socket Transport
+>
+[snip]
+
+
+-- 
+Anton R. Ivanov
+
+Cambridge Greys Limited, England and Wales company No 10273661
+http://www.cambridgegreys.com/
