@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXJwz-0008Fu-PI
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:17:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXJzp-0001xh-04
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXJwu-0002qp-Os
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:17:33 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35553)
+	(envelope-from <rth7680@gmail.com>) id 1dXJzk-0004sv-3d
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:20:29 -0400
+Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:33734)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXJwu-0002qN-Hi
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:17:28 -0400
-Received: by mail-pg0-x242.google.com with SMTP id d193so1243088pgc.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:17:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXJzj-0004si-UC
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:20:24 -0400
+Received: by mail-pf0-x232.google.com with SMTP id e26so5092481pfd.0
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:20:23 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <1500235468-15341-1-git-send-email-cota@braap.org>
-	<1500235468-15341-38-git-send-email-cota@braap.org>
+	<1500235468-15341-39-git-send-email-cota@braap.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <b977f473-6e92-9f1b-9f88-8bdddf898365@twiddle.net>
-Date: Mon, 17 Jul 2017 18:17:21 -1000
+Message-ID: <2ff2e174-848c-6b50-8620-c741fe116b5c@twiddle.net>
+Date: Mon, 17 Jul 2017 18:20:17 -1000
 MIME-Version: 1.0
-In-Reply-To: <1500235468-15341-38-git-send-email-cota@braap.org>
+In-Reply-To: <1500235468-15341-39-git-send-email-cota@braap.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 37/45] tcg: introduce **tcg_ctxs to keep
- track of all TCGContext's
+Subject: Re: [Qemu-devel] [PATCH v2 38/45] tcg: distribute profiling
+ counters across TCGContext's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +35,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 
 On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
-> Groundwork for supporting multiple TCG contexts.
-> 
-> Note that having n_tcg_ctxs is unnecessary. However, it is
-> convenient to have it, since it will simplify iterating over the
-> array: we'll have just a for loop instead of having to iterate
-> over a NULL-terminated array (which would require n+1 elems)
-> or having to check with ifdef's for usermode/softmmu.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->   tcg/tcg.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
-> 
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index f907c47..8094278 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -115,6 +115,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
->   static void tcg_out_tb_init(TCGContext *s);
->   static bool tcg_out_tb_finalize(TCGContext *s);
->   
-> +static TCGContext **tcg_ctxs;
-> +static unsigned int n_tcg_ctxs;
+> +#define PROF_ADD_MAX(to, from, field)                                   \
+> +    do {                                                                \
+> +        typeof((from)->field) val__ = atomic_read(&((from)->field));    \
+> +        if (val__ > (to)->field) {                                      \
+> +            (to)->field = val__;                                        \
+> +        }                                                               \
+> +    } while (0)
 
-I'm perfectly happy introducing these now, and converting stuff to use them.
+PROF_MAX?  There's no addition involved.
 
-> +static void tcg_ctxs_init(TCGContext *s)
-> +{
-> +    tcg_ctxs = g_new(TCGContext *, 1);
-> +    tcg_ctxs[0] = s;
-> +    n_tcg_ctxs = 1;
-> +}
+Otherwise,
 
-This was confusing to me, trying to figure out how this function would be 
-extended for multi-threading.  But it turns out it isn't -- it just goes away.
-
-> @@ -381,6 +390,7 @@ void tcg_context_init(TCGContext *s)
->           indirect_reg_alloc_order[i] = tcg_target_reg_alloc_order[i];
->       }
->   
-> +    tcg_ctxs_init(s);
->       tcg_ctx = s;
->   }
-
-Thus I think it would be simpler for the interim to do
-
-     tcg_ctx = s;
-     tcg_ctxs = &tcg_ctx;
-     n_tcg_ctxs = 1;
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 
 
 r~
