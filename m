@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXJLB-0008IZ-AE
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:38:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1dXJM1-0000bs-HV
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXJL7-0007hO-I9
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:38:29 -0400
-Date: Tue, 18 Jul 2017 13:33:01 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170718033301.GA2756@umbus.fritz.box>
-References: <20170718020033.8819-1-aik@ozlabs.ru>
+	(envelope-from <peterx@redhat.com>) id 1dXJLy-00089h-Dv
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:39:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dXJLy-00088n-7m
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:39:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01091C04B92C
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:39:17 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue, 18 Jul 2017 11:39:00 +0800
+Message-Id: <1500349150-13240-1-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
-Content-Disposition: inline
-In-Reply-To: <20170718020033.8819-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu] spapr_pci: Fix obsolete comment about
- MSIX encoding in addr/data
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/10] migration: export cap/params to qdev
+ props
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Xu <peterx@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+v3:
+- add r-b properly on each patch
+- patch 1: fix commit message [Eric]
+- patch 4: dropped since not used any more [Eduardo]
+- patch 7 (new patch 6): move the check from post_init() into
+  migration_object_init() [Eduardo]
+- patch 10 (new patch 9): rename var "head" -> "list" [Juan]
+- patch 11: rebased a lot due to patch 7's change, so removed Juan's r-b
 
---AhhlLboLdkugWU4S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v2:
+- extended the series from 3 -> 11 patches
+- renamed all the properties with "x-" prefix
+- handled the cap/param check for these new properties (mostly patch
+  4-11, but it contains lots of refactorings in general)
 
-On Tue, Jul 18, 2017 at 12:00:33PM +1000, Alexey Kardashevskiy wrote:
-> f1c2dc7c866a "spapr-pci: rework MSI/MSIX" (07/2013) changed MSIX encoding
-> but forgot to change the comment so this changes it.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+We have the MigrationState as QDev now (which seems crazy). Let's
+continue to benefit.
 
-Applied to ppc-for-2.10, thanks.
+This series is exporting all migration capabilities/params as global
+parameters. Then we can do something like this:
 
-> ---
->  hw/ppc/spapr_pci.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index a52dcf8ec0..4b895c5a2a 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -723,9 +723,7 @@ static PCIINTxRoute spapr_route_intx_pin_to_irq(void =
-*opaque, int pin)
->  /*
->   * MSI/MSIX memory region implementation.
->   * The handler handles both MSI and MSIX.
-> - * For MSI-X, the vector number is encoded as a part of the address,
-> - * data is set to 0.
-> - * For MSI, the vector number is encoded in least bits in data.
-> + * The vector number is encoded in least bits in data.
->   */
->  static void spapr_msi_write(void *opaque, hwaddr addr,
->                              uint64_t data, unsigned size)
+  qemu -global migration.postcopy-ram=3Dtrue \
+       -global migration.max-bandwidth=3D4096
+
+The values will be inited just like we typed these values into HMP
+monitor. It'll simplify lots of migration scripts.
+
+The changes are fairly straightforward. One tiny loss is that we still
+don't support:
+
+  -global migration.max-bandwidth=3D1g
+
+...just like what we did in HMP:
+
+  migrate_set_speed 1g
+
+...while we need to use:
+
+  -global migration.max-bandwidth=3D1073741824
+
+However that should only be used in scripts, and that's good enough
+imho.
+
+These properties should only be used for debugging/testing purpose,
+and we should not guarantee any interface compatibility for them (just
+like HMP).
+
+Please review. Thanks.
+
+Peter Xu (10):
+  qdev: provide DEFINE_PROP_INT64()
+  migration: export parameters to props
+  migration: export capabilities to props
+  migration: introduce migrate_params_check()
+  migration: provide migrate_params_apply()
+  migration: check global params for validity
+  migration: remove check against colo support
+  migration: provide migrate_caps_check()
+  migration: provide migrate_cap_add()
+  migration: check global caps for validity
+
+ hw/core/qdev-properties.c    |  32 ++++++
+ include/hw/qdev-properties.h |   3 +
+ include/migration/colo.h     |   1 -
+ migration/colo.c             |   5 -
+ migration/migration.c        | 267 +++++++++++++++++++++++++++++++++----=
+------
+ 5 files changed, 242 insertions(+), 66 deletions(-)
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---AhhlLboLdkugWU4S
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlltgWsACgkQbDjKyiDZ
-s5I6zw/9HCcwN7xvBGKwYke0SEpAJAqmwWF25MfTjXcaQEjTqnpklmW5nGAzkhfw
-8B4vI6oZNpnFWXmvlkbUbYMfuiMAEXi7x9D3V7HGtLWskfEYVD1J5Him7FyTwDzK
-A9pV4eRwNpkehy37lMbrlzO/bZXRlakt1te8EN9UxevAgMvvBddfRwXrPOKJ8MiE
-+0yt0hKVDV/wuQ+tgAGHeTL/JP/HH0oUKvWjdH2b4BJj9hMU4QCeziSfT/ocrLkO
-/SG5ozDBcId+vv26dDJW/yQC5akEOSUeIJ63RadruIDTkbq7rAGlDGBvCu1ATuSO
-7DVhuBaQTRyGsK2pQmzZEja/OG4preVMZ7G7hX8KTvTaTe1KKu/emeB/UWKTIbJ8
-Hv+HMH8fr15HhpDyq0LqaJnsZ40SAOm49g9DATShNtTLtvrVMOKy+CMlc7svi14W
-phgzw9aOmt9dNJxsJFcDqtl3BOl1WxPuWG9xh4r1Z+4j+AFUgixdkSM+nYtJ3F1J
-4SL4v4AjaGTeimhscPbtSqxYmHQm4LdpgXWjBNJhtop1TuoupJEc8yvwWWwGIrbV
-eJxEKeVcYaePoXMytJfdGJDdljM4Xr8pY42EET4LsGu0Pb5TQieI2KVhpfu7LDGy
-Zc7Ryqylqt2NooZs41uI73mhzuBE+tLA9XekpJ16xKO2mUcPSsc=
-=L6oF
------END PGP SIGNATURE-----
-
---AhhlLboLdkugWU4S--
+2.7.4
