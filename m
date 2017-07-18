@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXPwN-00046U-7X
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:41:20 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0I-0007Q9-NY
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXPwK-00016H-5c
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:41:19 -0400
-References: <20170718101632.3304-1-lvivier@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ef867792-9bc4-7338-7fe6-ce48241fb4e7@redhat.com>
-Date: Tue, 18 Jul 2017 12:41:09 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0F-00035K-Mu
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:22 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33693)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dXQ0F-00034Y-Ga
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:19 -0400
+Received: by mail-wr0-x230.google.com with SMTP id a10so23430529wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:45:17 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:44:42 +0100
+Message-Id: <20170718104513.23947-2-alex.bennee@linaro.org>
+In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
+References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170718101632.3304-1-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] spapr/htab: fix savevm
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 01/32] docker: allow customizing Travis
+ global_env variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, sbobroff@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "open list:-----------------..." <qemu-devel@nongnu.org>
 
-On 18.07.2017 12:16, Laurent Vivier wrote:
-> Commit 3a38429 ("spapr: Add a "no HPT" encoding to HTAB migration stream")
-> allows to migrate an empty HPT, but doesn't mark correctly the
-> end of the migration stream.
-> 
-> The end condition (value returned by htab_save_iterate())
-> should be 1, whereas in 3a38429 it returns 0.
-> 
-> The problem can be reproduced with QEMU monitor command "savevm":
-> the command never stops and the disk image grows without limit.
-> 
-> Fixes: 3a38429748aa4f74abaecf16c4c087e8a325e12a
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
-> v2: remove change in htab_save_complete() as
->     it always return 0 in case of success (Thomas)
-> 
->  hw/ppc/spapr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 970093e..1cb09e7 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1827,7 +1827,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
->      /* Iteration header */
->      if (!spapr->htab_shift) {
->          qemu_put_be32(f, -1);
-> -        return 0;
-> +        return 1;
->      } else {
->          qemu_put_be32(f, 0);
->      }
-> 
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This is useful so that we can do builds at higher than -j3 when running
+travis.py locally.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+diff --git a/tests/docker/travis.py b/tests/docker/travis.py
+index 8dcc964da4..703a7fde85 100755
+--- a/tests/docker/travis.py
++++ b/tests/docker/travis.py
+@@ -21,13 +21,12 @@ def load_yaml(fname):
+ def conf_iter(conf):
+     def env_to_list(env):
+         return env if isinstance(env, list) else [env]
+-    global_env = conf["env"]["global"]
+     for entry in conf["matrix"]["include"]:
+-        yield {"env": global_env + env_to_list(entry["env"]),
++        yield {"env": env_to_list(entry["env"]),
+                "compiler": entry["compiler"]}
+     for entry in itertools.product(conf["compiler"],
+                                    conf["env"]["matrix"]):
+-        yield {"env": global_env + env_to_list(entry[1]),
++        yield {"env": env_to_list(entry[1]),
+                "compiler": entry[0]}
+ 
+ def main():
+@@ -35,6 +34,7 @@ def main():
+         sys.stderr.write("Usage: %s <travis-file>\n" % sys.argv[0])
+         return 1
+     conf = load_yaml(sys.argv[1])
++    print "\n".join((": ${%s}" % var for var in conf["env"]["global"]))
+     for config in conf_iter(conf):
+         print "("
+         print "\n".join(config["env"])
+-- 
+2.13.0
