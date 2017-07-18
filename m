@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXZ7W-000575-KN
+	(envelope-from <armbru@redhat.com>) id 1dXZ7W-00056x-Ae
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXZ7V-00018u-3H
+	(envelope-from <armbru@redhat.com>) id 1dXZ7T-00017V-DQ
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38518)
+Received: from mx1.redhat.com ([209.132.183.28]:59732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXZ7U-00017y-Qa
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXZ7T-00016x-5a
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C6C95A04EC
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 38CEE8123D
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:22 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-60.ams2.redhat.com
 	[10.36.116.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 684B471CAD
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:23 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A216B7F8D5
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Jul 2017 22:29:20 +0200
-Message-Id: <1500409760-20730-11-git-send-email-armbru@redhat.com>
+Date: Tue, 18 Jul 2017 22:29:12 +0200
+Message-Id: <1500409760-20730-3-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500409760-20730-1-git-send-email-armbru@redhat.com>
 References: <1500409760-20730-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 10/10] migration: Use JSON null instead of "" to
- reset parameter to default
+Subject: [Qemu-devel] [PULL 02/10] qapi: Use QNull for a more regular
+ visit_type_null()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,146 +36,358 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-migrate-set-parameters sets migration parameters according to is
-arguments like this:
-
-* Present means "set the parameter to this value"
-
-* Absent means "leave the parameter unchanged"
-
-* Except for parameters tls_creds and tls_hostname, "" means "reset
-  the parameter to its default value
-
-The first two are perfectly normal: presence of the parameter makes
-the command do something.
-
-The third one overloads the parameter with a second meaning.  The
-overloading is *implicit*, i.e. it's not visible in the types.  Works
-here, because "" is neither a valid TLS credentials ID, nor a valid
-host name.
-
-Pressing argument values the schema accepts, but are semantically
-invalid, into service to mean "reset to default" is not general, as
-suitable invalid values need not exist.  I also find it ugly.
-
-To clean this up, we could add a separate flag argument to ask for
-"reset to default", or add a distinct value to @tls_creds and
-@tls_hostname.  This commit implements the latter: add JSON null to
-the values of @tls_creds and @tls_hostname, deprecate "".
-
-Because we're so close to the 2.10 freeze, implement it in the
-stupidest way possible: have qmp_migrate_set_parameters() rewrite null
-to "" before anything else can see the null.  The proper way to do it
-would be rewriting "" to null, but that requires fixing up code to
-work with null.  Add TODO comments for that.
+Make visit_type_null() take an @obj argument like its buddies.  This
+helps keep the next commit simple.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hmp.c                 |  8 ++++++--
- migration/migration.c | 18 ++++++++++++++++--
- qapi-schema.json      | 20 ++++++++++++++++++--
- 3 files changed, 40 insertions(+), 6 deletions(-)
+ hw/ppc/spapr_drc.c                  |  7 ++++++-
+ include/qapi/visitor-impl.h         |  3 ++-
+ include/qapi/visitor.h              |  8 ++++----
+ qapi/qapi-clone-visitor.c           |  5 +++--
+ qapi/qapi-dealloc-visitor.c         |  6 +++++-
+ qapi/qapi-visit-core.c              |  7 ++++---
+ qapi/qobject-input-visitor.c        |  6 +++++-
+ qapi/qobject-output-visitor.c       |  3 ++-
+ qapi/string-input-visitor.c         |  8 +++++++-
+ qapi/string-output-visitor.c        |  3 ++-
+ qapi/trace-events                   |  2 +-
+ target/ppc/translate_init.c         | 10 +++++++++-
+ tests/check-qnull.c                 |  9 +++++++--
+ tests/test-qobject-input-visitor.c  | 13 +++++++++----
+ tests/test-qobject-output-visitor.c |  3 ++-
+ 15 files changed, 68 insertions(+), 25 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 0a5de75..40ebeef 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1541,11 +1541,15 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-                 break;
-             case MIGRATION_PARAMETER_TLS_CREDS:
-                 p->has_tls_creds = true;
--                visit_type_str(v, param, &p->tls_creds, &err);
-+                p->tls_creds = g_new0(StrOrNull, 1);
-+                p->tls_creds->type = QTYPE_QSTRING;
-+                visit_type_str(v, param, &p->tls_creds->u.s, &err);
-                 break;
-             case MIGRATION_PARAMETER_TLS_HOSTNAME:
-                 p->has_tls_hostname = true;
--                visit_type_str(v, param, &p->tls_hostname, &err);
-+                p->tls_hostname = g_new0(StrOrNull, 1);
-+                p->tls_hostname->type = QTYPE_QSTRING;
-+                visit_type_str(v, param, &p->tls_hostname->u.s, &err);
-                 break;
-             case MIGRATION_PARAMETER_MAX_BANDWIDTH:
-                 p->has_max_bandwidth = true;
-diff --git a/migration/migration.c b/migration/migration.c
-index f6a9443..e2cfb99 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -703,6 +703,20 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
-                     "x_checkpoint_delay",
-                     "is invalid, it should be positive");
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index f34355d..3920a5b 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -267,12 +267,17 @@ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+                          void *opaque, Error **errp)
+ {
+     sPAPRDRConnector *drc = SPAPR_DR_CONNECTOR(obj);
++    QNull *null;
+     Error *err = NULL;
+     int fdt_offset_next, fdt_offset, fdt_depth;
+     void *fdt;
+ 
+     if (!drc->fdt) {
+-        visit_type_null(v, NULL, errp);
++        visit_type_null(v, NULL, &null, &err);
++        if (!err) {
++            QDECREF(null);
++        }
++        error_propagate(errp, err);
+         return;
      }
-+    /* TODO Rewrite "" to null instead */
-+    if (params->has_tls_creds
-+        && params->tls_creds->type == QTYPE_QNULL) {
-+        QDECREF(params->tls_creds->u.n);
-+        params->tls_creds->type = QTYPE_QSTRING;
-+        params->tls_creds->u.s = strdup("");
+ 
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index dcd656a..8ccb3b6 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -103,7 +103,8 @@ struct Visitor
+                      Error **errp);
+ 
+     /* Must be set to visit explicit null values.  */
+-    void (*type_null)(Visitor *v, const char *name, Error **errp);
++    void (*type_null)(Visitor *v, const char *name, QNull **obj,
++                      Error **errp);
+ 
+     /* Must be set for input visitors to visit structs, optional otherwise.
+        The core takes care of the return type in the public interface. */
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index 74768aa..fe9faf4 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -618,10 +618,10 @@ void visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp);
+  * @name expresses the relationship of the null value to its parent
+  * container; see the general description of @name above.
+  *
+- * Unlike all other visit_type_* functions, no obj parameter is
+- * needed; rather, this is a witness that an explicit null value is
+- * expected rather than any other type.
++ * @obj must be non-NULL.  Input visitors set *@obj to the value;
++ * other visitors ignore *@obj.
+  */
+-void visit_type_null(Visitor *v, const char *name, Error **errp);
++void visit_type_null(Visitor *v, const char *name, QNull **obj,
++                     Error **errp);
+ 
+ #endif
+diff --git a/qapi/qapi-clone-visitor.c b/qapi/qapi-clone-visitor.c
+index ed16d3a..d8b6279 100644
+--- a/qapi/qapi-clone-visitor.c
++++ b/qapi/qapi-clone-visitor.c
+@@ -127,12 +127,13 @@ static void qapi_clone_type_number(Visitor *v, const char *name, double *obj,
+     /* Value was already cloned by g_memdup() */
+ }
+ 
+-static void qapi_clone_type_null(Visitor *v, const char *name, Error **errp)
++static void qapi_clone_type_null(Visitor *v, const char *name, QNull **obj,
++                                 Error **errp)
+ {
+     QapiCloneVisitor *qcv = to_qcv(v);
+ 
+     assert(qcv->depth);
+-    /* Nothing to do */
++    *obj = qnull();
+ }
+ 
+ static void qapi_clone_free(Visitor *v)
+diff --git a/qapi/qapi-dealloc-visitor.c b/qapi/qapi-dealloc-visitor.c
+index fd6f9fb..ed70a01 100644
+--- a/qapi/qapi-dealloc-visitor.c
++++ b/qapi/qapi-dealloc-visitor.c
+@@ -103,8 +103,12 @@ static void qapi_dealloc_type_anything(Visitor *v, const char *name,
+     }
+ }
+ 
+-static void qapi_dealloc_type_null(Visitor *v, const char *name, Error **errp)
++static void qapi_dealloc_type_null(Visitor *v, const char *name,
++                                   QNull **obj, Error **errp)
+ {
++    if (obj) {
++        QDECREF(*obj);
 +    }
-+    /* TODO Rewrite "" to null instead */
-+    if (params->has_tls_hostname
-+        && params->tls_hostname->type == QTYPE_QNULL) {
-+        QDECREF(params->tls_hostname->u.n);
-+        params->tls_hostname->type = QTYPE_QSTRING;
-+        params->tls_hostname->u.s = strdup("");
+ }
+ 
+ static void qapi_dealloc_free(Visitor *v)
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 935a2c5..ed6d2af 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -325,10 +325,11 @@ void visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp)
+     error_propagate(errp, err);
+ }
+ 
+-void visit_type_null(Visitor *v, const char *name, Error **errp)
++void visit_type_null(Visitor *v, const char *name, QNull **obj,
++                     Error **errp)
+ {
+-    trace_visit_type_null(v, name);
+-    v->type_null(v, name, errp);
++    trace_visit_type_null(v, name, obj);
++    v->type_null(v, name, obj, errp);
+ }
+ 
+ static void output_type_enum(Visitor *v, const char *name, int *obj,
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 35aff78..ee9e47d 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -587,11 +587,13 @@ static void qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
+     *obj = qobj;
+ }
+ 
+-static void qobject_input_type_null(Visitor *v, const char *name, Error **errp)
++static void qobject_input_type_null(Visitor *v, const char *name,
++                                    QNull **obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+ 
++    *obj = NULL;
+     if (!qobj) {
+         return;
+     }
+@@ -599,7 +601,9 @@ static void qobject_input_type_null(Visitor *v, const char *name, Error **errp)
+     if (qobject_type(qobj) != QTYPE_QNULL) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+                    full_name(qiv, name), "null");
++        return;
+     }
++    *obj = qnull();
+ }
+ 
+ static void qobject_input_type_size_keyval(Visitor *v, const char *name,
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
+index 398dcb5..d325163 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -187,7 +187,8 @@ static void qobject_output_type_any(Visitor *v, const char *name,
+     qobject_output_add_obj(qov, name, *obj);
+ }
+ 
+-static void qobject_output_type_null(Visitor *v, const char *name, Error **errp)
++static void qobject_output_type_null(Visitor *v, const char *name,
++                                     QNull **obj, Error **errp)
+ {
+     QObjectOutputVisitor *qov = to_qov(v);
+     qobject_output_add(qov, name, qnull());
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 63ae115..67a0a4a 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -326,14 +326,20 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+     *obj = val;
+ }
+ 
+-static void parse_type_null(Visitor *v, const char *name, Error **errp)
++static void parse_type_null(Visitor *v, const char *name, QNull **obj,
++                            Error **errp)
+ {
+     StringInputVisitor *siv = to_siv(v);
+ 
++    *obj = NULL;
++
+     if (!siv->string || siv->string[0]) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
+                    "null");
++        return;
+     }
++
++    *obj = qnull();
+ }
+ 
+ static void string_input_free(Visitor *v)
+diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+index af649e1..7ab6446 100644
+--- a/qapi/string-output-visitor.c
++++ b/qapi/string-output-visitor.c
+@@ -256,7 +256,8 @@ static void print_type_number(Visitor *v, const char *name, double *obj,
+     string_output_set(sov, g_strdup_printf("%f", *obj));
+ }
+ 
+-static void print_type_null(Visitor *v, const char *name, Error **errp)
++static void print_type_null(Visitor *v, const char *name, QNull **obj,
++                            Error **errp)
+ {
+     StringOutputVisitor *sov = to_sov(v);
+     char *out;
+diff --git a/qapi/trace-events b/qapi/trace-events
+index 3b57aba..9e9008a 100644
+--- a/qapi/trace-events
++++ b/qapi/trace-events
+@@ -31,4 +31,4 @@ visit_type_bool(void *v, const char *name, bool *obj) "v=%p name=%s obj=%p"
+ visit_type_str(void *v, const char *name, char **obj) "v=%p name=%s obj=%p"
+ visit_type_number(void *v, const char *name, double *obj) "v=%p name=%s obj=%p"
+ visit_type_any(void *v, const char *name, void *obj) "v=%p name=%s obj=%p"
+-visit_type_null(void *v, const char *name) "v=%p name=%s"
++visit_type_null(void *v, const char *name, void *obj) "v=%p name=%s obj=%p"
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 783bf98..65e7f34 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8428,11 +8428,19 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data)
+ static void getset_compat_deprecated(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
+ {
++    Error *err = NULL;
++    QNull *null;
++
+     if (!qtest_enabled()) {
+         error_report("CPU 'compat' property is deprecated and has no effect; "
+                      "use max-cpu-compat machine property instead");
+     }
+-    visit_type_null(v, name, NULL);
++    visit_type_null(v, name, &null, &err);
++    if (err) {
++        error_free(err);
++        return;
 +    }
++    QDECREF(null);
+ }
+ 
+ static PropertyInfo ppc_compat_deprecated_propinfo = {
+diff --git a/tests/check-qnull.c b/tests/check-qnull.c
+index 1ab7c98..5c6eb0a 100644
+--- a/tests/check-qnull.c
++++ b/tests/check-qnull.c
+@@ -38,6 +38,7 @@ static void qnull_visit_test(void)
+ {
+     QObject *obj;
+     Visitor *v;
++    QNull *null;
  
      /*
-      * TODO if we fuse MigrateSetParameters back into
-@@ -726,11 +740,11 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
-     }
-     if (params->has_tls_creds) {
-         g_free(s->parameters.tls_creds);
--        s->parameters.tls_creds = g_strdup(params->tls_creds);
-+        s->parameters.tls_creds = g_strdup(params->tls_creds->u.s);
-     }
-     if (params->has_tls_hostname) {
-         g_free(s->parameters.tls_hostname);
--        s->parameters.tls_hostname = g_strdup(params->tls_hostname);
-+        s->parameters.tls_hostname = g_strdup(params->tls_hostname->u.s);
-     }
-     if (params->has_max_bandwidth) {
-         s->parameters.max_bandwidth = params->max_bandwidth;
-diff --git a/qapi-schema.json b/qapi-schema.json
-index b5ec942..9bd3390 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -116,6 +116,22 @@
- { 'command': 'qmp_capabilities' }
+      * Most tests of interactions between QObject and visitors are in
+@@ -49,13 +50,17 @@ static void qnull_visit_test(void)
+     obj = QOBJECT(qnull());
+     v = qobject_input_visitor_new(obj);
+     qobject_decref(obj);
+-    visit_type_null(v, NULL, &error_abort);
++    visit_type_null(v, NULL, &null, &error_abort);
++    g_assert(obj == QOBJECT(&qnull_));
++    QDECREF(null);
+     visit_free(v);
  
- ##
-+# @StrOrNull:
-+#
-+# This is a string value or the explicit lack of a string (null
-+# pointer in C).  Intended for cases when 'optional absent' already
-+# has a different meaning.
-+#
-+# @s: the string value
-+# @n: no string value
-+#
-+# Since: 2.10
-+##
-+{ 'alternate': 'StrOrNull',
-+  'data': { 's': 'str',
-+            'n': 'null' } }
-+
-+##
- # @LostTickPolicy:
- #
- # Policy for handling lost ticks in timer devices.
-@@ -1098,8 +1114,8 @@
-             '*decompress-threads': 'int',
-             '*cpu-throttle-initial': 'int',
-             '*cpu-throttle-increment': 'int',
--            '*tls-creds': 'str',
--            '*tls-hostname': 'str',
-+            '*tls-creds': 'StrOrNull',
-+            '*tls-hostname': 'StrOrNull',
-             '*max-bandwidth': 'int',
-             '*downtime-limit': 'int',
-             '*x-checkpoint-delay': 'int',
++    null = NULL;
+     v = qobject_output_visitor_new(&obj);
+-    visit_type_null(v, NULL, &error_abort);
++    visit_type_null(v, NULL, &null, &error_abort);
+     visit_complete(v, &obj);
+     g_assert(obj == QOBJECT(&qnull_));
++    QDECREF(null);
+     qobject_decref(obj);
+     visit_free(v);
+ 
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 34bab8a..f98caf9 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -510,6 +510,7 @@ static void test_visitor_in_null(TestInputVisitorData *data,
+ {
+     Visitor *v;
+     Error *err = NULL;
++    QNull *null;
+     char *tmp;
+ 
+     /*
+@@ -524,12 +525,15 @@ static void test_visitor_in_null(TestInputVisitorData *data,
+     v = visitor_input_test_init_full(data, false,
+                                      "{ 'a': null, 'b': '' }");
+     visit_start_struct(v, NULL, NULL, 0, &error_abort);
+-    visit_type_null(v, "a", &error_abort);
+-    visit_type_null(v, "b", &err);
++    visit_type_null(v, "a", &null, &error_abort);
++    g_assert(qobject_type(QOBJECT(null)) == QTYPE_QNULL);
++    QDECREF(null);
++    visit_type_null(v, "b", &null, &err);
+     error_free_or_abort(&err);
++    g_assert(!null);
+     visit_type_str(v, "c", &tmp, &err);
+-    g_assert(!tmp);
+     error_free_or_abort(&err);
++    g_assert(!tmp);
+     visit_check_struct(v, &error_abort);
+     visit_end_struct(v, NULL);
+ }
+@@ -1087,6 +1091,7 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
+     Error *err = NULL;
+     Visitor *v;
+     QObject *any;
++    QNull *null;
+     GenericAlternate *alt;
+     bool present;
+     int en;
+@@ -1120,7 +1125,7 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
+     error_free_or_abort(&err);
+     visit_type_any(v, "any", &any, &err);
+     error_free_or_abort(&err);
+-    visit_type_null(v, "null", &err);
++    visit_type_null(v, "null", &null, &err);
+     error_free_or_abort(&err);
+     visit_start_list(v, "sub", NULL, 0, &error_abort);
+     visit_start_struct(v, NULL, NULL, 0, &error_abort);
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
+index 749c540..8f1fcd4 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -445,11 +445,12 @@ static void test_visitor_out_alternate(TestOutputVisitorData *data,
+ static void test_visitor_out_null(TestOutputVisitorData *data,
+                                   const void *unused)
+ {
++    QNull *null = NULL;
+     QDict *qdict;
+     QObject *nil;
+ 
+     visit_start_struct(data->ov, NULL, NULL, 0, &error_abort);
+-    visit_type_null(data->ov, "a", &error_abort);
++    visit_type_null(data->ov, "a", &null, &error_abort);
+     visit_check_struct(data->ov, &error_abort);
+     visit_end_struct(data->ov, NULL);
+     qdict = qobject_to_qdict(visitor_get(data));
 -- 
 2.7.5
