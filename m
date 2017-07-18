@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXSkv-0000BB-3H
+	(envelope-from <armbru@redhat.com>) id 1dXSkv-0000BG-5H
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007Tm-CC
+	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007TG-7X
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:41 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Jul 2017 15:41:17 +0200
-Message-Id: <1500385286-21142-2-git-send-email-armbru@redhat.com>
+Date: Tue, 18 Jul 2017 15:41:26 +0200
+Message-Id: <1500385286-21142-11-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500385286-21142-1-git-send-email-armbru@redhat.com>
 References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 01/10] qapi: Separate type QNull from
- QObject
+Subject: [Qemu-devel] [PATCH for-2.10 10/10] migration: Use JSON null
+ instead of "" to reset parameter to default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
+migrate-set-parameters sets migration parameters according to is
+arguments like this:
+
+* Present means "set the parameter to this value"
+
+* Absent means "leave the parameter unchanged"
+
+* Except for parameters tls_creds and tls_hostname, "" means "reset
+  the parameter to its default value
+
+The first two are perfectly normal: presence of the parameter makes
+the command do something.
+
+The third one overloads the parameter with a second meaning.  The
+overloading is *implicit*, i.e. it's not visible in the types.  Works
+here, because "" is neither a valid TLS credentials ID, nor a valid
+host name.
+
+Pressing argument values the schema accepts, but are semantically
+invalid, into service to mean "reset to default" is not general, as
+suitable invalid values need not exist.  I also find it ugly.
+
+To clean this up, we could add a separate flag argument to ask for
+"reset to default", or add a distinct value to @tls_creds and
+@tls_hostname.  This commit implements the latter: add JSON null to
+the values of @tls_creds and @tls_hostname, deprecate "".
+
+Because we're so close to the 2.10 freeze, implement it in the
+stupidest way possible: have qmp_migrate_set_parameters() rewrite null
+to "" before anything else can see the null.  The proper way to do it
+would be rewriting "" to null, but that requires fixing up code to
+work with null.  Add TODO comments for that.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/qobject.h    | 10 +++++++---
- qapi/qobject-output-visitor.c |  2 +-
- qobject/json-parser.c         |  2 +-
- qobject/qnull.c               |  8 +++++---
- target/i386/cpu.c             |  4 ++--
- tests/check-qjson.c           |  6 +++---
- tests/check-qnull.c           | 18 +++++++++---------
- 7 files changed, 28 insertions(+), 22 deletions(-)
+ hmp.c                 |  8 ++++++--
+ migration/migration.c | 18 ++++++++++++++++--
+ qapi-schema.json      | 11 +++++++++--
+ 3 files changed, 31 insertions(+), 6 deletions(-)
 
-diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index b8ddbca..3543b55 100644
---- a/include/qapi/qmp/qobject.h
-+++ b/include/qapi/qmp/qobject.h
-@@ -93,11 +93,15 @@ static inline QType qobject_type(const QObject *obj)
-     return obj->type;
- }
+diff --git a/hmp.c b/hmp.c
+index 0a5de75..40ebeef 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1541,11 +1541,15 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+                 break;
+             case MIGRATION_PARAMETER_TLS_CREDS:
+                 p->has_tls_creds = true;
+-                visit_type_str(v, param, &p->tls_creds, &err);
++                p->tls_creds = g_new0(StrOrNull, 1);
++                p->tls_creds->type = QTYPE_QSTRING;
++                visit_type_str(v, param, &p->tls_creds->u.s, &err);
+                 break;
+             case MIGRATION_PARAMETER_TLS_HOSTNAME:
+                 p->has_tls_hostname = true;
+-                visit_type_str(v, param, &p->tls_hostname, &err);
++                p->tls_hostname = g_new0(StrOrNull, 1);
++                p->tls_hostname->type = QTYPE_QSTRING;
++                visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+                 break;
+             case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+                 p->has_max_bandwidth = true;
+diff --git a/migration/migration.c b/migration/migration.c
+index f6a9443..e2cfb99 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -703,6 +703,20 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+                     "x_checkpoint_delay",
+                     "is invalid, it should be positive");
+     }
++    /* TODO Rewrite "" to null instead */
++    if (params->has_tls_creds
++        && params->tls_creds->type == QTYPE_QNULL) {
++        QDECREF(params->tls_creds->u.n);
++        params->tls_creds->type = QTYPE_QSTRING;
++        params->tls_creds->u.s = strdup("");
++    }
++    /* TODO Rewrite "" to null instead */
++    if (params->has_tls_hostname
++        && params->tls_hostname->type == QTYPE_QNULL) {
++        QDECREF(params->tls_hostname->u.n);
++        params->tls_hostname->type = QTYPE_QSTRING;
++        params->tls_hostname->u.s = strdup("");
++    }
  
--extern QObject qnull_;
-+typedef struct QNull {
-+    QObject base;
-+} QNull;
+     /*
+      * TODO if we fuse MigrateSetParameters back into
+@@ -726,11 +740,11 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+     }
+     if (params->has_tls_creds) {
+         g_free(s->parameters.tls_creds);
+-        s->parameters.tls_creds = g_strdup(params->tls_creds);
++        s->parameters.tls_creds = g_strdup(params->tls_creds->u.s);
+     }
+     if (params->has_tls_hostname) {
+         g_free(s->parameters.tls_hostname);
+-        s->parameters.tls_hostname = g_strdup(params->tls_hostname);
++        s->parameters.tls_hostname = g_strdup(params->tls_hostname->u.s);
+     }
+     if (params->has_max_bandwidth) {
+         s->parameters.max_bandwidth = params->max_bandwidth;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index b5ec942..247af24 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -116,6 +116,13 @@
+ { 'command': 'qmp_capabilities' }
  
--static inline QObject *qnull(void)
-+extern QNull qnull_;
+ ##
++# @StrOrNull:
++##
++{ 'alternate': 'StrOrNull',
++  'data': { 's': 'str',
++            'n': 'null' } }
 +
-+static inline QNull *qnull(void)
- {
--    qobject_incref(&qnull_);
-+    QINCREF(&qnull_);
-     return &qnull_;
- }
- 
-diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
-index 70be84c..398dcb5 100644
---- a/qapi/qobject-output-visitor.c
-+++ b/qapi/qobject-output-visitor.c
-@@ -190,7 +190,7 @@ static void qobject_output_type_any(Visitor *v, const char *name,
- static void qobject_output_type_null(Visitor *v, const char *name, Error **errp)
- {
-     QObjectOutputVisitor *qov = to_qov(v);
--    qobject_output_add_obj(qov, name, qnull());
-+    qobject_output_add(qov, name, qnull());
- }
- 
- /* Finish building, and return the root object.
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 7a417f2..724ca24 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -445,7 +445,7 @@ static QObject *parse_keyword(JSONParserContext *ctxt)
-     } else if (!strcmp(token->str, "false")) {
-         return QOBJECT(qbool_from_bool(false));
-     } else if (!strcmp(token->str, "null")) {
--        return qnull();
-+        return QOBJECT(qnull());
-     }
-     parse_error(ctxt, token, "invalid keyword '%s'", token->str);
-     return NULL;
-diff --git a/qobject/qnull.c b/qobject/qnull.c
-index c124d05..69a21d1 100644
---- a/qobject/qnull.c
-+++ b/qobject/qnull.c
-@@ -14,7 +14,9 @@
- #include "qemu-common.h"
- #include "qapi/qmp/qobject.h"
- 
--QObject qnull_ = {
--    .type = QTYPE_QNULL,
--    .refcnt = 1,
-+QNull qnull_ = {
-+    .base = {
-+        .type = QTYPE_QNULL,
-+        .refcnt = 1,
-+    },
- };
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index c571772..10e8386 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2394,7 +2394,7 @@ static QDict *x86_cpu_static_props(void)
- 
-     d = qdict_new();
-     for (i = 0; props[i]; i++) {
--        qdict_put_obj(d, props[i], qnull());
-+        qdict_put(d, props[i], qnull());
-     }
- 
-     for (w = 0; w < FEATURE_WORDS; w++) {
-@@ -2404,7 +2404,7 @@ static QDict *x86_cpu_static_props(void)
-             if (!fi->feat_names[bit]) {
-                 continue;
-             }
--            qdict_put_obj(d, fi->feat_names[bit], qnull());
-+            qdict_put(d, fi->feat_names[bit], qnull());
-         }
-     }
- 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 53f2275..a3a97b0 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1012,7 +1012,7 @@ static void keyword_literal(void)
- {
-     QObject *obj;
-     QBool *qbool;
--    QObject *null;
-+    QNull *null;
-     QString *str;
- 
-     obj = qobject_from_json("true", &error_abort);
-@@ -1053,10 +1053,10 @@ static void keyword_literal(void)
-     g_assert(qobject_type(obj) == QTYPE_QNULL);
- 
-     null = qnull();
--    g_assert(null == obj);
-+    g_assert(QOBJECT(null) == obj);
- 
-     qobject_decref(obj);
--    qobject_decref(null);
-+    QDECREF(null);
- }
- 
- typedef struct LiteralQDictEntry LiteralQDictEntry;
-diff --git a/tests/check-qnull.c b/tests/check-qnull.c
-index 8dd1c96..1ab7c98 100644
---- a/tests/check-qnull.c
-+++ b/tests/check-qnull.c
-@@ -24,14 +24,14 @@ static void qnull_ref_test(void)
- {
-     QObject *obj;
- 
--    g_assert(qnull_.refcnt == 1);
--    obj = qnull();
-+    g_assert(qnull_.base.refcnt == 1);
-+    obj = QOBJECT(qnull());
-     g_assert(obj);
--    g_assert(obj == &qnull_);
--    g_assert(qnull_.refcnt == 2);
-+    g_assert(obj == QOBJECT(&qnull_));
-+    g_assert(qnull_.base.refcnt == 2);
-     g_assert(qobject_type(obj) == QTYPE_QNULL);
-     qobject_decref(obj);
--    g_assert(qnull_.refcnt == 1);
-+    g_assert(qnull_.base.refcnt == 1);
- }
- 
- static void qnull_visit_test(void)
-@@ -45,8 +45,8 @@ static void qnull_visit_test(void)
-      * depend on layering violations to check qnull_ refcnt.
-      */
- 
--    g_assert(qnull_.refcnt == 1);
--    obj = qnull();
-+    g_assert(qnull_.base.refcnt == 1);
-+    obj = QOBJECT(qnull());
-     v = qobject_input_visitor_new(obj);
-     qobject_decref(obj);
-     visit_type_null(v, NULL, &error_abort);
-@@ -55,11 +55,11 @@ static void qnull_visit_test(void)
-     v = qobject_output_visitor_new(&obj);
-     visit_type_null(v, NULL, &error_abort);
-     visit_complete(v, &obj);
--    g_assert(obj == &qnull_);
-+    g_assert(obj == QOBJECT(&qnull_));
-     qobject_decref(obj);
-     visit_free(v);
- 
--    g_assert(qnull_.refcnt == 1);
-+    g_assert(qnull_.base.refcnt == 1);
- }
- 
- int main(int argc, char **argv)
++##
+ # @LostTickPolicy:
+ #
+ # Policy for handling lost ticks in timer devices.
+@@ -1098,8 +1105,8 @@
+             '*decompress-threads': 'int',
+             '*cpu-throttle-initial': 'int',
+             '*cpu-throttle-increment': 'int',
+-            '*tls-creds': 'str',
+-            '*tls-hostname': 'str',
++            '*tls-creds': 'StrOrNull',
++            '*tls-hostname': 'StrOrNull',
+             '*max-bandwidth': 'int',
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
 -- 
 2.7.5
