@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXaYQ-0006hQ-B8
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:01:19 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXaZ9-0007Iy-45
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXaYL-0001aQ-MG
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:01:18 -0400
-References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
-	<1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
-Date: Tue, 18 Jul 2017 17:01:10 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXaZ4-0001nj-NV
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:02:03 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:58458)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXaZ4-0001nR-I1
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:01:58 -0400
+References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
+	<b551b2d487039c2e1165e9c732a9fa36bf6497f0.1500378931.git-series.james.hogan@imgtec.com>
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Message-ID: <bf6367d0-0553-7a34-9fc9-50c47d207443@imgtec.com>
+Date: Tue, 18 Jul 2017 23:01:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oqF0PEK6SiOdNrquXm7iooovLv7N8DHT3"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
- variable warning
+In-Reply-To: <b551b2d487039c2e1165e9c732a9fa36bf6497f0.1500378931.git-series.james.hogan@imgtec.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/14] target/mips: Add segmentation
+ control registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oqF0PEK6SiOdNrquXm7iooovLv7N8DHT3
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-Cc: patches@linaro.org
-Message-ID: <b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
- variable warning
-References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
- <1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/18/2017 11:26 AM, Peter Maydell wrote:
-> On OpenBSD the compiler warns:
-> bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wunu=
-sed-but-set-variable]
->=20
-> This is because a lot of the signal delivery code is #if-0'd
-> out as unused. Reshuffle #ifdefs a bit to silence the warning.
-
-Why not just nuke the #if 0 code instead (we can always 'git revert' it
-later as a starting point for someone that wants to implement it).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: James Hogan <james.hogan@imgtec.com>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
 
---oqF0PEK6SiOdNrquXm7iooovLv7N8DHT3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 18/07/2017 12:55, James Hogan wrote:
+> The optional segmentation control registers CP0_SegCtl0, CP0_SegCtl1 &
+> CP0_SegCtl2 control the behaviour and required privilege of the legacy
+> virtual memory segments.
+> 
+> Add them to the CP0 interface so they can be read and written when
+> CP0_Config3.SC=1, and initialise them to describe the standard legacy
+> layout so they can be used in future patches regardless of whether they
+> are exposed to the guest.
+> 
+> Signed-off-by: James Hogan <james.hogan@imgtec.com>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+> Changes in v2:
+> - Use ld_tl and ext32s_tl rather than ld32s_tl to avoid big endian host,
+>   MIPS64 target issues (Yongbok).
+> - Add missing break in DMFC0 CP0_SegCtl2 case.
+> ---
+>  target/mips/cpu.h       | 30 ++++++++++++++-
+>  target/mips/helper.h    |  3 +-
+>  target/mips/machine.c   |  7 ++-
+>  target/mips/op_helper.c | 24 +++++++++++-
+>  target/mips/translate.c | 88 ++++++++++++++++++++++++++++++++++++++++++-
+>  5 files changed, 150 insertions(+), 2 deletions(-)
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluhSYACgkQp6FrSiUn
-Q2oW9AgAgBBKucdENlPDMPletaUcuhRl7j/M2paG2eeDy3m6pjSKbpj1lz+RZfRK
-mL545LKV2BMK8hWSgl+dO5dIMxJmWrRkgkbKaHCsHgZ7Lo5g8N1B7XsCEWRCoOh5
-feuOcrY6mcO9L3HgrgYRc3LkfQUMSF5w5N0KgY+GASPW9qh3w+vy+Adm4ctwZE3p
-gmn0UUeySY4vjtMf5d5xjoWJ5ZYiGSibHC+Ue8DrDpsSKSi20jCMY1JRyytpyjTj
-yrRWpVLA+pJbEGV2iZ+wE3pNkOI248YoH/Qxf1qfTHQkAA1e83pyT6mCi33LPkIl
-NL36Dg6MyMevG9m7mfOzJp/mv07bVw==
-=KGTS
------END PGP SIGNATURE-----
 
---oqF0PEK6SiOdNrquXm7iooovLv7N8DHT3--
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+
+Regards,
+Yongbok
