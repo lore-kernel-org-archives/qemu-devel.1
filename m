@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXKwI-0000TB-Vb
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:20:56 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXKwK-0000VX-T0
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXKwF-0005Yv-PR
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:20:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54327
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXKwH-0005Zx-N0
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:20:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44444)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dXKwF-0005YL-JI
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:20:51 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1dXKwH-0005ZM-Cn
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 01:20:53 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6I5JLMG089320
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:20:50 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bsbm2970t-1
+	v6I5JMBt003400
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:20:52 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bs9y7cm6a-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:20:50 -0400
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:20:52 -0400
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 17 Jul 2017 23:20:49 -0600
+	Mon, 17 Jul 2017 23:20:51 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 00:20:09 -0500
+Date: Tue, 18 Jul 2017 00:20:11 -0500
 In-Reply-To: <1500355216-23603-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1500355216-23603-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1500355216-23603-2-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL 1/8] qga-win: fix installation on localized
- windows
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1500355216-23603-4-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 3/8] qemu-ga: check if utmpx.h is available on
+ the system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,101 +42,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Daniel Rempel <daniel@daynix.com>, Sameeh Jubran <sjubran@redhat.com>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-From: Daniel Rempel <daniel@daynix.com>
+From: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
-Bug: https://bugzilla.redhat.com/show_bug.cgi?id=1357789
-Replace hardcoded user and group names ("Administrators", "SYSTEM") with the ones acquired from system. Windows uses localized strings for these names and it may cause the installation to fail.
-Windows has Well-known SIDs for "Administrators" group and "SYSTEM" user so they were used to identify required users and groups.
-Well-known SIDs: https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
+Commit 161a56a9065 added command guest-get-users and requires the
+utmpx.h (defined by POSIX) to work. It is however not always available
+(e.g. on OpenBSD) therefor a check for its existence is necessary.
 
-Signed-off-by: Daniel Rempel <daniel@daynix.com>
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-Reviewed-by: Sameeh Jubran <sameeh@daynix.com>
+Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/vss-win32/install.cpp | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+ configure            | 19 +++++++++++++++++++
+ qga/commands-posix.c | 17 ++++++++++++++++-
+ 2 files changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
-index f41fcdf..ba7c94e 100644
---- a/qga/vss-win32/install.cpp
-+++ b/qga/vss-win32/install.cpp
-@@ -18,6 +18,9 @@
- #include <wbemidl.h>
- #include <comdef.h>
- #include <comutil.h>
-+#include <sddl.h>
+diff --git a/configure b/configure
+index a3f0522..e8798ce 100755
+--- a/configure
++++ b/configure
+@@ -4915,6 +4915,21 @@ if compile_prog "" "" ; then
+ fi
+=20
+ ##########################################
++# check for utmpx.h, it is missing e.g. on OpenBSD
 +
-+#define BUFFER_SIZE 1024
- 
- extern HINSTANCE g_hinstDll;
- 
-@@ -135,6 +138,27 @@ out:
-     return hr;
++have_utmpx=3Dno
++cat > $TMPC << EOF
++#include <utmpx.h>
++struct utmpx user_info;
++int main(void) {
++    return 0;
++}
++EOF
++if compile_prog "" "" ; then
++    have_utmpx=3Dyes
++fi
++
++##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+=20
+@@ -5959,6 +5974,10 @@ if test "$have_static_assert" =3D "yes" ; then
+   echo "CONFIG_STATIC_ASSERT=3Dy" >> $config_host_mak
+ fi
+=20
++if test "$have_utmpx" =3D "yes" ; then
++  echo "HAVE_UTMPX=3Dy" >> $config_host_mak
++fi
++
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the nam=
+e on
+ #                                     a thread we have a handle to
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index d8e4122..e7a047e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -15,7 +15,6 @@
+ #include <sys/ioctl.h>
+ #include <sys/wait.h>
+ #include <dirent.h>
+-#include <utmpx.h>
+ #include "qga/guest-agent-core.h"
+ #include "qga-qmp-commands.h"
+ #include "qapi/qmp/qerror.h"
+@@ -25,6 +24,10 @@
+ #include "qemu/base64.h"
+ #include "qemu/cutils.h"
+=20
++#ifdef HAVE_UTMPX
++#include <utmpx.h>
++#endif
++
+ #ifndef CONFIG_HAS_ENVIRON
+ #ifdef __APPLE__
+ #include <crt_externs.h>
+@@ -2519,6 +2522,8 @@ void ga_command_state_init(GAState *s, GACommandSta=
+te *cs)
+ #endif
  }
- 
-+/* Acquire group or user name by SID */
-+static HRESULT getNameByStringSID(
-+    const wchar_t *sid, LPWSTR buffer, LPDWORD bufferLen)
+=20
++#ifdef HAVE_UTMPX
++
+ #define QGA_MICRO_SECOND_TO_SECOND 1000000
+=20
+ static double ga_get_login_time(struct utmpx *user_info)
+@@ -2577,3 +2582,13 @@ GuestUserList *qmp_guest_get_users(Error **err)
+     g_hash_table_destroy(cache);
+     return head;
+ }
++
++#else
++
++GuestUserList *qmp_guest_get_users(Error **errp)
 +{
-+    HRESULT hr = S_OK;
-+    PSID psid = NULL;
-+    SID_NAME_USE groupType;
-+    DWORD domainNameLen = BUFFER_SIZE;
-+    wchar_t domainName[BUFFER_SIZE];
-+
-+    chk(ConvertStringSidToSidW(sid, &psid));
-+    LookupAccountSidW(NULL, psid, buffer, bufferLen,
-+                domainName, &domainNameLen, &groupType);
-+    hr = HRESULT_FROM_WIN32(GetLastError());
-+
-+    LocalFree(psid);
-+
-+out:
-+    return hr;
++    error_setg(errp, QERR_UNSUPPORTED);
++    return NULL;
 +}
 +
- /* Find and iterate QGA VSS provider in COM+ Application Catalog */
- static HRESULT QGAProviderFind(
-     HRESULT (*found)(ICatalogCollection *, int, void *), void *arg)
-@@ -216,6 +240,10 @@ STDAPI COMRegister(void)
-     CHAR dllPath[MAX_PATH], tlbPath[MAX_PATH];
-     bool unregisterOnFailure = false;
-     int count = 0;
-+    DWORD bufferLen = BUFFER_SIZE;
-+    wchar_t buffer[BUFFER_SIZE];
-+    const wchar_t *administratorsGroupSID = L"S-1-5-32-544";
-+    const wchar_t *systemUserSID = L"S-1-5-18";
- 
-     if (!g_hinstDll) {
-         errmsg(E_FAIL, "Failed to initialize DLL");
-@@ -284,11 +312,12 @@ STDAPI COMRegister(void)
- 
-     /* Setup roles of the applicaion */
- 
-+    chk(getNameByStringSID(administratorsGroupSID, buffer, &bufferLen));
-     chk(pApps->GetCollection(_bstr_t(L"Roles"), key,
-                              (IDispatch **)pRoles.replace()));
-     chk(pRoles->Populate());
-     chk(pRoles->Add((IDispatch **)pObj.replace()));
--    chk(put_Value(pObj, L"Name",        L"Administrators"));
-+    chk(put_Value(pObj, L"Name", buffer));
-     chk(put_Value(pObj, L"Description", L"Administrators group"));
-     chk(pRoles->SaveChanges(&n));
-     chk(pObj->get_Key(&key));
-@@ -303,8 +332,10 @@ STDAPI COMRegister(void)
-     chk(GetAdminName(&name));
-     chk(put_Value(pObj, L"User", _bstr_t(".\\") + name));
- 
-+    bufferLen = BUFFER_SIZE;
-+    chk(getNameByStringSID(systemUserSID, buffer, &bufferLen));
-     chk(pUsersInRole->Add((IDispatch **)pObj.replace()));
--    chk(put_Value(pObj, L"User", L"SYSTEM"));
-+    chk(put_Value(pObj, L"User", buffer));
-     chk(pUsersInRole->SaveChanges(&n));
- 
- out:
--- 
++#endif
+--=20
 2.7.4
