@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dXTKn-0000x5-8G
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dXTKo-0000yF-AW
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dXTKk-0007qJ-0t
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:45 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dXTKn-0007tB-Dm
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:46 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 18 Jul 2017 16:18:04 +0200
-Message-Id: <1500387486-5469-20-git-send-email-kwolf@redhat.com>
+Date: Tue, 18 Jul 2017 16:18:05 +0200
+Message-Id: <1500387486-5469-21-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1500387486-5469-1-git-send-email-kwolf@redhat.com>
 References: <1500387486-5469-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 19/21] block/vvfat: Fix compiler warning with
- gcc 7
+Subject: [Qemu-devel] [PULL 20/21] blockdev: move BDRV_O_NO_BACKING option
+ forward
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Max Reitz <mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
 
-gcc 7 complains that the sprintf() might write a null byte beyond the
-end of the tail buffer.  That is wrong, but we can silence it by making
-i unsigned (it can never be negative anyway, see the if condition right
-before).  For some reason, this allows gcc to suddenly accurately
-calculate the range of i so we can give the tail[] array the exact size
-it needs to have (which is 8 bytes) without gcc complaining.
+For both external_snapshot_prepare and qmp_drive_mirror, we eventually
+append the option BDRV_O_NO_BACKING. However, we generally do so after
+we create the image.
 
-In addition, let us convert the sprintf() to snprintf(), because that is
-always nicer, and add an assertion about the range of the return value
-afterwards so we can see that "8 - len" will never be negative and thus
-"entry->name + MIN(j, 8 - len)" will never be out of bounds.
+To accommodate image creation wanting to verify that a backing file
+exists or not, add this option prior to create to override checking
+the existence of the backing file. This prevents QEMU from trying to
+re-open a backing file that's already in use (thanks to qcow2 locking).
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/vvfat.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ blockdev.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 6b11596..a9e207f 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -549,7 +549,7 @@ static direntry_t *create_short_filename(BDRVVVFATState *s,
-     const gchar *p, *last_dot = NULL;
-     gunichar c;
-     bool lossy_conversion = false;
--    char tail[11];
-+    char tail[8];
- 
-     if (!entry) {
-         return NULL;
-@@ -614,7 +614,8 @@ static direntry_t *create_short_filename(BDRVVVFATState *s,
-     for (i = lossy_conversion ? 1 : 0; i < 999999; i++) {
-         direntry_t *entry1;
-         if (i > 0) {
--            int len = sprintf(tail, "~%d", i);
-+            int len = snprintf(tail, sizeof(tail), "~%u", (unsigned)i);
-+            assert(len <= 7);
-             memcpy(entry->name + MIN(j, 8 - len), tail, len);
+diff --git a/blockdev.c b/blockdev.c
+index 7f53cc8..6469f16 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1710,7 +1710,8 @@ static void external_snapshot_prepare(BlkActionState *common,
          }
-         for (entry1 = array_get(&(s->directory), directory_start);
+ 
+         flags = state->old_bs->open_flags;
+-        flags &= ~(BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING | BDRV_O_COPY_ON_READ);
++        flags &= ~(BDRV_O_SNAPSHOT | BDRV_O_COPY_ON_READ);
++        flags |= BDRV_O_NO_BACKING;
+ 
+         /* create new image w/backing file */
+         mode = s->has_mode ? s->mode : NEW_IMAGE_MODE_ABSOLUTE_PATHS;
+@@ -1735,8 +1736,6 @@ static void external_snapshot_prepare(BlkActionState *common,
+             qdict_put_str(options, "node-name", snapshot_node_name);
+         }
+         qdict_put_str(options, "driver", format);
+-
+-        flags |= BDRV_O_NO_BACKING;
+     }
+ 
+     state->new_bs = bdrv_open(new_image_file, snapshot_ref, options, flags,
+@@ -3548,6 +3547,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         backing_mode = MIRROR_OPEN_BACKING_CHAIN;
+     }
+ 
++    /* Don't open backing image in create() */
++    flags |= BDRV_O_NO_BACKING;
++
+     if ((arg->sync == MIRROR_SYNC_MODE_FULL || !source)
+         && arg->mode != NEW_IMAGE_MODE_EXISTING)
+     {
+@@ -3587,8 +3589,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+     /* Mirroring takes care of copy-on-write using the source's backing
+      * file.
+      */
+-    target_bs = bdrv_open(arg->target, NULL, options,
+-                          flags | BDRV_O_NO_BACKING, errp);
++    target_bs = bdrv_open(arg->target, NULL, options, flags, errp);
+     if (!target_bs) {
+         goto out;
+     }
 -- 
 1.8.3.1
