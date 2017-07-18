@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dXaPo-0005ny-V0
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:26 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dXaPq-0005rG-Ic
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dXaPm-00043X-Sv
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:24 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:48408)
+	(envelope-from <aurelien@aurel32.net>) id 1dXaPo-00045y-S0
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:26 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:48482)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dXaOY-0003Up-2M
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:22 -0400
+	id 1dXaOY-0003V9-1D
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:52:24 -0400
 From: Aurelien Jarno <aurelien@aurel32.net>
-Date: Tue, 18 Jul 2017 23:50:46 +0200
-Message-Id: <20170718215050.3812-28-aurelien@aurel32.net>
+Date: Tue, 18 Jul 2017 23:50:30 +0200
+Message-Id: <20170718215050.3812-12-aurelien@aurel32.net>
 In-Reply-To: <20170718215050.3812-1-aurelien@aurel32.net>
 References: <20170718215050.3812-1-aurelien@aurel32.net>
-Subject: [Qemu-devel] [PULL 27/31] target/sh4: Introduce CHECK_SH4A
+Subject: [Qemu-devel] [PULL 11/31] target/sh4: Recognize common gUSA
+ sequences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +30,360 @@ Cc: Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
 From: Richard Henderson <rth@twiddle.net>
 
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+For many of the sequences produced by gcc or glibc,
+we can translate these as host atomic operations.
+Which saves the need to acquire the exclusive lock.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <20170718200255.31647-24-rth@twiddle.net>
-[aurel32: fix conflict]
+
+Message-Id: <20170718200255.31647-8-rth@twiddle.net>
 Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
 ---
- target/sh4/translate.c | 64 +++++++++++++++++++++++---------------------------
- 1 file changed, 30 insertions(+), 34 deletions(-)
+ target/sh4/translate.c | 321 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 321 insertions(+)
 
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 37e9ae32a3..6362a4781e 100644
+index a4e614d0f7..385b69ef14 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -389,6 +389,11 @@ static inline void gen_store_fpr64(DisasContext *ctx, TCGv_i64 t, int reg)
-         goto do_illegal;                    \
+@@ -1869,10 +1869,17 @@ static void decode_opc(DisasContext * ctx)
+ */
+ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+ {
++    uint16_t insns[5];
++    int ld_adr, ld_dst, ld_mop;
++    int op_dst, op_src, op_opc;
++    int mv_src, mt_dst, st_src, st_mop;
++    TCGv op_arg;
++
+     uint32_t pc = ctx->pc;
+     uint32_t pc_end = ctx->tb->cs_base;
+     int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
+     int max_insns = (pc_end - pc) / 2;
++    int i;
+ 
+     if (pc != pc_end + backup || max_insns < 2) {
+         /* This is a malformed gUSA region.  Don't do anything special,
+@@ -1889,6 +1896,320 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+         return 0;
      }
  
-+#define CHECK_SH4A \
-+    if (!(ctx->features & SH_FEATURE_SH4A)) { \
-+        goto do_illegal;                      \
++    /* The state machine below will consume only a few insns.
++       If there are more than that in a region, fail now.  */
++    if (max_insns > ARRAY_SIZE(insns)) {
++        goto fail;
 +    }
 +
- static void _decode_opc(DisasContext * ctx)
- {
-     /* This code tries to make movcal emulation sufficiently
-@@ -1467,7 +1472,7 @@ static void _decode_opc(DisasContext * ctx)
- 	LDST(ssr,  0x403e, 0x4037, 0x0032, 0x4033, CHECK_PRIVILEGED)
- 	LDST(spc,  0x404e, 0x4047, 0x0042, 0x4043, CHECK_PRIVILEGED)
- 	ST(sgr,  0x003a, 0x4032, CHECK_PRIVILEGED)
--	LD(sgr,  0x403a, 0x4036, CHECK_PRIVILEGED if (!(ctx->features & SH_FEATURE_SH4A)) break;)
-+        LD(sgr,  0x403a, 0x4036, CHECK_PRIVILEGED CHECK_SH4A)
- 	LDST(dbr,  0x40fa, 0x40f6, 0x00fa, 0x40f2, CHECK_PRIVILEGED)
- 	LDST(mach, 0x400a, 0x4006, 0x000a, 0x4002, {})
- 	LDST(macl, 0x401a, 0x4016, 0x001a, 0x4012, {})
-@@ -1517,21 +1522,19 @@ static void _decode_opc(DisasContext * ctx)
-         ctx->has_movcal = 1;
- 	return;
-     case 0x40a9:                /* movua.l @Rm,R0 */
-+        CHECK_SH4A
-         /* Load non-boundary-aligned data */
--        if (ctx->features & SH_FEATURE_SH4A) {
--            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
--                                MO_TEUL | MO_UNALN);
--            return;
--        }
-+        tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
-+                            MO_TEUL | MO_UNALN);
-+        return;
-         break;
-     case 0x40e9:                /* movua.l @Rm+,R0 */
-+        CHECK_SH4A
-         /* Load non-boundary-aligned data */
--        if (ctx->features & SH_FEATURE_SH4A) {
--            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
--                                MO_TEUL | MO_UNALN);
--            tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
--            return;
--        }
-+        tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
-+                            MO_TEUL | MO_UNALN);
-+        tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
-+        return;
-         break;
-     case 0x0029:		/* movt Rn */
-         tcg_gen_mov_i32(REG(B11_8), cpu_sr_t);
-@@ -1542,7 +1545,8 @@ static void _decode_opc(DisasContext * ctx)
-                If (T == 1) R0 -> (Rn)
-                0 -> LDST
-         */
--        if (ctx->features & SH_FEATURE_SH4A) {
-+        CHECK_SH4A
-+        {
-             TCGLabel *label = gen_new_label();
-             tcg_gen_mov_i32(cpu_sr_t, cpu_ldst);
- 	    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_ldst, 0, label);
-@@ -1550,8 +1554,7 @@ static void _decode_opc(DisasContext * ctx)
- 	    gen_set_label(label);
- 	    tcg_gen_movi_i32(cpu_ldst, 0);
- 	    return;
--	} else
--	    break;
++    /* Read all of the insns for the region.  */
++    for (i = 0; i < max_insns; ++i) {
++        insns[i] = cpu_lduw_code(env, pc + i * 2);
++    }
++
++    ld_adr = ld_dst = ld_mop = -1;
++    mv_src = -1;
++    op_dst = op_src = op_opc = -1;
++    mt_dst = -1;
++    st_src = st_mop = -1;
++    TCGV_UNUSED(op_arg);
++    i = 0;
++
++#define NEXT_INSN \
++    do { if (i >= max_insns) goto fail; ctx->opcode = insns[i++]; } while (0)
++
++    /*
++     * Expect a load to begin the region.
++     */
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x6000: /* mov.b @Rm,Rn */
++        ld_mop = MO_SB;
++        break;
++    case 0x6001: /* mov.w @Rm,Rn */
++        ld_mop = MO_TESW;
++        break;
++    case 0x6002: /* mov.l @Rm,Rn */
++        ld_mop = MO_TESL;
++        break;
++    default:
++        goto fail;
++    }
++    ld_adr = B7_4;
++    ld_dst = B11_8;
++    if (ld_adr == ld_dst) {
++        goto fail;
++    }
++    /* Unless we see a mov, any two-operand operation must use ld_dst.  */
++    op_dst = ld_dst;
++
++    /*
++     * Expect an optional register move.
++     */
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x6003: /* mov Rm,Rn */
++        /* Here we want to recognize ld_dst being saved for later consumtion,
++           or for another input register being copied so that ld_dst need not
++           be clobbered during the operation.  */
++        op_dst = B11_8;
++        mv_src = B7_4;
++        if (op_dst == ld_dst) {
++            /* Overwriting the load output.  */
++            goto fail;
 +        }
-     case 0x0063:
-         /* MOVLI.L @Rm,R0
-                1 -> LDST
-@@ -1559,13 +1562,11 @@ static void _decode_opc(DisasContext * ctx)
-                When interrupt/exception
-                occurred 0 -> LDST
-         */
--	if (ctx->features & SH_FEATURE_SH4A) {
--	    tcg_gen_movi_i32(cpu_ldst, 0);
--            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TESL);
--	    tcg_gen_movi_i32(cpu_ldst, 1);
--	    return;
--	} else
--	    break;
-+        CHECK_SH4A
-+        tcg_gen_movi_i32(cpu_ldst, 0);
-+        tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TESL);
-+        tcg_gen_movi_i32(cpu_ldst, 1);
-+        return;
-     case 0x0093:		/* ocbi @Rn */
- 	{
-             gen_helper_ocbi(cpu_env, REG(B11_8));
-@@ -1580,20 +1581,15 @@ static void _decode_opc(DisasContext * ctx)
-     case 0x0083:		/* pref @Rn */
- 	return;
-     case 0x00d3:		/* prefi @Rn */
--	if (ctx->features & SH_FEATURE_SH4A)
--	    return;
--	else
--	    break;
-+        CHECK_SH4A
-+        return;
-     case 0x00e3:		/* icbi @Rn */
--	if (ctx->features & SH_FEATURE_SH4A)
--	    return;
--	else
--	    break;
-+        CHECK_SH4A
-+        return;
-     case 0x00ab:		/* synco */
--        if (ctx->features & SH_FEATURE_SH4A) {
--            tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--            return;
--        }
-+        CHECK_SH4A
-+        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-+        return;
-         break;
-     case 0x4024:		/* rotcl Rn */
- 	{
++        if (mv_src != ld_dst) {
++            /* Copying a new input; constrain op_src to match the load.  */
++            op_src = ld_dst;
++        }
++        break;
++
++    default:
++        /* Put back and re-examine as operation.  */
++        --i;
++    }
++
++    /*
++     * Expect the operation.
++     */
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x300c: /* add Rm,Rn */
++        op_opc = INDEX_op_add_i32;
++        goto do_reg_op;
++    case 0x2009: /* and Rm,Rn */
++        op_opc = INDEX_op_and_i32;
++        goto do_reg_op;
++    case 0x200a: /* xor Rm,Rn */
++        op_opc = INDEX_op_xor_i32;
++        goto do_reg_op;
++    case 0x200b: /* or Rm,Rn */
++        op_opc = INDEX_op_or_i32;
++    do_reg_op:
++        /* The operation register should be as expected, and the
++           other input cannot depend on the load.  */
++        if (op_dst != B11_8) {
++            goto fail;
++        }
++        if (op_src < 0) {
++            /* Unconstrainted input.  */
++            op_src = B7_4;
++        } else if (op_src == B7_4) {
++            /* Constrained input matched load.  All operations are
++               commutative; "swap" them by "moving" the load output
++               to the (implicit) first argument and the move source
++               to the (explicit) second argument.  */
++            op_src = mv_src;
++        } else {
++            goto fail;
++        }
++        op_arg = REG(op_src);
++        break;
++
++    case 0x6007: /* not Rm,Rn */
++        if (ld_dst != B7_4 || mv_src >= 0) {
++            goto fail;
++        }
++        op_dst = B11_8;
++        op_opc = INDEX_op_xor_i32;
++        op_arg = tcg_const_i32(-1);
++        break;
++
++    case 0x7000 ... 0x700f: /* add #imm,Rn */
++        if (op_dst != B11_8 || mv_src >= 0) {
++            goto fail;
++        }
++        op_opc = INDEX_op_add_i32;
++        op_arg = tcg_const_i32(B7_0s);
++        break;
++
++    case 0x3000: /* cmp/eq Rm,Rn */
++        /* Looking for the middle of a compare-and-swap sequence,
++           beginning with the compare.  Operands can be either order,
++           but with only one overlapping the load.  */
++        if ((ld_dst == B11_8) + (ld_dst == B7_4) != 1 || mv_src >= 0) {
++            goto fail;
++        }
++        op_opc = INDEX_op_setcond_i32;  /* placeholder */
++        op_src = (ld_dst == B11_8 ? B7_4 : B11_8);
++        op_arg = REG(op_src);
++
++        NEXT_INSN;
++        switch (ctx->opcode & 0xff00) {
++        case 0x8b00: /* bf label */
++        case 0x8f00: /* bf/s label */
++            if (pc + (i + 1 + B7_0s) * 2 != pc_end) {
++                goto fail;
++            }
++            if ((ctx->opcode & 0xff00) == 0x8b00) { /* bf label */
++                break;
++            }
++            /* We're looking to unconditionally modify Rn with the
++               result of the comparison, within the delay slot of
++               the branch.  This is used by older gcc.  */
++            NEXT_INSN;
++            if ((ctx->opcode & 0xf0ff) == 0x0029) { /* movt Rn */
++                mt_dst = B11_8;
++            } else {
++                goto fail;
++            }
++            break;
++
++        default:
++            goto fail;
++        }
++        break;
++
++    case 0x2008: /* tst Rm,Rn */
++        /* Looking for a compare-and-swap against zero.  */
++        if (ld_dst != B11_8 || ld_dst != B7_4 || mv_src >= 0) {
++            goto fail;
++        }
++        op_opc = INDEX_op_setcond_i32;
++        op_arg = tcg_const_i32(0);
++
++        NEXT_INSN;
++        if ((ctx->opcode & 0xff00) != 0x8900 /* bt label */
++            || pc + (i + 1 + B7_0s) * 2 != pc_end) {
++            goto fail;
++        }
++        break;
++
++    default:
++        /* Put back and re-examine as store.  */
++        --i;
++    }
++
++    /*
++     * Expect the store.
++     */
++    /* The store must be the last insn.  */
++    if (i != max_insns - 1) {
++        goto fail;
++    }
++    NEXT_INSN;
++    switch (ctx->opcode & 0xf00f) {
++    case 0x2000: /* mov.b Rm,@Rn */
++        st_mop = MO_UB;
++        break;
++    case 0x2001: /* mov.w Rm,@Rn */
++        st_mop = MO_UW;
++        break;
++    case 0x2002: /* mov.l Rm,@Rn */
++        st_mop = MO_UL;
++        break;
++    default:
++        goto fail;
++    }
++    /* The store must match the load.  */
++    if (ld_adr != B11_8 || st_mop != (ld_mop & MO_SIZE)) {
++        goto fail;
++    }
++    st_src = B7_4;
++
++#undef NEXT_INSN
++
++    /*
++     * Emit the operation.
++     */
++    tcg_gen_insn_start(pc, ctx->envflags);
++    switch (op_opc) {
++    case -1:
++        /* No operation found.  Look for exchange pattern.  */
++        if (st_src == ld_dst || mv_src >= 0) {
++            goto fail;
++        }
++        tcg_gen_atomic_xchg_i32(REG(ld_dst), REG(ld_adr), REG(st_src),
++                                ctx->memidx, ld_mop);
++        break;
++
++    case INDEX_op_add_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst && st_mop == MO_UL) {
++            tcg_gen_atomic_add_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_add_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++            if (op_dst != ld_dst) {
++                /* Note that mop sizes < 4 cannot use add_fetch
++                   because it won't carry into the higher bits.  */
++                tcg_gen_add_i32(REG(op_dst), REG(ld_dst), op_arg);
++            }
++        }
++        break;
++
++    case INDEX_op_and_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst) {
++            tcg_gen_atomic_and_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_and_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++            tcg_gen_and_i32(REG(op_dst), REG(ld_dst), op_arg);
++        }
++        break;
++
++    case INDEX_op_or_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst) {
++            tcg_gen_atomic_or_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                        op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_or_i32(REG(ld_dst), REG(ld_adr),
++                                        op_arg, ctx->memidx, ld_mop);
++            tcg_gen_or_i32(REG(op_dst), REG(ld_dst), op_arg);
++        }
++        break;
++
++    case INDEX_op_xor_i32:
++        if (op_dst != st_src) {
++            goto fail;
++        }
++        if (op_dst == ld_dst) {
++            tcg_gen_atomic_xor_fetch_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++        } else {
++            tcg_gen_atomic_fetch_xor_i32(REG(ld_dst), REG(ld_adr),
++                                         op_arg, ctx->memidx, ld_mop);
++            tcg_gen_xor_i32(REG(op_dst), REG(ld_dst), op_arg);
++        }
++        break;
++
++    case INDEX_op_setcond_i32:
++        if (st_src == ld_dst) {
++            goto fail;
++        }
++        tcg_gen_atomic_cmpxchg_i32(REG(ld_dst), REG(ld_adr), op_arg,
++                                   REG(st_src), ctx->memidx, ld_mop);
++        tcg_gen_setcond_i32(TCG_COND_EQ, cpu_sr_t, REG(ld_dst), op_arg);
++        if (mt_dst >= 0) {
++            tcg_gen_mov_i32(REG(mt_dst), cpu_sr_t);
++        }
++        break;
++
++    default:
++        g_assert_not_reached();
++    }
++
++    /* If op_src is not a valid register, then op_arg was a constant.  */
++    if (op_src < 0) {
++        tcg_temp_free_i32(op_arg);
++    }
++
++    /* The entire region has been translated.  */
++    ctx->envflags &= ~GUSA_MASK;
++    ctx->pc = pc_end;
++    return max_insns;
++
++ fail:
+     qemu_log_mask(LOG_UNIMP, "Unrecognized gUSA sequence %08x-%08x\n",
+                   pc, pc_end);
+ 
 -- 
 2.11.0
