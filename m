@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXY6U-0000TW-8b
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:24:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXYA5-0001SK-Fh
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXY6T-0006YU-45
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:24:18 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<1500385286-21142-11-git-send-email-armbru@redhat.com>
-	<20170718175229.GF2106@work-vm>
-Date: Tue, 18 Jul 2017 21:24:08 +0200
-In-Reply-To: <20170718175229.GF2106@work-vm> (David Alan Gilbert's message of
-	"Tue, 18 Jul 2017 18:52:30 +0100")
-Message-ID: <878tjlh7l3.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1dXYA4-0000Cl-Gi
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:28:01 -0400
+References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
+	<20170704220346.29244-17-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <164d97c1-9244-d406-ecac-93d1a00eb8a6@redhat.com>
+Date: Tue, 18 Jul 2017 14:27:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.10 10/10] migration: Use JSON null
- instead of "" to reset parameter to default
+In-Reply-To: <20170704220346.29244-17-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6"
+Subject: Re: [Qemu-devel] [PATCH 16/35] crypto: mark coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <164d97c1-9244-d406-ecac-93d1a00eb8a6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 16/35] crypto: mark coroutine_fn
+References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
+ <20170704220346.29244-17-marcandre.lureau@redhat.com>
+In-Reply-To: <20170704220346.29244-17-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> migrate-set-parameters sets migration parameters according to is
->> arguments like this:
->> 
->> * Present means "set the parameter to this value"
->> 
->> * Absent means "leave the parameter unchanged"
->> 
->> * Except for parameters tls_creds and tls_hostname, "" means "reset
->>   the parameter to its default value
->
-> Is this really what's happening? IMHO the tls_creds and tls_hostname
-> behaviour isn't that "" resets to the default, it just is the default.
-> I don't think there's anything special cased for tls_creds and
-> tls_hostname in the existing code.    It's this patch that's
-> adding more special casing.
->
-> (I'm not going to nack this, but I just don't get why it's such a big
-> deal)
+On 07/04/2017 05:03 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  block/crypto.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 10e5ddccaa..0e30a4ea06 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -568,7 +568,8 @@ static int block_crypto_open_luks(BlockDriverState =
+*bs,
+>                                       bs, options, flags, errp);
+>  }
+> =20
+> -static int block_crypto_create_luks(const char *filename,
+> +static int coroutine_fn
+> +block_crypto_create_luks(const char *filename,
+>                                      QemuOpts *opts,
+>                                      Error **errp)
 
-It wouldn't call it a big deal.  In fact, I called it a "minor QMP
-interface design flaw".
+Indentation is now off.
 
-The implementation encodes "no TLS credentials, do not use TLS" and "no
-host name, fall back to the one in the migration URI" as "".  Works
-because "" is neither a valid TLS credentials ID, nor a valid host name.
+I don't know how hard we should try to keep our usual style of:
 
-Until commit 4af245d (v2.9.0), the implementation used NULL / optional
-absent rather than "".  Cleaner, because it doesn't rely on "" being
-invalid.
+really long labels fn_name(parameters)
 
-The reason why commit 4af245d changed it to "" was that
-migrate-set-parameters can't do NULL / optional absent.  It can't,
-because it already uses optional absent for "do not change this
-parameter".
+vs. the style I'm used to in emacs:
 
-Replacing NULL by "" side-stepped this problem.  I dislike that because
-it's not general (only works as long as "" is not a valid value), and
-ugly.
+really long labels
+fn_name(parameters)
 
-Instead of side-stepping the problem, I proposed to tackle it: make JSON
-null mean NULL in migrate-set-parameters.  However, the freeze was
-literally the other day, we needed *some* solution, and only the one
-making "" special was ready.  So I let it pass.
+the latter makes it easier to grep for a function implementation (grep
+for ^fn_name), and also makes it easier to fit more parameters without
+line wrapping, but is not heavily used in our current code base.
 
-Related: NULL used to be shown as "" in query-migrate-parameters.
-Commit de63ab6 (v2.8.0) fixed that oddity, but commit 4af245d (v2.9.0)
-regressed the fix, probably unintentionally.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-My patch doesn't fix that regression.  It doesn't revert the flip from
-NULL to "".  It merely corrects the QAPI interface, in the stupidest way
-possible, because that's all I could do for 2.10's soft freeze.
 
-I'm open to fixing the query-migrate-parameters regression during
-freeze.
+--AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-See also
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-    Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
-    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluYS4ACgkQp6FrSiUn
+Q2qa+gf9Hp1VrgZfj4oPlDmJp5QxaiGa9fSMqFYPVKeqwJ1I4Tz5jPUr7KTC85Lb
+SVIBdEmhfLQ7MaSo+0YTPvYw8AFbAFFS5e8yfLkBerys+eqEWnXNUMfX5w+eCLgS
+zENHx9hFRqSQyIRnCuebgIESH4i3MXjfAnu89+fIOVtXMmvBk0hUcFiNo36HabnD
+VEq1r1hsQQGkY9TJZFJtfgx4w4mP3nwFxFbNZf2H1wokvWcCcLaPulUFwE4cKFve
+sDj+6TAUZBLQrYzaMIE5nMMMG6yl+fwfJAK7RMaIZbRf8WOhJ83qBTRDTLueXUfx
+w8CPNOkPCEk0ZVfV/57lgD2k65YZqQ==
+=KxT/
+-----END PGP SIGNATURE-----
 
-and
-
-    Message-ID: <87bmt3t5r0.fsf@dusky.pond.sub.org>
-    https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02841.html
+--AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6--
