@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXPhm-0006zc-Lc
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:26:15 -0400
+	(envelope-from <quintela@redhat.com>) id 1dXPnJ-0003y6-1V
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXPhh-000328-VL
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:26:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47786)
+	(envelope-from <quintela@redhat.com>) id 1dXPnE-0005FV-3E
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:31:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXPhh-00031L-MJ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:26:09 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 18 Jul 2017 11:25:19 +0100
-Message-Id: <20170718102519.15392-19-berrange@redhat.com>
-In-Reply-To: <20170718102519.15392-1-berrange@redhat.com>
-References: <20170718102519.15392-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 18/18] tests: crypto: add hmac speed
- benchmark support
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXPnD-0005FD-QR
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:31:52 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1a32d619-0b5b-fe11-36b4-94ef6bdcb331@linux.vnet.ibm.com> (Halil
+	Pasic's message of "Thu, 13 Jul 2017 17:45:28 +0200")
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
+	<20170713142721.3a40e083@gondolin>
+	<1798a9f2-63f0-ab03-11ad-5513d9a90da9@linux.vnet.ibm.com>
+	<20170713144941.GD2121@work-vm>
+	<99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
+	<20170713151104.GE2121@work-vm>
+	<1a32d619-0b5b-fe11-36b4-94ef6bdcb331@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 18 Jul 2017 12:31:47 +0200
+Message-ID: <87379uyr1o.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,143 +35,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> On 07/13/2017 05:11 PM, Dr. David Alan Gilbert wrote:
+>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>>> On 07/13/2017 04:49 PM, Dr. David Alan Gilbert wrote:
+>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
 
-This patch add a hmac speed benchmark, it helps us to
-measure the performance by using "make check-speed" or
-using "./tests/benchmark-crypto-hmac" directly.
+> @Dave:
+> There are a couple of questions I'm gonna have to ask/investigate should
+> it be me doing the 'return value for pre_save' (also notes to myself):
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- tests/.gitignore              |  1 +
- tests/Makefile.include        |  2 ++
- tests/benchmark-crypto-hmac.c | 82 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 85 insertions(+)
- create mode 100644 tests/benchmark-crypto-hmac.c
+As Dave said, just changing the prototype and fix callers will do a lot
+of good.
 
-diff --git a/tests/.gitignore b/tests/.gitignore
-index 7f88cc3771..fed0189a5a 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -1,6 +1,7 @@
- atomic_add-bench
- benchmark-crypto-cipher
- benchmark-crypto-hash
-+benchmark-crypto-hmac
- check-qdict
- check-qnum
- check-qjson
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c5a67a3dd7..18f9359188 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
- check-speed-y += tests/benchmark-crypto-hash$(EXESUF)
- check-unit-y += tests/test-crypto-hmac$(EXESUF)
-+check-speed-y += tests/benchmark-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
- check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
-@@ -638,6 +639,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
- tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
- tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
-+tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
-diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.c
-new file mode 100644
-index 0000000000..72408be987
---- /dev/null
-+++ b/tests/benchmark-crypto-hmac.c
-@@ -0,0 +1,82 @@
-+/*
-+ * QEMU Crypto hmac speed benchmark
-+ *
-+ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/hmac.h"
-+
-+#define KEY "monkey monkey monkey monkey"
-+
-+static void test_hmac_speed(const void *opaque)
-+{
-+    size_t chunk_size = (size_t)opaque;
-+    QCryptoHmac *hmac = NULL;
-+    uint8_t *in = NULL, *out = NULL;
-+    size_t out_len = 0;
-+    double total = 0.0;
-+    struct iovec iov;
-+    Error *err = NULL;
-+    int ret;
-+
-+    if (!qcrypto_hmac_supports(QCRYPTO_HASH_ALG_SHA256)) {
-+        return;
-+    }
-+
-+    in = g_new0(uint8_t, chunk_size);
-+    memset(in, g_test_rand_int(), chunk_size);
-+
-+    iov.iov_base = (char *)in;
-+    iov.iov_len = chunk_size;
-+
-+    g_test_timer_start();
-+    do {
-+        hmac = qcrypto_hmac_new(QCRYPTO_HASH_ALG_SHA256,
-+                                (const uint8_t *)KEY, strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytesv(hmac, &iov, 1, &out, &out_len, &err);
-+        g_assert(ret == 0);
-+        g_assert(err == NULL);
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        total += chunk_size;
-+    } while (g_test_timer_elapsed() < 5.0);
-+
-+    total /= 1024 * 1024; /* to MB */
-+
-+    g_print("hmac(sha256): ");
-+    g_print("Testing chunk_size %ld bytes ", chunk_size);
-+    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
-+    g_print("%.2f MB/sec\n", total / g_test_timer_last());
-+
-+    g_free(out);
-+    g_free(in);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    size_t i;
-+    char name[64];
-+
-+    g_test_init(&argc, &argv, NULL);
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    for (i = 512; i <= (64 * 1204); i *= 2) {
-+        memset(name, 0 , sizeof(name));
-+        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
-+        g_test_add_data_func(name, (void *)i, test_hmac_speed);
-+    }
-+
-+    return g_test_run();
-+}
--- 
-2.13.0
+> (keep the current qemu_file_set_error mechanism) or would you prefer
+> things converted? IMHO having a single method would be cleaner, but I
+> have not looked into this in great detail.
+
+Error handling is a mess in qemu (in general), and worse in migration
+(in particular).
+
+History lesson (that is even older than my involvement with qemu)
+
+It used to be that evrything was done with callbacks in the main loop.
+So there were not an easy way to pass error messages.  Everything was
+done through qemu_file_set_error() (well, actually it was done by hand).
+
+Then the migration thread came, and we can do things asyncronously, so
+we don't need to store the state in callbacks.  I did some changes long,
+long ago about returning  error messages instead of:
+
+if (error) {
+   qemu_file_set_error(f, -error);
+   return;
+}
+
+to
+
+if (error) {
+    return -error;
+}
+
+/* fix things to make errors negative, etc, etc, you get the idea */
+
+But we need to fix some things to make this work.
+
+Reception side is done through a coroutine, and then some of such things
+still stand.  Moving to a thread would be a good idea at some point O:-)
+
+> Also the question what is the semantic of qemu_file_set_error arises.
+> It ain't documented and I would intuitively suspect that it's rather
+> about the 'file' (that is transport) than the whole migration.
+
+We test in the "interesting" parts if there is an error on the file,
+
+from vmstate_load_state()
+
+                } else {
+                    ret = field->info->get(f, curr_elem, size, field);
+                }
+                if (ret >= 0) {
+                    ret = qemu_file_get_error(f);
+                }
+                if (ret < 0) {
+                    qemu_file_set_error(f, ret);
+                    error_report("Failed to load %s:%s", vmsd->name,
+                                 field->name);
+                    trace_vmstate_load_field_error(field->name, ret);
+                    return ret;
+                }
+
+
+You can see how many convolutions we do to maintain the error returned
+and the one in QEMUFile in sync.  Removing the one in QEMUFile would be
+a good idea, but requires lots of changes.
+
+For starters, see that all qemu_get_* return void.
+
+To add insult to injury:
+
+int qemu_peek_byte(QEMUFile *f, int offset)
+{
+    int index = f->buf_index + offset;
+
+    assert(!qemu_file_is_writable(f));
+    assert(offset < IO_BUF_SIZE);
+
+    if (index >= f->buf_size) {
+        qemu_fill_buffer(f);
+        index = f->buf_index + offset;
+        if (index >= f->buf_size) {
+            return 0;
+        }
+    }
+    return f->buf[index];
+}
+
+I.e. it never returns errors, if there is nothing to read, it just
+return 0.
+
+/me stops
+
+>
+>
+>
+>>>>
+>>>>   I *think* the migration code should spot that before it finishes
+>>>> but it might carry on for a little while before it does.
+>>>
+>>> I will keep this patch as is, since this is one of the "should not happen"
+>>> cases.
+
+Later, Juan.
