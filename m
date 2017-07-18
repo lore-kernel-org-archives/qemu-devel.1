@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQGp-00066e-Lp
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQGp-00066f-Mh
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQGn-0003BY-Ln
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQGm-0003B2-Jw
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:27 -0400
-Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:35404)
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dXQGn-0003Az-Ec
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:25 -0400
-Received: by mail-lf0-x234.google.com with SMTP id w198so10483319lff.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 04:02:25 -0700 (PDT)
+	id 1dXQGm-0003Aq-Cb
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:24 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id a10so24073067wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 04:02:24 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 18 Jul 2017 11:45:08 +0100
-Message-Id: <20170718104513.23947-28-alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:44:58 +0100
+Message-Id: <20170718104513.23947-18-alex.bennee@linaro.org>
 In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
 References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 27/32] shippable: add mips64el targets
+Subject: [Qemu-devel] [PULL 17/32] shippable: add armel targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,20 +37,17 @@ Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 diff --git a/.shippable.yml b/.shippable.yml
-index f2a904014a..53b43b349f 100644
+index 5e0caa65c5..abcaf6f4d4 100644
 --- a/.shippable.yml
 +++ b/.shippable.yml
-@@ -15,9 +15,10 @@ env:
-       TARGET_LIST=aarch64-softmmu,aarch64-linux-user
-     - IMAGE=debian-s390x-cross
-       TARGET_LIST=s390x-softmmu,s390x-linux-user
--    # mips64el-softmmu disabled due to libfdt problem
-     - IMAGE=debian-mips-cross
-       TARGET_LIST=mips-softmmu,mipsel-linux-user
-+    - IMAGE=debian-mips64el-cross
-+      TARGET_LIST=mips64el-softmmu,mips64el-linux-user
-     - IMAGE=debian-powerpc-cross
-       TARGET_LIST=ppc-softmmu,ppcemb-softmmu,ppc-linux-user
-     - IMAGE=debian-ppc64el-cross
+@@ -5,6 +5,8 @@ env:
+   global:
+     - LC_ALL=C
+   matrix:
++    - IMAGE=debian-armel-cross
++      TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
+     - IMAGE=debian-armhf-cross
+       TARGET_LIST=arm-softmmu,arm-linux-user,armeb-linux-user
+     - IMAGE=debian-arm64-cross
 -- 
 2.13.0
