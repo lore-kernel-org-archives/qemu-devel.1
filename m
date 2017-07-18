@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXTP9-0004vL-6a
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:23:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXTQf-0006Q5-Lo
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXTP8-0003YJ-9u
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:23:15 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33292)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXTP8-0003Xx-27
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:23:14 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id v105so1557731wrb.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:23:13 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dXTQe-0004Xr-Oa
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:24:49 -0400
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+	<1500385286-21142-2-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6229304c-ee67-3678-2ea3-eddf3f42f3cb@redhat.com>
+Date: Tue, 18 Jul 2017 09:24:40 -0500
 MIME-Version: 1.0
-In-Reply-To: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jul 2017 15:22:52 +0100
-Message-ID: <CAFEAcA-oPSoSBdJ0zdOQA0HAyBec51N743cNW+=Rjk8xZmckiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v2 0/8] qemu-ga patch queue
+In-Reply-To: <1500385286-21142-2-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pxXBC9Vh8AsLA5oVsnEKvQafpMeOb26eD"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 01/10] qapi: Separate type QNull
+ from QObject
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-On 18 July 2017 at 12:01, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request' into staging (2017-07-17 17:54:17 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/mdroth/qemu.git tags/qga-pull-2017-07-17-v2-tag
->
-> for you to fetch changes up to 339ca68bef9f30dd18e84b7d92398327e3f819a3:
->
->   test-qga: add test for guest-get-osinfo (2017-07-18 05:49:01 -0500)
->
-> ----------------------------------------------------------------
-> qemu-ga patch queue
->
-> * new command: qemu-get-osinfo
-> * build fix for OpenBSD
-> * better error-reporting for failure on keyfile dump
-> * remove redundant initialization of qa_state global
-> * include libpcre in w32 package
-> * w32 localization fixes for service installation/registration
->
-> v2:
-> * fix build issue with older GCCs introduced with guest_get_osinfo
-> * relocated some declarations in guest_get_osinfo
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pxXBC9Vh8AsLA5oVsnEKvQafpMeOb26eD
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+Message-ID: <6229304c-ee67-3678-2ea3-eddf3f42f3cb@redhat.com>
+Subject: Re: [PATCH for-2.10 01/10] qapi: Separate type QNull from QObject
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+ <1500385286-21142-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1500385286-21142-2-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 07/18/2017 08:41 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/qmp/qobject.h    | 10 +++++++---
+>  qapi/qobject-output-visitor.c |  2 +-
+>  qobject/json-parser.c         |  2 +-
+>  qobject/qnull.c               |  8 +++++---
+>  target/i386/cpu.c             |  4 ++--
+>  tests/check-qjson.c           |  6 +++---
+>  tests/check-qnull.c           | 18 +++++++++---------
+>  7 files changed, 28 insertions(+), 22 deletions(-)
 
--- PMM
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--pxXBC9Vh8AsLA5oVsnEKvQafpMeOb26eD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluGigACgkQp6FrSiUn
+Q2rHTgf/T9Q33io+EAoRIbIhtZu/kiW6TRkKWwZ1uIBo/KTWKaUWcVcxu1phEMf4
+NR7cSZvipv4KBgJ6nbfhmnIsf9I9yptb605f7F+NTxlV7Ey/6BzJJkUch8QDB71C
+g4ZZV63xDZc/9uLF+A31pAvewkolbVMQtMtaPk6OVYjAMSWyMzXwxtr2+plcuiCe
+UNH9z7UoNjsItlaZZCsm836UQi+LsGDVXWQSI6BAqGSUhzVNg9abXvlrNg0a1GZ1
+mzkBxVEYbaAVCLt6cBxR6qhZE6airHVO3T6EhzPXaRcdMDvNiaLYW5uK8LKopixP
+s9XUA+sfdrSPt9AtpB1oCShZWuXjxA==
+=jtan
+-----END PGP SIGNATURE-----
+
+--pxXBC9Vh8AsLA5oVsnEKvQafpMeOb26eD--
