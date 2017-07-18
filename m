@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dXZxX-00013q-CP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:23:12 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dXZyV-0001Yw-8U
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dXZxT-0004LC-69
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:23:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dXZxS-0004KT-Sn
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:23:07 -0400
-References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-	<96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <ac3a06a2-bc47-92bb-50e2-0b8174c2b515@redhat.com>
-Date: Tue, 18 Jul 2017 17:22:57 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dXZyR-00050q-8o
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 17:24:11 -0400
+Resent-Message-Id: <E1dXZyR-00050q-8o@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150041303653.87.14552021942412556226@5d477a5b5989>
+In-Reply-To: <1500387486-5469-1-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PO8Ne8RxKJV0lpadEecEhcWJJpMfbilFf"
-Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 18 Jul 2017 14:23:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/21] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,154 +23,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: Lukas Doktor <ldoktor@redhat.com>, Amador Segundo <asegundo@redhat.com>
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PO8Ne8RxKJV0lpadEecEhcWJJpMfbilFf
-From: Cleber Rosa <crosa@redhat.com>
-To: John Snow <jsnow@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org
-Cc: Lukas Doktor <ldoktor@redhat.com>, Amador Segundo <asegundo@redhat.com>
-Message-ID: <ac3a06a2-bc47-92bb-50e2-0b8174c2b515@redhat.com>
-Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
-References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
- <96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-In-Reply-To: <96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 07/18/2017 02:07 PM, John Snow wrote:
->=20
->=20
-> On 07/17/2017 11:01 PM, Jing Liu wrote:
->> Hi all,
->>
->> Do you anybody have iotests failure: 188, 189 and 087 of the latest qe=
-mu
->> upsteam?
->>
->> I just wondered if it has something wrong with my test machines becaus=
-e
->> I have different results with two machines.
->>
->>
->> Thanks.
->>
->> Jing
->>
->>
->=20
-> Presumably you are missing aio=3Dnative support for 087,
->=20
-
-I see 6 different "tests" as part of 087, and only one them requires AIO
-support ("aio=3Dnative without O_DIRECT"), which can fail like this:
-
---- /home/cleber/src/qemu/tests/qemu-iotests/087.out    2017-07-17
-19:33:26.409758360 -0400
-+++ 087.out.bad 2017-07-18 17:01:37.736038689 -0400
-@@ -27,7 +27,7 @@
- Testing:
- QMP_VERSION
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "aio=3Dnative was specified,=
-
-but it requires cache.direct=3Don, which was not specified."}}
-+{"error": {"class": "GenericError", "desc": "aio=3Dnative was specified,=
-
-but is not supported in this build."}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-"event": "SHUTDOWN", "data": {"guest": false}}
-
-Failures: 087
-Failed 1 of 1 tests
-
-When either "--disable-linux-aio" is given or when libaio headers are
-missing, which in the end means that CONFIG_LINUX_AIO won't be set in
-config-host.mak or config-host.h.
-
-> and 188/189 I believe require compression and/or LUKS libraries.
->=20
-
-I did not check if/which optional configure time option would end up
-disabling LUKS support and affecting those tests, but it's possible that
-something similar exists.
-
-> These are false positives caused by missing libraries. We should
-> probably work out a proper solution to meaningfully skipping tests we
-> didn't compile support for.
->=20
-> --js
->=20
-
-I see issues here:
-
-1) The qemu-iotests "runner", that is, "./check", understands that a
-file number is a test.  No further granularity is (currently?)
-achievable here.
-
-The easy solution would be to split tests which depend on optional
-features to separate test files.  In the 087 test given as example,
-the "=3D=3D=3D aio=3Dnative without O_DIRECT =3D=3D=3D" block would becom=
-e, say, 190.
-
-2) Skip tests based on features more easily.  There's already support
-for skipping tests on various situations.  From 087:
-
-=2E..
-_supported_fmt qcow2
-_supported_proto file
-_supported_os Linux
-=2E..
-
-It's trivial to also have access to other compile time settings.  I did
-a quick experiment that would add a "_required_feature" function to
-"common.rc".  For 087 (or 190?) it would look like:
-
-=2E..
-_supported_fmt qcow2
-_supported_proto file
-_supported_os Linux
-_required_feature CONFIG_LINUX_AIO
-=2E..
-
-Does it make sense?  Would a patch series along those lines would be
-welcomed by reviews?
-
-Thanks!
-
---=20
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
-
-
---PO8Ne8RxKJV0lpadEecEhcWJJpMfbilFf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZbnw0AAoJEGV+jTOl8gnz09IP/jkR99Rl52NMEwy0uHd/EPtB
-mXsa+XtbQaCXMAa6187MO4Eso762EoHcK64yckbfu+DEVCK/m6UWUQsLj22ft5Zu
-MoNMBJclUSkU8hWOtaV74Y3gaAgyiHifVgVrOY0WuPPPiJ//bUYej0P38QCe7mXy
-4YspxaUB4U1SrJna+ZySRFcfxOCmP0j6o2hBPLJwCm7sgWDD0IK5e2oheUKYQjij
-/ZGTn20jucvQtmcmgI/IDOdXJFCcMyrHIVATyeYluOofPhajZUFFejd+EeDwyWpS
-TM5CbtGamtEZaPyLZPBXswXD52hjpRUCLdUEY5sUpOnEXp3ghLVpTnjCco2s2VyW
-Y+Z7brcHbUPmPu9dQ2OiRmEgLPA7upKy2J4ZhJVwJSsCsuTSz1QAT3gr6wJ3D0rB
-AfT/gCAFUx36KqQm8ewwYRipweI9VPHtitJgoSaRKxfImVWBgXf3SYpL+8/aaLsO
-VzE3myiZ/A65/EYnarUKLCixRmmpLRKOxNzSteuvzqwqShrH/TFgg7gnCGd2P/pv
-L/YRucucbw35r92oyVjM8RktgtHMlZtJRfKFwuGt8rcrOntHj1vCn/Il3ULpet4t
-a/mufnhofN3czHRBRFxJjarBjj5ILqqoPS9XOIXpDYKK6fWJjqZjdglK3ZqQW0pW
-Yfby8MfbOJZFJmv/ULtF
-=G332
------END PGP SIGNATURE-----
-
---PO8Ne8RxKJV0lpadEecEhcWJJpMfbilFf--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAwLzIxXSBCbG9jayBsYXllciBwYXRjaGVzCk1lc3NhZ2UtaWQ6IDE1MDAz
+ODc0ODYtNTQ2OS0xLWdpdC1zZW5kLWVtYWlsLWt3b2xmQHJlZGhhdC5jb20KVHlwZTogc2VyaWVz
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
+dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0Jwo2NWVmNWQ3IHFlbXUtaW1nOiBDaGVjayBmb3IgYmFja2luZyBpbWFn
+ZSBpZiBzcGVjaWZpZWQgZHVyaW5nIGNyZWF0ZQoxZWQ1OTM5IGJsb2NrZGV2OiBtb3ZlIEJEUlZf
+T19OT19CQUNLSU5HIG9wdGlvbiBmb3J3YXJkCmE4ODFlZTEgYmxvY2svdnZmYXQ6IEZpeCBjb21w
+aWxlciB3YXJuaW5nIHdpdGggZ2NjIDcKMzEzZGVjNSB2dmZhdDogaW5pdGlhbGl6ZSBtZW1vcnkg
+YWZ0ZXIgYWxsb2NhdGluZyBpdAplMThjZjlmIHZ2ZmF0OiBjb3JyZWN0bHkgcGFyc2Ugbm9uLUFT
+Q0lJIHNob3J0IGFuZCBsb25nIGZpbGUgbmFtZXMKZDI0ZmU5MSB2dmZhdDogYWRkIGEgY29uc3Rh
+bnQgZm9yIGJvb3RzZWN0b3IgbmFtZQoyMTM4MTJlIHZ2ZmF0OiBhZGQgY29uc3RhbnRzIGZvciBz
+cGVjaWFsIHZhbHVlcyBvZiBuYW1lWzBdCjA3OWQzOWIgcWVtdS1pb3Rlc3RzOiBUZXN0IHVucGx1
+ZyBvZiAtZGV2aWNlIHdpdGhvdXQgZHJpdmUKOTlmMTM0NSBxZW11LWlvdGVzdHM6IFRlc3QgJ2lu
+Zm8gYmxvY2snCjdjMzNjOTcgc2NzaS1kaXNrOiBiZHJ2X2F0dGFjaF9kZXYoKSBmb3IgZW1wdHkg
+Q0QtUk9NCjE1MjkxOTIgaWRlOiBiZHJ2X2F0dGFjaF9kZXYoKSBmb3IgZW1wdHkgQ0QtUk9NCjQ4
+ZGQ0MzQgYmxvY2s6IExpc3QgYW5vbnltb3VzIGRldmljZSBCQnMgaW4gcXVlcnktYmxvY2sKOWI1
+YmY5OSBibG9jay9xYXBpOiBVc2UgYmxrX2FsbF9uZXh0KCkgZm9yIHF1ZXJ5LWJsb2NrCjkwY2Y0
+ZDAgYmxvY2s6IE1ha2UgYmxrX2FsbF9uZXh0KCkgcHVibGljCjcwMzQ5NzcgYmxvY2svcWFwaTog
+QWRkIHFkZXYgZGV2aWNlIG5hbWUgdG8gcXVlcnktYmxvY2sKMDEyZTMzZSBibG9jazogTWFrZSBi
+bGtfZ2V0X2F0dGFjaGVkX2Rldl9pZCgpIHB1YmxpYwo0OWU5ZTA2IGJsb2NrL3ZwYy5jOiBIYW5k
+bGUgd3JpdGUgZmFpbHVyZXMgaW4gZ2V0X2ltYWdlX29mZnNldCgpCmZlNDc0NDAgYmxvY2svdm1k
+azogUmVwb3J0IGZhaWx1cmVzIGluIHZtZGtfcmVhZF9jaWQoKQpiN2EwNzk3IGJsb2NrOiByZW1v
+dmUgdGltZXIgY2FuY2VsaW5nIGluIHRocm90dGxlX2NvbmZpZygpCjgxNzlhZGYgYmxvY2s6IGFk
+ZCBjbG9ja190eXBlIGZpZWxkIHRvIFRocm90dGxlR3JvdXAKYmU4Njk1MCBjb21taXQ6IEFkZCBO
+VUxMIGNoZWNrIGZvciBvdmVybGF5X2JzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzIxOiBjb21taXQ6IEFkZCBOVUxMIGNoZWNrIGZvciBvdmVybGF5X2JzLi4uCkNoZWNr
+aW5nIFBBVENIIDIvMjE6IGJsb2NrOiBhZGQgY2xvY2tfdHlwZSBmaWVsZCB0byBUaHJvdHRsZUdy
+b3VwLi4uCkNoZWNraW5nIFBBVENIIDMvMjE6IGJsb2NrOiByZW1vdmUgdGltZXIgY2FuY2VsaW5n
+IGluIHRocm90dGxlX2NvbmZpZygpLi4uCkNoZWNraW5nIFBBVENIIDQvMjE6IGJsb2NrL3ZtZGs6
+IFJlcG9ydCBmYWlsdXJlcyBpbiB2bWRrX3JlYWRfY2lkKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8y
+MTogYmxvY2svdnBjLmM6IEhhbmRsZSB3cml0ZSBmYWlsdXJlcyBpbiBnZXRfaW1hZ2Vfb2Zmc2V0
+KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMTogYmxvY2s6IE1ha2UgYmxrX2dldF9hdHRhY2hlZF9k
+ZXZfaWQoKSBwdWJsaWMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8yMTogYmxvY2svcWFwaTogQWRkIHFk
+ZXYgZGV2aWNlIG5hbWUgdG8gcXVlcnktYmxvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yMTogYmxv
+Y2s6IE1ha2UgYmxrX2FsbF9uZXh0KCkgcHVibGljLi4uCkNoZWNraW5nIFBBVENIIDkvMjE6IGJs
+b2NrL3FhcGk6IFVzZSBibGtfYWxsX25leHQoKSBmb3IgcXVlcnktYmxvY2suLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTAvMjE6IGJsb2NrOiBMaXN0IGFub255bW91cyBkZXZpY2UgQkJzIGluIHF1ZXJ5LWJs
+b2NrLi4uCkNoZWNraW5nIFBBVENIIDExLzIxOiBpZGU6IGJkcnZfYXR0YWNoX2RldigpIGZvciBl
+bXB0eSBDRC1ST00uLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjE6IHNjc2ktZGlzazogYmRydl9hdHRh
+Y2hfZGV2KCkgZm9yIGVtcHR5IENELVJPTS4uLgpDaGVja2luZyBQQVRDSCAxMy8yMTogcWVtdS1p
+b3Rlc3RzOiBUZXN0ICdpbmZvIGJsb2NrJy4uLgpDaGVja2luZyBQQVRDSCAxNC8yMTogcWVtdS1p
+b3Rlc3RzOiBUZXN0IHVucGx1ZyBvZiAtZGV2aWNlIHdpdGhvdXQgZHJpdmUuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMTUvMjE6IHZ2ZmF0OiBhZGQgY29uc3RhbnRzIGZvciBzcGVjaWFsIHZhbHVlcyBvZiBu
+YW1lWzBdLi4uCkNoZWNraW5nIFBBVENIIDE2LzIxOiB2dmZhdDogYWRkIGEgY29uc3RhbnQgZm9y
+IGJvb3RzZWN0b3IgbmFtZS4uLgpDaGVja2luZyBQQVRDSCAxNy8yMTogdnZmYXQ6IGNvcnJlY3Rs
+eSBwYXJzZSBub24tQVNDSUkgc2hvcnQgYW5kIGxvbmcgZmlsZSBuYW1lcy4uLgpDaGVja2luZyBQ
+QVRDSCAxOC8yMTogdnZmYXQ6IGluaXRpYWxpemUgbWVtb3J5IGFmdGVyIGFsbG9jYXRpbmcgaXQu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjE6IGJsb2NrL3Z2ZmF0OiBGaXggY29tcGlsZXIgd2Fybmlu
+ZyB3aXRoIGdjYyA3Li4uCkNoZWNraW5nIFBBVENIIDIwLzIxOiBibG9ja2RldjogbW92ZSBCRFJW
+X09fTk9fQkFDS0lORyBvcHRpb24gZm9yd2FyZC4uLgpDaGVja2luZyBQQVRDSCAyMS8yMTogcWVt
+dS1pbWc6IENoZWNrIGZvciBiYWNraW5nIGltYWdlIGlmIHNwZWNpZmllZCBkdXJpbmcgY3JlYXRl
+Li4uCkVSUk9SOiBFcnJvciBtZXNzYWdlcyBzaG91bGQgbm90IGNvbnRhaW4gbmV3bGluZXMKIzEw
+MzogRklMRTogYmxvY2suYzo0NDMyOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJUaGlz
+IG1heSBiZWNvbWUgYW4gZXJyb3IgaW4gZnV0dXJlIHZlcnNpb25zLlxuIik7Cgp0b3RhbDogMSBl
+cnJvcnMsIDAgd2FybmluZ3MsIDI1MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
