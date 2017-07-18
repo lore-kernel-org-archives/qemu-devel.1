@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXSko-000085-QW
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXSku-0000A8-99
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXSkn-0007Ms-Gu
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:34 -0400
-MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <87bmoi806u.fsf@linaro.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-27-f4bug@amsat.org>
-	<CAJ+F1C+WsdUp3Vtx+-FZ9g7URSAQuJWb6h7-w6yJXM+4TKQNjA@mail.gmail.com>
-	<87bmoi806u.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 18 Jul 2017 10:41:29 -0300
-Message-ID: <CAAdtpL7HcwwpCNjVxpaX=nB72LS_CJjU=VdS_aH0EM6i8QVBOw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 26/29] tests/tcg: use ARRAY_SIZE macro
+	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007Sj-4a
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 18 Jul 2017 15:41:20 +0200
+Message-Id: <1500385286-21142-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 04/10]
+ tests/test-qobject-input-visitor: Drop redundant test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +20,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, qemu trival <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-On Tue, Jul 18, 2017 at 8:16 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->
-> Pranith has had a couple of revs at this:
->
->   Subject: [PATCH v5 00/19] Cleanup of TCG tests
->   Date: Thu,  1 Dec 2016 00:14:14 -0500
->   Message-Id: <20161201051433.17168-1-bobby.prani@gmail.com>
->
-> We have the cross-compilers available as a fallback via docker although
-> not every one can seamlessly use it for building stuff. Is getting a
-> working cross-compiler setup too much of a hurdle fore those that want
-> to build cross-arch tests?
+test_visitor_in_alternate() tests UserDefAlternate with inadmissible
+input.  test_visitor_in_fail_alternate() does basically the same.
+Drop the former, keep the latter.
 
-I have a WiP branch using qemu to cross-run tests it _works_ funny but
-when it fails it is not funny to understand what is really buggy...
-/to be continued.../
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/test-qobject-input-visitor.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Phil.
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index f451844..bcf0261 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -567,7 +567,6 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
+                                       const void *unused)
+ {
+     Visitor *v;
+-    Error *err = NULL;
+     UserDefAlternate *tmp;
+     WrapAlternate *wrap;
+ 
+@@ -599,11 +598,6 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
+     g_assert_cmpint(tmp->u.udfu.u.value1.has_a_b, ==, false);
+     qapi_free_UserDefAlternate(tmp);
+ 
+-    v = visitor_input_test_init(data, "false");
+-    visit_type_UserDefAlternate(v, NULL, &tmp, &err);
+-    error_free_or_abort(&err);
+-    qapi_free_UserDefAlternate(tmp);
+-
+     v = visitor_input_test_init(data, "{ 'alt': 42 }");
+     visit_type_WrapAlternate(v, NULL, &wrap, &error_abort);
+     g_assert_cmpint(wrap->alt->type, ==, QTYPE_QNUM);
+-- 
+2.7.5
