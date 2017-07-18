@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dXSsy-0000RV-Et
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:50:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXSvI-0002Dp-Mw
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dXSsu-00041M-Fc
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:50:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dXSsu-0003zy-9j
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:49:56 -0400
-References: <767EFADFF809234DB6CAABD6D2F93847C5D31539@IRSMSX107.ger.corp.intel.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <3319b641-b7f3-0ee8-e5ed-9c378e723eb4@redhat.com>
-Date: Tue, 18 Jul 2017 16:49:51 +0300
+	(envelope-from <alex.bennee@linaro.org>) id 1dXSvE-0006B9-O7
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:52:24 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:35499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dXSvE-00069F-Hx
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:52:20 -0400
+Received: by mail-wr0-x233.google.com with SMTP id w4so29786517wrb.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 06:52:20 -0700 (PDT)
+References: <20170718061005.29518-1-f4bug@amsat.org>
+	<20170718061005.29518-27-f4bug@amsat.org>
+	<CAJ+F1C+WsdUp3Vtx+-FZ9g7URSAQuJWb6h7-w6yJXM+4TKQNjA@mail.gmail.com>
+	<87bmoi806u.fsf@linaro.org>
+	<CAJ+F1CLXojLp2VxET469gBLsaSwCvkQoGODOMyFUs3jUbkdk3A@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAJ+F1CLXojLp2VxET469gBLsaSwCvkQoGODOMyFUs3jUbkdk3A@mail.gmail.com>
+Date: Tue, 18 Jul 2017 14:52:16 +0100
+Message-ID: <878tjl97jj.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <767EFADFF809234DB6CAABD6D2F93847C5D31539@IRSMSX107.ger.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] >256 Virtio-net-pci hotplug Devices
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 26/29] tests/tcg: use ARRAY_SIZE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Kinsella, Ray" <ray.kinsella@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-
-On 18/07/2017 0:50, Kinsella, Ray wrote:
-> Hi folks,
-> 
-
-Hi Ray,
-
-> I am trying to create a VM that supports hot-plugging a large number of virtio-net-pci device,
-> up to 1000 devices initially.
-> 
->  From the docs (see below) and from playing with QEMU, it looks like there are two options.
-> Both with limitations.
-> 
-> PCI Express switch
-> 
-> It looks like using a PCI Express switch hierarchy is not an option due to bus exhaustion.
-> Each downstream port creates a separate bus and each downstream port only supports hot-plugging a single device.
-> So this gives us a max of 256-ish buses/devices pairs.
-
-Right.
-
-> 
-> PCI Root Ports
-> 
-> The other option is use a flatter hierarchy, with a number of multi-function PCI Root Ports hanging off 'pcie.0'.
-> However each 'PCI Root Port' can support hot-plugging a single device.
-> So this method really becomes a function of how many free address we have on 'pci.0'.
-> If we make room for say 16 multifunction devices, we get 16*8 ... 128
-> So ultimately, this will approach will give us a similar to number to using a switch.
-> 
-> Is there another method?
-
-You can use multi-function PCIe Root Ports, this will give you 8 ports
-per slot, if you have 16 empty slots (I think we have more) you reach
-128 root ports.
-Then you can use multi-function  virtio-net-pci devices, this will
-give you 8 functions per port, so you reach the target of 1024 devices.
-
-You loose hot-plug granularity since you can hot-plug 8-functions group,
-but maybe is OK, depending on your scenario.
-
-> ( pxb-pcie doesn't support hotplug for instance, and only a single pcie domain is supported qemu )
-> 
-
-Even so, you can use one cold-plugged pxb-pcie if you don't
-have enough empty slots on pcie.0, in order to reach the maximum
-number of PCIe Root Ports (256) which is the maximum for a single
-PCI domain.
-
-If you need granularity per single device (1000+ hot-pluggable),
-you could enhance the pxb-pcie to support multiple pci domains.
-
-Thanks,
-Marcel
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu trival <qemu-trivial@nongnu.org>, QEMU <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
 
-> Thanks,
-> 
-> Ray K
-> 
-> Pcie.txt,
-> ( https://github.com/qemu/qemu/blob/master/docs/pcie.txt )
-> Q35 preso
-> ( http://wiki.qemu.org/images/4/4e/Q35.pdf )
-> 
->   
-> 
-> 
+Marc-André Lureau <marcandre.lureau@gmail.com> writes:
+
+> Hi
+>
+> On Tue, Jul 18, 2017 at 4:16 AM, Alex Bennée <alex.bennee@linaro.org> wrote:
+>>
+>> Marc-André Lureau <marcandre.lureau@gmail.com> writes:
+>>
+>>> Hi
+>>>
+>>> On Mon, Jul 17, 2017 at 11:10 PM, Philippe Mathieu-Daudé
+>>> <f4bug@amsat.org> wrote:
+>>>> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.cocci
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> ---
+>>>>  tests/tcg/alpha/test-cond.c | 2 +-
+>>>>  tests/tcg/alpha/test-ovf.c  | 2 +-
+>>>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>
+>>> I think those do not include osdep.h
+>>>
+>>> (sigh, tests/tcg would need some love ;)
+>>
+>> Pranith has had a couple of revs at this:
+>>
+>>   Subject: [PATCH v5 00/19] Cleanup of TCG tests
+>>   Date: Thu,  1 Dec 2016 00:14:14 -0500
+>>   Message-Id: <20161201051433.17168-1-bobby.prani@gmail.com>
+>>
+>> We have the cross-compilers available as a fallback via docker although
+>> not every one can seamlessly use it for building stuff. Is getting a
+>> working cross-compiler setup too much of a hurdle fore those that want
+>> to build cross-arch tests?
+>
+> Yes, I also did some experiments in cleaning up tests/tcg
+> (https://github.com/elmarco/qemu/tree/tcg-tests)
+>
+> The trouble is I don't see an official/automated way to run tests/tcg
+> tests. Which cross-compiler should I use? When I played with this,
+> they all had various quirks, on Fedora, Debian or crosstool-ng.
+
+Debian at least have put a lot of work into getting cross-compilers
+installed as part of the native distro with good multi-arch support. We
+now use plain Debian 9 for most of the QEMU cross compiles - a few older
+architectures still need Debian 8 with the emdebian overlay.
+
+> I haven't looked at the docker tests, is this running tests/tcg test
+> somehow?
+
+No but as tests/tcg are all pretty simple and have less cross-compile
+dependencies than QEMU itself it is fairly trivial to invoke docker to
+do a cross-build for you in-place. e.g.:
+
+  docker run --rm -t -u (id -u) -v (pwd):(pwd) -w (pwd) qemu:debian-armhf-cross arm-linux-gnueabihf-gcc tests/tcg/hello-arm.c
+
+This is perhaps a bad example as there is a bit-rot that needs fixing.
+The alternative is to mine the users PATH for fairly standard
+cross-compile prefixes which work at least on Debian systems. I recently
+submitted a patch to RISU that allowed you to use either in its
+build-all-arches script:
+
+  https://git.linaro.org/people/peter.maydell/risu.git/tree/build-all-archs
+
+--
+Alex Bennée
