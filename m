@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dXTtH-0001Pa-KM
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:54:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXTw1-0004gs-Jf
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dXTtG-00080H-BH
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:54:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36792)
+	(envelope-from <eblake@redhat.com>) id 1dXTvy-0001Kw-8E
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:57:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dXTtG-0007zo-1R
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:54:22 -0400
-Date: Tue, 18 Jul 2017 16:54:17 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170718165417.1b18bcbc@nial.brq.redhat.com>
-In-Reply-To: <1500342577-12486-1-git-send-email-wang.yi59@zte.com.cn>
-References: <1500342577-12486-1-git-send-email-wang.yi59@zte.com.cn>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXTvx-0001KT-TH
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:57:10 -0400
+References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <93a523dc-0cf4-c73b-518d-ef48e9f8ca64@redhat.com>
+Date: Tue, 18 Jul 2017 09:57:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
+In-Reply-To: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj"
+Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Wang <wang.yi59@zte.com.cn>
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, liu.yunh@zte.com.cn, Liu.Jianjun3@zte.com.cn
+To: Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Mon, 17 Jul 2017 21:49:37 -0400
-Yi Wang <wang.yi59@zte.com.cn> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj
+From: Eric Blake <eblake@redhat.com>
+To: Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Message-ID: <93a523dc-0cf4-c73b-518d-ef48e9f8ca64@redhat.com>
+Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
+References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+In-Reply-To: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Add [vcpu] index support for hmp command "info lapic", which is
-> useful when debugging ipi and so on. Current behavior is not
-> changed when the parameter isn't specified.
-we shouldn't expose cpu_index to users anymore,
+On 07/17/2017 10:01 PM, Jing Liu wrote:
+> Hi all,
+>=20
+> Do you anybody have iotests failure: 188, 189 and 087 of the latest qem=
+u
+> upsteam?
+>=20
+> I just wondered if it has something wrong with my test machines because=
 
-I would suggest using to use real APIC ID here but we don't
-have monitor command that returns APIC IDs for present cpus.
+> I have different results with two machines.
 
-"info hotpluggable-cpus" gives you a list of available CPUs
-it also gives you qom_path to cpu so potentially you could
-read apic-id property of cpu.
+It might help to show the ./check command line you are using, as well as
+the errors you are getting.  Right now, master is failing on 51, 140,
+and 143 when I test across './check -raw', './check -qcow2', and
+'./check nbd', but not the three you mention.  But the iotests framework
+allows a lot more combinations of testing (and we probably have some
+lurking testsuite bugs on some of the more exotic combinations).
 
-But we have only QMP variant of qom-get so monitor needs
-addition of qom-get command that will be a wrapper around
-QMP command.
-
-It could be solved in 2 ways:
- * use socket-id/core-id/thread-id to specify desired cpu
-   /possible values in 'info hotpluggable-cpus'/
-
- * use apic-id value to specify interrupt controller
-   - apic-id could be retrieved with new qom-get
-     (qom-get would also be useful to read other properties)
-   - extend 'info registers' with apic id value
-    for example instead of current:
-    
-     CPU#1
-     EAX=00000c06 EBX=00000000 ECX=000002ff EDX=00000000
-     ....
-
-    it would look like:
-
-     CPU#1 (socket-id: a, core-id: b, thread-id: c, apic-id: d)
-     ...
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> 
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> Signed-off-by: Yun Liu <liu.yunh@zte.com.cn>
-> ---
->  hmp-commands-info.hx  | 6 +++---
->  target/i386/monitor.c | 8 +++++++-
->  2 files changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index d9df238..c534b03 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -115,9 +115,9 @@ ETEXI
->  #if defined(TARGET_I386)
->      {
->          .name       = "lapic",
-> -        .args_type  = "",
-> -        .params     = "",
-> -        .help       = "show local apic state",
-> +        .args_type  = "vcpu:i?",
-> +        .params     = "[vcpu]",
-> +        .help       = "show local apic state (vcpu: vCPU to read, default is 0)",
->          .cmd        = hmp_info_local_apic,
->      },
->  #endif
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 77ead60..813005e 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -632,8 +632,14 @@ const MonitorDef *target_monitor_defs(void)
->  
->  void hmp_info_local_apic(Monitor *mon, const QDict *qdict)
->  {
-> -    CPUState *cs = mon_get_cpu();
-> +    CPUState *cs;
->  
-> +    if (qdict_haskey(qdict, "vcpu")) {
-> +        int index = qdict_get_try_int(qdict, "vcpu", 0);
-> +        cs = qemu_get_cpu(index);
-> +    } else {
-> +        cs = mon_get_cpu();
-> +    }
->      if (!cs) {
->          monitor_printf(mon, "No CPU available\n");
->          return;
+--KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluIcMACgkQp6FrSiUn
+Q2oqHgf/Rng5CvU58F9ezgJKENoCcBs9wmc26L2YBlxPku2yzTmyt0rsb/HTLa7q
+u81f3er1HhiDlvxLBuhpRpI0vbmxLtPqQQQqjWKV1kAFF1RrKIZJc1hMZwoEJOFo
+Z1PRRvwdiQk3ZrlUsuS1s1Vgo00JZcemvBoPP1fbvyqNya1bBnVUf9UwgQT0PiDS
+Y15izV6Q2WSLUWXG1zyK9L2KDp/YOn3UK42UdHTisoDhtNJMIg+P29KdrQZ+7yef
+m9wJjGFEFkfshBEQf7heW77kJ/Igyz7THRT1vqk0AiE/oNe655V2dqd3ZSPQ/Jod
+bbCnt24noNeC6rsKwqzw230UAoPzRg==
+=rnd6
+-----END PGP SIGNATURE-----
+
+--KGmfWPE1ieXSRwwkSUwUFlHPf6vN6noIj--
