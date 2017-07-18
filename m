@@ -1,34 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGb-0005u4-Ph
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:16 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGY-00035E-MM
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGa-0005sq-G9
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47270)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGX-00034Z-C2
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50367)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dXQGY-00034f-CE
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:10 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1dXQGX-00034F-2o
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:09 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6IB0ivh121845
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:09 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bs1swcx5f-1
+	v6IAwghj039781
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:07 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bsaghs0np-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:08 -0400
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:07 -0400
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 05:02:08 -0600
+	Tue, 18 Jul 2017 05:02:06 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 06:01:40 -0500
+Date: Tue, 18 Jul 2017 06:01:39 -0500
 In-Reply-To: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1500375704-28002-5-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL v2 4/8] qga-win32: remove a redundancy code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1500375704-28002-4-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 3/8] qemu-ga: check if utmpx.h is available
+ on the system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,31 +42,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Peng Hao <peng.hao2@zte.com.cn>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-From: Peng Hao <peng.hao2@zte.com.cn>
+From: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 
-In the first line of run_agent,it has set ga_state = s,don't need
-set ga_state = s again behind.
+Commit 161a56a9065 added command guest-get-users and requires the
+utmpx.h (defined by POSIX) to work. It is however not always available
+(e.g. on OpenBSD) therefor a check for its existence is necessary.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qga/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure            | 19 +++++++++++++++++++
+ qga/commands-posix.c | 17 ++++++++++++++++-
+ 2 files changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/qga/main.c b/qga/main.c
-index 405c129..dcd6104 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -1314,7 +1314,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-     ga_command_state_init(s, s->command_state);
-     ga_command_state_init_all(s->command_state);
-     json_message_parser_init(&s->parser, process_event);
--    ga_state = s;
+diff --git a/configure b/configure
+index a3f0522..e8798ce 100755
+--- a/configure
++++ b/configure
+@@ -4915,6 +4915,21 @@ if compile_prog "" "" ; then
+ fi
+=20
+ ##########################################
++# check for utmpx.h, it is missing e.g. on OpenBSD
 +
- #ifndef _WIN32
-     if (!register_signal_handlers()) {
-         g_critical("failed to register signal handlers");
--- 
++have_utmpx=3Dno
++cat > $TMPC << EOF
++#include <utmpx.h>
++struct utmpx user_info;
++int main(void) {
++    return 0;
++}
++EOF
++if compile_prog "" "" ; then
++    have_utmpx=3Dyes
++fi
++
++##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+=20
+@@ -5959,6 +5974,10 @@ if test "$have_static_assert" =3D "yes" ; then
+   echo "CONFIG_STATIC_ASSERT=3Dy" >> $config_host_mak
+ fi
+=20
++if test "$have_utmpx" =3D "yes" ; then
++  echo "HAVE_UTMPX=3Dy" >> $config_host_mak
++fi
++
+ # Hold two types of flag:
+ #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the nam=
+e on
+ #                                     a thread we have a handle to
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index d8e4122..e7a047e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -15,7 +15,6 @@
+ #include <sys/ioctl.h>
+ #include <sys/wait.h>
+ #include <dirent.h>
+-#include <utmpx.h>
+ #include "qga/guest-agent-core.h"
+ #include "qga-qmp-commands.h"
+ #include "qapi/qmp/qerror.h"
+@@ -25,6 +24,10 @@
+ #include "qemu/base64.h"
+ #include "qemu/cutils.h"
+=20
++#ifdef HAVE_UTMPX
++#include <utmpx.h>
++#endif
++
+ #ifndef CONFIG_HAS_ENVIRON
+ #ifdef __APPLE__
+ #include <crt_externs.h>
+@@ -2519,6 +2522,8 @@ void ga_command_state_init(GAState *s, GACommandSta=
+te *cs)
+ #endif
+ }
+=20
++#ifdef HAVE_UTMPX
++
+ #define QGA_MICRO_SECOND_TO_SECOND 1000000
+=20
+ static double ga_get_login_time(struct utmpx *user_info)
+@@ -2577,3 +2582,13 @@ GuestUserList *qmp_guest_get_users(Error **err)
+     g_hash_table_destroy(cache);
+     return head;
+ }
++
++#else
++
++GuestUserList *qmp_guest_get_users(Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++    return NULL;
++}
++
++#endif
+--=20
 2.7.4
