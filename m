@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXKUb-0002j4-Pn
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:52:19 -0400
+	(envelope-from <cota@braap.org>) id 1dXKXH-00043L-4y
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:55:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXKUa-0002vh-L3
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:52:17 -0400
-Date: Tue, 18 Jul 2017 14:46:19 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170718044619.GC3140@umbus.fritz.box>
-References: <20170717041639.16137-1-nikunj@linux.vnet.ibm.com>
+	(envelope-from <cota@braap.org>) id 1dXKXE-0003pT-3c
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:55:03 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:58923)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXKXD-0003pC-SP
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 00:55:00 -0400
+Date: Tue, 18 Jul 2017 00:54:58 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170718045458.GB12960@flamenco>
+References: <1500235468-15341-1-git-send-email-cota@braap.org>
+	<1500235468-15341-11-git-send-email-cota@braap.org>
+	<92056605-c95b-b19b-0216-5d83be64e13d@twiddle.net>
+	<20170718002700.GA7414@flamenco>
+	<5382470b-120c-1cdd-32f3-d246d75059d2@twiddle.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="1ccMZA6j1vT5UqiK"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170717041639.16137-1-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: disable decrementer during reset
+In-Reply-To: <5382470b-120c-1cdd-32f3-d246d75059d2@twiddle.net>
+Subject: Re: [Qemu-devel] [PATCH v2 10/45] translate-all: guarantee that
+ tb_hash only holds valid TBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,154 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
+On Mon, Jul 17, 2017 at 17:40:29 -1000, Richard Henderson wrote:
+> On 07/17/2017 02:27 PM, Emilio G. Cota wrote:
+> >On Mon, Jul 17, 2017 at 12:55:03 -1000, Richard Henderson wrote:
+> >>On 07/16/2017 10:03 AM, Emilio G. Cota wrote:
+> >>>@@ -1073,13 +1073,17 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr)
+> >>>      assert_tb_locked();
+> >>>-    atomic_set(&tb->invalid, true);
+> >>>-
+> >>>      /* remove the TB from the hash list */
+> >>>      phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+> >>>      h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate);
+> >>>      qht_remove(&tcg_ctx.tb_ctx.htable, tb, h);
+> >>>+    /*
+> >>>+     * Mark the TB as invalid *after* it's been removed from tb_hash, which
+> >>>+     * eliminates the need to check this bit on lookups.
+> >>>+     */
+> >>>+    tb->invalid = true;
+> >>
+> >>I believe you need atomic_store_release here.  Previously we were relying on
+> >>the lock acquisition in qht_remove to provide the required memory barrier.
+> >>
+> >>We definitely need to make sure this reaches memory before we zap the TB in
+> >>the CPU_FOREACH loop.
+> >
+> >After this patch tb->invalid is only read/set with tb_lock held, so no need for
+> >atomics while accessing it.
+> 
+> I think there's a path by which we do get stale data.
+> For threads A and B,
+> 
+>   (A) Lookup succeeds for TB in hash without tb_lock
+>        (B) Removes TB from hash
+>        (B) Sets tb->invalid
+>        (B) Clears FORALL_CPU jmp_cache
+>   (A) Store TB into local jmp_cache
+> 
+> ... and since we never check for invalid again, there's nothing to evict TB
+> from the jmp_cache again.
 
---1ccMZA6j1vT5UqiK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ouch. Yes I see it now.
 
-On Mon, Jul 17, 2017 at 09:46:39AM +0530, Nikunj A Dadhania wrote:
-> Rebooting a SMP TCG guest is broken for both single/multi threaded TCG.
->=20
-> When reset happens, all the CPUs are in halted state. First CPU is brough=
-t out
-> of reset and secondary CPUs would be initialized by the guest kernel usin=
-g a
-> rtas call start-cpu.
->=20
-> However, in case of TCG, decrementer interrupts keep on coming and waking=
- the
-> secondary CPUs up.
->=20
-> These secondary CPUs would see the decrementer interrupt pending, which m=
-akes
-> cpu::has_work() to bring them out of wait loop and start executing
-> tcg_exec_cpu().
->=20
-> The problem with this is all the CPUs wake up and start booting SLOF imag=
-e,
-> causing the following exception(4 CPUs TCG VM):
+What threw me off was that in lookup_tb_ptr we're not checking tb->invalid,
+and that biased me into thinking that it's not needed. But I should have
+tried harder. Also, that's a bug, and yet another reason to have tb_lookup,
+so that we fix these things at once in one place.
 
-Ok, I'm still trying to understand why the behaviour on reboot is
-different from the first boot.  AFAICT on initial boot, the LPCR will
-have DEE / PECE3 enabled.  So why aren't we getting the same problem
-then?
+> Here's a plan that will make me happy:
+> 
+> (1) Drop this patch, leaving the set of tb->invalid (or CF_INVALID) in place.
+> (2) Include CF_INVALID in the mask of bits compared in tb_lookup__cpu_state.
+>     (a) At this point in the patch set that's just
+> 
+> 	(tb->flags & CF_INVALID) == 0
+> 
+>     (b) Later in the patch series when CF_PARALLEL is introduced
+>         (and CF_HASH_MASK, lets call it, instead of the cf_mask
+>         function you have now), this becomes
+> 
+>         (tb->flags & (CF_HASH_MASK | CF_INVALID)) == cf_mask
+> 
+> So that we continue to check CF_INVALID each time we lookup a TB, but now we
+> get it for free as a part of the other flags check.
 
+With the annoying atomic_read thrown in there :-) but yes, will do.
 
->=20
-> [   81.440850] reboot: Restarting system
->=20
-> SLOF
-> S
-> SLOF
-> SLOFLOF[0[0m ************************************************************=
-**********
-> QEMU Starting
->  Build Date =3D Mar  3 2017 13:29:19
->  FW Version =3D git-66d250ef0fd06bb8
-> [0m **********************************************************************
-> QEMU Starting
->  Build Date =3D Mar  3 2017 13:29:19
->  FW Version =3D git-66d250ef0fd06bb8
-> [0m *************************************m**********[?25l ***************=
-*******************************************************
-> QEMU Starting
->  Build Date =3D Mar  3 2017 13:29:19
->  FW Version =3D git-66d250ef0fd06bb8
-> ***********************
-> QEMU Starting
->  Build Date =3D Mar  3 2017 13:29:19
->  FW Version =3D git-66d250ef0fd06bb8
-> ERROR: Flatten device tree not available!
->=20
->  exception 300
-> SRR0 =3D 00000000000060e4  SRR1 =3D 800000008000000000000000
-> SPRG2 =3D 0000000000400000  SPRG3 =3D 0000000000004bd8
-> ERROR: Flatten device tree not available!
->=20
->  exception 300
-> SRR0 =3D 00000000000060e4  SRR1 =3D 800000008000000000000000
-> SPRG2 =3D 0000000000400000  SPRG3 =3D 0000000000004bd8
->=20
-> During reset, disable decrementer interrupt for secondary CPUs and enable=
- them
-> when the secondary CPUs are brought online by rtas start-cpu call.
->=20
-> Reported-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> ---
->  hw/ppc/spapr_cpu_core.c | 9 +++++++++
->  hw/ppc/spapr_rtas.c     | 8 ++++++++
->  2 files changed, 17 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index ea278ce..bbfe8c2 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -87,6 +87,15 @@ static void spapr_cpu_reset(void *opaque)
-> =20
->      env->spr[SPR_HIOR] =3D 0;
-> =20
-> +    /* Disable DECR for secondary cpus */
-> +    if (cs !=3D first_cpu) {
-> +        if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
-> +            env->spr[SPR_LPCR] &=3D ~LPCR_DEE;
-> +        } else {
-> +            /* P7 and P8 both have same bit for DECR */
-> +            env->spr[SPR_LPCR] &=3D ~LPCR_P8_PECE3;
-> +        }
-> +    }
->      /*
->       * This is a hack for the benefit of KVM PR - it abuses the SDR1
->       * slot in kvm_sregs to communicate the userspace address of the
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 94a2799..4623d1d 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -174,6 +174,14 @@ static void rtas_start_cpu(PowerPCCPU *cpu_, sPAPRMa=
-chineState *spapr,
->          kvm_cpu_synchronize_state(cs);
-> =20
->          env->msr =3D (1ULL << MSR_SF) | (1ULL << MSR_ME);
-> +
-> +        /* Enable DECR interrupt */
-> +        if (env->mmu_model =3D=3D POWERPC_MMU_3_00) {
-> +            env->spr[SPR_LPCR] |=3D LPCR_DEE;
-> +        } else {
-> +            /* P7 and P8 both have same bit for DECR */
-> +            env->spr[SPR_LPCR] |=3D LPCR_P8_PECE3;
-> +        }
->          env->nip =3D start;
->          env->gpr[3] =3D r3;
->          cs->halted =3D 0;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---1ccMZA6j1vT5UqiK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlltkpkACgkQbDjKyiDZ
-s5KKww//Rot/e4vuaqxc6yE4hq2HZNn02YK2hvGanVtZOQziumNs0LSOtfdRCtrl
-BBJkjgBfnVH0IwAI9qB2rOpBeqhL7FFky5SDhieviL9qaSeSirJHdsWWp4apwP4N
-CSAlltgbgXg8OdnLXA8EAzKs9x/w0A473aRWV2yhKzZru51WsLLVqj7qXoLZfuXr
-QhqFS9Teq3ow3si5M8RxGTi8pCgdVE3DQONfaNdHwNgLNnUh0+lRioAyOCV7MH73
-1G2yNw+0594BNhu6ZZMqNp05zTwLvcg9RWnmpHPoQ4uDE/S900Sy3RE20FhfITBW
-wYSzJI8P5dicNzEtKL07Yn1smGSmTGSDYuMuQP7SDMsB7xRoKylZPNMOiEzPJt1r
-KPbc/UfTvvuSSyv+BF4PPkFFGNWjkxMsekZu1GwAyN8x9AuI6Foce5u82FEs0Q23
-ZEcktHTpvjvbm37VDRA38mjQWgXBnwHe9wiuh078sN1mNJ8pZjYpmLksnn0ATT+0
-mXqDGZT3QSDjzC8XkaZoIhm7Ip2Chuxe4G2UNuXu3CzpoI7wsfiQrlchrt0H8VyB
-hSbV0FD8DR0ntG3hvtumVBWq6iZZ8MsCvegohmA8pYnxNdoserF7X0/n212+EOj3
-OV7A93k6umFYtNf73QYRMrx7FsCP/SxoYCSw+5SITUDutmPPAuw=
-=Skib
------END PGP SIGNATURE-----
-
---1ccMZA6j1vT5UqiK--
+		E.
