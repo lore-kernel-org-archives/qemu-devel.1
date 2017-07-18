@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXLtK-0002VK-1G
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:21:54 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXLx0-0006Oc-Ms
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXLtJ-0001yJ-7v
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:21:54 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 18 Jul 2017 03:10:05 -0300
-Message-Id: <20170718061005.29518-30-f4bug@amsat.org>
-In-Reply-To: <20170718061005.29518-1-f4bug@amsat.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
+	(envelope-from <rth7680@gmail.com>) id 1dXLwz-0005tp-NW
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 02:25:42 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170718045540.16322-1-f4bug@amsat.org>
+	<20170718045540.16322-4-f4bug@amsat.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <628617ba-12f6-97ad-6818-1d7d0c63f558@twiddle.net>
+Date: Mon, 17 Jul 2017 20:25:26 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20170718045540.16322-4-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 29/29] tests/qapi: use ARRAY_SIZE macro
+Subject: Re: [Qemu-devel] [PATCH v5 03/10] target/arm: optimize aarch64
+ rev16() using extract op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.cocci
+On 07/17/2017 06:55 PM, Philippe Mathieu-Daudé wrote:
+> Aurelien Jarno denoted this function could be implemented more effectively using
+> the aarch32 rev16() pattern.
+>    [http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg03180.html]
+> 
+> Done with the Coccinelle semantic patch from commit 58daf05d07dd
+>      (see scripts/coccinelle/tcg_gen_extract.cocci)
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/test-string-output-visitor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm dropping this patch and replacing it with the much smaller code mentioned 
+in the message quoted above.
 
-diff --git a/tests/test-string-output-visitor.c b/tests/test-string-output-visitor.c
-index e736db3af8..f0902dd49e 100644
---- a/tests/test-string-output-visitor.c
-+++ b/tests/test-string-output-visitor.c
-@@ -97,7 +97,7 @@ static void test_visitor_out_intList(TestOutputVisitorData *data,
-     Error *err = NULL;
-     char *str;
- 
--    for (i = 0; i < sizeof(value) / sizeof(value[0]); i++) {
-+    for (i = 0; i < ARRAY_SIZE(value); i++) {
-         *tmp = g_malloc0(sizeof(**tmp));
-         (*tmp)->value = value[i];
-         tmp = &(*tmp)->next;
--- 
-2.13.2
+
+r~
