@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXYA5-0001SK-Fh
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:28:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXYCL-0002Zd-Ew
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXYA4-0000Cl-Gi
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:28:01 -0400
-References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
-	<20170704220346.29244-17-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <164d97c1-9244-d406-ecac-93d1a00eb8a6@redhat.com>
-Date: Tue, 18 Jul 2017 14:27:42 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dXYCK-0001wq-H5
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:30:21 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33067)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXYCK-0001wT-A9
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 15:30:20 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id v105so13106701wrb.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 12:30:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170704220346.29244-17-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6"
-Subject: Re: [Qemu-devel] [PATCH 16/35] crypto: mark coroutine_fn
+In-Reply-To: <20170717221516.7692-1-eblake@redhat.com>
+References: <20170717221516.7692-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Jul 2017 20:29:58 +0100
+Message-ID: <CAFEAcA-bBLFfr27m-Q3T-01BMA3PLkcmsodh1tDU2BGAVTbCsA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-2.10 0/3] NBD patches for 2.10 soft
+ freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <164d97c1-9244-d406-ecac-93d1a00eb8a6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 16/35] crypto: mark coroutine_fn
-References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
- <20170704220346.29244-17-marcandre.lureau@redhat.com>
-In-Reply-To: <20170704220346.29244-17-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 17 July 2017 at 23:15, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3eb2:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-request' into staging (2017-07-17 17:54:17 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-07-17
+>
+> for you to fetch changes up to 5f66d060dbc37214c9d70305710c3e34c4531d7c:
+>
+>   nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients (2017-07-17 17:06:46 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2017-07-17
+>
+> - Eric Blake: nbd: Fix iotests failure due to changed client error message
+> - Eric Blake: [0/2] NBD fixes before softfreeze
+>
+> ----------------------------------------------------------------
+> Eric Blake (3):
+>       nbd: Fix iotests failure due to changed client error message
+>       nbd: Trace client command being sent
+>       nbd: Fix server reply to NBD_OPT_EXPORT_NAME of older clients
 
-On 07/04/2017 05:03 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  block/crypto.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 10e5ddccaa..0e30a4ea06 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -568,7 +568,8 @@ static int block_crypto_open_luks(BlockDriverState =
-*bs,
->                                       bs, options, flags, errp);
->  }
-> =20
-> -static int block_crypto_create_luks(const char *filename,
-> +static int coroutine_fn
-> +block_crypto_create_luks(const char *filename,
->                                      QemuOpts *opts,
->                                      Error **errp)
+Applied, thanks.
 
-Indentation is now off.
-
-I don't know how hard we should try to keep our usual style of:
-
-really long labels fn_name(parameters)
-
-vs. the style I'm used to in emacs:
-
-really long labels
-fn_name(parameters)
-
-the latter makes it easier to grep for a function implementation (grep
-for ^fn_name), and also makes it easier to fit more parameters without
-line wrapping, but is not heavily used in our current code base.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluYS4ACgkQp6FrSiUn
-Q2qa+gf9Hp1VrgZfj4oPlDmJp5QxaiGa9fSMqFYPVKeqwJ1I4Tz5jPUr7KTC85Lb
-SVIBdEmhfLQ7MaSo+0YTPvYw8AFbAFFS5e8yfLkBerys+eqEWnXNUMfX5w+eCLgS
-zENHx9hFRqSQyIRnCuebgIESH4i3MXjfAnu89+fIOVtXMmvBk0hUcFiNo36HabnD
-VEq1r1hsQQGkY9TJZFJtfgx4w4mP3nwFxFbNZf2H1wokvWcCcLaPulUFwE4cKFve
-sDj+6TAUZBLQrYzaMIE5nMMMG6yl+fwfJAK7RMaIZbRf8WOhJ83qBTRDTLueXUfx
-w8CPNOkPCEk0ZVfV/57lgD2k65YZqQ==
-=KxT/
------END PGP SIGNATURE-----
-
---AsKXO7UiE0ixRp29OoeIaCdDmu9OQOjw6--
+-- PMM
