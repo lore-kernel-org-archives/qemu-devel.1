@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXUdh-0000NC-Rd
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:42:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXUdz-0000dv-Qg
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXUdg-0006Rz-T0
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:42:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47458)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXUdg-0006Qm-Mz
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:42:20 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C7BB7CE1A
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 15:42:19 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Tue, 18 Jul 2017 17:41:27 +0200
-Message-Id: <20170718154127.6459-17-quintela@redhat.com>
-In-Reply-To: <20170718154127.6459-1-quintela@redhat.com>
-References: <20170718154127.6459-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 16/16] migration: check global caps for validity
+	(envelope-from <armbru@redhat.com>) id 1dXUdy-0006mF-VF
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:42:39 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87379zhrhn.fsf@dusky.pond.sub.org>
+	<1229e9b6-d675-ee15-ce98-6ee85a4f421b@redhat.com>
+Date: Tue, 18 Jul 2017 17:42:30 +0200
+In-Reply-To: <1229e9b6-d675-ee15-ce98-6ee85a4f421b@redhat.com> (Eric Blake's
+	message of "Fri, 14 Jul 2017 12:38:50 -0500")
+Message-ID: <87o9shrbtl.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] qapi: Stop abusing "special" values for something
+ entirely different
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-From: Peter Xu <peterx@redhat.com>
+Eric Blake <eblake@redhat.com> writes:
 
-Checks validity for all the capabilities that we enabled with command
-line.
+> On 07/14/2017 12:12 PM, Markus Armbruster wrote:
+>> 
+>> Instead of the last part, I prefer either
+>> 
+>> * so we add a *new* value, such as JSON null.
+>
+> I like that idea.
+>
+>> 
+>> 1. Stop abusing values the schema accepts, but are invalid to mean "do
+>> something else entirely".
+>> 
+>> 2. Add a first class null type to QAPI.
+>> 
+>> 3. Turn MigrationParameters members tls-creds and tls-hostname into
+>> alternate of str and null.  Deprecate "".
+>> 
+>> 4. Add a null member to alternate BlockdefRef.  Deprecate "".
+>
+> Back-compat concerns: would we still accept "" in place of null for a
+> release or two?
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <1500349150-13240-11-git-send-email-peterx@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/migration.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+Yes.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 0ebdde1..7615391 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2166,11 +2166,27 @@ static void migration_instance_init(Object *obj)
-  */
- static bool migration_object_check(MigrationState *ms, Error **errp)
- {
-+    MigrationCapabilityStatusList *head = NULL;
-+    /* Assuming all off */
-+    bool cap_list[MIGRATION_CAPABILITY__MAX] = { 0 }, ret;
-+    int i;
-+
-     if (!migrate_params_check(&ms->parameters, errp)) {
-         return false;
-     }
- 
--    return true;
-+    for (i = 0; i < MIGRATION_CAPABILITY__MAX; i++) {
-+        if (ms->enabled_capabilities[i]) {
-+            head = migrate_cap_add(head, i, true);
-+        }
-+    }
-+
-+    ret = migrate_caps_check(cap_list, head, errp);
-+
-+    /* It works with head == NULL */
-+    qapi_free_MigrationCapabilityStatusList(head);
-+
-+    return ret;
- }
- 
- static const TypeInfo migration_type = {
--- 
-2.9.4
+>                  Is it time to figure out how to add deprecation
+> notices/events to QMP?
+
+Yes, getting that in the next development cycle would be nice.
+
+>                         Or would this be a clean break-over point (since
+> introspection exists), where if introspection shows there is an
+> alternate between string and null, then libvirt MUST use null instead of
+> "" to get the desired semantics?
+
+Feels unnecessarily harsh to me.
+
+>> I got patches for 2., and I intend to work on 3. and 4.
+>> 
+>> Since this is "only" about "less than general and ugly", we may decide
+>> to leave things as they are if my patches turn out even uglier.
+>> 
+>> Meanwhile, opinions?
+>
+> Not much time left for soft freeze (which kind of echoes the dilemma we
+> had at 2.9).  Is this something you are aiming for in 2.10, or will it
+> be all the harder to worry about back-compat (because we'll have two
+> releases rather than one before we introduce the alternate-with-null
+> semantics)?
+
+Let's try to get it into 2.10.
