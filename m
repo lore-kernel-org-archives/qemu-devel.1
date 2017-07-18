@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXUH6-0002WR-KL
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:19:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXUHl-0003HK-0J
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXUH3-00059o-GU
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:19:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXUHh-0005l5-Sp
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:19:41 -0400
 References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-2-f4bug@amsat.org>
+	<20170718061005.29518-4-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0c9eec4e-729c-424b-36a8-d9d8df153cff@redhat.com>
-Date: Tue, 18 Jul 2017 10:18:50 -0500
+Message-ID: <72dfc5e2-8335-ec66-7e86-19ed72366a85@redhat.com>
+Date: Tue, 18 Jul 2017 10:19:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-2-f4bug@amsat.org>
+In-Reply-To: <20170718061005.29518-4-f4bug@amsat.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="1eOTEChltT9n8VamSbFEjjDQgVCDoqXkW"
-Subject: Re: [Qemu-devel] [PATCH 01/29] coccinelle: add a script to enforce
- qemu/osdep.h macros usage
+	boundary="OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g"
+Subject: Re: [Qemu-devel] [PATCH 03/29] qemu-img: use QEMU_IS_ALIGNED macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1eOTEChltT9n8VamSbFEjjDQgVCDoqXkW
+--OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <0c9eec4e-729c-424b-36a8-d9d8df153cff@redhat.com>
-Subject: Re: [PATCH 01/29] coccinelle: add a script to enforce qemu/osdep.h
- macros usage
+ qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <72dfc5e2-8335-ec66-7e86-19ed72366a85@redhat.com>
+Subject: Re: [PATCH 03/29] qemu-img: use QEMU_IS_ALIGNED macro
 References: <20170718061005.29518-1-f4bug@amsat.org>
- <20170718061005.29518-2-f4bug@amsat.org>
-In-Reply-To: <20170718061005.29518-2-f4bug@amsat.org>
+ <20170718061005.29518-4-f4bug@amsat.org>
+In-Reply-To: <20170718061005.29518-4-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 07/18/2017 01:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Might be worth mentioning which macros in the commit message body, so
-that a grep of 'git log' spots this commit easier.
-
-> ---
->  scripts/coccinelle/use_osdep.cocci | 60 ++++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 60 insertions(+)
->  create mode 100644 scripts/coccinelle/use_osdep.cocci
+> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osde=
+p.cocci
 >=20
-> +// docker run --rm -v `pwd`:`pwd` -w `pwd` philmd/coccinelle \
-> +//     --macro-file scripts/cocci-macro-file.h \
-> +//     --sp-file scripts/coccinelle/add_osdep.cocci \
-> +//     --keep-comments --in-place \
-> +//     --use-gitgrep --dir .
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  qemu-img.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Is '--use-gitgrep' a relatively new option to spatch (not present in my
-F26 coccinelle-1.0.6-7), or is it a directive specific to the docker
-coccinelle package you are using?  It's somewhat nice if there is a
-clean separation between which arguments are for spatch and which are
-for docker.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> +
-> +// Use QEMU_IS_ALIGNED()
-> +@@
-> +typedef uintptr_t;
-> +uintptr_t ptr;
-> +expression n, m;
-> +@@
-> +(
-> +-ptr % m =3D=3D 0
-> ++QEMU_PTR_IS_ALIGNED(ptr, m)
-> +|
-> +-n % m =3D=3D 0
-> ++QEMU_IS_ALIGNED(n, m)
-> +)
-
-Is it worth also trying to flag '(n & (m - 1)) =3D=3D 0' (for when m is a=
-
-power of 2)?
-
-> +
-> +// Use QEMU_ALIGN_DOWN()
-> +@@
-> +expression n, m;
-> +@@
-> +-n / m * m
-> ++QEMU_ALIGN_DOWN(n, m)
-
-Is it worth also trying to catch (n >> m) << m?
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 182e697f81..6f5f956302 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -3804,7 +3804,7 @@ static void bench_cb(void *opaque, int ret)
+>          b->in_flight--;
+> =20
+>          /* Time for flush? Drain queue if requested, then flush */
+> -        if (b->flush_interval && remaining % b->flush_interval =3D=3D =
+0) {
+> +        if (b->flush_interval && QEMU_IS_ALIGNED(remaining, b->flush_i=
+nterval)) {
+>              if (!b->in_flight || !b->drain_on_flush) {
+>                  BlockCompletionFunc *cb;
+> =20
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -104,7 +77,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---1eOTEChltT9n8VamSbFEjjDQgVCDoqXkW
+--OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -113,14 +86,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluJtoACgkQp6FrSiUn
-Q2qiegf+JthkdEoOAXOLB2+CyG4FS36og8AlZBb3A4v+vZtb9rkffICQQmVEoosf
-4cG5PgJ6H815PN4fT2oe5PY5CFwiFeDVJ5O2P4EQeqBAkj6NZE8AmcuIlSbgXTH0
-OCmiOwNAi33leStC/zMKns1XpJVLY4UWSttTshjorSRrWMCmtydyMVvjSE2lXmjC
-OIv7TWnuWYRygcaxaUSDW34Y9pvE6em139A2HJ15n5W1kPemOim6RomwF/UGab83
-PUdpCZH6nZmszeherde4vNaPzxETdHSmzK53MkhZEW8Ca5nlp7qA7EstHy7qQgqS
-uzP+7u4U6S6QD5/lPYRfnF8rU1n1Cg==
-=k2pg
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluJwQACgkQp6FrSiUn
+Q2pUmwgAlKSFZ7RVihHoGpqEhpjzlD+2MRUU52NE/WiW3PFuUp80C/0xq+oKr/CM
+qMo3z/JLBHXnQVQlZGm/mPOhAhJvPyfPVQrQs7uIvybSGRRwQ1I4nd9hVjR4Q7qX
+W6rGmOUB4pKKCO/kGQgCyXGbwS/aYoXk7AyGxljCtJy6DuBMXjyZYCl79jh1I1VA
+RmHMxBkdMxbJGeqFZ0LeEibZTEQ4OD9WOb2DkCtM5voOWDu0oXSAAvJlWMSyYdi5
+eITRs0j3VeMErkM1MIouSTPs6WUfGmKc1SwDzFU8FXNm4EJCxg4lVVClhhbvViSj
+pYN9C3FHeoip5fKHrnjxSBEsh48XMQ==
+=bEd/
 -----END PGP SIGNATURE-----
 
---1eOTEChltT9n8VamSbFEjjDQgVCDoqXkW--
+--OeqV2MLNvmp3EbGlO0nC36A7QeU5U2f0g--
