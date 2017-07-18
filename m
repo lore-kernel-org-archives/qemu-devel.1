@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXNwB-0005pd-PU
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:33:00 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dXO0m-00086U-DH
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:37:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXNw6-0001Y9-Tz
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:32:59 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dXNw6-0001Xl-Mp
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:32:54 -0400
-Received: by mail-wr0-x232.google.com with SMTP id a10so18419400wrd.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:32:54 -0700 (PDT)
-References: <20170717144848.11793-1-alex.bennee@linaro.org>
-	<20170717230025.GD2585@lemon>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170717230025.GD2585@lemon>
-Date: Tue, 18 Jul 2017 09:32:51 +0100
-Message-ID: <87d18y87rg.fsf@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1dXO0h-0003pZ-IW
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:37:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXO0h-0003pA-CH
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:37:39 -0400
+Date: Tue, 18 Jul 2017 10:37:30 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170718103730.58f3d8cc@gondolin>
+In-Reply-To: <20170718014926.44781-3-bjsdjshi@linux.vnet.ibm.com>
+References: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170718014926.44781-3-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 00/23] Current Travis Queue
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] vfio/ccw: fix initialization of the
+ Object DeviceState pointer in the common base-device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, Alex Williamson <alex.williamson@redhat.com>
 
+On Tue, 18 Jul 2017 03:49:26 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-Fam Zheng <famz@redhat.com> writes:
+> Commit 7da624e2 ("vfio: Test realized when using VFIOGroup.device_list
+> iterator") introduced a pointer to the Object DeviceState in the VFIO
+> common base-device and skiped non-realized devices as we iterate
 
-> On Mon, 07/17 15:48, Alex Bennée wrote:
->> Hi,
->>
->> This is the current status of the travis/next patch queue. The
->> includes updates from Paolo to allow parallelism while testing in the
->> docker environment. I've extended the travis image so we can actually
->> run our travis.py script in the Travis image.
->>
->> There are also a number of updates from Phillipe which add a bunch of
->> additional cross compile targets to our shippable setup. The cachinfo
->> patch is temporary and won't make the pull as it is already queued in
->> Richard's tcg-next.
->>
->> I'm currently trying to catch one of our Travis hangs in the act
->> (postcopy-test) but it seems to be very much a heavy load race
->> condition which annoyingly stops happening once you try and get
->> debugging tools on it. This is the reason I've updated the travis
->> docker image to include the debug tools ;-)
->>
->> As long as there are no screams of outrage I'll roll a pullreq for
->> softfreeze tomorrow.
->
-> Renaming of debian to debian9 seems backward incompatible. We don't care that
-> much, but I'd like to see a commit message justifying the change. Otherwise it
-> looks good to go (minus the cachinfo patch, of course).
+s/skiped/skipped/
 
-Well originally we were basing off debian-stable but we got caught out
-by the new release. With this series we have most things off the latest
-stable (Debian 9 - aka Stretch) but one or two builds are based of old
-stable (Debian 8 - aka Jessie) and using the embedian hacks we had
-before.
+I'll fix this while applying.
 
-I think for this it's mostly a matter of clarity.
-
---
-Alex Bennée
+> VFIOGroup.device_list. While it missed to initialize the pointer for
+> the vfio-ccw case. Let's fix it.
+> 
+> Fixes: 7da624e2 ("vfio: Test realized when using VFIOGroup.device_list
+>                   iterator")
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/vfio/ccw.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 8d97b53e77..a8baadf57a 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -338,6 +338,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+>      vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+>      vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
+>                                         cdev->hostid.ssid, cdev->hostid.devid);
+> +    vcdev->vdev.dev = dev;
+>      QLIST_FOREACH(vbasedev, &group->device_list, next) {
+>          if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+>              error_setg(&err, "vfio: subchannel %s has already been attached",
