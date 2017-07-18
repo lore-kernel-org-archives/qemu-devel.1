@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dXTKk-0000t6-0A
+	(envelope-from <kwolf@redhat.com>) id 1dXTKk-0000tk-GQ
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dXTKi-0007pS-QW
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dXTKh-0007oD-82
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 10:18:42 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 18 Jul 2017 16:18:02 +0200
-Message-Id: <1500387486-5469-18-git-send-email-kwolf@redhat.com>
+Date: Tue, 18 Jul 2017 16:17:58 +0200
+Message-Id: <1500387486-5469-14-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1500387486-5469-1-git-send-email-kwolf@redhat.com>
 References: <1500387486-5469-1-git-send-email-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/21] vvfat: correctly parse non-ASCII short
- and long file names
+Subject: [Qemu-devel] [PULL 13/21] qemu-iotests: Test 'info block'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,149 +22,678 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+This test makes sure that all block devices show up on 'info block',
+with all of the expected information, in different configurations.
 
-Write support works again when image contains non-ASCII names. It is eith=
-er the
-case when user created a non-ASCII filename, or when initial directory co=
-ntained
-a non-ASCII filename (since 0c36111f57ec2188f679e7fa810291b7386bdca1)
-
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/vvfat.c | 59 +++++++++++++++++++++++++++++++++++++----------------=
-------
- 1 file changed, 37 insertions(+), 22 deletions(-)
+ tests/qemu-iotests/186     | 147 ++++++++++++++
+ tests/qemu-iotests/186.out | 489 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 637 insertions(+)
+ create mode 100755 tests/qemu-iotests/186
+ create mode 100644 tests/qemu-iotests/186.out
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 36b4be9..ea7775f 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1669,6 +1669,7 @@ typedef struct {
-      * filename length is 0x3f * 13 bytes.
-      */
-     unsigned char name[0x3f * 13 + 1];
-+    gunichar2 name2[0x3f * 13 + 1];
-     int checksum, len;
-     int sequence_number;
- } long_file_name;
-@@ -1690,16 +1691,21 @@ static int parse_long_name(long_file_name* lfn,
-         return 1;
-=20
-     if (pointer[0] & 0x40) {
-+        /* first entry; do some initialization */
-         lfn->sequence_number =3D pointer[0] & 0x3f;
-         lfn->checksum =3D pointer[13];
-         lfn->name[0] =3D 0;
-         lfn->name[lfn->sequence_number * 13] =3D 0;
--    } else if ((pointer[0] & 0x3f) !=3D --lfn->sequence_number)
-+    } else if ((pointer[0] & 0x3f) !=3D --lfn->sequence_number) {
-+        /* not the expected sequence number */
-         return -1;
--    else if (pointer[13] !=3D lfn->checksum)
-+    } else if (pointer[13] !=3D lfn->checksum) {
-+        /* not the expected checksum */
-         return -2;
--    else if (pointer[12] || pointer[26] || pointer[27])
-+    } else if (pointer[12] || pointer[26] || pointer[27]) {
-+        /* invalid zero fields */
-         return -3;
-+    }
-=20
-     offset =3D 13 * (lfn->sequence_number - 1);
-     for (i =3D 0, j =3D 1; i < 13; i++, j+=3D2) {
-@@ -1708,16 +1714,29 @@ static int parse_long_name(long_file_name* lfn,
-         else if (j =3D=3D 26)
-             j =3D 28;
-=20
--        if (pointer[j+1] =3D=3D 0)
--            lfn->name[offset + i] =3D pointer[j];
--        else if (pointer[j+1] !=3D 0xff || (pointer[0] & 0x40) =3D=3D 0)
--            return -4;
--        else
--            lfn->name[offset + i] =3D 0;
-+        if (pointer[j] =3D=3D 0 && pointer[j + 1] =3D=3D 0) {
-+            /* end of long file name */
-+            break;
-+        }
-+        gunichar2 c =3D (pointer[j + 1] << 8) + pointer[j];
-+        lfn->name2[offset + i] =3D c;
-     }
-=20
--    if (pointer[0] & 0x40)
--        lfn->len =3D offset + strlen((char*)lfn->name + offset);
-+    if (pointer[0] & 0x40) {
-+        /* first entry; set len */
-+        lfn->len =3D offset + i;
-+    }
-+    if ((pointer[0] & 0x3f) =3D=3D 0x01) {
-+        /* last entry; finalize entry */
-+        glong olen;
-+        gchar *utf8 =3D g_utf16_to_utf8(lfn->name2, lfn->len, NULL, &ole=
-n, NULL);
-+        if (!utf8) {
-+            return -4;
-+        }
-+        lfn->len =3D olen;
-+        memcpy(lfn->name, utf8, olen + 1);
-+        g_free(utf8);
-+    }
-=20
-     return 0;
- }
-@@ -1733,12 +1752,14 @@ static int parse_short_name(BDRVVVFATState* s,
-=20
-     for (j =3D 7; j >=3D 0 && direntry->name[j] =3D=3D ' '; j--);
-     for (i =3D 0; i <=3D j; i++) {
--        if (direntry->name[i] <=3D ' ' || direntry->name[i] > 0x7f)
-+        uint8_t c =3D direntry->name[i];
-+        if (c !=3D to_valid_short_char(c)) {
-             return -1;
--        else if (s->downcase_short_names)
-+        } else if (s->downcase_short_names) {
-             lfn->name[i] =3D qemu_tolower(direntry->name[i]);
--        else
-+        } else {
-             lfn->name[i] =3D direntry->name[i];
-+        }
-     }
-=20
-     for (j =3D 2; j >=3D 0 && direntry->name[8 + j] =3D=3D ' '; j--) {
-@@ -1748,7 +1769,7 @@ static int parse_short_name(BDRVVVFATState* s,
-         lfn->name[i + j + 1] =3D '\0';
-         for (;j >=3D 0; j--) {
-             uint8_t c =3D direntry->name[8 + j];
--            if (c <=3D ' ' || c > 0x7f) {
-+            if (c !=3D to_valid_short_char(c)) {
-                 return -2;
-             } else if (s->downcase_short_names) {
-                 lfn->name[i + j] =3D qemu_tolower(c);
-@@ -2966,7 +2987,6 @@ DLOG(checkpoint());
-     /*
-      * Some sanity checks:
-      * - do not allow writing to the boot sector
--     * - do not allow to write non-ASCII filenames
-      */
-=20
-     if (sector_num < s->offset_to_fat)
-@@ -3000,13 +3020,8 @@ DLOG(checkpoint());
-                 direntries =3D (direntry_t*)(buf + 0x200 * (begin - sect=
-or_num));
-=20
-                 for (k =3D 0; k < (end - begin) * 0x10; k++) {
--                    /* do not allow non-ASCII filenames */
--                    if (parse_long_name(&lfn, direntries + k) < 0) {
--                        fprintf(stderr, "Warning: non-ASCII filename\n")=
-;
--                        return -1;
--                    }
-                     /* no access to the direntry of a read-only file */
--                    else if (is_short_name(direntries+k) &&
-+                    if (is_short_name(direntries + k) &&
-                             (direntries[k].attributes & 1)) {
-                         if (memcmp(direntries + k,
-                                     array_get(&(s->directory), dir_index=
- + k),
---=20
+diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
+new file mode 100755
+index 0000000..ab83ee4
+--- /dev/null
++++ b/tests/qemu-iotests/186
+@@ -0,0 +1,147 @@
++#!/bin/bash
++#
++# Test 'info block' with all kinds of configurations
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=kwolf@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
++    _notrun "Requires a PC machine"
++fi
++
++function do_run_qemu()
++{
++    echo Testing: "$@"
++
++    (
++        if ! test -t 0; then
++            while read cmd; do
++                echo $cmd
++            done
++        fi
++        echo quit
++    ) | $QEMU -S -nodefaults -display none -device virtio-scsi-pci -monitor stdio "$@"
++    echo
++}
++
++function check_info_block()
++{
++    echo "info block" |
++    QEMU_OPTIONS="" do_run_qemu "$@" | _filter_win32 | _filter_hmp |
++        _filter_qemu | _filter_generated_node_ids
++}
++
++
++size=64M
++_make_test_img $size
++
++removable="floppy ide-cd scsi-cd"
++fixed="ide-hd scsi-hd virtio-blk-pci"
++
++echo
++echo "=== Empty drives ==="
++echo
++
++for dev in $removable; do
++    check_info_block -device $dev
++    check_info_block -device $dev,id=qdev_id
++done
++
++echo
++echo "=== -blockdev/-device=<node-name> ==="
++echo
++
++for dev in $fixed $removable; do
++    check_info_block -blockdev driver=null-co,node-name=null -device $dev,drive=null
++    check_info_block -blockdev driver=null-co,node-name=null -device $dev,drive=null,id=qdev_id
++done
++
++echo
++echo "=== -drive if=none/-device=<node-name> ==="
++echo
++
++# This creates two BlockBackends that will show up in 'info block'!
++# A monitor-owned one from -drive, and anonymous one from -device
++for dev in $fixed $removable; do
++    check_info_block -drive if=none,driver=null-co,node-name=null -device $dev,drive=null,id=qdev_id
++done
++
++echo
++echo "=== -drive if=none/-device=<bb-name> (with medium) ==="
++echo
++
++for dev in $fixed $removable; do
++    check_info_block -drive if=none,driver=null-co,node-name=null -device $dev,drive=none0
++    check_info_block -drive if=none,driver=null-co,node-name=null -device $dev,drive=none0,id=qdev_id
++done
++
++echo
++echo "=== -drive if=none/-device=<bb-name> (without medium) ==="
++echo
++
++check_info_block -drive if=none
++
++for dev in $removable; do
++    check_info_block -drive if=none -device $dev,drive=none0
++    check_info_block -drive if=none -device $dev,drive=none0,id=qdev_id
++done
++
++echo
++echo "=== -drive if=... ==="
++echo
++
++check_info_block -drive if=floppy
++check_info_block -drive if=floppy,driver=null-co
++
++check_info_block -drive if=ide,driver=null-co
++check_info_block -drive if=ide,media=cdrom
++check_info_block -drive if=ide,driver=null-co,media=cdrom
++
++check_info_block -drive if=scsi,driver=null-co
++check_info_block -drive if=scsi,media=cdrom
++check_info_block -drive if=scsi,driver=null-co,media=cdrom
++
++check_info_block -drive if=virtio,driver=null-co
++
++check_info_block -drive if=pflash,driver=null-co,size=1M
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/186.out b/tests/qemu-iotests/186.out
+new file mode 100644
+index 0000000..b963b12
+--- /dev/null
++++ b/tests/qemu-iotests/186.out
+@@ -0,0 +1,489 @@
++QA output created by 186
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++
++=== Empty drives ===
++
++Testing: -device floppy
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++/machine/peripheral-anon/device[1]: [not inserted]
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -device floppy,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++qdev_id: [not inserted]
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -device ide-cd
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++/machine/peripheral-anon/device[1]: [not inserted]
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -device ide-cd,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++qdev_id: [not inserted]
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -device scsi-cd
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++/machine/peripheral-anon/device[1]: [not inserted]
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -device scsi-cd,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++qdev_id: [not inserted]
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++(qemu) quit
++
++
++=== -blockdev/-device=<node-name> ===
++
++Testing: -blockdev driver=null-co,node-name=null -device ide-hd,drive=null
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device ide-hd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device scsi-hd,drive=null
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device scsi-hd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device virtio-blk-pci,drive=null
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]/virtio-backend
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device virtio-blk-pci,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral/qdev_id/virtio-backend
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device floppy,drive=null
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device floppy,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device ide-cd,drive=null
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device ide-cd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device scsi-cd,drive=null
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -blockdev driver=null-co,node-name=null -device scsi-cd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++
++=== -drive if=none/-device=<node-name> ===
++
++Testing: -drive if=none,driver=null-co,node-name=null -device ide-hd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device scsi-hd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device virtio-blk-pci,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++
++null: null-co:// (null-co)
++    Attached to:      /machine/peripheral/qdev_id/virtio-backend
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device floppy,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device ide-cd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device scsi-cd,drive=null,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++
++null: null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++
++=== -drive if=none/-device=<bb-name> (with medium) ===
++
++Testing: -drive if=none,driver=null-co,node-name=null -device ide-hd,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device ide-hd,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      qdev_id
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device scsi-hd,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device scsi-hd,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      qdev_id
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device virtio-blk-pci,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]/virtio-backend
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device virtio-blk-pci,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral/qdev_id/virtio-backend
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device floppy,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device floppy,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device ide-cd,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device ide-cd,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device scsi-cd,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=none,driver=null-co,node-name=null -device scsi-cd,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0 (null): null-co:// (null-co)
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++
++=== -drive if=none/-device=<bb-name> (without medium) ===
++
++Testing: -drive if=none
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=none -device floppy,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=none -device floppy,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=none -device ide-cd,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=none -device ide-cd,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=none -device scsi-cd,drive=none0
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Attached to:      /machine/peripheral-anon/device[1]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=none -device scsi-cd,drive=none0,id=qdev_id
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++none0: [not inserted]
++    Attached to:      qdev_id
++    Removable device: not locked, tray closed
++(qemu) quit
++
++
++=== -drive if=... ===
++
++Testing: -drive if=floppy
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++floppy0: [not inserted]
++    Attached to:      /machine/unattached/device[17]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=floppy,driver=null-co
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++floppy0 (NODE_NAME): null-co:// (null-co)
++    Attached to:      /machine/unattached/device[17]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=ide,driver=null-co
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++ide0-hd0 (NODE_NAME): null-co:// (null-co)
++    Attached to:      /machine/unattached/device[18]
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=ide,media=cdrom
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++ide0-cd0: [not inserted]
++    Attached to:      /machine/unattached/device[18]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++Testing: -drive if=ide,driver=null-co,media=cdrom
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++ide0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
++    Attached to:      /machine/unattached/device[18]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++warning: qemu-system-x86_64: -drive if=scsi,driver=null-co: bus=0,unit=0 is deprecated with this machine type
++Testing: -drive if=scsi,driver=null-co
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++scsi0-hd0 (NODE_NAME): null-co:// (null-co)
++    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
++    Cache mode:       writeback
++(qemu) quit
++
++warning: qemu-system-x86_64: -drive if=scsi,media=cdrom: bus=0,unit=0 is deprecated with this machine type
++Testing: -drive if=scsi,media=cdrom
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++scsi0-cd0: [not inserted]
++    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
++    Removable device: not locked, tray closed
++(qemu) quit
++
++warning: qemu-system-x86_64: -drive if=scsi,driver=null-co,media=cdrom: bus=0,unit=0 is deprecated with this machine type
++Testing: -drive if=scsi,driver=null-co,media=cdrom
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++scsi0-cd0 (NODE_NAME): null-co:// (null-co, read-only)
++    Attached to:      /machine/unattached/device[27]/scsi.0/legacy[0]
++    Removable device: not locked, tray closed
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=virtio,driver=null-co
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++virtio0 (NODE_NAME): null-co:// (null-co)
++    Attached to:      /machine/peripheral-anon/device[1]/virtio-backend
++    Cache mode:       writeback
++(qemu) quit
++
++Testing: -drive if=pflash,driver=null-co,size=1M
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) info block
++pflash0 (NODE_NAME): json:{"driver": "null-co", "size": "1M"} (null-co)
++    Attached to:      /machine/unattached/device[2]
++    Cache mode:       writeback
++(qemu) quit
++
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 2aba585..0961f8c 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -181,5 +181,6 @@
+ 182 rw auto quick
+ 183 rw auto migration
+ 185 rw auto
++186 rw auto
+ 188 rw auto quick
+ 189 rw auto quick
+-- 
 1.8.3.1
