@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXV48-0001vO-Es
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:09:41 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dXV72-0004Jw-C8
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXV45-0000MP-8N
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:09:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34694)
+	(envelope-from <jsnow@redhat.com>) id 1dXV6z-0001sf-75
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:12:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49286)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXV45-0000Ly-29
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:09:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B86BB7CB97
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 16:09:35 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170714190827.4083-1-eblake@redhat.com>
-Date: Tue, 18 Jul 2017 18:09:33 +0200
-In-Reply-To: <20170714190827.4083-1-eblake@redhat.com> (Eric Blake's message
-	of "Fri, 14 Jul 2017 14:08:22 -0500")
-Message-ID: <87a841raki.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dXV6z-0001rs-1P
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:12:37 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Tue, 18 Jul 2017 12:12:26 -0400
+Message-Id: <20170718161230.21917-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/5] random qapi cleanups
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/4] Ide patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jsnow@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+The following changes since commit 368e708b4c95501574ab11632c7a0b8bb3ddc7=
+e8:
 
-> Trying to flush some of the random patches I have lying around
-> locally.  Some of these may have been posted to the list before,
-> perhaps as part of larger series, but I didn't bother to research
-> which parts came from where.
->
-> I'm not sure if this is in time for softfreeze; and if not, I'm
-> not sure how much is appropriate during freeze vs. being deferred
-> to 2.11.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pul=
+l-request' into staging (2017-07-18 15:24:11 +0100)
 
-A quick peek makes me think this series could in early during freeze,
-because it consists of documentation fixes, test enhancements and really
-simple bug fixes.
+are available in the git repository at:
+
+  https://github.com/jnsnow/qemu.git tags/ide-pull-request
+
+for you to fetch changes up to ff0ca962345ecdb87c331888a806cde49936fd9f:
+
+  tests/ahci-test: Be mean with RAM (2017-07-18 11:47:57 -0400)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Dr. David Alan Gilbert (1):
+  tests/ahci-test: Be mean with RAM
+
+John Snow (3):
+  ahci: add ahci_get_num_ports
+  ahci: Isolate public AHCI interface
+  ahci: split public and private interface
+
+ hw/i386/pc_q35.c       |   4 +-
+ hw/ide/ahci.c          |  10 +-
+ hw/ide/ahci_internal.h | 359 +++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ hw/ide/ich.c           |   2 +-
+ hw/mips/boston.c       |   4 +-
+ include/hw/ide/ahci.h  | 320 +------------------------------------------
+ tests/ahci-test.c      |   8 +-
+ 7 files changed, 380 insertions(+), 327 deletions(-)
+ create mode 100644 hw/ide/ahci_internal.h
+
+--=20
+2.9.4
