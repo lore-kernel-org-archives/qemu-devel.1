@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dXNKX-0002Dx-U6
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:54:07 -0400
+	(envelope-from <abologna@redhat.com>) id 1dXNT6-0004Me-AX
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1dXNKU-0007lk-R6
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:54:05 -0400
-Received: from hall.aurel32.net ([163.172.24.10]:40170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1dXNKU-0007lC-Jq
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:54:02 -0400
-Date: Tue, 18 Jul 2017 09:51:35 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170718075135.hjjuqz6upbe73473@aurel32.net>
-References: <20170707022111.21836-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170707022111.21836-1-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH v2 00/27] target/sh4 improvements
+	(envelope-from <abologna@redhat.com>) id 1dXNT1-00034R-GP
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 04:02:56 -0400
+Message-ID: <1500364961.11997.10.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Tue, 18 Jul 2017 10:02:41 +0200
+In-Reply-To: <68cfb52b-d4cc-1980-e6f5-a454baf4e2e5@linux.vnet.ibm.com>
+References: <149910050540.26371.12575732020425703531.stgit@bahia.lan>
+	<20170704072901.GA2180@umbus.fritz.box>
+	<20170704104722.499d4e86@bahia.lan>
+	<1499856934.13989.38.camel@redhat.com>
+	<68cfb52b-d4cc-1980-e6f5-a454baf4e2e5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] spapr: make default PHB optionnal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu, bruno@clisp.org, glaubitz@debian.org
+To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, libvir-list@redhat.com
 
-On 2017-07-06 16:20, Richard Henderson wrote:
-> This fixes two problems with atomic operations on sh4,
-> including an attempt at supporting the user-space atomics
-> technique used by most sh-linux-user binaries.
-> 
-> Changes since v1:
->   * Rebase on Aurelien's recent sh4 patchset.
->   * Patch 3,5 split out of patch 6.
->   * Patch 4 fixes the sh4-softmmu problem that Aurelien reported.
->   * Handle more cases of atomic_fetch_op seen in debian images.
->   * More cleanups for register banking.
->   * Fix for 64-bit fp memory operations.
->   * Tidy illegal instruction checks.
->   * Implement fpchg (missing from sh4a)
->   * Implement fsrra (had a nop implementation)
->   * Use tcg_gen_lookup_and_goto_ptr for simple branches.
+On Wed, 2017-07-12 at 17:09 +0530, Shivaprasad G Bhat wrote:
+> Setting numa_node for emulated devices is the benefit for now. On x86, =
+I
+> figured there is
+> no way to set the numa_node for the root controller and the emulated
+> devices sitting there
+> all have numa_node set to -1. Only the devices on the pxb can have a
+> sensible value specified.
+> Does it mean, the emulated devices/drivers don't care about the
+> numa_node they are on?
+>=C2=A0
+> Would it be fine on PPC to disallow setting the NUMA node for the
+> default PHB because that is where
+> all the emulated devices sit ?
 
-I have finally finished reviewing all patches, how do you want to
-proceed from there? Do you want to post a new version or should I just
-pick your patches and apply the small fixes that are needed?
+I was not aware of that limitation for x86 guests.
 
-Aurelien
+If that's the case, then I would say it's perfectly okay to
+just disallow setting the NUMA node for the default PHB, at
+least for the time being.
 
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+--=C2=A0
+Andrea Bolognani / Red Hat / Virtualization
