@@ -1,47 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dXXB1-0008NR-I3
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:24:56 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXXD7-0000bN-JT
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dXXAy-0006DM-CB
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:24:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41424)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dXXAy-0006CE-21
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:24:52 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6IINpSb091116
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:24:49 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bspj6tvv3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:24:49 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 19:24:47 +0100
-References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
-	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
-	<20170713142721.3a40e083@gondolin>
-	<1798a9f2-63f0-ab03-11ad-5513d9a90da9@linux.vnet.ibm.com>
-	<20170713144941.GD2121@work-vm>
-	<99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
-	<20170713151104.GE2121@work-vm>
-	<1a32d619-0b5b-fe11-36b4-94ef6bdcb331@linux.vnet.ibm.com>
-	<87379uyr1o.fsf@secure.mitica>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 20:24:41 +0200
+	(envelope-from <rth7680@gmail.com>) id 1dXXD4-0007lw-Gj
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:27:05 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXXD4-0007lo-CJ
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:27:02 -0400
+Received: by mail-qk0-x243.google.com with SMTP id q66so3458017qki.1
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 11:27:02 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1500235468-15341-1-git-send-email-cota@braap.org>
+	<1500235468-15341-46-git-send-email-cota@braap.org>
+	<04004f7a-0e84-1b51-bc93-97c70213541d@twiddle.net>
+	<20170718175231.GB31298@flamenco>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <314f06d9-b592-07b7-4445-e2dd81786a1a@twiddle.net>
+Date: Tue, 18 Jul 2017 08:26:56 -1000
 MIME-Version: 1.0
-In-Reply-To: <87379uyr1o.fsf@secure.mitica>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170718175231.GB31298@flamenco>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <a98fd605-df26-77cb-8c59-e8e26587e0ea@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
- states
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 45/45] tcg: enable multiple TCG contexts
+ in softmmu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,139 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org
 
-
-
-On 07/18/2017 12:31 PM, Juan Quintela wrote:
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->> On 07/13/2017 05:11 PM, Dr. David Alan Gilbert wrote:
->>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->>>> On 07/13/2017 04:49 PM, Dr. David Alan Gilbert wrote:
->>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> 
->> @Dave:
->> There are a couple of questions I'm gonna have to ask/investigate should
->> it be me doing the 'return value for pre_save' (also notes to myself):
-> 
-> As Dave said, just changing the prototype and fix callers will do a lot
-> of good.
-> 
->> (keep the current qemu_file_set_error mechanism) or would you prefer
->> things converted? IMHO having a single method would be cleaner, but I
->> have not looked into this in great detail.
-> 
-> Error handling is a mess in qemu (in general), and worse in migration
-> (in particular).
-> 
-> History lesson (that is even older than my involvement with qemu)
-> 
-> It used to be that evrything was done with callbacks in the main loop.
-> So there were not an easy way to pass error messages.  Everything was
-> done through qemu_file_set_error() (well, actually it was done by hand).
-> 
-> Then the migration thread came, and we can do things asyncronously, so
-> we don't need to store the state in callbacks.  I did some changes long,
-> long ago about returning  error messages instead of:
-> 
-> if (error) {
->    qemu_file_set_error(f, -error);
->    return;
-> }
-> 
-> to
-> 
-> if (error) {
->     return -error;
-> }
-> 
-> /* fix things to make errors negative, etc, etc, you get the idea */
-> 
-> But we need to fix some things to make this work.
-> 
-> Reception side is done through a coroutine, and then some of such things
-> still stand.  Moving to a thread would be a good idea at some point O:-)
-> 
->> Also the question what is the semantic of qemu_file_set_error arises.
->> It ain't documented and I would intuitively suspect that it's rather
->> about the 'file' (that is transport) than the whole migration.
-> 
-> We test in the "interesting" parts if there is an error on the file,
-> 
-> from vmstate_load_state()
-> 
->                 } else {
->                     ret = field->info->get(f, curr_elem, size, field);
->                 }
->                 if (ret >= 0) {
->                     ret = qemu_file_get_error(f);
->                 }
->                 if (ret < 0) {
->                     qemu_file_set_error(f, ret);
->                     error_report("Failed to load %s:%s", vmsd->name,
->                                  field->name);
->                     trace_vmstate_load_field_error(field->name, ret);
->                     return ret;
->                 }
-> 
-> 
-> You can see how many convolutions we do to maintain the error returned
-> and the one in QEMUFile in sync.  Removing the one in QEMUFile would be
-> a good idea, but requires lots of changes.
-> 
-> For starters, see that all qemu_get_* return void.
-> 
-> To add insult to injury:
-> 
-> int qemu_peek_byte(QEMUFile *f, int offset)
-> {
->     int index = f->buf_index + offset;
-> 
->     assert(!qemu_file_is_writable(f));
->     assert(offset < IO_BUF_SIZE);
-> 
->     if (index >= f->buf_size) {
->         qemu_fill_buffer(f);
->         index = f->buf_index + offset;
->         if (index >= f->buf_size) {
->             return 0;
->         }
->     }
->     return f->buf[index];
-> }
-> 
-> I.e. it never returns errors, if there is nothing to read, it just
-> return 0.
-> 
-> /me stops
-> 
-
-Hi Juan,
-
-Many thanks for providing me with your perspective and a little history
-lesson too. Knowing the history things do make much more sense. For me
-this is quite often the case (history helps understanding) but at the
-same time extracting the historical perspective form git is in my experience
-quite time consuming in average case, so I don't try too often (without
-having a very good reason).
-
-I will keep the things you explained in mind and try to push the
-migration subsystem into the right direction as far my time allows
-(or at least avoid pushing in the wrong direction).
-
-Regards,
-Halil
-
+On 07/18/2017 07:52 AM, Emilio G. Cota wrote:
+> On Mon, Jul 17, 2017 at 19:25:14 -1000, Richard Henderson wrote:
+>> On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
+>>> +
+>>> +    /* claim the first free pointer in tcg_ctxs and increment n_tcg_ctxs */
+>>> +    for (i = 0; i < smp_cpus; i++) {
+>>> +        if (atomic_cmpxchg(&tcg_ctxs[i], NULL, s) == NULL) {
+>>> +            unsigned int n;
+>>> +
+>>> +            n = atomic_fetch_inc(&n_tcg_ctxs);
 >>
+>> Surely this is too much effort.  The increment on n_tcg_ctxs is sufficient
+>> to produce an index for assignment.  We never free the contexts...
 >>
+>> Which also suggests that it might be better to avoid an indirection in
+>> tcg_ctxs and allocate all of the structures in one big block?  I.e.
 >>
->>>>>
->>>>>   I *think* the migration code should spot that before it finishes
->>>>> but it might carry on for a little while before it does.
->>>>
->>>> I will keep this patch as is, since this is one of the "should not happen"
->>>> cases.
+>> TCGContext *tcg_ctxs;
+>>
+>> // At the end of tcg_context_init.
+>> #ifdef CONFIG_USER_ONLY
+>>      tcg_ctxs = s;
+>> #else
+>>      // No need to zero; we'll completely overwrite each structure
+>>      // during tcg_register_thread.
+>>      tcg_ctxs = g_new(TCGContext, smp_cpus);
+>> #endif
 > 
-> Later, Juan.
-> 
+> The primary reason is that at this point we don't know yet whether
+> we'll need smp_cpus contexts or just one context (!mttcg), since
+> qemu_tcg_mttcg_enabled() is set up after this function is called
+> (the path is: vl.c -> configure_accelerator() -> tcg_init_context ->
+> this function; quite a bit later, qemu_tcg_configure() is
+> called, setting up the bool behind qemu_tcg_mttcg_enabled().)
+
+Ok, leave it as-is for now.  But what I take from what you're saying is that 
+startup is ripe for a bit of tidying up.  :-)
+
+
+r~
