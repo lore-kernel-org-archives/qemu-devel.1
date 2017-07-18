@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dXN2v-0004Fs-JB
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:35:54 -0400
+	(envelope-from <thuth@redhat.com>) id 1dXN3p-0004xz-5f
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dXN2s-00073K-F4
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:35:53 -0400
-Received: from mel.act-europe.fr ([194.98.77.210]:57242
-	helo=smtp.eu.adacore.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dXN2s-0006X5-6d
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:35:50 -0400
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <bb8781a1-602b-d77d-a103-6f8d23d7ff5f@adacore.com>
-Date: Tue, 18 Jul 2017 09:34:23 +0200
+	(envelope-from <thuth@redhat.com>) id 1dXN3l-0007hW-V9
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 03:36:49 -0400
+References: <20170630104632.27942-1-david@gibson.dropbear.id.au>
+	<20170630104632.27942-7-david@gibson.dropbear.id.au>
+	<a189522d-c798-097d-b985-13e15f48db41@redhat.com>
+	<20170718033708.GA3140@umbus.fritz.box>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ee35fa1b-b06e-6bc1-2e69-788ff2cad7ac@redhat.com>
+Date: Tue, 18 Jul 2017 09:36:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+In-Reply-To: <20170718033708.GA3140@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="OIaBDIKKjxfoSbgvxq3Ied65CoKEjGXUQ"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 06/21] spapr: Add a "no HPT"
+ encoding to HTAB migration stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +27,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, sbobroff@redhat.com
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OIaBDIKKjxfoSbgvxq3Ied65CoKEjGXUQ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-
-On 07/17/2017 07:27 PM, Edgar E. Iglesias wrote:
-> On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> 
->> On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
->> wrote:
->>> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->>> Paolo suggested offline that we send a pull request for this series.
->>> Here it is, I've run it through my testsuite + tested the LQSPI testcase
->>> on Zynq.
->>
->>> ----------------------------------------------------------------
->>> mmio-exec.for-upstream
+On 18.07.2017 05:37, David Gibson wrote:
+> On Mon, Jul 17, 2017 at 09:54:45PM +0200, Laurent Vivier wrote:
+>> On 30/06/2017 12:46, David Gibson wrote:
+>>> From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 >>>
->>> ----------------------------------------------------------------
->>> KONRAD Frederic (7):
->>>        cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
->>>        cputlb: move get_page_addr_code
->>>        cputlb: fix the way get_page_addr_code fills the tlb
->>>        qdev: add MemoryRegion property
->>>        introduce mmio_interface
->>>        exec: allow to get a pointer for some mmio memory region
->>>        xilinx_spips: allow mmio execution
+>>> Add a "no HPT" encoding (using value -1) to the HTAB migration
+>>> stream (in the place of HPT size) when the guest doesn't allocate HPT=
+=2E
+>>> This will help the target side to match target HPT with the source HP=
+T
+>>> and thus enable successful migration.
+>>>
+>>> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+>>> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---
+>>>  hw/ppc/spapr.c | 29 +++++++++++++++++++++++++----
+>>>  1 file changed, 25 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index 52f4e72..f3e0b9b 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1560,13 +1560,19 @@ static int htab_save_setup(QEMUFile *f, void =
+*opaque)
+>>>      sPAPRMachineState *spapr =3D opaque;
+>>> =20
+>>>      /* "Iteration" header */
+>>> -    qemu_put_be32(f, spapr->htab_shift);
+>>> +    if (!spapr->htab_shift) {
+>>> +        qemu_put_be32(f, -1);
+>>> +    } else {
+>>> +        qemu_put_be32(f, spapr->htab_shift);
+>>> +    }
+>>> =20
+>>>      if (spapr->htab) {
+>>>          spapr->htab_save_index =3D 0;
+>>>          spapr->htab_first_pass =3D true;
+>>>      } else {
+>>> -        assert(kvm_enabled());
+>>> +        if (spapr->htab_shift) {
+>>> +            assert(kvm_enabled());
+>>> +        }
+>>>      }
+>>> =20
+>>> =20
+>>> @@ -1712,7 +1718,12 @@ static int htab_save_iterate(QEMUFile *f, void=
+ *opaque)
+>>>      int rc =3D 0;
+>>> =20
+>>>      /* Iteration header */
+>>> -    qemu_put_be32(f, 0);
+>>> +    if (!spapr->htab_shift) {
+>>> +        qemu_put_be32(f, -1);
+>>> +        return 0;
+>>> +    } else {
+>>> +        qemu_put_be32(f, 0);
+>>> +    }
+>>> =20
+>>>      if (!spapr->htab) {
+>>>          assert(kvm_enabled());
+>>> @@ -1746,7 +1757,12 @@ static int htab_save_complete(QEMUFile *f, voi=
+d *opaque)
+>>>      int fd;
+>>> =20
+>>>      /* Iteration header */
+>>> -    qemu_put_be32(f, 0);
+>>> +    if (!spapr->htab_shift) {
+>>> +        qemu_put_be32(f, -1);
+>>> +        return 0;
+>>> +    } else {
+>>> +        qemu_put_be32(f, 0);
+>>> +    }
+>>> =20
+>>>      if (!spapr->htab) {
+>>>          int rc;
+>>> @@ -1790,6 +1806,11 @@ static int htab_load(QEMUFile *f, void *opaque=
+, int version_id)
+>>> =20
+>>>      section_hdr =3D qemu_get_be32(f);
+>>> =20
+>>> +    if (section_hdr =3D=3D -1) {
+>>> +        spapr_free_hpt(spapr);
+>>> +        return 0;
+>>> +    }
+>>> +
+>>>      if (section_hdr) {
+>>>          Error *local_err =3D NULL;
+>>> =20
+>>>
 >>
->> Hi Edgar -- can you or Fred explain how this code interacts with
->> VM migration? The mmio-interface device creates a RAM memory
->> region with memory_region_init_ram_ptr(), but it doesn't call
->> vmstate_register_ram(). On the other hand the core migration code
->> will try to migrate the contents of the RAMBlock anyway, just
->> without a name.
+>> It seems there is a bug in this patch: when using from QEMU console th=
+e
+>> command "savevm", it never stops and the qcow2 image grows without lim=
+it.
 >>
->> It's not clear to me how this works, and it would be nice to
->> get it clear so that we can make any necessary fixes before the
->> 2.10 release hits and we lose the opportunity to make any
->> migration-compatibility-breaking changes.
+>> I think this is because htab_save_iterate() and htab_save_complete()
+>> should mark the end of the sequence (the empty one, -1) by returning 1=
+
+>> and not 0 (see kvmppc_save_htab()).
+>=20
+> Ah, yes, I think you're right.  The end condition is one of the subtle
+> differences between the savevm and migration paths.
+>=20
+>> This fixes the problem for me:
 >>
->> thanks
->> -- PMM
->>
-> 
-> Hi Peter,
-> 
-> These temporary regions should be read-only and treated as temporary caches
-> AFAIU things.
-> I would say that they don't need to be migrated. After migration, the new
-> VM will recreate the ram areas from device backing.
-> 
-> Is there a way we can prevent migration of the RAMBlock?
-> 
-> Cheers,
-> Edgar
-> 
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 970093e..fa01511 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -1827,7 +1827,7 @@ static int htab_save_iterate(QEMUFile *f, void
+>> *opaque)
+>>      /* Iteration header */
+>>      if (!spapr->htab_shift) {
+>>          qemu_put_be32(f, -1);
+>> -        return 0;
+>> +        return 1;
+>>      } else {
+>>          qemu_put_be32(f, 0);
+>>      }
+>> @@ -1866,7 +1866,7 @@ static int htab_save_complete(QEMUFile *f, void
+>> *opaque)
+>>      /* Iteration header */
+>>      if (!spapr->htab_shift) {
+>>          qemu_put_be32(f, -1);
+>> -        return 0;
+>> +        return 1;
+>>      } else {
+>>          qemu_put_be32(f, 0);
+>>      }
+>=20
+> Can you polish this up and submit for merge, please?
 
-Hi All,
+Could/should we maybe finally have proper #defines or an enum for these
+return values? The raw numbers caused trouble in the past already, and
+now they caused trouble again ... we should avoid to step into that trap
+again in the future if possible.
 
-Yes Edgar is right, they don't need to be migrated (as the old
-Xilinx SPI cache).
-And it will be the case for all the other stuff using this as
-well.
+ Thomas
 
-Maybe we can simply drop the region before the migration?
 
-Fred
+
+
+--OIaBDIKKjxfoSbgvxq3Ied65CoKEjGXUQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZbbqFAAoJEC7Z13T+cC21YkQQAJ0m29P1mDtiYLz3o4fG8+ej
+hNLA304j64ua0w5fwz+N6sTb+tVB0UCE9ahCpC3XXfhXma92GVsi/DHvHFJB2KmS
+J3JsEXmAsDky1bO4oI3pDDl3CY2psC3G52TOGTb2fM7m2c3cxUx7CUDsqIBvRxlj
+LtQBREkX4IoZhVLbBk9U5ck2OO2ow1cqx1j8QPF46QFUsQwK0L+AqL38ExBfVFrR
+8QO+WW3uBj5uVjapWiKtM6XERAHS8kvZAJ3aMOSZyAuTWt1DxX3ggshKgu9Ws4fo
+w0xK3JXuLVQfsFtOm77tMzgbPO2DFr+eFjYao3XlwwzShF45RrXKtzD5etzCKgId
+ep7mH9FJ0DTa2iIwtMlnODZKwgjPknzdqKSh3Ss0TS5Q+vVx3/58aUd0g45A5jHe
+uisXsHNmAE8UuncTwNNfOSy7B3rDFVGUUZoFLqnrMXEwwLaLu+1JGbeyicPDOSRy
+osq1FSZtoCpKIuOLpAzzgOQ+hVxX5Js6+Al84BcRz93fDOz2GWbhIhsNsKVFSe+1
+gU5TA7SUKlgZFJPJzxiImoC4YOJ5Kva3ivsJyImbQSv2aCVznssCZ1lJc0ldv+uF
+jKsb2SxKMan6REZfkNfY/UBIsEtlXEDvhmeSec4ulH2nHrdARLbvBhhU/eMrJzv9
+plFTTDSHJmg+Bx1VNcyD
+=qk9S
+-----END PGP SIGNATURE-----
+
+--OIaBDIKKjxfoSbgvxq3Ied65CoKEjGXUQ--
