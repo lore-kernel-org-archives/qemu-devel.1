@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXYjW-0006sQ-EZ
+	(envelope-from <rth7680@gmail.com>) id 1dXYjW-0006tl-TX
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXYjR-000557-VV
+	(envelope-from <rth7680@gmail.com>) id 1dXYjV-000590-CY
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:38 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35883)
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35080)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXYjR-00054n-RJ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:33 -0400
-Received: by mail-qt0-x243.google.com with SMTP id l55so3659100qtl.3
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 13:04:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXYjV-00058Y-87
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:04:37 -0400
+Received: by mail-qk0-x241.google.com with SMTP id t186so2154618qkf.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 13:04:37 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 18 Jul 2017 10:02:50 -1000
-Message-Id: <20170718200255.31647-26-rth@twiddle.net>
+Date: Tue, 18 Jul 2017 10:02:51 -1000
+Message-Id: <20170718200255.31647-27-rth@twiddle.net>
 In-Reply-To: <20170718200255.31647-1-rth@twiddle.net>
 References: <20170718200255.31647-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH v3 25/30] target/sh4: Add missing FPSCR.PR == 0
- checks
+Subject: [Qemu-devel] [PATCH v3 26/30] target/sh4: Implement fsrra
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +29,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net
 
-Both frchg and fschg require PR == 0, otherwise undefined_operation.
-
-Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/sh4/translate.c | 2 ++
- 1 file changed, 2 insertions(+)
 
+---
+V2: Fix argument types in helper.h
+---
+ target/sh4/helper.h    |  1 +
+ target/sh4/op_helper.c | 16 ++++++++++++++++
+ target/sh4/translate.c |  2 ++
+ 3 files changed, 19 insertions(+)
+
+diff --git a/target/sh4/helper.h b/target/sh4/helper.h
+index 6c6fa04..1e768fc 100644
+--- a/target/sh4/helper.h
++++ b/target/sh4/helper.h
+@@ -37,6 +37,7 @@ DEF_HELPER_FLAGS_3(fsub_FT, TCG_CALL_NO_WG, f32, env, f32, f32)
+ DEF_HELPER_FLAGS_3(fsub_DT, TCG_CALL_NO_WG, f64, env, f64, f64)
+ DEF_HELPER_FLAGS_2(fsqrt_FT, TCG_CALL_NO_WG, f32, env, f32)
+ DEF_HELPER_FLAGS_2(fsqrt_DT, TCG_CALL_NO_WG, f64, env, f64)
++DEF_HELPER_FLAGS_2(fsrra_FT, TCG_CALL_NO_WG, f32, env, f32)
+ DEF_HELPER_FLAGS_2(ftrc_FT, TCG_CALL_NO_WG, i32, env, f32)
+ DEF_HELPER_FLAGS_2(ftrc_DT, TCG_CALL_NO_WG, i32, env, f64)
+ DEF_HELPER_3(fipr, void, env, i32, i32)
+diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
+index 8513f38..d798f23 100644
+--- a/target/sh4/op_helper.c
++++ b/target/sh4/op_helper.c
+@@ -406,6 +406,22 @@ float64 helper_fsqrt_DT(CPUSH4State *env, float64 t0)
+     return t0;
+ }
+ 
++float32 helper_fsrra_FT(CPUSH4State *env, float32 t0)
++{
++    set_float_exception_flags(0, &env->fp_status);
++    /* "Approximate" 1/sqrt(x) via actual computation.  */
++    t0 = float32_sqrt(t0, &env->fp_status);
++    t0 = float32_div(float32_one, t0, &env->fp_status);
++    /* Since this is supposed to be an approximation, an imprecision
++       exception is required.  One supposes this also follows the usual
++       IEEE rule that other exceptions take precidence.  */
++    if (get_float_exception_flags(&env->fp_status) == 0) {
++        set_float_exception_flags(float_flag_inexact, &env->fp_status);
++    }
++    update_fpscr(env, GETPC());
++    return t0;
++}
++
+ float32 helper_fsub_FT(CPUSH4State *env, float32 t0, float32 t1)
+ {
+     set_float_exception_flags(0, &env->fp_status);
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 65cc7d1..a5d07a0 100644
+index a5d07a0..12d5ed7 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -479,10 +479,12 @@ static void _decode_opc(DisasContext * ctx)
-         tcg_gen_movi_i32(cpu_sr_t, 1);
+@@ -1741,6 +1741,8 @@ static void _decode_opc(DisasContext * ctx)
  	return;
-     case 0xfbfd:		/* frchg */
+     case 0xf07d: /* fsrra FRn */
+ 	CHECK_FPU_ENABLED
 +        CHECK_FPSCR_PR_0
- 	tcg_gen_xori_i32(cpu_fpscr, cpu_fpscr, FPSCR_FR);
- 	ctx->bstate = BS_STOP;
- 	return;
-     case 0xf3fd:		/* fschg */
-+        CHECK_FPSCR_PR_0
-         tcg_gen_xori_i32(cpu_fpscr, cpu_fpscr, FPSCR_SZ);
- 	ctx->bstate = BS_STOP;
- 	return;
++        gen_helper_fsrra_FT(FREG(B11_8), cpu_env, FREG(B11_8));
+ 	break;
+     case 0xf08d: /* fldi0 FRn - FPSCR: R[PR] */
+ 	CHECK_FPU_ENABLED
 -- 
 2.9.4
