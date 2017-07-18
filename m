@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dXVFJ-0002VL-9Z
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:21:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXVIe-0005mt-KW
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:24:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dXVFG-0006Vc-57
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:21:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35382)
+	(envelope-from <armbru@redhat.com>) id 1dXVIb-0007pV-Ez
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:24:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dXVFF-0006VT-V9
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:21:10 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0606B7F408
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 16:21:08 +0000 (UTC)
-Date: Tue, 18 Jul 2017 12:21:07 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1561464108.54982839.1500394867090.JavaMail.zimbra@redhat.com>
-In-Reply-To: <877ez5k9y2.fsf@secure.mitica>
-References: <20170704220346.29244-1-marcandre.lureau@redhat.com>
-	<20170704220346.29244-15-marcandre.lureau@redhat.com>
-	<877ez5k9y2.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXVIb-0007oE-91
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:24:37 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87o9so1hl7.fsf@dusky.pond.sub.org>
+	<20170717103308.GI7163@stefanha-x1.localdomain>
+Date: Tue, 18 Jul 2017 18:24:19 +0200
+In-Reply-To: <20170717103308.GI7163@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Mon, 17 Jul 2017 11:33:08 +0100")
+Message-ID: <8760epr9vw.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/35] migration: mark coroutine_fn
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Improving QMP test coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, Cleber Rosa <cleber@redhat.com>
 
-Hi
+Stefan Hajnoczi <stefanha@gmail.com> writes:
 
------ Original Message -----
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  migration/migration.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 51ccd1a4c5..3370482637 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -303,7 +303,8 @@ static void process_incoming_migration_bh(void *opa=
-que)
-> >      migration_incoming_state_destroy();
-> >  }
-> > =20
-> > -static void process_incoming_migration_co(void *opaque)
-> > +static void coroutine_fn
-> > +process_incoming_migration_co(void *opaque)
-> >  {
-> >      QEMUFile *f =3D opaque;
-> >      MigrationIncomingState *mis =3D migration_incoming_get_current();
->=20
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->=20
->=20
-> Should I include it on the next migration PULL or is this entering some
-> other way?
+> On Thu, Jul 13, 2017 at 05:28:52PM +0200, Markus Armbruster wrote:
+>> What can we do to improve QMP testing?  Sadly, I don't have the master
+>> plan ready.  I can tell people their new code needs to come with tests,
+>> but that won't help much unless subsystem maintainers pick up the habit,
+>> too.  There are a few obvious tests to write for old code, such as a
+>> generic test of query-like commands without arguments and without side
+>> effects, similar to what test-hmp.c does for HMP command info (I hope to
+>> get around to that one).  But for much of the old code, we don't even
+>> know where the test coverage holes are.
+>> 
+>> Ideas anyone?
+>
+> It makes sense for maintainers to ask that new QMP commands come with
+> comprehensive tests.
+>
+> For me the main question is how to begin?  What is the easiest and
+> preferred way to write QMP command test cases?
+>
+> Today the most common approach is a qtest test case that sends commands
+> and verifies that the expected response is returned.  This approach
+> works but we could benefit from a discussion about the alternatives
+> (e.g.  qemu-iotests style shell scripts with output diffing).
 
-Not the I know of, feel free to include it next time.
+Output testing style delegates checking ouput to diff.  I rather like it
+when text output is readily available.  It is when testing QMP.  A
+non-trivial example using this style could be useful, as discussing
+ideas tends to be more productive when they come with patches.
 
-Thanks
+> If it's easy to write tests then developers will contribute more tests.
+
+Yes.  Maintainers can more easily demand them, too.
