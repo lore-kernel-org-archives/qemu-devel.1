@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1dXI6f-0003uo-VH
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:19:26 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dXIE0-0005I5-Ik
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:27:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1dXI6c-0006Zt-RT
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:19:25 -0400
-Received: from mail-by2nam01on0105.outbound.protection.outlook.com
-	([104.47.34.105]:36012
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew.Baumann@microsoft.com>)
-	id 1dXI6c-0006Xm-E6
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:19:22 -0400
-From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 18 Jul 2017 02:19:19 +0000
-Message-ID: <DM2PR21MB0060CAB0E196531F93212A619EA10@DM2PR21MB0060.namprd21.prod.outlook.com>
-References: <DM2PR21MB0060B20A50AEEC8B6816154C9EA00@DM2PR21MB0060.namprd21.prod.outlook.com>
-	<1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
-In-Reply-To: <1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.williamson@redhat.com>) id 1dXIDv-0003ek-Kv
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:27:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dXIDv-0003eK-Eu
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:26:55 -0400
+Date: Mon, 17 Jul 2017 20:26:53 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170717202653.46b12372@w520.home>
+In-Reply-To: <20170718014926.44781-3-bjsdjshi@linux.vnet.ibm.com>
+References: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170718014926.44781-3-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] Disable image locking for snapshot drive?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] vfio/ccw: fix initialization of the
+ Object DeviceState pointer in the common base-device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, cohuck@redhat.com, borntraeger@de.ibm.com
 
-PiBGcm9tOiBKb2huIFNub3cgW21haWx0bzpqc25vd0ByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25k
-YXksIDE3IEp1bHkgMjAxNyAxNzozNA0KPiBPbiAwNy8xNy8yMDE3IDA3OjMwIFBNLCBBbmRyZXcg
-QmF1bWFubiB2aWEgUWVtdS1kZXZlbCB3cm90ZToNCj4gPiBIaSBhbGwsDQo+ID4NCj4gPiBJJ20g
-cnVubmluZyBhIHJlY2VudCBMaW51eCBidWlsZCBvZiBxZW11IG9uIFdpbmRvd3MgU3Vic3lzdGVt
-IGZvciBMaW51eA0KPiAoV1NMKSB3aGljaCBkb2Vzbid0IGFwcGVhciB0byBpbXBsZW1lbnQgZmls
-ZSBsb2NraW5nOg0KPiA+DQo+ID4gJCBxZW11LXN5c3RlbS1hYXJjaDY0IC4uLiAtZHJpdmUgZmls
-ZT10ZXN0LnZoZHgsaWY9bm9uZSxpZD1oZDAgLWRldmljZQ0KPiB2aXJ0aW8tYmxrLXBjaSxkcml2
-ZT1oZDANCj4gPiBxZW11LXN5c3RlbS1hYXJjaDY0OiAtZHJpdmUgZmlsZT10ZXN0LnZoZHgsaWY9
-bm9uZSxpZD1oZDA6IEZhaWxlZCB0bw0KPiB1bmxvY2sgYnl0ZSAxMDANCj4gPiBxZW11LXN5c3Rl
-bS1hYXJjaDY0OiAtZHJpdmUgZmlsZT10ZXN0LnZoZHgsaWY9bm9uZSxpZD1oZDA6IEZhaWxlZCB0
-bw0KPiB1bmxvY2sgYnl0ZSAxMDANCj4gPiBxZW11LXN5c3RlbS1hYXJjaDY0OiAtZHJpdmUgZmls
-ZT10ZXN0LnZoZHgsaWY9bm9uZSxpZD1oZDA6IEZhaWxlZCB0byBsb2NrDQo+IGJ5dGUgMTAwDQo+
-ID4NCj4gPiBUaGF0J3Mgbm8gYmlnIGRlYWw7IEkgY2FuIHN3aXRjaCBpdCBvZmY6DQo+ID4NCj4g
-PiAkIHFlbXUtc3lzdGVtLWFhcmNoNjQgLi4uIC1kcml2ZQ0KPiBmaWxlPXRlc3QudmhkeCxpZj1u
-b25lLGZpbGUubG9ja2luZz1vZmYsaWQ9aGQwIC4uLg0KPiA+IChhbGwgZ29vZCkNCj4gPg0KPiA+
-IEJ1dCBob3cgY2FuIEkgZG8gdGhlIHNhbWUgZm9yIGEgc25hcHNob3QgZHJpdmU/DQo+ID4NCj4g
-PiAkIHFlbXUtc3lzdGVtLWFhcmNoNjQgLi4uIC1kcml2ZQ0KPiBmaWxlPXRlc3QudmhkeCxpZj1u
-b25lLGZpbGUubG9ja2luZz1vZmYsaWQ9aGQwIC1zbmFwc2hvdCAuLi4NCj4gPiBxZW11LXN5c3Rl
-bS1hYXJjaDY0OiAtZHJpdmUNCj4gZmlsZT10ZXN0LnZoZHgsaWY9bm9uZSxmaWxlLmxvY2tpbmc9
-b2ZmLGlkPWhkMDogRmFpbGVkIHRvIHVubG9jayBieXRlIDEwMA0KPiA+IHFlbXUtc3lzdGVtLWFh
-cmNoNjQ6IC1kcml2ZQ0KPiBmaWxlPXRlc3QudmhkeCxpZj1ub25lLGZpbGUubG9ja2luZz1vZmYs
-aWQ9aGQwOiBGYWlsZWQgdG8gdW5sb2NrIGJ5dGUgMTAwDQo+ID4gcWVtdS1zeXN0ZW0tYWFyY2g2
-NDogLWRyaXZlDQo+IGZpbGU9dGVzdC52aGR4LGlmPW5vbmUsZmlsZS5sb2NraW5nPW9mZixpZD1o
-ZDA6IENvdWxkIG5vdCBjcmVhdGUgdGVtcG9yYXJ5DQo+IG92ZXJsYXkgJy92YXIvdG1wL3ZsLm84
-M2R4bic6IEZhaWxlZCB0byBsb2NrIGJ5dGUgMTAwDQo+ID4NCj4gPiAoSSBhbHNvIHRyaWVkIHRo
-ZSBzbmFwc2hvdD1vbiBkcml2ZSBvcHRpb24gd2l0aCBzaW1pbGFyIHJlc3VsdHMuKQ0KPiA+DQo+
-ID4gVGhhbmtzLA0KPiA+IEFuZHJldw0KPiA+DQo+IA0KPiBMb29rcyBsaWtlIHRoZSBzaG9ydGhh
-bmQgIi1zbmFwc2hvdCIgZG9lc24ndCBsZXQgeW91IHNwZWNpZnkgYW55IGZ1cnRoZXINCj4gb3B0
-aW9ucywgd2hpY2ggaXMgYSBidW1tZXIuDQo+IA0KPiBZb3UgbWF5IG5lZWQgdG8gZG8gc29tZXRo
-aW5nIGEgbGl0dGxlIG1vcmUgbWFudWFsLCBhbmQgY3JlYXRlIHlvdXIgb3duDQo+IHRlbXBvcmFy
-eSBvdmVybGF5LCBhbmQgbGF1bmNoIFFFTVUgcG9pbnRpbmcgdG8gdGhhdCBvdmVybGF5IGluc3Rl
-YWQuDQoNCkNhbiB5b3UgZ2l2ZSBtZSBzb21lIG1vcmUgY2x1ZXMgd2hhdCB0aGlzIG1pZ2h0IGxv
-b2sgbGlrZT8NCg0KPiBUaGF0IHNvdW5kcyBsaWtlIGEgYml0IG9mIGEgaGFzc2xlLg0KPiANCj4g
-Q2FuIHdlIGNvbXBpbGUgbG9ja2luZyBzdXBwb3J0IG91dCBvZiBRRU1VIGluc3RlYWQgZm9yIHRo
-aXMgcGxhdGZvcm0/IE9yDQo+IGlzIHRoZXJlIGEgcnVudGltZSBvcHRpb24gZm9yIGRpc2FibGlu
-ZyBpdCBnbG9iYWxseT8NCg0KVGhlIGNvbXBpbGUgdGFyZ2V0IGlzIGp1c3QgTGludXgsIHNvIGF0
-IGJlc3QgaXQgd291bGQgbmVlZCB0byBiZSBhIHJ1bnRpbWUgY2hvaWNlIGJhc2VkIG9uIHBsYXRm
-b3JtIGRldGVjdGlvbiwgYW5kIEkgZG91YnQgdGhhdCBpcyBhIGdvb2QgaWRlYSAoV1NMIG1heSB3
-ZWxsIGdldCBhcm91bmQgdG8gaW1wbGVtZW50aW5nIHRoaXMgc3lzY2FsbCBpbiB0aGUgZnV0dXJl
-KS4gSSBhZ3JlZSBhIHJ1bnRpbWUgY29tbWFuZC1saW5lIGZsYWcgdG8gZGlzYWJsZSBpdCBnbG9i
-YWxseSB3b3VsZCBiZSBpZGVhbCwgYnV0IGZyb20gYSBxdWljayBsb29rIGF0IHRoZSBjb2RlIGl0
-IGRvZXNuJ3Qgc2VlbSB0byBleGlzdCBhdCBwcmVzZW50Lg0KDQpUaGFua3MsDQpBbmRyZXcNCg==
+On Tue, 18 Jul 2017 03:49:26 +0200
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> Commit 7da624e2 ("vfio: Test realized when using VFIOGroup.device_list
+> iterator") introduced a pointer to the Object DeviceState in the VFIO
+> common base-device and skiped non-realized devices as we iterate
+> VFIOGroup.device_list. While it missed to initialize the pointer for
+> the vfio-ccw case. Let's fix it.
+> 
+> Fixes: 7da624e2 ("vfio: Test realized when using VFIOGroup.device_list
+>                   iterator")
+
+Sorry for that.
+
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/vfio/ccw.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 8d97b53e77..a8baadf57a 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -338,6 +338,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+>      vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+>      vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
+>                                         cdev->hostid.ssid, cdev->hostid.devid);
+> +    vcdev->vdev.dev = dev;
+>      QLIST_FOREACH(vbasedev, &group->device_list, next) {
+>          if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+>              error_setg(&err, "vfio: subchannel %s has already been attached",
