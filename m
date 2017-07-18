@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXHdv-0002yJ-G9
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:46 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXHe7-00033h-Hj
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXHds-0004CI-FA
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46454)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXHe4-0004NA-Fq
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53293
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dXHds-0004BP-4q
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:40 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1dXHe4-0004Mh-AU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:52 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6I1nM3X068255
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:49:37 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bs1svrvhp-1
+	v6I1nnqb030255
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:49:51 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bs3d3v9f7-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:49:37 -0400
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:49:49 -0400
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 17 Jul 2017 21:49:35 -0400
+	Mon, 17 Jul 2017 21:49:37 -0400
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 03:49:25 +0200
+Date: Tue, 18 Jul 2017 03:49:26 +0200
 In-Reply-To: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170718014926.44781-2-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/2] vfio/ccw: allocate irq info with the right
- size
+Message-Id: <20170718014926.44781-3-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 2/2] vfio/ccw: fix initialization of the Object
+ DeviceState pointer in the common base-device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,33 +40,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, Jing Zhang <bjzhjing@linux.vnet.ibm.com>
+Cc: cohuck@redhat.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com, Alex Williamson <alex.williamson@redhat.com>
 
-From: Jing Zhang <bjzhjing@linux.vnet.ibm.com>
+Commit 7da624e2 ("vfio: Test realized when using VFIOGroup.device_list
+iterator") introduced a pointer to the Object DeviceState in the VFIO
+common base-device and skiped non-realized devices as we iterate
+VFIOGroup.device_list. While it missed to initialize the pointer for
+the vfio-ccw case. Let's fix it.
 
-When allocating memory for the vfio_irq_info parameter of the
-VFIO_DEVICE_GET_IRQ_INFO ioctl, we used the wrong size. Let's
-fix it by using the right size.
+Fixes: 7da624e2 ("vfio: Test realized when using VFIOGroup.device_list
+                  iterator")
 
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Signed-off-by: Jing Zhang <bjzhjing@linux.vnet.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 ---
- hw/vfio/ccw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/vfio/ccw.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 12d0262336..8d97b53e77 100644
+index 8d97b53e77..a8baadf57a 100644
 --- a/hw/vfio/ccw.c
 +++ b/hw/vfio/ccw.c
-@@ -168,7 +168,7 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
-         return;
-     }
- 
--    argsz = sizeof(*irq_set);
-+    argsz = sizeof(*irq_info);
-     irq_info = g_malloc0(argsz);
-     irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
-     irq_info->argsz = argsz;
+@@ -338,6 +338,7 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+     vcdev->vdev.type = VFIO_DEVICE_TYPE_CCW;
+     vcdev->vdev.name = g_strdup_printf("%x.%x.%04x", cdev->hostid.cssid,
+                                        cdev->hostid.ssid, cdev->hostid.devid);
++    vcdev->vdev.dev = dev;
+     QLIST_FOREACH(vbasedev, &group->device_list, next) {
+         if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+             error_setg(&err, "vfio: subchannel %s has already been attached",
 -- 
 2.11.2
