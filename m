@@ -1,20 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQFZ-00050T-L7
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:01:10 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGW-0005oV-4n
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXQFY-0002J7-VP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:01:09 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dXQGS-00032n-S1
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33191
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dXQGS-00032f-MQ
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:02:04 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6IAwm77135296
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:03 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bs4ff5b6a-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 07:02:03 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 18 Jul 2017 07:02:03 -0400
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Tue, 18 Jul 2017 06:01:36 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170718061005.29518-26-f4bug@amsat.org>
-References: <20170718061005.29518-1-f4bug@amsat.org>
-	<20170718061005.29518-26-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 18 Jul 2017 04:00:59 -0700
-Message-ID: <CAJ+F1CKZRQ_0bVFhj+hmtkRD0f_NrxzXTfYY0Qq0pkmhsKp9Tg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1500375704-28002-1-git-send-email-mdroth@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 25/29] libqos: use ARRAY_SIZE macro
+Subject: [Qemu-devel] [PULL v2 0/8] qemu-ga patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +39,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu trival <qemu-trivial@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Mon, Jul 17, 2017 at 11:10 PM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> Applied using the Coccinelle semantic patch scripts/coccinelle/use_osdep.=
-cocci
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
+The following changes since commit ca4e667dbf431d4a2a5a619cde79d30dd2ac3e=
+b2:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20170717-pull-req=
+uest' into staging (2017-07-17 17:54:17 +0100)
 
+are available in the git repository at:
 
->
-> No entry in MAINTAINERS for tests/libqos/* does it deserve it's own entry=
-?
->
+  git://github.com/mdroth/qemu.git tags/qga-pull-2017-07-17-v2-tag
 
-It would, do you want to candidate? :)
+for you to fetch changes up to 339ca68bef9f30dd18e84b7d92398327e3f819a3:
 
->  tests/libqos/libqos.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-> index 6226546c28..0edb7e99ba 100644
-> --- a/tests/libqos/libqos.c
-> +++ b/tests/libqos/libqos.c
-> @@ -258,7 +258,7 @@ void generate_pattern(void *buffer, size_t len, size_=
-t cycle_len)
->      p =3D rand() % 256;
->      for (i =3D 0; i < len; i++) {
->          tx[i] =3D p++ % 256;
-> -        if (i % cycle_len =3D=3D 0) {
-> +        if (QEMU_IS_ALIGNED(i, cycle_len)) {
->              p =3D rand() % 256;
->          }
->      }
-> --
-> 2.13.2
->
->
+  test-qga: add test for guest-get-osinfo (2017-07-18 05:49:01 -0500)
 
+----------------------------------------------------------------
+qemu-ga patch queue
 
+* new command: qemu-get-osinfo
+* build fix for OpenBSD
+* better error-reporting for failure on keyfile dump
+* remove redundant initialization of qa_state global
+* include libpcre in w32 package
+* w32 localization fixes for service installation/registration
 
---=20
-Marc-Andr=C3=A9 Lureau
+v2:
+* fix build issue with older GCCs introduced with guest_get_osinfo
+* relocated some declarations in guest_get_osinfo
+
+----------------------------------------------------------------
+Daniel Rempel (1):
+      qga-win: fix installation on localized windows
+
+Marc-Andr=C3=A9 Lureau (1):
+      qga: report error on keyfile dump error
+
+Peng Hao (1):
+      qga-win32: remove a redundancy code
+
+Thomas Lamprecht (1):
+      qemu-ga: add missing libpcre to MSI build
+
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (4):
+      qemu-ga: check if utmpx.h is available on the system
+      qemu-ga: add guest-get-osinfo command
+      test-qga: pass environemnt to qemu-ga
+      test-qga: add test for guest-get-osinfo
+
+ configure                      |  19 ++++
+ qga/commands-posix.c           | 157 ++++++++++++++++++++++++++++++++-
+ qga/commands-win32.c           | 191 +++++++++++++++++++++++++++++++++++=
+++++++
+ qga/installer/qemu-ga.wxs      |   4 +
+ qga/main.c                     |   9 +-
+ qga/qapi-schema.json           |  65 ++++++++++++++
+ qga/vss-win32/install.cpp      |  35 +++++++-
+ tests/data/test-qga-os-release |   7 ++
+ tests/test-qga.c               |  64 +++++++++++++-
+ 9 files changed, 542 insertions(+), 9 deletions(-)
+ create mode 100644 tests/data/test-qga-os-release
