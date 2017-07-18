@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7F-0003qn-3U
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:39 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7L-0003t5-1T
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7B-00059g-Ty
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:37 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:5519)
+	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7I-0005FF-Un
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:43 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:3251)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7B-00058p-Ln
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:33 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1dXR7I-0005F4-LY
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 07:56:40 -0400
 From: James Hogan <james.hogan@imgtec.com>
-Date: Tue, 18 Jul 2017 12:55:45 +0100
-Message-ID: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
+Date: Tue, 18 Jul 2017 12:55:47 +0100
+Message-ID: <cdee8fc6142bf90381edff96edc5773fd53f530d.1500378931.git-series.james.hogan@imgtec.com>
+In-Reply-To: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
+References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 0/14] target/mips: Add Enhanced Virtual
- Addressing (EVA) support
+Subject: [Qemu-devel] [PATCH 2/14] target/mips: Fix TLBWI shadow flush for
+ EHINV, XI, RI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,126 +27,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Petar Jovanovic <petar.jovanovic@imgtec.com>
+Cc: qemu-devel@nongnu.org, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-This patchset implements MIPS Enhanced Virtual Addressing (EVA) support
-in QEMU.
+Writing specific TLB entries with TLBWI flushes shadow TLB entries
+unless an existing entry is having its access permissions upgraded. This
+is necessary as software would from then on expect the previous mapping
+in that entry to no longer be in effect (even if QEMU has quietly
+evicted it to the shadow TLB on a TLBWR).
 
-The patches are grouped as follows:
+However it won't do this if only EHINV, XI, or RI bits have been set,
+even if that results in a reduction of permissions, so add the necessary
+checks to invoke the flush when these bits are set.
 
- - Patches 1-3: Preliminary fixes.
-   A few fixes are made for issues spotted during development.
-
- - Patch 4: CP0_EBase.WG (write gate).
-   This allows more bits of CP0_EBase to be written, which allows the
-   exception vector to be moved into a different segment than
-   kseg0/kseg1. The related CP0_Config5.CV allows cache error exceptions
-   not to be forced to get handled by KSeg1.
-
- - Patches 5-8: EVA user memory access instructions (CP0_Config5.EVA).
-   These allow kernel code to access the user mode view of memory, which
-   can no longer be done reliably with normal memory access instructions
-   for MUSUK segment access mode (see below).
-
- - Patches 9-12: Segmentation control (CP0_Config3.SC).
-   New cop0 registers are added to reconfigure the virtual memory
-   segments. This allows the traditionally fixed virtual memory segments
-   to be rearranged, and also allows segments to appear differently
-   based on execution mode, for example the access mode MUSUK (Mapped
-   User Supervisor, Unmapped Kernel) makes a segment TLB mapped to user
-   mode and cached unmapped (direct window to physical) to kernel mode,
-   and if EU=1 it is also uncached unmapped to error level (which
-   requires the addition of a new MMU mode).
-
- - Patch 13: P5600 EVA support.
-   We add the required capabilities to the P5600 CPU type to allow a
-   Malta EVA kernel to be executed.
-
- - Patch 14: I6400 & MIPS64R2-generic CP0_Ebase.WG support.
-   We add WG bit support to these MIPS64 CPUs so the guest kernel can
-   run KVM T&E.
-
-Notable limitations:
-
- - Neither CACHEE (the new EVA instruction) or CACHE (the pre-existing
-   non-EVA instruction) generate TLB exceptions for bad addresses, as
-   QEMU implements them only with a Cop0 privilege check.
-
- - No attempt has been made to implement BEV overlays yet, which would
-   allow non-standard boot exception vector addresses to be accessed in
-   kernel mode, even if the underlying segment is changed. This should
-   be done at some point, but wasn't necessary for my purposes.
-
- - MIPS64 segmentation control (for XKPhys) is functional, however there
-   are still a few corner cases that need resolving:
-    - EntryHi writability on r6 (you can't write an XKPhys address).
-    - R6 style Status.KX,SX,UX writability (KX=0 => SX=0, and SX=0 =>
-      UX=0).
-    - R6 style addressing special cases & sign extension.
-   so I wouldn't recommend enabling it for any CPUs yet. P6600 is the
-   only real core that implements it anyway.
-
-Changes in v2:
-
- - Rebased on 2.9.0
- - New patches 1-3, with some misc fixes
- - CP0_EBase.WG (patch 4):
-    - Fix CP0_EBase.WG to be read only when WG is not set in
-      CP0_EBase_rw_bitmask, otherwise it will be wrongly probed as
-      present.
-    - Make cache error exception vector conditional on Config3.SC as
-      well as Config5.CV, as per the PRA, and take the CP0C3_SC
-      definition from patch 7 (Yongbok).
-    - Rename CP0_EBase_rw_bitmask to CP0_EBaseWG_rw_bitmask (Yongbok).
- - Decode EVA load & stores (patch 6)
-    - Fix typo in commit message (Yongbok).
-    - Use sextract32 (Yongbok).
- - New patch 7, to decode microMIPS EVA loads & stores (Yongbok).
- - Abstract mmu_idx from hflags (patch 9):
-    - Also convert reference to hflags & MIPS_HFLAG_KSU in op_helper.c
-      to cpu_mmu_index (Yongbok).
- - Add an MMU mode for ERL (patch 10):
-    - Add ERL case to log output where cpu_mmu_index() is now used in
-      op_helper.c
- - Add segmentation control registers (Patch 11):
-    - Use ld_tl and ext32s_tl rather than ld32s_tl to avoid big endian
-      host, MIPS64 target issues (Yongbok).
-    - Add missing break in DMFC0 CP0_SegCtl2 case.
- - Implement segmentation control (Patch 12):
-    - Use hwaddr instead of target_ulong for physical addresses in
-      get_seg[ctl]_physical_address() (Yongbok).
-    - Fix xkphys privilege control based on access mode (am) (Yongbok).
-    - Fix xkphys TLB faults to use XTLB.
- - New patch 14.
-
+Fixes: 2fb58b73746e ("target-mips: add RI and XI fields to TLB entry")
+Fixes: 9456c2fbcd82 ("target-mips: add TLBINV support")
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
 Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Petar Jovanovic <petar.jovanovic@imgtec.com>
+---
+Changes in v2:
+- New patch.
+---
+ target/mips/op_helper.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-James Hogan (14):
-  target/mips: Fix MIPS64 MFC0 UserLocal on BE host
-  target/mips: Fix TLBWI shadow flush for EHINV,XI,RI
-  target/mips: Weaken TLB flush on UX,SX,KX,ASID changes
-  target/mips: Add CP0_Ebase.WG (write gate) support
-  target/mips: Prepare loads/stores for EVA
-  target/mips: Decode MIPS32 EVA load & store instructions
-  target/mips: Decode microMIPS EVA load & store instructions
-  target/mips: Check memory permissions with mem_idx
-  target/mips: Abstract mmu_idx from hflags
-  target/mips: Add an MMU mode for ERL
-  target/mips: Add segmentation control registers
-  target/mips: Implement segmentation control
-  target/mips: Add EVA support to P5600
-  target/mips: Enable CP0_EBase.WG on MIPS64 CPUs
-
- target/mips/cpu.h            |  58 ++++-
- target/mips/helper.c         | 210 ++++++++++++++-----
- target/mips/helper.h         |   3 +-
- target/mips/machine.c        |   9 +-
- target/mips/op_helper.c      |  58 ++++-
- target/mips/translate.c      | 405 ++++++++++++++++++++++++++++++++----
- target/mips/translate_init.c |  17 +-
- 7 files changed, 644 insertions(+), 116 deletions(-)
-
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index e5f3ea40420e..1961cacfab18 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -2029,7 +2029,7 @@ void r4k_helper_tlbwi(CPUMIPSState *env)
+     int idx;
+     target_ulong VPN;
+     uint16_t ASID;
+-    bool G, V0, D0, V1, D1;
++    bool EHINV, G, V0, D0, V1, D1, XI0, XI1, RI0, RI1;
+ 
+     idx = (env->CP0_Index & ~0x80000000) % env->tlb->nb_tlb;
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+@@ -2038,17 +2038,25 @@ void r4k_helper_tlbwi(CPUMIPSState *env)
+     VPN &= env->SEGMask;
+ #endif
+     ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    EHINV = (env->CP0_EntryHi & (1 << CP0EnHi_EHINV)) != 0;
+     G = env->CP0_EntryLo0 & env->CP0_EntryLo1 & 1;
+     V0 = (env->CP0_EntryLo0 & 2) != 0;
+     D0 = (env->CP0_EntryLo0 & 4) != 0;
++    XI0 = (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
++    RI0 = (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
+     V1 = (env->CP0_EntryLo1 & 2) != 0;
+     D1 = (env->CP0_EntryLo1 & 4) != 0;
++    XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
++    RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
+ 
+     /* Discard cached TLB entries, unless tlbwi is just upgrading access
+        permissions on the current entry. */
+     if (tlb->VPN != VPN || tlb->ASID != ASID || tlb->G != G ||
++        (!tlb->EHINV && EHINV) ||
+         (tlb->V0 && !V0) || (tlb->D0 && !D0) ||
+-        (tlb->V1 && !V1) || (tlb->D1 && !D1)) {
++        (!tlb->XI0 && XI0) || (!tlb->RI0 && RI0) ||
++        (tlb->V1 && !V1) || (tlb->D1 && !D1) ||
++        (!tlb->XI1 && XI1) || (!tlb->RI1 && RI1)) {
+         r4k_mips_tlb_flush_extra(env, env->tlb->nb_tlb);
+     }
+ 
 -- 
 git-series 0.8.10
