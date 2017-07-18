@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dXVKf-0000Wc-Dt
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:26:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dXVKg-0000Xb-Gr
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dXVKe-00011c-NP
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:26:45 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dXVKf-00012H-Gk
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:26:46 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jul 2017 17:26:34 +0100
-Message-Id: <1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 18 Jul 2017 17:26:33 +0100
+Message-Id: <1500395194-21455-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
 References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
- variable warning
+Subject: [Qemu-devel] [PATCH for-2.10 3/4] bsd-user/bsdload.c: Remove
+ write-only id_change variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +23,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: patches@linaro.org
 
-On OpenBSD the compiler warns:
-bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wunused-but-set-variable]
+On OpenBSD the compiler complains:
+bsd-user/bsdload.c:54:17: warning: variable 'id_change' set but not used [-Wunused-but-set-variable]
 
-This is because a lot of the signal delivery code is #if-0'd
-out as unused. Reshuffle #ifdefs a bit to silence the warning.
+This is dead code that was originally copied from linux-user.
+We fixed this in linux-user in commit 331c23b5ca44293d1 in 2011;
+delete the useless code from bsd-user too.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- bsd-user/main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ bsd-user/bsdload.c | 25 +------------------------
+ 1 file changed, 1 insertion(+), 24 deletions(-)
 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index fa9c012..501e16f 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -619,9 +619,10 @@ void cpu_loop(CPUSPARCState *env)
-             break;
-         case EXCP_DEBUG:
-             {
--                int sig;
+diff --git a/bsd-user/bsdload.c b/bsd-user/bsdload.c
+index 94eec36..f38c4fa 100644
+--- a/bsd-user/bsdload.c
++++ b/bsd-user/bsdload.c
+@@ -20,22 +20,6 @@ abi_long memcpy_to_target(abi_ulong dest, const void *src,
+     return 0;
+ }
+ 
+-static int in_group_p(gid_t g)
+-{
+-    /* return TRUE if we're in the specified group, FALSE otherwise */
+-    int         ngroup;
+-    int         i;
+-    gid_t       grouplist[TARGET_NGROUPS];
 -
--                sig = gdb_handlesig(cs, TARGET_SIGTRAP);
-+#if 0
-+                int sig =
-+#endif
-+                gdb_handlesig(cs, TARGET_SIGTRAP);
- #if 0
-                 if (sig)
-                   {
+-    ngroup = getgroups(TARGET_NGROUPS, grouplist);
+-    for(i = 0; i < ngroup; i++) {
+-        if(grouplist[i] == g) {
+-            return 1;
+-        }
+-    }
+-    return 0;
+-}
+-
+ static int count(char ** vec)
+ {
+     int         i;
+@@ -51,7 +35,7 @@ static int prepare_binprm(struct linux_binprm *bprm)
+ {
+     struct stat         st;
+     int mode;
+-    int retval, id_change;
++    int retval;
+ 
+     if(fstat(bprm->fd, &st) < 0) {
+         return(-errno);
+@@ -67,14 +51,10 @@ static int prepare_binprm(struct linux_binprm *bprm)
+ 
+     bprm->e_uid = geteuid();
+     bprm->e_gid = getegid();
+-    id_change = 0;
+ 
+     /* Set-uid? */
+     if(mode & S_ISUID) {
+         bprm->e_uid = st.st_uid;
+-        if(bprm->e_uid != geteuid()) {
+-            id_change = 1;
+-        }
+     }
+ 
+     /* Set-gid? */
+@@ -85,9 +65,6 @@ static int prepare_binprm(struct linux_binprm *bprm)
+      */
+     if ((mode & (S_ISGID | S_IXGRP)) == (S_ISGID | S_IXGRP)) {
+         bprm->e_gid = st.st_gid;
+-        if (!in_group_p(bprm->e_gid)) {
+-                id_change = 1;
+-        }
+     }
+ 
+     memset(bprm->buf, 0, sizeof(bprm->buf));
 -- 
 2.7.4
