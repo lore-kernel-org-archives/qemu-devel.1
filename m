@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXHbJ-00023a-KB
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:47:03 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXHdp-0002wI-RI
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXHbG-0002RD-HK
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:47:01 -0400
-Resent-Message-Id: <E1dXHbG-0002RD-HK@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21794)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXHdm-00047P-Pj
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56158
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dXHbG-0002Py-8y
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:46:58 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150034240295.84.3826970428741697105@5d477a5b5989>
-In-Reply-To: <1500295494-8991-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 17 Jul 2017 18:46:43 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/18] target-arm queue
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1dXHdm-00046S-JP
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:49:34 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6I1nOb4019180
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:49:33 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bs4j9sgnq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 21:49:33 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Mon, 17 Jul 2017 21:49:32 -0400
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Date: Tue, 18 Jul 2017 03:49:24 +0200
+Message-Id: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/2] vfio-ccw bugfixs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +36,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, borntraeger@de.ibm.com, bjsdjshi@linux.vnet.ibm.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAwLzE4XSB0YXJnZXQtYXJtIHF1ZXVlCk1lc3NhZ2UtaWQ6IDE1MDAyOTU0
-OTQtODk5MS0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpUeXBlOiBz
-ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBw
-YXRjaGV3LzIwMTcwNzE3MTEwOTM2LjIzMzE0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRj
-aGV3LzIwMTcwNzE3MTEwOTM2LjIzMzE0LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY0ZWZhY2UgTUFJTlRBSU5FUlM6IEFkZCBlbnRyaWVzIGZv
-ciBNUFMyIGJvYXJkCmYxZmVjZmIgaHcvYXJtL21wczI6IEFkZCBldGhlcm5ldAo1Y2M4ZTcxIGh3
-L2FybS9tcHMyOiBBZGQgU0NDCjU0MDRkNWEgaHcvbWlzYy9tcHMyX3NjYzogSW1wbGVtZW50IE1Q
-UzIgU2VyaWFsIENvbW11bmljYXRpb24gQ29udHJvbGxlcgozYjg1NjAxIGh3L2FybS9tcHMyOiBB
-ZGQgdGltZXJzCjg3ODQwMDggaHcvY2hhci9jbXNkay1hcGItdGltZXI6IEltcGxlbWVudCBDTVNE
-SyBBUEIgdGltZXIgZGV2aWNlCmQ3YWUzZDQgaHcvYXJtL21wczI6IEFkZCBVQVJUcwo0MWMwZjJk
-IGh3L2NoYXIvY21zZGstYXBiLXVhcnQuYzogSW1wbGVtZW50IENNU0RLIEFQQiBVQVJUCmM3ZWI4
-ZWIgaHcvYXJtL21wczI6IEltcGxlbWVudCBza2VsZXRvbiBtcHMyLWFuMzg1IGFuZCBtcHMyLWFu
-NTExIGJvYXJkIG1vZGVscwpiZGQ3YWY1IHRhcmdldC9hcm06IHVzZSBESVNBU19FWElUIGZvciBl
-cmV0IGhhbmRsaW5nCmVjNTViYzkgdGFyZ2V0L2FybTogdXNlIGdlbl9nb3RvX3RiIGZvciBJU0Ig
-aGFuZGxpbmcKZGFiZGQxMCB0YXJnZXQvYXJtL3RyYW5zbGF0ZTogZW5zdXJlIGdlbl9nb3RvX3Ri
-IHNldHMgZXhpdCBmbGFncwo3NTlhN2QyIHRhcmdldC9hcm0vdHJhbnNsYXRlLmg6IGV4cGFuZCBj
-b21tZW50IG9uIERJU0FTX0VYSVQKNTM4YTkwMCB0YXJnZXQvYXJtL3RyYW5zbGF0ZTogbWFrZSBE
-SVNBU19VUERBVEUgbWF0Y2ggZGVjbGFyZWQgc2VtYW50aWNzCmM0ZDY4ZDkgaW5jbHVkZS9leGVj
-L2V4ZWMtYWxsOiBkb2N1bWVudCBjb21tb24gZXhpdCBjb25kaXRpb25zCjJkOTZjYjggdGFyZ2V0
-L2FybTogTWFrZSBDb3J0ZXgtTTMgYW5kIE00IGRlZmF1bHQgdG8gOCBQTVNBIHJlZ2lvbnMKMDc5
-M2ZmZCBxZGV2OiBzdXBwb3J0IHByb3BlcnRpZXMgd2hpY2ggZG9uJ3Qgc2V0IGEgZGVmYXVsdCB2
-YWx1ZQo5MGVhMjFjIHFkZXYtcHJvcGVydGllcy5oOiBFeHBsaWNpdGx5IHNldCB0aGUgZGVmYXVs
-dCB2YWx1ZSBmb3IgYXJyYXlsZW4gcHJvcGVydGllcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS8xODogcWRldi1wcm9wZXJ0aWVzLmg6IEV4cGxpY2l0bHkgc2V0IHRoZSBk
-ZWZhdWx0IHZhbHVlIGZvciBhcnJheWxlbiBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBBVENIIDIv
-MTg6IHFkZXY6IHN1cHBvcnQgcHJvcGVydGllcyB3aGljaCBkb24ndCBzZXQgYSBkZWZhdWx0IHZh
-bHVlLi4uCkNoZWNraW5nIFBBVENIIDMvMTg6IHRhcmdldC9hcm06IE1ha2UgQ29ydGV4LU0zIGFu
-ZCBNNCBkZWZhdWx0IHRvIDggUE1TQSByZWdpb25zLi4uCkNoZWNraW5nIFBBVENIIDQvMTg6IGlu
-Y2x1ZGUvZXhlYy9leGVjLWFsbDogZG9jdW1lbnQgY29tbW9uIGV4aXQgY29uZGl0aW9ucy4uLgpD
-aGVja2luZyBQQVRDSCA1LzE4OiB0YXJnZXQvYXJtL3RyYW5zbGF0ZTogbWFrZSBESVNBU19VUERB
-VEUgbWF0Y2ggZGVjbGFyZWQgc2VtYW50aWNzLi4uCkNoZWNraW5nIFBBVENIIDYvMTg6IHRhcmdl
-dC9hcm0vdHJhbnNsYXRlLmg6IGV4cGFuZCBjb21tZW50IG9uIERJU0FTX0VYSVQuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNy8xODogdGFyZ2V0L2FybS90cmFuc2xhdGU6IGVuc3VyZSBnZW5fZ290b190YiBz
-ZXRzIGV4aXQgZmxhZ3MuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xODogdGFyZ2V0L2FybTogdXNlIGdl
-bl9nb3RvX3RiIGZvciBJU0IgaGFuZGxpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xODogdGFyZ2V0
-L2FybTogdXNlIERJU0FTX0VYSVQgZm9yIGVyZXQgaGFuZGxpbmcuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTAvMTg6IGh3L2FybS9tcHMyOiBJbXBsZW1lbnQgc2tlbGV0b24gbXBzMi1hbjM4NSBhbmQgbXBz
-Mi1hbjUxMSBib2FyZCBtb2RlbHMuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3
-NzogRklMRTogaHcvYXJtL21wczIuYzoyMjoKKyAqICAgaHR0cHM6Ly9kZXZlbG9wZXIuYXJtLmNv
-bS9wcm9kdWN0cy9zeXN0ZW0tZGVzaWduL2RldmVsb3BtZW50LWJvYXJkcy9jb3J0ZXgtbS1wcm90
-b3R5cGluZy1zeXN0ZW0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjgxIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDExLzE4OiBody9jaGFyL2Ntc2RrLWFwYi11YXJ0LmM6IEltcGxlbWVudCBDTVNESyBBUEIg
-VUFSVC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzYyOiBGSUxFOiBody9jaGFy
-L2Ntc2RrLWFwYi11YXJ0LmM6MTU6CisgKiBodHRwczovL2RldmVsb3Blci5hcm0uY29tL3Byb2R1
-Y3RzL3N5c3RlbS1kZXNpZ24vc3lzdGVtLWRlc2lnbi1raXRzL2NvcnRleC1tLXN5c3RlbS1kZXNp
-Z24ta2l0Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDUwOCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8x
-ODogaHcvYXJtL21wczI6IEFkZCBVQVJUcy4uLgpDaGVja2luZyBQQVRDSCAxMy8xODogaHcvY2hh
-ci9jbXNkay1hcGItdGltZXI6IEltcGxlbWVudCBDTVNESyBBUEIgdGltZXIgZGV2aWNlLi4uCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTc6IEZJTEU6IGh3L3RpbWVyL2Ntc2RrLWFw
-Yi10aW1lci5jOjE1OgorICogaHR0cHM6Ly9kZXZlbG9wZXIuYXJtLmNvbS9wcm9kdWN0cy9zeXN0
-ZW0tZGVzaWduL3N5c3RlbS1kZXNpZ24ta2l0cy9jb3J0ZXgtbS1zeXN0ZW0tZGVzaWduLWtpdAoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMzEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTQvMTg6IGh3L2Fy
-bS9tcHMyOiBBZGQgdGltZXJzLi4uCkNoZWNraW5nIFBBVENIIDE1LzE4OiBody9taXNjL21wczJf
-c2NjOiBJbXBsZW1lbnQgTVBTMiBTZXJpYWwgQ29tbXVuaWNhdGlvbiBDb250cm9sbGVyLi4uCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzA6IEZJTEU6IGh3L21pc2MvbXBzMi1zY2Mu
-YzoxNjoKKyAqIGh0dHA6Ly9pbmZvY2VudGVyLmFybS5jb20vaGVscC9pbmRleC5qc3A/dG9waWM9
-L2NvbS5hcm0uZG9jLjEwMDExMl8wMTAwXzAzX2VuL2luZGV4Lmh0bWwKCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTA1OiBGSUxFOiBody9taXNjL21w
-czItc2NjLmM6NTE6CitzdGF0aWMgYm9vbCBzY2NfY2ZnX3dyaXRlKE1QUzJTQ0MgKnMsIHVuc2ln
-bmVkIGZ1bmN0aW9uLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFs
-OiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzc5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE2LzE4OiBody9hcm0vbXBz
-MjogQWRkIFNDQy4uLgpDaGVja2luZyBQQVRDSCAxNy8xODogaHcvYXJtL21wczI6IEFkZCBldGhl
-cm5ldC4uLgpDaGVja2luZyBQQVRDSCAxOC8xODogTUFJTlRBSU5FUlM6IEFkZCBlbnRyaWVzIGZv
-ciBNUFMyIGJvYXJkLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Dear Conny,
+
+Here we got two bugfix patches for vfio-ccw:
+- fix commit 7da624e2 which missed to initialize a new introduced
+  pointer for the vfio-ccw case
+- fix a memory allocation that used a wrong size for an irq info
+  variable
+
+Dong Jia Shi (1):
+  vfio/ccw: fix initialization of the Object DeviceState pointer in the
+    common base-device
+
+Jing Zhang (1):
+  vfio/ccw: allocate irq info with the right size
+
+ hw/vfio/ccw.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+2.11.2
