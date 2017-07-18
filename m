@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dXHhE-00052D-Ao
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:53:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1dXHkI-0006TF-CD
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dXHhB-00061O-A9
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:53:08 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51327)
+	(envelope-from <peterx@redhat.com>) id 1dXHkF-0007XM-9m
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:56:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33844)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXHhB-000611-2r
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:53:05 -0400
-Date: Mon, 17 Jul 2017 21:53:03 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170718015303.GA20247@flamenco>
-References: <20170714001819.1660-1-rth@twiddle.net>
-	<20170714001819.1660-4-rth@twiddle.net>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dXHkF-0007Wq-0E
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 21:56:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF05C61D0F
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 01:56:13 +0000 (UTC)
+Date: Tue, 18 Jul 2017 09:56:06 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170718015606.GA27284@pxdev.xzpeter.org>
+References: <1500279971-13875-1-git-send-email-peterx@redhat.com>
+	<1500279971-13875-8-git-send-email-peterx@redhat.com>
+	<20170717182505.GA6020@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170714001819.1660-4-rth@twiddle.net>
-Subject: Re: [Qemu-devel] [PATCH 3/8] target/alpha: Merge several flag bytes
- into ENV->FLAGS
+In-Reply-To: <20170717182505.GA6020@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] migration: check global params
+ for validity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,144 +35,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Jul 13, 2017 at 14:18:14 -1000, Richard Henderson wrote:
-> The flags are arranged such that we can manipulate them either
-> a whole, or as individual bytes.  The computation within
-> cpu_get_tb_cpu_state is now reduced to a single load and mask.
+On Mon, Jul 17, 2017 at 03:25:05PM -0300, Eduardo Habkost wrote:
+> On Mon, Jul 17, 2017 at 04:26:07PM +0800, Peter Xu wrote:
+> > Adding validity check for the migration parameters passed in via global
+> > properties.
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  migration/migration.c | 34 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 34 insertions(+)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 8c65054..5a7f22c 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -2109,6 +2109,39 @@ static void migration_instance_init(Object *obj)
+> >      ms->parameters.tls_hostname = g_strdup("");
+> >  }
+> >  
+> > +static void migration_instance_post_init(Object *obj)
+> > +{
+> > +    MigrationState *ms = (MigrationState *)obj;
+> > +    Error *err = NULL;
+> > +    MigrationParameters params = {
+> > +        .has_compress_level = true,
+> > +        .compress_level = ms->parameters.compress_level,
+> > +        .has_compress_threads = true,
+> > +        .compress_threads = ms->parameters.compress_threads,
+> > +        .has_decompress_threads = true,
+> > +        .decompress_threads = ms->parameters.decompress_threads,
+> > +        .has_cpu_throttle_initial = true,
+> > +        .cpu_throttle_initial = ms->parameters.cpu_throttle_initial,
+> > +        .has_cpu_throttle_increment = true,
+> > +        .cpu_throttle_increment = ms->parameters.cpu_throttle_increment,
+> > +        .has_max_bandwidth = true,
+> > +        .max_bandwidth = ms->parameters.max_bandwidth,
+> > +        .has_downtime_limit = true,
+> > +        .downtime_limit = ms->parameters.downtime_limit,
+> > +        .has_x_checkpoint_delay = true,
+> > +        .x_checkpoint_delay = ms->parameters.x_checkpoint_delay,
+> > +        .has_block_incremental = true,
+> > +        .block_incremental = ms->parameters.block_incremental,
+> > +    };
+> > +
+> > +    /* We have applied all the migration properties... */
+> > +
+> > +    if (!migrate_params_check(&params, &err)) {
 > 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
-> ---
->  target/alpha/cpu.h       | 70 +++++++++++++++++--------------------
->  hw/alpha/dp264.c         |  1 -
->  linux-user/main.c        | 25 +++++++------
->  target/alpha/cpu.c       |  7 ++--
->  target/alpha/helper.c    | 12 +++----
->  target/alpha/machine.c   | 10 ++----
->  target/alpha/translate.c | 91 +++++++++++++++++++++++++++++++-----------------
->  7 files changed, 117 insertions(+), 99 deletions(-)
+> Why not just:
+>   if (!migrate_params_check(&ms->parameters, &err))
+> ?
 > 
-> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-> index aa83417..e95be2b 100644
-> --- a/target/alpha/cpu.h
-> +++ b/target/alpha/cpu.h
-> @@ -242,13 +242,11 @@ struct CPUAlphaState {
->      uint8_t fpcr_dyn_round;
->      uint8_t fpcr_flush_to_zero;
->  
-> -    /* The Internal Processor Registers.  Some of these we assume always
-> -       exist for use in user-mode.  */
-> -    uint8_t ps;
-> -    uint8_t intr_flag;
-> -    uint8_t pal_mode;
-> -    uint8_t fen;
-> +    /* Mask of PALmode, Processor State et al.  Most of this gets copied
-> +       into the TranslatorBlock flags and controls code generation.  */
-> +    uint32_t flags;
+> If the ms->parameters.has_* fields are not set to true anywhere,
+> we can set them to true in instance_init.
 
-Did you consider doing something like the appended? I don't like it
-because it messes with endianness, which is always a pain. But it
-lets you preserve the code that only touches the u8's as-is; this
-comes at the price of requiring a fast-path swap in big-endian hosts.
+Sure.
 
-An alternative would be to store the u8's in an order dependent on
-the endianness of the host -- but that would break vmstate saving,
-I guess.
+> 
+> (This would also also us to use QAPI_CLONE in
+> qmp_query_migrate_parameters() instead of manually copying each
+> field.
+> 
+> 
+> > +        error_report_err(err);
+> > +        exit(1);
+> > +    }
+> > +}
+> 
+> On real devices, this is normally done on realize (which has
+> proper error reporting).  We never realize the TYPE_MIGRATION
+> object because it's not a real device, though.
 
-		Emilio
+Hmm...
 
----8<---
+> 
+> Doing error checks on post_init feels fragile, as the only way
+> errors can be handled is triggering exit(1) in the middle of an
+> object_new() call.
+> 
+> As we have only one place where the TYPE_MIGRATION object is
+> created, I suggest calling migrate_params_check() inside
+> migration_object_init().
 
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index aa83417..22c52ac 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -244,10 +244,15 @@ struct CPUAlphaState {
- 
-     /* The Internal Processor Registers.  Some of these we assume always
-        exist for use in user-mode.  */
--    uint8_t ps;
--    uint8_t intr_flag;
--    uint8_t pal_mode;
--    uint8_t fen;
-+    union {
-+        struct {
-+            uint8_t pal_mode;
-+            uint8_t ps;
-+            uint8_t intr_flag;
-+            uint8_t fen;
-+        };
-+        uint32_t flags;
-+    };
- 
-     uint32_t pcc_ofs;
- 
-@@ -397,15 +402,35 @@ enum {
-     EXC_M_IOV = 64      /* Integer Overflow */
- };
- 
--/* Processor status constants.  */
--enum {
--    /* Low 3 bits are interrupt mask level.  */
--    PS_INT_MASK = 7,
- 
--    /* Bits 4 and 5 are the mmu mode.  The VMS PALcode uses all 4 modes;
--       The Unix PALcode only uses bit 4.  */
--    PS_USER_MODE = 8
--};
-+/* Low 3 bits are interrupt mask level.  */
-+#define PS_INT_MASK   7u
-+/* Bits 4 and 5 are the mmu mode.  The VMS PALcode uses all 4 modes;
-+   The Unix PALcode only uses bit 4.  */
-+#define PS_USER_MODE  8u
-+
-+/* CPUAlphaState->flags constants.  These are layed out so that we
-+   can set or reset the pieces individually by assigning to the byte,
-+   or manipulated as a whole.  */
-+
-+#define ENV_FLAG_PAL_SHIFT    0
-+#define ENV_FLAG_PS_SHIFT     8
-+#define ENV_FLAG_RX_SHIFT     16
-+#define ENV_FLAG_FEN_SHIFT    24
-+
-+#define ENV_FLAG_PAL_MODE     (1u << ENV_FLAG_PAL_SHIFT)
-+#define ENV_FLAG_PS_USER      (PS_USER_MODE << ENV_FLAG_PS_SHIFT)
-+#define ENV_FLAG_RX_FLAG      (1u << ENV_FLAG_RX_SHIFT)
-+#define ENV_FLAG_FEN          (1u << ENV_FLAG_FEN_SHIFT)
-+
-+#define ENV_FLAG_TB_MASK \
-+    (ENV_FLAG_PAL_MODE | ENV_FLAG_PS_USER | ENV_FLAG_FEN)
-+
-+#ifdef HOST_WORDS_BIGENDIAN
-+#define ENV_FLAG_TB(flags) (bswap32(flags) & ENV_FLAG_TB_MASK)
-+#else
-+#define ENV_FLAG_TB(flags) ((flags) & ENV_FLAG_TB_MASK)
-+#endif
- 
- static inline int cpu_mmu_index(CPUAlphaState *env, bool ifetch)
- {
-@@ -492,21 +517,10 @@ enum {
- static inline void cpu_get_tb_cpu_state(CPUAlphaState *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *pflags)
- {
--    int flags = 0;
--
-     *pc = env->pc;
-     *cs_base = 0;
- 
--    if (env->pal_mode) {
--        flags = TB_FLAGS_PAL_MODE;
--    } else {
--        flags = env->ps & PS_USER_MODE;
--    }
--    if (env->fen) {
--        flags |= TB_FLAGS_FEN;
--    }
--
--    *pflags = flags;
-+    *pflags = ENV_FLAG_TB(env->flags);
- }
- 
- #endif /* ALPHA_CPU_H */
+... How about I just provide a realize() for it? Then I can drop the
+QOM patch 4, also, I can keep the checks along with the object itself.
+
+Thanks,
+
+-- 
+Peter Xu
