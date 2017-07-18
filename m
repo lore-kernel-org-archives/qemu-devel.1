@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXZ7W-000570-B1
+	(envelope-from <armbru@redhat.com>) id 1dXZ7W-00056v-9o
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXZ7T-000174-3Q
+	(envelope-from <armbru@redhat.com>) id 1dXZ7U-00018U-SE
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38456)
+Received: from mx1.redhat.com ([209.132.183.28]:38510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXZ7S-00016p-T7
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXZ7U-00017o-K6
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 16:29:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD783A04EA
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A3E88A04E8
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:23 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-60.ams2.redhat.com
 	[10.36.116.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A87E55F912
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:21 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 42E5E77D4C
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:29:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Jul 2017 22:29:14 +0200
-Message-Id: <1500409760-20730-5-git-send-email-armbru@redhat.com>
+Date: Tue, 18 Jul 2017 22:29:17 +0200
+Message-Id: <1500409760-20730-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500409760-20730-1-git-send-email-armbru@redhat.com>
 References: <1500409760-20730-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 04/10] tests/test-qobject-input-visitor: Drop
- redundant test
+Subject: [Qemu-devel] [PULL 07/10] migration: Clean up around tls_creds,
+ tls_hostname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +36,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-test_visitor_in_alternate() tests UserDefAlternate with inadmissible
-input.  test_visitor_in_fail_alternate() does basically the same.
-Drop the former, keep the latter.
+Optional MigrationParameters members tls_creds and tls_hostname can't
+actually be absent outside qmp_migrate_set_parameters() since commit
+4af245d (v2.9.0).
+
+Note that commit 4af245d reverted the part of commit de63ab6 (v2.8.0)
+that made tls_creds and tls_hostname absent instead of "" in the value
+of query-migrate-parameters, even though commit de63ab6 called that a
+mistake.  What a mess.
+
+Drop the redundant tests for presence, and update documentation.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/test-qobject-input-visitor.c | 6 ------
- 1 file changed, 6 deletions(-)
+ hmp.c                 |  6 ++++--
+ migration/migration.c |  4 ++--
+ qapi-schema.json      | 11 +++++------
+ 3 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index f451844..bcf0261 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -567,7 +567,6 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
-                                       const void *unused)
- {
-     Visitor *v;
--    Error *err = NULL;
-     UserDefAlternate *tmp;
-     WrapAlternate *wrap;
- 
-@@ -599,11 +598,6 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
-     g_assert_cmpint(tmp->u.udfu.u.value1.has_a_b, ==, false);
-     qapi_free_UserDefAlternate(tmp);
- 
--    v = visitor_input_test_init(data, "false");
--    visit_type_UserDefAlternate(v, NULL, &tmp, &err);
--    error_free_or_abort(&err);
--    qapi_free_UserDefAlternate(tmp);
--
-     v = visitor_input_test_init(data, "{ 'alt': 42 }");
-     visit_type_WrapAlternate(v, NULL, &wrap, &error_abort);
-     g_assert_cmpint(wrap->alt->type, ==, QTYPE_QNUM);
+diff --git a/hmp.c b/hmp.c
+index 2993586..2b2db3c 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -313,12 +313,14 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRId64 "\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT],
+             params->cpu_throttle_increment);
++        assert(params->has_tls_creds);
+         monitor_printf(mon, "%s: '%s'\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
+-            params->has_tls_creds ? params->tls_creds : "");
++            params->tls_creds);
++        assert(params->has_tls_hostname);
+         monitor_printf(mon, "%s: '%s'\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
+-            params->has_tls_hostname ? params->tls_hostname : "");
++            params->tls_hostname);
+         assert(params->has_max_bandwidth);
+         monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH],
+diff --git a/migration/migration.c b/migration/migration.c
+index a0db40d..bae9808 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -438,9 +438,9 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->cpu_throttle_initial = s->parameters.cpu_throttle_initial;
+     params->has_cpu_throttle_increment = true;
+     params->cpu_throttle_increment = s->parameters.cpu_throttle_increment;
+-    params->has_tls_creds = !!s->parameters.tls_creds;
++    params->has_tls_creds = true;
+     params->tls_creds = g_strdup(s->parameters.tls_creds);
+-    params->has_tls_hostname = !!s->parameters.tls_hostname;
++    params->has_tls_hostname = true;
+     params->tls_hostname = g_strdup(s->parameters.tls_hostname);
+     params->has_max_bandwidth = true;
+     params->max_bandwidth = s->parameters.max_bandwidth;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 485767f..7b75cf1 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1054,9 +1054,7 @@
+ # @MigrationParameters:
+ #
+ # Optional members can be omitted on input ('migrate-set-parameters')
+-# but most members will always be present on output
+-# ('query-migrate-parameters'), with the exception of tls-creds and
+-# tls-hostname.
++# but members will always be present on output.
+ #
+ # @compress-level: compression level
+ #
+@@ -1077,10 +1075,10 @@
+ #             channel. On the outgoing side of the migration, the credentials
+ #             must be for a 'client' endpoint, while for the incoming side the
+ #             credentials must be for a 'server' endpoint. Setting this
+-#             will enable TLS for all migrations. The default is unset,
+-#             resulting in unsecured migration at the QEMU level. (Since 2.7)
++#             to a non-empty string enables TLS for all migrations.
+ #             An empty string means that QEMU will use plain text mode for
+-#             migration, rather than TLS (Since 2.9)
++#             migration, rather than TLS (Since 2.7)
++#             Note: 2.8 reports this by omitting tls-creds instead.
+ #
+ # @tls-hostname: hostname of the target host for the migration. This
+ #                is required when using x509 based TLS credentials and the
+@@ -1090,6 +1088,7 @@
+ #                certificate identity can be validated. (Since 2.7)
+ #                An empty string means that QEMU will use the hostname
+ #                associated with the migration URI, if any. (Since 2.9)
++#                Note: 2.8 reports this by omitting tls-hostname instead.
+ #
+ # @max-bandwidth: to set maximum speed for migration. maximum speed in
+ #                 bytes per second. (Since 2.8)
 -- 
 2.7.5
