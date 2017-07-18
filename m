@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXUt3-0000KA-8V
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:58:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXUvx-0003kR-2U
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXUt2-0000Wg-8T
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:58:13 -0400
-Date: Tue, 18 Jul 2017 16:57:59 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170718155759.GS11927@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<1500385286-21142-9-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1500385286-21142-9-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 08/10] migration: Add TODO
- comments on duplication of QAPI_CLONE()
+	(envelope-from <eblake@redhat.com>) id 1dXUvs-0001zb-N6
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:01:13 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 18 Jul 2017 11:00:59 -0500
+Message-Id: <20170718160059.26806-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: Make bdrv_img_create() size selection
+ easier to read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +18,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Tue, Jul 18, 2017 at 03:41:24PM +0200, Markus Armbruster wrote:
-> qmp_query_migrate_parameters() and qmp_migrate_set_parameters()
-> effectively duplicate QAPI_CLONE() inline.  Add suitable TODO
-> comments.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  migration/migration.c | 2 ++
->  1 file changed, 2 insertions(+)
+All callers of bdrv_img_create() pass in a size, or -1 to read the
+size from the backing file.  We then set that size as the QemuOpt
+default, which means we will reuse that default rather than the
+final parameter to qemu_opt_get_size() several lines later.  But
+it is rather confusing to read subsequent checks of 'size == -1'
+when it looks (without seeing the full context) like size defaults
+to 0; it also doesn't help that a size of 0 is valid (for some
+formats).
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Rework the logic to make things more legible.
 
-Regards,
-Daniel
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block.c b/block.c
+index 2dd9262cd0..57195ec40f 100644
+--- a/block.c
++++ b/block.c
+@@ -4398,7 +4398,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+
+     /* The size for the image must always be specified, unless we have a backing
+      * file and we have not been forbidden from opening it. */
+-    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
++    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, img_size);
+     if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
+         BlockDriverState *bs;
+         char *full_backing = g_new0(char, PATH_MAX);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.13.3
