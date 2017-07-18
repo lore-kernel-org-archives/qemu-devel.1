@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34797)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXIXl-0002pU-4Z
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:26 -0400
+	id 1dXIXl-0002pV-Ba
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXIXh-0007wM-72
+	id 1dXIXj-00080x-Sr
 	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:25 -0400
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:36535)
+Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:35781)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXIXh-0007w3-2a
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:21 -0400
-Received: by mail-qt0-x231.google.com with SMTP id 21so5943046qtx.3
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 19:47:20 -0700 (PDT)
+	id 1dXIXj-00080I-Nh
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:23 -0400
+Received: by mail-qk0-x22e.google.com with SMTP id p73so6180874qka.2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 19:47:23 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 23:47:08 -0300
-Message-Id: <20170718024713.27557-1-f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 23:47:09 -0300
+Message-Id: <20170718024713.27557-2-f4bug@amsat.org>
+In-Reply-To: <20170718024713.27557-1-f4bug@amsat.org>
+References: <20170718024713.27557-1-f4bug@amsat.org>
 In-Reply-To: <20170717144848.11793-1-alex.bennee@linaro.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2.5 0/5] (more) Updated Travis Queue
+Subject: [Qemu-devel] [PATCH v2.5 1/5] docker: add MXE (M cross environment)
+ base image for MinGW-w64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +39,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Sorry I messed previous series... just updated last 5 patches of v2.
+see http://mxe.cc/
 
-v2.5:
-- MXE replaced <tab> by <space>s
-- docker9/ports: lost package 'clang' re-added
-- include patch keep 'debian.docker' base image backward incompatible 
-
-On 07/17/2017 09:31 PM, Philippe Mathieu-Daudé wrote:
-> Hi,
-> 
-> a bit late, but in case you can take some for 2.10:
-> 
-> v2:
-> - cleanup few packages (to improve image caching)
-> - dropped mipsEL and keep mipsEB image (32-bit big endian)
-> - add mips64EL (64-bit little endian)
-> - add mingw32 and mingw64 targets (shared libs, could be static)
-> - add debian Ports image [can be dropped, use as base for SH4 for 2.11]
-> 
-> On 07/17/2017 11:48 AM, Alex Bennée wrote:
->> Hi,
->>
->> This is the current status of the travis/next patch queue. The
->> includes updates from Paolo to allow parallelism while testing in the
->> docker environment. I've extended the travis image so we can actually
->> run our travis.py script in the Travis image.
->>
->> There are also a number of updates from Phillipe which add a bunch of
->> additional cross compile targets to our shippable setup. The cachinfo
->> patch is temporary and won't make the pull as it is already queued in
->> Richard's tcg-next.
->>
->> I'm currently trying to catch one of our Travis hangs in the act
->> (postcopy-test) but it seems to be very much a heavy load race
->> condition which annoyingly stops happening once you try and get
->> debugging tools on it. This is the reason I've updated the travis
->> docker image to include the debug tools;-)
->>
->> As long as there are no screams of outrage I'll roll a pullreq for
->> softfreeze tomorrow.
-
-Philippe Mathieu-Daudé (5):
-  docker: add MXE (M cross environment) base image for MinGW-w64
-  shippable: add win32/64 targets
-  docker: add debian Ports base image
-  docker: warn users to use newer debian8/debian9 base image
-  docker: install clang since Shippable setup_ve() verify it is
-    available
-
- .shippable.yml                                     |  4 +++
- tests/docker/Makefile.include                      |  4 +++
- tests/docker/dockerfiles/debian-ports.docker       | 35 ++++++++++++++++++++++
- tests/docker/dockerfiles/debian-win32-cross.docker | 32 ++++++++++++++++++++
- tests/docker/dockerfiles/debian-win64-cross.docker | 32 ++++++++++++++++++++
- tests/docker/dockerfiles/debian.docker             | 13 ++++++++
- tests/docker/dockerfiles/debian8-mxe.docker        | 18 +++++++++++
- tests/docker/dockerfiles/debian9.docker            |  1 +
- 8 files changed, 139 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-ports.docker
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/docker/Makefile.include                      |  3 ++
+ tests/docker/dockerfiles/debian-win32-cross.docker | 32 ++++++++++++++++++++++
+ tests/docker/dockerfiles/debian-win64-cross.docker | 32 ++++++++++++++++++++++
+ tests/docker/dockerfiles/debian8-mxe.docker        | 18 ++++++++++++
+ 4 files changed, 85 insertions(+)
  create mode 100644 tests/docker/dockerfiles/debian-win32-cross.docker
  create mode 100644 tests/docker/dockerfiles/debian-win64-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian.docker
  create mode 100644 tests/docker/dockerfiles/debian8-mxe.docker
 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 5a8283674a..e993e149e7 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -58,6 +58,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
+ 
+ # Enforce dependancies for composite images
++docker-image-debian8-mxe: docker-image-debian8
+ docker-image-debian-amd64: docker-image-debian9
+ docker-image-debian-armel-cross: docker-image-debian9
+ docker-image-debian-armhf-cross: docker-image-debian9
+@@ -67,6 +68,8 @@ docker-image-debian-mips64el-cross: docker-image-debian9
+ docker-image-debian-powerpc-cross: docker-image-debian8
+ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
++docker-image-debian-win32-cross: docker-image-debian8-mxe
++docker-image-debian-win64-cross: docker-image-debian8-mxe
+ 
+ # Expand all the pre-requistes for each docker image and test combination
+ $(foreach i,$(DOCKER_IMAGES), \
+diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/docker/dockerfiles/debian-win32-cross.docker
+new file mode 100644
+index 0000000000..dd021f2df0
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-win32-cross.docker
+@@ -0,0 +1,32 @@
++#
++# Docker mingw32 cross-compiler target
++#
++# This docker target builds on the debian Jessie MXE base image.
++#
++FROM qemu:debian8-mxe
++
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++ENV TARGET i686
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        mxe-$TARGET-w64-mingw32.shared-bzip2 \
++        mxe-$TARGET-w64-mingw32.shared-curl \
++        mxe-$TARGET-w64-mingw32.shared-glib \
++        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
++        mxe-$TARGET-w64-mingw32.shared-libssh2 \
++        mxe-$TARGET-w64-mingw32.shared-libusb1 \
++        mxe-$TARGET-w64-mingw32.shared-lzo \
++        mxe-$TARGET-w64-mingw32.shared-nettle \
++        mxe-$TARGET-w64-mingw32.shared-ncurses \
++        mxe-$TARGET-w64-mingw32.shared-pixman \
++        mxe-$TARGET-w64-mingw32.shared-pkgconf \
++        mxe-$TARGET-w64-mingw32.shared-pthreads \
++        mxe-$TARGET-w64-mingw32.shared-sdl2 \
++        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
++        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
++        mxe-$TARGET-w64-mingw32.shared-zlib
++
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=$TARGET-w64-mingw32.shared-
+diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
+new file mode 100644
+index 0000000000..4542bcc821
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-win64-cross.docker
+@@ -0,0 +1,32 @@
++#
++# Docker mingw64 cross-compiler target
++#
++# This docker target builds on the debian Jessie MXE base image.
++#
++FROM qemu:debian8-mxe
++
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++ENV TARGET x86-64
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        mxe-$TARGET-w64-mingw32.shared-bzip2 \
++        mxe-$TARGET-w64-mingw32.shared-curl \
++        mxe-$TARGET-w64-mingw32.shared-glib \
++        mxe-$TARGET-w64-mingw32.shared-libgcrypt \
++        mxe-$TARGET-w64-mingw32.shared-libssh2 \
++        mxe-$TARGET-w64-mingw32.shared-libusb1 \
++        mxe-$TARGET-w64-mingw32.shared-lzo \
++        mxe-$TARGET-w64-mingw32.shared-nettle \
++        mxe-$TARGET-w64-mingw32.shared-ncurses \
++        mxe-$TARGET-w64-mingw32.shared-pixman \
++        mxe-$TARGET-w64-mingw32.shared-pkgconf \
++        mxe-$TARGET-w64-mingw32.shared-pthreads \
++        mxe-$TARGET-w64-mingw32.shared-sdl2 \
++        mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
++        mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
++        mxe-$TARGET-w64-mingw32.shared-zlib
++
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-w64-mingw32.shared-
+diff --git a/tests/docker/dockerfiles/debian8-mxe.docker b/tests/docker/dockerfiles/debian8-mxe.docker
+new file mode 100644
+index 0000000000..7bf1b59e54
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian8-mxe.docker
+@@ -0,0 +1,18 @@
++#
++# Docker mingw cross-compiler target
++#
++# This docker target builds on the debian Jessie base image.
++#
++FROM qemu:debian8
++
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++# Add the foreign architecture we want and install dependencies
++RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys D43A795B73B16ABE9643FE1AFD8FFF16DB45C6AB && \
++    echo "deb http://pkg.mxe.cc/repos/apt/debian jessie main" > /etc/apt/sources.list.d/mxeapt.list
++RUN apt-get update
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        $(apt-get -s install -y --no-install-recommends gw32.shared-mingw-w64 gw32.shared-mingw-w64 | egrep "^Inst mxe-x86-64-unknown-" | cut -d\  -f2)
++
++ENV PATH $PATH:/usr/lib/mxe/usr/bin/ 
 -- 
 2.13.2
