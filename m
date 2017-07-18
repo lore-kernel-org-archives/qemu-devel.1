@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0I-0007Q9-NY
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0I-0007Q8-NK
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0F-00035K-Mu
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0G-00035g-N9
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:22 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33693)
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35011)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dXQ0F-00034Y-Ga
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:19 -0400
-Received: by mail-wr0-x230.google.com with SMTP id a10so23430529wrd.0
+	id 1dXQ0G-00034O-GO
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:20 -0400
+Received: by mail-wr0-x230.google.com with SMTP id w4so22822475wrb.2
 	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:45:17 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 18 Jul 2017 11:44:42 +0100
-Message-Id: <20170718104513.23947-2-alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:44:43 +0100
+Message-Id: <20170718104513.23947-3-alex.bennee@linaro.org>
 In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
 References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/32] docker: allow customizing Travis
- global_env variables
+Subject: [Qemu-devel] [PULL 02/32] travis: move make -j flag out of script
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +33,33 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.be
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-This is useful so that we can do builds at higher than -j3 when running
-travis.py locally.
+Because global environment variables can be overridden when .travis.yml
+is processed by the docker-travis target, the effect of this patch is
+that docker-travis now obeys the "J=n" option.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/travis.py b/tests/docker/travis.py
-index 8dcc964da4..703a7fde85 100755
---- a/tests/docker/travis.py
-+++ b/tests/docker/travis.py
-@@ -21,13 +21,12 @@ def load_yaml(fname):
- def conf_iter(conf):
-     def env_to_list(env):
-         return env if isinstance(env, list) else [env]
--    global_env = conf["env"]["global"]
-     for entry in conf["matrix"]["include"]:
--        yield {"env": global_env + env_to_list(entry["env"]),
-+        yield {"env": env_to_list(entry["env"]),
-                "compiler": entry["compiler"]}
-     for entry in itertools.product(conf["compiler"],
-                                    conf["env"]["matrix"]):
--        yield {"env": global_env + env_to_list(entry[1]),
-+        yield {"env": env_to_list(entry[1]),
-                "compiler": entry[0]}
- 
- def main():
-@@ -35,6 +34,7 @@ def main():
-         sys.stderr.write("Usage: %s <travis-file>\n" % sys.argv[0])
-         return 1
-     conf = load_yaml(sys.argv[1])
-+    print "\n".join((": ${%s}" % var for var in conf["env"]["global"]))
-     for config in conf_iter(conf):
-         print "("
-         print "\n".join(config["env"])
+diff --git a/.travis.yml b/.travis.yml
+index 3c7a5cbe25..f583839755 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -46,6 +46,7 @@ notifications:
+ env:
+   global:
+     - TEST_CMD="make check"
++    - MAKEFLAGS="-j3"
+   matrix:
+     - CONFIG=""
+     - CONFIG="--enable-debug --enable-debug-tcg --enable-trace-backends=log"
+@@ -64,7 +65,7 @@ before_install:
+ before_script:
+   - ./configure ${CONFIG}
+ script:
+-  - make -j3 && ${TEST_CMD}
++  - make ${MAKEFLAGS} && ${TEST_CMD}
+ matrix:
+   include:
+     # Test with CLang for compile portability
 -- 
 2.13.0
