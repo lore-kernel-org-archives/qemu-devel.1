@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXSkw-0000DK-MF
+	(envelope-from <armbru@redhat.com>) id 1dXSku-0000B6-W2
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007UC-Hu
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXSkt-0007Ss-4u
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 09:41:40 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 18 Jul 2017 15:41:21 +0200
-Message-Id: <1500385286-21142-6-git-send-email-armbru@redhat.com>
+Date: Tue, 18 Jul 2017 15:41:19 +0200
+Message-Id: <1500385286-21142-4-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500385286-21142-1-git-send-email-armbru@redhat.com>
 References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 05/10] block: Use JSON null instead of
- "" to disable backing file
+Subject: [Qemu-devel] [PATCH for-2.10 03/10] qapi: Introduce a first class
+ 'null' type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,166 +23,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-BlockdevRef is an alternate of BlockdevOptions (inline definition) and
-str (reference to an existing block device by name).  BlockdevRef
-value "" is special: "no block device should be referenced."  It's
-actually interpreted that way in just one place: optional member
-@backing of COW formats.  Semantics:
-
-* Present means "use this block device" as backing storage
-
-* Absent means "default to the one stored in the image"
-
-* Except "" means "don't use backing storage at all"
-
-The first two are perfectly normal: when the parameter is absent, it
-defaults to an implied value, but the value's meaning is the same.
-
-The third one overloads the parameter with a second meaning.  The
-overloading is *implicit*, i.e. it's not visible in the types.  Works
-here, because "" is not a value block device ID.
-
-Pressing argument values the schema accepts, but are semantically
-invalid, into service to mean "do something else entirely" is not
-general, as suitable invalid values need not exist.  I also find it
-ugly.
-
-To clean this up, we could add a separate flag argument to suppress
-@backing, or add a distinct value to @backing.  This commit implements
-the latter: add JSON null to the values of @backing, deprecate "".
-
-Because we're so close to the 2.10 freeze, implement it in the
-stupidest way possible: have qmp_blockdev_add() rewrite null to ""
-before anything else can see the null.  Works, because BlockdevRef
-occurs only within arguments of blockdev-add.  The proper way to do it
-would be rewriting "" to null, preferably in a cleaner way, but that
-requires fixing up code to work with null.  Add a TODO comment for
-that.
+I expect the 'null' type to be useful mostly for members of alternate
+types.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- blockdev.c             | 14 ++++++++++++++
- qapi/block-core.json   | 29 ++++++++++++++++++++++-------
- tests/qemu-iotests/085 |  2 +-
- tests/qemu-iotests/139 |  2 +-
- 4 files changed, 38 insertions(+), 9 deletions(-)
+ include/qapi/qmp/qobject.h              |  4 ++--
+ include/qemu/typedefs.h                 |  1 +
+ scripts/qapi.py                         |  5 ++++-
+ tests/qapi-schema/qapi-schema-test.json |  3 ++-
+ tests/qapi-schema/qapi-schema-test.out  |  1 +
+ tests/test-qobject-input-visitor.c      |  5 +++++
+ tests/test-qobject-output-visitor.c     | 10 ++++++++++
+ 7 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 9c6dd27..1c42699 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3886,6 +3886,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
-     QObject *obj;
-     Visitor *v = qobject_output_visitor_new(&obj);
-     QDict *qdict;
-+    const QDictEntry *ent;
-     Error *local_err = NULL;
- 
-     visit_type_BlockdevOptions(v, NULL, &options, &local_err);
-@@ -3899,6 +3900,19 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
- 
-     qdict_flatten(qdict);
- 
-+    /*
-+     * Rewrite "backing": null to "backing": ""
-+     * TODO Rewrite "" to null instead, and perhaps not even here
-+     */
-+    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
-+        char *dot = strrchr(ent->key, '.');
-+
-+        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
-+            && qobject_type(ent->value) == QTYPE_QNULL) {
-+            qdict_put(qdict, ent->key, qstring_new());
-+        }
-+    }
-+
-     if (!qdict_get_try_str(qdict, "node-name")) {
-         error_setg(errp, "'node-name' must be specified for the root node");
-         goto fail;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c437aa5..4088041 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2266,15 +2266,14 @@
- # besides their data source and an optional backing file.
- #
- # @backing:     reference to or definition of the backing file block
--#               device (if missing, taken from the image file content). It is
--#               allowed to pass an empty string here in order to disable the
--#               default backing file.
-+#               device, null disables the backing file entirely.
-+#               Defaults to the backing file stored the image file.
- #
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsGenericCOWFormat',
-   'base': 'BlockdevOptionsGenericFormat',
--  'data': { '*backing': 'BlockdevRef' } }
-+  'data': { '*backing': 'BlockdevRefOrNull' } }
- 
- ##
- # @Qcow2OverlapCheckMode:
-@@ -3113,9 +3112,7 @@
- # Reference to a block device.
- #
- # @definition:      defines a new block device inline
--# @reference:       references the ID of an existing block device. An
--#                   empty string means that no block device should be
--#                   referenced.
-+# @reference:       references the ID of an existing block device
- #
- # Since: 2.9
- ##
-@@ -3124,6 +3121,24 @@
-             'reference': 'str' } }
- 
- ##
-+# @BlockdevRefOrNull:
-+#
-+# Reference to a block device.
-+#
-+# @definition:      defines a new block device inline
-+# @reference:       references the ID of an existing block device.
-+#                   An empty string means that no block device should
-+#                   be referenced.  Deprecated; use null instead.
-+# @null:            No block device should be referenced (since 2.10)
-+#
-+# Since: 2.9
-+##
-+{ 'alternate': 'BlockdevRefOrNull',
-+  'data': { 'definition': 'BlockdevOptions',
-+            'reference': 'str',
-+            'null': 'null' } }
-+
-+##
- # @blockdev-add:
- #
- # Creates a new block device. If the @id option is given at the top level, a
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index b97adcd..76e10aa 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -106,7 +106,7 @@ function add_snapshot_image()
-     snapshot_file="${TEST_DIR}/${1}-${snapshot_virt0}"
-     _make_test_img -b "${base_image}" "$size"
-     mv "${TEST_IMG}" "${snapshot_file}"
--    do_blockdev_add "$1" "'backing': '', " "${snapshot_file}"
-+    do_blockdev_add "$1" "'backing': null, " "${snapshot_file}"
+diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+index 3543b55..eab29ed 100644
+--- a/include/qapi/qmp/qobject.h
++++ b/include/qapi/qmp/qobject.h
+@@ -93,9 +93,9 @@ static inline QType qobject_type(const QObject *obj)
+     return obj->type;
  }
  
- # ${1}: unique identifier for the snapshot filename
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 175d8f0..b2f14db 100644
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -69,7 +69,7 @@ class TestBlockdevDel(iotests.QMPTestCase):
-                          '-b', base_img, new_img, '1M')
-         opts = {'driver': iotests.imgfmt,
-                 'node-name': node,
--                'backing': '',
-+                'backing': None,
-                 'file': {'driver': 'file',
-                          'filename': new_img}}
-         result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
+-typedef struct QNull {
++struct QNull {
+     QObject base;
+-} QNull;
++};
+ 
+ extern QNull qnull_;
+ 
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 2706aab..ba69bd8 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -87,6 +87,7 @@ typedef struct QEMUSGList QEMUSGList;
+ typedef struct QEMUTimer QEMUTimer;
+ typedef struct QEMUTimerListGroup QEMUTimerListGroup;
+ typedef struct QObject QObject;
++typedef struct QNull QNull;
+ typedef struct RAMBlock RAMBlock;
+ typedef struct Range Range;
+ typedef struct SerialState SerialState;
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 84e2eb4..8aa2775 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -20,6 +20,7 @@ import sys
+ from ordereddict import OrderedDict
+ 
+ builtin_types = {
++    'null':     'QTYPE_QNULL',
+     'str':      'QTYPE_QSTRING',
+     'int':      'QTYPE_QNUM',
+     'number':   'QTYPE_QNUM',
+@@ -1056,6 +1057,7 @@ class QAPISchemaType(QAPISchemaEntity):
+ 
+     def alternate_qtype(self):
+         json2qtype = {
++            'null':    'QTYPE_QNULL',
+             'string':  'QTYPE_QSTRING',
+             'number':  'QTYPE_QNUM',
+             'int':     'QTYPE_QNUM',
+@@ -1515,7 +1517,8 @@ class QAPISchema(object):
+                   ('uint64', 'int',     'uint64_t'),
+                   ('size',   'int',     'uint64_t'),
+                   ('bool',   'boolean', 'bool'),
+-                  ('any',    'value',   'QObject' + pointer_suffix)]:
++                  ('any',    'value',   'QObject' + pointer_suffix),
++                  ('null',   'null',    'QNull' + pointer_suffix)]:
+             self._def_builtin_type(*t)
+         self.the_empty_object_type = QAPISchemaObjectType(
+             'q_empty', None, None, None, [], None)
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+index 91ffb26..c72dbd8 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -93,7 +93,8 @@
+ { 'struct': 'WrapAlternate',
+   'data': { 'alt': 'UserDefAlternate' } }
+ { 'alternate': 'UserDefAlternate',
+-  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int' } }
++  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int',
++            'n': 'null' } }
+ 
+ { 'struct': 'UserDefC',
+   'data': { 'string1': 'str', 'string2': 'str' } }
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+index b88b8aa..3b1e908 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -64,6 +64,7 @@ alternate UserDefAlternate
+     case udfu: UserDefFlatUnion
+     case e: EnumOne
+     case i: int
++    case n: null
+ object UserDefB
+     member intb: int optional=False
+     member a-b: bool optional=True
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index f98caf9..f451844 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -583,6 +583,11 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
+     g_assert_cmpint(tmp->u.e, ==, ENUM_ONE_VALUE1);
+     qapi_free_UserDefAlternate(tmp);
+ 
++    v = visitor_input_test_init(data, "null");
++    visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
++    g_assert_cmpint(tmp->type, ==, QTYPE_QNULL);
++    qapi_free_UserDefAlternate(tmp);
++
+     v = visitor_input_test_init(data, "{'integer':1, 'string':'str', "
+                                 "'enum1':'value1', 'boolean':true}");
+     visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
+diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
+index 8f1fcd4..7eb1620 100644
+--- a/tests/test-qobject-output-visitor.c
++++ b/tests/test-qobject-output-visitor.c
+@@ -424,6 +424,16 @@ static void test_visitor_out_alternate(TestOutputVisitorData *data,
+ 
+     visitor_reset(data);
+     tmp = g_new0(UserDefAlternate, 1);
++    tmp->type = QTYPE_QNULL;
++    tmp->u.n = qnull();
++
++    visit_type_UserDefAlternate(data->ov, NULL, &tmp, &error_abort);
++    g_assert_cmpint(qobject_type(visitor_get(data)), ==, QTYPE_QNULL);
++
++    qapi_free_UserDefAlternate(tmp);
++
++    visitor_reset(data);
++    tmp = g_new0(UserDefAlternate, 1);
+     tmp->type = QTYPE_QDICT;
+     tmp->u.udfu.integer = 1;
+     tmp->u.udfu.string = g_strdup("str");
 -- 
 2.7.5
