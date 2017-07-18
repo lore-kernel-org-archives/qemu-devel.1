@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33798)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRN-0000hR-FQ
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:45 -0400
+	id 1dXGRR-0000l8-Ih
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRM-0004vH-Gx
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:41 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34542)
+	id 1dXGRP-0004wh-HU
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:45 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35172)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXGRM-0004v4-Cm
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:40 -0400
-Received: by mail-qk0-x242.google.com with SMTP id q66so732567qki.1
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:32:40 -0700 (PDT)
+	id 1dXGRP-0004wV-D3
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:32:43 -0400
+Received: by mail-qt0-x243.google.com with SMTP id h15so716296qte.2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:32:43 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 21:31:35 -0300
-Message-Id: <20170718003159.10200-8-f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 21:31:36 -0300
+Message-Id: <20170718003159.10200-9-f4bug@amsat.org>
 In-Reply-To: <20170718003159.10200-1-f4bug@amsat.org>
 References: <20170717144848.11793-1-alex.bennee@linaro.org>
 	<20170718003159.10200-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 07/31] docker: debian/s390x no more in
- unstable, now available in Stretch
+Subject: [Qemu-devel] [PATCH v2 08/31] docker: remove packages now dependent
+ of qemu in Stretch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,63 +41,73 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                      |  1 +
- tests/docker/dockerfiles/debian-s390x-cross.docker | 20 ++++++++++----------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ tests/docker/dockerfiles/debian-arm64-cross.docker  | 3 ---
+ tests/docker/dockerfiles/debian-armhf-cross.docker  | 3 ---
+ tests/docker/dockerfiles/debian-mipsel-cross.docker | 3 ---
+ tests/docker/dockerfiles/debian-s390x-cross.docker  | 3 ---
+ 4 files changed, 12 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 72bb52ad7b..84dce49655 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -59,6 +59,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- docker-image-debian-armhf-cross: docker-image-debian9
- docker-image-debian-arm64-cross: docker-image-debian9
- docker-image-debian-mipsel-cross: docker-image-debian9
-+docker-image-debian-s390x-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
+index f1bfa64160..6ed12a3f6e 100644
+--- a/tests/docker/dockerfiles/debian-arm64-cross.docker
++++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
+@@ -19,11 +19,8 @@ ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
  
- # Expand all the pre-requistes for each docker image and test combination
- $(foreach i,$(DOCKER_IMAGES), \
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+-        glusterfs-common:arm64 \
+         libbz2-dev:arm64 \
+         liblzo2-dev:arm64 \
+-        libncursesw5-dev:arm64 \
+-        libnfs-dev:arm64 \
+         librdmacm-dev:arm64 \
+         libsnappy-dev:arm64 \
+         libxen-dev:arm64
+diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
+index 2beacef49b..5100b0afc0 100644
+--- a/tests/docker/dockerfiles/debian-armhf-cross.docker
++++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
+@@ -19,11 +19,8 @@ ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
+ 
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+-        glusterfs-common:armhf \
+         libbz2-dev:armhf \
+         liblzo2-dev:armhf \
+-        libncursesw5-dev:armhf \
+-        libnfs-dev:armhf \
+         librdmacm-dev:armhf \
+         libsnappy-dev:armhf \
+         libxen-dev:armhf
+diff --git a/tests/docker/dockerfiles/debian-mipsel-cross.docker b/tests/docker/dockerfiles/debian-mipsel-cross.docker
+index 9ee997aa54..eb279c5044 100644
+--- a/tests/docker/dockerfiles/debian-mipsel-cross.docker
++++ b/tests/docker/dockerfiles/debian-mipsel-cross.docker
+@@ -20,10 +20,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get build-dep -yy -a mipsel qemu
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+-        glusterfs-common:mipsel \
+         libbz2-dev:mipsel \
+         liblzo2-dev:mipsel \
+-        libncursesw5-dev:mipsel \
+-        libnfs-dev:mipsel \
+         librdmacm-dev:mipsel \
+         libsnappy-dev:mipsel
 diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
-index cfc354ce5d..667e428a4c 100644
+index 667e428a4c..e188bfeda4 100644
 --- a/tests/docker/dockerfiles/debian-s390x-cross.docker
 +++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-@@ -1,27 +1,27 @@
- #
- # Docker s390 cross-compiler target
- #
--# This docker target is based on stretch (testing) as the stable build
--# doesn't have the cross compiler available.
-+# This docker target builds on the debian Stretch base image.
- #
--FROM debian:testing-slim
--
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
-+FROM qemu:debian9
- 
- # Add the s390x architecture
- RUN dpkg --add-architecture s390x
- 
- # Grab the updated list of packages
- RUN apt update && apt dist-upgrade -yy
--RUN apt install -yy build-essential clang
--RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
--RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        gcc-multilib-s390x-linux-gnu
-+
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get build-dep -yy -a s390x qemu
- 
- # Specify the cross prefix for this image (see tests/docker/common.rc)
- ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
- 
--RUN DEBIAN_FRONTEND=noninteractive \
-+# Install extra libraries to increase code coverage
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+@@ -23,10 +23,7 @@ ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
+ # Install extra libraries to increase code coverage
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
      apt-get install -y --no-install-recommends \
-         glusterfs-common:s390x \
+-        glusterfs-common:s390x \
          libbz2-dev:s390x \
+         liblzo2-dev:s390x \
+-        libncursesw5-dev:s390x \
+-        libnfs-dev:s390x \
+         librdmacm-dev:s390x \
+         libsnappy-dev:s390x
 -- 
 2.13.2
