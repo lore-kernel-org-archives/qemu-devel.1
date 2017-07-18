@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXatD-000867-QR
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:49 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dXatF-00087a-IK
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dXatC-0004U5-Gb
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39850)
+	(envelope-from <sstabellini@kernel.org>) id 1dXatE-0004Y8-76
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dXatC-0004SA-7z
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:46 -0400
+	id 1dXatD-0004W9-TJ
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 18:22:48 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 18 Jul 2017 15:22:38 -0700
-Message-Id: <1500416562-27337-3-git-send-email-sstabellini@kernel.org>
+Date: Tue, 18 Jul 2017 15:22:41 -0700
+Message-Id: <1500416562-27337-6-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1500416562-27337-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1707181519030.17537@sstabellini-ThinkPad-X260>
 	<1500416562-27337-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL for-2.10 3/7] xen-platform: separate unplugging
- of NVMe disks
+Subject: [Qemu-devel] [PULL for-2.10 6/7] xen/mapcache: introduce
+ xen_replace_cache_entry()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,126 +27,265 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Igor Druzhinin <igor.druzhinin@citrix.com>
 
-Commit 090fa1c8 "add support for unplugging NVMe disks..." extended the
-existing disk unplug flag to cover NVMe disks as well as IDE and SCSI.
+From: Igor Druzhinin <igor.druzhinin@citrix.com>
 
-The recent thread on the xen-devel mailing list [1] has highlighted that
-this is not desirable behaviour: PV frontends should be able to distinguish
-NVMe disks from other types of disk and should have separate control over
-whether they are unplugged.
+This new call is trying to update a requested map cache entry
+according to the changes in the physmap. The call is searching
+for the entry, unmaps it and maps again at the same place using
+a new guest address. If the mapping is dummy this call will
+make it real.
 
-This patch defines a new bit in the unplug mask for this purpose (see Xen
-commit [2]) and also tidies up the definitions of, and improves the
-comments regarding, the previously exiting bits in the protocol.
+This function makes use of a new xenforeignmemory_map2() call
+with an extended interface that was recently introduced in
+libxenforeignmemory [1].
 
-[1] https://lists.xen.org/archives/html/xen-devel/2017-03/msg02924.html
-[2] http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=1096aa02
+[1] https://www.mail-archive.com/xen-devel@lists.xen.org/msg113007.html
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/i386/xen/xen_platform.c | 47 ++++++++++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 12 deletions(-)
+ configure                     | 18 +++++++++
+ hw/i386/xen/xen-mapcache.c    | 85 +++++++++++++++++++++++++++++++++++++++----
+ include/hw/xen/xen_common.h   | 14 +++++++
+ include/sysemu/xen-mapcache.h | 11 +++++-
+ 4 files changed, 119 insertions(+), 9 deletions(-)
 
-diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
-index f231558..9ba7474 100644
---- a/hw/i386/xen/xen_platform.c
-+++ b/hw/i386/xen/xen_platform.c
-@@ -87,10 +87,30 @@ static void log_writeb(PCIXenPlatformState *s, char val)
-     }
+diff --git a/configure b/configure
+index e8798ce..bad50f5 100755
+--- a/configure
++++ b/configure
+@@ -2107,6 +2107,24 @@ EOF
+     # Xen unstable
+     elif
+         cat > $TMPC <<EOF &&
++#undef XC_WANT_COMPAT_MAP_FOREIGN_API
++#include <xenforeignmemory.h>
++int main(void) {
++  xenforeignmemory_handle *xfmem;
++
++  xfmem = xenforeignmemory_open(0, 0);
++  xenforeignmemory_map2(xfmem, 0, 0, 0, 0, 0, 0, 0);
++
++  return 0;
++}
++EOF
++        compile_prog "" "$xen_libs -lxendevicemodel $xen_stable_libs"
++      then
++      xen_stable_libs="-lxendevicemodel $xen_stable_libs"
++      xen_ctrl_version=41000
++      xen=yes
++    elif
++        cat > $TMPC <<EOF &&
+ #undef XC_WANT_COMPAT_DEVICEMODEL_API
+ #define __XEN_TOOLS__
+ #include <xendevicemodel.h>
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index 39cb511..56986db 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -151,6 +151,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
  }
  
--/* Xen Platform, Fixed IOPort */
--#define UNPLUG_ALL_DISKS 1
--#define UNPLUG_ALL_NICS 2
--#define UNPLUG_AUX_IDE_DISKS 4
-+/*
-+ * Unplug device flags.
-+ *
-+ * The logic got a little confused at some point in the past but this is
-+ * what they do now.
-+ *
-+ * bit 0: Unplug all IDE and SCSI disks.
-+ * bit 1: Unplug all NICs.
-+ * bit 2: Unplug IDE disks except primary master. This is overridden if
-+ *        bit 0 is also present in the mask.
-+ * bit 3: Unplug all NVMe disks.
-+ *
-+ */
-+#define _UNPLUG_IDE_SCSI_DISKS 0
-+#define UNPLUG_IDE_SCSI_DISKS (1u << _UNPLUG_IDE_SCSI_DISKS)
-+
-+#define _UNPLUG_ALL_NICS 1
-+#define UNPLUG_ALL_NICS (1u << _UNPLUG_ALL_NICS)
-+
-+#define _UNPLUG_AUX_IDE_DISKS 2
-+#define UNPLUG_AUX_IDE_DISKS (1u << _UNPLUG_AUX_IDE_DISKS)
-+
-+#define _UNPLUG_NVME_DISKS 3
-+#define UNPLUG_NVME_DISKS (1u << _UNPLUG_NVME_DISKS)
+ static void xen_remap_bucket(MapCacheEntry *entry,
++                             void *vaddr,
+                              hwaddr size,
+                              hwaddr address_index,
+                              bool dummy)
+@@ -167,7 +168,9 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+     err = g_malloc0(nb_pfn * sizeof (int));
  
- static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
- {
-@@ -122,7 +142,7 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
- {
-     uint32_t flags = *(uint32_t *)opaque;
-     bool aux = (flags & UNPLUG_AUX_IDE_DISKS) &&
--        !(flags & UNPLUG_ALL_DISKS);
-+        !(flags & UNPLUG_IDE_SCSI_DISKS);
- 
-     /* We have to ignore passthrough devices */
-     if (!strcmp(d->name, "xen-pci-passthrough")) {
-@@ -135,12 +155,16 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
-         break;
- 
-     case PCI_CLASS_STORAGE_SCSI:
--    case PCI_CLASS_STORAGE_EXPRESS:
-         if (!aux) {
-             object_unparent(OBJECT(d));
-         }
-         break;
- 
-+    case PCI_CLASS_STORAGE_EXPRESS:
-+        if (flags & UNPLUG_NVME_DISKS) {
-+            object_unparent(OBJECT(d));
+     if (entry->vaddr_base != NULL) {
+-        ram_block_notify_remove(entry->vaddr_base, entry->size);
++        if (!(entry->flags & XEN_MAPCACHE_ENTRY_DUMMY)) {
++            ram_block_notify_remove(entry->vaddr_base, entry->size);
 +        }
-+
-     default:
-         break;
+         if (munmap(entry->vaddr_base, entry->size) != 0) {
+             perror("unmap fails");
+             exit(-1);
+@@ -181,11 +184,11 @@ static void xen_remap_bucket(MapCacheEntry *entry,
      }
-@@ -158,10 +182,9 @@ static void platform_fixed_ioport_writew(void *opaque, uint32_t addr, uint32_t v
-     switch (addr) {
-     case 0: {
-         PCIDevice *pci_dev = PCI_DEVICE(s);
--        /* Unplug devices.  Value is a bitmask of which devices to
--           unplug, with bit 0 the disk devices, bit 1 the network
--           devices, and bit 2 the non-primary-master IDE devices. */
--        if (val & (UNPLUG_ALL_DISKS | UNPLUG_AUX_IDE_DISKS)) {
-+        /* Unplug devices. See comment above flag definitions */
-+        if (val & (UNPLUG_IDE_SCSI_DISKS | UNPLUG_AUX_IDE_DISKS |
-+                   UNPLUG_NVME_DISKS)) {
-             DPRINTF("unplug disks\n");
-             pci_unplug_disks(pci_dev->bus, val);
+ 
+     if (!dummy) {
+-        vaddr_base = xenforeignmemory_map(xen_fmem, xen_domid,
+-                                           PROT_READ | PROT_WRITE,
++        vaddr_base = xenforeignmemory_map2(xen_fmem, xen_domid, vaddr,
++                                           PROT_READ | PROT_WRITE, 0,
+                                            nb_pfn, pfns, err);
+         if (vaddr_base == NULL) {
+-            perror("xenforeignmemory_map");
++            perror("xenforeignmemory_map2");
+             exit(-1);
          }
-@@ -349,14 +372,14 @@ static void xen_platform_ioport_writeb(void *opaque, hwaddr addr,
-              * If VMDP was to control both disk and LAN it would use 4.
-              * If it controlled just disk or just LAN, it would use 8 below.
-              */
--            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-+            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
-             pci_unplug_nics(pci_dev->bus);
+     } else {
+@@ -193,7 +196,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+          * We create dummy mappings where we are unable to create a foreign
+          * mapping immediately due to certain circumstances (i.e. on resume now)
+          */
+-        vaddr_base = mmap(NULL, size, PROT_READ | PROT_WRITE,
++        vaddr_base = mmap(vaddr, size, PROT_READ | PROT_WRITE,
+                           MAP_ANON | MAP_SHARED, -1, 0);
+         if (vaddr_base == NULL) {
+             perror("mmap");
+@@ -201,6 +204,10 @@ static void xen_remap_bucket(MapCacheEntry *entry,
          }
-         break;
-     case 8:
-         switch (val) {
-         case 1:
--            pci_unplug_disks(pci_dev->bus, UNPLUG_ALL_DISKS);
-+            pci_unplug_disks(pci_dev->bus, UNPLUG_IDE_SCSI_DISKS);
-             break;
-         case 2:
-             pci_unplug_nics(pci_dev->bus);
+     }
+ 
++    if (!(entry->flags & XEN_MAPCACHE_ENTRY_DUMMY)) {
++        ram_block_notify_add(vaddr_base, size);
++    }
++
+     entry->vaddr_base = vaddr_base;
+     entry->paddr_index = address_index;
+     entry->size = size;
+@@ -213,7 +220,6 @@ static void xen_remap_bucket(MapCacheEntry *entry,
+         entry->flags &= ~(XEN_MAPCACHE_ENTRY_DUMMY);
+     }
+ 
+-    ram_block_notify_add(entry->vaddr_base, entry->size);
+     bitmap_zero(entry->valid_mapping, nb_pfn);
+     for (i = 0; i < nb_pfn; i++) {
+         if (!err[i]) {
+@@ -286,14 +292,14 @@ tryagain:
+     if (!entry) {
+         entry = g_malloc0(sizeof (MapCacheEntry));
+         pentry->next = entry;
+-        xen_remap_bucket(entry, cache_size, address_index, dummy);
++        xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
+     } else if (!entry->lock) {
+         if (!entry->vaddr_base || entry->paddr_index != address_index ||
+                 entry->size != cache_size ||
+                 !test_bits(address_offset >> XC_PAGE_SHIFT,
+                     test_bit_size >> XC_PAGE_SHIFT,
+                     entry->valid_mapping)) {
+-            xen_remap_bucket(entry, cache_size, address_index, dummy);
++            xen_remap_bucket(entry, NULL, cache_size, address_index, dummy);
+         }
+     }
+ 
+@@ -490,3 +496,66 @@ void xen_invalidate_map_cache(void)
+ 
+     mapcache_unlock();
+ }
++
++static uint8_t *xen_replace_cache_entry_unlocked(hwaddr old_phys_addr,
++                                                 hwaddr new_phys_addr,
++                                                 hwaddr size)
++{
++    MapCacheEntry *entry;
++    hwaddr address_index, address_offset;
++    hwaddr test_bit_size, cache_size = size;
++
++    address_index  = old_phys_addr >> MCACHE_BUCKET_SHIFT;
++    address_offset = old_phys_addr & (MCACHE_BUCKET_SIZE - 1);
++
++    assert(size);
++    /* test_bit_size is always a multiple of XC_PAGE_SIZE */
++    test_bit_size = size + (old_phys_addr & (XC_PAGE_SIZE - 1));
++    if (test_bit_size % XC_PAGE_SIZE) {
++        test_bit_size += XC_PAGE_SIZE - (test_bit_size % XC_PAGE_SIZE);
++    }
++    cache_size = size + address_offset;
++    if (cache_size % MCACHE_BUCKET_SIZE) {
++        cache_size += MCACHE_BUCKET_SIZE - (cache_size % MCACHE_BUCKET_SIZE);
++    }
++
++    entry = &mapcache->entry[address_index % mapcache->nr_buckets];
++    while (entry && !(entry->paddr_index == address_index &&
++                      entry->size == cache_size)) {
++        entry = entry->next;
++    }
++    if (!entry) {
++        DPRINTF("Trying to update an entry for %lx " \
++                "that is not in the mapcache!\n", old_phys_addr);
++        return NULL;
++    }
++
++    address_index  = new_phys_addr >> MCACHE_BUCKET_SHIFT;
++    address_offset = new_phys_addr & (MCACHE_BUCKET_SIZE - 1);
++
++    fprintf(stderr, "Replacing a dummy mapcache entry for %lx with %lx\n",
++            old_phys_addr, new_phys_addr);
++
++    xen_remap_bucket(entry, entry->vaddr_base,
++                     cache_size, address_index, false);
++    if (!test_bits(address_offset >> XC_PAGE_SHIFT,
++                test_bit_size >> XC_PAGE_SHIFT,
++                entry->valid_mapping)) {
++        DPRINTF("Unable to update a mapcache entry for %lx!\n", old_phys_addr);
++        return NULL;
++    }
++
++    return entry->vaddr_base + address_offset;
++}
++
++uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
++                                 hwaddr new_phys_addr,
++                                 hwaddr size)
++{
++    uint8_t *p;
++
++    mapcache_lock();
++    p = xen_replace_cache_entry_unlocked(old_phys_addr, new_phys_addr, size);
++    mapcache_unlock();
++    return p;
++}
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index e00ddd7..e28ed48 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -78,6 +78,20 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+ 
+ extern xenforeignmemory_handle *xen_fmem;
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41000
++
++static inline void *xenforeignmemory_map2(xenforeignmemory_handle *h,
++                                          uint32_t dom, void *addr,
++                                          int prot, int flags, size_t pages,
++                                          const xen_pfn_t arr[/*pages*/],
++                                          int err[/*pages*/])
++{
++    assert(addr == NULL && flags == 0);
++    return xenforeignmemory_map(h, dom, prot, pages, arr, err);
++}
++
++#endif
++
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
+ 
+ typedef xc_interface xendevicemodel_handle;
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index 01daaad..bd4d49e 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -21,7 +21,9 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+ ram_addr_t xen_ram_addr_from_mapcache(void *ptr);
+ void xen_invalidate_map_cache_entry(uint8_t *buffer);
+ void xen_invalidate_map_cache(void);
+-
++uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
++                                 hwaddr new_phys_addr,
++                                 hwaddr size);
+ #else
+ 
+ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+@@ -50,6 +52,13 @@ static inline void xen_invalidate_map_cache(void)
+ {
+ }
+ 
++static inline uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
++                                               hwaddr new_phys_addr,
++                                               hwaddr size)
++{
++    abort();
++}
++
+ #endif
+ 
+ #endif /* XEN_MAPCACHE_H */
 -- 
 1.9.1
