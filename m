@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0R-0007aM-5N
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0V-0007em-CS
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0O-0003BN-8x
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:31 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:32772)
+	(envelope-from <alex.bennee@linaro.org>) id 1dXQ0U-0003Em-LX
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:35 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:32838)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dXQ0O-0003Am-2i
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:28 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id a10so23437105wrd.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:45:27 -0700 (PDT)
+	id 1dXQ0U-0003EO-FN
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:45:34 -0400
+Received: by mail-wr0-x232.google.com with SMTP id a10so23440954wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:45:34 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 18 Jul 2017 11:44:49 +0100
-Message-Id: <20170718104513.23947-9-alex.bennee@linaro.org>
+Date: Tue, 18 Jul 2017 11:44:54 +0100
+Message-Id: <20170718104513.23947-14-alex.bennee@linaro.org>
 In-Reply-To: <20170718104513.23947-1-alex.bennee@linaro.org>
 References: <20170718104513.23947-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/32] docker: remove packages now dependent of
- qemu in Stretch
+Subject: [Qemu-devel] [PULL 13/32] docker: enable virgl to extend code
+ coverage on amd64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +35,35 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[AJB: mv, comments in dockerfile]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/docker/dockerfiles/debian-arm64-cross.docker b/tests/docker/dockerfiles/debian-arm64-cross.docker
-index f1bfa64160..6ed12a3f6e 100644
---- a/tests/docker/dockerfiles/debian-arm64-cross.docker
-+++ b/tests/docker/dockerfiles/debian-arm64-cross.docker
-@@ -19,11 +19,8 @@ ENV QEMU_CONFIGURE_OPTS --cross-prefix=aarch64-linux-gnu-
- 
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
--        glusterfs-common:arm64 \
-         libbz2-dev:arm64 \
-         liblzo2-dev:arm64 \
--        libncursesw5-dev:arm64 \
--        libnfs-dev:arm64 \
-         librdmacm-dev:arm64 \
-         libsnappy-dev:arm64 \
-         libxen-dev:arm64
-diff --git a/tests/docker/dockerfiles/debian-armhf-cross.docker b/tests/docker/dockerfiles/debian-armhf-cross.docker
-index 2beacef49b..5100b0afc0 100644
---- a/tests/docker/dockerfiles/debian-armhf-cross.docker
-+++ b/tests/docker/dockerfiles/debian-armhf-cross.docker
-@@ -19,11 +19,8 @@ ENV QEMU_CONFIGURE_OPTS --cross-prefix=arm-linux-gnueabihf-
- 
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
--        glusterfs-common:armhf \
-         libbz2-dev:armhf \
-         liblzo2-dev:armhf \
--        libncursesw5-dev:armhf \
--        libnfs-dev:armhf \
-         librdmacm-dev:armhf \
-         libsnappy-dev:armhf \
-         libxen-dev:armhf
-diff --git a/tests/docker/dockerfiles/debian-mipsel-cross.docker b/tests/docker/dockerfiles/debian-mipsel-cross.docker
-index 9ee997aa54..eb279c5044 100644
---- a/tests/docker/dockerfiles/debian-mipsel-cross.docker
-+++ b/tests/docker/dockerfiles/debian-mipsel-cross.docker
-@@ -20,10 +20,7 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get build-dep -yy -a mipsel qemu
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
--        glusterfs-common:mipsel \
-         libbz2-dev:mipsel \
-         liblzo2-dev:mipsel \
--        libncursesw5-dev:mipsel \
--        libnfs-dev:mipsel \
-         librdmacm-dev:mipsel \
-         libsnappy-dev:mipsel
-diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
-index 667e428a4c..e188bfeda4 100644
---- a/tests/docker/dockerfiles/debian-s390x-cross.docker
-+++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-@@ -23,10 +23,7 @@ ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
- # Install extra libraries to increase code coverage
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
--        glusterfs-common:s390x \
-         libbz2-dev:s390x \
-         liblzo2-dev:s390x \
--        libncursesw5-dev:s390x \
--        libnfs-dev:s390x \
-         librdmacm-dev:s390x \
-         libsnappy-dev:s390x
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
+index 2ab76120a4..360ecf0360 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -1,7 +1,8 @@
+ #
+ # Docker x86_64 target
+ #
+-# This docker target builds on the debian Stretch base image.
++# This docker target builds on the debian Stretch base image. Further
++# libraries which are not widely available are installed by hand.
+ #
+ FROM qemu:debian9
+ MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
+@@ -16,3 +17,12 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         librdmacm-dev \
+         libsnappy-dev \
+         libvte-dev
++
++# virgl
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        libegl1-mesa-dev \
++        libepoxy-dev \
++        libgbm-dev
++RUN git clone git://anongit.freedesktop.org/virglrenderer /usr/src/virglrenderer
++RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx --disable-tests && make install
 -- 
 2.13.0
