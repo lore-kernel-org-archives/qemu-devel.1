@@ -1,24 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXWuX-0003y9-2j
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:07:53 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dXXB1-0008NR-I3
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXWuS-0005ab-4V
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:07:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dXWuR-0005aI-UM
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:07:48 -0400
-References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-Date: Tue, 18 Jul 2017 14:07:45 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dXXAy-0006DM-CB
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:24:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dXXAy-0006CE-21
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 14:24:52 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6IINpSb091116
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:24:49 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bspj6tvv3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 14:24:49 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 18 Jul 2017 19:24:47 +0100
+References: <1499942429-55449-1-git-send-email-borntraeger@de.ibm.com>
+	<1499942429-55449-4-git-send-email-borntraeger@de.ibm.com>
+	<20170713142721.3a40e083@gondolin>
+	<1798a9f2-63f0-ab03-11ad-5513d9a90da9@linux.vnet.ibm.com>
+	<20170713144941.GD2121@work-vm>
+	<99be1408-f8e4-7ecb-f47e-9de94a20ff18@de.ibm.com>
+	<20170713151104.GE2121@work-vm>
+	<1a32d619-0b5b-fe11-36b4-94ef6bdcb331@linux.vnet.ibm.com>
+	<87379uyr1o.fsf@secure.mitica>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 18 Jul 2017 20:24:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+In-Reply-To: <87379uyr1o.fsf@secure.mitica>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
+Content-Transfer-Encoding: 8bit
+Message-Id: <a98fd605-df26-77cb-8c59-e8e26587e0ea@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH/s390-next 3/3] s390x/flic: migrate ais
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +50,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: Cleber Rosa <crosa@redhat.com>, Lukas Doktor <ldoktor@redhat.com>, Amador Segundo <asegundo@redhat.com>
+To: quintela@redhat.com
+Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>
 
 
 
-On 07/17/2017 11:01 PM, Jing Liu wrote:
-> Hi all,
+On 07/18/2017 12:31 PM, Juan Quintela wrote:
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>> On 07/13/2017 05:11 PM, Dr. David Alan Gilbert wrote:
+>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+>>>> On 07/13/2017 04:49 PM, Dr. David Alan Gilbert wrote:
+>>>>> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
 > 
-> Do you anybody have iotests failure: 188, 189 and 087 of the latest qemu
-> upsteam?
+>> @Dave:
+>> There are a couple of questions I'm gonna have to ask/investigate should
+>> it be me doing the 'return value for pre_save' (also notes to myself):
 > 
-> I just wondered if it has something wrong with my test machines because
-> I have different results with two machines.
+> As Dave said, just changing the prototype and fix callers will do a lot
+> of good.
+> 
+>> (keep the current qemu_file_set_error mechanism) or would you prefer
+>> things converted? IMHO having a single method would be cleaner, but I
+>> have not looked into this in great detail.
+> 
+> Error handling is a mess in qemu (in general), and worse in migration
+> (in particular).
+> 
+> History lesson (that is even older than my involvement with qemu)
+> 
+> It used to be that evrything was done with callbacks in the main loop.
+> So there were not an easy way to pass error messages.  Everything was
+> done through qemu_file_set_error() (well, actually it was done by hand).
+> 
+> Then the migration thread came, and we can do things asyncronously, so
+> we don't need to store the state in callbacks.  I did some changes long,
+> long ago about returning  error messages instead of:
+> 
+> if (error) {
+>    qemu_file_set_error(f, -error);
+>    return;
+> }
+> 
+> to
+> 
+> if (error) {
+>     return -error;
+> }
+> 
+> /* fix things to make errors negative, etc, etc, you get the idea */
+> 
+> But we need to fix some things to make this work.
+> 
+> Reception side is done through a coroutine, and then some of such things
+> still stand.  Moving to a thread would be a good idea at some point O:-)
+> 
+>> Also the question what is the semantic of qemu_file_set_error arises.
+>> It ain't documented and I would intuitively suspect that it's rather
+>> about the 'file' (that is transport) than the whole migration.
+> 
+> We test in the "interesting" parts if there is an error on the file,
+> 
+> from vmstate_load_state()
+> 
+>                 } else {
+>                     ret = field->info->get(f, curr_elem, size, field);
+>                 }
+>                 if (ret >= 0) {
+>                     ret = qemu_file_get_error(f);
+>                 }
+>                 if (ret < 0) {
+>                     qemu_file_set_error(f, ret);
+>                     error_report("Failed to load %s:%s", vmsd->name,
+>                                  field->name);
+>                     trace_vmstate_load_field_error(field->name, ret);
+>                     return ret;
+>                 }
 > 
 > 
-> Thanks.
+> You can see how many convolutions we do to maintain the error returned
+> and the one in QEMUFile in sync.  Removing the one in QEMUFile would be
+> a good idea, but requires lots of changes.
 > 
-> Jing
+> For starters, see that all qemu_get_* return void.
 > 
+> To add insult to injury:
+> 
+> int qemu_peek_byte(QEMUFile *f, int offset)
+> {
+>     int index = f->buf_index + offset;
+> 
+>     assert(!qemu_file_is_writable(f));
+>     assert(offset < IO_BUF_SIZE);
+> 
+>     if (index >= f->buf_size) {
+>         qemu_fill_buffer(f);
+>         index = f->buf_index + offset;
+>         if (index >= f->buf_size) {
+>             return 0;
+>         }
+>     }
+>     return f->buf[index];
+> }
+> 
+> I.e. it never returns errors, if there is nothing to read, it just
+> return 0.
+> 
+> /me stops
 > 
 
-Presumably you are missing aio=native support for 087,
+Hi Juan,
 
-and 188/189 I believe require compression and/or LUKS libraries.
+Many thanks for providing me with your perspective and a little history
+lesson too. Knowing the history things do make much more sense. For me
+this is quite often the case (history helps understanding) but at the
+same time extracting the historical perspective form git is in my experience
+quite time consuming in average case, so I don't try too often (without
+having a very good reason).
 
-These are false positives caused by missing libraries. We should
-probably work out a proper solution to meaningfully skipping tests we
-didn't compile support for.
+I will keep the things you explained in mind and try to push the
+migration subsystem into the right direction as far my time allows
+(or at least avoid pushing in the wrong direction).
 
---js
+Regards,
+Halil
+
+>>
+>>
+>>
+>>>>>
+>>>>>   I *think* the migration code should spot that before it finishes
+>>>>> but it might carry on for a little while before it does.
+>>>>
+>>>> I will keep this patch as is, since this is one of the "should not happen"
+>>>> cases.
+> 
+> Later, Juan.
+> 
