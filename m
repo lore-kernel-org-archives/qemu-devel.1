@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXV1P-00087w-KX
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:06:55 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXV3A-00019H-1R
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXV1L-000675-2i
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:06:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56938)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXV1K-00063U-NH
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:06:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170717081152.17153-1-lprosek@redhat.com>
-	<20170717081152.17153-10-lprosek@redhat.com>
-Date: Tue, 18 Jul 2017 18:06:41 +0200
-In-Reply-To: <20170717081152.17153-10-lprosek@redhat.com> (Ladi Prosek's
-	message of "Mon, 17 Jul 2017 10:11:52 +0200")
-Message-ID: <87eftdrapa.fsf@dusky.pond.sub.org>
+	(envelope-from <berrange@redhat.com>) id 1dXV38-0007qZ-T8
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:08:39 -0400
+Date: Tue, 18 Jul 2017 17:08:25 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170718160825.GW11927@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 9/9] checkpatch: add virtio_error and
- virtqueue_error to error funcs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 00/10] Correct two minor QMP
+ interface design flaws
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ladi Prosek <lprosek@redhat.com>
-Cc: qemu-devel@nongnu.org, casasfernando@hotmail.com, mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com, groug@kaod.org, arei.gonglei@huawei.com, aneesh.kumar@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-Ladi Prosek <lprosek@redhat.com> writes:
+On Tue, Jul 18, 2017 at 03:41:16PM +0200, Markus Armbruster wrote:
+> blockdev-add and migrate-set-parameters overload empty strings to mean
+> something entirely different.  See my memo "qapi: Stop abusing
+> "special" values for something entirely different" for details.
+> 
+>     Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
+>     https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
+> 
+> This series deprecates these usages of "" in favour of JSON null.
+> Because we're so close to the 2.10 freeze, the implementation is
+> intentionally stupid: rewrite null to "" at first opportunity.  The
+> proper way to do it would be rewriting "" to null, but that requires
+> fixing up code to work with null.  There are TODO comments for that.
+> I'm willing to take care of them in the next development cycle.
 
-> Two more error functions that should not contain newlines.
->
-> Suggested-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-> ---
->  scripts/checkpatch.pl | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 4e91122..2cd2713 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -2540,7 +2540,9 @@ sub process {
->  				info_vreport|
->  				error_report|
->  				warn_report|
-> -				info_report}x;
-> +				info_report|
-> +				virtio_error|
-> +				virtqueue_error}x;
->  
->  	if ($rawline =~ /\b(?:$qemu_error_funcs)\s*\(.*\".*\\n/) {
->  		ERROR("Error messages should not contain newlines\n" . $herecurr);
+I tested the migrate-set-parameters QMP command with this applied and
+I can still pass "" as the tls-hostname.
 
-What makes the two functions appropriate for this list is this pattern:
+When using query-migrate-parameters we still see "" too.
 
-    va_start(ap, fmt);
-    msg = g_strdup_vprintf(fmt, ap);
-    va_end(ap);
+So from POV of avoiding regressions for existing usage, we look OK
+here.
 
-    error_report("... %s", ..., msg);
-
-There's a related pattern using error_vreport().
-
-Do we have more instances of these patterns?
-
-Regardless:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
