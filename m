@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dXU4D-0003qS-3a
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXU5k-00055Y-Ku
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dXU49-0006r0-Df
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1dXU49-0006qR-1G
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:37 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6IF55vJ101710
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 11:05:35 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2bsdcfqn35-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 11:05:34 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 11:05:33 -0400
-References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
-	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 18 Jul 2017 11:05:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXU5j-00080l-Gy
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:07:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXU5j-00080A-7y
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:07:15 -0400
+References: <DM2PR21MB0060B20A50AEEC8B6816154C9EA00@DM2PR21MB0060.namprd21.prod.outlook.com>
+	<1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <edae6aa7-34ef-a3a8-94e0-175f05728345@redhat.com>
+Date: Tue, 18 Jul 2017 10:07:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <e048e7d8-30da-1740-981c-cfc6d5fa764b@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
+In-Reply-To: <1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="43HqkCJOpWFkDbTb4IGkp3LdUjd3oHb1l"
+Subject: Re: [Qemu-devel] Disable image locking for snapshot drive?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,39 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "famz@redhat.com" <famz@redhat.com>
 
-On 07/18/2017 04:49 AM, Amarnath Valluri wrote:
-> This change introduces a new TPM backend driver that can communicate with
-> swtpm(software TPM emulator) using unix domain socket interface.
->
-> Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
-> for out-of-band control messages.
->
-> The swtpm and associated tools can be found here:
->      https://github.com/stefanberger/swtpm
->
-> The swtpm's control channel protocol specification can be found here:
->      https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specification
->
-> Usage:
->      # setup TPM state directory
->      mkdir /tmp/mytpm
->      chown -R tss:root /tmp/mytpm
->      /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
->
->      # Ask qemu to use TPM emulator with given tpm state directory
->      qemu-system-x86_64 \
->          [...] \
->          -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
->          -device tpm-tis,tpmdev=tpm0 \
->          [...]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--43HqkCJOpWFkDbTb4IGkp3LdUjd3oHb1l
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "famz@redhat.com" <famz@redhat.com>
+Message-ID: <edae6aa7-34ef-a3a8-94e0-175f05728345@redhat.com>
+Subject: Re: [Qemu-devel] Disable image locking for snapshot drive?
+References: <DM2PR21MB0060B20A50AEEC8B6816154C9EA00@DM2PR21MB0060.namprd21.prod.outlook.com>
+ <1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
+In-Reply-To: <1263c0a6-263f-0b3b-c84a-f882df33856b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/17/2017 07:33 PM, John Snow wrote:
+>=20
+>=20
+> On 07/17/2017 07:30 PM, Andrew Baumann via Qemu-devel wrote:
+>> Hi all,
+>>
+>> I'm running a recent Linux build of qemu on Windows Subsystem for Linu=
+x (WSL) which doesn't appear to implement file locking:
+>>
+>> $ qemu-system-aarch64 ... -drive file=3Dtest.vhdx,if=3Dnone,id=3Dhd0 -=
+device virtio-blk-pci,drive=3Dhd0
+>> qemu-system-aarch64: -drive file=3Dtest.vhdx,if=3Dnone,id=3Dhd0: Faile=
+d to unlock byte 100
+
+Does WSL implement fcntl(F_SETLK) but not fcntl(F_OFD_SETLK)?  We
+already have code in place for compiling when F_OFD_SETLK is not
+supported (which makes lock=3Dauto do nothing, and issues a warning that
+F_SETLK locks may be ineffective when locks are explicitly requested),
+do we need to just expand that code into a runtime test of whether
+F_OFD_SETLK appears to be unsupported?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-In this description ',spawn,path=/usr/bin/swtpm' is missing. I had to 
-pass the path even with swtpm being in PATH on the command line but not 
-for the execv(). In case it didn't find the executable I had to 
-eliminate g_strfreev(argv) since it also wants to free the array itself, 
-so it wouldn't end up in a crash.
+--43HqkCJOpWFkDbTb4IGkp3LdUjd3oHb1l
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-    Stefan
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluJBkACgkQp6FrSiUn
+Q2oRCwf/SaGYF1Xg+HWmhEUcSeSrzT5B31IYPc3SZEPAHbIRh5YyKdqqQJ8JbZQE
+mSGR7+oB1aamaFin7qr/qeDtim7zWTPs0qEIv85O/bUuoVWhtnNdpL/xGXJfQNZb
+HgiPl0q3ff+SgqZKOYDrGk9+dYC/sV6JE2GR4t9ho1u5TkkJ/DTBQFoTYYFx2+gI
+A0NTdoZMK9ftfelqB9e6gEoyOZWEKu91cgwgFedyryuTPuOFV8RjdOcRNFnOO3YM
+e9rKGe51qjCDsQ6f0YFe+UFyx87k7KRcy3V+aZiL5ezxcQVjce+D/eCnjdWmLl76
+QQxYMv9pZYQ6ul/wYJ+SexY3bKbmbg==
+=SKxR
+-----END PGP SIGNATURE-----
+
+--43HqkCJOpWFkDbTb4IGkp3LdUjd3oHb1l--
