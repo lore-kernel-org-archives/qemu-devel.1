@@ -1,33 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXIXv-0002wm-Oh
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:36 -0400
+	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXIkt-0000vv-Nr
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXIXr-0008B3-S3
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:35 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36133)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dXIXr-0008A8-O5
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 22:47:31 -0400
-Received: by mail-qk0-x244.google.com with SMTP id d136so970475qkg.3
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 19:47:31 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Jul 2017 23:47:12 -0300
-Message-Id: <20170718024713.27557-5-f4bug@amsat.org>
-In-Reply-To: <20170718024713.27557-1-f4bug@amsat.org>
-References: <20170718024713.27557-1-f4bug@amsat.org>
-In-Reply-To: <20170717144848.11793-1-alex.bennee@linaro.org>
-References: <20170717144848.11793-1-alex.bennee@linaro.org>
+	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXIkq-0001eC-NQ
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:00:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liujbjl@linux.vnet.ibm.com>)
+	id 1dXIkq-0001bY-E3
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 23:00:56 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6I2wrpp007057
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:53 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2brqyade31-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:53 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <liujbjl@linux.vnet.ibm.com>;
+	Mon, 17 Jul 2017 23:00:52 -0400
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+	[9.57.199.106])
+	by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v6I30nBU18350150
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 03:00:49 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8EBB828046
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:43 -0400 (EDT)
+Received: from liujing-mac.local (unknown [9.197.255.127])
+	by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP id E878B2803D
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 23:00:41 -0400 (EDT)
+From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Date: Tue, 18 Jul 2017 11:01:00 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2.5 4/5] docker: warn users to use newer
- debian8/debian9 base image
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+Subject: [Qemu-devel] Question for iotests 188, 189 and 087
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,48 +49,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-to stay backward incompatible.
+Hi all,
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/docker/Makefile.include          |  1 +
- tests/docker/dockerfiles/debian.docker | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian.docker
+Do you anybody have iotests failure: 188, 189 and 087 of the latest qemu 
+upsteam?
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index e993e149e7..aaab1a4208 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -58,6 +58,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
- 
- # Enforce dependancies for composite images
-+docker-image-debian: docker-image-debian9
- docker-image-debian8-mxe: docker-image-debian8
- docker-image-debian-amd64: docker-image-debian9
- docker-image-debian-armel-cross: docker-image-debian9
-diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
-new file mode 100644
-index 0000000000..fd32e71b79
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian.docker
-@@ -0,0 +1,13 @@
-+# This template is deprecated and was previously based on Jessie on QEMU 2.9.
-+# Now than Stretch is out, please use qemu:debian8 as base for Jessie,
-+# and qemu:debian9 for Stretch.
-+#
-+FROM qemu:debian9
-+
-+MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
-+
-+RUN for n in $(seq 8); do echo; done && \
-+    echo "\n\t\tThis image is deprecated." && echo && \
-+    echo "\tUse 'FROM qemu:debian9' to use the stable Debian Stretch image" && \
-+    echo "\tor 'FROM qemu:debian8' to use old Debian Jessie." && \
-+    for n in $(seq 8); do echo; done
--- 
-2.13.2
+I just wondered if it has something wrong with my test machines because 
+I have different results with two machines.
+
+
+Thanks.
+
+Jing
