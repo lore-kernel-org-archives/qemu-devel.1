@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXGWq-0005iH-Qe
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:38:21 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXGop-000605-1d
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dXGWp-0007oE-Uz
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:38:20 -0400
-References: <20170718003422.4497-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1b1c8192-d488-b6c4-7a4c-ffbfdb02e50a@redhat.com>
-Date: Mon, 17 Jul 2017 20:38:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXGol-0004pz-Ve
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:56:55 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35377)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dXGol-0004pd-Ry
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:56:51 -0400
+Received: by mail-qt0-x242.google.com with SMTP id h15so765340qte.2
+	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:56:51 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 17 Jul 2017 21:56:31 -0300
+Message-Id: <20170718005631.21704-1-f4bug@amsat.org>
+In-Reply-To: <20170717230025.GD2585@lemon>
+References: <20170717230025.GD2585@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20170718003422.4497-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] qemu-img: Check for backing image
- if specified during create
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] docker: warn users to use newer
+ debian8/debian9 base image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Kevin: I took a stab at this 'feature', but if there are any fixups or
-changes that need to occur and it's important that it happens before I'm
-awake, please feel free to steal these patches and do whatever you need
-to them, including setting them on fire.
+to stay backward incompatible.
 
-Thanks,
---John
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/docker/Makefile.include          |  1 +
+ tests/docker/dockerfiles/debian.docker | 13 +++++++++++++
+ 2 files changed, 14 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian.docker
 
-post-script: I think the only thing that I don't really do here is
-attempt to force-open an image to see if it exists if a size is already
-provided in order to quiet errors related to locking.
-
-That change would just eliminate a little bit of "this image is locked!"
-whining in the case that -u was omitted but a size was provided, which
-is mostly QOL.
-
-On 07/17/2017 08:34 PM, John Snow wrote:
-> We do not currently guarantee that QEMU will or will not open a
-> backing file when creating a new overlay file. Presently, QEMU will
-> not open that file if you provide a filesize, because it has no reason
-> to want to open it in that case.
-> 
-> This series makes the contract more explicit: if '-u' is provided to
-> create, we will not open the backing image regardless, erroring out if
-> a size was not provided.
-> 
-> In the other case, if '-u' is not provided, we now endeavor to open the
-> backing image if possible to check that it exists. For now, if a size
-> is provided and the image does not exist, QEMU will only warn to maintain
-> compatibility with legacy behavior.
-> 
-> In the future, QEMU may treat the operation as a failure if '-u' was not
-> provided.
-> 
-> Tests are amended primarily to pass the '-u' flag where it makes sense;
-> which is when creating overlays for objects already open by QEMU. These
-> will now generally fail to succeed because of image locking. In this
-> case, they only warn instead of fail, but this keeps the output cleaner.
-> 
-> Test 111 is updated to accommodate a new error message.
-> 082, 085, 139, 156 and 158 add '-u' just to suppress warnings.
-> 
-> John Snow (2):
->   blockdev: move BDRV_O_NO_BACKING option forward
->   qemu-img: Check for backing image if specified during create
-> 
->  block.c                    | 96 +++++++++++++++++++++++++---------------------
->  blockdev.c                 | 11 +++---
->  qemu-img-cmds.hx           |  4 +-
->  qemu-img.c                 | 16 +++++---
->  tests/qemu-iotests/082     |  4 +-
->  tests/qemu-iotests/082.out |  4 +-
->  tests/qemu-iotests/085     |  2 +-
->  tests/qemu-iotests/111.out |  1 +
->  tests/qemu-iotests/139     |  2 +-
->  tests/qemu-iotests/156     |  2 +-
->  tests/qemu-iotests/158     |  2 +-
->  11 files changed, 81 insertions(+), 63 deletions(-)
-> 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index e993e149e7..aaab1a4208 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -58,6 +58,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ docker-image-debian-powerpc-cross: EXTRA_FILES:=tests/docker/dockerfiles/debian-apt-fake.sh
+ 
+ # Enforce dependancies for composite images
++docker-image-debian: docker-image-debian9
+ docker-image-debian8-mxe: docker-image-debian8
+ docker-image-debian-amd64: docker-image-debian9
+ docker-image-debian-armel-cross: docker-image-debian9
+diff --git a/tests/docker/dockerfiles/debian.docker b/tests/docker/dockerfiles/debian.docker
+new file mode 100644
+index 0000000000..fd32e71b79
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian.docker
+@@ -0,0 +1,13 @@
++# This template is deprecated and was previously based on Jessie on QEMU 2.9.
++# Now than Stretch is out, please use qemu:debian8 as base for Jessie,
++# and qemu:debian9 for Stretch.
++#
++FROM qemu:debian9
++
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++
++RUN for n in $(seq 8); do echo; done && \
++    echo "\n\t\tThis image is deprecated." && echo && \
++    echo "\tUse 'FROM qemu:debian9' to use the stable Debian Stretch image" && \
++    echo "\tor 'FROM qemu:debian8' to use old Debian Jessie." && \
++    for n in $(seq 8); do echo; done
+-- 
+2.13.2
