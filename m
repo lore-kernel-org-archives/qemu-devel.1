@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXRds-000276-4e
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:30:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXRjT-0004Pi-IT
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:36:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXRdo-0007gO-7U
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:30:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57188)
+	(envelope-from <eblake@redhat.com>) id 1dXRjP-0001wB-Ln
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:36:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXRdn-0007et-Ub
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:30:16 -0400
-Date: Tue, 18 Jul 2017 14:30:09 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170718143009.432250d5@gondolin>
-In-Reply-To: <1500040339-119465-12-git-send-email-imammedo@redhat.com>
-References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-12-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXRjP-0001uT-Bm
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 08:36:03 -0400
+References: <20170407143847.GM2138@work-vm>
+	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+	<20170717164641.GA31820@work-vm>
+	<a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+	<20170718072351.GB11927@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <503be976-144b-d468-04b2-12dd99947bf1@redhat.com>
+Date: Tue, 18 Jul 2017 07:35:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/28] s390x: replace cpu_s390x_init() with
- cpu_generic_init()
+In-Reply-To: <20170718072351.GB11927@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mj5AGN05sCm0Hfxk8vNWvtHw23dAbcATU"
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Fri, 14 Jul 2017 15:52:02 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mj5AGN05sCm0Hfxk8vNWvtHw23dAbcATU
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <f4bug@amsat.org>, qemu-devel@nongnu.org
+Message-ID: <503be976-144b-d468-04b2-12dd99947bf1@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+References: <20170407143847.GM2138@work-vm>
+ <1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+ <1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+ <6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+ <39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+ <20170717164641.GA31820@work-vm>
+ <a18cd09c-5dbd-525e-c4a6-8286e3ce2333@redhat.com>
+ <20170718072351.GB11927@redhat.com>
+In-Reply-To: <20170718072351.GB11927@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> cpu_s390x_init() is used only *-user targets indirectly
-> via cpu_init() macro and has a hack to assign ids to created
-> cpus (I'm not sure if 'id' really matters to *-user emulation).
-> 
-> So to on safe side, instead of having custom wrapper to do numbering
-> replace it with cpu_generic_init() and use S390CPUClass::next_cpu_id
-> which could serve the same purpose as static variable and move cpu->id
-> initialization to s390_cpu_initfn for CONFIG_USER_ONLY use-case.
-> 
-> PS:
-> ifdef is ugly but it allows us to hide s390x detail that isn't
-> set by *-user targets and reuse generic cpu creation utility
-> for btoh machine and user emulation.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> perhaps cpu->id isn't need by CONFIG_USER_ONLY but I'd leave to it
-> s390x maintainers to deal with it.
-> 
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Alexander Graf <agraf@suse.de>
-> CC: Cornelia Huck <cohuck@redhat.com>
-> CC: Thomas Huth <thuth@redhat.com>
-> ---
->  target/s390x/cpu.h    |  3 +--
->  target/s390x/cpu.c    |  7 +++++++
->  target/s390x/helper.c | 14 --------------
->  3 files changed, 8 insertions(+), 16 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index bdb9bdb..b6d25c6 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -477,7 +477,6 @@ static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
->  void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen);
->  #endif
->  
-> -S390CPU *cpu_s390x_init(const char *cpu_model);
->  S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
->  S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp);
->  void s390x_translate_init(void);
-> @@ -641,7 +640,7 @@ static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
->  
->  extern void subsystem_reset(void);
->  
-> -#define cpu_init(model) CPU(cpu_s390x_init(model))
-> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
->  #define cpu_signal_handler cpu_s390x_signal_handler
->  
->  void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index accef03..e40a26f 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -303,6 +303,13 @@ static void s390_cpu_initfn(Object *obj)
->          inited = true;
->          s390x_translate_init();
->      }
-> +
-> +#if defined(CONFIG_USER_ONLY)
-> +    {
-> +        S390CPUClass *scc = S390_CPU_GET_CLASS(obj);
-> +        cpu->id = scc->next_cpu_id;
-> +    }
-> +#endif
+On 07/18/2017 02:23 AM, Daniel P. Berrange wrote:
+>> How would it not help?  Are we using gcc 7 on windows builds?  Adding
+>> the assert is enough to shut up new gcc; old gcc was already silent; a=
+nd
+>> if mingw is still on old gcc, it doesn't matter whether assert() is
+>> marked noreturn for what this patch is doing.
+>=20
+> Mingw isn't using a fork of GCC anymore, its all mainline. Thus Fedora'=
+s
+> mingw gcc packages track native gcc packages. IOW i686-w64-mingw32-gcc
+> is already on version 7.1.0 in Fedora
 
-What about the null machine, which calls cpu_init() as well? Am I
-missing something?
+So I guess that means running 'make docker-test-mingw@fedora' on Fedora
+26 will find out if we need further tweaks?  Trying it now...
 
->  }
->  
->  static void s390_cpu_finalize(Object *obj)
-> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> index aef09e1..632b030 100644
-> --- a/target/s390x/helper.c
-> +++ b/target/s390x/helper.c
-> @@ -129,20 +129,6 @@ out:
->      return cpu;
->  }
->  
-> -S390CPU *cpu_s390x_init(const char *cpu_model)
-> -{
-> -    Error *err = NULL;
-> -    S390CPU *cpu;
-> -    /* Use to track CPU ID for linux-user only */
-> -    static int64_t next_cpu_id;
-> -
-> -    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
-> -    if (err) {
-> -        error_report_err(err);
-> -    }
-> -    return cpu;
-> -}
-> -
->  #if defined(CONFIG_USER_ONLY)
->  
->  void s390_cpu_do_interrupt(CPUState *cs)
+Nope, didn't get very far :(
+
+$ make docker-test-mingw@fedora
+  BUILD   fedora
+make[1]: Entering directory '/home/eblake/qemu'
+  ARCHIVE qemu.tgz
+usage: git archive [<options>] <tree-ish> [<path>...]
+=2E..
+make[1]: *** [/home/eblake/qemu/tests/docker/Makefile.include:35:
+docker-src.2017-07-18-07.35.20.4101] Error 129
+make[1]: Leaving directory '/home/eblake/qemu'
+make: *** [/home/eblake/qemu/tests/docker/Makefile.include:156:
+docker-run-test-mingw@fedora] Error 2
+
+Am I not doing it right?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--mj5AGN05sCm0Hfxk8vNWvtHw23dAbcATU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluAK4ACgkQp6FrSiUn
+Q2rWCAf/SSX5prGPbuJVtBS1JP8cWSUsGuGYlXDmL0Q4KF2pNXd8iWmQkzpzMF5n
+U3VM+uwXRMQX777bCG1XstD60LtSjMUH8Xl5DEzvO7owhdDlWHuq5ELl/hfvJTmD
+IIPAOcMiLN8f6c+TQ0cMm5J9SDRXyjzYqhXJva4UMV3b1vPYLkJdRgpggeCI6wma
+7cO1JqjeTuSXmy3sJB2tVfb5Fz0bR196cWaAefh70OVivOhd2F09pcyq4/dfyFSM
+vmzCOpO6NrjKgJPwSM+cO0EsZ1vvy9VV77n0TeeR38baRQvTiu18oI2KPlRHCHsb
+3qq0QTs3mkA+/QNmROKP2T31Rw35bw==
+=wXQC
+-----END PGP SIGNATURE-----
+
+--mj5AGN05sCm0Hfxk8vNWvtHw23dAbcATU--
