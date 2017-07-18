@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dXPYV-0001pl-R9
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:16:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXPhE-0006T1-7q
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1dXPYS-00071t-Ne
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:16:39 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 18 Jul 2017 12:16:32 +0200
-Message-Id: <20170718101632.3304-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] spapr/htab: fix savevm
+	(envelope-from <berrange@redhat.com>) id 1dXPhB-0002jE-HK
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:25:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXPhB-0002ig-85
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 06:25:37 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 18 Jul 2017 11:25:02 +0100
+Message-Id: <20170718102519.15392-2-berrange@redhat.com>
+In-Reply-To: <20170718102519.15392-1-berrange@redhat.com>
+References: <20170718102519.15392-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL v1 01/18] crypto: cipher: introduce context free
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,39 +25,118 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, sursingh@redhat.com, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, sbobroff@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-Commit 3a38429 ("spapr: Add a "no HPT" encoding to HTAB migration stream")
-allows to migrate an empty HPT, but doesn't mark correctly the
-end of the migration stream.
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-The end condition (value returned by htab_save_iterate())
-should be 1, whereas in 3a38429 it returns 0.
+Refactors the qcrypto_cipher_free(), splits it into two parts. One
+is gcrypt/nettle__cipher_free_ctx() to free the special context.
 
-The problem can be reproduced with QEMU monitor command "savevm":
-the command never stops and the disk image grows without limit.
+This makes code more clear, what's more, it would be used by the
+later patch.
 
-Fixes: 3a38429748aa4f74abaecf16c4c087e8a325e12a
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
-v2: remove change in htab_save_complete() as
-    it always return 0 in case of success (Thomas)
+ crypto/cipher-gcrypt.c | 31 ++++++++++++++++++-------------
+ crypto/cipher-nettle.c | 18 ++++++++++++++----
+ 2 files changed, 32 insertions(+), 17 deletions(-)
 
- hw/ppc/spapr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 970093e..1cb09e7 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1827,7 +1827,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
-     /* Iteration header */
-     if (!spapr->htab_shift) {
-         qemu_put_be32(f, -1);
--        return 0;
-+        return 1;
-     } else {
-         qemu_put_be32(f, 0);
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 6487ecaf37..0ecffa2751 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -64,6 +64,22 @@ struct QCryptoCipherGcrypt {
+     uint8_t *iv;
+ };
+ 
++static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
++                                   QCryptoCipherMode mode)
++{
++    if (!ctx) {
++        return;
++    }
++
++    gcry_cipher_close(ctx->handle);
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
++        gcry_cipher_close(ctx->tweakhandle);
++    }
++    g_free(ctx->iv);
++    g_free(ctx);
++}
++
++
+ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   QCryptoCipherMode mode,
+                                   const uint8_t *key, size_t nkey,
+@@ -228,11 +244,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+     return cipher;
+ 
+  error:
+-    gcry_cipher_close(ctx->handle);
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
+-        gcry_cipher_close(ctx->tweakhandle);
+-    }
+-    g_free(ctx);
++    gcrypt_cipher_free_ctx(ctx, mode);
+     g_free(cipher);
+     return NULL;
+ }
+@@ -240,17 +252,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+ 
+ void qcrypto_cipher_free(QCryptoCipher *cipher)
+ {
+-    QCryptoCipherGcrypt *ctx;
+     if (!cipher) {
+         return;
      }
+-    ctx = cipher->opaque;
+-    gcry_cipher_close(ctx->handle);
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
+-        gcry_cipher_close(ctx->tweakhandle);
+-    }
+-    g_free(ctx->iv);
+-    g_free(ctx);
++    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
+     g_free(cipher);
+ }
+ 
+diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+index dfc9030227..e04e3a1c30 100644
+--- a/crypto/cipher-nettle.c
++++ b/crypto/cipher-nettle.c
+@@ -249,6 +249,19 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+ }
+ 
+ 
++static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
++{
++    if (!ctx) {
++        return;
++    }
++
++    g_free(ctx->iv);
++    g_free(ctx->ctx);
++    g_free(ctx->ctx_tweak);
++    g_free(ctx);
++}
++
++
+ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                                   QCryptoCipherMode mode,
+                                   const uint8_t *key, size_t nkey,
+@@ -440,10 +453,7 @@ void qcrypto_cipher_free(QCryptoCipher *cipher)
+     }
+ 
+     ctx = cipher->opaque;
+-    g_free(ctx->iv);
+-    g_free(ctx->ctx);
+-    g_free(ctx->ctx_tweak);
+-    g_free(ctx);
++    nettle_cipher_free_ctx(ctx);
+     g_free(cipher);
+ }
+ 
 -- 
-2.9.4
+2.13.0
