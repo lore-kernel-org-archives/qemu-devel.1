@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXFy7-0002Df-Iz
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:30 -0400
+	(envelope-from <cota@braap.org>) id 1dXFyT-0002RF-2j
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXFy6-0001tm-RL
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:27 -0400
-Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:34960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXFy6-0001td-Nu
-	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:26 -0400
-Received: by mail-qt0-x236.google.com with SMTP id b40so3977764qtb.2
-	for <qemu-devel@nongnu.org>; Mon, 17 Jul 2017 17:02:26 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1500235468-15341-1-git-send-email-cota@braap.org>
-	<1500235468-15341-26-git-send-email-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <72ecc3a5-12ff-3d20-be58-0b5d2c6cc5aa@twiddle.net>
-Date: Mon, 17 Jul 2017 14:02:21 -1000
+	(envelope-from <cota@braap.org>) id 1dXFyP-00022j-Tf
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:49 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:60859)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dXFyP-00022M-LG
+	for qemu-devel@nongnu.org; Mon, 17 Jul 2017 20:02:45 -0400
+Date: Mon, 17 Jul 2017 20:02:44 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170718000244.GB30851@flamenco>
+References: <20170711175937.23140-1-alex.bennee@linaro.org>
+	<20170711175937.23140-2-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1500235468-15341-26-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 25/45] translate-all: define and use
- DEBUG_TB_INVALIDATE_GATE
+In-Reply-To: <20170711175937.23140-2-alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v3 1/6] include/exec/exec-all: document
+ common exit conditions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, rth@twiddle.net, qemu-devel@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 07/16/2017 10:04 AM, Emilio G. Cota wrote:
-> This gets rid of an ifdef check while ensuring that the debug code
-> is compiled, which prevents bit rot.
-> 
-> Suggested-by: Alex Benn√©e<alex.bennee@linaro.org>
-> Signed-off-by: Emilio G. Cota<cota@braap.org>
-> ---
->   accel/tcg/translate-all.c | 12 +++++++++---
->   1 file changed, 9 insertions(+), 3 deletions(-)
+On Tue, Jul 11, 2017 at 18:59:32 +0100, Alex BennÈe wrote:
+> As a precursor to later patches attempt to come up with a more
+> concrete wording for what each of the common exit cases would be.
+(snip)
+> + * In these cases as long as the PC is updated we can chain to the
+> + * next TB either by exiting the loop or looking up the next TB via
+> + * the loookup helper.
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+'o' x 3
 
+> + *
+> + *   DISAS_UPDATE  - CPU State was modified dynamically
+> + *
+> + * This covers any other CPU state which necessities us exiting the
+> + * TCG code to the main run-loop.
 
-r~
+s/necessities/necessitates/
+
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+
+		E.
