@@ -1,22 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXU3r-0003Fx-Jg
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:25 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dXU4D-0003qS-3a
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXU3q-0006ea-83
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:19 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<1500385286-21142-3-git-send-email-armbru@redhat.com>
-	<7d0832cf-34c8-9c21-f6fd-104738331f14@redhat.com>
-Date: Tue, 18 Jul 2017 17:05:06 +0200
-In-Reply-To: <7d0832cf-34c8-9c21-f6fd-104738331f14@redhat.com> (Eric Blake's
-	message of "Tue, 18 Jul 2017 09:36:02 -0500")
-Message-ID: <87h8y9vl99.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dXU49-0006r0-Df
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1dXU49-0006qR-1G
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:05:37 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6IF55vJ101710
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 11:05:35 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bsdcfqn35-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 11:05:34 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Tue, 18 Jul 2017 11:05:33 -0400
+References: <1500367747-8992-1-git-send-email-amarnath.valluri@intel.com>
+	<1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Tue, 18 Jul 2017 11:05:30 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.10 02/10] qapi: Use QNull for a more
- regular visit_type_null()
+In-Reply-To: <1500367747-8992-9-git-send-email-amarnath.valluri@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <e048e7d8-30da-1740-981c-cfc6d5fa764b@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 8/8] tpm: Added support for TPM emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +41,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
+To: Amarnath Valluri <amarnath.valluri@intel.com>, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 07/18/2017 08:41 AM, Markus Armbruster wrote:
->> Make visit_type_null() take an @obj argument like its buddies.  This
->> helps keeing the next commit simple.
+On 07/18/2017 04:49 AM, Amarnath Valluri wrote:
+> This change introduces a new TPM backend driver that can communicate with
+> swtpm(software TPM emulator) using unix domain socket interface.
 >
-> s/keeing/keep/
-
-Will fix.
-
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
+> Swtpm uses two unix sockets, one for plain TPM commands and responses, and one
+> for out-of-band control messages.
 >
->> +++ b/qapi/qobject-output-visitor.c
->> @@ -187,7 +187,8 @@ static void qobject_output_type_any(Visitor *v, const char *name,
->>      qobject_output_add_obj(qov, name, *obj);
->>  }
->>  
->> -static void qobject_output_type_null(Visitor *v, const char *name, Error **errp)
->> +static void qobject_output_type_null(Visitor *v, const char *name,
->> +                                     QNull **obj, Error **errp)
->>  {
->>      QObjectOutputVisitor *qov = to_qov(v);
->>      qobject_output_add(qov, name, qnull());
+> The swtpm and associated tools can be found here:
+>      https://github.com/stefanberger/swtpm
 >
-> would it be any better to call qobject_output_add(qov, name,
-> QINCREF(*obj)) here, to ensure we are indeed passing in an appropriate
-> QNull reference?  But your patch is at least self-consistent in stating
-> we ignore obj in output visitors.
+> The swtpm's control channel protocol specification can be found here:
+>      https://github.com/stefanberger/swtpm/wiki/Control-Channel-Specification
+>
+> Usage:
+>      # setup TPM state directory
+>      mkdir /tmp/mytpm
+>      chown -R tss:root /tmp/mytpm
+>      /usr/bin/swtpm_setup --tpm-state /tmp/mytpm --createek
+>
+>      # Ask qemu to use TPM emulator with given tpm state directory
+>      qemu-system-x86_64 \
+>          [...] \
+>          -tpmdev emulator,id=tpm0,tpmstatedir=/tmp/mytpm,logfile=/tmp/swtpm.log \
+>          -device tpm-tis,tpmdev=tpm0 \
+>          [...]
 
-A QAPI schema type is connected to a C type (QAPI-generated except for a
-few built-in types) and a QObject type.
 
-For QAPI schema type 'null', the QObject type is QNull.
+In this description ',spawn,path=/usr/bin/swtpm' is missing. I had to 
+pass the path even with swtpm being in PATH on the command line but not 
+for the execv(). In case it didn't find the executable I had to 
+eliminate g_strfreev(argv) since it also wants to free the array itself, 
+so it wouldn't end up in a crash.
 
-The C type is also QNull, but this is arbitrary.  We could just as well
-generate a C struct type for the purpose.  All we need is some non-null
-pointer value.  I'm lazy, so I grabbed one we already have: qnull_.
-
-qnull_ is kind of nice because "allocation" / "deallocation" merely
-increment / decrement its reference count.
-
-A separate struct could be made less efficient (allocate / deallocate an
-instance of the struct) or more efficient (make it a singleton without a
-reference count).
-
-To actually answer your question: I didn't feel like coupling the value
-qobject_output_type_null() creates to the value it receives, even though
-both are actually _qnull.
-
-Precedence for coupling: qobject_output_type_any().  But that one's
-different, because the choice of QObject as C type for 'any' is
-essential instead of arbitrary.
-
-Does this make some sense?
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+    Stefan
