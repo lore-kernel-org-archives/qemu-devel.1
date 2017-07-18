@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXVQD-0005hR-MA
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:32:33 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dXVST-000749-Or
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:34:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXVQ9-00031n-Ti
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:32:29 -0400
-Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:33176)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dXVQ9-00030I-Ce
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:32:25 -0400
-Received: by mail-lf0-x234.google.com with SMTP id z78so18883144lff.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 09:32:25 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dXVSR-000423-TE
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:34:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dXVSR-00041J-KG
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 12:34:47 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 18 Jul 2017 18:34:37 +0200
+Message-Id: <20170718163437.18001-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <1497523981-38449-1-git-send-email-pbonzini@redhat.com>
-	<1497523981-38449-41-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1497523981-38449-41-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 18 Jul 2017 16:32:13 +0000
-Message-ID: <CAJ+F1CJYp-13xa++8_p4g=bNKP3-JsB6-2ZoFRRo=DPPyEJaUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 40/41] vhost-user-scsi: Introduce
- vhost-user-scsi host device
+Subject: [Qemu-devel] [PATCH] build-sys: add --disable-vhost-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,516 +25,391 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: Felipe Franciosi <felipe@nutanix.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Thu, Jun 15, 2017 at 1:20 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+Learn to compile out vhost-user. Keep it enabled by default on
+non-mingw, that is assumed to be on POSIX.
 
-> From: Felipe Franciosi <felipe@nutanix.com>
->
-> This commit introduces a vhost-user device for SCSI. This is based
-> on the existing vhost-scsi implementation, but done over vhost-user
-> instead. It also uses a chardev to connect to the backend. Unlike
-> vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
->
-> To use it, start Qemu with a command line equivalent to:
->
-> qemu-system-x86_64 \
->        -chardev socket,id=3Dvus0,path=3D/tmp/vus.sock \
->        -device vhost-user-scsi-pci,chardev=3Dvus0,bus=3Dpci.0,addr=3D...
->
-> A separate commit presents a sample application linked with libiscsi to
-> provide a backend for vhost-user-scsi.
->
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-> Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->
+When trying to make a vhost-user netdev, it gives the following error:
 
-I just realized the patch was missing qemu-options.hx update. Oh wait,
-virtio-scsi-pci isn't documented either?
+-netdev vhost-user,id=3Dfoo,chardev=3Dchr-test: Parameter 'type' expects =
+a netdev backend type
 
-Would it have been possible to add a vhost-user-chr=3Dchr argument on
-virtio-scsi-pci instead of introducing a new device? Would that make sense
-(to share code, argument etc)?
+And similar error with the HMP/QMP monitors.
 
- .gitignore                          |   1 +
->  default-configs/pci.mak             |   1 +
->  default-configs/s390x-softmmu.mak   |   1 +
->  hw/scsi/Makefile.objs               |   1 +
->  hw/scsi/vhost-scsi-common.c         |   1 -
->  hw/scsi/vhost-user-scsi.c           | 205
-> ++++++++++++++++++++++++++++++++++++
->  hw/virtio/virtio-pci.c              |  58 ++++++++++
->  hw/virtio/virtio-pci.h              |  11 ++
->  include/hw/virtio/vhost-user-scsi.h |  35 ++++++
->  include/hw/virtio/virtio-scsi.h     |   2 +
->  10 files changed, 315 insertions(+), 1 deletion(-)
->  create mode 100644 hw/scsi/vhost-user-scsi.c
->  create mode 100644 include/hw/virtio/vhost-user-scsi.h
->
-> diff --git a/.gitignore b/.gitignore
-> index 11bb1b1..09c2363 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -50,6 +50,7 @@
->  /qemu-version.h.tmp
->  /module_block.h
->  /vscclient
-> +/vhost-user-scsi
->  /fsdev/virtfs-proxy-helper
->  *.[1-9]
->  *.a
-> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
-> index 3bbeb62..53ff109 100644
-> --- a/default-configs/pci.mak
-> +++ b/default-configs/pci.mak
-> @@ -43,3 +43,4 @@ CONFIG_VGA=3Dy
->  CONFIG_VGA_PCI=3Dy
->  CONFIG_IVSHMEM=3D$(CONFIG_EVENTFD)
->  CONFIG_ROCKER=3Dy
-> +CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
-> diff --git a/default-configs/s390x-softmmu.mak
-> b/default-configs/s390x-softmmu.mak
-> index 18aed56..b227a36 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -1,5 +1,6 @@
->  CONFIG_PCI=3Dy
->  CONFIG_VIRTIO_PCI=3Dy
-> +CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
->  CONFIG_VIRTIO=3Dy
->  CONFIG_SCLPCONSOLE=3Dy
->  CONFIG_TERMINAL3270=3Dy
-> diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
-> index 54d8754..b188f72 100644
-> --- a/hw/scsi/Makefile.objs
-> +++ b/hw/scsi/Makefile.objs
-> @@ -11,4 +11,5 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vscsi.o
->  ifeq ($(CONFIG_VIRTIO),y)
->  obj-y +=3D virtio-scsi.o virtio-scsi-dataplane.o
->  obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-common.o vhost-scsi.o
-> +obj-$(CONFIG_VHOST_USER_SCSI) +=3D vhost-scsi-common.o vhost-user-scsi.o
->  endif
-> diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
-> index e41c031..d434b3e 100644
-> --- a/hw/scsi/vhost-scsi-common.c
-> +++ b/hw/scsi/vhost-scsi-common.c
-> @@ -16,7 +16,6 @@
->   */
->
->  #include "qemu/osdep.h"
-> -#include <linux/vhost.h>
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
->  #include "migration/migration.h"
-> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-> new file mode 100644
-> index 0000000..500fa6a
-> --- /dev/null
-> +++ b/hw/scsi/vhost-user-scsi.c
-> @@ -0,0 +1,205 @@
-> +/*
-> + * vhost-user-scsi host device
-> + *
-> + * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-> + *
-> + * Author:
-> + *  Felipe Franciosi <felipe@nutanix.com>
-> + *
-> + * This work is largely based on the "vhost-scsi" implementation by:
-> + *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
-> + *  Nicholas Bellinger <nab@risingtidesystems.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2 or
-> later.
-> + * See the COPYING.LIB file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/typedefs.h"
-> +#include "qom/object.h"
-> +#include "hw/fw-path-provider.h"
-> +#include "hw/qdev-core.h"
-> +#include "hw/virtio/vhost.h"
-> +#include "hw/virtio/vhost-backend.h"
-> +#include "hw/virtio/vhost-user-scsi.h"
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/virtio-access.h"
-> +#include "chardev/char-fe.h"
-> +
-> +/* Features supported by the host application */
-> +static const int user_feature_bits[] =3D {
-> +    VIRTIO_F_NOTIFY_ON_EMPTY,
-> +    VIRTIO_RING_F_INDIRECT_DESC,
-> +    VIRTIO_RING_F_EVENT_IDX,
-> +    VIRTIO_SCSI_F_HOTPLUG,
-> +    VHOST_INVALID_FEATURE_BIT
-> +};
-> +
-> +static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t statu=
-s)
-> +{
-> +    VHostUserSCSI *s =3D (VHostUserSCSI *)vdev;
-> +    VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
-> +    bool start =3D (status & VIRTIO_CONFIG_S_DRIVER_OK) && vdev->vm_runn=
-ing;
-> +
-> +    if (vsc->dev.started =3D=3D start) {
-> +        return;
-> +    }
-> +
-> +    if (start) {
-> +        int ret;
-> +
-> +        ret =3D vhost_scsi_common_start(vsc);
-> +        if (ret < 0) {
-> +            error_report("unable to start vhost-user-scsi: %s",
-> strerror(-ret));
-> +            exit(1);
-> +        }
-> +    } else {
-> +        vhost_scsi_common_stop(vsc);
-> +    }
-> +}
-> +
-> +static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> +{
-> +}
-> +
-> +static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-> +{
-> +    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(dev);
-> +    VHostUserSCSI *s =3D VHOST_USER_SCSI(dev);
-> +    VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
-> +    Error *err =3D NULL;
-> +    int ret;
-> +
-> +    if (!vs->conf.chardev.chr) {
-> +        error_setg(errp, "vhost-user-scsi: missing chardev");
-> +        return;
-> +    }
-> +
-> +    virtio_scsi_common_realize(dev, vhost_dummy_handle_output,
-> +                               vhost_dummy_handle_output,
-> +                               vhost_dummy_handle_output, &err);
-> +    if (err !=3D NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    vsc->dev.nvqs =3D 2 + vs->conf.num_queues;
-> +    vsc->dev.vqs =3D g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-> +    vsc->dev.vq_index =3D 0;
-> +    vsc->dev.backend_features =3D 0;
-> +
-> +    ret =3D vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
-> +                         VHOST_BACKEND_TYPE_USER, 0);
-> +    if (ret < 0) {
-> +        error_setg(errp, "vhost-user-scsi: vhost initialization failed:
-> %s",
-> +                   strerror(-ret));
-> +        return;
-> +    }
-> +
-> +    /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-> +    vsc->channel =3D 0;
-> +    vsc->lun =3D 0;
-> +    vsc->target =3D vs->conf.boot_tpgt;
-> +}
-> +
-> +static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> +    VHostUserSCSI *s =3D VHOST_USER_SCSI(dev);
-> +    VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(s);
-> +
-> +    /* This will stop the vhost backend. */
-> +    vhost_user_scsi_set_status(vdev, 0);
-> +
-> +    vhost_dev_cleanup(&vsc->dev);
-> +    g_free(vsc->dev.vqs);
-> +
-> +    virtio_scsi_common_unrealize(dev, errp);
-> +}
-> +
-> +static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
-> +                                             uint64_t features, Error
-> **errp)
-> +{
-> +    VHostUserSCSI *s =3D VHOST_USER_SCSI(vdev);
-> +
-> +    /* Turn on predefined features supported by this device */
-> +    features |=3D s->host_features;
-> +
-> +    return vhost_scsi_common_get_features(vdev, features, errp);
-> +}
-> +
-> +static Property vhost_user_scsi_properties[] =3D {
-> +    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
-> +    DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0)=
-,
-> +    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues,
-> 1),
-> +    DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors=
-,
-> +                       0xFFFF),
-> +    DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun=
-,
-> 128),
-> +    DEFINE_PROP_BIT64("hotplug", VHostUserSCSI, host_features,
-> +                                                VIRTIO_SCSI_F_HOTPLUG,
-> +                                                true),
-> +    DEFINE_PROP_BIT64("param_change", VHostUserSCSI, host_features,
-> +                                                     VIRTIO_SCSI_F_CHANG=
-E,
-> +                                                     true),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static const VMStateDescription vmstate_vhost_scsi =3D {
-> +    .name =3D "virtio-scsi",
-> +    .minimum_version_id =3D 1,
-> +    .version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_VIRTIO_DEVICE,
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static void vhost_user_scsi_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_CLASS(klass);
-> +    FWPathProviderClass *fwc =3D FW_PATH_PROVIDER_CLASS(klass);
-> +
-> +    dc->props =3D vhost_user_scsi_properties;
-> +    dc->vmsd =3D &vmstate_vhost_scsi;
-> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> +    vdc->realize =3D vhost_user_scsi_realize;
-> +    vdc->unrealize =3D vhost_user_scsi_unrealize;
-> +    vdc->get_features =3D vhost_user_scsi_get_features;
-> +    vdc->set_config =3D vhost_scsi_common_set_config;
-> +    vdc->set_status =3D vhost_user_scsi_set_status;
-> +    fwc->get_dev_path =3D vhost_scsi_common_get_fw_dev_path;
-> +}
-> +
-> +static void vhost_user_scsi_instance_init(Object *obj)
-> +{
-> +    VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(obj);
-> +
-> +    vsc->feature_bits =3D user_feature_bits;
-> +
-> +    /* Add the bootindex property for this object */
-> +    device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NUL=
-L,
-> +                                  DEVICE(vsc), NULL);
-> +}
-> +
-> +static const TypeInfo vhost_user_scsi_info =3D {
-> +    .name =3D TYPE_VHOST_USER_SCSI,
-> +    .parent =3D TYPE_VHOST_SCSI_COMMON,
-> +    .instance_size =3D sizeof(VHostUserSCSI),
-> +    .class_init =3D vhost_user_scsi_class_init,
-> +    .instance_init =3D vhost_user_scsi_instance_init,
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_FW_PATH_PROVIDER },
-> +        { }
-> +    },
-> +};
-> +
-> +static void virtio_register_types(void)
-> +{
-> +    type_register_static(&vhost_user_scsi_info);
-> +}
-> +
-> +type_init(virtio_register_types)
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index f9b7244..20d6a08 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -2135,6 +2135,61 @@ static const TypeInfo vhost_scsi_pci_info =3D {
->  };
->  #endif
->
-> +#ifdef CONFIG_LINUX
-> +/* vhost-user-scsi-pci */
-> +static Property vhost_user_scsi_pci_properties[] =3D {
-> +    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
-> +                       DEV_NVECTORS_UNSPECIFIED),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error
-> **errp)
-> +{
-> +    VHostUserSCSIPCI *dev =3D VHOST_USER_SCSI_PCI(vpci_dev);
-> +    DeviceState *vdev =3D DEVICE(&dev->vdev);
-> +    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(vdev);
-> +
-> +    if (vpci_dev->nvectors =3D=3D DEV_NVECTORS_UNSPECIFIED) {
-> +        vpci_dev->nvectors =3D vs->conf.num_queues + 3;
-> +    }
-> +
-> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> +}
-> +
-> +static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *dat=
-a)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
-> +    PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
-> +    k->realize =3D vhost_user_scsi_pci_realize;
-> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> +    dc->props =3D vhost_user_scsi_pci_properties;
-> +    pcidev_k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
-> +    pcidev_k->device_id =3D PCI_DEVICE_ID_VIRTIO_SCSI;
-> +    pcidev_k->revision =3D 0x00;
-> +    pcidev_k->class_id =3D PCI_CLASS_STORAGE_SCSI;
-> +}
-> +
-> +static void vhost_user_scsi_pci_instance_init(Object *obj)
-> +{
-> +    VHostUserSCSIPCI *dev =3D VHOST_USER_SCSI_PCI(obj);
-> +
-> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> +                                TYPE_VHOST_USER_SCSI);
-> +    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-> +                              "bootindex", &error_abort);
-> +}
-> +
-> +static const TypeInfo vhost_user_scsi_pci_info =3D {
-> +    .name          =3D TYPE_VHOST_USER_SCSI_PCI,
-> +    .parent        =3D TYPE_VIRTIO_PCI,
-> +    .instance_size =3D sizeof(VHostUserSCSIPCI),
-> +    .instance_init =3D vhost_user_scsi_pci_instance_init,
-> +    .class_init    =3D vhost_user_scsi_pci_class_init,
-> +};
-> +#endif
-> +
->  /* vhost-vsock-pci */
->
->  #ifdef CONFIG_VHOST_VSOCK
-> @@ -2612,6 +2667,9 @@ static void virtio_pci_register_types(void)
->  #ifdef CONFIG_VHOST_SCSI
->      type_register_static(&vhost_scsi_pci_info);
->  #endif
-> +#ifdef CONFIG_LINUX
-> +    type_register_static(&vhost_user_scsi_pci_info);
-> +#endif
->  #ifdef CONFIG_VHOST_VSOCK
->      type_register_static(&vhost_vsock_pci_info);
->  #endif
-> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> index b095dfc..69f5959 100644
-> --- a/hw/virtio/virtio-pci.h
-> +++ b/hw/virtio/virtio-pci.h
-> @@ -26,6 +26,7 @@
->  #include "hw/virtio/virtio-input.h"
->  #include "hw/virtio/virtio-gpu.h"
->  #include "hw/virtio/virtio-crypto.h"
-> +#include "hw/virtio/vhost-user-scsi.h"
->
->  #ifdef CONFIG_VIRTFS
->  #include "hw/9pfs/virtio-9p.h"
-> @@ -44,6 +45,7 @@ typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
->  typedef struct VirtIOSerialPCI VirtIOSerialPCI;
->  typedef struct VirtIONetPCI VirtIONetPCI;
->  typedef struct VHostSCSIPCI VHostSCSIPCI;
-> +typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
->  typedef struct VirtIORngPCI VirtIORngPCI;
->  typedef struct VirtIOInputPCI VirtIOInputPCI;
->  typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
-> @@ -230,6 +232,15 @@ struct VHostSCSIPCI {
->  };
->  #endif
->
-> +#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci"
-> +#define VHOST_USER_SCSI_PCI(obj) \
-> +        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
-> +
-> +struct VHostUserSCSIPCI {
-> +    VirtIOPCIProxy parent_obj;
-> +    VHostUserSCSI vdev;
-> +};
-> +
->  /*
->   * virtio-blk-pci: This extends VirtioPCIProxy.
->   */
-> diff --git a/include/hw/virtio/vhost-user-scsi.h
-> b/include/hw/virtio/vhost-user-scsi.h
-> new file mode 100644
-> index 0000000..01861f7
-> --- /dev/null
-> +++ b/include/hw/virtio/vhost-user-scsi.h
-> @@ -0,0 +1,35 @@
-> +/*
-> + * vhost-user-scsi host device
-> + *
-> + * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-> + *
-> + * Author:
-> + *  Felipe Franciosi <felipe@nutanix.com>
-> + *
-> + * This file is largely based on "vhost-scsi.h" by:
-> + *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2 or
-> later.
-> + * See the COPYING.LIB file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef VHOST_USER_SCSI_H
-> +#define VHOST_USER_SCSI_H
-> +
-> +#include "qemu-common.h"
-> +#include "hw/qdev.h"
-> +#include "hw/virtio/virtio-scsi.h"
-> +#include "hw/virtio/vhost.h"
-> +#include "hw/virtio/vhost-scsi-common.h"
-> +
-> +#define TYPE_VHOST_USER_SCSI "vhost-user-scsi"
-> +#define VHOST_USER_SCSI(obj) \
-> +        OBJECT_CHECK(VHostUserSCSI, (obj), TYPE_VHOST_USER_SCSI)
-> +
-> +typedef struct VHostUserSCSI {
-> +    VHostSCSICommon parent_obj;
-> +    uint64_t host_features;
-> +} VHostUserSCSI;
-> +
-> +#endif /* VHOST_USER_SCSI_H */
-> diff --git a/include/hw/virtio/virtio-scsi.h
-> b/include/hw/virtio/virtio-scsi.h
-> index eac2013..de6ae5a 100644
-> --- a/include/hw/virtio/virtio-scsi.h
-> +++ b/include/hw/virtio/virtio-scsi.h
-> @@ -21,6 +21,7 @@
->  #include "hw/virtio/virtio.h"
->  #include "hw/pci/pci.h"
->  #include "hw/scsi/scsi.h"
-> +#include "chardev/char-fe.h"
->  #include "sysemu/iothread.h"
->
->  #define TYPE_VIRTIO_SCSI_COMMON "virtio-scsi-common"
-> @@ -53,6 +54,7 @@ struct VirtIOSCSIConf {
->      char *vhostfd;
->      char *wwpn;
->  #endif
-> +    CharBackend chardev;
->      uint32_t boot_tpgt;
->      IOThread *iothread;
->  };
-> --
-> 1.8.3.1
->
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+In the future, we may want to hide vhost-user from QAPI/introspection
+with conditional compilation, although the design of this hasn't been
+fully fleshed out yet and shouldn't prevent this patch from being
+applied.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/net/vhost_net.c                | 12 ++++++++++--
+ hw/net/virtio-net.c               |  4 ++++
+ hw/virtio/virtio-pci.c            |  4 ++--
+ net/hub.c                         |  2 ++
+ net/net.c                         |  4 +++-
+ configure                         | 22 +++++++++++++++++++++-
+ default-configs/pci.mak           |  2 +-
+ default-configs/s390x-softmmu.mak |  2 +-
+ net/Makefile.objs                 |  2 +-
+ qemu-options.hx                   |  4 ++++
+ tests/Makefile.include            |  6 +++---
+ 11 files changed, 52 insertions(+), 12 deletions(-)
+
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index e037db63a3..565a1cc99d 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -56,6 +56,7 @@ static const int kernel_feature_bits[] =3D {
+     VHOST_INVALID_FEATURE_BIT
+ };
+=20
++#ifdef CONFIG_VHOST_USER
+ /* Features supported by others. */
+ static const int user_feature_bits[] =3D {
+     VIRTIO_F_NOTIFY_ON_EMPTY,
+@@ -86,6 +87,7 @@ static const int user_feature_bits[] =3D {
+=20
+     VHOST_INVALID_FEATURE_BIT
+ };
++#endif
+=20
+ static const int *vhost_net_get_feature_bits(struct vhost_net *net)
+ {
+@@ -95,9 +97,11 @@ static const int *vhost_net_get_feature_bits(struct vh=
+ost_net *net)
+     case NET_CLIENT_DRIVER_TAP:
+         feature_bits =3D kernel_feature_bits;
+         break;
++#ifdef CONFIG_VHOST_USER
+     case NET_CLIENT_DRIVER_VHOST_USER:
+         feature_bits =3D user_feature_bits;
+         break;
++#endif
+     default:
+         error_report("Feature bits not defined for this type: %d",
+                 net->nc->info->type);
+@@ -193,6 +197,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *opt=
+ions)
+         }
+     }
+=20
++#ifdef CONFIG_VHOST_USER
+     /* Set sane init value. Override when guest acks. */
+     if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
+         features =3D vhost_user_get_acked_features(net->nc);
+@@ -203,7 +208,7 @@ struct vhost_net *vhost_net_init(VhostNetOptions *opt=
+ions)
+             goto fail;
+         }
+     }
+-
++#endif
+     vhost_net_ack_features(net, features);
+=20
+     return net;
+@@ -309,6 +314,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState=
+ *ncs,
+         net =3D get_vhost_net(ncs[i].peer);
+         vhost_net_set_vq_index(net, i * 2);
+=20
++#ifdef CONFIG_VHOST_USER
+         /* Suppress the masking guest notifiers on vhost user
+          * because vhost user doesn't interrupt masking/unmasking
+          * properly.
+@@ -316,8 +322,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState=
+ *ncs,
+         if (net->nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
+             dev->use_guest_notifier_mask =3D false;
+         }
++#endif
+      }
+-
+     r =3D k->set_guest_notifiers(qbus->parent, total_queues * 2, true);
+     if (r < 0) {
+         error_report("Error binding guest notifier: %d", -r);
+@@ -414,10 +420,12 @@ VHostNetState *get_vhost_net(NetClientState *nc)
+     case NET_CLIENT_DRIVER_TAP:
+         vhost_net =3D tap_get_vhost_net(nc);
+         break;
++#ifdef CONFIG_VHOST_USER
+     case NET_CLIENT_DRIVER_VHOST_USER:
+         vhost_net =3D vhost_user_get_vhost_net(nc);
+         assert(vhost_net);
+         break;
++#endif
+     default:
+         break;
+     }
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 148071a396..9bda4ab4f8 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -524,9 +524,11 @@ static int peer_attach(VirtIONet *n, int index)
+         return 0;
+     }
+=20
++#ifdef CONFIG_VHOST_USER
+     if (nc->peer->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
+         vhost_set_vring_enable(nc->peer, 1);
+     }
++#endif
+=20
+     if (nc->peer->info->type !=3D NET_CLIENT_DRIVER_TAP) {
+         return 0;
+@@ -547,9 +549,11 @@ static int peer_detach(VirtIONet *n, int index)
+         return 0;
+     }
+=20
++#ifdef CONFIG_VHOST_USER
+     if (nc->peer->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_USER) {
+         vhost_set_vring_enable(nc->peer, 0);
+     }
++#endif
+=20
+     if (nc->peer->info->type !=3D  NET_CLIENT_DRIVER_TAP) {
+         return 0;
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5d14bd66dc..85b82e6c94 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2135,7 +2135,7 @@ static const TypeInfo vhost_scsi_pci_info =3D {
+ };
+ #endif
+=20
+-#ifdef CONFIG_LINUX
++#ifdef CONFIG_VHOST_USER
+ /* vhost-user-scsi-pci */
+ static Property vhost_user_scsi_pci_properties[] =3D {
+     DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
+@@ -2665,7 +2665,7 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_VHOST_SCSI
+     type_register_static(&vhost_scsi_pci_info);
+ #endif
+-#ifdef CONFIG_LINUX
++#ifdef CONFIG_VHOST_USER
+     type_register_static(&vhost_user_scsi_pci_info);
+ #endif
+ #ifdef CONFIG_VHOST_VSOCK
+diff --git a/net/hub.c b/net/hub.c
+index 32d8cf5cd4..ec06275ff6 100644
+--- a/net/hub.c
++++ b/net/hub.c
+@@ -322,7 +322,9 @@ void net_hub_check_clients(void)
+             case NET_CLIENT_DRIVER_TAP:
+             case NET_CLIENT_DRIVER_SOCKET:
+             case NET_CLIENT_DRIVER_VDE:
++#ifdef CONFIG_VHOST_USER
+             case NET_CLIENT_DRIVER_VHOST_USER:
++#endif
+                 has_host_dev =3D 1;
+                 break;
+             default:
+diff --git a/net/net.c b/net/net.c
+index 0e28099554..d11909421c 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -957,7 +957,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DR=
+IVER__MAX])(
+         [NET_CLIENT_DRIVER_BRIDGE]    =3D net_init_bridge,
+ #endif
+         [NET_CLIENT_DRIVER_HUBPORT]   =3D net_init_hubport,
+-#ifdef CONFIG_VHOST_NET_USED
++#if defined(CONFIG_VHOST_NET_USED) && defined(CONFIG_VHOST_USER)
+         [NET_CLIENT_DRIVER_VHOST_USER] =3D net_init_vhost_user,
+ #endif
+ #ifdef CONFIG_L2TPV3
+@@ -1033,10 +1033,12 @@ static int net_client_init1(const void *object, b=
+ool is_netdev, Error **errp)
+             legacy.type =3D NET_CLIENT_DRIVER_NETMAP;
+             legacy.u.netmap =3D opts->u.netmap;
+             break;
++#ifdef CONFIG_VHOST_USER
+         case NET_LEGACY_OPTIONS_TYPE_VHOST_USER:
+             legacy.type =3D NET_CLIENT_DRIVER_VHOST_USER;
+             legacy.u.vhost_user =3D opts->u.vhost_user;
+             break;
++#endif
+         default:
+             abort();
+         }
+diff --git a/configure b/configure
+index a3f0522e8f..defb9e9974 100755
+--- a/configure
++++ b/configure
+@@ -306,6 +306,7 @@ tcg=3D"yes"
+ vhost_net=3D"no"
+ vhost_scsi=3D"no"
+ vhost_vsock=3D"no"
++vhost_user=3D""
+ kvm=3D"no"
+ hax=3D"no"
+ rdma=3D""
+@@ -1283,6 +1284,10 @@ for opt do
+   ;;
+   --enable-vxhs) vxhs=3D"yes"
+   ;;
++  --disable-vhost-user) vhost_user=3D"no"
++  ;;
++  --enable-vhost-user) vhost_user=3D"yes"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1291,6 +1296,14 @@ for opt do
+   esac
+ done
+=20
++if test "$vhost_user" =3D ""; then
++    if test "$mingw32" =3D "yes" ; then
++        vhost_user=3D"no"
++    else
++        vhost_user=3D"yes"
++    fi
++fi
++
+ case "$cpu" in
+     ppc)
+            CPU_CFLAGS=3D"-m32"
+@@ -1518,6 +1531,7 @@ disabled with --disable-FEATURE, default is enabled=
+ if available:
+   qom-cast-debug  cast debugging support
+   tools           build qemu-io, qemu-nbd and qemu-image tools
+   vxhs            Veritas HyperScale vDisk backend support
++  vhost-user      vhost-user support
+=20
+ NOTE: The object files are built at the place where configure is launche=
+d
+ EOF
+@@ -5278,6 +5292,7 @@ echo "libcap-ng support $cap_ng"
+ echo "vhost-net support $vhost_net"
+ echo "vhost-scsi support $vhost_scsi"
+ echo "vhost-vsock support $vhost_vsock"
++echo "vhost-user support $vhost_user"
+ echo "Trace backends    $trace_backends"
+ if have_backend "simple"; then
+ echo "Trace output file $trace_file-<pid>"
+@@ -5696,6 +5711,9 @@ fi
+ if test "$vhost_vsock" =3D "yes" ; then
+   echo "CONFIG_VHOST_VSOCK=3Dy" >> $config_host_mak
+ fi
++if test "$vhost_user" =3D "yes" ; then
++  echo "CONFIG_VHOST_USER=3Dy" >> $config_host_mak
++fi
+ if test "$blobs" =3D "yes" ; then
+   echo "INSTALL_BLOBS=3Dyes" >> $config_host_mak
+ fi
+@@ -6279,7 +6297,9 @@ if supported_kvm_target $target; then
+     echo "CONFIG_KVM=3Dy" >> $config_target_mak
+     if test "$vhost_net" =3D "yes" ; then
+         echo "CONFIG_VHOST_NET=3Dy" >> $config_target_mak
+-        echo "CONFIG_VHOST_NET_TEST_$target_name=3Dy" >> $config_host_ma=
+k
++        if test "$vhost_user" =3D "yes" ; then
++            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $confi=
+g_host_mak
++        fi
+     fi
+ fi
+ if supported_hax_target $target; then
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 53ff10975c..708d7b19ad 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -43,4 +43,4 @@ CONFIG_VGA=3Dy
+ CONFIG_VGA_PCI=3Dy
+ CONFIG_IVSHMEM=3D$(CONFIG_EVENTFD)
+ CONFIG_ROCKER=3Dy
+-CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
++CONFIG_VHOST_USER_SCSI=3D$(CONFIG_VHOST_USER)
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-so=
+ftmmu.mak
+index b227a36179..bb870477f8 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -1,6 +1,6 @@
+ CONFIG_PCI=3Dy
+ CONFIG_VIRTIO_PCI=3Dy
+-CONFIG_VHOST_USER_SCSI=3D$(CONFIG_LINUX)
++CONFIG_VHOST_USER_SCSI=3D$(CONFIG_VHOST_USER)
+ CONFIG_VIRTIO=3Dy
+ CONFIG_SCLPCONSOLE=3Dy
+ CONFIG_TERMINAL3270=3Dy
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index 67ba5e26fb..7cac7ed1e4 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -3,7 +3,7 @@ common-obj-y +=3D socket.o
+ common-obj-y +=3D dump.o
+ common-obj-y +=3D eth.o
+ common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
+-common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
++common-obj-$(CONFIG_VHOST_USER) +=3D vhost-user.o
+ common-obj-$(CONFIG_SLIRP) +=3D slirp.o
+ common-obj-$(CONFIG_VDE) +=3D vde.o
+ common-obj-$(CONFIG_NETMAP) +=3D netmap.o
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 746b5fa75d..c2d4ae440f 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1994,8 +1994,10 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+     "                VALE port (created on the fly) called 'name' ('nmna=
+me' is name of the \n"
+     "                netmap device, defaults to '/dev/netmap')\n"
+ #endif
++#ifdef CONFIG_VHOST_USER
+     "-netdev vhost-user,id=3Dstr,chardev=3Ddev[,vhostforce=3Don|off]\n"
+     "                configure a vhost-user network, backed by a chardev=
+ 'dev'\n"
++#endif
+     "-netdev hubport,id=3Dstr,hubid=3Dn\n"
+     "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH=
+_ALL)
+ DEF("net", HAS_ARG, QEMU_OPTION_net,
+@@ -2428,6 +2430,7 @@ The hubport netdev lets you connect a NIC to a QEMU=
+ "vlan" instead of a single
+ netdev.  @code{-net} and @code{-device} with parameter @option{vlan} cre=
+ate the
+ required hub automatically.
+=20
++#ifdef CONFIG_VHOST_USER
+ @item -netdev vhost-user,chardev=3D@var{id}[,vhostforce=3Don|off][,queue=
+s=3Dn]
+=20
+ Establish a vhost-user netdev, backed by a chardev @var{id}. The chardev=
+ should
+@@ -2445,6 +2448,7 @@ qemu -m 512 -object memory-backend-file,id=3Dmem,si=
+ze=3D512M,mem-path=3D/hugetlbfs,sha
+      -netdev type=3Dvhost-user,id=3Dnet0,chardev=3Dchr0 \
+      -device virtio-net-pci,netdev=3Dnet0
+ @end example
++#endif
+=20
+ @item -net dump[,vlan=3D@var{n}][,file=3D@var{file}][,len=3D@var{len}]
+ Dump network traffic on VLAN @var{n} to file @var{file} (@file{qemu-vlan=
+0.pcap} by default).
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index cfbb689e0e..6b9a0ce07e 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -252,9 +252,9 @@ check-qtest-i386-y +=3D tests/pc-cpu-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
+ gcov-files-i386-y +=3D hw/pci-host/q35.c
+-check-qtest-i386-$(CONFIG_VHOST_NET_TEST_i386) +=3D tests/vhost-user-tes=
+t$(EXESUF)
+-ifeq ($(CONFIG_VHOST_NET_TEST_i386),)
+-check-qtest-x86_64-$(CONFIG_VHOST_NET_TEST_x86_64) +=3D tests/vhost-user=
+-test$(EXESUF)
++check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=3D tests/vhost-use=
+r-test$(EXESUF)
++ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
++check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=3D tests/vhost=
+-user-test$(EXESUF)
+ endif
+ check-qtest-i386-y +=3D tests/test-netfilter$(EXESUF)
+ check-qtest-i386-y +=3D tests/test-filter-mirror$(EXESUF)
+--=20
+2.14.0.rc0.1.g40ca67566
