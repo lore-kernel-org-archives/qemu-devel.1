@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXUnr-0003I9-JU
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:52:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXUoK-0003f1-MU
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:53:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXUnn-0005aB-OZ
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:52:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXUnn-0005Zf-Il
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:52:47 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55C1E90907
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 15:52:46 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170717155632.12754-1-eblake@redhat.com>
-	<3070e28e-7676-3397-0f8f-8810ae1f6ece@redhat.com>
-Date: Tue, 18 Jul 2017 17:52:44 +0200
-In-Reply-To: <3070e28e-7676-3397-0f8f-8810ae1f6ece@redhat.com> (Eric Blake's
-	message of "Mon, 17 Jul 2017 11:02:35 -0500")
-Message-ID: <87iniprbcj.fsf@dusky.pond.sub.org>
+	(envelope-from <berrange@redhat.com>) id 1dXUoJ-0005pi-D9
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 11:53:20 -0400
+Date: Tue, 18 Jul 2017 16:53:06 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170718155306.GP11927@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
+	<1500385286-21142-6-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/5] Easier conversion from qapi to qobject
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1500385286-21142-6-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 05/10] block: Use JSON null
+ instead of "" to disable backing file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +25,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+On Tue, Jul 18, 2017 at 03:41:21PM +0200, Markus Armbruster wrote:
+> BlockdevRef is an alternate of BlockdevOptions (inline definition) and
+> str (reference to an existing block device by name).  BlockdevRef
+> value "" is special: "no block device should be referenced."  It's
+> actually interpreted that way in just one place: optional member
+> @backing of COW formats.  Semantics:
+> 
+> * Present means "use this block device" as backing storage
+> 
+> * Absent means "default to the one stored in the image"
+> 
+> * Except "" means "don't use backing storage at all"
+> 
+> The first two are perfectly normal: when the parameter is absent, it
+> defaults to an implied value, but the value's meaning is the same.
+> 
+> The third one overloads the parameter with a second meaning.  The
+> overloading is *implicit*, i.e. it's not visible in the types.  Works
+> here, because "" is not a value block device ID.
+> 
+> Pressing argument values the schema accepts, but are semantically
+> invalid, into service to mean "do something else entirely" is not
+> general, as suitable invalid values need not exist.  I also find it
+> ugly.
+> 
+> To clean this up, we could add a separate flag argument to suppress
+> @backing, or add a distinct value to @backing.  This commit implements
+> the latter: add JSON null to the values of @backing, deprecate "".
+> 
+> Because we're so close to the 2.10 freeze, implement it in the
+> stupidest way possible: have qmp_blockdev_add() rewrite null to ""
+> before anything else can see the null.  Works, because BlockdevRef
+> occurs only within arguments of blockdev-add.  The proper way to do it
+> would be rewriting "" to null, preferably in a cleaner way, but that
+> requires fixing up code to work with null.  Add a TODO comment for
+> that.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  blockdev.c             | 14 ++++++++++++++
+>  qapi/block-core.json   | 29 ++++++++++++++++++++++-------
+>  tests/qemu-iotests/085 |  2 +-
+>  tests/qemu-iotests/139 |  2 +-
+>  4 files changed, 38 insertions(+), 9 deletions(-)
 
-> On 07/17/2017 10:56 AM, Eric Blake wrote:
->> I'm not sure if I'm posted this before, or if it is a cleanup I've
->> just been sitting on locally.  In all likelihood, it will miss
->> tomorrow's freeze due to lack of review time, and thus be 2.11
->> material, but we'll see...
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-I had a quick glance.  Looks like a small improvement to me.  No need to
-rush it into 2.10.  I suspect some (all?) of the remaining qobject
-output visitor uses could also be converted.
 
-> Answering myself, it was part of my larger (mostly-unreviewed) attempt
-> to rip out dynamic JSON parsing [1]. But it is independent enough that
-> it warrants its own thread for separate review.
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index 9c6dd27..1c42699 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3886,6 +3886,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+>      QObject *obj;
+>      Visitor *v = qobject_output_visitor_new(&obj);
+>      QDict *qdict;
+> +    const QDictEntry *ent;
+>      Error *local_err = NULL;
+>  
+>      visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+> @@ -3899,6 +3900,19 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+>  
+>      qdict_flatten(qdict);
+>  
+> +    /*
+> +     * Rewrite "backing": null to "backing": ""
+> +     * TODO Rewrite "" to null instead, and perhaps not even here
+> +     */
+> +    for (ent = qdict_first(qdict); ent; ent = qdict_next(qdict, ent)) {
+> +        char *dot = strrchr(ent->key, '.');
+> +
+> +        if (!strcmp(dot ? dot + 1 : ent->key, "backing")
+> +            && qobject_type(ent->value) == QTYPE_QNULL) {
+> +            qdict_put(qdict, ent->key, qstring_new());
+> +        }
+> +    }
 
-Yes, splitting it out makes sense.  Thanks!
+I find it a little yucky that we're modifying the qdict, rather than
+the original "options" object, but I guess this is simpler for a quick
+hack
 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg05425.html
 
-[...]
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
