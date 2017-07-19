@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXlse-0004oc-Ci
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:06:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXlzu-0006W7-DQ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:14:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dXlsd-0000je-11
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:06:56 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:38528)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dXlsc-0000ir-Qv
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:06:54 -0400
-Received: by mail-lf0-x241.google.com with SMTP id l125so9179lfg.5
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 03:06:54 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1500448182-21376-1-git-send-email-armbru@redhat.com>
-References: <1500448182-21376-1-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 19 Jul 2017 12:06:52 +0200
-Message-ID: <CAJ+F1C+tNiGEkzC3aBf=_92oxb7NvG+UeYaUPLy9vKY8ym936g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vnc: Clarify documentation of QMP command
- change
+	(envelope-from <berrange@redhat.com>) id 1dXlzq-0004NU-Bd
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:14:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXlzq-0004Js-2U
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:14:22 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 19 Jul 2017 11:08:00 +0100
+Message-Id: <20170719100802.14094-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/2 (for 2.10] Document deprecated features
+ & support lifecycle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +22,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hi
+This is a followup to
 
-On Wed, Jul 19, 2017 at 9:09 AM, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> QMP command
->
->     { "execute": "change",
->       "arguments": { "device": "vnc", "target": "password", "arg": PWD } =
-}
->
-> behaves just like
->
->     { "execute": "change-vnc-password",
->       "arguments": { "password", "arg": PWD } }
->
-> Their documentation differs, however.  According to
-> change-vnc-password's documentation, "an empty password [...] will set
-> the password to the empty string", while change's documentation claims
-> "no future logins will be allowed".  The former is actually correct.
-> Replace the incorrect claim by a reference to change-vnc-password.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg02390.html
+  v2: https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01286.html
+  v3: https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg00651.html
+  v4: https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04239.html
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+I would really strongly like to see this documented in time for the
+2.10 release, so that we can start the clock ticking on our deprecation
+policy and thus actually delete some stuff in the not too distant
+future.
 
+The goal is to clarify to users & app developers what they can expect
+from QEMU in terms of feature lifecycle & any deprecation policy should
+it be neccessary to remove features.
 
-The password would have to be NULL to disallow further login, is that
-what your other series will allow to do?
+The list of features marked as deprecated was determined by looking at
+the QEMU source for the word "deprecated'. It was then compared with
+the doc Thomas put up at http://wiki.qemu.org/Features/LegacyRemoval
 
-> ---
->  qapi-schema.json | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 8b015be..58d3a02 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3011,8 +3011,7 @@
->  # @arg:    If @device is a block device, then this is an optional format=
- to open
->  #          the device with.
->  #          If @device is 'vnc' and @target is 'password', this is the ne=
-w VNC
-> -#          password to set.  If this argument is an empty string, then n=
-o future
-> -#          logins will be allowed.
-> +#          password to set.  See change-vnc-password for additional note=
-s.
->  #
->  # Returns: Nothing on success.
->  #          If @device is not a valid block device, DeviceNotFound
-> --
-> 2.7.5
->
->
+Key differences with the wiki page that Thomas wrote up vs patch 2
+in this series
 
+ - Deprecated features are given a fixed lifespan of 2 releases,
+   rather than listing deletion at a future "major" v3.0.0 release.
+   This ensures that applications like libvirt have a predictable
+   fixed amount of time to react to deprecations.
 
+ - Only lists features which are currently officially deprecated,
+   no list of possible future candidates. The wiki page is probably
+   a good place to maintain a list of future possible deprecations.
+   To turn them into actual deprecations, a patch to the QEMU doc
+   can then be posted & reviewed in the normal manner.
 
---=20
-Marc-Andr=C3=A9 Lureau
+ - Not listing the '-6' and '-e' args to qemu-img create. Those
+   were never deprecations, because the functionality was
+   immediately turned into a fatal error. Patches to delete these
+   have been merged now
+
+Changed in v5:
+
+ - Removed misleading reference to "major" release (Eduardo)
+
+Changed in v4:
+
+ - Misc typos / wording clarification (Thomas)
+
+Changed in v3:
+
+ - Rename appendix to "Deprecated features" (Markus)
+ - List all currently deprecated features
+ - Document that deprecated features will be removed after
+   2 releases of being deprecated
+ - Clarify that clock for removing historically deprecated
+   features starts with the forthcoming release.
+
+Changed in v2:
+
+ - Split into 2 patches so we can consider each suggested addition
+   independantly.
+
+Daniel P. Berrange (2):
+  docs: document support lifetime for features
+  docs: document deprecated features in appendix
+
+ qemu-doc.texi | 205 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 205 insertions(+)
+
+-- 
+2.13.0
