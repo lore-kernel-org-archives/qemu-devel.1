@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXkCf-0005Ns-30
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:19:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXkL6-0007sc-E0
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXkCe-0008Hr-9H
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:19:29 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXkCe-0008HN-2s
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:19:28 -0400
-Received: by mail-wm0-x232.google.com with SMTP id g127so7831064wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 01:19:28 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dXkL3-00042h-Q4
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:28:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38732)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXkL3-00042F-H8
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:28:09 -0400
+Date: Wed, 19 Jul 2017 09:28:01 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170719082801.GA30084@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170718102519.15392-1-berrange@redhat.com>
+	<CAFEAcA-Nri9i6woP_C954xRRdzqjtohiCjWQWSXM59knq9d5gg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
-References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
-	<1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
-	<b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Jul 2017 09:19:06 +0100
-Message-ID: <CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
- variable warning
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-Nri9i6woP_C954xRRdzqjtohiCjWQWSXM59knq9d5gg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v1 00/18] Merge crypto 201/07/18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 18 July 2017 at 23:01, Eric Blake <eblake@redhat.com> wrote:
-> On 07/18/2017 11:26 AM, Peter Maydell wrote:
->> On OpenBSD the compiler warns:
->> bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wunused-but-set-variable]
->>
->> This is because a lot of the signal delivery code is #if-0'd
->> out as unused. Reshuffle #ifdefs a bit to silence the warning.
->
-> Why not just nuke the #if 0 code instead (we can always 'git revert' it
-> later as a starting point for someone that wants to implement it).
+On Wed, Jul 19, 2017 at 09:11:17AM +0100, Peter Maydell wrote:
+> On 18 July 2017 at 11:25, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > The following changes since commit 6c6076662d98c068059983d411cb2a8987ba5670:
+> >
+> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-07-14 12:16:09 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   git://github.com/berrange/qemu tags/pull-qcrypto-2017-07-18-1
+> >
+> > for you to fetch changes up to 0e0fb56bcc8145d956bf527bfedc2be42bca101f:
+> >
+> >   tests: crypto: add hmac speed benchmark support (2017-07-18 11:18:30 +0100)
+> >
+> > ----------------------------------------------------------------
+> > Merge crypto 2017/07/18 v1
+> >
+> > ----------------------------------------------------------------
+> 
+> Hi; I'm afraid this failed to build on clang (x86 Linux, FreeBSD,
+> OSX):
+> 
+>   CC      crypto/cipher.o
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:9: error:
+> variable 'drv' is used uninitialized whenever 'if' condition is false
+> [-Werror,-Wsometimes-uninitialized]
+>     if (!ctx) {
+>         ^~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:192:30: note:
+> uninitialized use occurs here
+>     cipher->driver = (void *)drv;
+>                              ^~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:5: note:
+> remove the 'if' if its condition is always true
+>     if (!ctx) {
+>     ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:168:29: note:
+> initialize the variable 'drv' to silence this warning
+>     QCryptoCipherDriver *drv;
+>                             ^
+>                              = NULL
+> 1 error generated.
+> 
+> and also
+> 
+>   CC      crypto/hmac.o
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:9: error:
+> variable 'drv' is used uninitialized whenever 'if' condition is false
+> [-Werror,-Wsometimes-uninitialized]
+>     if (!ctx) {
+>         ^~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:116:28: note:
+> uninitialized use occurs here
+>     hmac->driver = (void *)drv;
+>                            ^~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:5: note:
+> remove the 'if' if its condition is always true
+>     if (!ctx) {
+>     ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:94:27: note:
+> initialize the variable 'drv' to silence this warning
+>     QCryptoHmacDriver *drv;
+>                           ^
+>                            = NULL
+> 
+> 
+> Looks like a false positive, I think :-(
 
-I went for the minimal change, especially given we know
-that the freebsd folks have a big patchset on top of
-us fixing a lot of bsd-user code and it didn't seem worth
-giving them a more awkward rebase task.
+Ok, I'll investigate.
 
-thanks
--- PMM
+BTW, any idea what's different between your clang builds and the
+clang builds that travis does - the latter passed on both OS-X
+and Linux.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
