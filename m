@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXpgT-0006U8-Pb
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:10:38 -0400
+	(envelope-from <marcel@redhat.com>) id 1dXq04-0002cV-6R
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXpgQ-0000m1-Ez
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:10:37 -0400
-Resent-Message-Id: <E1dXpgQ-0000m1-Ez@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21795)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dXpgQ-0000lw-4W
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:10:34 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150047342085.93.4723386967259777082@5d477a5b5989>
-In-Reply-To: <1500468850-15571-1-git-send-email-thuth@redhat.com>
+	(envelope-from <marcel@redhat.com>) id 1dXq01-0000Gp-4b
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:30:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dXq00-0000B0-Td
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:30:49 -0400
+References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
+	<1500470414-7911-3-git-send-email-zuban32s@gmail.com>
+	<20170719135612.GF5722@char.us.oracle.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <ff0883c0-ed89-71eb-a322-3c99c20c1db8@redhat.com>
+Date: Wed, 19 Jul 2017 17:30:38 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 19 Jul 2017 07:10:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] target/s390x: Fix broken build with
- --disable-tcg
+In-Reply-To: <20170719135612.GF5722@char.us.oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 2/2] pci: enable RedHat pci bridges to
+ reserve more buses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net, borntraeger@de.ibm.com, cohuck@redhat.com, agraf@suse.de
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: seabios@seabios.org, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTUw
-MDQ2ODg1MC0xNTU3MS0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzVdIHRhcmdldC9zMzkweDogRml4IGJyb2tlbiBidWlsZCB3
-aXRoIC0tZGlzYWJsZS10Y2cKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5M2JjNzJhIHRh
-cmdldC9zMzkweDogQWRkIHJlbWFpbmluZyBzd2l0Y2hlcyB0byBjb21waWxlIHdpdGggLS1kaXNh
-YmxlLXRjZwo3ZWQ5ZjU1IHRhcmdldC9zMzkweDogTW92ZSBleGNlcHRpb24tcmVsYXRlZCBmdW5j
-dGlvbnMgdG8gYSBuZXcgZXhjcF9oZWxwZXIuYyBmaWxlCjEyODVlYjkgdGFyZ2V0L3MzOTB4OiBN
-b3ZlIGRpYWcgaGVscGVycyB0byBhIHNlcGFyYXRlIGZpbGUKMjY5NDNhOCB0YXJnZXQvczM5MHg6
-IE1vdmUgczM5MF9jcHVfZHVtcF9zdGF0ZSgpIHRvIGhlbHBlci5jCjg3NTc3ZWMgdGFyZ2V0L3Mz
-OTB4OiBNb3ZlIHByb2dyYW1faW50ZXJydXB0KCkgJiB0cmlnZ2VyX3BnbV9leGNlcHRpb24oKSB0
-byBpbnRlcnJ1cHQuYwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiB0
-YXJnZXQvczM5MHg6IE1vdmUgcHJvZ3JhbV9pbnRlcnJ1cHQoKSAmIHRyaWdnZXJfcGdtX2V4Y2Vw
-dGlvbigpIHRvIGludGVycnVwdC5jLi4uCkNoZWNraW5nIFBBVENIIDIvNTogdGFyZ2V0L3MzOTB4
-OiBNb3ZlIHMzOTBfY3B1X2R1bXBfc3RhdGUoKSB0byBoZWxwZXIuYy4uLgpDaGVja2luZyBQQVRD
-SCAzLzU6IHRhcmdldC9zMzkweDogTW92ZSBkaWFnIGhlbHBlcnMgdG8gYSBzZXBhcmF0ZSBmaWxl
-Li4uCkNoZWNraW5nIFBBVENIIDQvNTogdGFyZ2V0L3MzOTB4OiBNb3ZlIGV4Y2VwdGlvbi1yZWxh
-dGVkIGZ1bmN0aW9ucyB0byBhIG5ldyBleGNwX2hlbHBlci5jIGZpbGUuLi4KRVJST1I6IGRvIG5v
-dCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM5ODogRklMRTogdGFyZ2V0L3MzOTB4L2V4Y3BfaGVscGVy
-LmM6MzI6CisvLyNkZWZpbmUgREVCVUdfUzM5MAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNv
-bW1lbnRzCiM5OTogRklMRTogdGFyZ2V0L3MzOTB4L2V4Y3BfaGVscGVyLmM6MzM6CisvLyNkZWZp
-bmUgREVCVUdfUzM5MF9TVERPVVQKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3Ig
-YWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzEwNTogRklMRTogdGFyZ2V0L3MzOTB4L2V4Y3Bf
-aGVscGVyLmM6Mzk6CisgICAgICAgICBpZiAocWVtdV9sb2dfc2VwYXJhdGUoKSkgcWVtdV9sb2co
-Zm10LCAjI19fVkFfQVJHU19fKTsgfSB3aGlsZSAoMCkKWy4uLl0KCnRvdGFsOiAzIGVycm9ycywg
-MCB3YXJuaW5ncywgMTA2MiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzU6IHRhcmdldC9zMzkweDogQWRkIHJlbWFp
-bmluZyBzd2l0Y2hlcyB0byBjb21waWxlIHdpdGggLS1kaXNhYmxlLXRjZy4uLgo9PT0gT1VUUFVU
-IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 19/07/2017 16:56, Konrad Rzeszutek Wilk wrote:
+> On Wed, Jul 19, 2017 at 04:20:14PM +0300, Aleksandr Bezzubikov wrote:
+>> In case of RedHat PCI bridges reserve additional buses, which number is provided
+> 
+> It is "Red Hat"
+>> in a vendor-specific capability.
+> 
+> And perhaps also a #define ?
+
+Right, please add it to src/hw/pci_ids.h.
+
+Thanks,
+Marcel
+
+
+>>
+>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>> ---
+>>   src/fw/pciinit.c | 12 ++++++++++--
+>>   1 file changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
+>> index 08221e6..b6f3a01 100644
+>> --- a/src/fw/pciinit.c
+>> +++ b/src/fw/pciinit.c
+>> @@ -578,9 +578,17 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
+>>           pci_bios_init_bus_rec(secbus, pci_bus);
+>>   
+>>           if (subbus != *pci_bus) {
+>> +            u16 vendor = pci_config_readw(bdf, PCI_VENDOR_ID);
+>> +            u8 res_bus = 0;
+>> +            if (vendor == 0x1b36) {
+>> +                u8 cap = pci_find_capability_bdf(bdf, PCI_CAP_ID_VNDR, 0);
+>> +                if (cap) {
+>> +                    res_bus = pci_config_readb(bdf, cap + 16);
+>> +                }
+>> +            }
+>>               dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
+>> -                    subbus, *pci_bus);
+>> -            subbus = *pci_bus;
+>> +                    subbus, *pci_bus + res_bus);
+>> +            subbus = *pci_bus + res_bus;
+>>           } else {
+>>               dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
+>>           }
+>> -- 
+>> 2.7.4
+>>
+>>
