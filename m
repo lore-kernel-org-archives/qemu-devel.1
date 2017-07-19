@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dXr7h-0003FQ-1S
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:42:49 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXr8r-00044g-G5
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:44:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dXr7g-0000fj-9m
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:42:49 -0400
-Date: Wed, 19 Jul 2017 16:34:45 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170719153445.GA25920@stefanha-x1.localdomain>
-References: <20170627154120.20346-1-stefanha@redhat.com>
-	<e711b03d-4543-be7d-24ef-c8eb7817cc41@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dXr8q-0001IB-5l
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:44:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXr8q-0001Hj-0T
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:44:00 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E684A62E8F
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 15:43:58 +0000 (UTC)
+Date: Wed, 19 Jul 2017 16:43:45 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170719154345.GM30084@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-4-quintela@redhat.com>
+	<20170719154208.GD3500@work-vm>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="r5Pyd7+fXNt84Ff3"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e711b03d-4543-be7d-24ef-c8eb7817cc41@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] docs: add
- qemu-block-drivers(7) man page
+In-Reply-To: <20170719154208.GD3500@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v5 03/17] qio: Create new
+ qio_channel_{readv, writev}_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
+On Wed, Jul 19, 2017 at 04:42:09PM +0100, Dr. David Alan Gilbert wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+> > The functions waits until it is able to write the full iov.
+> 
+> When is it safe to call these - I see qio_channel_wait does it's
+> own g_main_loop - so I guess they're intended to be called from their
+> own process?
+> 
+> What causes these to exit if the migration fails for some other
+> (non-file) related reason?
 
---r5Pyd7+fXNt84Ff3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It'll exit if the other end closes the socket, or if the local QEMU
+does a qio_channel_close() on it.  I don't know if this patch series
+uses either of those options tough.
 
-On Mon, Jul 17, 2017 at 02:37:49PM -0400, John Snow wrote:
-> On 06/27/2017 11:41 AM, Stefan Hajnoczi wrote:
-> > Block driver documentation is available in qemu-doc.html.  It would be
-> > convenient to have documentation for formats, protocols, and filter
-> > drivers in a man page.
-> >=20
-> > Extract the relevant part of qemu-doc.html into a new file called
-> > docs/qemu-block-drivers.texi.  This file can also be built as a
-> > stand-alone document (man, html, etc).
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Reviewed-by: John Snow <jsnow@redhat.com>
-> > ---
->=20
-> Ping for 2.10, or no?
-
-This is not urgent, it can go into 2.11.
-
-Stefan
-
---r5Pyd7+fXNt84Ff3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZb3wVAAoJEJykq7OBq3PIS2sIAIx4uA6sNPa8X0EU0PNg7S1k
-Xz0Zw5udNihTaKIxW1LzahesoiPCAC6SbLASh2ivycFGlSHJtxSd+eVPTM0nS+PI
-XlmMNuTRGn7K/mxbhT8if8AxKrTrU7c87I5XyLnI1w+V1ir+XrUtvHwEaLeDxszB
-fwb+n79MHzgpcFAwtUQjeJVpprGqFoe8ZAc9qJ59NWBARaxpnmNDy/9uQdb99FMc
-yuVTqTvKoLVkYaCkEI4VwihJVgRtNrjjlY18as8eJMglgKvI2t/c+vjShNAixjLW
-id6xx3hC4NQky3vUQ48db4aKoOBjjtaF3EiBGNBzdhx2xS97F6F8KgqxhD5XfR8=
-=AziZ
------END PGP SIGNATURE-----
-
---r5Pyd7+fXNt84Ff3--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
