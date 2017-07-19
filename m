@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXju5-00048r-GY
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:00:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1dXjuS-0004JN-JQ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXju2-0006zv-BW
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:00:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49534)
+	(envelope-from <thuth@redhat.com>) id 1dXjuP-00078m-1c
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:00:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXju2-0006zc-5P
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:00:14 -0400
-Date: Wed, 19 Jul 2017 10:00:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170719100007.1071ce70@gondolin>
-In-Reply-To: <5f8a2315-9224-f20c-7524-11f9a8ac8efd@de.ibm.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dXjuO-00078U-RG
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:00:36 -0400
 References: <20170718142455.32676-1-cohuck@redhat.com>
-	<20170718142455.32676-5-cohuck@redhat.com>
-	<5f8a2315-9224-f20c-7524-11f9a8ac8efd@de.ibm.com>
+	<20170718142455.32676-6-cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fdcf6619-2c87-3d47-eb60-f414fe9f2488@redhat.com>
+Date: Wed, 19 Jul 2017 10:00:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170718142455.32676-6-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 4/9] s390x/pci: do not advertise pci
- on non-pci builds
+Subject: Re: [Qemu-devel] [PATCH RFC v2 5/9] s390x/ccw: create s390 phb
+ conditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-On Tue, 18 Jul 2017 21:56:26 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 07/18/2017 04:24 PM, Cornelia Huck wrote:
-> > Only set the zpci and aen feature bits on builds that actually
-> > support pci.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  target/s390x/kvm.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> > index 831492f9a2..880eccd58a 100644
-> > --- a/target/s390x/kvm.c
-> > +++ b/target/s390x/kvm.c
-> > @@ -2685,8 +2685,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-> >      }
-> > 
-> >      /* set zpci and aen facilities */
-> > +#ifdef CONFIG_PCI
-> >      set_bit(S390_FEAT_ZPCI, model->features);
-> >      set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
-> > +#endif
-> > 
-> >      if (s390_known_cpu_type(cpu_type)) {
-> >          /* we want the exact model, even if some features are missing */
-> >   
+On 18.07.2017 16:24, Cornelia Huck wrote:
+> Don't create the s390 pci host bridge if we do not provide the zpci
+> facility.
 > 
-> Not strictly necessary but do you also want to ifdef this
-> 
->  kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
-> 
-> call?
-> 
-> If not you could actually even allow AEN but not PCI for !CONFIG_PCI.
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
 
-I'm a bit unsure about the relationship of ais and aen with pci. I
-remember that only adapters for pci currently support suppression,
-although it could spread to other adapter types in the future. Not sure
-about aen.
-
-So I'd keep the ais enablement call, even though it won't have much of
-an effect as no pci adapters will be registered.
-
-As I don't quite remember what aen governed, I need to rely on your
-feedback here.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
