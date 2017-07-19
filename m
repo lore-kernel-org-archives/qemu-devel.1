@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXl5d-0000Wz-K9
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXl67-0000tQ-8D
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXl5c-0001G0-Mq
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45772)
+	(envelope-from <berrange@redhat.com>) id 1dXl65-0001iZ-Ux
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl5c-0001FO-E1
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:16 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl65-0001hp-Lj
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:45 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 19 Jul 2017 10:15:44 +0100
-Message-Id: <20170719091600.8555-3-berrange@redhat.com>
+Date: Wed, 19 Jul 2017 10:15:58 +0100
+Message-Id: <20170719091600.8555-17-berrange@redhat.com>
 In-Reply-To: <20170719091600.8555-1-berrange@redhat.com>
 References: <20170719091600.8555-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/18] crypto: cipher: introduce
- qcrypto_cipher_ctx_new for gcrypt-backend
+Subject: [Qemu-devel] [PULL v2 16/18] tests: crypto: add cipher speed
+ benchmark support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +29,178 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
-gcrypt-backend impls.
+Now we have two qcrypto backends, libiary-backend and afalg-backend,
+but which one is faster? This patch add a cipher speed benchmark, it
+helps us to measure the performance by using "make check-speed" or
+using "./tests/benchmark-crypto-cipher" directly.
 
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- crypto/cipher-gcrypt.c | 50 +++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 33 insertions(+), 17 deletions(-)
+ tests/.gitignore                |  1 +
+ tests/Makefile.include          |  9 ++++-
+ tests/benchmark-crypto-cipher.c | 88 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 96 insertions(+), 2 deletions(-)
+ create mode 100644 tests/benchmark-crypto-cipher.c
 
-diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
-index 0ecffa2751..493938629e 100644
---- a/crypto/cipher-gcrypt.c
-+++ b/crypto/cipher-gcrypt.c
-@@ -80,12 +80,12 @@ static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
- }
+diff --git a/tests/.gitignore b/tests/.gitignore
+index 8e01b004f1..bde803d546 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -1,4 +1,5 @@
+ atomic_add-bench
++benchmark-crypto-cipher
+ check-qdict
+ check-qnum
+ check-qjson
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index cfbb689e0e..993440dc84 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -99,6 +99,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
+ check-unit-y += tests/test-crypto-hash$(EXESUF)
+ check-unit-y += tests/test-crypto-hmac$(EXESUF)
+ check-unit-y += tests/test-crypto-cipher$(EXESUF)
++check-speed-y += tests/benchmark-crypto-cipher$(EXESUF)
+ check-unit-y += tests/test-crypto-secret$(EXESUF)
+ check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
+ check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlssession$(EXESUF)
+@@ -532,6 +533,7 @@ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+ 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
+ 	$(test-qom-obj-y)
++benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
+ test-block-obj-y = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+@@ -635,6 +637,7 @@ tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+ tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+ tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+ tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
++tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+ tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
+ tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
  
+@@ -803,6 +806,7 @@ check-help:
+ 	@echo " make check-qtest-TARGET   Run qtest tests for given target"
+ 	@echo " make check-qtest          Run qtest tests"
+ 	@echo " make check-unit           Run qobject tests"
++	@echo " make check-speed          Run qobject speed tests"
+ 	@echo " make check-qapi-schema    Run QAPI schema tests"
+ 	@echo " make check-block          Run block tests"
+ 	@echo " make check-report.html    Generates an HTML test report"
+@@ -833,8 +837,8 @@ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: $(check-qtest-y)
+ 	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
+ 	done,)
  
--QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
--                                  QCryptoCipherMode mode,
--                                  const uint8_t *key, size_t nkey,
--                                  Error **errp)
-+static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
-+                                                   QCryptoCipherMode mode,
-+                                                   const uint8_t *key,
-+                                                   size_t nkey,
-+                                                   Error **errp)
- {
--    QCryptoCipher *cipher;
-     QCryptoCipherGcrypt *ctx;
-     gcry_error_t err;
-     int gcryalg, gcrymode;
-@@ -162,10 +162,6 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         return NULL;
-     }
- 
--    cipher = g_new0(QCryptoCipher, 1);
--    cipher->alg = alg;
--    cipher->mode = mode;
--
-     ctx = g_new0(QCryptoCipherGcrypt, 1);
- 
-     err = gcry_cipher_open(&ctx->handle, gcryalg, gcrymode, 0);
-@@ -174,7 +170,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-                    gcry_strerror(err));
-         goto error;
-     }
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
-+    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-         err = gcry_cipher_open(&ctx->tweakhandle, gcryalg, gcrymode, 0);
-         if (err != 0) {
-             error_setg(errp, "Cannot initialize cipher: %s",
-@@ -183,7 +179,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         }
-     }
- 
--    if (cipher->alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
-+    if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
-         /* We're using standard DES cipher from gcrypt, so we need
-          * to munge the key so that the results are the same as the
-          * bizarre RFB variant of DES :-)
-@@ -193,7 +189,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         g_free(rfbkey);
-         ctx->blocksize = 8;
-     } else {
--        if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
-+        if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-             nkey /= 2;
-             err = gcry_cipher_setkey(ctx->handle, key, nkey);
-             if (err != 0) {
-@@ -210,7 +206,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-                        gcry_strerror(err));
-             goto error;
-         }
--        switch (cipher->alg) {
-+        switch (alg) {
-         case QCRYPTO_CIPHER_ALG_AES_128:
-         case QCRYPTO_CIPHER_ALG_AES_192:
-         case QCRYPTO_CIPHER_ALG_AES_256:
-@@ -230,7 +226,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         }
-     }
- 
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
-+    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-         if (ctx->blocksize != XTS_BLOCK_SIZE) {
-             error_setg(errp,
-                        "Cipher block size %zu must equal XTS block size %d",
-@@ -240,12 +236,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-         ctx->iv = g_new0(uint8_t, ctx->blocksize);
-     }
- 
--    cipher->opaque = ctx;
--    return cipher;
-+    return ctx;
- 
-  error:
-     gcrypt_cipher_free_ctx(ctx, mode);
--    g_free(cipher);
-     return NULL;
- }
- 
-@@ -385,3 +379,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
- 
-     return 0;
- }
+-.PHONY: $(patsubst %, check-%, $(check-unit-y))
+-$(patsubst %, check-%, $(check-unit-y)): check-%: %
++.PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
++$(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
+ 	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command, \
+ 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$((RANDOM % 255 + 1))} \
+@@ -893,6 +897,7 @@ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-unit: $(patsubst %,check-%, $(check-unit-y))
++check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+ check: check-qapi-schema check-unit check-qtest
+ check-clean:
+diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-cipher.c
+new file mode 100644
+index 0000000000..c6a40929e4
+--- /dev/null
++++ b/tests/benchmark-crypto-cipher.c
+@@ -0,0 +1,88 @@
++/*
++ * QEMU Crypto cipher speed benchmark
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "crypto/init.h"
++#include "crypto/cipher.h"
 +
-+
-+QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-+                                  QCryptoCipherMode mode,
-+                                  const uint8_t *key, size_t nkey,
-+                                  Error **errp)
++static void test_cipher_speed(const void *opaque)
 +{
 +    QCryptoCipher *cipher;
-+    QCryptoCipherGcrypt *ctx;
++    Error *err = NULL;
++    double total = 0.0;
++    size_t chunk_size = (size_t)opaque;
++    uint8_t *key = NULL, *iv = NULL;
++    uint8_t *plaintext = NULL, *ciphertext = NULL;
++    size_t nkey = qcrypto_cipher_get_key_len(QCRYPTO_CIPHER_ALG_AES_128);
++    size_t niv = qcrypto_cipher_get_iv_len(QCRYPTO_CIPHER_ALG_AES_128,
++                                           QCRYPTO_CIPHER_MODE_CBC);
 +
-+    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
-+    if (!ctx) {
-+        return NULL;
++    key = g_new0(uint8_t, nkey);
++    memset(key, g_test_rand_int(), nkey);
++
++    iv = g_new0(uint8_t, niv);
++    memset(iv, g_test_rand_int(), niv);
++
++    ciphertext = g_new0(uint8_t, chunk_size);
++
++    plaintext = g_new0(uint8_t, chunk_size);
++    memset(plaintext, g_test_rand_int(), chunk_size);
++
++    cipher = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_128,
++                                QCRYPTO_CIPHER_MODE_CBC,
++                                key, nkey, &err);
++    g_assert(cipher != NULL);
++
++    g_assert(qcrypto_cipher_setiv(cipher,
++                                  iv, niv,
++                                  &err) == 0);
++
++    g_test_timer_start();
++    do {
++        g_assert(qcrypto_cipher_encrypt(cipher,
++                                        plaintext,
++                                        ciphertext,
++                                        chunk_size,
++                                        &err) == 0);
++        total += chunk_size;
++    } while (g_test_timer_elapsed() < 5.0);
++
++    total /= 1024 * 1024; /* to MB */
++
++    g_print("cbc(aes128): ");
++    g_print("Testing chunk_size %ld bytes ", chunk_size);
++    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
++    g_print("%.2f MB/sec\n", total / g_test_timer_last());
++
++    qcrypto_cipher_free(cipher);
++    g_free(plaintext);
++    g_free(ciphertext);
++    g_free(iv);
++    g_free(key);
++}
++
++int main(int argc, char **argv)
++{
++    size_t i;
++    char name[64];
++
++    g_test_init(&argc, &argv, NULL);
++    g_assert(qcrypto_init(NULL) == 0);
++
++    for (i = 512; i <= (64 * 1204); i *= 2) {
++        memset(name, 0 , sizeof(name));
++        snprintf(name, sizeof(name), "/crypto/cipher/speed-%lu", i);
++        g_test_add_data_func(name, (void *)i, test_cipher_speed);
 +    }
 +
-+    cipher = g_new0(QCryptoCipher, 1);
-+    cipher->alg = alg;
-+    cipher->mode = mode;
-+    cipher->opaque = ctx;
-+
-+    return cipher;
++    return g_test_run();
 +}
 -- 
 2.13.0
