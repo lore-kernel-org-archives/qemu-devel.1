@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dXjOe-0006Mo-Pk
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dXjRI-0000lS-2K
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dXjOd-0000fC-VM
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:48 -0400
-Received: from [59.151.112.132] (port=35077 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dXjOc-0000e7-NG
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:47 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Wed, 19 Jul 2017 15:29:56 +0800
-Message-ID: <1500449399-19107-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <cohuck@redhat.com>) id 1dXjRD-0002gd-2v
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:30:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXjRC-0002fU-Pj
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:30:27 -0400
+Date: Wed, 19 Jul 2017 09:30:20 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170719093020.3a46837c@gondolin>
+In-Reply-To: <b738069f-03d3-bf02-c98c-e07e8d42a8d2@redhat.com>
+References: <20170718142455.32676-1-cohuck@redhat.com>
+	<20170718142455.32676-9-cohuck@redhat.com>
+	<CAAdtpL4TGurYS3tO1RbbJ78HrMRg+AyUmFf_+WhfkTdXLp0cOA@mail.gmail.com>
+	<20170718172244.75fa5d73@gondolin>
+	<95af5742-5f15-8858-4af0-1688f8af2c87@linux.vnet.ibm.com>
+	<b738069f-03d3-bf02-c98c-e07e8d42a8d2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V3 1/4] net/colo-compare.c: Add checkpoint min
- period to optimize performance
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC v2 8/9] s390x/kvm: msi route fixup for
+ non-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +32,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Philippe =?UTF-8?B?TWF0aGll?= =?UTF-8?B?dS1EYXVkw6k=?= <f4bug@amsat.org>, "qemu-devel@nongnu.org
+	Developers" <qemu-devel@nongnu.org>, pmorel@linux.vnet.ibm.com, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-If colo-compare find out the first different packet that means
-the following packet almost is different. we needn't do a lot
-of checkpoint in this time, so we set the no-need-checkpoint
-peroid, default just set 3 second.
+On Wed, 19 Jul 2017 09:09:11 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+> On 19.07.2017 05:16, Yi Min Zhao wrote:
+> >=20
+> >=20
+> > =E5=9C=A8 2017/7/18 =E4=B8=8B=E5=8D=8811:22, Cornelia Huck =E5=86=99=E9=
+=81=93: =20
+> >> On Tue, 18 Jul 2017 11:58:08 -0300
+> >> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+> >> =20
+> >>> Hi Cornelia,
+> >>>
+> >>> On Tue, Jul 18, 2017 at 11:24 AM, Cornelia Huck <cohuck@redhat.com>
+> >>> wrote: =20
+> >>>> If we don't provide pci, we cannot have a pci device for which we
+> >>>> have to translate to adapter routes: just return -ENODEV.
+> >>>>
+> >>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>>> ---
+> >>>>   target/s390x/kvm.c | 33 +++++++++++++++++++--------------
+> >>>>   1 file changed, 19 insertions(+), 14 deletions(-)
+> >>>>
+> >>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> >>>> index 60688888c3..df0e5af151 100644
+> >>>> --- a/target/s390x/kvm.c
+> >>>> +++ b/target/s390x/kvm.c
+> >>>> @@ -2424,22 +2424,27 @@ int kvm_arch_fixup_msi_route(struct
+> >>>> kvm_irq_routing_entry *route,
+> >>>>       uint32_t idx =3D data >> ZPCI_MSI_VEC_BITS;
+> >>>>       uint32_t vec =3D data & ZPCI_MSI_VEC_MASK;
+> >>>>
+> >>>> -    pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+> >>>> -    if (!pbdev) {
+> >>>> -        DPRINTF("add_msi_route no dev\n");
+> >>>> -        return -ENODEV;
+> >>>> -    }
+> >>>> +    if (s390_has_feat(S390_FEAT_ZPCI)) {
+> >>>> +        pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+> >>>> +        if (!pbdev) {
+> >>>> +            DPRINTF("add_msi_route no dev\n");
+> >>>> +            return -ENODEV;
+> >>>> +        }
+> >>>>
+> >>>> -    pbdev->routes.adapter.ind_offset =3D vec;
+> >>>> +        pbdev->routes.adapter.ind_offset =3D vec;
+> >>>>
+> >>>> -    route->type =3D KVM_IRQ_ROUTING_S390_ADAPTER;
+> >>>> -    route->flags =3D 0;
+> >>>> -    route->u.adapter.summary_addr =3D
+> >>>> pbdev->routes.adapter.summary_addr;
+> >>>> -    route->u.adapter.ind_addr =3D pbdev->routes.adapter.ind_addr;
+> >>>> -    route->u.adapter.summary_offset =3D
+> >>>> pbdev->routes.adapter.summary_offset;
+> >>>> -    route->u.adapter.ind_offset =3D pbdev->routes.adapter.ind_offse=
+t;
+> >>>> -    route->u.adapter.adapter_id =3D pbdev->routes.adapter.adapter_i=
+d;
+> >>>> -    return 0;
+> >>>> +        route->type =3D KVM_IRQ_ROUTING_S390_ADAPTER;
+> >>>> +        route->flags =3D 0;
+> >>>> +        route->u.adapter.summary_addr =3D
+> >>>> pbdev->routes.adapter.summary_addr;
+> >>>> +        route->u.adapter.ind_addr =3D pbdev->routes.adapter.ind_add=
+r;
+> >>>> +        route->u.adapter.summary_offset =3D
+> >>>> pbdev->routes.adapter.summary_offset;
+> >>>> +        route->u.adapter.ind_offset =3D
+> >>>> pbdev->routes.adapter.ind_offset;
+> >>>> +        route->u.adapter.adapter_id =3D
+> >>>> pbdev->routes.adapter.adapter_id;
+> >>>> +        return 0;
+> >>>> +    } else {
+> >>>> +        DPRINTF("fixup_msi_route on non-pci machine?!\n");
+> >>>> +        return -ENODEV;
+> >>>> +    }
+> >>>>   }
+> >>>>
+> >>>>   int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *rout=
+e,
+> >>>> --=20
+> >>>> 2.13.3 =20
+> >>> What about inverting the check?
+> >>>
+> >>> +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
+> >>> +        DPRINTF("fixup_msi_route on non-pci machine?!\n");
+> >>> +        return -ENODEV;
+> >>> +    } =20
+> >> I usually prefer the more common branch on top, but (1) this causes
+> >> more changes in this case and (2) I'm not so sure if zpci on really is
+> >> the common case...
+> >> =20
+> > Sorry for my duplicated comment. I think we don't know which is more
+> > common. Currently 2.9
+> > machine doesn' t support zpci facility. But in the future, how will the
+> > thing change? =20
+>=20
+> No matter whether zpci is the more common case or not, but one good
+> coding style is to keep the level of indentation small. So the early
+> exit as suggested by Philippe is certainly a good idea in this case here.
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index ca67c68..5313e74 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -40,6 +40,9 @@
- /* TODO: Should be configurable */
- #define REGULAR_PACKET_CHECK_MS 3000
- 
-+/* TODO: Should be configurable */
-+#define CHECKPOINT_MIN_TIME 3000
-+
- /*
-   + CompareState ++
-   |               |
-@@ -75,6 +78,9 @@ typedef struct CompareState {
-     SocketReadState sec_rs;
-     bool vnet_hdr;
- 
-+    /* Record the last checkpoint time */
-+    int64_t checkpoint_time_ms;
-+
-     /* connection list: the connections belonged to this NIC could be found
-      * in this list.
-      * element type: Connection
-@@ -507,7 +513,19 @@ static void colo_compare_connection(void *opaque, void *user_data)
-              */
-             trace_colo_compare_main("packet different");
-             g_queue_push_tail(&conn->primary_list, pkt);
--            /* TODO: colo_notify_checkpoint();*/
-+
-+            if (pkt->creation_ms - s->checkpoint_time_ms >
-+                CHECKPOINT_MIN_TIME) {
-+                /*
-+                 * TODO: Notify colo frame to do checkpoint.
-+                 * colo_compare_inconsistent_notify();
-+                 *
-+                 * TODO: Reset s->checkpoint_time_ms after finish
-+                 * checkpoint(when colo-compare get notify from colo-frame,
-+                 * in another independent patch).
-+                 */
-+                s->checkpoint_time_ms = pkt->creation_ms;
-+            }
-             break;
-         }
-     }
-@@ -803,6 +821,7 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-                        colo_compare_thread, s,
-                        QEMU_THREAD_JOINABLE);
-     compare_id++;
-+    s->checkpoint_time_ms = 0;
- 
-     return;
- }
--- 
-2.7.4
+Yes, I will change that in the next revision.
