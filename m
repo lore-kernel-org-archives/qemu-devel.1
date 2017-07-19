@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1dXqx9-0000it-NR
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:31:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXr7H-00035B-Mr
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1dXqx8-00038D-DT
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:31:55 -0400
-Date: Wed, 19 Jul 2017 17:31:50 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20170719153150.GC8266@andariel.pipo.sk>
-References: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dXr7E-0000On-Ha
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:42:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXr7E-0000O8-6g
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:42:20 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A98CA793F0
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 15:42:18 +0000 (UTC)
+Date: Wed, 19 Jul 2017 16:42:09 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170719154208.GD3500@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-4-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NKoe5XOeduwbEQHU"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 v2] block: Skip implicit nodes in
- query-block/blockstats
+In-Reply-To: <20170717134238.1966-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 03/17] qio: Create new
+ qio_channel_{readv, writev}_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,177 +34,403 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, nsoffer@redhat.com, el13635@mail.ntua.gr, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
+* Juan Quintela (quintela@redhat.com) wrote:
+> The functions waits until it is able to write the full iov.
 
---NKoe5XOeduwbEQHU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+When is it safe to call these - I see qio_channel_wait does it's
+own g_main_loop - so I guess they're intended to be called from their
+own process?
 
-On Wed, Jul 19, 2017 at 15:58:05 +0200, Kevin Wolf wrote:
-> Commits 0db832f and 6cdbceb introduced the automatic insertion of filter
-> nodes above the top layer of mirror and commit block jobs. The
-> assumption made there was that since libvirt doesn't do node-level
-> management of the block layer yet, it shouldn't be affected by added
-> nodes.
->=20
-> This is true as far as commands issued by libvirt are concerned. It only
-> uses BlockBackend names to address nodes, so any operations it performs
-> still operate on the root of the tree as intended.
->=20
-> However, the assumption breaks down when you consider query commands,
-> which return data for the wrong node now. These commands also return
-> information on some child nodes (bs->file and/or bs->backing), which
-> libvirt does make use of, and which refer to the wrong nodes, too.
->=20
-> One of the consequences is that oVirt gets wrong information about the
-> image size and stops the VM in response as long as a mirror or commit
-> job is running:
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1470634
->=20
-> This patch fixes the problem by hiding the implicit nodes created
-> automatically by the mirror and commit block jobs in the output of
-> query-block and BlockBackend-based query-blockstats as long as the user
-> doesn't indicate that they are aware of those nodes by providing a node
-> name for them in the QMP command to start the block job.
->=20
-> The node-based commands query-named-block-nodes and query-blockstats
-> with query-nodes=3Dtrue still show all nodes, including implicit ones.
-> This ensures that users that are capable of node-level management can
-> still access the full information; users that only know BlockBackends
-> won't use these commands.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+What causes these to exit if the migration fails for some other
+(non-file) related reason?
+
+Dave
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> Add tests.
 > ---
->=20
-> v2:
-> - Skip implicit nodes not only on the top level, but also during the recu=
-rsive
->   calls [Peter]
-> - Spelling fix in the commit message [Manos]
->=20
->  block/commit.c             |  3 +++
->  block/mirror.c             |  3 +++
->  block/qapi.c               | 30 +++++++++++++++++++++++++-----
->  include/block/block_int.h  |  1 +
->  qapi/block-core.json       |  6 ++++--
->  tests/qemu-iotests/041     | 23 +++++++++++++++++++++++
->  tests/qemu-iotests/041.out |  4 ++--
->  7 files changed, 61 insertions(+), 9 deletions(-)
->=20
-
-[...]
-
-> diff --git a/block/qapi.c b/block/qapi.c
-> index 95b2e2d..d370d0f 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -133,6 +133,13 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend=
- *blk,
->              qapi_free_BlockDeviceInfo(info);
->              return NULL;
->          }
+>  include/io/channel.h           | 46 +++++++++++++++++++++++++
+>  io/channel.c                   | 76 ++++++++++++++++++++++++++++++++++++++++++
+>  migration/qemu-file-channel.c  | 29 +---------------
+>  tests/io-channel-helpers.c     | 55 ++++++++++++++++++++++++++++++
+>  tests/io-channel-helpers.h     |  4 +++
+>  tests/test-io-channel-buffer.c | 55 ++++++++++++++++++++++++++++--
+>  6 files changed, 234 insertions(+), 31 deletions(-)
+> 
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index db9bb02..bfc97e2 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
+> @@ -269,6 +269,52 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
+>                                  Error **errp);
+>  
+>  /**
+> + * qio_channel_readv_all:
+> + * @ioc: the channel object
+> + * @iov: the array of memory regions to read data into
+> + * @niov: the length of the @iov array
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Read data from the IO channel, storing it in the
+> + * memory regions referenced by @iov. Each element
+> + * in the @iov will be fully populated with data
+> + * before the next one is used. The @niov parameter
+> + * specifies the total number of elements in @iov.
+> + *
+> + * Returns: the number of bytes read, or -1 on error,
+> + * or QIO_CHANNEL_ERR_BLOCK if no data is available
+> + * and the channel is non-blocking
+> + */
+> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
+> +                              const struct iovec *iov,
+> +                              size_t niov,
+> +                              Error **errp);
 > +
-> +        /* Skip automatically inserted nodes that the user isn't aware o=
-f for
-> +         * query-block (blk !=3D NULL), but not for query-named-block-no=
-des */
-> +        while (blk && bs0 && bs0->drv && bs0->implicit) {
-> +            bs0 =3D backing_bs(bs0);
-> +        }
-
-I don't think that the ordering of this part is correct.
-
-This checks that the current bds in 'bs0' is not an 'implicit' node
-, and if not ...
-
 > +
->          if (bs0->drv && bs0->backing) {
->              bs0 =3D bs0->backing->bs;
-
-=2E.. this then fills bs0 with the backing file and in the next loop, the
-first thing we do is to populate the data. At this point it's not
-guaranteed though that the backing image is not a implicit node added
-by a commit job.
-
-I think you want to check if bs0 is implicit after you populate it by
-the backing image pointer.
-
->              (*p_image_info)->has_backing_image =3D true;
-
-[...]
-
-> @@ -434,8 +446,8 @@ static void bdrv_query_blk_stats(BlockDeviceStats *ds=
-, BlockBackend *blk)
->      }
+> +/**
+> + * qio_channel_writev_all:
+> + * @ioc: the channel object
+> + * @iov: the array of memory regions to write data from
+> + * @niov: the length of the @iov array
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Write data to the IO channel, reading it from the
+> + * memory regions referenced by @iov. Each element
+> + * in the @iov will be fully sent, before the next
+> + * one is used. The @niov parameter specifies the
+> + * total number of elements in @iov.
+> + *
+> + * It is required for all @iov data to be fully
+> + * sent.
+> + *
+> + * Returns: the number of bytes sent, or -1 on error,
+> + */
+> +ssize_t qio_channel_writev_all(QIOChannel *ioc,
+> +                               const struct iovec *iov,
+> +                               size_t niov,
+> +                               Error **erp);
+> +
+> +/**
+>   * qio_channel_readv:
+>   * @ioc: the channel object
+>   * @iov: the array of memory regions to read data into
+> diff --git a/io/channel.c b/io/channel.c
+> index cdf7454..82203ef 100644
+> --- a/io/channel.c
+> +++ b/io/channel.c
+> @@ -22,6 +22,7 @@
+>  #include "io/channel.h"
+>  #include "qapi/error.h"
+>  #include "qemu/main-loop.h"
+> +#include "qemu/iov.h"
+>  
+>  bool qio_channel_has_feature(QIOChannel *ioc,
+>                               QIOChannelFeature feature)
+> @@ -85,6 +86,81 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
 >  }
-> =20
-> -static BlockStats *bdrv_query_bds_stats(const BlockDriverState *bs,
-> -                                 bool query_backing)
-> +static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
-> +                                        bool blk_level)
->  {
->      BlockStats *s =3D NULL;
-> =20
-> @@ -446,6 +458,14 @@ static BlockStats *bdrv_query_bds_stats(const BlockD=
-riverState *bs,
->          return s;
->      }
-> =20
-> +    /* Skip automatically inserted nodes that the user isn't aware of in
-> +     * a BlockBackend-level command. Stay at the exact node for a node-l=
-evel
-> +     * command. */
-> +    while (blk_level && bs->drv && bs->implicit) {
-> +        bs =3D backing_bs(bs);
-> +        assert(bs);
+>  
+>  
+> +
+> +ssize_t qio_channel_readv_all(QIOChannel *ioc,
+> +                              const struct iovec *iov,
+> +                              size_t niov,
+> +                              Error **errp)
+> +{
+> +    ssize_t done = 0;
+> +    struct iovec *local_iov = g_new(struct iovec, niov);
+> +    struct iovec *local_iov_head = local_iov;
+> +    unsigned int nlocal_iov = niov;
+> +
+> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
+> +                          iov, niov,
+> +                          0, iov_size(iov, niov));
+> +
+> +    while (nlocal_iov > 0) {
+> +        ssize_t len;
+> +        len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
+> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> +            qio_channel_wait(ioc, G_IO_OUT);
+> +            continue;
+> +        }
+> +        if (len < 0) {
+> +            error_setg_errno(errp, EIO,
+> +                             "Channel was not able to read full iov");
+> +            done = -1;
+> +            goto cleanup;
+> +        }
+> +
+> +        iov_discard_front(&local_iov, &nlocal_iov, len);
+> +        done += len;
 > +    }
 > +
->      if (bdrv_get_node_name(bs)[0]) {
->          s->has_node_name =3D true;
->          s->node_name =3D g_strdup(bdrv_get_node_name(bs));
-
-
-This is okay, but what puzzles me is that it looks like
-bdrv_query_bds_stats recursively fills in the whole backing chain (but
-does not really enter much stats, besides the highest offset and the
-node name [1]).
-
-But then in qmp_query_blockstats only the top layer is populated by
-bdrv_query_blk_stats. I guess it makes some sense since not all stats
-are available for the lower levels of backing chain, but I find it weird
-that the whole nested structure full of empty fields is reported.
-
-Peter
-
-[1] The nested node name structure is great, since the current libvirt
-node name detection code is very fragile. This will allow making it much
-more robust. (the code is used to set the block write threshold event)
-
-Obviously the plan is still to supply the node names explicitly.
-
---NKoe5XOeduwbEQHU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAllve2AACgkQHGwCByjY
-1Gr2oA/9HGll/3ab8s/N6wRAXF6ZZe0gb/VYrpnnsgiLkrXJrJaKrUuJttMTqgGJ
-WkUzc/DKp8OzHLl5GTD4VZjZBbZmPYc78s+9d1aYYNIpGijyPyRZmPgdL1T5sSHN
-KwEIAL/En4Gq1AngIKnLsIuipX0CKgyQzDCUapuwkwfBU8ugd5ALS0n9V3F/bq3X
-iiThLT6Nt9F8ebXI5MW4gU1MgmYZOvXDO9UsOLDpnAv0jujzjGPERjqUoA7E2Kqh
-Y/4s1uetIOu8kn6g5mD+wivP1SC8Dgw/NgpLrcIhgun5GimqeIgLRWu+HrPlVPc7
-f2yfSVx7W7Z1ahRa2PuHDxFx3BPh8dVMTith1Q58P1fo69+x01cDzJbQuNrZQx+d
-ECGgWmTD6OwCWVuthEkvFFO3Ik9riLBrm5DOzM/aEzlpP29w34y7KUd7NchlAk2T
-YeGSVJBrWO7EchjOY84cg5+Wygpkq4sQH0FkImIfciKsWfRTPWPRlVMLtmn0o5F9
-9L9yLyvyo1RqEBl+wEJNo9/ht+sKiHjV9+Y9TNUhTFAx2nbgaLFXZzZiDig9IYfX
-FBEbKe6MTQlqAq28K/WrwECF/1KPG7w/9GeQKNn3rV2/MoBwalTo+EjGl4oEGt0Q
-gUTVtRNaP81g89qR/2zRJ8P9QgeTen/0BZji1i5MIE95juyG2Lw=
-=JyHx
------END PGP SIGNATURE-----
-
---NKoe5XOeduwbEQHU--
+> + cleanup:
+> +    g_free(local_iov_head);
+> +    return done;
+> +}
+> +
+> +ssize_t qio_channel_writev_all(QIOChannel *ioc,
+> +                               const struct iovec *iov,
+> +                               size_t niov,
+> +                               Error **errp)
+> +{
+> +    ssize_t done = 0;
+> +    struct iovec *local_iov = g_new(struct iovec, niov);
+> +    struct iovec *local_iov_head = local_iov;
+> +    unsigned int nlocal_iov = niov;
+> +
+> +    nlocal_iov = iov_copy(local_iov, nlocal_iov,
+> +                          iov, niov,
+> +                          0, iov_size(iov, niov));
+> +
+> +    while (nlocal_iov > 0) {
+> +        ssize_t len;
+> +        len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
+> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> +            qio_channel_wait(ioc, G_IO_OUT);
+> +            continue;
+> +        }
+> +        if (len < 0) {
+> +            error_setg_errno(errp, EIO,
+> +                             "Channel was not able to write full iov");
+> +            done = -1;
+> +            goto cleanup;
+> +        }
+> +
+> +        iov_discard_front(&local_iov, &nlocal_iov, len);
+> +        done += len;
+> +    }
+> +
+> + cleanup:
+> +    g_free(local_iov_head);
+> +    return done;
+> +}
+> +
+>  ssize_t qio_channel_readv(QIOChannel *ioc,
+>                            const struct iovec *iov,
+>                            size_t niov,
+> diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
+> index e202d73..457ea6c 100644
+> --- a/migration/qemu-file-channel.c
+> +++ b/migration/qemu-file-channel.c
+> @@ -36,35 +36,8 @@ static ssize_t channel_writev_buffer(void *opaque,
+>                                       int64_t pos)
+>  {
+>      QIOChannel *ioc = QIO_CHANNEL(opaque);
+> -    ssize_t done = 0;
+> -    struct iovec *local_iov = g_new(struct iovec, iovcnt);
+> -    struct iovec *local_iov_head = local_iov;
+> -    unsigned int nlocal_iov = iovcnt;
+>  
+> -    nlocal_iov = iov_copy(local_iov, nlocal_iov,
+> -                          iov, iovcnt,
+> -                          0, iov_size(iov, iovcnt));
+> -
+> -    while (nlocal_iov > 0) {
+> -        ssize_t len;
+> -        len = qio_channel_writev(ioc, local_iov, nlocal_iov, NULL);
+> -        if (len == QIO_CHANNEL_ERR_BLOCK) {
+> -            qio_channel_wait(ioc, G_IO_OUT);
+> -            continue;
+> -        }
+> -        if (len < 0) {
+> -            /* XXX handle Error objects */
+> -            done = -EIO;
+> -            goto cleanup;
+> -        }
+> -
+> -        iov_discard_front(&local_iov, &nlocal_iov, len);
+> -        done += len;
+> -    }
+> -
+> - cleanup:
+> -    g_free(local_iov_head);
+> -    return done;
+> +    return qio_channel_writev_all(ioc, iov, iovcnt, NULL);
+>  }
+>  
+>  
+> diff --git a/tests/io-channel-helpers.c b/tests/io-channel-helpers.c
+> index 05e5579..3d76d95 100644
+> --- a/tests/io-channel-helpers.c
+> +++ b/tests/io-channel-helpers.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu/osdep.h"
+>  #include "io-channel-helpers.h"
+>  #include "qapi/error.h"
+> +#include "qemu/iov.h"
+>  
+>  struct QIOChannelTest {
+>      QIOChannel *src;
+> @@ -153,6 +154,45 @@ static gpointer test_io_thread_reader(gpointer opaque)
+>      return NULL;
+>  }
+>  
+> +static gpointer test_io_thread_writer_all(gpointer opaque)
+> +{
+> +    QIOChannelTest *data = opaque;
+> +    size_t niov = data->niov;
+> +    ssize_t ret;
+> +
+> +    qio_channel_set_blocking(data->src, data->blocking, NULL);
+> +
+> +    ret = qio_channel_writev_all(data->src,
+> +                                 data->inputv,
+> +                                 niov,
+> +                                 &data->writeerr);
+> +    if (ret != iov_size(data->inputv, data->niov)) {
+> +        error_setg(&data->writeerr, "Unexpected I/O error");
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +/* This thread receives all data using iovecs */
+> +static gpointer test_io_thread_reader_all(gpointer opaque)
+> +{
+> +    QIOChannelTest *data = opaque;
+> +    size_t niov = data->niov;
+> +    ssize_t ret;
+> +
+> +    qio_channel_set_blocking(data->dst, data->blocking, NULL);
+> +
+> +    ret = qio_channel_readv_all(data->dst,
+> +                                data->outputv,
+> +                                niov,
+> +                                &data->readerr);
+> +
+> +    if (ret != iov_size(data->inputv, data->niov)) {
+> +        error_setg(&data->readerr, "Unexpected I/O error");
+> +    }
+> +
+> +    return NULL;
+> +}
+>  
+>  QIOChannelTest *qio_channel_test_new(void)
+>  {
+> @@ -231,6 +271,21 @@ void qio_channel_test_run_reader(QIOChannelTest *test,
+>      test->dst = NULL;
+>  }
+>  
+> +void qio_channel_test_run_writer_all(QIOChannelTest *test,
+> +                                     QIOChannel *src)
+> +{
+> +    test->src = src;
+> +    test_io_thread_writer_all(test);
+> +    test->src = NULL;
+> +}
+> +
+> +void qio_channel_test_run_reader_all(QIOChannelTest *test,
+> +                                     QIOChannel *dst)
+> +{
+> +    test->dst = dst;
+> +    test_io_thread_reader_all(test);
+> +    test->dst = NULL;
+> +}
+>  
+>  void qio_channel_test_validate(QIOChannelTest *test)
+>  {
+> diff --git a/tests/io-channel-helpers.h b/tests/io-channel-helpers.h
+> index fedc64f..17b9647 100644
+> --- a/tests/io-channel-helpers.h
+> +++ b/tests/io-channel-helpers.h
+> @@ -36,6 +36,10 @@ void qio_channel_test_run_writer(QIOChannelTest *test,
+>                                   QIOChannel *src);
+>  void qio_channel_test_run_reader(QIOChannelTest *test,
+>                                   QIOChannel *dst);
+> +void qio_channel_test_run_writer_all(QIOChannelTest *test,
+> +                                     QIOChannel *src);
+> +void qio_channel_test_run_reader_all(QIOChannelTest *test,
+> +                                     QIOChannel *dst);
+>  
+>  void qio_channel_test_validate(QIOChannelTest *test);
+>  
+> diff --git a/tests/test-io-channel-buffer.c b/tests/test-io-channel-buffer.c
+> index 64722a2..4bf64ae 100644
+> --- a/tests/test-io-channel-buffer.c
+> +++ b/tests/test-io-channel-buffer.c
+> @@ -22,8 +22,7 @@
+>  #include "io/channel-buffer.h"
+>  #include "io-channel-helpers.h"
+>  
+> -
+> -static void test_io_channel_buf(void)
+> +static void test_io_channel_buf1(void)
+>  {
+>      QIOChannelBuffer *buf;
+>      QIOChannelTest *test;
+> @@ -39,6 +38,53 @@ static void test_io_channel_buf(void)
+>      object_unref(OBJECT(buf));
+>  }
+>  
+> +static void test_io_channel_buf2(void)
+> +{
+> +    QIOChannelBuffer *buf;
+> +    QIOChannelTest *test;
+> +
+> +    buf = qio_channel_buffer_new(0);
+> +
+> +    test = qio_channel_test_new();
+> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
+> +    buf->offset = 0;
+> +    qio_channel_test_run_reader(test, QIO_CHANNEL(buf));
+> +    qio_channel_test_validate(test);
+> +
+> +    object_unref(OBJECT(buf));
+> +}
+> +
+> +static void test_io_channel_buf3(void)
+> +{
+> +    QIOChannelBuffer *buf;
+> +    QIOChannelTest *test;
+> +
+> +    buf = qio_channel_buffer_new(0);
+> +
+> +    test = qio_channel_test_new();
+> +    qio_channel_test_run_writer(test, QIO_CHANNEL(buf));
+> +    buf->offset = 0;
+> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
+> +    qio_channel_test_validate(test);
+> +
+> +    object_unref(OBJECT(buf));
+> +}
+> +
+> +static void test_io_channel_buf4(void)
+> +{
+> +    QIOChannelBuffer *buf;
+> +    QIOChannelTest *test;
+> +
+> +    buf = qio_channel_buffer_new(0);
+> +
+> +    test = qio_channel_test_new();
+> +    qio_channel_test_run_writer_all(test, QIO_CHANNEL(buf));
+> +    buf->offset = 0;
+> +    qio_channel_test_run_reader_all(test, QIO_CHANNEL(buf));
+> +    qio_channel_test_validate(test);
+> +
+> +    object_unref(OBJECT(buf));
+> +}
+>  
+>  int main(int argc, char **argv)
+>  {
+> @@ -46,6 +92,9 @@ int main(int argc, char **argv)
+>  
+>      g_test_init(&argc, &argv, NULL);
+>  
+> -    g_test_add_func("/io/channel/buf", test_io_channel_buf);
+> +    g_test_add_func("/io/channel/buf1", test_io_channel_buf1);
+> +    g_test_add_func("/io/channel/buf2", test_io_channel_buf2);
+> +    g_test_add_func("/io/channel/buf3", test_io_channel_buf3);
+> +    g_test_add_func("/io/channel/buf4", test_io_channel_buf4);
+>      return g_test_run();
+>  }
+> -- 
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
