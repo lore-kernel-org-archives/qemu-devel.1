@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dXk6V-0002ND-Nb
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:08 -0400
+	(envelope-from <mhocko@kernel.org>) id 1dXk6i-0002T9-V1
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dXk6S-0004HZ-Bq
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:07 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:50785)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1dXk6R-0004Fb-Gk
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:04 -0400
-Date: Wed, 19 Jul 2017 16:12:55 +0800 (CST)
-Message-ID: <201707191612551425978@zte.com.cn>
-References: 1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn,
-	20170719095058.4d46359d@Igors-MacBook-Pro.local
-Mime-Version: 1.0
-From: <peng.hao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gdmhvc3Q6IGZp?=
- =?utf-8?q?x_a_migration_failed_because_ofvhost_region_merge?=
+	(envelope-from <mhocko@kernel.org>) id 1dXk6f-0004Nl-Mw
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:20 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38962 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1dXk6f-0004MA-Fs
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:17 -0400
+Date: Wed, 19 Jul 2017 10:13:12 +0200
+From: Michal Hocko <mhocko@kernel.org>
+Message-ID: <20170719081311.GC26779@dhcp22.suse.cz>
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	<20170714123023.GA2624@dhcp22.suse.cz>
+	<20170714181523-mutt-send-email-mst@kernel.org>
+	<20170717152448.GN12888@dhcp22.suse.cz>
+	<596D6E7E.4070700@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <596D6E7E.4070700@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: imammedo@redhat.com
-Cc: mst@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-5Y+R5Lu25Lq677yaIDxpbWFtbWVkb0ByZWRoYXQuY29tPg0K5pS25Lu25Lq677ya5b2t5rWpMTAw
-OTY3NDINCuaKhOmAgeS6uu+8miA8bXN0QHJlZGhhdC5jb20+546L5Lia6LaFMTAxNTQ0MjUgPHFl
-bXUtZGV2ZWxAbm9uZ251Lm9yZz4NCuaXpSDmnJ8g77yaMjAxN+W5tDA35pyIMTnml6UgMTU6NTEN
-CuS4uyDpopgg77yaUmU6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0OiBmaXggYSBtaWdyYXRp
-b24gZmFpbGVkIGJlY2F1c2Ugb2Z2aG9zdCByZWdpb24gbWVyZ2UNCg0KDQoNCg0KDQpPbiBXZWQs
-IDE5IEp1bCAyMDE3IDIzOjE3OjMyICswODAwDQpQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20u
-Y24+IHdyb3RlOg0KDQo+IFdoZW4gYSBndWVzdCB0aGF0IGhhcyBzZXZlcmFsIGhvdHBsdWdnZWQg
-ZGltbXMgaXMgbWlncmF0ZWQsIGluDQo+IGRlc3RpbmF0aW9uIGhvc3QgaXQgd2lsbCBmYWlsIHRv
-IHJlc3VtZS4gQmVjYXVzZSB2aG9zdCByZWdpb25zIG9mDQo+IHNldmVyYWwgZGltbXMgaW4gc291
-cmNlIGhvc3QgYXJlIG1lcmdlZCBhbmQgaW4gdGhlIHJlc3RvcmUgc3RhZ2UNCj4gaW4gZGVzdGlu
-YXRpb24gaG9zdCBpdCBjb21wdXRlcyB3aGV0aGVyIG1vcmUgdGhhbiB2aG9zdCBzbG90IGxpbWl0
-DQo+IGJlZm9yZSBtZXJnaW5nIHZob3N0IHJlZ2lvbnMgb2Ygc2V2ZXJhbCBkaW1tcy4NCmNvdWxk
-IHlvdSBwcm92aWRlIGEgYml0IG1vcmUgZGV0YWlsZWQgZGVzY3JpcHRpb24gb2YgdGhlIHByb2Js
-ZW0NCmluY2x1ZGluZyBjb21tYW5kIGxpbmUrdXNlZCBkZXZpY2VfYWRkIGNvbW1hbmRzIG9uIHNv
-dXJjZSBhbmQNCmNvbW1hbmQgbGluZSBvbiBkZXN0aW5hdGlvbj8NCg0KLS0tLS0tLUkganVzdCBt
-aWdyYXRlIGd1ZXN0IHZtLiBUaGUgZ3Vlc3QgaGFzIHZob3N0LXVzZXIgbmV0LiBWaG9zdC11c2Vy
-IGhhcyBhIGxpbWl0IG9mIHNsb3RzDQoNCiAoVkhPU1RfTUVNT1JZX01BWF9OUkVHSU9OUz04KSxo
-b3RwbHVnIG1lbW9yeSAoZGltbSkgY2FuIGluY3JlYXNlIHZob3N0IHVzZWQgc2xvdHMNCg0KLGJ1
-dCB2aG9zdCBjYW4gbWVyZ2UgcmVnaW9uIHRvIGRlY3JlYXNlIHZob3N0IHVzZWQgc2xvdHMuDQoN
-CkJlZm9yZSBtaWdyYXRpb24gZ3VzZXQgaGFzIGhvdHBsdWdnZWQgIHNldmVyYWwgZGltbXMgb25l
-IGJ5IG9uZSAobW9yZSB0aGFuIHZob3N0IHNsb3QgbGltaXQsDQoNCmJ1dCBhZnRlciBtZXJnaW5n
-IGl0IGxlc3MgdGhhbiAgdmhvc3Qgc2xvdCBsaW1pdCkuIEluIG1pZ3JhdGluZyB0byBkZXN0aW5h
-dGlvbiBob3N0ICxxZW11IGJlZ2lucyB0byANCg0KZXhlY3V0ZSByZXN0b3JlIGd1ZXN0IGFuZCBp
-dCByZWFsaXplICBmb3JlYWNoICBkaW1tcyBkZXZpY2UgYXQgYSB0aW1lIGFuZCANCg0KDQpjb21w
-dXRlIHdoZXRoZXIgdmhvc3QgdXNlZCBzbG90cyBtb3JlIHRoYW4gdmhvc3Qgc2xvdCBsaW1pdCBi
-ZWZvcmUgbWVyZ2luZy4NCg0KDQpTbyByZXBvcnQgImEgdXNlZCB2aG9zdCBiYWNrZW5kIGhhcyBu
-byBmcmVlICBtZW1vcnkgc2xvdHMgbGVmdCIuDQoNCg0KSSBqdXN0IG1ha2UgYSBkaXN0aW5jdGlv
-biB1c2luZyBhIHZtIHN0YXRlLg0KDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVu
-Zy5oYW8yQHp0ZS5jb20uY24+DQo+IFNpZ25lZC1vZmYtYnk6IFdhbmcgWWVjaGFvIDx3YW5nLnll
-Y2hhbzI1NUB6dGUuY29tLmNuPg0KPiAtLS0NCj4gIGh3L21lbS9wYy1kaW1tLmMgfCAyICstDQo+
-ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRp
-ZmYgLS1naXQgYS9ody9tZW0vcGMtZGltbS5jIGIvaHcvbWVtL3BjLWRpbW0uYw0KPiBpbmRleCBl
-YTY3YjQ2Li5iYjBmYTA4IDEwMDY0NA0KPiAtLS0gYS9ody9tZW0vcGMtZGltbS5jDQo+ICsrKyBi
-L2h3L21lbS9wYy1kaW1tLmMNCj4gQEAgLTEwMSw3ICsxMDEsNyBAQCB2b2lkIHBjX2RpbW1fbWVt
-b3J5X3BsdWcoRGV2aWNlU3RhdGUgKmRldiwgTWVtb3J5SG90cGx1Z1N0YXRlICpocG1zLA0KPiAg
-ICAgICAgICBnb3RvIG91dA0KPiAgICAgIH0NCj4gIA0KPiAtICAgIGlmICghdmhvc3RfaGFzX2Zy
-ZWVfc2xvdCgpKSB7DQo+ICsgICAgaWYgKCF2aG9zdF9oYXNfZnJlZV9zbG90KCkgJiYgcnVuc3Rh
-dGVfaXNfcnVubmluZygpKSB7DQo+ICAgICAgICAgIGVycm9yX3NldGcoJmxvY2FsX2VyciwgImEg
-dXNlZCB2aG9zdCBiYWNrZW5kIGhhcyBubyBmcmVlIg0KPiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICIgbWVtb3J5IHNsb3RzIGxlZnQiKQ0KPiAgICAgICAgICBnb3RvIG91dA==
+On Tue 18-07-17 10:12:14, Wei Wang wrote:
+[...]
+> Probably I should have included the introduction of the usages in
+> the log. Hope it is not too later to explain here:
+
+Yes this should have been described in the cover.
+ 
+> Live migration needs to transfer the VM's memory from the source
+> machine to the destination round by round. For the 1st round, all the VM's
+> memory is transferred. From the 2nd round, only the pieces of memory
+> that were written by the guest (after the 1st round) are transferred. One
+> method that is popularly used by the hypervisor to track which part of
+> memory is written is to write-protect all the guest memory.
+> 
+> This patch enables the optimization of the 1st round memory transfer -
+> the hypervisor can skip the transfer of guest unused pages in the 1st round.
+
+All you should need is the check for the page reference count, no?  I
+assume you do some sort of pfn walk and so you should be able to get an
+access to the struct page.
+-- 
+Michal Hocko
+SUSE Labs
