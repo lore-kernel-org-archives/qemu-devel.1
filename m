@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXnwA-00040p-Bm
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:18:43 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXo6z-0006eu-SJ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:29:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dXnw7-0007hY-3A
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:18:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38082)
+	(envelope-from <dgilbert@redhat.com>) id 1dXo6w-0005wd-Pj
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:29:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38062)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXnw6-0007h9-Si
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:18:39 -0400
-Date: Wed, 19 Jul 2017 14:18:32 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170719141832.735af9ca@gondolin>
-In-Reply-To: <1bee2360-8107-590f-434c-fb2a946f34f4@redhat.com>
-References: <20170718142455.32676-1-cohuck@redhat.com>
-	<20170718142455.32676-5-cohuck@redhat.com>
-	<1bee2360-8107-590f-434c-fb2a946f34f4@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXo6w-0005wG-GY
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:29:50 -0400
+Date: Wed, 19 Jul 2017 13:29:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170719122943.GJ2103@work-vm>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	<bb8781a1-602b-d77d-a103-6f8d23d7ff5f@adacore.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 4/9] s390x/pci: do not advertise pci
- on non-pci builds
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb8781a1-602b-d77d-a103-6f8d23d7ff5f@adacore.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 19 Jul 2017 13:41:04 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 18.07.2017 16:24, Cornelia Huck wrote:
-> > Only set the zpci and aen feature bits on builds that actually
-> > support pci.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  target/s390x/kvm.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> > index 831492f9a2..880eccd58a 100644
-> > --- a/target/s390x/kvm.c
-> > +++ b/target/s390x/kvm.c
-> > @@ -2685,8 +2685,10 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-> >      }
-> >  
-> >      /* set zpci and aen facilities */
-> > +#ifdef CONFIG_PCI
-> >      set_bit(S390_FEAT_ZPCI, model->features);
-> >      set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
-> > +#endif
-> >  
-> >      if (s390_known_cpu_type(cpu_type)) {
-> >          /* we want the exact model, even if some features are missing */  
+* KONRAD Frederic (frederic.konrad@adacore.com) wrote:
 > 
-> Have you tried whether this actually still works right in builds where
-> CONFIG_PCI is enabled? I'm afraid, but I think the #ifdef does not work
-> here, since CONFIG_PCI is a Makefile-only setting, and it does not get
-> set in config-target.h at all...
+> 
+> On 07/17/2017 07:27 PM, Edgar E. Iglesias wrote:
+> > On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
+> > wrote:
+> > 
+> > > On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> > > wrote:
+> > > > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> > > > Paolo suggested offline that we send a pull request for this series.
+> > > > Here it is, I've run it through my testsuite + tested the LQSPI testcase
+> > > > on Zynq.
+> > > 
+> > > > ----------------------------------------------------------------
+> > > > mmio-exec.for-upstream
+> > > > 
+> > > > ----------------------------------------------------------------
+> > > > KONRAD Frederic (7):
+> > > >        cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+> > > >        cputlb: move get_page_addr_code
+> > > >        cputlb: fix the way get_page_addr_code fills the tlb
+> > > >        qdev: add MemoryRegion property
+> > > >        introduce mmio_interface
+> > > >        exec: allow to get a pointer for some mmio memory region
+> > > >        xilinx_spips: allow mmio execution
+> > > 
+> > > Hi Edgar -- can you or Fred explain how this code interacts with
+> > > VM migration? The mmio-interface device creates a RAM memory
+> > > region with memory_region_init_ram_ptr(), but it doesn't call
+> > > vmstate_register_ram(). On the other hand the core migration code
+> > > will try to migrate the contents of the RAMBlock anyway, just
+> > > without a name.
+> > > 
+> > > It's not clear to me how this works, and it would be nice to
+> > > get it clear so that we can make any necessary fixes before the
+> > > 2.10 release hits and we lose the opportunity to make any
+> > > migration-compatibility-breaking changes.
+> > > 
+> > > thanks
+> > > -- PMM
+> > > 
+> > 
+> > Hi Peter,
+> > 
+> > These temporary regions should be read-only and treated as temporary caches
+> > AFAIU things.
+> > I would say that they don't need to be migrated. After migration, the new
+> > VM will recreate the ram areas from device backing.
+> > 
+> > Is there a way we can prevent migration of the RAMBlock?
+> > 
+> > Cheers,
+> > Edgar
+> > 
+> 
+> Hi All,
+> 
+> Yes Edgar is right, they don't need to be migrated (as the old
+> Xilinx SPI cache).
+> And it will be the case for all the other stuff using this as
+> well.
+> 
+> Maybe we can simply drop the region before the migration?
 
-Of course it does not. Sigh.
+Dont forget the VM is still running during migration, so you
+can't drop anything that's needed for it to be able to execute.
 
-I think I'll just move this into a helper function in the zpci code
-resp. the zpci stub.
+Dave
+
+> Fred
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
