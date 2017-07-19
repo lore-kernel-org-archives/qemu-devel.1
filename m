@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXm6X-0001i3-No
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:21:18 -0400
+	(envelope-from <aurelien@aurel32.net>) id 1dXmD5-0003aa-4p
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dXm6T-0007eX-Kh
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:21:17 -0400
-Resent-Message-Id: <E1dXm6T-0007eX-Kh@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21849)
+	(envelope-from <aurelien@aurel32.net>) id 1dXmD4-0002mh-5x
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:28:03 -0400
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:53306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dXm6T-0007e1-B3
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:21:13 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150045964396.87.7952001243987438922@5d477a5b5989>
-In-Reply-To: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+	id 1dXmD4-0002kr-0C
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:28:02 -0400
+Date: Wed, 19 Jul 2017 12:27:50 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+Message-ID: <20170719102750.6br5bsfz5wbskfzm@aurel32.net>
+References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
+	<ffb745754ddd4f389935cfb2ad4b6f3e560a2655.1500378931.git-series.james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 19 Jul 2017 03:20:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH V3 0/4] Optimize COLO-compare performance
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ffb745754ddd4f389935cfb2ad4b6f3e560a2655.1500378931.git-series.james.hogan@imgtec.com>
+Subject: Re: [Qemu-devel] [PATCH 1/14] target/mips: Fix MIPS64 MFC0
+ UserLocal on BE host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhangchen.fnst@cn.fujitsu.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, lizhijian@cn.fujitsu.com, zhang.zhanghailiang@huawei.com, dgilbert@redhat.com
+To: James Hogan <james.hogan@imgtec.com>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, qemu-devel@nongnu.org, Petar Jovanovic <petar.jovanovic@imgtec.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBWMyAwLzRdIE9wdGltaXplIENPTE8tY29tcGFyZSBwZXJmb3JtYW5jZQpN
-ZXNzYWdlLWlkOiAxNTAwNDQ5Mzk5LTE5MTA3LTEtZ2l0LXNlbmQtZW1haWwtemhhbmdjaGVuLmZu
-c3RAY24uZnVqaXRzdS5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
-bXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNTAwNDQ4MTgyLTIxMzc2LTEtZ2l0LXNl
-bmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTAwNDQ4MTgyLTIxMzc2LTEt
-Z2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0
-Y2hldy8yMDE3MDcxOTA5NTAzMy4yMDQ4Mi0xLWRhdmlkQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
-MDE3MDcxOTA5NTAzMy4yMDQ4Mi0xLWRhdmlkQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0JwpmY2IwZDlmIG5ldC9jb2xvLWNvbXBhcmUuYzogRml4IGNvbW1lbnRzIGFu
-ZCBzY2hlbWUKMWI0NTMxYSBuZXQvY29sby1jb21wYXJlLmM6IEFkanVzdCBuZXQgcXVldWUgcG9w
-IG9yZGVyIGZvciBwZXJmb3JtYW5jZQo4NDMzZTg2IG5ldC9jb2xvLWNvbXBhcmUuYzogT3B0aW1p
-emUgdW5wcmVkaWN0YWJsZSB0Y3Agb3B0aW9ucyBjb21wYXJpc29uCjM4NGZhMzUgbmV0L2NvbG8t
-Y29tcGFyZS5jOiBBZGQgY2hlY2twb2ludCBtaW4gcGVyaW9kIHRvIG9wdGltaXplIHBlcmZvcm1h
-bmNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IG5ldC9jb2xvLWNv
-bXBhcmUuYzogQWRkIGNoZWNrcG9pbnQgbWluIHBlcmlvZCB0byBvcHRpbWl6ZSBwZXJmb3JtYW5j
-ZS4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IG5ldC9jb2xvLWNvbXBhcmUuYzogT3B0aW1pemUgdW5w
-cmVkaWN0YWJsZSB0Y3Agb3B0aW9ucyBjb21wYXJpc29uLi4uCkNoZWNraW5nIFBBVENIIDMvNDog
-bmV0L2NvbG8tY29tcGFyZS5jOiBBZGp1c3QgbmV0IHF1ZXVlIHBvcCBvcmRlciBmb3IgcGVyZm9y
-bWFuY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNC80OiBuZXQvY29sby1jb21wYXJlLmM6IEZpeCBjb21t
-ZW50cyBhbmQgc2NoZW1lLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJ3wn
-IChjdHg6RXhWKQojMTg6IEZJTEU6IG5ldC9jb2xvLWNvbXBhcmUuYzo1MDoKKyAgfGNvbm4gbGlz
-dCAgICAgICstLS0+Y29ubiAgICAgICAgICAgKy0tLS0tLS0tLT5jb25uICAgICAgICAgICB8LS0t
-PiAuLi4uLi4uCiAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChj
-dHg6V3hPKQojMTg6IEZJTEU6IG5ldC9jb2xvLWNvbXBhcmUuYzo1MDoKKyAgfGNvbm4gbGlzdCAg
-ICAgICstLS0+Y29ubiAgICAgICAgICAgKy0tLS0tLS0tLT5jb25uICAgICAgICAgICB8LS0tPiAu
-Li4uLi4uCiAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
-ZCB0aGF0ICcrJyAoY3R4Old4TykKIzE4OiBGSUxFOiBuZXQvY29sby1jb21wYXJlLmM6NTA6Cisg
-IHxjb25uIGxpc3QgICAgICArLS0tPmNvbm4gICAgICAgICAgICstLS0tLS0tLS0+Y29ubiAgICAg
-ICAgICAgfC0tLT4gLi4uLi4uLgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4Old4TykKIzE4
-OiBGSUxFOiBuZXQvY29sby1jb21wYXJlLmM6NTA6CisgIHxjb25uIGxpc3QgICAgICArLS0tPmNv
-bm4gICAgICAgICAgICstLS0tLS0tLS0+Y29ubiAgICAgICAgICAgfC0tLT4gLi4uLi4uLgogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnLT4nIChjdHg6T3hX
-KQojMTg6IEZJTEU6IG5ldC9jb2xvLWNvbXBhcmUuYzo1MDoKKyAgfGNvbm4gbGlzdCAgICAgICst
-LS0+Y29ubiAgICAgICAgICAgKy0tLS0tLS0tLT5jb25uICAgICAgICAgICB8LS0tPiAuLi4uLi4u
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKdG90YWw6IDUgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
-RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 2017-07-18 12:55, James Hogan wrote:
+> Using MFC0 to read CP0_UserLocal uses tcg_gen_ld32s_tl, however
+> CP0_UserLocal is a target_ulong. On a big endian host with a MIPS64
+> target this reads and sign extends the more significant half of the
+> 64-bit register.
+> 
+> Fix this by using ld_tl to load the whole target_ulong and ext32s_tl to
+> sign extend it, as done for various other target_ulong COP0 registers.
+> 
+> Fixes: d279279e2b5c ("target-mips: implement UserLocal Register")
+> Signed-off-by: James Hogan <james.hogan@imgtec.com>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Petar Jovanovic <petar.jovanovic@imgtec.com>
+> ---
+> Changes in v2:
+> - New patch.
+> ---
+>  target/mips/translate.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 3022f349cb2a..556aba969a12 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -5138,8 +5138,9 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+>              goto cp0_unimplemented;
+>          case 2:
+>              CP0_CHECK(ctx->ulri);
+> -            tcg_gen_ld32s_tl(arg, cpu_env,
+> -                             offsetof(CPUMIPSState, active_tc.CP0_UserLocal));
+> +            tcg_gen_ld_tl(arg, cpu_env,
+> +                          offsetof(CPUMIPSState, active_tc.CP0_UserLocal));
+> +            tcg_gen_ext32s_tl(arg, arg);
+>              rn = "UserLocal";
+>              break;
+>          default:
+
+I think this is what gen_mfc0_load64() does, that said this whole area
+probably need a rework (see for example how inefficiently
+gen_mfc0_load32 is implemented). So:
+
+Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
