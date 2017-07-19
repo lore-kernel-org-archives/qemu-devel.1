@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dXljU-0006no-J5
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:29 -0400
+	(envelope-from <david@redhat.com>) id 1dXljX-0006nw-1t
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dXljR-0005Rp-FZ
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45154)
+	(envelope-from <david@redhat.com>) id 1dXljW-0005Su-Bp
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60406)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dXljR-0005RJ-6a
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:25 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dXljW-0005Sd-5Y
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:30 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 19 Jul 2017 11:50:31 +0200
-Message-Id: <20170719095033.20482-4-david@redhat.com>
-In-Reply-To: <20170719095033.20482-1-david@redhat.com>
-References: <20170719095033.20482-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 3/5] target/s390x: introduce
- (test|set)_be_bit
+Date: Wed, 19 Jul 2017 11:50:28 +0200
+Message-Id: <20170719095033.20482-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/5] target/s390x: cpu model cleanups +
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +25,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, cohuck@redhat.com, jjherne@linux.vnet.ibm.com, david@redhat.com, borntraeger@de.ibm.com
 
-Using ordinary bitmap operations to set/test bits does not work properly
-on architectures !s390x. Let's drop (test|set)_bit_inv and introduce
-(test|set)_be_bit instead. These functions work on uint8_t array, not on
-unsigned longs arrays and are for now only used in the context of
-CPU features.
+We want to reuse e.g. s390_get_feat_block() in tcg. Turns out, that
+set_bit_inv() doesn't work as expected on other architectures (if we
+want to expose the uint8_t[] based data to the VM later), so let's
+fix that.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu_features.c |  8 ++++----
- target/s390x/cpu_features.h |  8 ++++++++
- target/s390x/kvm.c          | 14 ++------------
- 3 files changed, 14 insertions(+), 16 deletions(-)
+Some other minor cleanups, including better baselining support if one
+of the MSA subfunctions part of a base model is missing.
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 8b14917..1d3a036 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -340,8 +340,8 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-     case S390_FEAT_TYPE_STFL:
-         if (test_bit(S390_FEAT_ZARCH, features)) {
-             /* Features that are always active */
--            data[0] |= 0x20;  /* z/Architecture */
--            data[17] |= 0x20; /* Configuration-z-architectural-mode */
-+            set_be_bit(2, data);   /* z/Architecture */
-+            set_be_bit(138, data); /* Configuration-z-architectural-mode */
-         }
-         break;
-     case S390_FEAT_TYPE_PTFF:
-@@ -357,7 +357,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-     case S390_FEAT_TYPE_PCC:
-     case S390_FEAT_TYPE_PPNO:
-     case S390_FEAT_TYPE_KMA:
--        data[0] |= 0x80; /* query is always available */
-+        set_be_bit(0, data); /* query is always available */
-         break;
-     default:
-         break;
-@@ -368,7 +368,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
-         if (s390_features[feat].type == type) {
-             bit_nr = s390_features[feat].bit;
-             /* big endian on uint8_t array */
--            data[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+            set_be_bit(bit_nr, data);
-         }
-         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
-     }
-diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
-index 770435e..e306aa7 100644
---- a/target/s390x/cpu_features.h
-+++ b/target/s390x/cpu_features.h
-@@ -93,4 +93,12 @@ const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group);
- 
- #define BE_BIT_NR(BIT) (BIT ^ (BITS_PER_LONG - 1))
- 
-+static inline void set_be_bit(unsigned int bit_nr, uint8_t *array)
-+{
-+    array[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
-+}
-+static inline bool test_be_bit(unsigned int bit_nr, const uint8_t *array)
-+{
-+    return array[bit_nr / 8] & (0x80 >> (bit_nr % 8));
-+}
- #endif /* TARGET_S390X_CPU_FEATURES_H */
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 999ea57..fe02315 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2430,16 +2430,6 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
-     abort();
- }
- 
--static inline int test_bit_inv(long nr, const unsigned long *addr)
--{
--    return test_bit(BE_BIT_NR(nr), addr);
--}
--
--static inline void set_bit_inv(long nr, unsigned long *addr)
--{
--    set_bit(BE_BIT_NR(nr), addr);
--}
--
- static int query_cpu_subfunc(S390FeatBitmap features)
- {
-     struct kvm_s390_vm_cpu_subfunc prop;
-@@ -2566,7 +2556,7 @@ static int query_cpu_feat(S390FeatBitmap features)
-     }
- 
-     for (i = 0; i < ARRAY_SIZE(kvm_to_feat); i++) {
--        if (test_bit_inv(kvm_to_feat[i][0], (unsigned long *)prop.feat)) {
-+        if (test_be_bit(kvm_to_feat[i][0], prop.feat)) {
-             set_bit(kvm_to_feat[i][1], features);
-         }
-     }
-@@ -2585,7 +2575,7 @@ static int configure_cpu_feat(const S390FeatBitmap features)
- 
-     for (i = 0; i < ARRAY_SIZE(kvm_to_feat); i++) {
-         if (test_bit(kvm_to_feat[i][1], features)) {
--            set_bit_inv(kvm_to_feat[i][0], (unsigned long *)prop.feat);
-+            set_be_bit(kvm_to_feat[i][0], prop.feat);
-         }
-     }
-     return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+David Hildenbrand (5):
+  target/s390x: drop BE_BIT()
+  target/s390x: indicate query subfunction in s390_fill_feat_block
+  target/s390x: introduce (test|set)_be_bit
+  s390x/kvm: better comment regarding zPCI feature availability
+  target/s390x: improve baselining if certain base features are missing
+
+ target/s390x/cpu_features.c | 33 +++++++++++++++++++++++++++------
+ target/s390x/cpu_features.h |  9 ++++++++-
+ target/s390x/cpu_models.c   | 33 +++++++++++++++++++++++++++++++++
+ target/s390x/kvm.c          | 29 +++--------------------------
+ 4 files changed, 71 insertions(+), 33 deletions(-)
+
 -- 
 2.9.4
