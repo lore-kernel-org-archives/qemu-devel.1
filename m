@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXuuZ-0002sQ-V7
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:45:33 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dXuvz-0003Wr-Lb
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:47:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXuuY-0004Y9-P8
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:45:32 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXuuY-0004Xm-Hs
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:45:30 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id w191so8319245wmw.1
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 12:45:30 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1dXuvw-0005Hf-DQ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:46:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXuvw-0005H7-3h
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:46:56 -0400
+Date: Wed, 19 Jul 2017 16:46:50 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170719194650.GL2757@localhost.localdomain>
+References: <201707191247531805742@zte.com.cn>
+	<20170719061651.GE2757@localhost.localdomain>
+	<20170719121628.GI2103@work-vm>
+	<20170719124147.GH2757@localhost.localdomain>
+	<f870ca6c-a8fb-a88c-f171-a66f4158671d@redhat.com>
+	<20170719150758.GK30084@redhat.com>
+	<4558ee82-0214-cd91-1de9-8081b98ddb0b@redhat.com>
+	<20170719183224.GI2757@localhost.localdomain>
+	<20170719191748.GN3500@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20170719045722.25492-1-rth@twiddle.net>
-References: <20170719045722.25492-1-rth@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Jul 2017 20:45:08 +0100
-Message-ID: <CAFEAcA9Z_8kq_e+swQaZVEecmVmcNw9XJ4WRXatTLG26W=n0uQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/14] tcg-next patch queue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170719191748.GN3500@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +34,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, wang.yi59@zte.com.cn, liu.yunh@zte.com.cn, qemu-devel@nongnu.org, "libvir-list@redhat.com" <libvir-list@redhat.com>, pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net
 
-On 19 July 2017 at 05:57, Richard Henderson <rth@twiddle.net> wrote:
-> This edition is a real mix:
->   * Code gen improvement for mips64 host (Jiang)
->   * Build fix for ppc-linux (Philippe)
->   * Runtime fix for tci (Philippe)
->   * Fix atomic helper names in debugging dumps (rth)
->
->   * Cross-target tcg code gen improvements (Philippe)
->     This one had no obvious tree through which it should go,
->     so I went ahead and took them all.
->
->   * Cherry-picked the first patch from Lluis' generic translate loop,
->     wherein the interface to gen_intermediate_code changes trivially.
->     It's the only patch from that series that touches all targets,
->     and I see little point carrying it around further.
->
->
-> r~
->
->
-> The following changes since commit 6887dc6700ccb7820d8a9d370f421ee361c748e8:
->
->   Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20170718' into staging (2017-07-18 21:13:48 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20170718
->
-> for you to fetch changes up to 3d48caee9e2c18385be60bb0467fa1f61d325c64:
->
->   tcg: Pass generic CPUState to gen_intermediate_code() (2017-07-18 14:26:13 -1000)
->
-> ----------------------------------------------------------------
-> Queued tcg and tcg code gen related cleanups
->
+On Wed, Jul 19, 2017 at 08:17:49PM +0100, Dr. David Alan Gilbert wrote:
+> * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > On Wed, Jul 19, 2017 at 10:17:36AM -0500, Eric Blake wrote:
+> > > On 07/19/2017 10:07 AM, Daniel P. Berrange wrote:
+> > > >> It doesn't.  Perhaps we should add that as a future libvirt-qemu.so API
+> > > >> addition, although it's probably easier to just use QMP than HMP when
+> > > >> using 'virsh qemu-monitor-command' if HMP doesn't do what you want.
+> > > > 
+> > > > Or special case the "cpu 1" command - ie notice that it is being
+> > > > requested and don't execute 'human-montor-command'. Instead just
+> > > > record the CPU index, and use that for future "human-monitor-command"
+> > > > invokations, so we get full compat with the (dubious) stateful HMP
+> > > > semantics that traditionally existed.
+> > > 
+> > > Is 'cpu' (and the followup commands affected by it) the only stateful
+> > > HMP command pairing?  Is there a way to specify multiple HMP commands in
+> > > a single human-monitor-command QMP call?
+> > > 
+> > > Indeed, tweaking qemu's human-monitor-command call to track the state
+> > > might be cleaner than having libvirt have to tweak API to work around
+> > > this wart of HMP.
+> > 
+> > The CPU index was the only state kept by the human monitor, and I
+> > think it's by design that it stopped being considered "monitor
+> > state" to be tracked, and became just an argument to
+> > human-monitor-command.
+> > 
+> > It's true that it broke compatibility of
+> >   "virsh qemu-monitor-command <domain> --hmp 'cpu <n>'",
+> > when we moved to QMP, but this happened years ago, and it looks
+> > like nobody was relying on it.  I don't see the point of trying
+> > to emulate the previous stateful interface.
+> 
+> IMHO Yi's fix (once reworked) is the right fix - it removes the
+> use of that piece of state, when the optional parameter is used.
+> (OK, so it needs rework not to change that state and to
+> come to some agreement as to what to use instead of cpu index number
+> etc).
 
-The sparc-linux-user test fails:
+Agreed, as it helps us to keep the "virsh qemu-monitor-command"
+interface simpler.  But we have 8 commands that use
+mon_get_cpu(), we shouldn't fix only "info lapic".
 
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc-linux-user/qemu-sparc
--L ./gnemul/qemu-sparc sparc/ls -l dummyfile
-Inconsistency detected by ld.so: rtld.c: 858: dl_main: Assertion
-`_dl_rtld_map.l_prev->l_next == _dl_rtld_map.l_next' failed!
-Makefile:6: recipe for target 'test' failed
-
-A valgrind run produces a lot of noise, but
-this bit looks suspicious:
-
-==14436==
-==14436== Conditional jump or move depends on uninitialised value(s)
-==14436==    at 0x60003F7C: tcg_out_qemu_st_direct (tcg-target.inc.c:1733)
-==14436==    by 0x60004295: tcg_out_qemu_st (tcg-target.inc.c:1856)
-==14436==    by 0x60004F0C: tcg_out_op (tcg-target.inc.c:2140)
-==14436==    by 0x6000B0FF: tcg_reg_alloc_op (tcg.c:2360)
-==14436==    by 0x6000BCED: tcg_gen_code (tcg.c:2679)
-==14436==    by 0x600387B7: tb_gen_code (translate-all.c:1311)
-==14436==    by 0x6003637B: tb_find (cpu-exec.c:367)
-==14436==    by 0x60036A7C: cpu_exec (cpu-exec.c:675)
-==14436==    by 0x60039DA1: cpu_loop (main.c:1088)
-==14436==    by 0x6003B7AF: main (main.c:4860)
-==14436==
-==14436== Invalid write of size 4
-==14436==    at 0x605114FA: ???
-==14436==    by 0x6011ADDF: ??? (in
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc-linux-user/qemu-sparc)
-==14436==    by 0x6253464F: ???
-==14436==    by 0x6022852F: ??? (in
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc-linux-user/qemu-sparc)
-==14436==    by 0x6022818C: ??? (in
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc-linux-user/qemu-sparc)
-==14436==    by 0x6022852F: ??? (in
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc-linux-user/qemu-sparc)
-==14436==    by 0x416FFFFFFFF: ???
-==14436==    by 0x60227F1F: ??? (in
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/sparc-linux-user/qemu-sparc)
-==14436==  Address 0x59d1c7d0 is not stack'd, malloc'd or (recently) free'd
-==14436==
-
-Reverting "target/sparc: optimize gen_op_mulscc() using deposit op"
-fixed this, so I think that's probably the culprit.
-
-thanks
--- PMM
+-- 
+Eduardo
