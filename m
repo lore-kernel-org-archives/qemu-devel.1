@@ -1,39 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXjOQ-0006Fe-8m
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:35 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dXjOe-0006Mc-EM
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXjON-0000Zp-3k
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42750
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liujbjl@linux.vnet.ibm.com>)
-	id 1dXjOM-0000ZU-UW
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:31 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6J7OMva136523
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 03:27:30 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bspja2ubu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 03:27:29 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <liujbjl@linux.vnet.ibm.com>;
-	Wed, 19 Jul 2017 03:27:29 -0400
-References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
-	<96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-From: Jing Liu <liujbjl@linux.vnet.ibm.com>
-Date: Wed, 19 Jul 2017 15:27:39 +0800
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dXjOd-0000f2-Hr
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:48 -0400
+Received: from [59.151.112.132] (port=20158 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dXjOd-0000bK-59
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:27:47 -0400
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Wed, 19 Jul 2017 15:29:58 +0800
+Message-ID: <1500449399-19107-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <96e5169c-6149-fd7a-3347-0994089e01ac@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <b77f50e6-e8ce-75c3-bd1e-7cae3a4cee68@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH V3 3/4] net/colo-compare.c: Adjust net queue
+ pop order for performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,42 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Cleber Rosa <crosa@redhat.com>, Lukas Doktor <ldoktor@redhat.com>, Amador Segundo <asegundo@redhat.com>
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+The packet_enqueue() use g_queue_push_tail() to
+enqueue net packet, so it is more efficent way use
+g_queue_pop_head() to get packet for compare.
+That will improve the success rate of comparison.
+In my test the performance of ftp put 1000M file
+will increase 10%
 
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ net/colo-compare.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 2017/7/19 =E4=B8=8A=E5=8D=882:07, John Snow wrote:
->
-> On 07/17/2017 11:01 PM, Jing Liu wrote:
->> Hi all,
->>
->> Do you anybody have iotests failure: 188, 189 and 087 of the latest qe=
-mu
->> upsteam?
->>
->> I just wondered if it has something wrong with my test machines becaus=
-e
->> I have different results with two machines.
->>
->>
->> Thanks.
->>
->> Jing
->>
->>
-> Presumably you are missing aio=3Dnative support for 087,
->
-> and 188/189 I believe require compression and/or LUKS libraries.
-Hi John,
-
-Yes, I indeed miss some crypto libraries.
-Thank you for your support. Now all of them are fixed.
-
-Jing
-> These are false positives caused by missing libraries. We should
-> probably work out a proper solution to meaningfully skipping tests we
-> didn't compile support for.
->
-> --js
->
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 6aa5ea6..58c3250 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -489,7 +489,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+ 
+     while (!g_queue_is_empty(&conn->primary_list) &&
+            !g_queue_is_empty(&conn->secondary_list)) {
+-        pkt = g_queue_pop_tail(&conn->primary_list);
++        pkt = g_queue_pop_head(&conn->primary_list);
+         switch (conn->ip_proto) {
+         case IPPROTO_TCP:
+             result = g_queue_find_custom(&conn->secondary_list,
+@@ -527,7 +527,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+              * until next comparison.
+              */
+             trace_colo_compare_main("packet different");
+-            g_queue_push_tail(&conn->primary_list, pkt);
++            g_queue_push_head(&conn->primary_list, pkt);
+ 
+             if (pkt->creation_ms - s->checkpoint_time_ms >
+                 CHECKPOINT_MIN_TIME) {
+-- 
+2.7.4
