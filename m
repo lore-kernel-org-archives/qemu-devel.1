@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXcPK-0003Js-E5
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:00:03 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dXcRR-0004Jj-HU
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXcPH-0005FJ-B2
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:00:02 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXcPH-0005Ee-59
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 19:59:59 -0400
-Received: by mail-qk0-x241.google.com with SMTP id t186so2793340qkf.2
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 16:59:58 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170407143847.GM2138@work-vm>
-	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
-	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
-	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
-	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d47138bd-1257-19c0-418e-4a4addf7fd8a@twiddle.net>
-Date: Tue, 18 Jul 2017 13:59:52 -1000
+	(envelope-from <ehabkost@redhat.com>) id 1dXcRO-0006AD-E3
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:02:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34276)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXcRO-00069x-4g
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:02:10 -0400
+Date: Tue, 18 Jul 2017 21:02:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170719000206.GA2757@localhost.localdomain>
+References: <20170712162058.10538-1-ehabkost@redhat.com>
+	<20170712162058.10538-5-ehabkost@redhat.com>
+	<20170718152726.1f1b0bff@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170718152726.1f1b0bff@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] target/i386: Don't use
+ x86_cpu_load_def() on "max" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +29,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Jiri Denemark <jdenemar@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 07/17/2017 03:48 AM, Eric Blake wrote:
-> On 07/17/2017 08:42 AM, Eric Blake wrote:
->> On 07/13/2017 08:07 AM, Philippe Mathieu-Daudé wrote:
->>> On 04/07/2017 04:21 PM, Philippe Mathieu-Daudé wrote:
->>>> Hi Dave,
->>>>
->>>> On 04/07/2017 11:38 AM, Dr. David Alan Gilbert wrote:
->>>>> Hi,
->>>>>     Fedora 26 has gcc 7.0.1 which has the normal compliment
->>>>> of new fussy warnings; so far I've posted :
->>>>>
->>>>> tests/check-qdict: Fix missing brackets
->>>>> slirp/smb: Replace constant strings by glib string
->>>>>
->>>>> that fix one actual mistake and work around something it's being
->>>>> fussy over.
->>>>>
->>>>> But I've also got a pile of hacks, attached below that I'm
->>>>> not too sure what I'll do with them yet, but they're attached
->>>
->>> ping ... What do we do with them?
->>
->> Well, now that I've upgraded to the just-released Fedora 26, it is now
->> mainline gcc and affecting my builds.  So we should really try and find
->> patches that silence the warnings (although it counts as bug fixes, so
->> it won't hurt if it doesn't make tomorrow's freeze deadline).
+On Tue, Jul 18, 2017 at 03:27:26PM +0200, Igor Mammedov wrote:
+> On Wed, 12 Jul 2017 13:20:58 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
-> FWIW, most of these have been fixed in the meantime; the only remaining
-> hack I had to add was:
+> > When commit 0bacd8b3046f ('i386: Don't set CPUClass::cpu_def on
+> > "max" model') removed the CPUClass::cpu_def field, we kept using
+> > the x86_cpu_load_def() helper directly in max_x86_cpu_initfn(),
+> > emulating the previous behavior when CPUClass::cpu_def was set.
+> > 
+> > However, x86_cpu_load_def() is intended to help initialization of
+> > CPU models from the builtin_x86_defs table, and does lots of
+> > other steps that are not necessary for "max".
+> > 
+> > One of the things x86_cpu_load_def() do is to set the properties
+> > listed at tcg_default_props/kvm_default_props.  We must not do
+> > that on the "max" CPU model, otherwise under KVM we will
+> > incorrectly report all KVM features as always available, and the
+> > "svm" feature as always unavailable.  The latter caused the bug
+> > reported at:
+> Maybe add that all available features for 'max' are set later at realize() time
+> to ones actually supported by host.
+
+I can add the following paragraph to the commit message.  Is it
+enough to get your Reviewed-by?
+
+    target/i386: Don't use x86_cpu_load_def() on "max" CPU model
+    
+    When commit 0bacd8b3046f ('i386: Don't set CPUClass::cpu_def on
+    "max" model') removed the CPUClass::cpu_def field, we kept using
+    the x86_cpu_load_def() helper directly in max_x86_cpu_initfn()
+    because it allowed us to reuse the old max_x86_cpu_class_init()
+    code.
+    
+    However, the only X86CPUDefinition fields we really use are
+    vendor/family/model/stepping/model-id, and x86_cpu_load_def()
+    tries to do other stuff that is only necessary when using named
+    CPU models from builtin_x86_defs.
+    
+    One of the things x86_cpu_load_def() do is to set the properties
+    listed at kvm_default_props.  We must not do that on "max" and
+    "host" CPU models, otherwise we will incorrectly report all KVM
+    features as always available, and incorrectly report the "svm"
+    feature as always unavailable under KVM.  The latter caused the
+    bug reported at:
+    
+      https://bugzilla.redhat.com/show_bug.cgi?id=1467599
+      ("Unable to start domain: the CPU is incompatible with host CPU:
+      Host CPU does not provide required features: svm")
+
+    Replace x86_cpu_load_def() with simple object_property_set*()
+    calls.  In addition to fixing the above bug, this makes the KVM
+    code very similar to the TCG code inside max_x86_cpu_initfn().
+    
++   For reference, the full list of steps performed by
++   x86_cpu_load_def() is:
++   
++   * Setting min-level and min-xlevel.  Already done by
++     max_x86_cpu_initfn().
++   * Setting family/model/stepping/model-id.  Done by the code added
++     to max_x86_cpu_initfn() in this patch.
++   * Copying def->features.  Wrong because "-cpu max" features need to
++     be calculated at realize time.  This was not a problem in the
++     current code because host_cpudef.features was all zeroes.
++   * x86_cpu_apply_props() calls.  This causes the bug above, and
++     shouldn't be done.
++   * Setting CPUID_EXT_HYPERVISOR.  Not needed because it is already
++     reported by x86_cpu_get_supported_feature_word(), and because
++     "-cpu max" features need to be calculated at realize time.
++   * Setting CPU vendor to host CPU vendor if on KVM mode.
++     Redundant, because max_x86_cpu_initfn() already sets it to the
++     host CPU vendor.
++
+    Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
 > 
-> diff --git i/hw/usb/bus.c w/hw/usb/bus.c
-> index 5939b273b9..bce011058b 100644
-> --- i/hw/usb/bus.c
-> +++ w/hw/usb/bus.c
-> @@ -407,8 +407,9 @@ void usb_register_companion(const char *masterbus,
-> USBPort *ports[],
->   void usb_port_location(USBPort *downstream, USBPort *upstream, int portnr)
->   {
->       if (upstream) {
-> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
-> -                 upstream->path, portnr);
-> +        int l = snprintf(downstream->path, sizeof(downstream->path),
-> "%s.%d",
-> +                         upstream->path, portnr);
-> +        assert(l < sizeof(downstream->path));
+> Also while looking at it, I've noticed that:
+> x86_cpu_load_def()
+>   ...
+>       if (kvm_enabled()) {                                                         
+>         if (!kvm_irqchip_in_kernel()) {                                          
+>             x86_cpu_change_kvm_default("x2apic", "off");                         
+>         }
+> 
+> and
+> 
+> kvm_arch_get_supported_cpuid() also having
+>         if (!kvm_irqchip_in_kernel()) {                                          
+>             ret &= ~CPUID_EXT_X2APIC;                                            
+>         } 
+> 
+> so do we really need this duplication in x86_cpu_load_def()?
 
-Do you really need an assert there, or will
+Those two pieces of code represent two different rules:
 
-	(void)l; /* "used" */
+The first encodes the fact that we won't try to enable x2apic by
+default if !kvm_irqchip_in_kernel().  It is required so we don't
+get spurious "feature x2apic is unavailable" warnings (or fatal
+errors if in enforce mode).
 
-work as well?  You didn't mention what the reported error is, so I'm guessing.
+The second encodes the fact that we can't enable x2apic if
+!kvm_irqchip_in_kernel().  It is required so we block the user
+from enabling x2apic manually on the command-line.
 
+It's true that the first rule is a direct consequence of the
+second rule.  We could figure out a mechanism to make the code
+for the second rule trigger the first rule automatically, but I'm
+not sure it would be worth the extra complexity.  (And it's out
+of the scope of this patch).
 
-r~
+> 
+> > 
+> >   https://bugzilla.redhat.com/show_bug.cgi?id=1467599
+> >   ("Unable to start domain: the CPU is incompatible with host CPU:
+> >   Host CPU does not provide required features: svm")
+> > 
+> > Replace x86_cpu_load_def() with simple object_property_set*()
+> > calls.  In addition to fixing the above bug, this makes the KVM
+> > branch in max_x86_cpu_initfn() very similar to the existing TCG
+> > branch.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  target/i386/cpu.c | 18 ++++++++++++------
+> >  1 file changed, 12 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index e2cd157..62d8021 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -1596,15 +1596,21 @@ static void max_x86_cpu_initfn(Object *obj)
+> >      cpu->max_features = true;
+> >  
+> >      if (kvm_enabled()) {
+> > -        X86CPUDefinition host_cpudef = { };
+> > -        uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+> > +        char vendor[CPUID_VENDOR_SZ + 1] = { 0 };
+> > +        char model_id[CPUID_MODEL_ID_SZ + 1] = { 0 };
+> > +        int family, model, stepping;
+> >  
+> > -        host_vendor_fms(host_cpudef.vendor, &host_cpudef.family,
+> > -                        &host_cpudef.model, &host_cpudef.stepping);
+> > +        host_vendor_fms(vendor, &family, &model, &stepping);
+> >  
+> > -        cpu_x86_fill_model_id(host_cpudef.model_id);
+> > +        cpu_x86_fill_model_id(model_id);
+> >  
+> > -        x86_cpu_load_def(cpu, &host_cpudef, &error_abort);
+> this looses 
+>    env->features[FEAT_1_ECX] |= CPUID_EXT_HYPERVISOR;
+> but it looks like kvm_arch_get_supported_cpuid() will take care of it later
+> at realize() time.
+
+Yes, kvm_arch_get_supported_cpuid() already sets
+CPUID_EXT_HYPERVISOR, and on -cpu host/max, we only care about
+kvm_arch_get_supported_cpuid() (for KVM) or
+FeatureWord::tcg_features (for TCG).
+
+This is similar to the x2apic case: x86_cpu_load_def() encodes
+the fact that CPUID_EXT_HYPERVISOR is enabled by default (on the
+predefined CPU models).  kvm_arch_get_supported_cpuid() (and
+FeatureWord::tcg_features) encodes the fact that we _can_ enable
+CPUID_EXT_HYPERVISOR.
+
+> 
+> > +        object_property_set_str(OBJECT(cpu), vendor, "vendor", &error_abort);
+> > +        object_property_set_int(OBJECT(cpu), family, "family", &error_abort);
+> > +        object_property_set_int(OBJECT(cpu), model, "model", &error_abort);
+> > +        object_property_set_int(OBJECT(cpu), stepping, "stepping",
+> > +                                &error_abort);
+> > +        object_property_set_str(OBJECT(cpu), model_id, "model-id",
+> > +                                &error_abort);
+> >  
+> >          env->cpuid_min_level =
+> >              kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
+> 
+
+-- 
+Eduardo
