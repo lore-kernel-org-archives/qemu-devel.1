@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXlaW-0004Wt-Fo
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:48:13 -0400
+	(envelope-from <david@redhat.com>) id 1dXljU-0006no-J5
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXlaV-0001lN-QX
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:48:12 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37099)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXlaV-0001kn-Ho
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:48:11 -0400
-Received: by mail-wm0-x235.google.com with SMTP id g127so10249087wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 02:48:09 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170718103251.20657-1-berrange@redhat.com>
-References: <20170718103251.20657-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Jul 2017 10:47:48 +0100
-Message-ID: <CAFEAcA-qCJQcP4hCEHisVOmqj3t4agE9opLV_dUXBXJi4E6-zw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/1] Merge I/O 2017/07/18
+	(envelope-from <david@redhat.com>) id 1dXljR-0005Rp-FZ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dXljR-0005RJ-6a
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:57:25 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 19 Jul 2017 11:50:31 +0200
+Message-Id: <20170719095033.20482-4-david@redhat.com>
+In-Reply-To: <20170719095033.20482-1-david@redhat.com>
+References: <20170719095033.20482-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 3/5] target/s390x: introduce
+ (test|set)_be_bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: rth@twiddle.net, thuth@redhat.com, cohuck@redhat.com, jjherne@linux.vnet.ibm.com, david@redhat.com, borntraeger@de.ibm.com
 
-On 18 July 2017 at 11:32, Daniel P. Berrange <berrange@redhat.com> wrote:
-> The following changes since commit 9964e96dc9999cf7f7c936ee854a795415d19b60:
->
->   Merge remote-tracking branch 'jasowang/tags/net-pull-request' into staging (2017-05-23 15:01:31 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/berrange/qemu tags/pull-qio-2017-07-18-1
->
-> for you to fetch changes up to 8f7168b34323ceec4d5faff797e7bcf1be57e6be:
->
->   io: simplify qio_channel_attach_aio_context (2017-05-26 10:38:08 +0100)
->
-> ----------------------------------------------------------------
-> Merge I/O 2017/07/18 v1
->
-> ----------------------------------------------------------------
-> Paolo Bonzini (1):
->   io: simplify qio_channel_attach_aio_context
->
->  io/channel.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+Using ordinary bitmap operations to set/test bits does not work properly
+on architectures !s390x. Let's drop (test|set)_bit_inv and introduce
+(test|set)_be_bit instead. These functions work on uint8_t array, not on
+unsigned longs arrays and are for now only used in the context of
+CPU features.
 
-Applied, thanks.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu_features.c |  8 ++++----
+ target/s390x/cpu_features.h |  8 ++++++++
+ target/s390x/kvm.c          | 14 ++------------
+ 3 files changed, 14 insertions(+), 16 deletions(-)
 
--- PMM
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 8b14917..1d3a036 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -340,8 +340,8 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+     case S390_FEAT_TYPE_STFL:
+         if (test_bit(S390_FEAT_ZARCH, features)) {
+             /* Features that are always active */
+-            data[0] |= 0x20;  /* z/Architecture */
+-            data[17] |= 0x20; /* Configuration-z-architectural-mode */
++            set_be_bit(2, data);   /* z/Architecture */
++            set_be_bit(138, data); /* Configuration-z-architectural-mode */
+         }
+         break;
+     case S390_FEAT_TYPE_PTFF:
+@@ -357,7 +357,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+     case S390_FEAT_TYPE_PCC:
+     case S390_FEAT_TYPE_PPNO:
+     case S390_FEAT_TYPE_KMA:
+-        data[0] |= 0x80; /* query is always available */
++        set_be_bit(0, data); /* query is always available */
+         break;
+     default:
+         break;
+@@ -368,7 +368,7 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+         if (s390_features[feat].type == type) {
+             bit_nr = s390_features[feat].bit;
+             /* big endian on uint8_t array */
+-            data[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
++            set_be_bit(bit_nr, data);
+         }
+         feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
+     }
+diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+index 770435e..e306aa7 100644
+--- a/target/s390x/cpu_features.h
++++ b/target/s390x/cpu_features.h
+@@ -93,4 +93,12 @@ const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group);
+ 
+ #define BE_BIT_NR(BIT) (BIT ^ (BITS_PER_LONG - 1))
+ 
++static inline void set_be_bit(unsigned int bit_nr, uint8_t *array)
++{
++    array[bit_nr / 8] |= 0x80 >> (bit_nr % 8);
++}
++static inline bool test_be_bit(unsigned int bit_nr, const uint8_t *array)
++{
++    return array[bit_nr / 8] & (0x80 >> (bit_nr % 8));
++}
+ #endif /* TARGET_S390X_CPU_FEATURES_H */
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 999ea57..fe02315 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2430,16 +2430,6 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+     abort();
+ }
+ 
+-static inline int test_bit_inv(long nr, const unsigned long *addr)
+-{
+-    return test_bit(BE_BIT_NR(nr), addr);
+-}
+-
+-static inline void set_bit_inv(long nr, unsigned long *addr)
+-{
+-    set_bit(BE_BIT_NR(nr), addr);
+-}
+-
+ static int query_cpu_subfunc(S390FeatBitmap features)
+ {
+     struct kvm_s390_vm_cpu_subfunc prop;
+@@ -2566,7 +2556,7 @@ static int query_cpu_feat(S390FeatBitmap features)
+     }
+ 
+     for (i = 0; i < ARRAY_SIZE(kvm_to_feat); i++) {
+-        if (test_bit_inv(kvm_to_feat[i][0], (unsigned long *)prop.feat)) {
++        if (test_be_bit(kvm_to_feat[i][0], prop.feat)) {
+             set_bit(kvm_to_feat[i][1], features);
+         }
+     }
+@@ -2585,7 +2575,7 @@ static int configure_cpu_feat(const S390FeatBitmap features)
+ 
+     for (i = 0; i < ARRAY_SIZE(kvm_to_feat); i++) {
+         if (test_bit(kvm_to_feat[i][1], features)) {
+-            set_bit_inv(kvm_to_feat[i][0], (unsigned long *)prop.feat);
++            set_be_bit(kvm_to_feat[i][0], prop.feat);
+         }
+     }
+     return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+-- 
+2.9.4
