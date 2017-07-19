@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXwty-0002Ar-MR
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 17:53:03 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXyVH-00080h-6o
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXwtu-0004zg-PA
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 17:53:02 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35974)
+	(envelope-from <rth7680@gmail.com>) id 1dXyVE-0006Uj-2c
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:39 -0400
+Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:36013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXwtu-0004zU-LA
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 17:52:58 -0400
-Received: by mail-qt0-x243.google.com with SMTP id l55so1616105qtl.3
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 14:52:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXyVD-0006UT-TO
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:36 -0400
+Received: by mail-qt0-x22d.google.com with SMTP id 21so12001731qtx.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 16:35:35 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170719044522.21114-1-rth@twiddle.net>
-	<CAFEAcA_rx1UyVBrS1WaE6FZMvQPsb=RJJCZgnfS2AjWR+hsFsg@mail.gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e590ae65-f18f-7ced-c141-8833a3df38ca@twiddle.net>
-Date: Wed, 19 Jul 2017 11:52:51 -1000
+Date: Wed, 19 Jul 2017 13:34:41 -1000
+Message-Id: <20170719233455.8740-1-rth@twiddle.net>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_rx1UyVBrS1WaE6FZMvQPsb=RJJCZgnfS2AjWR+hsFsg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/8] target/alpha cleanups
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/14] tcg-next patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On 07/19/2017 06:57 AM, Peter Maydell wrote:
-> On 19 July 2017 at 05:45, Richard Henderson <rth@twiddle.net> wrote:
->> The new title holder for perf top is helper_lookup_tb_ptr.
->> Those targets that have a complicated cpu_get_tb_cpu_state
->> function are going to regret that.
-> 
-> Yeah, Paolo's pointed out (and had some patches for)
-> ARM's rather complicated cpu_get_tb_cpu_state(). My
-> issue with his suggested fixes was that they were
-> pretty fragile in terms of not having any guarantee
-> that the change always produced the right tb cpu
-> state flags answer...
+This edition is a real mix:
+  * Code gen improvement for mips64 host (Jiang)
+  * Build fix for ppc-linux (Philippe)
+  * Runtime fix for tci (Philippe)
+  * Fix atomic helper names in debugging dumps (rth)
 
-Oh?  I must have missed seeing this one.
-A quick patchwork search doesn't pull it up;
-do either of you have a link?
+  * Cross-target tcg code gen improvements (Philippe)
+    This one had no obvious tree through which it should go,
+    so I went ahead and took them all.
+
+  * Cherry-picked the first patch from Lluis' generic translate loop,
+    wherein the interface to gen_intermediate_code changes trivially.
+    It's the only patch from that series that touches all targets,
+    and I see little point carrying it around further.
+
+V2: Fixed typo in the sparc mulscc deposit patch.
 
 
 r~
+
+
+The following changes since commit d4e59218ab80e86015753782fb5378767a51ccd0:
+
+  Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-07-18-2' into staging (2017-07-19 20:45:37 +0100)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20170719
+
+for you to fetch changes up to 9c489ea6bed134fecfd556b439c68bba48fbe102:
+
+  tcg: Pass generic CPUState to gen_intermediate_code() (2017-07-19 14:45:16 -0700)
+
+----------------------------------------------------------------
+Queued tcg and tcg code gen related cleanups
+
+----------------------------------------------------------------
+Aurelien Jarno (1):
+      target/arm: optimize aarch32 rev16
+
+Jiang Biao (1):
+      tcg/mips: reserve a register for the guest_base.
+
+Lluís Vilanova (1):
+      tcg: Pass generic CPUState to gen_intermediate_code()
+
+Philippe Mathieu-Daudé (9):
+      util/cacheinfo: Add missing include for ppc linux
+      coccinelle: ignore ASTs pre-parsed cached C files
+      coccinelle: add a script to optimize tcg op using tcg_gen_extract()
+      target/m68k: optimize bcd_flags() using extract op
+      target/ppc: optimize various functions using extract op
+      target/sparc: optimize various functions using extract op
+      target/sparc: optimize gen_op_mulscc() using deposit op
+      target/alpha: optimize gen_cvtlq() using deposit op
+      tcg/tci: enable bswap16_i64
+
+Richard Henderson (2):
+      tcg: Expand glue macros before stringifying helper names
+      target/arm: Optimize aarch64 rev16
+
+ include/exec/exec-all.h                  |   2 +-
+ include/exec/helper-tcg.h                |  17 +++--
+ target/arm/translate.h                   |   4 +-
+ accel/tcg/translate-all.c                |   2 +-
+ target/alpha/translate.c                 |  13 ++--
+ target/arm/translate-a64.c               |  30 +++------
+ target/arm/translate.c                   |  12 ++--
+ target/cris/translate.c                  |   7 +-
+ target/hppa/translate.c                  |   5 +-
+ target/i386/translate.c                  |   5 +-
+ target/lm32/translate.c                  |   4 +-
+ target/m68k/translate.c                  |   8 +--
+ target/microblaze/translate.c            |   4 +-
+ target/mips/translate.c                  |   5 +-
+ target/moxie/translate.c                 |   4 +-
+ target/nios2/translate.c                 |   5 +-
+ target/openrisc/translate.c              |   4 +-
+ target/ppc/translate.c                   |  26 +++-----
+ target/ppc/translate/vsx-impl.inc.c      |  24 +++----
+ target/s390x/translate.c                 |   5 +-
+ target/sh4/translate.c                   |   5 +-
+ target/sparc/translate.c                 |  25 +++-----
+ target/tilegx/translate.c                |   5 +-
+ target/tricore/translate.c               |   5 +-
+ target/unicore32/translate.c             |   5 +-
+ target/xtensa/translate.c                |   5 +-
+ tcg/mips/tcg-target.inc.c                |  17 +++--
+ tcg/tci.c                                |   1 -
+ util/cacheinfo.c                         |   1 +
+ .gitignore                               |   2 +
+ scripts/coccinelle/tcg_gen_extract.cocci | 107 +++++++++++++++++++++++++++++++
+ 31 files changed, 218 insertions(+), 146 deletions(-)
+ create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
