@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXqUM-0005DO-E2
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:02:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXqUS-0005HX-CQ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:02:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXqUH-0004Gu-Kp
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:02:10 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:47607
-	helo=imgpgp01.kl.imgtec.org)
+	(envelope-from <eblake@redhat.com>) id 1dXqUP-0004MM-8s
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:02:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57496)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
-	id 1dXqUH-0004Gl-Bt
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:02:05 -0400
-Date: Wed, 19 Jul 2017 16:02:03 +0100
-From: James Hogan <james.hogan@imgtec.com>
-Message-ID: <20170719150203.GF6973@jhogan-linux.le.imgtec.org>
-References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
-	<742650a35d49502a994c008fd3a70eccd5391f1b.1500378931.git-series.james.hogan@imgtec.com>
-	<dfb9c8fe-0779-89d4-dbab-5b030f6666be@imgtec.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXqUO-0004Kr-V2
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:02:13 -0400
+References: <201707191247531805742@zte.com.cn>
+	<20170719061651.GE2757@localhost.localdomain>
+	<20170719121628.GI2103@work-vm>
+	<20170719124147.GH2757@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f870ca6c-a8fb-a88c-f171-a66f4158671d@redhat.com>
+Date: Wed, 19 Jul 2017 10:02:04 -0500
 MIME-Version: 1.0
+In-Reply-To: <20170719124147.GH2757@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jbjSy6MlVbxVYm72"
-Content-Disposition: inline
-In-Reply-To: <dfb9c8fe-0779-89d4-dbab-5b030f6666be@imgtec.com>
-Subject: Re: [Qemu-devel] [PATCH 4/14] target/mips: Add CP0_Ebase.WG (write
- gate) support
+	protocol="application/pgp-signature";
+	boundary="nJ3CduO3JuNSlAnhBGwMTSOOWNVixg8fx"
+Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: wang.yi59@zte.com.cn, liu.yunh@zte.com.cn, qemu-devel@nongnu.org, pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net, "libvir-list@redhat.com" <libvir-list@redhat.com>
 
---jbjSy6MlVbxVYm72
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nJ3CduO3JuNSlAnhBGwMTSOOWNVixg8fx
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: wang.yi59@zte.com.cn, liu.yunh@zte.com.cn, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>
+Message-ID: <f870ca6c-a8fb-a88c-f171-a66f4158671d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
+References: <201707191247531805742@zte.com.cn>
+ <20170719061651.GE2757@localhost.localdomain> <20170719121628.GI2103@work-vm>
+ <20170719124147.GH2757@localhost.localdomain>
+In-Reply-To: <20170719124147.GH2757@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 19, 2017 at 03:54:47PM +0100, Yongbok Kim wrote:
->=20
->=20
-> On 18/07/2017 12:55, James Hogan wrote:
-> > Add support for the CP0_EBase.WG bit, which allows upper bits to be
-> > written (bits 31:30 on MIPS32, or bits 63:30 on MIPS64), along with the
-> > CP0_Config5.CV bit to control whether the exception vector for Cache
-> > Error exceptions is forced into KSeg1.
-> >=20
-> > This is necessary on MIPS32 to support Segmentation Control and Enhanced
-> > Virtual Addressing (EVA) extensions (where KSeg1 addresses may not
-> > represent an unmapped uncached segment).
-> >=20
-> > It is also useful on MIPS64 to allow the exception base to reside in
-> > XKPhys, and possibly out of range of KSEG0 and KSEG1.
-> >=20
-> > Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> > Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> > Cc: Aurelien Jarno <aurelien@aurel32.net>
-> > ---
-> > Changes in v2:
-> > - Fix CP0_EBase.WG to be read only when WG is not set in
-> >   CP0_EBase_rw_bitmask, otherwise it will be wrongly probed as present.
-> > - Make cache error exception vector conditional on Config3.SC as well as
-> >   Config5.CV, as per the PRA, and take the CP0C3_SC definition from
-> >   patch 7 (Yongbok).
-> > - Rename CP0_EBase_rw_bitmask to CP0_EBaseWG_rw_bitmask (Yongbok).
-> > ---
-> >  target/mips/cpu.h            |  5 ++++-
-> >  target/mips/helper.c         | 14 ++++++++------
-> >  target/mips/machine.c        |  6 +++---
-> >  target/mips/op_helper.c      | 12 ++++++++++--
-> >  target/mips/translate.c      |  8 +++++---
-> >  target/mips/translate_init.c |  1 +
-> >  6 files changed, 31 insertions(+), 15 deletions(-)
-> >=20
->=20
->=20
-> > --- a/target/mips/op_helper.c
-> > +++ b/target/mips/op_helper.c
-> > @@ -1515,14 +1515,22 @@ target_ulong helper_mftc0_ebase(CPUMIPSState *e=
-nv)
-> > =20
-> >  void helper_mtc0_ebase(CPUMIPSState *env, target_ulong arg1)
-> >  {
-> > -    env->CP0_EBase =3D (env->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x3FFF=
-F000);
-> > +    target_ulong mask =3D 0x3FFFF000 | env->CP0_EBaseWG_rw_bitmask;
-> > +    if (arg1 & (1 << CP0EBase_WG) & mask) {
->=20
-> isn't it just ...?
-> if (arg1 & env->CP0_EBaseWG_rw_bitmask) {
+[adding libvirt]
 
-I suppose, now that the field is specific to the WG bit.
+On 07/19/2017 07:41 AM, Eduardo Habkost wrote:
 
-Thanks
-James
+>> virsh  qemu-monitor-command --domain rhel6.8 --hmp --cmd "cpu 1"
+>> virsh  qemu-monitor-command --domain rhel6.8 --hmp --cmd "info lapic"
+>> dumping local APIC state for CPU 0
+>=20
+> Right, the "cpu" command is useless inside a
+> 'human-monitor-command' QMP command.  The 'cpu-index' argument
+> should be used instead. should make "cpu" print an error if ran
+> inside 'human-monitor-command' instead of silently pretend it
+> worked.
+>=20
+> If virsh doesn't support the 'cpu-index' argument to
+> 'human-monitor-command',
 
->=20
-> > +        mask |=3D ~0x3FFFFFFF;
-> > +    }
-> > +    env->CP0_EBase =3D (env->CP0_EBase & ~mask) | (arg1 & mask);
-> >  }
-> > =20
-> >  void helper_mttc0_ebase(CPUMIPSState *env, target_ulong arg1)
-> >  {
-> >      int other_tc =3D env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
-> >      CPUMIPSState *other =3D mips_cpu_map_tc(env, &other_tc);
-> > -    other->CP0_EBase =3D (other->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x=
-3FFFF000);
-> > +    target_ulong mask =3D 0x3FFFF000 | env->CP0_EBaseWG_rw_bitmask;
-> > +    if (arg1 & (1 << CP0EBase_WG) & mask) {
->=20
-> here as well.
->=20
-> > +        mask |=3D ~0x3FFFFFFF;
-> > +    }
-> > +    other->CP0_EBase =3D (other->CP0_EBase & ~mask) | (arg1 & mask);
-> >  }
-> > =20
->=20
->=20
-> Otherwise,
-> Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
->=20
-> Regards,
-> Yongbok
+It doesn't.  Perhaps we should add that as a future libvirt-qemu.so API
+addition, although it's probably easier to just use QMP than HMP when
+using 'virsh qemu-monitor-command' if HMP doesn't do what you want.
 
---jbjSy6MlVbxVYm72
+> it's possible to work around that
+> limitation by building your own QMP command.  e.g.:
+>=20
+>   # virsh qemu-monitor-command f26test '{"execute":"human-monitor-comma=
+nd", "arguments":{"command-line":"info lapic", "cpu-index":1}}' | jq -r '=
+=2Ereturn'
+
+Indeed, there's the use of QMP to work around the HMP deficiency.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--nJ3CduO3JuNSlAnhBGwMTSOOWNVixg8fx
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAllvdGEACgkQbAtpk944
-dnrckg/+Mp7EwrNuHN1QPDL+1l5vDUZF8pxvq4ADxXJP0P1WGPSrAE5jIcpN4Tj/
-Zx42bEk9WOOVyi7pmJOzwh2qiY8twQlWYgK6d1RnHMN6dJlv/K6V3jAKjUvFVkFU
-5Bn00AoYRB5S1fgrjdMkqbUEqVrBmqKPUAnA1QuX3WfcnQkQT1AfRxgKP5KmP2KM
-h5TCg9F8R+hrZepbsD5vPzFPCfCEeQUA31L1c1H7MZ9KWynCYcn8VfgG6Aq+eVwp
-MuB2NCmTzXJ6DpikEUYy00n2uwOdkDaw+YJSmbJhYHyxzCYNMTjlFaVENKtGtjh+
-l3vInt4iWuIlyfb2y61p8xsjBPXrAi5gy5XKr64PhVHAj37RnYiHC+GR2mH2g4PH
-lDDNRe2UJagwdIRJjBRQvjcJzdZXm9gc6wKWZ5G3pYXApqLQSxuX3UXUuutlRwwW
-EvIYQTQ4EpbAy9VfCr1IR8EXrv99tJ2DmVRKDkbd6r8o0uE5hlVGr7OMdzdQC8fm
-iYHE0UY/rj7NFveHobyxTCGlVvbjEJ0Srttwtu3QCgeWQtROTI3Xv+pP97H2mo1s
-6610iKn0RrzVAHEZ/w6AlXZq/buFTuJvi/pnM/gXdNidYqO11iXiFi5gJlq8HfA9
-GjywiUxB8TE2uKkEoW7spT5qu/4FXKC9iWWQwFbNFNPDItb52RU=
-=MHvd
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllvdGwACgkQp6FrSiUn
+Q2raJQf+JIqAq+yX1txQddTakMcQU+jcUXUHUoJD14By6AT20oLN8MRHNkiu4spo
+TnIN++TZXu6thPDpVglxhQsEGxEEti39+Ja0OzE07oBC5ydltum5WDvpiItK8y9l
+UYPwV3i03DbenebYOljhTbAtpF04qTGkVkaiqr6kZl5HIYObAJJ+hweraTgWgnqq
+7ceaIyl45KTYnRLNSU+1xeFPRfZgKlPX4sP4quatZOywWeLPZfDZbvfWPv8S3nMK
+3E3hr5saBiExTGRgzONVpwJsJfrYRkwN7HFqJZjCjBx8OERoBUOhbaf0foTg9XDw
+RS7pS//71/46R4rAAFeLqX2kiNsinA==
+=yUil
 -----END PGP SIGNATURE-----
 
---jbjSy6MlVbxVYm72--
+--nJ3CduO3JuNSlAnhBGwMTSOOWNVixg8fx--
