@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dXkAY-0004BO-Uj
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:17:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXkCf-0005Ns-30
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dXkAV-0006dV-9M
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:17:18 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:63022)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dXkAU-0006bF-BF
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:17:15 -0400
-From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
-Date: Wed, 19 Jul 2017 16:15:49 +0800
-Message-Id: <1500452149-9520-1-git-send-email-lu.zhipeng@zte.com.cn>
-Subject: [Qemu-devel] [PATCH] qga: Add support network interface statistics
- in guest-network-get-interfaces command
+	(envelope-from <peter.maydell@linaro.org>) id 1dXkCe-0008Hr-9H
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:19:29 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37022)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXkCe-0008HN-2s
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:19:28 -0400
+Received: by mail-wm0-x232.google.com with SMTP id g127so7831064wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 01:19:28 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
+References: <1500395194-21455-1-git-send-email-peter.maydell@linaro.org>
+	<1500395194-21455-5-git-send-email-peter.maydell@linaro.org>
+	<b27c6322-49f7-3f73-6df3-e8f4ddae9652@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 19 Jul 2017 09:19:06 +0100
+Message-ID: <CAFEAcA9vTrpRL-cihQ-DtDj2TYAbNtzLf8b-WTAx+4Mz5xoKiA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 4/4] bsd-user/main.c: Fix unused
+ variable warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,176 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-we can get the network interface statistics inside a virtual machine by
-guest-network-get-interfaces command. it is very useful for us to monitor
-and analyze network traffic.
+On 18 July 2017 at 23:01, Eric Blake <eblake@redhat.com> wrote:
+> On 07/18/2017 11:26 AM, Peter Maydell wrote:
+>> On OpenBSD the compiler warns:
+>> bsd-user/main.c:622:21: warning: variable 'sig' set but not used [-Wunused-but-set-variable]
+>>
+>> This is because a lot of the signal delivery code is #if-0'd
+>> out as unused. Reshuffle #ifdefs a bit to silence the warning.
+>
+> Why not just nuke the #if 0 code instead (we can always 'git revert' it
+> later as a starting point for someone that wants to implement it).
 
-Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
----
- qga/commands-posix.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
- 2 files changed, 108 insertions(+), 2 deletions(-)
+I went for the minimal change, especially given we know
+that the freebsd folks have a big patchset on top of
+us fixing a lot of bsd-user code and it didn't seem worth
+giving them a more awkward rebase task.
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index d8e4122..b65dd8e 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -1639,6 +1639,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
-     return head;
- }
- 
-+static int guest_get_network_stats(const char *name,
-+                       GuestNetworkInterfaceStat *stats)
-+{
-+    int name_len;
-+    char const *devinfo = "/proc/net/dev";
-+    FILE *fp;
-+    char *line = NULL, *colon;
-+    size_t n;
-+    fp = fopen(devinfo, "r");
-+    if (!fp) {
-+        return -1;
-+    }
-+    name_len = strlen(name);
-+    while (getline(&line, &n, fp) != -1) {
-+        long long dummy;
-+        long long rx_bytes;
-+        long long rx_packets;
-+        long long rx_errs;
-+        long long rx_dropped;
-+        long long tx_bytes;
-+        long long tx_packets;
-+        long long tx_errs;
-+        long long tx_dropped;
-+        char *trim_line;
-+        trim_line = g_strchug(line);
-+        if (trim_line[0] == '\0') {
-+            continue;
-+        }
-+        colon = strchr(trim_line, ':');
-+        if (!colon) {
-+            continue;
-+        }
-+        if (colon - name_len  == trim_line &&
-+           strncmp(trim_line, name, name_len) == 0) {
-+            if (sscanf(colon + 1,
-+                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
-+                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
-+                  &dummy, &dummy, &dummy, &dummy,
-+                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
-+                  &dummy, &dummy, &dummy, &dummy) != 16) {
-+                continue;
-+            }
-+            stats->rx_bytes = rx_bytes;
-+            stats->rx_packets = rx_packets;
-+            stats->rx_errs = rx_errs;
-+            stats->rx_dropped = rx_dropped;
-+            stats->tx_bytes = tx_bytes;
-+            stats->tx_packets = tx_packets;
-+            stats->tx_errs = tx_errs;
-+            stats->tx_dropped = tx_dropped;
-+            fclose(fp);
-+            return 0;
-+        }
-+    }
-+    fclose(fp);
-+    g_debug("/proc/net/dev: Interface not found");
-+    return -1;
-+}
-+
- /*
-  * Build information about guest interfaces
-  */
-@@ -1655,6 +1714,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
-     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
-         GuestNetworkInterfaceList *info;
-         GuestIpAddressList **address_list = NULL, *address_item = NULL;
-+        GuestNetworkInterfaceStat  *interface_stat = NULL;
-         char addr4[INET_ADDRSTRLEN];
-         char addr6[INET6_ADDRSTRLEN];
-         int sock;
-@@ -1774,7 +1834,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
- 
-         info->value->has_ip_addresses = true;
- 
--
-+        if (!info->value->has_statistics) {
-+            interface_stat = g_malloc0(sizeof(*interface_stat));
-+            if (guest_get_network_stats(info->value->name,
-+                interface_stat) == -1) {
-+                info->value->has_statistics = false;
-+                g_free(interface_stat);
-+            } else {
-+                info->value->statistics = interface_stat;
-+                info->value->has_statistics = true;
-+            }
-+        }
-     }
- 
-     freeifaddrs(ifap);
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 03743ab..f12c3ca 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -643,6 +643,38 @@
-            'prefix': 'int'} }
- 
- ##
-+# @GuestNetworkInterfaceStat:
-+#
-+# @rx-bytes: total bytes received
-+#
-+# @rx-packets: total packets received
-+#
-+# @rx-errs: bad packets received
-+#
-+# @rx-dropped: receiver dropped packets
-+#
-+# @tx-bytes: total bytes transmitted
-+#
-+# @tx-packets: total packets transmitted
-+#
-+# @tx-errs: packet transmit problems
-+#
-+# @tx-dropped: dropped packets transmitted
-+#
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestNetworkInterfaceStat',
-+  'data': {'rx-bytes': 'uint64',
-+            'rx-packets': 'uint64',
-+            'rx-errs': 'uint64',
-+            'rx-dropped': 'uint64',
-+            'tx-bytes': 'uint64',
-+            'tx-packets': 'uint64',
-+            'tx-errs': 'uint64',
-+            'tx-dropped': 'uint64'
-+           } }
-+
-+##
- # @GuestNetworkInterface:
- #
- # @name: The name of interface for which info are being delivered
-@@ -651,12 +683,16 @@
- #
- # @ip-addresses: List of addresses assigned to @name
- #
-+# @statistics: various statistic counters related to @name
-+# (since 2.10)
-+#
- # Since: 1.1
- ##
- { 'struct': 'GuestNetworkInterface',
-   'data': {'name': 'str',
-            '*hardware-address': 'str',
--           '*ip-addresses': ['GuestIpAddress'] } }
-+           '*ip-addresses': ['GuestIpAddress'],
-+           '*statistics': 'GuestNetworkInterfaceStat' } }
- 
- ##
- # @guest-network-get-interfaces:
--- 
-1.8.3.1
+thanks
+-- PMM
