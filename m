@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXfcu-0000qF-Gr
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:26:18 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dXg1F-0008PW-18
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXfcq-0007JV-EE
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:26:16 -0400
-Date: Wed, 19 Jul 2017 13:24:38 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170719032438.GR3140@umbus.fritz.box>
-References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-6-git-send-email-clg@kaod.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dXg1B-0003g2-Tn
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:51:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dXg1B-0003fj-Jr
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:51:21 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6J3nk7J139160
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 23:51:19 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bspj7d3ex-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 23:51:19 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 19 Jul 2017 13:51:17 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170718065055.GG3140@umbus.fritz.box>
+References: <20170717041639.16137-1-nikunj@linux.vnet.ibm.com>
+	<20170718044619.GC3140@umbus.fritz.box>
+	<877ez6e2tm.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170718065055.GG3140@umbus.fritz.box>
+Date: Wed, 19 Jul 2017 09:20:52 +0530
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="xSu31lw3TgkWXnjh"
-Content-Disposition: inline
-In-Reply-To: <1499274819-15607-6-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 05/26] ppc/xive: define XIVE internal
- tables
+Content-Type: text/plain
+Message-Id: <87o9shm6eb.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v3] spapr: disable decrementer during reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,306 +42,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
+David Gibson <david@gibson.dropbear.id.au> writes:
 
---xSu31lw3TgkWXnjh
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Tue, Jul 18, 2017 at 10:53:01AM +0530, Nikunj A Dadhania wrote:
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>> 
+>> > On Mon, Jul 17, 2017 at 09:46:39AM +0530, Nikunj A Dadhania wrote:
+>> >> Rebooting a SMP TCG guest is broken for both single/multi threaded TCG.
+>> >> 
+>> >> When reset happens, all the CPUs are in halted state. First CPU is brought out
+>> >> of reset and secondary CPUs would be initialized by the guest kernel using a
+>> >> rtas call start-cpu.
+>> >> 
+>> >> However, in case of TCG, decrementer interrupts keep on coming and waking the
+>> >> secondary CPUs up.
+>> >> 
+>> >> These secondary CPUs would see the decrementer interrupt pending, which makes
+>> >> cpu::has_work() to bring them out of wait loop and start executing
+>> >> tcg_exec_cpu().
+>> >> 
+>> >> The problem with this is all the CPUs wake up and start booting SLOF image,
+>> >> causing the following exception(4 CPUs TCG VM):
+>> >
+>> > Ok, I'm still trying to understand why the behaviour on reboot is
+>> > different from the first boot.
+>> 
+>> During first boot, the cpu is in the stopped state, so
+>> cpus.c:cpu_thread_is_idle returns true and CPU remains in halted state
+>> until rtas start-cpu. Therefore, we never check the cpu_has_work()
+>> 
+>> In case of reboot, all CPUs are resumed after reboot. So we check the
+>> next condition cpu_has_work() in cpu_thread_is_idle(), where we see a
+>> DECR interrupt and remove the CPU from halted state as the CPU has
+>> work.
+>
+> Ok, so it sounds like we should set stopped on all the secondary CPUs
+> on reset as well.  What's causing them to be resumed after the reset
+> at the moment?
 
-On Wed, Jul 05, 2017 at 07:13:18PM +0200, C=E9dric Le Goater wrote:
-> The XIVE interrupt controller of the POWER9 uses a set of tables to
-> redirect exception from event sources to CPU threads. Among which we
-> choose to model :
->=20
->  - the State Bit Entries (SBE), also known as Event State Buffer
->    (ESB). This is a two bit state machine for each event source which
->    is used to trigger events. The bits are named "P" (pending) and "Q"
->    (queued) and can be controlled by MMIO.
->=20
->  - the Interrupt Virtualization Entry (IVE) table, also known as Event
->    Assignment Structure (EAS). This table is indexed by the IRQ number
->    and is looked up to find the Event Queue associated with a
->    triggered event.
->=20
->  - the Event Queue Descriptor (EQD) table, also known as Event
->    Notification Descriptor (END). The EQD contains fields that specify
->    the Event Queue on which event data is posted (and later pulled by
->    the OS) and also a target (or VPD) to notify.
->=20
-> An additional table was not modeled but we might need to to support
-> the H_INT_SET_OS_REPORTING_LINE hcall:
->=20
->  - the Virtual Processor Descriptor (VPD) table, also known as
->    Notification Virtual Target (NVT).
->=20
-> The XIVE object is expanded with the tables described above. The size
-> of each table depends on the number of provisioned IRQ and the maximum
-> number of CPUs in the system. The indexing is very basic and might
-> need to be improved for the EQs.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  hw/intc/xive-internal.h | 95 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  hw/intc/xive.c          | 72 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 167 insertions(+)
->=20
-> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
-> index 155c2dcd6066..8e755aa88a14 100644
-> --- a/hw/intc/xive-internal.h
-> +++ b/hw/intc/xive-internal.h
-> @@ -11,6 +11,89 @@
-> =20
->  #include <hw/sysbus.h>
-> =20
-> +/* Utilities to manipulate these (originaly from OPAL) */
-> +#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
-> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
-> +#define SETFIELD(m, v, val)                             \
-> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
-> +
-> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
-> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
-> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
-> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
-s))
-> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
-> +                                 PPC_BIT32(bs))
-> +
-> +/* IVE/EAS
-> + *
-> + * One per interrupt source. Targets that interrupt to a given EQ
-> + * and provides the corresponding logical interrupt number (EQ data)
-> + *
-> + * We also map this structure to the escalation descriptor inside
-> + * an EQ, though in that case the valid and masked bits are not used.
-> + */
-> +typedef struct XiveIVE {
-> +        /* Use a single 64-bit definition to make it easier to
-> +         * perform atomic updates
-> +         */
-> +        uint64_t        w;
-> +#define IVE_VALID       PPC_BIT(0)
-> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ block=
-# */
-> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ index=
- */
-> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
-> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to the =
-EQ */
-> +} XiveIVE;
-> +
-> +/* EQ */
-> +typedef struct XiveEQ {
-> +        uint32_t        w0;
-> +#define EQ_W0_VALID             PPC_BIT32(0)
-> +#define EQ_W0_ENQUEUE           PPC_BIT32(1)
-> +#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2)
-> +#define EQ_W0_BACKLOG           PPC_BIT32(3)
-> +#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4)
-> +#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5)
-> +#define EQ_W0_END_OF_INTR       PPC_BIT32(6)
-> +#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
-> +#define EQ_W0_SW0               PPC_BIT32(16)
-> +#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
-> +#define EQ_QSIZE_4K             0
-> +#define EQ_QSIZE_64K            4
-> +#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
-> +        uint32_t        w1;
-> +#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
-> +#define EQ_W1_ESn_P             PPC_BIT32(0)
-> +#define EQ_W1_ESn_Q             PPC_BIT32(1)
-> +#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
-> +#define EQ_W1_ESe_P             PPC_BIT32(2)
-> +#define EQ_W1_ESe_Q             PPC_BIT32(3)
-> +#define EQ_W1_GENERATION        PPC_BIT32(9)
-> +#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
-> +        uint32_t        w2;
-> +#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
-> +#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
-> +        uint32_t        w3;
-> +#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
-> +        uint32_t        w4;
-> +#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
-> +#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
-> +        uint32_t        w5;
-> +#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
-> +        uint32_t        w6;
-> +#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
-> +#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
-> +#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
-> +        uint32_t        w7;
-> +#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
-> +#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
-> +#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
-> +#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
-> +#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
-> +} XiveEQ;
-> +
-> +#define XIVE_EQ_PRIORITY_COUNT 8
-> +#define XIVE_PRIORITY_MAX  (XIVE_EQ_PRIORITY_COUNT - 1)
-> +
->  struct XIVE {
->      SysBusDevice parent;
-> =20
-> @@ -23,6 +106,18 @@ struct XIVE {
->      uint32_t     int_max;       /* Max index */
->      uint32_t     int_hw_bot;    /* Bottom index of HW IRQ allocator */
->      uint32_t     int_ipi_top;   /* Highest IPI index handed out so far +=
- 1 */
-> +
-> +    /* XIVE internal tables */
-> +    void         *sbe;
-> +    XiveIVE      *ivt;
-> +    XiveEQ       *eqdt;
->  };
-> =20
-> +void xive_reset(void *dev);
-> +XiveIVE *xive_get_ive(XIVE *x, uint32_t isn);
-> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx);
-> +
-> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t prio,
-> +                        uint32_t *out_eq_idx);
-> +
->  #endif /* _INTC_XIVE_INTERNAL_H */
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 5b4ea915d87c..5b14d8155317 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -35,6 +35,27 @@
->   */
->  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
-> =20
-> +
-> +void xive_reset(void *dev)
-> +{
-> +    XIVE *x =3D XIVE(dev);
-> +    int i;
-> +
-> +    /* SBEs are initialized to 0b01 which corresponds to "ints off" */
-> +    memset(x->sbe, 0x55, x->int_count / 4);
+That is part of the main loop in vl.c, when reset is requested. All the
+vcpus are paused (stopped == true) then system reset is issued, and all
+cpus are resumed (stopped == false). Which is correct.
 
-I think strictly this should be a DIV_ROUND_UP to handle the case of
-int_count not a multiple of 4.
+static bool main_loop_should_exit(void)
+{
+[...]
+    request = qemu_reset_requested();
+    if (request) {
+        pause_all_vcpus();
+        qemu_system_reset(request);
+        resume_all_vcpus();
+        if (!runstate_check(RUN_STATE_RUNNING) &&
+                !runstate_check(RUN_STATE_INMIGRATE)) {
+            runstate_set(RUN_STATE_PRELAUNCH);
+        }
+    }
+[...]
+}
 
-> +
-> +    /* Clear and mask all valid IVEs */
-> +    for (i =3D x->int_base; i < x->int_max; i++) {
-> +        XiveIVE *ive =3D &x->ivt[i];
-> +        if (ive->w & IVE_VALID) {
-> +            ive->w =3D IVE_VALID | IVE_MASKED;
-> +        }
-> +    }
-> +
-> +    /* clear all EQs */
-> +    memset(x->eqdt, 0, x->nr_targets * XIVE_EQ_PRIORITY_COUNT * sizeof(X=
-iveEQ));
-> +}
-> +
->  static void xive_init(Object *obj)
->  {
->      ;
-> @@ -62,6 +83,19 @@ static void xive_realize(DeviceState *dev, Error **err=
-p)
->      if (x->int_ipi_top < 0x10) {
->          x->int_ipi_top =3D 0x10;
->      }
-> +
-> +    /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte */
-> +    x->sbe =3D g_malloc0(x->int_count / 4);
+The CPUs are in halted state, i.e. cpu::halted = 1. We have set
+cpu::halted = 0 for the primary CPU, aka first_cpu, in
+spapr.c::ppc_spapr_reset()
 
-And here as well.
+In case of TCG, we have a decr callback (per CPU) scheduled once the
+machine is started which keeps on running and interrupting irrespective
+of the state of the machine.
 
-> +
-> +    /* Allocate the IVT (Interrupt Virtualization Table) */
-> +    x->ivt =3D g_malloc0(x->int_count * sizeof(XiveIVE));
-> +
-> +    /* Allocate the EQDT (Event Queue Descriptor Table), 8 priorities
-> +     * for each thread in the system */
-> +    x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
-> +                        sizeof(XiveEQ));
-> +
-> +    qemu_register_reset(xive_reset, dev);
->  }
-> =20
->  static Property xive_properties[] =3D {
-> @@ -92,3 +126,41 @@ static void xive_register_types(void)
->  }
-> =20
->  type_init(xive_register_types)
-> +
-> +XiveIVE *xive_get_ive(XIVE *x, uint32_t lisn)
-> +{
-> +    uint32_t idx =3D lisn;
-> +
-> +    if (idx < x->int_base || idx >=3D x->int_max) {
-> +        return NULL;
-> +    }
-> +
-> +    return &x->ivt[idx];
+tb_env->decr_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, &cpu_ppc_decr_cb, cpu);
 
-Should be idx - int_base, no?
+Which keeps on queueing the interrupt to the CPUs. All the other CPUs
+are in a tight loop checking cpu_thread_is_idle(), which returns false
+when it sees the decrementer interrupt, the cpu starts executing:
 
-> +}
-> +
-> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx)
-> +{
-> +    if (idx >=3D x->nr_targets * XIVE_EQ_PRIORITY_COUNT) {
-> +        return NULL;
-> +    }
-> +
-> +    return &x->eqdt[idx];
-> +}
-> +
-> +/* TODO: improve EQ indexing. This is very simple and relies on the
-> + * fact that target (CPU) numbers start at 0 and are contiguous. It
-> + * should be OK for sPAPR.
-> + */
-> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t priority,
-> +                        uint32_t *out_eq_idx)
-> +{
-> +    if (priority > XIVE_PRIORITY_MAX || target >=3D x->nr_targets) {
-> +        return false;
-> +    }
-> +
-> +    if (out_eq_idx) {
-> +        *out_eq_idx =3D target + priority;
-> +    }
-> +
-> +    return true;
+cpu_exec()
+  -> cpu_handle_halt()
+     -> sees cpu_has_work() and sets cpu->halted = 0
 
-Seems a clunky interface.  Why not return a XiveEQ *, NULL if the
-inputs aren't valud.
+And the execution resumes, when it shouldnt have. Ideally, for secondary
+CPUs, cpu::halted flag is cleared in rtas start-cpu call.
 
-> +}
+Initially, I thought we should not have interrupt during reset state.
+That was the reason of ignoring decr interrupt when msr_ee was disabled
+in my previous patch. BenH suggested that it is wrong from HW
+perspective.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---xSu31lw3TgkWXnjh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllu0PYACgkQbDjKyiDZ
-s5I3PA/9HPGDmi+1TKlsMZ60/ZYzPpCgM90Q88z3hZHAxa5STkRxGU3wVwRhUX3r
-eBAEvTLYx2qVJE6Du6nOBLXlXzh9DctvCZKyXeyn4qVjIqQ6eoJpPRpUcxv4vOMP
-CnHSmsXcTjncGw/JH3X2vddjtHBrRB6sitr3hg8LGCwwTIFBTa9ejFZ0fbGUU2Ud
-7gjnSlK4R2omwK++iYrULEVnhyXTw+E3X1pxLiY6dEVpHX0ldfZ7/duqW3mdFPGd
-XmlHScQP0E2kmWuGYL06wqoPDufYTxf1THgky0VdDapvnFeIykcaM3QhKIC/KGir
-JIIUr/ORLYsh2tVoGah7Z8FqFauPtQ/xbgO1ph7mJJSnJEH9mJvsG8KaIlN6fKZH
-HWwb9Fg1RHFFhvs2R9HvykIU4w2NWE6jySvhuC7REfSLl8LSlcSL71emURloqyw6
-kvpQb9Dq3dtYbR+DR+khV7u9HL2tai79X2fL86bkX4WCLwO58SRMP5tU95899v+a
-l4Dh3ep2w1hyfPEIBc185lquvqeHdu7Jirb2q9C5IJ+NrDpuZZnidBJ1LYt4N3nD
-hOCSTtsrBXQVffxFV0lRuTrxQKakMSimOwqWfdEnV8EidwT+o96r4h58a79XaWDP
-/0hFwP6cJcCE/4IiaHFqGKbio+jNvkvX2979hyTtFQrG1F+m7xA=
-=ZRVp
------END PGP SIGNATURE-----
-
---xSu31lw3TgkWXnjh--
+Regards,
+Nikunj
