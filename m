@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXeYw-0001qM-1O
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:18:07 -0400
+	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXeuC-0006hn-PR
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXeYs-0008P5-TS
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:18:06 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:59279)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXeYr-0008Nl-G2
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:18:02 -0400
-Date: Wed, 19 Jul 2017 10:17:50 +0800 (CST)
-Message-ID: <201707191017508680118@zte.com.cn>
-Mime-Version: 1.0
-From: <jiang.biao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_v2_00/45=5D_tcg=3A_support_for_m?=
- =?utf-8?q?ultiple_TCGcontexts?=
+	(envelope-from <liujbjl@linux.vnet.ibm.com>) id 1dXeu9-0001hh-Nl
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:40:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59128
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liujbjl@linux.vnet.ibm.com>)
+	id 1dXeu9-0001hL-Iu
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:40:01 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6J2d9S2086895
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 22:40:00 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2bspj9t4gf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 22:40:00 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <liujbjl@linux.vnet.ibm.com>;
+	Tue, 18 Jul 2017 22:39:59 -0400
+References: <15fc8a05-daff-d2af-7389-7253cb0b3517@linux.vnet.ibm.com>
+	<93a523dc-0cf4-c73b-518d-ef48e9f8ca64@redhat.com>
+From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+Date: Wed, 19 Jul 2017 10:40:11 +0800
+MIME-Version: 1.0
+In-Reply-To: <93a523dc-0cf4-c73b-518d-ef48e9f8ca64@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <6e17b13f-e903-2073-409c-2442c734251d@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Question for iotests 188, 189 and 087
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +42,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: cota@braap.org, qemu-devel@nongnu.org, alex.bennee@linaro.org, jiang.yong5@zte.com.cn, shi.zhongbing@zte.com.cn
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-PiBPbiAwNy8xOC8yMDE3IDAyOjIyIFBNLCBqaWFuZy5iaWFvMkB6dGUuY29tLmNuIHdyb3RlOg0K
-DQoNCg0KPiA+IFNlZWluZyB5b3VyIHdvcmsgb24gbXVsdGlwbGUgVENHLCBpdCBzZWVtcyB0aGF0
-IGl0IGhhcyBzb21lIGtpbmQgb2YgY29ubmVjdGlvbiANCj4gPiB3aXRoIHRoZSAgTVRUQ0cgZmVh
-dHVyZSwNCj4gPiANCj4gPiBidXQgSSBkbyBub3QgZmlndXJlIG91dCBob3cgdGhleSBhcmUgY29u
-bmVjdGVkIGluIGRldGFpbC4NCj4gPiANCj4gPiBDb3VsZCB5b3UgcGxzIGhlbHAgdG8gY29uZmly
-bSB0aGUgZm9sbG93aW5nIHF1ZXN0aW9uczoNCj4gPiANCj4gPiAgMS4NCj4gPiANCj4gPiAgICAg
-d2hhdCBpcyB0aGUgcmVsYXRpb25zaGlwIGJldHdlZW4geW91ciBwYXRjaGVzIGFuZCB0aGUgTVRU
-Q0cgZmVhdHVyZQ0KPiA+ICAgICBtZW50aW9uZWQgYnkgaHR0cHM6Ly9sd24ubmV0L0FydGljbGVz
-LzY5NzI2NS8/DQo+IA0KPiBUaGUgY3VycmVudCBNVFRDRyBmZWF0dXJlIGlzIGluIFFFTVUgbWFp
-bmxpbmUuICBJdCBhbGxvd3MgcGFyYWxsZWwgZXhlY3V0aW9uIG9mIA0KPiB0cmFuc2xhdGVkIGNv
-ZGUgaW4gYm90aCBzeXN0ZW0gbW9kZS4gIEl0IGRvZXMgKm5vdCogYWxsb3cgcGFyYWxsZWwgdHJh
-bnNsYXRpb24gDQo+IC0tIGFsbCB0cmFuc2xhdGlvbiBpcyBkb25lIHdpdGggdGJfbG9jayBoZWxk
-Lg0KPiANCj4gTm90ZSB0aGF0IHdlICphbHdheXMqIGhhdmUgcGFyYWxsZWwgZXhlY3V0aW9uIGlu
-IHVzZXIgbW9kZS4gIEhvd2V2ZXIsIHRoaXMgY2FuIA0KPiBhbmQgZG9lcyBsZWFkIHRvIHByb2Js
-ZW1zLiAgU2VlIGJlbG93Lg0KPiANCj4gVGhpcyBwYXRjaCBzZXQgYWxsb3dzIHBhcmFsbGVsIHRy
-YW5zbGF0aW9uIGluIHN5c3RlbSBtb2RlLiAgVGhpcyBpcyBzaG93biB0byANCj4gaW1wcm92ZSB0
-aGUgb3ZlcmFsbCB0aHJvdWdocHV0LiAgSXQgZG9lcyAqbm90KiBhbGxvdyBwYXJhbGxlbCB0cmFu
-c2xhdGlvbiBpbiANCj4gdXNlciBtb2RlLiAgRmlyc3RseSBiZWNhdXNlIHVzZXIgbW9kZSBhbHJl
-YWR5IHNoYXJlcyBtb3JlIHRyYW5zbGF0aW9ucyBiZXR3ZWVuIA0KPiB0aHJlYWRzIChiZWNhdXNl
-IGl0IGlzIHJ1bm5pbmcgYSBzaW5nbGUgZXhlY3V0YWJsZSksIGFuZCBzbyB0aGUgdHJhbnNsYXRp
-b24gDQo+IHJvdXRpbmVzIGFyZSBub3QgaGlnaCBpbiB0aGUgcHJvZmlsZS4gIFNlY29uZGx5IGJl
-Y2F1c2UgdGhlcmUgYXJlIGFkZGl0aW9uYWwgDQo+IGxvY2tpbmcgcHJvYmxlbXMgZHVlIHRvIHRo
-ZSBmYWN0IHRoYXQgd2UgaGF2ZSBubyBib3VuZCBvbiB0aGUgbnVtYmVyIG9mIHVzZXIgDQo+IHRo
-cmVhZHMuDQoNCkRvZXMgdGhhdCBtZWFuIGJvdGggdGhlIE1UVENHIGZlYXR1cmUgYW5kIHRoaXMg
-cGF0Y2ggc2V0IGFyZSBhbGwgYWJvdXQgc3lzdGVtIA0KDQoNCm1vZGUsIGFuZCBoYXZlIG5vdGhp
-bmcgdG8gZG8gd2l0aCBsaW51eC11c2VyIG1vZGU/DQoNCg0KDQoNCj4NCj4gIDIuDQo+IA0KPiAg
-ICAgV2hhdCBpcyB0aGUgY3VycmVudCBzdGF0dXMgb2YgdGhlIGRldmVsb3BtZW50IG9mIHRoZSBN
-VFRDRyBmZWF0dXJlPw0KPiANCj4gTVRUQ0cgaGFzIG9ubHkgYmVlbiBlbmFibGVkIG9uIGEgZmV3
-IHRhcmdldHM6IGFscGhhLCBhcm0sIHBwYzY0Lg0KPiBMb29rIGZvciAibXR0Y2c9eWVzIiBpbiBj
-b25maWd1cmUuDQo+IA0KPiBJbiBvcmRlciBmb3IgTVRUQ0cgdG8gYmUgZW5hYmxlZCwgdGhlIHRh
-cmdldCBtdXN0IGJlIGFkanVzdGVkIHNvIHRoYXQNCj4gKDEpIGFsbCBhdG9taWMgaW5zdHJ1Y3Rp
-b25zIGFyZSBpbXBsZW1lbnRlZCB3aXRoIGF0b21pYyB0Y2cgb3BlcmF0aW9ucywNCj4gKDIpIGRl
-ZmluZSBUQ0dfR1VFU1RfREVGQVVMVF9NTyB0byBpbmRpY2F0ZSBhbnkgYmFycmllcnMgaW1wbGll
-ZCBieQ0KPiAgICAgbm9ybWFsIG1lbW9yeSBvcGVyYXRpb25zIGJ5IHRoZSB0YXJnZXQgYXJjaGl0
-ZWN0dXJlLg0KPiANCj4gRm9yIHRhcmdldC9taXBzLCBuZWl0aGVyIG9mIHRoZXNlIHRoaW5ncyBh
-cmUgY29tcGxldGUuDQo+IA0KPiBNVFRDRyBoYXMgb25seSBiZWVuIGVuYWJsZWQgb24gb25lIGhv
-c3Q6IGkzODYuDQo+IExvb2sgZm9yIFRDR19UQVJHRVRfREVGQVVMVF9NTyBpbiB0Y2cvKi90Y2ct
-dGFyZ2V0LmguDQo+IA0KPiBJbiBvcmRlciBmb3IgTVRUQ0cgdG8gYmUgZW5hYmxlZCwgdGhlIHRh
-cmdldCBtZW1vcnkgb3JkZXIgbXVzdCBub3QgYmUgc3Ryb25nZXIgDQo+IHRoYW4gdGhlIGhvc3Qg
-bWVtb3J5IG9yZGVyLiAgU2luY2UgaTM4NiBoYXMgYSB2ZXJ5IHN0cm9uZyBob3N0IG1lbW9yeSBv
-cmRlciwgaXQgDQo+IGlzIGVhc3kgZm9yIGl0IHRvIGVtdWxhdGUgYW55IGd1ZXN0LiAgV2hlbiB0
-aGUgaG9zdCBoYXMgYSB3ZWFrIG1lbW9yeSBvcmRlciwgd2UgDQo+IG5lZWQgdG8gYWRkIHRoZSBh
-ZGRpdGlvbmFsIGJhcnJpZXJzIHRoYXQgYXJlIGltcGxpZWQgYnkgdGhlIHRhcmdldC4gIFRoaXMg
-aXMgDQo+IHdvcmsgdGhhdCBoYXMgbm90IGJlZW4gZG9uZS4NCj4gDQo+IEkgYW0gbm90IHN1cmUg
-d2h5IHdlIGhhdmUgbm90IGFscmVhZHkgYWRkZWQgdGhpcyBkZWZpbml0aW9uIHRvIGFsbCBvZiB0
-aGUgb3RoZXIgDQo+IHRjZyBob3N0cy4gIEkgdGhpbmsgdGhpcyBpcyBqdXN0IG92ZXJzaWdodCwg
-c2luY2UgYWxtb3N0IGV2ZXJ5b25lIHVzZXMgeDg2XzY0IA0KPiBsaW51eCBhcyB0aGUgaG9zdCBm
-b3IgdGVzdGluZyB0Y2cuICBIb3dldmVyLCBzaW5jZSBhbGwgb2YgdGhlIHN1cHBvcnRlZCB0YXJn
-ZXRzIA0KPiBoYXZlIHdlYWsgbWVtb3J5IG9yZGVycyB3ZSBvdWdodCB0byBiZSBhYmxlIHRvIHN1
-cHBvcnQgdGhlbSB3aXRoIGFueSBob3N0Lg0KSW4gbXkgY2FzZSwgSSB1c2UgTWlwczY0IGhvc3Qg
-YW5kIGkzODYgdGFyZ2V0LCBkb2VzIHRoYXQgbWVhbiBJIGNhbiBub3QgZW5hYmxlIA0KDQoNCnRo
-ZSBNVFRDRz8NCg0KDQoNCg0KPiA+ICAzLg0KPiA+IA0KPiA+ICAgICBJcyB0aGVyZSBhbnkgcHJv
-YmxlbSB3aXRoIHRoZSBtdWx0aXRocmVhZCBwcm9ncmFtbWUgcnVubmluZyB3aXRoIGxpbnV4LXVz
-ZXINCj4gPiAgICAgcWVtdSBtb2RlPyB3b3VsZCB0aGUgc2l0dWF0aW9uIGJlIGltcHJvdmVkIHdp
-dGggIHRoZSBNVFRDRyBmZWF0dXJlPw0KPiA+IA0KPiA+ICAgICBXZSBuZWVkIHRvIHVzZSBsaW51
-eC11c2VyIG1vZGUgcWVtdSB0byBydW4gbXVsdGl0aHJlYWQgYXBwLCBidXQgdGhlcmUgc2VlbXMN
-Cj4gPiAgICAgdG8gYmUgbWFueSBwcm9ibGVtLg0KPiANCj4gRm9yIHVzZXIgbW9kZSwgd2Ugc2hv
-dWxkIHN0aWxsIGZvbGxvdyB0aGUgcnVsZXMgZm9yIE1UVENHLCBidXQgd2UgZG8gbm90LiANCj4g
-SW5zdGVhZCB3ZSB0YWtlIGl0IG9uIGZhaXRoIHRoYXQgdGhleSBoYXZlIGJlZW4gYW5kIGV4ZWN1
-dGUgdGhlIGNvZGUgaW4gDQo+IHBhcmFsbGVsIGFueXdheS4gIFRoaXMgZmFpdGggaXMgb2Z0ZW4g
-bWlzcGxhY2VkIGFuZCBpdCBkb2VzIG1lYW4gdGhhdCANCj4gdW5zdXBwb3J0ZWQgdGFyZ2V0cyBl
-eGVjdXRlIHVzZXIgbW9kZSBjb2RlIGluY29ycmVjdGx5Lg0KV2hhdCBkbyB5b3UgZXhhY3RseSBt
-ZWFuIGFib3V0IHRoZSAqdW5zdXBwb3J0ZWQgdGFyZ2V0cyo/IG1pcHM/IGFybT8gaTM4Nj8gDQoN
-Cg0KV2hhdCBpcyB0aGUgbWFpbiByZWFzb24gZm9yIHRoZSBpbmNvcnJlY3RseSBleGVjdXRpb24g
-b2YgbXVsdGl0aHJlYWQgYXBwIGZvciB1c2VyIG1vZGU/DQoNCklzIE1UVENHIGhlbHBmdWwgZm9y
-IHRoYXQ/DQoNClNwZWNpZmljbHkgZm9yIG15IGNhc2UoaTM4NiB0YXJnZXQgb24gTWlwczY0IGhv
-c3QgaW4gdXNlciBtb2RlKSwgIGhvdyB0byBpbXByb3ZlZCB0aGUgc2l0dWF0aW9uPw0KDQoNCg0K
-DQpUaGFua3MgYSBsb3QgZm9yIHlvdXIgZGV0YWlsZWQgZXhwbGFpbmF0aW9uLg==
+Hi Eric,
+
+
+On 2017/7/18 =E4=B8=8B=E5=8D=8810:57, Eric Blake wrote:
+> On 07/17/2017 10:01 PM, Jing Liu wrote:
+>> Hi all,
+>>
+>> Do you anybody have iotests failure: 188, 189 and 087 of the latest qe=
+mu
+>> upsteam?
+>>
+>> I just wondered if it has something wrong with my test machines becaus=
+e
+>> I have different results with two machines.
+> It might help to show the ./check command line you are using, as well a=
+s
+> the errors you are getting.  Right now, master is failing on 51, 140,
+> and 143 when I test across './check -raw', './check -qcow2', and
+> './check nbd',
+I used ./check -qcow2 to do it.
+I tested on different machines and got different results. One is failed=20
+on 140 and 143. The other one told
+me 087, 140, 143, 188, 189.
+I guess it is because some configuration or libraries, and will also=20
+refer to other replies from the mail.
+I'll check the details.
+
+Thank you so much.
+
+Jing
+
+
+> but not the three you mention.  But the iotests framework
+> allows a lot more combinations of testing (and we probably have some
+> lurking testsuite bugs on some of the more exotic combinations).
+>
