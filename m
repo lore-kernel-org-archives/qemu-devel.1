@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXnan-0002kh-R2
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:56:38 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dXncw-0003zM-J4
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXnai-0005JJ-Rt
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:56:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40560)
+	(envelope-from <wei.w.wang@intel.com>) id 1dXncr-000687-Kg
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:58:50 -0400
+Received: from mga11.intel.com ([192.55.52.93]:60478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dXnai-0005J7-II
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:56:32 -0400
-References: <20170719100802.14094-1-berrange@redhat.com>
-	<20170719100802.14094-2-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d659c0cb-0cb2-3af7-b97f-05ad15aa3550@redhat.com>
-Date: Wed, 19 Jul 2017 13:56:24 +0200
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dXncr-00067h-A4
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:58:45 -0400
+Message-ID: <596F4A0E.4010507@intel.com>
+Date: Wed, 19 Jul 2017 20:01:18 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170719100802.14094-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
+	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
+	<20170714123023.GA2624@dhcp22.suse.cz>
+	<20170714181523-mutt-send-email-mst@kernel.org>
+	<20170717152448.GN12888@dhcp22.suse.cz>
+	<596D6E7E.4070700@intel.com>
+	<20170719081311.GC26779@dhcp22.suse.cz>
+In-Reply-To: <20170719081311.GC26779@dhcp22.suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/2 (for 2.10)] docs: document support
- lifetime for features
+Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Michal Hocko <mhocko@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On 19.07.2017 12:08, Daniel P. Berrange wrote:
-> There is currently no explicit guidance on the duration of support
-> for features such as versioned machine types, which have a finite
-> useful lifespan. Thus apps / users cannot predict how much time
-> they might be able to use a feature for, before it is removed (if
-> ever).
-> 
-> This adds a new appendix that lists items which have finite lifecycles,
-> such as machine types. For items which are generally expected to be
-> supported indefinitely, it sets out the policy around deprecation
-> and removal, should it be needed.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  qemu-doc.texi | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
-> 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 48af5155c7..200c0f7d0a 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -38,6 +38,7 @@
->  * QEMU Guest Agent::
->  * QEMU User space emulator::
->  * Implementation notes::
-> +* Support lifetime::
->  * License::
->  * Index::
->  @end menu
-> @@ -3128,6 +3129,42 @@ Run the emulation in single step mode.
->  
->  @include qemu-tech.texi
->  
-> +@node Support lifetime
-> +@appendix Support lifetime
-> +
-> +In general features are intended to be supported indefinitely once
-> +introduced into QEMU.
-> +
-> +In the event that a feature needs to be removed, it will be listed
-> +in the ``Deprecated features'' appendix of this document. The feature
-> +will remain functional for 2 releases prior to actual removal.
-> +
-> +Deprecated features may also generate warnings on the console when
-> +QEMU starts up, or if activated via a monitor command, however,
-> +this is not a mandatory requirement.
+On 07/19/2017 04:13 PM, Michal Hocko wrote:
+> On Tue 18-07-17 10:12:14, Wei Wang wrote:
+> [...]
+>> Probably I should have included the introduction of the usages in
+>> the log. Hope it is not too later to explain here:
+> Yes this should have been described in the cover.
 
-Ack for the part above.
-I still think we should not auto-remove old machine types blindly, but
-take a little bit more care there...
 
-So maybe submit above part now for 2.10, to get that in and thus the
-clock running, and then let's discuss the machine type part again
-independently for 2.11?
+OK, I will do it in the next version.
 
- Thomas
 
-> +Certain features have an inherently finite lifetime, and thus
-> +will be removed on a fixed schedule, without following the normal
-> +deprecation process. Such features are listed in the sections
-> +that follow.
-> +
-> +@node Machine types
-> +@section Machine types
-> +
-> +For architectures which aim to support live migration compatibility
-> +across releases, each release will introduce a new versioned machine
-> +type. For example, the 2.8.0 release introduced machine types
-> +``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
-> +
-> +To allow live migration of a guest running on a 2.8.0 release to a
-> +2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-> +``pc-q35-2.8''. To allow users live migrating VMs to skip multiple
-> +intermediate releases when upgrading, new releases of QEMU will
-> +support machine types from many previous versions.
-> +
-> +The supported lifetime for versioned machine types is 12 releases,
-> +which is equivalent to 4 years worth of previous QEMU releases.
+>   
+>> Live migration needs to transfer the VM's memory from the source
+>> machine to the destination round by round. For the 1st round, all the VM's
+>> memory is transferred. From the 2nd round, only the pieces of memory
+>> that were written by the guest (after the 1st round) are transferred. One
+>> method that is popularly used by the hypervisor to track which part of
+>> memory is written is to write-protect all the guest memory.
+>>
+>> This patch enables the optimization of the 1st round memory transfer -
+>> the hypervisor can skip the transfer of guest unused pages in the 1st round.
+> All you should need is the check for the page reference count, no?  I
+> assume you do some sort of pfn walk and so you should be able to get an
+> access to the struct page.
+
+
+Not necessarily - the guest struct page is not seen by the hypervisor. The
+hypervisor only gets those guest pfns which are hinted as unused. From the
+hypervisor (host) point of view, a guest physical address corresponds to a
+virtual address of a host process. So, once the hypervisor knows a guest
+physical page is unsued, it knows that the corresponding virtual memory of
+the process doesn't need to be transferred in the 1st round.
+
+
+Best,
+Wei
