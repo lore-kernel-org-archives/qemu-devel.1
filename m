@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXpLM-00029x-32
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:48:49 -0400
+	(envelope-from <drjones@redhat.com>) id 1dXpLO-0002Bn-4q
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:48:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXpLI-0008Hw-PD
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:48:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXpLI-0008HZ-Ey
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:48:44 -0400
-References: <1500448182-21376-1-git-send-email-armbru@redhat.com>
-	<CAJ+F1C+tNiGEkzC3aBf=_92oxb7NvG+UeYaUPLy9vKY8ym936g@mail.gmail.com>
-	<87h8y8iq4o.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d5698179-cd49-143c-fc73-7c4528bb0cb6@redhat.com>
-Date: Wed, 19 Jul 2017 08:48:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <87h8y8iq4o.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JebCpQn6VjPpISQ0XeCa7OOAJ004QQux9"
-Subject: Re: [Qemu-devel] [PATCH] vnc: Clarify documentation of QMP command
- change
+	(envelope-from <drjones@redhat.com>) id 1dXpLN-0008Jx-Bk
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:48:50 -0400
+From: Andrew Jones <drjones@redhat.com>
+Date: Wed, 19 Jul 2017 09:39:54 -0400
+Message-Id: <1500471597-2517-2-git-send-email-drjones@redhat.com>
+In-Reply-To: <1500471597-2517-1-git-send-email-drjones@redhat.com>
+References: <1500471597-2517-1-git-send-email-drjones@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] hw/arm/virt: add pmu interrupt state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +19,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, agraf@suse.de, cdall@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JebCpQn6VjPpISQ0XeCa7OOAJ004QQux9
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <d5698179-cd49-143c-fc73-7c4528bb0cb6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vnc: Clarify documentation of QMP command
- change
-References: <1500448182-21376-1-git-send-email-armbru@redhat.com>
- <CAJ+F1C+tNiGEkzC3aBf=_92oxb7NvG+UeYaUPLy9vKY8ym936g@mail.gmail.com>
- <87h8y8iq4o.fsf@dusky.pond.sub.org>
-In-Reply-To: <87h8y8iq4o.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mimicking gicv3-maintenance-interrupt, add the PMU's interrupt to
+CPU state.
 
-On 07/19/2017 07:10 AM, Markus Armbruster wrote:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->=20
->> Hi
->>
->> On Wed, Jul 19, 2017 at 9:09 AM, Markus Armbruster <armbru@redhat.com>=
- wrote:
->>> QMP command
->>>
->>>     { "execute": "change",
->>>       "arguments": { "device": "vnc", "target": "password", "arg": PW=
-D } }
->>>
->>> behaves just like
->>>
->>>     { "execute": "change-vnc-password",
->>>       "arguments": { "password", "arg": PWD } }
->>>
->>> Their documentation differs, however.  According to
->>> change-vnc-password's documentation, "an empty password [...] will se=
-t
->>> the password to the empty string", while change's documentation claim=
-s
->>> "no future logins will be allowed".  The former is actually correct.
->>> Replace the incorrect claim by a reference to change-vnc-password.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->>
->> The password would have to be NULL to disallow further login, is that
->> what your other series will allow to do?
->=20
-> I guess it could be applied to change-vnc-password that way.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/virt.c    | 3 +++
+ target/arm/cpu.c | 2 ++
+ target/arm/cpu.h | 2 ++
+ 3 files changed, 7 insertions(+)
 
-Ideally, 'change' will be deprecated (and certainly we shouldn't add
-anything further to it), but yes, 'change-vnc-password' could be
-enhanced in 2.11 to use the StrOrNull alternate to use null as the
-request for no password (since the empty string "" _is_ hashable as a
-password, whether or not we currently allow it to be one).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---JebCpQn6VjPpISQ0XeCa7OOAJ004QQux9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllvYzYACgkQp6FrSiUn
-Q2o8wwf/U5rY3DfKaK6FbDSrHvt6lBM+n4+hZP2StsYeaPgKRuNm8sYnLWKQ9P/G
-zGVXvSfCQ1yrY+XW89JW5ycz/XZg8uCk9NNGUmyHvuzcw6BzNLXDzhaF5oEz55nQ
-OIK4ONA4w7d4HqyyDn9l0XfOOBFaoQvw9wsbnkIQgnASrODFCtSoZ9wdrxNNoJBa
-0OQlTHw8q/5qOVeBvROZ/VtY43y6zVydntizSwTYNQIh7YUSz+fQAOD+Hn3Am4Hw
-qyyviMPvQ878BrPL/gLFcRM0IXCq0xiP8mG8OIR8tNhFA7/2rxqbUsEx61TOK7Y7
-FgMKn3P5xgjxuqb5G5+rPuAtV58jOA==
-=chHM
------END PGP SIGNATURE-----
-
---JebCpQn6VjPpISQ0XeCa7OOAJ004QQux9--
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 31739d75a3e0..ea26f0c473c2 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -610,6 +610,9 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+         qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt", 0,
+                                     qdev_get_gpio_in(gicdev, ppibase
+                                                      + ARCH_GICV3_MAINT_IRQ));
++        qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
++                                    qdev_get_gpio_in(gicdev, ppibase
++                                                     + VIRTUAL_PMU_IRQ));
+ 
+         sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+         sysbus_connect_irq(gicbusdev, i + smp_cpus,
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 96d1f840301f..fd82c7944840 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -499,6 +499,8 @@ static void arm_cpu_initfn(Object *obj)
+ 
+     qdev_init_gpio_out_named(DEVICE(cpu), &cpu->gicv3_maintenance_interrupt,
+                              "gicv3-maintenance-interrupt", 1);
++    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt,
++                             "pmu-interrupt", 1);
+ #endif
+ 
+     /* DTB consumers generally don't in fact care what the 'compatible'
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 102c58afac52..8d91166eb97b 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -584,6 +584,8 @@ struct ARMCPU {
+     qemu_irq gt_timer_outputs[NUM_GTIMERS];
+     /* GPIO output for GICv3 maintenance interrupt signal */
+     qemu_irq gicv3_maintenance_interrupt;
++    /* GPIO output for the PMU interrupt */
++    qemu_irq pmu_interrupt;
+ 
+     /* MemoryRegion to use for secure physical accesses */
+     MemoryRegion *secure_memory;
+-- 
+1.8.3.1
