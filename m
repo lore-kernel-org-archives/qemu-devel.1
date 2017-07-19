@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXgi4-0005Ar-8w
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1dXgi6-0005B7-MU
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXgi1-0001lT-Ly
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37766)
+	(envelope-from <bounces@canonical.com>) id 1dXgi5-0001nV-FS
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dXgi1-0001lA-Fp
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:37 -0400
+	id 1dXgi5-0001n7-9I
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dXgi0-0003q2-Kx
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:36 +0000
+	id 1dXgi4-0003q0-Ao
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9D7DF2E807E
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:36 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E4932E8078
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Jul 2017 04:17:26 -0000
-From: Launchpad Bug Tracker <1198350@bugs.launchpad.net>
-Reply-To: Bug 1198350 <1198350@bugs.launchpad.net>
+Date: Wed, 19 Jul 2017 04:17:52 -0000
+From: Launchpad Bug Tracker <924943@bugs.launchpad.net>
+Reply-To: Bug 924943 <924943@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130705221111.16044.84094.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150043784627.28289.1446433046681568870.malone@loganberry.canonical.com>
+References: <20120201160448.7612.88961.malonedeb@gac.canonical.com>
+Message-Id: <150043787286.28289.9340363670691258410.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1198350] Re: USB pass-through fails with
- USBDEVFS_DISCONNECT: Invalid argument
+Subject: [Qemu-devel] [Bug 924943] Re: usb-host devices given by command
+ line are routed incomplete to the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,78 +48,38 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1198350
+https://bugs.launchpad.net/bugs/924943
 
 Title:
-  USB pass-through fails with USBDEVFS_DISCONNECT: Invalid argument
+  usb-host devices given by command line are routed incomplete to the
+  guest
 
 Status in QEMU:
   Expired
 
 Bug description:
-  Host Gentoo linux 32bit
-  Guest Windows XP SP3
-  qemu 1.4.2 and
-  qemu fresh get clone and build 2013-07-04 (version1.5.50)
-  qemu command line
+  affected qemus: qemu-1.0, qemu-kvm-1.0, qemu and qemu-kvm master branches=
+ (older versions not tested)
+  affected guests: linux, windows
+  test hardware: standard usb key (or any other piece of USB hardware) that=
+ works perfectly when plugged in after guest bootup
 
-  qemu-system-i386 -enable-kvm localtime -m 2047 -boot d
-  /archive3/qemu/WindowsXP.img -net nic,model=3Drtl8139 -net user -usb
-  -device usb-ehci,id=3Dehci -usbdevice host:1493:19
+  Several Sequences have been tested:
+  - start qemu with  -readconfig /etc/ich9-ehci-uhci.cfg -device usb-tablet=
+ -device usb-host,bus=3Dehci.0
+  - start qemu with -readconfig /etc/ich9-ehci-uhci.cfg -device usb-tablet =
+-S (to not start up the guest directly) + at the console prompt: "device_ad=
+d usb-host" then "c" to start the guest.
 
-  The device I am trying to use with the guest is an interface for the
-  Suunto Ambit 2 GPS watch which has no linux support.
+  For the linux guest, I get a usb device listed and detected as /dev/sdb w=
+hen plugging it in at runtime. At startup linux does NOT detect it.
+  For the windows guest, I get a usb device listed and detected as "removab=
+le media" when plugging it in at runtime. At startup Windows does detect "s=
+omething" that is listed in the device manager as Generic Mass Storage devi=
+ce, but with a yellow exclamation mark and there is no removable media list=
+ed in Explorer
 
-  When the USB device is plugged in qemu reports to the command line:
-
-  USBDEVFS_DISCONNECT: Invalid argument
-  Invalid argument
-
-  dmesg shows
-
-  [237755.495968] usb 2-1.5: new full-speed USB device number 34 using ehci=
--pci
-  [237755.582778] usb 2-1.5: config 1 has an invalid interface number: 1 bu=
-t max is 0
-  [237755.582781] usb 2-1.5: config 1 has no interface number 0
-  [237755.583628] usb 2-1.5: New USB device found, idVendor=3D1493, idProdu=
-ct=3D0019
-  [237755.583631] usb 2-1.5: New USB device strings: Mfr=3D1, Product=3D2, =
-SerialNumber=3D3
-  [237755.583633] usb 2-1.5: Product: Ambit
-  [237755.583634] usb 2-1.5: Manufacturer: Suunto
-  [237755.583636] usb 2-1.5: SerialNumber: CE83095110000700
-  [237756.584937] usb 2-1.5: reset full-speed USB device number 34 using eh=
-ci-pci
-  [237756.832658] usb 2-1.5: reset full-speed USB device number 34 using eh=
-ci-pci
-  [237757.143585] usb 2-1.5: usbfs: process 12684 (qemu-system-i38) did not=
- claim interface 1 before use
-
-  In the windows guest Device Manager a HID device is listed but nothing
-  else happens, no found new hardware dialog or the Suunto software
-  (which is sitting there waiting) is not triggered as it should be.
-
-  I have tried successfully with several other devices (flash drive,
-  mouse, printer and video capture device). Because this device pretends
-  to be an HID device my kernel's hid-generic driver was picking it up
-  first until I modified hid-core.c to ignore this vendorid/productid.
-  But still no joy.
-
-  I'm guessing it has something to do with the the dmesg lines:
-
-  [237755.582778] usb 2-1.5: config 1 has an invalid interface number: 1 bu=
-t max is 0
-  [237755.582781] usb 2-1.5: config 1 has no interface number 0
-
-  But read that these warnings are not important though I don't get them
-  for other devices. Nor do I get:
-
-  [237757.143585] usb 2-1.5: usbfs: process 12684 (qemu-system-i38) did
-  not claim interface 1 before use
-
-  I've done alot of searching and I've run out of ideas. Any help would
-  be great.
+  If you need further testings, just let me know.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1198350/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/924943/+subscriptions
