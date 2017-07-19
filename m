@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXkO2-0001Sc-Pp
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:31:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1dXkPg-00020N-4d
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXkNy-0006Yv-MF
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:31:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54642)
+	(envelope-from <armbru@redhat.com>) id 1dXkPc-0007ek-1F
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:32:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXkNy-0006YD-DT
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:31:10 -0400
-Date: Wed, 19 Jul 2017 09:31:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170719083101.GC2103@work-vm>
-References: <150040682777.87.414629183259475192@5d477a5b5989>
-	<87379skjm4.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXkPb-0007eA-R3
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:32:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE81F7AE81
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 08:32:50 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170717180926.14924-1-ehabkost@redhat.com>
+Date: Wed, 19 Jul 2017 10:32:45 +0200
+In-Reply-To: <20170717180926.14924-1-ehabkost@redhat.com> (Eduardo Habkost's
+	message of "Mon, 17 Jul 2017 15:09:26 -0300")
+Message-ID: <87vamoyggi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87379skjm4.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PULL 00/16] Migration
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on
+ alternate conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: no-reply@patchew.org, qemu-devel@nongnu.org, famz@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> no-reply@patchew.org wrote:
-> > Hi,
-> >
-> > This series failed automatic build test. Please find the testing commands and
-> > their output below. If you have docker installed, you can probably reproduce it
-> > locally.
-> 
-> > cc: unrecognized option '-no-integrated-as'
-> > cc: unrecognized option '-no-integrated-as'
-> 
-> I hope this is not my fault
->    GTESTER tests/test-vmstate
-> 
-> > Failed to load simple/primitive:b_1
-> > Failed to load simple/primitive:i64_2
-> > Failed to load simple/primitive:i32_1
-> > Failed to load simple/primitive:i32_1
-> > Failed to load test/with_tmp:a
-> > Failed to load test/tmp_child_parent:f
-> > Failed to load test/tmp_child:parent
-> > Failed to load test/with_tmp:tmp
-> > Failed to load test/tmp_child:diff
-> > Failed to load test/with_tmp:tmp
-> > Failed to load test/tmp_child:diff
-> > Failed to load test/with_tmp:tmp
-> 
-> 
-> Dave, any good clue?
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Those are OK I think - those are the places it purposely generates
-a bad stream.
+> The conflict check added by commit c0644771 ("qapi: Reject
+> alternates that can't work with keyval_parse()") doesn't work
+> with the following declaration:
+>
+>   { 'alternate': 'Alt',
+>     'data': { 'one': 'bool',
+>               'two': 'str' } }
+>
+> It crashes with:
+>
+>   Traceback (most recent call last):
+>     File "./scripts/qapi-types.py", line 295, in <module>
+>       schema = QAPISchema(input_file)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
+>       self.exprs = check_exprs(parser.exprs)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
+>       check_alternate(expr, info)
+>     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
+>       % (name, key, types_seen[qtype]))
+>   KeyError: 'QTYPE_QSTRING'
+>
+> This happens because the previously-seen conflicting member
+> ('one') can't be found at types_seen[qtype], but at
+> types_seen['QTYPE_BOOL'].
 
-> 
-> > ERROR:/tmp/qemu-test/src/tests/test-qga.c:78:fixture_setup: assertion failed (fixture->fd != -1): (-1 != -1)
-> > GTester: last random seed: R02Sf37f37a8c5f8ed60d31dbaff962d3c9c
+Good catch.
 
-That's the problem; but test-qga is working fine here - and we shouldn't
-have gone anywhere near it in these patches.
+> Fix the bug by moving the error check to the same loop that adds
+> new items to types_seen, raising an exception if types_seen[qt]
+> is already set.
+>
+> Add two additional test cases that can detect the bug.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Dave
-
-> > make: *** [check-tests/test-qga] Error 1
-> > make: *** Waiting for unfinished jobs....
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Could not access KVM kernel module: No such file or directory
-> > failed to initialize KVM: No such file or directory
-> > Back to tcg accelerator.
-> > Traceback (most recent call last):
-> >   File "./tests/docker/docker.py", line 382, in <module>
-> >     sys.exit(main())
-> >   File "./tests/docker/docker.py", line 379, in main
-> >     return args.cmdobj.run(args, argv)
-> >   File "./tests/docker/docker.py", line 237, in run
-> >     return Docker().run(argv, args.keep, quiet=args.quiet)
-> >   File "./tests/docker/docker.py", line 205, in run
-> >     quiet=quiet)
-> >   File "./tests/docker/docker.py", line 123, in _do_check
-> >     return subprocess.check_call(self._command + cmd, **kwargs)
-> >   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
-> >     raise CalledProcessError(retcode, cmd)
-> > subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=656d0ada6bee11e794aa525400c803e1', '-u', '0', '-t', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/var/tmp/patchew-tester-tmp-uic4vhqy/src/docker-src.2017-07-18-15.22.06.26333:/var/tmp/qemu:z,ro', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
-> > tests/docker/Makefile.include:124: recipe for target 'docker-run' failed
-> > make[1]: *** [docker-run] Error 1
-> > make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-uic4vhqy/src'
-> > tests/docker/Makefile.include:156: recipe for target 'docker-run-test-quick@centos6' failed
-> > make: *** [docker-run-test-quick@centos6] Error 2
-> 
-> I am pretty sure that this should be a problem somewhere else, not this
-> patch, no?
-> 
-> Thanks, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
