@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXqao-0007zu-UN
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXqb9-0008Uc-0O
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:09:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXqal-0007Mm-2a
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47157)
+	(envelope-from <eblake@redhat.com>) id 1dXqb5-0007YR-Ra
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:09:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXqak-0007Kh-PR
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BACE97CB86
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 15:01:15 +0000 (UTC)
-Date: Wed, 19 Jul 2017 16:01:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170719150109.GN2103@work-vm>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-2-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXqb5-0007Xu-I8
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:09:07 -0400
+References: <1500452149-9520-1-git-send-email-lu.zhipeng@zte.com.cn>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f1e4c4e4-4cc6-66cc-9f66-02111defe968@redhat.com>
+Date: Wed, 19 Jul 2017 10:09:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-2-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 01/17] migrate: Add gboolean return type
- to migrate_channel_process_incoming
+In-Reply-To: <1500452149-9520-1-git-send-email-lu.zhipeng@zte.com.cn>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5sh382xXGxvT3didF4DUBO7ajhsFHRb4m"
+Subject: Re: [Qemu-devel] [PATCH] qga: Add support network interface
+ statistics in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,114 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5sh382xXGxvT3didF4DUBO7ajhsFHRb4m
+From: Eric Blake <eblake@redhat.com>
+To: ZhiPeng Lu <lu.zhipeng@zte.com.cn>, mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org
+Message-ID: <f1e4c4e4-4cc6-66cc-9f66-02111defe968@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qga: Add support network interface
+ statistics in guest-network-get-interfaces command
+References: <1500452149-9520-1-git-send-email-lu.zhipeng@zte.com.cn>
+In-Reply-To: <1500452149-9520-1-git-send-email-lu.zhipeng@zte.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/19/2017 03:15 AM, ZhiPeng Lu wrote:
+> we can get the network interface statistics inside a virtual machine by=
+
+> guest-network-get-interfaces command. it is very useful for us to monit=
+or
+> and analyze network traffic.
+>=20
+> Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 > ---
->  migration/channel.c |  3 ++-
->  migration/channel.h |  2 +-
->  migration/exec.c    |  6 ++++--
->  migration/socket.c  | 12 ++++++++----
->  4 files changed, 15 insertions(+), 8 deletions(-)
-> 
-> diff --git a/migration/channel.c b/migration/channel.c
-> index 3b7252f..719055d 100644
-> --- a/migration/channel.c
-> +++ b/migration/channel.c
-> @@ -19,7 +19,7 @@
->  #include "qapi/error.h"
->  #include "io/channel-tls.h"
->  
-> -void migration_channel_process_incoming(QIOChannel *ioc)
-> +gboolean migration_channel_process_incoming(QIOChannel *ioc)
->  {
->      MigrationState *s = migrate_get_current();
->  
-> @@ -39,6 +39,7 @@ void migration_channel_process_incoming(QIOChannel *ioc)
->          QEMUFile *f = qemu_fopen_channel_input(ioc);
->          migration_fd_process_incoming(f);
->      }
-> +    return FALSE; /* unregister */
->  }
->  
->  
-> diff --git a/migration/channel.h b/migration/channel.h
-> index e4b4057..72cbc9f 100644
-> --- a/migration/channel.h
-> +++ b/migration/channel.h
-> @@ -18,7 +18,7 @@
->  
->  #include "io/channel.h"
->  
-> -void migration_channel_process_incoming(QIOChannel *ioc);
-> +gboolean migration_channel_process_incoming(QIOChannel *ioc);
+>  qga/commands-posix.c | 72 ++++++++++++++++++++++++++++++++++++++++++++=
++++++++-
+>  qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
+>  2 files changed, 108 insertions(+), 2 deletions(-)
 
-Can you add a comment here that says what the return value means.
+Isn't this a repost of an earlier version of the same proposal? If so,
+including an appropriate v2, and documenting how it differs from v1,
+aids reviewers.
 
-Dave
+Unfortunately, this has missed soft freeze for 2.10 and is a new
+feature, so...
 
->  void migration_channel_connect(MigrationState *s,
->                                 QIOChannel *ioc,
-> diff --git a/migration/exec.c b/migration/exec.c
-> index 08b599e..2827f15 100644
-> --- a/migration/exec.c
-> +++ b/migration/exec.c
-> @@ -47,9 +47,11 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
->                                                 GIOCondition condition,
->                                                 gpointer opaque)
->  {
-> -    migration_channel_process_incoming(ioc);
-> +    gboolean result;
-> +
-> +    result = migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> -    return FALSE; /* unregister */
-> +    return result;
->  }
->  
->  void exec_start_incoming_migration(const char *command, Error **errp)
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 757d382..6195596 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -136,25 +136,29 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->  {
->      QIOChannelSocket *sioc;
->      Error *err = NULL;
-> +    gboolean result;
->  
->      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
->                                       &err);
->      if (!sioc) {
->          error_report("could not accept migration connection (%s)",
->                       error_get_pretty(err));
-> +        result = FALSE; /* unregister */
->          goto out;
->      }
->  
->      trace_migration_socket_incoming_accepted();
->  
->      qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming");
-> -    migration_channel_process_incoming(QIO_CHANNEL(sioc));
-> +    result = migration_channel_process_incoming(QIO_CHANNEL(sioc));
->      object_unref(OBJECT(sioc));
->  
->  out:
-> -    /* Close listening socket as its no longer needed */
-> -    qio_channel_close(ioc, NULL);
-> -    return FALSE; /* unregister */
-> +    if (result == FALSE) {
-> +        /* Close listening socket as its no longer needed */
-> +        qio_channel_close(ioc, NULL);
-> +    }
-> +    return result;
->  }
->  
->  
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +++ b/qga/qapi-schema.json
+> @@ -643,6 +643,38 @@
+>             'prefix': 'int'} }
+> =20
+>  ##
+> +# @GuestNetworkInterfaceStat:
+> +#
+> +# @rx-bytes: total bytes received
+> +#
+> +# @rx-packets: total packets received
+> +#
+> +# @rx-errs: bad packets received
+> +#
+> +# @rx-dropped: receiver dropped packets
+> +#
+> +# @tx-bytes: total bytes transmitted
+> +#
+> +# @tx-packets: total packets transmitted
+> +#
+> +# @tx-errs: packet transmit problems
+> +#
+> +# @tx-dropped: dropped packets transmitted
+> +#
+> +# Since: 2.10
+
+this needs to be changed to 2.11
+
+> @@ -651,12 +683,16 @@
+>  #
+>  # @ip-addresses: List of addresses assigned to @name
+>  #
+> +# @statistics: various statistic counters related to @name
+> +# (since 2.10)
+
+likewise
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--5sh382xXGxvT3didF4DUBO7ajhsFHRb4m
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllvdhEACgkQp6FrSiUn
+Q2oXnAgAqMTXeOK1CAUR9Rl/yuKmG9fWTGwoqWiWF+/9Qv8F7uFAvZOwOaLsyO2g
+c1gxowSiyZcBUAvOVQz+lvbUhMeFVlaLYfc95/PQOfxtrq7jGoQyyXbR9OuH4PIQ
+DFo1OeWKFVn4rpay0BaHmuOItkmlvKnlkItOhPgDEu629KTPY/NrtN12V2iClQLG
+5Rcc7VwCAsQtPqkSgtJRlxGjuvGW0QgPDwplVoOs3wtEiqRT/RBPojqq9XsGx3ly
+zgCsdw2oN7y6bMyCntPhuaumWjMn8kG1IIc6ciXYIfBao9LGY77SVUevRl3sQqwq
+OZsqTif0YeedWJxC5inngWbDd1stxA==
+=dhIP
+-----END PGP SIGNATURE-----
+
+--5sh382xXGxvT3didF4DUBO7ajhsFHRb4m--
