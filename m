@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXl5d-0000Wy-JV
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXl5k-0000ad-3J
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXl5b-0001FX-Ty
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48544)
+	(envelope-from <berrange@redhat.com>) id 1dXl5i-0001Jy-Di
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl5b-0001Ez-Ku
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:15 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl5i-0001JC-3l
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:22 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 19 Jul 2017 10:15:43 +0100
-Message-Id: <20170719091600.8555-2-berrange@redhat.com>
+Date: Wed, 19 Jul 2017 10:15:47 +0100
+Message-Id: <20170719091600.8555-6-berrange@redhat.com>
 In-Reply-To: <20170719091600.8555-1-berrange@redhat.com>
 References: <20170719091600.8555-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 01/18] crypto: cipher: introduce context free
- function
+Subject: [Qemu-devel] [PULL v2 05/18] crypto: cipher: add cipher driver
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +29,522 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Refactors the qcrypto_cipher_free(), splits it into two parts. One
-is gcrypt/nettle__cipher_free_ctx() to free the special context.
+1) makes the public APIs in cipher-nettle/gcrypt/builtin static,
+   and rename them with "nettle/gcrypt/builtin" prefix.
 
-This makes code more clear, what's more, it would be used by the
-later patch.
+2) introduces cipher framework, including QCryptoCipherDriver
+   and new public APIs.
 
 Reviewed-by: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- crypto/cipher-gcrypt.c | 31 ++++++++++++++++++-------------
- crypto/cipher-nettle.c | 18 ++++++++++++++----
- 2 files changed, 32 insertions(+), 17 deletions(-)
+ crypto/cipher-builtin.c | 64 +++++++++++++++++--------------------------
+ crypto/cipher-gcrypt.c  | 72 +++++++++++++++++++++----------------------------
+ crypto/cipher-nettle.c  | 71 ++++++++++++++++++++----------------------------
+ crypto/cipher.c         | 65 ++++++++++++++++++++++++++++++++++++++++++++
+ crypto/cipherpriv.h     | 40 +++++++++++++++++++++++++++
+ include/crypto/cipher.h |  1 +
+ 6 files changed, 190 insertions(+), 123 deletions(-)
+ create mode 100644 crypto/cipherpriv.h
 
+diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
+index 4ecd15eb9e..16a36d4532 100644
+--- a/crypto/cipher-builtin.c
++++ b/crypto/cipher-builtin.c
+@@ -22,6 +22,7 @@
+ #include "crypto/aes.h"
+ #include "crypto/desrfb.h"
+ #include "crypto/xts.h"
++#include "cipherpriv.h"
+ 
+ typedef struct QCryptoCipherBuiltinAESContext QCryptoCipherBuiltinAESContext;
+ struct QCryptoCipherBuiltinAESContext {
+@@ -466,25 +467,22 @@ static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+     return ctxt;
+ }
+ 
+-void qcrypto_cipher_free(QCryptoCipher *cipher)
++static void
++qcrypto_builtin_cipher_ctx_free(QCryptoCipher *cipher)
+ {
+     QCryptoCipherBuiltin *ctxt;
+ 
+-    if (!cipher) {
+-        return;
+-    }
+-
+     ctxt = cipher->opaque;
+     ctxt->free(cipher);
+-    g_free(cipher);
+ }
+ 
+ 
+-int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_builtin_cipher_encrypt(QCryptoCipher *cipher,
++                               const void *in,
++                               void *out,
++                               size_t len,
++                               Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt = cipher->opaque;
+ 
+@@ -498,11 +496,12 @@ int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_builtin_cipher_decrypt(QCryptoCipher *cipher,
++                               const void *in,
++                               void *out,
++                               size_t len,
++                               Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt = cipher->opaque;
+ 
+@@ -516,9 +515,10 @@ int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+-                         const uint8_t *iv, size_t niv,
+-                         Error **errp)
++static int
++qcrypto_builtin_cipher_setiv(QCryptoCipher *cipher,
++                             const uint8_t *iv, size_t niv,
++                             Error **errp)
+ {
+     QCryptoCipherBuiltin *ctxt = cipher->opaque;
+ 
+@@ -526,23 +526,9 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
+-{
+-    QCryptoCipher *cipher;
+-    QCryptoCipherBuiltin *ctxt;
+-
+-    ctxt = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+-    if (!ctxt) {
+-        return NULL;
+-    }
+-
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-    cipher->opaque = ctxt;
+-
+-    return cipher;
+-}
++static struct QCryptoCipherDriver qcrypto_cipher_lib_driver = {
++    .cipher_encrypt = qcrypto_builtin_cipher_encrypt,
++    .cipher_decrypt = qcrypto_builtin_cipher_decrypt,
++    .cipher_setiv = qcrypto_builtin_cipher_setiv,
++    .cipher_free = qcrypto_builtin_cipher_ctx_free,
++};
 diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
-index 6487ecaf37..0ecffa2751 100644
+index 493938629e..0489147398 100644
 --- a/crypto/cipher-gcrypt.c
 +++ b/crypto/cipher-gcrypt.c
-@@ -64,6 +64,22 @@ struct QCryptoCipherGcrypt {
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "crypto/xts.h"
++#include "cipherpriv.h"
+ 
+ #include <gcrypt.h>
+ 
+@@ -64,8 +65,9 @@ struct QCryptoCipherGcrypt {
      uint8_t *iv;
  };
  
-+static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
-+                                   QCryptoCipherMode mode)
-+{
-+    if (!ctx) {
-+        return;
-+    }
-+
-+    gcry_cipher_close(ctx->handle);
-+    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-+        gcry_cipher_close(ctx->tweakhandle);
-+    }
-+    g_free(ctx->iv);
-+    g_free(ctx);
-+}
-+
-+
- QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-                                   QCryptoCipherMode mode,
-                                   const uint8_t *key, size_t nkey,
-@@ -228,11 +244,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-     return cipher;
+-static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
+-                                   QCryptoCipherMode mode)
++static void
++qcrypto_gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
++                               QCryptoCipherMode mode)
+ {
+     if (!ctx) {
+         return;
+@@ -239,18 +241,15 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+     return ctx;
  
   error:
--    gcry_cipher_close(ctx->handle);
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
--        gcry_cipher_close(ctx->tweakhandle);
--    }
--    g_free(ctx);
-+    gcrypt_cipher_free_ctx(ctx, mode);
-     g_free(cipher);
+-    gcrypt_cipher_free_ctx(ctx, mode);
++    qcrypto_gcrypt_cipher_free_ctx(ctx, mode);
      return NULL;
  }
-@@ -240,17 +252,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
  
- void qcrypto_cipher_free(QCryptoCipher *cipher)
+ 
+-void qcrypto_cipher_free(QCryptoCipher *cipher)
++static void
++qcrypto_gcrypt_cipher_ctx_free(QCryptoCipher *cipher)
  {
--    QCryptoCipherGcrypt *ctx;
-     if (!cipher) {
-         return;
-     }
--    ctx = cipher->opaque;
--    gcry_cipher_close(ctx->handle);
--    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
--        gcry_cipher_close(ctx->tweakhandle);
+-    if (!cipher) {
+-        return;
 -    }
--    g_free(ctx->iv);
--    g_free(ctx);
-+    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
-     g_free(cipher);
+-    gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
+-    g_free(cipher);
++    qcrypto_gcrypt_cipher_free_ctx(cipher->opaque, cipher->mode);
  }
  
+ 
+@@ -274,11 +273,12 @@ static void qcrypto_gcrypt_xts_decrypt(const void *ctx,
+     g_assert(err == 0);
+ }
+ 
+-int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherGcrypt *ctx = cipher->opaque;
+     gcry_error_t err;
+@@ -309,11 +309,12 @@ int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_gcrypt_cipher_decrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherGcrypt *ctx = cipher->opaque;
+     gcry_error_t err;
+@@ -343,9 +344,10 @@ int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+     return 0;
+ }
+ 
+-int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+-                         const uint8_t *iv, size_t niv,
+-                         Error **errp)
++static int
++qcrypto_gcrypt_cipher_setiv(QCryptoCipher *cipher,
++                            const uint8_t *iv, size_t niv,
++                            Error **errp)
+ {
+     QCryptoCipherGcrypt *ctx = cipher->opaque;
+     gcry_error_t err;
+@@ -381,23 +383,9 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
+-{
+-    QCryptoCipher *cipher;
+-    QCryptoCipherGcrypt *ctx;
+-
+-    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+-    if (!ctx) {
+-        return NULL;
+-    }
+-
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-    cipher->opaque = ctx;
+-
+-    return cipher;
+-}
++static struct QCryptoCipherDriver qcrypto_cipher_lib_driver = {
++    .cipher_encrypt = qcrypto_gcrypt_cipher_encrypt,
++    .cipher_decrypt = qcrypto_gcrypt_cipher_decrypt,
++    .cipher_setiv = qcrypto_gcrypt_cipher_setiv,
++    .cipher_free = qcrypto_gcrypt_cipher_ctx_free,
++};
 diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
-index dfc9030227..e04e3a1c30 100644
+index e6d6e6cb69..c51f119cbc 100644
 --- a/crypto/cipher-nettle.c
 +++ b/crypto/cipher-nettle.c
-@@ -249,6 +249,19 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
+@@ -20,6 +20,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "crypto/xts.h"
++#include "cipherpriv.h"
+ 
+ #include <nettle/nettle-types.h>
+ #include <nettle/aes.h>
+@@ -249,7 +250,8 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg,
  }
  
  
-+static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
+-static void nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
++static void
++qcrypto_nettle_cipher_free_ctx(QCryptoCipherNettle *ctx)
+ {
+     if (!ctx) {
+         return;
+@@ -434,30 +436,27 @@ static QCryptoCipherNettle *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
+     return ctx;
+ 
+  error:
+-    nettle_cipher_free_ctx(ctx);
++    qcrypto_nettle_cipher_free_ctx(ctx);
+     return NULL;
+ }
+ 
+ 
+-void qcrypto_cipher_free(QCryptoCipher *cipher)
++static void
++qcrypto_nettle_cipher_ctx_free(QCryptoCipher *cipher)
+ {
+     QCryptoCipherNettle *ctx;
+ 
+-    if (!cipher) {
+-        return;
+-    }
+-
+     ctx = cipher->opaque;
+-    nettle_cipher_free_ctx(ctx);
+-    g_free(cipher);
++    qcrypto_nettle_cipher_free_ctx(ctx);
+ }
+ 
+ 
+-int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_nettle_cipher_encrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherNettle *ctx = cipher->opaque;
+ 
+@@ -499,11 +498,12 @@ int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
+ }
+ 
+ 
+-int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+-                           const void *in,
+-                           void *out,
+-                           size_t len,
+-                           Error **errp)
++static int
++qcrypto_nettle_cipher_decrypt(QCryptoCipher *cipher,
++                              const void *in,
++                              void *out,
++                              size_t len,
++                              Error **errp)
+ {
+     QCryptoCipherNettle *ctx = cipher->opaque;
+ 
+@@ -543,9 +543,10 @@ int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
+     return 0;
+ }
+ 
+-int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+-                         const uint8_t *iv, size_t niv,
+-                         Error **errp)
++static int
++qcrypto_nettle_cipher_setiv(QCryptoCipher *cipher,
++                            const uint8_t *iv, size_t niv,
++                            Error **errp)
+ {
+     QCryptoCipherNettle *ctx = cipher->opaque;
+     if (niv != ctx->blocksize) {
+@@ -558,23 +559,9 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
+-{
+-    QCryptoCipher *cipher;
+-    QCryptoCipherNettle *ctx;
+-
+-    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
+-    if (!ctx) {
+-        return NULL;
+-    }
+-
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-    cipher->opaque = ctx;
+-
+-    return cipher;
+-}
++static struct QCryptoCipherDriver qcrypto_cipher_lib_driver = {
++    .cipher_encrypt = qcrypto_nettle_cipher_encrypt,
++    .cipher_decrypt = qcrypto_nettle_cipher_decrypt,
++    .cipher_setiv = qcrypto_nettle_cipher_setiv,
++    .cipher_free = qcrypto_nettle_cipher_ctx_free,
++};
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index 5a9648942f..0a3d2e5b1d 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -21,6 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "crypto/cipher.h"
++#include "cipherpriv.h"
+ 
+ 
+ static size_t alg_key_len[QCRYPTO_CIPHER_ALG__MAX] = {
+@@ -155,3 +156,67 @@ qcrypto_cipher_munge_des_rfb_key(const uint8_t *key,
+ #else
+ #include "crypto/cipher-builtin.c"
+ #endif
++
++QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
++                                  QCryptoCipherMode mode,
++                                  const uint8_t *key, size_t nkey,
++                                  Error **errp)
 +{
++    QCryptoCipher *cipher;
++    void *ctx;
++
++    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
 +    if (!ctx) {
-+        return;
++        return NULL;
 +    }
 +
-+    g_free(ctx->iv);
-+    g_free(ctx->ctx);
-+    g_free(ctx->ctx_tweak);
-+    g_free(ctx);
++    cipher = g_new0(QCryptoCipher, 1);
++    cipher->alg = alg;
++    cipher->mode = mode;
++    cipher->opaque = ctx;
++    cipher->driver = (void *)&qcrypto_cipher_lib_driver;
++
++    return cipher;
 +}
 +
 +
- QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-                                   QCryptoCipherMode mode,
-                                   const uint8_t *key, size_t nkey,
-@@ -440,10 +453,7 @@ void qcrypto_cipher_free(QCryptoCipher *cipher)
-     }
++int qcrypto_cipher_encrypt(QCryptoCipher *cipher,
++                           const void *in,
++                           void *out,
++                           size_t len,
++                           Error **errp)
++{
++    QCryptoCipherDriver *drv = cipher->driver;
++    return drv->cipher_encrypt(cipher, in, out, len, errp);
++}
++
++
++int qcrypto_cipher_decrypt(QCryptoCipher *cipher,
++                           const void *in,
++                           void *out,
++                           size_t len,
++                           Error **errp)
++{
++    QCryptoCipherDriver *drv = cipher->driver;
++    return drv->cipher_decrypt(cipher, in, out, len, errp);
++}
++
++
++int qcrypto_cipher_setiv(QCryptoCipher *cipher,
++                         const uint8_t *iv, size_t niv,
++                         Error **errp)
++{
++    QCryptoCipherDriver *drv = cipher->driver;
++    return drv->cipher_setiv(cipher, iv, niv, errp);
++}
++
++
++void qcrypto_cipher_free(QCryptoCipher *cipher)
++{
++    QCryptoCipherDriver *drv;
++    if (cipher) {
++        drv = cipher->driver;
++        drv->cipher_free(cipher);
++        g_free(cipher);
++    }
++}
+diff --git a/crypto/cipherpriv.h b/crypto/cipherpriv.h
+new file mode 100644
+index 0000000000..4af5e85436
+--- /dev/null
++++ b/crypto/cipherpriv.h
+@@ -0,0 +1,40 @@
++/*
++ * QEMU Crypto cipher driver supports
++ *
++ * Copyright (c) 2017 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ *
++ */
++
++#ifndef QCRYPTO_CIPHERPRIV_H
++#define QCRYPTO_CIPHERPRIV_H
++
++typedef struct QCryptoCipherDriver QCryptoCipherDriver;
++
++struct QCryptoCipherDriver {
++    int (*cipher_encrypt)(QCryptoCipher *cipher,
++                          const void *in,
++                          void *out,
++                          size_t len,
++                          Error **errp);
++
++    int (*cipher_decrypt)(QCryptoCipher *cipher,
++                          const void *in,
++                          void *out,
++                          size_t len,
++                          Error **errp);
++
++    int (*cipher_setiv)(QCryptoCipher *cipher,
++                        const uint8_t *iv, size_t niv,
++                        Error **errp);
++
++    void (*cipher_free)(QCryptoCipher *cipher);
++};
++
++#endif
+diff --git a/include/crypto/cipher.h b/include/crypto/cipher.h
+index bec9f412b0..984fb8243f 100644
+--- a/include/crypto/cipher.h
++++ b/include/crypto/cipher.h
+@@ -80,6 +80,7 @@ struct QCryptoCipher {
+     QCryptoCipherAlgorithm alg;
+     QCryptoCipherMode mode;
+     void *opaque;
++    void *driver;
+ };
  
-     ctx = cipher->opaque;
--    g_free(ctx->iv);
--    g_free(ctx->ctx);
--    g_free(ctx->ctx_tweak);
--    g_free(ctx);
-+    nettle_cipher_free_ctx(ctx);
-     g_free(cipher);
- }
- 
+ /**
 -- 
 2.13.0
