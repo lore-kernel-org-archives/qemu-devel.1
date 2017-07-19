@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXk1b-0007sE-P4
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:08:04 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dXk2j-0000XM-Dz
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXk1Y-0002MF-FF
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:08:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60890)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dXk1Y-0002M9-7V
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:08:00 -0400
-References: <20170718142455.32676-1-cohuck@redhat.com>
-	<20170718142455.32676-8-cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3d0597bd-efbd-af9e-7662-fef13c27b6f7@redhat.com>
-Date: Wed, 19 Jul 2017 10:07:53 +0200
+	(envelope-from <alistair23@gmail.com>) id 1dXk2i-0002d2-Cq
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:09:13 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36517)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dXk2i-0002cy-6I
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:09:12 -0400
+Received: by mail-wr0-x243.google.com with SMTP id y67so6962131wrb.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 01:09:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170718142455.32676-8-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC v2 7/9] s390x/pci: fence off
- instructions for non-pci
+Sender: alistair23@gmail.com
+In-Reply-To: <1500449614-16811-1-git-send-email-armbru@redhat.com>
+References: <1500449614-16811-1-git-send-email-armbru@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 19 Jul 2017 10:08:40 +0200
+Message-ID: <CAKmqyKOe794WqeH9bO7g=wsQN05jq3gpFhoHLEZUFttdDo_bPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] error: Revert unwanted change of warning
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-On 18.07.2017 16:24, Cornelia Huck wrote:
-> If a guest running on a machine without zpci issues a pci instruction,
-> throw them an exception.
->=20
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+On Wed, Jul 19, 2017 at 9:33 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Commit 97f4030 changed warning messages from
+>
+>     timestamp-if-enabled progname ":" location "warning: " message
+>
+> to
+>
+>     "warning: " timestamp-if-enabled progname ":" location message
+>
+> This regressed qemu-iotests 051.  Put "warning: " right back where it
+> was, along with "info: ".
+>
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Cc: Alistair Francis <alistair.francis@xilinx.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks for this, I'm still traveling and couldn't have done this until
+next week.
+
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+
+Thanks,
+Alistair
+
+
+
 > ---
->  target/s390x/kvm.c | 54 +++++++++++++++++++++++++++++++++++++++++-----=
---------
->  1 file changed, 41 insertions(+), 13 deletions(-)
-[...]
->  static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-> @@ -1269,10 +1293,14 @@ static int kvm_mpcifc_service_call(S390CPU *cpu=
-, struct kvm_run *run)
->      uint64_t fiba;
->      uint8_t ar;
-> =20
-> -    cpu_synchronize_state(CPU(cpu));
-> -    fiba =3D get_base_disp_rxy(cpu, run, &ar);
-> +    if (s390_has_feat(S390_FEAT_ZPCI)) {
-> +        cpu_synchronize_state(CPU(cpu));
-> +        fiba =3D get_base_disp_rxy(cpu, run, &ar);
-> =20
-> -    return mpcifc_service_call(cpu, r1, fiba, ar);
-> +        return mpcifc_service_call(cpu, r1, fiba, ar);
-> +    } else {
-> +        return -1;
+>  util/qemu-error.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/util/qemu-error.c b/util/qemu-error.c
+> index c557c6a..a25d3b9 100644
+> --- a/util/qemu-error.c
+> +++ b/util/qemu-error.c
+> @@ -201,17 +201,6 @@ static void vreport(report_type type, const char *fmt, va_list ap)
+>      GTimeVal tv;
+>      gchar *timestr;
+>
+> -    switch (type) {
+> -    case REPORT_TYPE_ERROR:
+> -        break;
+> -    case REPORT_TYPE_WARNING:
+> -        error_printf("warning: ");
+> -        break;
+> -    case REPORT_TYPE_INFO:
+> -        error_printf("info: ");
+> -        break;
+> -    }
+> -
+>      if (enable_timestamp_msg && !cur_mon) {
+>          g_get_current_time(&tv);
+>          timestr = g_time_val_to_iso8601(&tv);
+> @@ -220,6 +209,18 @@ static void vreport(report_type type, const char *fmt, va_list ap)
+>      }
+>
+>      print_loc();
+> +
+> +    switch (type) {
+> +    case REPORT_TYPE_ERROR:
+> +        break;
+> +    case REPORT_TYPE_WARNING:
+> +        error_printf("warning: ");
+> +        break;
+> +    case REPORT_TYPE_INFO:
+> +        error_printf("info: ");
+> +        break;
 > +    }
+> +
+>      error_vprintf(fmt, ap);
+>      error_printf("\n");
 >  }
-
-I think I'd rather write these cases with early exits =C3=A0 la
-
-    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-        return -1;
-    }
-
-so you could get along with less change and less indentation ... but
-since this is rather a matter of taste, anyway:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> --
+> 2.7.5
+>
+>
