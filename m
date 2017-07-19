@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXimc-0002mx-II
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:31 -0400
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXimd-0002mz-Ms
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dXimY-0002a6-Ah
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXimY-0002Zg-0n
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXimY-0002aV-Qk
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:31 -0400
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:42432
+	helo=www.kot-begemot.co.uk)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
+	id 1dXimY-0002Z8-K2
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:26 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <150040682777.87.414629183259475192@5d477a5b5989>
-	(no-reply@patchew.org's message of "Tue, 18 Jul 2017 12:40:28 -0700
-	(PDT)")
-References: <150040682777.87.414629183259475192@5d477a5b5989>
-Reply-To: quintela@redhat.com
-Date: Wed, 19 Jul 2017 08:48:19 +0200
-Message-ID: <87379skjm4.fsf@secure.mitica>
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-2-anton.ivanov@cambridgegreys.com>
+	<1236f136-c211-32a1-11b1-1e86fad422c4@redhat.com>
+	<89e2f26c-4e1d-05ef-9a99-85dc5c9c111a@cambridgegreys.com>
+	<050e2865-0453-64d8-f29a-7b6d2bb418d9@redhat.com>
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Message-ID: <801b76cc-66fb-e7d9-3878-3afaf6fd60dc@cambridgegreys.com>
+Date: Wed, 19 Jul 2017 07:48:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 00/16] Migration
+In-Reply-To: <050e2865-0453-64d8-f29a-7b6d2bb418d9@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] Unified Datagram Socket Transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +32,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: qemu-devel@nongnu.org, famz@redhat.com, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-no-reply@patchew.org wrote:
-> Hi,
+[snip]
+
+>>> Could we keep l2tpv3 option?
+>>
+>> The l2tpv3 test is actually a test for recvmmsg. If you can do one 
+>> recvmmsg transport you can do all of them.
 >
-> This series failed automatic build test. Please find the testing commands and
-> their output below. If you have docker installed, you can probably reproduce it
-> locally.
+> Yes, but I wonder whether or not the check for recvmmsg is too simple. 
+> We probably want something like what AV_VSOCK did, test the support of 
+> each transport through socket().
 
-> cc: unrecognized option '-no-integrated-as'
-> cc: unrecognized option '-no-integrated-as'
+We may need this in the future.
 
-I hope this is not my fault
-   GTESTER tests/test-vmstate
+I do not think we need it for the first 3 transports lined up for this - 
+l2tpv3, gre and raw.  The only reqs are recvmmsg (and sendmmsg in the 
+future) and raw sockets. They are very simple :)
 
-> Failed to load simple/primitive:b_1
-> Failed to load simple/primitive:i64_2
-> Failed to load simple/primitive:i32_1
-> Failed to load simple/primitive:i32_1
-> Failed to load test/with_tmp:a
-> Failed to load test/tmp_child_parent:f
-> Failed to load test/tmp_child:parent
-> Failed to load test/with_tmp:tmp
-> Failed to load test/tmp_child:diff
-> Failed to load test/with_tmp:tmp
-> Failed to load test/tmp_child:diff
-> Failed to load test/with_tmp:tmp
+So unless we try to fold all of raw initialization (on/off for offloads, 
+etc) into the driver we should not need more tests for now. We will need 
+them once we add more transports.
+
+By the way - on raw, in addition to cost of timestamps, recvmmsg and 
+especially sendmmsg in most cases will have lower number of copies 
+compared to tpacket. IMHO there is still a very important use case for 
+tpacket, but it will require hw/ work - vm used as a forensic tap. We 
+will need to emulate one of the drivers which convey the timestamp so 
+that a pcap/tpacket implementation in the VM can get a precise timestamp 
+"at real capture".
+
+>
+>>
+>>>
+>>>>   if test "$cap_ng" = "yes" ; then
+>>>>     echo "CONFIG_LIBCAP=y" >> $config_host_mak
+>>>> diff --git a/net/Makefile.objs b/net/Makefile.objs
+>>>> index 67ba5e26fb..8026ad778a 100644
+>>>> --- a/net/Makefile.objs
+>>>> +++ b/net/Makefile.objs
+>>>> @@ -2,7 +2,7 @@ common-obj-y = net.o queue.o checksum.o util.o hub.o
+>>>>   common-obj-y += socket.o
+>>>>   common-obj-y += dump.o
+>>>>   common-obj-y += eth.o
+>>>> -common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+>>>> +common-obj-$(CONFIG_UNIFIED) += l2tpv3.o unified.o
+>>>>   common-obj-$(CONFIG_POSIX) += vhost-user.o
+>>>>   common-obj-$(CONFIG_SLIRP) += slirp.o
+>>>>   common-obj-$(CONFIG_VDE) += vde.o
+>
+> [...]
+>
+>>>>>   -    s = DO_UPCAST(NetL2TPV3State, nc, nc);
+>>>>> +    s->params = p;
+>>>>>   +    s->form_header = &l2tpv3_form_header;
+>>>>> +    s->verify_header = &l2tpv3_verify_header;
+>>>>>       s->queue_head = 0;
+>>>>>       s->queue_tail = 0;
+>>>>>       s->header_mismatch = false;
+>>>>
+>>>> Why not move all above into qemu_new_unified_net()?
+>>
+>> Only queue head/tail assignment can move.
+>>
+>> raw which uses same backend does not use header_mismatch. Form/verify 
+>> header are different for each sub-transport. F.e. for gre you need 
+>> the gre one, for raw you need the raw one, etc.
+>
+> Right, I mean pass function pointer to qemu_new_unified_net().
+
+Ack - will do in the next revision.
 
 
-Dave, any good clue?
+[snip]
 
+-- 
+Anton R. Ivanov
 
-> ERROR:/tmp/qemu-test/src/tests/test-qga.c:78:fixture_setup: assertion failed (fixture->fd != -1): (-1 != -1)
-> GTester: last random seed: R02Sf37f37a8c5f8ed60d31dbaff962d3c9c
-> make: *** [check-tests/test-qga] Error 1
-> make: *** Waiting for unfinished jobs....
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Could not access KVM kernel module: No such file or directory
-> failed to initialize KVM: No such file or directory
-> Back to tcg accelerator.
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 382, in <module>
->     sys.exit(main())
->   File "./tests/docker/docker.py", line 379, in main
->     return args.cmdobj.run(args, argv)
->   File "./tests/docker/docker.py", line 237, in run
->     return Docker().run(argv, args.keep, quiet=args.quiet)
->   File "./tests/docker/docker.py", line 205, in run
->     quiet=quiet)
->   File "./tests/docker/docker.py", line 123, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=656d0ada6bee11e794aa525400c803e1', '-u', '0', '-t', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/var/tmp/patchew-tester-tmp-uic4vhqy/src/docker-src.2017-07-18-15.22.06.26333:/var/tmp/qemu:z,ro', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
-> tests/docker/Makefile.include:124: recipe for target 'docker-run' failed
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-uic4vhqy/src'
-> tests/docker/Makefile.include:156: recipe for target 'docker-run-test-quick@centos6' failed
-> make: *** [docker-run-test-quick@centos6] Error 2
-
-I am pretty sure that this should be a problem somewhere else, not this
-patch, no?
-
-Thanks, Juan.
+Cambridge Greys Limited, England and Wales company No 10273661
+http://www.cambridgegreys.com/
