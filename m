@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXkZG-0005L1-OF
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:42:52 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dXkaZ-0006Jm-A9
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXkZD-0005Td-1X
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:42:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58823)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXkZC-0005Sj-Ni
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:42:46 -0400
-Date: Wed, 19 Jul 2017 09:42:41 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170719084241.GC30084@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170718102519.15392-1-berrange@redhat.com>
-	<CAFEAcA-Nri9i6woP_C954xRRdzqjtohiCjWQWSXM59knq9d5gg@mail.gmail.com>
-	<20170719082801.GA30084@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dXkaW-0006Ca-17
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:44:11 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33075)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dXkaV-0006BH-Of
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:44:07 -0400
+Received: by mail-wm0-x244.google.com with SMTP id 65so2621734wmf.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 01:44:06 -0700 (PDT)
+Date: Wed, 19 Jul 2017 09:44:02 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170719084402.GA5628@stefanha-x1.localdomain>
+References: <20170712094149.23069-1-jfreimann@redhat.com>
+	<20170712180550-mutt-send-email-mst@kernel.org>
+	<20170712211305.ajtizorj4yq6jble@localhost.localdomain>
+	<20170713012811-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="x+6KMIRAuhnl3hBn"
 Content-Disposition: inline
-In-Reply-To: <20170719082801.GA30084@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v1 00/18] Merge crypto 201/07/18
+In-Reply-To: <20170713012811-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] tests/pxe-testt: add testcase
+ using vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +33,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jens Freimann <jfreimann@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, victork@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Jul 19, 2017 at 09:28:01AM +0100, Daniel P. Berrange wrote:
-> On Wed, Jul 19, 2017 at 09:11:17AM +0100, Peter Maydell wrote:
-> > On 18 July 2017 at 11:25, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > > The following changes since commit 6c6076662d98c068059983d411cb2a8987ba5670:
-> > >
-> > >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-07-14 12:16:09 +0100)
-> > >
-> > > are available in the git repository at:
-> > >
-> > >   git://github.com/berrange/qemu tags/pull-qcrypto-2017-07-18-1
-> > >
-> > > for you to fetch changes up to 0e0fb56bcc8145d956bf527bfedc2be42bca101f:
-> > >
-> > >   tests: crypto: add hmac speed benchmark support (2017-07-18 11:18:30 +0100)
-> > >
-> > > ----------------------------------------------------------------
-> > > Merge crypto 2017/07/18 v1
-> > >
-> > > ----------------------------------------------------------------
-> > 
-> > Hi; I'm afraid this failed to build on clang (x86 Linux, FreeBSD,
-> > OSX):
-> > 
-> >   CC      crypto/cipher.o
-> > /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:9: error:
-> > variable 'drv' is used uninitialized whenever 'if' condition is false
-> > [-Werror,-Wsometimes-uninitialized]
-> >     if (!ctx) {
-> >         ^~~~
-> > /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:192:30: note:
-> > uninitialized use occurs here
-> >     cipher->driver = (void *)drv;
-> >                              ^~~
-> > /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:5: note:
-> > remove the 'if' if its condition is always true
-> >     if (!ctx) {
-> >     ^~~~~~~~~~
-> > /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:168:29: note:
-> > initialize the variable 'drv' to silence this warning
-> >     QCryptoCipherDriver *drv;
-> >                             ^
-> >                              = NULL
-> > 1 error generated.
-> > 
-> > and also
-> > 
-> >   CC      crypto/hmac.o
-> > /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:9: error:
-> > variable 'drv' is used uninitialized whenever 'if' condition is false
-> > [-Werror,-Wsometimes-uninitialized]
-> >     if (!ctx) {
-> >         ^~~~
-> > /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:116:28: note:
-> > uninitialized use occurs here
-> >     hmac->driver = (void *)drv;
-> >                            ^~~
-> > /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:5: note:
-> > remove the 'if' if its condition is always true
-> >     if (!ctx) {
-> >     ^~~~~~~~~~
-> > /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:94:27: note:
-> > initialize the variable 'drv' to silence this warning
-> >     QCryptoHmacDriver *drv;
-> >                           ^
-> >                            = NULL
-> > 
-> > 
-> > Looks like a false positive, I think :-(
-> 
-> Ok, I'll investigate.
-> 
-> BTW, any idea what's different between your clang builds and the
-> clang builds that travis does - the latter passed on both OS-X
-> and Linux.
 
-Never mind, I just it must just be a newer version of clang - the travis
-clang build uses 3.4.0 on Linux and 7.3.0 (?!?!??) on OS-X, where as latest
-I see for Linux is 4.0.0
+--x+6KMIRAuhnl3hBn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-/me wonders how OS-X clang versions map to Lnux clang versions ??!
+On Thu, Jul 13, 2017 at 01:33:43AM +0300, Michael S. Tsirkin wrote:
+> On Wed, Jul 12, 2017 at 11:13:05PM +0200, Jens Freimann wrote:
+> > On Wed, Jul 12, 2017 at 06:10:05PM +0300, Michael S. Tsirkin wrote:
+> > > On Wed, Jul 12, 2017 at 11:41:46AM +0200, Jens Freimann wrote:
+> > > > This implements a testcase for pxe-test using the vhost-user interf=
+ace. Spawn a
+> > > > vhost-user-bridge process and connect it to the qemu process.
+> > > >=20
+> > > > It is send as an RFC because:
+> > > >  - Patch 3/3: there must be cleaner way to do this.
+> > > >  - Does Patch 1/3 make sense or should I just redirect all output t=
+o /dev/null?
+> > > >  - don't hardcode port numbers in qemu cmdline, create socket and p=
+ass
+> > > >     fd to -netdev (need to figure out how to do this)
+> > >=20
+> > > Doesn't this work?
+> > >=20
+> > > -netdev socket,id=3Dstr[,fd=3Dh]
+> >=20
+> > It should. But I get this:
+> >=20
+> >        dded sock 5 for watching. max_sock: 5
+> >        Sock 3 removed from dispatcher watch.
+> >        qemu: error: specified mcastaddr "127.0.0.1" (0x7f000001) does n=
+ot contain a multicast address
+> >        qemu-system-x86_64: -netdev socket,id=3Dn1,fd=3D3: Device 'socke=
+t' could not be initialized
+> >        Broken pipe
+>=20
+> Not sure what's wrong with it, should not be too hard to debug.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Jens asked me this question on IRC.  I didn't know the answer either but
+git-log(1) shows what happened:
+
+-net socket,fd=3D was broken for SOCK_DGRAM from the moment mcast was
+introduced by commit 3d830459b1eccdb61b75e2712fd364012ce5a115 ("'-net
+socket,mcast=3D' option support (initial patch by Juan Jose Ciarlante)").
+
+The issue is probably that the fd init code doesn't know whether the
+user wanted mcast or not.  Right now it's hardcoded to assume that mcast
+is desired.  It may be necessary to extend the command-line syntax to
+specify mcast explicitly with fd=3D.
+
+Stefan
+
+--x+6KMIRAuhnl3hBn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZbxvSAAoJEJykq7OBq3PIGqkH+wdPtQTtO2gm+s5PUrDnpkGl
+1UUbt104kHaedcjlYW70aCG+EPxu3A6vQN3Sh+wcMLMztK2/th20deYZhJsJeTaa
+QD6MrFJGmOnKYQJv4CiO3IeoE9Zk2dgcbRvuykKss5bW+Bbmqg8OgLkjlSRP8l1d
+DHiHynvDuLPrq/vhUgjSmjA+bNt0jq6JIMzwWgO2Dyx0pZZkmSosPy2pa9F1xpfa
+aLRRnHQGRdDqJ4ce32DuqW1kObjJSO5lZ/Fb+QrU7r96nPNaArEM5R8QnMtCXzYa
+0VQyAg/YWRsqqnNDdf8TiKEfMmjN8CeqE+Y6ugxR1IaC9Mb9dn2NyJ1Rwtu03Oc=
+=r7Rq
+-----END PGP SIGNATURE-----
+
+--x+6KMIRAuhnl3hBn--
