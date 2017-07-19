@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXyVW-000878-4I
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXyVa-0008AJ-Kf
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXyVU-0006cI-PW
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:54 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:38595)
+	(envelope-from <rth7680@gmail.com>) id 1dXyVX-0006di-Gw
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:58 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXyVU-0006bw-Ks
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:52 -0400
-Received: by mail-qt0-x244.google.com with SMTP id h47so1768002qta.5
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 16:35:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXyVX-0006dS-CH
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 19:35:55 -0400
+Received: by mail-qt0-x244.google.com with SMTP id 50so1792746qtz.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 16:35:55 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Wed, 19 Jul 2017 13:34:46 -1000
-Message-Id: <20170719233455.8740-6-rth@twiddle.net>
+Date: Wed, 19 Jul 2017 13:34:47 -1000
+Message-Id: <20170719233455.8740-7-rth@twiddle.net>
 In-Reply-To: <20170719233455.8740-1-rth@twiddle.net>
 References: <20170719233455.8740-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 05/14] coccinelle: add a script to optimize
- tcg op using tcg_gen_extract()
+Subject: [Qemu-devel] [PULL v2 06/14] target/arm: Optimize aarch64 rev16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +27,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+It is much shorter to reverse all 4 half-words in parallel
+than extract, reverse, and deposit each in turn.
 
-The following thread was helpful while writing this script:
-
-    https://github.com/coccinelle/coccinelle/issues/86
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20170718045540.16322-3-f4bug@amsat.org>
+Suggested-by: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- scripts/coccinelle/tcg_gen_extract.cocci | 107 +++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
- create mode 100644 scripts/coccinelle/tcg_gen_extract.cocci
+ target/arm/translate-a64.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-diff --git a/scripts/coccinelle/tcg_gen_extract.cocci b/scripts/coccinelle/tcg_gen_extract.cocci
-new file mode 100644
-index 0000000000..81e66a35ae
---- /dev/null
-+++ b/scripts/coccinelle/tcg_gen_extract.cocci
-@@ -0,0 +1,107 @@
-+// optimize TCG using extract op
-+//
-+// Copyright: (C) 2017 Philippe Mathieu-Daudé. GPLv2+.
-+// Confidence: High
-+// Options: --macro-file scripts/cocci-macro-file.h
-+//
-+// Nikunj A Dadhania optimization:
-+// http://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05211.html
-+// Aurelien Jarno optimization:
-+// http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg01466.html
-+//
-+// This script can be run either using spatch locally or via a docker image:
-+//
-+// $ spatch \
-+//     --macro-file scripts/cocci-macro-file.h \
-+//     --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
-+//     --keep-comments --in-place \
-+//     --use-gitgrep --dir target
-+//
-+// $ docker run --rm -v `pwd`:`pwd` -w `pwd` philmd/coccinelle \
-+//     --macro-file scripts/cocci-macro-file.h \
-+//     --sp-file scripts/coccinelle/tcg_gen_extract.cocci \
-+//     --keep-comments --in-place \
-+//     --use-gitgrep --dir target
-+
-+@initialize:python@
-+@@
-+import sys
-+fd = sys.stderr
-+def debug(msg="", trailer="\n"):
-+    fd.write("[DBG] " + msg + trailer)
-+def low_bits_count(value):
-+    bits_count = 0
-+    while (value & (1 << bits_count)):
-+        bits_count += 1
-+    return bits_count
-+def Mn(order): # Mersenne number
-+    return (1 << order) - 1
-+
-+@match@
-+identifier ret;
-+metavariable arg;
-+constant ofs, msk;
-+position shr_p, and_p;
-+@@
-+(
-+    tcg_gen_shri_i32@shr_p
-+|
-+    tcg_gen_shri_i64@shr_p
-+|
-+    tcg_gen_shri_tl@shr_p
-+)(ret, arg, ofs);
-+...  WHEN != ret
-+(
-+    tcg_gen_andi_i32@and_p
-+|
-+    tcg_gen_andi_i64@and_p
-+|
-+    tcg_gen_andi_tl@and_p
-+)(ret, ret, msk);
-+
-+@script:python verify_len depends on match@
-+ret_s << match.ret;
-+msk_s << match.msk;
-+shr_p << match.shr_p;
-+extract_len;
-+@@
-+is_optimizable = False
-+debug("candidate at %s:%s" % (shr_p[0].file, shr_p[0].line))
-+try: # only eval integer, no #define like 'SR_M' (cpp did this, else some headers are missing).
-+    msk_v = long(msk_s.strip("UL"), 0)
-+    msk_b = low_bits_count(msk_v)
-+    if msk_b == 0:
-+        debug("  value: 0x%x low_bits: %d" % (msk_v, msk_b))
-+    else:
-+        debug("  value: 0x%x low_bits: %d [Mersenne number: 0x%x]" % (msk_v, msk_b, Mn(msk_b)))
-+        is_optimizable = Mn(msk_b) == msk_v # check low_bits
-+        coccinelle.extract_len = "%d" % msk_b
-+    debug("  candidate %s optimizable" % ("IS" if is_optimizable else "is NOT"))
-+except:
-+    debug("  ERROR (check included headers?)")
-+cocci.include_match(is_optimizable)
-+debug()
-+
-+@replacement depends on verify_len@
-+identifier match.ret;
-+metavariable match.arg;
-+constant match.ofs, match.msk;
-+position match.shr_p, match.and_p;
-+identifier verify_len.extract_len;
-+@@
-+(
-+-tcg_gen_shri_i32@shr_p(ret, arg, ofs);
-++tcg_gen_extract_i32(ret, arg, ofs, extract_len);
-+...  WHEN != ret
-+-tcg_gen_andi_i32@and_p(ret, ret, msk);
-+|
-+-tcg_gen_shri_i64@shr_p(ret, arg, ofs);
-++tcg_gen_extract_i64(ret, arg, ofs, extract_len);
-+...  WHEN != ret
-+-tcg_gen_andi_i64@and_p(ret, ret, msk);
-+|
-+-tcg_gen_shri_tl@shr_p(ret, arg, ofs);
-++tcg_gen_extract_tl(ret, arg, ofs, extract_len);
-+...  WHEN != ret
-+-tcg_gen_andi_tl@and_p(ret, ret, msk);
-+)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 3fa39023ca..5bb0f8ef22 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4043,25 +4043,13 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
+     TCGv_i64 tcg_rd = cpu_reg(s, rd);
+     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
+     TCGv_i64 tcg_rn = read_cpu_reg(s, rn, sf);
++    TCGv_i64 mask = tcg_const_i64(sf ? 0x00ff00ff00ff00ffull : 0x00ff00ff);
+ 
+-    tcg_gen_andi_i64(tcg_tmp, tcg_rn, 0xffff);
+-    tcg_gen_bswap16_i64(tcg_rd, tcg_tmp);
+-
+-    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 16);
+-    tcg_gen_andi_i64(tcg_tmp, tcg_tmp, 0xffff);
+-    tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
+-    tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 16, 16);
+-
+-    if (sf) {
+-        tcg_gen_shri_i64(tcg_tmp, tcg_rn, 32);
+-        tcg_gen_andi_i64(tcg_tmp, tcg_tmp, 0xffff);
+-        tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
+-        tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 32, 16);
+-
+-        tcg_gen_shri_i64(tcg_tmp, tcg_rn, 48);
+-        tcg_gen_bswap16_i64(tcg_tmp, tcg_tmp);
+-        tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, 48, 16);
+-    }
++    tcg_gen_shri_i64(tcg_tmp, tcg_rn, 8);
++    tcg_gen_and_i64(tcg_rd, tcg_rn, mask);
++    tcg_gen_and_i64(tcg_tmp, tcg_tmp, mask);
++    tcg_gen_shli_i64(tcg_rd, tcg_rd, 8);
++    tcg_gen_or_i64(tcg_rd, tcg_rd, tcg_tmp);
+ 
+     tcg_temp_free_i64(tcg_tmp);
+ }
 -- 
 2.13.3
