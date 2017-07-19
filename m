@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXfcu-0000q3-Af
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:26:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dXfcu-0000qF-Gr
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:26:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXfcq-0007JS-Eo
+	(envelope-from <dgibson@ozlabs.org>) id 1dXfcq-0007JV-EE
 	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 23:26:16 -0400
-Date: Wed, 19 Jul 2017 13:08:49 +1000
+Date: Wed, 19 Jul 2017 13:24:38 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170719030849.GQ3140@umbus.fritz.box>
+Message-ID: <20170719032438.GR3140@umbus.fritz.box>
 References: <1499274819-15607-1-git-send-email-clg@kaod.org>
-	<1499274819-15607-5-git-send-email-clg@kaod.org>
+	<1499274819-15607-6-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SlnaBQtdWG0gYnqZ"
+	protocol="application/pgp-signature"; boundary="xSu31lw3TgkWXnjh"
 Content-Disposition: inline
-In-Reply-To: <1499274819-15607-5-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/26] ppc/xive: introduce a skeleton
- for the XIVE interrupt controller model
+In-Reply-To: <1499274819-15607-6-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 05/26] ppc/xive: define XIVE internal
+ tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,256 +29,277 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---SlnaBQtdWG0gYnqZ
+--xSu31lw3TgkWXnjh
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 05, 2017 at 07:13:17PM +0200, C=E9dric Le Goater wrote:
-> Let's provide an empty shell for the XIVE controller model with a
-> couple of attributes for the IRQ number allocator. The latter is
-> largely inspired by OPAL which allocates IPI IRQ numbers from the
-> bottom of the IRQ number space and allocates the HW IRQ numbers from
-> the top.
+On Wed, Jul 05, 2017 at 07:13:18PM +0200, C=E9dric Le Goater wrote:
+> The XIVE interrupt controller of the POWER9 uses a set of tables to
+> redirect exception from event sources to CPU threads. Among which we
+> choose to model :
 >=20
-> The number of IPIs is simply deduced from the max number of CPUs the
-> guest supports and we provision a arbitrary number of HW irqs.
+>  - the State Bit Entries (SBE), also known as Event State Buffer
+>    (ESB). This is a two bit state machine for each event source which
+>    is used to trigger events. The bits are named "P" (pending) and "Q"
+>    (queued) and can be controlled by MMIO.
 >=20
-> The XIVE object is kept private because it will hold internal tables
-> which do not need to be exposed to sPAPR.
+>  - the Interrupt Virtualization Entry (IVE) table, also known as Event
+>    Assignment Structure (EAS). This table is indexed by the IRQ number
+>    and is looked up to find the Event Queue associated with a
+>    triggered event.
+>=20
+>  - the Event Queue Descriptor (EQD) table, also known as Event
+>    Notification Descriptor (END). The EQD contains fields that specify
+>    the Event Queue on which event data is posted (and later pulled by
+>    the OS) and also a target (or VPD) to notify.
+>=20
+> An additional table was not modeled but we might need to to support
+> the H_INT_SET_OS_REPORTING_LINE hcall:
+>=20
+>  - the Virtual Processor Descriptor (VPD) table, also known as
+>    Notification Virtual Target (NVT).
+>=20
+> The XIVE object is expanded with the tables described above. The size
+> of each table depends on the number of provisioned IRQ and the maximum
+> number of CPUs in the system. The indexing is very basic and might
+> need to be improved for the EQs.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  default-configs/ppc64-softmmu.mak |  1 +
->  hw/intc/Makefile.objs             |  1 +
->  hw/intc/xive-internal.h           | 28 ++++++++++++
->  hw/intc/xive.c                    | 94 +++++++++++++++++++++++++++++++++=
+>  hw/intc/xive-internal.h | 95 +++++++++++++++++++++++++++++++++++++++++++=
 ++++++
->  include/hw/ppc/xive.h             | 27 +++++++++++
->  5 files changed, 151 insertions(+)
->  create mode 100644 hw/intc/xive-internal.h
->  create mode 100644 hw/intc/xive.c
->  create mode 100644 include/hw/ppc/xive.h
+>  hw/intc/xive.c          | 72 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 167 insertions(+)
 >=20
-> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-so=
-ftmmu.mak
-> index 46c95993217d..1179c07e6e9f 100644
-> --- a/default-configs/ppc64-softmmu.mak
-> +++ b/default-configs/ppc64-softmmu.mak
-> @@ -56,6 +56,7 @@ CONFIG_SM501=3Dy
->  CONFIG_XICS=3D$(CONFIG_PSERIES)
->  CONFIG_XICS_SPAPR=3D$(CONFIG_PSERIES)
->  CONFIG_XICS_KVM=3D$(and $(CONFIG_PSERIES),$(CONFIG_KVM))
-> +CONFIG_XIVE=3D$(CONFIG_PSERIES)
->  # For PReP
->  CONFIG_SERIAL_ISA=3Dy
->  CONFIG_MC146818RTC=3Dy
-> diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-> index 78426a7dafcd..28b83456bfcc 100644
-> --- a/hw/intc/Makefile.objs
-> +++ b/hw/intc/Makefile.objs
-> @@ -35,6 +35,7 @@ obj-$(CONFIG_SH4) +=3D sh_intc.o
->  obj-$(CONFIG_XICS) +=3D xics.o
->  obj-$(CONFIG_XICS_SPAPR) +=3D xics_spapr.o
->  obj-$(CONFIG_XICS_KVM) +=3D xics_kvm.o
-> +obj-$(CONFIG_XIVE) +=3D xive.o
->  obj-$(CONFIG_POWERNV) +=3D xics_pnv.o
->  obj-$(CONFIG_ALLWINNER_A10_PIC) +=3D allwinner-a10-pic.o
->  obj-$(CONFIG_S390_FLIC) +=3D s390_flic.o
 > diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
-> new file mode 100644
-> index 000000000000..155c2dcd6066
-> --- /dev/null
+> index 155c2dcd6066..8e755aa88a14 100644
+> --- a/hw/intc/xive-internal.h
 > +++ b/hw/intc/xive-internal.h
-> @@ -0,0 +1,28 @@
-> +/*
-> + * Copyright 2016,2017 IBM Corporation.
+> @@ -11,6 +11,89 @@
+> =20
+>  #include <hw/sysbus.h>
+> =20
+> +/* Utilities to manipulate these (originaly from OPAL) */
+> +#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+> +#define SETFIELD(m, v, val)                             \
+> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)))
+> +
+> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
+> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
+> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
+> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BIT(b=
+s))
+> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+> +                                 PPC_BIT32(bs))
+> +
+> +/* IVE/EAS
 > + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version
-> + * 2 of the License, or (at your option) any later version.
+> + * One per interrupt source. Targets that interrupt to a given EQ
+> + * and provides the corresponding logical interrupt number (EQ data)
+> + *
+> + * We also map this structure to the escalation descriptor inside
+> + * an EQ, though in that case the valid and masked bits are not used.
 > + */
-> +#ifndef _INTC_XIVE_INTERNAL_H
-> +#define _INTC_XIVE_INTERNAL_H
+> +typedef struct XiveIVE {
+> +        /* Use a single 64-bit definition to make it easier to
+> +         * perform atomic updates
+> +         */
+> +        uint64_t        w;
+> +#define IVE_VALID       PPC_BIT(0)
+> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ block=
+# */
+> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ index=
+ */
+> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
+> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to the =
+EQ */
+> +} XiveIVE;
 > +
-> +#include <hw/sysbus.h>
+> +/* EQ */
+> +typedef struct XiveEQ {
+> +        uint32_t        w0;
+> +#define EQ_W0_VALID             PPC_BIT32(0)
+> +#define EQ_W0_ENQUEUE           PPC_BIT32(1)
+> +#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2)
+> +#define EQ_W0_BACKLOG           PPC_BIT32(3)
+> +#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4)
+> +#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5)
+> +#define EQ_W0_END_OF_INTR       PPC_BIT32(6)
+> +#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
+> +#define EQ_W0_SW0               PPC_BIT32(16)
+> +#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
+> +#define EQ_QSIZE_4K             0
+> +#define EQ_QSIZE_64K            4
+> +#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
+> +        uint32_t        w1;
+> +#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
+> +#define EQ_W1_ESn_P             PPC_BIT32(0)
+> +#define EQ_W1_ESn_Q             PPC_BIT32(1)
+> +#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
+> +#define EQ_W1_ESe_P             PPC_BIT32(2)
+> +#define EQ_W1_ESe_Q             PPC_BIT32(3)
+> +#define EQ_W1_GENERATION        PPC_BIT32(9)
+> +#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
+> +        uint32_t        w2;
+> +#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
+> +#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
+> +        uint32_t        w3;
+> +#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
+> +        uint32_t        w4;
+> +#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
+> +#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
+> +        uint32_t        w5;
+> +#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
+> +        uint32_t        w6;
+> +#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
+> +#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
+> +#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
+> +        uint32_t        w7;
+> +#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
+> +#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
+> +#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
+> +#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
+> +#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
+> +} XiveEQ;
 > +
-> +struct XIVE {
-> +    SysBusDevice parent;
-
-XIVE probably shouldn't be a SysBusDevice.  According to agraf, that
-should only be used for things which have an MMIO presence on a bus
-structure that's not worth the bother of more specifically modelling.
-
-I don't think that's the case for XIVE, so it should just have
-TYPE_DEVICE as its parent.  There are several pseries things which
-already get this wrong (mostly because I made them before fully
-understanding the role of the SysBus), but we should avoid adding
-others.
-
-> +    /* Properties */
-> +    uint32_t     nr_targets;
+> +#define XIVE_EQ_PRIORITY_COUNT 8
+> +#define XIVE_PRIORITY_MAX  (XIVE_EQ_PRIORITY_COUNT - 1)
 > +
-> +    /* IRQ number allocator */
-> +    uint32_t     int_count;     /* Number of interrupts: nr_targets + HW=
- IRQs */
-> +    uint32_t     int_base;      /* Min index */
-> +    uint32_t     int_max;       /* Max index */
-> +    uint32_t     int_hw_bot;    /* Bottom index of HW IRQ allocator */
-> +    uint32_t     int_ipi_top;   /* Highest IPI index handed out so far +=
+>  struct XIVE {
+>      SysBusDevice parent;
+> =20
+> @@ -23,6 +106,18 @@ struct XIVE {
+>      uint32_t     int_max;       /* Max index */
+>      uint32_t     int_hw_bot;    /* Bottom index of HW IRQ allocator */
+>      uint32_t     int_ipi_top;   /* Highest IPI index handed out so far +=
  1 */
-> +};
 > +
-> +#endif /* _INTC_XIVE_INTERNAL_H */
+> +    /* XIVE internal tables */
+> +    void         *sbe;
+> +    XiveIVE      *ivt;
+> +    XiveEQ       *eqdt;
+>  };
+> =20
+> +void xive_reset(void *dev);
+> +XiveIVE *xive_get_ive(XIVE *x, uint32_t isn);
+> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx);
+> +
+> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t prio,
+> +                        uint32_t *out_eq_idx);
+> +
+>  #endif /* _INTC_XIVE_INTERNAL_H */
 > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> new file mode 100644
-> index 000000000000..5b4ea915d87c
-> --- /dev/null
+> index 5b4ea915d87c..5b14d8155317 100644
+> --- a/hw/intc/xive.c
 > +++ b/hw/intc/xive.c
-> @@ -0,0 +1,94 @@
-> +/*
-> + * QEMU PowerPC XIVE model
-> + *
-> + * Copyright (c) 2017, IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License, version 2, as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "qapi/error.h"
-> +#include "target/ppc/cpu.h"
-> +#include "sysemu/cpus.h"
-> +#include "sysemu/dma.h"
-> +#include "monitor/monitor.h"
-> +#include "hw/ppc/xive.h"
+> @@ -35,6 +35,27 @@
+>   */
+>  #define MAX_HW_IRQS_ENTRIES (8 * 1024)
+> =20
 > +
-> +#include "xive-internal.h"
-> +
-> +/*
-> + * Main XIVE object
-
-As with XICs, does it really make sense for there to be a "main" XIVE
-object, or should be an interface attached to the machine?
-
-> + */
-> +
-> +/* Let's provision some HW IRQ numbers. We could use a XIVE property
-> + * also but it does not seem necessary for the moment.
-> + */
-> +#define MAX_HW_IRQS_ENTRIES (8 * 1024)
-> +
-> +static void xive_init(Object *obj)
-> +{
-> +    ;
-> +}
-> +
-> +static void xive_realize(DeviceState *dev, Error **errp)
+> +void xive_reset(void *dev)
 > +{
 > +    XIVE *x =3D XIVE(dev);
+> +    int i;
 > +
-> +    if (!x->nr_targets) {
-> +        error_setg(errp, "Number of interrupt targets needs to be greate=
-r 0");
-> +        return;
+> +    /* SBEs are initialized to 0b01 which corresponds to "ints off" */
+> +    memset(x->sbe, 0x55, x->int_count / 4);
+
+I think strictly this should be a DIV_ROUND_UP to handle the case of
+int_count not a multiple of 4.
+
+> +
+> +    /* Clear and mask all valid IVEs */
+> +    for (i =3D x->int_base; i < x->int_max; i++) {
+> +        XiveIVE *ive =3D &x->ivt[i];
+> +        if (ive->w & IVE_VALID) {
+> +            ive->w =3D IVE_VALID | IVE_MASKED;
+> +        }
 > +    }
 > +
-> +    /* Initialize IRQ number allocator. Let's use a base number if we
-> +     * need to introduce a notion of blocks one day.
-> +     */
-> +    x->int_base =3D 0;
-> +    x->int_count =3D x->nr_targets + MAX_HW_IRQS_ENTRIES;
-> +    x->int_max =3D x->int_base + x->int_count;
-> +    x->int_hw_bot =3D x->int_max;
-> +    x->int_ipi_top =3D x->int_base;
+> +    /* clear all EQs */
+> +    memset(x->eqdt, 0, x->nr_targets * XIVE_EQ_PRIORITY_COUNT * sizeof(X=
+iveEQ));
+> +}
 > +
-> +    /* Reserve some numbers as OPAL does ? */
-> +    if (x->int_ipi_top < 0x10) {
-> +        x->int_ipi_top =3D 0x10;
+>  static void xive_init(Object *obj)
+>  {
+>      ;
+> @@ -62,6 +83,19 @@ static void xive_realize(DeviceState *dev, Error **err=
+p)
+>      if (x->int_ipi_top < 0x10) {
+>          x->int_ipi_top =3D 0x10;
+>      }
+> +
+> +    /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte */
+> +    x->sbe =3D g_malloc0(x->int_count / 4);
+
+And here as well.
+
+> +
+> +    /* Allocate the IVT (Interrupt Virtualization Table) */
+> +    x->ivt =3D g_malloc0(x->int_count * sizeof(XiveIVE));
+> +
+> +    /* Allocate the EQDT (Event Queue Descriptor Table), 8 priorities
+> +     * for each thread in the system */
+> +    x->eqdt =3D g_malloc0(x->nr_targets * XIVE_EQ_PRIORITY_COUNT *
+> +                        sizeof(XiveEQ));
+> +
+> +    qemu_register_reset(xive_reset, dev);
+>  }
+> =20
+>  static Property xive_properties[] =3D {
+> @@ -92,3 +126,41 @@ static void xive_register_types(void)
+>  }
+> =20
+>  type_init(xive_register_types)
+> +
+> +XiveIVE *xive_get_ive(XIVE *x, uint32_t lisn)
+> +{
+> +    uint32_t idx =3D lisn;
+> +
+> +    if (idx < x->int_base || idx >=3D x->int_max) {
+> +        return NULL;
 > +    }
+> +
+> +    return &x->ivt[idx];
 
-I'm somewhat uncomfortable with an irq allocater here in the intc
-code.  As a rule, irq allocation is the responsibility of the machine,
-not any sub-component.  Furthermore, it should allocate in a way which
-is repeatable, since they need to stay stable across reboots and
-migrations.
-
-And, yes, we have an allocator of sorts in XICS - it has caused a
-number of problems in the past.
+Should be idx - int_base, no?
 
 > +}
 > +
-> +static Property xive_properties[] =3D {
-> +    DEFINE_PROP_UINT32("nr-targets", XIVE, nr_targets, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void xive_class_init(ObjectClass *klass, void *data)
+> +XiveEQ *xive_get_eq(XIVE *x, uint32_t idx)
 > +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    if (idx >=3D x->nr_targets * XIVE_EQ_PRIORITY_COUNT) {
+> +        return NULL;
+> +    }
 > +
-> +    dc->realize =3D xive_realize;
-> +    dc->props =3D xive_properties;
-> +    dc->desc =3D "XIVE";
+> +    return &x->eqdt[idx];
 > +}
 > +
-> +static const TypeInfo xive_info =3D {
-> +    .name =3D TYPE_XIVE,
-> +    .parent =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_init =3D xive_init,
-> +    .instance_size =3D sizeof(XIVE),
-> +    .class_init =3D xive_class_init,
-> +};
-> +
-> +static void xive_register_types(void)
-> +{
-> +    type_register_static(&xive_info);
-> +}
-> +
-> +type_init(xive_register_types)
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> new file mode 100644
-> index 000000000000..863f5a9c6b5f
-> --- /dev/null
-> +++ b/include/hw/ppc/xive.h
-> @@ -0,0 +1,27 @@
-> +/*
-> + * QEMU PowerPC XIVE model
-> + *
-> + * Copyright (c) 2017, IBM Corporation.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License, version 2, as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
+> +/* TODO: improve EQ indexing. This is very simple and relies on the
+> + * fact that target (CPU) numbers start at 0 and are contiguous. It
+> + * should be OK for sPAPR.
 > + */
+> +bool xive_eq_for_target(XIVE *x, uint32_t target, uint8_t priority,
+> +                        uint32_t *out_eq_idx)
+> +{
+> +    if (priority > XIVE_PRIORITY_MAX || target >=3D x->nr_targets) {
+> +        return false;
+> +    }
 > +
-> +#ifndef PPC_XIVE_H
-> +#define PPC_XIVE_H
+> +    if (out_eq_idx) {
+> +        *out_eq_idx =3D target + priority;
+> +    }
 > +
-> +typedef struct XIVE XIVE;
-> +
-> +#define TYPE_XIVE "xive"
-> +#define XIVE(obj) OBJECT_CHECK(XIVE, (obj), TYPE_XIVE)
-> +
-> +#endif /* PPC_XIVE_H */
+> +    return true;
+
+Seems a clunky interface.  Why not return a XiveEQ *, NULL if the
+inputs aren't valud.
+
+> +}
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -286,24 +307,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---SlnaBQtdWG0gYnqZ
+--xSu31lw3TgkWXnjh
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlluzUEACgkQbDjKyiDZ
-s5KMig//QHWLTwGAxSfgda4WEcRwDyQDEvWHTvIOF+I8cr3u3nk+x0oXCvoN9wHZ
-58QqbLYEmnyVBYmiKn1N3o0HrG0ZfuzfH9DMfj0hpFQZkGqy0bPHv50lPiMEbuyk
-Gj9FR9wIyFUziZ3WZVnKe/T42UdF63m/QQ4Q2EDH4Ppc4V47NIdfWIFZ2NWL/uI0
-aub3PE1gy26jyaG1BJn8iPBCEE9Tg54Z57H2givpaeKgISf4c/oM/26p/5zKTiRi
-GdXjnmqyubsJ57t7LP4QmpLxD8PnWIwz0846z68Zyo1W/Eu86K03aeUb3/5DFjjf
-3NT1qhsbUXH/1uU6XAI6N43OQV6ERh9nfRNMC5CH8G0Za0k4VbWOYjNTlXVuQ7/b
-5jDkeCKWinrTH1fksepM2d4TNaWgrRg4OR7feoOEGPtYQSQB6tB8FglXUQROeR2D
-spu5xyj3Sjbw0S2OQgrQY5OfiNet3PmhFb0bLIcWAgjpx470Yd76yPYPNldE+F+w
-YvQOpAmrUYGlrtev3K6ahooYuRwZxQGHMhnRhDowVxkaeR7+A8SImlfcMuu5mhEJ
-t7ntbW7+yK7CZrU8TOiKaItike1dhLJ8rd8npU+93TZKi7DjWGQlChhn6/5HBfL4
-NR+FoDp6ikxsAFEZgAuPcMEeYmthU464jf+EEWWxBkY+G+U8T0U=
-=vl+1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllu0PYACgkQbDjKyiDZ
+s5I3PA/9HPGDmi+1TKlsMZ60/ZYzPpCgM90Q88z3hZHAxa5STkRxGU3wVwRhUX3r
+eBAEvTLYx2qVJE6Du6nOBLXlXzh9DctvCZKyXeyn4qVjIqQ6eoJpPRpUcxv4vOMP
+CnHSmsXcTjncGw/JH3X2vddjtHBrRB6sitr3hg8LGCwwTIFBTa9ejFZ0fbGUU2Ud
+7gjnSlK4R2omwK++iYrULEVnhyXTw+E3X1pxLiY6dEVpHX0ldfZ7/duqW3mdFPGd
+XmlHScQP0E2kmWuGYL06wqoPDufYTxf1THgky0VdDapvnFeIykcaM3QhKIC/KGir
+JIIUr/ORLYsh2tVoGah7Z8FqFauPtQ/xbgO1ph7mJJSnJEH9mJvsG8KaIlN6fKZH
+HWwb9Fg1RHFFhvs2R9HvykIU4w2NWE6jySvhuC7REfSLl8LSlcSL71emURloqyw6
+kvpQb9Dq3dtYbR+DR+khV7u9HL2tai79X2fL86bkX4WCLwO58SRMP5tU95899v+a
+l4Dh3ep2w1hyfPEIBc185lquvqeHdu7Jirb2q9C5IJ+NrDpuZZnidBJ1LYt4N3nD
+hOCSTtsrBXQVffxFV0lRuTrxQKakMSimOwqWfdEnV8EidwT+o96r4h58a79XaWDP
+/0hFwP6cJcCE/4IiaHFqGKbio+jNvkvX2979hyTtFQrG1F+m7xA=
+=ZRVp
 -----END PGP SIGNATURE-----
 
---SlnaBQtdWG0gYnqZ--
+--xSu31lw3TgkWXnjh--
