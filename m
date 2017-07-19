@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dXs4g-00041f-8r
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:43:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXs7G-0005Li-Pm
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dXs4d-0007CI-4s
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:43:46 -0400
-References: <20170707203049.534-1-eblake@redhat.com>
-	<20170707203049.534-8-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5d065e35-6ffd-8db0-f7bb-6be4c01f2a31@virtuozzo.com>
-Date: Wed, 19 Jul 2017 19:43:37 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1dXs7D-0000IU-Ml
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXs7D-0000IF-DD
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:46:23 -0400
+Date: Wed, 19 Jul 2017 17:46:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170719164617.GO2103@work-vm>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	<bb8781a1-602b-d77d-a103-6f8d23d7ff5f@adacore.com>
+	<20170719122943.GJ2103@work-vm>
+	<3fe1df9e-6b49-621f-53b6-271fd2f77305@adacore.com>
 MIME-Version: 1.0
-In-Reply-To: <20170707203049.534-8-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] nbd: Implement NBD_OPT_GO on client
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3fe1df9e-6b49-621f-53b6-271fd2f77305@adacore.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +31,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, den@virtuozzo.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-07.07.2017 23:30, Eric Blake wrote:
+* KONRAD Frederic (frederic.konrad@adacore.com) wrote:
+> 
+> 
+> On 07/19/2017 02:29 PM, Dr. David Alan Gilbert wrote:
+> > * KONRAD Frederic (frederic.konrad@adacore.com) wrote:
+> > > 
+> > > 
+> > > On 07/17/2017 07:27 PM, Edgar E. Iglesias wrote:
+> > > > On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
+> > > > wrote:
+> > > > 
+> > > > > On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> > > > > wrote:
+> > > > > > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> > > > > > Paolo suggested offline that we send a pull request for this series.
+> > > > > > Here it is, I've run it through my testsuite + tested the LQSPI testcase
+> > > > > > on Zynq.
+> > > > > 
+> > > > > > ----------------------------------------------------------------
+> > > > > > mmio-exec.for-upstream
+> > > > > > 
+> > > > > > ----------------------------------------------------------------
+> > > > > > KONRAD Frederic (7):
+> > > > > >         cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+> > > > > >         cputlb: move get_page_addr_code
+> > > > > >         cputlb: fix the way get_page_addr_code fills the tlb
+> > > > > >         qdev: add MemoryRegion property
+> > > > > >         introduce mmio_interface
+> > > > > >         exec: allow to get a pointer for some mmio memory region
+> > > > > >         xilinx_spips: allow mmio execution
+> > > > > 
+> > > > > Hi Edgar -- can you or Fred explain how this code interacts with
+> > > > > VM migration? The mmio-interface device creates a RAM memory
+> > > > > region with memory_region_init_ram_ptr(), but it doesn't call
+> > > > > vmstate_register_ram(). On the other hand the core migration code
+> > > > > will try to migrate the contents of the RAMBlock anyway, just
+> > > > > without a name.
+> > > > > 
+> > > > > It's not clear to me how this works, and it would be nice to
+> > > > > get it clear so that we can make any necessary fixes before the
+> > > > > 2.10 release hits and we lose the opportunity to make any
+> > > > > migration-compatibility-breaking changes.
+> > > > > 
+> > > > > thanks
+> > > > > -- PMM
+> > > > > 
+> > > > 
+> > > > Hi Peter,
+> > > > 
+> > > > These temporary regions should be read-only and treated as temporary caches
+> > > > AFAIU things.
+> > > > I would say that they don't need to be migrated. After migration, the new
+> > > > VM will recreate the ram areas from device backing.
+> > > > 
+> > > > Is there a way we can prevent migration of the RAMBlock?
+> > > > 
+> > > > Cheers,
+> > > > Edgar
+> > > > 
+> > > 
+> > > Hi All,
+> > > 
+> > > Yes Edgar is right, they don't need to be migrated (as the old
+> > > Xilinx SPI cache).
+> > > And it will be the case for all the other stuff using this as
+> > > well.
+> > > 
+> > > Maybe we can simply drop the region before the migration?
+> > 
+> > Dont forget the VM is still running during migration, so you
+> > can't drop anything that's needed for it to be able to execute.
+> > 
+> > Dave
+> 
+> Scary.. Yes your right. I still think it doesn't need to be
+> migrated.. But how..
 
-[..]
+One question about the way your device works; being a cache, is
+there something bad that the guest could do which would make
+a reload into the cache fail - i.e the real program could
+be reliant on running out of data in the cache?
+i.e. could the state of the cache actually be system state
+which really does need migrating.
+(e.g. reprogram the flash via another route or something?)
 
->
-> +/* Returns -1 if NBD_OPT_GO proves the export @wantname cannot be
-> + * used, 0 if NBD_OPT_GO is unsupported (fall back to NBD_OPT_LIST and
-> + * NBD_OPT_EXPORT_NAME in that case), and > 0 if the export is good to
-> + * go (with @info populated). */
-> +static int nbd_opt_go(QIOChannel *ioc, const char *wantname,
-> +                      NBDExportInfo *info, Error **errp)
-> +{
-> +    nbd_opt_reply reply;
-> +    uint32_t len = strlen(wantname);
-> +    uint16_t type;
-> +    int error;
-> +    char *buf;
-> +
-> +    /* The protocol requires that the server send NBD_INFO_EXPORT with
-> +     * a non-zero flags (at least NBD_FLAG_HAS_FLAGS must be set); so
-> +     * flags still 0 is a witness of a broken server. */
-> +    info->flags = 0;
-> +
-> +    trace_nbd_opt_go_start(wantname);
-> +    buf = g_malloc(4 + len + 2 + 1);
-> +    stl_be_p(buf, len);
-> +    memcpy(buf + 4, wantname, len);
-> +    /* No requests, live with whatever server sends */
-> +    stw_be_p(buf + 4 + len, 0);
-> +    if (nbd_send_option_request(ioc, NBD_OPT_GO, len + 6, buf, errp) < 0) {
-> +        return -1;
-> +    }
-> +
-> +    while (1) {
-> +        if (nbd_receive_option_reply(ioc, NBD_OPT_GO, &reply, errp) < 0) {
-> +            return -1;
-> +        }
-> +        error = nbd_handle_reply_err(ioc, &reply, errp);
-> +        if (error <= 0) {
-> +            return error;
-> +        }
-> +        len = reply.length;
-> +
-> +        if (reply.type == NBD_REP_ACK) {
-> +            /* Server is done sending info and moved into transmission
-> +               phase, but make sure it sent flags */
-> +            if (len) {
-> +                error_setg(errp, "server sent invalid NBD_REP_ACK");
-> +                nbd_send_opt_abort(ioc);
+(I've seen real code rely on an ARM TLB like this).
 
-server is already in transmission phase, so we cant send any options 
-more, shouldn't CMD_DISC be send here instead?
+> BTW taking a look at this I found the comment below which seems
+> to implies that the content won't be migrated?
+> 
+> /**
+> 
+>  * memory_region_init_ram_ptr:  Initialize RAM memory region from a
+>  *                              user-provided pointer.  Accesses into the
+>  *                              region will modify memory directly.
+>  *
+> 
+>  * @mr: the #MemoryRegion to be initialized.
+> 
+>  * @owner: the object that tracks the region's reference count
+> 
+>  * @name: Region name, becomes part of RAMBlock name used in migration
+> stream
+>  *        must be unique within any device
+> 
+>  * @size: size of the region.
+> 
+>  * @ptr: memory to be mapped; must contain at least @size bytes.
+> 
+>  *
+> 
+>  * Note that this function does not do anything to cause the data in the
+>  * RAM memory region to be migrated; that is the responsibility of the
+> caller.
+>  */
+> 
+> And I guess we have the same issue when we try to unplug a device
+> during migration?
 
-> +                return -1;
-> +            }
-> +            if (!info->flags) {
-> +                error_setg(errp, "broken server omitted NBD_INFO_EXPORT");
-> +                nbd_send_opt_abort(ioc);
+plug/unplugging during a migration is a bad idea; I've sene suggestions
+some of the code is safe for bits of it; I'm not convinced.
 
-and here
+Dave
 
-> +                return -1;
-> +            }
-> +            trace_nbd_opt_go_success();
-> +            return 1;
-> +        }
-> +        if (reply.type != NBD_REP_INFO) {
-> +            error_setg(errp, "unexpected reply type %" PRIx32 ", expected %x",
-> +                       reply.type, NBD_REP_INFO);
-> +            nbd_send_opt_abort(ioc);
-> +            return -1;
-> +        }
-> +        if (len < sizeof(type)) {
-> +            error_setg(errp, "
-
-
--- 
-Best regards,
-Vladimir
+> Fred
+> 
+> > 
+> > > Fred
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
