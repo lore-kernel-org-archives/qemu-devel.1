@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXk55-0001gv-V0
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:11:40 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dXk6V-0002ND-Nb
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dXk54-0003nZ-VM
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:11:39 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36217)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dXk54-0003nB-O7
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:11:38 -0400
-Received: by mail-wm0-x233.google.com with SMTP id t70so34081830wmt.1
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 01:11:38 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170718102519.15392-1-berrange@redhat.com>
-References: <20170718102519.15392-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Jul 2017 09:11:17 +0100
-Message-ID: <CAFEAcA-Nri9i6woP_C954xRRdzqjtohiCjWQWSXM59knq9d5gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 00/18] Merge crypto 201/07/18
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dXk6S-0004HZ-Bq
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:07 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:50785)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dXk6R-0004Fb-Gk
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:04 -0400
+Date: Wed, 19 Jul 2017 16:12:55 +0800 (CST)
+Message-ID: <201707191612551425978@zte.com.cn>
+References: 1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn,
+	20170719095058.4d46359d@Igors-MacBook-Pro.local
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogIFtQQVRDSF0gdmhvc3Q6IGZp?=
+ =?utf-8?q?x_a_migration_failed_because_ofvhost_region_merge?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: imammedo@redhat.com
+Cc: mst@redhat.com, wang.yechao255@zte.com.cn, qemu-devel@nongnu.org
 
-On 18 July 2017 at 11:25, Daniel P. Berrange <berrange@redhat.com> wrote:
-> The following changes since commit 6c6076662d98c068059983d411cb2a8987ba5670:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-07-14 12:16:09 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/berrange/qemu tags/pull-qcrypto-2017-07-18-1
->
-> for you to fetch changes up to 0e0fb56bcc8145d956bf527bfedc2be42bca101f:
->
->   tests: crypto: add hmac speed benchmark support (2017-07-18 11:18:30 +0100)
->
-> ----------------------------------------------------------------
-> Merge crypto 2017/07/18 v1
->
-> ----------------------------------------------------------------
-
-Hi; I'm afraid this failed to build on clang (x86 Linux, FreeBSD,
-OSX):
-
-  CC      crypto/cipher.o
-/home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:9: error:
-variable 'drv' is used uninitialized whenever 'if' condition is false
-[-Werror,-Wsometimes-uninitialized]
-    if (!ctx) {
-        ^~~~
-/home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:192:30: note:
-uninitialized use occurs here
-    cipher->driver = (void *)drv;
-                             ^~~
-/home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:5: note:
-remove the 'if' if its condition is always true
-    if (!ctx) {
-    ^~~~~~~~~~
-/home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:168:29: note:
-initialize the variable 'drv' to silence this warning
-    QCryptoCipherDriver *drv;
-                            ^
-                             = NULL
-1 error generated.
-
-and also
-
-  CC      crypto/hmac.o
-/home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:9: error:
-variable 'drv' is used uninitialized whenever 'if' condition is false
-[-Werror,-Wsometimes-uninitialized]
-    if (!ctx) {
-        ^~~~
-/home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:116:28: note:
-uninitialized use occurs here
-    hmac->driver = (void *)drv;
-                           ^~~
-/home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:5: note:
-remove the 'if' if its condition is always true
-    if (!ctx) {
-    ^~~~~~~~~~
-/home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:94:27: note:
-initialize the variable 'drv' to silence this warning
-    QCryptoHmacDriver *drv;
-                          ^
-                           = NULL
-
-
-Looks like a false positive, I think :-(
-
-thanks
--- PMM
+5Y+R5Lu25Lq677yaIDxpbWFtbWVkb0ByZWRoYXQuY29tPg0K5pS25Lu25Lq677ya5b2t5rWpMTAw
+OTY3NDINCuaKhOmAgeS6uu+8miA8bXN0QHJlZGhhdC5jb20+546L5Lia6LaFMTAxNTQ0MjUgPHFl
+bXUtZGV2ZWxAbm9uZ251Lm9yZz4NCuaXpSDmnJ8g77yaMjAxN+W5tDA35pyIMTnml6UgMTU6NTEN
+CuS4uyDpopgg77yaUmU6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHZob3N0OiBmaXggYSBtaWdyYXRp
+b24gZmFpbGVkIGJlY2F1c2Ugb2Z2aG9zdCByZWdpb24gbWVyZ2UNCg0KDQoNCg0KDQpPbiBXZWQs
+IDE5IEp1bCAyMDE3IDIzOjE3OjMyICswODAwDQpQZW5nIEhhbyA8cGVuZy5oYW8yQHp0ZS5jb20u
+Y24+IHdyb3RlOg0KDQo+IFdoZW4gYSBndWVzdCB0aGF0IGhhcyBzZXZlcmFsIGhvdHBsdWdnZWQg
+ZGltbXMgaXMgbWlncmF0ZWQsIGluDQo+IGRlc3RpbmF0aW9uIGhvc3QgaXQgd2lsbCBmYWlsIHRv
+IHJlc3VtZS4gQmVjYXVzZSB2aG9zdCByZWdpb25zIG9mDQo+IHNldmVyYWwgZGltbXMgaW4gc291
+cmNlIGhvc3QgYXJlIG1lcmdlZCBhbmQgaW4gdGhlIHJlc3RvcmUgc3RhZ2UNCj4gaW4gZGVzdGlu
+YXRpb24gaG9zdCBpdCBjb21wdXRlcyB3aGV0aGVyIG1vcmUgdGhhbiB2aG9zdCBzbG90IGxpbWl0
+DQo+IGJlZm9yZSBtZXJnaW5nIHZob3N0IHJlZ2lvbnMgb2Ygc2V2ZXJhbCBkaW1tcy4NCmNvdWxk
+IHlvdSBwcm92aWRlIGEgYml0IG1vcmUgZGV0YWlsZWQgZGVzY3JpcHRpb24gb2YgdGhlIHByb2Js
+ZW0NCmluY2x1ZGluZyBjb21tYW5kIGxpbmUrdXNlZCBkZXZpY2VfYWRkIGNvbW1hbmRzIG9uIHNv
+dXJjZSBhbmQNCmNvbW1hbmQgbGluZSBvbiBkZXN0aW5hdGlvbj8NCg0KLS0tLS0tLUkganVzdCBt
+aWdyYXRlIGd1ZXN0IHZtLiBUaGUgZ3Vlc3QgaGFzIHZob3N0LXVzZXIgbmV0LiBWaG9zdC11c2Vy
+IGhhcyBhIGxpbWl0IG9mIHNsb3RzDQoNCiAoVkhPU1RfTUVNT1JZX01BWF9OUkVHSU9OUz04KSxo
+b3RwbHVnIG1lbW9yeSAoZGltbSkgY2FuIGluY3JlYXNlIHZob3N0IHVzZWQgc2xvdHMNCg0KLGJ1
+dCB2aG9zdCBjYW4gbWVyZ2UgcmVnaW9uIHRvIGRlY3JlYXNlIHZob3N0IHVzZWQgc2xvdHMuDQoN
+CkJlZm9yZSBtaWdyYXRpb24gZ3VzZXQgaGFzIGhvdHBsdWdnZWQgIHNldmVyYWwgZGltbXMgb25l
+IGJ5IG9uZSAobW9yZSB0aGFuIHZob3N0IHNsb3QgbGltaXQsDQoNCmJ1dCBhZnRlciBtZXJnaW5n
+IGl0IGxlc3MgdGhhbiAgdmhvc3Qgc2xvdCBsaW1pdCkuIEluIG1pZ3JhdGluZyB0byBkZXN0aW5h
+dGlvbiBob3N0ICxxZW11IGJlZ2lucyB0byANCg0KZXhlY3V0ZSByZXN0b3JlIGd1ZXN0IGFuZCBp
+dCByZWFsaXplICBmb3JlYWNoICBkaW1tcyBkZXZpY2UgYXQgYSB0aW1lIGFuZCANCg0KDQpjb21w
+dXRlIHdoZXRoZXIgdmhvc3QgdXNlZCBzbG90cyBtb3JlIHRoYW4gdmhvc3Qgc2xvdCBsaW1pdCBi
+ZWZvcmUgbWVyZ2luZy4NCg0KDQpTbyByZXBvcnQgImEgdXNlZCB2aG9zdCBiYWNrZW5kIGhhcyBu
+byBmcmVlICBtZW1vcnkgc2xvdHMgbGVmdCIuDQoNCg0KSSBqdXN0IG1ha2UgYSBkaXN0aW5jdGlv
+biB1c2luZyBhIHZtIHN0YXRlLg0KDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBQZW5nIEhhbyA8cGVu
+Zy5oYW8yQHp0ZS5jb20uY24+DQo+IFNpZ25lZC1vZmYtYnk6IFdhbmcgWWVjaGFvIDx3YW5nLnll
+Y2hhbzI1NUB6dGUuY29tLmNuPg0KPiAtLS0NCj4gIGh3L21lbS9wYy1kaW1tLmMgfCAyICstDQo+
+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRp
+ZmYgLS1naXQgYS9ody9tZW0vcGMtZGltbS5jIGIvaHcvbWVtL3BjLWRpbW0uYw0KPiBpbmRleCBl
+YTY3YjQ2Li5iYjBmYTA4IDEwMDY0NA0KPiAtLS0gYS9ody9tZW0vcGMtZGltbS5jDQo+ICsrKyBi
+L2h3L21lbS9wYy1kaW1tLmMNCj4gQEAgLTEwMSw3ICsxMDEsNyBAQCB2b2lkIHBjX2RpbW1fbWVt
+b3J5X3BsdWcoRGV2aWNlU3RhdGUgKmRldiwgTWVtb3J5SG90cGx1Z1N0YXRlICpocG1zLA0KPiAg
+ICAgICAgICBnb3RvIG91dA0KPiAgICAgIH0NCj4gIA0KPiAtICAgIGlmICghdmhvc3RfaGFzX2Zy
+ZWVfc2xvdCgpKSB7DQo+ICsgICAgaWYgKCF2aG9zdF9oYXNfZnJlZV9zbG90KCkgJiYgcnVuc3Rh
+dGVfaXNfcnVubmluZygpKSB7DQo+ICAgICAgICAgIGVycm9yX3NldGcoJmxvY2FsX2VyciwgImEg
+dXNlZCB2aG9zdCBiYWNrZW5kIGhhcyBubyBmcmVlIg0KPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICIgbWVtb3J5IHNsb3RzIGxlZnQiKQ0KPiAgICAgICAgICBnb3RvIG91dA==
