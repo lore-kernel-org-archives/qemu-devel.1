@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1dXk6i-0002T9-V1
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:21 -0400
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dXkAY-0004BO-Uj
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1dXk6f-0004Nl-Mw
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38962 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1dXk6f-0004MA-Fs
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:13:17 -0400
-Date: Wed, 19 Jul 2017 10:13:12 +0200
-From: Michal Hocko <mhocko@kernel.org>
-Message-ID: <20170719081311.GC26779@dhcp22.suse.cz>
-References: <1499863221-16206-1-git-send-email-wei.w.wang@intel.com>
-	<1499863221-16206-7-git-send-email-wei.w.wang@intel.com>
-	<20170714123023.GA2624@dhcp22.suse.cz>
-	<20170714181523-mutt-send-email-mst@kernel.org>
-	<20170717152448.GN12888@dhcp22.suse.cz>
-	<596D6E7E.4070700@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <596D6E7E.4070700@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v12 6/8] mm: support reporting free page
- blocks
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dXkAV-0006dV-9M
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:17:18 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:63022)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lu.zhipeng@zte.com.cn>) id 1dXkAU-0006bF-BF
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 04:17:15 -0400
+From: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+Date: Wed, 19 Jul 2017 16:15:49 +0800
+Message-Id: <1500452149-9520-1-git-send-email-lu.zhipeng@zte.com.cn>
+Subject: [Qemu-devel] [PATCH] qga: Add support network interface statistics
+ in guest-network-get-interfaces command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +22,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, david@redhat.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, virtio-dev@lists.oasis-open.org, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, ZhiPeng Lu <lu.zhipeng@zte.com.cn>
 
-On Tue 18-07-17 10:12:14, Wei Wang wrote:
-[...]
-> Probably I should have included the introduction of the usages in
-> the log. Hope it is not too later to explain here:
+we can get the network interface statistics inside a virtual machine by
+guest-network-get-interfaces command. it is very useful for us to monitor
+and analyze network traffic.
 
-Yes this should have been described in the cover.
+Signed-off-by: ZhiPeng Lu <lu.zhipeng@zte.com.cn>
+---
+ qga/commands-posix.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qga/qapi-schema.json | 38 ++++++++++++++++++++++++++-
+ 2 files changed, 108 insertions(+), 2 deletions(-)
+
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index d8e4122..b65dd8e 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1639,6 +1639,65 @@ guest_find_interface(GuestNetworkInterfaceList *head,
+     return head;
+ }
  
-> Live migration needs to transfer the VM's memory from the source
-> machine to the destination round by round. For the 1st round, all the VM's
-> memory is transferred. From the 2nd round, only the pieces of memory
-> that were written by the guest (after the 1st round) are transferred. One
-> method that is popularly used by the hypervisor to track which part of
-> memory is written is to write-protect all the guest memory.
-> 
-> This patch enables the optimization of the 1st round memory transfer -
-> the hypervisor can skip the transfer of guest unused pages in the 1st round.
-
-All you should need is the check for the page reference count, no?  I
-assume you do some sort of pfn walk and so you should be able to get an
-access to the struct page.
++static int guest_get_network_stats(const char *name,
++                       GuestNetworkInterfaceStat *stats)
++{
++    int name_len;
++    char const *devinfo = "/proc/net/dev";
++    FILE *fp;
++    char *line = NULL, *colon;
++    size_t n;
++    fp = fopen(devinfo, "r");
++    if (!fp) {
++        return -1;
++    }
++    name_len = strlen(name);
++    while (getline(&line, &n, fp) != -1) {
++        long long dummy;
++        long long rx_bytes;
++        long long rx_packets;
++        long long rx_errs;
++        long long rx_dropped;
++        long long tx_bytes;
++        long long tx_packets;
++        long long tx_errs;
++        long long tx_dropped;
++        char *trim_line;
++        trim_line = g_strchug(line);
++        if (trim_line[0] == '\0') {
++            continue;
++        }
++        colon = strchr(trim_line, ':');
++        if (!colon) {
++            continue;
++        }
++        if (colon - name_len  == trim_line &&
++           strncmp(trim_line, name, name_len) == 0) {
++            if (sscanf(colon + 1,
++                "%lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld",
++                  &rx_bytes, &rx_packets, &rx_errs, &rx_dropped,
++                  &dummy, &dummy, &dummy, &dummy,
++                  &tx_bytes, &tx_packets, &tx_errs, &tx_dropped,
++                  &dummy, &dummy, &dummy, &dummy) != 16) {
++                continue;
++            }
++            stats->rx_bytes = rx_bytes;
++            stats->rx_packets = rx_packets;
++            stats->rx_errs = rx_errs;
++            stats->rx_dropped = rx_dropped;
++            stats->tx_bytes = tx_bytes;
++            stats->tx_packets = tx_packets;
++            stats->tx_errs = tx_errs;
++            stats->tx_dropped = tx_dropped;
++            fclose(fp);
++            return 0;
++        }
++    }
++    fclose(fp);
++    g_debug("/proc/net/dev: Interface not found");
++    return -1;
++}
++
+ /*
+  * Build information about guest interfaces
+  */
+@@ -1655,6 +1714,7 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+         GuestNetworkInterfaceList *info;
+         GuestIpAddressList **address_list = NULL, *address_item = NULL;
++        GuestNetworkInterfaceStat  *interface_stat = NULL;
+         char addr4[INET_ADDRSTRLEN];
+         char addr6[INET6_ADDRSTRLEN];
+         int sock;
+@@ -1774,7 +1834,17 @@ GuestNetworkInterfaceList *qmp_guest_network_get_interfaces(Error **errp)
+ 
+         info->value->has_ip_addresses = true;
+ 
+-
++        if (!info->value->has_statistics) {
++            interface_stat = g_malloc0(sizeof(*interface_stat));
++            if (guest_get_network_stats(info->value->name,
++                interface_stat) == -1) {
++                info->value->has_statistics = false;
++                g_free(interface_stat);
++            } else {
++                info->value->statistics = interface_stat;
++                info->value->has_statistics = true;
++            }
++        }
+     }
+ 
+     freeifaddrs(ifap);
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 03743ab..f12c3ca 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -643,6 +643,38 @@
+            'prefix': 'int'} }
+ 
+ ##
++# @GuestNetworkInterfaceStat:
++#
++# @rx-bytes: total bytes received
++#
++# @rx-packets: total packets received
++#
++# @rx-errs: bad packets received
++#
++# @rx-dropped: receiver dropped packets
++#
++# @tx-bytes: total bytes transmitted
++#
++# @tx-packets: total packets transmitted
++#
++# @tx-errs: packet transmit problems
++#
++# @tx-dropped: dropped packets transmitted
++#
++# Since: 2.10
++##
++{ 'struct': 'GuestNetworkInterfaceStat',
++  'data': {'rx-bytes': 'uint64',
++            'rx-packets': 'uint64',
++            'rx-errs': 'uint64',
++            'rx-dropped': 'uint64',
++            'tx-bytes': 'uint64',
++            'tx-packets': 'uint64',
++            'tx-errs': 'uint64',
++            'tx-dropped': 'uint64'
++           } }
++
++##
+ # @GuestNetworkInterface:
+ #
+ # @name: The name of interface for which info are being delivered
+@@ -651,12 +683,16 @@
+ #
+ # @ip-addresses: List of addresses assigned to @name
+ #
++# @statistics: various statistic counters related to @name
++# (since 2.10)
++#
+ # Since: 1.1
+ ##
+ { 'struct': 'GuestNetworkInterface',
+   'data': {'name': 'str',
+            '*hardware-address': 'str',
+-           '*ip-addresses': ['GuestIpAddress'] } }
++           '*ip-addresses': ['GuestIpAddress'],
++           '*statistics': 'GuestNetworkInterfaceStat' } }
+ 
+ ##
+ # @guest-network-get-interfaces:
 -- 
-Michal Hocko
-SUSE Labs
+1.8.3.1
