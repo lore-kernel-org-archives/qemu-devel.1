@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXofO-0002Ge-Bl
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:05:30 -0400
+	(envelope-from <indiffpig@126.com>) id 1dXok3-0003jb-FS
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXofH-0008F3-Q9
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:05:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1500453887-20819-1-git-send-email-kwolf@redhat.com>
-Date: Wed, 19 Jul 2017 15:05:09 +0200
-In-Reply-To: <1500453887-20819-1-git-send-email-kwolf@redhat.com> (Kevin
-	Wolf's message of "Wed, 19 Jul 2017 10:44:47 +0200")
-Message-ID: <87a840inlm.fsf@dusky.pond.sub.org>
+	(envelope-from <indiffpig@126.com>) id 1dXojz-0001Pw-Ew
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:10:15 -0400
+Received: from m15-52.126.com ([220.181.15.52]:17542)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <indiffpig@126.com>) id 1dXojx-0001B0-KC
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:10:11 -0400
+Date: Wed, 19 Jul 2017 20:39:26 +0800 (CST)
+From: indiffpig  <indiffpig@126.com>
+In-Reply-To: <1500031677-2362-1-git-send-email-indiffPig@126.com>
+References: <1500031677-2362-1-git-send-email-indiffPig@126.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.10] block: Skip implicit nodes in
- query-block/blockstats
+Message-ID: <1b58cb8.a133.15d5adc3290.Coremail.indiffpig@126.com>
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH] dvs services stop then qemu may be accesse
+ null address case core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,216 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, pkrempa@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, nsoffer@redhat.com
+To: indiffPig@126.com
+Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
-Kevin Wolf <kwolf@redhat.com> writes:
-
-> Commits 0db832f and 6cdbceb introduced the automatic insertion of filter
-> nodes above the top layer of mirror and commit block jobs. The
-> assumption made there was that since libvirt doesn't do node-level
-> management of the block layer yet, it shouldn't be affected by added
-> nodes.
->
-> This is true as far as commands issued by libvirt are concerned. It only
-> uses BlockBackend names to address nodes, so any operations it performs
-> still operate on the root of the tree as intended.
->
-> However, the assumption breaks down when you consider query commands,
-> which return data for the wrong node now. These commands also return
-> information on some child nodes (bs->file and/or bs->backing), which
-> libvirt does make use of, and which refer to the wrong nodes, too.
->
-> One of the consequences is that oVirt gets wrong information about the
-> image size and stops the VM in response as long as a mirror or commit
-> job is running:
->
-> https://bugzilla.redhat.com/show_bug.cgi?id=1470634
->
-> This patch fixes the problem by hiding the implict nodes created
-> automatically by the mirror and commit block jobs in the output of
-> query-block and BlockBackend-based query-blockstats as long as the user
-> doesn't indicate that they are aware of those nodes by providing a node
-> name for them in the QMP command to start the block job.
->
-> The node-based commands query-named-block-nodes and query-blockstats
-> with query-nodes=true still show all nodes, including implicit ones.
-
-The only other query-FOO in block*.json is query-block-jobs.  Good.
-
-> This ensures that users that are capable of node-level management can
-> still access the full information; users that only know BlockBackends
-> won't use these commands.
-
-I think I can follow your reasoning, but I could use a concrete example.
-A small reproducer with output before and after the patch, and an
-explanation what exactly makes the output before the patch problematic.
-
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/commit.c             |  3 +++
->  block/mirror.c             |  3 +++
->  block/qapi.c               | 13 ++++++++++++-
->  include/block/block_int.h  |  1 +
->  qapi/block-core.json       |  6 ++++--
->  tests/qemu-iotests/041     | 23 +++++++++++++++++++++++
->  tests/qemu-iotests/041.out |  4 ++--
->  7 files changed, 48 insertions(+), 5 deletions(-)
->
-> diff --git a/block/commit.c b/block/commit.c
-> index 5cc910f..c7857c3 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -346,6 +346,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
->      if (commit_top_bs == NULL) {
->          goto fail;
->      }
-> +    if (!filter_node_name) {
-> +        commit_top_bs->implicit = true;
-> +    }
->      commit_top_bs->total_sectors = top->total_sectors;
->      bdrv_set_aio_context(commit_top_bs, bdrv_get_aio_context(top));
->  
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 8583b76..c9a6a3c 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -1168,6 +1168,9 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
->      if (mirror_top_bs == NULL) {
->          return;
->      }
-> +    if (!filter_node_name) {
-> +        mirror_top_bs->implicit = true;
-> +    }
->      mirror_top_bs->total_sectors = bs->total_sectors;
->      bdrv_set_aio_context(mirror_top_bs, bdrv_get_aio_context(bs));
->  
-> diff --git a/block/qapi.c b/block/qapi.c
-> index 95b2e2d..0ed23b8 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -324,6 +324,11 @@ static void bdrv_query_info(BlockBackend *blk, BlockInfo **p_info,
->      BlockDriverState *bs = blk_bs(blk);
->      char *qdev;
->  
-> +    /* Skip automatically inserted nodes that the user isn't aware of */
-> +    while (bs && bs->drv && bs->implicit) {
-> +        bs = backing_bs(bs);
-> +    }
-> +
->      info->device = g_strdup(blk_name(blk));
->      info->type = g_strdup("unknown");
->      info->locked = blk_dev_is_medium_locked(blk);
-> @@ -518,12 +523,18 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
->          }
->      } else {
->          for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
-> +            BlockDriverState *bs = blk_bs(blk);
->              BlockStatsList *info = g_malloc0(sizeof(*info));
->              AioContext *ctx = blk_get_aio_context(blk);
->              BlockStats *s;
->  
-> +            /* Skip automatically inserted nodes that the user isn't aware of */
-> +            while (bs && bs->drv && bs->implicit) {
-> +                bs = backing_bs(bs);
-> +            }
-> +
->              aio_context_acquire(ctx);
-> -            s = bdrv_query_bds_stats(blk_bs(blk), true);
-> +            s = bdrv_query_bds_stats(bs, true);
->              s->has_device = true;
->              s->device = g_strdup(blk_name(blk));
->              bdrv_query_blk_stats(s->stats, blk);
-
-The result types of query-block and query-blockstats are recursive.  How
-can I convince myself that we're skipping everywhere we need to?
-
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 5c6b761..d4f4ea7 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -549,6 +549,7 @@ struct BlockDriverState {
->      bool sg;        /* if true, the device is a /dev/sg* */
->      bool probed;    /* if true, format was probed rather than specified */
->      bool force_share; /* if true, always allow all shared permissions */
-> +    bool implicit;  /* if true, this filter node was automatically inserted */
-
-Makes sense.  How can I convince myself that your patch marks them all?
-
->  
->      BlockDriver *drv; /* NULL means no media */
->      void *opaque;
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index ff8e2ba..006e048 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -520,7 +520,8 @@
->  #
->  # Get a list of BlockInfo for all virtual block devices.
->  #
-> -# Returns: a list of @BlockInfo describing each virtual block device
-> +# Returns: a list of @BlockInfo describing each virtual block device. Filter
-> +# nodes that were created implicitly are skipped over.
->  #
->  # Since: 0.14.0
->  #
-> @@ -780,7 +781,8 @@
->  #               information, but not "backing".
->  #               If false or omitted, the behavior is as before - query all the
->  #               device backends, recursively including their "parent" and
-> -#               "backing". (Since 2.3)
-> +#               "backing". Filter nodes that were created implicitly are
-> +#               skipped over in this mode. (Since 2.3)
->  #
->  # Returns: A list of @BlockStats for each virtual block devices.
->  #
-> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-> index 2f54986..b798cca 100755
-> --- a/tests/qemu-iotests/041
-> +++ b/tests/qemu-iotests/041
-> @@ -169,6 +169,29 @@ class TestSingleDrive(iotests.QMPTestCase):
->          self.assertTrue(iotests.compare_images(test_img, target_img),
->                          'target image does not match source after mirroring')
->  
-> +    # Tests that the insertion of the mirror_top filter node doesn't make a
-> +    # difference to query-block
-> +    def test_implicit_node(self):
-> +        self.assert_no_active_block_jobs()
-> +
-> +        result = self.vm.qmp(self.qmp_cmd, device='drive0', sync='full',
-> +                             target=self.qmp_target)
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result = self.vm.qmp('query-block')
-> +        self.assert_qmp(result, 'return[0]/inserted/file', test_img)
-> +        self.assert_qmp(result, 'return[0]/inserted/drv', iotests.imgfmt)
-> +        self.assert_qmp(result, 'return[0]/inserted/backing_file', backing_img)
-> +        self.assert_qmp(result, 'return[0]/inserted/backing_file_depth', 1)
-> +
-> +        self.cancel_and_wait(force=True)
-> +        result = self.vm.qmp('query-block')
-> +        self.assert_qmp(result, 'return[0]/inserted/file', test_img)
-> +        self.assert_qmp(result, 'return[0]/inserted/drv', iotests.imgfmt)
-> +        self.assert_qmp(result, 'return[0]/inserted/backing_file', backing_img)
-> +        self.assert_qmp(result, 'return[0]/inserted/backing_file_depth', 1)
-> +        self.vm.shutdown()
-> +
->      def test_medium_not_found(self):
->          if iotests.qemu_default_machine != 'pc':
->              return
-> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-> index e30fd3b..c28b392 100644
-> --- a/tests/qemu-iotests/041.out
-> +++ b/tests/qemu-iotests/041.out
-> @@ -1,5 +1,5 @@
-> -...............................................................................
-> +.....................................................................................
->  ----------------------------------------------------------------------
-> -Ran 79 tests
-> +Ran 85 tests
->  
->  OK
-
-The patch makes sense to me.  The hard part is judging whether it's
-complete.  I could use a bit of help with that.
+Ck5vIG9uZSByZXBsaWVkIHRvIG15IG1haWwuIFNvbWVvbmUgbWlnaHQgdGhpbmsgSSB3YXMgdGFs
+a2luZyBub25zZW5zZS4gV2hlbiB0aGUgRFZTIHNlcnZpY2Ugc3RvcHBlZCwgYWxsIG91ciBRRU1V
+IHByb2Nlc3NlcyBleGl0ZWQuIERWUyB1c2VycyBjb21wbGFpbiB0aGF0IGV2ZW4gaWYgdGhlaXIg
+RFZTIHNlcnZpY2VzIGFyZSBzdG9wcGVkLCB2aG9zdC11c2VyIG5ldHdvcmtzIHNob3VsZCBub3Qg
+YmUgYmxvY2tlZCwgYnV0IHZpcnR1YWwgbWFjaGluZXMgc2hvdWxkIG5vdCBiZSBhbGxvd2VkIHRv
+IGV4aXQuIEkgZm91bmQgdGhlIHNlZ2RlZmF1bHQgZXJyb3IgaW4gdGhlIGhvc3QncyBsb2cgYWJv
+dXQgUUVNVSwgYW5kIGFsbCBlcnJvcnMgYXJlIHBvaW50aW5nIHRvIHRoZSBudWxsIHBvaW50ZXIg
+cmVmZXJyZWQgdG8gaW4gdGhlIHBhdGNoLiBXaGF0IGRvZXMgb3BlbiBzb3VyY2UgbWFpbnRlbmFu
+Y2Ugc3RhZmYgdGhpbmsgYWJvdXQ/CgoKCgoKCgpBdCAyMDE3LTA3LTE0IDE5OjI3OjU3LCBpbmRp
+ZmZQaWdAMTI2LmNvbSB3cm90ZToKPkZyb206ICJ5aW4uenVvd2VpIiA8aW5kaWZmUGlnQDEyNi5j
+b20+Cj4KPlNpZ25lZC1vZmYtYnk6IHlpbi56dW93ZWkgPGluZGlmZlBpZ0AxMjYuY29tPgo+LS0t
+Cj4gY2hhcmRldi9jaGFyLWZlLmMgfCA4ICsrKysrKystCj4gMSBmaWxlIGNoYW5nZWQsIDcgaW5z
+ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Cj5kaWZmIC0tZ2l0IGEvY2hhcmRldi9jaGFyLWZl
+LmMgYi9jaGFyZGV2L2NoYXItZmUuYwo+aW5kZXggM2Y5MGYwNS4uODJmN2UyYiAxMDA2NDQKPi0t
+LSBhL2NoYXJkZXYvY2hhci1mZS5jCj4rKysgYi9jaGFyZGV2L2NoYXItZmUuYwo+QEAgLTM1Myw3
+ICszNTMsMTMgQEAgZ3VpbnQgcWVtdV9jaHJfZmVfYWRkX3dhdGNoKENoYXJCYWNrZW5kICpiZSwg
+R0lPQ29uZGl0aW9uIGNvbmQsCj4gCj4gdm9pZCBxZW11X2Nocl9mZV9kaXNjb25uZWN0KENoYXJC
+YWNrZW5kICpiZSkKPiB7Cj4tICAgIENoYXJkZXYgKmNociA9IGJlLT5jaHI7Cj4rICAgIENoYXJk
+ZXYgKmNociA9IE5VTEw7Cj4rCj4rICAgIGlmIChiZSkgewo+KyAgICAgICAgY2hyID0gYmUtPmNo
+cjsKPisgICAgfSBlbHNlIHsKPisgICAgICAgIHJldHVybiA7Cj4rICAgIH0KPiAKPiAgICAgaWYg
+KGNociAmJiBDSEFSREVWX0dFVF9DTEFTUyhjaHIpLT5jaHJfZGlzY29ubmVjdCkgewo+ICAgICAg
+ICAgQ0hBUkRFVl9HRVRfQ0xBU1MoY2hyKS0+Y2hyX2Rpc2Nvbm5lY3QoY2hyKTsKPi0tIAo+MS44
+LjMuMQo+Cg==
