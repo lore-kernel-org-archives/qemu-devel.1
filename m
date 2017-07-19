@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXgi4-0005As-Lv
+	(envelope-from <bounces@canonical.com>) id 1dXgi4-0005Ar-8w
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXgi3-0001m2-Gj
+	(envelope-from <bounces@canonical.com>) id 1dXgi1-0001lT-Ly
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37789)
+Received: from indium.canonical.com ([91.189.90.7]:37766)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dXgi3-0001lj-4Y
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:39 -0400
+	id 1dXgi1-0001lA-Fp
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dXgi2-0003pu-2Z
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:38 +0000
+	id 1dXgi0-0003q2-Kx
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 126AC2E8076
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9D7DF2E807E
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Jul 2017 04:17:29 -0000
-From: Launchpad Bug Tracker <1034423@bugs.launchpad.net>
-Reply-To: Bug 1034423 <1034423@bugs.launchpad.net>
+Date: Wed, 19 Jul 2017 04:17:26 -0000
+From: Launchpad Bug Tracker <1198350@bugs.launchpad.net>
+Reply-To: Bug 1198350 <1198350@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120808150403.6400.41896.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150043784926.28289.5651437328431234283.malone@loganberry.canonical.com>
+References: <20130705221111.16044.84094.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150043784627.28289.1446433046681568870.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1034423] Re: Guests running OpenIndiana (and
- relatives) fail to boot on AMD hardware
+Subject: [Qemu-devel] [Bug 1198350] Re: USB pass-through fails with
+ USBDEVFS_DISCONNECT: Invalid argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,88 +48,78 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1034423
+https://bugs.launchpad.net/bugs/1198350
 
 Title:
-  Guests running OpenIndiana (and relatives) fail to boot on AMD
-  hardware
+  USB pass-through fails with USBDEVFS_DISCONNECT: Invalid argument
 
 Status in QEMU:
   Expired
 
 Bug description:
-  First observed with OpenSolaris 2009.06, and also applies to the
-  latest OpenIndiana release.
+  Host Gentoo linux 32bit
+  Guest Windows XP SP3
+  qemu 1.4.2 and
+  qemu fresh get clone and build 2013-07-04 (version1.5.50)
+  qemu command line
 
-  Version: qemu-kvm 1.1.1
+  qemu-system-i386 -enable-kvm localtime -m 2047 -boot d
+  /archive3/qemu/WindowsXP.img -net nic,model=3Drtl8139 -net user -usb
+  -device usb-ehci,id=3Dehci -usbdevice host:1493:19
 
-  Hardware:
+  The device I am trying to use with the guest is an interface for the
+  Suunto Ambit 2 GPS watch which has no linux support.
 
-  2 x AMD Opteron 6128 8-core processors, 64GB RAM.
+  When the USB device is plugged in qemu reports to the command line:
 
-  These guests boot on equivalent Intel hardware.
+  USBDEVFS_DISCONNECT: Invalid argument
+  Invalid argument
 
-  To reproduce:
+  dmesg shows
 
-  qemu-kvm -nodefaults -m 512 -cpu host -vga cirrus -usbdevice tablet
-  -vnc :99 -monitor stdio -hda drive.img -cdrom oi-dev-
-  151a5-live-x86.iso -boot order=3Ddc
+  [237755.495968] usb 2-1.5: new full-speed USB device number 34 using ehci=
+-pci
+  [237755.582778] usb 2-1.5: config 1 has an invalid interface number: 1 bu=
+t max is 0
+  [237755.582781] usb 2-1.5: config 1 has no interface number 0
+  [237755.583628] usb 2-1.5: New USB device found, idVendor=3D1493, idProdu=
+ct=3D0019
+  [237755.583631] usb 2-1.5: New USB device strings: Mfr=3D1, Product=3D2, =
+SerialNumber=3D3
+  [237755.583633] usb 2-1.5: Product: Ambit
+  [237755.583634] usb 2-1.5: Manufacturer: Suunto
+  [237755.583636] usb 2-1.5: SerialNumber: CE83095110000700
+  [237756.584937] usb 2-1.5: reset full-speed USB device number 34 using eh=
+ci-pci
+  [237756.832658] usb 2-1.5: reset full-speed USB device number 34 using eh=
+ci-pci
+  [237757.143585] usb 2-1.5: usbfs: process 12684 (qemu-system-i38) did not=
+ claim interface 1 before use
 
-  I've tested with "-vga std" and various different emulated CPU types,
-  to no effect.
+  In the windows guest Device Manager a HID device is listed but nothing
+  else happens, no found new hardware dialog or the Suunto software
+  (which is sitting there waiting) is not triggered as it should be.
 
-  What happens:
+  I have tried successfully with several other devices (flash drive,
+  mouse, printer and video capture device). Because this device pretends
+  to be an HID device my kernel's hid-generic driver was picking it up
+  first until I modified hid-core.c to ignore this vendorid/productid.
+  But still no joy.
 
-  GRUB loads, and offers multiple boot options, but none work. Some kind
-  of kernel panic flies by very fast before restarting the VM, and
-  careful use of the screenshot button reveals that it reads as follows:
+  I'm guessing it has something to do with the the dmesg lines:
 
-  panic[cpu0]/thread=3Dfec22de0: BAD TRAP: type=3D8 (#df Double fault)
-  rp=3Dfec2b48c add r=3D0
+  [237755.582778] usb 2-1.5: config 1 has an invalid interface number: 1 bu=
+t max is 0
+  [237755.582781] usb 2-1.5: config 1 has no interface number 0
 
-  #df Double fault
-  pid=3D0, pc=3D0xault
-  pid=3D0, pc=3D0xfe800377, sp=3D0xfec40090, eflags=3D0x202
-  cr0: 80050011<pg,wp,et,pe> cr4:b8<pge,pae,pse,de>
-  cr2: 0cr3: ae2f000
-                gs:            1b0    fs:              0   es:         160 =
-  ds:          160
-               edi:                0  esi:              0 ebp:             =
-0 esp: fec2b4c4
-               ebx: c0010015 edx:              0 ecx:             0 eax: fe=
-c40400
-               trp:                 8  err:              0 eip: fe800377  c=
-s:           158
-               efl:             202 usp: fec40090  ss:           160
-  tss.tss_link:     0x0
-  tss.tss_esp0:   0x0
-  tss.tss_ss0:     0x160
-  tss.tss_esp1:   0x0
-  tss.tss_ss1:      0x0
-  tss.tss esp2:     0x0
-  tss.tss_ss2:      0x0
-  tss.tss_cr3:       0xae2f000
-  tss.tss_eip:       0xfec40400
-  tss.tss_eflags:  0x202
-  tss.tss_eax:      0xfec40400
-  tss.tss_ebx:      0xc0010015
-  tss.tss_ecx:      0xc0010000
-  tss.tss_edx:      0x0
-  tss.tss_esp:      0xfec40090
+  But read that these warnings are not important though I don't get them
+  for other devices. Nor do I get:
 
-  Warning - stack not written to the dumpbuf
-  fec2b3c8 unix:due+e4 (8, fec2b48c, 0, 0)
-  fec2b478 unix:trap+12fa (fec2b48c, 0, 0)
-  fec2b48c unix:_cmntrap+7c (1b0, 0, 160, 160, 0)
+  [237757.143585] usb 2-1.5: usbfs: process 12684 (qemu-system-i38) did
+  not claim interface 1 before use
 
-  If there's any more, I haven't managed to catch it.
-
-  Solaris 11 does not seem to suffer from the same issue, although the
-  first message that appears at boot (after the version info) is "trap:
-  Unkown trap type 8 in user mode". Could be related?
-
-  As always, thanks in advance and please let me know if I can help to
-  test, or provide any more information.
+  I've done alot of searching and I've run out of ideas. Any help would
+  be great.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1034423/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1198350/+subscriptions
