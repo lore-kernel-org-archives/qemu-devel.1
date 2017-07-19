@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXtTH-0008Ko-Sh
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:13:16 -0400
+	(envelope-from <konrad.wilk@oracle.com>) id 1dXtYr-0002P9-Pg
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXtTE-00077t-PZ
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:13:15 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:37094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXtTE-00077m-Ky
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:13:12 -0400
-Received: by mail-qt0-x242.google.com with SMTP id n43so1145854qtc.4
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 11:13:12 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1500468850-15571-1-git-send-email-thuth@redhat.com>
-	<1500468850-15571-6-git-send-email-thuth@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <2d593bd0-0019-77bf-d709-a107a29b7488@twiddle.net>
-Date: Wed, 19 Jul 2017 08:13:06 -1000
+	(envelope-from <konrad.wilk@oracle.com>) id 1dXtYo-0001dk-Lg
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:19:01 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:17717)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
+	id 1dXtYo-0001dW-Bt
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:18:58 -0400
+Date: Wed, 19 Jul 2017 14:18:53 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-ID: <20170719181853.GC13096@char.us.oracle.com>
+References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
+	<20170719135726.GG5722@char.us.oracle.com>
+	<CAKSfGUDgtN+S=u_4S7-s1wUxt6fZtibLG+ZSX+qZ0d+9marXQQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1500468850-15571-6-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] target/s390x: Add remaining switches
- to compile with --disable-tcg
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKSfGUDgtN+S=u_4S7-s1wUxt6fZtibLG+ZSX+qZ0d+9marXQQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Allow RedHat PCI bridges reserve
+ more buses than necessary during init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Alexander Bezzubikov <zuban32s@gmail.com>
+Cc: marcel@redhat.com, qemu-devel@nongnu.org, seabios@seabios.org
 
-On 07/19/2017 02:54 AM, Thomas Huth wrote:
->       cc->has_work = s390_cpu_has_work;
-> +#ifdef CONFIG_TCG
->       cc->do_interrupt = s390_cpu_do_interrupt;
-> +#endif
->       cc->dump_state = s390_cpu_dump_state;
->       cc->set_pc = s390_cpu_set_pc;
->       cc->gdb_read_register = s390_cpu_gdb_read_register;
-> @@ -428,10 +430,12 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
->       cc->get_phys_page_debug = s390_cpu_get_phys_page_debug;
->       cc->vmsd = &vmstate_s390_cpu;
->       cc->write_elf64_note = s390_cpu_write_elf64_note;
-> +#ifdef CONFIG_TCG
->       cc->cpu_exec_interrupt = s390_cpu_exec_interrupt;
->       cc->debug_excp_handler = s390x_cpu_debug_excp_handler;
->       cc->do_unaligned_access = s390x_cpu_do_unaligned_access;
->   #endif
-> +#endif
+On Wed, Jul 19, 2017 at 05:14:41PM +0000, Alexander Bezzubikov wrote:
+> =D1=81=D1=80, 19 =D0=B8=D1=8E=D0=BB=D1=8F 2017 =D0=B3. =D0=B2 16:57, Ko=
+nrad Rzeszutek Wilk <konrad.wilk@oracle.com>:
+>=20
+> > On Wed, Jul 19, 2017 at 04:20:12PM +0300, Aleksandr Bezzubikov wrote:
+> > > Now PCI bridges (and PCIE root port too) get a bus range number in
+> > system init,
+> > > basing on currently plugged devices. That's why when one wants to
+> > hotplug another bridge,
+> > > it needs his child bus, which the parent is unable to provide.
+> >
+> > Could you explain how you trigger this?
+>=20
+>=20
+> I'm trying to hot plug pcie-pci bridge into pcie root port, and Linux s=
+ays
+> 'cannot allocate bus number for device bla-bla'. This obviously does no=
+t
+> allow me to use the bridge at all.
+>=20
+> >
+> >
+> > > The suggested workaround is to have vendor-specific capability in R=
+edHat
+> > generic pcie-root-port
+> > > that contains number of additional bus to reserve on BIOS PCI init.
+> >
+> > But wouldn't the proper fix be for the PCI bridge to have the subordi=
+nate
+> > value be extended to fit more bus ranges?
+>=20
+>=20
+> What do you mean? This is what I'm trying to do. Do you suppose to get =
+rid
+> of vendor-specific cap and use original register value instead of it?
 
-These ought to be if (tcg_enabled()), surely.
+I would suggest a simple fix - each bridge has a a number of bus devices
+it can use. You have up to 255 - so you split the number of northbridge
+numbers by the amount of NUMA nodes (if that is used) - so for example
+if you have 4 NUMA nodes, each bridge would cover 63 bus numbers.
+
+Meaning the root bridge would cover 0->63 bus, 64->128, and so on.
+That gives you enough space to plug in your plugged in devices
+(up to 63).
+
+And if you need sub-briges then carve out a specific range.
 
 
-r~
+>=20
+> >
+> > >
+> > > Aleksandr Bezzubikov (2):
+> > >   pci: add support for direct usage of bdf for capability lookup
+> > >   pci: enable RedHat pci bridges to reserve more buses
+> > >
+> > >  src/fw/pciinit.c   | 12 ++++++++++--
+> > >  src/hw/pcidevice.c | 24 ++++++++++++++++++++++++
+> > >  src/hw/pcidevice.h |  1 +
+> > >  3 files changed, 35 insertions(+), 2 deletions(-)
+> > >
+> > > --
+> > > 2.7.4
+> > >
+> > >
+> >
+> --=20
+> Alexander Bezzubikov
