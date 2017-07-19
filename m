@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXqna-0006Fb-MD
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:22:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dXqwU-0000S2-1W
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXqnX-0006sb-I8
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:22:02 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:6526)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXqnX-0006sP-Bd
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:21:59 -0400
-From: James Hogan <james.hogan@imgtec.com>
-Date: Wed, 19 Jul 2017 16:21:42 +0100
-Message-ID: <4053c89eefa69e2b4aa3e1072a6ae975b8d87734.1500477656.git-series.james.hogan@imgtec.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dXqwS-0002eo-Vm
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:31:14 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:36608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dXqwS-0002eK-OU
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:31:12 -0400
+Received: by mail-wr0-x233.google.com with SMTP id y43so60105186wrd.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 08:31:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/mips: Fix microMIPS jumps in 128MB block
+In-Reply-To: <20170718215050.3812-1-aurelien@aurel32.net>
+References: <20170718215050.3812-1-aurelien@aurel32.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 19 Jul 2017 16:30:50 +0100
+Message-ID: <CAFEAcA9MnPUSbKk+YyQmvbP7jrv8VgprU-hwTiq-PE25RU+Tdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/31] target/sh4 queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,70 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Nathan Froyd <froydnj@codesourcery.com>
+To: Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Three microMIPS jump instruction encodings (namely J32, JAL32, JALS32)
-shift their 26-bit immediate field by 1 instead of 2, allowing a jump
-only within the 128MB aligned block rather than the more common 256MB
-aligned block.
+On 18 July 2017 at 22:50, Aurelien Jarno <aurelien@aurel32.net> wrote:
+> This is the target/sh4 patch queue. It contains a better support for atomics
+> in linux-user, various FPU fixes and various cleanups.
+>
+> Thanks,
+> Aurelien
+>
+>
+> The following changes since commit 6887dc6700ccb7820d8a9d370f421ee361c748e8:
+>
+>   Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20170718' into staging (2017-07-18 21:13:48 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.aurel32.net/qemu.git tags/pull-target-sh4-20170718
+>
+> for you to fetch changes up to ec2eb22ebb3b36f39755414dcbe4f99c2c0562c9:
+>
+>   target/sh4: Use tcg_gen_lookup_and_goto_ptr (2017-07-18 23:39:18 +0200)
+>
+> ----------------------------------------------------------------
+> Queued target/sh4 patches
+>
+> ----------------------------------------------------------------
+> Aurelien Jarno (5):
+>       target/sh4: do not check for PR bit for fabs instruction
+>       target/sh4: fix FPU unorderered compare
+>       target/sh4: fix FPSCR cause vs flag inversion
+>       target/sh4: do not use a helper to implement fneg
+>       target/sh4: return result of fcmp using TCG
+>
+> Richard Henderson (26):
+>       target/sh4: Consolidate end-of-TB tests
+>       target/sh4: Introduce TB_FLAG_ENVFLAGS_MASK
+>       target/sh4: Keep env->flags clean
+>       target/sh4: Adjust TB_FLAG_PENDING_MOVCA
+>       target/sh4: Handle user-space atomics
+>       target/sh4: Recognize common gUSA sequences
+>       linux-user/sh4: Notice gUSA regions during signal delivery
+>       linux-user/sh4: Clean env->flags on signal boundaries
+>       target/sh4: Hoist register bank selection
+>       target/sh4: Unify cpu_fregs into FREG
+>       target/sh4: Pass DisasContext to fpr64 routines
+>       target/sh4: Hoist fp register bank selection
+>       target/sh4: Eliminate unused XREG macro
+>       target/sh4: Merge DREG into fpr64 routines
+>       target/sh4: Load/store Dr as 64-bit quantities
+>       target/sh4: Simplify 64-bit fp reg-reg move
+>       target/sh4: Unify code for CHECK_NOT_DELAY_SLOT
+>       target/sh4: Unify code for CHECK_PRIVILEGED
+>       target/sh4: Unify code for CHECK_FPU_ENABLED
+>       target/sh4: Tidy misc illegal insn checks
+>       target/sh4: Introduce CHECK_FPSCR_PR_*
+>       target/sh4: Introduce CHECK_SH4A
+>       target/sh4: Implement fpchg
+>       target/sh4: Add missing FPSCR.PR == 0 checks
+>       target/sh4: Implement fsrra
+>       target/sh4: Use tcg_gen_lookup_and_goto_ptr
 
-This wasn't being taken into account when masking the address of the
-delay slot in gen_compute_branch(), resulting in bit 27 of the PC being
-cleared. This meant that any such jump in an odd 128MB block incorrectly
-jumped to the even 128MB block before it.
+Applied, thanks.
 
-For example this jals jumped to 0x17000010:
-1f00000a:	7780 0008 	jals	1f000010 <.L11>
-
-And this jal jumped to 0x17000022:
-1f00001a:	f780 0011 	jal	1f000022 <.L12>
-
-And this j jumped to 0x17000030:
-1f00002a:	d780 0018 	j	1f000030 <.L13>
-
-All three encodings pass OPC_J or OPC_JAL to gen_compute_branch(), so
-allow the mask applied to the delay slot address to be changed from
-0xF0000000 to 0xF8000000 for these opcodes, but only when microMIPS is
-in use.
-
-Fixes: 3c824109da07 ("target-mips: microMIPS ASE support")
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Nathan Froyd <froydnj@codesourcery.com>
----
- target/mips/translate.c |  9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3022f349cb2a..7071b124344a 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4248,6 +4248,7 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
-     int bcond_compute = 0;
-     TCGv t0 = tcg_temp_new();
-     TCGv t1 = tcg_temp_new();
-+    int32_t seg_mask = 0xF0000000;      /* 256 MB-aligned region */
- 
-     if (ctx->hflags & MIPS_HFLAG_BMASK) {
- #ifdef MIPS_DEBUG_DISAS
-@@ -4303,9 +4304,15 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
-         break;
-     case OPC_J:
-     case OPC_JAL:
-+        /* microMIPS J32, JAL32 & JALS32 offsets are in 128 MB region not 256 */
-+        if ((ctx->hflags & MIPS_HFLAG_M16) &&
-+            (ctx->insn_flags & ASE_MICROMIPS)) {
-+            seg_mask = 0xF8000000;      /* 128 MB-aligned region */
-+        }
-+        /* fall through */
-     case OPC_JALX:
-         /* Jump to immediate */
--        btgt = ((ctx->pc + insn_bytes) & (int32_t)0xF0000000) | (uint32_t)offset;
-+        btgt = ((ctx->pc + insn_bytes) & seg_mask) | (uint32_t)offset;
-         break;
-     case OPC_JR:
-     case OPC_JALR:
--- 
-git-series 0.8.10
+-- PMM
