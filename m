@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXgi6-0005B7-MU
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:43 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dXgi5-0001nV-FS
+	(envelope-from <bounces@canonical.com>) id 1dXgi4-0005Aq-8z
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37840)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <bounces@canonical.com>) id 1dXgi0-0001l6-TU
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37744)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dXgi5-0001n7-9I
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:41 -0400
+	id 1dXgi0-0001kf-E4
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:35:36 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dXgi4-0003q0-Ao
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:40 +0000
+	id 1dXghz-0003q0-Ad
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4E4932E8078
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3B8122E8037
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 04:35:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Jul 2017 04:17:52 -0000
-From: Launchpad Bug Tracker <924943@bugs.launchpad.net>
-Reply-To: Bug 924943 <924943@bugs.launchpad.net>
+Date: Wed, 19 Jul 2017 04:17:54 -0000
+From: Launchpad Bug Tracker <1234179@bugs.launchpad.net>
+Reply-To: Bug 1234179 <1234179@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120201160448.7612.88961.malonedeb@gac.canonical.com>
-Message-Id: <150043787286.28289.9340363670691258410.malone@loganberry.canonical.com>
+References: <20131002134046.29393.71162.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150043787478.28289.7347532237225866621.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 924943] Re: usb-host devices given by command
- line are routed incomplete to the guest
+Subject: [Qemu-devel] [Bug 1234179] Re: QEMU segfaults during Windows 7
+ unattended install
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,38 +48,220 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/924943
+https://bugs.launchpad.net/bugs/1234179
 
 Title:
-  usb-host devices given by command line are routed incomplete to the
-  guest
+  QEMU segfaults during Windows 7 unattended install
 
 Status in QEMU:
   Expired
 
 Bug description:
-  affected qemus: qemu-1.0, qemu-kvm-1.0, qemu and qemu-kvm master branches=
- (older versions not tested)
-  affected guests: linux, windows
-  test hardware: standard usb key (or any other piece of USB hardware) that=
- works perfectly when plugged in after guest bootup
+  During today's automated qemu.git testing, a segmentation fault while
+  installing Windows 7 SP1 happened.
 
-  Several Sequences have been tested:
-  - start qemu with  -readconfig /etc/ich9-ehci-uhci.cfg -device usb-tablet=
- -device usb-host,bus=3Dehci.0
-  - start qemu with -readconfig /etc/ich9-ehci-uhci.cfg -device usb-tablet =
--S (to not start up the guest directly) + at the console prompt: "device_ad=
-d usb-host" then "c" to start the guest.
+  qemu.git top commit: =
 
-  For the linux guest, I get a usb device listed and detected as /dev/sdb w=
-hen plugging it in at runtime. At startup linux does NOT detect it.
-  For the windows guest, I get a usb device listed and detected as "removab=
-le media" when plugging it in at runtime. At startup Windows does detect "s=
-omething" that is listed in the device manager as Generic Mass Storage devi=
-ce, but with a yellow exclamation mark and there is no removable media list=
-ed in Explorer
+  10/02 01:30:24 INFO |       git:0150| git commit ID is a684f3cf9b9b9c3cb8=
+2be87aafc463de8974610c (tag v1.4.0-4237-ga684f3c)
 
-  If you need further testings, just let me know.
+  commit a684f3cf9b9b9c3cb82be87aafc463de8974610c
+  Merge: 349cd52 1cf9412
+  Author: Anthony Liguori <anthony@codemonkey.ws>
+  Date:   Mon Sep 30 17:15:27 2013 -0500
+
+      Merge remote-tracking branch 'kraxel/seabios-1.7.3.2' into staging
+      =
+
+      # By Gerd Hoffmann
+      # Via Gerd Hoffmann
+      * kraxel/seabios-1.7.3.2:
+        update seabios from 1.7.2.2 to 1.7.3.2
+      =
+
+      Message-id: 1380533055-24960-1-git-send-email-kraxel@redhat.com
+
+  We have the core file saved in our test servers, we can make
+  arrangements to transfer it if there's someone interested in
+  investigating further. The framework saved the 'bt full' of the core
+  file, that was missing some debug info:
+
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib64/libthread_db.so.1".
+  Core was generated by `/usr/local/autotest/tests/virt/qemu/qemu -S -name =
+virt-tests-vm1 -M pc -nodefau'.
+  Program terminated with signal 11, Segmentation fault.
+  #0  0x00007ffc8fb86cf0 in pixman_image_get_data () from /lib64/libpixman-=
+1.so.0
+  #0  0x00007ffc8fb86cf0 in pixman_image_get_data () from /lib64/libpixman-=
+1.so.0
+  No symbol table info available.
+  #1  0x00007ffc9165b05c in ?? ()
+  No symbol table info available.
+  #2  0x00007ffc9382b540 in ?? ()
+  No symbol table info available.
+  #3  0x00007ffc8f359a8d in clock_gettime () from /lib64/libc.so.6
+  No symbol table info available.
+  #4  0x00007ffc9382b5a8 in ?? ()
+  No symbol table info available.
+  #5  0x000000019382b4c0 in ?? ()
+  No symbol table info available.
+  #6  0x0000000000000000 in ?? ()
+  No symbol table info available.
+
+  Extra info:
+
+  Commits for the submodules:
+
+  10/02 01:30:29 DEBUG|base_utils:0134| [stdout] Submodule path 'dtc': chec=
+ked out 'bc895d6d09695d05ceb8b52486ffe861d6cfbdde'
+  10/02 01:30:51 DEBUG|base_utils:0134| [stdout] Submodule path 'pixman': c=
+hecked out '97336fad32acf802003855cd8bd6477fa49a12e3'
+  10/02 01:30:58 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/SLOF'=
+: checked out '8cfdfc43f4c4c8c8dfa4b7cf16f7c19c84eee812'
+  10/02 01:31:16 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/ipxe'=
+: checked out '09c5109b8585178172c7608de8d52e9d9af0b680'
+  10/02 01:31:20 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/openb=
+ios': checked out '0f3d51ef22ec9166beb3ed434d253029ed7cfe84'
+  10/02 01:31:21 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/qemu-=
+palcode': checked out 'c87a92639b28ac42bc8f6c67443543b405dc479b'
+  10/02 01:31:27 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/seabi=
+os': checked out 'ece025f5980bae88fa677bc9c0d24d2e580e205d'
+  10/02 01:31:28 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/sgabi=
+os': checked out '23d474943dcd55d0550a3d20b3d30e9040a4f15b'
+  10/02 01:31:31 DEBUG|base_utils:0134| [stdout] Submodule path 'roms/vgabi=
+os': checked out '19ea12c230ded95928ecaef0db47a82231c2e485'
+
+  Configure options:
+
+  10/02 01:31:32 DEBUG|base_utils:0099| Running '/usr/local/autotest/tmp/vi=
+rt/src/qemu/configure --target-list=3Dx86_64-softmmu --disable-strip --pref=
+ix=3D/usr/local/autotest/tests/virt/qemu/install_root'
+  10/02 01:31:35 DEBUG|env_proces:0829| (address cache) DHCP lease OK: 00:3=
+0:48:c5:d6:e2 --> 10.16.72.38
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Install prefix    /usr/loc=
+al/autotest/tests/virt/qemu/install_root
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] BIOS directory    /usr/loc=
+al/autotest/tests/virt/qemu/install_root/share/qemu
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] binary directory  /usr/loc=
+al/autotest/tests/virt/qemu/install_root/bin
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] library directory /usr/loc=
+al/autotest/tests/virt/qemu/install_root/lib
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libexec directory /usr/loc=
+al/autotest/tests/virt/qemu/install_root/libexec
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] include directory /usr/loc=
+al/autotest/tests/virt/qemu/install_root/include
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] config directory  /usr/loc=
+al/autotest/tests/virt/qemu/install_root/etc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] local state directory   /u=
+sr/local/autotest/tests/virt/qemu/install_root/var
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Manual directory  /usr/loc=
+al/autotest/tests/virt/qemu/install_root/share/man
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] ELF interp prefix /usr/gne=
+mul/qemu-%M
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Source path       /usr/loc=
+al/autotest/tmp/virt/src/qemu
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] C compiler        cc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Host C compiler   cc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] C++ compiler      c++
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Objective-C compiler cc
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] CFLAGS            -O2 -U_F=
+ORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g =
+
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] QEMU_CFLAGS       -Werror =
+-fPIE -DPIE -m64 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE=
+ -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmiss=
+ing-prototypes -fno-strict-aliasing  -Wendif-labels -Wmissing-include-dirs =
+-Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self -W=
+ignored-qualifiers -Wold-style-declaration -Wold-style-definition -Wtype-li=
+mits -fstack-protector-all  -I/usr/include/pixman-1   -I$(SRC_PATH)/dtc/lib=
+fdt
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] LDFLAGS           -Wl,--wa=
+rn-common -Wl,-z,relro -Wl,-z,now -pie -m64 -g =
+
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] make              make
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] install           install
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] python            python -B
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] smbd              /usr/sbi=
+n/smbd
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] host CPU          x86_64
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] host big endian   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] target list       x86_64-s=
+oftmmu
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] tcg debug enabled no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] gprof enabled     no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] sparse enabled    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] strip binaries    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] profiler          no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] static build      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] -Werror enabled   yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] pixman            system
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] SDL support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GTK support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] curses support    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] curl support      yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] mingw32 support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Audio drivers     oss
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Block whitelist (rw) =
+
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Block whitelist (ro) =
+
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VirtFS support    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC support       yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC TLS support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC SASL support  yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC JPEG support  no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC PNG support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] VNC WS support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] xen support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] brlapi support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] bluez  support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Documentation     no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GUEST_BASE        yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] PIE               yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] vde support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Linux AIO support no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] ATTR/XATTR support yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Install blobs     yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] KVM support       yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] RDMA support      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] TCG interpreter   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] fdt support       yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] preadv support    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] fdatasync         yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] madvise           yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] posix_madvise     yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] sigev_thread_id   yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] uuid support      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libcap-ng support no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] vhost-net support yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] vhost-scsi support yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Trace backend     nop
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] Trace output file trace-<p=
+id>
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] spice support     no (/)
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] rbd support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] xfsctl support    no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] nss used          no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libusb            no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] usb net redir     no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GLX support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libiscsi support  no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] build guest agent yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] QGA VSS support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] seccomp support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] coroutine backend ucontext
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] coroutine pool    yes
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] GlusterFS support no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] virtio-blk-data-plane no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] gcov              gcov
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] gcov enabled      no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] TPM support       no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] libssh2 support   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] TPM passthrough   no
+  10/02 01:31:40 DEBUG|base_utils:0134| [stdout] QOM debugging     yes
+  10/02 01:31:40 INFO |build_help:0617| Running parallel make on build dir
+  10/02 01:31:40 DEBUG|base_utils:0099| Running 'make -j 24'
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/924943/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1234179/+subscriptions
