@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXjUN-0002ix-27
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:33:43 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dXjXS-0003hT-BZ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dXjUI-000483-3X
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:33:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51558)
+	(envelope-from <imammedo@redhat.com>) id 1dXjXN-0006Hp-Kn
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:36:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dXjUH-00047t-TT
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:33:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 19 Jul 2017 09:33:34 +0200
-Message-Id: <1500449614-16811-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH] error: Revert unwanted change of warning
- messages
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dXjXN-0006HY-Er
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:36:49 -0400
+Date: Wed, 19 Jul 2017 09:36:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170719093650.2ec8f439@Igors-MacBook-Pro.local>
+In-Reply-To: <201707191225539935494@zte.com.cn>
+References: <201707191225539935494@zte.com.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,67 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Alistair Francis <alistair.francis@xilinx.com>
+To: wang.yi59@zte.com.cn
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, liu.yunh@zte.com.cn, dgilbert@redhat.com, pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net
 
-Commit 97f4030 changed warning messages from
+On Wed, 19 Jul 2017 12:25:53 +0800 (CST)
+<wang.yi59@zte.com.cn> wrote:
 
-    timestamp-if-enabled progname ":" location "warning: " message
+> >On Mon, 17 Jul 2017 21:49:37 -0400
+> 
+> >Yi Wang <address@hidden> wrote:
+> 
+> >
+> 
+> >> Add [vcpu] index support for hmp command "info lapic", which is
+> 
+> >> useful when debugging ipi and so on. Current behavior is not
+> 
+> >> changed when the parameter isn't specified.
+> 
+> >we shouldn't expose cpu_index to users anymore,
+> 
+> >
+> 
+> >I would suggest using to use real APIC ID here but we don't
+> 
+> >have monitor command that returns APIC IDs for present cpus.
+> 
+> 
+> 
+> 
+> Would you like to explain the reason we shouldn't use cpu_index any
+> 
+> more, which is more straightforward than socket-id/core-id/thread-id?
+> 
+> As Eduardo wrote in the next reply, "CPU #<n>" is already a perfectly
+> 
+> good identifier for a human interface :-)
+We are working on hiding cpu_index from user interface,
+it's still work in progress but and having old commands, that use cpu_index
+and haven't been fixed yet, doesn't mean that we should add more.
 
-to
+Anyways as Eduardo pointed out combo of cpu/info lapic should be sufficient
+for your task and this patch seems unnecessary.
 
-    "warning: " timestamp-if-enabled progname ":" location message
-
-This regressed qemu-iotests 051.  Put "warning: " right back where it
-was, along with "info: ".
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- util/qemu-error.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
-
-diff --git a/util/qemu-error.c b/util/qemu-error.c
-index c557c6a..a25d3b9 100644
---- a/util/qemu-error.c
-+++ b/util/qemu-error.c
-@@ -201,17 +201,6 @@ static void vreport(report_type type, const char *fmt, va_list ap)
-     GTimeVal tv;
-     gchar *timestr;
- 
--    switch (type) {
--    case REPORT_TYPE_ERROR:
--        break;
--    case REPORT_TYPE_WARNING:
--        error_printf("warning: ");
--        break;
--    case REPORT_TYPE_INFO:
--        error_printf("info: ");
--        break;
--    }
--
-     if (enable_timestamp_msg && !cur_mon) {
-         g_get_current_time(&tv);
-         timestr = g_time_val_to_iso8601(&tv);
-@@ -220,6 +209,18 @@ static void vreport(report_type type, const char *fmt, va_list ap)
-     }
- 
-     print_loc();
-+
-+    switch (type) {
-+    case REPORT_TYPE_ERROR:
-+        break;
-+    case REPORT_TYPE_WARNING:
-+        error_printf("warning: ");
-+        break;
-+    case REPORT_TYPE_INFO:
-+        error_printf("info: ");
-+        break;
-+    }
-+
-     error_vprintf(fmt, ap);
-     error_printf("\n");
- }
--- 
-2.7.5
+> 
+> Many thanks.
+> 
+> 
+> 
+> 
+> 
+> ---
+> 
+> Best wishes
+> 
+> Yi Wang
