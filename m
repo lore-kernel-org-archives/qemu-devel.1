@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXqF3-0000tj-Pa
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:46:23 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXqNL-0002XU-83
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:54:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXqEy-0005tv-Rv
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:46:21 -0400
-Received: from ivanoab5.miniserver.com ([78.31.111.25]:42476
-	helo=www.kot-begemot.co.uk)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
-	id 1dXqEy-0005rg-LW
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:46:16 -0400
-References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
-	<20170718170819.28494-3-anton.ivanov@cambridgegreys.com>
-	<03702920-f5b1-6579-0c59-a0d46274a6d9@redhat.com>
-From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Message-ID: <d237447d-f581-d452-bef3-243d2e6db1ee@cambridgegreys.com>
-Date: Wed, 19 Jul 2017 15:46:05 +0100
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXqNH-0001Mh-5Y
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:54:55 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:58434)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXqNG-0001M3-VB
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:54:51 -0400
+References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
+	<742650a35d49502a994c008fd3a70eccd5391f1b.1500378931.git-series.james.hogan@imgtec.com>
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Message-ID: <dfb9c8fe-0779-89d4-dbab-5b030f6666be@imgtec.com>
+Date: Wed, 19 Jul 2017 15:54:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <03702920-f5b1-6579-0c59-a0d46274a6d9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <742650a35d49502a994c008fd3a70eccd5391f1b.1500378931.git-series.james.hogan@imgtec.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] Unified Datagram Socket Transport -
- GRE support
+Subject: Re: [Qemu-devel] [PATCH 4/14] target/mips: Add CP0_Ebase.WG (write
+ gate) support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: jasowang@redhat.com
+To: James Hogan <james.hogan@imgtec.com>
+Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
 
 
-On 19/07/17 15:40, Eric Blake wrote:
-> On 07/18/2017 12:08 PM, anton.ivanov@cambridgegreys.com wrote:
->> From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
->>
->> This adds GRETAP support to the unified socket driver.
->>
->> Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
->> ---
->>   net/Makefile.objs |   2 +-
->>   net/clients.h     |   4 +
->>   net/gre.c         | 313 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   net/net.c         |   5 +
->>   qapi-schema.json  |  46 +++++++-
->>   qemu-options.hx   |  63 ++++++++++-
->>   6 files changed, 425 insertions(+), 8 deletions(-)
->>   create mode 100644 net/gre.c
->>
-> Just an interface review:
->
->> +++ b/qapi-schema.json
->> @@ -3847,7 +3847,41 @@
->>       'txsession':    'uint32',
->>       '*rxsession':   'uint32',
->>       '*offset':      'uint32' } }
->> -
->> +##
->> +# @NetdevGREOptions:
->> +#
->> +# Connect the VLAN to Ethernet over Ethernet over GRE (GRETAP) tunnel
->> +#
->> +# @src: source address
->> +#
->> +# @dst: destination address
->> +#
->> +# @ipv6: force the use of ipv6
-> This doesn't quite match what we do with other sockets (where we have
-> both ipv4 and ipv6 booleans to allow IPv4-only, IPv6-only, or both).  Is
-> this something where we can reuse InetSocketAddress instead of inventing
-> yet another way of doing things?
-
-I can try that in the next version.
-
->
-> Then again, it does match what NetdevL2TPv3Options did :(
->
->> +#
->> +# @sequence: have sequence counter
->> +#
->> +# @pinsequence: pin sequence counter to zero -
->> +#              workaround for buggy implementations or
->> +#              networks with packet reorder
->> +#
->> +# @txkey: 32 bit transmit key
->> +#
->> +# @rxkey: 32 bit receive key
-> Worth listing what the defaults are for these optional fields when not
-> present?
-
-GRE header is incremental.
-
-If there is no tx/rxkey the header is shorter and these are not present 
-in the header.
-
-If a key is specified the header is longer to accommodate the key.
-
-They are optional - similar to the l2tpv3 cookie.
-
->
->> +#
->> +# Note - gre checksums are not supported at present
->> +#
->> +#
->> +# Since 2.9
-> You've missed 2.9 by a long shot.  You've also missed 2.10 softfreeze
-> for a new feature, so this should read since 2.11.
-
-The patch has been sitting in my outgoing queue for reasons outside my 
-control for months. I apologise for that and I am re-aligning all of 
-them for 2.11
-
->
->> @@ -3966,7 +4000,7 @@
->>   ##
->>   { 'enum': 'NetClientDriver',
->>     'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde', 'dump',
->> -            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
->> +            'bridge', 'hubport', 'netmap', 'vhost-user', 'gre' ] }
-> Worth adding a comment that 'gre' is since 2.11 (look for other enums
-> that have had additions after the initial release of the enum, for an
-> example of the preferred format).
-
-Ack.
-
->
->>   
->>   ##
->>   # @Netdev:
->> @@ -3996,7 +4030,8 @@
->>       'bridge':   'NetdevBridgeOptions',
->>       'hubport':  'NetdevHubPortOptions',
->>       'netmap':   'NetdevNetmapOptions',
->> -    'vhost-user': 'NetdevVhostUserOptions' } }
->> +    'vhost-user': 'NetdevVhostUserOptions',
->> +    'gre':      'NetdevGREOptions' } }
-> Okay.
->
->>   
->>   ##
->>   # @NetLegacy:
->> @@ -4027,7 +4062,7 @@
->>   ##
->>   { 'enum': 'NetLegacyOptionsType',
->>     'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
->> -           'dump', 'bridge', 'netmap', 'vhost-user'] }
->> +           'dump', 'bridge', 'netmap', 'vhost-user', 'gre'] }
-> Not okay.  NetLegacy should never grow again (that's the whole point of
-> it being legacy - we're trying to phase it out).
-
-OK, I will revise the patch before the next submission.
-
-A.
+On 18/07/2017 12:55, James Hogan wrote:
+> Add support for the CP0_EBase.WG bit, which allows upper bits to be
+> written (bits 31:30 on MIPS32, or bits 63:30 on MIPS64), along with the
+> CP0_Config5.CV bit to control whether the exception vector for Cache
+> Error exceptions is forced into KSeg1.
+> 
+> This is necessary on MIPS32 to support Segmentation Control and Enhanced
+> Virtual Addressing (EVA) extensions (where KSeg1 addresses may not
+> represent an unmapped uncached segment).
+> 
+> It is also useful on MIPS64 to allow the exception base to reside in
+> XKPhys, and possibly out of range of KSEG0 and KSEG1.
+> 
+> Signed-off-by: James Hogan <james.hogan@imgtec.com>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> ---
+> Changes in v2:
+> - Fix CP0_EBase.WG to be read only when WG is not set in
+>   CP0_EBase_rw_bitmask, otherwise it will be wrongly probed as present.
+> - Make cache error exception vector conditional on Config3.SC as well as
+>   Config5.CV, as per the PRA, and take the CP0C3_SC definition from
+>   patch 7 (Yongbok).
+> - Rename CP0_EBase_rw_bitmask to CP0_EBaseWG_rw_bitmask (Yongbok).
+> ---
+>  target/mips/cpu.h            |  5 ++++-
+>  target/mips/helper.c         | 14 ++++++++------
+>  target/mips/machine.c        |  6 +++---
+>  target/mips/op_helper.c      | 12 ++++++++++--
+>  target/mips/translate.c      |  8 +++++---
+>  target/mips/translate_init.c |  1 +
+>  6 files changed, 31 insertions(+), 15 deletions(-)
+> 
 
 
--- 
-Anton R. Ivanov
+> --- a/target/mips/op_helper.c
+> +++ b/target/mips/op_helper.c
+> @@ -1515,14 +1515,22 @@ target_ulong helper_mftc0_ebase(CPUMIPSState *env)
+>  
+>  void helper_mtc0_ebase(CPUMIPSState *env, target_ulong arg1)
+>  {
+> -    env->CP0_EBase = (env->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x3FFFF000);
+> +    target_ulong mask = 0x3FFFF000 | env->CP0_EBaseWG_rw_bitmask;
+> +    if (arg1 & (1 << CP0EBase_WG) & mask) {
 
-Cambridge Greys Limited, England and Wales company No 10273661
-http://www.cambridgegreys.com/
+isn't it just ...?
+if (arg1 & env->CP0_EBaseWG_rw_bitmask) {
+
+> +        mask |= ~0x3FFFFFFF;
+> +    }
+> +    env->CP0_EBase = (env->CP0_EBase & ~mask) | (arg1 & mask);
+>  }
+>  
+>  void helper_mttc0_ebase(CPUMIPSState *env, target_ulong arg1)
+>  {
+>      int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
+>      CPUMIPSState *other = mips_cpu_map_tc(env, &other_tc);
+> -    other->CP0_EBase = (other->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x3FFFF000);
+> +    target_ulong mask = 0x3FFFF000 | env->CP0_EBaseWG_rw_bitmask;
+> +    if (arg1 & (1 << CP0EBase_WG) & mask) {
+
+here as well.
+
+> +        mask |= ~0x3FFFFFFF;
+> +    }
+> +    other->CP0_EBase = (other->CP0_EBase & ~mask) | (arg1 & mask);
+>  }
+>  
+
+
+Otherwise,
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+
+Regards,
+Yongbok
