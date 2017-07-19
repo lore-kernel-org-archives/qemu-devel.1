@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXuEf-0005yt-98
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:02:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXuFG-0006KE-M7
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXuEc-0008Mq-4S
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:02:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41248)
+	(envelope-from <dgilbert@redhat.com>) id 1dXuFD-0008Vl-Ft
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:02:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXuEb-0008Md-S5
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:02:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXuFD-0008VY-5P
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 15:02:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C00D97CE12
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 19:02:08 +0000 (UTC)
-Date: Wed, 19 Jul 2017 16:02:03 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170719190203.GA16400@localhost.localdomain>
-References: <20170719163108.26943-1-apahim@redhat.com>
-	<20170719163108.26943-2-apahim@redhat.com>
-	<20170719183447.GJ2757@localhost.localdomain>
+	by mx1.redhat.com (Postfix) with ESMTPS id 15CDEC04B940
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 19:02:46 +0000 (UTC)
+Date: Wed, 19 Jul 2017 20:02:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170719190238.GK3500@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-11-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170719183447.GJ2757@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu.py: fix is_running()
+In-Reply-To: <20170717134238.1966-11-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 10/17] migration: Create ram_multifd_page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,105 +33,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On Wed, Jul 19, 2017 at 03:34:47PM -0300, Eduardo Habkost wrote:
-> On Wed, Jul 19, 2017 at 06:31:06PM +0200, Amador Pahim wrote:
-> > Current implementation is broken. It does not really test if the child
-> > process is running.
-> > 
-> > The Popen.returncode will only be set after by a poll(), wait() or
-> > communicate(). If the Popen fails to launch a VM, the Popen.returncode
-> > will not turn to None by itself.
-> > 
-> > Instead of using Popen.returncode, let's use Popen.poll(), which
-> > actually checks if child process has terminated.
-> > 
-> > Signed-off-by: Amador Pahim <apahim@redhat.com>
+* Juan Quintela (quintela@redhat.com) wrote:
+> The function still don't use multifd, but we have simplified
+> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
+> counter and a new flag for this type of pages.
 > 
-> I vaguely remember I had a version of that code using poll() and
-> it broke scripts for some reason.  I will try to find out why, so
-> we can either fix the script or document the reason why poll()
-> isn't a good choice here.
-
-Thanks to git reflog, I found the original "fix" I had in my WIP
-tree:
-
-251fc73 work/device-crash-script@{71}: commit: fixup! qemu.py: Don't set _popen=None on error/shutdown
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 4dae811..cbc9e2a 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -86,7 +86,7 @@ class QEMUMachine(object):
-             raise
-
-     def is_running(self):
--        return self._popen and (self._popen.poll() is None)
-+        return self._popen and (self._popen.returncode is None)
-
-     def exitcode(self):
-         if self._popen:
-@@ -137,6 +137,7 @@ class QEMUMachine(object):
-         except:
-             if self.is_running():
-                 self._popen.kill()
-+                self._popen.wait()
-             self._load_io_log()
-             self._post_shutdown()
-             raise
-
-The original bug was like this: if QEMU process took a little
-longer to be actually terminated after self._popen.kill() was
-called, it triggering post-shutdown code inside shutdown()
-(because is_running() was still True), causing the following
-exception:
-
-Traceback (most recent call last):
-  File "./scripts/device-crash-test.py", line 528, in <module>
-    sys.exit(main())
-  File "./scripts/device-crash-test.py", line 487, in main
-    f = checkOneCase(args, t)
-  File "./scripts/device-crash-test.py", line 320, in checkOneCase
-    vm.shutdown()
-  File "/home/ehabkost/rh/proj/virt/qemu/scripts/qemu.py", line 156, in shutdown
-    self._load_io_log()
-  File "/home/ehabkost/rh/proj/virt/qemu/scripts/qemu.py", line 101, in _load_io_log
-    with open(self._qemu_log_path, "r") as fh:
-IOError: [Errno 2] No such file or directory: '/var/tmp/qemu-23568.log'
-
-
-My fix was incorrect: the actual bug was the missing
-self._popen.wait() call after self._popen.kill(), not the
-self._popen.poll() call.  Your fix looks good and
-device-crash-test is not crashing.
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  hmp.c                 |  2 ++
+>  migration/migration.c |  1 +
+>  migration/ram.c       | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  qapi-schema.json      |  5 ++-
+>  4 files changed, 96 insertions(+), 2 deletions(-)
 > 
-> > ---
-> >  scripts/qemu.py | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > index 880e3e8219..f0fade32bd 100644
-> > --- a/scripts/qemu.py
-> > +++ b/scripts/qemu.py
-> > @@ -86,7 +86,7 @@ class QEMUMachine(object):
-> >              raise
-> >  
-> >      def is_running(self):
-> > -        return self._popen and (self._popen.returncode is None)
-> > +        return self._popen and (self._popen.poll() is None)
-> >  
-> >      def exitcode(self):
-> >          if self._popen is None:
-> > -- 
-> > 2.13.3
-> > 
-> 
+> diff --git a/hmp.c b/hmp.c
+> index b01605a..eeb308b 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -234,6 +234,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>              monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
+>                             info->ram->postcopy_requests);
+>          }
+> +        monitor_printf(mon, "multifd: %" PRIu64 " pages\n",
+> +                       info->ram->multifd);
+>      }
+>  
+>      if (info->has_disk) {
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e1c79d5..d9d5415 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -528,6 +528,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>      info->ram->dirty_sync_count = ram_counters.dirty_sync_count;
+>      info->ram->postcopy_requests = ram_counters.postcopy_requests;
+>      info->ram->page_size = qemu_target_page_size();
+> +    info->ram->multifd = ram_counters.multifd;
+>  
+>      if (migrate_use_xbzrle()) {
+>          info->has_xbzrle_cache = true;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index b80f511..2bf3fa7 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -68,6 +68,7 @@
+>  #define RAM_SAVE_FLAG_XBZRLE   0x40
+>  /* 0x80 is reserved in migration.h start with 0x100 next */
+>  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
+> +#define RAM_SAVE_FLAG_MULTIFD_PAGE     0x200
+>  
+>  static inline bool is_zero_range(uint8_t *p, uint64_t size)
+>  {
+> @@ -362,12 +363,17 @@ static void compress_threads_save_setup(void)
+>  /* Multiple fd's */
+>  
+>  struct MultiFDSendParams {
+> +    /* not changed */
+>      uint8_t id;
+>      QemuThread thread;
+>      QIOChannel *c;
+>      QemuSemaphore sem;
+>      QemuMutex mutex;
+> +    /* protected by param mutex */
+>      bool quit;
+
+Should probably comment to say what address space address is in - this
+is really a qemu pointer - and that's why we can treat 0 as special?
+
+> +    uint8_t *address;
+> +    /* protected by multifd mutex */
+> +    bool done;
+
+done needs a comment to explain what it is because
+it sounds similar to quit;  I think 'done' is saying that
+the thread is idle having done what was asked?
+
+>  };
+>  typedef struct MultiFDSendParams MultiFDSendParams;
+>  
+> @@ -375,6 +381,8 @@ struct {
+>      MultiFDSendParams *params;
+>      /* number of created threads */
+>      int count;
+> +    QemuMutex mutex;
+> +    QemuSemaphore sem;
+>  } *multifd_send_state;
+>  
+>  static void terminate_multifd_send_threads(void)
+> @@ -443,6 +451,7 @@ static void *multifd_send_thread(void *opaque)
+>      } else {
+>          qio_channel_write(p->c, string, MULTIFD_UUID_MSG, &error_abort);
+>      }
+> +    qemu_sem_post(&multifd_send_state->sem);
+>  
+>      while (!exit) {
+>          qemu_mutex_lock(&p->mutex);
+> @@ -450,6 +459,15 @@ static void *multifd_send_thread(void *opaque)
+>              qemu_mutex_unlock(&p->mutex);
+>              break;
+>          }
+> +        if (p->address) {
+> +            p->address = 0;
+> +            qemu_mutex_unlock(&p->mutex);
+> +            qemu_mutex_lock(&multifd_send_state->mutex);
+> +            p->done = true;
+> +            qemu_mutex_unlock(&multifd_send_state->mutex);
+> +            qemu_sem_post(&multifd_send_state->sem);
+> +            continue;
+> +        }
+>          qemu_mutex_unlock(&p->mutex);
+>          qemu_sem_wait(&p->sem);
+>      }
+> @@ -469,6 +487,8 @@ int multifd_save_setup(void)
+>      multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
+>      multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
+>      multifd_send_state->count = 0;
+> +    qemu_mutex_init(&multifd_send_state->mutex);
+> +    qemu_sem_init(&multifd_send_state->sem, 0);
+>      for (i = 0; i < thread_count; i++) {
+>          char thread_name[16];
+>          MultiFDSendParams *p = &multifd_send_state->params[i];
+> @@ -477,6 +497,8 @@ int multifd_save_setup(void)
+>          qemu_sem_init(&p->sem, 0);
+>          p->quit = false;
+>          p->id = i;
+> +        p->done = true;
+> +        p->address = 0;
+>          p->c = socket_send_channel_create();
+>          if (!p->c) {
+>              error_report("Error creating a send channel");
+> @@ -491,6 +513,30 @@ int multifd_save_setup(void)
+>      return 0;
+>  }
+>  
+> +static int multifd_send_page(uint8_t *address)
+> +{
+> +    int i;
+> +    MultiFDSendParams *p = NULL; /* make happy gcc */
+> +
+> +    qemu_sem_wait(&multifd_send_state->sem);
+> +    qemu_mutex_lock(&multifd_send_state->mutex);
+> +    for (i = 0; i < multifd_send_state->count; i++) {
+> +        p = &multifd_send_state->params[i];
+> +
+> +        if (p->done) {
+> +            p->done = false;
+> +            break;
+> +        }
+> +    }
+> +    qemu_mutex_unlock(&multifd_send_state->mutex);
+> +    qemu_mutex_lock(&p->mutex);
+> +    p->address = address;
+> +    qemu_mutex_unlock(&p->mutex);
+> +    qemu_sem_post(&p->sem);
+
+My feeling, without having fully thought it through, is that
+the locking around 'address' can be simplified; especially if the
+sending-thread never actually changes it.
+
+http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_11
+defines that most of the pthread_ functions act as barriers;
+including the sem_post and pthread_cond_signal that qemu_sem_post
+uses.
+
+> +    return 0;
+> +}
+> +
+>  struct MultiFDRecvParams {
+>      uint8_t id;
+>      QemuThread thread;
+> @@ -537,6 +583,7 @@ void multifd_load_cleanup(void)
+>          qemu_sem_destroy(&p->sem);
+>          socket_recv_channel_destroy(p->c);
+>          g_free(p);
+> +        multifd_recv_state->params[i] = NULL;
+>      }
+>      g_free(multifd_recv_state->params);
+>      multifd_recv_state->params = NULL;
+> @@ -1058,6 +1105,32 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
+>      return pages;
+>  }
+>  
+> +static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+> +                            bool last_stage)
+> +{
+> +    int pages;
+> +    uint8_t *p;
+> +    RAMBlock *block = pss->block;
+> +    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
+> +
+> +    p = block->host + offset;
+> +
+> +    pages = save_zero_page(rs, block, offset, p);
+> +    if (pages == -1) {
+> +        ram_counters.transferred +=
+> +            save_page_header(rs, rs->f, block,
+> +                             offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> +        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+> +        multifd_send_page(p);
+> +        ram_counters.transferred += TARGET_PAGE_SIZE;
+> +        pages = 1;
+> +        ram_counters.normal++;
+> +        ram_counters.multifd++;
+> +    }
+> +
+> +    return pages;
+> +}
+> +
+>  static int do_compress_ram_page(QEMUFile *f, RAMBlock *block,
+>                                  ram_addr_t offset)
+>  {
+> @@ -1486,6 +1559,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
+>          if (migrate_use_compression() &&
+>              (rs->ram_bulk_stage || !migrate_use_xbzrle())) {
+>              res = ram_save_compressed_page(rs, pss, last_stage);
+> +        } else if (migrate_use_multifd()) {
+> +            res = ram_multifd_page(rs, pss, last_stage);
+
+It's a pity we can't wire this up with compression, but I understand
+why you simplify that.
+
+I'll see how the multiple-pages stuff works below; but the interesting
+thing here is we've already split up host-pages, which seems like a bad
+idea.
+
+
+>          } else {
+>              res = ram_save_page(rs, pss, last_stage);
+>          }
+> @@ -2778,6 +2853,10 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>      if (!migrate_use_compression()) {
+>          invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
+>      }
+> +
+> +    if (!migrate_use_multifd()) {
+> +        invalid_flags |= RAM_SAVE_FLAG_MULTIFD_PAGE;
+> +    }
+>      /* This RCU critical section can be very long running.
+>       * When RCU reclaims in the code start to become numerous,
+>       * it will be necessary to reduce the granularity of this
+> @@ -2802,13 +2881,17 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>              if (flags & invalid_flags & RAM_SAVE_FLAG_COMPRESS_PAGE) {
+>                  error_report("Received an unexpected compressed page");
+>              }
+> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_MULTIFD_PAGE) {
+> +                error_report("Received an unexpected multifd page");
+> +            }
+>  
+>              ret = -EINVAL;
+>              break;
+>          }
+>  
+>          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+> -                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
+> +                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
+> +                     RAM_SAVE_FLAG_MULTIFD_PAGE)) {
+>              RAMBlock *block = ram_block_from_stream(f, flags);
+>  
+>              host = host_from_ram_block_offset(block, addr);
+> @@ -2896,6 +2979,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>                  break;
+>              }
+>              break;
+> +
+> +        case RAM_SAVE_FLAG_MULTIFD_PAGE:
+> +            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+> +            break;
+> +
+>          case RAM_SAVE_FLAG_EOS:
+>              /* normal exit */
+>              break;
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 5b3733e..f708782 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -601,6 +601,8 @@
+>  # @page-size: The number of bytes per page for the various page-based
+>  #        statistics (since 2.10)
+>  #
+> +# @multifd: number of pages sent with multifd (since 2.10)
+
+Hopeful!
+
+Dave
+>  # Since: 0.14.0
+>  ##
+>  { 'struct': 'MigrationStats',
+> @@ -608,7 +610,8 @@
+>             'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+>             'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+>             'mbps' : 'number', 'dirty-sync-count' : 'int',
+> -           'postcopy-requests' : 'int', 'page-size' : 'int' } }
+> +           'postcopy-requests' : 'int', 'page-size' : 'int',
+> +           'multifd' : 'int'} }
+>  
+>  ##
+>  # @XBZRLECacheStats:
 > -- 
-> Eduardo
-
--- 
-Eduardo
+> 2.9.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
