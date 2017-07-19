@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXtMq-0005Fp-7F
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:06:37 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXtOR-0005wl-3z
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dXtMp-0003gp-9E
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:06:36 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33001)
+	(envelope-from <rth7680@gmail.com>) id 1dXtOO-0004Lt-0D
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:08:15 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXtMp-0003gj-57
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:06:35 -0400
-Received: by mail-qk0-x244.google.com with SMTP id u126so337062qka.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 11:06:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXtON-0004LZ-Ra
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:08:11 -0400
+Received: by mail-qt0-x242.google.com with SMTP id l55so1136558qtl.3
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 11:08:11 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <1500468850-15571-1-git-send-email-thuth@redhat.com>
-	<1500468850-15571-3-git-send-email-thuth@redhat.com>
+	<1500468850-15571-4-git-send-email-thuth@redhat.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <cddd3b82-6cf3-1584-da8f-2ea4bac19eb5@twiddle.net>
-Date: Wed, 19 Jul 2017 08:06:27 -1000
+Message-ID: <c452c67f-6519-ae89-e26b-9699cdb18c93@twiddle.net>
+Date: Wed, 19 Jul 2017 08:08:05 -1000
 MIME-Version: 1.0
-In-Reply-To: <1500468850-15571-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1500468850-15571-4-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] target/s390x: Move
- s390_cpu_dump_state() to helper.c
+Subject: Re: [Qemu-devel] [PATCH 3/5] target/s390x: Move diag helpers to a
+ separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +36,17 @@ To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
 On 07/19/2017 02:54 AM, Thomas Huth wrote:
-> translate.c can not be compiled with --disable-tcg, but we need
-> the s390_cpu_dump_state() in KVM-only builds, too. So let's move
-> that function to helper.c instead, which will also be compiled
-> when --disable-tcg has been specified.
+> misc_helper.c won't be compiled with --disable-tcg anymore, but we
+> still need the diag helpers in KVM builds, too, so move the helper
+> functions to a separate file.
 > 
 > Signed-off-by: Thomas Huth<thuth@redhat.com>
 > ---
->   target/s390x/helper.c    | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
->   target/s390x/translate.c | 60 ------------------------------------------------
->   2 files changed, 60 insertions(+), 60 deletions(-)
+>   target/s390x/Makefile.objs |   2 +-
+>   target/s390x/diag.c        | 179 +++++++++++++++++++++++++++++++++++++++++++++
+>   target/s390x/misc_helper.c | 167 ------------------------------------------
+>   3 files changed, 180 insertions(+), 168 deletions(-)
+>   create mode 100644 target/s390x/diag.c
 
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 
