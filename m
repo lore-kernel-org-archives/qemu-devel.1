@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXksY-00054Q-O5
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:02:47 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXl5d-0000Wz-K9
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dXksV-0000vz-LT
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:02:46 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:39941
-	helo=imgpgp01.kl.imgtec.org)
+	(envelope-from <berrange@redhat.com>) id 1dXl5c-0001G0-Mq
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
-	id 1dXksV-0000vY-CW
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:02:43 -0400
-Date: Wed, 19 Jul 2017 10:02:41 +0100
-From: James Hogan <james.hogan@imgtec.com>
-Message-ID: <20170719090241.GB6973@jhogan-linux.le.imgtec.org>
-References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
-	<150041287987.87.17542667042734114407@5d477a5b5989>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5aIuwG0DlmrBHPsb"
-Content-Disposition: inline
-In-Reply-To: <150041287987.87.17542667042734114407@5d477a5b5989>
-Subject: Re: [Qemu-devel] [PATCH 0/14] target/mips: Add Enhanced Virtual
- Addressing (EVA) support
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl5c-0001FO-E1
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:16 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed, 19 Jul 2017 10:15:44 +0100
+Message-Id: <20170719091600.8555-3-berrange@redhat.com>
+In-Reply-To: <20170719091600.8555-1-berrange@redhat.com>
+References: <20170719091600.8555-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL v2 02/18] crypto: cipher: introduce
+ qcrypto_cipher_ctx_new for gcrypt-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,102 +25,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, yongbok.kim@imgtec.com, aurelien@aurel32.net, petar.jovanovic@imgtec.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
---5aIuwG0DlmrBHPsb
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-On Tue, Jul 18, 2017 at 02:21:20PM -0700, no-reply@patchew.org wrote:
-> Checking PATCH 2/14: target/mips: Fix TLBWI shadow flush for EHINV, XI, R=
-I...
-> ERROR: space prohibited after that '&' (ctx:WxW)
-> #44: FILE: target/mips/op_helper.c:2045:
-> +    XI0 =3D (env->CP0_EntryLo0 >> CP0EnLo_XI) & 1;
->                                              ^
->=20
-> ERROR: space prohibited after that '&' (ctx:WxW)
-> #45: FILE: target/mips/op_helper.c:2046:
-> +    RI0 =3D (env->CP0_EntryLo0 >> CP0EnLo_RI) & 1;
->                                              ^
->=20
-> ERROR: space prohibited after that '&' (ctx:WxW)
-> #48: FILE: target/mips/op_helper.c:2049:
-> +    XI1 =3D (env->CP0_EntryLo1 >> CP0EnLo_XI) & 1;
->                                              ^
->=20
-> ERROR: space prohibited after that '&' (ctx:WxW)
-> #49: FILE: target/mips/op_helper.c:2050:
-> +    RI1 =3D (env->CP0_EntryLo1 >> CP0EnLo_RI) & 1;
->                                              ^
->=20
-> total: 4 errors, 0 warnings, 34 lines checked
+Extracts qcrypto_cipher_ctx_new() from qcrypto_cipher_new() for
+gcrypt-backend impls.
 
-These are false positives. The code looks fine to me. They are binary
-bitwise-and operators, not unary address-of operators.
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ crypto/cipher-gcrypt.c | 50 +++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 33 insertions(+), 17 deletions(-)
 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-
-It looks orphaned.
-
-> Checking PATCH 10/14: target/mips: Add an MMU mode for ERL...
-> ERROR: trailing statements should be on next line
-> #94: FILE: target/mips/op_helper.c:98:
-> +    case 3: cpu_##insn##_error_ra(env, addr, val, retaddr); break;      \
->=20
-> ERROR: trailing statements should be on next line
-> #102: FILE: target/mips/op_helper.c:1456:
-> +        case 3: qemu_log(", ERL\n"); break;
->=20
-> ERROR: trailing statements should be on next line
-> #110: FILE: target/mips/op_helper.c:2251:
-> +        case 3: qemu_log(", ERL\n"); break;
->=20
-> total: 3 errors, 0 warnings, 79 lines checked
-
-These are all consistent with the surrounding code.
-
-> Checking PATCH 12/14: target/mips: Implement segmentation control...
-> ERROR: braces {} are necessary for all arms of this statement
-> #246: FILE: target/mips/helper.c:836:
-> +            if ((R !=3D 0 || UX) && (R !=3D 3 || KX) &&
-> [...]
->=20
-> ERROR: braces {} are necessary for all arms of this statement
-> #258: FILE: target/mips/helper.c:854:
-> +            if ((R !=3D 0 || UX) && (R !=3D 3 || KX) &&
-> [...]
->=20
-> total: 2 errors, 0 warnings, 234 lines checked
-
-And these are both pre-existing style issues that the patch hasn't
-changed.
-
-Cheers
-James
-
---5aIuwG0DlmrBHPsb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAllvIDAACgkQbAtpk944
-dnpqexAAj/J934F6hetLjYYX5HEtEm9eGfs+LhAd8LJ+wrHJ+MEZFOFbOT+YkQuZ
-ABXA6Db/NF2k0LaNMedpbWb9dS/WqzZWzfKMLcr4bxkMaeDbeIQ47tMw547XtIKi
-GZwlFpHweWJhR43fmf/FZE0aN5vQxAe2gWAyPffSNPSS/7St/cCgPxXlf8jSXyPW
-j92yQ2sP8480E0FlVLlH8Aqw1J/oNvr6pmHGOmTpvy/5p2AuTf1tJlcaWtWTFyTC
-Q5Z+ATn4kyQ2Rxckgm7te0U3JDEgRv3eVp1W4xmnskPWpYql++ukqUj895f1lqEL
-TJ1Qkshka0YZVJMB1xmtKAhiSrKMu3IvFd09ZFSccYtk7VvIepvLggPKrVLqqR7G
-NISBlEE28Ho9/rkA+2UsAv4fZCQIm7czDJ0KStJR2gaT/4uE4xqE1Q88PcDUCY7j
-lgUKtezRrXjoxTlq1MXdm1If/XEvlymTCTZYB1dKd2p9FyjAiWm+mIUivsRIa5M2
-G/JRpPur6mAehZT7EOoktX8u/Sra25E8jGjhInaoj61XEExR4/JVRJ0P70H3xItN
-n71kA6p3L5HedosonwKUWrpMy7lpvmgAp0xulO9N6rij74OvG/klCJCztfeGj5es
-PhFsWRBKc0l7aIyMA98ZGa3bTzLviNZeTZQDIAiT+d6rS6IbweM=
-=QVHK
------END PGP SIGNATURE-----
-
---5aIuwG0DlmrBHPsb--
+diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+index 0ecffa2751..493938629e 100644
+--- a/crypto/cipher-gcrypt.c
++++ b/crypto/cipher-gcrypt.c
+@@ -80,12 +80,12 @@ static void gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx,
+ }
+ 
+ 
+-QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+-                                  QCryptoCipherMode mode,
+-                                  const uint8_t *key, size_t nkey,
+-                                  Error **errp)
++static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCryptoCipherAlgorithm alg,
++                                                   QCryptoCipherMode mode,
++                                                   const uint8_t *key,
++                                                   size_t nkey,
++                                                   Error **errp)
+ {
+-    QCryptoCipher *cipher;
+     QCryptoCipherGcrypt *ctx;
+     gcry_error_t err;
+     int gcryalg, gcrymode;
+@@ -162,10 +162,6 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         return NULL;
+     }
+ 
+-    cipher = g_new0(QCryptoCipher, 1);
+-    cipher->alg = alg;
+-    cipher->mode = mode;
+-
+     ctx = g_new0(QCryptoCipherGcrypt, 1);
+ 
+     err = gcry_cipher_open(&ctx->handle, gcryalg, gcrymode, 0);
+@@ -174,7 +170,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                    gcry_strerror(err));
+         goto error;
+     }
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+         err = gcry_cipher_open(&ctx->tweakhandle, gcryalg, gcrymode, 0);
+         if (err != 0) {
+             error_setg(errp, "Cannot initialize cipher: %s",
+@@ -183,7 +179,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         }
+     }
+ 
+-    if (cipher->alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
++    if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
+         /* We're using standard DES cipher from gcrypt, so we need
+          * to munge the key so that the results are the same as the
+          * bizarre RFB variant of DES :-)
+@@ -193,7 +189,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         g_free(rfbkey);
+         ctx->blocksize = 8;
+     } else {
+-        if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++        if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+             nkey /= 2;
+             err = gcry_cipher_setkey(ctx->handle, key, nkey);
+             if (err != 0) {
+@@ -210,7 +206,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+                        gcry_strerror(err));
+             goto error;
+         }
+-        switch (cipher->alg) {
++        switch (alg) {
+         case QCRYPTO_CIPHER_ALG_AES_128:
+         case QCRYPTO_CIPHER_ALG_AES_192:
+         case QCRYPTO_CIPHER_ALG_AES_256:
+@@ -230,7 +226,7 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         }
+     }
+ 
+-    if (cipher->mode == QCRYPTO_CIPHER_MODE_XTS) {
++    if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+         if (ctx->blocksize != XTS_BLOCK_SIZE) {
+             error_setg(errp,
+                        "Cipher block size %zu must equal XTS block size %d",
+@@ -240,12 +236,10 @@ QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+         ctx->iv = g_new0(uint8_t, ctx->blocksize);
+     }
+ 
+-    cipher->opaque = ctx;
+-    return cipher;
++    return ctx;
+ 
+  error:
+     gcrypt_cipher_free_ctx(ctx, mode);
+-    g_free(cipher);
+     return NULL;
+ }
+ 
+@@ -385,3 +379,25 @@ int qcrypto_cipher_setiv(QCryptoCipher *cipher,
+ 
+     return 0;
+ }
++
++
++QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
++                                  QCryptoCipherMode mode,
++                                  const uint8_t *key, size_t nkey,
++                                  Error **errp)
++{
++    QCryptoCipher *cipher;
++    QCryptoCipherGcrypt *ctx;
++
++    ctx = qcrypto_cipher_ctx_new(alg, mode, key, nkey, errp);
++    if (!ctx) {
++        return NULL;
++    }
++
++    cipher = g_new0(QCryptoCipher, 1);
++    cipher->alg = alg;
++    cipher->mode = mode;
++    cipher->opaque = ctx;
++
++    return cipher;
++}
+-- 
+2.13.0
