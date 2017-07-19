@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXglC-0008HS-V7
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:38:57 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dXgmm-000161-KB
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dXgl9-0002oX-OJ
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:38:54 -0400
-Date: Wed, 19 Jul 2017 14:34:42 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170719043442.GX3140@umbus.fritz.box>
-References: <149910050540.26371.12575732020425703531.stgit@bahia.lan>
-	<20170704072901.GA2180@umbus.fritz.box>
-	<20170704104722.499d4e86@bahia.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4PR/+zdSfVlxyWed"
-Content-Disposition: inline
-In-Reply-To: <20170704104722.499d4e86@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: make default PHB optionnal
+	(envelope-from <rth7680@gmail.com>) id 1dXgmj-0003ji-A2
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:40:32 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35713)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dXgmi-0003is-Vp
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 00:40:29 -0400
+Received: by mail-pg0-x241.google.com with SMTP id d193so5373350pgc.2
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 21:40:28 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Tue, 18 Jul 2017 18:40:18 -1000
+Message-Id: <20170719044018.18063-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH for-2.10] util: Introduce include/qemu/cpuid.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,260 +24,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, Andrea Bolognani <abologna@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
+
+Clang 3.9 passes the CONFIG_AVX2_OPT configure test.  However, the
+supplied <cpuid.h> does not contain the bit_AVX2 define that we use
+when detecting whether the routine can be enabled.
+
+Introduce a qemu-specific header that uses the compiler's definition
+of __cpuid et al, but supplies any missing bit_* definitions needed.
+This avoids introducing any extra ifdefs to util/bufferiszero.c, and
+allows quite a few to be removed from tcg/i386/tcg-target.inc.c.
+
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+
+Peter, this is the clang 3.9 problem I mentioned the other day,
+when attempting to reproduce the other clang 3.8 problem.
 
 
---4PR/+zdSfVlxyWed
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+r~
 
-On Tue, Jul 04, 2017 at 10:47:22AM +0200, Greg Kurz wrote:
-> On Tue, 4 Jul 2017 17:29:01 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Mon, Jul 03, 2017 at 06:48:25PM +0200, Greg Kurz wrote:
-> > > The sPAPR machine always create a default PHB during initialization, =
-even
-> > > if -nodefaults was passed on the command line. This forces the user to
-> > > rely on -global if she wants to set properties of the default PHB, su=
-ch
-> > > as numa_node.
-> > >=20
-> > > This patch introduces a new machine create-default-phb property to co=
-ntrol
-> > > whether the default PHB must be created or not. It defaults to on in =
-order
-> > > to preserve old setups (which is also the motivation to not alter the
-> > > current behavior of -nodefaults).
-> > >=20
-> > > If create-default-phb is set to off, the default PHB isn't created, n=
-or
-> > > any other device usually created with it. It is mandatory to provide
-> > > a PHB on the command line to be able to use PCI devices (otherwise QE=
-MU
-> > > won't start). For example, the following creates a PHB with the same
-> > > mappings as the default PHB and also sets the NUMA affinity:
-> > >=20
-> > >     -machine type=3Dpseries,create-default-phb=3Doff \
-> > >     -numa node,nodeid=3D0 -device spapr-pci-host-bridge,index=3D0,num=
-a_node=3D0
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> > So, I agree that the distinction between default devices that are
-> > disabled with -nodefaults and default devices that aren't is a big
-> > mess in qemu configuration.  But on the other hand this only addresses
-> > one tiny aspect of that, and in the meantime means we will silently
-> > ignore some other configuration options in some conditions.
-> >=20
-> > So, what's the immediate benefit / use case for this?
-> >=20
->=20
-> With the current code base, the only way to set properties of the default
-> PHB, is to pass -global spapr-pci-host-bridge.prop=3Dvalue for each prope=
-rty.
-> The immediate benefit of this patch is to unify the way libvirt passes
-> PHB description to the command line:
+---
+ include/qemu/cpuid.h      | 57 +++++++++++++++++++++++++++++++++++++++++++++++
+ tcg/i386/tcg-target.inc.c | 36 +++++++-----------------------
+ util/bufferiszero.c       |  7 +++---
+ configure                 | 43 +++++++++++++++++++----------------
+ 4 files changed, 92 insertions(+), 51 deletions(-)
+ create mode 100644 include/qemu/cpuid.h
 
-I thought you could use -set to set things more explicitly.  But I'll
-admit, I can never remember how the syntax of that works.
->=20
-> ie, do:
->=20
->     -machine type=3Dpseries,create-default-phb=3Doff \
->     -device spapr-pci-host-bridge,prop1=3Da,prop2=3Db,prop3=3Dc \
->     -device spapr-pci-host-bridge,prop1=3Dd,prop2=3De,prop3=3Df
->=20
-> instead of:
->=20
->     -machine type=3Dpseries \
->     -global spapr-pci-host-bridge.prop1=3Da \
->     -global spapr-pci-host-bridge.prop2=3Db \
->     -global spapr-pci-host-bridge.prop3=3Dc \
->     -device spapr-pci-host-bridge,prop1=3Dd,prop2=3De,prop3=3Df
->=20
-> > > ---
-> > >  hw/ppc/spapr.c         |   63 ++++++++++++++++++++++++++++++++++----=
-----------
-> > >  include/hw/ppc/spapr.h |    2 ++
-> > >  2 files changed, 47 insertions(+), 18 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index ba8f57a5a054..3395bb3774b9 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -2103,7 +2103,7 @@ static void ppc_spapr_init(MachineState *machin=
-e)
-> > >      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
-> > >      const char *kernel_filename =3D machine->kernel_filename;
-> > >      const char *initrd_filename =3D machine->initrd_filename;
-> > > -    PCIHostState *phb;
-> > > +    PCIHostState *phb =3D NULL;
-> > >      int i;
-> > >      MemoryRegion *sysmem =3D get_system_memory();
-> > >      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> > > @@ -2294,7 +2294,9 @@ static void ppc_spapr_init(MachineState *machin=
-e)
-> > >      /* Set up PCI */
-> > >      spapr_pci_rtas_init();
-> > > =20
-> > > -    phb =3D spapr_create_phb(spapr, 0);
-> > > +    if (spapr->create_default_phb) {
-> > > +        phb =3D spapr_create_phb(spapr, 0);
-> > > +    }
-> > > =20
-> > >      for (i =3D 0; i < nb_nics; i++) {
-> > >          NICInfo *nd =3D &nd_table[i];
-> > > @@ -2305,7 +2307,7 @@ static void ppc_spapr_init(MachineState *machin=
-e)
-> > > =20
-> > >          if (strcmp(nd->model, "ibmveth") =3D=3D 0) {
-> > >              spapr_vlan_create(spapr->vio_bus, nd);
-> > > -        } else {
-> > > +        } else if (phb) {
-> > >              pci_nic_init_nofail(&nd_table[i], phb->bus, nd->model, N=
-ULL);
-> > >          }
-> > >      }
-> > > @@ -2314,24 +2316,26 @@ static void ppc_spapr_init(MachineState *mach=
-ine)
-> > >          spapr_vscsi_create(spapr->vio_bus);
-> > >      }
-> > > =20
-> > > -    /* Graphics */
-> > > -    if (spapr_vga_init(phb->bus, &error_fatal)) {
-> > > -        spapr->has_graphics =3D true;
-> > > -        machine->usb |=3D defaults_enabled() && !machine->usb_disabl=
-ed;
-> > > -    }
-> > > -
-> > > -    if (machine->usb) {
-> > > -        if (smc->use_ohci_by_default) {
-> > > -            pci_create_simple(phb->bus, -1, "pci-ohci");
-> > > -        } else {
-> > > -            pci_create_simple(phb->bus, -1, "nec-usb-xhci");
-> > > +    if (phb) {
-> > > +        /* Graphics */
-> > > +        if (spapr_vga_init(phb->bus, &error_fatal)) {
-> > > +            spapr->has_graphics =3D true;
-> > > +            machine->usb |=3D defaults_enabled() && !machine->usb_di=
-sabled;
-> > >          }
-> > > =20
-> > > -        if (spapr->has_graphics) {
-> > > -            USBBus *usb_bus =3D usb_bus_find(-1);
-> > > +        if (machine->usb) {
-> > > +            if (smc->use_ohci_by_default) {
-> > > +                pci_create_simple(phb->bus, -1, "pci-ohci");
-> > > +            } else {
-> > > +                pci_create_simple(phb->bus, -1, "nec-usb-xhci");
-> > > +            }
-> > > +
-> > > +            if (spapr->has_graphics) {
-> > > +                USBBus *usb_bus =3D usb_bus_find(-1);
-> > > =20
-> > > -            usb_create_simple(usb_bus, "usb-kbd");
-> > > -            usb_create_simple(usb_bus, "usb-mouse");
-> > > +                usb_create_simple(usb_bus, "usb-kbd");
-> > > +                usb_create_simple(usb_bus, "usb-mouse");
-> > > +            }
-> > >          }
-> > >      }
-> > > =20
-> > > @@ -2544,12 +2548,27 @@ static void spapr_set_modern_hotplug_events(O=
-bject *obj, bool value,
-> > >      spapr->use_hotplug_event_source =3D value;
-> > >  }
-> > > =20
-> > > +static bool spapr_get_create_default_phb(Object *obj, Error **errp)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > +
-> > > +    return spapr->create_default_phb;
-> > > +}
-> > > +
-> > > +static void spapr_set_create_default_phb(Object *obj, bool value, Er=
-ror **errp)
-> > > +{
-> > > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > +
-> > > +    spapr->create_default_phb =3D value;
-> > > +}
-> > > +
-> > >  static void spapr_machine_initfn(Object *obj)
-> > >  {
-> > >      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > =20
-> > >      spapr->htab_fd =3D -1;
-> > >      spapr->use_hotplug_event_source =3D true;
-> > > +    spapr->create_default_phb =3D true;
-> > >      object_property_add_str(obj, "kvm-type",
-> > >                              spapr_get_kvm_type, spapr_set_kvm_type, =
-NULL);
-> > >      object_property_set_description(obj, "kvm-type",
-> > > @@ -2568,6 +2587,14 @@ static void spapr_machine_initfn(Object *obj)
-> > >      ppc_compat_add_property(obj, "max-cpu-compat", &spapr->max_compa=
-t_pvr,
-> > >                              "Maximum permitted CPU compatibility mod=
-e",
-> > >                              &error_fatal);
-> > > +
-> > > +    object_property_add_bool(obj, "create-default-phb",
-> > > +                            spapr_get_create_default_phb,
-> > > +                            spapr_set_create_default_phb,
-> > > +                            NULL);
-> > > +    object_property_set_description(obj, "create-default-phb",
-> > > +                                    "Create a default PCI Host Bridg=
-e",
-> > > +                                    NULL);
-> > >  }
-> > > =20
-> > >  static void spapr_machine_finalizefn(Object *obj)
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index a184ffab0ebc..6ee914764807 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -93,6 +93,8 @@ struct sPAPRMachineState {
-> > >      bool use_hotplug_event_source;
-> > >      sPAPREventSource *event_sources;
-> > > =20
-> > > +    bool create_default_phb;
-> > > +
-> > >      /* ibm,client-architecture-support option negotiation */
-> > >      bool cas_reboot;
-> > >      bool cas_legacy_guest_workaround;
-> > >  =20
-> >=20
->=20
-
-
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---4PR/+zdSfVlxyWed
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAllu4WIACgkQbDjKyiDZ
-s5IZtQ/9H/v4RmYsUMp31aaiKUKI4X8JwygRGz5liOhgIWxczdMBSyXwm8gpbphn
-FRtob3qqTbNoxhu1dlpxH2G056/YB78EL3RD7PWDQgj/FONOE3hYUgbp/2kXgj4f
-456dAbpQGxadjRvbQjzKUhtiXaT2NASDkCeQVWO5Qq2INBJSngaeuYBg+PTtETVI
-9sP0jBKD0LtsNDieE5urNQQ0aV0s0eVPtXq5OOhuTdK8COD5q9W8Q+0Qh/fk0Jj1
-sFwdZu39TNSlVXbgyCzXuwA9PcvZ4mS4Uv4WRnmujXzZPE0r9IudZE2HCn3A1cuG
-XldSH9FwEkIaGpkXSSRYh6ataFLqe3oAglsX8jdnHbA3Qq9CoPzFC6Akf+vFF5TG
-w8mjB7HRo8aqh4T5c+W/mYOwEIx3V6FsVDTVwi4azshnwFmB+9wH/qTJDyvrsvBV
-7t0Qi6y07Nq4WRaMXGjjwo9YAqxaKygmJpNxyA34WTHpgtmIIbhC/WMRPYHCWbpU
-VFipsZNjez9TMftdSB63JOM4lGgy+nzX8tGN55JjwDZl9yNZ13+ageYZq3J7wVf3
-xzxWCmjnAjn8OkZNj91zVcgLpG3fdkq8ZbErc8N0SUufzm21rIpFjmQi+qrlnzkw
-H5IMmuPju3Mi8vlfFr3GEuToUf7AfgY9PChH7KAXrJT2LURtu6M=
-=ivd0
------END PGP SIGNATURE-----
-
---4PR/+zdSfVlxyWed--
+diff --git a/include/qemu/cpuid.h b/include/qemu/cpuid.h
+new file mode 100644
+index 0000000..6930170
+--- /dev/null
++++ b/include/qemu/cpuid.h
+@@ -0,0 +1,57 @@
++/* cpuid.h: Macros to identify the properties of an x86 host.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_CPUID_H
++#define QEMU_CPUID_H
++
++#ifndef CONFIG_CPUID_H
++# error "<cpuid.h> is unusable with this compiler"
++#endif
++
++#include <cpuid.h>
++
++/* Cover the uses that we have within qemu.  */
++/* ??? Irritating that we have the same information in target/i386/.  */
++
++/* Leaf 1, %edx */
++#ifndef bit_CMOV
++#define bit_CMOV        (1 << 15)
++#endif
++#ifndef bit_SSE2
++#define bit_SSE2        (1 << 26)
++#endif
++
++/* Leaf 1, %ecx */
++#ifndef bit_SSE4_1
++#define bit_SSE4_1      (1 << 19)
++#endif
++#ifndef bit_MOVBE
++#define bit_MOVBE       (1 << 22)
++#endif
++#ifndef bit_OSXSAVE
++#define bit_OSXSAVE     (1 << 27)
++#endif
++#ifndef bit_AVX
++#define bit_AVX         (1 << 28)
++#endif
++
++/* Leaf 7, %ebx */
++#ifndef bit_BMI
++#define bit_BMI         (1 << 3)
++#endif
++#ifndef bit_AVX2
++#define bit_AVX2        (1 << 5)
++#endif
++#ifndef bit_BMI2
++#define bit_BMI2        (1 << 8)
++#endif
++
++/* Leaf 0x80000001, %ecx */
++#ifndef bit_LZCNT
++#define bit_LZCNT       (1 << 5)
++#endif
++
++#endif /* QEMU_CPUID_H */
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 01e3b4e..e4b120a 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -109,40 +109,30 @@ static const int tcg_target_call_oarg_regs[] = {
+    detection, as we're not going to go so far as our own inline assembly.
+    If not available, default values will be assumed.  */
+ #if defined(CONFIG_CPUID_H)
+-#include <cpuid.h>
++#include "qemu/cpuid.h"
+ #endif
+ 
+-/* For 32-bit, we are going to attempt to determine at runtime whether cmov
+-   is available.  */
++/* For 64-bit, we always know that CMOV is available.  */
+ #if TCG_TARGET_REG_BITS == 64
+ # define have_cmov 1
+-#elif defined(CONFIG_CPUID_H) && defined(bit_CMOV)
++#elif defined(CONFIG_CPUID_H)
+ static bool have_cmov;
+ #else
+ # define have_cmov 0
+ #endif
+ 
+-/* If bit_MOVBE is defined in cpuid.h (added in GCC version 4.6), we are
+-   going to attempt to determine at runtime whether movbe is available.  */
+-#if defined(CONFIG_CPUID_H) && defined(bit_MOVBE)
+-static bool have_movbe;
+-#else
+-# define have_movbe 0
+-#endif
+-
+ /* We need these symbols in tcg-target.h, and we can't properly conditionalize
+    it there.  Therefore we always define the variable.  */
+ bool have_bmi1;
+ bool have_popcnt;
+ 
+-#if defined(CONFIG_CPUID_H) && defined(bit_BMI2)
++#ifdef CONFIG_CPUID_H
++static bool have_movbe;
+ static bool have_bmi2;
+-#else
+-# define have_bmi2 0
+-#endif
+-#if defined(CONFIG_CPUID_H) && defined(bit_LZCNT)
+ static bool have_lzcnt;
+ #else
++# define have_movbe 0
++# define have_bmi2 0
+ # define have_lzcnt 0
+ #endif
+ 
+@@ -2619,36 +2609,26 @@ static void tcg_target_init(TCGContext *s)
+            available, we'll use a small forward branch.  */
+         have_cmov = (d & bit_CMOV) != 0;
+ #endif
+-#ifndef have_movbe
+         /* MOVBE is only available on Intel Atom and Haswell CPUs, so we
+            need to probe for it.  */
+         have_movbe = (c & bit_MOVBE) != 0;
+-#endif
+-#ifdef bit_POPCNT
+         have_popcnt = (c & bit_POPCNT) != 0;
+-#endif
+     }
+ 
+     if (max >= 7) {
+         /* BMI1 is available on AMD Piledriver and Intel Haswell CPUs.  */
+         __cpuid_count(7, 0, a, b, c, d);
+-#ifdef bit_BMI
+         have_bmi1 = (b & bit_BMI) != 0;
+-#endif
+-#ifndef have_bmi2
+         have_bmi2 = (b & bit_BMI2) != 0;
+-#endif
+     }
+-#endif
+ 
+-#ifndef have_lzcnt
+     max = __get_cpuid_max(0x8000000, 0);
+     if (max >= 1) {
+         __cpuid(0x80000001, a, b, c, d);
+         /* LZCNT was introduced with AMD Barcelona and Intel Haswell CPUs.  */
+         have_lzcnt = (c & bit_LZCNT) != 0;
+     }
+-#endif
++#endif /* CONFIG_CPUID_H */
+ 
+     if (TCG_TARGET_REG_BITS == 64) {
+         tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffff);
+diff --git a/util/bufferiszero.c b/util/bufferiszero.c
+index eb974b7..2178d8a 100644
+--- a/util/bufferiszero.c
++++ b/util/bufferiszero.c
+@@ -197,7 +197,7 @@ buffer_zero_avx2(const void *buf, size_t len)
+ 
+ /* Make sure that these variables are appropriately initialized when
+  * SSE2 is enabled on the compiler command-line, but the compiler is
+- * too old to support <cpuid.h>.
++ * too old to support CONFIG_AVX2_OPT.
+  */
+ #ifdef CONFIG_AVX2_OPT
+ # define INIT_CACHE 0
+@@ -231,7 +231,8 @@ static void init_accel(unsigned cache)
+ }
+ 
+ #ifdef CONFIG_AVX2_OPT
+-#include <cpuid.h>
++#include "qemu/cpuid.h"
++
+ static void __attribute__((constructor)) init_cpuid_cache(void)
+ {
+     int max = __get_cpuid_max(0, NULL);
+@@ -243,7 +244,6 @@ static void __attribute__((constructor)) init_cpuid_cache(void)
+         if (d & bit_SSE2) {
+             cache |= CACHE_SSE2;
+         }
+-#ifdef CONFIG_AVX2_OPT
+         if (c & bit_SSE4_1) {
+             cache |= CACHE_SSE4;
+         }
+@@ -257,7 +257,6 @@ static void __attribute__((constructor)) init_cpuid_cache(void)
+                 cache |= CACHE_AVX2;
+             }
+         }
+-#endif
+     }
+     cpuid_cache = cache;
+     init_accel(cache);
+diff --git a/configure b/configure
+index e8798ce..63a890e 100755
+--- a/configure
++++ b/configure
+@@ -358,6 +358,7 @@ libusb=""
+ usb_redir=""
+ opengl=""
+ opengl_dmabuf="no"
++cpuid_h="no"
+ avx2_opt="no"
+ zlib="yes"
+ lzo=""
+@@ -1932,24 +1933,6 @@ EOF
+   fi
+ fi
+ 
+-##########################################
+-# avx2 optimization requirement check
+-
+-cat > $TMPC << EOF
+-#pragma GCC push_options
+-#pragma GCC target("avx2")
+-#include <cpuid.h>
+-#include <immintrin.h>
+-static int bar(void *a) {
+-    __m256i x = *(__m256i *)a;
+-    return _mm256_testz_si256(x, x);
+-}
+-int main(int argc, char *argv[]) { return bar(argv[0]); }
+-EOF
+-if compile_object "" ; then
+-  avx2_opt="yes"
+-fi
+-
+ #########################################
+ # zlib check
+ 
+@@ -4629,7 +4612,6 @@ fi
+ ########################################
+ # check if cpuid.h is usable.
+ 
+-cpuid_h=no
+ cat > $TMPC << EOF
+ #include <cpuid.h>
+ int main(void) {
+@@ -4651,6 +4633,29 @@ if compile_prog "" "" ; then
+     cpuid_h=yes
+ fi
+ 
++##########################################
++# avx2 optimization requirement check
++#
++# There is no point enabling this if cpuid.h is not usable,
++# since we won't be able to select the new routines.
++
++if test $cpuid_h = yes; then
++  cat > $TMPC << EOF
++#pragma GCC push_options
++#pragma GCC target("avx2")
++#include <cpuid.h>
++#include <immintrin.h>
++static int bar(void *a) {
++    __m256i x = *(__m256i *)a;
++    return _mm256_testz_si256(x, x);
++}
++int main(int argc, char *argv[]) { return bar(argv[0]); }
++EOF
++  if compile_object "" ; then
++    avx2_opt="yes"
++  fi
++fi
++
+ ########################################
+ # check if __[u]int128_t is usable.
+ 
+-- 
+2.9.4
