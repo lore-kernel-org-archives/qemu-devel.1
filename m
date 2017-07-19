@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXi8G-00013Q-Hm
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:06:49 -0400
+	(envelope-from <lprosek@redhat.com>) id 1dXi8W-0001Af-N8
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXi8B-0004pR-FY
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:06:48 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:48809)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXi8A-0004oW-RP
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:06:43 -0400
-Date: Wed, 19 Jul 2017 14:06:36 +0800 (CST)
-Message-ID: <201707191406361857655@zte.com.cn>
-References: 201707191017508680118@zte.com.cn,
-	918c73df-fad9-ab4e-1ec9-3b45ef14aa2f@twiddle.net
-Mime-Version: 1.0
-From: <jiang.biao2@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH_v2_00/45=5D_tcg=3A_support_for_m?=
- =?utf-8?q?ultipleTCGcontexts?=
+	(envelope-from <lprosek@redhat.com>) id 1dXi8R-0004vp-NF
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:04 -0400
+Received: from mail-ua0-f175.google.com ([209.85.217.175]:33240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dXi8R-0004vb-JC
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:06:59 -0400
+Received: by mail-ua0-f175.google.com with SMTP id y47so27938945uag.0
+	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 23:06:59 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1C+HE1NXFmuhY0sJsZUUQ4F8Ua6wpnnuGA4UrWUzZVOPKg@mail.gmail.com>
+References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
+	<20170714222705-mutt-send-email-mst@kernel.org>
+	<71fd872e-ca59-169d-07fb-5e304713fa84@redhat.com>
+	<20170715011517-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CJZ2p_i-SCi-s5=-xcmg4wORv6B_7kjCyRGb5r8oDBWCQ@mail.gmail.com>
+	<20170715021021-mutt-send-email-mst@kernel.org>
+	<CAJ+F1CLciE6piWiAo=5r-J6jPQnvj-LWxxbTHsY5d=o-VW7Bsg@mail.gmail.com>
+	<CABdb73513u5O0Z5ZBWcKq-UPPAXSTWhibUBEXqrksAiNOXYJfg@mail.gmail.com>
+	<CAJ+F1C+HE1NXFmuhY0sJsZUUQ4F8Ua6wpnnuGA4UrWUzZVOPKg@mail.gmail.com>
+From: Ladi Prosek <lprosek@redhat.com>
+Date: Wed, 19 Jul 2017 08:06:58 +0200
+Message-ID: <CABdb734Lj28SbeEYKCWCvjZmVbxBHd_a6Gizq_QwgGFX2x6ZAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] KASLR kernel dump support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +36,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: shi.zhongbing@zte.com.cn, cota@braap.org, alex.bennee@linaro.org, qemu-devel@nongnu.org, jiang.yong5@zte.com.cn
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dave Anderson <anderson@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-PiBGb3IgdGhpcyBzcGVjaWZpYyBjYXNlLCB0aGUgcHJpbWFyeSBwcm9ibGVtIHdpbGwgYmUgdGhl
-IGltcGxpY2l0IG1lbW9yeSANCj4gYmFycmllcnMgdGhhdCB0aGUgaTM4NiBndWVzdCByZXF1aXJl
-cywgYnV0IHRoYXQgdGhlIG1pcHM2NCBob3N0IGRvZXMgbm90IHByb3ZpZGUuDQo+IA0KPiBGb3Ig
-dGNnL21pcHMvLCBUQ0dfVEFSR0VUX0RFRkFVTFRfTU8gc2hvdWxkIGJlIDAsIGJlY2F1c2UgdGhl
-IG1pcHMgYXJjaGl0ZWN0dXJlIA0KPiBkb2VzIG5vdCBoYXZlIGFueSBpbXBsaWNpdCBtZW1vcnkg
-b3JkZXJpbmcuICBBbGwgbWVtb3J5IGJhcnJpZXJzIGFyZSBleHBsaWNpdCANCj4gdmlhIFNZTkMg
-aW5zdHJ1Y3Rpb25zLg0KPiANCj4gRm9yIHRhcmdldC9pMzg2LCBUQ0dfR1VFU1RfREVGQVVMVF9N
-TyBpcyBUQ0dfTU9fQUxMICYgflRDR19NT19TVF9MRCwgb3INCj4gDQo+ICAgICBUQ0dfTU9fTERf
-TEQgfCBUQ0dfTU9fTERfU1QgfCBUQ0dfTU9fU1RfU1QNCj4gDQo+IHdoaWNoIG1lYW5zIHRoYXQg
-aW1wbGljaXQgbWVtb3J5IGJhcnJpZXJzIGV4aXN0IGJldHdlZW4gbG9hZC9sb2FkLCBsb2FkL3N0
-b3JlLCANCj4gc3RvcmUvc3RvcmUsIGJ1dCBub3Qgc3RvcmUvbG9hZC4NCj4gDQo+IEluIG9yZGVy
-IHRvIGZpeCB0aGlzLCB3ZSBuZWVkIHRvIGFkZCB0aGUgbWlzc2luZyBiYXJyaWVycyB0byB0aGUg
-b3Bjb2RlIHN0cmVhbS4NCj4gDQo+IFRoZSBzaW1wbGVzdCBmaXggZm9yIHRoaXMgaXMgdG8gcHV0
-IGEgY2FsbA0KPiANCj4gICAgIHRjZ19nZW5fbWIoVENHX01PX0FMTCB8IFRDR19CQVJfU0MpDQo+
-IA0KPiBhdCB0aGUgZW5kIG9mIGdlbl9sZHN0X2kzMiBhbmQgZ2VuX2xkc3RfaTY0LiAgVGhhdCBz
-aG91bGQgYmUgZ29vZCBlbm91Z2ggdG8gDQo+IG1ha2UgeW91ciBzcGVjaWZpYyBjYXNlIG9wZXJh
-dGUgY29ycmVjdGx5Lg0KPiANCj4gQSBwcm9wZXIgZml4IHdpbGwgaW52b2x2ZSAoMSkgZW1pdHRp
-bmcgdGhvc2UgYmFycmllcnMgb25seSBpZiB0aGUgYmFycmllciBpcyANCj4gbm90IGltcGxpZWQg
-YnkgdGhlIGhvc3QgYW5kICgyKSBvcHRpbWl6aW5nIGF3YXkgcmVkdW5kYW50IGJhcnJpZXJzLg0K
-PiANClRoYW5rcyB2ZXJ5IG11Y2guIFRoYXQgcmVhbGx5IGhlbHBzIGEgbG90Lg0KDQpJJ2xsIGRp
-ZyBkZWVwZXIgaW50byB0aGF0IGFuZCBtYXliZSBmZWVkYmFjayBzb21lIHBhdGNoZXMu
+On Tue, Jul 18, 2017 at 6:18 PM, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+> Hi
+>
+> On Tue, Jul 18, 2017 at 6:05 PM Ladi Prosek <lprosek@redhat.com> wrote:
+>>
+>>
+>> > I would like to hear from Ladi how he intended to use the device in
+>> > the future, and if he would also prefer ACPI methods and what those
+>> > methods should be.
+>>
+>> We should be able to drive pretty much anything from Windows. I wrote
+>> a dummy driver for your earlier prototype just to be sure that ACPI
+>> methods are fine, as I had not done or seen that before.
+>>
+>> There are constraints which may be unique to Windows, though. If the
+>> dump-support data is kept in guest-allocated memory, the guest must be
+>> able to revoke it (set / call the method with NULL PA?) because
+>> Windows drivers must free everything on unload. Unlike Linux, I don't
+>
+>
+> Well, the currently proposed vmcoreinfo device has a 4k memory region to =
+put
+> anything you want, Windows shouldn't be allowed to touch it directly (e82=
+0
+> regions iirc)
+
+Got it. And we would likely use it to put just addr/size there to make
+updates atomic. I think we're supposed to update our dump-support data
+on memory hot-plug for example.
+
+>> think we can get a piece of memory at startup and keep it for as long
+>> as the OS running. It would be flagged as a memory leak. But that
+>> should be easy to have. Can't really think of anything else.
+>
+>
+> The question is what kind of data you want to give to the host to help wi=
+th
+> debug. Is this something that can be as simple as addr/size, or you would
+> rather have a 4k page to put various things there.
+
+The size of the dump header as currently provided by Windows (that's
+the dump-support data we want to pass to the host) is 4k. So I
+wouldn't put it directly in the page anyway. That, plus the desire to
+update the data at least somewhat atomically, would make me prefer a
+simple addr/size pair I think.
+
+>>
+>>
+>> >>>
+>> >>> >> > instead of exporting a physical addess and storing address ther=
+e.
+>> >>> >> > This
+>> >>> >> > way you can add more methods as you add functionality.
+>> >>> >>
+>> >>> >> I'm not saying this is a bad idea (especially because I don't ful=
+ly
+>> >>> >> understand your point), but I will say that I'm quite sad that yo=
+u
+>> >>> >> are
+>> >>> >> sending Marc-Andr=C3=A9 back to the drawing board after he posted=
+ v4 --
+>> >>> >> also
+>> >>> >> invalidating my review efforts. :/
+>> >>> >>
+>> >>> >> Laszlo
+>> >>> >
+>> >>> > You are right, I should have looked at this sooner. Early RFC
+>> >>> > suggested writing into fw cfg directly. I couldn't find any
+>> >>> > discussion around this - why was this abandoned?
+>> >>>
+>> >>> Violation (or rather abuse) of layers iirc
+>> >>
+>> >> Hmm.  I tried to find discussion about that and failed.  It is
+>> >> available
+>> >> through QEMU0002 in ACPI - would it be OK if guests went through that=
+?
+>> >
+>> > I wouldn't mind, although merging functionality in a single device
+>> > isn't what I would think of first. I guess Ladi would be happier with
+>> > a single device. I suppose it shouldn't break drivers if we had
+>> > memory, io, methods etc to the device?
+>>
+>> Yeah, it would be nice if this was part of pvpanic. Even something
+>> really simple like:
+>>
+>>  /* The bit of supported pv event */
+>>  #define PVPANIC_F_PANICKED      0
+>> +#define PVPANIC_F_DUMP_INFO_SET      1
+>
+>
+> QEMU0002 is fw_cfg
+
+Ah, sorry, I got confused.
+
+>>
+>>
+>> -     memory_region_init_io(&s->io, OBJECT(s), &pvpanic_ops, s, "pvpanic=
+",
+>> 1);
+>> +    memory_region_init_io(&s->io, OBJECT(s), &pvpanic_ops, s,
+>> "pvpanic", 32); // or whatever
+>>
+>> The guest writes to two or three registers: PA, size, type?, then sets
+>> the PVPANIC_F_DUMP_INFO_SET bit.
+>>
+>> Although not sure if extending the I/O region is OK. And of course I
+>> only need this on x86 :p
+>>
+>
+> I would rather have a solution that works on various archs. It's a shame
+> pvpanic was designed with x86 only in mind imho.
+
+Understood. Thanks!
+
+>
+> --
+> Marc-Andr=C3=A9 Lureau
