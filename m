@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXvBr-0007vl-6d
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXvBr-0007vm-6o
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 16:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXvBo-0004jj-UT
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXvBo-0004jR-I8
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 16:03:23 -0400
-Received: from ivanoab5.miniserver.com ([78.31.111.25]:42510
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:42507
 	helo=www.kot-begemot.co.uk)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
-	id 1dXvBo-0004iy-KD
+	id 1dXvBo-0004in-A4
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 16:03:20 -0400
 From: anton.ivanov@cambridgegreys.com
-Date: Wed, 19 Jul 2017 21:02:58 +0100
-Message-Id: <20170719200259.17428-4-anton.ivanov@cambridgegreys.com>
+Date: Wed, 19 Jul 2017 21:02:59 +0100
+Message-Id: <20170719200259.17428-5-anton.ivanov@cambridgegreys.com>
 In-Reply-To: <20170719200259.17428-1-anton.ivanov@cambridgegreys.com>
 References: <20170719200259.17428-1-anton.ivanov@cambridgegreys.com>
-Subject: [Qemu-devel] [PATCH 3/4] GRETAP Backend for UDST
+Subject: [Qemu-devel] [PATCH 4/4] Raw Backend for UDST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +30,68 @@ Cc: jasowang@redhat.com, Anton Ivanov <anton.ivanov@cambridgegreys.com>
 
 From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
 
-GRETAP Backend for Universal Datagram Socket Transport
+Raw Socket Backend for Universal Datagram Socket Transport
 
 Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
 ---
  net/Makefile.objs |   2 +-
- net/clients.h     |   4 +
- net/gre.c         | 311 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ net/clients.h     |   3 ++
  net/net.c         |   1 +
- qapi-schema.json  |  41 ++++++-
- qemu-options.hx   |  60 ++++++++++-
- 6 files changed, 414 insertions(+), 5 deletions(-)
- create mode 100644 net/gre.c
+ net/raw.c         | 123 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi-schema.json  |  20 ++++++++-
+ qemu-options.hx   |  32 ++++++++++++++
+ 6 files changed, 178 insertions(+), 3 deletions(-)
+ create mode 100644 net/raw.c
 
 diff --git a/net/Makefile.objs b/net/Makefile.objs
-index ffdfb96bd0..919bc3d78f 100644
+index 919bc3d78f..457297b5ed 100644
 --- a/net/Makefile.objs
 +++ b/net/Makefile.objs
 @@ -2,7 +2,7 @@ common-obj-y = net.o queue.o checksum.o util.o hub.o
  common-obj-y += socket.o
  common-obj-y += dump.o
  common-obj-y += eth.o
--common-obj-$(CONFIG_UDST) += udst.o l2tpv3.o
-+common-obj-$(CONFIG_UDST) += udst.o l2tpv3.o gre.o
+-common-obj-$(CONFIG_UDST) += udst.o l2tpv3.o gre.o
++common-obj-$(CONFIG_UDST) += udst.o l2tpv3.o gre.o raw.o
  common-obj-$(CONFIG_POSIX) += vhost-user.o
  common-obj-$(CONFIG_SLIRP) += slirp.o
  common-obj-$(CONFIG_VDE) += vde.o
 diff --git a/net/clients.h b/net/clients.h
-index 5cae479730..8f8a59aee3 100644
+index 8f8a59aee3..98d8ae59b7 100644
 --- a/net/clients.h
 +++ b/net/clients.h
-@@ -49,6 +49,10 @@ int net_init_bridge(const Netdev *netdev, const char *name,
- 
- int net_init_l2tpv3(const Netdev *netdev, const char *name,
+@@ -53,6 +53,9 @@ int net_init_l2tpv3(const Netdev *netdev, const char *name,
+ int net_init_gre(const Netdev *netdev, const char *name,
                      NetClientState *peer, Error **errp);
-+
-+int net_init_gre(const Netdev *netdev, const char *name,
+ 
++int net_init_raw(const Netdev *netdev, const char *name,
 +                    NetClientState *peer, Error **errp);
 +
  #ifdef CONFIG_VDE
  int net_init_vde(const Netdev *netdev, const char *name,
                   NetClientState *peer, Error **errp);
-diff --git a/net/gre.c b/net/gre.c
+diff --git a/net/net.c b/net/net.c
+index 6163a8a3af..8eb0aa2bee 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -963,6 +963,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
+ #ifdef CONFIG_UDST
+         [NET_CLIENT_DRIVER_L2TPV3] = net_init_l2tpv3,
+         [NET_CLIENT_DRIVER_GRE] = net_init_gre,
++        [NET_CLIENT_DRIVER_RAW] = net_init_raw,
+ #endif
+ };
+ 
+diff --git a/net/raw.c b/net/raw.c
 new file mode 100644
-index 0000000000..7734d78102
+index 0000000000..8f73248095
 --- /dev/null
-+++ b/net/gre.c
-@@ -0,0 +1,311 @@
++++ b/net/raw.c
+@@ -0,0 +1,123 @@
 +/*
 + * QEMU System Emulator
 + *
-+ * Copyright (c) 2015-2017 Cambridge GREys Limited
++ * Copyright (c) 2015-2017 Cambridge Greys Limited
 + * Copyright (c) 2003-2008 Fabrice Bellard
 + * Copyright (c) 2012-2014 Cisco Systems
 + *
@@ -106,7 +117,12 @@ index 0000000000..7734d78102
 +#include "qemu/osdep.h"
 +#include <linux/ip.h>
 +#include <netdb.h>
++#include <sys/ioctl.h>
++#include <net/if.h>
 +#include "net/net.h"
++#include <sys/socket.h>
++#include <linux/if_packet.h>
++#include <net/ethernet.h>
 +#include "clients.h"
 +#include "qemu-common.h"
 +#include "qemu/error-report.h"
@@ -117,265 +133,74 @@ index 0000000000..7734d78102
 +#include "qemu/main-loop.h"
 +#include "udst.h"
 +
-+/* IANA-assigned IP protocol ID for GRE */
-+
-+
-+#ifndef IPPROTO_GRE
-+#define IPPROTO_GRE 0x2F
-+#endif
-+
-+#define GRE_MODE_CHECKSUM     htons(8 << 12)   /* checksum */
-+#define GRE_MODE_RESERVED     htons(4 << 12)   /* unused */
-+#define GRE_MODE_KEY          htons(2 << 12)   /* KEY present */
-+#define GRE_MODE_SEQUENCE     htons(1 << 12)   /* no sequence */
-+
-+
-+/* GRE TYPE for Ethernet in GRE aka GRETAP */
-+
-+#define GRE_IRB htons(0x6558)
-+
-+struct gre_minimal_header {
-+   uint16_t header;
-+   uint16_t arptype;
-+};
-+
-+typedef struct GRETunnelParams {
-+    /*
-+     * GRE parameters
-+     */
-+
-+    uint32_t rx_key;
-+    uint32_t tx_key;
-+    uint32_t sequence;
-+
-+    /* Flags */
-+
-+    bool ipv6;
-+    bool udp;
-+    bool has_sequence;
-+    bool pin_sequence;
-+    bool checksum;
-+    bool key;
-+
-+    /* Precomputed GRE specific offsets */
-+
-+    uint32_t key_offset;
-+    uint32_t sequence_offset;
-+    uint32_t checksum_offset;
-+
-+    struct gre_minimal_header header_bits;
-+
-+} GRETunnelParams;
-+
-+
-+
-+static void gre_form_header(void *us)
++static int noop(void *us, uint8_t *buf)
 +{
-+    NetUdstState *s = (NetUdstState *) us;
-+    GRETunnelParams *p = (GRETunnelParams *) s->params;
-+
-+    uint32_t *sequence;
-+
-+    *((uint32_t *) s->header_buf) = *((uint32_t *) &p->header_bits);
-+
-+    if (p->key) {
-+        stl_be_p(
-+            (uint32_t *) (s->header_buf + p->key_offset),
-+            p->tx_key
-+        );
-+    }
-+    if (p->has_sequence) {
-+        sequence = (uint32_t *)(s->header_buf + p->sequence_offset);
-+        if (p->pin_sequence) {
-+            *sequence = 0;
-+        } else {
-+            stl_be_p(sequence, ++p->sequence);
-+        }
-+    }
-+}
-+
-+static int gre_verify_header(void *us, uint8_t *buf)
-+{
-+
-+    NetUdstState *s = (NetUdstState *) us;
-+    GRETunnelParams *p = (GRETunnelParams *) s->params;
-+    uint32_t key;
-+
-+
-+    if (!p->ipv6) {
-+        buf += sizeof(struct iphdr) /* fix for ipv4 raw */;
-+    }
-+
-+    if (*((uint32_t *) buf) != *((uint32_t *) &p->header_bits)) {
-+        if (!s->header_mismatch) {
-+            error_report("header type disagreement, expecting %0x, got %0x",
-+                *((uint32_t *) &p->header_bits), *((uint32_t *) buf));
-+        }
-+        return -1;
-+    }
-+
-+    if (p->key) {
-+        key = ldl_be_p(buf + p->key_offset);
-+        if (key != p->rx_key) {
-+            if (!s->header_mismatch) {
-+                error_report("unknown key id %0x, expecting %0x",
-+                    key, p->rx_key);
-+            }
-+            return -1;
-+        }
-+    }
 +    return 0;
 +}
 +
-+int net_init_gre(const Netdev *netdev,
++int net_init_raw(const Netdev *netdev,
 +                    const char *name,
 +                    NetClientState *peer, Error **errp)
 +{
-+    const NetdevGREOptions *gre;
++
++    const NetdevRawOptions *raw;
 +    NetUdstState *s;
 +    NetClientState *nc;
-+    GRETunnelParams *p;
 +
-+    int fd = -1, gairet;
-+    struct addrinfo hints;
-+    struct addrinfo *result = NULL;
++    int fd = -1;
++    int err;
++
++    struct ifreq ifr;
++    struct sockaddr_ll sock;
++
 +
 +    nc = qemu_new_udst_net_client(name, peer);
 +
 +    s = DO_UPCAST(NetUdstState, nc, nc);
 +
-+    p = g_malloc(sizeof(GRETunnelParams));
-+
-+    s->params = p;
-+    p->header_bits.arptype = GRE_IRB;
-+    p->header_bits.header = 0;
-+
-+    assert(netdev->type == NET_CLIENT_DRIVER_GRE);
-+    gre = &netdev->u.gre;
-+
-+    if (gre->has_ipv6 && gre->ipv6) {
-+        p->ipv6 = gre->ipv6;
-+    } else {
-+        p->ipv6 = false;
-+    }
-+
-+    s->offset = 4;
-+    p->key_offset = 4;
-+    p->sequence_offset = 4;
-+    p->checksum_offset = 4;
-+
-+    if (gre->has_rxkey || gre->has_txkey) {
-+        if (gre->has_rxkey && gre->has_txkey) {
-+            p->key = true;
-+            p->header_bits.header |= GRE_MODE_KEY;
-+        } else {
-+            goto outerr;
-+        }
-+    } else {
-+        p->key = false;
-+    }
-+
-+    if (p->key) {
-+        p->rx_key = gre->rxkey;
-+        p->tx_key = gre->txkey;
-+        s->offset += 4;
-+        p->sequence_offset += 4;
-+    }
-+
-+
-+    if (gre->has_sequence && gre->sequence) {
-+        s->offset += 4;
-+        p->has_sequence = true;
-+        p->header_bits.header |= GRE_MODE_SEQUENCE;
-+    } else {
-+        p->sequence = false;
-+    }
-+
-+    if (gre->has_pinsequence && gre->pinsequence) {
-+        /* pin sequence implies that there is sequence */
-+        p->has_sequence = true;
-+        p->pin_sequence = true;
-+    } else {
-+        p->pin_sequence = false;
-+    }
-+
-+    memset(&hints, 0, sizeof(hints));
-+
-+    if (p->ipv6) {
-+        hints.ai_family = AF_INET6;
-+    } else {
-+        hints.ai_family = AF_INET;
-+    }
-+
-+    hints.ai_socktype = SOCK_RAW;
-+    hints.ai_protocol = IPPROTO_GRE;
-+
-+    gairet = getaddrinfo(gre->src, NULL, &hints, &result);
-+
-+    if ((gairet != 0) || (result == NULL)) {
-+        error_report(
-+            "gre_open : could not resolve src, errno = %s",
-+            gai_strerror(gairet)
-+        );
-+        goto outerr;
-+    }
-+    fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
++    fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 +    if (fd == -1) {
-+        fd = -errno;
-+        error_report("gre_open : socket creation failed, errno = %d", -fd);
-+        goto outerr;
-+    }
-+    if (bind(fd, (struct sockaddr *) result->ai_addr, result->ai_addrlen)) {
-+        error_report("gre_open :  could not bind socket err=%i", errno);
-+        goto outerr;
-+    }
-+    if (result) {
-+        freeaddrinfo(result);
-+    }
-+
-+    memset(&hints, 0, sizeof(hints));
-+
-+    if (p->ipv6) {
-+        hints.ai_family = AF_INET6;
-+    } else {
-+        hints.ai_family = AF_INET;
-+    }
-+    hints.ai_socktype = SOCK_RAW;
-+    hints.ai_protocol = IPPROTO_GRE;
-+
-+    result = NULL;
-+    gairet = getaddrinfo(gre->dst, NULL, &hints, &result);
-+    if ((gairet != 0) || (result == NULL)) {
-+        error_report(
-+            "gre_open : could not resolve dst, error = %s",
-+            gai_strerror(gairet)
-+        );
++        err = -errno;
++        error_report("raw_open : raw socket creation failed, errno = %d", -err);
 +        goto outerr;
 +    }
 +
-+    s->dgram_dst = g_new0(struct sockaddr_storage, 1);
-+    memcpy(s->dgram_dst, result->ai_addr, result->ai_addrlen);
-+    s->dst_size = result->ai_addrlen;
 +
-+    if (result) {
-+        freeaddrinfo(result);
++    s->dgram_dst = NULL;
++    s->dst_size = 0;
++
++    assert(netdev->type == NET_CLIENT_DRIVER_RAW);
++    raw = &netdev->u.raw;
++
++    memset(&ifr, 0, sizeof(struct ifreq));
++    strncpy((char *) &ifr.ifr_name, raw->ifname, sizeof(ifr.ifr_name) - 1);
++
++    if (ioctl(fd, SIOCGIFINDEX, (void *) &ifr) < 0) {
++        err = -errno;
++        error_report("SIOCGIFINDEX, failed to get raw interface index for %s",
++            raw->ifname);
++        goto outerr;
 +    }
 +
-+    if ((p->ipv6) || (p->udp)) {
-+        s->header_size = s->offset;
-+    } else {
-+        s->header_size = s->offset + sizeof(struct iphdr);
++    sock.sll_family = AF_PACKET;
++    sock.sll_protocol = htons(ETH_P_ALL);
++    sock.sll_ifindex = ifr.ifr_ifindex;
++
++    if (bind(fd, (struct sockaddr *) &sock, sizeof(struct sockaddr_ll)) < 0) {
++        error_report("raw: failed to bind raw socket");
++        err = -errno;
++        goto outerr;
 +    }
++
++    s->offset = 0;
 +
 +    qemu_net_finalize_udst_init(s,
-+        &gre_verify_header,
-+        &gre_form_header,
++        &noop,
++        NULL,
 +        fd);
 +
-+    p->sequence = 0;
-+
 +    snprintf(s->nc.info_str, sizeof(s->nc.info_str),
-+             "gre: connected");
++             "raw: connected");
 +    return 0;
 +outerr:
 +    error_setg(errp, "Cannot initialize GRE transport");
@@ -383,171 +208,103 @@ index 0000000000..7734d78102
 +    if (fd >= 0) {
 +        close(fd);
 +    }
-+    if (result) {
-+        freeaddrinfo(result);
-+    }
 +    return -1;
 +}
-diff --git a/net/net.c b/net/net.c
-index 723a256260..6163a8a3af 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -962,6 +962,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
- #endif
- #ifdef CONFIG_UDST
-         [NET_CLIENT_DRIVER_L2TPV3] = net_init_l2tpv3,
-+        [NET_CLIENT_DRIVER_GRE] = net_init_gre,
- #endif
- };
- 
++
 diff --git a/qapi-schema.json b/qapi-schema.json
-index 62a044f006..082f56645a 100644
+index 082f56645a..8499c5403b 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -3852,7 +3852,41 @@
-     'txsession':    'uint32',
-     '*rxsession':   'uint32',
-     '*offset':      'uint32' } }
--
-+##
-+# @NetdevGREOptions:
+@@ -3900,6 +3900,21 @@
+   'data': { } }
+ 
+ ##
++# @NetdevRawOptions:
 +#
-+# Connect the VLAN to Ethernet over Ethernet over GRE (GRETAP) tunnel
++# Connect the VLAN to an network interface using raw sockets
 +#
-+# @src: source address
++# @ifname: network interface name
 +#
-+# @dst: destination address
-+#
-+# @ipv6: force the use of ipv6
-+#
-+# @sequence: have sequence counter
-+#
-+# @pinsequence: pin sequence counter to zero -
-+#              workaround for buggy implementations or
-+#              networks with packet reorder
-+#
-+# @txkey: 32 bit transmit key
-+#
-+# @rxkey: 32 bit receive key
-+#
-+# Note - gre checksums are not supported at present
-+#
-+#
++
 +# Since 2.9
 +##
-+{ 'struct': 'NetdevGREOptions',
++{ 'struct': 'NetdevRawOptions',
 +  'data': {
-+    'src':          'str',
-+    'dst':          'str',
-+    '*ipv6':        'bool',
-+    '*sequence':     'bool',
-+    '*pinsequence':  'bool',
-+    '*txkey':    'uint32',
-+    '*rxkey':    'uint32' } }
- ##
- # @NetdevUdstOptions:
++    'ifname':          'str'
++} }
++
++##
+ # @NetdevVdeOptions:
  #
-@@ -3983,7 +4017,7 @@
+ # Connect the VLAN to a vde switch running on the host.
+@@ -4017,7 +4032,7 @@
  ##
  { 'enum': 'NetClientDriver',
    'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde', 'dump',
--            'bridge', 'hubport', 'netmap', 'vhost-user', 'udst' ] }
-+            'bridge', 'hubport', 'netmap', 'vhost-user', 'udst', 'gre' ] }
+-            'bridge', 'hubport', 'netmap', 'vhost-user', 'udst', 'gre' ] }
++            'bridge', 'hubport', 'netmap', 'vhost-user', 'udst', 'gre', 'raw' ] }
  
  ##
  # @Netdev:
-@@ -4016,7 +4050,8 @@
-     'hubport':  'NetdevHubPortOptions',
+@@ -4051,7 +4066,8 @@
      'netmap':   'NetdevNetmapOptions',
      'vhost-user': 'NetdevVhostUserOptions',
--    'udst':     'NetdevUdstOptions' } }
-+    'udst':     'NetdevUdstOptions',
-+    'gre':      'NetdevGREOptions' } }
+     'udst':     'NetdevUdstOptions',
+-    'gre':      'NetdevGREOptions' } }
++    'gre':      'NetdevGREOptions',
++    'raw':      'NetdevRawOptions' } }
  
  ##
  # @NetLegacy:
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 9caf53fd76..e35ef032cf 100644
+index e35ef032cf..12d2538db8 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -1971,6 +1971,23 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "                use 'counter=off' to force a 'cut-down' L2TPv3 with no counter\n"
-     "                use 'pincounter=on' to work around broken counter handling in peer\n"
-     "                use 'offset=X' to add an extra offset between header and data\n"
-+    "-netdev gre,id=str,src=srcaddr,dst=dstaddr[,rxkey=rxkey],txkey=txkey[,ipv6=on/off]\n"
-+    "         [,sequence][,pinsequence]\n"
+@@ -1988,6 +1988,13 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+     "                use 'txkey=0x01234' to specify a txkey\n"
+     "                use 'sequence=on' to add frame sequence to each packet\n"
+     "                use 'pinsequence=on' to work around broken sequence handling in peer\n"
++    "-netdev raw,id=str,ifname=ifname\n"
 +    "                configure a network backend with ID 'str' connected to\n"
-+    "                an Ethernet over GRE pseudowire (aka GRE TAP).\n"
-+    "                Linux kernel 3.3+ as well as most routers and some switches\n"
-+    "                can talk GRETAP. This transport allows connecting a VM to a VM,\n"
-+    "                VM to a router and even VM to Host. It is a nearly-universal\n"
-+    "                standard (RFC1701).\n"
-+    "                use 'src=' to specify source address\n"
-+    "                use 'dst=' to specify destination address\n"
-+    "                use 'ipv6=on' to force v6\n"
-+    "                GRE may use keys to prevent misconfiguration as\n"
-+    "                well as a weak security measure\n"
-+    "                use 'rxkey=0x01234' to specify a rxkey\n"
-+    "                use 'txkey=0x01234' to specify a txkey\n"
-+    "                use 'sequence=on' to add frame sequence to each packet\n"
-+    "                use 'pinsequence=on' to work around broken sequence handling in peer\n"
++    "                an Ethernet interface named ifname via raw socket.\n"
++    "                This backend does not change the interface settings.\n"
++    "                Most interfaces will require being set into promisc mode,\n"
++    "                as well having most offloads (TSO, etc) turned off.\n"
++    "                Some virtual interfaces like tap support only RX.\n"
  #endif
      "-netdev socket,id=str[,fd=h][,listen=[host]:port][,connect=host:port]\n"
      "                configure a network backend to connect to another network\n"
-@@ -2394,12 +2411,53 @@ ip l2tp add session tunnel_id 1 name vmtunnel0 session_id \
- ifconfig vmtunnel0 mtu 1500
- ifconfig vmtunnel0 up
- brctl addif br-lan vmtunnel0
-+@end example
-+
-+Alternatively, it is possible to assign an IP address to vmtunnel0, which allows
-+the VM to connect to the host directly without using Linux bridging.
-+
-+
-+@item -netdev gre,id=@var{id},src=@var{srcaddr},dst=@var{dstaddr}[,ipv6][,sequence][,pinsequence][,txkey=@var{txkey}][,rxkey=@var{rxkey}]
-+Connect VLAN @var{n} to a GRE pseudowire. GRE (RFC1701) is a popular
-+protocol to transport various data frames between two systems.
-+We are interested in a specific GRE variety where the transported
-+frames are Ethernet. This GRE type is usually referred to as GRETAP.
-+It is present in routers, firewalls, switches and the Linux kernel
-+(from version 3.3 onwards).
-+
-+This transport allows a VM to communicate to another VM, router or firewall directly.
-+
-+@item src=@var{srcaddr}
-+    source address (mandatory)
-+@item dst=@var{dstaddr}
-+    destination address (mandatory)
-+@item ipv6
-+    force v6, otherwise defaults to v4.
-+@item rxkey=@var{rxkey}
-+@itemx txkey=@var{txkey}
-+    Keys are a weak form of security in the gre specification.
-+Their function is mostly to prevent misconfiguration.
-+@item sequence=on
-+    Add frame sequence to GRE frames
-+@item pinsequence=on
-+    Work around broken sequence handling in peer. This may also help on
-+networks which have packet reorder.
-+
-+For example, to attach a VM running on host 4.3.2.1 via GRETAP to the bridge br-lan
-+on the remote Linux host 1.2.3.4:
-+@example
-+# Setup tunnel on linux host using raw ip as encapsulation
-+# on 1.2.3.4
-+ip link add gt0 type gretap local 1.2.3.4 remote 4.3.2.1
-+ifconfig gt0 mtu 1500
-+ifconfig gt0 up
-+brctl addif br-lan gt0
- 
- 
- # on 4.3.2.1
- # launch QEMU instance - if your network has reorder or is very lossy add ,pincounter
- 
--qemu-system-i386 linux.img -net nic -net l2tpv3,src=4.2.3.1,dst=1.2.3.4,udp,srcport=16384,dstport=16384,rxsession=0xffffffff,txsession=0xffffffff,counter
-+qemu-system-i386 linux.img -device virtio-net-pci,netdev=gre0 -netdev gre,id=gre0,src=4.2.3.1,dst=1.2.3.4
- 
+@@ -2462,6 +2469,31 @@ qemu-system-i386 linux.img -device virtio-net-pci,netdev=gre0 -netdev gre,id=gre
  
  @end example
+ 
++@item -netdev raw,id=@var{id},ifname=@var{ifname}
++Connect VLAN @var{n} directly to an Ethernet interface using raw socket.
++
++This transport allows a VM to bypass most of the network stack which is
++extremely useful for tapping.
++
++@item ifname=@var{ifname}
++    interface name (mandatory)
++
++@example
++# set up the interface - put it in promiscuous mode and turn off offloads
++ifconfig eth0 up
++ifconfig eth0 promisc
++
++/sbin/ethtool -K eth0 gro off
++/sbin/ethtool -K eth0 tso off
++/sbin/ethtool -K eth0 gso off
++/sbin/ethtool -K eth0 tx off
++
++# launch QEMU instance - if your network has reorder or is very lossy add ,pincounter
++
++qemu-system-i386 linux.img -device virtio-net-pci,netdev=raw0 -netdev raw,id=raw0,ifname=eth0
++
++@end example
++
+ @item -netdev vde,id=@var{id}[,sock=@var{socketpath}][,port=@var{n}][,group=@var{groupname}][,mode=@var{octalmode}]
+ @itemx -net vde[,vlan=@var{n}][,name=@var{name}][,sock=@var{socketpath}] [,port=@var{n}][,group=@var{groupname}][,mode=@var{octalmode}]
+ Connect VLAN @var{n} to PORT @var{n} of a vde switch running on host and
 -- 
 2.11.0
