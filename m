@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXrWQ-0006EG-S9
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:08:23 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1dXrZF-0007U9-PP
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:11:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXrWM-0006VT-SO
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:08:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48006)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXrWM-0006Uy-MC
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:08:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1A02272CB
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 16:08:17 +0000 (UTC)
-Date: Wed, 19 Jul 2017 17:08:11 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170719160811.GP30084@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-4-quintela@redhat.com>
-	<20170719154208.GD3500@work-vm> <20170719154345.GM30084@redhat.com>
-	<20170719160418.GG3500@work-vm>
+	(envelope-from <pkrempa@redhat.com>) id 1dXrZE-0000XI-Oc
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 12:11:17 -0400
+Date: Wed, 19 Jul 2017 18:11:11 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20170719161111.GE8266@andariel.pipo.sk>
+References: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
+	<2e750f9b-8a7f-44be-a673-8046aa73f914@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cYtjc4pxslFTELvY"
 Content-Disposition: inline
-In-Reply-To: <20170719160418.GG3500@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v5 03/17] qio: Create new
- qio_channel_{readv, writev}_all
+In-Reply-To: <2e750f9b-8a7f-44be-a673-8046aa73f914@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2] block: Skip implicit nodes in
+ query-block/blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, armbru@redhat.com, nsoffer@redhat.com, el13635@mail.ntua.gr, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On Wed, Jul 19, 2017 at 05:04:19PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Wed, Jul 19, 2017 at 04:42:09PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Juan Quintela (quintela@redhat.com) wrote:
-> > > > The functions waits until it is able to write the full iov.
-> > > 
-> > > When is it safe to call these - I see qio_channel_wait does it's
-> > > own g_main_loop - so I guess they're intended to be called from their
-> > > own process?
-> > > 
-> > > What causes these to exit if the migration fails for some other
-> > > (non-file) related reason?
-> > 
-> > It'll exit if the other end closes the socket, or if the local QEMU
-> > does a qio_channel_close() on it.  I don't know if this patch series
-> > uses either of those options tough.
-> 
-> How do you safely cope with calling close on a socket that's currently
-> being waited on/might be reading?  In the cancel case we use shutdown()
-> to force exits with out actually closing.
 
-You can use qio_channel_shutdown() instead if that's desired
+--cYtjc4pxslFTELvY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Wed, Jul 19, 2017 at 09:55:51 -0500, Eric Blake wrote:
+> On 07/19/2017 08:58 AM, Kevin Wolf wrote:
+> > Commits 0db832f and 6cdbceb introduced the automatic insertion of filter
+> > nodes above the top layer of mirror and commit block jobs. The
+> > assumption made there was that since libvirt doesn't do node-level
+> > management of the block layer yet, it shouldn't be affected by added
+> > nodes.
+> >=20
+> > This is true as far as commands issued by libvirt are concerned. It only
+> > uses BlockBackend names to address nodes, so any operations it performs
+> > still operate on the root of the tree as intended.
+> >=20
+> > However, the assumption breaks down when you consider query commands,
+> > which return data for the wrong node now. These commands also return
+> > information on some child nodes (bs->file and/or bs->backing), which
+> > libvirt does make use of, and which refer to the wrong nodes, too.
+>=20
+> I'm a bit worried about this statement.  Libvirt controls the
+> BLOCK_WRITE_THRESHOLD event via block-set-write-threshold, which
+> requires the use of a node name (for a qcow2-backed-by-block-device, you
+> want the threshold to be tied to the block-device protocol BDS, not the
+> qcow2 format BDS).  We need to test that this patch does not break
+> write-threshold computation (ie. that libvirt is still able to use the
+> query commands to learn WHICH node name to pass to
+> block-set-write-threshold).
+
+Libvirt currently uses 'query-named-block-nodes' for this, but the
+algorithm is terrible. But dealing with this lately I've figured out
+that actually 'query-blockstats' provides the node name information way
+more conveniently. Especially the hierarchy and link to the storage node
+are very clear.
+
+I'm actually refactoring the nodename detector to use this.
+
+> Or put another way, there are two types of implicit nodes names: the
+> implicit node names for protocol BDS (libvirt cares about those), and
+> the implicit node names for block job temporary BDS (libvirt does not
+> care about those).  If this patch is touching ONLY the block job
+> implicit node names, we may be okay - but that's something we want to
+
+The code does this. The boolean suppressing the output to the query
+commands is set only to BDSs which are created
+
+> test with libvirt before accepting this patch.  Peter, are you in a
+> position to test it faster than me?
+
+Tomorrow at best.
+
+Either way. I've followed the code through and currently it looks like
+it should be okay from libvirt's pov.
+
+--cYtjc4pxslFTELvY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAllvhJkACgkQHGwCByjY
+1GrxcQ//a7mEYTHe+y9n8ENO+kIpptTYbzaQE+WGXZI9A3gZHyJo94CCE+vCg6bZ
+/elXdYVzAVMF9iC37NaeIX+UXlIZk1JddBtBljdp/F9PPkSw5QQMYYl8iXPAlDbB
+7vkkW8O5xfyH1DUhisAwYglBDKFKc2+5h6e8Wubh31kJ7DWcaS/yya/NZ9jkJSCm
+YtsqxPhGSvnijEe3XK9xgxJGcBscmZGdlXVDmNkt57Gmcu7T9jwFuCBnSKHGYjsW
+4dCeAxgpRnA2XS9pfDoYeHFhOLki3yR0shcQWmXm1Sl/KWwHXhxWIqik4h4E3b/e
+DHrhyTmCRTinCI1zqIBSBOMuL/oC6GeATHwvDV62NZWN5+uEnONAkFERE0Am47Q5
+aE3tMlb/3hVrJ90wksCuZRLGGk03XBsAErwIjefjimLgkJdQ4oGxa8ZEuqQoSMut
+xkb/N00D1kb/wMpv+/uG4NcZJQ1oPZmA/BBjhh1xd6y/wSn/CI/w2faI/LepOwKE
+MLjlonMSMB3TCnx+0lWIoEYN4/HuHH/HBOYOkLNb0hzEKQtxNmZfI2DyoKKMb1qC
+DqYwjpbzUgFRnpyd9KFLFuI2RUX8a15lWFrA+mE+914i+SosUONRZTsGTnYgJluL
+A9w7QsFg0B32z1SfSnxWJPFUK5n2CEfU7qMAT0TL3Vt7Q7bADcE=
+=3P/3
+-----END PGP SIGNATURE-----
+
+--cYtjc4pxslFTELvY--
