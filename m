@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXl5t-0000jT-JO
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dXl6C-0000yA-9h
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXl5s-0001TK-PH
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49634)
+	(envelope-from <berrange@redhat.com>) id 1dXl6A-0001l1-FJ
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl5s-0001Se-I4
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:32 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXl6A-0001kg-5z
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:16:50 -0400
+Date: Wed, 19 Jul 2017 10:16:45 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 19 Jul 2017 10:15:52 +0100
-Message-Id: <20170719091600.8555-11-berrange@redhat.com>
-In-Reply-To: <20170719091600.8555-1-berrange@redhat.com>
-References: <20170719091600.8555-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 10/18] crypto: hmac: introduce
- qcrypto_hmac_ctx_new for glib-backend
+Message-ID: <20170719091645.GF30084@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170718102519.15392-1-berrange@redhat.com>
+	<CAFEAcA-Nri9i6woP_C954xRRdzqjtohiCjWQWSXM59knq9d5gg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-Nri9i6woP_C954xRRdzqjtohiCjWQWSXM59knq9d5gg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v1 00/18] Merge crypto 201/07/18
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
+On Wed, Jul 19, 2017 at 09:11:17AM +0100, Peter Maydell wrote:
+> On 18 July 2017 at 11:25, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > The following changes since commit 6c6076662d98c068059983d411cb2a8987ba5670:
+> >
+> >   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2017-07-14 12:16:09 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   git://github.com/berrange/qemu tags/pull-qcrypto-2017-07-18-1
+> >
+> > for you to fetch changes up to 0e0fb56bcc8145d956bf527bfedc2be42bca101f:
+> >
+> >   tests: crypto: add hmac speed benchmark support (2017-07-18 11:18:30 +0100)
+> >
+> > ----------------------------------------------------------------
+> > Merge crypto 2017/07/18 v1
+> >
+> > ----------------------------------------------------------------
+> 
+> Hi; I'm afraid this failed to build on clang (x86 Linux, FreeBSD,
+> OSX):
+> 
+>   CC      crypto/cipher.o
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:9: error:
+> variable 'drv' is used uninitialized whenever 'if' condition is false
+> [-Werror,-Wsometimes-uninitialized]
+>     if (!ctx) {
+>         ^~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:192:30: note:
+> uninitialized use occurs here
+>     cipher->driver = (void *)drv;
+>                              ^~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:177:5: note:
+> remove the 'if' if its condition is always true
+>     if (!ctx) {
+>     ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/cipher.c:168:29: note:
+> initialize the variable 'drv' to silence this warning
+>     QCryptoCipherDriver *drv;
+>                             ^
+>                              = NULL
+> 1 error generated.
+> 
+> and also
+> 
+>   CC      crypto/hmac.o
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:9: error:
+> variable 'drv' is used uninitialized whenever 'if' condition is false
+> [-Werror,-Wsometimes-uninitialized]
+>     if (!ctx) {
+>         ^~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:116:28: note:
+> uninitialized use occurs here
+>     hmac->driver = (void *)drv;
+>                            ^~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:103:5: note:
+> remove the 'if' if its condition is always true
+>     if (!ctx) {
+>     ^~~~~~~~~~
+> /home/petmay01/linaro/qemu-for-merges/crypto/hmac.c:94:27: note:
+> initialize the variable 'drv' to silence this warning
+>     QCryptoHmacDriver *drv;
+>                           ^
+>                            = NULL
+> 
+> 
+> Looks like a false positive, I think :-(
 
-Extracts qcrypto_hmac_ctx_new() from qcrypto_hmac_new() for
-glib-backend impls.
+Yes, both false positives - in v2 I initialized the 'drv' variable to NULL
+in both cases to stop it getting confused.
 
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- crypto/hmac-glib.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
-
-diff --git a/crypto/hmac-glib.c b/crypto/hmac-glib.c
-index 08a1fdd10a..f0ccfd6eda 100644
---- a/crypto/hmac-glib.c
-+++ b/crypto/hmac-glib.c
-@@ -49,11 +49,11 @@ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
-     return false;
- }
- 
--QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
--                              const uint8_t *key, size_t nkey,
--                              Error **errp)
-+static QCryptoHmacGlib *
-+qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
-+                     const uint8_t *key, size_t nkey,
-+                     Error **errp)
- {
--    QCryptoHmac *hmac;
-     QCryptoHmacGlib *ctx;
- 
-     if (!qcrypto_hmac_supports(alg)) {
-@@ -62,9 +62,6 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-         return NULL;
-     }
- 
--    hmac = g_new0(QCryptoHmac, 1);
--    hmac->alg = alg;
--
-     ctx = g_new0(QCryptoHmacGlib, 1);
- 
-     ctx->ghmac = g_hmac_new(qcrypto_hmac_alg_map[alg],
-@@ -74,12 +71,10 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-         goto error;
-     }
- 
--    hmac->opaque = ctx;
--    return hmac;
-+    return ctx;
- 
- error:
-     g_free(ctx);
--    g_free(hmac);
-     return NULL;
- }
- 
-@@ -134,6 +129,25 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-     return 0;
- }
- 
-+QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-+                              const uint8_t *key, size_t nkey,
-+                              Error **errp)
-+{
-+    QCryptoHmac *hmac;
-+    QCryptoHmacGlib *ctx;
-+
-+    ctx = qcrypto_hmac_ctx_new(alg, key, nkey, errp);
-+    if (!ctx) {
-+        return NULL;
-+    }
-+
-+    hmac = g_new0(QCryptoHmac, 1);
-+    hmac->alg = alg;
-+    hmac->opaque = ctx;
-+
-+    return hmac;
-+}
-+
- #else
- 
- bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
+Regards,
+Daniel
 -- 
-2.13.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
