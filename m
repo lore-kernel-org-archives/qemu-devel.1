@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dXiEP-0004YV-DR
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:13:10 -0400
+	(envelope-from <quintela@redhat.com>) id 1dXimc-0002mx-II
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dXiEO-0000Jj-5z
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:13:09 -0400
-Date: Wed, 19 Jul 2017 08:12:59 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170719061259.GB4617@noname.redhat.com>
-References: <1500385286-21142-1-git-send-email-armbru@redhat.com>
-	<20170718160825.GW11927@redhat.com>
+	(envelope-from <quintela@redhat.com>) id 1dXimY-0002a6-Ah
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dXimY-0002Zg-0n
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:48:26 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <150040682777.87.414629183259475192@5d477a5b5989>
+	(no-reply@patchew.org's message of "Tue, 18 Jul 2017 12:40:28 -0700
+	(PDT)")
+References: <150040682777.87.414629183259475192@5d477a5b5989>
+Reply-To: quintela@redhat.com
+Date: Wed, 19 Jul 2017 08:48:19 +0200
+Message-ID: <87379skjm4.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170718160825.GW11927@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 00/10] Correct two minor QMP
- interface design flaws
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 00/16] Migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, eblake@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
+To: no-reply@patchew.org
+Cc: qemu-devel@nongnu.org, famz@redhat.com, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Am 18.07.2017 um 18:08 hat Daniel P. Berrange geschrieben:
-> On Tue, Jul 18, 2017 at 03:41:16PM +0200, Markus Armbruster wrote:
-> > blockdev-add and migrate-set-parameters overload empty strings to mean
-> > something entirely different.  See my memo "qapi: Stop abusing
-> > "special" values for something entirely different" for details.
-> > 
-> >     Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
-> >     https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
-> > 
-> > This series deprecates these usages of "" in favour of JSON null.
-> > Because we're so close to the 2.10 freeze, the implementation is
-> > intentionally stupid: rewrite null to "" at first opportunity.  The
-> > proper way to do it would be rewriting "" to null, but that requires
-> > fixing up code to work with null.  There are TODO comments for that.
-> > I'm willing to take care of them in the next development cycle.
-> 
-> I tested the migrate-set-parameters QMP command with this applied and
-> I can still pass "" as the tls-hostname.
-> 
-> When using query-migrate-parameters we still see "" too.
-> 
-> So from POV of avoiding regressions for existing usage, we look OK
-> here.
+no-reply@patchew.org wrote:
+> Hi,
+>
+> This series failed automatic build test. Please find the testing commands and
+> their output below. If you have docker installed, you can probably reproduce it
+> locally.
 
-Opportunity for a follow-up patch: Automate these tests.
+> cc: unrecognized option '-no-integrated-as'
+> cc: unrecognized option '-no-integrated-as'
 
-Kevin
+I hope this is not my fault
+   GTESTER tests/test-vmstate
+
+> Failed to load simple/primitive:b_1
+> Failed to load simple/primitive:i64_2
+> Failed to load simple/primitive:i32_1
+> Failed to load simple/primitive:i32_1
+> Failed to load test/with_tmp:a
+> Failed to load test/tmp_child_parent:f
+> Failed to load test/tmp_child:parent
+> Failed to load test/with_tmp:tmp
+> Failed to load test/tmp_child:diff
+> Failed to load test/with_tmp:tmp
+> Failed to load test/tmp_child:diff
+> Failed to load test/with_tmp:tmp
+
+
+Dave, any good clue?
+
+
+> ERROR:/tmp/qemu-test/src/tests/test-qga.c:78:fixture_setup: assertion failed (fixture->fd != -1): (-1 != -1)
+> GTester: last random seed: R02Sf37f37a8c5f8ed60d31dbaff962d3c9c
+> make: *** [check-tests/test-qga] Error 1
+> make: *** Waiting for unfinished jobs....
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Could not access KVM kernel module: No such file or directory
+> failed to initialize KVM: No such file or directory
+> Back to tcg accelerator.
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 382, in <module>
+>     sys.exit(main())
+>   File "./tests/docker/docker.py", line 379, in main
+>     return args.cmdobj.run(args, argv)
+>   File "./tests/docker/docker.py", line 237, in run
+>     return Docker().run(argv, args.keep, quiet=args.quiet)
+>   File "./tests/docker/docker.py", line 205, in run
+>     quiet=quiet)
+>   File "./tests/docker/docker.py", line 123, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=656d0ada6bee11e794aa525400c803e1', '-u', '0', '-t', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/var/tmp/patchew-tester-tmp-uic4vhqy/src/docker-src.2017-07-18-15.22.06.26333:/var/tmp/qemu:z,ro', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
+> tests/docker/Makefile.include:124: recipe for target 'docker-run' failed
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-uic4vhqy/src'
+> tests/docker/Makefile.include:156: recipe for target 'docker-run-test-quick@centos6' failed
+> make: *** [docker-run-test-quick@centos6] Error 2
+
+I am pretty sure that this should be a problem somewhere else, not this
+patch, no?
+
+Thanks, Juan.
