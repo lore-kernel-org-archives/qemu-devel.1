@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dXou0-00075M-0c
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:20:32 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dXp2t-0002ER-OU
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:29:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dXotv-0006DQ-AZ
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:20:32 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dXotv-0006CI-3i
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:20:27 -0400
-Received: by mail-lf0-x242.google.com with SMTP id t72so4308340lff.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 06:20:25 -0700 (PDT)
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Wed, 19 Jul 2017 16:20:13 +0300
-Message-Id: <1500470414-7911-2-git-send-email-zuban32s@gmail.com>
-In-Reply-To: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
-References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [RFC PATCH 1/2] pci: add support for direct usage of
- bdf for capability lookup
+	(envelope-from <mlureau@redhat.com>) id 1dXp2o-00014o-OX
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:29:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34482)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dXp2o-000148-HH
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:29:38 -0400
+Date: Wed, 19 Jul 2017 09:29:35 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <806154869.55582011.1500470975500.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1b58cb8.a133.15d5adc3290.Coremail.indiffpig@126.com>
+References: <1500031677-2362-1-git-send-email-indiffPig@126.com>
+	<1b58cb8.a133.15d5adc3290.Coremail.indiffpig@126.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] dvs services stop then qemu may be accesse
+ null address case core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: seabios@seabios.org
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
+To: indiffpig <indiffpig@126.com>
+Cc: indiffPig@126.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Add a capability lookup function which gets bdf instead of pci_device
-as its first argument. It may be useful when we have bdf,
-but don't have the whole pci_device structure.
+Hi
 
-Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
----
- src/hw/pcidevice.c | 24 ++++++++++++++++++++++++
- src/hw/pcidevice.h |  1 +
- 2 files changed, 25 insertions(+)
+----- Original Message -----
+> 
+> No one replied to my mail. Someone might think I was talking nonsense. When
+> the DVS service stopped, all our QEMU processes exited. DVS users complain
+> that even if their DVS services are stopped, vhost-user networks should not
+> be blocked, but virtual machines should not be allowed to exit. I found the
+> segdefault error in the host's log about QEMU, and all errors are pointing
+> to the null pointer referred to in the patch. What does open source
+> maintenance staff think about?
+> 
 
-diff --git a/src/hw/pcidevice.c b/src/hw/pcidevice.c
-index cfebf66..3fa240e 100644
---- a/src/hw/pcidevice.c
-+++ b/src/hw/pcidevice.c
-@@ -158,6 +158,30 @@ u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap)
-     return 0;
- }
- 
-+u8 pci_find_capability_bdf(int bdf, u8 cap_id, u8 cap)
-+{
-+    int i;
-+    u16 status = pci_config_readw(bdf, PCI_STATUS);
-+
-+    if (!(status & PCI_STATUS_CAP_LIST))
-+        return 0;
-+
-+    if (cap == 0) {
-+        /* find first */
-+        cap = pci_config_readb(bdf, PCI_CAPABILITY_LIST);
-+    } else {
-+        /* find next */
-+        cap = pci_config_readb(bdf, cap + PCI_CAP_LIST_NEXT);
-+    }
-+    for (i = 0; cap && i <= 0xff; i++) {
-+        if (pci_config_readb(bdf, cap + PCI_CAP_LIST_ID) == cap_id)
-+            return cap;
-+        cap = pci_config_readb(bdf, cap + PCI_CAP_LIST_NEXT);
-+    }
-+
-+    return 0;
-+}
-+
- // Enable PCI bus-mastering (ie, DMA) support on a pci device
- void
- pci_enable_busmaster(struct pci_device *pci)
-diff --git a/src/hw/pcidevice.h b/src/hw/pcidevice.h
-index 354b549..e4ed5cf 100644
---- a/src/hw/pcidevice.h
-+++ b/src/hw/pcidevice.h
-@@ -70,6 +70,7 @@ int pci_init_device(const struct pci_device_id *ids
- struct pci_device *pci_find_init_device(const struct pci_device_id *ids
-                                         , void *arg);
- u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap);
-+u8 pci_find_capability_bdf(int bdf, u8 cap_id, u8 cap);
- void pci_enable_busmaster(struct pci_device *pci);
- u16 pci_enable_iobar(struct pci_device *pci, u32 addr);
- void *pci_enable_membar(struct pci_device *pci, u32 addr);
--- 
-2.7.4
+You don't explain well how the crash happen. I don't even know what dvs service is.
+
+Could you provide a description of how to reproduce the crash?
+
+When there is a crash, it's good to also provide the backtrace.
+
+Your patch may solve your problem, but there might be different (better) solutions, and we should try to cover this case in our tests.
+
+thanks
+
+> 
+> At 2017-07-14 19:27:57, indiffPig@126.com wrote:
+> >From: "yin.zuowei" <indiffPig@126.com>
+> >
+> >Signed-off-by: yin.zuowei <indiffPig@126.com>
+> >---
+> > chardev/char-fe.c | 8 +++++++-
+> > 1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+> >index 3f90f05..82f7e2b 100644
+> >--- a/chardev/char-fe.c
+> >+++ b/chardev/char-fe.c
+> >@@ -353,7 +353,13 @@ guint qemu_chr_fe_add_watch(CharBackend *be,
+> >GIOCondition cond,
+> > 
+> > void qemu_chr_fe_disconnect(CharBackend *be)
+> > {
+> >-    Chardev *chr = be->chr;
+> >+    Chardev *chr = NULL;
+> >+
+> >+    if (be) {
+> >+        chr = be->chr;
+> >+    } else {
+> >+        return ;
+> >+    }
+> > 
+> >     if (chr && CHARDEV_GET_CLASS(chr)->chr_disconnect) {
+> >         CHARDEV_GET_CLASS(chr)->chr_disconnect(chr);
+> >--
+> >1.8.3.1
+> >
+> 
