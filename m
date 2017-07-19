@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXm3Y-00084B-Hb
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:18:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dXm6X-0001i3-No
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXm3S-0005st-73
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:18:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXm3R-0005sX-TH
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:18:06 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 19 Jul 2017 11:08:01 +0100
-Message-Id: <20170719100802.14094-2-berrange@redhat.com>
-In-Reply-To: <20170719100802.14094-1-berrange@redhat.com>
-References: <20170719100802.14094-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/2 (for 2.10)] docs: document support
- lifetime for features
+	(envelope-from <no-reply@patchew.org>) id 1dXm6T-0007eX-Kh
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:21:17 -0400
+Resent-Message-Id: <E1dXm6T-0007eX-Kh@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21849)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dXm6T-0007e1-B3
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:21:13 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150045964396.87.7952001243987438922@5d477a5b5989>
+In-Reply-To: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 19 Jul 2017 03:20:44 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH V3 0/4] Optimize COLO-compare performance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: zhangchen.fnst@cn.fujitsu.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, lizhijian@cn.fujitsu.com, zhang.zhanghailiang@huawei.com, dgilbert@redhat.com
 
-There is currently no explicit guidance on the duration of support
-for features such as versioned machine types, which have a finite
-useful lifespan. Thus apps / users cannot predict how much time
-they might be able to use a feature for, before it is removed (if
-ever).
-
-This adds a new appendix that lists items which have finite lifecycles,
-such as machine types. For items which are generally expected to be
-supported indefinitely, it sets out the policy around deprecation
-and removal, should it be needed.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- qemu-doc.texi | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
-
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 48af5155c7..200c0f7d0a 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -38,6 +38,7 @@
- * QEMU Guest Agent::
- * QEMU User space emulator::
- * Implementation notes::
-+* Support lifetime::
- * License::
- * Index::
- @end menu
-@@ -3128,6 +3129,42 @@ Run the emulation in single step mode.
- 
- @include qemu-tech.texi
- 
-+@node Support lifetime
-+@appendix Support lifetime
-+
-+In general features are intended to be supported indefinitely once
-+introduced into QEMU.
-+
-+In the event that a feature needs to be removed, it will be listed
-+in the ``Deprecated features'' appendix of this document. The feature
-+will remain functional for 2 releases prior to actual removal.
-+
-+Deprecated features may also generate warnings on the console when
-+QEMU starts up, or if activated via a monitor command, however,
-+this is not a mandatory requirement.
-+
-+Certain features have an inherently finite lifetime, and thus
-+will be removed on a fixed schedule, without following the normal
-+deprecation process. Such features are listed in the sections
-+that follow.
-+
-+@node Machine types
-+@section Machine types
-+
-+For architectures which aim to support live migration compatibility
-+across releases, each release will introduce a new versioned machine
-+type. For example, the 2.8.0 release introduced machine types
-+``pc-i440fx-2.8'' and ``pc-q35-2.8'' for the x86_64/i686 architectures.
-+
-+To allow live migration of a guest running on a 2.8.0 release to a
-+2.9.0, the QEMU 2.9.0 version must support the ``pc-i440fx-2.8'' and
-+``pc-q35-2.8''. To allow users live migrating VMs to skip multiple
-+intermediate releases when upgrading, new releases of QEMU will
-+support machine types from many previous versions.
-+
-+The supported lifetime for versioned machine types is 12 releases,
-+which is equivalent to 4 years worth of previous QEMU releases.
-+
- @node License
- @appendix License
- 
--- 
-2.13.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCBWMyAwLzRdIE9wdGltaXplIENPTE8tY29tcGFyZSBwZXJmb3JtYW5jZQpN
+ZXNzYWdlLWlkOiAxNTAwNDQ5Mzk5LTE5MTA3LTEtZ2l0LXNlbmQtZW1haWwtemhhbmdjaGVuLmZu
+c3RAY24uZnVqaXRzdS5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
+IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
+bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
+cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
+ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNTAwNDQ4MTgyLTIxMzc2LTEtZ2l0LXNl
+bmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTAwNDQ4MTgyLTIxMzc2LTEt
+Z2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0
+Y2hldy8yMDE3MDcxOTA5NTAzMy4yMDQ4Mi0xLWRhdmlkQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE3MDcxOTA5NTAzMy4yMDQ4Mi0xLWRhdmlkQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0JwpmY2IwZDlmIG5ldC9jb2xvLWNvbXBhcmUuYzogRml4IGNvbW1lbnRzIGFu
+ZCBzY2hlbWUKMWI0NTMxYSBuZXQvY29sby1jb21wYXJlLmM6IEFkanVzdCBuZXQgcXVldWUgcG9w
+IG9yZGVyIGZvciBwZXJmb3JtYW5jZQo4NDMzZTg2IG5ldC9jb2xvLWNvbXBhcmUuYzogT3B0aW1p
+emUgdW5wcmVkaWN0YWJsZSB0Y3Agb3B0aW9ucyBjb21wYXJpc29uCjM4NGZhMzUgbmV0L2NvbG8t
+Y29tcGFyZS5jOiBBZGQgY2hlY2twb2ludCBtaW4gcGVyaW9kIHRvIG9wdGltaXplIHBlcmZvcm1h
+bmNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IG5ldC9jb2xvLWNv
+bXBhcmUuYzogQWRkIGNoZWNrcG9pbnQgbWluIHBlcmlvZCB0byBvcHRpbWl6ZSBwZXJmb3JtYW5j
+ZS4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IG5ldC9jb2xvLWNvbXBhcmUuYzogT3B0aW1pemUgdW5w
+cmVkaWN0YWJsZSB0Y3Agb3B0aW9ucyBjb21wYXJpc29uLi4uCkNoZWNraW5nIFBBVENIIDMvNDog
+bmV0L2NvbG8tY29tcGFyZS5jOiBBZGp1c3QgbmV0IHF1ZXVlIHBvcCBvcmRlciBmb3IgcGVyZm9y
+bWFuY2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNC80OiBuZXQvY29sby1jb21wYXJlLmM6IEZpeCBjb21t
+ZW50cyBhbmQgc2NoZW1lLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJ3wn
+IChjdHg6RXhWKQojMTg6IEZJTEU6IG5ldC9jb2xvLWNvbXBhcmUuYzo1MDoKKyAgfGNvbm4gbGlz
+dCAgICAgICstLS0+Y29ubiAgICAgICAgICAgKy0tLS0tLS0tLT5jb25uICAgICAgICAgICB8LS0t
+PiAuLi4uLi4uCiAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChj
+dHg6V3hPKQojMTg6IEZJTEU6IG5ldC9jb2xvLWNvbXBhcmUuYzo1MDoKKyAgfGNvbm4gbGlzdCAg
+ICAgICstLS0+Y29ubiAgICAgICAgICAgKy0tLS0tLS0tLT5jb25uICAgICAgICAgICB8LS0tPiAu
+Li4uLi4uCiAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
+ZCB0aGF0ICcrJyAoY3R4Old4TykKIzE4OiBGSUxFOiBuZXQvY29sby1jb21wYXJlLmM6NTA6Cisg
+IHxjb25uIGxpc3QgICAgICArLS0tPmNvbm4gICAgICAgICAgICstLS0tLS0tLS0+Y29ubiAgICAg
+ICAgICAgfC0tLT4gLi4uLi4uLgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4Old4TykKIzE4
+OiBGSUxFOiBuZXQvY29sby1jb21wYXJlLmM6NTA6CisgIHxjb25uIGxpc3QgICAgICArLS0tPmNv
+bm4gICAgICAgICAgICstLS0tLS0tLS0+Y29ubiAgICAgICAgICAgfC0tLT4gLi4uLi4uLgogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnLT4nIChjdHg6T3hX
+KQojMTg6IEZJTEU6IG5ldC9jb2xvLWNvbXBhcmUuYzo1MDoKKyAgfGNvbm4gbGlzdCAgICAgICst
+LS0+Y29ubiAgICAgICAgICAgKy0tLS0tLS0tLT5jb25uICAgICAgICAgICB8LS0tPiAuLi4uLi4u
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKdG90YWw6IDUgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
