@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXoUg-00057I-IC
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:54:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1dXoUr-0005FQ-JA
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:54:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXoUe-0003nr-P7
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:54:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52278)
+	(envelope-from <thuth@redhat.com>) id 1dXoUm-0003rR-OT
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:54:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dXoUe-0003nV-Fv
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:54:20 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dXoUm-0003r9-Hw
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:54:28 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 19 Jul 2017 14:54:07 +0200
-Message-Id: <1500468850-15571-3-git-send-email-thuth@redhat.com>
+Date: Wed, 19 Jul 2017 14:54:10 +0200
+Message-Id: <1500468850-15571-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1500468850-15571-1-git-send-email-thuth@redhat.com>
 References: <1500468850-15571-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] target/s390x: Move s390_cpu_dump_state()
- to helper.c
+Subject: [Qemu-devel] [PATCH 5/5] target/s390x: Add remaining switches to
+ compile with --disable-tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,155 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Cc: Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-translate.c can not be compiled with --disable-tcg, but we need
-the s390_cpu_dump_state() in KVM-only builds, too. So let's move
-that function to helper.c instead, which will also be compiled
-when --disable-tcg has been specified.
+Adding some CONFIG_TCG tests to be finally able to compile QEMU
+on s390x also without TCG.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/s390x/helper.c    | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/translate.c | 60 ------------------------------------------------
- 2 files changed, 60 insertions(+), 60 deletions(-)
+ target/s390x/Makefile.objs | 6 +++---
+ target/s390x/cpu.c         | 4 ++++
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 2a89029..e2040d6 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -756,3 +756,63 @@ void s390x_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-     program_interrupt(env, PGM_SPECIFICATION, ILEN_AUTO);
- }
- #endif /* CONFIG_USER_ONLY */
-+
-+void s390_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-+                         int flags)
-+{
-+    S390CPU *cpu = S390_CPU(cs);
-+    CPUS390XState *env = &cpu->env;
-+    int i;
-+
-+    if (env->cc_op > 3) {
-+        cpu_fprintf(f, "PSW=mask %016" PRIx64 " addr %016" PRIx64 " cc %15s\n",
-+                    env->psw.mask, env->psw.addr, cc_name(env->cc_op));
-+    } else {
-+        cpu_fprintf(f, "PSW=mask %016" PRIx64 " addr %016" PRIx64 " cc %02x\n",
-+                    env->psw.mask, env->psw.addr, env->cc_op);
-+    }
-+
-+    for (i = 0; i < 16; i++) {
-+        cpu_fprintf(f, "R%02d=%016" PRIx64, i, env->regs[i]);
-+        if ((i % 4) == 3) {
-+            cpu_fprintf(f, "\n");
-+        } else {
-+            cpu_fprintf(f, " ");
-+        }
-+    }
-+
-+    for (i = 0; i < 16; i++) {
-+        cpu_fprintf(f, "F%02d=%016" PRIx64, i, get_freg(env, i)->ll);
-+        if ((i % 4) == 3) {
-+            cpu_fprintf(f, "\n");
-+        } else {
-+            cpu_fprintf(f, " ");
-+        }
-+    }
-+
-+    for (i = 0; i < 32; i++) {
-+        cpu_fprintf(f, "V%02d=%016" PRIx64 "%016" PRIx64, i,
-+                    env->vregs[i][0].ll, env->vregs[i][1].ll);
-+        cpu_fprintf(f, (i % 2) ? "\n" : " ");
-+    }
-+
-+#ifndef CONFIG_USER_ONLY
-+    for (i = 0; i < 16; i++) {
-+        cpu_fprintf(f, "C%02d=%016" PRIx64, i, env->cregs[i]);
-+        if ((i % 4) == 3) {
-+            cpu_fprintf(f, "\n");
-+        } else {
-+            cpu_fprintf(f, " ");
-+        }
-+    }
-+#endif
-+
-+#ifdef DEBUG_INLINE_BRANCHES
-+    for (i = 0; i < CC_OP_MAX; i++) {
-+        cpu_fprintf(f, "  %15s = %10ld\t%10ld\n", cc_name(i),
-+                    inline_branch_miss[i], inline_branch_hit[i]);
-+    }
-+#endif
-+
-+    cpu_fprintf(f, "\n");
-+}
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 1dffcee..81843cd 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -93,66 +93,6 @@ static uint64_t pc_to_link_info(DisasContext *s, uint64_t pc)
-     return pc;
- }
+diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
+index cc2b4c9..f42cd1f 100644
+--- a/target/s390x/Makefile.objs
++++ b/target/s390x/Makefile.objs
+@@ -1,6 +1,6 @@
+-obj-y += translate.o helper.o cpu.o interrupt.o
+-obj-y += int_helper.o fpu_helper.o cc_helper.o mem_helper.o misc_helper.o
+-obj-y += gdbstub.o cpu_models.o cpu_features.o excp_helper.o
++obj-y += cpu.o cpu_models.o cpu_features.o gdbstub.o interrupt.o helper.o
++obj-$(CONFIG_TCG) += translate.o cc_helper.o excp_helper.o fpu_helper.o
++obj-$(CONFIG_TCG) += int_helper.o mem_helper.o misc_helper.o
+ obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o diag.o
+ obj-$(CONFIG_KVM) += kvm.o
  
--void s390_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
--                         int flags)
--{
--    S390CPU *cpu = S390_CPU(cs);
--    CPUS390XState *env = &cpu->env;
--    int i;
--
--    if (env->cc_op > 3) {
--        cpu_fprintf(f, "PSW=mask %016" PRIx64 " addr %016" PRIx64 " cc %15s\n",
--                    env->psw.mask, env->psw.addr, cc_name(env->cc_op));
--    } else {
--        cpu_fprintf(f, "PSW=mask %016" PRIx64 " addr %016" PRIx64 " cc %02x\n",
--                    env->psw.mask, env->psw.addr, env->cc_op);
--    }
--
--    for (i = 0; i < 16; i++) {
--        cpu_fprintf(f, "R%02d=%016" PRIx64, i, env->regs[i]);
--        if ((i % 4) == 3) {
--            cpu_fprintf(f, "\n");
--        } else {
--            cpu_fprintf(f, " ");
--        }
--    }
--
--    for (i = 0; i < 16; i++) {
--        cpu_fprintf(f, "F%02d=%016" PRIx64, i, get_freg(env, i)->ll);
--        if ((i % 4) == 3) {
--            cpu_fprintf(f, "\n");
--        } else {
--            cpu_fprintf(f, " ");
--        }
--    }
--
--    for (i = 0; i < 32; i++) {
--        cpu_fprintf(f, "V%02d=%016" PRIx64 "%016" PRIx64, i,
--                    env->vregs[i][0].ll, env->vregs[i][1].ll);
--        cpu_fprintf(f, (i % 2) ? "\n" : " ");
--    }
--
--#ifndef CONFIG_USER_ONLY
--    for (i = 0; i < 16; i++) {
--        cpu_fprintf(f, "C%02d=%016" PRIx64, i, env->cregs[i]);
--        if ((i % 4) == 3) {
--            cpu_fprintf(f, "\n");
--        } else {
--            cpu_fprintf(f, " ");
--        }
--    }
--#endif
--
--#ifdef DEBUG_INLINE_BRANCHES
--    for (i = 0; i < CC_OP_MAX; i++) {
--        cpu_fprintf(f, "  %15s = %10ld\t%10ld\n", cc_name(i),
--                    inline_branch_miss[i], inline_branch_hit[i]);
--    }
--#endif
--
--    cpu_fprintf(f, "\n");
--}
--
- static TCGv_i64 psw_addr;
- static TCGv_i64 psw_mask;
- static TCGv_i64 gbea;
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index accef03..489bc25 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -417,7 +417,9 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     cc->reset = s390_cpu_full_reset;
+     cc->class_by_name = s390_cpu_class_by_name,
+     cc->has_work = s390_cpu_has_work;
++#ifdef CONFIG_TCG
+     cc->do_interrupt = s390_cpu_do_interrupt;
++#endif
+     cc->dump_state = s390_cpu_dump_state;
+     cc->set_pc = s390_cpu_set_pc;
+     cc->gdb_read_register = s390_cpu_gdb_read_register;
+@@ -428,10 +430,12 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     cc->get_phys_page_debug = s390_cpu_get_phys_page_debug;
+     cc->vmsd = &vmstate_s390_cpu;
+     cc->write_elf64_note = s390_cpu_write_elf64_note;
++#ifdef CONFIG_TCG
+     cc->cpu_exec_interrupt = s390_cpu_exec_interrupt;
+     cc->debug_excp_handler = s390x_cpu_debug_excp_handler;
+     cc->do_unaligned_access = s390x_cpu_do_unaligned_access;
+ #endif
++#endif
+     cc->disas_set_info = s390_cpu_disas_set_info;
+ 
+     cc->gdb_num_core_regs = S390_NUM_CORE_REGS;
 -- 
 1.8.3.1
