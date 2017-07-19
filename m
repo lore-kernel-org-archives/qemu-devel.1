@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <indiffpig@126.com>) id 1dXok3-0003jb-FS
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:10:16 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dXomu-0004SH-4S
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <indiffpig@126.com>) id 1dXojz-0001Pw-Ew
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:10:15 -0400
-Received: from m15-52.126.com ([220.181.15.52]:17542)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <indiffpig@126.com>) id 1dXojx-0001B0-KC
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:10:11 -0400
-Date: Wed, 19 Jul 2017 20:39:26 +0800 (CST)
-From: indiffpig  <indiffpig@126.com>
-In-Reply-To: <1500031677-2362-1-git-send-email-indiffPig@126.com>
-References: <1500031677-2362-1-git-send-email-indiffPig@126.com>
+	(envelope-from <cohuck@redhat.com>) id 1dXomq-0002Vl-4M
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:13:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dXomp-0002Ui-RE
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 09:13:08 -0400
+Date: Wed, 19 Jul 2017 15:03:13 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170719150313.6acdb087@gondolin>
+In-Reply-To: <20170718142455.32676-1-cohuck@redhat.com>
+References: <20170718142455.32676-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Message-ID: <1b58cb8.a133.15d5adc3290.Coremail.indiffpig@126.com>
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH] dvs services stop then qemu may be accesse
- null address case core
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 0/9] s390x: zPCI detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: indiffPig@126.com
-Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
 
-Ck5vIG9uZSByZXBsaWVkIHRvIG15IG1haWwuIFNvbWVvbmUgbWlnaHQgdGhpbmsgSSB3YXMgdGFs
-a2luZyBub25zZW5zZS4gV2hlbiB0aGUgRFZTIHNlcnZpY2Ugc3RvcHBlZCwgYWxsIG91ciBRRU1V
-IHByb2Nlc3NlcyBleGl0ZWQuIERWUyB1c2VycyBjb21wbGFpbiB0aGF0IGV2ZW4gaWYgdGhlaXIg
-RFZTIHNlcnZpY2VzIGFyZSBzdG9wcGVkLCB2aG9zdC11c2VyIG5ldHdvcmtzIHNob3VsZCBub3Qg
-YmUgYmxvY2tlZCwgYnV0IHZpcnR1YWwgbWFjaGluZXMgc2hvdWxkIG5vdCBiZSBhbGxvd2VkIHRv
-IGV4aXQuIEkgZm91bmQgdGhlIHNlZ2RlZmF1bHQgZXJyb3IgaW4gdGhlIGhvc3QncyBsb2cgYWJv
-dXQgUUVNVSwgYW5kIGFsbCBlcnJvcnMgYXJlIHBvaW50aW5nIHRvIHRoZSBudWxsIHBvaW50ZXIg
-cmVmZXJyZWQgdG8gaW4gdGhlIHBhdGNoLiBXaGF0IGRvZXMgb3BlbiBzb3VyY2UgbWFpbnRlbmFu
-Y2Ugc3RhZmYgdGhpbmsgYWJvdXQ/CgoKCgoKCgpBdCAyMDE3LTA3LTE0IDE5OjI3OjU3LCBpbmRp
-ZmZQaWdAMTI2LmNvbSB3cm90ZToKPkZyb206ICJ5aW4uenVvd2VpIiA8aW5kaWZmUGlnQDEyNi5j
-b20+Cj4KPlNpZ25lZC1vZmYtYnk6IHlpbi56dW93ZWkgPGluZGlmZlBpZ0AxMjYuY29tPgo+LS0t
-Cj4gY2hhcmRldi9jaGFyLWZlLmMgfCA4ICsrKysrKystCj4gMSBmaWxlIGNoYW5nZWQsIDcgaW5z
-ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Cj5kaWZmIC0tZ2l0IGEvY2hhcmRldi9jaGFyLWZl
-LmMgYi9jaGFyZGV2L2NoYXItZmUuYwo+aW5kZXggM2Y5MGYwNS4uODJmN2UyYiAxMDA2NDQKPi0t
-LSBhL2NoYXJkZXYvY2hhci1mZS5jCj4rKysgYi9jaGFyZGV2L2NoYXItZmUuYwo+QEAgLTM1Myw3
-ICszNTMsMTMgQEAgZ3VpbnQgcWVtdV9jaHJfZmVfYWRkX3dhdGNoKENoYXJCYWNrZW5kICpiZSwg
-R0lPQ29uZGl0aW9uIGNvbmQsCj4gCj4gdm9pZCBxZW11X2Nocl9mZV9kaXNjb25uZWN0KENoYXJC
-YWNrZW5kICpiZSkKPiB7Cj4tICAgIENoYXJkZXYgKmNociA9IGJlLT5jaHI7Cj4rICAgIENoYXJk
-ZXYgKmNociA9IE5VTEw7Cj4rCj4rICAgIGlmIChiZSkgewo+KyAgICAgICAgY2hyID0gYmUtPmNo
-cjsKPisgICAgfSBlbHNlIHsKPisgICAgICAgIHJldHVybiA7Cj4rICAgIH0KPiAKPiAgICAgaWYg
-KGNociAmJiBDSEFSREVWX0dFVF9DTEFTUyhjaHIpLT5jaHJfZGlzY29ubmVjdCkgewo+ICAgICAg
-ICAgQ0hBUkRFVl9HRVRfQ0xBU1MoY2hyKS0+Y2hyX2Rpc2Nvbm5lY3QoY2hyKTsKPi0tIAo+MS44
-LjMuMQo+Cg==
+On Tue, 18 Jul 2017 16:24:46 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> Next try of the zPCI detangling, taking cpu models into account.
+> 
+> The goal of this is twofold:
+> - Being able to disable PCI support in a build completely, as for v1.
+> - Properly fencing off PCI if the relevant facility bit is not provided.
+> 
+> The second one leads to an interesting usability problem: -device help
+> still shows the various pci devices, but you cannot add them if the
+> cpu model does not include zpci, due to the phb not being instantiated.
+> The user is presented with
+> 
+> qemu-system-s390x: -device virtio-rng-pci: No 'PCI' bus found for device 'virtio-rng-pci'
+> 
+> ...which is not very helpful, as it does not point to the root cause (no
+> zpci in the cpu model, and therefore no pci at all). Not sure how one can
+> communicate this root cause, ideas welcome.
+
+An idea on how to improve this would still be welcome :)
+
+> 
+> A cross-check with the zpci documentation would also be good, as it is
+> not public.
+> 
+> Changes v1->v2:
+> - add hw/s390x/s390-pci-stub.c to get rid of the ifdeffery
+> - use the cpumodel to decide whether the guest can use pci instructions or
+>   not; also use this in the sclp and ioinst code
+> 
+> Branch in git:
+> 
+> git://github.com/cohuck/qemu no-zpci-cpumodel
+
+I've updated this with the various feedback I got, but probably will
+not have time to do more until next week.
+
+> 
+> Cornelia Huck (9):
+>   kvm: remove hard dependency on pci
+>   s390x/pci: add stubs
+>   s390x: chsc nt2 events are pci-only
+>   s390x/pci: do not advertise pci on non-pci builds
+>   s390x/ccw: create s390 phb conditionally
+>   s390x/sclp: properly guard pci-specific functions
+>   s390x/pci: fence off instructions for non-pci
+>   s390x/kvm: msi route fixup for non-pci
+>   s390x: refine pci dependencies
+> 
+>  default-configs/s390x-softmmu.mak |  2 +-
+>  hw/pci/pci-stub.c                 | 12 ++++++
+>  hw/s390x/Makefile.objs            |  3 +-
+>  hw/s390x/s390-pci-bus.c           |  4 +-
+>  hw/s390x/s390-pci-bus.h           |  4 +-
+>  hw/s390x/s390-pci-stub.c          | 74 ++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-virtio-ccw.c        | 12 +++---
+>  hw/s390x/sclp.c                   | 19 +++++++--
+>  target/s390x/ioinst.c             | 16 +++++++
+>  target/s390x/kvm.c                | 89 +++++++++++++++++++++++++++------------
+>  10 files changed, 193 insertions(+), 42 deletions(-)
+>  create mode 100644 hw/s390x/s390-pci-stub.c
+> 
