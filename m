@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dXeN2-00087I-6D
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:05:49 -0400
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXeYw-0001qM-1O
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dXeMw-0003yV-Sd
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:05:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dXeMw-0003y5-3j
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:05:42 -0400
-Date: Wed, 19 Jul 2017 05:05:37 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170719004721-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] host side todo list for virtio rdma
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXeYs-0008P5-TS
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:18:06 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:59279)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jiang.biao2@zte.com.cn>) id 1dXeYr-0008Nl-G2
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 22:18:02 -0400
+Date: Wed, 19 Jul 2017 10:17:50 +0800 (CST)
+Message-ID: <201707191017508680118@zte.com.cn>
+Mime-Version: 1.0
+From: <jiang.biao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_v2_00/45=5D_tcg=3A_support_for_m?=
+ =?utf-8?q?ultiple_TCGcontexts?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,176 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio@lists.oasis-open.org, virtio-dev@lists.oasis-open.org
-Cc: qemu-devel@nongnu.org, linux-rdma@vger.kernel.org, Marcel Apfelbaum <marcel.a@redhat.com>
+To: rth@twiddle.net
+Cc: cota@braap.org, qemu-devel@nongnu.org, alex.bennee@linaro.org, jiang.yong5@zte.com.cn, shi.zhongbing@zte.com.cn
 
-Here are some thoughts on bits that are still missing to get a working
-virtio-rdma, with some suggestions. These are very preliminary but I
-feel I kept these in my head (and discussed offline) for too long. All
-of the below is just my personal humble opinion.
-
-Feature Requirements:
-
-The basic requirement is to be able to do RDMA to/from
-VM memory, with support for VM migration and/or memory
-overcommit and/or autonuma and/or THP.
-Why are migration/overcommit/autonuma required?
-Without these, you can do RDMA with device passthrough,
-with likely better performance.
-
-Feature Non-requirements:
-
-It's not a requirement to support RDMA without VM exits,
-e.g. like with device passthrough. While avoiding exits improves
-performance, it would be handy to more than RDMA,
-so there seems no reason to require it from RDMA when we
-do not have it for e.g. network.
-
-Assumptions:
-
-It's OK to assume specific hardware capabilities at least initially.
-
-High level architecture:
-
-Follows the same lines as most other virtio devices:
-
-+-----------------------------------
-+ 
-+ guest kernel
-+             ^
-+-------------|----------------------
-+             v
-+ host kernel (kvm, vhost)
-+ 
-+             ^
-+-------------|----------------------
-+             v
-+ 
-+ host userspace (QEMU, vhost-user)
-+ 
-+-----------------------------------
-
-Each request is forwarded by host kernel to QEMU,
-that executes it using the ibverbs library.
-
-Most of this should be implementable host-side using existing
-software. However, several issues remain and would need
-infrastructure changes, as outlined below.
-
-Host-side todo list for virtio-rdma support:
-
-- Memory registration for guest userspace.
-
-  Register memory region verb accepts a single virtual address,
-  which supplies both the on-wire key for access and the
-  range of memory to access. Guest kernel turns this into a
-  list of pages (e.g. by get_user_pages); when forwarded to host this
-  turns into a s/g list of virtual addresses in QEMU address space.
-
-  Suggestion: add a new verb, along the lines of ibv_register_physical,
-  which splits these two parameters, accepting the on-wire VA key
-  and separately a list of userspace virtual address/size pairs.
-
-- Memory registration for guest kernels.
-
-  Another ability used by some in-kernel users is registering all of memory.
-  Ranges not actually present are never accessed - this is OK as
-  kernel users are trusted. Memory hotplug changes which ranges
-  are present.
-
-  Suggestion: add some throw-away memory and map all
-  non-present ranges there. Add ibv_reregister_physical_mr or similar
-  API to update mappings on guest memory hotplug/unplug.
-
-- Memory overcommit/autonuma/THP.
-
-  This includes techniques such as swap,KSM,COW, page migration.
-  All these rely on ability to move pages around without
-  breaking hardware access.
-
-  Suggestion: for hardware that supports it,
-  enabling on-demand paging for all registered memory seems
-  to address the issue more or less transparently to guests.
-  This isn't supported by all hardware but might be
-  at least a reasonable first step.
-
-- Migration: memory tracking.
-
-  Migration requires detecting hardware access to pages
-  either on write (pre-copy) or any access (post-copy).
-  Post copy just requires ODP support to work with
-  userfaultfd properly.
-  Pre-copy would require a write-tracking API along
-  the lines of one exposed by KVM or vhost.
-  Each tracked page would be write-protected (causing faults on
-  hardware access) on hardware write fault is generated
-  and recorded, page is made writeable.
-
-- Migration: moving QP numbers.
-
-  QP numbers are exposed on the wire and so must move together
-  with the VM.
-
-  Suggestion: allow specifying QP number when creating a QP.
-  To avoid conflicts between multiple users, initial version can limit
-  library to a single user per device. Multiple VMs can simply
-  attach to distinct VFs.
-
-- Migration: moving QP state.
-
-  When migrating the VM, a QP has to be torn down
-  on source and created on destination.
-  We have to migrate e.g. the current PSN - but what
-  should happen when a new packet arrives on source
-  after QP has been torn down?
-
-  Suggestion 1: move QP to a special state "suspended" and ignore
-  packets, or cause source to retransmit with e.g. an out of
-  resources error. Retransmit counter might need to be
-  adjusted compared to what guest requested to account
-  for the extra need to retransmit.
-  Is there a good existing QP state that does this?
-
-  Suggestion 2: forward packets to destination somehow.
-  Might overload the fabric as we are crossing e.g.
-  pci bus multiple times.
-
-- Migration: network update
-
-  ROCE v1 and infiniband seem to tie connections to
-  hardware specific GIDs which can not be moved by software.
-
-  Suggestion: limit migration to RoCE v2 initially.
-
-- Migration: packet loss recovery.
-
-  As a RoCE address moves across the network, network has
-  to be updated which takes time, meanwhile packet loss seems
-  to be hard to avoid.
-
-  Suggestion: limit initial support to hardware that is
-  able to recover from occasional packet drops, with
-  some slowdown.
-
-- Migration: suspend/resume API?
-  It might be easier to pack up state of all resources
-  such as all QP numbers and state of all QPs etc
-  in a single memory buffer, migrate then unpack on destination.
-
-  Removes need for 2 separate APIs for suspended state and
-  for specifying QPN on creation.
-
-  This creates a format for serialization that will have to
-  be maintained in a compatible way - it is not clear that
-  the maintainance overhead is worth the potential
-  simplification, if any.
-
-
-That's it - I hope this helps, feel free to discuss, preferably copying
-virtio-dev (subscription required for now, people are looking into
-fixing this, sorry about that).
-
-Thanks!
-
--- 
-MST
+PiBPbiAwNy8xOC8yMDE3IDAyOjIyIFBNLCBqaWFuZy5iaWFvMkB6dGUuY29tLmNuIHdyb3RlOg0K
+DQoNCg0KPiA+IFNlZWluZyB5b3VyIHdvcmsgb24gbXVsdGlwbGUgVENHLCBpdCBzZWVtcyB0aGF0
+IGl0IGhhcyBzb21lIGtpbmQgb2YgY29ubmVjdGlvbiANCj4gPiB3aXRoIHRoZSAgTVRUQ0cgZmVh
+dHVyZSwNCj4gPiANCj4gPiBidXQgSSBkbyBub3QgZmlndXJlIG91dCBob3cgdGhleSBhcmUgY29u
+bmVjdGVkIGluIGRldGFpbC4NCj4gPiANCj4gPiBDb3VsZCB5b3UgcGxzIGhlbHAgdG8gY29uZmly
+bSB0aGUgZm9sbG93aW5nIHF1ZXN0aW9uczoNCj4gPiANCj4gPiAgMS4NCj4gPiANCj4gPiAgICAg
+d2hhdCBpcyB0aGUgcmVsYXRpb25zaGlwIGJldHdlZW4geW91ciBwYXRjaGVzIGFuZCB0aGUgTVRU
+Q0cgZmVhdHVyZQ0KPiA+ICAgICBtZW50aW9uZWQgYnkgaHR0cHM6Ly9sd24ubmV0L0FydGljbGVz
+LzY5NzI2NS8/DQo+IA0KPiBUaGUgY3VycmVudCBNVFRDRyBmZWF0dXJlIGlzIGluIFFFTVUgbWFp
+bmxpbmUuICBJdCBhbGxvd3MgcGFyYWxsZWwgZXhlY3V0aW9uIG9mIA0KPiB0cmFuc2xhdGVkIGNv
+ZGUgaW4gYm90aCBzeXN0ZW0gbW9kZS4gIEl0IGRvZXMgKm5vdCogYWxsb3cgcGFyYWxsZWwgdHJh
+bnNsYXRpb24gDQo+IC0tIGFsbCB0cmFuc2xhdGlvbiBpcyBkb25lIHdpdGggdGJfbG9jayBoZWxk
+Lg0KPiANCj4gTm90ZSB0aGF0IHdlICphbHdheXMqIGhhdmUgcGFyYWxsZWwgZXhlY3V0aW9uIGlu
+IHVzZXIgbW9kZS4gIEhvd2V2ZXIsIHRoaXMgY2FuIA0KPiBhbmQgZG9lcyBsZWFkIHRvIHByb2Js
+ZW1zLiAgU2VlIGJlbG93Lg0KPiANCj4gVGhpcyBwYXRjaCBzZXQgYWxsb3dzIHBhcmFsbGVsIHRy
+YW5zbGF0aW9uIGluIHN5c3RlbSBtb2RlLiAgVGhpcyBpcyBzaG93biB0byANCj4gaW1wcm92ZSB0
+aGUgb3ZlcmFsbCB0aHJvdWdocHV0LiAgSXQgZG9lcyAqbm90KiBhbGxvdyBwYXJhbGxlbCB0cmFu
+c2xhdGlvbiBpbiANCj4gdXNlciBtb2RlLiAgRmlyc3RseSBiZWNhdXNlIHVzZXIgbW9kZSBhbHJl
+YWR5IHNoYXJlcyBtb3JlIHRyYW5zbGF0aW9ucyBiZXR3ZWVuIA0KPiB0aHJlYWRzIChiZWNhdXNl
+IGl0IGlzIHJ1bm5pbmcgYSBzaW5nbGUgZXhlY3V0YWJsZSksIGFuZCBzbyB0aGUgdHJhbnNsYXRp
+b24gDQo+IHJvdXRpbmVzIGFyZSBub3QgaGlnaCBpbiB0aGUgcHJvZmlsZS4gIFNlY29uZGx5IGJl
+Y2F1c2UgdGhlcmUgYXJlIGFkZGl0aW9uYWwgDQo+IGxvY2tpbmcgcHJvYmxlbXMgZHVlIHRvIHRo
+ZSBmYWN0IHRoYXQgd2UgaGF2ZSBubyBib3VuZCBvbiB0aGUgbnVtYmVyIG9mIHVzZXIgDQo+IHRo
+cmVhZHMuDQoNCkRvZXMgdGhhdCBtZWFuIGJvdGggdGhlIE1UVENHIGZlYXR1cmUgYW5kIHRoaXMg
+cGF0Y2ggc2V0IGFyZSBhbGwgYWJvdXQgc3lzdGVtIA0KDQoNCm1vZGUsIGFuZCBoYXZlIG5vdGhp
+bmcgdG8gZG8gd2l0aCBsaW51eC11c2VyIG1vZGU/DQoNCg0KDQoNCj4NCj4gIDIuDQo+IA0KPiAg
+ICAgV2hhdCBpcyB0aGUgY3VycmVudCBzdGF0dXMgb2YgdGhlIGRldmVsb3BtZW50IG9mIHRoZSBN
+VFRDRyBmZWF0dXJlPw0KPiANCj4gTVRUQ0cgaGFzIG9ubHkgYmVlbiBlbmFibGVkIG9uIGEgZmV3
+IHRhcmdldHM6IGFscGhhLCBhcm0sIHBwYzY0Lg0KPiBMb29rIGZvciAibXR0Y2c9eWVzIiBpbiBj
+b25maWd1cmUuDQo+IA0KPiBJbiBvcmRlciBmb3IgTVRUQ0cgdG8gYmUgZW5hYmxlZCwgdGhlIHRh
+cmdldCBtdXN0IGJlIGFkanVzdGVkIHNvIHRoYXQNCj4gKDEpIGFsbCBhdG9taWMgaW5zdHJ1Y3Rp
+b25zIGFyZSBpbXBsZW1lbnRlZCB3aXRoIGF0b21pYyB0Y2cgb3BlcmF0aW9ucywNCj4gKDIpIGRl
+ZmluZSBUQ0dfR1VFU1RfREVGQVVMVF9NTyB0byBpbmRpY2F0ZSBhbnkgYmFycmllcnMgaW1wbGll
+ZCBieQ0KPiAgICAgbm9ybWFsIG1lbW9yeSBvcGVyYXRpb25zIGJ5IHRoZSB0YXJnZXQgYXJjaGl0
+ZWN0dXJlLg0KPiANCj4gRm9yIHRhcmdldC9taXBzLCBuZWl0aGVyIG9mIHRoZXNlIHRoaW5ncyBh
+cmUgY29tcGxldGUuDQo+IA0KPiBNVFRDRyBoYXMgb25seSBiZWVuIGVuYWJsZWQgb24gb25lIGhv
+c3Q6IGkzODYuDQo+IExvb2sgZm9yIFRDR19UQVJHRVRfREVGQVVMVF9NTyBpbiB0Y2cvKi90Y2ct
+dGFyZ2V0LmguDQo+IA0KPiBJbiBvcmRlciBmb3IgTVRUQ0cgdG8gYmUgZW5hYmxlZCwgdGhlIHRh
+cmdldCBtZW1vcnkgb3JkZXIgbXVzdCBub3QgYmUgc3Ryb25nZXIgDQo+IHRoYW4gdGhlIGhvc3Qg
+bWVtb3J5IG9yZGVyLiAgU2luY2UgaTM4NiBoYXMgYSB2ZXJ5IHN0cm9uZyBob3N0IG1lbW9yeSBv
+cmRlciwgaXQgDQo+IGlzIGVhc3kgZm9yIGl0IHRvIGVtdWxhdGUgYW55IGd1ZXN0LiAgV2hlbiB0
+aGUgaG9zdCBoYXMgYSB3ZWFrIG1lbW9yeSBvcmRlciwgd2UgDQo+IG5lZWQgdG8gYWRkIHRoZSBh
+ZGRpdGlvbmFsIGJhcnJpZXJzIHRoYXQgYXJlIGltcGxpZWQgYnkgdGhlIHRhcmdldC4gIFRoaXMg
+aXMgDQo+IHdvcmsgdGhhdCBoYXMgbm90IGJlZW4gZG9uZS4NCj4gDQo+IEkgYW0gbm90IHN1cmUg
+d2h5IHdlIGhhdmUgbm90IGFscmVhZHkgYWRkZWQgdGhpcyBkZWZpbml0aW9uIHRvIGFsbCBvZiB0
+aGUgb3RoZXIgDQo+IHRjZyBob3N0cy4gIEkgdGhpbmsgdGhpcyBpcyBqdXN0IG92ZXJzaWdodCwg
+c2luY2UgYWxtb3N0IGV2ZXJ5b25lIHVzZXMgeDg2XzY0IA0KPiBsaW51eCBhcyB0aGUgaG9zdCBm
+b3IgdGVzdGluZyB0Y2cuICBIb3dldmVyLCBzaW5jZSBhbGwgb2YgdGhlIHN1cHBvcnRlZCB0YXJn
+ZXRzIA0KPiBoYXZlIHdlYWsgbWVtb3J5IG9yZGVycyB3ZSBvdWdodCB0byBiZSBhYmxlIHRvIHN1
+cHBvcnQgdGhlbSB3aXRoIGFueSBob3N0Lg0KSW4gbXkgY2FzZSwgSSB1c2UgTWlwczY0IGhvc3Qg
+YW5kIGkzODYgdGFyZ2V0LCBkb2VzIHRoYXQgbWVhbiBJIGNhbiBub3QgZW5hYmxlIA0KDQoNCnRo
+ZSBNVFRDRz8NCg0KDQoNCg0KPiA+ICAzLg0KPiA+IA0KPiA+ICAgICBJcyB0aGVyZSBhbnkgcHJv
+YmxlbSB3aXRoIHRoZSBtdWx0aXRocmVhZCBwcm9ncmFtbWUgcnVubmluZyB3aXRoIGxpbnV4LXVz
+ZXINCj4gPiAgICAgcWVtdSBtb2RlPyB3b3VsZCB0aGUgc2l0dWF0aW9uIGJlIGltcHJvdmVkIHdp
+dGggIHRoZSBNVFRDRyBmZWF0dXJlPw0KPiA+IA0KPiA+ICAgICBXZSBuZWVkIHRvIHVzZSBsaW51
+eC11c2VyIG1vZGUgcWVtdSB0byBydW4gbXVsdGl0aHJlYWQgYXBwLCBidXQgdGhlcmUgc2VlbXMN
+Cj4gPiAgICAgdG8gYmUgbWFueSBwcm9ibGVtLg0KPiANCj4gRm9yIHVzZXIgbW9kZSwgd2Ugc2hv
+dWxkIHN0aWxsIGZvbGxvdyB0aGUgcnVsZXMgZm9yIE1UVENHLCBidXQgd2UgZG8gbm90LiANCj4g
+SW5zdGVhZCB3ZSB0YWtlIGl0IG9uIGZhaXRoIHRoYXQgdGhleSBoYXZlIGJlZW4gYW5kIGV4ZWN1
+dGUgdGhlIGNvZGUgaW4gDQo+IHBhcmFsbGVsIGFueXdheS4gIFRoaXMgZmFpdGggaXMgb2Z0ZW4g
+bWlzcGxhY2VkIGFuZCBpdCBkb2VzIG1lYW4gdGhhdCANCj4gdW5zdXBwb3J0ZWQgdGFyZ2V0cyBl
+eGVjdXRlIHVzZXIgbW9kZSBjb2RlIGluY29ycmVjdGx5Lg0KV2hhdCBkbyB5b3UgZXhhY3RseSBt
+ZWFuIGFib3V0IHRoZSAqdW5zdXBwb3J0ZWQgdGFyZ2V0cyo/IG1pcHM/IGFybT8gaTM4Nj8gDQoN
+Cg0KV2hhdCBpcyB0aGUgbWFpbiByZWFzb24gZm9yIHRoZSBpbmNvcnJlY3RseSBleGVjdXRpb24g
+b2YgbXVsdGl0aHJlYWQgYXBwIGZvciB1c2VyIG1vZGU/DQoNCklzIE1UVENHIGhlbHBmdWwgZm9y
+IHRoYXQ/DQoNClNwZWNpZmljbHkgZm9yIG15IGNhc2UoaTM4NiB0YXJnZXQgb24gTWlwczY0IGhv
+c3QgaW4gdXNlciBtb2RlKSwgIGhvdyB0byBpbXByb3ZlZCB0aGUgc2l0dWF0aW9uPw0KDQoNCg0K
+DQpUaGFua3MgYSBsb3QgZm9yIHlvdXIgZGV0YWlsZWQgZXhwbGFpbmF0aW9uLg==
