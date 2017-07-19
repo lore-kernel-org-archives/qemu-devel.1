@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dXsYn-0007Mp-TY
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:54 -0400
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXspg-00043x-Fm
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dXsYm-0007e5-LT
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:53 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33573)
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dXspd-0007QW-BS
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:32:20 -0400
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:42487
+	helo=www.kot-begemot.co.uk)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dXsYm-0007dP-Fe
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:52 -0400
-Received: by mail-pf0-x244.google.com with SMTP id e199so462938pfh.0
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 10:14:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
+	id 1dXspd-0007QA-5Q
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:32:17 -0400
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-3-anton.ivanov@cambridgegreys.com>
+	<03702920-f5b1-6579-0c59-a0d46274a6d9@redhat.com>
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Message-ID: <7c19329b-f3dc-1f54-9fac-8ecf43123a8b@cambridgegreys.com>
+Date: Wed, 19 Jul 2017 18:32:08 +0100
 MIME-Version: 1.0
-References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
-	<20170719135726.GG5722@char.us.oracle.com>
-In-Reply-To: <20170719135726.GG5722@char.us.oracle.com>
-From: Alexander Bezzubikov <zuban32s@gmail.com>
-Date: Wed, 19 Jul 2017 17:14:41 +0000
-Message-ID: <CAKSfGUDgtN+S=u_4S7-s1wUxt6fZtibLG+ZSX+qZ0d+9marXQQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Allow RedHat PCI bridges reserve
- more buses than necessary during init
+In-Reply-To: <03702920-f5b1-6579-0c59-a0d46274a6d9@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] Unified Datagram Socket Transport -
+ GRE support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: marcel@redhat.com, qemu-devel@nongnu.org, seabios@seabios.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com
 
-=D1=81=D1=80, 19 =D0=B8=D1=8E=D0=BB=D1=8F 2017 =D0=B3. =D0=B2 16:57, Konrad=
- Rzeszutek Wilk <konrad.wilk@oracle.com>:
 
-> On Wed, Jul 19, 2017 at 04:20:12PM +0300, Aleksandr Bezzubikov wrote:
-> > Now PCI bridges (and PCIE root port too) get a bus range number in
-> system init,
-> > basing on currently plugged devices. That's why when one wants to
-> hotplug another bridge,
-> > it needs his child bus, which the parent is unable to provide.
+
+On 19/07/17 15:40, Eric Blake wrote:
+> On 07/18/2017 12:08 PM, anton.ivanov@cambridgegreys.com wrote:
+>> From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+>>
+>> This adds GRETAP support to the unified socket driver.
+>>
+>> Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+>> ---
+>>   net/Makefile.objs |   2 +-
+>>   net/clients.h     |   4 +
+>>   net/gre.c         | 313 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   net/net.c         |   5 +
+>>   qapi-schema.json  |  46 +++++++-
+>>   qemu-options.hx   |  63 ++++++++++-
+>>   6 files changed, 425 insertions(+), 8 deletions(-)
+>>   create mode 100644 net/gre.c
+>>
+> Just an interface review:
 >
-> Could you explain how you trigger this?
-
-
-I'm trying to hot plug pcie-pci bridge into pcie root port, and Linux says
-'cannot allocate bus number for device bla-bla'. This obviously does not
-allow me to use the bridge at all.
-
+>> +++ b/qapi-schema.json
+>> @@ -3847,7 +3847,41 @@
+>>       'txsession':    'uint32',
+>>       '*rxsession':   'uint32',
+>>       '*offset':      'uint32' } }
+>> -
+>> +##
+>> +# @NetdevGREOptions:
+>> +#
+>> +# Connect the VLAN to Ethernet over Ethernet over GRE (GRETAP) tunnel
+>> +#
+>> +# @src: source address
+>> +#
+>> +# @dst: destination address
+>> +#
+>> +# @ipv6: force the use of ipv6
+> This doesn't quite match what we do with other sockets (where we have
+> both ipv4 and ipv6 booleans to allow IPv4-only, IPv6-only, or both).  Is
+> this something where we can reuse InetSocketAddress instead of inventing
+> yet another way of doing things?
 >
->
-> > The suggested workaround is to have vendor-specific capability in RedHa=
-t
-> generic pcie-root-port
-> > that contains number of additional bus to reserve on BIOS PCI init.
->
-> But wouldn't the proper fix be for the PCI bridge to have the subordinate
-> value be extended to fit more bus ranges?
+> Then again, it does match what NetdevL2TPv3Options did :(
 
+I just reviewed this again.
 
-What do you mean? This is what I'm trying to do. Do you suppose to get rid
-of vendor-specific cap and use original register value instead of it?
+I do not think  we can today. This is the declaration:
 
->
-> >
-> > Aleksandr Bezzubikov (2):
-> >   pci: add support for direct usage of bdf for capability lookup
-> >   pci: enable RedHat pci bridges to reserve more buses
-> >
-> >  src/fw/pciinit.c   | 12 ++++++++++--
-> >  src/hw/pcidevice.c | 24 ++++++++++++++++++++++++
-> >  src/hw/pcidevice.h |  1 +
-> >  3 files changed, 35 insertions(+), 2 deletions(-)
-> >
-> > --
-> > 2.7.4
-> >
-> >
->
---=20
-Alexander Bezzubikov
+##
+{ 'struct': 'InetSocketAddressBase',
+   'data': {
+     'host': 'str',
+     'port': 'str' } }
+
+##
+
+If I read this right port is mandatory, correct?
+
+We may be able to do it if the port portion if InetSocketAddress becomes 
+optional. There is no such thing as port for the protocols which use the 
+raw families.
+
+I now recall it being the reason why L2TPv3 does it this way.
+
+I am addressing the rest of the comments in the meantime.
+
+A.
+
+[snip]
+
+-- 
+Anton R. Ivanov
+
+Cambridge Greys Limited, England and Wales company No 10273661
+http://www.cambridgegreys.com/
