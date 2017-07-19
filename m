@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dXrHg-0006cO-Cw
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:53:09 -0400
+	(envelope-from <jfreimann@redhat.com>) id 1dXrMZ-0000ij-By
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dXrHd-00062L-9k
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:53:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48360)
+	(envelope-from <jfreimann@redhat.com>) id 1dXrMW-00008x-BG
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:58:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dXrHc-00061i-W3
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:53:05 -0400
-Date: Wed, 19 Jul 2017 18:52:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170719184748-mutt-send-email-mst@kernel.org>
-References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
-	<20170719095058.4d46359d@Igors-MacBook-Pro.local>
-	<20170719114612.GC3500@work-vm>
-	<20170719152427.620b2a2a@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+	id 1dXrMW-00007x-43
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:58:08 -0400
+Date: Wed, 19 Jul 2017 17:51:27 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+Message-ID: <20170719155127.dqdm2wghdnbsmwie@dhcp-192-218.str.redhat.com>
+References: <20170712094149.23069-1-jfreimann@redhat.com>
+	<20170712180550-mutt-send-email-mst@kernel.org>
+	<20170712211305.ajtizorj4yq6jble@localhost.localdomain>
+	<20170713012811-mutt-send-email-mst@kernel.org>
+	<20170719084402.GA5628@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20170719152427.620b2a2a@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
- vhost region merge
+In-Reply-To: <20170719084402.GA5628@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/3] tests/pxe-testt: add testcase
+ using vhost-user-bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, Peng Hao <peng.hao2@zte.com.cn>, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, victork@redhat.com, qemu-devel@nongnu.org
 
-On Wed, Jul 19, 2017 at 03:24:27PM +0200, Igor Mammedov wrote:
-> On Wed, 19 Jul 2017 12:46:13 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > On Wed, 19 Jul 2017 23:17:32 +0800
-> > > Peng Hao <peng.hao2@zte.com.cn> wrote:
-> > >   
-> > > > When a guest that has several hotplugged dimms is migrated, in
-> > > > destination host it will fail to resume. Because vhost regions of
-> > > > several dimms in source host are merged and in the restore stage
-> > > > in destination host it computes whether more than vhost slot limit
-> > > > before merging vhost regions of several dimms.  
-> > > could you provide a bit more detailed description of the problem
-> > > including command line+used device_add commands on source and
-> > > command line on destination?  
-> > 
-> > (ccing in Marc Andre and Maxime)
-> > 
-> > Hmm, I'd like to understade the situation where you get merging between
-> > RAMBlocks; that complicates some stuff for postcopy.
-> and probably inconsistent merging breaks vhost as well
-> 
-> merging might happen if regions are adjacent or overlap
-> but for that to happen merged regions must have equal
-> distance between their GPA:HVA pairs, so that following
-> translation would work:
-> 
-> if gva in regionX[gva_start, len, hva_start]
->    hva = hva_start + gva - gva_start
-> 
-> while GVA of regions is under QEMU control and deterministic
-> HVA is not, so in migration case merging might happen on source
-> side but not on destination, resulting in different memory maps.
-> 
-> Maybe Michael might know details why migration works in vhost usecase,
-> but I don't see vhost sending any vmstate data.
+On Wed, Jul 19, 2017 at 09:44:02AM +0100, Stefan Hajnoczi wrote:
+>On Thu, Jul 13, 2017 at 01:33:43AM +0300, Michael S. Tsirkin wrote:
+>> On Wed, Jul 12, 2017 at 11:13:05PM +0200, Jens Freimann wrote:
+>> > On Wed, Jul 12, 2017 at 06:10:05PM +0300, Michael S. Tsirkin wrote:
+>> > > On Wed, Jul 12, 2017 at 11:41:46AM +0200, Jens Freimann wrote:
+>> > > > This implements a testcase for pxe-test using the vhost-user interface. Spawn a
+>> > > > vhost-user-bridge process and connect it to the qemu process.
+>> > > >
+>> > > > It is send as an RFC because:
+>> > > >  - Patch 3/3: there must be cleaner way to do this.
+>> > > >  - Does Patch 1/3 make sense or should I just redirect all output to /dev/null?
+>> > > >  - don't hardcode port numbers in qemu cmdline, create socket and pass
+>> > > >     fd to -netdev (need to figure out how to do this)
+>> > >
+>> > > Doesn't this work?
+>> > >
+>> > > -netdev socket,id=str[,fd=h]
+>> >
+>> > It should. But I get this:
+>> >
+>> >        dded sock 5 for watching. max_sock: 5
+>> >        Sock 3 removed from dispatcher watch.
+>> >        qemu: error: specified mcastaddr "127.0.0.1" (0x7f000001) does not contain a multicast address
+>> >        qemu-system-x86_64: -netdev socket,id=n1,fd=3: Device 'socket' could not be initialized
+>> >        Broken pipe
+>>
+>> Not sure what's wrong with it, should not be too hard to debug.
+>
+>Jens asked me this question on IRC.  I didn't know the answer either but
+>git-log(1) shows what happened:
+>
+>-net socket,fd= was broken for SOCK_DGRAM from the moment mcast was
+>introduced by commit 3d830459b1eccdb61b75e2712fd364012ce5a115 ("'-net
+>socket,mcast=' option support (initial patch by Juan Jose Ciarlante)").
+>
+>The issue is probably that the fd init code doesn't know whether the
+>user wanted mcast or not.  Right now it's hardcoded to assume that mcast
+>is desired.  It may be necessary to extend the command-line syntax to
+>specify mcast explicitly with fd=.
 
-We aren't merging ramblocks at all.
-When we are passing blocks A and B to vhost, if we see that
+Thanks for confirming this Stefan! I'll try to come up with an extension to the
+command-line syntax and send a proposal to the list.
 
-hvaB=hvaA + lenA
-gpaB=gpaA + lenA
-
-then we can improve performance a bit by passing a single
-chunk to vhost: hvaA,gpaA,lena+lenB
-
-so it does not affect migration normally.
-
-> 
-> > 
-> > > > 
-> > > > Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> > > > Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
-> > > > ---
-> > > >  hw/mem/pc-dimm.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > index ea67b46..bb0fa08 100644
-> > > > --- a/hw/mem/pc-dimm.c
-> > > > +++ b/hw/mem/pc-dimm.c
-> > > > @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > >          goto out;
-> > > >      }
-> > > >  
-> > > > -    if (!vhost_has_free_slot()) {
-> > > > +    if (!vhost_has_free_slot() && runstate_is_running()) {
-> > > >          error_setg(&local_err, "a used vhost backend has no free"
-> > > >                                 " memory slots left");
-> > > >          goto out;  
-> > 
-> > Even this produces the wrong error message in this case,
-> > it also makes me think if the existing code should undo a lot of
-> > the object_property_set's that happen.
-> > 
-> > Dave
-> > > 
-> > >   
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+regards,
+Jens
