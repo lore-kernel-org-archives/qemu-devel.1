@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXjiO-0007Ux-CO
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:48:13 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dXjlA-0000M8-GA
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dXjiK-00024b-EW
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:48:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44100)
+	(envelope-from <imammedo@redhat.com>) id 1dXjl6-0003H4-Gm
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:51:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44892)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dXjiK-00024B-86
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:48:08 -0400
-References: <20170718142455.32676-1-cohuck@redhat.com>
-	<20170718142455.32676-3-cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4cbc5c19-6c4d-6387-2b8d-8635918a41b9@redhat.com>
-Date: Wed, 19 Jul 2017 09:42:27 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dXjl6-0003Gw-9r
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 03:51:00 -0400
+Date: Wed, 19 Jul 2017 09:50:58 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170719095058.4d46359d@Igors-MacBook-Pro.local>
+In-Reply-To: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1500477452-59643-1-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <20170718142455.32676-3-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 2/9] s390x/pci: add stubs
+Subject: Re: [Qemu-devel] [PATCH] vhost: fix a migration failed because of
+ vhost region merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,18 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: mst@redhat.com, Wang Yechao <wang.yechao255@zte.com.cn>, qemu-devel@nongnu.org
 
-On 18.07.2017 16:24, Cornelia Huck wrote:
-> Some non-pci code calls into zpci code. Provide some stubs for builds
-> without pci.
+On Wed, 19 Jul 2017 23:17:32 +0800
+Peng Hao <peng.hao2@zte.com.cn> wrote:
+
+> When a guest that has several hotplugged dimms is migrated, in
+> destination host it will fail to resume. Because vhost regions of
+> several dimms in source host are merged and in the restore stage
+> in destination host it computes whether more than vhost slot limit
+> before merging vhost regions of several dimms.
+could you provide a bit more detailed description of the problem
+including command line+used device_add commands on source and
+command line on destination?
+
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
 > ---
->  hw/s390x/Makefile.objs   |  3 +-
->  hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 76 insertions(+), 1 deletion(-)
->  create mode 100644 hw/s390x/s390-pci-stub.c
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>  hw/mem/pc-dimm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index ea67b46..bb0fa08 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -101,7 +101,7 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+>          goto out;
+>      }
+>  
+> -    if (!vhost_has_free_slot()) {
+> +    if (!vhost_has_free_slot() && runstate_is_running()) {
+>          error_setg(&local_err, "a used vhost backend has no free"
+>                                 " memory slots left");
+>          goto out;
