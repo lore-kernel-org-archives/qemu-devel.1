@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXtm1-0005Jq-So
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:32:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dXtoK-0006Zh-E2
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dXtlx-0004DJ-16
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:32:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58226)
+	(envelope-from <ehabkost@redhat.com>) id 1dXtoF-0005We-Hf
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:35:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXtlw-0004CF-Qs
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:32:32 -0400
-Date: Wed, 19 Jul 2017 15:32:24 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dXtoF-0005WP-B1
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 14:34:55 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4E3FF4A701
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 18:34:54 +0000 (UTC)
+Date: Wed, 19 Jul 2017 15:34:47 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170719183224.GI2757@localhost.localdomain>
-References: <201707191247531805742@zte.com.cn>
-	<20170719061651.GE2757@localhost.localdomain>
-	<20170719121628.GI2103@work-vm>
-	<20170719124147.GH2757@localhost.localdomain>
-	<f870ca6c-a8fb-a88c-f171-a66f4158671d@redhat.com>
-	<20170719150758.GK30084@redhat.com>
-	<4558ee82-0214-cd91-1de9-8081b98ddb0b@redhat.com>
+Message-ID: <20170719183447.GJ2757@localhost.localdomain>
+References: <20170719163108.26943-1-apahim@redhat.com>
+	<20170719163108.26943-2-apahim@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4558ee82-0214-cd91-1de9-8081b98ddb0b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
+In-Reply-To: <20170719163108.26943-2-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu.py: fix is_running()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, wang.yi59@zte.com.cn, liu.yunh@zte.com.cn, qemu-devel@nongnu.org, "libvir-list@redhat.com" <libvir-list@redhat.com>, pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
 
-On Wed, Jul 19, 2017 at 10:17:36AM -0500, Eric Blake wrote:
-> On 07/19/2017 10:07 AM, Daniel P. Berrange wrote:
-> >> It doesn't.  Perhaps we should add that as a future libvirt-qemu.so API
-> >> addition, although it's probably easier to just use QMP than HMP when
-> >> using 'virsh qemu-monitor-command' if HMP doesn't do what you want.
-> > 
-> > Or special case the "cpu 1" command - ie notice that it is being
-> > requested and don't execute 'human-montor-command'. Instead just
-> > record the CPU index, and use that for future "human-monitor-command"
-> > invokations, so we get full compat with the (dubious) stateful HMP
-> > semantics that traditionally existed.
+On Wed, Jul 19, 2017 at 06:31:06PM +0200, Amador Pahim wrote:
+> Current implementation is broken. It does not really test if the child
+> process is running.
 > 
-> Is 'cpu' (and the followup commands affected by it) the only stateful
-> HMP command pairing?  Is there a way to specify multiple HMP commands in
-> a single human-monitor-command QMP call?
+> The Popen.returncode will only be set after by a poll(), wait() or
+> communicate(). If the Popen fails to launch a VM, the Popen.returncode
+> will not turn to None by itself.
 > 
-> Indeed, tweaking qemu's human-monitor-command call to track the state
-> might be cleaner than having libvirt have to tweak API to work around
-> this wart of HMP.
+> Instead of using Popen.returncode, let's use Popen.poll(), which
+> actually checks if child process has terminated.
+> 
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
 
-The CPU index was the only state kept by the human monitor, and I
-think it's by design that it stopped being considered "monitor
-state" to be tracked, and became just an argument to
-human-monitor-command.
+I vaguely remember I had a version of that code using poll() and
+it broke scripts for some reason.  I will try to find out why, so
+we can either fix the script or document the reason why poll()
+isn't a good choice here.
 
-It's true that it broke compatibility of
-  "virsh qemu-monitor-command <domain> --hmp 'cpu <n>'",
-when we moved to QMP, but this happened years ago, and it looks
-like nobody was relying on it.  I don't see the point of trying
-to emulate the previous stateful interface.
+> ---
+>  scripts/qemu.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 880e3e8219..f0fade32bd 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -86,7 +86,7 @@ class QEMUMachine(object):
+>              raise
+>  
+>      def is_running(self):
+> -        return self._popen and (self._popen.returncode is None)
+> +        return self._popen and (self._popen.poll() is None)
+>  
+>      def exitcode(self):
+>          if self._popen is None:
+> -- 
+> 2.13.3
+> 
 
 -- 
 Eduardo
