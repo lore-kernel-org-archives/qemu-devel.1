@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dXlk9-0007Hb-Ra
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:58:11 -0400
+	(envelope-from <david@redhat.com>) id 1dXlmS-0000vj-2O
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dXlk6-0005Zh-Of
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:58:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34150)
+	(envelope-from <david@redhat.com>) id 1dXlmN-0006H3-4R
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:00:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dXlk6-0005ZM-FR
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 05:58:06 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dXlmM-0006GU-Ut
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 06:00:27 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 19 Jul 2017 11:50:33 +0200
-Message-Id: <20170719095033.20482-6-david@redhat.com>
+Date: Wed, 19 Jul 2017 11:50:29 +0200
+Message-Id: <20170719095033.20482-2-david@redhat.com>
 In-Reply-To: <20170719095033.20482-1-david@redhat.com>
 References: <20170719095033.20482-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 5/5] target/s390x: improve baselining if
- certain base features are missing
+Subject: [Qemu-devel] [PATCH v1 1/5] target/s390x: drop BE_BIT()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +26,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, thuth@redhat.com, cohuck@redhat.com, jjherne@linux.vnet.ibm.com, david@redhat.com, borntraeger@de.ibm.com
 
-There are certain features that we put into base models, but that are
-not relevant for the actual search. The most famous example are
-MSA subfunctions that might be disabled on certain real hardware out
-there.
-
-While the kvm host model detection will usually detect the correct model
-on such machines (as it will in the common case not pass features to check
-for into s390_find_cpu_def()), baselining will fall back to a quite old
-model just because some MSA subfunctions are missing.
-
-Let's improve that by ignoring lack of these features while performing
-the search for a base model.
+Unused and broken, let's just get rid of it.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu_models.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ target/s390x/cpu_features.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index f4e5bb6..92120f4 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -78,6 +78,9 @@ static S390CPUDef s390_cpu_defs[] = {
-     CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
- };
+diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+index 14bc311..770435e 100644
+--- a/target/s390x/cpu_features.h
++++ b/target/s390x/cpu_features.h
+@@ -92,6 +92,5 @@ typedef struct {
+ const S390FeatGroupDef *s390_feat_group_def(S390FeatGroup group);
  
-+/* features part of a base model but not relevant for finding a base model */
-+S390FeatBitmap ignored_base_feat;
-+
- void s390_cpudef_featoff(uint8_t gen, uint8_t ec_ga, S390Feat feat)
- {
-     const S390CPUDef *def;
-@@ -237,6 +240,11 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-         if (features) {
-             /* see if the model satisfies the minimum features */
-             bitmap_andnot(missing, def->base_feat, features, S390_FEAT_MAX);
-+            /*
-+             * Ignore certain features that are in the base model, but not
-+             * relevant for the search (esp. MSA subfunctions).
-+             */
-+            bitmap_andnot(missing, missing, ignored_base_feat, S390_FEAT_MAX);
-             if (!bitmap_empty(missing, S390_FEAT_MAX)) {
-                 break;
-             }
-@@ -1209,10 +1217,35 @@ static const TypeInfo host_s390_cpu_type_info = {
- };
- #endif
+ #define BE_BIT_NR(BIT) (BIT ^ (BITS_PER_LONG - 1))
+-#define BE_BIT(BIT) (1ULL < BE_BIT_NR(BIT))
  
-+static void init_ignored_base_feat(void)
-+{
-+    static const int feats[] = {
-+         /* MSA subfunctions that could not be available on certain machines */
-+         S390_FEAT_KMAC_DEA,
-+         S390_FEAT_KMAC_TDEA_128,
-+         S390_FEAT_KMAC_TDEA_192,
-+         S390_FEAT_KMC_DEA,
-+         S390_FEAT_KMC_TDEA_128,
-+         S390_FEAT_KMC_TDEA_192,
-+         S390_FEAT_KM_DEA,
-+         S390_FEAT_KM_TDEA_128,
-+         S390_FEAT_KM_TDEA_192,
-+         S390_FEAT_KIMD_SHA_1,
-+         S390_FEAT_KLMD_SHA_1,
-+    };
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(feats); i++) {
-+        set_bit(feats[i], ignored_base_feat);
-+    }
-+}
-+
- static void register_types(void)
- {
-     int i;
- 
-+    init_ignored_base_feat();
-+
-     /* init all bitmaps from gnerated data initially */
-     for (i = 0; i < ARRAY_SIZE(s390_cpu_defs); i++) {
-         s390_init_feat_bitmap(s390_cpu_defs[i].base_init,
+ #endif /* TARGET_S390X_CPU_FEATURES_H */
 -- 
 2.9.4
