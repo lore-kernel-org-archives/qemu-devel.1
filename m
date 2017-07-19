@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXqNL-0002XU-83
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:54:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXqOQ-0003QP-F0
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXqNH-0001Mh-5Y
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:54:55 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:58434)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dXqNG-0001M3-VB
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:54:51 -0400
-References: <cover.34f8428dbbcaa0611cef759667d281ae508ac91d.1500378931.git-series.james.hogan@imgtec.com>
-	<742650a35d49502a994c008fd3a70eccd5391f1b.1500378931.git-series.james.hogan@imgtec.com>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <dfb9c8fe-0779-89d4-dbab-5b030f6666be@imgtec.com>
-Date: Wed, 19 Jul 2017 15:54:47 +0100
+	(envelope-from <eblake@redhat.com>) id 1dXqOP-0001ml-DH
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 10:56:02 -0400
+References: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2e750f9b-8a7f-44be-a673-8046aa73f914@redhat.com>
+Date: Wed, 19 Jul 2017 09:55:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <742650a35d49502a994c008fd3a70eccd5391f1b.1500378931.git-series.james.hogan@imgtec.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/14] target/mips: Add CP0_Ebase.WG (write
- gate) support
+In-Reply-To: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XusaFO3eLtaSL4CsJBujPgPPX55JdhQLx"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2] block: Skip implicit nodes in
+ query-block/blockstats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +24,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, pkrempa@redhat.com, nsoffer@redhat.com, el13635@mail.ntua.gr, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XusaFO3eLtaSL4CsJBujPgPPX55JdhQLx
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, armbru@redhat.com, pkrempa@redhat.com,
+ nsoffer@redhat.com, el13635@mail.ntua.gr, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org
+Message-ID: <2e750f9b-8a7f-44be-a673-8046aa73f914@redhat.com>
+Subject: Re: [PATCH for-2.10 v2] block: Skip implicit nodes in
+ query-block/blockstats
+References: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1500472685-25246-1-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 07/19/2017 08:58 AM, Kevin Wolf wrote:
+> Commits 0db832f and 6cdbceb introduced the automatic insertion of filte=
+r
+> nodes above the top layer of mirror and commit block jobs. The
+> assumption made there was that since libvirt doesn't do node-level
+> management of the block layer yet, it shouldn't be affected by added
+> nodes.
+>=20
+> This is true as far as commands issued by libvirt are concerned. It onl=
+y
+> uses BlockBackend names to address nodes, so any operations it performs=
 
-On 18/07/2017 12:55, James Hogan wrote:
-> Add support for the CP0_EBase.WG bit, which allows upper bits to be
-> written (bits 31:30 on MIPS32, or bits 63:30 on MIPS64), along with the
-> CP0_Config5.CV bit to control whether the exception vector for Cache
-> Error exceptions is forced into KSeg1.
-> 
-> This is necessary on MIPS32 to support Segmentation Control and Enhanced
-> Virtual Addressing (EVA) extensions (where KSeg1 addresses may not
-> represent an unmapped uncached segment).
-> 
-> It is also useful on MIPS64 to allow the exception base to reside in
-> XKPhys, and possibly out of range of KSEG0 and KSEG1.
-> 
-> Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> still operate on the root of the tree as intended.
+>=20
+> However, the assumption breaks down when you consider query commands,
+> which return data for the wrong node now. These commands also return
+> information on some child nodes (bs->file and/or bs->backing), which
+> libvirt does make use of, and which refer to the wrong nodes, too.
+
+I'm a bit worried about this statement.  Libvirt controls the
+BLOCK_WRITE_THRESHOLD event via block-set-write-threshold, which
+requires the use of a node name (for a qcow2-backed-by-block-device, you
+want the threshold to be tied to the block-device protocol BDS, not the
+qcow2 format BDS).  We need to test that this patch does not break
+write-threshold computation (ie. that libvirt is still able to use the
+query commands to learn WHICH node name to pass to
+block-set-write-threshold).
+
+Or put another way, there are two types of implicit nodes names: the
+implicit node names for protocol BDS (libvirt cares about those), and
+the implicit node names for block job temporary BDS (libvirt does not
+care about those).  If this patch is touching ONLY the block job
+implicit node names, we may be okay - but that's something we want to
+test with libvirt before accepting this patch.  Peter, are you in a
+position to test it faster than me?
+
+>=20
+> One of the consequences is that oVirt gets wrong information about the
+> image size and stops the VM in response as long as a mirror or commit
+> job is running:
+>=20
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1470634
+>=20
+> This patch fixes the problem by hiding the implicit nodes created
+> automatically by the mirror and commit block jobs in the output of
+> query-block and BlockBackend-based query-blockstats as long as the user=
+
+> doesn't indicate that they are aware of those nodes by providing a node=
+
+> name for them in the QMP command to start the block job.
+>=20
+> The node-based commands query-named-block-nodes and query-blockstats
+> with query-nodes=3Dtrue still show all nodes, including implicit ones.
+> This ensures that users that are capable of node-level management can
+> still access the full information; users that only know BlockBackends
+> won't use these commands.
+
+Current libvirt is using both of those commands, mainly in support of
+computing the generated node name to pass to block-set-write-threshold.
+So the fact that these are not filtered may still be enough for libvirt
+to get everything it needs.
+
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
-> Changes in v2:
-> - Fix CP0_EBase.WG to be read only when WG is not set in
->   CP0_EBase_rw_bitmask, otherwise it will be wrongly probed as present.
-> - Make cache error exception vector conditional on Config3.SC as well as
->   Config5.CV, as per the PRA, and take the CP0C3_SC definition from
->   patch 7 (Yongbok).
-> - Rename CP0_EBase_rw_bitmask to CP0_EBaseWG_rw_bitmask (Yongbok).
-> ---
->  target/mips/cpu.h            |  5 ++++-
->  target/mips/helper.c         | 14 ++++++++------
->  target/mips/machine.c        |  6 +++---
->  target/mips/op_helper.c      | 12 ++++++++++--
->  target/mips/translate.c      |  8 +++++---
->  target/mips/translate_init.c |  1 +
->  6 files changed, 31 insertions(+), 15 deletions(-)
-> 
+>=20
+> v2:
+> - Skip implicit nodes not only on the top level, but also during the re=
+cursive
+>   calls [Peter]
+> - Spelling fix in the commit message [Manos]
+>=20
+At any rate, the code looks okay to me, so now it's just a matter of
+testing that the patch doesn't break libvirt's other uses, while fixing
+the incorrect allocation reporting while a job is active.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -1515,14 +1515,22 @@ target_ulong helper_mftc0_ebase(CPUMIPSState *env)
->  
->  void helper_mtc0_ebase(CPUMIPSState *env, target_ulong arg1)
->  {
-> -    env->CP0_EBase = (env->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x3FFFF000);
-> +    target_ulong mask = 0x3FFFF000 | env->CP0_EBaseWG_rw_bitmask;
-> +    if (arg1 & (1 << CP0EBase_WG) & mask) {
+--XusaFO3eLtaSL4CsJBujPgPPX55JdhQLx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-isn't it just ...?
-if (arg1 & env->CP0_EBaseWG_rw_bitmask) {
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-> +        mask |= ~0x3FFFFFFF;
-> +    }
-> +    env->CP0_EBase = (env->CP0_EBase & ~mask) | (arg1 & mask);
->  }
->  
->  void helper_mttc0_ebase(CPUMIPSState *env, target_ulong arg1)
->  {
->      int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
->      CPUMIPSState *other = mips_cpu_map_tc(env, &other_tc);
-> -    other->CP0_EBase = (other->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x3FFFF000);
-> +    target_ulong mask = 0x3FFFF000 | env->CP0_EBaseWG_rw_bitmask;
-> +    if (arg1 & (1 << CP0EBase_WG) & mask) {
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllvcvcACgkQp6FrSiUn
+Q2qRPAgAlFRLLaD+hrQTM2tkuA9+SyCt5nkmXP5GYWZ67O4tPa68inSQGrTVhb1p
+g46T5isqHny7uwP2Gk2b5kzOwU5pDB4KQeD6xmJ2qRdcL6lEuKJQ12WZ73scT3r5
+tCE/fidR1NT6eID+VwqoXMW79YaE1e6jIoxknUoNylyz3EFvahcNGMkElBcKucWL
+JMEMoh3Fr5ukzvlNu/osQlMrzyoKBcQ+Bet5+oF6YDPZJwI38cmMbDVGfxjxbxMX
+rOsjXWlfVyp1BtLKU2pe9+saO2a3F4ohZ8usOZTuH3TEUikl8V8i0YrLwvSAoV7x
+5FZ+sz+RVjDAjHw+eLojgRAp+lLEBQ==
+=gcg/
+-----END PGP SIGNATURE-----
 
-here as well.
-
-> +        mask |= ~0x3FFFFFFF;
-> +    }
-> +    other->CP0_EBase = (other->CP0_EBase & ~mask) | (arg1 & mask);
->  }
->  
-
-
-Otherwise,
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
-
-Regards,
-Yongbok
+--XusaFO3eLtaSL4CsJBujPgPPX55JdhQLx--
