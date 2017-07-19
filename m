@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXo6z-0006eu-SJ
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:29:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1dXo8D-0007IK-Ms
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dXo6w-0005wd-Pj
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:29:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXo6w-0005wG-GY
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:29:50 -0400
-Date: Wed, 19 Jul 2017 13:29:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170719122943.GJ2103@work-vm>
-References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
-	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
-	<bb8781a1-602b-d77d-a103-6f8d23d7ff5f@adacore.com>
+	(envelope-from <bounces@canonical.com>) id 1dXo8A-0006sR-H0
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:31:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54701)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dXo8A-0006sF-Am
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 08:31:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dXo85-0001z9-IA
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 12:31:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 483E02E81C8
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 12:30:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bb8781a1-602b-d77d-a103-6f8d23d7ff5f@adacore.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Jul 2017 12:18:24 -0000
+From: Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1703506 <1703506@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149974876377.6612.10329067332937096720.malonedeb@gac.canonical.com>
+Message-Id: <150046670420.26481.11145723481291329881.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1703506] Re: SMT not supported by QEMU on AMD
+ Ryzen CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-* KONRAD Frederic (frederic.konrad@adacore.com) wrote:
-> 
-> 
-> On 07/17/2017 07:27 PM, Edgar E. Iglesias wrote:
-> > On Mon, Jul 17, 2017 at 11:33 PM, Peter Maydell <peter.maydell@linaro.org>
-> > wrote:
-> > 
-> > > On 14 June 2017 at 18:45, Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> > > wrote:
-> > > > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> > > > Paolo suggested offline that we send a pull request for this series.
-> > > > Here it is, I've run it through my testsuite + tested the LQSPI testcase
-> > > > on Zynq.
-> > > 
-> > > > ----------------------------------------------------------------
-> > > > mmio-exec.for-upstream
-> > > > 
-> > > > ----------------------------------------------------------------
-> > > > KONRAD Frederic (7):
-> > > >        cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
-> > > >        cputlb: move get_page_addr_code
-> > > >        cputlb: fix the way get_page_addr_code fills the tlb
-> > > >        qdev: add MemoryRegion property
-> > > >        introduce mmio_interface
-> > > >        exec: allow to get a pointer for some mmio memory region
-> > > >        xilinx_spips: allow mmio execution
-> > > 
-> > > Hi Edgar -- can you or Fred explain how this code interacts with
-> > > VM migration? The mmio-interface device creates a RAM memory
-> > > region with memory_region_init_ram_ptr(), but it doesn't call
-> > > vmstate_register_ram(). On the other hand the core migration code
-> > > will try to migrate the contents of the RAMBlock anyway, just
-> > > without a name.
-> > > 
-> > > It's not clear to me how this works, and it would be nice to
-> > > get it clear so that we can make any necessary fixes before the
-> > > 2.10 release hits and we lose the opportunity to make any
-> > > migration-compatibility-breaking changes.
-> > > 
-> > > thanks
-> > > -- PMM
-> > > 
-> > 
-> > Hi Peter,
-> > 
-> > These temporary regions should be read-only and treated as temporary caches
-> > AFAIU things.
-> > I would say that they don't need to be migrated. After migration, the new
-> > VM will recreate the ram areas from device backing.
-> > 
-> > Is there a way we can prevent migration of the RAMBlock?
-> > 
-> > Cheers,
-> > Edgar
-> > 
-> 
-> Hi All,
-> 
-> Yes Edgar is right, they don't need to be migrated (as the old
-> Xilinx SPI cache).
-> And it will be the case for all the other stuff using this as
-> well.
-> 
-> Maybe we can simply drop the region before the migration?
+Thank you for the info.  Having info on Linux guests' behavior would be
+nice to have, but it's possible to extract the raw CPUID data seen by
+the Windows guest using an equivalent Windows tool (suggestions of tools
+are welcome).
 
-Dont forget the VM is still running during migration, so you
-can't drop anything that's needed for it to be able to execute.
+Also, can somebody confirm if the same Windows version works as expected
+on bare metal?
 
-Dave
+-- =
 
-> Fred
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1703506
+
+Title:
+  SMT not supported by QEMU on AMD Ryzen CPU
+
+Status in QEMU:
+  New
+
+Bug description:
+  HyperThreading/SMT is supported by AMD Ryzen CPUs but results in this
+  message when setting the topology to threads=3D2:
+
+  qemu-system-x86_64: AMD CPU doesn't support hyperthreading. Please
+  configure -smp options properly.
+
+  Checking in a Windows 10 guest reveals that SMT is not enabled, and
+  from what I understand, QEMU converts the topology from threads to
+  cores internally on AMD CPUs. This appears to cause performance
+  problems in the guest perhaps because programs are assuming that these
+  threads are actual cores.
+
+  Software: Linux 4.12, qemu 2.9.0 host with KVM enabled, Windows 10 pro
+  guest
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1703506/+subscriptions
