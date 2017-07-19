@@ -1,43 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXcvM-00030T-My
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:33:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1dXcxC-00045Y-As
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:35:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dXcvH-00036P-QK
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:33:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56933
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dXcvH-00036D-K7
-	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:33:03 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v6J0T94V131167
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:33:02 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2bskq6gceg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 20:33:01 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Tue, 18 Jul 2017 20:33:01 -0400
-Date: Wed, 19 Jul 2017 08:32:55 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170718014926.44781-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170718014926.44781-2-bjsdjshi@linux.vnet.ibm.com>
-	<20170718103213.29a597b2@gondolin>
-	<20170718084943.GC15985@bjsdjshi@linux.vnet.ibm.com>
-	<20170718110749.5e7bcc65@gondolin>
+	(envelope-from <eblake@redhat.com>) id 1dXcx7-0003h5-Pu
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:35:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXcx7-0003fT-FP
+	for qemu-devel@nongnu.org; Tue, 18 Jul 2017 20:34:57 -0400
+References: <20170407143847.GM2138@work-vm>
+	<1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+	<1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+	<6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+	<39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+	<d47138bd-1257-19c0-418e-4a4addf7fd8a@twiddle.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4348196f-c0bc-df80-6ae1-5ea4b8cbba9f@redhat.com>
+Date: Tue, 18 Jul 2017 19:34:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170718110749.5e7bcc65@gondolin>
-Message-Id: <20170719003255.GA11964@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] vfio/ccw: allocate irq info with the
- right size
+In-Reply-To: <d47138bd-1257-19c0-418e-4a4addf7fd8a@twiddle.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="roBqWb2Nj0WMwtrLpn56AGjn3k268WpPl"
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,57 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, Jing Zhang <bjzhjing@linux.vnet.ibm.com>
+To: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-* Cornelia Huck <cohuck@redhat.com> [2017-07-18 11:07:49 +0200]:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--roBqWb2Nj0WMwtrLpn56AGjn3k268WpPl
+From: Eric Blake <eblake@redhat.com>
+To: Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <4348196f-c0bc-df80-6ae1-5ea4b8cbba9f@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
+References: <20170407143847.GM2138@work-vm>
+ <1573e08f-9805-eaf4-3fe1-c1172b6ef6e4@amsat.org>
+ <1c55bc6d-7ef7-dcf5-81e8-22712f575691@amsat.org>
+ <6e4fb953-17b4-a11b-4f98-8ddfd5ff12f8@redhat.com>
+ <39dc6b92-dd56-fe33-cd85-92c03d69f133@redhat.com>
+ <d47138bd-1257-19c0-418e-4a4addf7fd8a@twiddle.net>
+In-Reply-To: <d47138bd-1257-19c0-418e-4a4addf7fd8a@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, 18 Jul 2017 16:49:43 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > * Cornelia Huck <cohuck@redhat.com> [2017-07-18 10:32:13 +0200]:
-> > 
-> > > On Tue, 18 Jul 2017 03:49:25 +0200
-> > > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> > >   
-> > > > From: Jing Zhang <bjzhjing@linux.vnet.ibm.com>
-> > > > 
-> > > > When allocating memory for the vfio_irq_info parameter of the
-> > > > VFIO_DEVICE_GET_IRQ_INFO ioctl, we used the wrong size. Let's
-> > > > fix it by using the right size.
-> > > > 
-> > > > Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > > Signed-off-by: Jing Zhang <bjzhjing@linux.vnet.ibm.com>
-> > > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > > ---
-> > > >  hw/vfio/ccw.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-> > > > index 12d0262336..8d97b53e77 100644
-> > > > --- a/hw/vfio/ccw.c
-> > > > +++ b/hw/vfio/ccw.c
-> > > > @@ -168,7 +168,7 @@ static void vfio_ccw_register_io_notifier(VFIOCCWDevice *vcdev, Error **errp)
-> > > >          return;
-> > > >      }
-> > > >  
-> > > > -    argsz = sizeof(*irq_set);
-> > > > +    argsz = sizeof(*irq_info);
-> > > >      irq_info = g_malloc0(argsz);
-> > > >      irq_info->index = VFIO_CCW_IO_IRQ_INDEX;
-> > > >      irq_info->argsz = argsz;  
-> > > 
-> > > irq_set is larger than irq_info, but yes, let's do this correctly.
-> > > 
-> > > Out of curiosity, how did you spot this?
-> > >   
-> > 
-> > I'm trying to reuse the code here, while introducing some new MMIO
-> > regions, which you will see them some days later. ;>
-> > 
-> 
-> Looking forward to that :)
-> 
+On 07/18/2017 06:59 PM, Richard Henderson wrote:
 
-If they are lucky enough to survive the internal review to meet you.
-haha.
+>> +++ w/hw/usb/bus.c
+>> @@ -407,8 +407,9 @@ void usb_register_companion(const char *masterbus,=
+
+>> USBPort *ports[],
+>>   void usb_port_location(USBPort *downstream, USBPort *upstream, int
+>> portnr)
+>>   {
+>>       if (upstream) {
+>> -        snprintf(downstream->path, sizeof(downstream->path), "%s.%d",=
+
+>> -                 upstream->path, portnr);
+>> +        int l =3D snprintf(downstream->path, sizeof(downstream->path)=
+,
+>> "%s.%d",
+>> +                         upstream->path, portnr);
+>> +        assert(l < sizeof(downstream->path));
+>=20
+> Do you really need an assert there, or will
+>=20
+>     (void)l; /* "used" */
+>=20
+> work as well?  You didn't mention what the reported error is, so I'm
+> guessing.
+
+The original error is that gcc 7 complains that snprintf is prone to
+buffer overflow if the input is unbounded.  Adding the assert that we
+KNOW the input is not unbounded is enough to shut up gcc, on Linux.
+What was then drawn into question is whether assert still has that
+property on mingw (since assert on mingw lacks the noreturn marking that
+it has on Linux).
+
+At this point, unless someone posts an actual failure of gcc 7 compiling
+this code for mingw, I don't see why we have to change it; shutting up
+the warning on Linux is good enough for the purpose of this patch.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--roBqWb2Nj0WMwtrLpn56AGjn3k268WpPl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlluqSwACgkQp6FrSiUn
+Q2oSugf9FNuR7JYbLGzQV3xx4uKkOo969e4lII6Mn1T+UzbKrywyus0sfDODmLdR
+3dDbmu9Q0pkdaLagovvR7YM6fKXY2MuA6tXRgJ9yvFjJ2Rqa4dH6wbp+yKWtWqRW
+NVyLpSse6YqhlTWOJVxjkrFvoQtfY1wKtLkNg7L7N+87IrVSdTfuhf8DI3fRPk+J
+MNj/cFXN4xQ3KU9NxPmZ1kw+ZOp9STeRPQx4wq/D3nlIZrhudJDGDswfMG2SIyk2
+/tcKkmNfCfSPQIDfADdswDParoWpvBRFz26xVbXrWTQ0EWPjpepCN93uj18lo7XI
+MLQJyHSGWdLeAM0ukQ1gvR4ebnR4Cw==
+=HzN2
+-----END PGP SIGNATURE-----
+
+--roBqWb2Nj0WMwtrLpn56AGjn3k268WpPl--
