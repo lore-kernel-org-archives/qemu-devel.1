@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1dXn58-0007oN-8Y
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:23:56 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dXn9E-00018H-4p
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1dXn56-0001Tv-Qa
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:23:54 -0400
-Date: Wed, 19 Jul 2017 13:15:29 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20170719111529.GB7802@andariel.pipo.sk>
-References: <1500453887-20819-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dXn9A-00032D-4q
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:28:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dXn99-000323-Qj
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 07:28:04 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v6JBOaUX082105
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 07:28:02 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2bt1uvcnhv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 07:28:01 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 19 Jul 2017 07:28:00 -0400
+References: <20170719095033.20482-1-david@redhat.com>
+	<20170719095033.20482-3-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 19 Jul 2017 13:27:54 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ddcd+dsiJrvLd0CP"
-Content-Disposition: inline
-In-Reply-To: <1500453887-20819-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] block: Skip implicit nodes in
- query-block/blockstats
+In-Reply-To: <20170719095033.20482-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+Message-Id: <43c37bcc-089e-1df9-5a38-e886e996cd4a@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] target/s390x: indicate query
+ subfunction in s390_fill_feat_block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,141 +43,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, nsoffer@redhat.com, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, thuth@redhat.com, cohuck@redhat.com, jjherne@linux.vnet.ibm.com
 
+On 07/19/2017 11:50 AM, David Hildenbrand wrote:
+> We'll have to do the same for TCG, so let's just move it in there.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
---ddcd+dsiJrvLd0CP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+looks sane.
 
-On Wed, Jul 19, 2017 at 10:44:47 +0200, Kevin Wolf wrote:
-> Commits 0db832f and 6cdbceb introduced the automatic insertion of filter
-> nodes above the top layer of mirror and commit block jobs. The
-> assumption made there was that since libvirt doesn't do node-level
-> management of the block layer yet, it shouldn't be affected by added
-> nodes.
->=20
-> This is true as far as commands issued by libvirt are concerned. It only
-> uses BlockBackend names to address nodes, so any operations it performs
-> still operate on the root of the tree as intended.
->=20
-> However, the assumption breaks down when you consider query commands,
-> which return data for the wrong node now. These commands also return
-> information on some child nodes (bs->file and/or bs->backing), which
-> libvirt does make use of, and which refer to the wrong nodes, too.
->=20
-> One of the consequences is that oVirt gets wrong information about the
-> image size and stops the VM in response as long as a mirror or commit
-> job is running:
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1470634
->=20
-> This patch fixes the problem by hiding the implict nodes created
-> automatically by the mirror and commit block jobs in the output of
-> query-block and BlockBackend-based query-blockstats as long as the user
-> doesn't indicate that they are aware of those nodes by providing a node
-> name for them in the QMP command to start the block job.
->=20
-> The node-based commands query-named-block-nodes and query-blockstats
-> with query-nodes=3Dtrue still show all nodes, including implicit ones.
-> This ensures that users that are capable of node-level management can
-> still access the full information; users that only know BlockBackends
-> won't use these commands.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
 > ---
->  block/commit.c             |  3 +++
->  block/mirror.c             |  3 +++
->  block/qapi.c               | 13 ++++++++++++-
->  include/block/block_int.h  |  1 +
->  qapi/block-core.json       |  6 ++++--
->  tests/qemu-iotests/041     | 23 +++++++++++++++++++++++
->  tests/qemu-iotests/041.out |  4 ++--
->  7 files changed, 48 insertions(+), 5 deletions(-)
-
-Fails to apply to master, thus I didn't do a functional check, but from
-reading the code ...
-
-> diff --git a/block/qapi.c b/block/qapi.c
-> index 95b2e2d..0ed23b8 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -324,6 +324,11 @@ static void bdrv_query_info(BlockBackend *blk, Block=
-Info **p_info,
->      BlockDriverState *bs =3D blk_bs(blk);
->      char *qdev;
-> =20
-> +    /* Skip automatically inserted nodes that the user isn't aware of */
-> +    while (bs && bs->drv && bs->implicit) {
-> +        bs =3D backing_bs(bs);
-> +    }
-
-So bdrv_query_info then calls bdrv_block_device_info, which also
-populates the backing chain for that bs. That function does not do this
-trick of skipping the implicit nodes.
-
-=46rom what I've understood from the 'commit' job, it's possible to have
-the implicit node inserted even at the @top bs of the commit job, so it
-looks to me as if bdrv_block_device_info will need such a tweak too.
-
-> +
->      info->device =3D g_strdup(blk_name(blk));
->      info->type =3D g_strdup("unknown");
->      info->locked =3D blk_dev_is_medium_locked(blk);
-> @@ -518,12 +523,18 @@ BlockStatsList *qmp_query_blockstats(bool has_query=
-_nodes,
->          }
->      } else {
->          for (blk =3D blk_next(NULL); blk; blk =3D blk_next(blk)) {
-> +            BlockDriverState *bs =3D blk_bs(blk);
->              BlockStatsList *info =3D g_malloc0(sizeof(*info));
->              AioContext *ctx =3D blk_get_aio_context(blk);
->              BlockStats *s;
-> =20
-> +            /* Skip automatically inserted nodes that the user isn't awa=
-re of */
-> +            while (bs && bs->drv && bs->implicit) {
-> +                bs =3D backing_bs(bs);
-> +            }
-> +
->              aio_context_acquire(ctx);
-> -            s =3D bdrv_query_bds_stats(blk_bs(blk), true);
-> +            s =3D bdrv_query_bds_stats(bs, true);
-
-Same here. The recursive call in bdrv_query_bds_stats does not skip the
-implicitly added layers IIUC.
-
->              s->has_device =3D true;
->              s->device =3D g_strdup(blk_name(blk));
->              bdrv_query_blk_stats(s->stats, blk);
-
-Feel free to add a 'Reviewed-by' if I did not understand what's
-happening in the commit job properly, or if you add the skipping into
-the gathering functions as well.
-
-Peter
-
---ddcd+dsiJrvLd0CP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAllvP08ACgkQHGwCByjY
-1GpARg/9GAshsFIHFt84A8aXsF05wZkQEacNaS1W7xkY7zebgsCxhComXeL0edlO
-DDAJGhzFcZFY+FuxxMLpzlAM/jbeG4cJUBGHB40hqfRcinfcKTW+AeGLSA22Zki6
-/1ssVMwxpyKYd3ZNDVtJKs0pJt8/3n4giWswy75PD6D2I9LmebnYZipl2urk7c2B
-wWrHTbSQNKU+fq3Wcl6yX0hN4WBkJCZjHNdt1OX+VXdq9SrBmWVMcbvSWnI8rUIp
-JFRuau+cRf64/g5CLugP67Rpon4oXxvDtTk4aCXaSk6iQTg0ptiFovG+YsUXRL0B
-4rfFOjnQF5DoF9lssnIXthJsCedltcc+MTurtiwlrDk24JQ2M13pvvRHMEyeUR2d
-meV3gNWvlW8eaKZTX7iTqXvs69wsqhF0E/G4CUW0llXnYMgOoKK1Z9tPYGoE3eO+
-NdoWfYze/lIXBPIqNzvPu2TU/XTkoAR2Js7/0P2HvPkCp95QrJb+c1dur+0o95YO
-BL/tj5smT0Hdj6xJrrNy6DKnML5Oyga+YyOx1GSzTW553441rwQy906R1AYfVreD
-mjoobsrXn5IAKEsJ1Useuh0WxLNgUI0Ti7KaDo9V4xcUZ0JzoMChbFaOqghXn09A
-s+AX6EBkNfwGilFpj5FtGrIABeOakU6uACLoNYCJdhUuOe5oA4o=
-=Soeq
------END PGP SIGNATURE-----
-
---ddcd+dsiJrvLd0CP--
+>  target/s390x/cpu_features.c | 31 ++++++++++++++++++++++++++-----
+>  target/s390x/kvm.c          | 13 -------------
+>  2 files changed, 26 insertions(+), 18 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index fa887d9..8b14917 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -336,11 +336,32 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+>      S390Feat feat;
+>      int bit_nr;
+> 
+> -    if (type == S390_FEAT_TYPE_STFL && test_bit(S390_FEAT_ZARCH, features)) {
+> -        /* Features that are always active */
+> -        data[0] |= 0x20;  /* z/Architecture */
+> -        data[17] |= 0x20; /* Configuration-z-architectural-mode */
+> -    }
+> +    switch (type) {
+> +    case S390_FEAT_TYPE_STFL:
+> +        if (test_bit(S390_FEAT_ZARCH, features)) {
+> +            /* Features that are always active */
+> +            data[0] |= 0x20;  /* z/Architecture */
+> +            data[17] |= 0x20; /* Configuration-z-architectural-mode */
+> +        }
+> +        break;
+> +    case S390_FEAT_TYPE_PTFF:
+> +    case S390_FEAT_TYPE_KMAC:
+> +    case S390_FEAT_TYPE_KMC:
+> +    case S390_FEAT_TYPE_KM:
+> +    case S390_FEAT_TYPE_KIMD:
+> +    case S390_FEAT_TYPE_KLMD:
+> +    case S390_FEAT_TYPE_PCKMO:
+> +    case S390_FEAT_TYPE_KMCTR:
+> +    case S390_FEAT_TYPE_KMF:
+> +    case S390_FEAT_TYPE_KMO:
+> +    case S390_FEAT_TYPE_PCC:
+> +    case S390_FEAT_TYPE_PPNO:
+> +    case S390_FEAT_TYPE_KMA:
+> +        data[0] |= 0x80; /* query is always available */
+> +        break;
+> +    default:
+> +        break;
+> +    };
+> 
+>      feat = find_first_bit(features, S390_FEAT_MAX);
+>      while (feat < S390_FEAT_MAX) {
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 831492f..999ea57 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2506,41 +2506,28 @@ static int configure_cpu_subfunc(const S390FeatBitmap features)
+>      s390_fill_feat_block(features, S390_FEAT_TYPE_PLO, prop.plo);
+>      if (test_bit(S390_FEAT_TOD_CLOCK_STEERING, features)) {
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_PTFF, prop.ptff);
+> -        prop.ptff[0] |= 0x80; /* query is always available */
+>      }
+>      if (test_bit(S390_FEAT_MSA, features)) {
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KMAC, prop.kmac);
+> -        prop.kmac[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KMC, prop.kmc);
+> -        prop.kmc[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KM, prop.km);
+> -        prop.km[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KIMD, prop.kimd);
+> -        prop.kimd[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KLMD, prop.klmd);
+> -        prop.klmd[0] |= 0x80; /* query is always available */
+>      }
+>      if (test_bit(S390_FEAT_MSA_EXT_3, features)) {
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_PCKMO, prop.pckmo);
+> -        prop.pckmo[0] |= 0x80; /* query is always available */
+>      }
+>      if (test_bit(S390_FEAT_MSA_EXT_4, features)) {
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KMCTR, prop.kmctr);
+> -        prop.kmctr[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KMF, prop.kmf);
+> -        prop.kmf[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KMO, prop.kmo);
+> -        prop.kmo[0] |= 0x80; /* query is always available */
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_PCC, prop.pcc);
+> -        prop.pcc[0] |= 0x80; /* query is always available */
+>      }
+>      if (test_bit(S390_FEAT_MSA_EXT_5, features)) {
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_PPNO, prop.ppno);
+> -        prop.ppno[0] |= 0x80; /* query is always available */
+>      }
+>      if (test_bit(S390_FEAT_MSA_EXT_8, features)) {
+>          s390_fill_feat_block(features, S390_FEAT_TYPE_KMA, prop.kma);
+> -        prop.kma[0] |= 0x80; /* query is always available */
+>      }
+>      return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+>  }
+> 
