@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXqaN-0007da-0z
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dXqao-0007zu-UN
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dXqaJ-0007FQ-SG
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41144)
+	(envelope-from <dgilbert@redhat.com>) id 1dXqal-0007Mm-2a
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47157)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dXqaJ-0007FG-LU
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:19 -0400
-Date: Wed, 19 Jul 2017 16:07:58 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170719150758.GK30084@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <201707191247531805742@zte.com.cn>
-	<20170719061651.GE2757@localhost.localdomain>
-	<20170719121628.GI2103@work-vm>
-	<20170719124147.GH2757@localhost.localdomain>
-	<f870ca6c-a8fb-a88c-f171-a66f4158671d@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dXqak-0007Kh-PR
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 11:08:46 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BACE97CB86
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 15:01:15 +0000 (UTC)
+Date: Wed, 19 Jul 2017 16:01:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170719150109.GN2103@work-vm>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-2-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f870ca6c-a8fb-a88c-f171-a66f4158671d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hmp: allow cpu index for "info lapic"
+In-Reply-To: <20170717134238.1966-2-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 01/17] migrate: Add gboolean return type
+ to migrate_channel_process_incoming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +34,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, wang.yi59@zte.com.cn, liu.yunh@zte.com.cn, qemu-devel@nongnu.org, "libvir-list@redhat.com" <libvir-list@redhat.com>, pbonzini@redhat.com, Liu.Jianjun3@zte.com.cn, rth@twiddle.net
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
 
-On Wed, Jul 19, 2017 at 10:02:04AM -0500, Eric Blake wrote:
-> [adding libvirt]
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/channel.c |  3 ++-
+>  migration/channel.h |  2 +-
+>  migration/exec.c    |  6 ++++--
+>  migration/socket.c  | 12 ++++++++----
+>  4 files changed, 15 insertions(+), 8 deletions(-)
 > 
-> On 07/19/2017 07:41 AM, Eduardo Habkost wrote:
-> 
-> >> virsh  qemu-monitor-command --domain rhel6.8 --hmp --cmd "cpu 1"
-> >> virsh  qemu-monitor-command --domain rhel6.8 --hmp --cmd "info lapic"
-> >> dumping local APIC state for CPU 0
-> > 
-> > Right, the "cpu" command is useless inside a
-> > 'human-monitor-command' QMP command.  The 'cpu-index' argument
-> > should be used instead. should make "cpu" print an error if ran
-> > inside 'human-monitor-command' instead of silently pretend it
-> > worked.
-> > 
-> > If virsh doesn't support the 'cpu-index' argument to
-> > 'human-monitor-command',
-> 
-> It doesn't.  Perhaps we should add that as a future libvirt-qemu.so API
-> addition, although it's probably easier to just use QMP than HMP when
-> using 'virsh qemu-monitor-command' if HMP doesn't do what you want.
+> diff --git a/migration/channel.c b/migration/channel.c
+> index 3b7252f..719055d 100644
+> --- a/migration/channel.c
+> +++ b/migration/channel.c
+> @@ -19,7 +19,7 @@
+>  #include "qapi/error.h"
+>  #include "io/channel-tls.h"
+>  
+> -void migration_channel_process_incoming(QIOChannel *ioc)
+> +gboolean migration_channel_process_incoming(QIOChannel *ioc)
+>  {
+>      MigrationState *s = migrate_get_current();
+>  
+> @@ -39,6 +39,7 @@ void migration_channel_process_incoming(QIOChannel *ioc)
+>          QEMUFile *f = qemu_fopen_channel_input(ioc);
+>          migration_fd_process_incoming(f);
+>      }
+> +    return FALSE; /* unregister */
+>  }
+>  
+>  
+> diff --git a/migration/channel.h b/migration/channel.h
+> index e4b4057..72cbc9f 100644
+> --- a/migration/channel.h
+> +++ b/migration/channel.h
+> @@ -18,7 +18,7 @@
+>  
+>  #include "io/channel.h"
+>  
+> -void migration_channel_process_incoming(QIOChannel *ioc);
+> +gboolean migration_channel_process_incoming(QIOChannel *ioc);
 
-Or special case the "cpu 1" command - ie notice that it is being
-requested and don't execute 'human-montor-command'. Instead just
-record the CPU index, and use that for future "human-monitor-command"
-invokations, so we get full compat with the (dubious) stateful HMP
-semantics that traditionally existed.
+Can you add a comment here that says what the return value means.
 
-> 
-> > it's possible to work around that
-> > limitation by building your own QMP command.  e.g.:
-> > 
-> >   # virsh qemu-monitor-command f26test '{"execute":"human-monitor-command", "arguments":{"command-line":"info lapic", "cpu-index":1}}' | jq -r '.return'
-> 
-> Indeed, there's the use of QMP to work around the HMP deficiency.
-> 
+Dave
+
+>  void migration_channel_connect(MigrationState *s,
+>                                 QIOChannel *ioc,
+> diff --git a/migration/exec.c b/migration/exec.c
+> index 08b599e..2827f15 100644
+> --- a/migration/exec.c
+> +++ b/migration/exec.c
+> @@ -47,9 +47,11 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
+>                                                 GIOCondition condition,
+>                                                 gpointer opaque)
+>  {
+> -    migration_channel_process_incoming(ioc);
+> +    gboolean result;
+> +
+> +    result = migration_channel_process_incoming(ioc);
+>      object_unref(OBJECT(ioc));
+> -    return FALSE; /* unregister */
+> +    return result;
+>  }
+>  
+>  void exec_start_incoming_migration(const char *command, Error **errp)
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 757d382..6195596 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -136,25 +136,29 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+>  {
+>      QIOChannelSocket *sioc;
+>      Error *err = NULL;
+> +    gboolean result;
+>  
+>      sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+>                                       &err);
+>      if (!sioc) {
+>          error_report("could not accept migration connection (%s)",
+>                       error_get_pretty(err));
+> +        result = FALSE; /* unregister */
+>          goto out;
+>      }
+>  
+>      trace_migration_socket_incoming_accepted();
+>  
+>      qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming");
+> -    migration_channel_process_incoming(QIO_CHANNEL(sioc));
+> +    result = migration_channel_process_incoming(QIO_CHANNEL(sioc));
+>      object_unref(OBJECT(sioc));
+>  
+>  out:
+> -    /* Close listening socket as its no longer needed */
+> -    qio_channel_close(ioc, NULL);
+> -    return FALSE; /* unregister */
+> +    if (result == FALSE) {
+> +        /* Close listening socket as its no longer needed */
+> +        qio_channel_close(ioc, NULL);
+> +    }
+> +    return result;
+>  }
+>  
+>  
 > -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+> 2.9.4
 > 
-
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
