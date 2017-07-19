@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dXi8W-0001Af-N8
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:05 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dXi8c-0001EA-Ms
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lprosek@redhat.com>) id 1dXi8R-0004vp-NF
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:04 -0400
-Received: from mail-ua0-f175.google.com ([209.85.217.175]:33240)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lprosek@redhat.com>) id 1dXi8R-0004vb-JC
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:06:59 -0400
-Received: by mail-ua0-f175.google.com with SMTP id y47so27938945uag.0
-	for <qemu-devel@nongnu.org>; Tue, 18 Jul 2017 23:06:59 -0700 (PDT)
+	(envelope-from <jasowang@redhat.com>) id 1dXi8X-0004zz-IX
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dXi8X-0004zT-8C
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 02:07:05 -0400
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-2-anton.ivanov@cambridgegreys.com>
+	<1236f136-c211-32a1-11b1-1e86fad422c4@redhat.com>
+	<89e2f26c-4e1d-05ef-9a99-85dc5c9c111a@cambridgegreys.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <050e2865-0453-64d8-f29a-7b6d2bb418d9@redhat.com>
+Date: Wed, 19 Jul 2017 14:07:00 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+HE1NXFmuhY0sJsZUUQ4F8Ua6wpnnuGA4UrWUzZVOPKg@mail.gmail.com>
-References: <20170714182012.4595-1-marcandre.lureau@redhat.com>
-	<20170714222705-mutt-send-email-mst@kernel.org>
-	<71fd872e-ca59-169d-07fb-5e304713fa84@redhat.com>
-	<20170715011517-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJZ2p_i-SCi-s5=-xcmg4wORv6B_7kjCyRGb5r8oDBWCQ@mail.gmail.com>
-	<20170715021021-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CLciE6piWiAo=5r-J6jPQnvj-LWxxbTHsY5d=o-VW7Bsg@mail.gmail.com>
-	<CABdb73513u5O0Z5ZBWcKq-UPPAXSTWhibUBEXqrksAiNOXYJfg@mail.gmail.com>
-	<CAJ+F1C+HE1NXFmuhY0sJsZUUQ4F8Ua6wpnnuGA4UrWUzZVOPKg@mail.gmail.com>
-From: Ladi Prosek <lprosek@redhat.com>
-Date: Wed, 19 Jul 2017 08:06:58 +0200
-Message-ID: <CABdb734Lj28SbeEYKCWCvjZmVbxBHd_a6Gizq_QwgGFX2x6ZAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <89e2f26c-4e1d-05ef-9a99-85dc5c9c111a@cambridgegreys.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] KASLR kernel dump support
+Subject: Re: [Qemu-devel] [PATCH 1/3] Unified Datagram Socket Transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,124 +30,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dave Anderson <anderson@redhat.com>, QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: Anton Ivanov <anton.ivanov@cambridgegreys.com>, qemu-devel@nongnu.org
 
-On Tue, Jul 18, 2017 at 6:18 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
-> Hi
->
-> On Tue, Jul 18, 2017 at 6:05 PM Ladi Prosek <lprosek@redhat.com> wrote:
->>
->>
->> > I would like to hear from Ladi how he intended to use the device in
->> > the future, and if he would also prefer ACPI methods and what those
->> > methods should be.
->>
->> We should be able to drive pretty much anything from Windows. I wrote
->> a dummy driver for your earlier prototype just to be sure that ACPI
->> methods are fine, as I had not done or seen that before.
->>
->> There are constraints which may be unique to Windows, though. If the
->> dump-support data is kept in guest-allocated memory, the guest must be
->> able to revoke it (set / call the method with NULL PA?) because
->> Windows drivers must free everything on unload. Unlike Linux, I don't
+
+
+On 2017=E5=B9=B407=E6=9C=8819=E6=97=A5 13:48, Anton Ivanov wrote:
 >
 >
-> Well, the currently proposed vmcoreinfo device has a 4k memory region to =
-put
-> anything you want, Windows shouldn't be allowed to touch it directly (e82=
-0
-> regions iirc)
-
-Got it. And we would likely use it to put just addr/size there to make
-updates atomic. I think we're supposed to update our dump-support data
-on memory hot-plug for example.
-
->> think we can get a piece of memory at startup and keep it for as long
->> as the OS running. It would be flagged as a memory leak. But that
->> should be easy to have. Can't really think of anything else.
+> On 19/07/17 06:39, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B407=E6=9C=8819=E6=97=A5 01:08, anton.ivanov@cambridgegr=
+eys.com wrote:
+>>> From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+>>>
+>>> 1. Creates a common backend for socket transports using
+>>> recvmmsg().
+>>> 2. Migrates L2TPv3 to the new backend
+>>
+>> It would be better if you could further split out 2 from this patch.
+>>
+>>>
+>>> Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+>>> ---
+>>>   configure         |  10 +-
+>>>   net/Makefile.objs |   2 +-
+>>>   net/l2tpv3.c      | 531=20
+>>> +++++++++---------------------------------------------
+>>>   net/net.c         |   4 +-
+>>>   net/unified.c     | 406 +++++++++++++++++++++++++++++++++++++++++
+>>>   net/unified.h     | 118 ++++++++++++
+>>>   6 files changed, 613 insertions(+), 458 deletions(-)
+>>>   create mode 100644 net/unified.c
+>>>   create mode 100644 net/unified.h
+>>>
+>>> diff --git a/configure b/configure
+>>> index a3f0522e8f..99a60b723c 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -1862,7 +1862,7 @@ if ! compile_object -Werror ; then
+>>>   fi
+>>>     ##########################################
+>>> -# L2TPV3 probe
+>>> +# UNIFIED probe
+>>>     cat > $TMPC <<EOF
+>>>   #include <sys/socket.h>
+>>> @@ -1870,9 +1870,9 @@ cat > $TMPC <<EOF
+>>>   int main(void) { return sizeof(struct mmsghdr); }
+>>>   EOF
+>>>   if compile_prog "" "" ; then
+>>> -  l2tpv3=3Dyes
+>>> +  unified=3Dyes
+>>>   else
+>>> -  l2tpv3=3Dno
+>>> +  unified=3Dno
+>>>   fi
+>>>     ##########################################
+>>> @@ -5458,8 +5458,8 @@ fi
+>>>   if test "$netmap" =3D "yes" ; then
+>>>     echo "CONFIG_NETMAP=3Dy" >> $config_host_mak
+>>>   fi
+>>> -if test "$l2tpv3" =3D "yes" ; then
+>>> -  echo "CONFIG_L2TPV3=3Dy" >> $config_host_mak
+>>> +if test "$unified" =3D "yes" ; then
+>>> +  echo "CONFIG_UNIFIED=3Dy" >> $config_host_mak
+>>>   fi
+>>
+>> Could we keep l2tpv3 option?
 >
->
-> The question is what kind of data you want to give to the host to help wi=
-th
-> debug. Is this something that can be as simple as addr/size, or you would
-> rather have a 4k page to put various things there.
+> The l2tpv3 test is actually a test for recvmmsg. If you can do one=20
+> recvmmsg transport you can do all of them.
 
-The size of the dump header as currently provided by Windows (that's
-the dump-support data we want to pass to the host) is 4k. So I
-wouldn't put it directly in the page anyway. That, plus the desire to
-update the data at least somewhat atomically, would make me prefer a
-simple addr/size pair I think.
-
->>
->>
->> >>>
->> >>> >> > instead of exporting a physical addess and storing address ther=
-e.
->> >>> >> > This
->> >>> >> > way you can add more methods as you add functionality.
->> >>> >>
->> >>> >> I'm not saying this is a bad idea (especially because I don't ful=
-ly
->> >>> >> understand your point), but I will say that I'm quite sad that yo=
-u
->> >>> >> are
->> >>> >> sending Marc-Andr=C3=A9 back to the drawing board after he posted=
- v4 --
->> >>> >> also
->> >>> >> invalidating my review efforts. :/
->> >>> >>
->> >>> >> Laszlo
->> >>> >
->> >>> > You are right, I should have looked at this sooner. Early RFC
->> >>> > suggested writing into fw cfg directly. I couldn't find any
->> >>> > discussion around this - why was this abandoned?
->> >>>
->> >>> Violation (or rather abuse) of layers iirc
->> >>
->> >> Hmm.  I tried to find discussion about that and failed.  It is
->> >> available
->> >> through QEMU0002 in ACPI - would it be OK if guests went through that=
-?
->> >
->> > I wouldn't mind, although merging functionality in a single device
->> > isn't what I would think of first. I guess Ladi would be happier with
->> > a single device. I suppose it shouldn't break drivers if we had
->> > memory, io, methods etc to the device?
->>
->> Yeah, it would be nice if this was part of pvpanic. Even something
->> really simple like:
->>
->>  /* The bit of supported pv event */
->>  #define PVPANIC_F_PANICKED      0
->> +#define PVPANIC_F_DUMP_INFO_SET      1
->
->
-> QEMU0002 is fw_cfg
-
-Ah, sorry, I got confused.
-
->>
->>
->> -     memory_region_init_io(&s->io, OBJECT(s), &pvpanic_ops, s, "pvpanic=
-",
->> 1);
->> +    memory_region_init_io(&s->io, OBJECT(s), &pvpanic_ops, s,
->> "pvpanic", 32); // or whatever
->>
->> The guest writes to two or three registers: PA, size, type?, then sets
->> the PVPANIC_F_DUMP_INFO_SET bit.
->>
->> Although not sure if extending the I/O region is OK. And of course I
->> only need this on x86 :p
->>
->
-> I would rather have a solution that works on various archs. It's a shame
-> pvpanic was designed with x86 only in mind imho.
-
-Understood. Thanks!
+Yes, but I wonder whether or not the check for recvmmsg is too simple.=20
+We probably want something like what AV_VSOCK did, test the support of=20
+each transport through socket().
 
 >
-> --
-> Marc-Andr=C3=A9 Lureau
+>>
+>>>   if test "$cap_ng" =3D "yes" ; then
+>>>     echo "CONFIG_LIBCAP=3Dy" >> $config_host_mak
+>>> diff --git a/net/Makefile.objs b/net/Makefile.objs
+>>> index 67ba5e26fb..8026ad778a 100644
+>>> --- a/net/Makefile.objs
+>>> +++ b/net/Makefile.objs
+>>> @@ -2,7 +2,7 @@ common-obj-y =3D net.o queue.o checksum.o util.o hub.=
+o
+>>>   common-obj-y +=3D socket.o
+>>>   common-obj-y +=3D dump.o
+>>>   common-obj-y +=3D eth.o
+>>> -common-obj-$(CONFIG_L2TPV3) +=3D l2tpv3.o
+>>> +common-obj-$(CONFIG_UNIFIED) +=3D l2tpv3.o unified.o
+>>>   common-obj-$(CONFIG_POSIX) +=3D vhost-user.o
+>>>   common-obj-$(CONFIG_SLIRP) +=3D slirp.o
+>>>   common-obj-$(CONFIG_VDE) +=3D vde.o
+
+[...]
+
+>>>>   -    s =3D DO_UPCAST(NetL2TPV3State, nc, nc);
+>>>> +    s->params =3D p;
+>>>>   +    s->form_header =3D &l2tpv3_form_header;
+>>>> +    s->verify_header =3D &l2tpv3_verify_header;
+>>>>       s->queue_head =3D 0;
+>>>>       s->queue_tail =3D 0;
+>>>>       s->header_mismatch =3D false;
+>>>
+>>> Why not move all above into qemu_new_unified_net()?
+>
+> Only queue head/tail assignment can move.
+>
+> raw which uses same backend does not use header_mismatch. Form/verify=20
+> header are different for each sub-transport. F.e. for gre you need the=20
+> gre one, for raw you need the raw one, etc.
+
+Right, I mean pass function pointer to qemu_new_unified_net().
+
+>
+>>
+>>> @@ -549,9 +188,9 @@ int net_init_l2tpv3(const Netdev *netdev,
+>>>       l2tpv3 =3D &netdev->u.l2tpv3;
+>>>         if (l2tpv3->has_ipv6 && l2tpv3->ipv6) {
+>>> -        s->ipv6 =3D l2tpv3->ipv6;
+>>> +        p->ipv6 =3D l2tpv3->ipv6;
+>>>       } else {
+>>> -        s->ipv6 =3D false;
+>>> +        p->ipv6 =3D false;
+
+[...]
+
+>>>   diff --git a/net/unified.c b/net/unified.c
+>>
+>> Not a native speaker, but I think we need a better name here e.g udst=20
+>> which is short for Unified Datagram Socket Transport?
+>
+> I am not a native speaker either :)
+>
+> I am OK - let's call it udst as this is more descriptive and this=20
+> clearly delineates that you cannot
+> migrate tcp/socket to it.
+
+Ok.
+
+>
+>>
+>>>
+
+[...]
+
+>>> +
+>>> +static ssize_t net_unified_receive_dgram_iov(NetClientState *nc,
+>>> +                    const struct iovec *iov,
+>>> +                    int iovcnt)
+>>> +{
+>>> +    NetUnifiedState *s =3D DO_UPCAST(NetUnifiedState, nc, nc);
+>>> +
+>>> +    struct msghdr message;
+>>> +    int ret;
+>>> +
+>>> +    if (iovcnt > MAX_UNIFIED_IOVCNT - 1) {
+>>> +        error_report(
+>>> +            "iovec too long %d > %d, change unified.h",
+>>> +            iovcnt, MAX_UNIFIED_IOVCNT
+>>> +        );
+>>> +        return -1;
+>>> +    }
+>>> +    if (s->offset > 0) {
+>>
+>> net_l2tpv3_receive_dgram_iov() does not have this check. I guess it=20
+>> s->offset=3D0 will be used by other transport. Maybe it's better to=20
+>> delay this change until is has a real user or add a comment here.
+>
+> The real user is in patch No 2. Raw.
+
+Ok.
+
+Thanks.
