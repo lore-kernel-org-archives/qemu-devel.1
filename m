@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXsYL-00079f-Gu
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:26 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dXsYn-0007Mp-TY
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dXsYG-00074g-SN
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dXsYG-00072l-Ip
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:20 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A15B61D19
-	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 17:14:19 +0000 (UTC)
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-5-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <58af8e24-6246-c961-4b09-1f9e32c4f181@redhat.com>
-Date: Wed, 19 Jul 2017 12:14:12 -0500
+	(envelope-from <zuban32s@gmail.com>) id 1dXsYm-0007e5-LT
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:53 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33573)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dXsYm-0007dP-Fe
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 13:14:52 -0400
+Received: by mail-pf0-x244.google.com with SMTP id e199so462938pfh.0
+	for <qemu-devel@nongnu.org>; Wed, 19 Jul 2017 10:14:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170717134238.1966-5-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WhavEfsSrouLHxlWiRe0JGnBOsScLUVd8"
-Subject: Re: [Qemu-devel] [PATCH v5 04/17] migration: Add multifd capability
+References: <1500470414-7911-1-git-send-email-zuban32s@gmail.com>
+	<20170719135726.GG5722@char.us.oracle.com>
+In-Reply-To: <20170719135726.GG5722@char.us.oracle.com>
+From: Alexander Bezzubikov <zuban32s@gmail.com>
+Date: Wed, 19 Jul 2017 17:14:41 +0000
+Message-ID: <CAKSfGUDgtN+S=u_4S7-s1wUxt6fZtibLG+ZSX+qZ0d+9marXQQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Allow RedHat PCI bridges reserve
+ more buses than necessary during init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: marcel@redhat.com, qemu-devel@nongnu.org, seabios@seabios.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WhavEfsSrouLHxlWiRe0JGnBOsScLUVd8
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
-Message-ID: <58af8e24-6246-c961-4b09-1f9e32c4f181@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 04/17] migration: Add multifd capability
-References: <20170717134238.1966-1-quintela@redhat.com>
- <20170717134238.1966-5-quintela@redhat.com>
-In-Reply-To: <20170717134238.1966-5-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+=D1=81=D1=80, 19 =D0=B8=D1=8E=D0=BB=D1=8F 2017 =D0=B3. =D0=B2 16:57, Konrad=
+ Rzeszutek Wilk <konrad.wilk@oracle.com>:
 
-On 07/17/2017 08:42 AM, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/migration.c | 9 +++++++++
->  migration/migration.h | 1 +
->  qapi-schema.json      | 4 ++--
->  3 files changed, 12 insertions(+), 2 deletions(-)
->=20
+> On Wed, Jul 19, 2017 at 04:20:12PM +0300, Aleksandr Bezzubikov wrote:
+> > Now PCI bridges (and PCIE root port too) get a bus range number in
+> system init,
+> > basing on currently plugged devices. That's why when one wants to
+> hotplug another bridge,
+> > it needs his child bus, which the parent is unable to provide.
+>
+> Could you explain how you trigger this?
 
-> +++ b/qapi-schema.json
-> @@ -902,14 +902,14 @@
->  #
->  # @return-path: If enabled, migration will use the return path even
->  #               for precopy. (since 2.10)
-> +# @x-multifd: Use more than one fd for migration (since 2.10)
 
-Are we still aiming for 2.10, even though this is a feature and soft
-freeze has already passed?  Better would be updating it to say 2.11
+I'm trying to hot plug pcie-pci bridge into pcie root port, and Linux says
+'cannot allocate bus number for device bla-bla'. This obviously does not
+allow me to use the bridge at all.
 
+>
+>
+> > The suggested workaround is to have vendor-specific capability in RedHa=
+t
+> generic pcie-root-port
+> > that contains number of additional bus to reserve on BIOS PCI init.
+>
+> But wouldn't the proper fix be for the PCI bridge to have the subordinate
+> value be extended to fit more bus ranges?
+
+
+What do you mean? This is what I'm trying to do. Do you suppose to get rid
+of vendor-specific cap and use original register value instead of it?
+
+>
+> >
+> > Aleksandr Bezzubikov (2):
+> >   pci: add support for direct usage of bdf for capability lookup
+> >   pci: enable RedHat pci bridges to reserve more buses
+> >
+> >  src/fw/pciinit.c   | 12 ++++++++++--
+> >  src/hw/pcidevice.c | 24 ++++++++++++++++++++++++
+> >  src/hw/pcidevice.h |  1 +
+> >  3 files changed, 35 insertions(+), 2 deletions(-)
+> >
+> > --
+> > 2.7.4
+> >
+> >
+>
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WhavEfsSrouLHxlWiRe0JGnBOsScLUVd8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllvk2QACgkQp6FrSiUn
-Q2perAgAo5dxEENODw0etj1yiZ0Pi9XKN4Car44+1yxJzUiOkNE7DhrKXMsF1EZ4
-PQH2FwFoTgjHLYvMp5GejrR5cOyXPbeWXRHgU22+4eORof2Mq+1S1UvYDmcErnyF
-Ibz1DwCuotB3JltexyP1n5EXhgYiIxCae2LxDJuift38vGNt8UVPcPnP01ESJ6/F
-KMJ31IglxjjStJG00NpCgLaKoKz/zVUgMfAUlvMHnILT1wWA1ZOMVGVbUfE/4uea
-5BP1ILxTbPaLoHciCRcMJ0PM+/GhTG1nk3FlAxV/r+Q1+qBH8oF0hujioIi5T3GI
-sRwMjiE64Keo/WRlz39g18aTa0sWYw==
-=uKpW
------END PGP SIGNATURE-----
-
---WhavEfsSrouLHxlWiRe0JGnBOsScLUVd8--
+Alexander Bezzubikov
