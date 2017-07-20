@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qM-00016J-9u
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:41 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qM-00016P-CF
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qJ-0005pW-CC
+	(envelope-from <cota@braap.org>) id 1dY1qI-0005oM-UT
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:38 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:54327)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39539)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005oJ-6g
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qI-0005nv-Kh
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:34 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:08:51 -0400
-Message-Id: <1500520169-23367-6-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:08:49 -0400
+Message-Id: <1500520169-23367-4-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v3 05/43] cpu-exec: rename have_tb_lock to
- acquired_tb_lock in tb_find
+Subject: [Qemu-devel] [PATCH v3 03/43] exec-all: fix typos in
+ TranslationBlock's documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Reusing the have_tb_lock name, which is also defined in translate-all.c,
-makes code reviewing unnecessarily harder.
-
-Avoid potential confusion by renaming the local have_tb_lock variable
-to something else.
-
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/cpu-exec.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/exec/exec-all.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index d84b01d..c4c289b 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -337,7 +337,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
--    bool have_tb_lock = false;
-+    bool acquired_tb_lock = false;
- 
-     /* we record a subset of the CPU state. It will
-        always be the same before a given translated block
-@@ -356,7 +356,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
-              */
-             mmap_lock();
-             tb_lock();
--            have_tb_lock = true;
-+            acquired_tb_lock = true;
- 
-             /* There's a chance that our desired tb has been translated while
-              * taking the locks so we check again inside the lock.
-@@ -384,15 +384,15 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 87b1b74..69c1b36 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -370,7 +370,7 @@ struct TranslationBlock {
+     /* The following data are used to directly call another TB from
+      * the code of this one. This can be done either by emitting direct or
+      * indirect native jump instructions. These jumps are reset so that the TB
+-     * just continue its execution. The TB can be linked to another one by
++     * just continues its execution. The TB can be linked to another one by
+      * setting one of the jump targets (or patching the jump instruction). Only
+      * two of such jumps are supported.
+      */
+@@ -381,7 +381,7 @@ struct TranslationBlock {
+ #else
+     uintptr_t jmp_target_addr[2]; /* target address for indirect jump */
  #endif
-     /* See if we can patch the calling TB. */
-     if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
--        if (!have_tb_lock) {
-+        if (!acquired_tb_lock) {
-             tb_lock();
--            have_tb_lock = true;
-+            acquired_tb_lock = true;
-         }
-         if (!tb->invalid) {
-             tb_add_jump(last_tb, tb_exit, tb);
-         }
-     }
--    if (have_tb_lock) {
-+    if (acquired_tb_lock) {
-         tb_unlock();
-     }
-     return tb;
+-    /* Each TB has an assosiated circular list of TBs jumping to this one.
++    /* Each TB has an associated circular list of TBs jumping to this one.
+      * jmp_list_first points to the first TB jumping to this one.
+      * jmp_list_next is used to point to the next TB in a list.
+      * Since each TB can have two jumps, it can participate in two lists.
 -- 
 2.7.4
