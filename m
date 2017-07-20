@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY8GI-0000b8-Ua
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:00:51 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dY8I6-0001WJ-Ke
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY8GE-0003rL-6m
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:00:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50220)
+	(envelope-from <dgilbert@redhat.com>) id 1dY8I2-0004r1-OB
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:02:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dY8GD-0003qo-Tj
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:00:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170714190827.4083-1-eblake@redhat.com>
-	<20170714190827.4083-4-eblake@redhat.com>
-Date: Thu, 20 Jul 2017 12:00:42 +0200
-In-Reply-To: <20170714190827.4083-4-eblake@redhat.com> (Eric Blake's message
-	of "Fri, 14 Jul 2017 14:08:25 -0500")
-Message-ID: <87fudrmnqt.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY8I2-0004qS-2w
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:02:38 -0400
+Date: Thu, 20 Jul 2017 11:02:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720100232.GA2456@work-vm>
+References: <1497462353-3432-1-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA-iWRqhNhrJsrvODRunkwMGTUsTMfhdHZw3aCjoc3p1Mg@mail.gmail.com>
+	<CAJy5ezpvpohU5x48WrKz57k9+s39hkSCUm+f_u2qf7E0Zin7Mw@mail.gmail.com>
+	<20170717185830.GD31820@work-vm>
+	<CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/5] qapi: Visitor documentation tweak
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-yt=fkPrGL_6X_A8n=+u5YuX1+V82Sc7+2MeuA38kH0A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v1 0/7] MMIO Exec pull request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, KONRAD Frederic <frederic.konrad@adacore.com>, Juan Quintela <quintela@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 17 July 2017 at 19:58, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> > * Edgar E. Iglesias (edgar.iglesias@gmail.com) wrote:
+> >> Is there a way we can prevent migration of the RAMBlock?
+> >
+> > Not yet, I think we'd have to:
+> >    a) Add a flag to the RAMBlock
+> >    b) Set it/clear it on registration
+> >    c) Have a RAMBLOCK_FOREACH_MIGRATABLE macro
+> >    d) Replace all of the RAMBLOCK_FOREACH (and the couple of hand coded
+> >    cases) with the RAMBLOCK_FOREACH_MIGRATABLE
+> >    e) Worry about the corner cases!
+> >
+> > I've got a few worries about what happens when the kernel tries to
+> > do dirty yncing - I'm not sure if we have to change anything on that
+> > interface to skip those RAMBlocks.
+> 
+> OK, so what should we do for 2.10 ?
+> 
+> We could:
+>  * implement the changes you suggest above, and mark only
+>    vmstate_register_ram'd blocks as migratable
+>    (would probably need to fix some places which buggily
+>    don't call vmstate_register_ram)
+>  * implement the changes above, but special case mmio-interface
+>    so only its ramblock is marked unmigratable
 
-> Make it clear that the name parameter to visit_start_struct()
-> has the same semantics as for visit_start_int().
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  include/qapi/visitor.h | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-> index b0a048f..dc09cc7 100644
-> --- a/include/qapi/visitor.h
-> +++ b/include/qapi/visitor.h
-> @@ -60,13 +60,13 @@
->   * visitors are declared here; the remaining visitors are generated in
->   * qapi-visit.h.
->   *
-> - * The @name parameter of visit_type_FOO() describes the relation
-> - * between this QAPI value and its parent container.  When visiting
-> - * the root of a tree, @name is ignored; when visiting a member of an
-> - * object, @name is the key associated with the value; when visiting a
-> - * member of a list, @name is NULL; and when visiting the member of an
-> - * alternate, @name should equal the name used for visiting the
-> - * alternate.
-> + * The @name parameter of visit_type_FOO() and visit_start_OBJECT()
+I think either of these is too late for 2.10 - I don't fancy prodding
+about in all of the migration RAM loops at this stage.
 
-Our terminology is horrible:
+>  * postpone the changes above until 2.11, and for 2.10 register
+>    a migration-blocker in mmio-interface so that we at least
+>    give the user a useful error rather than having it fail
+>    obscurely on vmload (and release note this)
 
-    JSON object / QDict   / QAPI complex type (struct or union)
-    JSON array  / QList   / QAPI array or list (used interchangeably)
-    JSON value  / QObject / QAPI I'm-not-even-sure-what
+I think that's best, especially because I've just thought of another nasty.
+If I understand the way mmio-interface is working, you're dynamically
+changing the RAMBlock list while the guest is running.
+And while we are using QLIST_FOREACH_RCU I'm not convinced we're
+actually safe against dynamic modification of that list.
 
-Because of this mess, nobody knows what you mean when you say OBJECT.
+> (Or something else?)
+> 
+> I do think we definitely need to fix this for 2.11 at latest.
 
-visit_start_BAR()?
+OK, I can do a-e OK, I'm more worried now about that dynamic
+modification I just thought of.
 
-> + * describes the relation between this QAPI value and its parent
-> + * container.  When visiting the root of a tree, @name is ignored;
-> + * when visiting a member of an object, @name is the key associated
-> + * with the value; when visiting a member of a list, @name is NULL;
-> + * and when visiting the member of an alternate, @name should equal
-> + * the name used for visiting the alternate.
->   *
->   * The visit_type_FOO() functions expect a non-null @obj argument;
->   * they allocate *@obj during input visits, leave it unchanged on
+Dave
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> thanks
+> -- PMM
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
