@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dY85u-0004OG-Sg
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:50:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1dY884-0005UM-35
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:52:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dY85s-0005xJ-Qu
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:50:06 -0400
-Received: from mail-lf0-x22d.google.com ([2a00:1450:4010:c07::22d]:36770)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dY85s-0005vg-DP
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:50:04 -0400
-Received: by mail-lf0-x22d.google.com with SMTP id d78so10080985lfg.3
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 02:50:04 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dY880-00078w-3d
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:52:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dY87z-00078Y-Qc
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:52:16 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170714190827.4083-1-eblake@redhat.com>
+	<20170714190827.4083-3-eblake@redhat.com>
+Date: Thu, 20 Jul 2017 11:52:11 +0200
+In-Reply-To: <20170714190827.4083-3-eblake@redhat.com> (Eric Blake's message
+	of "Fri, 14 Jul 2017 14:08:24 -0500")
+Message-ID: <87mv7zmo50.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
-	<1500541371-24788-9-git-send-email-sf@sfritsch.de>
-In-Reply-To: <1500541371-24788-9-git-send-email-sf@sfritsch.de>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 20 Jul 2017 09:49:52 +0000
-Message-ID: <CAJ+F1C+F2kKjQWT=tcRBbiYCfb+6FMWmBMOih8XiiB+C2Ov0FA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] usb-ccid: Reduce logging at level
- WARN
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 2/5] tests: Enhance qobject output to cover
+ partial visit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,216 +28,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Fritsch <sf@sfritsch.de>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Jul 20, 2017 at 11:04 AM Stefan Fritsch <sf@sfritsch.de> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> From: Stefan Fritsch <stefan_fritsch@genua.de>
+> Add a test that proves (at least when run under valgrind) that
+> we are correctly handling allocated memory even when a visit
+> is aborted in the middle for whatever other reason.
 >
-> Change all DPRINTF()s using (1 =3D=3D WARN) to use symbolic
-> constants. Most of these DPRINTFs are now only logging at higher log
-> levels.
+> See commit f24582d "qapi: fix double free in
+> qmp_output_visitor_cleanup()" for a fix that was lacking
+> testsuite exposure prior to this patch.
 >
-> This allows to use ccid's debug level 1 =3D=3D WARN in normal operation.
->
-> Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  hw/usb/dev-smartcard-reader.c | 37 +++++++++++++++++++------------------
->  1 file changed, 19 insertions(+), 18 deletions(-)
+>  tests/test-qobject-output-visitor.c | 46 ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 45 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
-c
-> index 72324e8313..fcc3ac1338 100644
-> --- a/hw/usb/dev-smartcard-reader.c
-> +++ b/hw/usb/dev-smartcard-reader.c
-> @@ -669,7 +669,7 @@ static void ccid_handle_reset(USBDevice *dev)
+> diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
+> index 749c540..1e9a5d1 100644
+> --- a/tests/test-qobject-output-visitor.c
+> +++ b/tests/test-qobject-output-visitor.c
+> @@ -1,7 +1,7 @@
+>  /*
+>   * QObject Output Visitor unit-tests.
+>   *
+> - * Copyright (C) 2011-2016 Red Hat Inc.
+> + * Copyright (C) 2011-2017 Red Hat Inc.
+>   *
+>   * Authors:
+>   *  Luiz Capitulino <lcapitulino@redhat.com>
+> @@ -251,6 +251,48 @@ static void test_visitor_out_struct_errors(TestOutputVisitorData *data,
+>  }
+>
+>
+> +static void test_visitor_out_partial_visit(TestOutputVisitorData *data,
+> +                                           const void *unused)
+> +{
+> +    /* Various checks that a mid-visit abort doesn't leak or double-free. */
+> +    const char *str = "hi";
+> +    Error *err = NULL;
+> +    UserDefAlternate uda = {
+> +        .type = QTYPE_QDICT,
+> +        .u.udfu = { .integer = 1,
+> +                    .string = (char *) "bye",
+> +                    .enum1 = -1 } /* intentionally bad */
+> +    };
+> +    UserDefAlternate *obj = &uda;
+> +
+> +    /* Abort within a nested object with no data members */
+> +    visit_start_struct(data->ov, NULL, NULL, 0, &error_abort);
+> +    visit_start_struct(data->ov, "nested", NULL, 0, &error_abort);
+> +    visitor_reset(data);
+> +
+> +    /* Abort in the middle of a list of strings */
+> +    visit_start_list(data->ov, "list", NULL, 0, &error_abort);
+> +    visit_type_str(data->ov, NULL, (char **)&str, &error_abort);
+> +    visit_type_str(data->ov, NULL, (char **)&str, &error_abort);
+> +    visitor_reset(data);
+> +
+> +    /*
+> +     * Abort in the middle of an alternate. Alternates can't be
+> +     * virtually visited, so we get to inline the first half of
+> +     * visit_type_UserDefAlternate().
+> +     */
+
+Not exactly inline.  Perhaps:
+
+       /*
+        * Abort in the middle of an alternate.  Since alternates don't
+        * support virtual visits, we perform a real one, similar to what
+        * visit_type_UserDefAlternate() would do.
+        */
+
+Hmm, what would visit_type_UserDefAlternate() do for @uda?  Could we
+simply call it here and be done?
+
+I've explored supporting virtual alternate visits, but my solution isn't
+quite ready, yet.
+
+> +    visit_start_alternate(data->ov, NULL, (GenericAlternate **)&obj,
+> +                          sizeof(uda), &error_abort);
+> +    visit_start_struct(data->ov, NULL, NULL, 0, &error_abort);
+> +    visit_type_UserDefUnionBase_members(data->ov,
+> +                                        (UserDefUnionBase *)&uda.u.udfu,
+> +                                        &err);
+> +    /* error expected because of bad "enum1" discriminator value */
+> +    error_free_or_abort(&err);
+> +    visitor_reset(data);
+> +}
+> +
+> +
+>  static void test_visitor_out_list(TestOutputVisitorData *data,
+>                                    const void *unused)
 >  {
->      USBCCIDState *s =3D USB_CCID_DEV(dev);
->
-> -    DPRINTF(s, 1, "Reset\n");
-> +    DPRINTF(s, D_VERBOSE, "Reset\n");
->
->      ccid_reset(s);
->  }
-> @@ -713,7 +713,7 @@ static void ccid_handle_control(USBDevice *dev,
-> USBPacket *p, int request,
->      USBCCIDState *s =3D USB_CCID_DEV(dev);
->      int ret;
->
-> -    DPRINTF(s, 1, "%s: got control %s (%x), value %x\n", __func__,
-> +    DPRINTF(s, D_TRACE, "%s: got control %s (%x), value %x\n", __func__,
->              ccid_control_to_str(s, request), request, value);
->      ret =3D usb_desc_handle_control(dev, p, request, value, index, lengt=
-h,
-> data);
->      if (ret >=3D 0) {
-> @@ -723,19 +723,20 @@ static void ccid_handle_control(USBDevice *dev,
-> USBPacket *p, int request,
->      switch (request) {
->          /* Class specific requests.  */
->      case ClassInterfaceOutRequest | CCID_CONTROL_ABORT:
-> -        DPRINTF(s, 1, "ccid_control abort UNIMPLEMENTED\n");
-> +        DPRINTF(s, D_INFO, "ccid_control abort UNIMPLEMENTED\n");
->          p->status =3D USB_RET_STALL;
->          break;
->      case ClassInterfaceRequest | CCID_CONTROL_GET_CLOCK_FREQUENCIES:
-> -        DPRINTF(s, 1, "ccid_control get clock frequencies
-> UNIMPLEMENTED\n");
-> +        DPRINTF(s, D_INFO,
-> +                "ccid_control get clock frequencies UNIMPLEMENTED\n");
->          p->status =3D USB_RET_STALL;
->          break;
->      case ClassInterfaceRequest | CCID_CONTROL_GET_DATA_RATES:
-> -        DPRINTF(s, 1, "ccid_control get data rates UNIMPLEMENTED\n");
-> +        DPRINTF(s, D_INFO, "ccid_control get data rates UNIMPLEMENTED\n"=
-);
->          p->status =3D USB_RET_STALL;
->          break;
->
-
-WARN was quite appropriate for unimplemented code reached, no?
-
-
->      default:
-> -        DPRINTF(s, 1, "got unsupported/bogus control %x, value %x\n",
-> +        DPRINTF(s, D_INFO, "got unsupported/bogus control %x, value %x\n=
-",
->                  request, value);
->
-
-I would also keep it at WARN here,  (as the unhandled case in
-ccid_handle_bulk_out)
-
-         p->status =3D USB_RET_STALL;
->          break;
-> @@ -1020,13 +1021,13 @@ static void ccid_on_apdu_from_guest(USBCCIDState
-> *s, CCID_XferBlock *recv)
->      uint32_t len;
->
->      if (ccid_card_status(s) !=3D ICC_STATUS_PRESENT_ACTIVE) {
-> -        DPRINTF(s, 1,
-> +        DPRINTF(s, D_INFO,
->                  "usb-ccid: not sending apdu to client, no card
-> connected\n");
->          ccid_write_data_block_error(s, recv->hdr.bSlot, recv->hdr.bSeq);
->          return;
->      }
->      len =3D le32_to_cpu(recv->hdr.dwLength);
-> -    DPRINTF(s, 1, "%s: seq %d, len %d\n", __func__,
-> +    DPRINTF(s, D_TRACE, "%s: seq %d, len %d\n", __func__,
->                  recv->hdr.bSeq, len);
->      if (le16_to_cpu(recv->wLevelParameter)) {
->          DPRINTF(s, D_WARN, "Unsupported non-zero level Parameter %x\n",
-> @@ -1087,7 +1088,7 @@ static void ccid_handle_bulk_out(USBCCIDState *s,
-> USBPacket *p)
->          return;
->      }
->      if (s->bulk_out_pos - 10 !=3D ccid_header->dwLength) {
-> -        DPRINTF(s, 1,
-> +        DPRINTF(s, D_WARN,
->                  "usb-ccid: bulk_in: message size mismatch (got %d,
-> expected %d)\n",
->                  s->bulk_out_pos - 10, ccid_header->dwLength);
->          goto err;
-> @@ -1101,7 +1102,7 @@ static void ccid_handle_bulk_out(USBCCIDState *s,
-> USBPacket *p)
->          ccid_write_slot_status(s, ccid_header);
->          break;
->      case CCID_MESSAGE_TYPE_PC_to_RDR_IccPowerOn:
-> -        DPRINTF(s, 1, "%s: PowerOn: %d\n", __func__,
-> +        DPRINTF(s, D_VERBOSE, "%s: PowerOn: %d\n", __func__,
->                  ((CCID_IccPowerOn *)(ccid_header))->bPowerSelect);
->          s->powered =3D true;
->          if (!ccid_card_inserted(s)) {
-> @@ -1137,7 +1138,7 @@ static void ccid_handle_bulk_out(USBCCIDState *s,
-> USBPacket *p)
->          ccid_write_slot_status(s, ccid_header);
->          break;
->      default:
-> -        DPRINTF(s, 1,
-> +        DPRINTF(s, D_WARN,
->                  "handle_data: ERROR: unhandled message type %Xh\n",
->                  ccid_header->bMessageType);
->
-         /*
-> @@ -1229,13 +1230,13 @@ static void ccid_handle_data(USBDevice *dev,
-> USBPacket *p)
->              }
->              break;
->          default:
-> -            DPRINTF(s, 1, "Bad endpoint\n");
-> +            DPRINTF(s, D_INFO, "Bad endpoint\n");
->              p->status =3D USB_RET_STALL;
->              break;
->          }
->          break;
->      default:
-> -        DPRINTF(s, 1, "Bad token\n");
-> +        DPRINTF(s, D_INFO, "Bad token\n");
->          p->status =3D USB_RET_STALL;
->          break;
->      }
-> @@ -1285,7 +1286,7 @@ void ccid_card_send_apdu_to_guest(CCIDCardState
-> *card,
->      Answer *answer;
->
->      if (!ccid_has_pending_answers(s)) {
-> -        DPRINTF(s, 1, "CCID ERROR: got an APDU without pending
-> answers\n");
-> +        DPRINTF(s, D_WARN, "CCID ERROR: got an APDU without pending
-> answers\n");
->          return;
->      }
->      s->bmCommandStatus =3D COMMAND_STATUS_NO_ERROR;
-> @@ -1295,7 +1296,7 @@ void ccid_card_send_apdu_to_guest(CCIDCardState
-> *card,
->          ccid_report_error_failed(s, ERROR_HW_ERROR);
->          return;
->      }
-> -    DPRINTF(s, 1, "APDU returned to guest %d (answer seq %d, slot %d)\n"=
-,
-> +    DPRINTF(s, D_TRACE, "APDU returned to guest %d (answer seq %d, slot
-> %d)\n",
->          len, answer->seq, answer->slot);
->      ccid_write_data_block_answer(s, apdu, len);
->  }
-> @@ -1317,7 +1318,7 @@ int ccid_card_ccid_attach(CCIDCardState *card)
->      USBDevice *dev =3D USB_DEVICE(qdev->parent_bus->parent);
->      USBCCIDState *s =3D USB_CCID_DEV(dev);
->
-> -    DPRINTF(s, 1, "CCID Attach\n");
-> +    DPRINTF(s, D_VERBOSE, "CCID Attach\n");
->      if (s->migration_state =3D=3D MIGRATION_MIGRATED) {
->          s->migration_state =3D MIGRATION_NONE;
->      }
-> @@ -1330,7 +1331,7 @@ void ccid_card_ccid_detach(CCIDCardState *card)
->      USBDevice *dev =3D USB_DEVICE(qdev->parent_bus->parent);
->      USBCCIDState *s =3D USB_CCID_DEV(dev);
->
-> -    DPRINTF(s, 1, "CCID Detach\n");
-> +    DPRINTF(s, D_VERBOSE, "CCID Detach\n");
->      if (ccid_card_inserted(s)) {
->          ccid_on_slot_change(s, false);
->      }
-> @@ -1345,7 +1346,7 @@ void ccid_card_card_error(CCIDCardState *card,
-> uint64_t error)
->
->      s->bmCommandStatus =3D COMMAND_STATUS_FAILED;
->      s->last_answer_error =3D error;
-> -    DPRINTF(s, 1, "VSC_Error: %" PRIX64 "\n", s->last_answer_error);
-> +    DPRINTF(s, D_INFO, "VSC_Error: %" PRIX64 "\n", s->last_answer_error)=
-;
->
-
-I'd keep WARN here too
-
-
->      /* TODO: these errors should be more verbose and propagated to the
-> guest.*/
->      /*
->       * We flush all pending answers on CardRemove message in
-> ccid-card-passthru,
-> --
->
---=20
-Marc-Andr=C3=A9 Lureau
+> @@ -815,6 +857,8 @@ int main(int argc, char **argv)
+>                              &out_visitor_data, test_visitor_out_struct_nested);
+>      output_visitor_test_add("/visitor/output/struct-errors",
+>                              &out_visitor_data, test_visitor_out_struct_errors);
+> +    output_visitor_test_add("/visitor/output/partial-visit",
+> +                            &out_visitor_data, test_visitor_out_partial_visit);
+>      output_visitor_test_add("/visitor/output/list",
+>                              &out_visitor_data, test_visitor_out_list);
+>      output_visitor_test_add("/visitor/output/any",
