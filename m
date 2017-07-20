@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qO-00016Z-Fw
+	(envelope-from <cota@braap.org>) id 1dY1qO-00016e-Sn
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qJ-0005rA-VY
+	(envelope-from <cota@braap.org>) id 1dY1qL-0005tJ-OY
 	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:40 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:34291)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40079)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005q8-Qz
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qL-0005sf-LA
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:37 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:09:08 -0400
-Message-Id: <1500520169-23367-23-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:18 -0400
+Message-Id: <1500520169-23367-33-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 22/43] translate-all: define and use
- DEBUG_TB_FLUSH_GATE
+Subject: [Qemu-devel] [PATCH v3 32/43] tcg: take .helpers out of TCGContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +29,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-This gets rid of some ifdef checks while ensuring that the debug code
-is compiled, which prevents bit rot.
+Groundwork for supporting multiple TCG contexts.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+The hash table becomes read-only after it is filled in,
+so we can save space by keeping just a global pointer to it.
+
 Reviewed-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ tcg/tcg.h |  2 --
+ tcg/tcg.c | 10 +++++-----
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 645bc70..c1cd258 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -65,6 +65,12 @@
- /* make various TB consistency checks */
- /* #define DEBUG_TB_CHECK */
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 22f7ecd..53c679f 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -664,8 +664,6 @@ struct TCGContext {
  
-+#ifdef DEBUG_TB_FLUSH
-+#define DEBUG_TB_FLUSH_GATE 1
-+#else
-+#define DEBUG_TB_FLUSH_GATE 0
-+#endif
-+
- #if !defined(CONFIG_USER_ONLY)
- /* TB consistency checks only implemented for usermode emulation.  */
- #undef DEBUG_TB_CHECK
-@@ -899,13 +905,13 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
-         goto done;
-     }
+     tcg_insn_unit *code_ptr;
  
--#if defined(DEBUG_TB_FLUSH)
--    printf("qemu: flush code_size=%ld nb_tbs=%d avg_tb_size=%ld\n",
--           (unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer),
--           tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
--           ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)) /
--           tcg_ctx.tb_ctx.nb_tbs : 0);
--#endif
-+    if (DEBUG_TB_FLUSH_GATE) {
-+        printf("qemu: flush code_size=%td nb_tbs=%d avg_tb_size=%td\n",
-+               tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer,
-+               tcg_ctx.tb_ctx.nb_tbs, tcg_ctx.tb_ctx.nb_tbs > 0 ?
-+               (tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer) /
-+               tcg_ctx.tb_ctx.nb_tbs : 0);
-+    }
-     if ((unsigned long)(tcg_ctx.code_gen_ptr - tcg_ctx.code_gen_buffer)
-         > tcg_ctx.code_gen_buffer_size) {
-         cpu_abort(cpu, "Internal error: code buffer overflow\n");
+-    GHashTable *helpers;
+-
+ #ifdef CONFIG_PROFILER
+     /* profiling info */
+     int64_t tb_count1;
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 28c1b94..c0c2d6c 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -319,6 +319,7 @@ typedef struct TCGHelperInfo {
+ static const TCGHelperInfo all_helpers[] = {
+ #include "exec/helper-tcg.h"
+ };
++static GHashTable *helper_table;
+ 
+ static int indirect_reg_alloc_order[ARRAY_SIZE(tcg_target_reg_alloc_order)];
+ static void process_op_defs(TCGContext *s);
+@@ -329,7 +330,6 @@ void tcg_context_init(TCGContext *s)
+     TCGOpDef *def;
+     TCGArgConstraint *args_ct;
+     int *sorted_args;
+-    GHashTable *helper_table;
+ 
+     memset(s, 0, sizeof(*s));
+     s->nb_globals = 0;
+@@ -357,7 +357,7 @@ void tcg_context_init(TCGContext *s)
+ 
+     /* Register helpers.  */
+     /* Use g_direct_hash/equal for direct pointer comparisons on func.  */
+-    s->helpers = helper_table = g_hash_table_new(NULL, NULL);
++    helper_table = g_hash_table_new(NULL, NULL);
+ 
+     for (i = 0; i < ARRAY_SIZE(all_helpers); ++i) {
+         g_hash_table_insert(helper_table, (gpointer)all_helpers[i].func,
+@@ -761,7 +761,7 @@ void tcg_gen_callN(TCGContext *s, void *func, TCGArg ret,
+     unsigned sizemask, flags;
+     TCGHelperInfo *info;
+ 
+-    info = g_hash_table_lookup(s->helpers, (gpointer)func);
++    info = g_hash_table_lookup(helper_table, (gpointer)func);
+     flags = info->flags;
+     sizemask = info->sizemask;
+ 
+@@ -990,8 +990,8 @@ static char *tcg_get_arg_str_idx(TCGContext *s, char *buf,
+ static inline const char *tcg_find_helper(TCGContext *s, uintptr_t val)
+ {
+     const char *ret = NULL;
+-    if (s->helpers) {
+-        TCGHelperInfo *info = g_hash_table_lookup(s->helpers, (gpointer)val);
++    if (helper_table) {
++        TCGHelperInfo *info = g_hash_table_lookup(helper_table, (gpointer)val);
+         if (info) {
+             ret = info->name;
+         }
 -- 
 2.7.4
