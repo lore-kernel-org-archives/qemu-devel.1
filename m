@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY8Po-0005mA-5a
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:10:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1dY8be-0000H5-Of
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:22:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY8Pk-00012I-V8
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:10:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42396)
+	(envelope-from <peterx@redhat.com>) id 1dY8bZ-0007ut-QV
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:22:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dY8Pk-00011s-JL
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:10:36 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dY8bZ-0007uZ-Hr
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 06:22:49 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D5542F86DA
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 10:10:35 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170714190827.4083-1-eblake@redhat.com>
-	<20170714190827.4083-6-eblake@redhat.com>
-Date: Thu, 20 Jul 2017 12:10:33 +0200
-In-Reply-To: <20170714190827.4083-6-eblake@redhat.com> (Eric Blake's message
-	of "Fri, 14 Jul 2017 14:08:27 -0500")
-Message-ID: <87zibzl8py.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 5300BC0567A2
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 10:22:48 +0000 (UTC)
+Date: Thu, 20 Jul 2017 18:22:44 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170720102244.GF23385@pxdev.xzpeter.org>
+References: <20170717134238.1966-1-quintela@redhat.com>
+	<20170717134238.1966-14-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 5/5] qtest: Document calling conventions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170717134238.1966-14-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 13/17] migration: Create thread
+ infrastructure for multifd recv side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,122 +34,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
 
-Eric Blake <eblake@redhat.com> writes:
+On Mon, Jul 17, 2017 at 03:42:34PM +0200, Juan Quintela wrote:
 
-> We have two flavors of vararg usage in qtest; make it clear that
-> qmp() has different semantics than hmp(), and let the compiler
-> enforce that hmp() is used correctly. Since qmp() only accepts
-> a subset of printf flags (namely, those that our JSON parser
-> understands), I figured that it is probably not worth adding a
-> format attribute to qmp() at this time.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/libqtest.h | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
->
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 38bc1e9..762ed13 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -50,7 +50,8 @@ void qtest_quit(QTestState *s);
+[...]
+
+>  struct MultiFDRecvParams {
+> +    /* not changed */
+>      uint8_t id;
+>      QemuThread thread;
+>      QIOChannel *c;
+> +    QemuSemaphore ready;
+>      QemuSemaphore sem;
+>      QemuMutex mutex;
+> +    /* proteced by param mutex */
+>      bool quit;
+> +    multifd_pages_t pages;
+> +    bool done;
+
+(Again, I am thinking whether we can get rid of this "done" field just
+ like the comment I left in sending part, but I'll wait to see how
+ that discussion goes in case I missed anything, so will skip it here
+ for now...)
+
+>  };
+>  typedef struct MultiFDRecvParams MultiFDRecvParams;
+>  
+> @@ -629,12 +637,20 @@ static void *multifd_recv_thread(void *opaque)
+>  {
+>      MultiFDRecvParams *p = opaque;
+>  
+> +    qemu_sem_post(&p->ready);
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+>          if (p->quit) {
+>              qemu_mutex_unlock(&p->mutex);
+>              break;
+>          }
+> +        if (p->pages.num) {
+> +            p->pages.num = 0;
+> +            p->done = true;
+> +            qemu_mutex_unlock(&p->mutex);
+> +            qemu_sem_post(&p->ready);
+> +            continue;
+> +        }
+>          qemu_mutex_unlock(&p->mutex);
+>          qemu_sem_wait(&p->sem);
+>      }
+> @@ -679,8 +695,11 @@ gboolean multifd_new_channel(QIOChannel *ioc)
+>      }
+>      qemu_mutex_init(&p->mutex);
+>      qemu_sem_init(&p->sem, 0);
+> +    qemu_sem_init(&p->ready, 0);
+>      p->quit = false;
+>      p->id = id;
+> +    p->done = false;
+> +    multifd_init_group(&p->pages);
+>      p->c = ioc;
+>      atomic_set(&multifd_recv_state->params[id], p);
+>      qemu_thread_create(&p->thread, "multifd_recv", multifd_recv_thread, p,
+> @@ -709,6 +728,42 @@ int multifd_load_setup(void)
+>      return 0;
+>  }
+>  
+> +static void multifd_recv_page(uint8_t *address, uint16_t fd_num)
+> +{
+> +    int thread_count;
+> +    MultiFDRecvParams *p;
+> +    static multifd_pages_t pages;
+> +    static bool once;
+> +
+> +    if (!once) {
+> +        multifd_init_group(&pages);
+> +        once = true;
+> +    }
+> +
+> +    pages.iov[pages.num].iov_base = address;
+> +    pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
+> +    pages.num++;
+> +
+> +    if (fd_num == UINT16_MAX) {
+
+(so this check is slightly mistery as well if we don't define
+ something... O:-)
+
+> +        return;
+> +    }
+> +
+> +    thread_count = migrate_multifd_threads();
+> +    assert(fd_num < thread_count);
+> +    p = multifd_recv_state->params[fd_num];
+> +
+> +    qemu_sem_wait(&p->ready);
+
+Shall we check for p->pages.num == 0 before wait? What if the
+corresponding thread is already finished its old work and ready?
+
+> +
+> +    qemu_mutex_lock(&p->mutex);
+> +    p->done = false;
+> +    iov_copy(p->pages.iov, pages.num, pages.iov, pages.num, 0,
+> +             iov_size(pages.iov, pages.num));
+
+Question: any reason why we don't use the same for loop in
+multifd-send codes, and just copy the IOVs in that loop? (offset is
+always zero, and we are copying the whole thing after all)
+
+> +    p->pages.num = pages.num;
+> +    pages.num = 0;
+> +    qemu_mutex_unlock(&p->mutex);
+> +    qemu_sem_post(&p->sem);
+> +}
+> +
 >  /**
->   * qtest_qmp_discard_response:
->   * @s: #QTestState instance to operate on.
-> - * @fmt...: QMP message to send to qemu
-> + * @fmt...: QMP message to send to qemu; only recognizes formats
-> + * understood by json-lexer.c
+>   * save_page_header: write page header to wire
 >   *
->   * Sends a QMP message to QEMU and consumes the response.
->   */
+> @@ -1155,7 +1210,7 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
+>          ram_counters.transferred +=
+>              save_page_header(rs, rs->f, block,
+>                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
+> -        fd_num = multifd_send_page(p);
+> +        fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
+>          qemu_put_be16(rs->f, fd_num);
+>          ram_counters.transferred += 2; /* size of fd_num */
+>          qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
+> @@ -3020,10 +3075,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  
+>          case RAM_SAVE_FLAG_MULTIFD_PAGE:
+>              fd_num = qemu_get_be16(f);
+> -            if (fd_num != 0) {
+> -                /* this is yet an unused variable, changed later */
+> -                fd_num = fd_num;
+> -            }
+> +            multifd_recv_page(host, fd_num);
+>              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
+>              break;
+>  
+> -- 
+> 2.9.4
+> 
 
-These formats are chosen so that gcc can help us check them.  Please add
-GCC_FMT_ATTR().  Precedence: qobject_from_jsonf().
+Thanks,
 
-Where are the "formats understood by json-lexer.c" documented?
-
-More of the same below.
-
-> @@ -59,7 +60,8 @@ void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
->  /**
->   * qtest_qmp:
->   * @s: #QTestState instance to operate on.
-> - * @fmt...: QMP message to send to qemu
-> + * @fmt...: QMP message to send to qemu; only recognizes formats
-> + * understood by json-lexer.c
->   *
->   * Sends a QMP message to QEMU and returns the response.
->   */
-> @@ -134,14 +136,14 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
->  /**
->   * qtest_hmp:
->   * @s: #QTestState instance to operate on.
-> - * @fmt...: HMP command to send to QEMU
-> + * @fmt...: HMP command to send to QEMU, passed through sprintf()
-
-Not actually through sprintf(), but I get what you mean.  I like to
-document such things as "Format arguments like vsprintf()."
-
->   *
->   * Send HMP command to QEMU via QMP's human-monitor-command.
->   * QMP events are discarded.
->   *
->   * Returns: the command's output.  The caller should g_free() it.
->   */
-> -char *qtest_hmp(QTestState *s, const char *fmt, ...);
-> +char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
->
->  /**
->   * qtest_hmpv:
-> @@ -535,7 +537,8 @@ static inline void qtest_end(void)
->
->  /**
->   * qmp:
-> - * @fmt...: QMP message to send to qemu
-> + * @fmt...: QMP message to send to qemu; only recognizes formats
-> + * understood by json-lexer.c
->   *
->   * Sends a QMP message to QEMU and returns the response.
->   */
-> @@ -543,7 +546,8 @@ QDict *qmp(const char *fmt, ...);
->
->  /**
->   * qmp_async:
-> - * @fmt...: QMP message to send to qemu
-> + * @fmt...: QMP message to send to qemu; only recognizes formats
-> + * understood by json-lexer.c
->   *
->   * Sends a QMP message to QEMU and leaves the response in the stream.
->   */
-> @@ -551,7 +555,8 @@ void qmp_async(const char *fmt, ...);
->
->  /**
->   * qmp_discard_response:
-> - * @fmt...: QMP message to send to qemu
-> + * @fmt...: QMP message to send to qemu; only recognizes formats
-> + * understood by json-lexer.c
->   *
->   * Sends a QMP message to QEMU and consumes the response.
->   */
-> @@ -592,13 +597,13 @@ static inline QDict *qmp_eventwait_ref(const char *event)
->
->  /**
->   * hmp:
-> - * @fmt...: HMP command to send to QEMU
-> + * @fmt...: HMP command to send to QEMU, passed through printf()
-
-Here, you claim printf().  Typo?
-
->   *
->   * Send HMP command to QEMU via QMP's human-monitor-command.
->   *
->   * Returns: the command's output.  The caller should g_free() it.
->   */
-> -char *hmp(const char *fmt, ...);
-> +char *hmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
->
->  /**
->   * get_irq:
+-- 
+Peter Xu
