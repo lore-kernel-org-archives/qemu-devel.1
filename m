@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qM-00016M-Al
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:42 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qN-00016W-PL
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qI-0005oc-Vq
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:38 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:51259)
+	(envelope-from <cota@braap.org>) id 1dY1qJ-0005qi-P1
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:39 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52893)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qI-0005nh-Ne
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:34 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qJ-0005pB-J4
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:35 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:08:47 -0400
-Message-Id: <1500520169-23367-2-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:02 -0400
+Message-Id: <1500520169-23367-17-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 01/43] cputlb: bring back tlb_flush_count
- under !TLB_DEBUG
+Subject: [Qemu-devel] [PATCH v3 16/43] target/m68k: check CF_PARALLEL
+ instead of parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,103 +27,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Commit f0aff0f124 ("cputlb: add assert_cpu_is_self checks") buried
-the increment of tlb_flush_count under TLB_DEBUG. This results in
-"info jit" always (mis)reporting 0 TLB flushes when !TLB_DEBUG.
+Thereby decoupling the resulting translated code from the current state
+of the system.
 
-Besides, under MTTCG tlb_flush_count is updated by several threads,
-so in order not to lose counts we'd either have to use atomic ops
-or distribute the counter, which is more scalable.
-
-This patch does the latter by embedding tlb_flush_count in CPUArchState.
-The global count is then easily obtained by iterating over the CPU list.
-
-Note that this change also requires updating the accessors to
-tlb_flush_count to use atomic_read/set whenever there may be conflicting
-accesses (as defined in C11) to it.
-
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/cpu-defs.h   |  1 +
- include/exec/cputlb.h     |  3 +--
- accel/tcg/cputlb.c        | 17 ++++++++++++++---
- accel/tcg/translate-all.c |  2 +-
- 4 files changed, 17 insertions(+), 6 deletions(-)
+ target/m68k/helper.h    |  1 +
+ target/m68k/op_helper.c | 33 ++++++++++++++++++++-------------
+ target/m68k/translate.c | 12 ++++++++++--
+ 3 files changed, 31 insertions(+), 15 deletions(-)
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index bc8e7f8..e43ff83 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -137,6 +137,7 @@ typedef struct CPUIOTLBEntry {
-     CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
-     CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
-     CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
-+    size_t tlb_flush_count;                                             \
-     target_ulong tlb_flush_addr;                                        \
-     target_ulong tlb_flush_mask;                                        \
-     target_ulong vtlb_index;                                            \
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index 3f94178..c91db21 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
-@@ -23,7 +23,6 @@
- /* cputlb.c */
- void tlb_protect_code(ram_addr_t ram_addr);
- void tlb_unprotect_code(ram_addr_t ram_addr);
--extern int tlb_flush_count;
--
-+size_t tlb_flush_count(void);
- #endif
- #endif
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 85635ae..9377110 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -92,8 +92,18 @@ static void flush_all_helper(CPUState *src, run_on_cpu_func fn,
-     }
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index 475a1f2..eebe52d 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -11,6 +11,7 @@ DEF_HELPER_2(set_sr, void, env, i32)
+ DEF_HELPER_3(movec, void, env, i32, i32)
+ DEF_HELPER_4(cas2w, void, env, i32, i32, i32)
+ DEF_HELPER_4(cas2l, void, env, i32, i32, i32)
++DEF_HELPER_4(cas2l_parallel, void, env, i32, i32, i32)
+ 
+ #define dh_alias_fp ptr
+ #define dh_ctype_fp FPReg *
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index 7b5126c..6308951 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -361,6 +361,7 @@ void HELPER(divsll)(CPUM68KState *env, int numr, int regr, int32_t den)
+     env->dregs[numr] = quot;
  }
  
--/* statistics */
--int tlb_flush_count;
-+size_t tlb_flush_count(void)
-+{
-+    CPUState *cpu;
-+    size_t count = 0;
-+
-+    CPU_FOREACH(cpu) {
-+        CPUArchState *env = cpu->env_ptr;
-+
-+        count += atomic_read(&env->tlb_flush_count);
-+    }
-+    return count;
-+}
++/* We're executing in a serial context -- no need to be atomic.  */
+ void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
+ {
+     uint32_t Dc1 = extract32(regs, 9, 3);
+@@ -374,17 +375,11 @@ void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
+     int16_t l1, l2;
+     uintptr_t ra = GETPC();
  
- /* This is OK because CPU architectures generally permit an
-  * implementation to drop entries from the TLB at any time, so
-@@ -112,7 +122,8 @@ static void tlb_flush_nocheck(CPUState *cpu)
+-    if (parallel_cpus) {
+-        /* Tell the main loop we need to serialize this insn.  */
+-        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+-    } else {
+-        /* We're executing in a serial context -- no need to be atomic.  */
+-        l1 = cpu_lduw_data_ra(env, a1, ra);
+-        l2 = cpu_lduw_data_ra(env, a2, ra);
+-        if (l1 == c1 && l2 == c2) {
+-            cpu_stw_data_ra(env, a1, u1, ra);
+-            cpu_stw_data_ra(env, a2, u2, ra);
+-        }
++    l1 = cpu_lduw_data_ra(env, a1, ra);
++    l2 = cpu_lduw_data_ra(env, a2, ra);
++    if (l1 == c1 && l2 == c2) {
++        cpu_stw_data_ra(env, a1, u1, ra);
++        cpu_stw_data_ra(env, a2, u2, ra);
      }
  
-     assert_cpu_is_self(cpu);
--    tlb_debug("(count: %d)\n", tlb_flush_count++);
-+    atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
-+    tlb_debug("(count: %zu)\n", tlb_flush_count());
+     if (c1 != l1) {
+@@ -399,7 +394,8 @@ void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
+     env->dregs[Dc2] = deposit32(env->dregs[Dc2], 0, 16, l2);
+ }
  
-     tb_lock();
+-void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
++static void do_cas2l(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2,
++                     bool parallel)
+ {
+     uint32_t Dc1 = extract32(regs, 9, 3);
+     uint32_t Dc2 = extract32(regs, 6, 3);
+@@ -416,7 +412,7 @@ void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
+     TCGMemOpIdx oi;
+ #endif
  
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 090ebad..3ee69e5 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1916,7 +1916,7 @@ void dump_exec_info(FILE *f, fprintf_function cpu_fprintf)
-             atomic_read(&tcg_ctx.tb_ctx.tb_flush_count));
-     cpu_fprintf(f, "TB invalidate count %d\n",
-             tcg_ctx.tb_ctx.tb_phys_invalidate_count);
--    cpu_fprintf(f, "TLB flush count     %d\n", tlb_flush_count);
-+    cpu_fprintf(f, "TLB flush count     %zu\n", tlb_flush_count());
-     tcg_dump_info(f, cpu_fprintf);
+-    if (parallel_cpus) {
++    if (parallel) {
+         /* We're executing in a parallel context -- must be atomic.  */
+ #ifdef CONFIG_ATOMIC64
+         uint64_t c, u, l;
+@@ -470,6 +466,17 @@ void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
+     env->dregs[Dc2] = l2;
+ }
  
-     tb_unlock();
++void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
++{
++    do_cas2l(env, regs, a1, a2, false);
++}
++
++void HELPER(cas2l_parallel)(CPUM68KState *env, uint32_t regs, uint32_t a1,
++                            uint32_t a2)
++{
++    do_cas2l(env, regs, a1, a2, true);
++}
++
+ struct bf_data {
+     uint32_t addr;
+     uint32_t bofs;
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 188520b..65044be 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2308,7 +2308,11 @@ DISAS_INSN(cas2w)
+                          (REG(ext1, 6) << 3) |
+                          (REG(ext2, 0) << 6) |
+                          (REG(ext1, 0) << 9));
+-    gen_helper_cas2w(cpu_env, regs, addr1, addr2);
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
++        gen_helper_exit_atomic(cpu_env);
++    } else {
++        gen_helper_cas2w(cpu_env, regs, addr1, addr2);
++    }
+     tcg_temp_free(regs);
+ 
+     /* Note that cas2w also assigned to env->cc_op.  */
+@@ -2354,7 +2358,11 @@ DISAS_INSN(cas2l)
+                          (REG(ext1, 6) << 3) |
+                          (REG(ext2, 0) << 6) |
+                          (REG(ext1, 0) << 9));
+-    gen_helper_cas2l(cpu_env, regs, addr1, addr2);
++    if (tb_cflags(s->tb) & CF_PARALLEL) {
++        gen_helper_cas2l_parallel(cpu_env, regs, addr1, addr2);
++    } else {
++        gen_helper_cas2l(cpu_env, regs, addr1, addr2);
++    }
+     tcg_temp_free(regs);
+ 
+     /* Note that cas2l also assigned to env->cc_op.  */
 -- 
 2.7.4
