@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dY7JX-000519-K4
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:00:08 -0400
+	(envelope-from <sf@sfritsch.de>) id 1dY7Mr-0006AF-6b
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dY7JT-0001ur-QR
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:00:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41764)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dY7JT-0001td-Kv
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:00:03 -0400
-Date: Thu, 20 Jul 2017 09:59:58 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170720085958.GC21566@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
+	(envelope-from <sf@sfritsch.de>) id 1dY7Mq-0004Kn-F7
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:33 -0400
+Received: from manul.sfritsch.de ([2a01:4f8:172:195f:112::2]:36992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sf@sfritsch.de>) id 1dY7Mq-0004KS-8n
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:03:32 -0400
+From: Stefan Fritsch <sf@sfritsch.de>
+Date: Thu, 20 Jul 2017 11:02:43 +0200
+Message-Id: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
+Subject: [Qemu-devel] [PATCH v2 0/8] usb-ccid: Misc fixes and T=1 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +21,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>
-Cc: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Jul 20, 2017 at 10:43:53AM +0800, =E9=99=B3=E5=9F=B9=E6=B3=93 wro=
-te:
-> Can I mount encrypt qcow2 file through qemu-nbd?
+From: Stefan Fritsch <stefan_fritsch@genua.de>
 
-What encryption format are you referring to ?  The old AES encrypt, or th=
-e
-new LUKS encrypt ? The latter is the only one people should be using, and
-you can expose it with
+Sorry, I have accidentally sent an old patchset that was missing one
+fix.
 
-   qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
-             --image-opts driver=3Dqcow2,file.filename=3Ddemo.qcow2,encry=
-pt.format=3Dluks,encrypt.key-secret=3Dsec0
+This set of changes contains fixes and extensions to allow to use ccid
+card passthru with a physical cardos smartcard using the T=1 protocol.
 
-Note that 'passwd.txt' file must *not* contain a newline. eg create it
-with   'echo -n 123456 > passwd.txt' - the -n flag to omit the newline
+Unfortunately, our vscard client program ist not public, therefore it
+is difficult for other people to test the functionality. But maybe you
+are still interested to include some bits of it in qemu?
 
-You should only do decrypt in qemu-nbd, if you are trying to interoperate
-with non-QEMU tools.  If you are exposing the NBD volume to a QEMU system
-emulator, you should make the NBD server expose the file as raw, and let
-the  QEMU client do the decryption instead, so data over the NBD socket
-is still secure.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+v2: Fix 'usb-ccid: Fix chaining fields in CCID USB messages' not
+    compiling.
+
+
+Stefan Fritsch (8):
+  usb-ccid: Add support to dump all USB packets
+  usb-ccid: Fix USB packet generation for 64-Bytes sized packets.
+  usb-ccid: Set protocol parameters based on card ATR
+  usb-ccid: Fix ATR parsing
+  usb-ccid: Fix USB descriptor
+  usb-ccid: Fix chaining fields in CCID USB messages
+  usb-ccid: Increase ccid max APDU size
+  usb-ccid: Reduce logging at level WARN
+
+ hw/usb/ccid-card-passthru.c   |  34 +++++++---
+ hw/usb/dev-smartcard-reader.c | 148 ++++++++++++++++++++++++++++++++----------
+ 2 files changed, 138 insertions(+), 44 deletions(-)
+
+-- 
+2.11.0
