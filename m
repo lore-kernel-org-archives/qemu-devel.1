@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dYGBC-0003EN-2j
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:28:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYGEe-0005GH-Dq
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dYGB7-0003FO-0H
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:28:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dYGB6-0003Ev-Pq
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:28:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C9B2C4A71A
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 18:27:59 +0000 (UTC)
-Date: Thu, 20 Jul 2017 15:27:53 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170720182753.GV2757@localhost.localdomain>
-References: <20170720162815.19802-1-ldoktor@redhat.com>
-	<20170720162815.19802-6-ldoktor@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dYGEd-0005Je-Gn
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:31:40 -0400
+References: <1500560441-5670-1-git-send-email-pl@kamp.de>
+	<1500560441-5670-2-git-send-email-pl@kamp.de>
+	<72303744-31bc-1c28-2d34-5926975b0b2d@redhat.com>
+	<2177e9ee-73c6-cc7d-76a4-e56749be5815@kamp.de>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <79e8a12e-8446-9031-46bb-0df32e2c22af@redhat.com>
+Date: Thu, 20 Jul 2017 13:31:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170720162815.19802-6-ldoktor@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/11] qemu.py: Use custom exceptions
- rather than Exception
+In-Reply-To: <2177e9ee-73c6-cc7d-76a4-e56749be5815@kamp.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xeSmbWTFgJ8gNKXKLVSN44mGo4lf3OvJ9"
+Subject: Re: [Qemu-devel] [PATCH V4 01/10] specs/qcow2: add compress format
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
-On Thu, Jul 20, 2017 at 06:28:09PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> The naked Exception should not be widely used. It makes sense to be a
-> bit more specific and use better-suited custom exceptions. As a benefit
-> we can store the full reply in the exception in case someone needs it
-> when catching the exception.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xeSmbWTFgJ8gNKXKLVSN44mGo4lf3OvJ9
+From: Eric Blake <eblake@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
+ den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+Message-ID: <79e8a12e-8446-9031-46bb-0df32e2c22af@redhat.com>
+Subject: Re: [PATCH V4 01/10] specs/qcow2: add compress format extension
+References: <1500560441-5670-1-git-send-email-pl@kamp.de>
+ <1500560441-5670-2-git-send-email-pl@kamp.de>
+ <72303744-31bc-1c28-2d34-5926975b0b2d@redhat.com>
+ <2177e9ee-73c6-cc7d-76a4-e56749be5815@kamp.de>
+In-Reply-To: <2177e9ee-73c6-cc7d-76a4-e56749be5815@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/20/2017 11:26 AM, Peter Lieven wrote:
+>> I haven't yet checked your code implementation to see where you are
+>> setting window sizes, to know if window size is something that should =
+be
+>> a tunable in the file format.
+>>
+> You don't have to know the window size that was used. The docs of zlib
 >=20
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> ---
->  scripts/qemu.py | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
+> just say, that the windowSize specified at inflate must be greater or e=
+qual
 >=20
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 5948e19..2bd522f 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -19,6 +19,19 @@ import subprocess
->  import qmp.qmp
-> =20
-> =20
-> +class MonitorResponseError(qmp.qmp.QMPError):
-> +    '''
-> +    Represents erroneous QMP monitor reply
-> +    '''
-> +    def __init__(self, reply):
-> +        try:
-> +            desc =3D reply["error"]["desc"]
-> +        except KeyError:
-> +            desc =3D reply
-> +        super(MonitorResponseError, self).__init__(desc)
-> +        self.reply =3D reply
-
-This would require every user of self.reply to first check if
-it's a string or dictionary.  All because of the "Monitor is
-closed" case below:
-
-> +
-> +
->  class QEMUMachine(object):
->      '''A QEMU VM'''
-> =20
-> @@ -197,9 +210,9 @@ class QEMUMachine(object):
->          '''
->          reply =3D self.qmp(cmd, conv_keys, **args)
->          if reply is None:
-> -            raise Exception("Monitor is closed")
-> +            raise qmp.qmp.QMPError("Monitor is closed")
-
-Should we really use the same exception type for this, if it's
-not really a QMP monitor error reply, and won't even have a real
-QMP reply in self.reply?
-
-
->          if "error" in reply:
-> -            raise Exception(reply["error"]["desc"])
-> +            raise MonitorResponseError(reply)
->          return reply["return"]
-> =20
->      def get_qmp_event(self, wait=3DFalse):
-> --=20
-> 2.9.4
+> to the one used at deflate. So if we change the code to use 15 we can s=
+afely
 >=20
+> decompress old clusters that where compressed with 12.
+
+Then you DO have to know the window size.  If I write my own qcow2
+parser, and don't know what size you picked on compression, then how do
+I know that the size I pick is >=3D your size during my decompression?
+
+Even if you DON'T want size to be a tunable (and I'm on the fence on
+that one), you STILL need the spec to state that for maximum
+compatibility, when the incompatible feature is off, implementations
+MUST use window size 12 for compression; and that when the compression
+extension is used, implementations MUST use window size 15.
+
+Or, by having window size be a tunable in the extension header allows
+implementations to record window size, then you allow implemenations to
+explicitly KNOW what window size they must meet or exceed.
 
 --=20
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--xeSmbWTFgJ8gNKXKLVSN44mGo4lf3OvJ9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllw9v8ACgkQp6FrSiUn
+Q2pXeQf+Iot3N9Z5ipuAVeAoYvtxdPT32GdWG8lmTdxrYRbJIV7TFChFwp9jfKek
+Nw2tsK9YYczh5KS43r8EQ35D+/yw4Sqai4Xm8pE2MxQogZ+ooMW9TndYAakcBZSo
+K0Q23TjAaD+N1JiE9mNq4NmsOkLI5lfPOnTJ5HjxYML8R6MNhRyQsqtRu1dpXdB0
+5qSgQr86NGuEO5oHGAHTl6dY9GnfmBWGnOcmj3zjaH6iQxdjRcxCvLL0uwBBjzZS
+FtkHsdL3PQxJC0b34wuF5rJro4ogKrcfygEo38ZzreC+v5t4rNk325wgLGOMzBIc
+A+KzLwUUA0MCq6V4wIfkxUQgp5wcJw==
+=DABz
+-----END PGP SIGNATURE-----
+
+--xeSmbWTFgJ8gNKXKLVSN44mGo4lf3OvJ9--
