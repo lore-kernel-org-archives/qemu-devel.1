@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dY7rO-0005Vp-Or
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:35:07 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dY7rY-0005eM-GY
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:35:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dY7rJ-00045m-SM
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:35:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dY7rJ-000459-Lq
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:35:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62455C04D2A4
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:35:00 +0000 (UTC)
-Date: Thu, 20 Jul 2017 17:34:55 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170720093455.GC23385@pxdev.xzpeter.org>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-10-quintela@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dY7rX-0004Jj-0m
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:35:16 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dY7rW-0004IP-Kk
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:35:14 -0400
+Received: by mail-lf0-x244.google.com with SMTP id p11so1281522lfd.1
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 02:35:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-10-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 09/17] migration: Start of multiple fd
- work
+References: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
+	<1500541371-24788-4-git-send-email-sf@sfritsch.de>
+In-Reply-To: <1500541371-24788-4-git-send-email-sf@sfritsch.de>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 20 Jul 2017 09:35:02 +0000
+Message-ID: <CAJ+F1CK3zYyFFm7b7PnNq7GYwMXGmO=cvdPWUOitboWdeGtsXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/8] usb-ccid: Set protocol parameters
+ based on card ATR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +31,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, berrange@redhat.com
+To: Stefan Fritsch <sf@sfritsch.de>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Jul 17, 2017 at 03:42:30PM +0200, Juan Quintela wrote:
+On Thu, Jul 20, 2017 at 11:11 AM Stefan Fritsch <sf@sfritsch.de> wrote:
 
-[...]
-
->  int multifd_load_setup(void)
->  {
->      int thread_count;
-> -    uint8_t i;
->  
->      if (!migrate_use_multifd()) {
->          return 0;
+> From: Stefan Fritsch <stefan_fritsch@genua.de>
+>
+> For the ATR interface bytes encoding see ISO/IEC 7816-3. For the
+> interpretation of the protocol parameter block see the CCID
+> specification.
+>
+> - Values that are not present in the ATR default to zero.
+> - TA_1 is used to fill bmFindexDindex.
+> - The high nibble of bmTCCKST0 must be the protocol (T=3D0 or T=3D1).
+> - For T=3D0 the bWaitingInteger can be found in the global byte TC_2,
+>   for T=3D1 the waiting integer is in TB_3 and bIFSC is in TA_3.
+>
+> Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
+> Signed-off-by: Christian Ehrhardt <christian_ehrhardt@genua.de>
+> ---
+>  hw/usb/dev-smartcard-reader.c | 66
+> +++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 54 insertions(+), 12 deletions(-)
+>
+> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
+c
+> index 49791492ea..769949144b 100644
+> --- a/hw/usb/dev-smartcard-reader.c
+> +++ b/hw/usb/dev-smartcard-reader.c
+> @@ -801,7 +801,7 @@ static void ccid_write_parameters(USBCCIDState *s,
+> CCID_Header *recv)
+>          return;
 >      }
->      thread_count = migrate_multifd_threads();
->      multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
-> -    multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
-> +    multifd_recv_state->params = g_new0(MultiFDRecvParams *, thread_count);
->      multifd_recv_state->count = 0;
-> -    for (i = 0; i < thread_count; i++) {
-> -        char thread_name[16];
-> -        MultiFDRecvParams *p = &multifd_recv_state->params[i];
-> -
-> -        qemu_mutex_init(&p->mutex);
-> -        qemu_sem_init(&p->sem, 0);
-> -        p->quit = false;
-> -        p->id = i;
-> -        snprintf(thread_name, sizeof(thread_name), "multifdrecv_%d", i);
-> -        qemu_thread_create(&p->thread, thread_name, multifd_recv_thread, p,
-> -                           QEMU_THREAD_JOINABLE);
-> -        multifd_recv_state->count++;
-> -    }
+>      h->b.hdr.bMessageType =3D CCID_MESSAGE_TYPE_RDR_to_PC_Parameters;
+> -    h->b.hdr.dwLength =3D 0;
+> +    h->b.hdr.dwLength =3D (s->bProtocolNum =3D=3D 1) ? 7 : 5;
+>      h->b.hdr.bSlot =3D recv->bSlot;
+>      h->b.hdr.bSeq =3D recv->bSeq;
+>      h->b.bStatus =3D ccid_calc_status(s);
+> @@ -871,6 +871,49 @@ static uint8_t atr_get_protocol_num(const uint8_t
+> *atr, uint32_t len)
+>      return atr[i] & 0x0f;
+>  }
+>
+> +/*
+> + * Get a specific interface byte TX_y (X=3D'A'..'D' y=3D1..3)
+> + * See ISO/IEC 7816-3:2006 Chapter 8 for details.
+> + */
+> +static uint8_t atr_get_TXY(const uint8_t *atr, uint32_t len, char x, int
+> y)
+> +{
+> +    int pos;
+> +    uint8_t t0, ti, i;
+> +
+> +    if (x < 'A' || x > 'D') {
+> +        return 0;
+> +    }
+>
 
-Could I ask why we explicitly switched from MultiFDRecvParams[] array
-into a pointer array? Can we still use the old array?  Thanks,
+or you could assert it, since it's compile time constant
 
--- 
-Peter Xu
+(I have vague memories of parsing ATR, but the rest looks ok, it might be
+worth to include tests for that function though)
+
+
+> +    x -=3D 'A';
+> +
+> +    if (len < 2) {
+> +        return 0;
+> +    }
+> +    t0 =3D atr[1] >> 4;
+> +    pos =3D 2;
+> +    ti =3D 1;
+> +    /* Skip TA_i..TD_i if present while not at requested index y */
+> +    while (ti < y) {
+> +        pos +=3D !!(t0 & 0x01) + !!(t0 & 0x02) + !!(t0 & 0x04);
+> +        if (pos >=3D len || !(t0 & 0x08)) {
+> +            return 0;
+> +        }
+> +        t0 =3D atr[pos++] >> 4;
+> +        ti++;
+> +    }
+> +    if (!(t0 & 0x01 << x)) {
+> +        return 0;
+> +    }
+> +    for (i =3D 0; i < x; ++i) {
+> +        if (t0 & (1 << i)) {
+> +            pos++;
+> +        }
+> +    }
+> +    if (pos >=3D len) {
+> +        return 0;
+> +    }
+> +    return atr[pos];
+> +}
+> +
+>  static void ccid_write_data_block_atr(USBCCIDState *s, CCID_Header *recv=
+)
+>  {
+>      const uint8_t *atr =3D NULL;
+> @@ -890,21 +933,20 @@ static void ccid_write_data_block_atr(USBCCIDState
+> *s, CCID_Header *recv)
+>                                               : s->bProtocolNum);
+>      switch (atr_protocol_num) {
+>      case 0:
+> -        /* TODO: unimplemented ATR T0 parameters */
+> -        t0->bmFindexDindex =3D 0;
+> -        t0->bmTCCKST0 =3D 0;
+> +        t0->bmFindexDindex =3D atr_get_TXY(atr, len, 'A', 1);
+> +        t0->bmTCCKST0 =3D 0;      /* T0 */
+>          t0->bGuardTimeT0 =3D 0;
+> -        t0->bWaitingIntegerT0 =3D 0;
+> +        t0->bWaitingIntegerT0 =3D atr_get_TXY(atr, len, 'C', 2);
+>          t0->bClockStop =3D 0;
+>          break;
+>      case 1:
+> -        /* TODO: unimplemented ATR T1 parameters */
+> -        t1->bmFindexDindex =3D 0;
+> -        t1->bmTCCKST1 =3D 0;
+> -        t1->bGuardTimeT1 =3D 0;
+> -        t1->bWaitingIntegerT1 =3D 0;
+> -        t1->bClockStop =3D 0;
+> -        t1->bIFSC =3D 0;
+> +        /* NOTE: If present TD2 should specify protocl T=3D1 */
+> +        t1->bmFindexDindex =3D atr_get_TXY(atr, len, 'A', 1);
+> +        t1->bmTCCKST1 =3D 0x10;   /* T1 */
+> +        t1->bGuardTimeT1 =3D atr_get_TXY(atr, len, 'C', 1);
+> +        t1->bWaitingIntegerT1 =3D atr_get_TXY(atr, len, 'B', 3);
+> +        t1->bClockStop =3D 0x00;
+> +        t1->bIFSC =3D atr_get_TXY(atr, len, 'A', 3);
+>          t1->bNadValue =3D 0;
+>          break;
+>      default:
+> --
+> 2.11.0
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
