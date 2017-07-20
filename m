@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dYETP-0005xL-Bq
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:38:48 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dYEV1-0007kE-JU
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:40:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dYETM-0002iy-5U
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:38:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47002)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dYETL-0002ih-SH
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:38:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0044C0467DA
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:29:30 +0000 (UTC)
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Thu, 20 Jul 2017 18:28:10 +0200
-Message-Id: <20170720162815.19802-7-ldoktor@redhat.com>
-In-Reply-To: <20170720162815.19802-1-ldoktor@redhat.com>
-References: <20170720162815.19802-1-ldoktor@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <programmingkidx@gmail.com>) id 1dYEUy-0003ed-EL
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:40:27 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:37200)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dYEUy-0003eT-9M
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:40:24 -0400
+Received: by mail-it0-x242.google.com with SMTP id j81so2215386ita.4
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:40:24 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/11] qmp.py: Couple of pylint/style fixes
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Message-Id: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+Date: Thu, 20 Jul 2017 12:40:20 -0400
+Subject: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84 breaks
+ Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,157 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ldoktor@redhat.com, apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, ehabkost@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, ehabkost@redhat.com, phil@philjordan.eu
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-No actual code changes, just a few pylint/style fixes and docstring
-clarifications.
+I noticed that Windows 2000 does not boot up in QEMU recently. After =
+bisecting the issue I found the offending commit:
 
-Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
----
- scripts/qmp/qmp.py | 37 ++++++++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 13 deletions(-)
+commit 77af8a2b95b79699de650965d5228772743efe84
+Author: Phil Dennis-Jordan <phil@philjordan.eu>
+Date:   Wed Mar 15 19:20:26 2017 +1300
 
-diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index 62d3651..bb4d614 100644
---- a/scripts/qmp/qmp.py
-+++ b/scripts/qmp/qmp.py
-@@ -13,19 +13,30 @@ import errno
- import socket
- import sys
-=20
-+
- class QMPError(Exception):
-     pass
-=20
-+
- class QMPConnectError(QMPError):
-     pass
-=20
-+
- class QMPCapabilitiesError(QMPError):
-     pass
-=20
-+
- class QMPTimeoutError(QMPError):
-     pass
-=20
-+
- class QEMUMonitorProtocol:
-+
-+    #: Socket's error class
-+    error =3D socket.error
-+    #: Socket's timeout
-+    timeout =3D socket.timeout
-+
-     def __init__(self, address, server=3DFalse, debug=3DFalse):
-         """
-         Create a QEMUMonitorProtocol class.
-@@ -42,6 +53,7 @@ class QEMUMonitorProtocol:
-         self.__address =3D address
-         self._debug =3D debug
-         self.__sock =3D self.__get_sock()
-+        self.__sockfile =3D None
-         if server:
-             self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADD=
-R, 1)
-             self.__sock.bind(self.__address)
-@@ -56,7 +68,7 @@ class QEMUMonitorProtocol:
-=20
-     def __negotiate_capabilities(self):
-         greeting =3D self.__json_read()
--        if greeting is None or not greeting.has_key('QMP'):
-+        if greeting is None or "QMP" not in greeting:
-             raise QMPConnectError
-         # Greeting seems ok, negotiate capabilities
-         resp =3D self.cmd('qmp_capabilities')
-@@ -78,8 +90,6 @@ class QEMUMonitorProtocol:
-                     continue
-             return resp
-=20
--    error =3D socket.error
--
-     def __get_events(self, wait=3DFalse):
-         """
-         Check for new events in the stream and cache them in __events.
-@@ -89,8 +99,8 @@ class QEMUMonitorProtocol:
-=20
-         @raise QMPTimeoutError: If a timeout float is provided and the t=
-imeout
-                                 period elapses.
--        @raise QMPConnectError: If wait is True but no events could be r=
-etrieved
--                                or if some other error occurred.
-+        @raise QMPConnectError: If wait is True but no events could be
-+                                retrieved or if some other error occurre=
-d.
-         """
-=20
-         # Check for new events regardless and pull them into the cache:
-@@ -175,7 +185,7 @@ class QEMUMonitorProtocol:
-         @param args: command arguments (dict)
-         @param id: command id (dict, list, string or int)
-         """
--        qmp_cmd =3D { 'execute': name }
-+        qmp_cmd =3D {'execute': name}
-         if args:
-             qmp_cmd['arguments'] =3D args
-         if id:
-@@ -183,6 +193,9 @@ class QEMUMonitorProtocol:
-         return self.cmd_obj(qmp_cmd)
-=20
-     def command(self, cmd, **kwds):
-+        """
-+        Build and send a QMP command to the monitor, report errors when =
-any
-+        """
-         ret =3D self.cmd(cmd, kwds)
-         if ret.has_key('error'):
-             raise Exception(ret['error']['desc'])
-@@ -190,15 +203,15 @@ class QEMUMonitorProtocol:
-=20
-     def pull_event(self, wait=3DFalse):
-         """
--        Get and delete the first available QMP event.
-+        Get and pop the first available QMP event.
-=20
-         @param wait (bool): block until an event is available.
-         @param wait (float): If wait is a float, treat it as a timeout v=
-alue.
-=20
-         @raise QMPTimeoutError: If a timeout float is provided and the t=
-imeout
-                                 period elapses.
--        @raise QMPConnectError: If wait is True but no events could be r=
-etrieved
--                                or if some other error occurred.
-+        @raise QMPConnectError: If wait is True but no events could be
-+                                retrieved or if some other error occurre=
-d.
-=20
-         @return The first available QMP event, or None.
-         """
-@@ -217,8 +230,8 @@ class QEMUMonitorProtocol:
-=20
-         @raise QMPTimeoutError: If a timeout float is provided and the t=
-imeout
-                                 period elapses.
--        @raise QMPConnectError: If wait is True but no events could be r=
-etrieved
--                                or if some other error occurred.
-+        @raise QMPConnectError: If wait is True but no events could be
-+                                retrieved or if some other error occurre=
-d.
-=20
-         @return The list of available QMP events.
-         """
-@@ -235,8 +248,6 @@ class QEMUMonitorProtocol:
-         self.__sock.close()
-         self.__sockfile.close()
-=20
--    timeout =3D socket.timeout
--
-     def settimeout(self, timeout):
-         self.__sock.settimeout(timeout)
-=20
---=20
-2.9.4
+    hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest =
+OS support.
+   =20
+    This updates the FADT generated for x86/64 machine types from =
+Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The =
+intention is to expose the reset register information to guest operating =
+systems which require it, specifically OS X/macOS. Revision 1 FADTs do =
+not contain the fields relating to the reset register.
+   =20
+    The new layout and contents remains backwards-compatible with =
+operating systems which only support ACPI 1.0, as the existing fields =
+are not modified by this change, as the 64-bit and 32-bit variants are =
+allowed to co-exist according to the ACPI 2.0 standard. No regressions =
+became apparent in tests with a range of Windows (XP-10) and Linux =
+versions.
+   =20
+    The BIOS tables test suite's FADT checksum test has also been =
+updated to reflect the new FADT layout and content.
+   =20
+    Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+    Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+:040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 =
+6d2a94150cf1eafb16f0ccf6325281415fef64a6 M	hw
+:040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d =
+68f9368d8d78fd3267f609b603f97e8a74bdf528 M	include
+:040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff =
+8ed08cef10fddee7814e38ad62be11371592a75a M	tests
