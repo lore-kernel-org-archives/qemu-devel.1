@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qM-00016H-9a
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:42 -0400
+	(envelope-from <cota@braap.org>) id 1dY1qP-00016l-5z
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dY1qI-0005oW-Vk
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:38 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:34925)
+	(envelope-from <cota@braap.org>) id 1dY1qL-0005sI-5L
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:41 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:55933)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qI-0005no-NE
-	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:34 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dY1qL-0005rv-1g
+	for qemu-devel@nongnu.org; Wed, 19 Jul 2017 23:09:37 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Wed, 19 Jul 2017 23:08:48 -0400
-Message-Id: <1500520169-23367-3-git-send-email-cota@braap.org>
+Date: Wed, 19 Jul 2017 23:09:14 -0400
+Message-Id: <1500520169-23367-29-git-send-email-cota@braap.org>
 In-Reply-To: <1500520169-23367-1-git-send-email-cota@braap.org>
 References: <1500520169-23367-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 02/43] tcg: fix corruption of code_time
- profiling counter upon tb_flush
+Subject: [Qemu-devel] [PATCH v3 28/43] exec-all: rename tb_free to tb_remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +29,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>
 
-Whenever there is an overflow in code_gen_buffer (e.g. we run out
-of space in it and have to flush it), the code_time profiling counter
-ends up with an invalid value (that is, code_time -= profile_getclock(),
-without later on getting += profile_getclock() due to the goto).
+We don't really free anything in this function anymore; we just remove
+the TB from the binary search tree.
 
-Fix it by using the ti variable, so that we only update code_time
-when there is no overflow. Note that in case there is an overflow
-we fail to account for the elapsed coding time, but this is quite rare
-so we can probably live with it.
-
-"info jit" before/after, roughly at the same time during debian-arm bootup:
-
-- before:
-Statistics:
-TB flush count      1
-TB invalidate count 4665
-TLB flush count     998
-JIT cycles          -615191529184601 (-256329.804 s at 2.4 GHz)
-translated TBs      302310 (aborted=0 0.0%)
-avg ops/TB          48.4 max=438
-deleted ops/TB      8.54
-avg temps/TB        32.31 max=38
-avg host code/TB    361.5
-avg search data/TB  24.5
-cycles/op           -42014693.0
-cycles/in byte      -121444900.2
-cycles/out byte     -5629031.1
-cycles/search byte     -83114481.0
-  gen_interm time   -0.0%
-  gen_code time     100.0%
-optim./code time    -0.0%
-liveness/code time  -0.0%
-cpu_restore count   6236
-  avg cycles        110.4
-
-- after:
-Statistics:
-TB flush count      1
-TB invalidate count 4665
-TLB flush count     1010
-JIT cycles          1996899624 (0.832 s at 2.4 GHz)
-translated TBs      297961 (aborted=0 0.0%)
-avg ops/TB          48.5 max=438
-deleted ops/TB      8.56
-avg temps/TB        32.31 max=38
-avg host code/TB    361.8
-avg search data/TB  24.5
-cycles/op           138.2
-cycles/in byte      398.4
-cycles/out byte     18.5
-cycles/search byte     273.1
-  gen_interm time   14.0%
-  gen_code time     86.0%
-optim./code time    19.4%
-liveness/code time  10.3%
-cpu_restore count   6372
-  avg cycles        111.0
-
+Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/exec/exec-all.h   | 2 +-
+ accel/tcg/cpu-exec.c      | 2 +-
+ accel/tcg/translate-all.c | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index eb3eb7b..7bc2050 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -428,7 +428,7 @@ static inline uint32_t curr_cflags(void)
+     return parallel_cpus ? CF_PARALLEL : 0;
+ }
+ 
+-void tb_free(TranslationBlock *tb);
++void tb_remove(TranslationBlock *tb);
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index cb1e6d3..1963bda 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -218,7 +218,7 @@ static void cpu_exec_nocache(CPUState *cpu, int max_cycles,
+ 
+     tb_lock();
+     tb_phys_invalidate(tb, -1);
+-    tb_free(tb);
++    tb_remove(tb);
+     tb_unlock();
+ }
+ #endif
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 3ee69e5..63f8538 100644
+index cb71aef..448f13b 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -1300,7 +1300,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
- #ifdef CONFIG_PROFILER
-     tcg_ctx.tb_count++;
-     tcg_ctx.interm_time += profile_getclock() - ti;
--    tcg_ctx.code_time -= profile_getclock();
-+    ti = profile_getclock();
- #endif
- 
-     /* ??? Overflow could be handled better here.  In particular, we
-@@ -1318,7 +1318,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+@@ -375,7 +375,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
+         if (tb->cflags & CF_NOCACHE) {
+             /* one-shot translation, invalidate it immediately */
+             tb_phys_invalidate(tb, -1);
+-            tb_free(tb);
++            tb_remove(tb);
+         }
+         r = true;
      }
+@@ -874,7 +874,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+ }
  
- #ifdef CONFIG_PROFILER
--    tcg_ctx.code_time += profile_getclock();
-+    tcg_ctx.code_time += profile_getclock() - ti;
-     tcg_ctx.code_in_len += tb->size;
-     tcg_ctx.code_out_len += gen_code_size;
-     tcg_ctx.search_out_len += search_size;
+ /* Called with tb_lock held.  */
+-void tb_free(TranslationBlock *tb)
++void tb_remove(TranslationBlock *tb)
+ {
+     assert_tb_locked();
+ 
+@@ -1809,7 +1809,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+              * cpu_exec_nocache() */
+             tb_phys_invalidate(tb->orig_tb, -1);
+         }
+-        tb_free(tb);
++        tb_remove(tb);
+     }
+     /* FIXME: In theory this could raise an exception.  In practice
+        we have already translated the block once so it's probably ok.  */
 -- 
 2.7.4
