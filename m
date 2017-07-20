@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYB4z-0002h4-R8
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:02:46 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dYB9I-0004VG-Il
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:05:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dYB4s-0006SB-H6
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:01:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dYB4s-0006R9-8m
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:01:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dYB4q-0004um-SX
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 13:01:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0AD9E2E80CD
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 13:01:12 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1dYB9F-0000uZ-Q9
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:05:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dYB9F-0000u2-Fz
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 09:05:45 -0400
+Date: Thu, 20 Jul 2017 15:05:37 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170720150537.1bf00f96@gondolin>
+In-Reply-To: <1500550051-7821-2-git-send-email-borntraeger@de.ibm.com>
+References: <1500550051-7821-1-git-send-email-borntraeger@de.ibm.com>
+	<1500550051-7821-2-git-send-email-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Jul 2017 12:52:25 -0000
-From: Thomas Huth <1703795@bugs.launchpad.net>
-Reply-To: Bug 1703795 <1703795@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149985188503.15456.11517595781983565935.malonedeb@wampee.canonical.com>
-Message-Id: <150055514546.6612.14464181789377878813.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1703795] Re: Unable to release mouse in SDL2 mode
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390/cpumodel: remove KSS from the
+ default model of z14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Which version of SDL2 are you using? Could you please try to reproduce
-it with the latest version to see whether the problem has been fixed
-there?
+On Thu, 20 Jul 2017 13:27:31 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
--- =
+> The SIE_KSS feature will allow a guest to use KSS for a nested guest.
+> To create a nested guest the SIE_F2 facility is still necessary.
+> Since SIE_F2 is not part of the default model it does not make
+> a lot of sense to provide the SIE_KSS feature in the default model.
+> Let's also create a dependency check.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.vnet.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+> ---
+>  target/s390x/cpu_models.c   | 1 +
+>  target/s390x/gen-features.c | 1 -
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1703795
+I can either queue this; or, if you want to push this out as a fixup,
+feel free to add
 
-Title:
-  Unable to release mouse in SDL2 mode
-
-Status in QEMU:
-  New
-
-Bug description:
-  Starting with commit 8f4ea9cd0b770dbe496d9d24f0ef8813fdbfe0d0 "sdl:
-  prefer sdl2 over sdl1", I can no longer release mouse pointer grab
-  unless I use --with-sdlabi=3D1.2 configure option.
-
-  This easily reproduces in e.g. guest Kubuntu, when I let it start Xorg
-  and then click into the QEMU window. After this the mouse is trapped
-  and no matter how I combine Ctrl+Alt and motion of the cursor, the
-  pointer never goes out from the window. When at the border, QEMU
-  window switches from "Press Ctrl+Alt to exit grab" to "QEMU", i.e. it
-  thinks that it has released the grab. But it hasn't really, so I have
-  to go to VT1 and do "pkill qemu" from there to get my pointer back.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1703795/+subscriptions
+Acked-by: Cornelia Huck <cohuck@redhat.com>
