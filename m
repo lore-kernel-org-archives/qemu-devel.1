@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYGzT-0004d9-1y
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:20:04 -0400
+	(envelope-from <lists@philjordan.eu>) id 1dYH94-0000ay-Hl
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYGzR-0003q8-R8
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:20:03 -0400
-References: <1500560441-5670-1-git-send-email-pl@kamp.de>
-	<1500560441-5670-9-git-send-email-pl@kamp.de>
-	<6c67ca5d-56be-548b-8854-5891818c4217@redhat.com>
-	<8b0c6cba-3a8e-62dd-35af-46dc05420ec7@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6a336b66-1fe9-cc1f-414c-75852c65d04d@redhat.com>
-Date: Thu, 20 Jul 2017 14:19:52 -0500
+	(envelope-from <lists@philjordan.eu>) id 1dYH93-0004Uq-Gc
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:29:58 -0400
+Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:36374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lists@philjordan.eu>) id 1dYH93-0004PI-8A
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:29:57 -0400
+Received: by mail-ua0-x22f.google.com with SMTP id 35so30786420uax.3
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:29:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8b0c6cba-3a8e-62dd-35af-46dc05420ec7@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="39bWIvGtxtqA7sAi9BAqf7MxJ3HW3r3xc"
-Subject: Re: [Qemu-devel] [PATCH V4 08/10] block/qcow2: start using the
- compress format extension
+In-Reply-To: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
+From: Phil Dennis-Jordan <lists@philjordan.eu>
+Date: Thu, 20 Jul 2017 21:29:33 +0200
+Message-ID: <CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
+ breaks Windows 2000 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,121 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, ehabkost@redhat.com, Phil Dennis-Jordan <phil@philjordan.eu>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---39bWIvGtxtqA7sAi9BAqf7MxJ3HW3r3xc
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, lersek@redhat.com,
- den@openvz.org, mreitz@redhat.com, berrange@redhat.com
-Message-ID: <6a336b66-1fe9-cc1f-414c-75852c65d04d@redhat.com>
-Subject: Re: [PATCH V4 08/10] block/qcow2: start using the compress format
- extension
-References: <1500560441-5670-1-git-send-email-pl@kamp.de>
- <1500560441-5670-9-git-send-email-pl@kamp.de>
- <6c67ca5d-56be-548b-8854-5891818c4217@redhat.com>
- <8b0c6cba-3a8e-62dd-35af-46dc05420ec7@kamp.de>
-In-Reply-To: <8b0c6cba-3a8e-62dd-35af-46dc05420ec7@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
+<programmingkidx@gmail.com> wrote:
+> I noticed that Windows 2000 does not boot up in QEMU recently. After bise=
+cting the issue I found the offending commit:
 
-On 07/20/2017 11:30 AM, Peter Lieven wrote:
+Ouch. I reckon we have 2 options for fixing this:
 
->> The new code is now unconditionally initializing with -15 instead of
->> -12.  Does that matter, or does decompression work regardless of windo=
-w
->> size used at creation, as long as the initialized size at decompressio=
-n
->> is at least as large?  On the other hand, I guess that means if someon=
-e
->> compresses with a large window, and then I initialize the decompressor=
+1. Export two FADTs, one ACPI 1.0, one ACPI 2.0. The latter would need
+to be pointed to by an XSDT, which Qemu currently doesn't implement at
+all as far as I'm aware. Any ideas on how SeaBIOS or OVMF would handle
+this? Any likely other OS regressions?
 
->> with a small window, my decompression will fail?  That's why knowing t=
-he
->> minimum window size should be part of the spec, whether or not we make=
+2. Select FADT version with an option. This one is definitely safe,
+but adds yet another option.
 
->> it a tunable.
->=20
-> The decompression is supposed to fail if you compress with 15 and
-> decompress with 12. In fact it doesn't.
-
-Actually, I think (this is my guess here, not actual researched fact)
-that the decompression error is possible ONLY if compression produced a
-symbol that actually required more than 12 bits of memory - to get that
-large of a symbol, you need to compress a lot of bits.  For our default
-cluster of 64k, it might very well be that you rarely, if ever,
-encounter a single cluster that compresses differently under window size
-15 than it did under window size 12 (other than perhaps the speed at
-which compression took place), because there simply wasn't enough
-content to reach the point where you needed a symbol in the compression
-stream using more than 12 bits.  So in that case, compressing under 15
-and decompressing under 12 doesn't hit the error.  But as you get larger
-cluster sizes (2M clusters), or perhaps if you pass particularly nasty
-sequences of input to compression (I'm not sure what sequences would
-have the right properties), then you do indeed result in a compression
-stream that starts to encounter symbols exceeding the window size.
-
-But if my guess is right, then don't read the docs as "decompression
-will fail", but rather as "decompression may fail" if you set the
-decompress window smaller than the compression window.
-
-> I would like to avoid the windowBits in the qcow2 header as it makes
->=20
-> the code to read and write it more complicated. If you don't like the c=
-hange
->=20
-> of the windowBits we can even stick with 12. If someone wants fast comp=
-ression
->=20
-> he will likely not use zlib at all and use lzo.
-
-Also, note that historically, 'compress -b N' has allowed tuning the
-window size; current POSIX states that compress only has to support
-windows from 9 to 14, but permits implementations to use up to 16 (and
-future POSIX is considering improving the compress utility to require
-support for 16 as the window size, https://posix.rhansen.org/p/bug1041).
- I don't know why gzip didn't expose a '-b N' windowsize parameter the
-way compress did, but it sounds like the same thing.
-
->=20
-> I just changed the windowBits to 15 as it increases speed and improves =
-compression.
-
-Does windowBits 16 make any difference?
-
->=20
-> (likely at the cost of memory during compression/decompression)
->=20
->=20
-> Peter
->=20
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thoughts?
 
 
---39bWIvGtxtqA7sAi9BAqf7MxJ3HW3r3xc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllxAlgACgkQp6FrSiUn
-Q2pYPQf/SFyXuUpPrnf4RZie/AM7iUhXQJDNWSyWrkSpafe8/nuMdBba80wpU5HL
-6fV9k8BXIM/yMOcZOlpYTsuwUmc0OHB9JFR4IecQcdqDVsnznCJn+3tGPDBWuhjK
-/uVB8l5s9LvtNZrZxuudn+pwD0sc0Ag1jr5pzuypldgYuZD8Y6E1N9FsvAE28ksE
-PGM9boJoN6cLV0sDlnCBXdy2XeTdTuTLjOTOmZ1lkg8Z4dJ9KIhrvQqooyEwag4Z
-vdgyfJM3lCPmUYR+m+1T6PB6JEFFrVl7pp5N2tOzsHRY5lSsoQDUK9nByXH0W1Wq
-MQ5nQWaCWfWFZ/u4uNAHp/EI6BxSTw==
-=4zmK
------END PGP SIGNATURE-----
-
---39bWIvGtxtqA7sAi9BAqf7MxJ3HW3r3xc--
+> commit 77af8a2b95b79699de650965d5228772743efe84
+> Author: Phil Dennis-Jordan <phil@philjordan.eu>
+> Date:   Wed Mar 15 19:20:26 2017 +1300
+>
+>     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS=
+ support.
+>
+>     This updates the FADT generated for x86/64 machine types from Revisio=
+n 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is to e=
+xpose the reset register information to guest operating systems which requi=
+re it, specifically OS X/macOS. Revision 1 FADTs do not contain the fields =
+relating to the reset register.
+>
+>     The new layout and contents remains backwards-compatible with operati=
+ng systems which only support ACPI 1.0, as the existing fields are not modi=
+fied by this change, as the 64-bit and 32-bit variants are allowed to co-ex=
+ist according to the ACPI 2.0 standard. No regressions became apparent in t=
+ests with a range of Windows (XP-10) and Linux versions.
+>
+>     The BIOS tables test suite's FADT checksum test has also been updated=
+ to reflect the new FADT layout and content.
+>
+>     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+>     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+> :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 6d2a94150cf1eafb1=
+6f0ccf6325281415fef64a6 M      hw
+> :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d 68f9368d8d78fd326=
+7f609b603f97e8a74bdf528 M      include
+> :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff 8ed08cef10fddee78=
+14e38ad62be11371592a75a M      tests
+>
+>
