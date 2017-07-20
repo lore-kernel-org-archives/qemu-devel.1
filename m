@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYHqP-0007xN-Ie
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:14:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1dYHwx-0001OM-Vd
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:21:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dYHqM-0000f6-A4
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:14:45 -0400
-Received: from mail-it0-f54.google.com ([209.85.214.54]:35059)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dYHqM-0000dz-4P
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:14:42 -0400
-Received: by mail-it0-f54.google.com with SMTP id h199so21825049ith.0
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 13:14:41 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dYHwt-0003G6-BG
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:21:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dYHwt-0003F9-1a
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 16:21:27 -0400
+References: <20170714190827.4083-1-eblake@redhat.com>
+	<20170714190827.4083-2-eblake@redhat.com>
+	<87vamnmqab.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e5e2e67d-82b6-92cf-715a-2a7129e83df5@redhat.com>
+Date: Thu, 20 Jul 2017 15:21:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170720174905.GQ2757@localhost.localdomain>
-References: <20170720091902.22476-1-apahim@redhat.com>
-	<20170720091902.22476-2-apahim@redhat.com>
-	<87inin1g78.fsf@dusky.pond.sub.org>
-	<CALAZnb1uWT__Pnd-zeP3_L+t+JDtK42+KHV9qo_r6qXWs4P64w@mail.gmail.com>
-	<87vamnuovc.fsf@dusky.pond.sub.org>
-	<20170720174905.GQ2757@localhost.localdomain>
-From: Amador Pahim <apahim@redhat.com>
-Date: Thu, 20 Jul 2017 22:14:40 +0200
-Message-ID: <CALAZnb3W+NnjKafbmZ1Bn77Dm=YqfkVDKinz+VU2BF7D-x-7mA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] qemu.py: fix is_running()
+In-Reply-To: <87vamnmqab.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="caMnnODaSiNKbC4N5CRuqxlxFadnmGmDV"
+Subject: Re: [Qemu-devel] [PATCH 1/5] qapi: Further enhance visitor virtual
+ walk doc example
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,175 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, Cleber Rosa <crosa@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Thu, Jul 20, 2017 at 7:49 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Thu, Jul 20, 2017 at 05:09:11PM +0200, Markus Armbruster wrote:
->> Amador Pahim <apahim@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--caMnnODaSiNKbC4N5CRuqxlxFadnmGmDV
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <e5e2e67d-82b6-92cf-715a-2a7129e83df5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] qapi: Further enhance visitor virtual
+ walk doc example
+References: <20170714190827.4083-1-eblake@redhat.com>
+ <20170714190827.4083-2-eblake@redhat.com> <87vamnmqab.fsf@dusky.pond.sub.org>
+In-Reply-To: <87vamnmqab.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 07/20/2017 04:05 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> Markus pointed out that the example given for virtual walks did
+>> not discuss how to do a virtual walk of an alternate type.  It
+>> turns out that for output, we don't need to visit an alternate
+>> (just directly visit the type that we want); and for input,
+>> visit_start_alternate() is not currently wired up for alternates
+>> (it requires a QAPI type, rather than permitting NULL for a
+>> virtual walk).  Also, the example was never updated in commit
+>> 3b098d5 about where visit_complete() would fit in.  Improve the
+>> description and example to give more details along these lines.
 >>
->> > On Thu, Jul 20, 2017 at 1:49 PM, Markus Armbruster <armbru@redhat.com> wrote:
->> >> Amador Pahim <apahim@redhat.com> writes:
->> >>
->> >>> Current implementation is broken. It does not really test if the child
->> >>> process is running.
->> >>
->> >> What usage exactly is broken by this?  Got a reproducer for me?
->> >
->> > Problem is that 'returncode' is not set without a calling
->> > poll()/wait()/communicate(), so it's only useful to test if the
->> > process is running after such calls. But if we use 'poll()' instead,
->> > it will, according to the docs, "Check if child process has
->> > terminated. Set and return returncode attribute."
->> >
->> > Reproducer is:
->> >
->> >  >>> import subprocess
->> >  >>> devnull = open('/dev/null', 'rb')
->> >  >>> p = subprocess.Popen(['qemu-system-x86_64', '-broken'],
->> > stdin=devnull, stdout=devnull, stderr=devnull, shell=False)
->> >  >>> print p.returncode
->> >  None
->> >  >>> print p.poll()
->> >  1
->> >  >>> print p.returncode
->> >  1
->> >
->> >>> The Popen.returncode will only be set after by a poll(), wait() or
->> >>> communicate(). If the Popen fails to launch a VM, the Popen.returncode
->> >>> will not turn to None by itself.
->> >>
->> >> Hmm.  What is the value of .returncode then?
->> >
->> > returncode starts with None and becomes the process exit code when the
->> > process is over and one of that three methods is called (poll(),
->> > wait() or communicate()).
->> >
->> > There's an error in my description though. The correct would be: "The
->> > Popen.returncode will only be set after a call to poll(), wait() or
->> > communicate(). If the Popen fails to launch a VM, the Popen.returncode
->> > will not turn from None to the actual return code by itself."
->>
->> Suggest to add ", and is_running() continues to report True".
->>
->> >>> Instead of using Popen.returncode, let's use Popen.poll(), which
->> >>> actually checks if child process has terminated.
->> >>>
->> >>> Signed-off-by: Amador Pahim <apahim@redhat.com>
->> >>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> >>> Reviewed-by: Fam Zheng <famz@redhat.com>
->> >>> ---
->> >>>  scripts/qemu.py | 2 +-
->> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
->> >>>
->> >>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->> >>> index 880e3e8219..f0fade32bd 100644
->> >>> --- a/scripts/qemu.py
->> >>> +++ b/scripts/qemu.py
->> >>> @@ -86,7 +86,7 @@ class QEMUMachine(object):
->> >>>              raise
->> >>>
->> >>>      def is_running(self):
->> >>> -        return self._popen and (self._popen.returncode is None)
->> >>> +        return self._popen and (self._popen.poll() is None)
->> >>>
->
-> After re-reading shutdown(), I think this is _not_ OK: if
-> is_running() return False before we call .wait(), we will never
-> load the log file or run _post_shutdown() if QEMU exits between
-> the launch() and shutdown() calls.
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>=20
+> This clashes with some unfinished work I have on alternates.  If I can
+> finish it quickly, we can compare and decide whether we still need this=
+=2E
 
-Yes, I just noticed that while cleaning up the code.
+It sounds like your stuff is 2.11 material; at this point, I'm trying to
+decide which of my patches are still worth 2.10 softfreeze material.
+While doc fixes are safe, I'm also fine stating that we don't want
+churn, so I'll remove this part of my series from 2.10 consideration,
+and like you say, we'll compare against your work in 2.11 later.
 
->
-> Yes, it's fragile.
->
-> The root problem on both launch() and shutdown() seems to be
-> coupling the external "is QEMU running?" state with the internal
-> "did we load the log file and ran _post_shutdown() already?"
-> state.
->
-> I see two possible approaches for this:
->
-> 1) Benefit from the fact that the internal Popen state will not
->    change under our feet unless we explicitly call
->    poll()/wait()/etc, and keep the existing code.  (Not my
->    favorite option)
->
-> 2) Rewrite the code so that we don't depend on the subtle Popen
->    internal state rules, and track our own internal state in
->    a QEMUMachine attribute.  e.g.:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-+1 for this approach. I'm working on something similar, thanks for the
-detailed "e.g." code here.
 
->
->     def _handle_shutdown(self):
->         '''Load log file and call _post_shutdown() hook if necessary'''
->         # Must be called only after QEMU actually exited.
->         assert not self.is_running()
->         if self._shutdown_pending:
->             if self.exitcode() < 0:
->                 sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode, ' '.join(self._args)))
->             self._load_io_log()
->             self._post_shutdown()
->             self._shutdown_pending = False
->
->     def _terminate(self):
->         '''Terminate QEMU if it's still running'''
->         if self.is_running():
->             try:
->                 self._qmp.cmd('quit')
->                 self._qmp.close()
->             except:
->                 self._popen.kill()
->                 self._popen.wait()
->
->     def _launch(self):
->         '''Launch the VM and establish a QMP connection'''
->         devnull = open('/dev/null', 'rb')
->         qemulog = open(self._qemu_log_path, 'wb')
->         self._shutdown_pending = True
->         self._pre_launch()
->         args = self._wrapper + [self._binary] + self._base_args() + self._args
->         self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
->                                        stderr=subprocess.STDOUT, shell=False)
->         self._post_launch()
->
->     def launch(self):
->         try:
->             self._launch()
->         except:
->             self._terminate()
->             self._handle_shutdown()
->             raise
->
->     def shutdown(self):
->         '''Terminate the VM and clean up'''
->         self._terminate()
->         self._handle_shutdown()
->
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->
->> >>>      def exitcode(self):
->> >>>          if self._popen is None:
->> >>                return None
->> >>            return self._popen.returncode
->> >>
->> >> Why is this one safe?
->> >
->> > Here it's used just to retrieve the value from the Popen.returncode.
->> > It's not being used to check whether the process is running or not.
->>
->> If self._popen is not None, we return self._popen.returncode.  It's None
->> if .poll() etc. haven't been called.  Can this happen?  If not, why not?
->> If yes, why is returning None then okay?
->
-> It can't happen because the only caller of exitcode()
-> (device-crash-test) calls it immediately after shutdown().  But
-> it would be nice to make exitcode() behavior consistent with
-> is_running().
->
-> --
-> Eduardo
+--caMnnODaSiNKbC4N5CRuqxlxFadnmGmDV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllxEMQACgkQp6FrSiUn
+Q2o5JQf+PhZIBqoiondEtvq3F1o+iQDuHimErqN0P5AqEZd1PaG2OHH8qXHY1Cw4
+WMUUREJxi9LfARfU5Ku7jkejf1lVXyS2rBgzuKP8//DNnWlhONT9a/tkXeeodLCz
+x2FFYK0s3RCe7duYEoPQRZBM5N80F9sO7p1RQ3oxScdLv8ZjwvS9hc0AYV3bFIBq
+4UVDFn2gxpWZrZywNuBNaikkmWILKeT21tMl3l6FXzDMmk5lAXTNXIrmAf4M0Vi0
+5kOyu6W6hIpvm99geWZW/btKizzMY7Fif6+g+dJrASi5MucM0YxHzbSLDwe/RTeD
+VLp4VcxBGdMIYzxl2XEfT4boz/yedg==
+=96kg
+-----END PGP SIGNATURE-----
+
+--caMnnODaSiNKbC4N5CRuqxlxFadnmGmDV--
