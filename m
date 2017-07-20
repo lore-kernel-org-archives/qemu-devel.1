@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYGA6-0002bC-CT
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:26:59 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dYGBC-0003EN-2j
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dYGA2-0002cp-5y
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:26:58 -0400
-References: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <eec67af4-3f8e-bb85-0854-61f4d450f627@redhat.com>
-Date: Thu, 20 Jul 2017 13:26:50 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1dYGB7-0003FO-0H
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:28:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dYGB6-0003Ev-Pq
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 14:28:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9B2C4A71A
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 18:27:59 +0000 (UTC)
+Date: Thu, 20 Jul 2017 15:27:53 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170720182753.GV2757@localhost.localdomain>
+References: <20170720162815.19802-1-ldoktor@redhat.com>
+	<20170720162815.19802-6-ldoktor@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DmOfBJXUroEnWpasoiLm51H24CH73FxB5"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] util/oslib-posix.c: Avoid warning
- on NetBSD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170720162815.19802-6-ldoktor@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 05/11] qemu.py: Use custom exceptions
+ rather than Exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +35,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Kamil Rytarowski <kamil@netbsd.org>, patches@linaro.org
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: apahim@redhat.com, qemu-devel@nongnu.org, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DmOfBJXUroEnWpasoiLm51H24CH73FxB5
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-Cc: Kamil Rytarowski <kamil@netbsd.org>, patches@linaro.org
-Message-ID: <eec67af4-3f8e-bb85-0854-61f4d450f627@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] util/oslib-posix.c: Avoid warning
- on NetBSD
-References: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1500568341-8389-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 07/20/2017 11:32 AM, Peter Maydell wrote:
-> On NetBSD the compiler warns:
-> util/oslib-posix.c: In function 'sigaction_invoke':
-> util/oslib-posix.c:589:5: warning: missing braces around initializer [-=
-Wmissing-braces]
->      siginfo_t si =3D { 0 };
->      ^
-
-Uggh. That is a broken compiler.  C99 declares that 'anything =3D {0}' is=
-
-supposed to be a valid way to zero-initialize anything.
-
-> util/oslib-posix.c:589:5: warning: (near initialization for 'si.si_pad'=
-) [-Wmissing-braces]
+On Thu, Jul 20, 2017 at 06:28:09PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
+> The naked Exception should not be widely used. It makes sense to be a
+> bit more specific and use better-suited custom exceptions. As a benefit
+> we can store the full reply in the exception in case someone needs it
+> when catching the exception.
 >=20
-> because on this platform siginfo_t is defined as
->   typedef union siginfo {
->           char    si_pad[128];    /* Total size; for future expansion *=
-/
->           struct _ksiginfo _info;
->   } siginfo_t;
->=20
-> Avoid this warning by initializing the struct with {} instead;
-> this is a GCC extension but we use it all over the codebase already.
-
-Well, I'm glad that works to shut up the broken compiler.
-
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 > ---
->  util/oslib-posix.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+>  scripts/qemu.py | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index b2dea48..cacf0ef 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -586,7 +586,7 @@ void qemu_free_stack(void *stack, size_t sz)
->  void sigaction_invoke(struct sigaction *action,
->                        struct qemu_signalfd_siginfo *info)
->  {
-> -    siginfo_t si =3D { 0 };
-> +    siginfo_t si =3D {};
->      si.si_signo =3D info->ssi_signo;
->      si.si_errno =3D info->ssi_errno;
->      si.si_code =3D info->ssi_code;
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 5948e19..2bd522f 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -19,6 +19,19 @@ import subprocess
+>  import qmp.qmp
+> =20
+> =20
+> +class MonitorResponseError(qmp.qmp.QMPError):
+> +    '''
+> +    Represents erroneous QMP monitor reply
+> +    '''
+> +    def __init__(self, reply):
+> +        try:
+> +            desc =3D reply["error"]["desc"]
+> +        except KeyError:
+> +            desc =3D reply
+> +        super(MonitorResponseError, self).__init__(desc)
+> +        self.reply =3D reply
+
+This would require every user of self.reply to first check if
+it's a string or dictionary.  All because of the "Monitor is
+closed" case below:
+
+> +
+> +
+>  class QEMUMachine(object):
+>      '''A QEMU VM'''
+> =20
+> @@ -197,9 +210,9 @@ class QEMUMachine(object):
+>          '''
+>          reply =3D self.qmp(cmd, conv_keys, **args)
+>          if reply is None:
+> -            raise Exception("Monitor is closed")
+> +            raise qmp.qmp.QMPError("Monitor is closed")
+
+Should we really use the same exception type for this, if it's
+not really a QMP monitor error reply, and won't even have a real
+QMP reply in self.reply?
+
+
+>          if "error" in reply:
+> -            raise Exception(reply["error"]["desc"])
+> +            raise MonitorResponseError(reply)
+>          return reply["return"]
+> =20
+>      def get_qmp_event(self, wait=3DFalse):
+> --=20
+> 2.9.4
 >=20
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---DmOfBJXUroEnWpasoiLm51H24CH73FxB5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAllw9eoACgkQp6FrSiUn
-Q2ow2gf/dgjVCePlP+22F40D9ETGGN7p+QTV9g5RWo1d7mjiFyYZIa+uX2PHC4ij
-DqIPR030viKYPxXzvfM+iZ95i0DI2cKfkmad1sdHNMdVTm3KRXr1TeBlnBVplC3e
-KfdCvze6SqrQpf5v01Aa4pX50avMS1uQ8KCfAs230ixzOF7YRyCZxBS1RNePH74Y
-iUvqGGAFN3lvIkiWjtAcpjwiBmf2IUPqX6jPD8p3q6maNcSZBwd/iHfrEXz81bA4
-f8UlTRlhmHz70+Yk+Wt70q0U19iszu25P1MvF5BQbC+fc5tjTfTXoKimvI+qIvHY
-8ra6tdN4jNEgEJMK/0DyXIsTt8qqqw==
-=C3S1
------END PGP SIGNATURE-----
-
---DmOfBJXUroEnWpasoiLm51H24CH73FxB5--
+Eduardo
