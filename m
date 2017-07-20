@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY80G-000133-Nv
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:17 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dY80g-0001c9-3P
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dY80B-0002iY-QX
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dY80B-0002iA-Gp
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 619517F407
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:44:10 +0000 (UTC)
-Date: Thu, 20 Jul 2017 10:44:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170720094404.GA2101@work-vm>
-References: <20170717134238.1966-1-quintela@redhat.com>
-	<20170717134238.1966-12-quintela@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dY80e-0002sC-Us
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:42 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33711)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dY80e-0002rp-Jq
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:44:40 -0400
+Received: by mail-lf0-x242.google.com with SMTP id k82so879203lfg.0
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 02:44:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170717134238.1966-12-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 11/17] migration: Really use multiple
- pages at a time
+References: <1500541371-24788-1-git-send-email-sf@sfritsch.de>
+	<1500541371-24788-6-git-send-email-sf@sfritsch.de>
+In-Reply-To: <1500541371-24788-6-git-send-email-sf@sfritsch.de>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 20 Jul 2017 09:44:28 +0000
+Message-ID: <CAJ+F1C+jaaM3RO+daipiUNnVmLjZOVd3vGjT=p=E0cKUtQp_aQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] usb-ccid: Fix USB descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,144 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, berrange@redhat.com
+To: Stefan Fritsch <sf@sfritsch.de>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We now send several pages at a time each time that we wakeup a thread.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
-> Use iovec's insead of creating the equivalent.
+On Thu, Jul 20, 2017 at 11:09 AM Stefan Fritsch <sf@sfritsch.de> wrote:
+
+> From: Stefan Fritsch <stefan_fritsch@genua.de>
+>
+> - We want to support both T=3D0 and T=3D1. Additionally, note that all
+>   fields in USB descriptors are little endian and the supported
+>   protocols are in the lowest byte the of the 32-Bit dwProtocols field.
+> - We want APDU level exchanges. This saves us from PPS exchanges and from
+>   APDU reassembly from T=3D1 packets.
+>
+>
+Did you test this with various versions of Windows?
+
+
+> Signed-off-by: Stefan Fritsch <stefan_fritsch@genua.de>
+> Signed-off-by: Christian Ehrhardt <christian_ehrhardt@genua.de>
 > ---
->  migration/ram.c | 46 ++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 40 insertions(+), 6 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 2bf3fa7..90e1bcb 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -362,6 +362,13 @@ static void compress_threads_save_setup(void)
->  
->  /* Multiple fd's */
->  
-> +
-> +typedef struct {
-> +    int num;
-> +    int size;
-
-size_t ?
-
-> +    struct iovec *iov;
-> +} multifd_pages_t;
-> +
->  struct MultiFDSendParams {
->      /* not changed */
->      uint8_t id;
-> @@ -371,7 +378,7 @@ struct MultiFDSendParams {
->      QemuMutex mutex;
->      /* protected by param mutex */
->      bool quit;
-> -    uint8_t *address;
-> +    multifd_pages_t pages;
->      /* protected by multifd mutex */
->      bool done;
->  };
-> @@ -459,8 +466,8 @@ static void *multifd_send_thread(void *opaque)
->              qemu_mutex_unlock(&p->mutex);
->              break;
->          }
-> -        if (p->address) {
-> -            p->address = 0;
-> +        if (p->pages.num) {
-> +            p->pages.num = 0;
->              qemu_mutex_unlock(&p->mutex);
->              qemu_mutex_lock(&multifd_send_state->mutex);
->              p->done = true;
-> @@ -475,6 +482,13 @@ static void *multifd_send_thread(void *opaque)
->      return NULL;
->  }
->  
-> +static void multifd_init_group(multifd_pages_t *pages)
-> +{
-> +    pages->num = 0;
-> +    pages->size = migrate_multifd_group();
-> +    pages->iov = g_malloc0(pages->size * sizeof(struct iovec));
-
-Does that get freed anywhere?
-
-> +}
-> +
->  int multifd_save_setup(void)
->  {
->      int thread_count;
-> @@ -498,7 +512,7 @@ int multifd_save_setup(void)
->          p->quit = false;
->          p->id = i;
->          p->done = true;
-> -        p->address = 0;
-> +        multifd_init_group(&p->pages);
->          p->c = socket_send_channel_create();
->          if (!p->c) {
->              error_report("Error creating a send channel");
-> @@ -515,8 +529,23 @@ int multifd_save_setup(void)
->  
->  static int multifd_send_page(uint8_t *address)
->  {
-> -    int i;
-> +    int i, j;
->      MultiFDSendParams *p = NULL; /* make happy gcc */
-> +    static multifd_pages_t pages;
-> +    static bool once;
-> +
-> +    if (!once) {
-> +        multifd_init_group(&pages);
-> +        once = true;
-> +    }
-> +
-> +    pages.iov[pages.num].iov_base = address;
-> +    pages.iov[pages.num].iov_len = TARGET_PAGE_SIZE;
-> +    pages.num++;
-> +
-> +    if (pages.num < (pages.size - 1)) {
-> +        return UINT16_MAX;
-
-That's a very odd magic constant to return.
-What's your intention?
-
-> +    }
->  
->      qemu_sem_wait(&multifd_send_state->sem);
->      qemu_mutex_lock(&multifd_send_state->mutex);
-> @@ -530,7 +559,12 @@ static int multifd_send_page(uint8_t *address)
->      }
->      qemu_mutex_unlock(&multifd_send_state->mutex);
->      qemu_mutex_lock(&p->mutex);
-> -    p->address = address;
-> +    p->pages.num = pages.num;
-> +    for (j = 0; j < pages.size; j++) {
-> +        p->pages.iov[j].iov_base = pages.iov[j].iov_base;
-> +        p->pages.iov[j].iov_len = pages.iov[j].iov_len;
-> +    }
-
-It would seem more logical to update p->pages.num last
-
-This is also a little odd in that iov_len is never really used,
-it's always TARGET_PAGE_SIZE.
-
-> +    pages.num = 0;
->      qemu_mutex_unlock(&p->mutex);
->      qemu_sem_post(&p->sem);
-
-What makes sure that any final chunk of pages that was less
-than the group size is sent at the end?
-
-Dave
-
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  hw/usb/dev-smartcard-reader.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
+c
+> index 769949144b..bc4dc35d3f 100644
+> --- a/hw/usb/dev-smartcard-reader.c
+> +++ b/hw/usb/dev-smartcard-reader.c
+> @@ -353,8 +353,8 @@ static const uint8_t qemu_ccid_descriptor[] =3D {
+>                       */
+>          0x07,       /* u8  bVoltageSupport; 01h - 5.0v, 02h - 3.0, 03 -
+> 1.8 */
+>
+> -        0x00, 0x00, /* u32 dwProtocols; RRRR PPPP. RRRR =3D 0000h.*/
+> -        0x01, 0x00, /* PPPP: 0001h =3D Protocol T=3D0, 0002h =3D Protoco=
+l T=3D1 */
+> +        0x03, 0x00, /* u32 dwProtocols; RRRR PPPP. RRRR =3D 0000h.*/
+> +        0x00, 0x00, /* PPPP: 0001h =3D Protocol T=3D0, 0002h =3D Protoco=
+l T=3D1 */
+>                      /* u32 dwDefaultClock; in kHZ (0x0fa0 is 4 MHz) */
+>          0xa0, 0x0f, 0x00, 0x00,
+>                      /* u32 dwMaximumClock; */
+> @@ -397,7 +397,7 @@ static const uint8_t qemu_ccid_descriptor[] =3D {
+>                       * insertion and removal. Must set bit 5 in
+> bmAttributes
+>                       * in Configuration descriptor if 100000 is set.
+>                       */
+> -        0xfe, 0x04, 0x01, 0x00,
+> +        0xfe, 0x04, 0x04, 0x00,
+>                      /*
+>                       * u32 dwMaxCCIDMessageLength; For extended APDU in
+>                       * [261 + 10 , 65544 + 10]. Otherwise the minimum is
+> --
+> 2.11.0
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
