@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lists@philjordan.eu>) id 1dYH94-0000ay-Hl
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:29:59 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dYH9O-0000pB-MX
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lists@philjordan.eu>) id 1dYH93-0004Uq-Gc
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:29:58 -0400
-Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:36374)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lists@philjordan.eu>) id 1dYH93-0004PI-8A
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:29:57 -0400
-Received: by mail-ua0-x22f.google.com with SMTP id 35so30786420uax.3
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 12:29:55 -0700 (PDT)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dYH9K-00055a-MJ
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:30:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:59953
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dYH9K-0004oj-E4
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 15:30:14 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <768886e5-c27a-a6d9-b5f1-b6712c76b7a0@ilande.co.uk>
+Message-ID: <7ca287e3-c496-b58f-7df6-e0e82ea56ff0@ilande.co.uk>
+Date: Thu, 20 Jul 2017 20:29:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-References: <3E24AFDE-D25A-416B-A600-3C2221C3A9F1@gmail.com>
-From: Phil Dennis-Jordan <lists@philjordan.eu>
-Date: Thu, 20 Jul 2017 21:29:33 +0200
-Message-ID: <CAGCz3vu5x59+mKg8011=DRyZQKbuBV2F20ZpPnG1TOCxsOb+mQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Commit 77af8a2b95b79699de650965d5228772743efe84
- breaks Windows 2000 support
+In-Reply-To: <768886e5-c27a-a6d9-b5f1-b6712c76b7a0@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Build failure on git master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, ehabkost@redhat.com, Phil Dennis-Jordan <phil@philjordan.eu>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, Jul 20, 2017 at 6:40 PM, Programmingkid
-<programmingkidx@gmail.com> wrote:
-> I noticed that Windows 2000 does not boot up in QEMU recently. After bise=
-cting the issue I found the offending commit:
+On 19/07/17 18:09, Mark Cave-Ayland wrote:
 
-Ouch. I reckon we have 2 options for fixing this:
+> Hi all,
+> 
+> I see the following build failure here on git master with gcc 4.7.2:
+> 
+> cc -I/home/build/src/qemu/git/qemu/block -Iblock
+> -I/home/build/src/qemu/git/qemu/tcg
+> -I/home/build/src/qemu/git/qemu/tcg/i386
+> -I/home/build/src/qemu/git/qemu/linux-headers
+> -I/home/build/src/qemu/git/qemu/linux-headers -I.
+> -I/home/build/src/qemu/git/qemu
+> -I/home/build/src/qemu/git/qemu/accel/tcg
+> -I/home/build/src/qemu/git/qemu/include -I/usr/include/pixman-1
+> -I/home/build/src/qemu/git/qemu/dtc/libfdt -Werror -pthread
+> -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+> -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+> -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings
+> -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv
+> -Wendif-labels -Wno-missing-include-dirs -Wempty-body -Wnested-externs
+> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+> -Wold-style-declaration -Wold-style-definition -Wtype-limits
+> -fstack-protector-all -I/usr/include/p11-kit-1
+> -I/usr/include/libpng12   -I/home/build/src/qemu/git/qemu/tests -MMD -MP
+> -MT block/vpc.o -MF block/vpc.d -O2 -U_FORTIFY_SOURCE
+> -D_FORTIFY_SOURCE=2 -g   -c -o block/vpc.o block/vpc.c
+> block/vpc.c: In function ‘vpc_co_pwritev’:
+> block/vpc.c:652:9: error: ‘ret’ may be used uninitialized in this
+> function [-Werror=maybe-uninitialized]
+> cc1: all warnings being treated as errors
+> make: *** [block/vpc.o] Error 1
+> 
+> At a quick glance it looks as if this is being caused by commit cfc87e00
+> "block/vpc.c: Handle write failures in get_image_offset()".
 
-1. Export two FADTs, one ACPI 1.0, one ACPI 2.0. The latter would need
-to be pointed to by an XSDT, which Qemu currently doesn't implement at
-all as far as I'm aware. Any ideas on how SeaBIOS or OVMF would handle
-this? Any likely other OS regressions?
+The fix is seemingly quite simple:
 
-2. Select FADT version with an option. This one is definitely safe,
-but adds yet another option.
+diff --git a/block/vpc.c b/block/vpc.c
+index 10e6519..574879b 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -649,7 +649,7 @@ vpc_co_pwritev(BlockDriverState *bs, uint64_t
+offset, uint64_t bytes,
+     int64_t image_offset;
+     int64_t n_bytes;
+     int64_t bytes_done = 0;
+-    int ret;
++    int ret = 0;
+     VHDFooter *footer =  (VHDFooter *) s->footer_buf;
+     QEMUIOVector local_qiov;
 
-Thoughts?
 
+ATB,
 
-> commit 77af8a2b95b79699de650965d5228772743efe84
-> Author: Phil Dennis-Jordan <phil@philjordan.eu>
-> Date:   Wed Mar 15 19:20:26 2017 +1300
->
->     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS=
- support.
->
->     This updates the FADT generated for x86/64 machine types from Revisio=
-n 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is to e=
-xpose the reset register information to guest operating systems which requi=
-re it, specifically OS X/macOS. Revision 1 FADTs do not contain the fields =
-relating to the reset register.
->
->     The new layout and contents remains backwards-compatible with operati=
-ng systems which only support ACPI 1.0, as the existing fields are not modi=
-fied by this change, as the 64-bit and 32-bit variants are allowed to co-ex=
-ist according to the ACPI 2.0 standard. No regressions became apparent in t=
-ests with a range of Windows (XP-10) and Linux versions.
->
->     The BIOS tables test suite's FADT checksum test has also been updated=
- to reflect the new FADT layout and content.
->
->     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
->     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
-> :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 6d2a94150cf1eafb1=
-6f0ccf6325281415fef64a6 M      hw
-> :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d 68f9368d8d78fd326=
-7f609b603f97e8a74bdf528 M      include
-> :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff 8ed08cef10fddee78=
-14e38ad62be11371592a75a M      tests
->
->
+Mark.
