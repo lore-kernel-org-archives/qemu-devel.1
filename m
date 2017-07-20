@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYE6I-0001QW-Ig
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:14:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dYE7I-00024e-Vx
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:15:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dYE6D-0002KD-Iz
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:14:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44180)
+	(envelope-from <dgilbert@redhat.com>) id 1dYE7H-0004aN-KG
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:15:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYE6D-0002IY-C7
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:14:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dYE7H-0004Vf-Az
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 12:15:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 52D31267C2
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:14:48 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170717180926.14924-1-ehabkost@redhat.com>
-Date: Thu, 20 Jul 2017 18:14:44 +0200
-In-Reply-To: <20170717180926.14924-1-ehabkost@redhat.com> (Eduardo Habkost's
-	message of "Mon, 17 Jul 2017 15:09:26 -0300")
-Message-ID: <877ez3rsp7.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E43876A00
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 16:15:52 +0000 (UTC)
+Date: Thu, 20 Jul 2017 17:15:49 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170720161548.GC2456@work-vm>
+References: <20170407143847.GM2138@work-vm> <20170720105004.GA26866@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] qapi: Fix error handling code on
- alternate conflict
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170720105004.GA26866@redhat.com>
+Subject: Re: [Qemu-devel] Hacks for building on gcc 7 / Fedora 26
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Fri, Apr 07, 2017 at 03:38:47PM +0100, Dr. David Alan Gilbert wrote:
+> > Hi,
+> >    Fedora 26 has gcc 7.0.1 which has the normal compliment
+> > of new fussy warnings; so far I've posted :
+> > 
+> > tests/check-qdict: Fix missing brackets
+> > slirp/smb: Replace constant strings by glib string
+> > 
+> > that fix one actual mistake and work around something it's being
+> > fussy over.
+> > 
+> > But I've also got a pile of hacks, attached below that I'm
+> > not too sure what I'll do with them yet, but they're attached
+> > for anyone else trying to build.  Note they're smoke-only-tested.
+> > 
+> > I also have gcc bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80346
+> > filed for what I reckon is a couple of overly pessimistic warnings.
+> 
+> 
+> > diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+> > index bd9fd55b0a..ebb0221140 100644
+> > --- a/include/qemu/iov.h
+> > +++ b/include/qemu/iov.h
+> > @@ -46,7 +46,7 @@ static inline size_t
+> >  iov_from_buf(const struct iovec *iov, unsigned int iov_cnt,
+> >               size_t offset, const void *buf, size_t bytes)
+> >  {
+> > -    if (__builtin_constant_p(bytes) && iov_cnt &&
+> > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
+> >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
+> >          memcpy(iov[0].iov_base + offset, buf, bytes);
+> >          return bytes;
+> > @@ -59,7 +59,7 @@ static inline size_t
+> >  iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
+> >             size_t offset, void *buf, size_t bytes)
+> >  {
+> > -    if (__builtin_constant_p(bytes) && iov_cnt &&
+> > +    if (__builtin_constant_p(bytes) && iov_cnt && bytes <= INT_MAX &&
+> >          offset <= iov[0].iov_len && bytes <= iov[0].iov_len - offset) {
+> >          memcpy(buf, iov[0].iov_base + offset, bytes);
+> >          return bytes;
 
-> The conflict check added by commit c0644771 ("qapi: Reject
-> alternates that can't work with keyval_parse()") doesn't work
-> with the following declaration:
->
->   { 'alternate': 'Alt',
->     'data': { 'one': 'bool',
->               'two': 'str' } }
->
-> It crashes with:
->
->   Traceback (most recent call last):
->     File "./scripts/qapi-types.py", line 295, in <module>
->       schema = QAPISchema(input_file)
->     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
->       self.exprs = check_exprs(parser.exprs)
->     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
->       check_alternate(expr, info)
->     File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
->       % (name, key, types_seen[qtype]))
->   KeyError: 'QTYPE_QSTRING'
->
-> This happens because the previously-seen conflicting member
-> ('one') can't be found at types_seen[qtype], but at
-> types_seen['QTYPE_BOOL'].
->
-> Fix the bug by moving the error check to the same loop that adds
-> new items to types_seen, raising an exception if types_seen[qt]
-> is already set.
->
-> Add two additional test cases that can detect the bug.
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-[...]
-> diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
-> new file mode 100644
-> index 0000000..e69de29
-> diff --git a/tests/qapi-schema/alternate-multi-conflict.json b/tests/qapi-schema/alternate-multi-conflict.json
-> new file mode 100644
-> index 0000000..e69de29
+tbh I don't know what the right fix for this is;  the gcc discussion
+confused me as to why it thinks it can be a valid case.
 
-Accident?  Can drop on commit.
+> > diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+> > index 88dbf97853..c55de4f65b 100644
+> > --- a/tests/bios-tables-test.c
+> > +++ b/tests/bios-tables-test.c
+> > @@ -98,7 +98,7 @@ static void test_acpi_rsdt_table(test_data *data)
+> >      AcpiRsdtDescriptorRev1 *rsdt_table = &data->rsdt_table;
+> >      uint32_t addr = data->rsdp_table.rsdt_physical_address;
+> >      uint32_t *tables;
+> > -    int tables_nr;
+> > +    unsigned int tables_nr;
+> >      uint8_t checksum;
+> >  
+> >      /* read the header */
+
+> Unless I've missed a patch somwhere, I think the problems that these two
+> chunks are fixing are still needed for current git master, to stop warnings
+> in the unit tests.
+> 
+
+The second one of those I can post a patch for; the trick is to change
+the g_assert_cmpint to a g_assert and then gcc realises the bad case
+can't happen.  I'll post that in a few mins.
+
+Dave
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
