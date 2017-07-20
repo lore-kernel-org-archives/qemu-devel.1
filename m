@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dY7VZ-0005Pr-LH
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:12:34 -0400
+	(envelope-from <apahim@redhat.com>) id 1dY7cr-0008GU-8K
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dY7VW-0000Ke-DQ
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:12:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32910)
+	(envelope-from <apahim@redhat.com>) id 1dY7cn-00047A-Qx
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:20:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dY7VW-0000KM-6N
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:12:30 -0400
-Date: Thu, 20 Jul 2017 10:12:24 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170720091224.GD21566@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAB3eZfsG9YLTfA8ATJujjGE1D3G3iQQ+OXmUvo49J7d-QpDgTg@mail.gmail.com>
-	<20170720085958.GC21566@redhat.com>
-	<CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAB3eZfuGD8OKr0HJwzDmiuAp5Sk5BuA8K4E+CvhwuYTAaKuMQA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Can I mount encrypt qcow2?
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1dY7cn-00045Y-Kp
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 05:20:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 893ED72D09
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 09:20:00 +0000 (UTC)
+From: Amador Pahim <apahim@redhat.com>
+Date: Thu, 20 Jul 2017 11:18:59 +0200
+Message-Id: <20170720091902.22476-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] scripts/qemu.py small fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?6Zmz5Z+55rOT?= <pahome.chen@mirlab.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
 
-On Thu, Jul 20, 2017 at 05:07:49PM +0800, =E9=99=B3=E5=9F=B9=E6=B3=93 wro=
-te:
-> oh~ I don't know can expose the LUKS encryption. I'm sure the older(AES=
-)
-> can't be mounted by qemu-nbd.
+First commit fixes the 'is_running()' method, which is not
+working currently.
 
-It can be mounted, with current git master (all the commands I show
-below are for git master btw).
+Second commit includes the qemu command line and its output when
+there's an exception during the launch() and the VM is not started.
 
-You should, however, *never* use the old AES format any more. It is
-broken by design and not considered secure.
+Last commit renames self._args to self.args. The leading underscore
+represents that the variable is private and as such it should not be
+accessed externally. But that variable is the main API for inclusion
+of Qemu command arguments, so the rename makes it public.
 
-> If I encrypt by the command you recommended:
->=20
-> > qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
-> >              --image-opts driver=3Dqcow2,file.filename=3D
-> > demo.qcow2,encrypt.format=3Dluks,encrypt.key-secret=3Dsec0
+Changes v1->v2:
+ - Style fixes to make checkpatch.pl happy.
+ - Rebased.
+Changes v2->v3:
+ - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
 
-This *is* exposing the encrypted file -  not creating it. If you
-want to connect to a host nbd device then you use the command
-above, with the -c arg
+Amador Pahim (3):
+  qemu.py: fix is_running()
+  qemu.py: include debug information on launch error
+  qemu.py: make 'args' public
 
-$ qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
-           -c /dev/nbd0 \
-           --image-opts driver=3Dqcow2,file.filename=3Ddemo.qcow2,encrypt=
-.format=3Dluks,encrypt.key-secret=3Dsec0
+ scripts/qemu.py               | 33 ++++++++++++++++++++++++---------
+ tests/qemu-iotests/iotests.py | 18 +++++++++---------
+ 2 files changed, 33 insertions(+), 18 deletions(-)
 
-
-If you have a legacy AES qcow2 file the syntax is very similar
-
-$ qemu-nbd --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Draw \
-           -c /dev/nbd0 \
-           --image-opts driver=3Dqcow2,file.filename=3Ddemo.qcow2,encrypt=
-.format=3Daes,encrypt.key-secret=3Dsec0
-
-Note we just changed the encrypt.format parameter there.
-
-
-To actually create an encrypted file in the first place you need the
-qemu-img command
-
-$ qemu-img create --object secret,id=3Dsec0,file=3Dpasswd.txt,format=3Dra=
-w \
-           -f qcow2 -o encrypt.format=3Dluks,encrypt.key-secret=3Dsec0 \
-	   demo.qcow2 1G
- =20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+2.13.3
