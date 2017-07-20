@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYA32-0005KT-JL
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:55:17 -0400
+	(envelope-from <armbru@redhat.com>) id 1dYA6P-0006rW-TA
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dYA31-0005Qd-Gs
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:55:16 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dYA31-0005QK-As
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:55:15 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id w126so22305151wme.0
-	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 04:55:15 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dYA6L-0006Ly-Vv
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:58:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dYA6L-0006Ln-N9
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 07:58:41 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B917313A60
+	for <qemu-devel@nongnu.org>; Thu, 20 Jul 2017 11:58:39 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170720091902.22476-1-apahim@redhat.com>
+	<20170720091902.22476-3-apahim@redhat.com>
+Date: Thu, 20 Jul 2017 13:58:33 +0200
+In-Reply-To: <20170720091902.22476-3-apahim@redhat.com> (Amador Pahim's
+	message of "Thu, 20 Jul 2017 11:19:01 +0200")
+Message-ID: <87d18v1frq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <874lu74ask.fsf@dusky.pond.sub.org>
-References: <1500021225-4118-1-git-send-email-peter.maydell@linaro.org>
-	<1500021225-4118-2-git-send-email-peter.maydell@linaro.org>
-	<874lu74ask.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Jul 2017 12:54:53 +0100
-Message-ID: <CAFEAcA8Yhke2xipJjHB_rDNcMsZgCktJH+CpPBpH79VvhgMZRg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/3] configure: Rename CONFIG_IVSHMEM to
- CONFIG_IVSHMEM_DEVICE
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] qemu.py: include debug information
+ on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +34,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kamil Rytarowski <n54@gmx.com>, "patches@linaro.org" <patches@linaro.org>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, crosa@redhat.com, famz@redhat.com
 
-On 20 July 2017 at 12:17, Markus Armbruster <armbru@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
+Amador Pahim <apahim@redhat.com> writes:
+
+> When launching a VM, if an exception happens and the VM is not
+> initiated, it is useful to see the qemu command line that was executed
+> and the output of that command.
 >
->> The current CONFIG_IVSHMEM is confusing, because it looks like it's a
->> flag for "do we have ivshmem support?", but actually it's a flag for
->> "is the ivshmem PCI device being compiled?" (and implicitly "do we
->> have ivshmem support?" is tested with CONFIG_EVENTFD).
->>
->> Rename it to CONFIG_IVSHMEM_DEVICE to clear this confusion up;
->> shortly we will add a new CONFIG_IVSHMEM which really does indicate
->> whether the host can support ivshmem.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Before the patch:
 >
-> I don't really care how we name this macro, but I can't help to
-> wonder...  We have many CONFIG_<dev>.  The pci.mak context even shows
-> some.  Why is <dev> = IVSHMEM confusing?  Why is <dev> = EDU *not*
-> confusing?
+>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
+>     >>> VM.launch()
+>     Traceback (most recent call last):
+>       File "<stdin>", line 1, in <module>
+>       File "qemu.py", line 137, in launch
+>         self._post_launch()
+>       File "qemu.py", line 121, in _post_launch
+>         self._qmp.accept()
+>       File "qmp/qmp.py", line 145, in accept
+>         self.__sock, _ = self.__sock.accept()
+>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+>         sock, addr = self._sock.accept()
+>     socket.timeout: timed out
+>
+> After the patch:
+>
+>     >>> VM = qemu.QEMUMachine('../aarch64-softmmu/qemu-system-aarch64')
+>     >>> VM.launch()
+>     Traceback (most recent call last):
+>       File "<stdin>", line 1, in <module>
+>       File "qemu.py", line 156, in launch
+>         raise RuntimeError(msg)
+>     RuntimeError: Error launching VM.
+>     Original Exception:
+>     Traceback (most recent call last):
+>       File "qemu.py", line 138, in launch
+>         self._post_launch()
+>       File "qemu.py", line 122, in _post_launch
+>         self._qmp.accept()
+>       File "qmp/qmp.py", line 145, in accept
+>         self.__sock, _ = self.__sock.accept()
+>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+>         sock, addr = self._sock.accept()
+>     timeout: timed out
+>     Command:
+>     /usr/bin/qemu-system-aarch64 -chardev socket,id=mon,
+>     path=/var/tmp/qemu-23958-monitor.sock -mon chardev=mon,mode=control
+>     -display none -vga none
+>     Output:
+>     qemu-system-aarch64: No machine specified, and there is no default
+>     Use -machine help to list supported machines
+>
+> Also, if the launch() faces an exception, the 'except' now will use args
+> to fill the debug information. So this patch assigns 'args' earlier,
+> assuring it will be available for the 'except'.
+>
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> ---
+>  scripts/qemu.py | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index f0fade32bd..2707ae7f75 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -18,6 +18,7 @@ import os
+>  import sys
+>  import subprocess
+>  import qmp.qmp
+> +import traceback
+>  
+>  
+>  class QEMUMachine(object):
+> @@ -129,17 +130,30 @@ class QEMUMachine(object):
+>          '''Launch the VM and establish a QMP connection'''
+>          devnull = open('/dev/null', 'rb')
+>          qemulog = open(self._qemu_log_path, 'wb')
+> +        args = self._wrapper + [self._binary] + self._base_args() + self.args
+>          try:
+>              self._pre_launch()
+> -            args = self._wrapper + [self._binary] + self._base_args() + self._args
+>              self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+>                                             stderr=subprocess.STDOUT, shell=False)
+>              self._post_launch()
 
-Well, this did confuse the people involved in trying to fix
-this bug first time round, because we tried to add
-an "ifdef CONFIG_IVSHMEM" guard to the Makefile lines that
-defnie the rules for ivshmem-client and ivshmem-server,
-and it it fails in obscure and confusing ways because
-CONFIG_IVSHMEM doesn't mean "ivshmem OK", it means only
-"this particular foo-softmmu build has the ivshmem device in it".
+Lifting the assignment out of the try makes sense, because exceptions
+there are programming errors.
 
-Basically, it looks like a global config flag but it isn't
-(because ivshmem has globally built parts, ie the tools,
-as well as the device itself, and configure tests that control
-whether it can be built or not) whereas nobody thinks CONFIG_EDU
-is something that should control global parts of the build
-because the device is only the device and the host config
-doesn't matter.
+Why are ._pre_launch() and ._post_launch() inside the try?
 
-thanks
--- PMM
+>          except:
+
+Why do we catch all exceptions, and not just
+subprocess.CalledProcessError?
+
+> +            self._load_io_log()
+>              if self.is_running():
+
+I suspect we can't get here only for "odd" exceptions, not for
+subprocess.CalledProcessError.
+
+>                  self._popen.kill()
+>                  self._popen.wait()
+> -            self._load_io_log()
+> +            else:
+> +                exc_type, exc_value, exc_traceback = sys.exc_info()
+> +                msg = ('Error launching VM.\n'
+> +                       'Original Exception: \n%s'
+> +                       'Command:\n%s\n'
+> +                       'Output:\n%s\n' %
+> +                       (''.join(traceback.format_exception(exc_type,
+> +                                                           exc_value,
+> +                                                           exc_traceback)),
+> +                        ' '.join(args),
+> +                        self._iolog))
+> +                self._post_shutdown()
+> +                raise RuntimeError(msg)
+>              self._post_shutdown()
+>              raise
+
+Why do we print a traceback when subprocess.CalledProcessError?
