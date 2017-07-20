@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY6HS-0003jR-GL
+	(envelope-from <armbru@redhat.com>) id 1dY6HT-0003k0-1Y
 	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dY6HQ-00038S-KI
-	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1dY6HR-0003Aj-He
+	for qemu-devel@nongnu.org; Thu, 20 Jul 2017 03:53:55 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 20 Jul 2017 09:53:34 +0200
-Message-Id: <1500537221-20556-4-git-send-email-armbru@redhat.com>
+Date: Thu, 20 Jul 2017 09:53:38 +0200
+Message-Id: <1500537221-20556-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1500537221-20556-1-git-send-email-armbru@redhat.com>
 References: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/10] qapi: Introduce a first class 'null'
- type
+Subject: [Qemu-devel] [PATCH v2 07/10] migration: Clean up around tls_creds,
+ tls_hostname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,172 +23,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, berrange@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com
 
-I expect the 'null' type to be useful mostly for members of alternate
-types.
+Optional MigrationParameters members tls_creds and tls_hostname can't
+actually be absent outside qmp_migrate_set_parameters() since commit
+4af245d (v2.9.0).
+
+Note that commit 4af245d reverted the part of commit de63ab6 (v2.8.0)
+that made tls_creds and tls_hostname absent instead of "" in the value
+of query-migrate-parameters, even though commit de63ab6 called that a
+mistake.  What a mess.
+
+Drop the redundant tests for presence, and update documentation.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt            | 10 ++++++----
- include/qapi/qmp/qobject.h              |  4 ++--
- include/qemu/typedefs.h                 |  1 +
- scripts/qapi.py                         |  5 ++++-
- tests/qapi-schema/qapi-schema-test.json |  3 ++-
- tests/qapi-schema/qapi-schema-test.out  |  1 +
- tests/test-qobject-input-visitor.c      |  5 +++++
- tests/test-qobject-output-visitor.c     | 10 ++++++++++
- 8 files changed, 31 insertions(+), 8 deletions(-)
+ hmp.c                 |  6 ++++--
+ migration/migration.c |  4 ++--
+ qapi-schema.json      | 11 +++++------
+ 3 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 52e3874..9903ac4 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -282,6 +282,7 @@ The following types are predefined, and map to C as follows:
-   size      uint64_t   like uint64_t, except StringInputVisitor
-                        accepts size suffixes
-   bool      bool       JSON true or false
-+  null      QNull *    JSON null
-   any       QObject *  any JSON value
-   QType     QType      JSON string matching enum QType values
- 
-@@ -536,10 +537,11 @@ can only express a choice between types represented differently in
- JSON.  If a branch is typed as the 'bool' built-in, the alternate
- accepts true and false; if it is typed as any of the various numeric
- built-ins, it accepts a JSON number; if it is typed as a 'str'
--built-in or named enum type, it accepts a JSON string; and if it is
--typed as a complex type (struct or union), it accepts a JSON object.
--Two different complex types, for instance, aren't permitted, because
--both are represented as a JSON object.
-+built-in or named enum type, it accepts a JSON string; if it is typed
-+as the 'null' built-in, it accepts JSON null; and if it is typed as a
-+complex type (struct or union), it accepts a JSON object.  Two
-+different complex types, for instance, aren't permitted, because both
-+are represented as a JSON object.
- 
- The example alternate declaration above allows using both of the
- following example objects:
-diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
-index 3543b55..eab29ed 100644
---- a/include/qapi/qmp/qobject.h
-+++ b/include/qapi/qmp/qobject.h
-@@ -93,9 +93,9 @@ static inline QType qobject_type(const QObject *obj)
-     return obj->type;
- }
- 
--typedef struct QNull {
-+struct QNull {
-     QObject base;
--} QNull;
-+};
- 
- extern QNull qnull_;
- 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 7b0d4e7..39bc835 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -89,6 +89,7 @@ typedef struct QEMUSGList QEMUSGList;
- typedef struct QEMUTimer QEMUTimer;
- typedef struct QEMUTimerListGroup QEMUTimerListGroup;
- typedef struct QObject QObject;
-+typedef struct QNull QNull;
- typedef struct RAMBlock RAMBlock;
- typedef struct Range Range;
- typedef struct SerialState SerialState;
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 84e2eb4..8aa2775 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -20,6 +20,7 @@ import sys
- from ordereddict import OrderedDict
- 
- builtin_types = {
-+    'null':     'QTYPE_QNULL',
-     'str':      'QTYPE_QSTRING',
-     'int':      'QTYPE_QNUM',
-     'number':   'QTYPE_QNUM',
-@@ -1056,6 +1057,7 @@ class QAPISchemaType(QAPISchemaEntity):
- 
-     def alternate_qtype(self):
-         json2qtype = {
-+            'null':    'QTYPE_QNULL',
-             'string':  'QTYPE_QSTRING',
-             'number':  'QTYPE_QNUM',
-             'int':     'QTYPE_QNUM',
-@@ -1515,7 +1517,8 @@ class QAPISchema(object):
-                   ('uint64', 'int',     'uint64_t'),
-                   ('size',   'int',     'uint64_t'),
-                   ('bool',   'boolean', 'bool'),
--                  ('any',    'value',   'QObject' + pointer_suffix)]:
-+                  ('any',    'value',   'QObject' + pointer_suffix),
-+                  ('null',   'null',    'QNull' + pointer_suffix)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type = QAPISchemaObjectType(
-             'q_empty', None, None, None, [], None)
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index 91ffb26..c72dbd8 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -93,7 +93,8 @@
- { 'struct': 'WrapAlternate',
-   'data': { 'alt': 'UserDefAlternate' } }
- { 'alternate': 'UserDefAlternate',
--  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int' } }
-+  'data': { 'udfu': 'UserDefFlatUnion', 'e': 'EnumOne', 'i': 'int',
-+            'n': 'null' } }
- 
- { 'struct': 'UserDefC',
-   'data': { 'string1': 'str', 'string2': 'str' } }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index b88b8aa..3b1e908 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -64,6 +64,7 @@ alternate UserDefAlternate
-     case udfu: UserDefFlatUnion
-     case e: EnumOne
-     case i: int
-+    case n: null
- object UserDefB
-     member intb: int optional=False
-     member a-b: bool optional=True
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index f98caf9..f451844 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -583,6 +583,11 @@ static void test_visitor_in_alternate(TestInputVisitorData *data,
-     g_assert_cmpint(tmp->u.e, ==, ENUM_ONE_VALUE1);
-     qapi_free_UserDefAlternate(tmp);
- 
-+    v = visitor_input_test_init(data, "null");
-+    visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-+    g_assert_cmpint(tmp->type, ==, QTYPE_QNULL);
-+    qapi_free_UserDefAlternate(tmp);
-+
-     v = visitor_input_test_init(data, "{'integer':1, 'string':'str', "
-                                 "'enum1':'value1', 'boolean':true}");
-     visit_type_UserDefAlternate(v, NULL, &tmp, &error_abort);
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-output-visitor.c
-index 8f1fcd4..7eb1620 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -424,6 +424,16 @@ static void test_visitor_out_alternate(TestOutputVisitorData *data,
- 
-     visitor_reset(data);
-     tmp = g_new0(UserDefAlternate, 1);
-+    tmp->type = QTYPE_QNULL;
-+    tmp->u.n = qnull();
-+
-+    visit_type_UserDefAlternate(data->ov, NULL, &tmp, &error_abort);
-+    g_assert_cmpint(qobject_type(visitor_get(data)), ==, QTYPE_QNULL);
-+
-+    qapi_free_UserDefAlternate(tmp);
-+
-+    visitor_reset(data);
-+    tmp = g_new0(UserDefAlternate, 1);
-     tmp->type = QTYPE_QDICT;
-     tmp->u.udfu.integer = 1;
-     tmp->u.udfu.string = g_strdup("str");
+diff --git a/hmp.c b/hmp.c
+index dae4604..d7b4727 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -313,12 +313,14 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRId64 "\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT],
+             params->cpu_throttle_increment);
++        assert(params->has_tls_creds);
+         monitor_printf(mon, "%s: '%s'\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
+-            params->has_tls_creds ? params->tls_creds : "");
++            params->tls_creds);
++        assert(params->has_tls_hostname);
+         monitor_printf(mon, "%s: '%s'\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
+-            params->has_tls_hostname ? params->tls_hostname : "");
++            params->tls_hostname);
+         assert(params->has_max_bandwidth);
+         monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
+             MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH],
+diff --git a/migration/migration.c b/migration/migration.c
+index 7615391..88b9277 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -444,9 +444,9 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->cpu_throttle_initial = s->parameters.cpu_throttle_initial;
+     params->has_cpu_throttle_increment = true;
+     params->cpu_throttle_increment = s->parameters.cpu_throttle_increment;
+-    params->has_tls_creds = !!s->parameters.tls_creds;
++    params->has_tls_creds = true;
+     params->tls_creds = g_strdup(s->parameters.tls_creds);
+-    params->has_tls_hostname = !!s->parameters.tls_hostname;
++    params->has_tls_hostname = true;
+     params->tls_hostname = g_strdup(s->parameters.tls_hostname);
+     params->has_max_bandwidth = true;
+     params->max_bandwidth = s->parameters.max_bandwidth;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 8b015be..62e7d07 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1054,9 +1054,7 @@
+ # @MigrationParameters:
+ #
+ # Optional members can be omitted on input ('migrate-set-parameters')
+-# but most members will always be present on output
+-# ('query-migrate-parameters'), with the exception of tls-creds and
+-# tls-hostname.
++# but members will always be present on output.
+ #
+ # @compress-level: compression level
+ #
+@@ -1077,10 +1075,10 @@
+ #             channel. On the outgoing side of the migration, the credentials
+ #             must be for a 'client' endpoint, while for the incoming side the
+ #             credentials must be for a 'server' endpoint. Setting this
+-#             will enable TLS for all migrations. The default is unset,
+-#             resulting in unsecured migration at the QEMU level. (Since 2.7)
++#             to a non-empty string enables TLS for all migrations.
+ #             An empty string means that QEMU will use plain text mode for
+-#             migration, rather than TLS (Since 2.9)
++#             migration, rather than TLS (Since 2.7)
++#             Note: 2.8 reports this by omitting tls-creds instead.
+ #
+ # @tls-hostname: hostname of the target host for the migration. This
+ #                is required when using x509 based TLS credentials and the
+@@ -1090,6 +1088,7 @@
+ #                certificate identity can be validated. (Since 2.7)
+ #                An empty string means that QEMU will use the hostname
+ #                associated with the migration URI, if any. (Since 2.9)
++#                Note: 2.8 reports this by omitting tls-hostname instead.
+ #
+ # @max-bandwidth: to set maximum speed for migration. maximum speed in
+ #                 bytes per second. (Since 2.8)
 -- 
 2.7.5
